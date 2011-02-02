@@ -62,18 +62,18 @@ public class RemoveReadWrites extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Read read) {
-		if(read.getTarget() != null) {			
+		if (read.getTarget() != null) {
 			read.getTarget().removeUse(read);
 		}
 		read.getPort().removeUse(read);
-		instructionIterator.remove();
+		itInstruction.remove();
 	}
 
 	@Override
 	public void visit(Write write) {
 		write.getTarget().removeUse(write);
 		write.getPort().removeUse(write);
-		instructionIterator.remove();
+		itInstruction.remove();
 	}
 
 }

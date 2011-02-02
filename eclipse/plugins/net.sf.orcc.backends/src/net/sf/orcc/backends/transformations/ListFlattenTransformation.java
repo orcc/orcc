@@ -114,7 +114,7 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 
 		// returns the load or store, and has the effect that instructions will
 		// be inserted before it
-		Instruction instruction = instructionIterator.previous();
+		Instruction instruction = itInstruction.previous();
 
 		for (Expression expr : indexes) {
 			int size;
@@ -144,7 +144,7 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 
 			// add the assign instruction for each index
 			Assign assign = new Assign(indexVar, expr);
-			instructionIterator.add(assign);
+			itInstruction.add(assign);
 
 			// size of the concatenated index
 			concatenatedSize += indexSize;
@@ -169,10 +169,10 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 		// add a special assign instruction that assigns the index variable the
 		// concatenation of index expressions
 		AssignIndex assignIndex = new AssignIndex(indexVar, listIndex, type);
-		instructionIterator.add(assignIndex);
+		itInstruction.add(assignIndex);
 
 		// so the load (or store) is not endlessly revisited
-		instructionIterator.next();
+		itInstruction.next();
 	}
 
 	@Override

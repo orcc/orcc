@@ -54,20 +54,20 @@ public class ListOfOneElementToScalarTransformation extends
 
 	@Override
 	public void visit(Read read) {
-		if (read.getNumTokens() == 1 && instructionIterator.hasNext()) {
-			Instruction instruction = instructionIterator.next();
+		if (read.getNumTokens() == 1 && itInstruction.hasNext()) {
+			Instruction instruction = itInstruction.next();
 			if (instruction.isLoad()) {
 				Load load = (Load) instruction;
-				
+
 				Variable oldTarget = read.getTarget();
 				read.setTarget(load.getTarget());
-				
+
 				// clean up uses
 				load.setTarget(null);
 				load.setSource(null);
-				
-				// remove instruction				
-				instructionIterator.remove();
+
+				// remove instruction
+				itInstruction.remove();
 				procedure.getLocals().remove(oldTarget.getName());
 			}
 		}
@@ -75,71 +75,72 @@ public class ListOfOneElementToScalarTransformation extends
 
 	@Override
 	public void visit(Write write) {
-		if (write.getNumTokens() == 1 && instructionIterator.hasPrevious()) {
-			instructionIterator.previous();
-			if (instructionIterator.hasPrevious()) {
-				Instruction instruction = instructionIterator.previous();
+		if (write.getNumTokens() == 1 && itInstruction.hasPrevious()) {
+			itInstruction.previous();
+			if (itInstruction.hasPrevious()) {
+				Instruction instruction = itInstruction.previous();
 				if (instruction.isStore()) {
 					Store store = (Store) instruction;
 					Expression expr = store.getValue();
-					
+
 					Variable oldTarget = write.getTarget();
 					Variable newTarget;
-					
+
 					// remove instruction
-					instructionIterator.remove();
+					itInstruction.remove();
 					procedure.getLocals().remove(oldTarget.getName());
-					
+
 					if (expr.isVarExpr()) {
 						VarExpr var = (VarExpr) expr;
 						newTarget = var.getVar().getVariable();
-						
-					}
-					else {
-						LocalVariable localNewTarget = procedure.newTempLocalVariable(null, expr.getType(), "scalar_" + oldTarget.getName());
+
+					} else {
+						LocalVariable localNewTarget = procedure
+								.newTempLocalVariable(null, expr.getType(),
+										"scalar_" + oldTarget.getName());
 						localNewTarget.setAssignable(true);
 						localNewTarget.setIndex(1);
-						
+
 						Assign assign = new Assign(localNewTarget, expr);
-						Use.addUses(assign, expr);						
-						
+						Use.addUses(assign, expr);
+
 						newTarget = localNewTarget;
-						
-						//instructionIterator.previous();
-						instructionIterator.add(assign);						
+
+						// instructionIterator.previous();
+						itInstruction.add(assign);
 					}
 					write.setTarget(newTarget);
 					newTarget.setInstruction(write);
-					instructionIterator.next();
-					
+					itInstruction.next();
+
 					// clean up uses
 					store.setTarget(null);
 					store.setValue(null);
 				}
-				if (instructionIterator.hasNext()) {
-					instructionIterator.next();
+				if (itInstruction.hasNext()) {
+					itInstruction.next();
 				}
 			}
 		}
 
 	}
-	
+
 	@Override
 	public void visit(Peek peek) {
-		if (peek.getNumTokens() == 1 && instructionIterator.hasNext()) {
-			Instruction instruction = instructionIterator.next();
+		if (peek.getNumTokens() == 1 && itInstruction.hasNext()) {
+			Instruction instruction = itInstruction.next();
 			if (instruction.isLoad()) {
 				Load load = (Load) instruction;
-				
+
 				Variable oldTarget = peek.getTarget();
 				peek.setTarget(load.getTarget());
-				
+
 				// clean up uses
 				load.setTarget(null);
 				load.setSource(null);
-				
+
 				// remove instruction
-				instructionIterator.remove();
+				itInstruction.remove();
 				procedure.getLocals().remove(oldTarget.getName());
 			}
 		}

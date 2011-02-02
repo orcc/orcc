@@ -124,7 +124,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 				Assign assign = new Assign(newVar, expr);
 
 				// Add assignement to instruction's list
-				instructionIterator.add(assign);
+				itInstruction.add(assign);
 
 				return new VarExpr(new Use(newVar));
 			}
@@ -163,7 +163,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			Assign newAssign = new Assign(location, target, varExpr);
 
 			// Add assignement to instruction's list
-			instructionIterator.add(newAssign);
+			itInstruction.add(newAssign);
 
 			return transitionVar;
 		} else if (castTarget.isExtended() || castTarget.isTrunced()) {
@@ -180,7 +180,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			Assign newAssign = new Assign(location, target, varExpr);
 
 			// Add assignement to instruction's list
-			instructionIterator.add(newAssign);
+			itInstruction.add(newAssign);
 
 			return transitionVar;
 		}
@@ -201,7 +201,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 		if (value.isBinaryExpr()) {
 			BinaryExpr binExpr = (BinaryExpr) value;
 
-			instructionIterator.previous();
+			itInstruction.previous();
 
 			Expression expr = (Expression) binExpr.accept(
 					new CastExprInterpreter(), binExpr.getType());
@@ -211,7 +211,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			}
 			Use.addUses(assign, expr);
 
-			instructionIterator.next();
+			itInstruction.next();
 
 			if (!binExpr.getOp().isComparison()) {
 				LocalVariable newVar = castTarget(assign.getTarget(),
@@ -232,11 +232,11 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			for (Expression parameter : parameters) {
 				Variable variable = variables
 						.get(parameters.indexOf(parameter));
-				instructionIterator.previous();
+				itInstruction.previous();
 				Expression newParam = (Expression) parameter.accept(
 						new CastExprInterpreter(), variable.getType());
 				parameters.set(parameters.indexOf(parameter), newParam);
-				instructionIterator.next();
+				itInstruction.next();
 			}
 			Use.addUses(call, call.getParameters());
 		}
@@ -262,12 +262,12 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			CFGNode node = phi.getBlock().getPredecessors().get(indexValue);
 
 			if (node.isBlockNode()) {
-				instructionIterator = ((BlockNode) node).lastListIterator();
+				itInstruction = ((BlockNode) node).lastListIterator();
 			} else if (node.isIfNode()) {
-				instructionIterator = ((IfNode) node).getJoinNode()
+				itInstruction = ((IfNode) node).getJoinNode()
 						.lastListIterator();
 			} else {
-				instructionIterator = ((WhileNode) node).getJoinNode()
+				itInstruction = ((WhileNode) node).getJoinNode()
 						.lastListIterator();
 			}
 
@@ -283,12 +283,12 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 		Type returnType = procedure.getReturnType();
 
 		if ((returnType != null) && (!returnType.isVoid())) {
-			instructionIterator.previous();
+			itInstruction.previous();
 			Expression value = returnInstr.getValue();
 			Expression newValue = (Expression) value.accept(
 					new CastExprInterpreter(), returnType);
 			returnInstr.setValue(newValue);
-			instructionIterator.next();
+			itInstruction.next();
 			Use.addUses(returnInstr, returnInstr.getValue());
 		}
 	}
@@ -298,7 +298,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 		Expression value = store.getValue();
 		Variable target = store.getTarget();
 
-		instructionIterator.previous();
+		itInstruction.previous();
 
 		Expression newValue = (Expression) value.accept(
 				new CastExprInterpreter(), target.getType());
@@ -308,6 +308,6 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			Use.addUses(store, newValue);
 		}
 
-		instructionIterator.next();
+		itInstruction.next();
 	}
 }

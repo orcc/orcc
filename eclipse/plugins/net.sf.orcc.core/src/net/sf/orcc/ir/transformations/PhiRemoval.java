@@ -61,7 +61,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 		@Override
 		public void visit(PhiAssignment instruction) {
-			instructionIterator.remove();
+			itInstruction.remove();
 		}
 
 		@Override
@@ -74,7 +74,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 	private void removePhis(BlockNode join) {
 		ListIterator<Instruction> it = join.listIterator();
 		while (it.hasNext()) {
-			instructionIterator = it;
+			itInstruction = it;
 			it.next().accept(new PhiRemover());
 		}
 	}
@@ -132,17 +132,17 @@ public class PhiRemoval extends AbstractActorTransformation {
 	@Override
 	public void visit(WhileNode node) {
 		// the node before the while.
-		if (nodeIterator.hasPrevious()) {
-			CFGNode previousNode = nodeIterator.previous();
+		if (itNode.hasPrevious()) {
+			CFGNode previousNode = itNode.previous();
 			if (previousNode.isBlockNode()) {
 				targetBlock = (BlockNode) previousNode;
 			} else {
 				targetBlock = new BlockNode(procedure);
-				nodeIterator.add(targetBlock);
+				itNode.add(targetBlock);
 			}
 		} else {
 			targetBlock = new BlockNode(procedure);
-			nodeIterator.add(targetBlock);
+			itNode.add(targetBlock);
 		}
 
 		BlockNode join = node.getJoinNode();
@@ -150,7 +150,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 		join.accept(this);
 
 		// go back to the while
-		nodeIterator.next();
+		itNode.next();
 
 		// last node of the while
 		targetBlock = BlockNode.getLast(procedure, node.getNodes());

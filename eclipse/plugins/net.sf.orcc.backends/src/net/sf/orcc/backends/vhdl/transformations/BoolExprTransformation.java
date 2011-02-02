@@ -107,7 +107,7 @@ public class BoolExprTransformation extends AbstractActorTransformation {
 		assign = new Assign(target, new BoolExpr(false));
 		block.add(assign);
 
-		nodeIterator.add(node);
+		itNode.add(node);
 	}
 
 	/**
@@ -126,10 +126,10 @@ public class BoolExprTransformation extends AbstractActorTransformation {
 		}
 
 		// adds this block after the IfNode
-		nodeIterator.add(block);
+		itNode.add(block);
 
 		// moves the iterator back so the new block will be visited next
-		nodeIterator.previous();
+		itNode.previous();
 	}
 
 	/**
@@ -152,9 +152,9 @@ public class BoolExprTransformation extends AbstractActorTransformation {
 
 				// removes this assign and moves remaining instructions to a new
 				// block
-				instructionIterator.previous();
-				instructionIterator.remove();
-				createNewBlock(instructionIterator);
+				itInstruction.previous();
+				itInstruction.remove();
+				createNewBlock(itInstruction);
 			}
 		}
 	}
@@ -176,8 +176,8 @@ public class BoolExprTransformation extends AbstractActorTransformation {
 				createIfNode(local, expr);
 
 				// moves this return and remaining instructions to a new block
-				instructionIterator.previous();
-				createNewBlock(instructionIterator);
+				itInstruction.previous();
+				createNewBlock(itInstruction);
 			}
 		}
 	}
@@ -194,8 +194,8 @@ public class BoolExprTransformation extends AbstractActorTransformation {
 				createIfNode(local, expr);
 
 				// moves this store and remaining instructions to a new block
-				instructionIterator.previous();
-				createNewBlock(instructionIterator);
+				itInstruction.previous();
+				createNewBlock(itInstruction);
 			}
 		}
 	}

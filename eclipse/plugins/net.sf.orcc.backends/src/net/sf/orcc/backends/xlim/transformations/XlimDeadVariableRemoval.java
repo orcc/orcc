@@ -33,7 +33,7 @@ public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 				((VarExpr) ternaryOperation.getFalseValue()).getVar().remove();
 
 				// remove instruction
-				instructionIterator.remove();
+				itInstruction.remove();
 
 				procedure.getLocals().remove(variable.getName());
 				changed = true;

@@ -89,15 +89,15 @@ public class AddGEPTransformation extends AbstractActorTransformation {
 		List<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			instructionIterator.previous();
+			itInstruction.previous();
 
 			Variable newSource = addGEP(source.getVariable(), target.getType(),
-					indexes, instructionIterator);
+					indexes, itInstruction);
 
 			load.setSource(new Use(newSource));
 			removeIndexes(load, indexes);
 
-			instructionIterator.next();
+			itInstruction.next();
 		}
 
 	}
@@ -108,16 +108,16 @@ public class AddGEPTransformation extends AbstractActorTransformation {
 		List<Expression> indexes = store.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			instructionIterator.previous();
+			itInstruction.previous();
 			TypeList typeList = (TypeList) target.getType();
 
 			Variable newTarget = addGEP(target, typeList.getElementType(),
-					indexes, instructionIterator);
+					indexes, itInstruction);
 
 			store.setTarget(newTarget);
 			removeIndexes(store, indexes);
 
-			instructionIterator.next();
+			itInstruction.next();
 		}
 	}
 

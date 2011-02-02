@@ -48,18 +48,17 @@ public class CustomPeekAdder extends AbstractActorTransformation {
 	@Override
 	public void visit(Peek peek) {
 		if (!peek.isUnit()) {
-			instructionIterator.remove();
-			while (instructionIterator.hasNext()) {
-				Instruction instruction = instructionIterator.next();
+			itInstruction.remove();
+			while (itInstruction.hasNext()) {
+				Instruction instruction = itInstruction.next();
 				if (instruction.isLoad()) {
 					Load load = (Load) instruction;
 					if (load.getSource().getVariable() == peek.getTarget()) {
-						instructionIterator.remove();
+						itInstruction.remove();
 						int index = ((IntExpr) load.getIndexes().get(0))
 								.getIntValue();
-						instructionIterator.add(new CustomPeek(peek
-								.getLocation(), peek.getPort(), index, load
-								.getTarget()));
+						itInstruction.add(new CustomPeek(peek.getLocation(),
+								peek.getPort(), index, load.getTarget()));
 					} else {
 						return;
 					}

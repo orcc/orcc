@@ -106,7 +106,7 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 	@Override
 	public void visit(Write write) {
 		writes.add(write);
-		instructionIterator.set(new WriteEnd(write));
+		itInstruction.set(new WriteEnd(write));
 	}
 
 }

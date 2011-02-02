@@ -75,7 +75,7 @@ public class TernaryOperationAdder extends AbstractActorTransformation {
 		ListIterator<Instruction> it = blockNode.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
-			instructionIterator = it;
+			itInstruction = it;
 			if (instruction.isPhi()) {
 				PhiAssignment phi = (PhiAssignment) instruction;
 

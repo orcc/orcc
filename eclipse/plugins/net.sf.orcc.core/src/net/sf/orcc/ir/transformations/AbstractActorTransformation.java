@@ -65,11 +65,11 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 
 	protected Actor actor;
 
-	protected ListIterator<Instruction> instructionIterator;
-
 	protected ListIterator<Action> itAction;
 
-	protected ListIterator<CFGNode> nodeIterator;
+	protected ListIterator<Instruction> itInstruction;
+
+	protected ListIterator<CFGNode> itNode;
 
 	protected Procedure procedure;
 
@@ -114,7 +114,7 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 		ListIterator<Instruction> it = blockNode.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
-			instructionIterator = it;
+			itInstruction = it;
 			instruction.accept(this);
 		}
 	}
@@ -142,7 +142,7 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 		ListIterator<CFGNode> it = nodes.listIterator();
 		while (it.hasNext()) {
 			CFGNode node = it.next();
-			nodeIterator = it;
+			itNode = it;
 			node.accept(this);
 		}
 	}

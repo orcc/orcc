@@ -54,14 +54,14 @@ import net.sf.orcc.ir.nodes.IfNode;
 public class DeadCodeElimination extends AbstractActorTransformation {
 
 	private void addNodes(List<CFGNode> nodes, BlockNode join, int index) {
-		nodeIterator.previous();
-		nodeIterator.remove();
+		itNode.previous();
+		itNode.remove();
 
 		for (CFGNode node : nodes) {
-			nodeIterator.add(node);
+			itNode.add(node);
 		}
 
-		nodeIterator.add(join);
+		itNode.add(join);
 		replacePhis(join, index);
 	}
 

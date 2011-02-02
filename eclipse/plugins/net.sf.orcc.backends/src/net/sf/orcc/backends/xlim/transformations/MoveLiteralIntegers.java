@@ -135,27 +135,27 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	@Override
 	public void visit(Assign assign) {
 		assign.setValue((Expression) assign.getValue().accept(exprInterpreter,
-				instructionIterator));
+				itInstruction));
 		Use.addUses(assign, assign.getValue());
 	}
 
 	@Override
 	public void visit(IfNode ifNode) {
 		// Check the presence of a BlockNode before and create one if needed
-		if (instructionIterator == null) {
+		if (itInstruction == null) {
 			Procedure procedure = ifNode.getProcedure();
 			int index = procedure.getNodes().indexOf(ifNode);
 			BlockNode newBlock = new BlockNode(procedure);
 			procedure.getNodes().add(index, newBlock);
-			instructionIterator = newBlock.getInstructions().listIterator();
+			itInstruction = newBlock.getInstructions().listIterator();
 		}
-		ListIterator<Instruction> instructionIteratorBackup = instructionIterator;
+		ListIterator<Instruction> instructionIteratorBackup = itInstruction;
 		ifNode.setValue((Expression) ifNode.getValue().accept(exprInterpreter,
-				instructionIterator));
+				itInstruction));
 		visit(ifNode.getThenNodes());
-		instructionIterator = instructionIteratorBackup;
+		itInstruction = instructionIteratorBackup;
 		visit(ifNode.getElseNodes());
-		instructionIterator = instructionIteratorBackup;
+		itInstruction = instructionIteratorBackup;
 		// Unusually visit method to doesn't add new instructions in join node
 		for (Instruction instr : ifNode.getJoinNode().getInstructions()) {
 			instr.accept(this);
@@ -176,8 +176,8 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	public void visit(PhiAssignment phi) {
 		ListIterator<Expression> it = phi.getValues().listIterator();
 		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(exprInterpreter,
-					instructionIterator));
+			it.set((Expression) it.next()
+					.accept(exprInterpreter, itInstruction));
 		}
 		Use.addUses(phi, phi.getValues());
 	}
@@ -190,7 +190,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	@Override
 	public void visit(Store store) {
 		store.setValue((Expression) store.getValue().accept(exprInterpreter,
-				instructionIterator));
+				itInstruction));
 		Use.addUses(store, store.getValue());
 	}
 
@@ -199,19 +199,18 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		if (node instanceof TernaryOperation) {
 			TernaryOperation ternaryOperation = (TernaryOperation) node;
 
-			ternaryOperation.setConditionValue((Expression) ternaryOperation
-					.getConditionValue().accept(exprInterpreter,
-							instructionIterator));
+			ternaryOperation
+					.setConditionValue((Expression) ternaryOperation
+							.getConditionValue().accept(exprInterpreter,
+									itInstruction));
 			Use.addUses(ternaryOperation, ternaryOperation.getConditionValue());
 
 			ternaryOperation.setTrueValue((Expression) ternaryOperation
-					.getTrueValue()
-					.accept(exprInterpreter, instructionIterator));
+					.getTrueValue().accept(exprInterpreter, itInstruction));
 			Use.addUses(ternaryOperation, ternaryOperation.getTrueValue());
 
 			ternaryOperation.setFalseValue((Expression) ternaryOperation
-					.getFalseValue().accept(exprInterpreter,
-							instructionIterator));
+					.getFalseValue().accept(exprInterpreter, itInstruction));
 			Use.addUses(ternaryOperation, ternaryOperation.getFalseValue());
 		}
 	}
@@ -219,18 +218,18 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	@Override
 	public void visit(WhileNode whileNode) {
 		// Check the presence of a BlockNode before and create one if needed
-		if (instructionIterator == null) {
+		if (itInstruction == null) {
 			Procedure procedure = whileNode.getProcedure();
 			int index = procedure.getNodes().indexOf(whileNode);
 			BlockNode newBlock = new BlockNode(procedure);
 			procedure.getNodes().add(index, newBlock);
-			instructionIterator = newBlock.getInstructions().listIterator();
+			itInstruction = newBlock.getInstructions().listIterator();
 		}
-		ListIterator<Instruction> instructionIteratorBackup = instructionIterator;
+		ListIterator<Instruction> instructionIteratorBackup = itInstruction;
 		whileNode.setValue((Expression) whileNode.getValue().accept(
-				exprInterpreter, instructionIterator));
+				exprInterpreter, itInstruction));
 		visit(whileNode.getNodes());
-		instructionIterator = instructionIteratorBackup;
+		itInstruction = instructionIteratorBackup;
 		// Unusually visit method to doesn't add new instructions in join node
 		for (Instruction instr : whileNode.getJoinNode().getInstructions()) {
 			instr.accept(this);

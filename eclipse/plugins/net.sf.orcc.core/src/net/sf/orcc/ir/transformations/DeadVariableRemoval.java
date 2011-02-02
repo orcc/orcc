@@ -76,7 +76,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			assign.setValue(null);
 
 			// remove instruction
-			instructionIterator.remove();
+			itInstruction.remove();
 
 			procedure.getLocals().remove(variable.getName());
 			changed = true;
@@ -98,7 +98,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 				call.setTarget(null);
 
 				// remove instruction
-				instructionIterator.remove();
+				itInstruction.remove();
 
 				// remove result
 				procedure.getLocals().remove(variable.getName());
@@ -122,7 +122,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			Use.removeUses(load, load.getIndexes());
 
 			// remove instruction
-			instructionIterator.remove();
+			itInstruction.remove();
 
 			procedure.getLocals().remove(target.getName());
 			changed = true;
@@ -143,7 +143,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			peek.setPort(null);
 
 			// remove instruction
-			instructionIterator.remove();
+			itInstruction.remove();
 
 			procedure.getLocals().remove(variable.getName());
 			changed = true;
@@ -169,7 +169,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			}
 
 			// remove instruction
-			instructionIterator.remove();
+			itInstruction.remove();
 
 			procedure.getLocals().remove(variable.getName());
 			changed = true;
@@ -237,7 +237,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			store.setValue(null);
 
 			// remove instruction
-			instructionIterator.remove();
+			itInstruction.remove();
 
 			procedure.getLocals().remove(target.getName());
 			changed = true;

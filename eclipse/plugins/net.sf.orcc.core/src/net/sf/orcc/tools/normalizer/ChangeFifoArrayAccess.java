@@ -81,7 +81,7 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 					IrFactory.eINSTANCE.createTypeInt(32)));
 			use.setNode(store);
 
-			instructionIterator.add(store);
+			itInstruction.add(store);
 		} else {
 			System.err.println("TODO index");
 		}

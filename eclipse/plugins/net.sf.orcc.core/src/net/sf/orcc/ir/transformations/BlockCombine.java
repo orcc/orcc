@@ -54,7 +54,7 @@ public class BlockCombine extends AbstractActorTransformation {
 			previous.add(node);
 
 			// remove this block
-			nodeIterator.remove();
+			itNode.remove();
 		}
 	}
 
