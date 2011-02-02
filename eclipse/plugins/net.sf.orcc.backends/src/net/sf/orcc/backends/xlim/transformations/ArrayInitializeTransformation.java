@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -58,7 +57,7 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		// Initialize value field if there is an initial value
 		for (Variable stateVar : actor.getStateVars()) {
 			Expression initConst = ((GlobalVariable) stateVar)

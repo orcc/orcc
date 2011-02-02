@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
@@ -55,7 +54,7 @@ import net.sf.orcc.ir.transformations.BuildCFG;
  */
 public class ThreeAddressCodeTransformation extends AbstractActorTransformation {
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		ActorTransformation[] transformations = {
 				new CopyPropagationTransformation(),
 				new ExpressionSplitterTransformation(), new BuildCFG(),

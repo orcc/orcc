@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.instructions.AssignIndex;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -177,7 +176,7 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		if (applyToDeclarations) {
 			// VHDL synthesizers don't support multi-dimensional memory yet
 			for (GlobalVariable variable : actor.getStateVars()) {

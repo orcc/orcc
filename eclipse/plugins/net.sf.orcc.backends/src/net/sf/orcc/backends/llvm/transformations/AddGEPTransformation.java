@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.llvm.instructions.GEP;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -78,7 +77,7 @@ public class AddGEPTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		this.file = actor.getFile();
 		super.transform(actor);
 	}

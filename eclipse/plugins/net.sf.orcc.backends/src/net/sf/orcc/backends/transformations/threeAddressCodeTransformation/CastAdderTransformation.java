@@ -30,7 +30,6 @@ package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Cast;
@@ -166,7 +165,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			// Add assignement to instruction's list
 			instructionIterator.add(newAssign);
 
-			return transitionVar;			
+			return transitionVar;
 		} else if (castTarget.isExtended() || castTarget.isTrunced()) {
 			Location location = target.getLocation();
 
@@ -190,7 +189,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		this.file = actor.getFile();
 		super.transform(actor);
 	}

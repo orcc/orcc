@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -168,7 +167,7 @@ public class ExpressionSplitterTransformation extends
 	}
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		this.file = actor.getFile();
 		super.transform(actor);
 	}

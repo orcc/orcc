@@ -31,7 +31,6 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -128,7 +127,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	private String file;
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		this.file = actor.getFile();
 		super.transform(actor);
 	}

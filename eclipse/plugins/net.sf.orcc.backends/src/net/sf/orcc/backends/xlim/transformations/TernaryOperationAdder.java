@@ -30,7 +30,6 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.ListIterator;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -60,7 +59,7 @@ public class TernaryOperationAdder extends AbstractActorTransformation {
 	private LocalVariable condVar;
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			if (!proc.getReturnType().isVoid()) {
 				newBlockNode = new BlockNode(proc);

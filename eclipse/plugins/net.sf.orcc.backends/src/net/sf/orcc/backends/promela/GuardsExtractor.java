@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -63,15 +62,15 @@ public class GuardsExtractor extends AbstractActorTransformation {
 	private Map<Action, List<Peek>> peeks;
 
 	private Map<Action, List<Load>> loads;
-	
+
 	private List<Expression> guardList;
 
 	private List<Load> loadList;
 
 	private List<Load> usedLoadsList;
-	
+
 	private List<Peek> peekList;
-	
+
 	private int peekCnt = 0;
 
 	public GuardsExtractor(Map<Action, List<Expression>> guards,
@@ -90,11 +89,13 @@ public class GuardsExtractor extends AbstractActorTransformation {
 			guards.get(action).add(0, new BoolExpr(true));
 		}
 		// add the guards from the previous actions as not guard
-		for (Expression expr : prevGuards){
+		for (Expression expr : prevGuards) {
 			prty = new UnaryExpr(UnaryOp.LOGIC_NOT, expr, expr.getType());
 			guards.get(action).add(prty);
 		}
-		prevGuards.add(guards.get(action).get(0)); // TODO: if the original guard is more than 1 expr this will not work
+		prevGuards.add(guards.get(action).get(0)); // TODO: if the original
+													// guard is more than 1 expr
+													// this will not work
 	}
 
 	// If the local variable derived from this variable is used in an expression
@@ -106,7 +107,8 @@ public class GuardsExtractor extends AbstractActorTransformation {
 			// do not remove the Loads related to Peeks
 			if (isFromPeek(ld)) {
 				usedLoadsList.add(ld);
-				ld.getTarget().setName(ld.getTarget().getBaseName()+"_peek_"+peekCnt++);
+				ld.getTarget().setName(
+						ld.getTarget().getBaseName() + "_peek_" + peekCnt++);
 				continue;
 			}
 			ListIterator<Expression> itr = guardList.listIterator();
@@ -116,18 +118,18 @@ public class GuardsExtractor extends AbstractActorTransformation {
 			}
 		}
 	}
-	
+
 	private boolean isFromPeek(Load ld) {
 		ListIterator<Peek> peekIter = peekList.listIterator();
-		while (peekIter.hasNext()){
+		while (peekIter.hasNext()) {
 			Peek pk = peekIter.next();
-			if (ld.getSource().getVariable() == pk.getTarget()){
+			if (ld.getSource().getVariable() == pk.getTarget()) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	// recursively searches through the expression and finds if the local
 	// variable derived from the Load is present
 	private void replaceVarInExpr(Expression expr, Load ld) {
@@ -143,7 +145,7 @@ public class GuardsExtractor extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		for (Action action : actor.getActions()) {
 			currAction = action;
 			guardList = new ArrayList<Expression>();
@@ -201,7 +203,7 @@ public class GuardsExtractor extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Peek peek) {
-		peekList.add(peek); 
+		peekList.add(peek);
 	}
 
 }

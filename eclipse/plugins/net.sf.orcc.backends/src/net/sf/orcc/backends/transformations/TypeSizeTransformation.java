@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.transformations;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -84,7 +83,7 @@ public class TypeSizeTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
 		checkVariables(actor.getInputs());
