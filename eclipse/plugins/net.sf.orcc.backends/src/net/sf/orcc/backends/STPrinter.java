@@ -39,21 +39,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionPrinter;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.impl.TypeBoolImpl;
-import net.sf.orcc.ir.impl.TypeFloatImpl;
-import net.sf.orcc.ir.impl.TypeIntImpl;
-import net.sf.orcc.ir.impl.TypeListImpl;
-import net.sf.orcc.ir.impl.TypeStringImpl;
-import net.sf.orcc.ir.impl.TypeUintImpl;
-import net.sf.orcc.ir.impl.TypeVoidImpl;
 import net.sf.orcc.ir.type.TypePrinter;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -168,23 +154,8 @@ public final class STPrinter {
 		STGroup.debug = false;
 
 		// register renderers
-		AttributeRenderer renderer;
-
-		Class<?>[] classesExpression = { BinaryExpr.class, BoolExpr.class,
-				IntExpr.class, ListExpr.class, StringExpr.class,
-				UnaryExpr.class, VarExpr.class };
-		renderer = new ExpressionRenderer();
-		for (Class<?> clasz : classesExpression) {
-			group.registerRenderer(clasz, renderer);
-		}
-
-		Class<?>[] classesType = { TypeBoolImpl.class, TypeFloatImpl.class,
-				TypeIntImpl.class, TypeListImpl.class, TypeStringImpl.class,
-				TypeUintImpl.class, TypeVoidImpl.class };
-		renderer = new TypeRenderer();
-		for (Class<?> clasz : classesType) {
-			group.registerRenderer(clasz, renderer);
-		}
+		group.registerRenderer(Expression.class, new ExpressionRenderer());
+		group.registerRenderer(Type.class, new TypeRenderer());
 	}
 
 	/**
