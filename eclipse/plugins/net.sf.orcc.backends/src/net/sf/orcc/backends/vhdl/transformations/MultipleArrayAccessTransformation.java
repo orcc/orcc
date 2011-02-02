@@ -32,17 +32,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
+import net.sf.orcc.util.UniqueEdge;
+
+import org.jgrapht.DirectedGraph;
 
 /**
  * This transformation transforms an actor so that there is at most one access
@@ -56,84 +61,17 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 public class MultipleArrayAccessTransformation extends
 		AbstractActorTransformation {
 
-	/**
-	 * This class counts the number of loads/stores to each given array.
-	 * 
-	 */
-	private static class RWCounter extends AbstractActorTransformation {
+	private Action action;
 
-		private Map<Variable, Integer> numRW;
+	private FSM fsm;
 
-		public RWCounter() {
-			numRW = new HashMap<Variable, Integer>();
-		}
+	private Map<Variable, Integer> numRW;
 
-		public Map<Variable, Integer> getMap() {
-			return numRW;
-		}
+	private String sourceName;
 
-		@Override
-		public void visit(IfNode ifNode) {
-			// the idea is that branches of a "if" are exclusive
-			// so the number of accesses to consider is the max in each branch
-			// rather than the sum
+	private Map<String, Integer> stateNames;
 
-			Map<Variable, Integer> before = new HashMap<Variable, Integer>(
-					numRW);
-			visit(ifNode.getThenNodes());
-			Map<Variable, Integer> numThen = numRW;
-
-			numRW = new HashMap<Variable, Integer>(before);
-			visit(ifNode.getElseNodes());
-			Map<Variable, Integer> numElse = numRW;
-			numRW = before;
-
-			for (Entry<Variable, Integer> entryT : numThen.entrySet()) {
-				Variable var = entryT.getKey();
-				if (numElse.containsKey(var)) {
-					numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
-				}
-			}
-			for (Entry<Variable, Integer> entryE : numElse.entrySet()) {
-				Variable var = entryE.getKey();
-				if (numThen.containsKey(var)) {
-					numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
-				}
-			}
-
-			visit(ifNode.getJoinNode());
-		}
-
-		@Override
-		public void visit(Load load) {
-			visitLoadStore(load.getSource().getVariable(), load.getIndexes());
-		}
-
-		@Override
-		public void visit(Store store) {
-			visitLoadStore(store.getTarget(), store.getIndexes());
-		}
-
-		/**
-		 * Visits a load or a store, and updates the numRW map.
-		 * 
-		 * @param variable
-		 *            a variable
-		 * @param indexes
-		 *            a list of indexes
-		 */
-		private void visitLoadStore(Variable variable, List<Expression> indexes) {
-			if (!indexes.isEmpty()) {
-				Integer numAccesses = numRW.get(variable);
-				if (numAccesses == null) {
-					numRW.put(variable, 1);
-				} else {
-					numRW.put(variable, numAccesses + 1);
-				}
-			}
-		}
-
-	}
+	private String targetName;
 
 	/**
 	 * Adds an FSM to the given action scheduler.
@@ -142,7 +80,7 @@ public class MultipleArrayAccessTransformation extends
 	 *            action scheduler
 	 */
 	private void addFsm(ActionScheduler actionScheduler) {
-		FSM fsm = new FSM();
+		fsm = new FSM();
 		fsm.setInitialState("init");
 		fsm.addState("init");
 		for (Action action : actionScheduler.getActions()) {
@@ -154,29 +92,124 @@ public class MultipleArrayAccessTransformation extends
 	}
 
 	@Override
+	public void transform(Actor actor) {
+		fsm = actor.getActionScheduler().getFsm();
+		if (fsm == null) {
+			for (Action action : actor.getActionScheduler().getActions()) {
+				sourceName = "init";
+				targetName = "init";
+				visit(action);
+			}
+		} else {
+			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
+			Set<UniqueEdge> edges = graph.edgeSet();
+			for (UniqueEdge edge : edges) {
+				State source = graph.getEdgeSource(edge);
+				sourceName = source.getName();
+
+				State target = graph.getEdgeTarget(edge);
+				targetName = target.getName();
+
+				Action action = (Action) edge.getObject();
+				visit(action);
+			}
+		}
+	}
+
+	private void updateTransitions() {
+		// add an FSM if the actor does not have one
+		if (fsm == null) {
+			addFsm(actor.getActionScheduler());
+		}
+
+		// get unique state name
+		String stateName = targetName + "_" + action.getName();
+		Integer count = stateNames.get(stateName);
+		if (count == null) {
+			count = 1;
+		}
+		stateNames.put(stateName, count + 1);
+		stateName = stateName + "_" + count;
+
+		// add state
+		fsm.addState(stateName);
+
+		// update transitions
+		fsm.removeTransition(sourceName, targetName, action);
+		fsm.addTransition(sourceName, stateName, action);
+		fsm.addTransition(stateName, targetName, action);
+	}
+
+	@Override
 	public void visit(Action action) {
 		// we are only interested in the body
+		this.action = action;
 		visit(action.getBody());
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
-		RWCounter counter = new RWCounter();
-		counter.visit(procedure);
+	public void visit(IfNode ifNode) {
+		// the idea is that branches of a "if" are exclusive
+		// so the number of accesses to consider is the max in each branch
+		// rather than the sum
 
-		Map<Variable, Integer> numRW = counter.getMap();
-		boolean needsTransformation = false;
-		for (Integer value : numRW.values()) {
-			if (value > 1) {
-				needsTransformation = true;
-				break;
+		Map<Variable, Integer> before = new HashMap<Variable, Integer>(numRW);
+		visit(ifNode.getThenNodes());
+		Map<Variable, Integer> numThen = numRW;
+
+		numRW = new HashMap<Variable, Integer>(before);
+		visit(ifNode.getElseNodes());
+		Map<Variable, Integer> numElse = numRW;
+		numRW = before;
+
+		for (Entry<Variable, Integer> entryT : numThen.entrySet()) {
+			Variable var = entryT.getKey();
+			if (numElse.containsKey(var)) {
+				numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
+			}
+		}
+		for (Entry<Variable, Integer> entryE : numElse.entrySet()) {
+			Variable var = entryE.getKey();
+			if (numThen.containsKey(var)) {
+				numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
 			}
 		}
 
-		if (needsTransformation) {
-			FSM fsm = actor.getActionScheduler().getFsm();
-			if (fsm == null) {
-				addFsm(actor.getActionScheduler());
+		visit(ifNode.getJoinNode());
+	}
+
+	@Override
+	public void visit(Load load) {
+		visitLoadStore(load.getSource().getVariable(), load.getIndexes());
+	}
+
+	@Override
+	public void visit(Store store) {
+		visitLoadStore(store.getTarget(), store.getIndexes());
+	}
+
+	/**
+	 * Visits a load or a store, and updates the numRW map.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @param indexes
+	 *            a list of indexes
+	 */
+	private void visitLoadStore(Variable variable, List<Expression> indexes) {
+		if (!indexes.isEmpty()) {
+			Integer numAccesses = numRW.get(variable);
+			if (numAccesses == null) {
+				numRW.put(variable, 1);
+			} else {
+				// need to cut here!
+				numRW.put(variable, numAccesses + 1);
+
+				updateTransitions();
+
+				// move this instruction and all following blocks to another
+				// action
+				// Action newAction = createNewAction();
 			}
 		}
 	}

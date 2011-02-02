@@ -47,6 +47,7 @@ import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
+import net.sf.orcc.backends.vhdl.transformations.MultipleArrayAccessTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transformations.VariableRedimension;
 import net.sf.orcc.interpreter.ActorInterpreter;
@@ -113,7 +114,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new TransformConditionals(),
 
 				// transform multiple array accesses
-				// new MultipleArrayAccessTransformation(),
+				new MultipleArrayAccessTransformation(),
 
 				//
 				new ListFlattenTransformation(true, false, true),
