@@ -51,25 +51,24 @@ signal <portType(port=port, IOtype=" ", dataType="idata")>
 
 signalDeclaration(variable) ::= <<
 <if(variable.port)
->
-signal <variable> : <variable.type>;<
-else
+>signal <variable> : <variable.type>;
+<else
 ><if(!variable.type.list)
   ><if(!variable.assignable)
-    >constant <variable> : <variable.type> := <variable.initialValue>;<
-    else
-    >signal <variable> : <variable.type>;<
-    endif><
+    >constant <variable> : <variable.type> := <variable.initialValue>;
+    <else
+    >signal <variable> : <variable.type>;
+    <endif><
   else
   ><if(!variable.assignable)
     ><if(variable.initialized)
       >type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
-constant <variable> : memory_type_<variable> := <variable.initialValue>;<
-      endif><
+constant <variable> : memory_type_<variable> := <variable.initialValue>;
+      <endif><
     else
     >type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
-signal <variable> : memory_type_<variable>;<
-    endif><
+signal <variable> : memory_type_<variable>;
+   <endif><
   endif><
 endif>
 >>
@@ -565,7 +564,11 @@ printActionFire(action) ::= <<
     <action.inputPattern.keys : {port|<port.name>_ack \<= isSchedulable_<action>_go;} ; separator="\n"><
   endif><
 else
+>< if(action.outputPattern.keys)
+>    <action>_go  \<= isSchedulable_<action>_go and <action.outputPattern.keys : {port|<port.name>_rdy}; separator=" and ">;<
+  else
 >    <action>_go  \<= isSchedulable_<action>_go;<
+  endif><
 endif>  
 >>
 
