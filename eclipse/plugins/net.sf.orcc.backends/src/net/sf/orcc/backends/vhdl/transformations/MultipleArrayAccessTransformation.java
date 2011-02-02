@@ -31,6 +31,7 @@ package net.sf.orcc.backends.vhdl.transformations;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -38,8 +39,10 @@ import java.util.Set;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.IrFactory;
@@ -69,6 +72,36 @@ import org.jgrapht.DirectedGraph;
  */
 public class MultipleArrayAccessTransformation extends
 		AbstractActorTransformation {
+
+	private class CodeMover extends AbstractActorTransformation {
+
+		public CodeMover() {
+
+		}
+
+		public void moveCode(Procedure oldProc, Procedure newProc) {
+			// move instructions
+			BlockNode block = BlockNode.getLast(newProc);
+			ListIterator<Instruction> itInstr = MultipleArrayAccessTransformation.this.itInstruction;
+			Instruction instruction = itInstr.previous();
+			itInstr.remove();
+			block.add(instruction);
+			while (itInstr.hasNext()) {
+				instruction = itInstr.next();
+				itInstr.remove();
+				block.add(instruction);
+			}
+
+			// move next nodes
+			ListIterator<CFGNode> itNode = MultipleArrayAccessTransformation.this.itNode;
+			while (itNode.hasNext()) {
+				CFGNode node = itNode.next();
+				itNode.remove();
+				newProc.getNodes().add(node);
+			}
+		}
+
+	}
 
 	private Action action;
 
@@ -192,15 +225,14 @@ public class MultipleArrayAccessTransformation extends
 		fsm.removeTransition(sourceName, targetName, action);
 		fsm.addTransition(sourceName, stateName, action);
 		fsm.addTransition(stateName, targetName, newAction);
-		
-		// set new source state to the new state name
-		sourceName = stateName;
 	}
 
 	@Override
 	public void visit(Action action) {
-		// we are only interested in the body
 		this.action = action;
+		numRW.clear();
+		
+		// we are only interested in the body
 		visit(action.getBody());
 	}
 
@@ -259,19 +291,21 @@ public class MultipleArrayAccessTransformation extends
 			if (numAccesses == null) {
 				numRW.put(variable, 1);
 			} else {
-				// need to cut here!
-				numRW.put(variable, numAccesses + 1);
-
 				// new name for action/state
 				String newActionName = createName();
 
 				// create new action
 				Action newAction = createNewAction(newActionName);
-				
-				// CUT!
+
+				// move code
+				new CodeMover().moveCode(action.getBody(), newAction.getBody());
 
 				// update transitions
 				updateTransitions(newAction);
+				
+				// set new source state to the new state name
+				sourceName = newActionName;
+				visit(newAction);
 			}
 		}
 	}

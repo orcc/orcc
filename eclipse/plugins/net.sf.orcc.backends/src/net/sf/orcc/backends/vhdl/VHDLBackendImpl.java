@@ -112,11 +112,14 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new BoolExprTransformation(),
 
 				new TransformConditionals(),
+				
+				// TODO: transform while loops
+				// should be done before MAAT
 
 				// transform multiple array accesses
 				new MultipleArrayAccessTransformation(),
 
-				//
+				// flattens multi-dimensional arrays
 				new ListFlattenTransformation(true, false, true),
 
 				// renames variables so we can inline them in the template
