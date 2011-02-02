@@ -60,6 +60,7 @@ class LLVMExecution;
 class Configuration;
 class BroadcastAdder;
 
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Scheduler/Scheduler.h"
 //------------------------------
 

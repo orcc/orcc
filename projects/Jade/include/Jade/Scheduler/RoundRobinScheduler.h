@@ -71,8 +71,6 @@ public:
 	RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool verbose = false);
 	~RoundRobinScheduler();
 
-	void stop(pthread_t* thread);
-
 	llvm::Function* getMainFunction(){return scheduler;};
 	
 	void setExternalFunctions(LLVMExecution* executionEngine);

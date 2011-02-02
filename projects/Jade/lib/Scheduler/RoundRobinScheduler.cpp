@@ -126,11 +126,6 @@ void RoundRobinScheduler::createSchedulerFn(){
 	schedBrInst = BranchInst::Create(BBReturn, schedulerBB, stopVal, schedulerBB);
 }
 
-void RoundRobinScheduler::stop(pthread_t* thread){
-
-	stop(thread);
-}
-
 void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 
 	//Get configuration of the decoder
@@ -159,7 +154,6 @@ void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 	Procedure* setVideo = display->getProcedure("set_video");
 	Procedure* setInit = display->getProcedure("set_init");
 	Procedure* writeMb = display->getProcedure("write_mb");
-	Display* displayTest = new Display();
 /*
 	if(nodisplay){
 		executionEngine->mapProcedure(setVideo, (void *)emptyFunc);

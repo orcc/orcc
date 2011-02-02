@@ -75,9 +75,6 @@ extern cl::list<std::string> MAttrs;
 extern cl::opt<std::string> MCPU;
 extern cl::opt<std::string> TargetTriple;
 
-extern "C" void (*write_mb(Display*))();
-extern "C" void (*set_video(Display*))(int, int);
-
 //===----------------------------------------------------------------------===//
 // main Driver function
 //
@@ -153,7 +150,11 @@ void* LLVMExecution::getExit() {
 }
 
 void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
-	EE->addGlobalMapping(procedure->getFunction(), Addr);
+	Function* function = procedure->getFunction();
+	
+	if (EE->getPointerToGlobalIfAvailable(function) == NULL){
+		EE->addGlobalMapping(function, Addr);
+	}
 }
 
 bool LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
@@ -201,8 +202,49 @@ void LLVMExecution::run() {
 }
 
 void LLVMExecution::setIO(){
+	Configuration* configuration = decoder->getConfiguration();
+	
+	//Set input of the decoder
+	Instance* in = configuration->getInstance("source");
+	
+	if (in != NULL){
+		setIn(in);
+	}
+
+	//Set output of the decoder
+	Instance* out = configuration->getInstance("display");
+
+	if (out != NULL){
+		setOut(out);
+	}
+}
+
+void LLVMExecution::setIn(Instance* instance){
 
 }
+
+void  LLVMExecution::setOut(Instance* instance){
+	display = new Display(1);
+
+	//Set var display
+	StateVar* stateVar = instance->getStateVar("display");
+	Display** ptrDisplay = (Display**)getGVPtr(stateVar->getGlobalVariable());
+	*ptrDisplay = display;
+
+	//Set setvideo procedure
+	Procedure* setVideoProc = instance->getProcedure("set_video");
+	if (setVideoProc != NULL){
+		mapProcedure(setVideoProc, (void*)set_video);
+	}
+
+	//Set writemb procedure
+	Procedure* writeMbProc = instance->getProcedure("write_mb");
+	if (writeMbProc != NULL){
+		mapProcedure(writeMbProc, (void*)write_mb);
+	}
+
+}
+
 
 void LLVMExecution::runFunction(Function* function) {
 	std::vector<GenericValue> noargs;
@@ -210,8 +252,7 @@ void LLVMExecution::runFunction(Function* function) {
 }
 
 void LLVMExecution::stop(pthread_t* thread) {
-	Scheduler* scheduler = decoder->getScheduler();
-	scheduler->stop(thread);
+	display->forceStop(thread);
 }
 
 void LLVMExecution::recompile(Function* function) {
@@ -223,7 +264,7 @@ bool LLVMExecution::isCompiledGV(llvm::GlobalVariable* gv){
 }
 
 void* LLVMExecution::getGVPtr(llvm::GlobalVariable* gv){
-	return EE->getPointerToGlobalIfAvailable(gv);
+	return EE->getPointerToGlobal(gv);
 }
 
 void LLVMExecution::clear() {
@@ -251,9 +292,8 @@ void LLVMExecution::setInputStimulus(std::string input){
 	sourceFile->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
 
 	//Check if source has been previously compiled
-	void* sourcePr = getGVPtr(sourceFile);
-
-	if (sourcePr != NULL){
+	if (isCompiledGV(sourceFile)){
+		void* sourcePr = getGVPtr(sourceFile);
 		EE->updateGlobalMapping(sourceFile, (void*)input.c_str());
 	}
 }

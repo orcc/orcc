@@ -1,3 +1,4 @@
+@display = global i8* null
 @WIDTH = external global %struct.fifo_i16_s*      ; <%struct.fifo_i16_s**> [#uses=3]
 @HEIGHT = external global %struct.fifo_i16_s*     ; <%struct.fifo_i16_s**> [#uses=3]
 @B = external global %struct.fifo_i8_s*           ; <%struct.fifo_i8_s**> [#uses=3]
@@ -38,6 +39,7 @@ bb1:                                              ; preds = %bb
   br i1 %5, label %bb2, label %bb3
 
 bb2:                                              ; preds = %bb1
+  %display_class1 = load i8** @display
   %6 = load %struct.fifo_i16_s** @WIDTH, align 4  ; <%struct.fifo_i16_s*> [#uses=1]
   %7 = call i16* @fifo_i16_read(%struct.fifo_i16_s* %6, i32 1) nounwind ; <i16*> [#uses=1]
   store i16* %7, i16** %ptr, align 4
@@ -66,7 +68,7 @@ bb2:                                              ; preds = %bb1
   %25 = sext i16 %24 to i32                       ; <i32> [#uses=1]
   %26 = load i16* %width, align 2                 ; <i16> [#uses=1]
   %27 = sext i16 %26 to i32                       ; <i32> [#uses=1]
-  call void @set_video(i32 %27, i32 %25) nounwind
+  call void @set_video(i8* %display_class1, i32 %27, i32 %25) nounwind
   %28 = load i32* %i, align 4                     ; <i32> [#uses=1]
   %29 = add nsw i32 %28, 1                        ; <i32> [#uses=1]
   store i32 %29, i32* %i, align 4
@@ -79,8 +81,9 @@ bb3:                                              ; preds = %bb2, %bb1, %bb
   br i1 %32, label %bb4, label %bb5
 
 bb4:                                              ; preds = %bb5, %bb4
+  %display_class2 = load i8** @display
   %33 = call i8* @fifo_u8_read(%struct.fifo_i8_s* %30, i32 384) nounwind ; <i8*> [#uses=1]
-  call void @write_mb(i8* %33) nounwind
+  call void @write_mb(i8* %display_class2, i8* %33) nounwind
   call void @fifo_u8_read_end(%struct.fifo_i8_s* %30, i32 384) nounwind
   %34 = load i32* %i, align 4                     ; <i32> [#uses=1]
   %35 = add nsw i32 %34, 1                        ; <i32> [#uses=1]
@@ -94,14 +97,15 @@ return:                                           ; preds = %bb7
   ret void
 }
 
-declare void @set_video(i32, i32)
+declare void @set_video(i8*, i32, i32)
 
-declare void @write_mb(i8*)
+declare void @write_mb(i8*, i8*)
 
 !source = !{!0}
 !name = !{!1}
 !action_scheduler = !{!2}
 !inputs = !{!3, !5, !7}
+!state_variables = !{!9}
 !procedures = !{!12, !14}
 !actions = !{!15}
 
@@ -115,8 +119,11 @@ declare void @write_mb(i8*)
 !6 = metadata  !{ i32 16 ,  null }
 !7 = metadata !{metadata !8, metadata !"HEIGHT", %struct.fifo_i16_s** @HEIGHT}
 !8 = metadata  !{ i32 16 ,  null }
-!12 = metadata !{metadata !"set_video", i1 1 , void(i32, i32)* @set_video}
-!14 = metadata !{metadata !"write_mb", i1 1 , void(i8*)* @write_mb}
+!9 = metadata !{metadata !10, metadata !11, null, i8** @display}
+!10 = metadata !{metadata !"display", i1 0, i32 0,  i32 0}
+!11 = metadata  !{ i32 8 ,  null }
+!12 = metadata !{metadata !"set_video", i1 1 , void(i8*, i32, i32)* @set_video}
+!14 = metadata !{metadata !"write_mb", i1 1 , void(i8*, i8*)* @write_mb}
 !15 = metadata !{ null, metadata !16, null, metadata !17, metadata !18}
 !16 = metadata !{metadata !3, i32 1}
 !17 = metadata  !{metadata !"isSchedulable_get_data", i1 0, i1()* @isSchedulable_get_data}

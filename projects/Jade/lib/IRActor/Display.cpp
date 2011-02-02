@@ -36,6 +36,7 @@
 */
 
 //------------------------------
+#include <iostream>
 #include "SDL.h"
 
 #include <pthread.h>
@@ -52,77 +53,147 @@ SDL_Overlay* Display::m_overlay = NULL;
 int Display::m_width = 0;
 int Display::m_height = 0;
 bool Display::init = false;
+int Display::boundedDisplays = 0;
 
-Display::Display(){
+void Display::press_a_key(int code) {
+	char buf[2];
+	printf("Press enter to continue\n");
+	fgets(buf, 2, stdin);
+	exit(code);
+}
+
+Display::Display(int id, bool printFps){
+	this->id = id;
+	this->outputFps = outputFps;
 	width = 0;
 	height = 0;
 	x = 0;
 	y = 0;
+	boundedDisplays++;
+	pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+	pthread_cond_t cond_mutex = PTHREAD_COND_INITIALIZER;
+
+	if (!init){
+		display_init();
+	}
 }
 
 Display::~Display(){
+	boundedDisplays--;
 
+	if (boundedDisplays == 0){
+		SDL_Quit();
+	}
+}
+
+void Display::forceStop(pthread_t* thread){
+	SDL_Event sdlEvent;
+	sdlEvent.type = SDL_QUIT;
+	SDL_PushEvent(&sdlEvent);
+	pthread_join (*thread, NULL);
+	SDL_Quit();
+}
+
+void Display::waitForFirstFrame(){
+	clock_t start = clock ();
+	
+	//Wait for the first image to be display
+	pthread_mutex_lock( &mutex );
+	pthread_cond_wait( &cond_mutex, &mutex );
+	pthread_mutex_unlock( &mutex );
+
+	if (outputFps){
+		cout << "---> First image arrived after " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
+	}
+}
+
+void Display::setFirstFrame(){
+	pthread_mutex_lock( &mutex );
+	pthread_cond_signal( &cond_mutex);
+	pthread_mutex_unlock( &mutex );
+	
+	t = SDL_GetTicks();
 }
 
 
+void Display::display_write_mb(unsigned char tokens[384]) {
+	int i, j, cnt, base;
 
-/*
-#if defined(__LP64__) || defined(_LP64)
-#define fstat(op1, op2) fstat64(op1, op2)
-#define teststat stat64
-#else
-#define teststat stat
-#endif
-*/
-static int m_x;
-static int m_y;
-static int m_width;
-static int m_height;
+	cnt = 0;
+	base = y * m_width + x;
 
-static unsigned char img_buf_y[MAX_WIDTH * MAX_HEIGHT];
-static unsigned char img_buf_u[MAX_WIDTH * MAX_HEIGHT / 4];
-static unsigned char img_buf_v[MAX_WIDTH * MAX_HEIGHT / 4];
+	for (i = 0; i < 16; i++) {
+		for (j = 0; j < 16; j++) {
+			int tok = tokens[cnt];
+			int idx = base + i * m_width + j;
+			cnt++;
+			img_buf_y[idx] = tok;
+		}
+	}
 
-extern llvm::cl::opt<int> StopAt;
+	base = y / 2 * m_width / 2 + x / 2;
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < 8; j++) {
+			int tok = tokens[cnt];
+			int idx = base + i * m_width / 2 + j;
+			cnt++;
+			img_buf_u[idx] = tok;
+		}
+	}
 
-//Exit function of the decoder
-void (*exit_decoder)(int);
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < 8; j++) {
+			int tok = tokens[cnt];
+			int idx = base + i * m_width / 2 + j;
+			cnt++;
+			img_buf_v[idx] = tok;
+		}
+	}
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond_mutex = PTHREAD_COND_INITIALIZER;
+	x += 16;
+	if (x == width) {
+		x = 0;
+		y += 16;
+	}
 
-static void press_a_key(int code) {
-	char buf[2];
-	printf("Press enter to continue\n");
-	fgets(buf, 2, stdin);
-	exit_decoder(code);
+	if (y == height) {
+		// image received
+		x = 0;
+		y = 0;
+		
+		frameDecoded++;
+
+		if (frameDecoded == stopAfter){
+			exit(1);
+		}else if (frameDecoded ==1 ){
+			setFirstFrame();
+		}else if (outputFps){
+			printFps();
+		}
+
+		//Write resulting image
+		display_show_image(this);
+	}
 }
-
-static Uint32 start_time;
-static int num_images_start;
-static int num_images_end;
-bool verboseDisplay;
 
 void print_fps_avg(void) {
-	Uint32 t = SDL_GetTicks();
+	/*Uint32 t = SDL_GetTicks();
 
 	printf("%i images in %f seconds: %f FPS\n",
-		num_images_end, (float) t / 1000.0f,
-		1000.0f * (float)num_images_end / (float)t);
+		num_images_end, (float) firstFrame / 1000.0f,
+		1000.0f * (float)firstFrame / (float)t);*/
 }
 
-static Uint32 t;
+void Display::printFps(){
+	int t2 = SDL_GetTicks();
 
-void emptyFunc(){
+	if (t2 - t > 3000) {
+		printf("%f images/sec\n",
+			1000.0f * (float)(frameDecoded - frameStart) / (float)(t2 - t));
 
-}
-
-void initT(){
-	start_time = SDL_GetTicks();
-	t = start_time;
-}
-
-void Display::display_write_image(Display* display) {
+		t = t2;
+		frameStart = frameDecoded;
+	}
 
 }
 
@@ -144,10 +215,6 @@ void Display::display_show_image(Display* display) {
 	//Preparing surface
 	SDL_Rect rect = { 0, 0, m_width, m_height };
 
-	int t2;
-	SDL_Event event;
-
-
 	memcpy(m_overlay->pixels[0], img_buf_y, width * height );
 	memcpy(m_overlay->pixels[1], img_buf_u, width * height / 4 );
 	memcpy(m_overlay->pixels[2], img_buf_v, width * height / 4 );
@@ -156,38 +223,14 @@ void Display::display_show_image(Display* display) {
 	SDL_DisplayYUVOverlay(m_overlay, &rect);
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
+	SDL_Event event;
 	
-	if (num_images_end == 0){
-		 	pthread_mutex_lock( &mutex );
-			pthread_cond_signal( &cond_mutex);
-			pthread_mutex_unlock( &mutex );
-	}
-	
-	num_images_end++;
-	t2 = SDL_GetTicks();
-
-	if ((t2 - t > 3000)&&(verboseDisplay)) {
-		printf("%f images/sec\n",
-			1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
-
-		t = t2;
-		num_images_start = num_images_end;
-	}
-
-	if (num_images_end == StopAt){
-		exit(1);
-	}
-
 	/* Grab all the events off the queue. */
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 			case SDL_QUIT:
-				m_x = 0;
-				m_y = 0;
 				m_width = 0;
 				m_height = 0;
-				num_images_start = 0;
-				num_images_end = 0;
 				pthread_exit(NULL);
 				break;
 			default:
@@ -204,58 +247,10 @@ void stop(pthread_t* thread){
 	SDL_Quit();
 }
 
-void Display::display_write_mb(unsigned char tokens[384]) {
-	int i, j, cnt, base;
+void Display::display_init() {
+	//Display is initialized
+	init = true;
 
-	//printf("display_write_mb (%i, %i)\n", m_x, m_y);
-
-	cnt = 0;
-	base = m_y * m_width + m_x;
-
-	for (i = 0; i < 16; i++) {
-		for (j = 0; j < 16; j++) {
-			int tok = tokens[cnt];
-			int idx = base + i * m_width + j;
-			cnt++;
-			img_buf_y[idx] = tok;
-		}
-	}
-
-	base = m_y / 2 * m_width / 2 + m_x / 2;
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = tokens[cnt];
-			int idx = base + i * m_width / 2 + j;
-			cnt++;
-			img_buf_u[idx] = tok;
-		}
-	}
-
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = tokens[cnt];
-			int idx = base + i * m_width / 2 + j;
-			cnt++;
-			img_buf_v[idx] = tok;
-		}
-	}
-
-	m_x += 16;
-	if (m_x == m_width) {
-		m_x = 0;
-		m_y += 16;
-	}
-
-	if (m_y == m_height) {
-		m_x = 0;
-		m_y = 0;
-		
-		//Write resulting image
-		display_show_image(this);
-	}
-}
-
-void display_init() {
 	// First, initialize SDL's video subsystem.
 	if (SDL_Init( SDL_INIT_VIDEO ) < 0) {
 		fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
@@ -270,6 +265,13 @@ void display_init() {
 	atexit(print_fps_avg);*/
 }
 
+void Display::setSize(int width, int height){
+	this->width = width;
+	this->height = height;
+
+	display_set_video(this);
+}
+
 void Display::display_set_video(Display* display) {
 	int width = display->getWidth();
 	int height = display->getHeight();
@@ -282,7 +284,7 @@ void Display::display_set_video(Display* display) {
 	m_width = width;
 	m_height = height;
 
-	if (verboseDisplay){
+	if (display->printFpsEnable()){
 		printf("set display to %ix%i\n", width, height);
 	}
 

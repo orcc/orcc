@@ -140,12 +140,11 @@ public:
 	/**
      *  @brief Return the pointer of a compiled GlobalVariable
 	 *
-	 *   Return the address of a llvm::GlobalVariable (or a llvm::Function) previously compiled,
-	 *     if GlobalVariable has not been compiled return NULL.
+	 *   Return the address of a llvm::GlobalVariable (or a llvm::Function)
      *
 	 *	@param gv : the llvm::GlobalVariable to get pointer from.
 	 *
-	 *	@return adress if gv has been compiled otherwise NULL
+	 *	@return address of a gv
      */
 	void* getGVPtr(llvm::GlobalVariable* gv);
 
@@ -167,6 +166,9 @@ public:
 private:
 
 	void setIO();
+
+	void setIn(Instance* intance);
+	void setOut(Instance* intance);
 
 	Source* source;
 	Display* display;

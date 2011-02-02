@@ -53,6 +53,7 @@
 
 #include "Jade/XDFParser.h"
 #include "Jade/DecoderEngine.h"
+#include "Jade/Actor/Display.h"
 #include "Jade/Fifo/FifoSelection.h"
 #include "Jade/Scenario/Manager.h"
 #include "Jade/Util/OptionMng.h"
@@ -176,6 +177,8 @@ cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations
 void clean_exit(int sig){
 	exit(0);
 }
+
+int Display::stopAfter = StopAt;
 
 //Verify if directory is well formed
 void setDirectory(std::string* dir){

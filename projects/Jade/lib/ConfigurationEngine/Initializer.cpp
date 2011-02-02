@@ -98,8 +98,10 @@ void Initializer::initializeFSM(FSM* fsm){
 	int stateIndex = state->getIndex();
 
 	GlobalVariable* fsmVar = fsm->getFsmState();
-	int* fsmPtr = (int*)executionEngine->getGVPtr(fsmVar);
-	if (fsmPtr != NULL){
+
+	if (executionEngine->isCompiledGV(fsmVar)){
+		int* fsmPtr = (int*)executionEngine->getGVPtr(fsmVar);
+		
 		*fsmPtr = stateIndex;
 	}
 }
