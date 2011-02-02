@@ -1,48 +1,47 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<XDF name="test">
-    <!-- ************************************** -->
-    <!-- Input ports of the Graph               -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Output ports of the Graph              -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Variables and Parameters of the Graph  -->
-    <!-- ************************************** -->
-    <Decl kind="Variable" name="gpar">
-        <Type name="int"/>
-        <Expr kind="BinOpSeq">
-            <Expr kind="Literal" literal-kind="Integer" value="2"/>
+<?xml version="1.0" encoding="UTF-8"?><XDF name="test">
+   <!-- ************************************** -->
+   <!-- Input ports of the Graph               -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Output ports of the Graph              -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Variables and Parameters of the Graph  -->
+   <!-- ************************************** -->
+   <Decl kind="Variable" name="gpar">
+      <Type name="int"/>
+      <Expr kind="BinOpSeq">
+         <Expr kind="Literal" literal-kind="Integer" value="2"/>
+         <Op name="*"/>
+         <Expr kind="Literal" literal-kind="Integer" value="10"/>
+         <Op name="+"/>
+         <Expr kind="Literal" literal-kind="Integer" value="1"/>
+      </Expr>
+   </Decl>
+   <!-- ************************************** -->
+   <!-- Instances of the Graph                 -->
+   <!-- ************************************** -->
+   <Instance id="Dummy">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Parameters.Dummy"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="par">
+         <Expr kind="BinOpSeq">
+            <Expr kind="Var" name="gpar"/>
             <Op name="*"/>
-            <Expr kind="Literal" literal-kind="Integer" value="10"/>
+            <Expr kind="Literal" literal-kind="Integer" value="2"/>
             <Op name="+"/>
-            <Expr kind="Literal" literal-kind="Integer" value="1"/>
-        </Expr>
-    </Decl>
-    <!-- ************************************** -->
-    <!-- Instances of the Graph                 -->
-    <!-- ************************************** -->
-    <Instance id="Dummy">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../VTL/Parameters/Dummy"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-        <Parameter name="par">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Var" name="gpar"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-                <Op name="+"/>
-                <Expr kind="Var" name="gpar"/>
-                <Op name="+"/>
-                <Expr kind="Literal" literal-kind="Integer" value="10"/>
-            </Expr>
-        </Parameter>
-    </Instance>
-    <!-- ************************************** -->
-    <!-- Connections of the Graph               -->
-    <!-- ************************************** -->
+            <Expr kind="Var" name="gpar"/>
+            <Op name="+"/>
+            <Expr kind="Literal" literal-kind="Integer" value="10"/>
+         </Expr>
+      </Parameter>
+   </Instance>
+   <!-- ************************************** -->
+   <!-- Connections of the Graph               -->
+   <!-- ************************************** -->
 </XDF>

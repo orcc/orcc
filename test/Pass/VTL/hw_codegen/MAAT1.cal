@@ -1,0 +1,18 @@
+package hw_codegen;
+
+actor MAAT1() ==> :
+
+	List(type:int, size=10) values := [i : for int i in 0 .. 9];
+
+	action ==>
+	var
+		int v0 = values[0],
+		int v1 = values[1]
+	do
+		values[0] := values[3];
+		values[1] := values[2];
+		values[2] := v1;
+		values[3] := v0;
+	end
+
+end
