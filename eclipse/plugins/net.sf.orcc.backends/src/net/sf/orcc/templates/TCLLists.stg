@@ -12,7 +12,7 @@ set Testbench "../src/Testbench"
 vcom -93 -reportprogress 30 -work work $SRC/orcc_package.vhd
 vcom -93 -reportprogress 30 -work work $SRC/sim_package.vhd
 # Compile FIFO and broadcast
-vcom -93 -reportprogress 30 -work work $SRC/FIFO/broadcast.vhd 
+vcom -93 -reportprogress 30 -work work $SRC/broadcast.vhd 
 vcom -93 -reportprogress 30 -work work $SRC/FIFO/ram_generic.vhd 
 vcom -93 -reportprogress 30 -work work $SRC/FIFO/counter.vhd 
 vcom -93 -reportprogress 30 -work work $SRC/FIFO/control.vhd 

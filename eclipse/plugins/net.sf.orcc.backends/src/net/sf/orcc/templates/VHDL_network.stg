@@ -285,6 +285,7 @@ broadcast_<name> : entity work.broadcast
     <outgoingMap.(instance) : {connection | <printBroadcastOutputs( connection=connection, i0=i0, map=network.successorsMap.(instance),
     																vmap=network.targetMap.(connection), control="ack")>}; separator="\n">
 <endif>
+    clock         =\> clock,
     reset_n       =\> reset_n);
 >>
 

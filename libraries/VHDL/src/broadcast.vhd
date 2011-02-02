@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2011-01-18
+-- Last update: 2011-02-02
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -55,7 +55,8 @@ entity broadcast is
       size  : integer := 2);
   port
     (
-      reset_n  : in  std_logic;
+      reset_n     : in  std_logic;
+      clock       : in  std_logic;
       --
       input_data  : in  std_logic_vector (width -1 downto 0);
       input_send  : in  std_logic;
@@ -93,28 +94,29 @@ begin
   -- Management of the external ACK (source actor)
   externalAck : process (output_ack, internalAck, input_send) is
   begin
-    if (input_send = '1' and (output_ack or internalAck) = ones) then
+    if ((output_ack or internalAck) = ones) then
       input_ack <= '1';
     else
       input_ack <= '0';
     end if;
   end process externalAck;
 
-
+  
   -- Management of the internal ACK (source actor)
   counterGen : for i in 0 to size -1 generate
-    process (output_ack, internalAck, input_send) is
+    process (clock, reset_n) is
     begin
       if reset_n = '0' then
         internalAck(i) <= '0';
-      elsif (input_send = '1' and (output_ack or internalAck) = ones) then
-        internalAck(i) <= '0';
-      elsif (input_send = '1' and output_ack(i) = '1') then
-        internalAck(i) <= '1';
+      elsif rising_edge (clock) then
+        if ((output_ack or internalAck) = ones) then
+          internalAck(i) <= '0';
+        elsif output_ack(i) = '1' then
+          internalAck(i) <= '1';
+        end if;
       end if;
     end process;
   end generate counterGen;
-  
   
 end arch_broadcast;
 
