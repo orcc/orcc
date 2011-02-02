@@ -1,5 +1,5 @@
-CMake: orcc support library and a batch to run CMake
-eclipse: runtime Java library and a project to run generated Java code
+C: projects for generated C code
+Java: projects for generated Java code
 experiments: experimental things :-)
 Jade: the JIT Adaptive Decoder Engine
-VHDL: package for generated VHDL code
+VHDL: for generated VHDL code
