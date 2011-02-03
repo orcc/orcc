@@ -50,7 +50,7 @@ bool ROW ==> int(size=osz) Y0 , int(size=osz) Y1 :
 
 	int osz = 24;
 
-	int count := 0;
+	int(size=3) count := 0;
 
 	/*
   action X0:[a], X1:[b], X2:[c], X3:[d], ROW:[r] ==>
