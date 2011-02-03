@@ -112,6 +112,7 @@ public class ActorInterpreter {
 
 		// Build a node interpreter for visiting CFG and instructions
 		nodeInterpreter = new NodeInterpreter();
+		nodeInterpreter.setActor(actor);
 		nodeInterpreter.setProcess(process);
 
 		// Create the List allocator for state and procedure local vars

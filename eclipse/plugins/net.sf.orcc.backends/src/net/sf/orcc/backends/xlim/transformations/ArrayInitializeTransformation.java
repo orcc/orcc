@@ -50,6 +50,20 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  */
 public class ArrayInitializeTransformation extends AbstractActorTransformation {
 
+	private class SpecialNodeInterpreter extends NodeInterpreter {
+
+		@Override
+		public void visit(Store instr) {
+			Variable target = instr.getTarget();
+			Type type = target.getType();
+			// Allocate value field of list if it is initialized
+			if (type.isList() && target.getValue() == null) {
+				target.setValue((Expression) type.accept(listAllocator));
+			}
+			super.visit(instr);
+		}
+	}
+
 	private NodeInterpreter nodeInterpreter;
 
 	public ArrayInitializeTransformation() {
@@ -90,19 +104,6 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 	public void visit(Call call) {
 		// Set initialize to external thus it will not be printed
 		call.getProcedure().setExternal(true);
-	}
-
-	private class SpecialNodeInterpreter extends NodeInterpreter {
-		@Override
-		public void visit(Store instr) {
-			Variable target = instr.getTarget();
-			Type type = target.getType();
-			// Allocate value field of list if it is initialized
-			if (type.isList() && target.getValue() == null) {
-				target.setValue((Expression) type.accept(listAllocator));
-			}
-			super.visit(instr);
-		}
 	}
 
 }

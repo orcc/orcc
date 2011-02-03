@@ -314,6 +314,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 				Instruction instr = instrStack.remove(0);
 
 				NodeInterpreter interp = new NodeInterpreter();
+				interp.setActor(actorIR);
 				interp.setFifos(fifos);
 				interp.setProcess(process);
 				instr.accept(interp);

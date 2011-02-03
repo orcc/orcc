@@ -34,6 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
@@ -140,6 +141,16 @@ public class NodeInterpreter extends AbstractActorTransformation {
 		}
 	}
 
+	/**
+	 * Sets the actor attribute.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	public void setActor(Actor actor) {
+		this.actor = actor;
+	}
+
 	public void setFifos(Map<String, Fifo> fifos) {
 		this.fifos = fifos;
 	}
@@ -150,8 +161,20 @@ public class NodeInterpreter extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Assign instr) {
-		LocalVariable target = instr.getTarget();
-		target.setValue((Expression) instr.getValue().accept(exprInterpreter));
+		try {
+			LocalVariable target = instr.getTarget();
+			target.setValue((Expression) instr.getValue().accept(
+					exprInterpreter));
+		} catch (OrccRuntimeException e) {
+			String file;
+			if (actor == null) {
+				file = "";
+			} else {
+				file = actor.getFile();
+			}
+
+			throw new OrccRuntimeException(file, instr.getLocation(), "", e);
+		}
 	}
 
 	@Override

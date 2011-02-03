@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
@@ -46,6 +47,12 @@ import net.sf.orcc.runtime.Fifo_boolean;
 import net.sf.orcc.runtime.Fifo_int;
 import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.SimuActor;
+import net.sf.orcc.ui.OrccActivator;
+
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.ui.PlatformUI;
 
 public class InterpreterSimulatorImpl extends AbstractSimulator {
 
@@ -82,19 +89,23 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 		} else if ("Display".equals(simpleName)) {
 			simuActorInstance = new InterpreterSimuDisplay(instanceId, process);
 		} else if ("ReadImage".equals(simpleName)) {
-			simuActorInstance = new InterpreterSimuReadImage(instanceId, stimulusFile, process);
+			simuActorInstance = new InterpreterSimuReadImage(instanceId,
+					stimulusFile, process);
 		} else if ("DisplayImage".equals(simpleName)) {
-			simuActorInstance = new InterpreterSimuDisplayImage(instanceId, process);
+			simuActorInstance = new InterpreterSimuDisplayImage(instanceId,
+					process);
 		} else if ("WriteFile".equals(simpleName)) {
-			simuActorInstance = new InterpreterSimuWriteFile(instanceId, actorParameters, process);
+			simuActorInstance = new InterpreterSimuWriteFile(instanceId,
+					actorParameters, process);
 		} else if ("ReadFile".equals(simpleName)) {
-			simuActorInstance = new InterpreterSimuReadFile(instanceId, actorParameters, process);
+			simuActorInstance = new InterpreterSimuReadFile(instanceId,
+					actorParameters, process);
 		} else {
 			// Generic simulator actor
 			simuActorInstance = new InterpreterSimuActor(instanceId,
 					actorParameters, actorIR, process);
 		}
-		
+
 		return simuActorInstance;
 	}
 
@@ -188,7 +199,35 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 		int actorStatus = 0;
 		for (SimuActor simuActorInstance : simuActorsMap.values()) {
 			AbstractInterpreterSimuActor myInstance = (AbstractInterpreterSimuActor) simuActorInstance;
-			actorStatus = myInstance.runAllSchedulableAction();
+			try {
+				actorStatus = myInstance.runAllSchedulableAction();
+			} catch (final OrccRuntimeException e) {
+				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						Throwable throwable = e;
+						StringBuilder builder = new StringBuilder();
+						while (throwable != null
+								&& throwable.getCause() != throwable) {
+							builder.append(throwable.getLocalizedMessage());
+							builder.append('\n');
+							throwable = throwable.getCause();
+						}
+
+						IStatus status = new Status(IStatus.ERROR,
+								OrccActivator.PLUGIN_ID, builder.toString());
+
+						ErrorDialog
+								.openError(
+										null,
+										"Simulation error",
+										"An error occurred while simulating your design:",
+										status);
+					}
+				});
+				actorStatus = -1;
+			}
 			// process.write("Run actor "
 			// + ((SimuActor) myInstance).getInstanceId() + " returning "
 			// + actorStatus + "\n");

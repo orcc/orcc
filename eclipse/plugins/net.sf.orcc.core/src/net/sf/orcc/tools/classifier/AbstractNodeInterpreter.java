@@ -70,7 +70,6 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	 * {@link AbstractExpressionEvaluator} to evaluate expressions.
 	 */
 	public AbstractNodeInterpreter() {
-		super();
 		exprInterpreter = new AbstractExpressionEvaluator();
 	}
 

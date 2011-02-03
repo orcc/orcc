@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Variable;
 
 /**
  * This class defines an expression evaluator.
@@ -105,7 +106,13 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 
 	@Override
 	public Object interpret(VarExpr expr, Object... args) {
-		return expr.getVar().getVariable().getValue();
+		Variable variable = expr.getVar().getVariable();
+		Expression value = variable.getValue();
+		if (value == null) {
+			throw new OrccRuntimeException("Uninitialized variable: "
+					+ variable.getName());
+		}
+		return value;
 	}
 
 	/**
