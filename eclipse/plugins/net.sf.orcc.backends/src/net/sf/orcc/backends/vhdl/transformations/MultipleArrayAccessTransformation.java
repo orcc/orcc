@@ -73,27 +73,213 @@ import org.jgrapht.DirectedGraph;
 public class MultipleArrayAccessTransformation extends
 		AbstractActorTransformation {
 
+	private class ActionVisitor extends AbstractActorTransformation {
+
+		private Action currentAction;
+
+		private Action nextAction;
+
+		private FSM fsm;
+
+		private Map<Variable, Integer> numRW;
+
+		private String sourceName;
+
+		private String targetName;
+
+		public ActionVisitor(String sourceName, String targetName) {
+			numRW = new HashMap<Variable, Integer>();
+			this.sourceName = sourceName;
+			this.targetName = targetName;
+		}
+
+		/**
+		 * Adds an FSM to the given action scheduler.
+		 * 
+		 * @param actionScheduler
+		 *            action scheduler
+		 */
+		private void addFsm(ActionScheduler actionScheduler) {
+			fsm = new FSM();
+			fsm.setInitialState("init");
+			fsm.addState("init");
+			for (Action action : actionScheduler.getActions()) {
+				fsm.addTransition("init", "init", action);
+			}
+
+			actionScheduler.getActions().clear();
+			actionScheduler.setFsm(fsm);
+		}
+
+		/**
+		 * Creates a new empty action with the given name.
+		 * 
+		 * @param name
+		 *            action name
+		 * @return a new empty action with the given name
+		 */
+		private Action createNewAction(String name) {
+			// scheduler
+			Procedure scheduler = new Procedure(name, new Location(),
+					IrFactory.eINSTANCE.createTypeBool());
+			BlockNode block = new BlockNode(scheduler);
+			block.add(new Return(new BoolExpr(true)));
+			scheduler.getNodes().add(block);
+
+			// body
+			Procedure body = new Procedure(name, new Location(),
+					IrFactory.eINSTANCE.createTypeVoid());
+			block = new BlockNode(scheduler);
+			block.add(new Return(null));
+			scheduler.getNodes().add(block);
+
+			// tag
+			Tag tag = new Tag();
+			tag.add(name);
+
+			Action action = new Action(new Location(), tag, new Pattern(),
+					new Pattern(), scheduler, body);
+			return action;
+		}
+
+		private void updateTransitions(Action newAction) {
+			// add an FSM if the actor does not have one
+			if (fsm == null) {
+				addFsm(MultipleArrayAccessTransformation.this.actor
+						.getActionScheduler());
+			}
+
+			// add state
+			String stateName = newAction.getName();
+			fsm.addState(stateName);
+
+			// update transitions
+			fsm.removeTransition(sourceName, targetName, currentAction);
+			fsm.addTransition(sourceName, stateName, currentAction);
+			fsm.addTransition(stateName, targetName, newAction);
+		}
+
+		@Override
+		public void visit(Action action) {
+			nextAction = action;
+			while (nextAction != null) {
+				currentAction = nextAction;
+				nextAction = null;
+				numRW.clear();
+
+				visit(currentAction.getBody());
+			}
+		}
+
+		@Override
+		public void visit(IfNode ifNode) {
+			// the idea is that branches of a "if" are exclusive
+			// so the number of accesses to consider is the max in each branch
+			// rather than the sum
+
+			Map<Variable, Integer> before = new HashMap<Variable, Integer>(
+					numRW);
+			visit(ifNode.getThenNodes());
+			Map<Variable, Integer> numThen = numRW;
+
+			numRW = new HashMap<Variable, Integer>(before);
+			visit(ifNode.getElseNodes());
+			Map<Variable, Integer> numElse = numRW;
+			numRW = before;
+
+			for (Entry<Variable, Integer> entryT : numThen.entrySet()) {
+				Variable var = entryT.getKey();
+				if (numElse.containsKey(var)) {
+					numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
+				}
+			}
+			for (Entry<Variable, Integer> entryE : numElse.entrySet()) {
+				Variable var = entryE.getKey();
+				if (numThen.containsKey(var)) {
+					numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
+				}
+			}
+
+			visit(ifNode.getJoinNode());
+		}
+
+		@Override
+		public void visit(Load load) {
+			visitLoadStore(load.getSource().getVariable(), load.getIndexes());
+		}
+
+		@Override
+		public void visit(Store store) {
+			visitLoadStore(store.getTarget(), store.getIndexes());
+		}
+
+		/**
+		 * Visits a load or a store, and updates the numRW map.
+		 * 
+		 * @param variable
+		 *            a variable
+		 * @param indexes
+		 *            a list of indexes
+		 */
+		private void visitLoadStore(Variable variable, List<Expression> indexes) {
+			if (!indexes.isEmpty()) {
+				Integer numAccesses = numRW.get(variable);
+				if (numAccesses == null) {
+					numRW.put(variable, 1);
+				} else {
+					// get unique state name
+					String stateName = targetName;
+					Integer count = stateNames.get(stateName);
+					if (count == null) {
+						stateName = targetName + "_" + currentAction.getName();
+						count = stateNames.get(stateName);
+						if (count == null) {
+							count = 1;
+						}
+					}
+					stateNames.put(stateName, count + 1);
+
+					String newActionName = stateName + "_" + count;
+
+					// create new action
+					nextAction = createNewAction(newActionName);
+
+					// move code
+					new CodeMover(itInstruction, itNode).moveCode(
+							currentAction.getBody(), nextAction.getBody());
+
+					// update transitions
+					updateTransitions(nextAction);
+
+					// set new source state to the new state name
+					sourceName = newActionName;
+				}
+			}
+		}
+
+	}
+
 	private class CodeMover extends AbstractActorTransformation {
 
-		public CodeMover() {
-
+		public CodeMover(ListIterator<Instruction> itInstruction,
+				ListIterator<CFGNode> itNode) {
+			this.itInstruction = itInstruction;
+			this.itNode = itNode;
 		}
 
 		public void moveCode(Procedure oldProc, Procedure newProc) {
 			// move instructions
 			BlockNode block = BlockNode.getLast(newProc);
-			ListIterator<Instruction> itInstr = MultipleArrayAccessTransformation.this.itInstruction;
-			Instruction instruction = itInstr.previous();
-			itInstr.remove();
+			Instruction instruction = itInstruction.previous();
+			itInstruction.remove();
 			block.add(instruction);
-			while (itInstr.hasNext()) {
-				instruction = itInstr.next();
-				itInstr.remove();
+			while (itInstruction.hasNext()) {
+				instruction = itInstruction.next();
+				itInstruction.remove();
 				block.add(instruction);
 			}
 
 			// move next nodes
-			ListIterator<CFGNode> itNode = MultipleArrayAccessTransformation.this.itNode;
 			while (itNode.hasNext()) {
 				CFGNode node = itNode.next();
 				itNode.remove();
@@ -103,209 +289,34 @@ public class MultipleArrayAccessTransformation extends
 
 	}
 
-	private Action action;
-
-	private FSM fsm;
-
-	private Map<Variable, Integer> numRW;
-
-	private String sourceName;
-
 	private Map<String, Integer> stateNames;
-
-	private String targetName;
-
-	/**
-	 * Adds an FSM to the given action scheduler.
-	 * 
-	 * @param actionScheduler
-	 *            action scheduler
-	 */
-	private void addFsm(ActionScheduler actionScheduler) {
-		fsm = new FSM();
-		fsm.setInitialState("init");
-		fsm.addState("init");
-		for (Action action : actionScheduler.getActions()) {
-			fsm.addTransition("init", "init", action);
-		}
-
-		actionScheduler.getActions().clear();
-		actionScheduler.setFsm(fsm);
-	}
-
-	/**
-	 * Creates a unique action/state name.
-	 * 
-	 * @return a unique action/state name
-	 */
-	private String createName() {
-		// get unique state name
-		String stateName = targetName + "_" + action.getName();
-		Integer count = stateNames.get(stateName);
-		if (count == null) {
-			count = 1;
-		}
-		stateNames.put(stateName, count + 1);
-		return stateName + "_" + count;
-	}
-
-	/**
-	 * Creates a new empty action with the given name.
-	 * 
-	 * @param name
-	 *            action name
-	 * @return a new empty action with the given name
-	 */
-	private Action createNewAction(String name) {
-		// scheduler
-		Procedure scheduler = new Procedure(name, new Location(),
-				IrFactory.eINSTANCE.createTypeBool());
-		BlockNode block = new BlockNode(scheduler);
-		block.add(new Return(new BoolExpr(true)));
-		scheduler.getNodes().add(block);
-
-		// body
-		Procedure body = new Procedure(name, new Location(),
-				IrFactory.eINSTANCE.createTypeVoid());
-		block = new BlockNode(scheduler);
-		block.add(new Return(null));
-		scheduler.getNodes().add(block);
-
-		// tag
-		Tag tag = new Tag();
-		tag.add(name);
-
-		Action action = new Action(new Location(), tag, new Pattern(),
-				new Pattern(), scheduler, body);
-		return action;
-	}
 
 	@Override
 	public void transform(Actor actor) {
 		this.actor = actor;
-		numRW = new HashMap<Variable, Integer>();
 		stateNames = new HashMap<String, Integer>();
 
-		fsm = actor.getActionScheduler().getFsm();
+		FSM fsm = actor.getActionScheduler().getFsm();
 		if (fsm == null) {
 			List<Action> actions = new ArrayList<Action>(actor
 					.getActionScheduler().getActions());
 			for (Action action : actions) {
-				sourceName = "init";
-				targetName = "init";
-				visit(action);
+				String sourceName = "init";
+				String targetName = "init";
+				new ActionVisitor(sourceName, targetName).visit(action);
 			}
 		} else {
 			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
 			Set<UniqueEdge> edges = graph.edgeSet();
 			for (UniqueEdge edge : edges) {
 				State source = graph.getEdgeSource(edge);
-				sourceName = source.getName();
+				String sourceName = source.getName();
 
 				State target = graph.getEdgeTarget(edge);
-				targetName = target.getName();
+				String targetName = target.getName();
 
 				Action action = (Action) edge.getObject();
-				visit(action);
-			}
-		}
-	}
-
-	private void updateTransitions(Action newAction) {
-		// add an FSM if the actor does not have one
-		if (fsm == null) {
-			addFsm(actor.getActionScheduler());
-		}
-
-		// add state
-		String stateName = newAction.getName();
-		fsm.addState(stateName);
-
-		// update transitions
-		fsm.removeTransition(sourceName, targetName, action);
-		fsm.addTransition(sourceName, stateName, action);
-		fsm.addTransition(stateName, targetName, newAction);
-	}
-
-	@Override
-	public void visit(Action action) {
-		this.action = action;
-		numRW.clear();
-		
-		// we are only interested in the body
-		visit(action.getBody());
-	}
-
-	@Override
-	public void visit(IfNode ifNode) {
-		// the idea is that branches of a "if" are exclusive
-		// so the number of accesses to consider is the max in each branch
-		// rather than the sum
-
-		Map<Variable, Integer> before = new HashMap<Variable, Integer>(numRW);
-		visit(ifNode.getThenNodes());
-		Map<Variable, Integer> numThen = numRW;
-
-		numRW = new HashMap<Variable, Integer>(before);
-		visit(ifNode.getElseNodes());
-		Map<Variable, Integer> numElse = numRW;
-		numRW = before;
-
-		for (Entry<Variable, Integer> entryT : numThen.entrySet()) {
-			Variable var = entryT.getKey();
-			if (numElse.containsKey(var)) {
-				numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
-			}
-		}
-		for (Entry<Variable, Integer> entryE : numElse.entrySet()) {
-			Variable var = entryE.getKey();
-			if (numThen.containsKey(var)) {
-				numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
-			}
-		}
-
-		visit(ifNode.getJoinNode());
-	}
-
-	@Override
-	public void visit(Load load) {
-		visitLoadStore(load.getSource().getVariable(), load.getIndexes());
-	}
-
-	@Override
-	public void visit(Store store) {
-		visitLoadStore(store.getTarget(), store.getIndexes());
-	}
-
-	/**
-	 * Visits a load or a store, and updates the numRW map.
-	 * 
-	 * @param variable
-	 *            a variable
-	 * @param indexes
-	 *            a list of indexes
-	 */
-	private void visitLoadStore(Variable variable, List<Expression> indexes) {
-		if (!indexes.isEmpty()) {
-			Integer numAccesses = numRW.get(variable);
-			if (numAccesses == null) {
-				numRW.put(variable, 1);
-			} else {
-				// new name for action/state
-				String newActionName = createName();
-
-				// create new action
-				Action newAction = createNewAction(newActionName);
-
-				// move code
-				new CodeMover().moveCode(action.getBody(), newAction.getBody());
-
-				// update transitions
-				updateTransitions(newAction);
-				
-				// set new source state to the new state name
-				sourceName = newActionName;
-				visit(newAction);
+				new ActionVisitor(sourceName, targetName).visit(action);
 			}
 		}
 	}
