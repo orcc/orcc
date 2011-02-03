@@ -54,6 +54,8 @@ int Display::m_width = 0;
 int Display::m_height = 0;
 bool Display::init = false;
 int Display::boundedDisplays = 0;
+pthread_mutex_t Display::mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t Display::cond_mutex = PTHREAD_COND_INITIALIZER;
 
 void Display::press_a_key(int code) {
 	char buf[2];
@@ -65,13 +67,13 @@ void Display::press_a_key(int code) {
 Display::Display(int id, bool printFps){
 	this->id = id;
 	this->outputFps = outputFps;
+	this->frameDecoded = 0;
 	width = 0;
 	height = 0;
 	x = 0;
 	y = 0;
+	init = false;
 	boundedDisplays++;
-	pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_cond_t cond_mutex = PTHREAD_COND_INITIALIZER;
 
 	if (!init){
 		display_init();
@@ -102,23 +104,22 @@ void Display::waitForFirstFrame(){
 	pthread_cond_wait( &cond_mutex, &mutex );
 	pthread_mutex_unlock( &mutex );
 
-	if (outputFps){
-		cout << "---> First image arrived after " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
-	}
+	cout << "---> First image arrived after " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
 }
 
-void Display::setFirstFrame(){
+void Display::sendFirstFrameEvent(){
 	pthread_mutex_lock( &mutex );
 	pthread_cond_signal( &cond_mutex);
 	pthread_mutex_unlock( &mutex );
-	
-	t = SDL_GetTicks();
 }
 
 
 void Display::display_write_mb(unsigned char tokens[384]) {
 	int i, j, cnt, base;
 
+	if (t == 0){
+		t = SDL_GetTicks();
+	}
 	cnt = 0;
 	base = y * m_width + x;
 
@@ -166,7 +167,7 @@ void Display::display_write_mb(unsigned char tokens[384]) {
 		if (frameDecoded == stopAfter){
 			exit(1);
 		}else if (frameDecoded ==1 ){
-			setFirstFrame();
+			sendFirstFrameEvent();
 		}else if (outputFps){
 			printFps();
 		}

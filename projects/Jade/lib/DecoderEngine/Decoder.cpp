@@ -134,6 +134,8 @@ void Decoder::startInThread(pthread_t* thread){
 	
 	//Lock display mutex until the first image arrive
 	pthread_create( thread, NULL, &Decoder::threadStart, this );
+
+	executionEngine->waitForFirstFrame();
 }
 
 void* Decoder::threadStart( void* args ){

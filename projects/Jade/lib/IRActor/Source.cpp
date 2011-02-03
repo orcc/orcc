@@ -43,16 +43,31 @@
 
 using namespace std;
 
-Source::Source(int id, string stimulus){
+Source::Source(int id){
 	this->id = id;
-	this->stimulus = stimulus;
 	this->cnt = 0;
+	this->file = NULL;
 
-	this->file = fopen(stimulus.c_str(), "rb");
-	if (file == NULL) {
-		cout << "could not open file " << stimulus.c_str() << "\n.";
-		exit(1);
+}
+
+Source::~Source(){
+	if (file != NULL){
+		fclose(file);
 	}
+}
+
+void Source::setStimulus(std::string stimulus){
+		this->stimulus = stimulus;
+
+		if (file != NULL){
+			fclose(file);
+		}
+
+		file = fopen(stimulus.c_str(), "rb");
+		if (file == NULL) {
+			cout << "could not open file " << stimulus.c_str() << "\n.";
+			exit(1);
+		}
 }
 
 void Source::source_get_src(unsigned char* tokens, int nbTokens){

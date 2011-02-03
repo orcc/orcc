@@ -83,6 +83,8 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder): Context(C)  {
   std::string ErrorMsg;
 
   this->decoder = decoder;
+  this->source = new Source(1);
+
   Module* module = decoder->getModule();
 
   // If the user doesn't want core files, disable them.
@@ -222,7 +224,7 @@ void LLVMExecution::setIO(){
 }
 
 void LLVMExecution::setIn(Instance* instance){
-	source = new Source(1, stimulus);
+	source->setStimulus(stimulus);
 
 	//Set var source
 	StateVar* stateVar = instance->getStateVar("source");
@@ -237,7 +239,7 @@ void LLVMExecution::setIn(Instance* instance){
 }
 
 void  LLVMExecution::setOut(Instance* instance){
-	display = new Display(1);
+	 display = new Display(1);
 
 	//Set var display
 	StateVar* stateVar = instance->getStateVar("display");
@@ -258,6 +260,10 @@ void  LLVMExecution::setOut(Instance* instance){
 
 }
 
+bool LLVMExecution::waitForFirstFrame(){
+	display->waitForFirstFrame();
+	return true;
+}
 
 void LLVMExecution::runFunction(Function* function) {
 	std::vector<GenericValue> noargs;

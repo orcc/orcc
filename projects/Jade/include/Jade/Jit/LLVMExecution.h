@@ -152,6 +152,11 @@ public:
      */
 	bool mapFifo(Port* port, AbstractFifo* fifo);
 
+	/**
+     *  @brief Wait for the actual execution of the decoder
+     */
+	bool waitForFirstFrame();
+
 	void* getExit(); 
 	void recompile(llvm::Function* function);
 	

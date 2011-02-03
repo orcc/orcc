@@ -118,11 +118,10 @@ public:
 
 	bool printFpsEnable(){return outputFps;};
 
-	void waitForFirstFrame();
+	static void waitForFirstFrame();
 private:
 	void printFps();
-	void setFirstFrame();
-
+	
 	/** Buffers of display */
 	unsigned char img_buf_y[MAX_WIDTH * MAX_HEIGHT];
 	unsigned char img_buf_u[MAX_WIDTH * MAX_HEIGHT / 4];
@@ -146,14 +145,15 @@ private:
 	int t;
 	
 	/** Thread mutex */
-	pthread_mutex_t mutex;
-	pthread_cond_t cond_mutex;
+	static pthread_mutex_t mutex;
+	static pthread_cond_t cond_mutex;
 
 	/** Static functions of display */
 	static void display_init();
 	static void display_show_image(Display* display);
 	static void display_set_video(Display* display);
 	static void press_a_key(int code);
+	static void sendFirstFrameEvent();
 
 	/** Static member of display */
 	static SDL_Surface *m_screen;

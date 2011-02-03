@@ -51,7 +51,10 @@
  */
 class Source {
 public:
-	Source(int id, std::string stimulus);
+	Source(int id);
+
+	void setStimulus(std::string stimulus);
+
 	~Source();
 
 	void source_get_src(unsigned char* tokens, int nbTokens);
