@@ -1,7 +1,7 @@
 actor GzipDecompressor() int(size=8) C ==> int(size=8) D:
 
 	// the bits of the byte read
-	uint(size=16) bits;
+	uint(size=16) bits := 0;
 	
 	// number of bits remaining in value
 	uint(size=4) num_bits := 0;

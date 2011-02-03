@@ -1,4 +1,4 @@
-actor GzipParser() int(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(size=8) BDATA, bool END:
+actor GzipParser() uint(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(size=8) BDATA, bool END:
 
 	procedure fail(String reason)
 	begin
