@@ -293,7 +293,12 @@ public class NodeInterpreter extends AbstractActorTransformation {
 	@Override
 	public void visit(PhiAssignment phi) {
 		Expression value = phi.getValues().get(branch);
-		phi.getTarget().setValue((Expression) value.accept(exprInterpreter));
+		try {
+			value = (Expression) value.accept(exprInterpreter);
+		} catch (OrccRuntimeException e) {
+			value = null;
+		}
+		phi.getTarget().setValue(value);
 	}
 
 	@Override
