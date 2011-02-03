@@ -53,18 +53,18 @@ public class VHDLTypePrinter extends TypePrinter {
 	 *            an integer that gives the number of bits
 	 */
 	private void printInt(int size) {
-		// limits size to 32 bits
-		if (size >= 31) {
-			size = 31;
+		// limits size to 32 bit signed int
+		if (size >= 32) {
+			size = 32;
 		}
 
-		long bound = 1 << (size - 1);
+		long bound = (long) 1 << (size - 1);
 		builder.append("integer range ");
 		builder.append(bound - 1);
 		builder.append(" downto -");
 		builder.append(bound);
 	}
-	
+
 	/**
 	 * Prints an unsigned integer with the given number of bits.
 	 * 
@@ -72,18 +72,17 @@ public class VHDLTypePrinter extends TypePrinter {
 	 *            an unsigned integer that gives the number of bits
 	 */
 	private void printUint(int size) {
-		// limits size to 32 bits
+		// limits size to 31 bit unsigned int
 		if (size >= 31) {
 			size = 31;
 		}
 
-		long bound = 1 << size;
+		long bound = (long) 1 << size;
 		builder.append("integer range ");
-		// math.abs avoid a negative value if size = 31
-		builder.append(Math.abs(bound) - 1);
+		builder.append(bound - 1);
 		builder.append(" downto 0");
 	}
-	
+
 	@Override
 	public void visit(TypeBool type) {
 		builder.append("std_logic");
