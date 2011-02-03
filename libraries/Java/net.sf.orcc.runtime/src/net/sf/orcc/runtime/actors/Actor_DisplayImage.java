@@ -187,7 +187,7 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 				}
 			}
 
-			if (imageDone == false) {
+			if (sizeDone == true && imageDone == false) {
 				if (fifo_R.hasTokens(1) && fifo_G.hasTokens(1)
 						&& fifo_B.hasTokens(1)) {
 					writeImage();
@@ -250,6 +250,7 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 		}
 
 		sizeDone = true;
+		System.out.println("setImageSize - Image " + newWidth + "x" + newHeight);
 	}
 
 	private void writeImage() {

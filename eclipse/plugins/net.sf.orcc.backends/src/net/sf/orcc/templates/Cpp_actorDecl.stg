@@ -9,8 +9,8 @@ listSize(values) ::= <<
 >>
 
 variableDeclaration(variable) ::= <<
-<if (variable.type.dimensions)
-><variable.type> (*<variable>)<listSize(rest(variable.type.dimensions)) ><
+<if (variable.type.dimensionsExpr)
+><variable.type> (*<variable>)<listSize(rest(variable.type.dimensionsExpr)) ><
 else
 ><variable.type> <variable><
 endif>

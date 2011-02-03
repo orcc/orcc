@@ -64,8 +64,8 @@ const <variableDeclaration(variable)> = <Constant(variable.initialValue)>;<\n><e
 ///////////////////////////////////////////////////////////////////////////////
 StateVarAllocation(variable) ::= <<
 <if(variable.assignable)>
-<if (variable.type.dimensions)>
-<variable>(new <variable.type><listSize(variable.type.dimensions)>),
+<if (variable.type.dimensionsExpr)>
+<variable>(new <variable.type><listSize(variable.type.dimensionsExpr)>),
 <else>
 <if (variable.initialized)>
 <variable>(<Constant(variable.initialValue)>),
