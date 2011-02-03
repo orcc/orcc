@@ -75,16 +75,26 @@ public class MultipleArrayAccessTransformation extends
 
 	private class ActionVisitor extends AbstractActorTransformation {
 
+		/**
+		 * action being visited
+		 */
 		private Action currentAction;
 
+		/**
+		 * action to visit next (may be null)
+		 */
 		private Action nextAction;
-
-		private FSM fsm;
 
 		private Map<Variable, Integer> numRW;
 
+		/**
+		 * name of the source state
+		 */
 		private String sourceName;
 
+		/**
+		 * name of the target state
+		 */
 		private String targetName;
 
 		public ActionVisitor(String sourceName, String targetName) {
@@ -289,6 +299,8 @@ public class MultipleArrayAccessTransformation extends
 
 	}
 
+	private FSM fsm;
+
 	private Map<String, Integer> stateNames;
 
 	@Override
@@ -296,7 +308,7 @@ public class MultipleArrayAccessTransformation extends
 		this.actor = actor;
 		stateNames = new HashMap<String, Integer>();
 
-		FSM fsm = actor.getActionScheduler().getFsm();
+		fsm = actor.getActionScheduler().getFsm();
 		if (fsm == null) {
 			List<Action> actions = new ArrayList<Action>(actor
 					.getActionScheduler().getActions());
