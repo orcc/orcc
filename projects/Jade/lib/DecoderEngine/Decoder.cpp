@@ -80,7 +80,6 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose): Co
 
 	//Create execution engine
 	executionEngine = new LLVMExecution(Context, this);
-	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine); //Todo : simplify process
 }
 
 Decoder::~Decoder (){
@@ -109,7 +108,6 @@ void Decoder::setConfiguration(Configuration* newConfiguration){
 	configuration = newConfiguration;
 
 	executionEngine->recompile(scheduler->getMainFunction());
-	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine);
 
 	if (verbose){
 		cout<< "---> Scheduling recompilation takes " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
@@ -117,11 +115,9 @@ void Decoder::setConfiguration(Configuration* newConfiguration){
 }
 
 void Decoder::start(){
-	executionEngine->setInputStimulus(stimulus);
-	
 	running = true;
 
-	executionEngine->run();
+	executionEngine->run(stimulus);
 }
 
 void Decoder::stop(){

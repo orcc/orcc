@@ -84,8 +84,6 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder,
 	//Create the scheduler function
 	createSchedulerFn();
 	
-	//Set compare file if needed
-	setCompare();
 }
 
 RoundRobinScheduler::~RoundRobinScheduler (){
@@ -124,107 +122,6 @@ void RoundRobinScheduler::createSchedulerFn(){
 	// Load stop value and test if the scheduler must be stop
 	LoadInst* stopVal = new LoadInst(stopGV, "", schedulerBB);
 	schedBrInst = BranchInst::Create(BBReturn, schedulerBB, stopVal, schedulerBB);
-}
-
-void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
-
-	//Get configuration of the decoder
-	Configuration* configuration = decoder->getConfiguration();
-
-	//Set exit function
-	//exit_decoder = (void(*)(int))executionEngine->getExit();
-
-	if(YuvFile.compare("") != 0){
-		Instance* compare = configuration->getInstance("Compare");
-
-		//Map fstat function used in compare actor
-		Procedure* filesize = compare->getProcedure("Filesize");
-		executionEngine->mapProcedure(filesize, (void *)Filesize);
-	}
-
-	//Get display instance
-	Instance* display = configuration->getInstance("display");
-
-	//Display is not contains in the current decoder
-	if (display == NULL){
-		return;
-	}
-
-	//Get procedures from display
-	Procedure* setVideo = display->getProcedure("set_video");
-	Procedure* setInit = display->getProcedure("set_init");
-	Procedure* writeMb = display->getProcedure("write_mb");
-/*
-	if(nodisplay){
-		executionEngine->mapProcedure(setVideo, (void *)emptyFunc);
-		executionEngine->mapProcedure(setInit, (void *)initT);
-		executionEngine->mapProcedure(writeMb, (void *)display_write_mb);
-	}else{*/
-		//Map procedure to display
-		//executionEngine->mapProcedure(setVideo, (void *)display_set_video);
-		//executionEngine->mapProcedure(setInit, (void *)display_init);
-		//executionEngine->mapProcedure(writeMb, (void *)displayTest->display_set_video);
-	//}
-}
-
-GlobalVariable* RoundRobinScheduler::getSource(){
-	Module* module = decoder->getModule();
-	
-	//Get configuration of the decoder
-	Configuration* configuration = decoder->getConfiguration();
-
-	//Get source instance
-	Instance* source = configuration->getInstance("source");
-	
-	//Source is not contains in the current decoder
-	if (source == NULL){
-		return NULL;
-	}
-	
-	Variable* sourceFileVar = source->getStateVar("input_file");
-	return  sourceFileVar->getGlobalVariable();
-}
-
-void RoundRobinScheduler::setCompare(){
-	list<Instance*>::iterator it;
-	Configuration* configuration = decoder->getConfiguration();
-	Actor* compare = configuration->getActor("Compare");
-	
-	//Actor compare is not present in the decoder
-	if ((compare == NULL) && (YuvFile.compare("") != 0)){
-		printf("Actor Compare is not present in the current description");
-		exit(1);
-	}
-	
-	//Actor compare is present but the option not set
-	if ((compare != NULL) && (YuvFile.compare("") == 0)){
-		printf("Actor Compare is present in the current description but not set");
-		exit(1);
-	}
-
-	//Actor compare is not present and the option is not set
-	if ((compare == NULL) && (YuvFile.compare("") == 0)){
-		return;
-	}
-	
-	//Get all instances of actor compare
-	list<Instance*>* instances = compare->getInstances();
-	Module* module = decoder->getModule();
-	
-
-	//Fix compare file in all instance
-	for ( it=instances->begin() ; it != instances->end(); it++ ){
-		Instance* instance = *it;
-
-		//Insert compare file string
-		ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),YuvFile.size()+1); 
-		GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context,YuvFile), "compareFile", 0, false, 0);
-
-		//Store adress in input file of source
-		GlobalVariable* yuvVar = instance->getStateVar("yuv_file")->getGlobalVariable();
-		Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
-		yuvVar->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
-	}
 }
 
 void RoundRobinScheduler::addInstance(Instance* instance){

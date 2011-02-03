@@ -93,18 +93,11 @@ public:
 	void mapProcedure(Procedure* procedure, void *Addr);
 
 	/**
-     *  @brief Set the input stimulus for the  decoder
+     *  @brief run the current decoder with the given stimulus
      *
-	 *	@param input : input string of the decoder
+	 *	@param stimulus : the input stimulus
      */
-	void setInputStimulus(std::string input);
-
-	/**
-     *  @brief run the current decoder
-     *
-	 *	Run the decoder using the given function name
-     */
-	void run();
+	void run(std::string stimulus);
 
 	/**
      *  @brief run a specific function of the current decoder
@@ -187,6 +180,9 @@ private:
 
 	/** Result of the execution */
 	int result;
+
+	/** Input stimulus */
+	std::string stimulus;
 };
 
 #endif

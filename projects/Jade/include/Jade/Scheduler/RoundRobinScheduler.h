@@ -71,26 +71,37 @@ public:
 	RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool verbose = false);
 	~RoundRobinScheduler();
 
+	/**
+     *  @brief Return the main function of the scheduler
+     *
+	 *	@return the main llvm::Function of scheduler
+     */
 	llvm::Function* getMainFunction(){return scheduler;};
 	
-	void setExternalFunctions(LLVMExecution* executionEngine);
-
-	llvm::GlobalVariable* getSource();
-
+	/**
+     *  @brief Add an instance in the scheduler
+     *
+	 *	@param instance : the Instance to add
+     */
 	void addInstance(Instance* instance);
+
+	/**
+     *  @brief Remove an instance in the scheduler
+     *
+	 *	@param instance : the Instance to remove
+     */
 	void removeInstance(Instance* instance);
-
-	void refresh();
-
 
 private:
 
+	/**
+     *  @brief Create the scheduler function
+     */
 	void createSchedulerFn();
 
-	void setDisplay();
-
-	void setCompare();
-
+	/**
+     *  @brief Remove a call
+     */
 	void removeCall(llvm::Function* function);
 
 	/** Decoder bound to the round robin scheduler */

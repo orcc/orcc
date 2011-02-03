@@ -23,4 +23,5 @@ add_library (IRActor
   BroadcastActor.cpp
   BroadcastAdder.cpp
   Display.cpp
+  Source.cpp
  )

@@ -57,6 +57,7 @@
 
 #include "Jade/Decoder.h"
 #include "Jade/Actor/Display.h"
+#include "Jade/Actor/Source.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/AbstractFifo.h"
@@ -175,11 +176,12 @@ bool LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
 	
 }
 
-void LLVMExecution::run() {
+void LLVMExecution::run(string stimulus) {
 	std::string ErrorMsg;
 	Module* module = decoder->getModule();
 	clock_t timer = clock ();
-	
+	this->stimulus = stimulus;
+
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
 
@@ -220,7 +222,18 @@ void LLVMExecution::setIO(){
 }
 
 void LLVMExecution::setIn(Instance* instance){
+	source = new Source(1, stimulus);
 
+	//Set var source
+	StateVar* stateVar = instance->getStateVar("source");
+	Source** ptrSource = (Source**)getGVPtr(stateVar->getGlobalVariable());
+	*ptrSource = source;
+
+	//Set setvideo procedure
+	Procedure* getSrcProc = instance->getProcedure("get_src");
+	if (getSrcProc != NULL){
+		mapProcedure(getSrcProc, (void*)get_src);
+	}
 }
 
 void  LLVMExecution::setOut(Instance* instance){
@@ -278,25 +291,6 @@ void LLVMExecution::clear() {
 	}*/
 }
 
-
-void LLVMExecution::setInputStimulus(std::string input){
-	Module* module = decoder->getModule();
-
-	//Insert source file string
-	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),input.size()+1); 
-	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, input), "fileName", 0, false, 0);
-
-	//Store adress in input GV
-	GlobalVariable* sourceFile= decoder->getScheduler()->getSource();
-	Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
-	sourceFile->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
-
-	//Check if source has been previously compiled
-	if (isCompiledGV(sourceFile)){
-		void* sourcePr = getGVPtr(sourceFile);
-		EE->updateGlobalMapping(sourceFile, (void*)input.c_str());
-	}
-}
 
 LLVMExecution::~LLVMExecution(){
 	// Run static destructors.
