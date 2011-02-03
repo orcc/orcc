@@ -42,6 +42,7 @@
 
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/Core/Expr/IntExpr.h"
+#include "Jade/Core/Expr/ListExpr.h"
 
 namespace llvm{
 	class BasicBlock;
@@ -126,6 +127,15 @@ private:
 	 * @param expr : the initial value
 	 */
 	void initializeIntExpr(llvm::GlobalVariable* var, IntExpr* expr);
+
+	/**
+	 * @brief Initialize a list expression
+	 * 
+	 * @param var : the GlobalVariable to initialize
+	 *
+	 * @param expr : the initial values
+	 */
+	void initializeListExpr(llvm::GlobalVariable* var, ListExpr* expr);
 
 
 	/** Decoder to initialize */

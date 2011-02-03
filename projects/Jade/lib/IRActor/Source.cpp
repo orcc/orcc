@@ -77,19 +77,14 @@ void Source::source_get_src(unsigned char* tokens, int nbTokens){
 		fseek(file, 0, 0);
 	}
 
-	n = fread(tokens, 1, nbTokens, file);
-/* Todo : the case of end of file	
-	if (n < nbTokens) {
-		for (int i = 0; i < nbTokens; i++){
+	for (int i = 0; i < nbTokens; i++){
+		n = fread(tokens, 1, 1, file);
+		if (n < 1) {	
+			fseek(file, 0, 0);
+			cnt = 0;
 			n = fread(tokens, 1, 1, file);
-			if (n < 1) {	
-				fseek(file, 0, 0);
-				cnt = 0;
-				n = fread(tokens, 1, 1, file);
-			}
-			tokens++;
-			cnt++;
 		}
-	}*/
-	
+		tokens++;
+		cnt++;
+	}
 }

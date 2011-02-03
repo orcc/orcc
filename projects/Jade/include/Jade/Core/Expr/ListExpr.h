@@ -79,7 +79,7 @@ public:
 	 *  @param values : llvm::ConstantArray value of the ListExpr.
      *
      */
-	ListExpr(llvm::LLVMContext &C, llvm::ConstantArray* values) : Expr(C){
+	ListExpr(llvm::LLVMContext &C, llvm::Constant* values) : Expr(C){
 		this->constantArray = values;
 	};
 

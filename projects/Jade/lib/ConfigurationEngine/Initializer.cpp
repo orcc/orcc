@@ -133,6 +133,8 @@ void Initializer::initializeStateVariable(StateVar* var){
 	
 	if (initVal->isIntExpr()){
 		initializeIntExpr(var->getGlobalVariable(), (IntExpr*)initVal);
+	}else if (initVal->isListExpr()){
+		initializeListExpr(var->getGlobalVariable(), (ListExpr*)initVal);
 	}else{
 		cout<< "Initialize only support initialization of integer \n";
 		exit(1);
@@ -143,4 +145,8 @@ void Initializer::initializeStateVariable(StateVar* var){
 
 void Initializer::initializeIntExpr(GlobalVariable* var, IntExpr* expr){
 	new StoreInst(expr->getConstant(), var, entryBB);
+}
+
+void Initializer::initializeListExpr(GlobalVariable* var, ListExpr* expr){
+	
 }
