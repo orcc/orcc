@@ -28,38 +28,19 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
-import net.sf.orcc.util.UniqueEdge;
-
-import org.jgrapht.DirectedGraph;
 
 /**
  * This transformation transforms an actor so that there is at most one access
@@ -70,108 +51,46 @@ import org.jgrapht.DirectedGraph;
  * @author Nicolas Siret
  * 
  */
-public class MultipleArrayAccessTransformation extends
-		AbstractActorTransformation {
+public class MultipleArrayAccessTransformation extends ActionSplitter {
 
-	private class ActionVisitor extends AbstractActorTransformation {
-
-		/**
-		 * action being visited
-		 */
-		private Action currentAction;
-
-		/**
-		 * action to visit next (may be null)
-		 */
-		private Action nextAction;
+	private class BranchVisitor extends AbstractBranchVisitor {
 
 		private Map<Variable, Integer> numRW;
 
-		/**
-		 * name of the source state
-		 */
-		private String sourceName;
+		private Expression splitCondition;
 
-		/**
-		 * name of the target state
-		 */
-		private String targetName;
-
-		public ActionVisitor(String sourceName, String targetName) {
+		public BranchVisitor(String sourceName, String targetName) {
+			super(sourceName, targetName);
 			numRW = new HashMap<Variable, Integer>();
-			this.sourceName = sourceName;
-			this.targetName = targetName;
 		}
 
 		/**
-		 * Adds an FSM to the given action scheduler.
+		 * Returns true if one of the values is greater than one, which means an
+		 * array has been found to be accessed more than once.
 		 * 
-		 * @param actionScheduler
-		 *            action scheduler
+		 * @return true if one of the values is greater than one
 		 */
-		private void addFsm(ActionScheduler actionScheduler) {
-			fsm = new FSM();
-			fsm.setInitialState("init");
-			fsm.addState("init");
-			for (Action action : actionScheduler.getActions()) {
-				fsm.addTransition("init", "init", action);
+		private boolean hasManyAccesses() {
+			for (Integer value : numRW.values()) {
+				if (value > 1) {
+					return true;
+				}
 			}
 
-			actionScheduler.getActions().clear();
-			actionScheduler.setFsm(fsm);
-		}
-
-		/**
-		 * Creates a new empty action with the given name.
-		 * 
-		 * @param name
-		 *            action name
-		 * @return a new empty action with the given name
-		 */
-		private Action createNewAction(String name) {
-			// scheduler
-			Procedure scheduler = new Procedure(name, new Location(),
-					IrFactory.eINSTANCE.createTypeBool());
-			BlockNode block = new BlockNode(scheduler);
-			block.add(new Return(new BoolExpr(true)));
-			scheduler.getNodes().add(block);
-
-			// body
-			Procedure body = new Procedure(name, new Location(),
-					IrFactory.eINSTANCE.createTypeVoid());
-			block = new BlockNode(scheduler);
-			block.add(new Return(null));
-			scheduler.getNodes().add(block);
-
-			// tag
-			Tag tag = new Tag();
-			tag.add(name);
-
-			Action action = new Action(new Location(), tag, new Pattern(),
-					new Pattern(), scheduler, body);
-			return action;
-		}
-
-		private void updateTransitions(Action newAction) {
-			// add an FSM if the actor does not have one
-			if (fsm == null) {
-				addFsm(MultipleArrayAccessTransformation.this.actor
-						.getActionScheduler());
-			}
-
-			// add state
-			String stateName = newAction.getName();
-			fsm.addState(stateName);
-
-			// update transitions
-			fsm.removeTransition(sourceName, targetName, currentAction);
-			fsm.addTransition(sourceName, stateName, currentAction);
-			fsm.addTransition(stateName, targetName, newAction);
+			return false;
 		}
 
 		@Override
 		public void visit(Action action) {
+			this.branchName = targetName + "_" + action.getName();
 			nextAction = action;
+			visitInBranch();
+		}
+
+		/**
+		 * Visits the next action(s) without updating the branch name.
+		 */
+		private void visitInBranch() {
 			while (nextAction != null) {
 				currentAction = nextAction;
 				nextAction = null;
@@ -183,33 +102,37 @@ public class MultipleArrayAccessTransformation extends
 
 		@Override
 		public void visit(IfNode ifNode) {
-			// the idea is that branches of a "if" are exclusive
-			// so the number of accesses to consider is the max in each branch
-			// rather than the sum
+			// record condition
+			Expression oldCondition = splitCondition;
+			splitCondition = ifNode.getValue();
 
-			Map<Variable, Integer> before = new HashMap<Variable, Integer>(
-					numRW);
+			// visit then
+			numRW.clear();
 			visit(ifNode.getThenNodes());
-			Map<Variable, Integer> numThen = numRW;
+			if (hasManyAccesses()) {
+				visitInBranch();
 
-			numRW = new HashMap<Variable, Integer>(before);
+				// no need for "else" to have a split condition (because the
+				// transition will be added after)
+				splitCondition = null;
+			} else {
+				// invert split condition
+				splitCondition = new UnaryExpr(UnaryOp.LOGIC_NOT,
+						splitCondition, IrFactory.eINSTANCE.createTypeBool());
+			}
+
+			// visit else
+			numRW.clear();
 			visit(ifNode.getElseNodes());
-			Map<Variable, Integer> numElse = numRW;
-			numRW = before;
-
-			for (Entry<Variable, Integer> entryT : numThen.entrySet()) {
-				Variable var = entryT.getKey();
-				if (numElse.containsKey(var)) {
-					numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
-				}
-			}
-			for (Entry<Variable, Integer> entryE : numElse.entrySet()) {
-				Variable var = entryE.getKey();
-				if (numThen.containsKey(var)) {
-					numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
-				}
+			if (hasManyAccesses()) {
+				visitInBranch();
 			}
 
+			// restore condition
+			splitCondition = oldCondition;
+
+			// join: not supposed to have any array there
+			numRW.clear();
 			visit(ifNode.getJoinNode());
 		}
 
@@ -237,100 +160,18 @@ public class MultipleArrayAccessTransformation extends
 				if (numAccesses == null) {
 					numRW.put(variable, 1);
 				} else {
-					// get unique state name
-					String stateName = targetName;
-					Integer count = stateNames.get(stateName);
-					if (count == null) {
-						stateName = targetName + "_" + currentAction.getName();
-						count = stateNames.get(stateName);
-						if (count == null) {
-							count = 1;
-						}
-					}
-					stateNames.put(stateName, count + 1);
+					numRW.put(variable, numAccesses + 1);
 
-					String newActionName = stateName + "_" + count;
-
-					// create new action
-					nextAction = createNewAction(newActionName);
-
-					// move code
-					new CodeMover(itInstruction, itNode).moveCode(
-							currentAction.getBody(), nextAction.getBody());
-
-					// update transitions
-					updateTransitions(nextAction);
-
-					// set new source state to the new state name
-					sourceName = newActionName;
+					splitAction();
 				}
 			}
 		}
 
 	}
 
-	private class CodeMover extends AbstractActorTransformation {
-
-		public CodeMover(ListIterator<Instruction> itInstruction,
-				ListIterator<CFGNode> itNode) {
-			this.itInstruction = itInstruction;
-			this.itNode = itNode;
-		}
-
-		public void moveCode(Procedure oldProc, Procedure newProc) {
-			// move instructions
-			BlockNode block = BlockNode.getLast(newProc);
-			Instruction instruction = itInstruction.previous();
-			itInstruction.remove();
-			block.add(instruction);
-			while (itInstruction.hasNext()) {
-				instruction = itInstruction.next();
-				itInstruction.remove();
-				block.add(instruction);
-			}
-
-			// move next nodes
-			while (itNode.hasNext()) {
-				CFGNode node = itNode.next();
-				itNode.remove();
-				newProc.getNodes().add(node);
-			}
-		}
-
-	}
-
-	private FSM fsm;
-
-	private Map<String, Integer> stateNames;
-
 	@Override
-	public void transform(Actor actor) {
-		this.actor = actor;
-		stateNames = new HashMap<String, Integer>();
-
-		fsm = actor.getActionScheduler().getFsm();
-		if (fsm == null) {
-			List<Action> actions = new ArrayList<Action>(actor
-					.getActionScheduler().getActions());
-			for (Action action : actions) {
-				String sourceName = "init";
-				String targetName = "init";
-				new ActionVisitor(sourceName, targetName).visit(action);
-			}
-		} else {
-			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
-			Set<UniqueEdge> edges = graph.edgeSet();
-			for (UniqueEdge edge : edges) {
-				State source = graph.getEdgeSource(edge);
-				String sourceName = source.getName();
-
-				State target = graph.getEdgeTarget(edge);
-				String targetName = target.getName();
-
-				Action action = (Action) edge.getObject();
-				new ActionVisitor(sourceName, targetName).visit(action);
-			}
-		}
+	protected void visit(String sourceName, String targetName, Action action) {
+		new BranchVisitor(sourceName, targetName).visit(action);
 	}
 
 }
