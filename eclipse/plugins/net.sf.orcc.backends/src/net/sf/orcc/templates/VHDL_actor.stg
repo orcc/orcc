@@ -78,7 +78,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // Print variables
 ///////////////////////////////////////////////////////////////////////////////
-variableDeclaration(variable) ::= <<
+VarDeclaration(variable) ::= <<
 <if(variable.type.list)
 >-- error !!!!! variable <variable> : <variable.type> (0 to <listSize(variable.type.dimensions)> -1)<
 else
@@ -413,7 +413,7 @@ procedure(procedure, transformReturn) ::= <<
 
 printLocals(procedure) ::= <<
 <if(procedure.locals.list)
-><procedure.locals.list: {variable| <VarInFctDeclaration(variable)>;<\n>}><
+><procedure.locals.list: {variable| <VarDeclaration(variable)>;<\n>}><
 endif>
 >>
 
