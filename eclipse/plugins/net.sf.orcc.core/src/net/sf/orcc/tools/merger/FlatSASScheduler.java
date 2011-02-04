@@ -30,7 +30,6 @@
 package net.sf.orcc.tools.merger;
 
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
@@ -54,20 +53,20 @@ public class FlatSASScheduler extends AbstractScheduler {
 	}
 
 	public Schedule schedule() throws OrccException {
-		Map<Vertex, Integer> repetitions = new RepetitionVectorAnalyzer(graph)
-				.computeRepetitionsVector();
 
+		repetitionVector = new RepetitionVectorAnalyzer(graph)
+				.getRepetitionVector();
 		Schedule schedule = new Schedule();
 		schedule.setIterationCount(1);
 
 		List<Vertex> sort = new TopologicalSorter(graph).topologicalSort();
 		for (Vertex vertex : sort) {
 			if (vertex.isInstance()) {
-				int rep = repetitions.get(vertex);
+				int rep = repetitionVector.get(vertex);
 				Iterand iterand = null;
 				if (rep > 1) {
 					Schedule subSched = new Schedule();
-					subSched.setIterationCount(repetitions.get(vertex));
+					subSched.setIterationCount(repetitionVector.get(vertex));
 					subSched.add(new Iterand(vertex));
 					iterand = new Iterand(subSched);
 				} else {

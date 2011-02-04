@@ -145,46 +145,50 @@ public class RepetitionVectorAnalyzer {
 	/**
 	 * Computes the repetition vector
 	 * 
+	 * @return
+	 * 
 	 * @throws OrccException
 	 *             if an actor is not static
 	 */
-	public Map<Vertex, Integer> computeRepetitionsVector() throws OrccException {
+	public Map<Vertex, Integer> getRepetitionVector() throws OrccException {
+		if (repetitionVector != null) {
+			Vertex vertex = null;
+			
+			for (Vertex v : graph.vertexSet()) {
+				if (v.isInstance()) {
+					vertex = v;
+					break;
+				}
+			}
+			// Vertex vertex = (Vertex) graph.vertexSet().toArray()[0];
 
-		Vertex vertex = null;
-		for (Vertex v : graph.vertexSet()) {
-			if (v.isInstance()) {
-				vertex = v;
-				break;
+			calculateRate(vertex, new Rational(1, 1));
+
+			Iterator<Rational> it = rationals.values().iterator();
+			int lcm = it.next().getDenominator();
+			while (it.hasNext()) {
+				lcm = Rational.lcm(lcm, it.next().getDenominator());
+			}
+
+			for (Map.Entry<Vertex, Rational> entry : rationals.entrySet()) {
+
+				int rep = entry.getValue().getNumerator() * lcm
+						/ entry.getValue().getDenominator();
+
+				repetitionVector.put(entry.getKey(), rep);
+			}
+
+			checkConsistency();
+
+			// multiply the actor repetition count with its number of phases
+
+			for (Map.Entry<Vertex, Integer> entry : repetitionVector.entrySet()) {
+				Integer val = entry.getValue();
+				int nbPhases = getStaticClass(entry.getKey())
+						.getNumberOfPhases();
+				entry.setValue(val * nbPhases);
 			}
 		}
-		// Vertex vertex = (Vertex) graph.vertexSet().toArray()[0];
-
-		calculateRate(vertex, new Rational(1, 1));
-
-		Iterator<Rational> it = rationals.values().iterator();
-		int lcm = it.next().getDenominator();
-		while (it.hasNext()) {
-			lcm = Rational.lcm(lcm, it.next().getDenominator());
-		}
-
-		for (Map.Entry<Vertex, Rational> entry : rationals.entrySet()) {
-
-			int rep = entry.getValue().getNumerator() * lcm
-					/ entry.getValue().getDenominator();
-
-			repetitionVector.put(entry.getKey(), rep);
-		}
-
-		checkConsistency();
-
-		// multiply the actor repetition count with its number of phases
-
-		for (Map.Entry<Vertex, Integer> entry : repetitionVector.entrySet()) {
-			Integer val = entry.getValue();
-			int nbPhases = getStaticClass(entry.getKey()).getNumberOfPhases();
-			entry.setValue(val * nbPhases);
-		}
-
 		return repetitionVector;
 	}
 

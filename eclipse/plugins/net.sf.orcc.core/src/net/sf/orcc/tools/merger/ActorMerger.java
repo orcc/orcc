@@ -103,6 +103,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		@Override
 		public void transform(Actor actor) {
+			this.actor = actor;
 			for (Procedure proc : actor.getProcs()) {
 				loads = new HashMap<Variable, Integer>();
 				stores = new HashMap<Variable, Integer>();
@@ -304,7 +305,7 @@ public class ActorMerger implements INetworkTransformation {
 	 * 
 	 */
 	private void createActor(Set<Vertex> vertices) throws OrccException {
-		String name = "cluster_" + clusterIdx++;
+		String name = "Cluster_" + clusterIdx++;
 
 		OrderedMap<String, Port> inputs = getInputs(vertices);
 		OrderedMap<String, Port> outputs = getOutputs(vertices);
@@ -573,7 +574,9 @@ public class ActorMerger implements INetworkTransformation {
 				Port tgtPort = connection.getTarget();
 				Port port = new Port(tgtPort);
 				port.setName("_input_" + index);
-				port.increaseTokenConsumption(tgtPort.getNumTokensConsumed());
+				
+				int rep = scheduler.getRepetitionVector().get(tgt);
+				port.increaseTokenConsumption(rep * tgtPort.getNumTokensConsumed());
 				inputs.put(port.getName(), port);
 				index++;
 
@@ -597,7 +600,9 @@ public class ActorMerger implements INetworkTransformation {
 				Port srcPort = connection.getSource();
 				Port port = new Port(srcPort);
 				port.setName("_output_" + index);
-				port.increaseTokenProduction(srcPort.getNumTokensProduced());
+
+				int rep = scheduler.getRepetitionVector().get(src);
+				port.increaseTokenProduction(rep * srcPort.getNumTokensProduced());
 				outputs.put(port.getName(), port);
 				index++;
 
@@ -616,7 +621,8 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private void mergeActors(Set<Vertex> vertices) throws OrccException {
 		createActor(vertices);
-		Instance instance = new Instance(actor.getName(), actor.getName());
+		String name = actor.getName();
+		Instance instance = new Instance(name.toLowerCase(), name);
 		instance.setContents(actor);
 		Vertex[] v = (Vertex[]) vertices.toArray(new Vertex[0]);
 		instance.getAttributes().putAll(v[0].getInstance().getAttributes());

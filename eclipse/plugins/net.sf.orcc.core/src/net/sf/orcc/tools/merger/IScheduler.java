@@ -33,6 +33,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Vertex;
 
 /**
  * This interface defines a scheduler.
@@ -46,7 +47,9 @@ public interface IScheduler {
 	public int getDepth();
 
 	public Schedule getSchedule();
-	
+
+	public Map<Vertex, Integer> getRepetitionVector();
+
 	/**
 	 * Schedules the given network in-place.
 	 * 
