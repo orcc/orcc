@@ -454,32 +454,39 @@ end process out_management;
 FSM_outputs(port) ::= <<
 case <port.name>FSM_out is
   when waitSend =\>
-    if <port.name>_isend = '1' then
+      <port.name>_rdy    \<= '1';
+      <port.name>_send   \<= <port.name>_isend;
+    if (<port.name>_isend = '1') then
+      <port.name>_data   \<= <port.name>_idata;
+      <port.name>FSM_out \<= checkAck;
+    end if;
+  --
+  when checkAck =\>
+    if ((<port.name>_ack and <port.name>_isend) = '1') then
       <port.name>_rdy    \<= '1';
       <port.name>_send   \<= '1';
-      <port.name>_data   \<= <port.name>_idata;
-      <port.name>FSM_out \<= waitAck;
-    else
+      <port.name>_data   \<= <port.name>_idata;  
+    elsif (<port.name>_ack = '1') then
       <port.name>_rdy    \<= '1';
       <port.name>_send   \<= '0';
       <port.name>FSM_out \<= waitSend;
+    elsif (<port.name>_isend = '1') then
+      <port.name>_rdy    \<= '0';
+      <port.name>_send   \<= '1';
+      <port.name>FSM_out \<= waitAck;
+    else
+      <port.name>_rdy    \<= '1';
+      <port.name>_send   \<= '1';
     end if;
   --
   when waitAck =\>
-    if <port.name>_ack = '1' and <port.name>_isend = '1' then
+    <port.name>_send   \<= '1';  
+    if (<port.name>_ack = '1') then
       <port.name>_rdy    \<= '1';
-      <port.name>_send   \<= '1';
-      <port.name>_data   \<= <port.name>_idata;            
-      <port.name>FSM_out \<= waitAck;
-    elsif <port.name>_ack = '1' then
-      <port.name>_rdy    \<= '1';
-      <port.name>_send   \<= '0';
-      <port.name>FSM_out \<= waitSend;
+      <port.name>_data   \<= <port.name>_idata;  
+      <port.name>FSM_out \<= checkAck;
     else
       <port.name>_rdy    \<= '0';
-      <port.name>_send   \<= '1';
-      <port.name>_data   \<= <port.name>_idata;            
-      <port.name>FSM_out \<= waitAck;
     end if;
   --
   when others =\> null;
@@ -494,6 +501,7 @@ else
 endif>
 
 <port.name>_rdy  \<= '0';     
+<port.name>_reg  \<= '0';     
 <port.name>_send \<= '0';
 >>
 
@@ -760,7 +768,7 @@ endif>
   ---------------------------------------------------------------------------
   -- FSM
   ---------------------------------------------------------------------------
-  type FSM_out_type is (waitSend, waitAck);
+  type FSM_out_type is (waitSend, checkAck, waitAck);
   <actor.outputs.list : {port| signal <port.name>FSM_out : FSM_out_type;}; separator="\n">
   <if(actor.actionScheduler.fsm)
   >  --
