@@ -501,7 +501,9 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	public void checkFunction(final AstFunction function) {
 		checkUniqueNames(function.getParameters());
 		checkUniqueNames(function.getVariables());
-		checkReturnType(function);
+		if (!function.isNative()) {
+			checkReturnType(function);
+		}
 
 		// do not check functions of a unit
 		if (function.eContainer() instanceof AstUnit) {
