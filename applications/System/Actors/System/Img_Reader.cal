@@ -30,7 +30,7 @@
 // Author: Endri Bezati (endri.bezati@epfl.ch)
 package System;
 
-actor Img_Reader () 
+native actor Img_Reader () 
 		==> 
 			uint(size=8)  R,
 			uint(size=8)  G,

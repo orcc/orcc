@@ -30,7 +30,7 @@
 // Author: Endri Bezati <endri.bezati@epfl.ch>
 package System;
 
-actor Writer()
+native actor Writer()
 	uint(size=8) In,
 	bool EOF ==>:
 	

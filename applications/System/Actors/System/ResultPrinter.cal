@@ -34,5 +34,5 @@
  ******************************************************************************/
  package System;
  
-actor ResultPrinter() String Check ==> :
+native actor ResultPrinter() String Check ==> :
 end

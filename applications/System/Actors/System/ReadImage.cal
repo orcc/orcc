@@ -32,7 +32,7 @@
 // Reads an image. Outputs width, height, and image content (RGB).
 package System;
 
-actor ReadImage() ==>
+native actor ReadImage() ==>
 	uint(size=8) R, uint(size=8) G, uint(size=8) B, uint(size=16) SizeOfImage :
 
 	// so the actor scheduler will call an initialize function

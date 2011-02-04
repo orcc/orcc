@@ -41,6 +41,6 @@ ENDCOPYRIGHT
 //
 package System;
 
-actor art_DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
+native actor art_DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
 
 end

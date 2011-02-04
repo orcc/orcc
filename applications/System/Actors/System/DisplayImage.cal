@@ -32,7 +32,7 @@
 // Displays an image. Reads width, height, and image content (RGB).
 package System;
 
-actor DisplayImage()
+native actor DisplayImage()
   uint(size=8) R, uint(size=8) G, uint(size=8) B, uint(size=16) SizeOfImage ==> :
 
 end

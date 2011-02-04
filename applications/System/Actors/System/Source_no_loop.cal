@@ -30,7 +30,7 @@
 // Author: Endri Bezati (endri.bezati@epfl.ch)
 package System;
 
-actor Source_no_loop () 
+native actor Source_no_loop () 
 		==> 
 			uint(size=8) O,
 			bool EOF :

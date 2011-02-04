@@ -3,6 +3,6 @@ package std.io;
 /**
  * Standard I/O reader actor.
  */
-actor Reader() ==> :
+native actor Reader() ==> :
 
 end

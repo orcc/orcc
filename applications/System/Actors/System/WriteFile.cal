@@ -1,6 +1,6 @@
 package System;
 
-actor WriteFile (String filename) uint(size=8) IN ==> :
+native actor WriteFile (String filename) uint(size=8) IN ==> :
 
 	// so the actor scheduler will call an initialize function
 	initialize ==>

@@ -30,7 +30,7 @@
 // Author: Matthieu Wipliez <mwipliez@users.sourceforge.net>
 package System;
 
-actor Source () ==> uint(size=8) O :
+native actor Source () ==> uint(size=8) O :
 
 	// so the actor scheduler will call an initialize function
 	initialize ==>
