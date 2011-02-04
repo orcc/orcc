@@ -53,7 +53,7 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 		/**
 		 * name of the branch being visited
 		 */
-		protected String branchName;
+		private String branchName;
 
 		/**
 		 * action being visited
@@ -145,14 +145,17 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 		 *            the newly-created action
 		 */
 		final protected void replaceTransition(Action newAction) {
-			removeTransition(sourceName, targetName, currentAction);
+			// add an FSM if the actor does not have one
+			if (fsm == null) {
+				addFsm();
+			}
 
 			// add state and transitions
 			String newStateName = newAction.getName();
 			fsm.addState(newStateName);
 
-			fsm.addTransition(sourceName, newStateName, currentAction);
-			fsm.addTransition(newStateName, targetName, newAction);
+			fsm.replaceTarget(sourceName, currentAction, newStateName);
+			fsm.addTransition(newStateName, newAction, targetName);
 		}
 
 		/**
@@ -241,7 +244,7 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 	/**
 	 * Map used to create new unique state names.
 	 */
-	protected Map<String, Integer> stateNames;
+	private Map<String, Integer> stateNames;
 
 	/**
 	 * Adds an FSM to the given action scheduler.
@@ -256,7 +259,7 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 		fsm.setInitialState("init");
 		fsm.addState("init");
 		for (Action action : scheduler.getActions()) {
-			fsm.addTransition("init", "init", action);
+			fsm.addTransition("init", action, "init");
 		}
 
 		scheduler.getActions().clear();
@@ -282,7 +285,7 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 		fsm.addState(targetName);
 
 		// update transitions
-		fsm.addTransition(sourceName, targetName, newAction);
+		fsm.addTransition(sourceName, newAction, targetName);
 	}
 
 	/**
@@ -292,15 +295,14 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 	 * @param action
 	 *            an action
 	 */
-	final public void removeTransition(String sourceName, String targetName,
-			Action action) {
+	final public void removeTransition(String sourceName, Action action) {
 		// add an FSM if the actor does not have one
 		if (fsm == null) {
 			addFsm();
 		}
 
 		// remove transition
-		fsm.removeTransition(sourceName, targetName, action);
+		fsm.removeTransition(sourceName, action);
 	}
 
 	@Override
