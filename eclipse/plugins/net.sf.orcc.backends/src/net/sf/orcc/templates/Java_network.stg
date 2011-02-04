@@ -30,7 +30,7 @@ private IActor actor_<instance.id>;
 
 constructActor(instance) ::= <<
 <if (instance.actor)>
-<if(instance.actor.system)>
+<if(instance.actor.native)>
 actor_<instance.id> = new Actor_<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);
 <else>
 actor_<instance.id> = new net.sf.orcc.generated.<instance.actor.package>.Actor_<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);

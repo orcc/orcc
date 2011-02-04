@@ -347,7 +347,7 @@ i32 <if(var.index)><var.index><else>0<endif>
 >>
 
 procExtern_MD(proc) ::= <<
-<if(proc.external)>i1 1<else>i1 0<endif>
+<if(proc.native)>i1 1<else>i1 0<endif>
 >>
 
 procRetType_MD(proc) ::= <<

@@ -72,6 +72,8 @@ public interface IRConstants {
 
 	public final static String KEY_NAME = "name";
 
+	public static final String KEY_NATIVE = "native";
+
 	public final static String KEY_OUTPUTS = "outputs";
 
 	public final static String KEY_PARAMETERS = "parameters";

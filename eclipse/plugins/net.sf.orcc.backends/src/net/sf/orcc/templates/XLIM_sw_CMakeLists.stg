@@ -1,7 +1,7 @@
 
 printInstance(instance) ::= <<
 <if(instance.actor)>
-<if(!instance.actor.system)>
+<if(!instance.actor.native)>
 <instance.id>.c
 <endif>
 <endif>
@@ -9,7 +9,7 @@ printInstance(instance) ::= <<
 
 printXlim2c(instance) ::= <<
 <if(instance.actor)>
-<if(!instance.actor.system)>
+<if(!instance.actor.native)>
 run_xlim2c(<instance.id>)
 <endif>
 <endif>

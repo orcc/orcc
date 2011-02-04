@@ -46,6 +46,7 @@ import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTION_SCHED;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INITIALIZES;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INPUTS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_NAME;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_NATIVE;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_OUTPUTS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_PARAMETERS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_PROCEDURES;
@@ -303,6 +304,8 @@ public class IRParser {
 			parseParameters(obj.get(KEY_PARAMETERS).getAsJsonArray());
 			variables = new Scope<String, Variable>(variables, true);
 
+			boolean nativeFlag = obj.get(KEY_NATIVE).getAsBoolean();
+
 			inputs = parsePorts(obj.get(KEY_INPUTS).getAsJsonArray());
 			outputs = parsePorts(obj.get(KEY_OUTPUTS).getAsJsonArray());
 
@@ -328,7 +331,7 @@ public class IRParser {
 			ActionScheduler sched = parseActionScheduler(array);
 
 			Actor actor = new Actor(name, file, parameters, inputs, outputs,
-					stateVars, procs, actions, initializes, sched);
+					nativeFlag, stateVars, procs, actions, initializes, sched);
 
 			return actor;
 		} finally {

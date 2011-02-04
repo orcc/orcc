@@ -1,5 +1,5 @@
 printActor(id, actor) ::= <<
-<if (!actor.system)
+<if (!actor.native)
 ><id>.c
 <endif>
 >>

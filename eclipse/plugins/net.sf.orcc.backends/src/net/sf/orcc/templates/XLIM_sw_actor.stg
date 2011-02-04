@@ -390,7 +390,7 @@ WhileNode(whileNode) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-<if(!procedure.external)>
+<if(!procedure.native)>
 <printNodes(procedure.nodes)>
 <endif>
 >>

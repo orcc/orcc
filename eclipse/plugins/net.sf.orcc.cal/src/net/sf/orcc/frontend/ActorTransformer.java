@@ -553,9 +553,9 @@ public class ActorTransformer {
 
 			return new Actor(
 					net.sf.orcc.cal.util.Util.getQualifiedName(entity), file,
-					parameters, inputs, outputs, stateVars, procedures,
-					actions.getAllActions(), initializes.getAllActions(),
-					scheduler);
+					parameters, inputs, outputs, entity.isNative(), stateVars,
+					procedures, actions.getAllActions(),
+					initializes.getAllActions(), scheduler);
 		} finally {
 			// cleanup
 			astTransformer.clear();

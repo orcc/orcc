@@ -89,11 +89,6 @@ public class Procedure extends AbstractLocalizable {
 
 	}
 
-	/**
-	 * whether this procedure is external.
-	 */
-	private boolean external;
-
 	private CFG graph;
 
 	/**
@@ -105,6 +100,11 @@ public class Procedure extends AbstractLocalizable {
 	 * the name of this procedure
 	 */
 	private String name;
+
+	/**
+	 * whether this procedure is external.
+	 */
+	private boolean nativeFlag;
 
 	/**
 	 * the list of nodes of this procedure
@@ -128,8 +128,7 @@ public class Procedure extends AbstractLocalizable {
 	 * 
 	 * @param name
 	 *            The procedure name.
-	 * @param external
-	 *            Whether it is external or not.
+	 * @param native Whether it is native or not.
 	 * @param location
 	 *            The procedure location.
 	 * @param returnType
@@ -139,11 +138,11 @@ public class Procedure extends AbstractLocalizable {
 	 * @param locals
 	 *            The procedure local variables.
 	 */
-	public Procedure(String name, boolean external, Location location,
+	public Procedure(String name, boolean nativeFlag, Location location,
 			Type returnType, OrderedMap<String, Variable> parameters,
 			OrderedMap<String, Variable> locals, List<CFGNode> nodes) {
 		super(location);
-		this.external = external;
+		this.nativeFlag = nativeFlag;
 		this.nodes = nodes;
 		this.locals = locals;
 		this.name = name;
@@ -166,7 +165,7 @@ public class Procedure extends AbstractLocalizable {
 	 */
 	public Procedure(String name, Location location, Type returnType) {
 		super(location);
-		this.external = false;
+		this.nativeFlag = false;
 		this.nodes = new ArrayList<CFGNode>();
 		this.locals = new OrderedMap<String, Variable>();
 		this.name = name;
@@ -258,12 +257,12 @@ public class Procedure extends AbstractLocalizable {
 	}
 
 	/**
-	 * Returns <code>true</code> if this procedure is external.
+	 * Returns <code>true</code> if this procedure is native.
 	 * 
-	 * @return <code>true</code> if this procedure is external
+	 * @return <code>true</code> if this procedure is native
 	 */
-	public boolean isExternal() {
-		return external;
+	public boolean isNative() {
+		return nativeFlag;
 	}
 
 	/**
@@ -295,16 +294,6 @@ public class Procedure extends AbstractLocalizable {
 	}
 
 	/**
-	 * Sets this procedure as "external".
-	 * 
-	 * @param external
-	 *            value of external flag
-	 */
-	public void setExternal(boolean external) {
-		this.external = external;
-	}
-
-	/**
 	 * Set the CFG of this procedure.
 	 * 
 	 * @param the
@@ -322,6 +311,16 @@ public class Procedure extends AbstractLocalizable {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Sets this procedure as "native".
+	 * 
+	 * @param nativeFlag
+	 *            value of native flag
+	 */
+	public void setNative(boolean nativeFlag) {
+		this.nativeFlag = nativeFlag;
 	}
 
 	/**

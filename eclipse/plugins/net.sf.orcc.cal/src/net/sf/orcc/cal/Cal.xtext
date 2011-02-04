@@ -12,7 +12,8 @@ AstEntity:
 	('package' package=QualifiedName ';')?
 	(imports += Import)*
 	
-	(('actor' name=ID actor=AstActor) | ('unit' name=ID unit=AstUnit));
+	( ((native ?= 'native')? 'actor' name=ID actor=AstActor)
+	| ('unit' name=ID unit=AstUnit) );
 
 Import: 'import' importedNamespace=QualifiedNameWithWildCard ';';
 
@@ -46,7 +47,9 @@ AstActor: {AstActor}
 		(outputs += AstPort (',' outputs += AstPort)*)? ':'
 
 	(functions += AstFunction
+	| functions += AstNativeFunction
 	| procedures += AstProcedure
+	| procedures += AstNativeProcedure
 	| actions += AstAction
 	| initializes += AstInitialize
 	| stateVariables += AstStateVariable)*
@@ -70,6 +73,12 @@ AstFunction:
 	expression=AstExpression
 	'end';
 
+AstNativeFunction returns AstFunction:
+	native?='native' 'function' name=ID
+	'('
+		(parameters += AstVariableDeclaration (',' parameters += AstVariableDeclaration)*)?
+	')' '-->' type=AstType 'end';
+
 AstProcedure:
 	'procedure' name=ID
 	'('
@@ -81,6 +90,12 @@ AstProcedure:
 	'begin'
 		(statements += AstStatement)*
 	'end';
+
+AstNativeProcedure returns AstProcedure:
+	native ?= 'native' 'procedure' name=ID
+	'('
+		(parameters += AstVariableDeclaration (',' parameters += AstVariableDeclaration)*)?
+	')' 'end';
 
 AstParameter returns AstVariable: AstVariableDeclaration ('=' value=AstExpression)?;
 

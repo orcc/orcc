@@ -53,7 +53,7 @@ static void initNetwork(AbstractActorInstance ***pInstances, int *pNumberOfInsta
 /////////////////////////////
 
 declareActorInstance(actorInstance) ::= <<
-<if(actorInstance.actor.system)>
+<if(actorInstance.actor.native)>
 extern ActorClass ActorClass_<actorInstance.actor.simpleName>;
 <else>
 extern ActorClass ActorClass_<actorInstance.id>;
@@ -72,7 +72,7 @@ declarePort(dir,port,id) ::= <<
 /////////////////////////////
 
 initializeActorInstance(actorInstance,numberOfReaders,localFifoSize,index) ::= <<
-<if(actorInstance.actor.system)>
+<if(actorInstance.actor.native)>
 p<actorInstance.id> = createActorInstance(&ActorClass_<actorInstance.actor.simpleName>);
 <else>
 p<actorInstance.id> = createActorInstance(&ActorClass_<actorInstance.id>);

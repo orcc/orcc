@@ -202,7 +202,7 @@ while (<whileNode.value>) {
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-<if(!procedure.external)>
+<if(!procedure.native)>
 
 static <procedure.returnType> <procedure>(<
   procedure.parameters.list: {param | <varDecl(param)>}; wrap, anchor, separator=", ">) {

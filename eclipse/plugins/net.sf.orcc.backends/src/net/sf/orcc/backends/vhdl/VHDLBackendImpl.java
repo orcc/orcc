@@ -150,7 +150,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		// remove initialization procedure (we could do better)
 		Procedure initProc = actor.getProcs().get("_initialize");
 		if (initProc != null) {
-			initProc.setExternal(true);
+			initProc.setNative(true);
 		}
 	}
 

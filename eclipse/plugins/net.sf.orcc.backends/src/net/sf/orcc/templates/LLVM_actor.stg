@@ -472,7 +472,7 @@ b<label(blockNode)>:
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-<if(!procedure.external)>
+<if(!procedure.native)>
 define <procedure.returnType> @<procedure>(<procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 <if(procedure.locals.list)>

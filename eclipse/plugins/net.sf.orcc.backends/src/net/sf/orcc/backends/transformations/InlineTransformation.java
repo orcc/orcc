@@ -350,7 +350,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 		Procedure function = call.getProcedure();
 
 		// Set the function/procedure to external thus it will not be printed
-		function.setExternal(true);
+		function.setNative(true);
 
 		// Create a new local variable to all function/procedure's variable
 		// except for list (reference is using)

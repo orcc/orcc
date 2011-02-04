@@ -102,8 +102,8 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Call call) {
-		// Set initialize to external thus it will not be printed
-		call.getProcedure().setExternal(true);
+		// Set initialize to native so it will not be printed
+		call.getProcedure().setNative(true);
 	}
 
 }

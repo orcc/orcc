@@ -169,7 +169,7 @@ public final class STPrinter {
 	 * @throws IOException
 	 */
 	public boolean printActor(String fileName, Actor actor) throws IOException {
-		if (!actor.isSystem()) {
+		if (!actor.isNative()) {
 			// if source file is older than target file, do not generate
 			File sourceFile = new File(actor.getFile());
 			File targetFile = new File(fileName);
@@ -213,7 +213,7 @@ public final class STPrinter {
 		long lastModified = getLastModifiedHierarchy(instance);
 
 		if (instance.isNetwork()
-				|| (instance.isActor() && !instance.getActor().isSystem())) {
+				|| (instance.isActor() && !instance.getActor().isNative())) {
 			// if source file is older than target file, do not generate
 			File targetFile = new File(fileName);
 			long targetLastModified = targetFile.lastModified();

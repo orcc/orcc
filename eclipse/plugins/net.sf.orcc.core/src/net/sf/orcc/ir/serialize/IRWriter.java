@@ -46,6 +46,7 @@ import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTION_SCHED;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INITIALIZES;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INPUTS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_NAME;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_NATIVE;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_OUTPUTS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_PARAMETERS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_PROCEDURES;
@@ -118,8 +119,8 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.OrderedMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -736,6 +737,7 @@ public class IRWriter {
 		obj.add(KEY_PARAMETERS, writeParameters(actor.getParameters()));
 		obj.add(KEY_INPUTS, writePorts(actor.getInputs()));
 		obj.add(KEY_OUTPUTS, writePorts(actor.getOutputs()));
+		obj.addProperty(KEY_NATIVE, actor.isNative());
 		obj.add(KEY_STATE_VARS, writeStateVariables(actor.getStateVars()));
 		obj.add(KEY_PROCEDURES, writeProcedures(actor.getProcs()));
 
@@ -898,7 +900,7 @@ public class IRWriter {
 	private JsonArray writeProcedure(Procedure procedure) {
 		JsonArray array = new JsonArray();
 		array.add(new JsonPrimitive(procedure.getName()));
-		array.add(new JsonPrimitive(procedure.isExternal()));
+		array.add(new JsonPrimitive(procedure.isNative()));
 		array.add(writeLocation(procedure.getLocation()));
 		array.add(writeType(procedure.getReturnType()));
 

@@ -97,7 +97,7 @@ public class StaticSubsetDetector {
 
 		Actor cluster = new Actor("cluster", "", null,
 				new OrderedMap<String, Port>(), new OrderedMap<String, Port>(),
-				null, null, null, null, null);
+				false, null, null, null, null, null);
 		Instance inst = new Instance(cluster.getName(), cluster.getName());
 		inst.setContents(cluster);
 		Vertex clusterVertex = new Vertex(inst);

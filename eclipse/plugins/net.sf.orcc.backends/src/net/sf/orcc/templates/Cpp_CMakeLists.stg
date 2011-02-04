@@ -1,5 +1,5 @@
 addActor(actor) ::= <<
-<if (!actor.system)>
+<if (!actor.native)>
 <if (!actor.packageAsList.empty)><actor.packageAsList; separator="/">/<endif><actor.simpleName>.cpp
 <endif>
 >>

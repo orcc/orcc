@@ -65,6 +65,8 @@ public class Actor implements Comparable<Actor> {
 
 	private String name;
 
+	private boolean nativeFlag;
+
 	private OrderedMap<String, Port> outputs;
 
 	private OrderedMap<String, ? extends Variable> parameters;
@@ -105,6 +107,7 @@ public class Actor implements Comparable<Actor> {
 	public Actor(String name, String file,
 			OrderedMap<String, ? extends Variable> parameters,
 			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
+			boolean nativeFlag,
 			OrderedMap<String, GlobalVariable> stateVars,
 			OrderedMap<String, Procedure> procs, List<Action> actions,
 			List<Action> initializes, ActionScheduler scheduler) {
@@ -113,6 +116,7 @@ public class Actor implements Comparable<Actor> {
 		this.initializes = initializes;
 		this.inputs = inputs;
 		this.name = name;
+		this.nativeFlag = nativeFlag;
 		this.outputs = outputs;
 		this.parameters = parameters;
 		this.procs = procs;
@@ -316,8 +320,8 @@ public class Actor implements Comparable<Actor> {
 	 * @return <code>true</code> if this actor is a <code>system</code> actor,
 	 *         <code>false</code> otherwise
 	 */
-	public boolean isSystem() {
-		return actions.isEmpty();
+	public boolean isNative() {
+		return nativeFlag;
 	}
 
 	/**

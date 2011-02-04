@@ -828,7 +828,7 @@ public class AstTransformer {
 				if (procedure == null) {
 					procedure = new Procedure("print", location,
 							IrFactory.eINSTANCE.createTypeVoid());
-					procedure.setExternal(true);
+					procedure.setNative(true);
 					procedures.put("print", procedure);
 				}
 
@@ -1314,8 +1314,8 @@ public class AstTransformer {
 		restoreContext(oldContext);
 		addReturn(procedure, value);
 
-		if (astFunction.eContainer() == null) {
-			procedure.setExternal(true);
+		if (astFunction.eContainer() == null || astFunction.isNative()) {
+			procedure.setNative(true);
 		}
 
 		procedures.put(file, location, name, procedure);
@@ -1482,8 +1482,8 @@ public class AstTransformer {
 		restoreContext(oldContext);
 		addReturn(procedure, null);
 
-		if (astProcedure.eContainer() == null) {
-			procedure.setExternal(true);
+		if (astProcedure.eContainer() == null || astProcedure.isNative()) {
+			procedure.setNative(true);
 		}
 
 		procedures.put(file, location, name, procedure);

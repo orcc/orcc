@@ -174,7 +174,7 @@ fifo_<writeEnd.port>.writeEnd(<writeEnd.numTokens>, <writeEnd.target>);
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-<if(!procedure.external)>
+<if(!procedure.native)>
 
 private <procedure.returnType> <procedure>(<procedure.parameters.list: {parameter | <variableDeclaration(parameter)>}; wrap, anchor, separator=", ">) {
 <if(procedure.locals.list)>

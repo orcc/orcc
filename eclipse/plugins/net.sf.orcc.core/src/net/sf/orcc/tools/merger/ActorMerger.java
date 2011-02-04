@@ -228,7 +228,7 @@ public class ActorMerger implements INetworkTransformation {
 			Actor current = instance.getActor();
 
 			for (Procedure proc : current.getProcs()) {
-				if (!proc.isExternal()) {
+				if (!proc.isNative()) {
 					proc.setName(id + "_" + proc.getName());
 					actor.getProcs().put(proc.getName(), proc);
 				}
@@ -317,8 +317,8 @@ public class ActorMerger implements INetworkTransformation {
 		List<Action> initializes = new ArrayList<Action>();
 		ActionScheduler sched = new ActionScheduler(actions, null);
 
-		actor = new Actor(name, "", parameters, inputs, outputs, stateVars,
-				procs, actions, initializes, sched);
+		actor = new Actor(name, "", parameters, inputs, outputs, false,
+				stateVars, procs, actions, initializes, sched);
 
 		addProceduresAndStateVars();
 
@@ -574,9 +574,10 @@ public class ActorMerger implements INetworkTransformation {
 				Port tgtPort = connection.getTarget();
 				Port port = new Port(tgtPort);
 				port.setName("_input_" + index);
-				
+
 				int rep = scheduler.getRepetitionVector().get(tgt);
-				port.increaseTokenConsumption(rep * tgtPort.getNumTokensConsumed());
+				port.increaseTokenConsumption(rep
+						* tgtPort.getNumTokensConsumed());
 				inputs.put(port.getName(), port);
 				index++;
 
@@ -602,7 +603,8 @@ public class ActorMerger implements INetworkTransformation {
 				port.setName("_output_" + index);
 
 				int rep = scheduler.getRepetitionVector().get(src);
-				port.increaseTokenProduction(rep * srcPort.getNumTokensProduced());
+				port.increaseTokenProduction(rep
+						* srcPort.getNumTokensProduced());
 				outputs.put(port.getName(), port);
 				index++;
 
