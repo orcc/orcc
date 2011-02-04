@@ -123,8 +123,10 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	
 	Initializer initializer(Context, decoder);
 	for (itKeep = keeps->begin(); itKeep != keeps->end(); itKeep++){
-		initializer.initialize((*itKeep).second);
+		initializer.add((*itKeep).second);
 	}
+	
+	initializer.initialize();
 
 	// Setting connections of the decoder
 	Connector connector(Context, decoder);
@@ -144,8 +146,10 @@ void ConfigurationEngine::reinit(Decoder* decoder){
 	map<string, Instance*>* instances = configuration->getInstances();
 
 	for (it = instances->begin(); it != instances->end(); it++){
-		initializer.initialize(it->second);
+		initializer.add(it->second);
 	}
+	
+	initializer.initialize();
 
 	// Reset connections of the decoder
 	connector.setConnections(configuration, decoder->getEE());

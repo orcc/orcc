@@ -97,7 +97,10 @@ Constant* IntExpr::getConstant(){
 }
 
 Constant* ListExpr::getConstant(){
-	return NULL;
+	if (constantArray == NULL){
+		NULL;
+	}
+	return constantArray;
 }
 
 Constant* BinaryExpr::getConstant(){

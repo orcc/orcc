@@ -74,13 +74,19 @@ public:
 	Initializer(llvm::LLVMContext& C, Decoder* decoder);
 
 	/**
-	 * @brief Initialize an instance.
+	 * @brief Add an instance to initialize.
 	 *
-	 *	Initialize an already compiled instance
+	 *	Add an already compiled instance for reinitialization
 	 *
 	 * @param instance : Instance to reinitialize
 	 */
-	void initialize(Instance* instance);
+	void add(Instance* instance);
+
+	/**
+	 * @brief Launch the initialization process.
+	 *
+	 */
+	void initialize();
 
 	~Initializer();
 
@@ -92,11 +98,6 @@ private:
 	 *	@param module : the Module to write the function
 	 */
 	void createInitializeFn(llvm::Module* module);
-
-	/**
-	 * @brief Run the initializer
-	 */
-	void runInitializer();
 
 	/**
 	 * @brief Initialize an FSM

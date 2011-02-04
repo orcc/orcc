@@ -40,6 +40,7 @@
 
 #include "Initializer.h"
 
+#include "llvm/Constants.h"
 #include "llvm/Function.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/GlobalVariable.h"
@@ -57,7 +58,8 @@ using namespace llvm;
 Initializer::Initializer( LLVMContext& C, Decoder* decoder) : Context(C){
 	this->executionEngine = decoder->getEE();
 	this->decoder = decoder;
-	this->initFn = NULL;
+
+	createInitializeFn(decoder->getModule());
 }
 
 Initializer::~Initializer(){
@@ -66,10 +68,14 @@ Initializer::~Initializer(){
 	}	
 }
 
+void Initializer::initialize(){
+	//Close function
+	ReturnInst::Create(Context, 0, entryBB);
+
+	executionEngine->runFunction(initFn);
+}
+
 void Initializer::createInitializeFn(Module* module){
-	if (initFn != NULL){
-		initFn->eraseFromParent();
-	}
 	
 	FunctionType* FTY = FunctionType::get(Type::getVoidTy(Context), (Type*)NULL);
 	initFn = Function::Create(FTY, Function::ExternalLinkage, "init", module);
@@ -79,8 +85,7 @@ void Initializer::createInitializeFn(Module* module){
 	
 }
 
-void Initializer::initialize(Instance* instance){
-	createInitializeFn(decoder->getModule());
+void Initializer::add(Instance* instance){
 	ActionScheduler* actionScheduler = instance->getActionScheduler();
 	
 	if (actionScheduler->hasFsm()){
@@ -88,8 +93,6 @@ void Initializer::initialize(Instance* instance){
 	}
 
 	initializeStateVariables(instance->getStateVars());
-
-	runInitializer();
 }
 
 void Initializer::initializeFSM(FSM* fsm){
@@ -104,13 +107,6 @@ void Initializer::initializeFSM(FSM* fsm){
 		
 		*fsmPtr = stateIndex;
 	}
-}
-
-void Initializer::runInitializer(){
-	//Close function
-	ReturnInst::Create(Context, 0, entryBB);
-
-	executionEngine->runFunction(initFn);
 }
 
 void Initializer::initializeStateVariables(map<string, StateVar*>* vars){
@@ -136,7 +132,7 @@ void Initializer::initializeStateVariable(StateVar* var){
 	}else if (initVal->isListExpr()){
 		initializeListExpr(var->getGlobalVariable(), (ListExpr*)initVal);
 	}else{
-		cout<< "Initialize only support initialization of integer \n";
+		cout<< "Initialize only support initialization of integer. \n";
 		exit(1);
 	}
 	
@@ -148,5 +144,28 @@ void Initializer::initializeIntExpr(GlobalVariable* var, IntExpr* expr){
 }
 
 void Initializer::initializeListExpr(GlobalVariable* var, ListExpr* expr){
+	ConstantArray* constantArray = cast<ConstantArray>(expr->getConstant());
+	const PointerType* ptrType = cast<PointerType>(var->getType());
+	const ArrayType* arraytype = cast<ArrayType>(ptrType->getElementType());
 	
+	uint64_t numElements = arraytype->getNumElements();
+
+	for (uint64_t elt = 0; elt < numElements; elt++){
+		Constant* Elt = constantArray->getOperand(elt);
+
+		if (Elt == NULL){
+			cout<< "Initialization error of array. \n";
+			exit(1);
+		}
+
+		const Type *Int32Ty = Type::getInt32Ty(Context);
+
+		Value *Idxs[2];
+		Idxs[0] = ConstantInt::get(Int32Ty, 0);
+		Idxs[1] = ConstantInt::get(Int32Ty, elt);
+		
+		GetElementPtrInst* getInst = GetElementPtrInst::Create(var, Idxs, Idxs + 2, "", entryBB);
+			
+		new StoreInst( Elt, getInst, entryBB);
+	}
 }
