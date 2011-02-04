@@ -11,6 +11,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.Instruction;
@@ -80,40 +81,22 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 		}
 
 		/**
-		 * Adds an FSM to the given action scheduler.
-		 * 
-		 * @param actionScheduler
-		 *            action scheduler
-		 */
-		private void addFsm(ActionScheduler actionScheduler) {
-			fsm = new FSM();
-			fsm.setInitialState("init");
-			fsm.addState("init");
-			for (Action action : actionScheduler.getActions()) {
-				fsm.addTransition("init", "init", action);
-			}
-
-			actionScheduler.getActions().clear();
-			actionScheduler.setFsm(fsm);
-		}
-
-		/**
 		 * Creates a new empty action with the given name.
 		 * 
 		 * @param name
 		 *            action name
 		 * @return a new empty action with the given name
 		 */
-		private Action createNewAction(String name) {
+		final protected Action createNewAction(Expression condition, String name) {
 			// scheduler
-			Procedure scheduler = new Procedure(name, new Location(),
-					IrFactory.eINSTANCE.createTypeBool());
+			Procedure scheduler = new Procedure("isSchedulable_" + name,
+					new Location(), IrFactory.eINSTANCE.createTypeBool());
 			LocalVariable result = scheduler.newTempLocalVariable(
 					ActionSplitter.this.actor.getFile(),
 					IrFactory.eINSTANCE.createTypeBool(), "result");
 			result.setIndex(1);
 			BlockNode block = new BlockNode(scheduler);
-			block.add(new Assign(result, new BoolExpr(true)));
+			block.add(new Assign(result, condition));
 			block.add(new Return(new VarExpr(new Use(result))));
 			scheduler.getNodes().add(block);
 
@@ -142,7 +125,7 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 		 * 
 		 * @return a new unique state name
 		 */
-		private String getNewStateName() {
+		final protected String getNewStateName() {
 			String stateName = branchName;
 			Integer count = stateNames.get(stateName);
 			if (count == null) {
@@ -161,20 +144,15 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 		 * @param newAction
 		 *            the newly-created action
 		 */
-		private void replaceTransition(Action newAction) {
-			// add an FSM if the actor does not have one
-			if (fsm == null) {
-				addFsm(ActionSplitter.this.actor.getActionScheduler());
-			}
+		final protected void replaceTransition(Action newAction) {
+			removeTransition(sourceName, targetName, currentAction);
 
-			// add state
-			String stateName = newAction.getName();
-			fsm.addState(stateName);
+			// add state and transitions
+			String newStateName = newAction.getName();
+			fsm.addState(newStateName);
 
-			// update transitions
-			fsm.removeTransition(sourceName, targetName, currentAction);
-			fsm.addTransition(sourceName, stateName, currentAction);
-			fsm.addTransition(stateName, targetName, newAction);
+			fsm.addTransition(sourceName, newStateName, currentAction);
+			fsm.addTransition(newStateName, targetName, newAction);
 		}
 
 		/**
@@ -184,11 +162,11 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 			String newActionName = getNewStateName();
 
 			// create new action
-			nextAction = createNewAction(newActionName);
+			nextAction = createNewAction(new BoolExpr(true), newActionName);
 
 			// move code
-			new CodeMover(itInstruction, itNode).moveCode(
-					currentAction.getBody(), nextAction.getBody());
+			new CodeMover().moveBlock(itInstruction, nextAction.getBody());
+			new CodeMover().moveNodes(itNode, nextAction.getBody());
 
 			// update transitions
 			replaceTransition(nextAction);
@@ -197,17 +175,41 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 			sourceName = newActionName;
 		}
 
-	}
-
-	private class CodeMover extends AbstractActorTransformation {
-
-		public CodeMover(ListIterator<Instruction> itInstruction,
-				ListIterator<CFGNode> itNode) {
-			this.itInstruction = itInstruction;
-			this.itNode = itNode;
+		@Override
+		public void visit(Action action) {
+			this.branchName = targetName + "_" + action.getName();
+			nextAction = action;
+			visitInBranch();
 		}
 
-		public void moveCode(Procedure oldProc, Procedure newProc) {
+		/**
+		 * Visits the next action(s) without updating the branch name.
+		 */
+		protected void visitInBranch() {
+			while (nextAction != null) {
+				currentAction = nextAction;
+				nextAction = null;
+
+				visit(currentAction.getBody());
+			}
+		}
+
+	}
+
+	/**
+	 * This class defines methods to move code (blocks and instructions) from
+	 * one procedure to another.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	protected class CodeMover extends AbstractActorTransformation {
+
+		public CodeMover() {
+		}
+
+		public void moveBlock(ListIterator<Instruction> itInstruction,
+				Procedure newProc) {
 			// move instructions
 			BlockNode block = BlockNode.getLast(newProc);
 			Instruction instruction = itInstruction.previous();
@@ -217,6 +219,14 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 				instruction = itInstruction.next();
 				itInstruction.remove();
 				block.add(instruction);
+			}
+		}
+
+		public void moveNodes(ListIterator<CFGNode> itNode, Procedure newProc) {
+			while (itNode.hasNext()) {
+				CFGNode node = itNode.next();
+				itNode.remove();
+				newProc.getNodes().add(node);
 			}
 		}
 
@@ -233,11 +243,90 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 	 */
 	protected Map<String, Integer> stateNames;
 
+	/**
+	 * Adds an FSM to the given action scheduler.
+	 * 
+	 * @param actionScheduler
+	 *            action scheduler
+	 */
+	final public void addFsm() {
+		ActionScheduler scheduler = actor.getActionScheduler();
+
+		fsm = new FSM();
+		fsm.setInitialState("init");
+		fsm.addState("init");
+		for (Action action : scheduler.getActions()) {
+			fsm.addTransition("init", "init", action);
+		}
+
+		scheduler.getActions().clear();
+		scheduler.setFsm(fsm);
+	}
+
+	/**
+	 * Adds a transition <code>source</code> -&gt; <code>target</code> with the
+	 * given action.
+	 * 
+	 * @param newAction
+	 *            the newly-created action
+	 */
+	final public void addTransition(String sourceName, String targetName,
+			Action newAction) {
+		// add an FSM if the actor does not have one
+		if (fsm == null) {
+			addFsm();
+		}
+
+		// add state
+		fsm.addState(sourceName);
+		fsm.addState(targetName);
+
+		// update transitions
+		fsm.addTransition(sourceName, targetName, newAction);
+	}
+
+	/**
+	 * Removes the transition <code>source</code> -&gt; <code>target</code> with
+	 * the given action.
+	 * 
+	 * @param action
+	 *            an action
+	 */
+	final public void removeTransition(String sourceName, String targetName,
+			Action action) {
+		// add an FSM if the actor does not have one
+		if (fsm == null) {
+			addFsm();
+		}
+
+		// remove transition
+		fsm.removeTransition(sourceName, targetName, action);
+	}
+
 	@Override
 	public void transform(Actor actor) {
 		this.actor = actor;
 		stateNames = new HashMap<String, Integer>();
+	}
 
+	/**
+	 * Visits the given transition characterized by its source name, target name
+	 * and action.
+	 * 
+	 * @param sourceName
+	 *            name of source state
+	 * @param targetName
+	 *            name of target state
+	 * @param action
+	 *            action associated with transition
+	 */
+	abstract protected void visit(String sourceName, String targetName,
+			Action action);
+
+	/**
+	 * Visits all actions of this actor.
+	 */
+	protected final void visitAllActions() {
 		fsm = actor.getActionScheduler().getFsm();
 		if (fsm == null) {
 			// no FSM: simply visit all the actions
@@ -267,19 +356,5 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 			}
 		}
 	}
-
-	/**
-	 * Visits the given transition characterized by its source name, target name
-	 * and action.
-	 * 
-	 * @param sourceName
-	 *            name of source state
-	 * @param targetName
-	 *            name of target state
-	 * @param action
-	 *            action associated with transition
-	 */
-	abstract protected void visit(String sourceName, String targetName,
-			Action action);
 
 }

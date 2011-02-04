@@ -30,14 +30,16 @@ package net.sf.orcc.backends.vhdl.transformations;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -53,13 +55,19 @@ import net.sf.orcc.ir.nodes.IfNode;
  */
 public class MultipleArrayAccessTransformation extends ActionSplitter {
 
-	private class BranchVisitor extends AbstractBranchVisitor {
+	/**
+	 * This class extends the abstract branch visitor by splitting "if"
+	 * conditionals if the "then" branch or the "else" branch contain more than
+	 * one access to a given array.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class ConditionalSplitter extends AbstractBranchVisitor {
 
 		private Map<Variable, Integer> numRW;
 
-		private Expression splitCondition;
-
-		public BranchVisitor(String sourceName, String targetName) {
+		public ConditionalSplitter(String sourceName, String targetName) {
 			super(sourceName, targetName);
 			numRW = new HashMap<Variable, Integer>();
 		}
@@ -70,8 +78,8 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 		 * 
 		 * @return true if one of the values is greater than one
 		 */
-		private boolean hasManyAccesses() {
-			for (Integer value : numRW.values()) {
+		private boolean hasManyAccesses(Map<?, Integer> map) {
+			for (Integer value : map.values()) {
 				if (value > 1) {
 					return true;
 				}
@@ -80,60 +88,67 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 			return false;
 		}
 
-		@Override
-		public void visit(Action action) {
-			this.branchName = targetName + "_" + action.getName();
-			nextAction = action;
-			visitInBranch();
+		/**
+		 * Splits the given IfNode into three different actions: one containing
+		 * the "then" branch, one containing the "else" branch, and the final
+		 * one containing the rest.
+		 * 
+		 * @param ifNode
+		 */
+		private void splitIfNode(IfNode ifNode) {
+			String oldTargetName = targetName;
+
+			// replaces existing transition by a transition to a "fork" state
+			removeTransition(sourceName, targetName, currentAction);
+
+			String forkSourceName = sourceName + "_fork";
+			addTransition(sourceName, forkSourceName, currentAction);
+
+			// remove this IfNode from action before "fork"
+			itNode.remove();
+
+			// add cond branches to a "join" state
+			String joinTargetName = targetName + "_join";
+
+			splitNodes(ifNode.getValue(), ifNode.getThenNodes().listIterator());
+			addTransition(forkSourceName, joinTargetName, nextAction);
+
+			splitNodes(new BoolExpr(true), ifNode.getElseNodes().listIterator());
+			addTransition(forkSourceName, joinTargetName, nextAction);
+
+			// add join to original target state
+			splitNodes(new BoolExpr(true), itNode);
+			addTransition(joinTargetName, oldTargetName, nextAction);
+			sourceName = oldTargetName;
+			targetName = oldTargetName;
 		}
 
-		/**
-		 * Visits the next action(s) without updating the branch name.
-		 */
-		private void visitInBranch() {
-			while (nextAction != null) {
-				currentAction = nextAction;
-				nextAction = null;
-				numRW.clear();
-
-				visit(currentAction.getBody());
-			}
+		private void splitNodes(Expression condition,
+				ListIterator<CFGNode> itNode) {
+			String newActionName = getNewStateName();
+			nextAction = createNewAction(condition, newActionName);
+			new CodeMover().moveNodes(itNode, nextAction.getBody());
 		}
 
 		@Override
 		public void visit(IfNode ifNode) {
-			// record condition
-			Expression oldCondition = splitCondition;
-			splitCondition = ifNode.getValue();
+			ListIterator<CFGNode> localItNode = itNode;
 
 			// visit then
 			numRW.clear();
 			visit(ifNode.getThenNodes());
-			if (hasManyAccesses()) {
-				visitInBranch();
-
-				// no need for "else" to have a split condition (because the
-				// transition will be added after)
-				splitCondition = null;
-			} else {
-				// invert split condition
-				splitCondition = new UnaryExpr(UnaryOp.LOGIC_NOT,
-						splitCondition, IrFactory.eINSTANCE.createTypeBool());
-			}
+			boolean thenNeedSplit = hasManyAccesses(numRW);
 
 			// visit else
 			numRW.clear();
 			visit(ifNode.getElseNodes());
-			if (hasManyAccesses()) {
-				visitInBranch();
+			boolean elseNeedSplit = hasManyAccesses(numRW);
+
+			// check number of accesses
+			if (thenNeedSplit || elseNeedSplit) {
+				itNode = localItNode;
+				splitIfNode(ifNode);
 			}
-
-			// restore condition
-			splitCondition = oldCondition;
-
-			// join: not supposed to have any array there
-			numRW.clear();
-			visit(ifNode.getJoinNode());
 		}
 
 		@Override
@@ -161,7 +176,58 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 					numRW.put(variable, 1);
 				} else {
 					numRW.put(variable, numAccesses + 1);
+				}
+			}
+		}
 
+	}
+
+	/**
+	 * This class extends the abstract branch visitor by splitting any action
+	 * that contain more than one access to a given array.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class UnconditionalSplitter extends AbstractBranchVisitor {
+
+		private Map<Variable, Integer> numRW;
+
+		public UnconditionalSplitter(String sourceName, String targetName) {
+			super(sourceName, targetName);
+			numRW = new HashMap<Variable, Integer>();
+		}
+
+		@Override
+		public void visit(Load load) {
+			visitLoadStore(load.getSource().getVariable(), load.getIndexes());
+		}
+
+		@Override
+		public void visit(Procedure procedure) {
+			numRW.clear();
+			super.visit(procedure);
+		}
+
+		@Override
+		public void visit(Store store) {
+			visitLoadStore(store.getTarget(), store.getIndexes());
+		}
+
+		/**
+		 * Visits a load or a store, and updates the numRW map.
+		 * 
+		 * @param variable
+		 *            a variable
+		 * @param indexes
+		 *            a list of indexes
+		 */
+		private void visitLoadStore(Variable variable, List<Expression> indexes) {
+			if (!indexes.isEmpty()) {
+				Integer numAccesses = numRW.get(variable);
+				if (numAccesses == null) {
+					numRW.put(variable, 1);
+				} else {
 					splitAction();
 				}
 			}
@@ -169,9 +235,28 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 
 	}
 
+	private boolean conditionalPhase;
+
+	@Override
+	public void transform(Actor actor) {
+		super.transform(actor);
+
+		// first we split conditional branches that contain multiple accesses
+		conditionalPhase = true;
+		visitAllActions();
+
+		// then we split any action that contain multiple accesses
+		conditionalPhase = false;
+		visitAllActions();
+	}
+
 	@Override
 	protected void visit(String sourceName, String targetName, Action action) {
-		new BranchVisitor(sourceName, targetName).visit(action);
+		if (conditionalPhase) {
+			new ConditionalSplitter(sourceName, targetName).visit(action);
+		} else {
+			new UnconditionalSplitter(sourceName, targetName).visit(action);
+		}
 	}
 
 }
