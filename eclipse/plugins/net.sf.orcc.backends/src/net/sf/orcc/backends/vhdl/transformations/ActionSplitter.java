@@ -103,9 +103,9 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 			// body
 			Procedure body = new Procedure(name, new Location(),
 					IrFactory.eINSTANCE.createTypeVoid());
-			block = new BlockNode(scheduler);
+			block = new BlockNode(body);
 			block.add(new Return(null));
-			scheduler.getNodes().add(block);
+			body.getNodes().add(block);
 
 			// tag
 			Tag tag = new Tag();

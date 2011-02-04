@@ -106,21 +106,28 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new DeadVariableRemoval(false),
 
 				// out-of-SSA transformation
+				// must be done before WTF and MAAT passes because having phis
+				// span multiple procedures does not make sense
 				new PhiRemoval(),
 
-				new VariableRedimension(),
-				new BoolExprTransformation(),
-
-				new TransformConditionals(),
-				
-				// TODO: transform while loops
-				// should be done before MAAT
+				// TODO: While To FSM transformation
+				// must be done before MAAT because MAAT does not handle
+				// multiple array accesses in loops
 
 				// transform multiple array accesses
 				new MultipleArrayAccessTransformation(),
 
+				// transform "b := a > b;" statements to if conditionals
+				new BoolExprTransformation(),
+
+				// transforms "if (b)" to "if (b = true)"
+				new TransformConditionals(),
+
 				// flattens multi-dimensional arrays
 				new ListFlattenTransformation(true, false, true),
+
+				// replaces local array of size 1 by scalars
+				new VariableRedimension(),
 
 				// renames variables so we can inline them in the template
 				// should remain after other transformations
