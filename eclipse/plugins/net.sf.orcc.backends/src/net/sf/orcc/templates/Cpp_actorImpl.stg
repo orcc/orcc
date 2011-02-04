@@ -449,7 +449,7 @@ ActorAKA("<actor.simpleName>", instanceName, <length(actor.inputs.list)>, <lengt
 destructor(stateVars) ::= <<
 <actor.simpleName>::~<actor.simpleName>()
 {
-	<stateVars: StateVarDestruction()>
+	<stateVars: StateVarDestruction(); separator="\n">
 }
 
 >>
@@ -464,9 +464,9 @@ actor(actor, options) ::= <<
 #include \<string.h\>
 
 #include "<actor.simpleName>.h"
-
+<if (!actor.packageAsList.empty)>
 using namespace <actor.packageAsList; separator="::">;
-
+<endif>
 #ifdef __TRACE_CAPTURE__
 extern TraceAka g_oTracer;
 #endif

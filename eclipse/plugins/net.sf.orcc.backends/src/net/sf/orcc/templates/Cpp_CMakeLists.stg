@@ -1,6 +1,6 @@
 addActor(actor) ::= <<
 <if (!actor.system)>
-<actor.packageAsList; separator="/">/<actor.simpleName>.cpp
+<if (!actor.packageAsList.empty)><actor.packageAsList; separator="/">/<endif><actor.simpleName>.cpp
 <endif>
 >>
 

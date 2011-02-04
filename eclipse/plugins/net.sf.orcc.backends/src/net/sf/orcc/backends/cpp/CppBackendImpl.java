@@ -204,6 +204,8 @@ public class CppBackendImpl extends AbstractBackend {
 			List<String> packages = actor.getPackageAsList();
 			Iterator<String> it = packages.iterator();
 
+			String name;
+			if(!packages.isEmpty()) {
 			StringBuffer sb = new StringBuffer();
 			if (it.hasNext()) {
 				sb.append(it.next());
@@ -215,8 +217,11 @@ public class CppBackendImpl extends AbstractBackend {
 			String hierPath = path + File.separator + sb.toString();
 			new File(hierPath).mkdirs();
 
-			String name = hierPath + File.separator + actor.getSimpleName();
-
+			name = hierPath + File.separator + actor.getSimpleName();
+			} else {
+				name = path + File.separator + actor.getSimpleName();
+			}
+			
 			if (printHeader) {
 				printer.loadGroups("Cpp_actorDecl");
 				printer.printActor(name + ".h", actor);

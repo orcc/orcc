@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // include Actors
 includeActor(actor) ::= <<
-#include "<actor.packageAsList; separator="/">/<actor.simpleName>.h"
+#include "<if (!actor.packageAsList.empty)><actor.packageAsList; separator="/">/<endif><actor.simpleName>.h"
 >>
 
 includeActors(actors) ::= <<
@@ -249,7 +249,7 @@ TraceAka g_oTracer;
 
 <includeActors(network.actors)>
 
-#define SIZE 10000
+#define SIZE 1024
 
 <declareInstances(network.instances)>
 
