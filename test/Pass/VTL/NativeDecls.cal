@@ -1,0 +1,12 @@
+actor NativeDecls () ==> :
+
+	native function natF1(int x) --> bool end
+	
+	native procedure natProc(bool z) end
+
+	action ==>
+	do
+		natProc(natF1(5));
+	end
+
+end
