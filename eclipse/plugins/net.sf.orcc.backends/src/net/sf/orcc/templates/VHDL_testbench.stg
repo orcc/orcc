@@ -198,7 +198,7 @@ if(port.type.bool)
       assert (<port.name>_data = '0')
         report "incorrectly value computed : 1 instead of : 0"
         severity error;                
-    end if;>
+    end if;<
 else
 ><if(port.type.int)
   >    assert (<port.name>_data  = std_logic_vector(to_signed(input_bit, <port.type.size>)))
