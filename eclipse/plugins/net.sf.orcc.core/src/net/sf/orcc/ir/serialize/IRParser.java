@@ -433,7 +433,7 @@ public class IRParser {
 				JsonArray targetArray = targetElement.getAsJsonArray();
 				Action action = getAction(targetArray.get(0).getAsJsonArray());
 				String target = targetArray.get(1).getAsString();
-				fsm.addTransition(source, target, action);
+				fsm.addTransition(source, action, target);
 			}
 		}
 

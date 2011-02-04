@@ -89,7 +89,7 @@ public class RegExpConverter {
 		for (Action action : nextActions) {
 			Integer target = targets.get(action);
 			String targetName = nameMap.get(target);
-			fsm.addTransition(sourceName, targetName, action);
+			fsm.addTransition(sourceName, action, targetName);
 		}
 	}
 

@@ -264,12 +264,12 @@ public class FSM {
 	 * 
 	 * @param source
 	 *            name of the source state
-	 * @param target
-	 *            name of the target state
 	 * @param action
 	 *            an action
+	 * @param target
+	 *            name of the target state
 	 */
-	public void addTransition(String source, String target, Action action) {
+	public void addTransition(String source, Action action, String target) {
 		State tgtState = states.get(target);
 
 		Transition transition = transitions.get(source);
@@ -361,54 +361,45 @@ public class FSM {
 
 	/**
 	 * Removes the transition from the state whose name is given by
-	 * <code>source</code> to the state whose name is given by
-	 * <code>target</code> and whose action equals to the given action.
+	 * <code>source</code> and whose action equals to the given action.
 	 * 
 	 * @param source
 	 *            name of source state
-	 * @param target
-	 *            name of target state
 	 * @param action
 	 *            action associated with the transition
 	 */
-	public void removeTransition(String source, String target, Action action) {
+	public void removeTransition(String source, Action action) {
 		Transition transition = transitions.get(source);
 		Iterator<NextStateInfo> it = transition.getNextStateInfo().iterator();
 		while (it.hasNext()) {
 			NextStateInfo info = it.next();
-			if (info.getAction() == action
-					&& info.getTargetState().getName().equals(target)) {
+			if (info.getAction() == action) {
 				it.remove();
 			}
 		}
 	}
 
 	/**
-	 * Refresh this FSM with the corresponding a graph representation of this
-	 * FSM.
+	 * Replaces the target of the transition from the state whose name is given
+	 * by <code>source</code> and whose action equals to the given action by a
+	 * target state with the given name.
 	 * 
-	 * @param graph
-	 *            : a graph representation of this FSM
+	 * @param source
+	 *            name of source state
+	 * @param action
+	 *            action associated with the transition
+	 * @param newTargetName
+	 *            name of the new target state
 	 */
-	public void setGraph(DirectedGraph<State, UniqueEdge> graph) {
-		// Clear fsm
-		states.clear();
-		transitions.clear();
-
-		// TODO : Initial state from graph not taken in account
-		setInitialState(getInitialState().getName());
-
-		// Set states of the fsm
-		for (State state : graph.vertexSet()) {
-			addState(state.getName());
-		}
-
-		// Set transitions of the fsm
-		for (UniqueEdge edge : graph.edgeSet()) {
-			State source = graph.getEdgeSource(edge);
-			State target = graph.getEdgeTarget(edge);
-			Action action = (Action) edge.getObject();
-			addTransition(source.getName(), target.getName(), action);
+	public void replaceTarget(String source, Action action, String newTargetName) {
+		Transition transition = transitions.get(source);
+		Iterator<NextStateInfo> it = transition.getNextStateInfo().iterator();
+		while (it.hasNext()) {
+			NextStateInfo info = it.next();
+			if (info.getAction() == action) {
+				// updates target state of this transition
+				info.targetState = states.get(newTargetName);
+			}
 		}
 	}
 

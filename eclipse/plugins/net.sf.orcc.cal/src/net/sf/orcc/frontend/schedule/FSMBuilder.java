@@ -107,7 +107,7 @@ public class FSMBuilder {
 		// add the transitions in the right order
 		for (Action action : nextActions) {
 			String target = targets.get(action);
-			fsm.addTransition(source, target, action);
+			fsm.addTransition(source, action, target);
 		}
 	}
 
