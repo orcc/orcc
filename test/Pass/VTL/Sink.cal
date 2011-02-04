@@ -1,0 +1,9 @@
+/**
+ * This actor consumes tokens.
+ */
+actor Sink() int I ==> :
+
+	action I:[i] ==>
+	end
+
+end

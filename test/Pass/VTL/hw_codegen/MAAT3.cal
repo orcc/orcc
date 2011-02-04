@@ -1,0 +1,19 @@
+package hw_codegen;
+
+actor MAAT3() ==> int O :
+
+	List(type:int, size=10) values := [i : for int i in 0 .. 9];
+
+	action ==> O:[values[0], values[1]]
+	var
+		int a = 18,
+		int b = 23
+	do
+		if a > b then
+			values[2] := values[3];
+		else
+			values[4] := a + b;
+		end
+	end
+
+end

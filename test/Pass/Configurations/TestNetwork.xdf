@@ -29,7 +29,26 @@
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
    </Instance>
+   <Instance id="maat3">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="hw_codegen.MAAT3"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="sink">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Sink"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
    <!-- ************************************** -->
    <!-- Connections of the Graph               -->
    <!-- ************************************** -->
+   <Connection dst="sink" dst-port="I" src="maat3" src-port="O"/>
 </XDF>
