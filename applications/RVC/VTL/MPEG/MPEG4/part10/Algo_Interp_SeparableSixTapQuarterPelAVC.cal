@@ -6,7 +6,7 @@
 
 //Modified by Damien de Saint Jorre ; IETR/INSA of Rennes (France)
 
-package Proprietary.IETR.MPEG4.part10;
+package MPEG.MPEG4.part10;
 import MPEG.Common.Imp_Math.*;
 
 actor Algo_Interp_SeparableSixTapQuarterPelAVC ()

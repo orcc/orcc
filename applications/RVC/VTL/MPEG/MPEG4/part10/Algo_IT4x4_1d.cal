@@ -49,104 +49,30 @@ Standards.
 
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2007.
-
-: modified 7/22/08 with a guard in the action read_coeff, 
-  and a parameter NB4x4 which is set to 16 for luma or 4 for chroma
 *************************************************************************/
 
-package Proprietary.IETR.MPEG4.part10;
+package MPEG.MPEG4.part10;
 
-actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
-		int(size=16) Lev2d, 
-		int(size=8) QP,
-		bool        DCCoeff_Present, 
-		int(size=8) ScalingList
-				==> 
-				int(size=16) Cof:
-				
-  List( type:uint(size=5), size=6*16 ) t_normAdjust4x4  = [
-    10, 13, 10, 13, 13, 16, 13, 16, 10, 13, 10, 13, 13, 16, 13, 16, // qp_rem = 0
-    11, 14, 11, 14, 14, 18, 14, 18, 11, 14, 11, 14, 14, 18, 14, 18, // qp_rem = 1
-    13, 16, 13, 16, 16, 20, 16, 20, 13, 16, 13, 16, 16, 20, 16, 20, // qp_rem = 2
-    14, 18, 14, 18, 18, 23, 18, 23, 14, 18, 14, 18, 18, 23, 18, 23, // qp_rem = 3
-    16, 20, 16, 20, 20, 25, 20, 25, 16, 20, 16, 20, 20, 25, 20, 25, // qp_rem = 4
-    18, 23, 18, 23, 23, 29, 23, 29, 18, 23, 18, 23, 23, 29, 23, 29 // qp_rem = 5
-  ];
-  List( type:uint(size=4), size=16 )  t_Index = [
-    0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
-  ];
+actor Algo_IT4x4_1d () int(size=16) X ==> int(size=16) Y :
 
-  List (type: int(size=32), size=96) t_LevelScale;
-  bool ValDCCoeff_Present;
-
-  int(size=8) qp;
-  int(size=8) qp_per;
-  int(size=8) qp_rem;
-  int(size=8) qp_sft;
-  
-  int nb_4x4:=0;
-  
-  read_qp: action QP:[x] ==>
-  do
-    qp := x;
-    qp_per := qp / 6;
-    qp_rem := qp mod 6;
-    qp_sft := lshift(1, 3-qp_per);
-  end
-
-  read_sl: action ScalingList:[SL] repeat 4*4 ==>
-  do
-    t_LevelScale := [ SL[t_Index[s]] *t_normAdjust4x4[t*16 + s]:for int t in 0 .. 5, for int s in 0 .. 15 ];
-  end
-
-  read_idf: action DCCoeff_Present:[x] ==>
-  do
-    ValDCCoeff_Present := x;
-  end
-  
-  
-  read_coeff: action Lev2d:[ x ] repeat 16 ==> Cof:[buff] repeat 16
+  action X:[x] repeat 4 ==> Y:[ y[0], y[1], y[2], y[3]]
   var
-    List (type: int(size=16), size=16) buff := [ 0 : for int s in 0 .. 15 ]
+   List(type:int(size=16), size=4 ) buf,
+   List(type:int(size=16), size=4 ) y
   do
-    nb_4x4:= nb_4x4 + 1;
-    buff [0] := if (ValDCCoeff_Present)then
-    				x[0] 
-                else         // DC coefficient
-                  if qp >= 24 then
-                    lshift(x[0]*t_LevelScale[qp_rem*16], qp_per-4)
-                  else
-                    rshift(x[0]*t_LevelScale[qp_rem*16]+qp_sft, 4-qp_per)
-                  end 
-                end;
-	foreach int i in 1 .. 15 do
-        buff[i] := 
-        	if qp >= 24 then         // AC coefficient
-				 lshift(x[i]*t_LevelScale[qp_rem*16+i], qp_per-4 )
-  			else
-				rshift(x[i]*t_LevelScale[qp_rem*16+i]+qp_sft, 4-qp_per )
-			end;
-    end
+    buf := [
+      x[0] + x[2],
+      x[0] - x[2],
+      rshift(x[1],1) - x[3],
+      x[1] + rshift(x[3],1)
+    ];
+
+    y :=[
+      buf[0] + buf[3],
+      buf[1] + buf[2],
+      buf[1] - buf[2],
+      buf[0] - buf[3]
+    ];
   end
 
-  read_coeff_done:
-  action ==> 
-  guard nb_4x4=NB4x4
-  do
-  	nb_4x4:=0;
-  end
-
-  schedule fsm read_qp:
-    read_qp      ( read_qp 	  		) --> read_idf;
-    read_idf     ( read_idf   		) --> read_sl;
-    read_sl      ( read_sl    		) --> read_coeff;
-    read_coeff   ( read_coeff 		) --> read_coeff;
-    read_coeff   ( read_coeff_done  ) --> read_qp;
-  end
-  
-  priority
-    read_coeff_done > read_coeff;
-  end
-  
- end
-
+end

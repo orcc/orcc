@@ -1,139 +1,134 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<XDF name="InterPred">
-    <!-- ************************************** -->
-    <!-- Input ports of the Graph               -->
-    <!-- ************************************** -->
-    <Port kind="Input" name="ReadResult">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="Coef_ACR">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MV">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PartSZ">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbType">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="SubMbType">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="SelectList">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
-    <!-- ************************************** -->
-    <!-- Output ports of the Graph              -->
-    <!-- ************************************** -->
-    <Port kind="Output" name="MB4x4Pred_L">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="10"/>
-            </Entry>
-        </Type>
-    </Port>
-    <!-- ************************************** -->
-    <!-- Variables and Parameters of the Graph  -->
-    <!-- ************************************** -->
-    <Decl kind="Param" name="SAMPLE_SIZE">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MB_WIDTH">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MV_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="Idx_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MODE_SZ">
-        <Type name="int"/>
-    </Decl>
-    <!-- ************************************** -->
-    <!-- Instances of the Graph                 -->
-    <!-- ************************************** -->
-    <Instance id="Algo_Interp_SeparableSixTapQuarterPelAVC">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_Interp_SeparableSixTapQuarterPelAVC"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="Add_Clip">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="MPEG.Common.Add_i9_clip"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-        <Parameter name="Max">
-            <Expr kind="Literal" literal-kind="Integer" value="255"/>
-        </Parameter>
-        <Parameter name="Min">
-            <Expr kind="Literal" literal-kind="Integer" value="0"/>
-        </Parameter>
-    </Instance>
-    <Instance id="Algo_Interp_Reord">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-        <Parameter name="SzSidePerPart">
+<?xml version="1.0" encoding="UTF-8"?><XDF name="InterPred">
+   <!-- ************************************** -->
+   <!-- Input ports of the Graph               -->
+   <!-- ************************************** -->
+   <Port kind="Input" name="ReadResult">
+      <Type name="uint">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="8"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="Coef_ACR">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="9"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="MV">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="PartSZ">
+      <Type name="uint">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="MbType">
+      <Type name="uint">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="SubMbType">
+      <Type name="uint">
+         <Entry kind="Expr" name="size">
             <Expr kind="Literal" literal-kind="Integer" value="4"/>
-        </Parameter>
-    </Instance>
-    <!-- ************************************** -->
-    <!-- Connections of the Graph               -->
-    <!-- ************************************** -->
-    <Connection dst="" dst-port="MB4x4Pred_L" src="Add_Clip" src-port="Z"/>
-    <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC"
-        dst-port="PartSZ" src="" src-port="PartSZ"/>
-    <Connection dst="Add_Clip" dst-port="Y" src="" src-port="Coef_ACR"/>
-    <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC"
-        dst-port="Mv" src="" src-port="MV"/>
-    <Connection dst="Algo_Interp_Reord" dst-port="MbType" src="" src-port="MbType"/>
-    <Connection dst="Algo_Interp_Reord" dst-port="SubMbType" src="" src-port="SubMbType"/>
-    <Connection dst="Algo_Interp_Reord" dst-port="SelectList" src="" src-port="SelectList"/>
-    <Connection dst="Add_Clip" dst-port="X" src="Algo_Interp_Reord" src-port="MbPred"/>
-    <Connection dst="Algo_Interp_Reord" dst-port="Interp"
-        src="Algo_Interp_SeparableSixTapQuarterPelAVC" src-port="Interp"/>
-    <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC"
-        dst-port="ReadResult" src="" src-port="ReadResult"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="SelectList">
+      <Type name="uint">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="2"/>
+         </Entry>
+      </Type>
+   </Port>
+   <!-- ************************************** -->
+   <!-- Output ports of the Graph              -->
+   <!-- ************************************** -->
+   <Port kind="Output" name="MB4x4Pred_L">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="10"/>
+         </Entry>
+      </Type>
+   </Port>
+   <!-- ************************************** -->
+   <!-- Variables and Parameters of the Graph  -->
+   <!-- ************************************** -->
+   <Decl kind="Param" name="SAMPLE_SIZE">
+      <Type name="int"/>
+   </Decl>
+   <Decl kind="Param" name="MB_WIDTH">
+      <Type name="int"/>
+   </Decl>
+   <Decl kind="Param" name="MV_SZ">
+      <Type name="int"/>
+   </Decl>
+   <Decl kind="Param" name="Idx_SZ">
+      <Type name="int"/>
+   </Decl>
+   <Decl kind="Param" name="MODE_SZ">
+      <Type name="int"/>
+   </Decl>
+   <!-- ************************************** -->
+   <!-- Instances of the Graph                 -->
+   <!-- ************************************** -->
+   <Instance id="Algo_Interp_SeparableSixTapQuarterPelAVC">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="MPEG.MPEG4.part10.Algo_Interp_SeparableSixTapQuarterPelAVC"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="Add_Clip">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="MPEG.Common.Add_i9_clip"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="Max">
+         <Expr kind="Literal" literal-kind="Integer" value="255"/>
+      </Parameter>
+      <Parameter name="Min">
+         <Expr kind="Literal" literal-kind="Integer" value="0"/>
+      </Parameter>
+   </Instance>
+   <Instance id="Algo_Interp_Reord">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="SzSidePerPart">
+         <Expr kind="Literal" literal-kind="Integer" value="4"/>
+      </Parameter>
+   </Instance>
+   <!-- ************************************** -->
+   <!-- Connections of the Graph               -->
+   <!-- ************************************** -->
+   <Connection dst="" dst-port="MB4x4Pred_L" src="Add_Clip" src-port="Z"/>
+   <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC" dst-port="PartSZ" src="" src-port="PartSZ"/>
+   <Connection dst="Add_Clip" dst-port="Y" src="" src-port="Coef_ACR"/>
+   <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC" dst-port="Mv" src="" src-port="MV"/>
+   <Connection dst="Algo_Interp_Reord" dst-port="MbType" src="" src-port="MbType"/>
+   <Connection dst="Algo_Interp_Reord" dst-port="SubMbType" src="" src-port="SubMbType"/>
+   <Connection dst="Algo_Interp_Reord" dst-port="SelectList" src="" src-port="SelectList"/>
+   <Connection dst="Add_Clip" dst-port="X" src="Algo_Interp_Reord" src-port="MbPred"/>
+   <Connection dst="Algo_Interp_Reord" dst-port="Interp" src="Algo_Interp_SeparableSixTapQuarterPelAVC" src-port="Interp"/>
+   <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC" dst-port="ReadResult" src="" src-port="ReadResult"/>
 </XDF>

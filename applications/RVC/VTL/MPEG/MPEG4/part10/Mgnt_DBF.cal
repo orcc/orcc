@@ -37,7 +37,7 @@
 
 // Mgnt_DBF.cal
 // Description: The management part of deblocking filter without mbaff
-package Proprietary.IETR.MPEG4.part10;
+package MPEG.MPEG4.part10;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
 import MPEG.Common.Imp_PictureInfo.*;

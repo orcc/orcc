@@ -66,7 +66,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Algo_IS_Zigzag_4x4"/>
+      <Class name="MPEG.MPEG4.part10.Algo_IS_Zigzag_4x4"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -75,7 +75,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_IQ_INTRA16x16"/>
+      <Class name="MPEG.MPEG4.part10.Mgnt_IQ_INTRA16x16"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -84,7 +84,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Algo_IQ_QSAndSLAndIDCTScaler_4x4"/>
+      <Class name="MPEG.MPEG4.part10.Algo_IQ_QSAndSLAndIDCTScaler_4x4"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->

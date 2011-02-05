@@ -18,7 +18,7 @@ This FU puts together 4*4 macroblock send in raster scan order to generate a 16x
  
 *****************************************************************************/
 
-package Proprietary.IETR.MPEG4.part10;
+package MPEG.MPEG4.part10;
 
 actor Algo_Merge_4x4_to_8x8 () int(size=16) X ==> int(size=9) Y :
 

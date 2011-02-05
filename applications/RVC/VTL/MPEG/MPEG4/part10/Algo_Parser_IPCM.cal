@@ -1,6 +1,7 @@
-/*************************************************************************
+/********************************************************************************
+
 This software module was originally developed by 
-Kenji Otoi, Yoshihisa Yamada and Kohtaro Asai (Mitsubishi Electric Corporation), 
+Endri Bezati (IETR/INSA of Rennes), 
 in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
 for reference purposes and its performance may not have been optimized. 
 This software module is an implementation of one or more tools as 
@@ -23,42 +24,78 @@ Assurance that the originally developed software module can be used
 (1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
 (2) to develop the ISO/IEC 23002-4: 
 
-Mitsubishi Electric Corporation grants ISO/IEC all rights necessary to 
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
 include the originally developed software module or modifications thereof 
 in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
 worldwide, non-exclusive, copyright license to copy, distribute, and make 
 derivative works for use in implementations of the ISO/IEC 23002-4 in 
 products that satisfy conformance criteria (if any), and to the extent 
 that such originally developed software module or portions of it are 
-included in the ISO/IEC 23002-4.  To the extent that Mitsubishi Electric 
-Corporation owns patent rights that would be required to make, use, or 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
 sell the originally developed software module or portions thereof 
-included in the ISO/IEC 23002-4 in a conforming product, Mitsubishi 
-Electric Corporation will assure the ISO/IEC that it is willing to 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
 negotiate licenses under reasonable and non-discriminatory terms and 
 conditions with applicants throughout the world.
 
 ISO/IEC gives You a free license to this software module or modifications 
 thereof for the sole  purpose of developing theISO/IEC 23002-4
 
-Mitsubishi Electric Corporation retains full right to modify and use the 
+IETR/INSA of Rennes retains full right to modify and use the 
 code for its own purpose, assign or donate the code to a third party and 
 to inhibit third parties from using the code for products that do not 
 conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
 Standards. 
 
 This copyright notice must be included in all copies or derivative works. 
-Copyright (c) ISO/IEC 2007.
-*************************************************************************/
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
 
-package Proprietary.IETR.MPEG4.part10;
+package MPEG.MPEG4.part10;
 
-actor Algo_IS_Zigzag_4x4 () int(size=16) levarr ==> int(size=16) Lev2d :
-  List( type:uint(size=4), size=16 )  t_Index =
-	  [
-	    0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
-	  ];
+actor Algo_Parser_IPCM ( ) 
+		int ( size = 9 ) I_PCM
+				==>
+				int ( size = 9 ) I_PCM_Y,
+				int ( size = 9 ) I_PCM_U,
+				int ( size = 9 ) I_PCM_V :
 
-  action levarr:[ x ] repeat 16 ==> Lev2d:[ [ x[t_Index[s]] : for int s in 0 .. 15 ] ] repeat 16
-  end
+	bool DEBUG_INPUT = true;
+		 	 
+ split_Y: action I_PCM : [ x ] repeat 256 ==> I_PCM_Y : [ x ] repeat 256
+ 		do
+ 			if(DEBUG_INPUT)then
+ 				foreach int i in 0 .. 255
+ 				do
+ 					println("Input Parser_IPCM I_PCM : "+x[i]);
+ 				end
+ 			end
+		end							 	 
+		
+ split_U: action I_PCM : [ x ] repeat 64  ==> I_PCM_U : [ x ] repeat 64
+ 		do
+ 			if(DEBUG_INPUT)then
+ 				foreach int i in 0 .. 63
+ 				do
+ 					println("Input Parser_IPCM I_PCM : "+x[i]);
+ 				end
+ 			end
+		  end
+		 
+ split_V: action I_PCM : [ x ] repeat 64  ==> I_PCM_V : [ x ] repeat 64
+ 		do
+ 			if(DEBUG_INPUT)then
+ 				foreach int i in 0 .. 63
+ 				do
+ 					println("Input Parser_IPCM I_PCM : "+x[i]);
+ 				end
+ 			end
+		  end
+		 						 	   
+ schedule fsm splitY:
+ 	splitY			( split_Y )		--> splitU;
+ 	splitU			( split_U )		--> splitV;
+ 	splitV			( split_V )		--> splitY;
+ end
 end

@@ -50,19 +50,23 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
+//Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
+package MPEG.MPEG4.part10;
+
+import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+
+actor Algo_DCR_Hadamard_LUMA_Scaling ()
+		int (size=16) I, 
+		int (size=8)  QP,
+		int (size=8)  ScalingList,
+		uint(size=6)  MbType
+				==>
+		int(size=16) O:
 
 
-
-package Proprietary.IETR.MPEG4.part10;
-
-actor Algo_DCR_Hadamard_CHROMA ()
-  	int(size=16) levarr, 
-  	int(size=8) QP, 
-  	int(size=8) ScalingList 
-  			==> 
-  			int(size=16) Cof :
-
-  List( type:uint(size=5), size=6*16 ) t_normAdjust4x4  = [// same as a AVC_IQ4x4's t_normAdjust4x4. used only 16*n-th(n=0..5) elements in this FU.
+	bool DEBUG_INPUT = false;
+	
+  List( type:uint(size=5), size=6*16 ) t_normAdjust4x4  = [// same as a AVC_IQ4x4's t_normAdjust4x4. used only 16*n-th(n=0..5) elements in this FU. 
     // qp_rem = 0
     10, 13, 10, 13, 13, 16, 13, 16, 10, 13, 10, 13, 13, 16, 13, 16,
 
@@ -81,58 +85,96 @@ actor Algo_DCR_Hadamard_CHROMA ()
     // qp_rem = 5
     18, 23, 18, 23, 23, 29, 23, 29, 18, 23, 18, 23, 23, 29, 23, 29
   ];
-  List( type:uint(size=4), size=16 ) t_Index = [
-    0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
-  ];
 
-  List( type:int(size=32), size=96 )  t_LevelScale;
+  List( type:uint(size=4), size=16 )  t_Index =
+	  [
+	    0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
+	  ];
+
+  List( type:int(size=16), size=96 ) t_LevelScale;
   int(size=8) qp;
   int(size=8) qp_per;
   int(size=8) qp_rem;
+  int(size=8) qp_sft;
+
+  bool IsIntra16x16;
+
+
+	MacroBlockType.IsIPCM: action
+			MbType :[mb_type]
+				==>
+		guard
+			mb_type = BLOCK_TYPE_I_PCM
+		end
+
+	MacroBlockType.IsNotIPCM: action
+			MbType :[mb_type]
+				==>
+		guard
+			mb_type != BLOCK_TYPE_I_PCM
+		do
+			IsIntra16x16 := Is_Intra_16x16(mb_type);
+		end
 
   read_qp: action QP:[x] ==>
   do
+	if(DEBUG_INPUT)then
+		println("Input DCR_Hadamard_Luma_Scaling QP:"+x);
+	end
     qp := x;
     qp_per := qp / 6;
     qp_rem := qp mod 6;
+    qp_sft := lshift(1, 5-qp_per);
   end
 
   read_sl: action ScalingList:[SL] repeat 4*4 ==>
   do
+	if(DEBUG_INPUT)then
+		foreach int i in 0 .. 15
+		do
+			println("Input DCR_Hadamard_Luma_Scaling ScalingList:"+SL[i]);
+		end
+	end
     t_LevelScale := [ SL[t_Index[s]] *t_normAdjust4x4[t*16 + s]:for int t in 0 .. 5, for int s in 0 .. 15 ];
   end
 
-  itrans:
-  action levarr:[x] repeat 4 ==> Cof:[[
-    if qp_per < 5 then
-      rshift(y[s] * t_LevelScale[16*qp_rem], 5 - qp_per)
-    else
-      lshift(y[s] * t_LevelScale[16*qp_rem], qp_per - 5)
-    end :for int s in 0 .. 3]] repeat 4
-  var
-   List(type:int(size=16), size=4) buf,
-   List(type:int(size=16), size=4) y
-  do
-    buf := [
-      x[0] + x[2],
-      x[0] - x[2],
-      x[1] + x[3],
-      x[1] - x[3]
-    ];
 
-    y :=[
-      buf[0] + buf[2],
-      buf[0] - buf[2],
-      buf[1] + buf[3],
-      buf[1] - buf[3]
-    ];
-    
+  iquantise.Launch: action
+  		I:[i] repeat 16
+			==>
+		O:[ [
+    			if qp_per < 6 then
+    			  rshift( i[s] * t_LevelScale[16*qp_rem] + qp_sft, 6 - qp_per)
+   				else
+      			  lshift( i[s] * t_LevelScale[16*qp_rem], qp_per - 6)
+    			end : for int s in 0 .. 15 
+    	  ] ] repeat 16
+	do
+		if(DEBUG_INPUT)then
+			foreach int j in 0 .. 15
+			do
+				println("Input DCR_Hadamard_Luma_Scaling I:"+i[j]);
+			end
+		end
+	end
+
+
+  iquantise.Skip: action
+			==>
+	guard
+		not IsIntra16x16
+  	end
+
+  schedule fsm CheckMbType:
+	CheckMbType (MacroBlockType.IsIPCM )--> CheckMbType;
+	CheckMbType (MacroBlockType.IsNotIPCM )--> read_qp;
+
+    read_qp      ( read_qp 	  		) --> read_sl;
+    read_sl      ( read_sl    		) --> iquantise;
+    iquantise    ( iquantise 		) --> CheckMbType;
   end
-  
-  schedule fsm  read_qp:
-  	read_qp				(read_qp) 		--> read_sl;
-    read_sl			  	(read_sl) 		--> itrans;
-  	itrans				(itrans) 		--> read_qp;
+  priority
+  	iquantise.Skip > iquantise.Launch;
+  	MacroBlockType.IsNotIPCM > MacroBlockType.IsIPCM;
   end
-  
 end

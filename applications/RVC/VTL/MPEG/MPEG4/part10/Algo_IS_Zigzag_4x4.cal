@@ -51,9 +51,14 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-package Proprietary.IETR.MPEG4.part10;
+package MPEG.MPEG4.part10;
 
-actor Algo_Transpose4x4 () int(size=16) X ==> int(size=16) Y :
-  action X:[ x ] repeat 16 ==> Y: [ [ x[ 4 * c + r ] : for int r in 0 .. 3, for int c in 0 .. 3 ] ] repeat 16
+actor Algo_IS_Zigzag_4x4 () int(size=16) levarr ==> int(size=16) Lev2d :
+  List( type:uint(size=4), size=16 )  t_Index =
+	  [
+	    0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
+	  ];
+
+  action levarr:[ x ] repeat 16 ==> Lev2d:[ [ x[t_Index[s]] : for int s in 0 .. 15 ] ] repeat 16
   end
 end

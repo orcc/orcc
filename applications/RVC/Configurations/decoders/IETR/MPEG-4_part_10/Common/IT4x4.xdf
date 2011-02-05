@@ -32,7 +32,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Algo_IT4x4_1d"/>
+      <Class name="MPEG.MPEG4.part10.Algo_IT4x4_1d"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -41,7 +41,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Algo_Transpose4x4"/>
+      <Class name="MPEG.MPEG4.part10.Algo_Transpose4x4"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -50,7 +50,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Algo_IT4x4_1d"/>
+      <Class name="MPEG.MPEG4.part10.Algo_IT4x4_1d"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -59,7 +59,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Algo_Transpose4x4"/>
+      <Class name="MPEG.MPEG4.part10.Algo_Transpose4x4"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -68,7 +68,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Algo_IT4x4_Addshift"/>
+      <Class name="MPEG.MPEG4.part10.Algo_IT4x4_Addshift"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->

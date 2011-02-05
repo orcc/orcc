@@ -13,41 +13,27 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
+ 
+This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
+ 
 *****************************************************************************/
-package Proprietary.IETR.MPEG4.part10;
 
-actor Mgnt_IQ_Chroma()
-	int(size=16) CoefDCR_C,
-	int(size=16) CoefAC_C
-		==>
-	int(size=16) Lev2d,
-	bool        DCCoeff_Present
-		:
+package MPEG.MPEG4.part10;
 
-	int Nb4x4 := 4;
+actor Algo_Merge_4x4_to_16x16_norasterscan () int(size=10) X ==> int(size=10) Y :
 
-	lev2d: action CoefDCR_C:[ x ], CoefAC_C:[ y ] repeat 16 ==> Lev2d:[ buff ]
-		repeat 16
-	var
-		List(type: int(size=16), size=16) buff := [ 0 : for int s in 0 .. 15
-		]
-	do
-		buff[0] := x;
-		foreach int i in 1 .. 15 do
-			buff[i] := y[i];
-		end
-		Nb4x4 := Nb4x4 + 1;
-	end
-
-	intra_dc: action ==> DCCoeff_Present:[true]
-	guard
-		Nb4x4 = 4
-	do
-		Nb4x4 := 0;
-	end
-
-	priority
-		intra_dc > lev2d;
-	end
+  
+  Reorder:action X:[ x ] repeat 64 ==> Y:[ buff] repeat 64
+  var
+ 	 List( type:int(size=16), size=64 ) buff := [ 0 : for int i in 0 .. 63 ]
+  do    
+   foreach int l in 0 .. 3 do
+    foreach int n in 0 .. 3 do
+      foreach int i in 0 .. 3 do
+	        buff[i+n*4+l*16] := x[i+n*16+l*4];
+	    end
+      end
+    end
+  end
 
 end
