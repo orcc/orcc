@@ -484,12 +484,22 @@ patternPort(dir, port, index, index0) ::= <<
 \</operation\>
 >>
 
-outputPatternDecision(index, action, state)::=<<
+outputPatternDecisionState(index, action, state)::=<<
 \<module kind="if"\>
 	\<module decision="outputPattern_<instance.id>_<action.name>_decision_s_<state>_<index>" kind="test"\>
 		\<operation kind="noop"\>
 			\<port dir="in" source="outputPattern_<instance.id>_<action.name>_res_<index>"/\>
 			\<port dir="out" size="1" source="outputPattern_<instance.id>_<action.name>_decision_s_<state>_<index>" typeName="bool"/\>
+		\</operation\>
+	\</module\>
+>>
+
+outputPatternDecision(index, action)::=<<
+\<module kind="if"\>
+	\<module decision="outputPattern_<instance.id>_<action.name>_decision_s__<index>" kind="test"\>
+		\<operation kind="noop"\>
+			\<port dir="in" source="outputPattern_<instance.id>_<action.name>_res_<index>"/\>
+			\<port dir="out" size="1" source="outputPattern_<instance.id>_<action.name>_decision_s__<index>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 >>
@@ -584,7 +594,7 @@ scheduler(actions) ::= <<
 			<if(actions)><schedulingTest(actions)><endif>
 			\<!--Close modules --\>
 			<if(actions)>  	 	 
-			<actions:{\</module\>\</module\>}; separator="\n">
+			<actions:{action|\</module\>\</module\>}; separator="\n">
 			<endif>
 		\</module\>
 	\</module\>
@@ -611,7 +621,7 @@ actionTestState(nextState) ::= <<
 	\<module kind="then"\>
 		<if(nextState.action.outputPattern)>
 		\<!-- Last outputPattern --\>
-		<outputPatternDecision(index=length(nextState.action.outputPattern.keys),action=nextState.action,state=transition.sourceState); separator="\n">
+		<outputPatternDecisionState(index=length(nextState.action.outputPattern.keys),action=nextState.action,state=transition.sourceState); separator="\n">
 			\<module kind="then"\>
 				<actionCall(nextState.action)>
 				<actionCallState(nextState)>
@@ -628,7 +638,7 @@ actionTestState(nextState) ::= <<
 
 schedulingTestState(nextStates) ::= <<
 <nextStates: actionTestState(); separator="\n">
-<nextStates: {\</module\>\</module\>}; separator="\n">
+<nextStates: {nextState|\</module\>\</module\>}; separator="\n">
 >>
 
 Transition(transition) ::= <<
@@ -678,8 +688,8 @@ inputPatternTest(action) ::= <<
 
 Transitions(actions, transitions) ::= <<
 \<!-- All transitions --\>
-<transitions:{transition | <Transition(transition=transition)>}; separator="\n">
-<transitions:{\</module\>\</module\>}; separator="\n">
+<transitions:{transition|<Transition(transition=transition)>}; separator="\n">
+<transitions:{transition|\</module\>\</module\>}; separator="\n">
 >>
 
 enumStates(transition)::= <<
@@ -726,7 +736,7 @@ schedulerFSM(actions, fsm) ::= <<
 			<Transitions(actions=actions, transitions=fsm.transitions)>
 			\<!--Close modules for untagged actions --\>
 			<if(actions)>  	 	 
-			<actions:{\</module\>\</module\>}; separator="\n">
+			<actions:{action|\</module\>\</module\>}; separator="\n">
 			<endif>
 		\</module\>
 	\</module\>
