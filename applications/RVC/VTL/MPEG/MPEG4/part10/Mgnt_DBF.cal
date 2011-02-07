@@ -39,7 +39,7 @@
 // Description: The management part of deblocking filter without mbaff
 package MPEG.MPEG4.part10;
 
-import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
 import MPEG.Common.Imp_PictureInfo.*;
   
 actor Mgnt_DBF (int LUMA_CHROMA) 

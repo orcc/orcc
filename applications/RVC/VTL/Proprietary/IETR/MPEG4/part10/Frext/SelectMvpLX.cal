@@ -53,7 +53,7 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 package Proprietary.IETR.MPEG4.part10.Frext;
 
-import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
 actor SelectMvpLX()
 	uint(size=6)  MbType,

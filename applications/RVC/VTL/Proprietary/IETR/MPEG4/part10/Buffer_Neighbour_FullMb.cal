@@ -20,7 +20,7 @@ gorinje@gmail.com
 *****************************************************************************/
 package Proprietary.IETR.MPEG4.part10;
 
-import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
 import MPEG.Common.Imp_PictureInfo.*;
 
 actor Buffer_Neighbour_FullMb ( int MB_WIDTH , bool IsChroma)

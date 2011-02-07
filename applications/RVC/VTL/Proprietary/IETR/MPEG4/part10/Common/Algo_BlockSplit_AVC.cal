@@ -54,7 +54,7 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
 package Proprietary.IETR.MPEG4.part10.Common;
 
-import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
 actor Algo_BlockSplit_AVC()
 	int (size=12) Coeff,

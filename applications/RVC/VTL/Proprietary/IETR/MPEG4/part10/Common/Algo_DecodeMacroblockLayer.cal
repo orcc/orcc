@@ -16,7 +16,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
-import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 import MPEG.Common.Imp_ByteOperation.*;
 
 actor Algo_DecodeMacroblockLayer()

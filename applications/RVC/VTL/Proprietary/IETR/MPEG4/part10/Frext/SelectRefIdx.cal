@@ -16,7 +16,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 package Proprietary.IETR.MPEG4.part10.Frext;
 
-import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
 actor SelectRefIdx()
 	uint(size=2)  SelectList,

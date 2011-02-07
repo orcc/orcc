@@ -53,7 +53,7 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 package Proprietary.IETR.MPEG4.part10.Frext;
 
-import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 import MPEG.Common.Imp_PictureInfo.*;
 
 actor Algo_MvBuffer()
