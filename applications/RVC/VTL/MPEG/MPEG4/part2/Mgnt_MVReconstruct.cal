@@ -56,13 +56,13 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 
 	List(type: int(size=MV_SZ), size=BUF_SIZE) buf := [ 0 : for int i in 1 .. BUF_SIZE ];
 
-	int(size=MV_SZ) mv_rsize:=0;
+	int(size=MV_SZ) mv_rsize;
 
-	int(size=MV_SZ) mv_range:=0;
+	int(size=MV_SZ) mv_range;
 
-	int(size=MV_SZ) mv_low:=0;
+	int(size=MV_SZ) mv_low;
 
-	int(size=MV_SZ) mv_high:=0;
+	int(size=MV_SZ) mv_high;
 
 	// New VOP
 	start: action BTYPE:[ cmd ] ==>
@@ -150,17 +150,17 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 		end
 	end
 
-	int(size=MB_COORD_SZ + 3) aptr:=0;
+	int(size=MB_COORD_SZ + 3) aptr;
 
-	int(size=MB_COORD_SZ + 3) bptr:=0;
+	int(size=MB_COORD_SZ + 3) bptr;
 
-	int(size=MB_COORD_SZ + 3) cptr:=0;
+	int(size=MB_COORD_SZ + 3) cptr;
 
-	int(size=MV_SZ) apred:=0;
+	int(size=MV_SZ) apred;
 
-	int(size=MV_SZ) bpred:=0;
+	int(size=MV_SZ) bpred;
 
-	int(size=MV_SZ) cpred:=0;
+	int(size=MV_SZ) cpred;
 
 	// No need to compute any more MVs for chroma or for luma blocks > 1 if not fourmv
 	compute.done: action ==>
@@ -203,9 +203,9 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 	// Compute the MVs - written so that same actions used for both x,y
 	int(size=MV_SZ) mag;
 
-	int(size=MV_SZ) mv_x:=0;
+	int(size=MV_SZ) mv_x;
 
-	int(size=MV_SZ) mv_y:=0;
+	int(size=MV_SZ) mv_y;
 
 	int(size=MV_SZ + 2) sum_x;
 

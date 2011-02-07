@@ -62,25 +62,25 @@ int(size=PIX_SZ) MOT :
 		y = 9
 	end
 
-	int(size=PIX_SZ) d0:=0;
+	int(size=PIX_SZ) d0;
 
-	int(size=PIX_SZ) d1:=0;
+	int(size=PIX_SZ) d1;
 
-	int(size=PIX_SZ) d2:=0;
+	int(size=PIX_SZ) d2;
 
-	int(size=PIX_SZ) d3:=0;
+	int(size=PIX_SZ) d3;
 
-	int(size=PIX_SZ) d4:=0;
+	int(size=PIX_SZ) d4;
 
-	int(size=PIX_SZ) d5:=0;
+	int(size=PIX_SZ) d5;
 
-	int(size=PIX_SZ) d6:=0;
+	int(size=PIX_SZ) d6;
 
-	int(size=PIX_SZ) d7:=0;
+	int(size=PIX_SZ) d7;
 
-	int(size=PIX_SZ) d8:=0;
+	int(size=PIX_SZ) d8;
 
-	int(size=PIX_SZ) d9:=0;
+	int(size=PIX_SZ) d9;
 
 	row_col_0: action RD:[ d ] ==>
 	guard

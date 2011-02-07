@@ -43,6 +43,8 @@ import net.sf.orcc.ir.Variable;
  */
 public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 
+	private boolean throwException;
+
 	/**
 	 * Evaluates this expression and return its value as an integer.
 	 * 
@@ -69,6 +71,13 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 		Expression result = interpretBinaryExpr(val1, expr.getOp(), val2);
 
 		if (result == null) {
+			// will throw exception if uninitialized variable used
+			throwException = true;
+			expr.getE1().accept(this);
+			expr.getE2().accept(this);
+			throwException = false;
+
+			// if no exception has been thrown, throw it now
 			throw new OrccRuntimeException(
 					"Could not evaluate binary expression " + " expr " + expr
 							+ " " + expr.getOp().toString() + "(" + " exp1: "
@@ -96,6 +105,12 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 		Expression result = interpretUnaryExpr(expr.getOp(), value);
 
 		if (result == null) {
+			// will throw exception if uninitialized variable used
+			throwException = true;
+			expr.getExpr().accept(this);
+			throwException = false;
+
+			// if no exception has been thrown, throw it now
 			throw new OrccRuntimeException(
 					"Could not evaluate unary expression " + "expr "
 							+ expr.getOp().toString() + "("
@@ -108,7 +123,8 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	public Object interpret(VarExpr expr, Object... args) {
 		Variable variable = expr.getVar().getVariable();
 		Expression value = variable.getValue();
-		if (value == null) {
+		if (value == null && throwException) {
+			throwException = false;
 			throw new OrccRuntimeException("Uninitialized variable: "
 					+ variable.getName());
 		}
