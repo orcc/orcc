@@ -551,4 +551,15 @@
             id="net.sf.orcc.ui.grammar.cal">
       </definition>
    </extension>
+   <extension point="org.eclipse.ui.editors">
+      <editor
+            class="net.sf.graphiti.ui.editors.GraphEditor"
+            contributorClass="net.sf.graphiti.ui.editors.GraphActionBarContributor"
+            default="true"
+            extensions="xdf"
+            icon="icons/network.gif"
+            id="net.sf.orcc.ui.editors.GraphEditor"
+            name="Orcc Network Editor">
+      </editor>
+   </extension>
 </plugin>
