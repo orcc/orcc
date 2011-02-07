@@ -20,21 +20,90 @@
 //   coordinates) as well as arrays of YUV 4:2:0 output data.  'StrengthOut'
 //   should be used for debug only and produces a map of strength values and
 //   important parameters for debug purposes.
-//
-//   Note that the following modes are not supported by this revision of the 
-//   design:
-//     * MBAFF (Macroblock Adaptive Field/Frame mode)
-//     * only 4:2:0 format is supported
-//     * > 8-bit video
+/**
+ * This software module was originally developed by 
+ * Paul Schumacher (Xilinx Inc.), 
+ * in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+ * for reference purposes and its performance may not have been optimized. 
+ * This software module is an implementation of one or more tools as 
+ * specified by the ISO/IEC 23002-4.
+ * 
+ * ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+ * license to copy, distribute, and make derivative works of this software 
+ * module or modifications thereof for use in implementations of the 
+ * ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+ * 
+ * Those intending to use this software module in products are advised that 
+ * its use may infringe existing patents. ISO/IEC have no liability for use 
+ * of this software module or modifications thereof.
+ * 
+ * Copyright is not released for products that do not conform to audiovisual 
+ * and image-coding related ITU Recommendations and/or ISO/IEC International 
+ * Standards. 
+ * 
+ * Assurance that the originally developed software module can be used 
+ * (1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+ * (2) to develop the ISO/IEC 23002-4: 
+ *
+ *
+ * Xilinx Inc. grants ISO/IEC all rights necessary to 
+ * include the originally developed software module or modifications thereof 
+ * in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+ * worldwide, non-exclusive, copyright license to copy, distribute, and make 
+ * derivative works for use in implementations of the ISO/IEC 23002-4 in 
+ * products that satisfy conformance criteria (if any), and to the extent 
+ * that such originally developed software module or portions of it are 
+ * included in the ISO/IEC 23002-4.  To the extent that NCKU
+ * owns patent rights that would be required to make, use, or 
+ * sell the originally developed software module or portions thereof 
+ * included in the ISO/IEC 23002-4 in a conforming product, NCKU will assure the ISO/IEC that it is willing to 
+ * negotiate licenses under reasonable and non-discriminatory terms and 
+ * conditions with applicants throughout the world.
+ *
+ * ISO/IEC gives You a free license to this software module or modifications 
+ * thereof for the sole  purpose of developing the ISO/IEC 23002-4.
+ * 
+ * NCKU retains full right to modify and use the 
+ * code for its own purpose, assign or donate the code to a third party and 
+ * to inhibit third parties from using the code for products that do not 
+ * conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+ * Standards. 
+ * 
+ * This copyright notice must be included in all copies or derivative works. 
+ * Copyright (c) ISO/IEC 2006-2010.
+ */
+/*
+* Author: Paul Schumacher, Xilinx Research Labs 
+*         (Email: paul.schumacher@xilinx.com)
+*
+*
+* Description:
+*   This design performs the in-loop deblocking filter for an AVC video 
+*   coder.  Tokens on the inputs and outputs of this block contain maps 
+*   (similar to structures) for easier interfacing.  One token on 'mbIn' is 
+*   assumed to contain the contents of a single macroblock (MB) including the 
+*   input YUV values as well as the MB parameters.  This design assumes raster 
+*   order of MBs (see below).  One token on 'imgParams' contains a map of 
+*   parameters for one frame or field.
+*
+*   The 'mbDataOut' and 'StrengthOut' outputs each produce one token per MB.
+*   One token on 'mbDataOut' is a map containing the (x,y) position (in MB
+*   coordinates) as well as arrays of YUV 4:2:0 output data.  'StrengthOut'
+*   should be used for debug only and produces a map of strength values and
+*   important parameters for debug purposes.
+*
+*   Note that the following modes are not supported by this revision of the 
+*   design:
+*     * MBAFF (Macroblock Adaptive Field/Frame mode)
+*     * only 4:2:0 format is supported
+*     * > 8-bit video
 
-// Revised:
-//  Author: Jia-Wei Liang, MSOC Lab, NCKU
-//  (E-mail: n2697181@mail.ncku.edu.tw)
-//  This loop filter has a bug and is fixed.
-//  The bug is that the loop filter does not perform deblocking on the right and
-//  bottom boundaries of a macroblock before outputting it out.
-//  The codes have been modified to output macroblocks at correct time.
-
+* Revised:
+*  Author: Jia-Wei Liang, MSOC Lab, NCKU
+*  (E-mail: n2697181@mail.ncku.edu.tw)
+* Author: Micka‘l Raulet (INSA Rennes)
+* 	add RVC-CAL compliancy 
+* */
 // Mgnt_DBF.cal
 // Description: The management part of deblocking filter without mbaff
 package MPEG.MPEG4.part10;
