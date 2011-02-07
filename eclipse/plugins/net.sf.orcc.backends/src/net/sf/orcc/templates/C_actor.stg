@@ -72,7 +72,7 @@ static <varDecl(variable)>;
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-Assign(assign) ::= <<
+PrintAssign(assign) ::= <<
 
 <assign.target> = <assign.value>;
 >>
@@ -107,7 +107,7 @@ PrintParameter(parameter) ::= <<
 <if (!parameter.stringExpr)>, <parameter><endif>
 >>
 
-Call(call) ::= <<
+PrintCall(call) ::= <<
 
 <if(call.print)>printf(<call.parameters: PrintFormat()><call.parameters: PrintParameter()>);<
 else
@@ -115,45 +115,45 @@ else
 endif>
 >>
 
-Load(load) ::= <<
+PrintLoad(load) ::= <<
 
 <load.target> = <load.source><load.indexes : {index | [<index>]}>;
 >>
 
-Peek(peek) ::= <<
+PrintPeek(peek) ::= <<
 
 <peek.target> = fifo_<peek.port.type>_peek(<instance.id>_<peek.port>, <peek.target>_buf, <peek.numTokens>);
 >>
 
-Read(read) ::= <<
+PrintRead(read) ::= <<
 
 <if (read.target)
 ><read.target> = fifo_<read.port.type>_read(<instance.id>_<read.port>, <read.target>_buf, <read.numTokens>);<
 endif>
 >>
 
-ReadEnd(readEnd) ::= <<
+PrintReadEnd(readEnd) ::= <<
 
 fifo_<readEnd.port.type>_read_end(<instance.id>_<readEnd.port>, <readEnd.numTokens>);
 >>
 
-Return(return) ::= <<
+PrintReturn(return) ::= <<
 <if(return.value)>
 return <return.value>;<
 endif>
 >>
 
-Store(store) ::= <<
+PrintStore(store) ::= <<
 
 <store.target><store.indexes : {index | [<index>]}> = <store.value>;
 >>
 
-Write(write) ::= <<
+PrintWrite(write) ::= <<
 
 <write.target> = fifo_<write.port.type>_write(<instance.id>_<write.port>, <write.target>_buf, <write.numTokens>);
 >>
 
-WriteEnd(writeEnd) ::= <<
+PrintWriteEnd(writeEnd) ::= <<
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 fifo_<writeEnd.port.type>_trace(<instance.id>_<writeEnd.port>, <writeEnd.target>_buf, "<instance.id>_<writeEnd.port>.txt", <writeEnd.numTokens>);
 <endif>
@@ -165,36 +165,50 @@ fifo_<writeEnd.port.type>_write_end(<instance.id>_<writeEnd.port>, <writeEnd.tar
 ///////////////////////////////////////////////////////////////////////////////
 
 printInstructions(instructions) ::= <<
-<instructions: {instr | <(instr.class.simpleName)(instr)>}>
+<instructions: {instr | <
+if (instr.assign)><PrintAssign(assign=instr)><
+elseif (instr.call)><PrintCall(call=instr)><
+elseif (instr.load)><PrintLoad(load=instr)><
+elseif (instr.peek)><PrintPeek(peek=instr)><
+elseif (instr.read)><PrintRead(read=instr)><
+elseif (instr.readEnd)><PrintReadEnd(readEnd=instr)><
+elseif (instr.return)><PrintReturn(return=instr)><
+elseif (instr.store)><PrintStore(store=instr)><
+elseif (instr.write)><PrintWrite(write=instr)><
+elseif (instr.writeEnd)><PrintWriteEnd(writeEnd=instr)><
+endif>}>
 >>
 
 printNodes(nodes) ::= <<
-<nodes: {node | <(node.class.simpleName)(node)>}>
+<nodes: {node | <if (node.blockNode)><PrintBlockNode(node)><
+elseif (node.ifNode)><PrintIfNode(node)><
+elseif (node.whileNode)><PrintWhileNode(node)><
+endif>}>
 >>
 
 // block node
-BlockNode(blockNode) ::= <<
+PrintBlockNode(blockNode) ::= <<
 <printInstructions(blockNode.instructions)>
 >>
 
 // if node
-IfNode(ifNode) ::= <<
+PrintIfNode(ifNode) ::= <<
 
 if (<ifNode.value>) {
 	<printNodes(ifNode.thenNodes)>
 }<if(ifNode.elseNodes)> else {
 	<printNodes(ifNode.elseNodes)>
 }<endif>
-<BlockNode(ifNode.joinNode)>
+<PrintBlockNode(ifNode.joinNode)>
 >>
 
 // while node
-WhileNode(whileNode) ::= <<
+PrintWhileNode(whileNode) ::= <<
 
 while (<whileNode.value>) {
 	<printNodes(whileNode.nodes)>
 }
-<BlockNode(whileNode.joinNode)>
+<PrintBlockNode(whileNode.joinNode)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
