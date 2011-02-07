@@ -41,11 +41,9 @@ ENDCOPYRIGHT
 // Limit pixel value to either [0,255] or [-255,255]
 package Proprietary.Xilinx.MPEG4_part2.iDCT;
 
-actor Xilinx_clip () int(size=isz) I, bool SIGNED ==> int(size=osz) O :
+import MPEG.MPEG4.part2.Constants.*;
 
-	int isz = 10;
-
-	int osz = 9;
+actor Xilinx_clip () int(size=PIX_SZ) I, bool SIGNED ==> int(size=OUT_SZ) O :
 
 	int(size=7) count := -1;
 

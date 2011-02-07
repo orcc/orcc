@@ -23,7 +23,7 @@ actor Mgnt_Framebuf () int(size=ADDR_SZ) RA, int(size=ADDR_SZ) WA, int(size=PIX_
 
 	int PIX_SZ = 9;
 
-	List(type: int(size=PIX_SZ), size=BUF_SZ) buf := [ 0 : for int i in 1 .. BUF_SZ ];
+	List(type: int(size=PIX_SZ), size=BUF_SZ) buf;
 
 	action RA:[ a ] ==> RD:[ buf[a] ] //do
 		//if a = 25344 + 115456 + 24 then
