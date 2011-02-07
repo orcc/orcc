@@ -2,8 +2,8 @@ package MPEG.MPEG4.part2;
 
 unit Constants :
 
-	int PIX_SZ = 9;
+	int PIX_SZ = 10;
 	
-	int OUT_SZ = 10;
+	int OUT_SZ = 9;
 
 end
