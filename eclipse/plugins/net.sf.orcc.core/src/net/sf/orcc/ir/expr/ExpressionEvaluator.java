@@ -272,6 +272,11 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 				IntExpr i1 = (IntExpr) val1;
 				IntExpr i2 = (IntExpr) val2;
 				return new BoolExpr(!i1.equals(i2));
+			} else if (val1 != null && val1.isBooleanExpr() && val2 != null
+					&& val2.isBooleanExpr()) {
+				BoolExpr b1 = (BoolExpr) val1;
+				BoolExpr b2 = (BoolExpr) val2;
+				return new BoolExpr(!b1.equals(b2));
 			}
 			break;
 		case PLUS:
