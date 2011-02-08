@@ -438,73 +438,26 @@ printActionBodyInline(action) ::= <<
 // Management of Outputs 
 ///////////////////////////////////////////////////////////////////////////////
 OutputsManag() ::= <<
-out_management : process (clock, reset_n) is
-begin
-  if reset_n = '0' then
-    <actor.outputs.list : OutputsReset(); separator="\n">
-    --
-    <actor.outputs.list : {port|<port.name>FSM_out \<= waitSend;}; separator="\n">
-  --
-  elsif rising_edge(clock) then
-    <actor.outputs.list : FSM_outputs(); separator="\n\n">
-  end if;
-end process out_management;
+---------------------------------------------------------------------------
+-- Transmission manager
+---------------------------------------------------------------------------
+<actor.outputs.list : printArbiter(); separator="\n\n">
 >>
 
-FSM_outputs(port) ::= <<
-case <port.name>FSM_out is
-  when waitSend =\>
-      <port.name>_rdy    \<= '1';
-      <port.name>_send   \<= <port.name>_isend;
-    if (<port.name>_isend = '1') then
-      <port.name>_data   \<= <port.name>_idata;
-      <port.name>FSM_out \<= checkAck;
-    end if;
-  --
-  when checkAck =\>
-    if ((<port.name>_ack and <port.name>_isend) = '1') then
-      <port.name>_rdy    \<= '1';
-      <port.name>_send   \<= '1';
-      <port.name>_data   \<= <port.name>_idata;  
-    elsif (<port.name>_ack = '1') then
-      <port.name>_rdy    \<= '1';
-      <port.name>_send   \<= '0';
-      <port.name>FSM_out \<= waitSend;
-    elsif (<port.name>_isend = '1') then
-      <port.name>_rdy    \<= '0';
-      <port.name>_send   \<= '1';
-      <port.name>FSM_out \<= waitAck;
-    else
-      <port.name>_rdy    \<= '1';
-      <port.name>_send   \<= '1';
-    end if;
-  --
-  when waitAck =\>
-    <port.name>_send   \<= '1';  
-    if (<port.name>_ack = '1') then
-      <port.name>_rdy    \<= '1';
-      <port.name>_data   \<= <port.name>_idata;  
-      <port.name>FSM_out \<= checkAck;
-    else
-      <port.name>_rdy    \<= '0';
-    end if;
-  --
-  when others =\> null;
-end case;
+printArbiter(port) ::= <<
+comArbiter_<port.name> : entity work.comArbiter
+generic map (
+  width => <port.type.size>)
+port map (
+  reset_n      => reset_n,
+  clock        => clock,
+  actor_data<if(port.type.bool)>(0)<endif>   => <port.name>_idata,
+  actor_send   => <port.name>_isend,
+  actor_rdy    => <port.name>_rdy,
+  network_data<if(port.type.bool)>(0)<endif> => <port.name>_data,
+  network_send => <port.name>_send,
+  network_ack  => <port.name>_ack);
 >>
-
-OutputsReset(port) ::= <<
-<if(port.type.bool)
-><port.name>_data \<= '0';<
-else
-><port.name>_data \<= (others =\> '0');<
-endif>
-
-<port.name>_rdy  \<= '0';     
-<port.name>_reg  \<= '0';     
-<port.name>_send \<= '0';
->>
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
