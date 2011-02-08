@@ -28,7 +28,10 @@
  */
 package net.sf.orcc.ui.properties;
 
-import net.sf.graphiti.ui.properties.ListSection;
+import net.sf.graphiti.ui.properties.MapSection;
+
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
  * This class defines a map section for graph variables.
@@ -36,6 +39,14 @@ import net.sf.graphiti.ui.properties.ListSection;
  * @author Matthieu Wipliez
  * 
  */
-public class GraphVariablesMapSection extends ListSection {
+public class GraphVariablesMapSection extends MapSection {
+
+	@Override
+	public void createControls(Composite parent,
+			TabbedPropertySheetPage aTabbedPropertySheetPage) {
+		super.createControls(parent, aTabbedPropertySheetPage);
+		getForm().setText("Graph variables");
+		setParameterName("network variable declaration");
+	}
 
 }

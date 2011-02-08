@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.ui.properties;
 
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
+
 import net.sf.graphiti.ui.properties.MapSection;
 
 /**
@@ -37,5 +40,13 @@ import net.sf.graphiti.ui.properties.MapSection;
  * 
  */
 public class VertexParametersMapSection extends MapSection {
+
+	@Override
+	public void createControls(Composite parent,
+			TabbedPropertySheetPage aTabbedPropertySheetPage) {
+		super.createControls(parent, aTabbedPropertySheetPage);
+		getForm().setText("Instance parameters");
+		setParameterName("instance parameter");
+	}
 
 }

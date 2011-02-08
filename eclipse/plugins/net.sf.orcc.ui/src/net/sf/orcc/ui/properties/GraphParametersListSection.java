@@ -45,7 +45,8 @@ public class GraphParametersListSection extends ListSection {
 	public void createControls(Composite parent,
 			TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
-		getWidgetFactory().decorateFormHeading(getForm());
+		getForm().setText("Graph parameters");
+		setParameterName("network parameter");
 	}
 
 }
