@@ -1,0 +1,38 @@
+
+/**
+ * This unit declares constants used by GZIP.
+ * Copied from tree.c (gzip-1.4).
+ * 
+ * @author Matthieu Wipliez
+ */
+unit GzipConstants :
+
+	/** All codes must not exceed MAX_BITS bits */
+	int MAX_BITS = 15;
+
+	/** Bit length codes must not exceed MAX_BL_BITS bits */
+	int MAX_BL_BITS = 7;
+
+	/** number of length codes, not counting the special END_BLOCK code */
+	int LENGTH_CODES = 29;
+
+	/** number of literal bytes 0..255 */
+	int LITERALS = 256;
+
+	/** end of block literal code */
+	int END_BLOCK = 256;
+
+	/** number of Literal or Length codes, including the END_BLOCK code */
+	int L_CODES = LITERALS + 1 + LENGTH_CODES;
+
+	/** number of distance codes */
+	int D_CODES = 30;
+
+	/** number of codes used to transfer the bit lengths */
+	int BL_CODES = 19;
+
+	int STORED_BLOCK = 0;
+	int STATIC_TREES = 1;
+	int DYN_TREES = 2;
+
+end

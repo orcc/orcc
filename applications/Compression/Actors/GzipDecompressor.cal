@@ -1,3 +1,6 @@
+import std.util.BitOps.selectbit;
+import GzipConstants.*;
+
 actor GzipDecompressor() int(size=8) C ==> int(size=8) D:
 
 	// the bits of the byte read
@@ -11,12 +14,94 @@ actor GzipDecompressor() int(size=8) C ==> int(size=8) D:
 	
 	// compression type
 	uint(size=2) btype;
+
+	List(type:int, size=16) bl_count;
+	List(type:int, size=16) next_code;
+	List(type:int, size=288) tree_len;
+	List(type:int, size=288) tree_code;
+	
+	procedure set_len(int from, int to, int bitlen)
+	var
+		int n := from
+	begin
+		while n <= to do
+    		tree_len[n] := bitlen;
+    		bl_count[bitlen] := bl_count[bitlen] + 1;
+			n := n + 1;
+		end
+	end
+	
+	procedure step1()
+	begin
+		bl_count := [ 0 : for int bits in 0 .. MAX_BITS ];
+		
+		set_len(0, 143, 8);
+		set_len(144, 255, 9);
+		set_len(256, 279, 7);
+		set_len(280, 287, 8);
+    
+		foreach int i in 1 .. MAX_BITS do
+			println("bl_count[" + i + "] = " + bl_count[i]);
+		end
+	end
+	
+	procedure step2()
+	var
+		int code := 0
+	begin
+		bl_count[0] := 0;
+		foreach int bits in 1 .. MAX_BITS do
+			code := (code + bl_count[bits - 1]) << 1;
+			next_code[bits] := code;
+			println("next_code[" + bits + "] = " + next_code[bits]);
+		end
+	end
+	
+	procedure print_bin(int number, int numbits)
+	var
+		int bit
+	begin
+		foreach int i in 1 .. numbits do
+			bit := selectbit(number, numbits - i);
+			if bit != 0 then
+				print(1);
+			else
+				print(0);
+			end
+		end
+		println();
+	end
+	
+	procedure step3(int max_code)
+	var
+		int len := 0
+	begin
+		foreach int n in 0 .. max_code do
+			len := tree_len[n];
+			if len != 0 then
+				tree_code[n] := next_code[len];
+				println("next_code[" + len + "] := " + next_code[len]);
+				print_bin(tree_code[n], len);
+				next_code[len] := next_code[len] + 1;
+			end
+		end
+	end
+	
+	initialize ==>
+	do
+		step1();
+		step2();
+		
+		println("******************************************");
+		step3(287);
+	end
 	
 	///////////////////////////////////////////////////////////////////////////
 	procedure bits_read(int(size=5) n)
 	begin
 		num_bits := num_bits - n;
 		bits := bits >> n;
+		println("bits_read: " + n + " bits requested, " + num_bits + " remaining");
 	end
 	
 	function need_bits(int n) --> bool :
@@ -31,6 +116,7 @@ actor GzipDecompressor() int(size=8) C ==> int(size=8) D:
 	///////////////////////////////////////////////////////////////////////////
 	load: action C:[ byte ] ==>
 	do
+		println("loaded 8 bits");
 		bits := (byte << num_bits) | bits;
 		num_bits := num_bits + 8;
 	end
@@ -43,6 +129,7 @@ actor GzipDecompressor() int(size=8) C ==> int(size=8) D:
 	do
 		bfinal := (bits & 1) = 1;
 		btype := (bits >> 1) & 0x03;
+		println("block_header: bfinal=" + bfinal + ", btype=" + btype);
 		bits_read(3);
 	end
 
@@ -50,7 +137,7 @@ actor GzipDecompressor() int(size=8) C ==> int(size=8) D:
 	// uncompressed data
 	uncompressed: action ==>
 	guard
-		btype = 0
+		btype = STORED_BLOCK
 	end
 
 	uint(size=16) len;
@@ -78,7 +165,7 @@ actor GzipDecompressor() int(size=8) C ==> int(size=8) D:
 	// fixed Huffman coding
 	fixed_huffman: action ==>
 	guard
-		btype = 0x01
+		btype = STATIC_TREES
 	end
 	
 	decode_literal: action ==>
