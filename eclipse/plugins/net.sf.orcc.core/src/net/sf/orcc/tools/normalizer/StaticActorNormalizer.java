@@ -358,6 +358,7 @@ public class StaticActorNormalizer {
 			Variable var = stateVars.get(port.getName());
 
 			Read read = new Read(port, numTokens, var);
+			var.setInstruction(read);
 			block.add(read);
 		}
 	}
@@ -391,14 +392,16 @@ public class StaticActorNormalizer {
 	 *            the body of the static action being created
 	 */
 	private void createWrites(Procedure procedure) {
-		Pattern inputPattern = staticCls.getOutputPattern();
+		Pattern outputPattern = staticCls.getOutputPattern();
 		BlockNode block = BlockNode.getLast(procedure);
-		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
+		for (Entry<Port, Integer> entry : outputPattern.entrySet()) {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();
 			Variable var = stateVars.get(port.getName());
 
 			Write write = new Write(port, numTokens, var);
+			var.setInstruction(write);
+			var.addUse(write);
 			block.add(write);
 		}
 	}
