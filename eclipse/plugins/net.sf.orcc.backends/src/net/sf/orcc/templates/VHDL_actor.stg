@@ -447,7 +447,7 @@ OutputsManag() ::= <<
 printArbiter(port) ::= <<
 comArbiter_<port.name> : entity work.comArbiter
 generic map (
-  width =\> <port.type.size>)
+  width =\> <if(port.type.bool)>(1)<else><port.type.size><endif>)
 port map (
   reset_n      =\> reset_n,
   clock        =\> clock,

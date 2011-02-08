@@ -102,7 +102,9 @@ begin
       when "111" =>                     -- ""       ""
         actor_rdy    <= '1';
         network_send <= '1';
-      when others => null;
+      when others =>
+        actor_rdy    <= '0';
+        network_send <= '0';
     end case;
   end process;
 

@@ -16,6 +16,15 @@ add wave -noupdate -color {Orange Red} -radix decimal /tb_xilinx_idct2d/xilinx_i
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/y1_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/y1_ack
 add wave -noupdate -divider <NULL>
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/actor_data
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/actor_send
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/actor_rdy
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/network_data
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/network_send
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/network_ack
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/management
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/data_in_reg
+add wave -noupdate -divider <NULL>
 add wave -noupdate -divider farimerge
 add wave -noupdate -divider <NULL>
 add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/r0_data
@@ -40,6 +49,15 @@ add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fair
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/rowout_data
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/rowout_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/rowout_ack
+add wave -noupdate -divider <NULL>
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/actor_data
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/actor_send
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/actor_rdy
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/network_data
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/network_send
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/network_ack
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/management
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/data_in_reg
 add wave -noupdate -divider <NULL>
 add wave -noupdate -divider Broadcast
 add wave -noupdate -divider <NULL>
@@ -224,7 +242,7 @@ add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/o_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/o_ack
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {47 ns} 0}
+WaveRestoreCursors {{Cursor 1} {1035 ns} 0}
 configure wave -namecolwidth 222
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -239,4 +257,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {388 ns}
+WaveRestoreZoom {0 ns} {653 ns}
