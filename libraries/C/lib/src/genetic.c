@@ -96,7 +96,10 @@ static int write_better_mapping(population *pop, struct genetic_s *genetic_info)
 }
 
 
+
+
 static int check_individual_presence(individual* ind, individual** list, int size){
+
 	return 0;
 }
 
@@ -178,11 +181,27 @@ static individual* mutation(individual *original, struct genetic_s *genetic_info
 	return mutated;
 }
 
+static individual* generate_random_individual(struct genetic_s *genetic_info){
+	int i;
+	individual* ind = (individual*) malloc(sizeof(individual));
+	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	ind->fps = -1;
+	ind->old_fps = -1;
+
+	// Initialize genes randomly
+	for (i = 0; i < genetic_info->actors_nb; i++) {
+		ind->genes[i] = (gene*) malloc(sizeof(gene));
+		ind->genes[i]->actor = genetic_info->actors[i];
+		ind->genes[i]->mapped_core = rand() % genetic_info->threads_nb;
+	}
+
+	return ind;
+}
+
 
 static void map_actors_on_threads(individual *individual, struct genetic_s *genetic_info) {
 	int i;
 	struct mapping_s *mapping  = compute_mapping(individual, genetic_info);
-	struct actor_s **actors = mapping->actors_mapping[0];
 
 	for (i = 0; i < genetic_info->threads_nb; i++) {
 		sched_reinit(&genetic_info->schedulers[i], mapping->actors_per_threads[i], mapping->actors_mapping[i]);
@@ -243,7 +262,7 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 
 
 static population* initialize_population(struct genetic_s *genetic_info) {
-	int i, j;
+	int i;
 
 	// Allocate memory to store the new population
 	population *pop = (population*) malloc(sizeof(population));
@@ -259,17 +278,7 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 
 	// Initialize first generation of individuals
 	for (i = 0; i < genetic_info->population_size; i++) {
-		pop->individuals[i] = (individual*) malloc(sizeof(individual));
-		pop->individuals[i]->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
-		pop->individuals[i]->fps = -1;
-		pop->individuals[i]->old_fps = -1;
-
-		// Initialize genes randomly
-		for (j = 0; j < genetic_info->actors_nb; j++) {
-			pop->individuals[i]->genes[j] = (gene*) malloc(sizeof(gene));
-			pop->individuals[i]->genes[j]->actor = genetic_info->actors[j];
-			pop->individuals[i]->genes[j]->mapped_core = rand() % genetic_info->threads_nb;
-		}
+		pop->individuals[i] = generate_random_individual(genetic_info);
 	}
 
 	return pop;
