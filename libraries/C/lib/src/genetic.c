@@ -114,6 +114,26 @@ static int is_contained(individual* ind, population* pop, int size, struct genet
 }
 
 
+static gene* copy_gene(gene *g){
+	gene *new_g = (gene*) malloc(sizeof(gene));
+	new_g->actor = g->actor;
+	new_g->mapped_core = g->mapped_core;
+	return new_g;
+}
+
+static individual* copy_individual(individual *ind, struct genetic_s *genetic_info){
+	int i;
+	individual *new_ind = (individual*) malloc(sizeof(individual));
+	new_ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	new_ind->fps = ind->fps;
+	new_ind->old_fps = ind->old_fps;
+	for (i = 0; i < genetic_info->actors_nb; i++) {
+		new_ind->genes[i] = copy_gene(ind->genes[i]);
+	}
+	return new_ind;
+}
+
+
 static int compare_individual_fps(void const *a, void const *b)
 {
 	individual const **pi1 = (individual const**) a;
@@ -158,14 +178,12 @@ static void crossover(individual **children, individual **parents, struct geneti
 	children[1]->old_fps = -1;
 
 	for (i = 0; i < genetic_info->actors_nb; i++) {
-		children[0]->genes[i] = (gene*) malloc(sizeof(gene));
-		children[1]->genes[i] = (gene*) malloc(sizeof(gene));
 		if (i < cut) {
-			children[0]->genes[i] = parents[0]->genes[i];
-			children[1]->genes[i] = parents[1]->genes[i];
+			children[0]->genes[i] = copy_gene(parents[0]->genes[i]);
+			children[1]->genes[i] = copy_gene(parents[1]->genes[i]);
 		} else {
-			children[0]->genes[i] = parents[1]->genes[i];
-			children[1]->genes[i] = parents[0]->genes[i];
+			children[0]->genes[i] = copy_gene(parents[1]->genes[i]);
+			children[1]->genes[i] = copy_gene(parents[0]->genes[i]);
 		}
 	}
 }
@@ -180,9 +198,7 @@ static individual* mutation(individual *original, struct genetic_s *genetic_info
 	mutated->old_fps = -1;
 
 	for (i = 0; i < genetic_info->actors_nb; i++) {
-		mutated->genes[i] = (gene*) malloc(sizeof(gene));
-
-		mutated->genes[i] = original->genes[i];
+		mutated->genes[i] = copy_gene(original->genes[i]);
 		if (i == mutated_index) {
 			mutated->genes[i]->mapped_core = rand() % genetic_info->threads_nb;
 		}
@@ -229,22 +245,6 @@ static void destroy_population(population *pop, struct genetic_s *genetic_info){
 	free(pop);
 }
 
-static individual* copy_individual(individual *ind, struct genetic_s *genetic_info){
-	int i;
-	individual* new_ind = (individual*) malloc(sizeof(individual));
-	new_ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
-	new_ind->fps = ind->fps;
-	new_ind->old_fps = ind->old_fps;
-
-	for (i = 0; i < genetic_info->actors_nb; i++) {
-		new_ind->genes[i] = (gene*) malloc(sizeof(gene));
-		new_ind->genes[i]->actor = ind->genes[i]->actor;
-		new_ind->genes[i]->mapped_core = ind->genes[i]->mapped_core;
-	}
-
-	return new_ind;
-}
-
 
 static population* compute_next_population(population *pop, struct genetic_s *genetic_info) {
 	int i, free, last;
@@ -278,10 +278,13 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 		individual *children[2];
 		individual *parents[2];
 
-		parents[0] = selection(pop, genetic_info);
-		parents[1] = selection(pop, genetic_info);
+		do{
+			parents[0] = selection(pop, genetic_info);
+			parents[1] = selection(pop, genetic_info);
 
-		crossover(children, parents, genetic_info);
+			crossover(children, parents, genetic_info);
+		} while(is_contained(children[0], next_pop, i, genetic_info)
+				|| is_contained(children[1], next_pop, i, genetic_info));
 
 		next_pop->individuals[i] = children[0];
 		next_pop->individuals[i + 1] = children[1];
@@ -289,7 +292,10 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 
 	// Mutation
 	for (; i < genetic_info->population_size; i++) {
-		next_pop->individuals[i] = mutation(selection(pop, genetic_info), genetic_info);
+		do{
+			next_pop->individuals[i] = mutation(selection(pop, genetic_info), genetic_info);
+		}
+		while(is_contained(next_pop->individuals[i], next_pop, i, genetic_info));
 	}
 
 	destroy_population(pop, genetic_info);
@@ -315,7 +321,10 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 
 	// Initialize first generation of individuals
 	for (i = 0; i < genetic_info->population_size; i++) {
-		pop->individuals[i] = generate_random_individual(genetic_info);
+		do{
+			pop->individuals[i] = generate_random_individual(genetic_info);
+		}
+		while(is_contained(pop->individuals[i], pop, i, genetic_info));
 	}
 
 	return pop;
