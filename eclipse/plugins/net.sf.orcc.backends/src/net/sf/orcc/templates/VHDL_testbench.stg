@@ -128,7 +128,7 @@ case_define_in(port) ::= <<
 case tb_FSM_<port.name> is
   when after_reset =\>
     count \<= count + 1;
-    if count = 15 then
+    if (count = 15) then
       tb_FSM_<port.name> \<= read_file;
       count           \<= 0;
     end if;
@@ -137,7 +137,7 @@ case tb_FSM_<port.name> is
     if (not endfile (sim_file_<instance.id>_<port.name>)) then
       readline(sim_file_<instance.id>_<port.name>, line_number);
       --
-      if line_number'length \> 0 and line_number(1) /= '/' then
+      if (line_number'length \> 0 and line_number(1) /= '/') then
         read(line_number, input_bit);
         <sendData(port)>
         <port.name>_send \<= '1';    
@@ -149,7 +149,7 @@ case tb_FSM_<port.name> is
     if (not endfile (sim_file_<instance.id>_<port.name>)) and <port.name>_ack = '1' then
       readline(sim_file_<instance.id>_<port.name>, line_number);
       --
-      if line_number'length \> 0 and line_number(1) /= '/' then
+      if (line_number'length \> 0 and line_number(1) /= '/') then
         read(line_number, input_bit);
         <sendData(port)>
         <port.name>_send \<= '1';      
@@ -165,14 +165,15 @@ end case;
 
 waveform_process_out(output) ::= <<
 -- Output(s) waveform Generation
+<output.list: {port|<port.name>_ack \<= <port.name>_send;}; separator="\n">    
+--
 WaveGen_Proc_Out : process (reset_n, clock)
   variable Input_bit   : integer range 2147483647 downto - 2147483648;
   variable line_number : line;
 begin
-  if reset_n = '0' then
-    <output.list: {port|<port.name>_ack \<= '1';}; separator="\n">   
-    --
-  elsif rising_edge(clock) then
+  if (reset_n = '0') then
+    -- nothing here
+  elsif (rising_edge(clock)) then
     <output.list: case_define_out(); separator="\n">
   end if;
 end process WaveGen_Proc_Out;
@@ -186,11 +187,11 @@ case_define_out(port) ::= <<
 if (not endfile (sim_file_<instance.id>_<port.name>) and <port.name>_send = '1') then
   readline(sim_file_<instance.id>_<port.name>, line_number);
   --
-  if line_number'length \> 0 and line_number(1) /= '/' then
+  if (line_number'length \> 0 and line_number(1) /= '/') then
     read(line_number, input_bit);
 <
 if(port.type.bool)
->    if Input_bit = 1 then
+>    if (input_bit = 1) then
       assert (<port.name>_data = '1')
         report "incorrectly value computed : 0 instead of : 1"
         severity error;
@@ -213,10 +214,7 @@ else
   <endif
   ><endif
 >    --
-    <port.name>_ack \<= '1';    
   end if;
-else
-  <port.name>_ack \<= '0';     
 end if;
 
 >>
