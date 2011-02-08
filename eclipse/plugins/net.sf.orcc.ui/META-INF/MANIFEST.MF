@@ -16,6 +16,7 @@ Require-Bundle: net.sf.graphiti.model,
  org.eclipse.jdt.core,
  org.eclipse.ui,
  org.eclipse.ui.ide,
+ org.eclipse.ui.views.properties.tabbed,
  org.eclipse.xtext.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -575,4 +575,55 @@
             name="Orcc Network Editor">
       </editor>
    </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs
+            contributorId="net.sf.graphiti.ui.properties.contributor">
+         <propertyTab
+               category="net.sf.graphiti.ui.properties.category.vertex"
+               id="net.sf.orcc.ui.properties.tab.vertex.parameters"
+               label="Instance parameters">
+         </propertyTab>
+         <propertyTab
+               category="net.sf.graphiti.ui.properties.category.graph"
+               id="net.sf.orcc.ui.properties.tab.graph.parameters"
+               label="Network parameters">
+         </propertyTab>
+         <propertyTab
+               category="net.sf.graphiti.ui.properties.category.graph"
+               id="net.sf.orcc.ui.properties.tab.graph.variables"
+               label="Network variable declarations">
+         </propertyTab>
+      </propertyTabs>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections
+            contributorId="net.sf.graphiti.ui.properties.contributor">
+         <propertySection
+               class="net.sf.orcc.ui.properties.VertexParametersMapSection"
+               id="net.sf.orcc.ui.properties.section.vertex.parameters"
+               tab="net.sf.orcc.ui.properties.tab.vertex.parameters">
+            <input
+                  type="net.sf.graphiti.model.Vertex">
+            </input>
+         </propertySection>
+         <propertySection
+               class="net.sf.orcc.ui.properties.GraphParametersListSection"
+               id="net.sf.orcc.ui.properties.section.graph.parameters"
+               tab="net.sf.orcc.ui.properties.tab.graph.parameters">
+            <input
+                  type="net.sf.graphiti.model.Graph">
+            </input>
+         </propertySection>
+         <propertySection
+               class="net.sf.orcc.ui.properties.GraphVariablesMapSection"
+               id="net.sf.orcc.ui.properties.section.graph.variables"
+               tab="net.sf.orcc.ui.properties.tab.graph.variables">
+            <input
+                  type="net.sf.graphiti.model.Graph">
+            </input>
+         </propertySection>
+      </propertySections>
+   </extension>
 </plugin>
