@@ -447,16 +447,16 @@ OutputsManag() ::= <<
 printArbiter(port) ::= <<
 comArbiter_<port.name> : entity work.comArbiter
 generic map (
-  width => <port.type.size>)
+  width =\> <port.type.size>)
 port map (
-  reset_n      => reset_n,
-  clock        => clock,
-  actor_data<if(port.type.bool)>(0)<endif>   => <port.name>_idata,
-  actor_send   => <port.name>_isend,
-  actor_rdy    => <port.name>_rdy,
-  network_data<if(port.type.bool)>(0)<endif> => <port.name>_data,
-  network_send => <port.name>_send,
-  network_ack  => <port.name>_ack);
+  reset_n      =\> reset_n,
+  clock        =\> clock,
+  actor_data<if(port.type.bool)>(0)<endif>   =\> <port.name>_idata,
+  actor_send   =\> <port.name>_isend,
+  actor_rdy    =\> <port.name>_rdy,
+  network_data<if(port.type.bool)>(0)<endif> =\> <port.name>_data,
+  network_send =\> <port.name>_send,
+  network_ack  =\> <port.name>_ack);
 >>
 
 
