@@ -96,15 +96,25 @@ static int write_better_mapping(population *pop, struct genetic_s *genetic_info)
 }
 
 
-
-
-static int check_individual_presence(individual* ind, individual** list, int size){
-
-	return 0;
+static int individual_equal(individual* ind1, individual* ind2, struct genetic_s *genetic_info){
+	int i, equal = 1;
+	for(i=0; i<genetic_info->actors_nb && equal; i++){
+		equal = (ind1->genes[i] == ind2->genes[i]);
+	}
+	return equal;
 }
 
 
-static int compare_individual(void const *a, void const *b)
+static int is_contained(individual* ind, population* pop, int size, struct genetic_s *genetic_info){
+	int i, contains = 0;
+	for(i=0; i<size && !contains; i++){
+		contains = individual_equal(ind, pop->individuals[i], genetic_info);
+	}
+	return contains;
+}
+
+
+static int compare_individual_fps(void const *a, void const *b)
 {
 	individual const **pi1 = (individual const**) a;
 	individual const **pi2 = (individual const**) b;
@@ -208,27 +218,54 @@ static void map_actors_on_threads(individual *individual, struct genetic_s *gene
 	}
 }
 
+static void destroy_population(population *pop, struct genetic_s *genetic_info){
+	int i,j;
+	for(i=0; i<genetic_info->population_size; i++) {
+		for (j = 0; j < genetic_info->actors_nb; j++) {
+			free(pop->individuals[i]->genes[j]);
+		}
+		free(pop->individuals[i]);
+	}
+	free(pop);
+}
+
+static individual* copy_individual(individual *ind, struct genetic_s *genetic_info){
+	int i;
+	individual* new_ind = (individual*) malloc(sizeof(individual));
+	new_ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	new_ind->fps = ind->fps;
+	new_ind->old_fps = ind->old_fps;
+
+	for (i = 0; i < genetic_info->actors_nb; i++) {
+		new_ind->genes[i] = (gene*) malloc(sizeof(gene));
+		new_ind->genes[i]->actor = ind->genes[i]->actor;
+		new_ind->genes[i]->mapped_core = ind->genes[i]->mapped_core;
+	}
+
+	return new_ind;
+}
+
 
 static population* compute_next_population(population *pop, struct genetic_s *genetic_info) {
 	int i, free, last;
 
 	// Allocate memory to store the new population
-	population *nextPop = (population*) malloc(sizeof(population));
+	population *next_pop = (population*) malloc(sizeof(population));
 	individual **individuals = (individual**) malloc(genetic_info->population_size
 			* sizeof(individual*));
 
 	// Initialize population fields
-	nextPop->individuals = individuals;
-	nextPop->generation_nb = pop->generation_nb + 1;
+	next_pop->individuals = individuals;
+	next_pop->generation_nb = pop->generation_nb + 1;
 
 	// Sort population by descending fps value
-	qsort(pop->individuals, genetic_info->population_size, sizeof(individual*), compare_individual);
+	qsort(pop->individuals, genetic_info->population_size, sizeof(individual*), compare_individual_fps);
 
 	// Backup better individuals
 	for (i = 0; i < genetic_info->population_size * genetic_info->keep_ratio; i++) {
-		nextPop->individuals[i] = pop->individuals[i];
-		nextPop->individuals[i]->old_fps = nextPop->individuals[i]->fps;
-		nextPop->individuals[i]->fps = -1;
+		next_pop->individuals[i] = copy_individual(pop->individuals[i], genetic_info);
+		next_pop->individuals[i]->old_fps = next_pop->individuals[i]->fps;
+		next_pop->individuals[i]->fps = -1;
 	}
 
 	// Crossover
@@ -246,18 +283,18 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 
 		crossover(children, parents, genetic_info);
 
-		nextPop->individuals[i] = children[0];
-		nextPop->individuals[i + 1] = children[1];
+		next_pop->individuals[i] = children[0];
+		next_pop->individuals[i + 1] = children[1];
 	}
 
 	// Mutation
 	for (; i < genetic_info->population_size; i++) {
-		nextPop->individuals[i] = mutation(selection(pop, genetic_info), genetic_info);
+		next_pop->individuals[i] = mutation(selection(pop, genetic_info), genetic_info);
 	}
 
-	// TODO: Remove old population and unused individuals from memory
+	destroy_population(pop, genetic_info);
 
-	return nextPop;
+	return next_pop;
 }
 
 
