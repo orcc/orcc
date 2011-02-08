@@ -56,6 +56,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.tools.classifier.ActorClassifier;
+import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
 /**
  * C back-end.
@@ -152,8 +153,13 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
+		boolean normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+
 		if (classify) {
 			new ActorClassifier().transform(actor);
+			if (normalize) {
+				new ActorNormalizer().transform(actor);
+			}
 		}
 
 		ActorTransformation[] transformations = { new TypeSizeTransformation(),
@@ -180,18 +186,9 @@ public class CBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
-		if (classify) {
-			boolean normalize = getAttribute("net.sf.orcc.backends.normalize",
-					false);
-			if (normalize) {
-				network.normalizeActors();
-			}
-
-			boolean merge = getAttribute("net.sf.orcc.backends.merge", false);
-			if (merge) {
-				network.mergeActors();
-			}
+		boolean merge = getAttribute("net.sf.orcc.backends.merge", false);
+		if (merge) {
+			network.mergeActors();
 		}
 
 		// until now, printer is default printer
