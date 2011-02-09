@@ -46,7 +46,6 @@
 #endif
 
 static FILE *F = NULL;
-static int cnt = 0;
 
 // Called before any *_scheduler function.
 void source_genetic_initialize() {
@@ -71,7 +70,8 @@ void source_genetic_initialize() {
 
 extern struct fifo_i8_s *source_genetic_O;
 
-static int stop = 0;
+int stop = 0;
+int restart = 0;
 
 void source_genetic_scheduler(struct schedinfo_s *si) {
 	unsigned char *ptr;
@@ -83,18 +83,19 @@ void source_genetic_scheduler(struct schedinfo_s *si) {
 		fseek(F, 0, 0);
 	}
 
-	while (fifo_i8_has_room(source_genetic_O, 1)) {
+	while (fifo_i8_has_room(source_genetic_O, 1) && !stop) {
 		i8 source_genetic_O_buf[1];
 		ptr = fifo_i8_write(source_genetic_O, source_genetic_O_buf, 1);
 		n = fread(ptr, 1, 1, F);
 		if (n < 1) {
-			fseek(F, 0, 0);
-			cnt = 0;
-			n = fread(ptr, 1, 1, F);
+			if (feof(F)) {
+				stop = 1;
+			}
 		}
-		i++;
-		cnt++;
-		fifo_i8_write_end(source_genetic_O, source_genetic_O_buf, 1);
+		else{
+			i++;
+			fifo_i8_write_end(source_genetic_O, source_genetic_O_buf, 1);
+		}
 	}
 
 	si->num_firings = i;
