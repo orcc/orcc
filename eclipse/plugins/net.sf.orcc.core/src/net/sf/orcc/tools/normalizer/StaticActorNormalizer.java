@@ -39,6 +39,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -157,9 +158,40 @@ public class StaticActorNormalizer {
 		@Override
 		public void visit(SimplePattern pattern) {
 			BlockNode block = BlockNode.getLast(procedure, nodes);
+			Action action = pattern.getAction();
+			
+			//Call the action corresponding to the pattern
 			Call call = new Call(new Location(), null, pattern.getAction()
 					.getBody(), new ArrayList<Expression>());
+			
+			//Update variable counter index
+			List<Instruction> indexIn = updateIndex(action.getInputPattern());
+			List<Instruction> indexOut = updateIndex(action.getOutputPattern());
+			
+			//Add all instructions
 			block.add(call);
+			block.addAll(indexIn);
+			block.addAll(indexOut);
+		}
+		
+		private List<Instruction> updateIndex(Pattern pattern){
+			List<Instruction> instrs = new ArrayList<Instruction>();
+			
+			for (Entry<Port, Integer> entry : pattern.entrySet()){
+				Port port = entry.getKey();
+				Integer tokens = entry.getValue();
+							
+				Variable varCount = stateVars.get(port.getName() + "_count");
+				Use use = new Use(varCount);
+				
+				Store store = new Store(varCount, new ArrayList<Expression>(), new BinaryExpr(
+						new VarExpr(use), BinaryOp.PLUS, new IntExpr(tokens),
+						IrFactory.eINSTANCE.createTypeInt(32)));
+				instrs.add(store);
+
+			}
+			
+			return instrs;
 		}
 
 	}
@@ -400,8 +432,11 @@ public class StaticActorNormalizer {
 			Variable var = stateVars.get(port.getName());
 
 			Write write = new Write(port, numTokens, var);
+			
+			//Avoid this instructions to be removed by the Dead Code transformation
 			var.setInstruction(write);
 			var.addUse(write);
+			
 			block.add(write);
 		}
 	}

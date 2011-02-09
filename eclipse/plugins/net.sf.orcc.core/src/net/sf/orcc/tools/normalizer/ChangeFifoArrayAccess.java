@@ -58,7 +58,7 @@ import net.sf.orcc.util.OrderedMap;
 public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 
 	private OrderedMap<String, GlobalVariable> stateVars;
-
+	
 	@Override
 	public void transform(Actor actor) {
 		stateVars = actor.getStateVars();
@@ -67,26 +67,21 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 
 	private void updateIndex(Variable var, Instruction instr,
 			List<Expression> indexes) {
-		Expression index = indexes.get(0);
-
-		if (index.equals(new IntExpr(0))) {
+		
+		if (indexes.size() < 2 ) {
 			Variable varCount = stateVars.get(var.getName() + "_count");
+						
 			Use use = new Use(varCount, instr);
-			indexes.set(0, new VarExpr(use));
+			BinaryExpr expr = new BinaryExpr(new VarExpr(use), BinaryOp.PLUS, indexes.get(0),
+					IrFactory.eINSTANCE.createTypeInt(32));
+			
+			indexes.set(0, expr);
 
-			indexes = new ArrayList<Expression>(0);
-			use = new Use(varCount);
-			Store store = new Store(varCount, indexes, new BinaryExpr(
-					new VarExpr(use), BinaryOp.PLUS, new IntExpr(1),
-					IrFactory.eINSTANCE.createTypeInt(32)));
-			use.setNode(store);
-
-			itInstruction.add(store);
 		} else {
 			System.err.println("TODO index");
 		}
 	}
-
+	
 	@Override
 	public void visit(Load load) {
 		Use use = load.getSource();
