@@ -1,9 +1,10 @@
 package gzip;
 
 import std.util.BitOps.selectbit;
+import std.util.BitOps.selectbits;
 import gzip.Constants.*;
 
-actor Deflate() int(size=8) C ==> int(size=8) D:
+actor Inflate() int(size=8) C ==> int(size=8) D:
 
 	// the bits of the byte read
 	uint(size=16) bits := 0;
@@ -21,6 +22,7 @@ actor Deflate() int(size=8) C ==> int(size=8) D:
 	List(type:int, size=16) next_code;
 	List(type:int, size=288) tree_len;
 	List(type:int, size=288) tree_code;
+	List(type:int, size=512) invtree_code := [ 0 : for int i in 0 .. 511 ];
 	
 	procedure set_len(int from, int to, int bitlen)
 	var
@@ -41,10 +43,6 @@ actor Deflate() int(size=8) C ==> int(size=8) D:
 		set_len(144, 255, 9);
 		set_len(256, 279, 7);
 		set_len(280, 287, 8);
-    
-		foreach int i in 1 .. MAX_BITS do
-			println("bl_count[" + i + "] = " + bl_count[i]);
-		end
 	end
 	
 	procedure step2()
@@ -55,7 +53,6 @@ actor Deflate() int(size=8) C ==> int(size=8) D:
 		foreach int bits in 1 .. MAX_BITS do
 			code := (code + bl_count[bits - 1]) << 1;
 			next_code[bits] := code;
-			println("next_code[" + bits + "] = " + next_code[bits]);
 		end
 	end
 	
@@ -82,8 +79,7 @@ actor Deflate() int(size=8) C ==> int(size=8) D:
 			len := tree_len[n];
 			if len != 0 then
 				tree_code[n] := next_code[len];
-				println("next_code[" + len + "] := " + next_code[len]);
-				print_bin(tree_code[n], len);
+				invtree_code[tree_code[n]] := n;
 				next_code[len] := next_code[len] + 1;
 			end
 		end
@@ -93,8 +89,6 @@ actor Deflate() int(size=8) C ==> int(size=8) D:
 	do
 		step1();
 		step2();
-		
-		println("******************************************");
 		step3(287);
 	end
 	
@@ -124,13 +118,14 @@ actor Deflate() int(size=8) C ==> int(size=8) D:
 	end
 
 	///////////////////////////////////////////////////////////////////////////
-	// block header
-	block_header: action ==>
+	// read block header
+
+	read.header: action ==>
 	guard
 		need_bits(3)
 	do
-		bfinal := (bits & 1) = 1;
-		btype := (bits >> 1) & 0x03;
+		bfinal := selectbit(bits, 0) = 1;
+		btype := selectbits(bits, 1, 2) >> 1;
 		println("block_header: bfinal=" + bfinal + ", btype=" + btype);
 		bits_read(3);
 	end
@@ -165,12 +160,44 @@ actor Deflate() int(size=8) C ==> int(size=8) D:
 	
 	///////////////////////////////////////////////////////////////////////////
 	// fixed Huffman coding
+	bool done_decoding;
+	int(size=8) value_len;
+	int(size=9) value;
+	
 	fixed_huffman: action ==>
 	guard
 		btype = STATIC_TREES
+	do
+		done_decoding := false;
+		value := 0;
+		value_len := 0;
+		println();
 	end
 	
-	decode_literal: action ==>
+	done.fixed: action ==>
+	guard done_decoding
+	end
+	
+	loop.fixed: action ==>
+	guard
+		need_bits(1)
+	var
+		uint(size=1) bit = selectbit(bits, 0)
+	do
+		value := (value << 1) | bit;
+		value_len := value_len + 1;
+		
+		print("code_len = " + value_len + ", bit read = " + bit + ", code = ");
+		print_bin(value, 9);
+		
+		println("invtree_code[" + value + "] = " + invtree_code[value]);
+		println("tree_len[" + invtree_code[value] + "] = " + tree_len[invtree_code[value]]);
+		
+		done_decoding := (value_len = tree_len[invtree_code[value]]);
+		bits_read(1);
+	end
+	
+	output_value: action ==> D:[0]
 	end
 
 	///////////////////////////////////////////////////////////////////////////
@@ -180,8 +207,8 @@ actor Deflate() int(size=8) C ==> int(size=8) D:
 		start (is_final) --> done;
 		start (other) --> new_block;
 
+		new_block (read.header) --> body;
 		new_block (load) --> new_block;
-		new_block (block_header) --> body;
 		
 		body (uncompressed) --> uncompressed;
 		body (fixed_huffman) --> fixed;
@@ -189,14 +216,17 @@ actor Deflate() int(size=8) C ==> int(size=8) D:
 		uncompressed (read_uc_len) --> uncompressed_loop;
 		uncompressed_loop (loop.uc) --> uncompressed_loop;
 		uncompressed_loop (done.uc) --> start;
-		
-		fixed (decode_literal) --> start;
+
+		fixed (done.fixed) --> fixed_decoded;
+		fixed (loop.fixed) --> fixed;
+		fixed (load) --> fixed;
+
+		fixed_decoded (fixed_huffman) --> fixed;
 	end
 	
 	priority
 		is_final > other;
-		done > loop;
-		block_header > load;
+		done > loop > read > load;
 	end
 
 end

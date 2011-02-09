@@ -38,11 +38,11 @@
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
    </Instance>
-   <Instance id="decompressor">
+   <Instance id="inflate">
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="gzip.Deflate"/>
+      <Class name="gzip.Inflate"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -63,6 +63,6 @@
    <Connection dst="crc32" dst-port="END" src="parser" src-port="END"/>
    <Connection dst="parser" dst-port="CRC" src="crc32" src-port="CRC"/>
    <Connection dst="crc32" dst-port="I" src="parser" src-port="HDATA"/>
-   <Connection dst="decompressor" dst-port="C" src="parser" src-port="BDATA"/>
-   <Connection dst="print_data" dst-port="I" src="decompressor" src-port="D"/>
+   <Connection dst="inflate" dst-port="C" src="parser" src-port="BDATA"/>
+   <Connection dst="print_data" dst-port="I" src="inflate" src-port="D"/>
 </XDF>
