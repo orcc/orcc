@@ -234,7 +234,7 @@ static <procedure.returnType> <procedure>(<
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 
-action(action) ::= <<
+printAction(action) ::= <<
 <procedure(action.body)><procedure(action.scheduler)>
 >>
 
@@ -265,12 +265,7 @@ checkInputPattern(pattern) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
-actionCall(action) ::= <<
-<action.body>();
-i++;
->>
-
-actionTest(action) ::= <<
+actionTest(action, restActions) ::= <<
 if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
 	<if(action.outputPattern)>
 	<outputPattern(pattern=action.outputPattern)>
@@ -280,24 +275,30 @@ if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
 		break;
 	}
 	<endif>
-	<actionCall(action)>
-}>>
-
-schedulingTest(actions) ::= <<
-<actions: actionTest(); separator=" else ">
+	<action.body>();
+	i++;
+} else {
+	<printActions(restActions)>
+}
 >>
 
-scheduler(actions) ::= <<
-void <instance.id>_scheduler(struct schedinfo_s *si) {
+printActions(actions) ::= <<
+<if (first(actions))
+><actionTest(action=first(actions), restActions=rest(actions))><
+else
+>si-\>num_firings = i;
+si-\>reason = starved;
+si-\>ports = 0x0<instance.actor.templateData.maskInputs>;
+return;<
+endif>
+>>
+
+printActionScheduler(name, actions) ::= <<
+void <name>(struct schedinfo_s *si) {
 	int i = 0;
-  
+
 	while (1) {
-		<if(actions)><schedulingTest(actions)><endif> else {
-			si-\>num_firings = i;
-			si-\>reason = starved;
-			si-\>ports = 0x0<instance.actor.templateData.maskInputs>;
-			break;
-		}
+		<printActions(actions)>
 	}
 }
 
@@ -306,16 +307,10 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
 
-actionCallState(nextState) ::= <<
-<nextState.action.body>();
-i++;
-goto l_<nextState.targetState>;
->>
-
-actionTestState(nextState) ::= <<
-if (<checkInputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.action>()) {
-	<if(nextState.action.outputPattern)>
-	<outputPattern(nextState.action.outputPattern)>
+actionTestState(state, restStates) ::= <<
+if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()) {
+	<if (state.action.outputPattern)>
+	<outputPattern(state.action.outputPattern)>
 		_FSM_state = s_<transition.sourceState>;
 		si-\>num_firings = i;
 		si-\>reason = full;
@@ -323,39 +318,41 @@ if (<checkInputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.a
 		return;
 	}
 	<endif>
-	<actionCallState(nextState)>
-}>>
-
-schedulingTestState(nextStates) ::= <<
-<nextStates: actionTestState(); separator=" else ">
+	<state.action.body>();
+	i++;
+	goto l_<state.targetState>;
+} else {
+	<schedulingStates(restStates)>
+}
 >>
 
-Transition(transition) ::= <<
+schedulingStates(states) ::= <<
+<if (first(states))
+><actionTestState(state=first(states), restStates=rest(states))><
+else
+>_FSM_state = s_<transition.sourceState>;
+si-\>num_firings = i;
+si-\>reason = starved;
+si-\>ports = 0x0<instance.actor.templateData.maskInputsTransition.(transition)>;
+return;<
+endif>
+>>
+
+printTransition(transition) ::= <<
 
 
 l_<transition.sourceState>:
 	<if (actions)>
-	while (outside_FSM_scheduler()) {
-		i++;
-	}
+	<instance.id>_outside_FSM_scheduler(si);
+	i += si-\>num_firings;
 	<endif>
 	<if (transition.nextStateInfo.empty)>
 	printf("stuck in state \"<transition.sourceState>\" in the instance <instance.id>\n");
 	wait_for_key();
 	exit(1);
 	<else>
-	<schedulingTestState(nextStates=transition.nextStateInfo)> else {
-		_FSM_state = s_<transition.sourceState>;
-		si-\>num_firings = i;
-		si-\>reason = starved;
-		si-\>ports = 0x0<instance.actor.templateData.maskInputsTransition.(transition)>;
-		return;
-	}
+	<schedulingStates(transition.nextStateInfo)>
 	<endif>
->>
-
-Transitions(actions, transitions) ::= <<
-<transitions: Transition()>
 >>
 
 switchTransition(transition) ::= <<
@@ -364,7 +361,7 @@ case s_<transition.sourceState>:
 	goto l_<transition.sourceState>;
 >>
 
-switch(transitions) ::= <<
+printSwitch(transitions) ::= <<
 switch (_FSM_state) {
 <transitions: switchTransition()>
 default:
@@ -387,23 +384,17 @@ static char *stateNames[] = {
 static enum states _FSM_state = s_<fsm.initialState>;
 
 <if(actions)>
-static int outside_FSM_scheduler() {
-	int i = 0;
-	<schedulingTest(actions)> else {
-		return 0;
-	}
-	return 1;
-}
+<printActionScheduler(name={<instance.id>_outside_FSM_scheduler}, actions=actions)>
 <endif>
 
 void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	// jump to FSM state 
-	<switch(fsm.transitions)>
+	<printSwitch(fsm.transitions)>
 
 	// FSM transitions
-<Transitions(actions=actions, transitions=fsm.transitions)>
+<fsm.transitions: printTransition()>
 }
 
 >>
@@ -449,29 +440,22 @@ instance(instance, options) ::= <<
 <instance.actor.procs.list: procedure()>
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-<instance.actor.actions: action()>
+<instance.actor.actions: printAction()>
 <if(instance.actor.initializes)>
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-<instance.actor.initializes: action()>
+<instance.actor.initializes: printAction()>
 void <instance.id>_initialize(struct schedinfo_s *si) {
-	int res = 1;
 	int i = 0;
-
-	<if(instance.actor.initializes)>
-	do {
-		<schedulingTest(instance.actor.initializes)>
-	} while (0);
-	<endif>
+	<printActions(instance.actor.initializes)>
 }
-
 <endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
 <if(instance.actor.actionScheduler.fsm)>
 <schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)>
 <else>
-<scheduler(actions=instance.actor.actionScheduler.actions)>
+<printActionScheduler(name={<instance.id>_scheduler}, actions=instance.actor.actionScheduler.actions)>
 <endif>
 
 >>
