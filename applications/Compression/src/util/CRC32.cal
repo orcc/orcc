@@ -1,3 +1,5 @@
+package util;
+
 actor CRC32() int(size=8) I, bool END ==> uint(size=32) CRC :
 
 	List(type:uint(size=32), size=256) crc_table;

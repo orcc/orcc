@@ -1,7 +1,9 @@
-import std.util.BitOps.selectbit;
-import GzipConstants.*;
+package gzip;
 
-actor GzipDecompressor() int(size=8) C ==> int(size=8) D:
+import std.util.BitOps.selectbit;
+import gzip.Constants.*;
+
+actor Deflate() int(size=8) C ==> int(size=8) D:
 
 	// the bits of the byte read
 	uint(size=16) bits := 0;

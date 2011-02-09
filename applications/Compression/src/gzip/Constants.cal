@@ -1,3 +1,4 @@
+package gzip;
 
 /**
  * This unit declares constants used by GZIP.
@@ -5,7 +6,7 @@
  * 
  * @author Matthieu Wipliez
  */
-unit GzipConstants :
+unit Constants :
 
 	/** All codes must not exceed MAX_BITS bits */
 	int MAX_BITS = 15;
