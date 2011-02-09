@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- lib/ST-4.0b3.jar
+ lib/ST-4.0b4.jar
 Bundle-Activator: net.sf.orcc.backends.Activator
 Export-Package: net.sf.orcc.backends,
  net.sf.orcc.backends.cpp,
