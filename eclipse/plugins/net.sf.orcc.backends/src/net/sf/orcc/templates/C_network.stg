@@ -289,7 +289,6 @@ network(debugFifos, fifoSize, network, options) ::= <<
 <if (options.needPthreads)>
 #include "orcc_thread.h"
 
-#define THREAD_NB <options.threadsNb>
 <endif>
 <if(options.needDynamicMapping)>
 #include "orcc_thread.h"
