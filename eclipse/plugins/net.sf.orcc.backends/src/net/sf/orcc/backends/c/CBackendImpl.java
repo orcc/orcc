@@ -190,6 +190,12 @@ public class CBackendImpl extends AbstractBackend {
 		if (merge) {
 			network.mergeActors();
 		}
+		
+		//Experimental
+		boolean merge2 = getAttribute("net.sf.orcc.backends.merge2", false);
+		if (merge2) {
+			
+		}
 
 		// until now, printer is default printer
 		printer = new STPrinter();

@@ -51,6 +51,7 @@ import net.sf.orcc.util.OrderedMap;
  * they use global arrays.
  * 
  * @author Matthieu Wipliez
+ * @author Jerome Gorin
  * 
  */
 public class ChangeFifoArrayAccess extends AbstractActorTransformation {

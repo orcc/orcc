@@ -71,6 +71,7 @@ import net.sf.orcc.util.OrderedMap;
  * This class defines a normalizer for static actors.
  * 
  * @author Matthieu Wipliez
+ * @autho  Jerome Gorin
  * 
  */
 public class StaticActorNormalizer {
