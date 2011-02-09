@@ -40,6 +40,15 @@ DECL int FIFO_HAS_TOKENS(T)(struct FIFO_S(T) *fifo, int n) {
 	}
 }
 
+DECL int FIFO_GET_NB_TOKENS(T)(struct FIFO_S(T) *fifo) {
+	// return fifo->fill_count;
+	if (fifo->write_ind >= fifo->read_ind) {
+		return fifo->write_ind - fifo->read_ind;
+	} else {
+		return fifo->size - fifo->read_ind + fifo->write_ind;
+	}
+}
+
 DECL int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, int n) {
 	// return (fifo->size - fifo->fill_count) >= n;
 	if (fifo->read_ind > fifo->write_ind) {

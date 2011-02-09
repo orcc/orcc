@@ -56,6 +56,9 @@ static struct FIFO_S(type) fifo_##count = { (size) + 1, array_##count, 0, 0 };
 #define FIFO_HAS_TOKENS(T) FIFO_HAS_TOKENS_EXPAND(T)
 #define FIFO_HAS_TOKENS_EXPAND(T) fifo_ ## T ## _has_tokens
 
+#define FIFO_GET_NB_TOKENS(T) FIFO_GET_NB_TOKENS_EXPAND(T)
+#define FIFO_GET_NB_TOKENS_EXPAND(T) fifo_ ## T ## _get_nb_tokens
+
 #define FIFO_PEEK(T) FIFO_PEEK_EXPAND(T)
 #define FIFO_PEEK_EXPAND(T) fifo_ ## T ## _peek
 

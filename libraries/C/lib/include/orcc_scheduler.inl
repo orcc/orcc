@@ -35,10 +35,12 @@
 * Returns the next actor in actors list.
 */
 static struct actor_s *sched_get_next(struct scheduler_s *sched) {
+	struct actor_s *actor;
 	if(sched->num_actors == 0){
 		return NULL;
 	}
-	struct actor_s *actor = sched->actors[sched->next_schedulable];
+
+	actor = sched->actors[sched->next_schedulable];
 	sched->next_schedulable++;
 	if(sched->next_schedulable == sched->num_actors){
 	  sched->next_schedulable = 0;
