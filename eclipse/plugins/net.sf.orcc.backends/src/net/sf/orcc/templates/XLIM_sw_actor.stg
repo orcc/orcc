@@ -62,14 +62,14 @@ actorPorts() ::= <<
 
 initVariable(type, value) ::= <<
 <if(value.listExpr)>\<initValue typeName="List"\> 
-  <value.value: {value | <initVariable(type=type.type, value=value)>}; separator="">\</initValue\>
+<value.value: {value | <initVariable(type=type.type, value=value)>}; separator="">\</initValue\>
 <else>\<initValue size="<if (type.bool)>1<else><type.size><endif>" typeName="<type>" value="<value>"/\>
 <endif>
 >>
 
 stateVar(var) ::= <<
 <if(var.initialized)>\<stateVar name="<var.name>" sourceName="<var.name>"\>
-  <initVariable(type=var.type, value=var.initialValue)>\</stateVar\>
+<initVariable(type=var.type, value=var.initialValue)>\</stateVar\>
 <else>
 <typeDefLocal(var)>
 \<stateVar name="<var.name>" sourceName="<var.name>" typeName="<if(var.type.list)><var.name>_typedef<else><var.type><endif>"<if(!var.type.list)> size="<if (var.type.bool)>1<else><var.type.size><endif>"<endif>/\>
@@ -154,8 +154,8 @@ instruction(op) ::= <<
 
 Cast(target,value,cast) ::= << 
 \<operation kind="cast"\> 
-  <untypedPort(dir="in",source=value.var.variable)> 
-  <typedPort(dir="out",type=target.type,source=target)> 
+	<untypedPort(dir="in",source=value.var.variable)> 
+	<typedPort(dir="out",type=target.type,source=target)> 
 \</operation\> 
 >> 
 
@@ -175,11 +175,11 @@ Peek(peek) ::= <<
 
 CustomPeek(customPeek) ::= <<
 \<operation kind="$literal_Integer" value="<customPeek.tokenIndex>"\>
-  \<port dir="out" size="32" source="customPeek_<instance.id>_<procedure>_<customPeek.tokenIndex>_<customPeek.target>" typeName="int"/\>
+	\<port dir="out" size="32" source="customPeek_<instance.id>_<procedure>_<customPeek.tokenIndex>_<customPeek.target>" typeName="int"/\>
 \</operation\>
 \<operation kind="pinPeek" portName="<customPeek.port.name>" removable="no"\>
-  \<port dir="in" source="customPeek_<instance.id>_<procedure>_<customPeek.tokenIndex>_<customPeek.target>"/\>
-  <typedPort(dir="out", type=customPeek.port.type, source=customPeek.target)>
+	\<port dir="in" source="customPeek_<instance.id>_<procedure>_<customPeek.tokenIndex>_<customPeek.target>"/\>
+	<typedPort(dir="out", type=customPeek.port.type, source=customPeek.target)>
 \</operation\>
 >>
 
@@ -257,24 +257,24 @@ AssignIndex(assignIndex) ::= <<
 <if(rest(assignIndex.indexes))>
 <sizeDeclare(target=assignIndex.target, type=assignIndex.listType)>
 \<operation kind="noop"\>
-  \<port dir="in" source="<first(assignIndex.indexes)>"/\>
-  \<port dir="out" size="32" source="<assignIndex.target>_tmp_0" typeName="int"/\>
+	\<port dir="in" source="<first(assignIndex.indexes)>"/\>
+	\<port dir="out" size="32" source="<assignIndex.target>_tmp_0" typeName="int"/\>
 \</operation\>
 <flatIndexes(indexes=rest(assignIndex.indexes), target=assignIndex.target, lastIndex="0", indexMap=assignIndex.expressionToIndexMap)>
 <else>
 \<operation kind="noop"\>
-  \<port dir="in" source="<first(assignIndex.indexes)>"/\>
-  <typedPort(dir="out", type=assignIndex.target.type, source=assignIndex.target)>
+	\<port dir="in" source="<first(assignIndex.indexes)>"/\>
+	<typedPort(dir="out", type=assignIndex.target.type, source=assignIndex.target)>
 \</operation\>
 <endif>
 >>
 
 TernaryOperation(ternaryOperation) ::= <<
 \<operation kind="$selector"\>
-  <untypedPort(dir="in", source=ternaryOperation.conditionValue)>
-  <untypedPort(dir="in", source=ternaryOperation.trueValue)>
-  <untypedPort(dir="in", source=ternaryOperation.falseValue)>
-  <typedPort(dir="out", type=ternaryOperation.target.type, source=ternaryOperation.target)>
+	<untypedPort(dir="in", source=ternaryOperation.conditionValue)>
+	<untypedPort(dir="in", source=ternaryOperation.trueValue)>
+	<untypedPort(dir="in", source=ternaryOperation.falseValue)>
+	<typedPort(dir="out", type=ternaryOperation.target.type, source=ternaryOperation.target)>
 \</operation\>
 >>
 
@@ -284,21 +284,21 @@ TernaryOperation(ternaryOperation) ::= <<
 
 flatIndexes(indexes,target,lastIndex,indexMap) ::= <<
 \<operation kind="$mul"\>
-  \<port dir="in" source="<target>_tmp_<lastIndex>"/\>
-  \<port dir="in" source="<target>_size_<indexMap.(first(indexes))>"/\>
-  \<port dir="out" size="32" source="<target>_tmpMul_<indexMap.(first(indexes))>" typeName="int"/\>
+	\<port dir="in" source="<target>_tmp_<lastIndex>"/\>
+	\<port dir="in" source="<target>_size_<indexMap.(first(indexes))>"/\>
+	\<port dir="out" size="32" source="<target>_tmpMul_<indexMap.(first(indexes))>" typeName="int"/\>
 \</operation\>
 \<operation kind="$add"\>
-  \<port dir="in" source="<target>_tmpMul_<indexMap.(first(indexes))>"/\>
-  \<port dir="in" source="<first(indexes)>"/\>
-  \<port dir="out" size="32" source="<target>_tmp_<indexMap.(first(indexes))>" typeName="int"/\>
+	\<port dir="in" source="<target>_tmpMul_<indexMap.(first(indexes))>"/\>
+	\<port dir="in" source="<first(indexes)>"/\>
+	\<port dir="out" size="32" source="<target>_tmp_<indexMap.(first(indexes))>" typeName="int"/\>
 \</operation\>
 <if(rest(indexes))>
 <flatIndexes(indexes=rest(indexes), target=target, lastIndex=indexMap.(first(indexes)), indexMap=indexMap)>
 <else>
 \<operation kind="noop"\>
-  \<port dir="in" source="<target>_tmp_<indexMap.(first(indexes))>"/\>
-  <typedPort(dir="out", type=target.type, source=target)>
+	\<port dir="in" source="<target>_tmp_<indexMap.(first(indexes))>"/\>
+	<typedPort(dir="out", type=target.type, source=target)>
 \</operation\>
 <endif>
 >>
@@ -306,7 +306,7 @@ flatIndexes(indexes,target,lastIndex,indexMap) ::= <<
 sizeDeclare(target,type) ::= <<
 <type.dimensions:{dimension|
 \<operation kind="$literal_Integer" value="<dimension>"\>
-  \<port dir="out" size="32" source="<target>_size_<i0>" typeName="int"/\>
+	\<port dir="out" size="32" source="<target>_size_<i0>" typeName="int"/\>
 \</operation\>}>
 >>
 
@@ -406,12 +406,12 @@ typeDef(action) ::= <<
 typeDefLocal(local) ::= <<
 <if(local.type.list)>
 \<typeDef name="<local>_typedef"\>
-  \<type name="List"\>
-    \<valuePar name="size" value="<local.type.size>"/\>
-    \<typePar name="type"\>
-      <typeDefListElements(local.type.type)>
-    \</typePar\>
-  \</type\>
+	\<type name="List"\>
+		\<valuePar name="size" value="<local.type.size>"/\>
+		\<typePar name="type"\>
+			<typeDefListElements(local.type.type)>
+		\</typePar\>
+	\</type\>
 \</typeDef\>
 <endif>
 >>
@@ -419,17 +419,17 @@ typeDefLocal(local) ::= <<
 typeDefListElements(type) ::= <<
 <if(type.list)>
 \<type name="List"\>
-  \<valuePar name="size" value="<type.size>"/\>
-  \<typePar name="type"\>
-    <typeDefListElements(type.type)>
-  \</typePar\>
+	\<valuePar name="size" value="<type.size>"/\>
+	\<typePar name="type"\>
+		<typeDefListElements(type.type)>
+	\</typePar\>
 \</type\>
 <else
 ><if(type.bool)
 >\<type name="<type>"/\>
 <else
 >\<type name="<type>"\>
-  \<valuePar name="size" value="<type.size>"/\>
+	\<valuePar name="size" value="<type.size>"/\>
 \</type\><
 endif><
 endif>
@@ -506,8 +506,8 @@ outputPatternDecision(index, action)::=<<
 
 inputPatternDecision(index) ::= <<
 \<operation kind="noop"\>
-  \<port dir="in" source="inputPattern_<instance.id>_<action.name>_res_<index>"/\>
-  \<port dir="out" size="1" source="inputPattern_<instance.id>_<action.name>_decision" typeName="bool"/\>
+	\<port dir="in" source="inputPattern_<instance.id>_<action.name>_res_<index>"/\>
+	\<port dir="out" size="1" source="inputPattern_<instance.id>_<action.name>_decision" typeName="bool"/\>
 \</operation\>
 >>
 
@@ -532,7 +532,7 @@ inputPattern(pattern, action) ::= <<
 
 declarePinAvailableVariable(port) ::= <<
 \<operation kind="pinAvail" portName="<port>"\>
-  \<port dir="out" size="32" source="<port>_pinAvail" typeName="int"/\>
+	\<port dir="out" size="32" source="<port>_pinAvail" typeName="int"/\>
 \</operation\>
 >>
 
@@ -674,14 +674,14 @@ inputPatternTest(action) ::= <<
 <if(action.inputPattern)>
 <inputPattern(pattern=action.inputPattern,action=action)>
 \<operation kind="$and"\>
-  \<port dir="in" source="inputPattern_<instance.id>_<action>_decision"/\>
-  \<port dir="in" source="isSchedulable_<action>_go"/\>
-  \<port dir="out" size="1" source="isSchedulable_<action>_goWithToken" typeName="bool"/\>
+	\<port dir="in" source="inputPattern_<instance.id>_<action>_decision"/\>
+	\<port dir="in" source="isSchedulable_<action>_go"/\>
+	\<port dir="out" size="1" source="isSchedulable_<action>_goWithToken" typeName="bool"/\>
 \</operation\>
 <else>
 \<operation kind="noop"\>
-  \<port dir="in" source="isSchedulable_<action>_go"/\>
-  \<port dir="out" size="1" source="isSchedulable_<action>_goWithToken" typeName="bool"/\>
+	\<port dir="in" source="isSchedulable_<action>_go"/\>
+	\<port dir="out" size="1" source="isSchedulable_<action>_goWithToken" typeName="bool"/\>
 \</operation\>
 <endif>
 >>

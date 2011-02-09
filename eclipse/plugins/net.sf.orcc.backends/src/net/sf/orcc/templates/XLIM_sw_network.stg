@@ -4,13 +4,13 @@
 
 network(debugFifos, fifoSize, network, options) ::= <<
 
-  #include \<stdlib.h\>
-  #include "actors-config.h"
-  
-  <initNetwork(network)>
-  
-  <printMain()>
-  
+	#include \<stdlib.h\>
+	#include "actors-config.h"
+	
+	<initNetwork(network)>
+	
+	<printMain()>
+
 >>
 
 /////////////////////////////
@@ -19,10 +19,10 @@ network(debugFifos, fifoSize, network, options) ::= <<
 
 printMain() ::= <<
 int main(int argc, char *argv[]) {
-  int numberOfInstances;
-  AbstractActorInstance **instances;
-  initNetwork(&instances, &numberOfInstances);
-  executeNetwork(argc, argv, instances, numberOfInstances);
+	int numberOfInstances;
+	AbstractActorInstance **instances;
+	initNetwork(&instances, &numberOfInstances);
+	executeNetwork(argc, argv, instances, numberOfInstances);
 }
 >>
 
@@ -33,18 +33,18 @@ int main(int argc, char *argv[]) {
 initNetwork(network) ::= <<
 static void initNetwork(AbstractActorInstance ***pInstances, int *pNumberOfInstances) {
 
-  int numberOfInstances = <length(network.instances)>;
-  AbstractActorInstance **actorInstances = (AbstractActorInstance **) malloc(numberOfInstances * sizeof(AbstractActorInstance *));
+	int numberOfInstances = <length(network.instances)>;
+	AbstractActorInstance **actorInstances = (AbstractActorInstance **) malloc(numberOfInstances * sizeof(AbstractActorInstance *));
 
-  *pInstances=actorInstances;
+	*pInstances=actorInstances;
 
-  *pNumberOfInstances=numberOfInstances;
+	*pNumberOfInstances=numberOfInstances;
 
-  <network.instances : {instance | <declareActorInstance(actorInstance=instance)>}; separator="\n\n">
-  
-  <network.instances : {instance | <initializeActorInstance(actorInstance=instance,numberOfReaders=network.numberOfReadersMap.(instance),localFifoSize=network.portToFiFoSizeMap.(instance),index=i0)>}; separator="\n\n">
-  
-  <network.connections : {connection | <connectPorts(source=connection.source, idSource=network.sourceMap.(connection).instance.id, target=connection.target, idTarget=network.targetMap.(connection).instance.id)>}; separator="\n">
+	<network.instances : {instance | <declareActorInstance(actorInstance=instance)>}; separator="\n\n">
+
+	<network.instances : {instance | <initializeActorInstance(actorInstance=instance,numberOfReaders=network.numberOfReadersMap.(instance),localFifoSize=network.portToFiFoSizeMap.(instance),index=i0)>}; separator="\n\n">
+
+	<network.connections : {connection | <connectPorts(source=connection.source, idSource=network.sourceMap.(connection).instance.id, target=connection.target, idTarget=network.targetMap.(connection).instance.id)>}; separator="\n">
 }
 >>
 

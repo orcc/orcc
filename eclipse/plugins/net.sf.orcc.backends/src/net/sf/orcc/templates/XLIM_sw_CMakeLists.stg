@@ -25,7 +25,7 @@ project (<network.name>)
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line take their definition,
 # otherwise set CMAKE_BUILD_TYPE to Release
 IF(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
-   SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+	SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
 ENDIF()
 
 # Common packages required
@@ -38,11 +38,11 @@ find_package(LibXml2)
 include_directories(${ACTORS}/include ${SDL_INCLUDE_DIR})
 
 macro (run_xlim2c actor) 
-  add_custom_command (
-    OUTPUT ${CMAKE_SOURCE_DIR}/${actor}.c
-    DEPENDS ${CMAKE_SOURCE_DIR}/${actor}.xlim
-    COMMAND ${ACTORS}/bin/xlim2c ${CMAKE_SOURCE_DIR}/${actor}.xlim ${CMAKE_SOURCE_DIR}/${actor}.c
-  )
+	add_custom_command (
+		OUTPUT ${CMAKE_SOURCE_DIR}/${actor}.c
+		DEPENDS ${CMAKE_SOURCE_DIR}/${actor}.xlim
+		COMMAND ${ACTORS}/bin/xlim2c ${CMAKE_SOURCE_DIR}/${actor}.xlim ${CMAKE_SOURCE_DIR}/${actor}.c
+	)
 endmacro(run_xlim2c)
 
 <network.instances: printXlim2c()>
