@@ -1,13 +1,4 @@
 ///////////////////////////////////////////////////////////////////////////////
-// FIFO declaration
-///////////////////////////////////////////////////////////////////////////////
-
-fifo(port) ::= <<
-extern struct fifo_<port.type>_s *<instance.id>_<port.name>;
-
->>
-
-///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -135,6 +126,7 @@ endif>
 PrintReadEnd(readEnd) ::= <<
 
 fifo_<readEnd.port.type>_read_end(<instance.id>_<readEnd.port>, <readEnd.numTokens>);
+numTokens_<readEnd.port.name> -= <readEnd.numTokens>;
 >>
 
 PrintReturn(return) ::= <<
@@ -254,12 +246,14 @@ int ports = 0;
 if (ports != 0) {
 >>
 
-checkInputPatternPort(port) ::= <<
-fifo_<port.type>_has_tokens(<instance.id>_<port>, <pattern.(port)>)
+checkInputPattern(pattern) ::= <<
+<pattern.keys: { port | numTokens_<port.name> \>= <pattern.(port)> && }>
 >>
 
-checkInputPattern(pattern) ::= <<
-<pattern.keys: { port | <checkInputPatternPort(port)> && }>
+printGetNumTokens() ::= <<
+<instance.actor.inputs.list:
+	{ port | numTokens_<port.name> = fifo_<port.type>_get_num_tokens(<instance.id>_<port>);
+}>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -296,6 +290,8 @@ endif>
 printActionScheduler(name, actions) ::= <<
 void <name>(struct schedinfo_s *si) {
 	int i = 0;
+
+	<printGetNumTokens()>
 
 	while (1) {
 		<printActions(actions)>
@@ -390,6 +386,8 @@ static enum states _FSM_state = s_<fsm.initialState>;
 void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
+	<printGetNumTokens()>
+
 	// jump to FSM state 
 	<printSwitch(fsm.transitions)>
 
@@ -424,10 +422,14 @@ instance(instance, options) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-<instance.actor.inputs.list: fifo()>
+<instance.actor.inputs.list: { port | extern struct fifo_<port.type>_s *<instance.id>_<port.name>;
+}>
+<instance.actor.inputs.list: { port | static int numTokens_<port.name>;
+}>
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-<instance.actor.outputs.list: fifo()>
+<instance.actor.outputs.list: { port | extern struct fifo_<port.type>_s *<instance.id>_<port.name>;
+}>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Parameter values of the instance
