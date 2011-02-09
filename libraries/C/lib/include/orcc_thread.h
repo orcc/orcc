@@ -84,7 +84,6 @@
 
 struct sync_s {
 	semaphore_struct sem_monitor;
-	semaphore_struct sem_threads;
 	int active_sync;
 };
 

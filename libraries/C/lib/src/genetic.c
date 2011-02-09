@@ -96,6 +96,19 @@ static int write_better_mapping(population *pop, struct genetic_s *genetic_info)
 }
 
 
+static void print_mapping(individual *ind, struct genetic_s *genetic_info){
+	int i;
+	printf("{");
+	for(i=0; i<genetic_info->actors_nb; i++){
+		printf("%i", ind->genes[i]->mapped_core);
+		if(i != genetic_info->actors_nb-1){
+			printf(", ");
+		}
+	}
+	printf("}\n");
+}
+
+
 static int individual_equal(individual* ind1, individual* ind2, struct genetic_s *genetic_info){
 	int i, equal = 1;
 	for(i=0; i<genetic_info->actors_nb && equal; i++){
@@ -205,6 +218,23 @@ static individual* mutation(individual *original, struct genetic_s *genetic_info
 	}
 
 	return mutated;
+}
+
+static individual* generate_constant_individual(struct genetic_s *genetic_info, int thread){
+	int i;
+	individual* ind = (individual*) malloc(sizeof(individual));
+	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	ind->fps = -1;
+	ind->old_fps = -1;
+
+	// Initialize genes randomly
+	for (i = 0; i < genetic_info->actors_nb; i++) {
+		ind->genes[i] = (gene*) malloc(sizeof(gene));
+		ind->genes[i]->actor = genetic_info->actors[i];
+		ind->genes[i]->mapped_core = thread;
+	}
+
+	return ind;
 }
 
 static individual* generate_random_individual(struct genetic_s *genetic_info){
@@ -319,8 +349,11 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 	// Initialize random function
 	srand((unsigned)time(NULL));
 
-	// Initialize first generation of individuals
-	for (i = 0; i < genetic_info->population_size; i++) {
+	// Initialize first generation of individuals (constant and random)
+	for (i = 0; (i < genetic_info->population_size) && (i < genetic_info->threads_nb); i++){
+		pop->individuals[i] = generate_constant_individual(genetic_info,i);
+	}
+	for (i = genetic_info->threads_nb; i < genetic_info->population_size; i++) {
 		do{
 			pop->individuals[i] = generate_random_individual(genetic_info);
 		}
@@ -343,13 +376,15 @@ void *monitor(void *data) {
 	map_actors_on_threads(population->individuals[evalIndNb], monitoring->genetic_info);
 
 	while (population->generation_nb < monitoring->genetic_info->generation_nb) {
+		print_mapping(population->individuals[evalIndNb],monitoring->genetic_info);
+
 		// Backup informations to compute partial fps except first time
 		if(evalIndNb != 0 || population->generation_nb != 0){
 			backup_partial_start_info();
 		}
 		// wakeup all threads
 		for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
-			semaphoreSet(monitoring->sync->sem_threads);
+			semaphoreSet(monitoring->genetic_info->schedulers[i].sem_thread);
 		}
 
 		// wait threads synchro
@@ -367,6 +402,7 @@ void *monitor(void *data) {
 			printf(" (old = %f fps)\n",population->individuals[evalIndNb]->old_fps);
 		}
 
+
 		evalIndNb++;
 
 		if (evalIndNb == monitoring->genetic_info->population_size) {
@@ -381,7 +417,7 @@ void *monitor(void *data) {
 	active_fps_printing();
 
 	for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
-		semaphoreSet(monitoring->sync->sem_threads);
+		semaphoreSet(monitoring->genetic_info->schedulers[i].sem_thread);
 	}
 
 	return NULL;

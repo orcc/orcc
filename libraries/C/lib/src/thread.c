@@ -33,7 +33,6 @@
 
 void sync_init(struct sync_s *sync) {
 	semaphoreCreate(sync->sem_monitor, 0);
-	semaphoreCreate(sync->sem_threads, 0);
 	sync->active_sync = 1;
 }
 

@@ -24,6 +24,7 @@ void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **acto
 		}
 	}
 	semaphoreCreate(sched->sem_schedulable, 1);
+	semaphoreCreate(sched->sem_thread, 0);
 }
 
 /**

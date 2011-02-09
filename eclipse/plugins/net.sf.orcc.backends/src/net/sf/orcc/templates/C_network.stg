@@ -187,14 +187,37 @@ printInitializes(instances) ::= <<
 printSchedulers(isPointer) ::= <<
 struct actor_s *my_actor;
 struct schedinfo_s si;
+
 <if(options.needDynamicMapping)>
 clock_t start, end;
+
+semaphoreWait(sched-\>sem_thread); 
 start = clock ();
 
-semaphoreWait(sched-\>sync-\>sem_threads); 
-start = clock ();
-<endif>
-
+while (1) {
+	my_actor = sched_get_next(<if(!isPointer)>&<endif>sched);
+	if(my_actor == NULL){
+		semaphoreSet(sched-\>sync-\>sem_monitor);
+		semaphoreWait(sched-\>sem_thread);
+		start = clock ();
+  	}
+  	else{
+		si.num_firings = 0;
+		my_actor-\>sched_func(&si);
+#ifdef PRINT_FIRINGS
+		printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
+#endif
+		if(sched-\>sync-\>active_sync){
+			end = clock ();
+			if((((end - start) / (double)CLOCKS_PER_SEC) \>= SYNC_DELAY)){
+				semaphoreSet(sched-\>sync-\>sem_monitor);
+				semaphoreWait(sched-\>sem_thread);
+				start = clock ();
+			}
+		}
+  	}
+}
+<else>
 while (1) {
 	my_actor = sched_get_next(<if(!isPointer)>&<endif>sched);    
 	si.num_firings = 0;
@@ -202,17 +225,8 @@ while (1) {
 #ifdef PRINT_FIRINGS
 	printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
-<if(options.needDynamicMapping)>
-	if(sched-\>sync-\>active_sync){
-		end = clock ();
-		if((((end - start) / (double)CLOCKS_PER_SEC) \>= SYNC_DELAY)){
-			semaphoreSet(sched-\>sync-\>sem_monitor);
-			semaphoreWait(sched-\>sync-\>sem_threads);
-			start = clock ();
-		}
-	}
-<endif>
 }
+<endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -274,11 +288,14 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #include "orcc_util.h"
 <if (options.needPthreads)>
 #include "orcc_thread.h"
+
+#define THREAD_NB <options.threadsNb>
 <endif>
 <if(options.needDynamicMapping)>
 #include "orcc_thread.h"
 #include "orcc_genetic.h"
 
+#define THREAD_NB <options.threadsNb>
 #define SYNC_DELAY 3
 
 #define POPULATION_SIZE 20
@@ -355,34 +372,34 @@ static void scheduler() {
 	int i;
 	
 	cpu_set_t cpuset;
-	thread_struct threads[<options.threadsNb>], thread_monitor;
-	thread_id_struct threads_id[<options.threadsNb>], thread_monitor_id;
+	thread_struct threads[THREAD_NB], thread_monitor;
+	thread_id_struct threads_id[THREAD_NB], thread_monitor_id;
 	
-	struct scheduler_s schedulers[<options.threadsNb>];
+	struct scheduler_s schedulers[THREAD_NB];
 	struct sync_s sched_sync;
 	struct genetic_s genetic_info;
 	struct monitor_s monitoring;
 	
 	sync_init(&sched_sync);
-	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), sizeof(schedulers) / sizeof(schedulers[0]));
+	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB);
 	monitor_init(&monitoring, &sched_sync, &genetic_info);
 	
 	<printInitializes(network.instances)>
 	
 	remove_fps_printing();
 	
-	for(i=0; i \< <options.threadsNb>; i++){
+	for(i=0; i \< THREAD_NB; i++){
 		sched_init(&schedulers[i], sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);
 		threadCreate(threads[i], thread_scheduler, schedulers[i], threads_id[i]);
 	}
 	threadCreate(thread_monitor, monitor, monitoring, thread_monitor_id);
 
 	clear_cpu_set(cpuset);
-	for(i=0; i \< <options.threadsNb>; i++){
+	for(i=0; i \< THREAD_NB; i++){
 		set_affinity(cpuset, i, threads[i]);
 	}
 	
-	for(i=0; i \< <options.threadsNb>; i++){
+	for(i=0; i \< THREAD_NB; i++){
 		threadJoin(threads[i]);
 	}
 	threadJoin(thread_monitor);

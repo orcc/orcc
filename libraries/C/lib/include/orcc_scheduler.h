@@ -59,6 +59,7 @@ struct scheduler_s {
 	int next_schedulable;
 	struct sync_s *sync;
 	semaphore_struct sem_schedulable;
+	semaphore_struct sem_thread;
 };
 
 #include "orcc_scheduler.inl"
