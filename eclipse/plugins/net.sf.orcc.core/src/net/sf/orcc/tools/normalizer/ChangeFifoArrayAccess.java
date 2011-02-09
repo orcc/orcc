@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.tools.normalizer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
@@ -41,7 +40,6 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
@@ -58,7 +56,7 @@ import net.sf.orcc.util.OrderedMap;
 public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 
 	private OrderedMap<String, GlobalVariable> stateVars;
-	
+
 	@Override
 	public void transform(Actor actor) {
 		stateVars = actor.getStateVars();
@@ -67,21 +65,21 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 
 	private void updateIndex(Variable var, Instruction instr,
 			List<Expression> indexes) {
-		
-		if (indexes.size() < 2 ) {
+
+		if (indexes.size() < 2) {
 			Variable varCount = stateVars.get(var.getName() + "_count");
-						
+
 			Use use = new Use(varCount, instr);
-			BinaryExpr expr = new BinaryExpr(new VarExpr(use), BinaryOp.PLUS, indexes.get(0),
-					IrFactory.eINSTANCE.createTypeInt(32));
-			
+			BinaryExpr expr = new BinaryExpr(new VarExpr(use), BinaryOp.PLUS,
+					indexes.get(0), IrFactory.eINSTANCE.createTypeInt(32));
+
 			indexes.set(0, expr);
 
 		} else {
 			System.err.println("TODO index");
 		}
 	}
-	
+
 	@Override
 	public void visit(Load load) {
 		Use use = load.getSource();

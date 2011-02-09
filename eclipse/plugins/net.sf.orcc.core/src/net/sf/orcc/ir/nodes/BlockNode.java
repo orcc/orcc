@@ -181,7 +181,7 @@ public final class BlockNode extends AbstractNode implements
 		instruction.setBlock(this);
 		instructions.add(instruction);
 	}
-	
+
 	/**
 	 * Appends the specified instruction to this block at the specified index.
 	 * 
@@ -202,7 +202,7 @@ public final class BlockNode extends AbstractNode implements
 	 *            a list of instruction
 	 */
 	public void addAll(List<Instruction> instructions) {
-		for (Instruction instr : instructions){
+		for (Instruction instr : instructions) {
 			add(instr);
 		}
 	}
