@@ -90,7 +90,7 @@ printFormat(parameter) ::= <<
 <if (parameter.stringExpr)
 >"<parameter>"<
 else
-> "%<PrintFormatType(parameter.type)>" <
+> "%<printFormatType(parameter.type)>" <
 endif>
 >>
 
@@ -100,7 +100,7 @@ printParameter(parameter) ::= <<
 
 printCall(call) ::= <<
 
-<if(call.print)>printf(<call.parameters: PrintFormat()><call.parameters: printParameter()>);<
+<if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printParameter()>);<
 else
 ><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
 endif>
