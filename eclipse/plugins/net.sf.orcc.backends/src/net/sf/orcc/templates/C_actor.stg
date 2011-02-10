@@ -63,12 +63,12 @@ static <varDecl(variable)>;
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-PrintAssign(assign) ::= <<
+printAssign(assign) ::= <<
 
 <assign.target> = <assign.value>;
 >>
 
-PrintFormatType(type) ::= <<
+printFormatType(type) ::= <<
 <if (type.bool)
 >i<
 elseif (type.float)
@@ -86,7 +86,7 @@ elseif (type.void)
 endif>
 >>
 
-PrintFormat(parameter) ::= <<
+printFormat(parameter) ::= <<
 <if (parameter.stringExpr)
 >"<parameter>"<
 else
@@ -94,58 +94,58 @@ else
 endif>
 >>
 
-PrintParameter(parameter) ::= <<
+printParameter(parameter) ::= <<
 <if (!parameter.stringExpr)>, <parameter><endif>
 >>
 
-PrintCall(call) ::= <<
+printCall(call) ::= <<
 
-<if(call.print)>printf(<call.parameters: PrintFormat()><call.parameters: PrintParameter()>);<
+<if(call.print)>printf(<call.parameters: PrintFormat()><call.parameters: printParameter()>);<
 else
 ><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
 endif>
 >>
 
-PrintLoad(load) ::= <<
+printLoad(load) ::= <<
 
 <load.target> = <load.source><load.indexes : {index | [<index>]}>;
 >>
 
-PrintPeek(peek) ::= <<
+printPeek(peek) ::= <<
 
 <peek.target> = fifo_<peek.port.type>_peek(<instance.id>_<peek.port>, <peek.target>_buf, <peek.numTokens>);
 >>
 
-PrintRead(read) ::= <<
+printRead(read) ::= <<
 
 <if (read.target)
 ><read.target> = fifo_<read.port.type>_read(<instance.id>_<read.port>, <read.target>_buf, <read.numTokens>);<
 endif>
 >>
 
-PrintReadEnd(readEnd) ::= <<
+printReadEnd(readEnd) ::= <<
 
 fifo_<readEnd.port.type>_read_end(<instance.id>_<readEnd.port>, <readEnd.numTokens>);
 numTokens_<readEnd.port.name> -= <readEnd.numTokens>;
 >>
 
-PrintReturn(return) ::= <<
+printReturn(return) ::= <<
 <if(return.value)>
 return <return.value>;<
 endif>
 >>
 
-PrintStore(store) ::= <<
+printStore(store) ::= <<
 
 <store.target><store.indexes : {index | [<index>]}> = <store.value>;
 >>
 
-PrintWrite(write) ::= <<
+printWrite(write) ::= <<
 
 <write.target> = fifo_<write.port.type>_write(<instance.id>_<write.port>, <write.target>_buf, <write.numTokens>);
 >>
 
-PrintWriteEnd(writeEnd) ::= <<
+printWriteEnd(writeEnd) ::= <<
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 fifo_<writeEnd.port.type>_trace(<instance.id>_<writeEnd.port>, <writeEnd.target>_buf, "<instance.id>_<writeEnd.port>.txt", <writeEnd.numTokens>);
 <endif>
@@ -159,49 +159,49 @@ fifo_<writeEnd.port.type>_write_end(<instance.id>_<writeEnd.port>, <writeEnd.tar
 
 printInstructions(instructions) ::= <<
 <instructions: {instr | <
-if (instr.assign)><PrintAssign(assign=instr)><
-elseif (instr.call)><PrintCall(call=instr)><
-elseif (instr.load)><PrintLoad(load=instr)><
-elseif (instr.peek)><PrintPeek(peek=instr)><
-elseif (instr.read)><PrintRead(read=instr)><
-elseif (instr.readEnd)><PrintReadEnd(readEnd=instr)><
-elseif (instr.return)><PrintReturn(return=instr)><
-elseif (instr.store)><PrintStore(store=instr)><
-elseif (instr.write)><PrintWrite(write=instr)><
-elseif (instr.writeEnd)><PrintWriteEnd(writeEnd=instr)><
+if (instr.assign)><printAssign(assign=instr)><
+elseif (instr.call)><printCall(call=instr)><
+elseif (instr.load)><printLoad(load=instr)><
+elseif (instr.peek)><printPeek(peek=instr)><
+elseif (instr.read)><printRead(read=instr)><
+elseif (instr.readEnd)><printReadEnd(readEnd=instr)><
+elseif (instr.return)><printReturn(return=instr)><
+elseif (instr.store)><printStore(store=instr)><
+elseif (instr.write)><printWrite(write=instr)><
+elseif (instr.writeEnd)><printWriteEnd(writeEnd=instr)><
 endif>}>
 >>
 
 printNodes(nodes) ::= <<
-<nodes: {node | <if (node.blockNode)><PrintBlockNode(node)><
-elseif (node.ifNode)><PrintIfNode(node)><
-elseif (node.whileNode)><PrintWhileNode(node)><
+<nodes: {node | <if (node.blockNode)><printBlockNode(node)><
+elseif (node.ifNode)><printIfNode(node)><
+elseif (node.whileNode)><printWhileNode(node)><
 endif>}>
 >>
 
 // block node
-PrintBlockNode(blockNode) ::= <<
+printBlockNode(blockNode) ::= <<
 <printInstructions(blockNode.instructions)>
 >>
 
 // if node
-PrintIfNode(ifNode) ::= <<
+printIfNode(ifNode) ::= <<
 
 if (<ifNode.value>) {
 	<printNodes(ifNode.thenNodes)>
 }<if(ifNode.elseNodes)> else {
 	<printNodes(ifNode.elseNodes)>
 }<endif>
-<PrintBlockNode(ifNode.joinNode)>
+<printBlockNode(ifNode.joinNode)>
 >>
 
 // while node
-PrintWhileNode(whileNode) ::= <<
+printWhileNode(whileNode) ::= <<
 
 while (<whileNode.value>) {
 	<printNodes(whileNode.nodes)>
 }
-<PrintBlockNode(whileNode.joinNode)>
+<printBlockNode(whileNode.joinNode)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

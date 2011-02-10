@@ -28,7 +28,7 @@ listSize(values) ::= <<
 // differs from inherited listSize because this one does not print any size
 // information.
 listDim(value) ::= <<
-<value : {[]} >
+<value : {val | []} >
 >>
 
 // a variable definition
@@ -104,7 +104,7 @@ private <variableDeclarationInit(variable)>;
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-PrintParameter(parameter) ::= <<
+printParameter(parameter) ::= <<
 <if (parameter.stringExpr)
 >"<parameter>"<
 else
@@ -112,15 +112,15 @@ else
 endif>
 >>
 
-Call(call) ::= <<
+printCall(call) ::= <<
 
-<if(call.print)>System.out.print(<call.parameters: PrintParameter(); separator=" + ">);<
+<if(call.print)>System.out.print(<call.parameters: printParameter(); separator=" + ">);<
 else
 ><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
 endif>
 >>
 
-Load(load) ::= <<
+printLoad(load) ::= <<
 
 <if (load.source.variable.port && !load.indexes.empty)
 ><load.target> = <load.source>[<load.source>_Index + <first(load.indexes)>]<rest(load.indexes) : {index | [<index>]}>;<
@@ -129,12 +129,12 @@ else
 >>
 
 // peek instruction
-Peek(peek) ::= <<
-<Read(peek)>
+printPeek(peek) ::= <<
+<printRead(peek)>
 >>
 
 // read instruction
-Read(read) ::= <<
+printRead(read) ::= <<
 
 <if (read.target)
 >int <read.port>_Index = fifo_<read.port>.getReadIndex(<read.numTokens>);
@@ -144,12 +144,12 @@ else
 fifo_<read.port>.getReadArray(<read.numTokens>);<endif>
 >>
 
-ReadEnd(readEnd) ::= <<
+printReadEnd(readEnd) ::= <<
 
 fifo_<readEnd.port>.readEnd(<readEnd.numTokens>);
 >>
 
-Store(store) ::= <<
+printStore(store) ::= <<
 
 <if (store.target.port && !store.indexes.empty)
 ><store.target>[<store.target>_Index + <first(store.indexes)>]<rest(store.indexes) : {index | [<index>]}> = <store.value>;<
@@ -158,13 +158,13 @@ else
 >>
 
 // write instruction
-Write(write) ::= <<
+printWrite(write) ::= <<
 
 <write.target> = fifo_<write.port>.getWriteArray(<write.numTokens>);
 int <write.port>_Index = fifo_<write.port>.getWriteIndex(<write.numTokens>);
 >>
 
-WriteEnd(writeEnd) ::= <<
+printWriteEnd(writeEnd) ::= <<
 
 fifo_<writeEnd.port>.writeEnd(<writeEnd.numTokens>, <writeEnd.target>);
 >>
@@ -180,11 +180,12 @@ private <procedure.returnType> <procedure>(<procedure.parameters.list: {paramete
 <if(procedure.locals.list)>
 	<procedure.locals.list: {local | <variableDeclarationInit(local)>;<\n>}>
 <endif>
-	<procedure.nodes: {node | <(node.class.simpleName)(node)>}>
+	<printNodes(procedure.nodes)>
 }
 
 <endif>
 >>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action scheduler
