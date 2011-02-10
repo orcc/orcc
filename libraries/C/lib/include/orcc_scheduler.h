@@ -57,6 +57,7 @@ struct scheduler_s {
 	struct actor_s *schedulable[MAX_ACTORS];
 	int next_entry;
 	int next_schedulable;
+	int next_else_schedulable;
 	struct sync_s *sync;
 	semaphore_struct sem_schedulable;
 	semaphore_struct sem_thread;

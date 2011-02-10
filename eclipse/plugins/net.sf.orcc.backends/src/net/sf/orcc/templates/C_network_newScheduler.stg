@@ -58,9 +58,9 @@ while (1) {
 #ifdef PRINT_FIRINGS
 		printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
-		if (si.reason == full) {
+		if (si.reason == full <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
 			sched_add_successors(sched, my_actor, si.ports);
-		} else if (si.reason == starved) {
+		} else if (si.reason == starved <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
 			sched_add_predecessors(sched, my_actor, si.ports);
 		}
 	}
