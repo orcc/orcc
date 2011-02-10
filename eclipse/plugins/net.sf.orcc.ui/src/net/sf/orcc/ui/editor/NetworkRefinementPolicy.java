@@ -102,10 +102,7 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 	 * @return a project
 	 */
 	private IProject getProject(Vertex vertex) {
-		IPath location = new Path(vertex.getParent().getFileName());
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IFile file = root.getFileForLocation(location);
-		return file.getProject();
+		return vertex.getParent().getFile().getProject();
 	}
 
 	@Override
