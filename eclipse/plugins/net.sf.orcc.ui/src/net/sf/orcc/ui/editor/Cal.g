@@ -138,7 +138,7 @@ attributeDecl: id=QID (EQ expression SEMICOLON -> ^(Attribute ^(Var $id) ^(Expre
 ///////////////////////////////////////////////////////////////////////////////
 // ACTOR
 
-actor: packageRule? oneImport* ACTOR QID
+actor: packageRule? oneImport* NATIVE? ACTOR QID
   LPAREN parameters? RPAREN
   portSignature COLON .* EOF ->
     ^(Actor ^(Name QID) parameters? portSignature);
@@ -229,6 +229,7 @@ MUTABLE: 'mutable';
 NETWORK: 'network';
 PACKAGE	: 'package';
 STRUCTURE: 'structure';
+NATIVE: 'native';
 NOT: 'not';
 VAR: 'var';
 

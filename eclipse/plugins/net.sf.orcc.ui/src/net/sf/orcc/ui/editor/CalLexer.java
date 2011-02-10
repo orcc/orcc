@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:45:30 C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g 2010-12-16 01:20:01
+// $ANTLR 3.3 Nov 30, 2010 12:45:30 D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g 2011-02-10 09:56:25
 
 package net.sf.orcc.ui.editor;
 
@@ -67,37 +67,38 @@ public class CalLexer extends Lexer {
     public static final int DOT=54;
     public static final int LBRACE=55;
     public static final int RBRACE=56;
-    public static final int ACTOR=57;
-    public static final int PACKAGE=58;
-    public static final int IMPORT=59;
-    public static final int QID_WILDCARD=60;
-    public static final int MULTI=61;
-    public static final int LT=62;
-    public static final int MINUS=63;
-    public static final int NOT=64;
-    public static final int PLUS=65;
-    public static final int TIMES=66;
-    public static final int DIV=67;
-    public static final int XOR=68;
-    public static final int FLOAT=69;
-    public static final int INTEGER=70;
-    public static final int STRING=71;
-    public static final int TRUE=72;
-    public static final int FALSE=73;
-    public static final int ALL=74;
-    public static final int ID=75;
-    public static final int LINE_COMMENT=76;
-    public static final int MULTI_LINE_COMMENT=77;
-    public static final int WHITESPACE=78;
-    public static final int GE=79;
-    public static final int GT=80;
-    public static final int LE=81;
-    public static final int NE=82;
-    public static final int ARROW=83;
-    public static final int DOUBLE_DOT=84;
-    public static final int AND=85;
-    public static final int OR=86;
-    public static final int SHARP=87;
+    public static final int NATIVE=57;
+    public static final int ACTOR=58;
+    public static final int PACKAGE=59;
+    public static final int IMPORT=60;
+    public static final int QID_WILDCARD=61;
+    public static final int MULTI=62;
+    public static final int LT=63;
+    public static final int MINUS=64;
+    public static final int NOT=65;
+    public static final int PLUS=66;
+    public static final int TIMES=67;
+    public static final int DIV=68;
+    public static final int XOR=69;
+    public static final int FLOAT=70;
+    public static final int INTEGER=71;
+    public static final int STRING=72;
+    public static final int TRUE=73;
+    public static final int FALSE=74;
+    public static final int ALL=75;
+    public static final int ID=76;
+    public static final int LINE_COMMENT=77;
+    public static final int MULTI_LINE_COMMENT=78;
+    public static final int WHITESPACE=79;
+    public static final int GE=80;
+    public static final int GT=81;
+    public static final int LE=82;
+    public static final int NE=83;
+    public static final int ARROW=84;
+    public static final int DOUBLE_DOT=85;
+    public static final int AND=86;
+    public static final int OR=87;
+    public static final int SHARP=88;
 
     // delegates
     // delegators
@@ -110,15 +111,15 @@ public class CalLexer extends Lexer {
         super(input,state);
 
     }
-    public String getGrammarFileName() { return "C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g"; }
+    public String getGrammarFileName() { return "D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g"; }
 
     // $ANTLR start "ALL"
     public final void mALL() throws RecognitionException {
         try {
             int _type = ALL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:222:4: ( 'all' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:222:6: 'all'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:222:4: ( 'all' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:222:6: 'all'
             {
             match("all"); 
 
@@ -138,8 +139,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = ACTOR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:223:6: ( 'actor' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:223:8: 'actor'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:223:6: ( 'actor' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:223:8: 'actor'
             {
             match("actor"); 
 
@@ -159,8 +160,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = END;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:224:4: ( 'end' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:224:6: 'end'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:224:4: ( 'end' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:224:6: 'end'
             {
             match("end"); 
 
@@ -180,8 +181,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = ENTITIES;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:225:9: ( 'entities' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:225:11: 'entities'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:225:9: ( 'entities' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:225:11: 'entities'
             {
             match("entities"); 
 
@@ -201,8 +202,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = IMPORT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:226:7: ( 'import' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:226:9: 'import'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:226:7: ( 'import' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:226:9: 'import'
             {
             match("import"); 
 
@@ -222,8 +223,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = MULTI;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:227:6: ( 'multi' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:227:8: 'multi'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:227:6: ( 'multi' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:227:8: 'multi'
             {
             match("multi"); 
 
@@ -243,8 +244,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = MUTABLE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:228:8: ( 'mutable' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:228:10: 'mutable'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:228:8: ( 'mutable' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:228:10: 'mutable'
             {
             match("mutable"); 
 
@@ -264,8 +265,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = NETWORK;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:229:8: ( 'network' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:229:10: 'network'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:229:8: ( 'network' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:229:10: 'network'
             {
             match("network"); 
 
@@ -285,8 +286,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = PACKAGE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:230:9: ( 'package' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:230:11: 'package'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:230:9: ( 'package' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:230:11: 'package'
             {
             match("package"); 
 
@@ -306,8 +307,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = STRUCTURE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:231:10: ( 'structure' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:231:12: 'structure'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:231:10: ( 'structure' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:231:12: 'structure'
             {
             match("structure"); 
 
@@ -322,13 +323,34 @@ public class CalLexer extends Lexer {
     }
     // $ANTLR end "STRUCTURE"
 
+    // $ANTLR start "NATIVE"
+    public final void mNATIVE() throws RecognitionException {
+        try {
+            int _type = NATIVE;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:232:7: ( 'native' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:232:9: 'native'
+            {
+            match("native"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        }
+    }
+    // $ANTLR end "NATIVE"
+
     // $ANTLR start "NOT"
     public final void mNOT() throws RecognitionException {
         try {
             int _type = NOT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:232:4: ( 'not' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:232:6: 'not'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:233:4: ( 'not' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:233:6: 'not'
             {
             match("not"); 
 
@@ -348,8 +370,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = VAR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:233:4: ( 'var' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:233:6: 'var'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:234:4: ( 'var' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:234:6: 'var'
             {
             match("var"); 
 
@@ -369,8 +391,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = TRUE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:235:5: ( 'true' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:235:7: 'true'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:236:5: ( 'true' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:236:7: 'true'
             {
             match("true"); 
 
@@ -390,8 +412,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = FALSE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:236:6: ( 'false' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:236:8: 'false'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:237:6: ( 'false' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:237:8: 'false'
             {
             match("false"); 
 
@@ -409,8 +431,8 @@ public class CalLexer extends Lexer {
     // $ANTLR start "ID"
     public final void mID() throws RecognitionException {
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:239:3: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' | '0' .. '9' )* )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:239:5: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' | '0' .. '9' )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:240:3: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' | '0' .. '9' )* )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:240:5: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' ) ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' | '0' .. '9' )*
             {
             if ( input.LA(1)=='$'||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
                 input.consume();
@@ -421,7 +443,7 @@ public class CalLexer extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:239:39: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' | '0' .. '9' )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:240:39: ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '$' | '0' .. '9' )*
             loop1:
             do {
                 int alt1=2;
@@ -434,7 +456,7 @@ public class CalLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:
             	    {
             	    if ( input.LA(1)=='$'||(input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
             	        input.consume();
@@ -468,11 +490,11 @@ public class CalLexer extends Lexer {
         try {
             int _type = QID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:241:4: ( ID ( DOT ID )* )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:241:6: ID ( DOT ID )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:242:4: ( ID ( DOT ID )* )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:242:6: ID ( DOT ID )*
             {
             mID(); 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:241:9: ( DOT ID )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:242:9: ( DOT ID )*
             loop2:
             do {
                 int alt2=2;
@@ -485,7 +507,7 @@ public class CalLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:241:10: DOT ID
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:242:10: DOT ID
             	    {
             	    mDOT(); 
             	    mID(); 
@@ -514,11 +536,11 @@ public class CalLexer extends Lexer {
         try {
             int _type = QID_WILDCARD;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:243:13: ( ID ( DOT ID )* ( '.*' )? )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:243:15: ID ( DOT ID )* ( '.*' )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:244:13: ( ID ( DOT ID )* ( '.*' )? )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:244:15: ID ( DOT ID )* ( '.*' )?
             {
             mID(); 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:243:18: ( DOT ID )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:244:18: ( DOT ID )*
             loop3:
             do {
                 int alt3=2;
@@ -537,7 +559,7 @@ public class CalLexer extends Lexer {
 
                 switch (alt3) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:243:19: DOT ID
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:244:19: DOT ID
             	    {
             	    mDOT(); 
             	    mID(); 
@@ -550,7 +572,7 @@ public class CalLexer extends Lexer {
                 }
             } while (true);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:243:28: ( '.*' )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:244:28: ( '.*' )?
             int alt4=2;
             int LA4_0 = input.LA(1);
 
@@ -559,7 +581,7 @@ public class CalLexer extends Lexer {
             }
             switch (alt4) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:243:28: '.*'
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:244:28: '.*'
                     {
                     match(".*"); 
 
@@ -585,10 +607,10 @@ public class CalLexer extends Lexer {
         try {
             int _type = FLOAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:6: ( ( '-' )? ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ ) ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:8: ( '-' )? ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:6: ( ( '-' )? ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ ) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:8: ( '-' )? ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ ) )
             {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:8: ( '-' )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:8: ( '-' )?
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -597,7 +619,7 @@ public class CalLexer extends Lexer {
             }
             switch (alt5) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:8: '-'
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:8: '-'
                     {
                     match('-'); 
 
@@ -606,14 +628,14 @@ public class CalLexer extends Lexer {
 
             }
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:13: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:13: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ ) )
             int alt18=3;
             alt18 = dfa18.predict(input);
             switch (alt18) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:14: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )?
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:14: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )?
                     {
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:14: ( '0' .. '9' )+
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:14: ( '0' .. '9' )+
                     int cnt6=0;
                     loop6:
                     do {
@@ -627,7 +649,7 @@ public class CalLexer extends Lexer {
 
                         switch (alt6) {
                     	case 1 :
-                    	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:15: '0' .. '9'
+                    	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:15: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -644,7 +666,7 @@ public class CalLexer extends Lexer {
                     } while (true);
 
                     match('.'); 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:30: ( '0' .. '9' )*
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:30: ( '0' .. '9' )*
                     loop7:
                     do {
                         int alt7=2;
@@ -657,7 +679,7 @@ public class CalLexer extends Lexer {
 
                         switch (alt7) {
                     	case 1 :
-                    	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:31: '0' .. '9'
+                    	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:31: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -669,7 +691,7 @@ public class CalLexer extends Lexer {
                         }
                     } while (true);
 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:42: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )?
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:42: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )?
                     int alt10=2;
                     int LA10_0 = input.LA(1);
 
@@ -678,7 +700,7 @@ public class CalLexer extends Lexer {
                     }
                     switch (alt10) {
                         case 1 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:43: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:43: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
                             {
                             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                                 input.consume();
@@ -689,7 +711,7 @@ public class CalLexer extends Lexer {
                                 recover(mse);
                                 throw mse;}
 
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:55: ( '+' | '-' )?
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:55: ( '+' | '-' )?
                             int alt8=2;
                             int LA8_0 = input.LA(1);
 
@@ -698,7 +720,7 @@ public class CalLexer extends Lexer {
                             }
                             switch (alt8) {
                                 case 1 :
-                                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:
+                                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:
                                     {
                                     if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
                                         input.consume();
@@ -715,7 +737,7 @@ public class CalLexer extends Lexer {
 
                             }
 
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:68: ( '0' .. '9' )+
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:68: ( '0' .. '9' )+
                             int cnt9=0;
                             loop9:
                             do {
@@ -729,7 +751,7 @@ public class CalLexer extends Lexer {
 
                                 switch (alt9) {
                             	case 1 :
-                            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:245:69: '0' .. '9'
+                            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:69: '0' .. '9'
                             	    {
                             	    matchRange('0','9'); 
 
@@ -755,10 +777,10 @@ public class CalLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:4: '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )?
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:4: '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )?
                     {
                     match('.'); 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:8: ( '0' .. '9' )+
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:8: ( '0' .. '9' )+
                     int cnt11=0;
                     loop11:
                     do {
@@ -772,7 +794,7 @@ public class CalLexer extends Lexer {
 
                         switch (alt11) {
                     	case 1 :
-                    	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:9: '0' .. '9'
+                    	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:9: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -788,7 +810,7 @@ public class CalLexer extends Lexer {
                         cnt11++;
                     } while (true);
 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:20: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )?
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:20: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )?
                     int alt14=2;
                     int LA14_0 = input.LA(1);
 
@@ -797,7 +819,7 @@ public class CalLexer extends Lexer {
                     }
                     switch (alt14) {
                         case 1 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:21: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:21: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
                             {
                             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                                 input.consume();
@@ -808,7 +830,7 @@ public class CalLexer extends Lexer {
                                 recover(mse);
                                 throw mse;}
 
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:33: ( '+' | '-' )?
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:33: ( '+' | '-' )?
                             int alt12=2;
                             int LA12_0 = input.LA(1);
 
@@ -817,7 +839,7 @@ public class CalLexer extends Lexer {
                             }
                             switch (alt12) {
                                 case 1 :
-                                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:
+                                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:
                                     {
                                     if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
                                         input.consume();
@@ -834,7 +856,7 @@ public class CalLexer extends Lexer {
 
                             }
 
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:46: ( '0' .. '9' )+
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:46: ( '0' .. '9' )+
                             int cnt13=0;
                             loop13:
                             do {
@@ -848,7 +870,7 @@ public class CalLexer extends Lexer {
 
                                 switch (alt13) {
                             	case 1 :
-                            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:246:47: '0' .. '9'
+                            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:47: '0' .. '9'
                             	    {
                             	    matchRange('0','9'); 
 
@@ -874,9 +896,9 @@ public class CalLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:4: ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:4: ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
                     {
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:4: ( '0' .. '9' )+
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:4: ( '0' .. '9' )+
                     int cnt15=0;
                     loop15:
                     do {
@@ -890,7 +912,7 @@ public class CalLexer extends Lexer {
 
                         switch (alt15) {
                     	case 1 :
-                    	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:5: '0' .. '9'
+                    	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:5: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -906,8 +928,8 @@ public class CalLexer extends Lexer {
                         cnt15++;
                     } while (true);
 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:16: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:17: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:16: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:17: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
                     {
                     if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                         input.consume();
@@ -918,7 +940,7 @@ public class CalLexer extends Lexer {
                         recover(mse);
                         throw mse;}
 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:29: ( '+' | '-' )?
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:29: ( '+' | '-' )?
                     int alt16=2;
                     int LA16_0 = input.LA(1);
 
@@ -927,7 +949,7 @@ public class CalLexer extends Lexer {
                     }
                     switch (alt16) {
                         case 1 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:
                             {
                             if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
                                 input.consume();
@@ -944,7 +966,7 @@ public class CalLexer extends Lexer {
 
                     }
 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:42: ( '0' .. '9' )+
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:42: ( '0' .. '9' )+
                     int cnt17=0;
                     loop17:
                     do {
@@ -958,7 +980,7 @@ public class CalLexer extends Lexer {
 
                         switch (alt17) {
                     	case 1 :
-                    	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:247:43: '0' .. '9'
+                    	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:43: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -999,10 +1021,10 @@ public class CalLexer extends Lexer {
         try {
             int _type = INTEGER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:8: ( ( '-' )? ( '0' .. '9' )+ )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:10: ( '-' )? ( '0' .. '9' )+
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:8: ( ( '-' )? ( '0' .. '9' )+ )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:10: ( '-' )? ( '0' .. '9' )+
             {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:10: ( '-' )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:10: ( '-' )?
             int alt19=2;
             int LA19_0 = input.LA(1);
 
@@ -1011,7 +1033,7 @@ public class CalLexer extends Lexer {
             }
             switch (alt19) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:10: '-'
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:10: '-'
                     {
                     match('-'); 
 
@@ -1020,7 +1042,7 @@ public class CalLexer extends Lexer {
 
             }
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:15: ( '0' .. '9' )+
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:15: ( '0' .. '9' )+
             int cnt20=0;
             loop20:
             do {
@@ -1034,7 +1056,7 @@ public class CalLexer extends Lexer {
 
                 switch (alt20) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:248:16: '0' .. '9'
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:16: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -1066,11 +1088,11 @@ public class CalLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:7: ( '\\\"' ( . )* '\\\"' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:9: '\\\"' ( . )* '\\\"'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:250:7: ( '\\\"' ( . )* '\\\"' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:250:9: '\\\"' ( . )* '\\\"'
             {
             match('\"'); 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:14: ( . )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:250:14: ( . )*
             loop21:
             do {
                 int alt21=2;
@@ -1086,7 +1108,7 @@ public class CalLexer extends Lexer {
 
                 switch (alt21) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:249:14: .
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:250:14: .
             	    {
             	    matchAny(); 
 
@@ -1115,12 +1137,12 @@ public class CalLexer extends Lexer {
         try {
             int _type = LINE_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:251:13: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:251:15: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:13: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:15: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
             {
             match("//"); 
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:251:20: (~ ( '\\n' | '\\r' ) )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:20: (~ ( '\\n' | '\\r' ) )*
             loop22:
             do {
                 int alt22=2;
@@ -1133,7 +1155,7 @@ public class CalLexer extends Lexer {
 
                 switch (alt22) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:251:20: ~ ( '\\n' | '\\r' )
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:20: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1153,7 +1175,7 @@ public class CalLexer extends Lexer {
                 }
             } while (true);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:251:34: ( '\\r' )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:34: ( '\\r' )?
             int alt23=2;
             int LA23_0 = input.LA(1);
 
@@ -1162,7 +1184,7 @@ public class CalLexer extends Lexer {
             }
             switch (alt23) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:251:34: '\\r'
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:34: '\\r'
                     {
                     match('\r'); 
 
@@ -1189,12 +1211,12 @@ public class CalLexer extends Lexer {
         try {
             int _type = MULTI_LINE_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:19: ( '/*' ( . )* '*/' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:21: '/*' ( . )* '*/'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:253:19: ( '/*' ( . )* '*/' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:253:21: '/*' ( . )* '*/'
             {
             match("/*"); 
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:26: ( . )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:253:26: ( . )*
             loop24:
             do {
                 int alt24=2;
@@ -1219,7 +1241,7 @@ public class CalLexer extends Lexer {
 
                 switch (alt24) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:252:26: .
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:253:26: .
             	    {
             	    matchAny(); 
 
@@ -1250,8 +1272,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = WHITESPACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:253:11: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:253:13: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:254:11: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:254:13: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
             {
             if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
                 input.consume();
@@ -1279,8 +1301,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = EQ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:255:3: ( '=' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:255:5: '='
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:256:3: ( '=' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:256:5: '='
             {
             match('='); 
 
@@ -1299,8 +1321,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = GE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:256:3: ( '>=' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:256:5: '>='
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:257:3: ( '>=' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:257:5: '>='
             {
             match(">="); 
 
@@ -1320,8 +1342,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = GT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:257:3: ( '>' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:257:5: '>'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:258:3: ( '>' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:258:5: '>'
             {
             match('>'); 
 
@@ -1340,8 +1362,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = LE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:258:3: ( '<=' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:258:5: '<='
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:259:3: ( '<=' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:259:5: '<='
             {
             match("<="); 
 
@@ -1361,8 +1383,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = LT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:259:3: ( '<' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:259:5: '<'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:260:3: ( '<' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:260:5: '<'
             {
             match('<'); 
 
@@ -1381,8 +1403,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = NE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:260:3: ( '!=' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:260:5: '!='
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:261:3: ( '!=' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:261:5: '!='
             {
             match("!="); 
 
@@ -1402,8 +1424,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = ARROW;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:262:6: ( '->' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:262:8: '->'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:263:6: ( '->' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:263:8: '->'
             {
             match("->"); 
 
@@ -1423,8 +1445,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = COLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:263:6: ( ':' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:263:8: ':'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:264:6: ( ':' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:264:8: ':'
             {
             match(':'); 
 
@@ -1443,8 +1465,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = COLON_EQUAL;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:264:12: ( ':=' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:264:14: ':='
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:265:12: ( ':=' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:265:14: ':='
             {
             match(":="); 
 
@@ -1464,8 +1486,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = COMMA;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:265:6: ( ',' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:265:8: ','
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:266:6: ( ',' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:266:8: ','
             {
             match(','); 
 
@@ -1482,8 +1504,8 @@ public class CalLexer extends Lexer {
     // $ANTLR start "DOT"
     public final void mDOT() throws RecognitionException {
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:268:4: ( '.' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:268:6: '.'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:269:4: ( '.' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:269:6: '.'
             {
             match('.'); 
 
@@ -1500,8 +1522,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = DOUBLE_DASH_ARROW;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:270:18: ( '-->' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:270:20: '-->'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:271:18: ( '-->' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:271:20: '-->'
             {
             match("-->"); 
 
@@ -1521,8 +1543,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = DOUBLE_EQUAL_ARROW;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:271:19: ( '==>' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:271:21: '==>'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:272:19: ( '==>' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:272:21: '==>'
             {
             match("==>"); 
 
@@ -1542,8 +1564,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = DOUBLE_DOT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:272:11: ( '..' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:272:13: '..'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:273:11: ( '..' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:273:13: '..'
             {
             match(".."); 
 
@@ -1563,8 +1585,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = LBRACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:274:7: ( '{' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:274:9: '{'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:275:7: ( '{' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:275:9: '{'
             {
             match('{'); 
 
@@ -1583,8 +1605,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = RBRACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:275:7: ( '}' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:275:9: '}'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:276:7: ( '}' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:276:9: '}'
             {
             match('}'); 
 
@@ -1603,8 +1625,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = LBRACKET;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:276:9: ( '[' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:276:11: '['
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:277:9: ( '[' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:277:11: '['
             {
             match('['); 
 
@@ -1623,8 +1645,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = RBRACKET;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:277:9: ( ']' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:277:11: ']'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:278:9: ( ']' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:278:11: ']'
             {
             match(']'); 
 
@@ -1643,8 +1665,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = LPAREN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:278:7: ( '(' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:278:9: '('
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:279:7: ( '(' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:279:9: '('
             {
             match('('); 
 
@@ -1663,8 +1685,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = RPAREN;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:279:7: ( ')' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:279:9: ')'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:280:7: ( ')' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:280:9: ')'
             {
             match(')'); 
 
@@ -1683,8 +1705,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = XOR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:281:4: ( '^' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:281:6: '^'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:282:4: ( '^' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:282:6: '^'
             {
             match('^'); 
 
@@ -1703,8 +1725,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = AND;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:282:4: ( '&' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:282:6: '&'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:283:4: ( '&' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:283:6: '&'
             {
             match('&'); 
 
@@ -1723,8 +1745,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = OR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:283:3: ( '|' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:283:5: '|'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:284:3: ( '|' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:284:5: '|'
             {
             match('|'); 
 
@@ -1743,8 +1765,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = DIV;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:284:4: ( '/' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:284:6: '/'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:285:4: ( '/' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:285:6: '/'
             {
             match('/'); 
 
@@ -1763,8 +1785,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = MINUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:285:6: ( '-' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:285:8: '-'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:286:6: ( '-' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:286:8: '-'
             {
             match('-'); 
 
@@ -1783,8 +1805,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = PLUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:286:5: ( '+' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:286:7: '+'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:287:5: ( '+' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:287:7: '+'
             {
             match('+'); 
 
@@ -1803,8 +1825,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = TIMES;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:287:6: ( '*' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:287:8: '*'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:288:6: ( '*' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:288:8: '*'
             {
             match('*'); 
 
@@ -1823,8 +1845,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = SEMICOLON;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:289:10: ( ';' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:289:12: ';'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:290:10: ( ';' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:290:12: ';'
             {
             match(';'); 
 
@@ -1843,8 +1865,8 @@ public class CalLexer extends Lexer {
         try {
             int _type = SHARP;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:290:6: ( '#' )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:290:8: '#'
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:291:6: ( '#' )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:291:8: '#'
             {
             match('#'); 
 
@@ -1859,355 +1881,362 @@ public class CalLexer extends Lexer {
     // $ANTLR end "SHARP"
 
     public void mTokens() throws RecognitionException {
-        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:8: ( ALL | ACTOR | END | ENTITIES | IMPORT | MULTI | MUTABLE | NETWORK | PACKAGE | STRUCTURE | NOT | VAR | TRUE | FALSE | QID | QID_WILDCARD | FLOAT | INTEGER | STRING | LINE_COMMENT | MULTI_LINE_COMMENT | WHITESPACE | EQ | GE | GT | LE | LT | NE | ARROW | COLON | COLON_EQUAL | COMMA | DOUBLE_DASH_ARROW | DOUBLE_EQUAL_ARROW | DOUBLE_DOT | LBRACE | RBRACE | LBRACKET | RBRACKET | LPAREN | RPAREN | XOR | AND | OR | DIV | MINUS | PLUS | TIMES | SEMICOLON | SHARP )
-        int alt25=50;
+        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:8: ( ALL | ACTOR | END | ENTITIES | IMPORT | MULTI | MUTABLE | NETWORK | PACKAGE | STRUCTURE | NATIVE | NOT | VAR | TRUE | FALSE | QID | QID_WILDCARD | FLOAT | INTEGER | STRING | LINE_COMMENT | MULTI_LINE_COMMENT | WHITESPACE | EQ | GE | GT | LE | LT | NE | ARROW | COLON | COLON_EQUAL | COMMA | DOUBLE_DASH_ARROW | DOUBLE_EQUAL_ARROW | DOUBLE_DOT | LBRACE | RBRACE | LBRACKET | RBRACKET | LPAREN | RPAREN | XOR | AND | OR | DIV | MINUS | PLUS | TIMES | SEMICOLON | SHARP )
+        int alt25=51;
         alt25 = dfa25.predict(input);
         switch (alt25) {
             case 1 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:10: ALL
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:10: ALL
                 {
                 mALL(); 
 
                 }
                 break;
             case 2 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:14: ACTOR
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:14: ACTOR
                 {
                 mACTOR(); 
 
                 }
                 break;
             case 3 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:20: END
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:20: END
                 {
                 mEND(); 
 
                 }
                 break;
             case 4 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:24: ENTITIES
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:24: ENTITIES
                 {
                 mENTITIES(); 
 
                 }
                 break;
             case 5 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:33: IMPORT
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:33: IMPORT
                 {
                 mIMPORT(); 
 
                 }
                 break;
             case 6 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:40: MULTI
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:40: MULTI
                 {
                 mMULTI(); 
 
                 }
                 break;
             case 7 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:46: MUTABLE
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:46: MUTABLE
                 {
                 mMUTABLE(); 
 
                 }
                 break;
             case 8 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:54: NETWORK
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:54: NETWORK
                 {
                 mNETWORK(); 
 
                 }
                 break;
             case 9 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:62: PACKAGE
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:62: PACKAGE
                 {
                 mPACKAGE(); 
 
                 }
                 break;
             case 10 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:70: STRUCTURE
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:70: STRUCTURE
                 {
                 mSTRUCTURE(); 
 
                 }
                 break;
             case 11 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:80: NOT
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:80: NATIVE
+                {
+                mNATIVE(); 
+
+                }
+                break;
+            case 12 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:87: NOT
                 {
                 mNOT(); 
 
                 }
                 break;
-            case 12 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:84: VAR
+            case 13 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:91: VAR
                 {
                 mVAR(); 
 
                 }
                 break;
-            case 13 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:88: TRUE
+            case 14 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:95: TRUE
                 {
                 mTRUE(); 
 
                 }
                 break;
-            case 14 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:93: FALSE
+            case 15 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:100: FALSE
                 {
                 mFALSE(); 
 
                 }
                 break;
-            case 15 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:99: QID
+            case 16 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:106: QID
                 {
                 mQID(); 
 
                 }
                 break;
-            case 16 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:103: QID_WILDCARD
+            case 17 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:110: QID_WILDCARD
                 {
                 mQID_WILDCARD(); 
 
                 }
                 break;
-            case 17 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:116: FLOAT
+            case 18 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:123: FLOAT
                 {
                 mFLOAT(); 
 
                 }
                 break;
-            case 18 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:122: INTEGER
+            case 19 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:129: INTEGER
                 {
                 mINTEGER(); 
 
                 }
                 break;
-            case 19 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:130: STRING
+            case 20 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:137: STRING
                 {
                 mSTRING(); 
 
                 }
                 break;
-            case 20 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:137: LINE_COMMENT
+            case 21 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:144: LINE_COMMENT
                 {
                 mLINE_COMMENT(); 
 
                 }
                 break;
-            case 21 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:150: MULTI_LINE_COMMENT
+            case 22 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:157: MULTI_LINE_COMMENT
                 {
                 mMULTI_LINE_COMMENT(); 
 
                 }
                 break;
-            case 22 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:169: WHITESPACE
+            case 23 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:176: WHITESPACE
                 {
                 mWHITESPACE(); 
 
                 }
                 break;
-            case 23 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:180: EQ
+            case 24 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:187: EQ
                 {
                 mEQ(); 
 
                 }
                 break;
-            case 24 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:183: GE
+            case 25 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:190: GE
                 {
                 mGE(); 
 
                 }
                 break;
-            case 25 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:186: GT
+            case 26 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:193: GT
                 {
                 mGT(); 
 
                 }
                 break;
-            case 26 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:189: LE
+            case 27 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:196: LE
                 {
                 mLE(); 
 
                 }
                 break;
-            case 27 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:192: LT
+            case 28 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:199: LT
                 {
                 mLT(); 
 
                 }
                 break;
-            case 28 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:195: NE
+            case 29 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:202: NE
                 {
                 mNE(); 
 
                 }
                 break;
-            case 29 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:198: ARROW
+            case 30 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:205: ARROW
                 {
                 mARROW(); 
 
                 }
                 break;
-            case 30 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:204: COLON
+            case 31 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:211: COLON
                 {
                 mCOLON(); 
 
                 }
                 break;
-            case 31 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:210: COLON_EQUAL
+            case 32 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:217: COLON_EQUAL
                 {
                 mCOLON_EQUAL(); 
 
                 }
                 break;
-            case 32 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:222: COMMA
+            case 33 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:229: COMMA
                 {
                 mCOMMA(); 
 
                 }
                 break;
-            case 33 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:228: DOUBLE_DASH_ARROW
+            case 34 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:235: DOUBLE_DASH_ARROW
                 {
                 mDOUBLE_DASH_ARROW(); 
 
                 }
                 break;
-            case 34 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:246: DOUBLE_EQUAL_ARROW
+            case 35 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:253: DOUBLE_EQUAL_ARROW
                 {
                 mDOUBLE_EQUAL_ARROW(); 
 
                 }
                 break;
-            case 35 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:265: DOUBLE_DOT
+            case 36 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:272: DOUBLE_DOT
                 {
                 mDOUBLE_DOT(); 
 
                 }
                 break;
-            case 36 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:276: LBRACE
+            case 37 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:283: LBRACE
                 {
                 mLBRACE(); 
 
                 }
                 break;
-            case 37 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:283: RBRACE
+            case 38 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:290: RBRACE
                 {
                 mRBRACE(); 
 
                 }
                 break;
-            case 38 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:290: LBRACKET
+            case 39 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:297: LBRACKET
                 {
                 mLBRACKET(); 
 
                 }
                 break;
-            case 39 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:299: RBRACKET
+            case 40 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:306: RBRACKET
                 {
                 mRBRACKET(); 
 
                 }
                 break;
-            case 40 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:308: LPAREN
+            case 41 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:315: LPAREN
                 {
                 mLPAREN(); 
 
                 }
                 break;
-            case 41 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:315: RPAREN
+            case 42 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:322: RPAREN
                 {
                 mRPAREN(); 
 
                 }
                 break;
-            case 42 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:322: XOR
+            case 43 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:329: XOR
                 {
                 mXOR(); 
 
                 }
                 break;
-            case 43 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:326: AND
+            case 44 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:333: AND
                 {
                 mAND(); 
 
                 }
                 break;
-            case 44 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:330: OR
+            case 45 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:337: OR
                 {
                 mOR(); 
 
                 }
                 break;
-            case 45 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:333: DIV
+            case 46 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:340: DIV
                 {
                 mDIV(); 
 
                 }
                 break;
-            case 46 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:337: MINUS
+            case 47 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:344: MINUS
                 {
                 mMINUS(); 
 
                 }
                 break;
-            case 47 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:343: PLUS
+            case 48 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:350: PLUS
                 {
                 mPLUS(); 
 
                 }
                 break;
-            case 48 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:348: TIMES
+            case 49 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:355: TIMES
                 {
                 mTIMES(); 
 
                 }
                 break;
-            case 49 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:354: SEMICOLON
+            case 50 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:361: SEMICOLON
                 {
                 mSEMICOLON(); 
 
                 }
                 break;
-            case 50 :
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:364: SHARP
+            case 51 :
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:1:371: SHARP
                 {
                 mSHARP(); 
 
@@ -2271,40 +2300,41 @@ public class CalLexer extends Lexer {
             this.transition = DFA18_transition;
         }
         public String getDescription() {
-            return "245:13: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ ) )";
+            return "246:13: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | '.' ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )? | ( '0' .. '9' )+ ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ ) )";
         }
     }
     static final String DFA25_eotS =
-        "\1\uffff\13\50\1\67\1\70\2\uffff\1\74\1\uffff\1\76\1\100\1\102"+
-        "\1\uffff\1\104\16\uffff\3\50\2\uffff\12\50\21\uffff\1\125\1\50\1"+
-        "\uffff\1\50\1\130\5\50\1\136\2\50\1\141\2\50\1\uffff\2\50\1\uffff"+
-        "\5\50\1\uffff\2\50\1\uffff\1\154\1\50\1\156\2\50\1\161\4\50\1\uffff"+
-        "\1\166\1\uffff\1\50\1\170\1\uffff\4\50\1\uffff\1\50\1\uffff\1\176"+
-        "\1\177\1\u0080\1\50\1\u0082\3\uffff\1\50\1\uffff\1\u0084\1\uffff";
+        "\1\uffff\13\50\1\70\1\71\2\uffff\1\75\1\uffff\1\77\1\101\1\103"+
+        "\1\uffff\1\105\16\uffff\3\50\2\uffff\13\50\21\uffff\1\127\1\50\1"+
+        "\uffff\1\50\1\132\6\50\1\141\2\50\1\144\2\50\1\uffff\2\50\1\uffff"+
+        "\6\50\1\uffff\2\50\1\uffff\1\160\1\50\1\162\2\50\1\165\5\50\1\uffff"+
+        "\1\173\1\uffff\1\50\1\175\1\uffff\2\50\1\u0080\2\50\1\uffff\1\50"+
+        "\1\uffff\1\u0084\1\u0085\1\uffff\1\u0086\1\50\1\u0088\3\uffff\1"+
+        "\50\1\uffff\1\u008a\1\uffff";
     static final String DFA25_eofS =
-        "\u0085\uffff";
+        "\u008b\uffff";
     static final String DFA25_minS =
         "\1\11\13\44\1\55\2\56\1\uffff\1\52\1\uffff\3\75\1\uffff\1\75\16"+
-        "\uffff\3\44\1\uffff\13\44\21\uffff\2\44\1\uffff\15\44\1\uffff\2"+
-        "\44\1\uffff\5\44\1\uffff\2\44\1\uffff\12\44\1\uffff\1\44\1\uffff"+
-        "\2\44\1\uffff\4\44\1\uffff\1\44\1\uffff\5\44\3\uffff\1\44\1\uffff"+
-        "\1\44\1\uffff";
+        "\uffff\3\44\1\uffff\14\44\21\uffff\2\44\1\uffff\16\44\1\uffff\2"+
+        "\44\1\uffff\6\44\1\uffff\2\44\1\uffff\13\44\1\uffff\1\44\1\uffff"+
+        "\2\44\1\uffff\5\44\1\uffff\1\44\1\uffff\2\44\1\uffff\3\44\3\uffff"+
+        "\1\44\1\uffff\1\44\1\uffff";
     static final String DFA25_maxS =
         "\1\175\13\172\1\76\1\145\1\71\1\uffff\1\57\1\uffff\3\75\1\uffff"+
-        "\1\75\16\uffff\3\172\1\uffff\13\172\21\uffff\2\172\1\uffff\15\172"+
-        "\1\uffff\2\172\1\uffff\5\172\1\uffff\2\172\1\uffff\12\172\1\uffff"+
-        "\1\172\1\uffff\2\172\1\uffff\4\172\1\uffff\1\172\1\uffff\5\172\3"+
-        "\uffff\1\172\1\uffff\1\172\1\uffff";
+        "\1\75\16\uffff\3\172\1\uffff\14\172\21\uffff\2\172\1\uffff\16\172"+
+        "\1\uffff\2\172\1\uffff\6\172\1\uffff\2\172\1\uffff\13\172\1\uffff"+
+        "\1\172\1\uffff\2\172\1\uffff\5\172\1\uffff\1\172\1\uffff\2\172\1"+
+        "\uffff\3\172\3\uffff\1\172\1\uffff\1\172\1\uffff";
     static final String DFA25_acceptS =
-        "\17\uffff\1\23\1\uffff\1\26\3\uffff\1\34\1\uffff\1\40\1\44\1\45"+
-        "\1\46\1\47\1\50\1\51\1\52\1\53\1\54\1\57\1\60\1\61\1\62\3\uffff"+
-        "\1\17\13\uffff\1\35\1\41\1\21\1\56\1\22\1\43\1\24\1\25\1\55\1\42"+
-        "\1\27\1\30\1\31\1\32\1\33\1\37\1\36\2\uffff\1\20\15\uffff\1\1\2"+
-        "\uffff\1\3\5\uffff\1\13\2\uffff\1\14\12\uffff\1\15\1\uffff\1\2\2"+
-        "\uffff\1\6\4\uffff\1\16\1\uffff\1\5\5\uffff\1\7\1\10\1\11\1\uffff"+
-        "\1\4\1\uffff\1\12";
+        "\17\uffff\1\24\1\uffff\1\27\3\uffff\1\35\1\uffff\1\41\1\45\1\46"+
+        "\1\47\1\50\1\51\1\52\1\53\1\54\1\55\1\60\1\61\1\62\1\63\3\uffff"+
+        "\1\20\14\uffff\1\36\1\42\1\22\1\57\1\23\1\44\1\25\1\26\1\56\1\43"+
+        "\1\30\1\31\1\32\1\33\1\34\1\40\1\37\2\uffff\1\21\16\uffff\1\1\2"+
+        "\uffff\1\3\6\uffff\1\14\2\uffff\1\15\13\uffff\1\16\1\uffff\1\2\2"+
+        "\uffff\1\6\5\uffff\1\17\1\uffff\1\5\2\uffff\1\13\3\uffff\1\7\1\10"+
+        "\1\11\1\uffff\1\4\1\uffff\1\12";
     static final String DFA25_specialS =
-        "\u0085\uffff}>";
+        "\u008b\uffff}>";
     static final String[] DFA25_transitionS = {
             "\2\21\1\uffff\2\21\22\uffff\1\21\1\25\1\17\1\44\1\13\1\uffff"+
             "\1\37\1\uffff\1\34\1\35\1\42\1\41\1\27\1\14\1\16\1\20\12\15"+
@@ -2320,73 +2350,75 @@ public class CalLexer extends Lexer {
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\24\47\1\54\5\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\4\47\1\55\11\47\1\56\13\47",
+            "\47\1\uffff\1\56\3\47\1\55\11\47\1\57\13\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\1\57\31\47",
+            "\47\1\uffff\1\60\31\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\23\47\1\60\6\47",
+            "\47\1\uffff\23\47\1\61\6\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\1\61\31\47",
+            "\47\1\uffff\1\62\31\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\21\47\1\62\10\47",
+            "\47\1\uffff\21\47\1\63\10\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\1\63\31\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\32\47",
-            "\1\65\1\66\1\uffff\12\15\4\uffff\1\64",
-            "\1\66\1\uffff\12\15\13\uffff\1\66\37\uffff\1\66",
-            "\1\71\1\uffff\12\66",
-            "",
-            "\1\73\4\uffff\1\72",
-            "",
-            "\1\75",
-            "\1\77",
-            "\1\101",
-            "",
-            "\1\103",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\13\47\1\105\16\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\23\47\1\106\6\47",
+            "\47\1\uffff\1\64\31\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\32\47",
+            "\1\66\1\67\1\uffff\12\15\4\uffff\1\65",
+            "\1\67\1\uffff\12\15\13\uffff\1\67\37\uffff\1\67",
+            "\1\72\1\uffff\12\67",
             "",
-            "\1\110\5\uffff\1\107\26\uffff\32\110\4\uffff\1\110\1\uffff"+
-            "\32\110",
+            "\1\74\4\uffff\1\73",
+            "",
+            "\1\76",
+            "\1\100",
+            "\1\102",
+            "",
+            "\1\104",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\3\47\1\111\17\47\1\112\6\47",
+            "\47\1\uffff\13\47\1\106\16\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\17\47\1\113\12\47",
+            "\47\1\uffff\23\47\1\107\6\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\13\47\1\114\7\47\1\115\6\47",
+            "\47\1\uffff\32\47",
+            "",
+            "\1\111\5\uffff\1\110\26\uffff\32\111\4\uffff\1\111\1\uffff"+
+            "\32\111",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\23\47\1\116\6\47",
+            "\47\1\uffff\3\47\1\112\17\47\1\113\6\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\17\47\1\114\12\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\13\47\1\115\7\47\1\116\6\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\23\47\1\117\6\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\2\47\1\120\27\47",
+            "\47\1\uffff\23\47\1\120\6\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\21\47\1\121\10\47",
+            "\47\1\uffff\23\47\1\121\6\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\21\47\1\122\10\47",
+            "\47\1\uffff\2\47\1\122\27\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\24\47\1\123\5\47",
+            "\47\1\uffff\21\47\1\123\10\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\13\47\1\124\16\47",
+            "\47\1\uffff\21\47\1\124\10\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\24\47\1\125\5\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\13\47\1\126\16\47",
             "",
             "",
             "",
@@ -2407,112 +2439,121 @@ public class CalLexer extends Lexer {
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\32\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\16\47\1\126\13\47",
+            "\47\1\uffff\16\47\1\130\13\47",
             "",
-            "\1\127\11\uffff\1\51\1\uffff\12\127\7\uffff\32\127\4\uffff"+
-            "\1\127\1\uffff\32\127",
+            "\1\131\11\uffff\1\51\1\uffff\12\131\7\uffff\32\131\4\uffff"+
+            "\1\131\1\uffff\32\131",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\32\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\10\47\1\131\21\47",
+            "\47\1\uffff\10\47\1\133\21\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\16\47\1\132\13\47",
+            "\47\1\uffff\16\47\1\134\13\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\23\47\1\133\6\47",
+            "\47\1\uffff\23\47\1\135\6\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\1\134\31\47",
+            "\47\1\uffff\1\136\31\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\26\47\1\135\3\47",
+            "\47\1\uffff\26\47\1\137\3\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\32\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\12\47\1\137\17\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\24\47\1\140\5\47",
+            "\47\1\uffff\10\47\1\140\21\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\32\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\4\47\1\142\25\47",
+            "\47\1\uffff\12\47\1\142\17\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\22\47\1\143\7\47",
-            "",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\21\47\1\144\10\47",
-            "\1\127\11\uffff\1\51\1\uffff\12\127\7\uffff\32\127\4\uffff"+
-            "\1\127\1\uffff\32\127",
-            "",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\23\47\1\145\6\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\21\47\1\146\10\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\10\47\1\147\21\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\1\47\1\150\30\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\16\47\1\151\13\47",
-            "",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\1\152\31\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\2\47\1\153\27\47",
-            "",
+            "\47\1\uffff\24\47\1\143\5\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\32\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\4\47\1\155\25\47",
+            "\47\1\uffff\4\47\1\145\25\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\32\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\10\47\1\157\21\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\23\47\1\160\6\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\32\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\13\47\1\162\16\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\21\47\1\163\10\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\6\47\1\164\23\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\23\47\1\165\6\47",
+            "\47\1\uffff\22\47\1\146\7\47",
             "",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\32\47",
+            "\47\1\uffff\21\47\1\147\10\47",
+            "\1\131\11\uffff\1\51\1\uffff\12\131\7\uffff\32\131\4\uffff"+
+            "\1\131\1\uffff\32\131",
             "",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\4\47\1\167\25\47",
+            "\47\1\uffff\23\47\1\150\6\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\32\47",
+            "\47\1\uffff\21\47\1\151\10\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\10\47\1\152\21\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\1\47\1\153\30\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\16\47\1\154\13\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\25\47\1\155\4\47",
             "",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\4\47\1\171\25\47",
+            "\47\1\uffff\1\156\31\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\12\47\1\172\17\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\4\47\1\173\25\47",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\24\47\1\174\5\47",
-            "",
-            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\22\47\1\175\7\47",
+            "\47\1\uffff\2\47\1\157\27\47",
             "",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\32\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\32\47",
+            "\47\1\uffff\4\47\1\161\25\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\32\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\21\47\1\u0081\10\47",
+            "\47\1\uffff\10\47\1\163\21\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\23\47\1\164\6\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\32\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\13\47\1\166\16\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\21\47\1\167\10\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\4\47\1\170\25\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\6\47\1\171\23\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\23\47\1\172\6\47",
+            "",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\32\47",
+            "",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\4\47\1\174\25\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\32\47",
+            "",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\4\47\1\176\25\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\12\47\1\177\17\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\32\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\4\47\1\u0081\25\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\24\47\1\u0082\5\47",
+            "",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\22\47\1\u0083\7\47",
+            "",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\32\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\32\47",
+            "",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\32\47",
+            "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
+            "\47\1\uffff\21\47\1\u0087\10\47",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\32\47",
             "",
             "",
             "",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
-            "\47\1\uffff\4\47\1\u0083\25\47",
+            "\47\1\uffff\4\47\1\u0089\25\47",
             "",
             "\1\47\11\uffff\1\51\1\uffff\12\47\7\uffff\32\47\4\uffff\1"+
             "\47\1\uffff\32\47",
@@ -2549,7 +2590,7 @@ public class CalLexer extends Lexer {
             this.transition = DFA25_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( ALL | ACTOR | END | ENTITIES | IMPORT | MULTI | MUTABLE | NETWORK | PACKAGE | STRUCTURE | NOT | VAR | TRUE | FALSE | QID | QID_WILDCARD | FLOAT | INTEGER | STRING | LINE_COMMENT | MULTI_LINE_COMMENT | WHITESPACE | EQ | GE | GT | LE | LT | NE | ARROW | COLON | COLON_EQUAL | COMMA | DOUBLE_DASH_ARROW | DOUBLE_EQUAL_ARROW | DOUBLE_DOT | LBRACE | RBRACE | LBRACKET | RBRACKET | LPAREN | RPAREN | XOR | AND | OR | DIV | MINUS | PLUS | TIMES | SEMICOLON | SHARP );";
+            return "1:1: Tokens : ( ALL | ACTOR | END | ENTITIES | IMPORT | MULTI | MUTABLE | NETWORK | PACKAGE | STRUCTURE | NATIVE | NOT | VAR | TRUE | FALSE | QID | QID_WILDCARD | FLOAT | INTEGER | STRING | LINE_COMMENT | MULTI_LINE_COMMENT | WHITESPACE | EQ | GE | GT | LE | LT | NE | ARROW | COLON | COLON_EQUAL | COMMA | DOUBLE_DASH_ARROW | DOUBLE_EQUAL_ARROW | DOUBLE_DOT | LBRACE | RBRACE | LBRACKET | RBRACKET | LPAREN | RPAREN | XOR | AND | OR | DIV | MINUS | PLUS | TIMES | SEMICOLON | SHARP );";
         }
     }
  

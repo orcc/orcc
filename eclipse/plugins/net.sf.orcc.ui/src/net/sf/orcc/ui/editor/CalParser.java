@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:45:30 C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g 2010-12-16 01:20:00
+// $ANTLR 3.3 Nov 30, 2010 12:45:30 D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g 2011-02-10 09:56:25
 
 package net.sf.orcc.ui.editor;
 
@@ -22,7 +22,7 @@ import org.antlr.runtime.tree.TreeAdaptor;
 @SuppressWarnings("unused")
 public class CalParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "Attribute", "Connector", "EntityDecl", "EntityExpr", "EntityPar", "Network", "StructureStmt", "VarDecl", "Actor", "Dot", "Empty", "Name", "Inputs", "Outputs", "PortDecl", "QualifiedId", "Parameter", "Type", "TypeAttr", "ExprAttr", "TypePar", "BinOp", "Boolean", "Expression", "Integer", "List", "Minus", "Not", "Real", "String", "UnOp", "Var", "NETWORK", "QID", "LBRACKET", "RBRACKET", "LPAREN", "RPAREN", "COLON", "END", "DOUBLE_EQUAL_ARROW", "VAR", "MUTABLE", "EQ", "COLON_EQUAL", "SEMICOLON", "ENTITIES", "COMMA", "STRUCTURE", "DOUBLE_DASH_ARROW", "DOT", "LBRACE", "RBRACE", "ACTOR", "PACKAGE", "IMPORT", "QID_WILDCARD", "MULTI", "LT", "MINUS", "NOT", "PLUS", "TIMES", "DIV", "XOR", "FLOAT", "INTEGER", "STRING", "TRUE", "FALSE", "ALL", "ID", "LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE", "GE", "GT", "LE", "NE", "ARROW", "DOUBLE_DOT", "AND", "OR", "SHARP"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "Attribute", "Connector", "EntityDecl", "EntityExpr", "EntityPar", "Network", "StructureStmt", "VarDecl", "Actor", "Dot", "Empty", "Name", "Inputs", "Outputs", "PortDecl", "QualifiedId", "Parameter", "Type", "TypeAttr", "ExprAttr", "TypePar", "BinOp", "Boolean", "Expression", "Integer", "List", "Minus", "Not", "Real", "String", "UnOp", "Var", "NETWORK", "QID", "LBRACKET", "RBRACKET", "LPAREN", "RPAREN", "COLON", "END", "DOUBLE_EQUAL_ARROW", "VAR", "MUTABLE", "EQ", "COLON_EQUAL", "SEMICOLON", "ENTITIES", "COMMA", "STRUCTURE", "DOUBLE_DASH_ARROW", "DOT", "LBRACE", "RBRACE", "NATIVE", "ACTOR", "PACKAGE", "IMPORT", "QID_WILDCARD", "MULTI", "LT", "MINUS", "NOT", "PLUS", "TIMES", "DIV", "XOR", "FLOAT", "INTEGER", "STRING", "TRUE", "FALSE", "ALL", "ID", "LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE", "GE", "GT", "LE", "NE", "ARROW", "DOUBLE_DOT", "AND", "OR", "SHARP"
     };
     public static final int EOF=-1;
     public static final int Attribute=4;
@@ -78,37 +78,38 @@ public class CalParser extends Parser {
     public static final int DOT=54;
     public static final int LBRACE=55;
     public static final int RBRACE=56;
-    public static final int ACTOR=57;
-    public static final int PACKAGE=58;
-    public static final int IMPORT=59;
-    public static final int QID_WILDCARD=60;
-    public static final int MULTI=61;
-    public static final int LT=62;
-    public static final int MINUS=63;
-    public static final int NOT=64;
-    public static final int PLUS=65;
-    public static final int TIMES=66;
-    public static final int DIV=67;
-    public static final int XOR=68;
-    public static final int FLOAT=69;
-    public static final int INTEGER=70;
-    public static final int STRING=71;
-    public static final int TRUE=72;
-    public static final int FALSE=73;
-    public static final int ALL=74;
-    public static final int ID=75;
-    public static final int LINE_COMMENT=76;
-    public static final int MULTI_LINE_COMMENT=77;
-    public static final int WHITESPACE=78;
-    public static final int GE=79;
-    public static final int GT=80;
-    public static final int LE=81;
-    public static final int NE=82;
-    public static final int ARROW=83;
-    public static final int DOUBLE_DOT=84;
-    public static final int AND=85;
-    public static final int OR=86;
-    public static final int SHARP=87;
+    public static final int NATIVE=57;
+    public static final int ACTOR=58;
+    public static final int PACKAGE=59;
+    public static final int IMPORT=60;
+    public static final int QID_WILDCARD=61;
+    public static final int MULTI=62;
+    public static final int LT=63;
+    public static final int MINUS=64;
+    public static final int NOT=65;
+    public static final int PLUS=66;
+    public static final int TIMES=67;
+    public static final int DIV=68;
+    public static final int XOR=69;
+    public static final int FLOAT=70;
+    public static final int INTEGER=71;
+    public static final int STRING=72;
+    public static final int TRUE=73;
+    public static final int FALSE=74;
+    public static final int ALL=75;
+    public static final int ID=76;
+    public static final int LINE_COMMENT=77;
+    public static final int MULTI_LINE_COMMENT=78;
+    public static final int WHITESPACE=79;
+    public static final int GE=80;
+    public static final int GT=81;
+    public static final int LE=82;
+    public static final int NE=83;
+    public static final int ARROW=84;
+    public static final int DOUBLE_DOT=85;
+    public static final int AND=86;
+    public static final int OR=87;
+    public static final int SHARP=88;
 
     // delegates
     // delegators
@@ -132,7 +133,7 @@ public class CalParser extends Parser {
     }
 
     public String[] getTokenNames() { return CalParser.tokenNames; }
-    public String getGrammarFileName() { return "C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g"; }
+    public String getGrammarFileName() { return "D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g"; }
 
 
     public static class network_return extends ParserRuleReturnScope {
@@ -141,7 +142,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "network"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:1: network : NETWORK QID ( LBRACKET ( typePars )? RBRACKET )? LPAREN ( parameters )? RPAREN portSignature COLON ( oneImport )* ( varDeclSection )? ( entitySection )? ( structureSection )? END EOF -> ^( Network QID ( parameters )? portSignature ( varDeclSection )? ( entitySection )? ( structureSection )? ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:1: network : NETWORK QID ( LBRACKET ( typePars )? RBRACKET )? LPAREN ( parameters )? RPAREN portSignature COLON ( oneImport )* ( varDeclSection )? ( entitySection )? ( structureSection )? END EOF -> ^( Network QID ( parameters )? portSignature ( varDeclSection )? ( entitySection )? ( structureSection )? ) ;
     public final CalParser.network_return network() throws RecognitionException {
         CalParser.network_return retval = new CalParser.network_return();
         retval.start = input.LT(1);
@@ -198,8 +199,8 @@ public class CalParser extends Parser {
         RewriteRuleSubtreeStream stream_parameters=new RewriteRuleSubtreeStream(adaptor,"rule parameters");
         RewriteRuleSubtreeStream stream_oneImport=new RewriteRuleSubtreeStream(adaptor,"rule oneImport");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:8: ( NETWORK QID ( LBRACKET ( typePars )? RBRACKET )? LPAREN ( parameters )? RPAREN portSignature COLON ( oneImport )* ( varDeclSection )? ( entitySection )? ( structureSection )? END EOF -> ^( Network QID ( parameters )? portSignature ( varDeclSection )? ( entitySection )? ( structureSection )? ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:10: NETWORK QID ( LBRACKET ( typePars )? RBRACKET )? LPAREN ( parameters )? RPAREN portSignature COLON ( oneImport )* ( varDeclSection )? ( entitySection )? ( structureSection )? END EOF
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:8: ( NETWORK QID ( LBRACKET ( typePars )? RBRACKET )? LPAREN ( parameters )? RPAREN portSignature COLON ( oneImport )* ( varDeclSection )? ( entitySection )? ( structureSection )? END EOF -> ^( Network QID ( parameters )? portSignature ( varDeclSection )? ( entitySection )? ( structureSection )? ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:10: NETWORK QID ( LBRACKET ( typePars )? RBRACKET )? LPAREN ( parameters )? RPAREN portSignature COLON ( oneImport )* ( varDeclSection )? ( entitySection )? ( structureSection )? END EOF
             {
             NETWORK1=(Token)match(input,NETWORK,FOLLOW_NETWORK_in_network236);  
             stream_NETWORK.add(NETWORK1);
@@ -207,7 +208,7 @@ public class CalParser extends Parser {
             QID2=(Token)match(input,QID,FOLLOW_QID_in_network238);  
             stream_QID.add(QID2);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:22: ( LBRACKET ( typePars )? RBRACKET )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:22: ( LBRACKET ( typePars )? RBRACKET )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -216,12 +217,12 @@ public class CalParser extends Parser {
             }
             switch (alt2) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:23: LBRACKET ( typePars )? RBRACKET
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:23: LBRACKET ( typePars )? RBRACKET
                     {
                     LBRACKET3=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_network241);  
                     stream_LBRACKET.add(LBRACKET3);
 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:32: ( typePars )?
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:32: ( typePars )?
                     int alt1=2;
                     int LA1_0 = input.LA(1);
 
@@ -230,7 +231,7 @@ public class CalParser extends Parser {
                     }
                     switch (alt1) {
                         case 1 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:32: typePars
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:90:32: typePars
                             {
                             pushFollow(FOLLOW_typePars_in_network243);
                             typePars4=typePars();
@@ -256,7 +257,7 @@ public class CalParser extends Parser {
             LPAREN6=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_network252);  
             stream_LPAREN.add(LPAREN6);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:91:10: ( parameters )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:91:10: ( parameters )?
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -265,7 +266,7 @@ public class CalParser extends Parser {
             }
             switch (alt3) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:91:10: parameters
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:91:10: parameters
                     {
                     pushFollow(FOLLOW_parameters_in_network254);
                     parameters7=parameters();
@@ -291,7 +292,7 @@ public class CalParser extends Parser {
             COLON10=(Token)match(input,COLON,FOLLOW_COLON_in_network263);  
             stream_COLON.add(COLON10);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:93:3: ( oneImport )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:93:3: ( oneImport )*
             loop4:
             do {
                 int alt4=2;
@@ -304,7 +305,7 @@ public class CalParser extends Parser {
 
                 switch (alt4) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:93:3: oneImport
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:93:3: oneImport
             	    {
             	    pushFollow(FOLLOW_oneImport_in_network267);
             	    oneImport11=oneImport();
@@ -321,7 +322,7 @@ public class CalParser extends Parser {
                 }
             } while (true);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:93:14: ( varDeclSection )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:93:14: ( varDeclSection )?
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -330,7 +331,7 @@ public class CalParser extends Parser {
             }
             switch (alt5) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:93:14: varDeclSection
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:93:14: varDeclSection
                     {
                     pushFollow(FOLLOW_varDeclSection_in_network270);
                     varDeclSection12=varDeclSection();
@@ -344,7 +345,7 @@ public class CalParser extends Parser {
 
             }
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:94:3: ( entitySection )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:94:3: ( entitySection )?
             int alt6=2;
             int LA6_0 = input.LA(1);
 
@@ -353,7 +354,7 @@ public class CalParser extends Parser {
             }
             switch (alt6) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:94:3: entitySection
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:94:3: entitySection
                     {
                     pushFollow(FOLLOW_entitySection_in_network275);
                     entitySection13=entitySection();
@@ -367,7 +368,7 @@ public class CalParser extends Parser {
 
             }
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:94:18: ( structureSection )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:94:18: ( structureSection )?
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -376,7 +377,7 @@ public class CalParser extends Parser {
             }
             switch (alt7) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:94:18: structureSection
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:94:18: structureSection
                     {
                     pushFollow(FOLLOW_structureSection_in_network278);
                     structureSection14=structureSection();
@@ -399,7 +400,7 @@ public class CalParser extends Parser {
 
 
             // AST REWRITE
-            // elements: parameters, QID, varDeclSection, portSignature, entitySection, structureSection
+            // elements: entitySection, structureSection, portSignature, QID, parameters, varDeclSection
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -411,32 +412,32 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 95:11: -> ^( Network QID ( parameters )? portSignature ( varDeclSection )? ( entitySection )? ( structureSection )? )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:96:5: ^( Network QID ( parameters )? portSignature ( varDeclSection )? ( entitySection )? ( structureSection )? )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:96:5: ^( Network QID ( parameters )? portSignature ( varDeclSection )? ( entitySection )? ( structureSection )? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Network, "Network"), root_1);
 
                 adaptor.addChild(root_1, stream_QID.nextNode());
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:96:19: ( parameters )?
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:96:19: ( parameters )?
                 if ( stream_parameters.hasNext() ) {
                     adaptor.addChild(root_1, stream_parameters.nextTree());
 
                 }
                 stream_parameters.reset();
                 adaptor.addChild(root_1, stream_portSignature.nextTree());
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:97:7: ( varDeclSection )?
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:97:7: ( varDeclSection )?
                 if ( stream_varDeclSection.hasNext() ) {
                     adaptor.addChild(root_1, stream_varDeclSection.nextTree());
 
                 }
                 stream_varDeclSection.reset();
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:97:23: ( entitySection )?
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:97:23: ( entitySection )?
                 if ( stream_entitySection.hasNext() ) {
                     adaptor.addChild(root_1, stream_entitySection.nextTree());
 
                 }
                 stream_entitySection.reset();
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:97:38: ( structureSection )?
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:97:38: ( structureSection )?
                 if ( stream_structureSection.hasNext() ) {
                     adaptor.addChild(root_1, stream_structureSection.nextTree());
 
@@ -475,7 +476,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "portSignature"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:99:1: portSignature : inputPorts DOUBLE_EQUAL_ARROW outputPorts -> inputPorts outputPorts ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:99:1: portSignature : inputPorts DOUBLE_EQUAL_ARROW outputPorts -> inputPorts outputPorts ;
     public final CalParser.portSignature_return portSignature() throws RecognitionException {
         CalParser.portSignature_return retval = new CalParser.portSignature_return();
         retval.start = input.LT(1);
@@ -493,8 +494,8 @@ public class CalParser extends Parser {
         RewriteRuleSubtreeStream stream_inputPorts=new RewriteRuleSubtreeStream(adaptor,"rule inputPorts");
         RewriteRuleSubtreeStream stream_outputPorts=new RewriteRuleSubtreeStream(adaptor,"rule outputPorts");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:99:14: ( inputPorts DOUBLE_EQUAL_ARROW outputPorts -> inputPorts outputPorts )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:99:16: inputPorts DOUBLE_EQUAL_ARROW outputPorts
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:99:14: ( inputPorts DOUBLE_EQUAL_ARROW outputPorts -> inputPorts outputPorts )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:99:16: inputPorts DOUBLE_EQUAL_ARROW outputPorts
             {
             pushFollow(FOLLOW_inputPorts_in_portSignature324);
             inputPorts17=inputPorts();
@@ -558,7 +559,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "inputPorts"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:1: inputPorts : ( portDecls -> ^( Inputs portDecls ) | -> ^( Inputs Empty ) );
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:1: inputPorts : ( portDecls -> ^( Inputs portDecls ) | -> ^( Inputs Empty ) );
     public final CalParser.inputPorts_return inputPorts() throws RecognitionException {
         CalParser.inputPorts_return retval = new CalParser.inputPorts_return();
         retval.start = input.LT(1);
@@ -570,7 +571,7 @@ public class CalParser extends Parser {
 
         RewriteRuleSubtreeStream stream_portDecls=new RewriteRuleSubtreeStream(adaptor,"rule portDecls");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:11: ( portDecls -> ^( Inputs portDecls ) | -> ^( Inputs Empty ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:11: ( portDecls -> ^( Inputs portDecls ) | -> ^( Inputs Empty ) )
             int alt8=2;
             int LA8_0 = input.LA(1);
 
@@ -588,7 +589,7 @@ public class CalParser extends Parser {
             }
             switch (alt8) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:13: portDecls
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:13: portDecls
                     {
                     pushFollow(FOLLOW_portDecls_in_inputPorts341);
                     portDecls20=portDecls();
@@ -611,7 +612,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 101:23: -> ^( Inputs portDecls )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:26: ^( Inputs portDecls )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:26: ^( Inputs portDecls )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Inputs, "Inputs"), root_1);
@@ -627,7 +628,7 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:48: 
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:48: 
                     {
 
                     // AST REWRITE
@@ -643,7 +644,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 101:48: -> ^( Inputs Empty )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:51: ^( Inputs Empty )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:101:51: ^( Inputs Empty )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Inputs, "Inputs"), root_1);
@@ -684,7 +685,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "outputPorts"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:1: outputPorts : ( portDecls -> ^( Outputs portDecls ) | -> ^( Outputs Empty ) );
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:1: outputPorts : ( portDecls -> ^( Outputs portDecls ) | -> ^( Outputs Empty ) );
     public final CalParser.outputPorts_return outputPorts() throws RecognitionException {
         CalParser.outputPorts_return retval = new CalParser.outputPorts_return();
         retval.start = input.LT(1);
@@ -696,7 +697,7 @@ public class CalParser extends Parser {
 
         RewriteRuleSubtreeStream stream_portDecls=new RewriteRuleSubtreeStream(adaptor,"rule portDecls");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:12: ( portDecls -> ^( Outputs portDecls ) | -> ^( Outputs Empty ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:12: ( portDecls -> ^( Outputs portDecls ) | -> ^( Outputs Empty ) )
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -714,7 +715,7 @@ public class CalParser extends Parser {
             }
             switch (alt9) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:14: portDecls
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:14: portDecls
                     {
                     pushFollow(FOLLOW_portDecls_in_outputPorts366);
                     portDecls21=portDecls();
@@ -737,7 +738,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 103:24: -> ^( Outputs portDecls )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:27: ^( Outputs portDecls )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:27: ^( Outputs portDecls )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Outputs, "Outputs"), root_1);
@@ -753,7 +754,7 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:50: 
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:50: 
                     {
 
                     // AST REWRITE
@@ -769,7 +770,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 103:50: -> ^( Outputs Empty )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:53: ^( Outputs Empty )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:103:53: ^( Outputs Empty )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Outputs, "Outputs"), root_1);
@@ -810,7 +811,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "varDeclSection"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:1: varDeclSection : VAR ( varDecl )+ -> ( varDecl )+ ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:1: varDeclSection : VAR ( varDecl )+ -> ( varDecl )+ ;
     public final CalParser.varDeclSection_return varDeclSection() throws RecognitionException {
         CalParser.varDeclSection_return retval = new CalParser.varDeclSection_return();
         retval.start = input.LT(1);
@@ -825,13 +826,13 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_VAR=new RewriteRuleTokenStream(adaptor,"token VAR");
         RewriteRuleSubtreeStream stream_varDecl=new RewriteRuleSubtreeStream(adaptor,"rule varDecl");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:15: ( VAR ( varDecl )+ -> ( varDecl )+ )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:17: VAR ( varDecl )+
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:15: ( VAR ( varDecl )+ -> ( varDecl )+ )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:17: VAR ( varDecl )+
             {
             VAR22=(Token)match(input,VAR,FOLLOW_VAR_in_varDeclSection392);  
             stream_VAR.add(VAR22);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:21: ( varDecl )+
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:21: ( varDecl )+
             int cnt10=0;
             loop10:
             do {
@@ -845,7 +846,7 @@ public class CalParser extends Parser {
 
                 switch (alt10) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:21: varDecl
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:106:21: varDecl
             	    {
             	    pushFollow(FOLLOW_varDecl_in_varDeclSection394);
             	    varDecl23=varDecl();
@@ -919,7 +920,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "varDecl"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:1: varDecl : ( MUTABLE )? typeAndId ( ( EQ | COLON_EQUAL ) expression -> ^( VarDecl typeAndId ^( Expression expression ) ) | -> ^( VarDecl typeAndId ) ) SEMICOLON ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:1: varDecl : ( MUTABLE )? typeAndId ( ( EQ | COLON_EQUAL ) expression -> ^( VarDecl typeAndId ^( Expression expression ) ) | -> ^( VarDecl typeAndId ) ) SEMICOLON ;
     public final CalParser.varDecl_return varDecl() throws RecognitionException {
         CalParser.varDecl_return retval = new CalParser.varDecl_return();
         retval.start = input.LT(1);
@@ -946,10 +947,10 @@ public class CalParser extends Parser {
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_typeAndId=new RewriteRuleSubtreeStream(adaptor,"rule typeAndId");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:8: ( ( MUTABLE )? typeAndId ( ( EQ | COLON_EQUAL ) expression -> ^( VarDecl typeAndId ^( Expression expression ) ) | -> ^( VarDecl typeAndId ) ) SEMICOLON )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:10: ( MUTABLE )? typeAndId ( ( EQ | COLON_EQUAL ) expression -> ^( VarDecl typeAndId ^( Expression expression ) ) | -> ^( VarDecl typeAndId ) ) SEMICOLON
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:8: ( ( MUTABLE )? typeAndId ( ( EQ | COLON_EQUAL ) expression -> ^( VarDecl typeAndId ^( Expression expression ) ) | -> ^( VarDecl typeAndId ) ) SEMICOLON )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:10: ( MUTABLE )? typeAndId ( ( EQ | COLON_EQUAL ) expression -> ^( VarDecl typeAndId ^( Expression expression ) ) | -> ^( VarDecl typeAndId ) ) SEMICOLON
             {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:10: ( MUTABLE )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:10: ( MUTABLE )?
             int alt11=2;
             int LA11_0 = input.LA(1);
 
@@ -958,7 +959,7 @@ public class CalParser extends Parser {
             }
             switch (alt11) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:10: MUTABLE
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:108:10: MUTABLE
                     {
                     MUTABLE24=(Token)match(input,MUTABLE,FOLLOW_MUTABLE_in_varDecl407);  
                     stream_MUTABLE.add(MUTABLE24);
@@ -975,7 +976,7 @@ public class CalParser extends Parser {
             state._fsp--;
 
             stream_typeAndId.add(typeAndId25.getTree());
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:3: ( ( EQ | COLON_EQUAL ) expression -> ^( VarDecl typeAndId ^( Expression expression ) ) | -> ^( VarDecl typeAndId ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:3: ( ( EQ | COLON_EQUAL ) expression -> ^( VarDecl typeAndId ^( Expression expression ) ) | -> ^( VarDecl typeAndId ) )
             int alt13=2;
             int LA13_0 = input.LA(1);
 
@@ -993,9 +994,9 @@ public class CalParser extends Parser {
             }
             switch (alt13) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:4: ( EQ | COLON_EQUAL ) expression
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:4: ( EQ | COLON_EQUAL ) expression
                     {
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:4: ( EQ | COLON_EQUAL )
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:4: ( EQ | COLON_EQUAL )
                     int alt12=2;
                     int LA12_0 = input.LA(1);
 
@@ -1013,7 +1014,7 @@ public class CalParser extends Parser {
                     }
                     switch (alt12) {
                         case 1 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:5: EQ
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:5: EQ
                             {
                             EQ26=(Token)match(input,EQ,FOLLOW_EQ_in_varDecl416);  
                             stream_EQ.add(EQ26);
@@ -1022,7 +1023,7 @@ public class CalParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:10: COLON_EQUAL
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:10: COLON_EQUAL
                             {
                             COLON_EQUAL27=(Token)match(input,COLON_EQUAL,FOLLOW_COLON_EQUAL_in_varDecl420);  
                             stream_COLON_EQUAL.add(COLON_EQUAL27);
@@ -1042,7 +1043,7 @@ public class CalParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: expression, typeAndId
+                    // elements: typeAndId, expression
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -1054,13 +1055,13 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 109:34: -> ^( VarDecl typeAndId ^( Expression expression ) )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:37: ^( VarDecl typeAndId ^( Expression expression ) )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:37: ^( VarDecl typeAndId ^( Expression expression ) )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(VarDecl, "VarDecl"), root_1);
 
                         adaptor.addChild(root_1, stream_typeAndId.nextTree());
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:57: ^( Expression expression )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:109:57: ^( Expression expression )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Expression, "Expression"), root_2);
@@ -1079,7 +1080,7 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:110:5: 
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:110:5: 
                     {
 
                     // AST REWRITE
@@ -1095,7 +1096,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 110:5: -> ^( VarDecl typeAndId )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:110:8: ^( VarDecl typeAndId )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:110:8: ^( VarDecl typeAndId )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(VarDecl, "VarDecl"), root_1);
@@ -1143,7 +1144,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "entitySection"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:1: entitySection : ENTITIES ( entityDecl )+ -> ( entityDecl )+ ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:1: entitySection : ENTITIES ( entityDecl )+ -> ( entityDecl )+ ;
     public final CalParser.entitySection_return entitySection() throws RecognitionException {
         CalParser.entitySection_return retval = new CalParser.entitySection_return();
         retval.start = input.LT(1);
@@ -1158,13 +1159,13 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_ENTITIES=new RewriteRuleTokenStream(adaptor,"token ENTITIES");
         RewriteRuleSubtreeStream stream_entityDecl=new RewriteRuleSubtreeStream(adaptor,"rule entityDecl");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:14: ( ENTITIES ( entityDecl )+ -> ( entityDecl )+ )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:16: ENTITIES ( entityDecl )+
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:14: ( ENTITIES ( entityDecl )+ -> ( entityDecl )+ )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:16: ENTITIES ( entityDecl )+
             {
             ENTITIES30=(Token)match(input,ENTITIES,FOLLOW_ENTITIES_in_entitySection460);  
             stream_ENTITIES.add(ENTITIES30);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:25: ( entityDecl )+
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:25: ( entityDecl )+
             int cnt14=0;
             loop14:
             do {
@@ -1178,7 +1179,7 @@ public class CalParser extends Parser {
 
                 switch (alt14) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:25: entityDecl
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:113:25: entityDecl
             	    {
             	    pushFollow(FOLLOW_entityDecl_in_entitySection462);
             	    entityDecl31=entityDecl();
@@ -1252,7 +1253,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "entityDecl"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:1: entityDecl : QID EQ entityExpr SEMICOLON -> ^( EntityDecl ^( Var QID ) entityExpr ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:1: entityDecl : QID EQ entityExpr SEMICOLON -> ^( EntityDecl ^( Var QID ) entityExpr ) ;
     public final CalParser.entityDecl_return entityDecl() throws RecognitionException {
         CalParser.entityDecl_return retval = new CalParser.entityDecl_return();
         retval.start = input.LT(1);
@@ -1273,8 +1274,8 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_entityExpr=new RewriteRuleSubtreeStream(adaptor,"rule entityExpr");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:11: ( QID EQ entityExpr SEMICOLON -> ^( EntityDecl ^( Var QID ) entityExpr ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:13: QID EQ entityExpr SEMICOLON
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:11: ( QID EQ entityExpr SEMICOLON -> ^( EntityDecl ^( Var QID ) entityExpr ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:13: QID EQ entityExpr SEMICOLON
             {
             QID32=(Token)match(input,QID,FOLLOW_QID_in_entityDecl475);  
             stream_QID.add(QID32);
@@ -1294,7 +1295,7 @@ public class CalParser extends Parser {
 
 
             // AST REWRITE
-            // elements: entityExpr, QID
+            // elements: QID, entityExpr
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1306,12 +1307,12 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 115:41: -> ^( EntityDecl ^( Var QID ) entityExpr )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:44: ^( EntityDecl ^( Var QID ) entityExpr )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:44: ^( EntityDecl ^( Var QID ) entityExpr )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EntityDecl, "EntityDecl"), root_1);
 
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:57: ^( Var QID )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:115:57: ^( Var QID )
                 {
                 Object root_2 = (Object)adaptor.nil();
                 root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -1354,7 +1355,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "entityExpr"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:1: entityExpr : QID LPAREN ( entityPars )? RPAREN -> ^( EntityExpr ^( Var QID ) ( entityPars )? ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:1: entityExpr : QID LPAREN ( entityPars )? RPAREN -> ^( EntityExpr ^( Var QID ) ( entityPars )? ) ;
     public final CalParser.entityExpr_return entityExpr() throws RecognitionException {
         CalParser.entityExpr_return retval = new CalParser.entityExpr_return();
         retval.start = input.LT(1);
@@ -1375,8 +1376,8 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_entityPars=new RewriteRuleSubtreeStream(adaptor,"rule entityPars");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:11: ( QID LPAREN ( entityPars )? RPAREN -> ^( EntityExpr ^( Var QID ) ( entityPars )? ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:13: QID LPAREN ( entityPars )? RPAREN
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:11: ( QID LPAREN ( entityPars )? RPAREN -> ^( EntityExpr ^( Var QID ) ( entityPars )? ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:13: QID LPAREN ( entityPars )? RPAREN
             {
             QID36=(Token)match(input,QID,FOLLOW_QID_in_entityExpr502);  
             stream_QID.add(QID36);
@@ -1384,7 +1385,7 @@ public class CalParser extends Parser {
             LPAREN37=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_entityExpr504);  
             stream_LPAREN.add(LPAREN37);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:24: ( entityPars )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:24: ( entityPars )?
             int alt15=2;
             int LA15_0 = input.LA(1);
 
@@ -1393,7 +1394,7 @@ public class CalParser extends Parser {
             }
             switch (alt15) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:24: entityPars
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:24: entityPars
                     {
                     pushFollow(FOLLOW_entityPars_in_entityExpr506);
                     entityPars38=entityPars();
@@ -1425,12 +1426,12 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 117:43: -> ^( EntityExpr ^( Var QID ) ( entityPars )? )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:46: ^( EntityExpr ^( Var QID ) ( entityPars )? )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:46: ^( EntityExpr ^( Var QID ) ( entityPars )? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EntityExpr, "EntityExpr"), root_1);
 
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:59: ^( Var QID )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:59: ^( Var QID )
                 {
                 Object root_2 = (Object)adaptor.nil();
                 root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -1439,7 +1440,7 @@ public class CalParser extends Parser {
 
                 adaptor.addChild(root_1, root_2);
                 }
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:70: ( entityPars )?
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:117:70: ( entityPars )?
                 if ( stream_entityPars.hasNext() ) {
                     adaptor.addChild(root_1, stream_entityPars.nextTree());
 
@@ -1478,7 +1479,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "entityPars"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:1: entityPars : entityPar ( COMMA entityPar )* -> ( entityPar )+ ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:1: entityPars : entityPar ( COMMA entityPar )* -> ( entityPar )+ ;
     public final CalParser.entityPars_return entityPars() throws RecognitionException {
         CalParser.entityPars_return retval = new CalParser.entityPars_return();
         retval.start = input.LT(1);
@@ -1495,8 +1496,8 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_entityPar=new RewriteRuleSubtreeStream(adaptor,"rule entityPar");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:11: ( entityPar ( COMMA entityPar )* -> ( entityPar )+ )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:13: entityPar ( COMMA entityPar )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:11: ( entityPar ( COMMA entityPar )* -> ( entityPar )+ )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:13: entityPar ( COMMA entityPar )*
             {
             pushFollow(FOLLOW_entityPar_in_entityPars531);
             entityPar40=entityPar();
@@ -1504,7 +1505,7 @@ public class CalParser extends Parser {
             state._fsp--;
 
             stream_entityPar.add(entityPar40.getTree());
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:23: ( COMMA entityPar )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:23: ( COMMA entityPar )*
             loop16:
             do {
                 int alt16=2;
@@ -1517,7 +1518,7 @@ public class CalParser extends Parser {
 
                 switch (alt16) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:24: COMMA entityPar
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:119:24: COMMA entityPar
             	    {
             	    COMMA41=(Token)match(input,COMMA,FOLLOW_COMMA_in_entityPars534);  
             	    stream_COMMA.add(COMMA41);
@@ -1590,7 +1591,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "entityPar"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:1: entityPar : QID EQ expression -> ^( EntityPar ^( Var QID ) ^( Expression expression ) ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:1: entityPar : QID EQ expression -> ^( EntityPar ^( Var QID ) ^( Expression expression ) ) ;
     public final CalParser.entityPar_return entityPar() throws RecognitionException {
         CalParser.entityPar_return retval = new CalParser.entityPar_return();
         retval.start = input.LT(1);
@@ -1608,8 +1609,8 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:10: ( QID EQ expression -> ^( EntityPar ^( Var QID ) ^( Expression expression ) ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:12: QID EQ expression
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:10: ( QID EQ expression -> ^( EntityPar ^( Var QID ) ^( Expression expression ) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:12: QID EQ expression
             {
             QID43=(Token)match(input,QID,FOLLOW_QID_in_entityPar550);  
             stream_QID.add(QID43);
@@ -1626,7 +1627,7 @@ public class CalParser extends Parser {
 
 
             // AST REWRITE
-            // elements: QID, expression
+            // elements: expression, QID
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1638,12 +1639,12 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 121:30: -> ^( EntityPar ^( Var QID ) ^( Expression expression ) )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:33: ^( EntityPar ^( Var QID ) ^( Expression expression ) )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:33: ^( EntityPar ^( Var QID ) ^( Expression expression ) )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EntityPar, "EntityPar"), root_1);
 
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:45: ^( Var QID )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:45: ^( Var QID )
                 {
                 Object root_2 = (Object)adaptor.nil();
                 root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -1652,7 +1653,7 @@ public class CalParser extends Parser {
 
                 adaptor.addChild(root_1, root_2);
                 }
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:56: ^( Expression expression )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:121:56: ^( Expression expression )
                 {
                 Object root_2 = (Object)adaptor.nil();
                 root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Expression, "Expression"), root_2);
@@ -1694,7 +1695,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "structureSection"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:1: structureSection : STRUCTURE ( structureStmt )+ -> ( structureStmt )+ ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:1: structureSection : STRUCTURE ( structureStmt )+ -> ( structureStmt )+ ;
     public final CalParser.structureSection_return structureSection() throws RecognitionException {
         CalParser.structureSection_return retval = new CalParser.structureSection_return();
         retval.start = input.LT(1);
@@ -1709,13 +1710,13 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_STRUCTURE=new RewriteRuleTokenStream(adaptor,"token STRUCTURE");
         RewriteRuleSubtreeStream stream_structureStmt=new RewriteRuleSubtreeStream(adaptor,"rule structureStmt");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:17: ( STRUCTURE ( structureStmt )+ -> ( structureStmt )+ )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:19: STRUCTURE ( structureStmt )+
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:17: ( STRUCTURE ( structureStmt )+ -> ( structureStmt )+ )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:19: STRUCTURE ( structureStmt )+
             {
             STRUCTURE46=(Token)match(input,STRUCTURE,FOLLOW_STRUCTURE_in_structureSection580);  
             stream_STRUCTURE.add(STRUCTURE46);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:29: ( structureStmt )+
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:29: ( structureStmt )+
             int cnt17=0;
             loop17:
             do {
@@ -1729,7 +1730,7 @@ public class CalParser extends Parser {
 
                 switch (alt17) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:29: structureStmt
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:124:29: structureStmt
             	    {
             	    pushFollow(FOLLOW_structureStmt_in_structureSection582);
             	    structureStmt47=structureStmt();
@@ -1803,7 +1804,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "structureStmt"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:1: structureStmt : c1= connector DOUBLE_DASH_ARROW c2= connector (at= attributeSection )? SEMICOLON -> ^( StructureStmt $c1 $c2 ( $at)? ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:1: structureStmt : c1= connector DOUBLE_DASH_ARROW c2= connector (at= attributeSection )? SEMICOLON -> ^( StructureStmt $c1 $c2 ( $at)? ) ;
     public final CalParser.structureStmt_return structureStmt() throws RecognitionException {
         CalParser.structureStmt_return retval = new CalParser.structureStmt_return();
         retval.start = input.LT(1);
@@ -1826,8 +1827,8 @@ public class CalParser extends Parser {
         RewriteRuleSubtreeStream stream_attributeSection=new RewriteRuleSubtreeStream(adaptor,"rule attributeSection");
         RewriteRuleSubtreeStream stream_connector=new RewriteRuleSubtreeStream(adaptor,"rule connector");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:14: (c1= connector DOUBLE_DASH_ARROW c2= connector (at= attributeSection )? SEMICOLON -> ^( StructureStmt $c1 $c2 ( $at)? ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:16: c1= connector DOUBLE_DASH_ARROW c2= connector (at= attributeSection )? SEMICOLON
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:14: (c1= connector DOUBLE_DASH_ARROW c2= connector (at= attributeSection )? SEMICOLON -> ^( StructureStmt $c1 $c2 ( $at)? ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:16: c1= connector DOUBLE_DASH_ARROW c2= connector (at= attributeSection )? SEMICOLON
             {
             pushFollow(FOLLOW_connector_in_structureStmt597);
             c1=connector();
@@ -1844,7 +1845,7 @@ public class CalParser extends Parser {
             state._fsp--;
 
             stream_connector.add(c2.getTree());
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:62: (at= attributeSection )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:62: (at= attributeSection )?
             int alt18=2;
             int LA18_0 = input.LA(1);
 
@@ -1853,7 +1854,7 @@ public class CalParser extends Parser {
             }
             switch (alt18) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:62: at= attributeSection
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:126:62: at= attributeSection
                     {
                     pushFollow(FOLLOW_attributeSection_in_structureStmt607);
                     at=attributeSection();
@@ -1888,14 +1889,14 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 126:91: -> ^( StructureStmt $c1 $c2 ( $at)? )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:127:3: ^( StructureStmt $c1 $c2 ( $at)? )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:127:3: ^( StructureStmt $c1 $c2 ( $at)? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(StructureStmt, "StructureStmt"), root_1);
 
                 adaptor.addChild(root_1, stream_c1.nextTree());
                 adaptor.addChild(root_1, stream_c2.nextTree());
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:127:27: ( $at)?
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:127:27: ( $at)?
                 if ( stream_at.hasNext() ) {
                     adaptor.addChild(root_1, stream_at.nextTree());
 
@@ -1934,7 +1935,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "connector"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:129:1: connector : v1= QID ( DOT v2= QID -> ^( Connector ^( Var $v1) ^( Var $v2) ) | -> ^( Connector ^( Var $v1) ) ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:129:1: connector : v1= QID ( DOT v2= QID -> ^( Connector ^( Var $v1) ^( Var $v2) ) | -> ^( Connector ^( Var $v1) ) ) ;
     public final CalParser.connector_return connector() throws RecognitionException {
         CalParser.connector_return retval = new CalParser.connector_return();
         retval.start = input.LT(1);
@@ -1952,13 +1953,13 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
 
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:129:10: (v1= QID ( DOT v2= QID -> ^( Connector ^( Var $v1) ^( Var $v2) ) | -> ^( Connector ^( Var $v1) ) ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:129:12: v1= QID ( DOT v2= QID -> ^( Connector ^( Var $v1) ^( Var $v2) ) | -> ^( Connector ^( Var $v1) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:129:10: (v1= QID ( DOT v2= QID -> ^( Connector ^( Var $v1) ^( Var $v2) ) | -> ^( Connector ^( Var $v1) ) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:129:12: v1= QID ( DOT v2= QID -> ^( Connector ^( Var $v1) ^( Var $v2) ) | -> ^( Connector ^( Var $v1) ) )
             {
             v1=(Token)match(input,QID,FOLLOW_QID_in_connector638);  
             stream_QID.add(v1);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:129:19: ( DOT v2= QID -> ^( Connector ^( Var $v1) ^( Var $v2) ) | -> ^( Connector ^( Var $v1) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:129:19: ( DOT v2= QID -> ^( Connector ^( Var $v1) ^( Var $v2) ) | -> ^( Connector ^( Var $v1) ) )
             int alt19=2;
             int LA19_0 = input.LA(1);
 
@@ -1976,7 +1977,7 @@ public class CalParser extends Parser {
             }
             switch (alt19) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:130:3: DOT v2= QID
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:130:3: DOT v2= QID
                     {
                     DOT50=(Token)match(input,DOT,FOLLOW_DOT_in_connector644);  
                     stream_DOT.add(DOT50);
@@ -1987,7 +1988,7 @@ public class CalParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: v2, v1
+                    // elements: v1, v2
                     // token labels: v1, v2
                     // rule labels: retval
                     // token list labels: 
@@ -2001,12 +2002,12 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 130:14: -> ^( Connector ^( Var $v1) ^( Var $v2) )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:130:17: ^( Connector ^( Var $v1) ^( Var $v2) )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:130:17: ^( Connector ^( Var $v1) ^( Var $v2) )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Connector, "Connector"), root_1);
 
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:130:29: ^( Var $v1)
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:130:29: ^( Var $v1)
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -2015,7 +2016,7 @@ public class CalParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:130:40: ^( Var $v2)
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:130:40: ^( Var $v2)
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -2034,7 +2035,7 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:131:5: 
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:131:5: 
                     {
 
                     // AST REWRITE
@@ -2051,12 +2052,12 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 131:5: -> ^( Connector ^( Var $v1) )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:131:8: ^( Connector ^( Var $v1) )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:131:8: ^( Connector ^( Var $v1) )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Connector, "Connector"), root_1);
 
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:131:20: ^( Var $v1)
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:131:20: ^( Var $v1)
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -2104,7 +2105,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "attributeSection"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:1: attributeSection : LBRACE ( attributeDecl )* RBRACE -> ( attributeDecl )* ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:1: attributeSection : LBRACE ( attributeDecl )* RBRACE -> ( attributeDecl )* ;
     public final CalParser.attributeSection_return attributeSection() throws RecognitionException {
         CalParser.attributeSection_return retval = new CalParser.attributeSection_return();
         retval.start = input.LT(1);
@@ -2122,13 +2123,13 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_LBRACE=new RewriteRuleTokenStream(adaptor,"token LBRACE");
         RewriteRuleSubtreeStream stream_attributeDecl=new RewriteRuleSubtreeStream(adaptor,"rule attributeDecl");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:17: ( LBRACE ( attributeDecl )* RBRACE -> ( attributeDecl )* )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:19: LBRACE ( attributeDecl )* RBRACE
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:17: ( LBRACE ( attributeDecl )* RBRACE -> ( attributeDecl )* )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:19: LBRACE ( attributeDecl )* RBRACE
             {
             LBRACE51=(Token)match(input,LBRACE,FOLLOW_LBRACE_in_attributeSection693);  
             stream_LBRACE.add(LBRACE51);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:26: ( attributeDecl )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:26: ( attributeDecl )*
             loop20:
             do {
                 int alt20=2;
@@ -2141,7 +2142,7 @@ public class CalParser extends Parser {
 
                 switch (alt20) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:26: attributeDecl
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:26: attributeDecl
             	    {
             	    pushFollow(FOLLOW_attributeDecl_in_attributeSection695);
             	    attributeDecl52=attributeDecl();
@@ -2176,7 +2177,7 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 133:48: -> ( attributeDecl )*
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:51: ( attributeDecl )*
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:133:51: ( attributeDecl )*
                 while ( stream_attributeDecl.hasNext() ) {
                     adaptor.addChild(root_0, stream_attributeDecl.nextTree());
 
@@ -2212,7 +2213,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "attributeDecl"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:1: attributeDecl : id= QID ( EQ expression SEMICOLON -> ^( Attribute ^( Var $id) ^( Expression expression ) ) | COLON type SEMICOLON -> ^( Attribute ^( Var $id) ^( Type type ) ) ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:1: attributeDecl : id= QID ( EQ expression SEMICOLON -> ^( Attribute ^( Var $id) ^( Expression expression ) ) | COLON type SEMICOLON -> ^( Attribute ^( Var $id) ^( Type type ) ) ) ;
     public final CalParser.attributeDecl_return attributeDecl() throws RecognitionException {
         CalParser.attributeDecl_return retval = new CalParser.attributeDecl_return();
         retval.start = input.LT(1);
@@ -2241,13 +2242,13 @@ public class CalParser extends Parser {
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_type=new RewriteRuleSubtreeStream(adaptor,"rule type");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:14: (id= QID ( EQ expression SEMICOLON -> ^( Attribute ^( Var $id) ^( Expression expression ) ) | COLON type SEMICOLON -> ^( Attribute ^( Var $id) ^( Type type ) ) ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:16: id= QID ( EQ expression SEMICOLON -> ^( Attribute ^( Var $id) ^( Expression expression ) ) | COLON type SEMICOLON -> ^( Attribute ^( Var $id) ^( Type type ) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:14: (id= QID ( EQ expression SEMICOLON -> ^( Attribute ^( Var $id) ^( Expression expression ) ) | COLON type SEMICOLON -> ^( Attribute ^( Var $id) ^( Type type ) ) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:16: id= QID ( EQ expression SEMICOLON -> ^( Attribute ^( Var $id) ^( Expression expression ) ) | COLON type SEMICOLON -> ^( Attribute ^( Var $id) ^( Type type ) ) )
             {
             id=(Token)match(input,QID,FOLLOW_QID_in_attributeDecl712);  
             stream_QID.add(id);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:23: ( EQ expression SEMICOLON -> ^( Attribute ^( Var $id) ^( Expression expression ) ) | COLON type SEMICOLON -> ^( Attribute ^( Var $id) ^( Type type ) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:23: ( EQ expression SEMICOLON -> ^( Attribute ^( Var $id) ^( Expression expression ) ) | COLON type SEMICOLON -> ^( Attribute ^( Var $id) ^( Type type ) ) )
             int alt21=2;
             int LA21_0 = input.LA(1);
 
@@ -2265,7 +2266,7 @@ public class CalParser extends Parser {
             }
             switch (alt21) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:24: EQ expression SEMICOLON
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:24: EQ expression SEMICOLON
                     {
                     EQ54=(Token)match(input,EQ,FOLLOW_EQ_in_attributeDecl715);  
                     stream_EQ.add(EQ54);
@@ -2282,7 +2283,7 @@ public class CalParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: id, expression
+                    // elements: expression, id
                     // token labels: id
                     // rule labels: retval
                     // token list labels: 
@@ -2295,12 +2296,12 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 135:48: -> ^( Attribute ^( Var $id) ^( Expression expression ) )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:51: ^( Attribute ^( Var $id) ^( Expression expression ) )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:51: ^( Attribute ^( Var $id) ^( Expression expression ) )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Attribute, "Attribute"), root_1);
 
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:63: ^( Var $id)
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:63: ^( Var $id)
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -2309,7 +2310,7 @@ public class CalParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:74: ^( Expression expression )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:135:74: ^( Expression expression )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Expression, "Expression"), root_2);
@@ -2328,7 +2329,7 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:136:3: COLON type SEMICOLON
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:136:3: COLON type SEMICOLON
                     {
                     COLON57=(Token)match(input,COLON,FOLLOW_COLON_in_attributeDecl742);  
                     stream_COLON.add(COLON57);
@@ -2345,7 +2346,7 @@ public class CalParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: id, type
+                    // elements: type, id
                     // token labels: id
                     // rule labels: retval
                     // token list labels: 
@@ -2358,12 +2359,12 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 136:24: -> ^( Attribute ^( Var $id) ^( Type type ) )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:136:27: ^( Attribute ^( Var $id) ^( Type type ) )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:136:27: ^( Attribute ^( Var $id) ^( Type type ) )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Attribute, "Attribute"), root_1);
 
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:136:39: ^( Var $id)
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:136:39: ^( Var $id)
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -2372,7 +2373,7 @@ public class CalParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:136:50: ^( Type type )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:136:50: ^( Type type )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Type, "Type"), root_2);
@@ -2420,37 +2421,40 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "actor"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:1: actor : ( packageRule )? ( oneImport )* ACTOR QID LPAREN ( parameters )? RPAREN portSignature COLON ( . )* EOF -> ^( Actor ^( Name QID ) ( parameters )? portSignature ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:1: actor : ( packageRule )? ( oneImport )* ( NATIVE )? ACTOR QID LPAREN ( parameters )? RPAREN portSignature COLON ( . )* EOF -> ^( Actor ^( Name QID ) ( parameters )? portSignature ) ;
     public final CalParser.actor_return actor() throws RecognitionException {
         CalParser.actor_return retval = new CalParser.actor_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token ACTOR62=null;
-        Token QID63=null;
-        Token LPAREN64=null;
-        Token RPAREN66=null;
-        Token COLON68=null;
-        Token wildcard69=null;
-        Token EOF70=null;
+        Token NATIVE62=null;
+        Token ACTOR63=null;
+        Token QID64=null;
+        Token LPAREN65=null;
+        Token RPAREN67=null;
+        Token COLON69=null;
+        Token wildcard70=null;
+        Token EOF71=null;
         CalParser.packageRule_return packageRule60 = null;
 
         CalParser.oneImport_return oneImport61 = null;
 
-        CalParser.parameters_return parameters65 = null;
+        CalParser.parameters_return parameters66 = null;
 
-        CalParser.portSignature_return portSignature67 = null;
+        CalParser.portSignature_return portSignature68 = null;
 
 
-        Object ACTOR62_tree=null;
-        Object QID63_tree=null;
-        Object LPAREN64_tree=null;
-        Object RPAREN66_tree=null;
-        Object COLON68_tree=null;
-        Object wildcard69_tree=null;
-        Object EOF70_tree=null;
+        Object NATIVE62_tree=null;
+        Object ACTOR63_tree=null;
+        Object QID64_tree=null;
+        Object LPAREN65_tree=null;
+        Object RPAREN67_tree=null;
+        Object COLON69_tree=null;
+        Object wildcard70_tree=null;
+        Object EOF71_tree=null;
         RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
+        RewriteRuleTokenStream stream_NATIVE=new RewriteRuleTokenStream(adaptor,"token NATIVE");
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_EOF=new RewriteRuleTokenStream(adaptor,"token EOF");
         RewriteRuleTokenStream stream_ACTOR=new RewriteRuleTokenStream(adaptor,"token ACTOR");
@@ -2461,10 +2465,10 @@ public class CalParser extends Parser {
         RewriteRuleSubtreeStream stream_packageRule=new RewriteRuleSubtreeStream(adaptor,"rule packageRule");
         RewriteRuleSubtreeStream stream_oneImport=new RewriteRuleSubtreeStream(adaptor,"rule oneImport");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:6: ( ( packageRule )? ( oneImport )* ACTOR QID LPAREN ( parameters )? RPAREN portSignature COLON ( . )* EOF -> ^( Actor ^( Name QID ) ( parameters )? portSignature ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:8: ( packageRule )? ( oneImport )* ACTOR QID LPAREN ( parameters )? RPAREN portSignature COLON ( . )* EOF
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:6: ( ( packageRule )? ( oneImport )* ( NATIVE )? ACTOR QID LPAREN ( parameters )? RPAREN portSignature COLON ( . )* EOF -> ^( Actor ^( Name QID ) ( parameters )? portSignature ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:8: ( packageRule )? ( oneImport )* ( NATIVE )? ACTOR QID LPAREN ( parameters )? RPAREN portSignature COLON ( . )* EOF
             {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:8: ( packageRule )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:8: ( packageRule )?
             int alt22=2;
             int LA22_0 = input.LA(1);
 
@@ -2473,7 +2477,7 @@ public class CalParser extends Parser {
             }
             switch (alt22) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:8: packageRule
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:8: packageRule
                     {
                     pushFollow(FOLLOW_packageRule_in_actor777);
                     packageRule60=packageRule();
@@ -2487,7 +2491,7 @@ public class CalParser extends Parser {
 
             }
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:21: ( oneImport )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:21: ( oneImport )*
             loop23:
             do {
                 int alt23=2;
@@ -2500,7 +2504,7 @@ public class CalParser extends Parser {
 
                 switch (alt23) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:21: oneImport
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:21: oneImport
             	    {
             	    pushFollow(FOLLOW_oneImport_in_actor780);
             	    oneImport61=oneImport();
@@ -2517,89 +2521,109 @@ public class CalParser extends Parser {
                 }
             } while (true);
 
-            ACTOR62=(Token)match(input,ACTOR,FOLLOW_ACTOR_in_actor783);  
-            stream_ACTOR.add(ACTOR62);
-
-            QID63=(Token)match(input,QID,FOLLOW_QID_in_actor785);  
-            stream_QID.add(QID63);
-
-            LPAREN64=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_actor789);  
-            stream_LPAREN.add(LPAREN64);
-
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:142:10: ( parameters )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:32: ( NATIVE )?
             int alt24=2;
             int LA24_0 = input.LA(1);
 
-            if ( (LA24_0==QID) ) {
+            if ( (LA24_0==NATIVE) ) {
                 alt24=1;
             }
             switch (alt24) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:142:10: parameters
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:141:32: NATIVE
                     {
-                    pushFollow(FOLLOW_parameters_in_actor791);
-                    parameters65=parameters();
+                    NATIVE62=(Token)match(input,NATIVE,FOLLOW_NATIVE_in_actor783);  
+                    stream_NATIVE.add(NATIVE62);
 
-                    state._fsp--;
-
-                    stream_parameters.add(parameters65.getTree());
 
                     }
                     break;
 
             }
 
-            RPAREN66=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_actor794);  
-            stream_RPAREN.add(RPAREN66);
+            ACTOR63=(Token)match(input,ACTOR,FOLLOW_ACTOR_in_actor786);  
+            stream_ACTOR.add(ACTOR63);
 
-            pushFollow(FOLLOW_portSignature_in_actor798);
-            portSignature67=portSignature();
+            QID64=(Token)match(input,QID,FOLLOW_QID_in_actor788);  
+            stream_QID.add(QID64);
+
+            LPAREN65=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_actor792);  
+            stream_LPAREN.add(LPAREN65);
+
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:142:10: ( parameters )?
+            int alt25=2;
+            int LA25_0 = input.LA(1);
+
+            if ( (LA25_0==QID) ) {
+                alt25=1;
+            }
+            switch (alt25) {
+                case 1 :
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:142:10: parameters
+                    {
+                    pushFollow(FOLLOW_parameters_in_actor794);
+                    parameters66=parameters();
+
+                    state._fsp--;
+
+                    stream_parameters.add(parameters66.getTree());
+
+                    }
+                    break;
+
+            }
+
+            RPAREN67=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_actor797);  
+            stream_RPAREN.add(RPAREN67);
+
+            pushFollow(FOLLOW_portSignature_in_actor801);
+            portSignature68=portSignature();
 
             state._fsp--;
 
-            stream_portSignature.add(portSignature67.getTree());
-            COLON68=(Token)match(input,COLON,FOLLOW_COLON_in_actor800);  
-            stream_COLON.add(COLON68);
+            stream_portSignature.add(portSignature68.getTree());
+            COLON69=(Token)match(input,COLON,FOLLOW_COLON_in_actor803);  
+            stream_COLON.add(COLON69);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:143:23: ( . )*
-            loop25:
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:143:23: ( . )*
+            loop26:
             do {
-                int alt25=2;
-                int LA25_0 = input.LA(1);
+                int alt26=2;
+                int LA26_0 = input.LA(1);
 
-                if ( ((LA25_0>=Attribute && LA25_0<=SHARP)) ) {
-                    alt25=1;
+                if ( ((LA26_0>=Attribute && LA26_0<=SHARP)) ) {
+                    alt26=1;
                 }
-                else if ( (LA25_0==EOF) ) {
-                    alt25=2;
+                else if ( (LA26_0==EOF) ) {
+                    alt26=2;
                 }
 
 
-                switch (alt25) {
+                switch (alt26) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:143:23: .
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:143:23: .
             	    {
-            	    wildcard69=(Token)input.LT(1);
+            	    wildcard70=(Token)input.LT(1);
             	    matchAny(input); 
-            	    wildcard69_tree = (Object)adaptor.create(wildcard69);
-            	    adaptor.addChild(root_0, wildcard69_tree);
+            	    wildcard70_tree = (Object)adaptor.create(wildcard70);
+            	    adaptor.addChild(root_0, wildcard70_tree);
 
 
             	    }
             	    break;
 
             	default :
-            	    break loop25;
+            	    break loop26;
                 }
             } while (true);
 
-            EOF70=(Token)match(input,EOF,FOLLOW_EOF_in_actor805);  
-            stream_EOF.add(EOF70);
+            EOF71=(Token)match(input,EOF,FOLLOW_EOF_in_actor808);  
+            stream_EOF.add(EOF71);
 
 
 
             // AST REWRITE
-            // elements: portSignature, parameters, QID
+            // elements: parameters, portSignature, QID
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2611,12 +2635,12 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 143:30: -> ^( Actor ^( Name QID ) ( parameters )? portSignature )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:144:5: ^( Actor ^( Name QID ) ( parameters )? portSignature )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:144:5: ^( Actor ^( Name QID ) ( parameters )? portSignature )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Actor, "Actor"), root_1);
 
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:144:13: ^( Name QID )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:144:13: ^( Name QID )
                 {
                 Object root_2 = (Object)adaptor.nil();
                 root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Name, "Name"), root_2);
@@ -2625,7 +2649,7 @@ public class CalParser extends Parser {
 
                 adaptor.addChild(root_1, root_2);
                 }
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:144:25: ( parameters )?
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:144:25: ( parameters )?
                 if ( stream_parameters.hasNext() ) {
                     adaptor.addChild(root_1, stream_parameters.nextTree());
 
@@ -2665,38 +2689,38 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "packageRule"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:146:1: packageRule : PACKAGE QID SEMICOLON ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:146:1: packageRule : PACKAGE QID SEMICOLON ;
     public final CalParser.packageRule_return packageRule() throws RecognitionException {
         CalParser.packageRule_return retval = new CalParser.packageRule_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token PACKAGE71=null;
-        Token QID72=null;
-        Token SEMICOLON73=null;
+        Token PACKAGE72=null;
+        Token QID73=null;
+        Token SEMICOLON74=null;
 
-        Object PACKAGE71_tree=null;
-        Object QID72_tree=null;
-        Object SEMICOLON73_tree=null;
+        Object PACKAGE72_tree=null;
+        Object QID73_tree=null;
+        Object SEMICOLON74_tree=null;
 
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:146:13: ( PACKAGE QID SEMICOLON )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:146:15: PACKAGE QID SEMICOLON
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:146:13: ( PACKAGE QID SEMICOLON )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:146:15: PACKAGE QID SEMICOLON
             {
             root_0 = (Object)adaptor.nil();
 
-            PACKAGE71=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_packageRule834); 
-            PACKAGE71_tree = (Object)adaptor.create(PACKAGE71);
-            adaptor.addChild(root_0, PACKAGE71_tree);
+            PACKAGE72=(Token)match(input,PACKAGE,FOLLOW_PACKAGE_in_packageRule837); 
+            PACKAGE72_tree = (Object)adaptor.create(PACKAGE72);
+            adaptor.addChild(root_0, PACKAGE72_tree);
 
-            QID72=(Token)match(input,QID,FOLLOW_QID_in_packageRule836); 
-            QID72_tree = (Object)adaptor.create(QID72);
-            adaptor.addChild(root_0, QID72_tree);
+            QID73=(Token)match(input,QID,FOLLOW_QID_in_packageRule839); 
+            QID73_tree = (Object)adaptor.create(QID73);
+            adaptor.addChild(root_0, QID73_tree);
 
-            SEMICOLON73=(Token)match(input,SEMICOLON,FOLLOW_SEMICOLON_in_packageRule838); 
-            SEMICOLON73_tree = (Object)adaptor.create(SEMICOLON73);
-            adaptor.addChild(root_0, SEMICOLON73_tree);
+            SEMICOLON74=(Token)match(input,SEMICOLON,FOLLOW_SEMICOLON_in_packageRule841); 
+            SEMICOLON74_tree = (Object)adaptor.create(SEMICOLON74);
+            adaptor.addChild(root_0, SEMICOLON74_tree);
 
 
             }
@@ -2725,35 +2749,35 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "oneImport"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:151:1: oneImport : IMPORT ( QID | QID_WILDCARD ) SEMICOLON ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:151:1: oneImport : IMPORT ( QID | QID_WILDCARD ) SEMICOLON ;
     public final CalParser.oneImport_return oneImport() throws RecognitionException {
         CalParser.oneImport_return retval = new CalParser.oneImport_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token IMPORT74=null;
-        Token set75=null;
-        Token SEMICOLON76=null;
+        Token IMPORT75=null;
+        Token set76=null;
+        Token SEMICOLON77=null;
 
-        Object IMPORT74_tree=null;
-        Object set75_tree=null;
-        Object SEMICOLON76_tree=null;
+        Object IMPORT75_tree=null;
+        Object set76_tree=null;
+        Object SEMICOLON77_tree=null;
 
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:151:10: ( IMPORT ( QID | QID_WILDCARD ) SEMICOLON )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:151:12: IMPORT ( QID | QID_WILDCARD ) SEMICOLON
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:151:10: ( IMPORT ( QID | QID_WILDCARD ) SEMICOLON )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:151:12: IMPORT ( QID | QID_WILDCARD ) SEMICOLON
             {
             root_0 = (Object)adaptor.nil();
 
-            IMPORT74=(Token)match(input,IMPORT,FOLLOW_IMPORT_in_oneImport848); 
-            IMPORT74_tree = (Object)adaptor.create(IMPORT74);
-            adaptor.addChild(root_0, IMPORT74_tree);
+            IMPORT75=(Token)match(input,IMPORT,FOLLOW_IMPORT_in_oneImport851); 
+            IMPORT75_tree = (Object)adaptor.create(IMPORT75);
+            adaptor.addChild(root_0, IMPORT75_tree);
 
-            set75=(Token)input.LT(1);
+            set76=(Token)input.LT(1);
             if ( input.LA(1)==QID||input.LA(1)==QID_WILDCARD ) {
                 input.consume();
-                adaptor.addChild(root_0, (Object)adaptor.create(set75));
+                adaptor.addChild(root_0, (Object)adaptor.create(set76));
                 state.errorRecovery=false;
             }
             else {
@@ -2761,9 +2785,9 @@ public class CalParser extends Parser {
                 throw mse;
             }
 
-            SEMICOLON76=(Token)match(input,SEMICOLON,FOLLOW_SEMICOLON_in_oneImport858); 
-            SEMICOLON76_tree = (Object)adaptor.create(SEMICOLON76);
-            adaptor.addChild(root_0, SEMICOLON76_tree);
+            SEMICOLON77=(Token)match(input,SEMICOLON,FOLLOW_SEMICOLON_in_oneImport861); 
+            SEMICOLON77_tree = (Object)adaptor.create(SEMICOLON77);
+            adaptor.addChild(root_0, SEMICOLON77_tree);
 
 
             }
@@ -2792,66 +2816,66 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "parameter"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:156:1: parameter : typeAndId ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:156:1: parameter : typeAndId ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) ) ;
     public final CalParser.parameter_return parameter() throws RecognitionException {
         CalParser.parameter_return retval = new CalParser.parameter_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token EQ78=null;
-        CalParser.typeAndId_return typeAndId77 = null;
+        Token EQ79=null;
+        CalParser.typeAndId_return typeAndId78 = null;
 
-        CalParser.expression_return expression79 = null;
+        CalParser.expression_return expression80 = null;
 
 
-        Object EQ78_tree=null;
+        Object EQ79_tree=null;
         RewriteRuleTokenStream stream_EQ=new RewriteRuleTokenStream(adaptor,"token EQ");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_typeAndId=new RewriteRuleSubtreeStream(adaptor,"rule typeAndId");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:156:10: ( typeAndId ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:156:12: typeAndId ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:156:10: ( typeAndId ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:156:12: typeAndId ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) )
             {
-            pushFollow(FOLLOW_typeAndId_in_parameter868);
-            typeAndId77=typeAndId();
+            pushFollow(FOLLOW_typeAndId_in_parameter871);
+            typeAndId78=typeAndId();
 
             state._fsp--;
 
-            stream_typeAndId.add(typeAndId77.getTree());
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:157:3: ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) )
-            int alt26=2;
-            int LA26_0 = input.LA(1);
+            stream_typeAndId.add(typeAndId78.getTree());
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:157:3: ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) )
+            int alt27=2;
+            int LA27_0 = input.LA(1);
 
-            if ( (LA26_0==EQ) ) {
-                alt26=1;
+            if ( (LA27_0==EQ) ) {
+                alt27=1;
             }
-            else if ( (LA26_0==RPAREN||LA26_0==COMMA) ) {
-                alt26=2;
+            else if ( (LA27_0==RPAREN||LA27_0==COMMA) ) {
+                alt27=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 26, 0, input);
+                    new NoViableAltException("", 27, 0, input);
 
                 throw nvae;
             }
-            switch (alt26) {
+            switch (alt27) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:157:4: EQ expression
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:157:4: EQ expression
                     {
-                    EQ78=(Token)match(input,EQ,FOLLOW_EQ_in_parameter873);  
-                    stream_EQ.add(EQ78);
+                    EQ79=(Token)match(input,EQ,FOLLOW_EQ_in_parameter876);  
+                    stream_EQ.add(EQ79);
 
-                    pushFollow(FOLLOW_expression_in_parameter875);
-                    expression79=expression();
+                    pushFollow(FOLLOW_expression_in_parameter878);
+                    expression80=expression();
 
                     state._fsp--;
 
-                    stream_expression.add(expression79.getTree());
+                    stream_expression.add(expression80.getTree());
 
 
                     // AST REWRITE
-                    // elements: typeAndId, expression
+                    // elements: expression, typeAndId
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -2863,13 +2887,13 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 157:18: -> ^( Parameter typeAndId ^( Expression expression ) )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:157:21: ^( Parameter typeAndId ^( Expression expression ) )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:157:21: ^( Parameter typeAndId ^( Expression expression ) )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Parameter, "Parameter"), root_1);
 
                         adaptor.addChild(root_1, stream_typeAndId.nextTree());
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:157:43: ^( Expression expression )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:157:43: ^( Expression expression )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Expression, "Expression"), root_2);
@@ -2888,7 +2912,7 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:158:5: 
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:158:5: 
                     {
 
                     // AST REWRITE
@@ -2904,7 +2928,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 158:5: -> ^( Parameter typeAndId )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:158:8: ^( Parameter typeAndId )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:158:8: ^( Parameter typeAndId )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Parameter, "Parameter"), root_1);
@@ -2949,62 +2973,62 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "parameters"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:1: parameters : parameter ( COMMA parameter )* -> ( parameter )+ ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:1: parameters : parameter ( COMMA parameter )* -> ( parameter )+ ;
     public final CalParser.parameters_return parameters() throws RecognitionException {
         CalParser.parameters_return retval = new CalParser.parameters_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token COMMA81=null;
-        CalParser.parameter_return parameter80 = null;
+        Token COMMA82=null;
+        CalParser.parameter_return parameter81 = null;
 
-        CalParser.parameter_return parameter82 = null;
+        CalParser.parameter_return parameter83 = null;
 
 
-        Object COMMA81_tree=null;
+        Object COMMA82_tree=null;
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_parameter=new RewriteRuleSubtreeStream(adaptor,"rule parameter");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:11: ( parameter ( COMMA parameter )* -> ( parameter )+ )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:13: parameter ( COMMA parameter )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:11: ( parameter ( COMMA parameter )* -> ( parameter )+ )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:13: parameter ( COMMA parameter )*
             {
-            pushFollow(FOLLOW_parameter_in_parameters909);
-            parameter80=parameter();
+            pushFollow(FOLLOW_parameter_in_parameters912);
+            parameter81=parameter();
 
             state._fsp--;
 
-            stream_parameter.add(parameter80.getTree());
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:23: ( COMMA parameter )*
-            loop27:
+            stream_parameter.add(parameter81.getTree());
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:23: ( COMMA parameter )*
+            loop28:
             do {
-                int alt27=2;
-                int LA27_0 = input.LA(1);
+                int alt28=2;
+                int LA28_0 = input.LA(1);
 
-                if ( (LA27_0==COMMA) ) {
-                    alt27=1;
+                if ( (LA28_0==COMMA) ) {
+                    alt28=1;
                 }
 
 
-                switch (alt27) {
+                switch (alt28) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:24: COMMA parameter
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:160:24: COMMA parameter
             	    {
-            	    COMMA81=(Token)match(input,COMMA,FOLLOW_COMMA_in_parameters912);  
-            	    stream_COMMA.add(COMMA81);
+            	    COMMA82=(Token)match(input,COMMA,FOLLOW_COMMA_in_parameters915);  
+            	    stream_COMMA.add(COMMA82);
 
-            	    pushFollow(FOLLOW_parameter_in_parameters914);
-            	    parameter82=parameter();
+            	    pushFollow(FOLLOW_parameter_in_parameters917);
+            	    parameter83=parameter();
 
             	    state._fsp--;
 
-            	    stream_parameter.add(parameter82.getTree());
+            	    stream_parameter.add(parameter83.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop27;
+            	    break loop28;
                 }
             } while (true);
 
@@ -3061,37 +3085,37 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "portDecl"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:1: portDecl : ( MULTI )? typeAndId -> ^( PortDecl typeAndId ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:1: portDecl : ( MULTI )? typeAndId -> ^( PortDecl typeAndId ) ;
     public final CalParser.portDecl_return portDecl() throws RecognitionException {
         CalParser.portDecl_return retval = new CalParser.portDecl_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token MULTI83=null;
-        CalParser.typeAndId_return typeAndId84 = null;
+        Token MULTI84=null;
+        CalParser.typeAndId_return typeAndId85 = null;
 
 
-        Object MULTI83_tree=null;
+        Object MULTI84_tree=null;
         RewriteRuleTokenStream stream_MULTI=new RewriteRuleTokenStream(adaptor,"token MULTI");
         RewriteRuleSubtreeStream stream_typeAndId=new RewriteRuleSubtreeStream(adaptor,"rule typeAndId");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:9: ( ( MULTI )? typeAndId -> ^( PortDecl typeAndId ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:11: ( MULTI )? typeAndId
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:9: ( ( MULTI )? typeAndId -> ^( PortDecl typeAndId ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:11: ( MULTI )? typeAndId
             {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:11: ( MULTI )?
-            int alt28=2;
-            int LA28_0 = input.LA(1);
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:11: ( MULTI )?
+            int alt29=2;
+            int LA29_0 = input.LA(1);
 
-            if ( (LA28_0==MULTI) ) {
-                alt28=1;
+            if ( (LA29_0==MULTI) ) {
+                alt29=1;
             }
-            switch (alt28) {
+            switch (alt29) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:11: MULTI
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:11: MULTI
                     {
-                    MULTI83=(Token)match(input,MULTI,FOLLOW_MULTI_in_portDecl931);  
-                    stream_MULTI.add(MULTI83);
+                    MULTI84=(Token)match(input,MULTI,FOLLOW_MULTI_in_portDecl934);  
+                    stream_MULTI.add(MULTI84);
 
 
                     }
@@ -3099,12 +3123,12 @@ public class CalParser extends Parser {
 
             }
 
-            pushFollow(FOLLOW_typeAndId_in_portDecl934);
-            typeAndId84=typeAndId();
+            pushFollow(FOLLOW_typeAndId_in_portDecl937);
+            typeAndId85=typeAndId();
 
             state._fsp--;
 
-            stream_typeAndId.add(typeAndId84.getTree());
+            stream_typeAndId.add(typeAndId85.getTree());
 
 
             // AST REWRITE
@@ -3120,7 +3144,7 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 165:28: -> ^( PortDecl typeAndId )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:31: ^( PortDecl typeAndId )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:31: ^( PortDecl typeAndId )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(PortDecl, "PortDecl"), root_1);
@@ -3159,62 +3183,62 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "portDecls"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:1: portDecls : portDecl ( COMMA portDecl )* -> ( portDecl )+ ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:1: portDecls : portDecl ( COMMA portDecl )* -> ( portDecl )+ ;
     public final CalParser.portDecls_return portDecls() throws RecognitionException {
         CalParser.portDecls_return retval = new CalParser.portDecls_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token COMMA86=null;
-        CalParser.portDecl_return portDecl85 = null;
+        Token COMMA87=null;
+        CalParser.portDecl_return portDecl86 = null;
 
-        CalParser.portDecl_return portDecl87 = null;
+        CalParser.portDecl_return portDecl88 = null;
 
 
-        Object COMMA86_tree=null;
+        Object COMMA87_tree=null;
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_portDecl=new RewriteRuleSubtreeStream(adaptor,"rule portDecl");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:10: ( portDecl ( COMMA portDecl )* -> ( portDecl )+ )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:12: portDecl ( COMMA portDecl )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:10: ( portDecl ( COMMA portDecl )* -> ( portDecl )+ )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:12: portDecl ( COMMA portDecl )*
             {
-            pushFollow(FOLLOW_portDecl_in_portDecls949);
-            portDecl85=portDecl();
+            pushFollow(FOLLOW_portDecl_in_portDecls952);
+            portDecl86=portDecl();
 
             state._fsp--;
 
-            stream_portDecl.add(portDecl85.getTree());
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:21: ( COMMA portDecl )*
-            loop29:
+            stream_portDecl.add(portDecl86.getTree());
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:21: ( COMMA portDecl )*
+            loop30:
             do {
-                int alt29=2;
-                int LA29_0 = input.LA(1);
+                int alt30=2;
+                int LA30_0 = input.LA(1);
 
-                if ( (LA29_0==COMMA) ) {
-                    alt29=1;
+                if ( (LA30_0==COMMA) ) {
+                    alt30=1;
                 }
 
 
-                switch (alt29) {
+                switch (alt30) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:22: COMMA portDecl
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:167:22: COMMA portDecl
             	    {
-            	    COMMA86=(Token)match(input,COMMA,FOLLOW_COMMA_in_portDecls952);  
-            	    stream_COMMA.add(COMMA86);
+            	    COMMA87=(Token)match(input,COMMA,FOLLOW_COMMA_in_portDecls955);  
+            	    stream_COMMA.add(COMMA87);
 
-            	    pushFollow(FOLLOW_portDecl_in_portDecls954);
-            	    portDecl87=portDecl();
+            	    pushFollow(FOLLOW_portDecl_in_portDecls957);
+            	    portDecl88=portDecl();
 
             	    state._fsp--;
 
-            	    stream_portDecl.add(portDecl87.getTree());
+            	    stream_portDecl.add(portDecl88.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop29;
+            	    break loop30;
                 }
             } while (true);
 
@@ -3271,32 +3295,32 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "mainParameter"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:1: mainParameter : typeAndId EOF -> ^( Parameter typeAndId ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:1: mainParameter : typeAndId EOF -> ^( Parameter typeAndId ) ;
     public final CalParser.mainParameter_return mainParameter() throws RecognitionException {
         CalParser.mainParameter_return retval = new CalParser.mainParameter_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token EOF89=null;
-        CalParser.typeAndId_return typeAndId88 = null;
+        Token EOF90=null;
+        CalParser.typeAndId_return typeAndId89 = null;
 
 
-        Object EOF89_tree=null;
+        Object EOF90_tree=null;
         RewriteRuleTokenStream stream_EOF=new RewriteRuleTokenStream(adaptor,"token EOF");
         RewriteRuleSubtreeStream stream_typeAndId=new RewriteRuleSubtreeStream(adaptor,"rule typeAndId");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:14: ( typeAndId EOF -> ^( Parameter typeAndId ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:16: typeAndId EOF
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:14: ( typeAndId EOF -> ^( Parameter typeAndId ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:16: typeAndId EOF
             {
-            pushFollow(FOLLOW_typeAndId_in_mainParameter972);
-            typeAndId88=typeAndId();
+            pushFollow(FOLLOW_typeAndId_in_mainParameter975);
+            typeAndId89=typeAndId();
 
             state._fsp--;
 
-            stream_typeAndId.add(typeAndId88.getTree());
-            EOF89=(Token)match(input,EOF,FOLLOW_EOF_in_mainParameter974);  
-            stream_EOF.add(EOF89);
+            stream_typeAndId.add(typeAndId89.getTree());
+            EOF90=(Token)match(input,EOF,FOLLOW_EOF_in_mainParameter977);  
+            stream_EOF.add(EOF90);
 
 
 
@@ -3313,7 +3337,7 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 172:30: -> ^( Parameter typeAndId )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:33: ^( Parameter typeAndId )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:33: ^( Parameter typeAndId )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Parameter, "Parameter"), root_1);
@@ -3352,7 +3376,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "typeAndId"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:174:1: typeAndId : typeName= QID ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:174:1: typeAndId : typeName= QID ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) ) ;
     public final CalParser.typeAndId_return typeAndId() throws RecognitionException {
         CalParser.typeAndId_return retval = new CalParser.typeAndId_return();
         retval.start = input.LT(1);
@@ -3361,7 +3385,7 @@ public class CalParser extends Parser {
 
         Token typeName=null;
         Token varName=null;
-        CalParser.typeRest_return typeRest90 = null;
+        CalParser.typeRest_return typeRest91 = null;
 
 
         Object typeName_tree=null;
@@ -3369,62 +3393,62 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_typeRest=new RewriteRuleSubtreeStream(adaptor,"rule typeRest");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:174:10: (typeName= QID ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:174:12: typeName= QID ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:174:10: (typeName= QID ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:174:12: typeName= QID ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) )
             {
-            typeName=(Token)match(input,QID,FOLLOW_QID_in_typeAndId991);  
+            typeName=(Token)match(input,QID,FOLLOW_QID_in_typeAndId994);  
             stream_QID.add(typeName);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:3: ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) )
-            int alt31=2;
-            int LA31_0 = input.LA(1);
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:3: ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) )
+            int alt32=2;
+            int LA32_0 = input.LA(1);
 
-            if ( ((LA31_0>=QID && LA31_0<=LBRACKET)||LA31_0==LPAREN) ) {
-                alt31=1;
+            if ( ((LA32_0>=QID && LA32_0<=LBRACKET)||LA32_0==LPAREN) ) {
+                alt32=1;
             }
-            else if ( (LA31_0==EOF||(LA31_0>=RPAREN && LA31_0<=COLON)||LA31_0==DOUBLE_EQUAL_ARROW||(LA31_0>=EQ && LA31_0<=SEMICOLON)||LA31_0==COMMA) ) {
-                alt31=2;
+            else if ( (LA32_0==EOF||(LA32_0>=RPAREN && LA32_0<=COLON)||LA32_0==DOUBLE_EQUAL_ARROW||(LA32_0>=EQ && LA32_0<=SEMICOLON)||LA32_0==COMMA) ) {
+                alt32=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 31, 0, input);
+                    new NoViableAltException("", 32, 0, input);
 
                 throw nvae;
             }
-            switch (alt31) {
+            switch (alt32) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:4: ( typeRest )? varName= QID
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:4: ( typeRest )? varName= QID
                     {
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:4: ( typeRest )?
-                    int alt30=2;
-                    int LA30_0 = input.LA(1);
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:4: ( typeRest )?
+                    int alt31=2;
+                    int LA31_0 = input.LA(1);
 
-                    if ( (LA30_0==LBRACKET||LA30_0==LPAREN) ) {
-                        alt30=1;
+                    if ( (LA31_0==LBRACKET||LA31_0==LPAREN) ) {
+                        alt31=1;
                     }
-                    switch (alt30) {
+                    switch (alt31) {
                         case 1 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:4: typeRest
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:4: typeRest
                             {
-                            pushFollow(FOLLOW_typeRest_in_typeAndId996);
-                            typeRest90=typeRest();
+                            pushFollow(FOLLOW_typeRest_in_typeAndId999);
+                            typeRest91=typeRest();
 
                             state._fsp--;
 
-                            stream_typeRest.add(typeRest90.getTree());
+                            stream_typeRest.add(typeRest91.getTree());
 
                             }
                             break;
 
                     }
 
-                    varName=(Token)match(input,QID,FOLLOW_QID_in_typeAndId1001);  
+                    varName=(Token)match(input,QID,FOLLOW_QID_in_typeAndId1004);  
                     stream_QID.add(varName);
 
 
 
                     // AST REWRITE
-                    // elements: typeName, typeRest, varName
+                    // elements: typeName, varName, typeRest
                     // token labels: typeName, varName
                     // rule labels: retval
                     // token list labels: 
@@ -3438,12 +3462,12 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 175:26: -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName)
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:29: ^( Type ^( Var $typeName) ( typeRest )? )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:29: ^( Type ^( Var $typeName) ( typeRest )? )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Type, "Type"), root_1);
 
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:36: ^( Var $typeName)
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:36: ^( Var $typeName)
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -3452,7 +3476,7 @@ public class CalParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:53: ( typeRest )?
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:53: ( typeRest )?
                         if ( stream_typeRest.hasNext() ) {
                             adaptor.addChild(root_1, stream_typeRest.nextTree());
 
@@ -3461,7 +3485,7 @@ public class CalParser extends Parser {
 
                         adaptor.addChild(root_0, root_1);
                         }
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:64: ^( Var $varName)
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:175:64: ^( Var $varName)
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_1);
@@ -3477,7 +3501,7 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:176:5: 
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:176:5: 
                     {
 
                     // AST REWRITE
@@ -3494,7 +3518,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 176:5: -> ^( Var $typeName)
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:176:8: ^( Var $typeName)
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:176:8: ^( Var $typeName)
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_1);
@@ -3539,44 +3563,44 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "type"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:1: type : QID ( typeRest )? -> ^( Type ^( Var QID ) ( typeRest )? ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:1: type : QID ( typeRest )? -> ^( Type ^( Var QID ) ( typeRest )? ) ;
     public final CalParser.type_return type() throws RecognitionException {
         CalParser.type_return retval = new CalParser.type_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token QID91=null;
-        CalParser.typeRest_return typeRest92 = null;
+        Token QID92=null;
+        CalParser.typeRest_return typeRest93 = null;
 
 
-        Object QID91_tree=null;
+        Object QID92_tree=null;
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_typeRest=new RewriteRuleSubtreeStream(adaptor,"rule typeRest");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:5: ( QID ( typeRest )? -> ^( Type ^( Var QID ) ( typeRest )? ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:7: QID ( typeRest )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:5: ( QID ( typeRest )? -> ^( Type ^( Var QID ) ( typeRest )? ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:7: QID ( typeRest )?
             {
-            QID91=(Token)match(input,QID,FOLLOW_QID_in_type1045);  
-            stream_QID.add(QID91);
+            QID92=(Token)match(input,QID,FOLLOW_QID_in_type1048);  
+            stream_QID.add(QID92);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:11: ( typeRest )?
-            int alt32=2;
-            int LA32_0 = input.LA(1);
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:11: ( typeRest )?
+            int alt33=2;
+            int LA33_0 = input.LA(1);
 
-            if ( (LA32_0==LBRACKET||LA32_0==LPAREN) ) {
-                alt32=1;
+            if ( (LA33_0==LBRACKET||LA33_0==LPAREN) ) {
+                alt33=1;
             }
-            switch (alt32) {
+            switch (alt33) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:11: typeRest
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:11: typeRest
                     {
-                    pushFollow(FOLLOW_typeRest_in_type1047);
-                    typeRest92=typeRest();
+                    pushFollow(FOLLOW_typeRest_in_type1050);
+                    typeRest93=typeRest();
 
                     state._fsp--;
 
-                    stream_typeRest.add(typeRest92.getTree());
+                    stream_typeRest.add(typeRest93.getTree());
 
                     }
                     break;
@@ -3586,7 +3610,7 @@ public class CalParser extends Parser {
 
 
             // AST REWRITE
-            // elements: QID, typeRest
+            // elements: typeRest, QID
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -3598,12 +3622,12 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 178:21: -> ^( Type ^( Var QID ) ( typeRest )? )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:24: ^( Type ^( Var QID ) ( typeRest )? )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:24: ^( Type ^( Var QID ) ( typeRest )? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Type, "Type"), root_1);
 
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:31: ^( Var QID )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:31: ^( Var QID )
                 {
                 Object root_2 = (Object)adaptor.nil();
                 root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_2);
@@ -3612,7 +3636,7 @@ public class CalParser extends Parser {
 
                 adaptor.addChild(root_1, root_2);
                 }
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:42: ( typeRest )?
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:42: ( typeRest )?
                 if ( stream_typeRest.hasNext() ) {
                     adaptor.addChild(root_1, stream_typeRest.nextTree());
 
@@ -3651,26 +3675,26 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "typeRest"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:1: typeRest : ( LBRACKET ( typePars )? RBRACKET -> ( typePars )? | LPAREN ( typeAttrs )? RPAREN -> ( typeAttrs )? );
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:1: typeRest : ( LBRACKET ( typePars )? RBRACKET -> ( typePars )? | LPAREN ( typeAttrs )? RPAREN -> ( typeAttrs )? );
     public final CalParser.typeRest_return typeRest() throws RecognitionException {
         CalParser.typeRest_return retval = new CalParser.typeRest_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token LBRACKET93=null;
-        Token RBRACKET95=null;
-        Token LPAREN96=null;
-        Token RPAREN98=null;
-        CalParser.typePars_return typePars94 = null;
+        Token LBRACKET94=null;
+        Token RBRACKET96=null;
+        Token LPAREN97=null;
+        Token RPAREN99=null;
+        CalParser.typePars_return typePars95 = null;
 
-        CalParser.typeAttrs_return typeAttrs97 = null;
+        CalParser.typeAttrs_return typeAttrs98 = null;
 
 
-        Object LBRACKET93_tree=null;
-        Object RBRACKET95_tree=null;
-        Object LPAREN96_tree=null;
-        Object RPAREN98_tree=null;
+        Object LBRACKET94_tree=null;
+        Object RBRACKET96_tree=null;
+        Object LPAREN97_tree=null;
+        Object RPAREN99_tree=null;
         RewriteRuleTokenStream stream_LBRACKET=new RewriteRuleTokenStream(adaptor,"token LBRACKET");
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_RBRACKET=new RewriteRuleTokenStream(adaptor,"token RBRACKET");
@@ -3678,54 +3702,54 @@ public class CalParser extends Parser {
         RewriteRuleSubtreeStream stream_typePars=new RewriteRuleSubtreeStream(adaptor,"rule typePars");
         RewriteRuleSubtreeStream stream_typeAttrs=new RewriteRuleSubtreeStream(adaptor,"rule typeAttrs");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:9: ( LBRACKET ( typePars )? RBRACKET -> ( typePars )? | LPAREN ( typeAttrs )? RPAREN -> ( typeAttrs )? )
-            int alt35=2;
-            int LA35_0 = input.LA(1);
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:9: ( LBRACKET ( typePars )? RBRACKET -> ( typePars )? | LPAREN ( typeAttrs )? RPAREN -> ( typeAttrs )? )
+            int alt36=2;
+            int LA36_0 = input.LA(1);
 
-            if ( (LA35_0==LBRACKET) ) {
-                alt35=1;
+            if ( (LA36_0==LBRACKET) ) {
+                alt36=1;
             }
-            else if ( (LA35_0==LPAREN) ) {
-                alt35=2;
+            else if ( (LA36_0==LPAREN) ) {
+                alt36=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 35, 0, input);
+                    new NoViableAltException("", 36, 0, input);
 
                 throw nvae;
             }
-            switch (alt35) {
+            switch (alt36) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:11: LBRACKET ( typePars )? RBRACKET
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:11: LBRACKET ( typePars )? RBRACKET
                     {
-                    LBRACKET93=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_typeRest1070);  
-                    stream_LBRACKET.add(LBRACKET93);
+                    LBRACKET94=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_typeRest1073);  
+                    stream_LBRACKET.add(LBRACKET94);
 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:20: ( typePars )?
-                    int alt33=2;
-                    int LA33_0 = input.LA(1);
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:20: ( typePars )?
+                    int alt34=2;
+                    int LA34_0 = input.LA(1);
 
-                    if ( (LA33_0==QID) ) {
-                        alt33=1;
+                    if ( (LA34_0==QID) ) {
+                        alt34=1;
                     }
-                    switch (alt33) {
+                    switch (alt34) {
                         case 1 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:20: typePars
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:20: typePars
                             {
-                            pushFollow(FOLLOW_typePars_in_typeRest1072);
-                            typePars94=typePars();
+                            pushFollow(FOLLOW_typePars_in_typeRest1075);
+                            typePars95=typePars();
 
                             state._fsp--;
 
-                            stream_typePars.add(typePars94.getTree());
+                            stream_typePars.add(typePars95.getTree());
 
                             }
                             break;
 
                     }
 
-                    RBRACKET95=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_typeRest1075);  
-                    stream_RBRACKET.add(RBRACKET95);
+                    RBRACKET96=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_typeRest1078);  
+                    stream_RBRACKET.add(RBRACKET96);
 
 
 
@@ -3742,7 +3766,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 180:39: -> ( typePars )?
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:42: ( typePars )?
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:180:42: ( typePars )?
                         if ( stream_typePars.hasNext() ) {
                             adaptor.addChild(root_0, stream_typePars.nextTree());
 
@@ -3755,36 +3779,36 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:5: LPAREN ( typeAttrs )? RPAREN
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:5: LPAREN ( typeAttrs )? RPAREN
                     {
-                    LPAREN96=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_typeRest1086);  
-                    stream_LPAREN.add(LPAREN96);
+                    LPAREN97=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_typeRest1089);  
+                    stream_LPAREN.add(LPAREN97);
 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:12: ( typeAttrs )?
-                    int alt34=2;
-                    int LA34_0 = input.LA(1);
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:12: ( typeAttrs )?
+                    int alt35=2;
+                    int LA35_0 = input.LA(1);
 
-                    if ( (LA34_0==QID) ) {
-                        alt34=1;
+                    if ( (LA35_0==QID) ) {
+                        alt35=1;
                     }
-                    switch (alt34) {
+                    switch (alt35) {
                         case 1 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:12: typeAttrs
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:12: typeAttrs
                             {
-                            pushFollow(FOLLOW_typeAttrs_in_typeRest1088);
-                            typeAttrs97=typeAttrs();
+                            pushFollow(FOLLOW_typeAttrs_in_typeRest1091);
+                            typeAttrs98=typeAttrs();
 
                             state._fsp--;
 
-                            stream_typeAttrs.add(typeAttrs97.getTree());
+                            stream_typeAttrs.add(typeAttrs98.getTree());
 
                             }
                             break;
 
                     }
 
-                    RPAREN98=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_typeRest1091);  
-                    stream_RPAREN.add(RPAREN98);
+                    RPAREN99=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_typeRest1094);  
+                    stream_RPAREN.add(RPAREN99);
 
 
 
@@ -3801,7 +3825,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 181:30: -> ( typeAttrs )?
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:33: ( typeAttrs )?
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:33: ( typeAttrs )?
                         if ( stream_typeAttrs.hasNext() ) {
                             adaptor.addChild(root_0, stream_typeAttrs.nextTree());
 
@@ -3839,62 +3863,62 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "typeAttrs"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:1: typeAttrs : typeAttr ( COMMA typeAttr )* -> ( typeAttr )+ ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:1: typeAttrs : typeAttr ( COMMA typeAttr )* -> ( typeAttr )+ ;
     public final CalParser.typeAttrs_return typeAttrs() throws RecognitionException {
         CalParser.typeAttrs_return retval = new CalParser.typeAttrs_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token COMMA100=null;
-        CalParser.typeAttr_return typeAttr99 = null;
+        Token COMMA101=null;
+        CalParser.typeAttr_return typeAttr100 = null;
 
-        CalParser.typeAttr_return typeAttr101 = null;
+        CalParser.typeAttr_return typeAttr102 = null;
 
 
-        Object COMMA100_tree=null;
+        Object COMMA101_tree=null;
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_typeAttr=new RewriteRuleSubtreeStream(adaptor,"rule typeAttr");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:10: ( typeAttr ( COMMA typeAttr )* -> ( typeAttr )+ )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:12: typeAttr ( COMMA typeAttr )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:10: ( typeAttr ( COMMA typeAttr )* -> ( typeAttr )+ )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:12: typeAttr ( COMMA typeAttr )*
             {
-            pushFollow(FOLLOW_typeAttr_in_typeAttrs1103);
-            typeAttr99=typeAttr();
+            pushFollow(FOLLOW_typeAttr_in_typeAttrs1106);
+            typeAttr100=typeAttr();
 
             state._fsp--;
 
-            stream_typeAttr.add(typeAttr99.getTree());
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:21: ( COMMA typeAttr )*
-            loop36:
+            stream_typeAttr.add(typeAttr100.getTree());
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:21: ( COMMA typeAttr )*
+            loop37:
             do {
-                int alt36=2;
-                int LA36_0 = input.LA(1);
+                int alt37=2;
+                int LA37_0 = input.LA(1);
 
-                if ( (LA36_0==COMMA) ) {
-                    alt36=1;
+                if ( (LA37_0==COMMA) ) {
+                    alt37=1;
                 }
 
 
-                switch (alt36) {
+                switch (alt37) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:22: COMMA typeAttr
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:22: COMMA typeAttr
             	    {
-            	    COMMA100=(Token)match(input,COMMA,FOLLOW_COMMA_in_typeAttrs1106);  
-            	    stream_COMMA.add(COMMA100);
+            	    COMMA101=(Token)match(input,COMMA,FOLLOW_COMMA_in_typeAttrs1109);  
+            	    stream_COMMA.add(COMMA101);
 
-            	    pushFollow(FOLLOW_typeAttr_in_typeAttrs1108);
-            	    typeAttr101=typeAttr();
+            	    pushFollow(FOLLOW_typeAttr_in_typeAttrs1111);
+            	    typeAttr102=typeAttr();
 
             	    state._fsp--;
 
-            	    stream_typeAttr.add(typeAttr101.getTree());
+            	    stream_typeAttr.add(typeAttr102.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop36;
+            	    break loop37;
                 }
             } while (true);
 
@@ -3951,33 +3975,33 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "typeAttr"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:185:1: typeAttr : QID typeAttrRest -> typeAttrRest ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:185:1: typeAttr : QID typeAttrRest -> typeAttrRest ;
     public final CalParser.typeAttr_return typeAttr() throws RecognitionException {
         CalParser.typeAttr_return retval = new CalParser.typeAttr_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token QID102=null;
-        CalParser.typeAttrRest_return typeAttrRest103 = null;
+        Token QID103=null;
+        CalParser.typeAttrRest_return typeAttrRest104 = null;
 
 
-        Object QID102_tree=null;
+        Object QID103_tree=null;
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_typeAttrRest=new RewriteRuleSubtreeStream(adaptor,"rule typeAttrRest");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:185:9: ( QID typeAttrRest -> typeAttrRest )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:185:11: QID typeAttrRest
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:185:9: ( QID typeAttrRest -> typeAttrRest )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:185:11: QID typeAttrRest
             {
-            QID102=(Token)match(input,QID,FOLLOW_QID_in_typeAttr1122);  
-            stream_QID.add(QID102);
+            QID103=(Token)match(input,QID,FOLLOW_QID_in_typeAttr1125);  
+            stream_QID.add(QID103);
 
-            pushFollow(FOLLOW_typeAttrRest_in_typeAttr1124);
-            typeAttrRest103=typeAttrRest();
+            pushFollow(FOLLOW_typeAttrRest_in_typeAttr1127);
+            typeAttrRest104=typeAttrRest();
 
             state._fsp--;
 
-            stream_typeAttrRest.add(typeAttrRest103.getTree());
+            stream_typeAttrRest.add(typeAttrRest104.getTree());
 
 
             // AST REWRITE
@@ -4024,56 +4048,56 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "typeAttrRest"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:187:1: typeAttrRest : ( COLON type -> ^( TypeAttr type ) | EQ expression -> ^( ExprAttr ^( Expression expression ) ) );
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:187:1: typeAttrRest : ( COLON type -> ^( TypeAttr type ) | EQ expression -> ^( ExprAttr ^( Expression expression ) ) );
     public final CalParser.typeAttrRest_return typeAttrRest() throws RecognitionException {
         CalParser.typeAttrRest_return retval = new CalParser.typeAttrRest_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token COLON104=null;
-        Token EQ106=null;
-        CalParser.type_return type105 = null;
+        Token COLON105=null;
+        Token EQ107=null;
+        CalParser.type_return type106 = null;
 
-        CalParser.expression_return expression107 = null;
+        CalParser.expression_return expression108 = null;
 
 
-        Object COLON104_tree=null;
-        Object EQ106_tree=null;
+        Object COLON105_tree=null;
+        Object EQ107_tree=null;
         RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
         RewriteRuleTokenStream stream_EQ=new RewriteRuleTokenStream(adaptor,"token EQ");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_type=new RewriteRuleSubtreeStream(adaptor,"rule type");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:187:13: ( COLON type -> ^( TypeAttr type ) | EQ expression -> ^( ExprAttr ^( Expression expression ) ) )
-            int alt37=2;
-            int LA37_0 = input.LA(1);
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:187:13: ( COLON type -> ^( TypeAttr type ) | EQ expression -> ^( ExprAttr ^( Expression expression ) ) )
+            int alt38=2;
+            int LA38_0 = input.LA(1);
 
-            if ( (LA37_0==COLON) ) {
-                alt37=1;
+            if ( (LA38_0==COLON) ) {
+                alt38=1;
             }
-            else if ( (LA37_0==EQ) ) {
-                alt37=2;
+            else if ( (LA38_0==EQ) ) {
+                alt38=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 37, 0, input);
+                    new NoViableAltException("", 38, 0, input);
 
                 throw nvae;
             }
-            switch (alt37) {
+            switch (alt38) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:187:15: COLON type
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:187:15: COLON type
                     {
-                    COLON104=(Token)match(input,COLON,FOLLOW_COLON_in_typeAttrRest1135);  
-                    stream_COLON.add(COLON104);
+                    COLON105=(Token)match(input,COLON,FOLLOW_COLON_in_typeAttrRest1138);  
+                    stream_COLON.add(COLON105);
 
-                    pushFollow(FOLLOW_type_in_typeAttrRest1137);
-                    type105=type();
+                    pushFollow(FOLLOW_type_in_typeAttrRest1140);
+                    type106=type();
 
                     state._fsp--;
 
-                    stream_type.add(type105.getTree());
+                    stream_type.add(type106.getTree());
 
 
                     // AST REWRITE
@@ -4089,7 +4113,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 187:26: -> ^( TypeAttr type )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:187:29: ^( TypeAttr type )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:187:29: ^( TypeAttr type )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TypeAttr, "TypeAttr"), root_1);
@@ -4105,17 +4129,17 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:3: EQ expression
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:3: EQ expression
                     {
-                    EQ106=(Token)match(input,EQ,FOLLOW_EQ_in_typeAttrRest1149);  
-                    stream_EQ.add(EQ106);
+                    EQ107=(Token)match(input,EQ,FOLLOW_EQ_in_typeAttrRest1152);  
+                    stream_EQ.add(EQ107);
 
-                    pushFollow(FOLLOW_expression_in_typeAttrRest1151);
-                    expression107=expression();
+                    pushFollow(FOLLOW_expression_in_typeAttrRest1154);
+                    expression108=expression();
 
                     state._fsp--;
 
-                    stream_expression.add(expression107.getTree());
+                    stream_expression.add(expression108.getTree());
 
 
                     // AST REWRITE
@@ -4131,12 +4155,12 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 188:17: -> ^( ExprAttr ^( Expression expression ) )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:20: ^( ExprAttr ^( Expression expression ) )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:20: ^( ExprAttr ^( Expression expression ) )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(ExprAttr, "ExprAttr"), root_1);
 
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:31: ^( Expression expression )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:31: ^( Expression expression )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(Expression, "Expression"), root_2);
@@ -4180,62 +4204,62 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "typePars"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:1: typePars : typePar ( COMMA typePar )* -> ( typePar )+ ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:1: typePars : typePar ( COMMA typePar )* -> ( typePar )+ ;
     public final CalParser.typePars_return typePars() throws RecognitionException {
         CalParser.typePars_return retval = new CalParser.typePars_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token COMMA109=null;
-        CalParser.typePar_return typePar108 = null;
+        Token COMMA110=null;
+        CalParser.typePar_return typePar109 = null;
 
-        CalParser.typePar_return typePar110 = null;
+        CalParser.typePar_return typePar111 = null;
 
 
-        Object COMMA109_tree=null;
+        Object COMMA110_tree=null;
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_typePar=new RewriteRuleSubtreeStream(adaptor,"rule typePar");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:9: ( typePar ( COMMA typePar )* -> ( typePar )+ )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:11: typePar ( COMMA typePar )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:9: ( typePar ( COMMA typePar )* -> ( typePar )+ )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:11: typePar ( COMMA typePar )*
             {
-            pushFollow(FOLLOW_typePar_in_typePars1170);
-            typePar108=typePar();
+            pushFollow(FOLLOW_typePar_in_typePars1173);
+            typePar109=typePar();
 
             state._fsp--;
 
-            stream_typePar.add(typePar108.getTree());
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:19: ( COMMA typePar )*
-            loop38:
+            stream_typePar.add(typePar109.getTree());
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:19: ( COMMA typePar )*
+            loop39:
             do {
-                int alt38=2;
-                int LA38_0 = input.LA(1);
+                int alt39=2;
+                int LA39_0 = input.LA(1);
 
-                if ( (LA38_0==COMMA) ) {
-                    alt38=1;
+                if ( (LA39_0==COMMA) ) {
+                    alt39=1;
                 }
 
 
-                switch (alt38) {
+                switch (alt39) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:20: COMMA typePar
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:20: COMMA typePar
             	    {
-            	    COMMA109=(Token)match(input,COMMA,FOLLOW_COMMA_in_typePars1173);  
-            	    stream_COMMA.add(COMMA109);
+            	    COMMA110=(Token)match(input,COMMA,FOLLOW_COMMA_in_typePars1176);  
+            	    stream_COMMA.add(COMMA110);
 
-            	    pushFollow(FOLLOW_typePar_in_typePars1175);
-            	    typePar110=typePar();
+            	    pushFollow(FOLLOW_typePar_in_typePars1178);
+            	    typePar111=typePar();
 
             	    state._fsp--;
 
-            	    stream_typePar.add(typePar110.getTree());
+            	    stream_typePar.add(typePar111.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop38;
+            	    break loop39;
                 }
             } while (true);
 
@@ -4292,50 +4316,50 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "typePar"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:1: typePar : QID ( LT type )? -> ^( TypePar QID ( type )? ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:1: typePar : QID ( LT type )? -> ^( TypePar QID ( type )? ) ;
     public final CalParser.typePar_return typePar() throws RecognitionException {
         CalParser.typePar_return retval = new CalParser.typePar_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token QID111=null;
-        Token LT112=null;
-        CalParser.type_return type113 = null;
+        Token QID112=null;
+        Token LT113=null;
+        CalParser.type_return type114 = null;
 
 
-        Object QID111_tree=null;
-        Object LT112_tree=null;
+        Object QID112_tree=null;
+        Object LT113_tree=null;
         RewriteRuleTokenStream stream_LT=new RewriteRuleTokenStream(adaptor,"token LT");
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_type=new RewriteRuleSubtreeStream(adaptor,"rule type");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:8: ( QID ( LT type )? -> ^( TypePar QID ( type )? ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:10: QID ( LT type )?
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:8: ( QID ( LT type )? -> ^( TypePar QID ( type )? ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:10: QID ( LT type )?
             {
-            QID111=(Token)match(input,QID,FOLLOW_QID_in_typePar1189);  
-            stream_QID.add(QID111);
+            QID112=(Token)match(input,QID,FOLLOW_QID_in_typePar1192);  
+            stream_QID.add(QID112);
 
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:14: ( LT type )?
-            int alt39=2;
-            int LA39_0 = input.LA(1);
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:14: ( LT type )?
+            int alt40=2;
+            int LA40_0 = input.LA(1);
 
-            if ( (LA39_0==LT) ) {
-                alt39=1;
+            if ( (LA40_0==LT) ) {
+                alt40=1;
             }
-            switch (alt39) {
+            switch (alt40) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:15: LT type
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:15: LT type
                     {
-                    LT112=(Token)match(input,LT,FOLLOW_LT_in_typePar1192);  
-                    stream_LT.add(LT112);
+                    LT113=(Token)match(input,LT,FOLLOW_LT_in_typePar1195);  
+                    stream_LT.add(LT113);
 
-                    pushFollow(FOLLOW_type_in_typePar1194);
-                    type113=type();
+                    pushFollow(FOLLOW_type_in_typePar1197);
+                    type114=type();
 
                     state._fsp--;
 
-                    stream_type.add(type113.getTree());
+                    stream_type.add(type114.getTree());
 
                     }
                     break;
@@ -4345,7 +4369,7 @@ public class CalParser extends Parser {
 
 
             // AST REWRITE
-            // elements: type, QID
+            // elements: QID, type
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -4357,13 +4381,13 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 192:25: -> ^( TypePar QID ( type )? )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:28: ^( TypePar QID ( type )? )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:28: ^( TypePar QID ( type )? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TypePar, "TypePar"), root_1);
 
                 adaptor.addChild(root_1, stream_QID.nextNode());
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:42: ( type )?
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:192:42: ( type )?
                 if ( stream_type.hasNext() ) {
                     adaptor.addChild(root_1, stream_type.nextTree());
 
@@ -4402,32 +4426,32 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "mainExpression"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:1: mainExpression : expression EOF -> ^( Expression expression ) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:1: mainExpression : expression EOF -> ^( Expression expression ) ;
     public final CalParser.mainExpression_return mainExpression() throws RecognitionException {
         CalParser.mainExpression_return retval = new CalParser.mainExpression_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token EOF115=null;
-        CalParser.expression_return expression114 = null;
+        Token EOF116=null;
+        CalParser.expression_return expression115 = null;
 
 
-        Object EOF115_tree=null;
+        Object EOF116_tree=null;
         RewriteRuleTokenStream stream_EOF=new RewriteRuleTokenStream(adaptor,"token EOF");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:15: ( expression EOF -> ^( Expression expression ) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:17: expression EOF
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:15: ( expression EOF -> ^( Expression expression ) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:17: expression EOF
             {
-            pushFollow(FOLLOW_expression_in_mainExpression1217);
-            expression114=expression();
+            pushFollow(FOLLOW_expression_in_mainExpression1220);
+            expression115=expression();
 
             state._fsp--;
 
-            stream_expression.add(expression114.getTree());
-            EOF115=(Token)match(input,EOF,FOLLOW_EOF_in_mainExpression1219);  
-            stream_EOF.add(EOF115);
+            stream_expression.add(expression115.getTree());
+            EOF116=(Token)match(input,EOF,FOLLOW_EOF_in_mainExpression1222);  
+            stream_EOF.add(EOF116);
 
 
 
@@ -4444,7 +4468,7 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 197:32: -> ^( Expression expression )
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:35: ^( Expression expression )
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:35: ^( Expression expression )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Expression, "Expression"), root_1);
@@ -4483,66 +4507,66 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "expression"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:1: expression : factor ( binop factor )* ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:1: expression : factor ( binop factor )* ;
     public final CalParser.expression_return expression() throws RecognitionException {
         CalParser.expression_return retval = new CalParser.expression_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        CalParser.factor_return factor116 = null;
+        CalParser.factor_return factor117 = null;
 
-        CalParser.binop_return binop117 = null;
+        CalParser.binop_return binop118 = null;
 
-        CalParser.factor_return factor118 = null;
+        CalParser.factor_return factor119 = null;
 
 
 
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:11: ( factor ( binop factor )* )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:13: factor ( binop factor )*
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:11: ( factor ( binop factor )* )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:13: factor ( binop factor )*
             {
             root_0 = (Object)adaptor.nil();
 
-            pushFollow(FOLLOW_factor_in_expression1234);
-            factor116=factor();
+            pushFollow(FOLLOW_factor_in_expression1237);
+            factor117=factor();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, factor116.getTree());
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:20: ( binop factor )*
-            loop40:
+            adaptor.addChild(root_0, factor117.getTree());
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:20: ( binop factor )*
+            loop41:
             do {
-                int alt40=2;
-                int LA40_0 = input.LA(1);
+                int alt41=2;
+                int LA41_0 = input.LA(1);
 
-                if ( (LA40_0==MINUS||(LA40_0>=PLUS && LA40_0<=XOR)) ) {
-                    alt40=1;
+                if ( (LA41_0==MINUS||(LA41_0>=PLUS && LA41_0<=XOR)) ) {
+                    alt41=1;
                 }
 
 
-                switch (alt40) {
+                switch (alt41) {
             	case 1 :
-            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:21: binop factor
+            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:21: binop factor
             	    {
-            	    pushFollow(FOLLOW_binop_in_expression1237);
-            	    binop117=binop();
+            	    pushFollow(FOLLOW_binop_in_expression1240);
+            	    binop118=binop();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, binop117.getTree());
-            	    pushFollow(FOLLOW_factor_in_expression1239);
-            	    factor118=factor();
+            	    adaptor.addChild(root_0, binop118.getTree());
+            	    pushFollow(FOLLOW_factor_in_expression1242);
+            	    factor119=factor();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, factor118.getTree());
+            	    adaptor.addChild(root_0, factor119.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop40;
+            	    break loop41;
                 }
             } while (true);
 
@@ -4573,7 +4597,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "unop"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:1: unop : (op= MINUS | op= NOT ) -> ^( UnOp $op) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:1: unop : (op= MINUS | op= NOT ) -> ^( UnOp $op) ;
     public final CalParser.unop_return unop() throws RecognitionException {
         CalParser.unop_return retval = new CalParser.unop_return();
         retval.start = input.LT(1);
@@ -4587,39 +4611,39 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_MINUS=new RewriteRuleTokenStream(adaptor,"token MINUS");
 
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:5: ( (op= MINUS | op= NOT ) -> ^( UnOp $op) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:7: (op= MINUS | op= NOT )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:5: ( (op= MINUS | op= NOT ) -> ^( UnOp $op) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:7: (op= MINUS | op= NOT )
             {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:7: (op= MINUS | op= NOT )
-            int alt41=2;
-            int LA41_0 = input.LA(1);
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:7: (op= MINUS | op= NOT )
+            int alt42=2;
+            int LA42_0 = input.LA(1);
 
-            if ( (LA41_0==MINUS) ) {
-                alt41=1;
+            if ( (LA42_0==MINUS) ) {
+                alt42=1;
             }
-            else if ( (LA41_0==NOT) ) {
-                alt41=2;
+            else if ( (LA42_0==NOT) ) {
+                alt42=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 41, 0, input);
+                    new NoViableAltException("", 42, 0, input);
 
                 throw nvae;
             }
-            switch (alt41) {
+            switch (alt42) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:8: op= MINUS
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:8: op= MINUS
                     {
-                    op=(Token)match(input,MINUS,FOLLOW_MINUS_in_unop1251);  
+                    op=(Token)match(input,MINUS,FOLLOW_MINUS_in_unop1254);  
                     stream_MINUS.add(op);
 
 
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:19: op= NOT
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:19: op= NOT
                     {
-                    op=(Token)match(input,NOT,FOLLOW_NOT_in_unop1257);  
+                    op=(Token)match(input,NOT,FOLLOW_NOT_in_unop1260);  
                     stream_NOT.add(op);
 
 
@@ -4644,7 +4668,7 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 201:27: -> ^( UnOp $op)
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:30: ^( UnOp $op)
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:30: ^( UnOp $op)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(UnOp, "UnOp"), root_1);
@@ -4683,7 +4707,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "binop"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:1: binop : (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR ) -> ^( BinOp $op) ;
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:1: binop : (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR ) -> ^( BinOp $op) ;
     public final CalParser.binop_return binop() throws RecognitionException {
         CalParser.binop_return retval = new CalParser.binop_return();
         retval.start = input.LT(1);
@@ -4700,85 +4724,85 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_TIMES=new RewriteRuleTokenStream(adaptor,"token TIMES");
 
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:6: ( (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR ) -> ^( BinOp $op) )
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:8: (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:6: ( (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR ) -> ^( BinOp $op) )
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:8: (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR )
             {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:8: (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR )
-            int alt42=5;
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:8: (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR )
+            int alt43=5;
             switch ( input.LA(1) ) {
             case PLUS:
                 {
-                alt42=1;
+                alt43=1;
                 }
                 break;
             case MINUS:
                 {
-                alt42=2;
+                alt43=2;
                 }
                 break;
             case TIMES:
                 {
-                alt42=3;
+                alt43=3;
                 }
                 break;
             case DIV:
                 {
-                alt42=4;
+                alt43=4;
                 }
                 break;
             case XOR:
                 {
-                alt42=5;
+                alt43=5;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("", 42, 0, input);
+                    new NoViableAltException("", 43, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt42) {
+            switch (alt43) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:9: op= PLUS
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:9: op= PLUS
                     {
-                    op=(Token)match(input,PLUS,FOLLOW_PLUS_in_binop1277);  
+                    op=(Token)match(input,PLUS,FOLLOW_PLUS_in_binop1280);  
                     stream_PLUS.add(op);
 
 
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:19: op= MINUS
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:19: op= MINUS
                     {
-                    op=(Token)match(input,MINUS,FOLLOW_MINUS_in_binop1283);  
+                    op=(Token)match(input,MINUS,FOLLOW_MINUS_in_binop1286);  
                     stream_MINUS.add(op);
 
 
                     }
                     break;
                 case 3 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:30: op= TIMES
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:30: op= TIMES
                     {
-                    op=(Token)match(input,TIMES,FOLLOW_TIMES_in_binop1289);  
+                    op=(Token)match(input,TIMES,FOLLOW_TIMES_in_binop1292);  
                     stream_TIMES.add(op);
 
 
                     }
                     break;
                 case 4 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:41: op= DIV
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:41: op= DIV
                     {
-                    op=(Token)match(input,DIV,FOLLOW_DIV_in_binop1295);  
+                    op=(Token)match(input,DIV,FOLLOW_DIV_in_binop1298);  
                     stream_DIV.add(op);
 
 
                     }
                     break;
                 case 5 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:50: op= XOR
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:50: op= XOR
                     {
-                    op=(Token)match(input,XOR,FOLLOW_XOR_in_binop1301);  
+                    op=(Token)match(input,XOR,FOLLOW_XOR_in_binop1304);  
                     stream_XOR.add(op);
 
 
@@ -4803,7 +4827,7 @@ public class CalParser extends Parser {
             root_0 = (Object)adaptor.nil();
             // 203:58: -> ^( BinOp $op)
             {
-                // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:61: ^( BinOp $op)
+                // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:61: ^( BinOp $op)
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(BinOp, "BinOp"), root_1);
@@ -4842,69 +4866,69 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "factor"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:205:1: factor : ( term | unop term -> ^( Expression unop term ) );
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:205:1: factor : ( term | unop term -> ^( Expression unop term ) );
     public final CalParser.factor_return factor() throws RecognitionException {
         CalParser.factor_return retval = new CalParser.factor_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        CalParser.term_return term119 = null;
+        CalParser.term_return term120 = null;
 
-        CalParser.unop_return unop120 = null;
+        CalParser.unop_return unop121 = null;
 
-        CalParser.term_return term121 = null;
+        CalParser.term_return term122 = null;
 
 
         RewriteRuleSubtreeStream stream_unop=new RewriteRuleSubtreeStream(adaptor,"rule unop");
         RewriteRuleSubtreeStream stream_term=new RewriteRuleSubtreeStream(adaptor,"rule term");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:205:7: ( term | unop term -> ^( Expression unop term ) )
-            int alt43=2;
-            int LA43_0 = input.LA(1);
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:205:7: ( term | unop term -> ^( Expression unop term ) )
+            int alt44=2;
+            int LA44_0 = input.LA(1);
 
-            if ( ((LA43_0>=QID && LA43_0<=LBRACKET)||LA43_0==LPAREN||(LA43_0>=FLOAT && LA43_0<=FALSE)) ) {
-                alt43=1;
+            if ( ((LA44_0>=QID && LA44_0<=LBRACKET)||LA44_0==LPAREN||(LA44_0>=FLOAT && LA44_0<=FALSE)) ) {
+                alt44=1;
             }
-            else if ( ((LA43_0>=MINUS && LA43_0<=NOT)) ) {
-                alt43=2;
+            else if ( ((LA44_0>=MINUS && LA44_0<=NOT)) ) {
+                alt44=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 43, 0, input);
+                    new NoViableAltException("", 44, 0, input);
 
                 throw nvae;
             }
-            switch (alt43) {
+            switch (alt44) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:205:9: term
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:205:9: term
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_term_in_factor1318);
-                    term119=term();
+                    pushFollow(FOLLOW_term_in_factor1321);
+                    term120=term();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, term119.getTree());
+                    adaptor.addChild(root_0, term120.getTree());
 
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:206:3: unop term
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:206:3: unop term
                     {
-                    pushFollow(FOLLOW_unop_in_factor1322);
-                    unop120=unop();
+                    pushFollow(FOLLOW_unop_in_factor1325);
+                    unop121=unop();
 
                     state._fsp--;
 
-                    stream_unop.add(unop120.getTree());
-                    pushFollow(FOLLOW_term_in_factor1324);
-                    term121=term();
+                    stream_unop.add(unop121.getTree());
+                    pushFollow(FOLLOW_term_in_factor1327);
+                    term122=term();
 
                     state._fsp--;
 
-                    stream_term.add(term121.getTree());
+                    stream_term.add(term122.getTree());
 
 
                     // AST REWRITE
@@ -4920,7 +4944,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 206:13: -> ^( Expression unop term )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:206:16: ^( Expression unop term )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:206:16: ^( Expression unop term )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Expression, "Expression"), root_1);
@@ -4962,71 +4986,71 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "term"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:208:1: term : ( atom | LPAREN expression RPAREN -> ^( Expression expression ) );
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:208:1: term : ( atom | LPAREN expression RPAREN -> ^( Expression expression ) );
     public final CalParser.term_return term() throws RecognitionException {
         CalParser.term_return retval = new CalParser.term_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token LPAREN123=null;
-        Token RPAREN125=null;
-        CalParser.atom_return atom122 = null;
+        Token LPAREN124=null;
+        Token RPAREN126=null;
+        CalParser.atom_return atom123 = null;
 
-        CalParser.expression_return expression124 = null;
+        CalParser.expression_return expression125 = null;
 
 
-        Object LPAREN123_tree=null;
-        Object RPAREN125_tree=null;
+        Object LPAREN124_tree=null;
+        Object RPAREN126_tree=null;
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_LPAREN=new RewriteRuleTokenStream(adaptor,"token LPAREN");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:208:5: ( atom | LPAREN expression RPAREN -> ^( Expression expression ) )
-            int alt44=2;
-            int LA44_0 = input.LA(1);
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:208:5: ( atom | LPAREN expression RPAREN -> ^( Expression expression ) )
+            int alt45=2;
+            int LA45_0 = input.LA(1);
 
-            if ( ((LA44_0>=QID && LA44_0<=LBRACKET)||(LA44_0>=FLOAT && LA44_0<=FALSE)) ) {
-                alt44=1;
+            if ( ((LA45_0>=QID && LA45_0<=LBRACKET)||(LA45_0>=FLOAT && LA45_0<=FALSE)) ) {
+                alt45=1;
             }
-            else if ( (LA44_0==LPAREN) ) {
-                alt44=2;
+            else if ( (LA45_0==LPAREN) ) {
+                alt45=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 44, 0, input);
+                    new NoViableAltException("", 45, 0, input);
 
                 throw nvae;
             }
-            switch (alt44) {
+            switch (alt45) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:208:7: atom
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:208:7: atom
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_atom_in_term1341);
-                    atom122=atom();
+                    pushFollow(FOLLOW_atom_in_term1344);
+                    atom123=atom();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, atom122.getTree());
+                    adaptor.addChild(root_0, atom123.getTree());
 
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:209:5: LPAREN expression RPAREN
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:209:5: LPAREN expression RPAREN
                     {
-                    LPAREN123=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_term1347);  
-                    stream_LPAREN.add(LPAREN123);
+                    LPAREN124=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_term1350);  
+                    stream_LPAREN.add(LPAREN124);
 
-                    pushFollow(FOLLOW_expression_in_term1349);
-                    expression124=expression();
+                    pushFollow(FOLLOW_expression_in_term1352);
+                    expression125=expression();
 
                     state._fsp--;
 
-                    stream_expression.add(expression124.getTree());
-                    RPAREN125=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_term1351);  
-                    stream_RPAREN.add(RPAREN125);
+                    stream_expression.add(expression125.getTree());
+                    RPAREN126=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_term1354);  
+                    stream_RPAREN.add(RPAREN126);
 
 
 
@@ -5043,7 +5067,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 209:30: -> ^( Expression expression )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:209:33: ^( Expression expression )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:209:33: ^( Expression expression )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Expression, "Expression"), root_1);
@@ -5084,36 +5108,36 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "atom"
-    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:211:1: atom : ( QID -> ^( Var QID ) | FLOAT -> ^( Real FLOAT ) | INTEGER -> ^( Integer INTEGER ) | STRING -> ^( String STRING ) | TRUE -> ^( Boolean TRUE ) | FALSE -> ^( Boolean FALSE ) | LBRACKET ( expression ( COMMA expression )* )? RBRACKET -> ^( List ( expression )* ) );
+    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:211:1: atom : ( QID -> ^( Var QID ) | FLOAT -> ^( Real FLOAT ) | INTEGER -> ^( Integer INTEGER ) | STRING -> ^( String STRING ) | TRUE -> ^( Boolean TRUE ) | FALSE -> ^( Boolean FALSE ) | LBRACKET ( expression ( COMMA expression )* )? RBRACKET -> ^( List ( expression )* ) );
     public final CalParser.atom_return atom() throws RecognitionException {
         CalParser.atom_return retval = new CalParser.atom_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token QID126=null;
-        Token FLOAT127=null;
-        Token INTEGER128=null;
-        Token STRING129=null;
-        Token TRUE130=null;
-        Token FALSE131=null;
-        Token LBRACKET132=null;
-        Token COMMA134=null;
-        Token RBRACKET136=null;
-        CalParser.expression_return expression133 = null;
+        Token QID127=null;
+        Token FLOAT128=null;
+        Token INTEGER129=null;
+        Token STRING130=null;
+        Token TRUE131=null;
+        Token FALSE132=null;
+        Token LBRACKET133=null;
+        Token COMMA135=null;
+        Token RBRACKET137=null;
+        CalParser.expression_return expression134 = null;
 
-        CalParser.expression_return expression135 = null;
+        CalParser.expression_return expression136 = null;
 
 
-        Object QID126_tree=null;
-        Object FLOAT127_tree=null;
-        Object INTEGER128_tree=null;
-        Object STRING129_tree=null;
-        Object TRUE130_tree=null;
-        Object FALSE131_tree=null;
-        Object LBRACKET132_tree=null;
-        Object COMMA134_tree=null;
-        Object RBRACKET136_tree=null;
+        Object QID127_tree=null;
+        Object FLOAT128_tree=null;
+        Object INTEGER129_tree=null;
+        Object STRING130_tree=null;
+        Object TRUE131_tree=null;
+        Object FALSE132_tree=null;
+        Object LBRACKET133_tree=null;
+        Object COMMA135_tree=null;
+        Object RBRACKET137_tree=null;
         RewriteRuleTokenStream stream_LBRACKET=new RewriteRuleTokenStream(adaptor,"token LBRACKET");
         RewriteRuleTokenStream stream_INTEGER=new RewriteRuleTokenStream(adaptor,"token INTEGER");
         RewriteRuleTokenStream stream_FLOAT=new RewriteRuleTokenStream(adaptor,"token FLOAT");
@@ -5125,57 +5149,57 @@ public class CalParser extends Parser {
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:211:5: ( QID -> ^( Var QID ) | FLOAT -> ^( Real FLOAT ) | INTEGER -> ^( Integer INTEGER ) | STRING -> ^( String STRING ) | TRUE -> ^( Boolean TRUE ) | FALSE -> ^( Boolean FALSE ) | LBRACKET ( expression ( COMMA expression )* )? RBRACKET -> ^( List ( expression )* ) )
-            int alt47=7;
+            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:211:5: ( QID -> ^( Var QID ) | FLOAT -> ^( Real FLOAT ) | INTEGER -> ^( Integer INTEGER ) | STRING -> ^( String STRING ) | TRUE -> ^( Boolean TRUE ) | FALSE -> ^( Boolean FALSE ) | LBRACKET ( expression ( COMMA expression )* )? RBRACKET -> ^( List ( expression )* ) )
+            int alt48=7;
             switch ( input.LA(1) ) {
             case QID:
                 {
-                alt47=1;
+                alt48=1;
                 }
                 break;
             case FLOAT:
                 {
-                alt47=2;
+                alt48=2;
                 }
                 break;
             case INTEGER:
                 {
-                alt47=3;
+                alt48=3;
                 }
                 break;
             case STRING:
                 {
-                alt47=4;
+                alt48=4;
                 }
                 break;
             case TRUE:
                 {
-                alt47=5;
+                alt48=5;
                 }
                 break;
             case FALSE:
                 {
-                alt47=6;
+                alt48=6;
                 }
                 break;
             case LBRACKET:
                 {
-                alt47=7;
+                alt48=7;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("", 47, 0, input);
+                    new NoViableAltException("", 48, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt47) {
+            switch (alt48) {
                 case 1 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:211:7: QID
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:211:7: QID
                     {
-                    QID126=(Token)match(input,QID,FOLLOW_QID_in_atom1366);  
-                    stream_QID.add(QID126);
+                    QID127=(Token)match(input,QID,FOLLOW_QID_in_atom1369);  
+                    stream_QID.add(QID127);
 
 
 
@@ -5192,7 +5216,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 211:11: -> ^( Var QID )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:211:14: ^( Var QID )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:211:14: ^( Var QID )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Var, "Var"), root_1);
@@ -5208,10 +5232,10 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:212:3: FLOAT
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:212:3: FLOAT
                     {
-                    FLOAT127=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_atom1378);  
-                    stream_FLOAT.add(FLOAT127);
+                    FLOAT128=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_atom1381);  
+                    stream_FLOAT.add(FLOAT128);
 
 
 
@@ -5228,7 +5252,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 212:9: -> ^( Real FLOAT )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:212:12: ^( Real FLOAT )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:212:12: ^( Real FLOAT )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Real, "Real"), root_1);
@@ -5244,10 +5268,10 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:213:3: INTEGER
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:213:3: INTEGER
                     {
-                    INTEGER128=(Token)match(input,INTEGER,FOLLOW_INTEGER_in_atom1390);  
-                    stream_INTEGER.add(INTEGER128);
+                    INTEGER129=(Token)match(input,INTEGER,FOLLOW_INTEGER_in_atom1393);  
+                    stream_INTEGER.add(INTEGER129);
 
 
 
@@ -5264,7 +5288,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 213:11: -> ^( Integer INTEGER )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:213:14: ^( Integer INTEGER )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:213:14: ^( Integer INTEGER )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Integer, "Integer"), root_1);
@@ -5280,10 +5304,10 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:214:3: STRING
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:214:3: STRING
                     {
-                    STRING129=(Token)match(input,STRING,FOLLOW_STRING_in_atom1402);  
-                    stream_STRING.add(STRING129);
+                    STRING130=(Token)match(input,STRING,FOLLOW_STRING_in_atom1405);  
+                    stream_STRING.add(STRING130);
 
 
 
@@ -5300,7 +5324,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 214:10: -> ^( String STRING )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:214:13: ^( String STRING )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:214:13: ^( String STRING )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(String, "String"), root_1);
@@ -5316,10 +5340,10 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:215:3: TRUE
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:215:3: TRUE
                     {
-                    TRUE130=(Token)match(input,TRUE,FOLLOW_TRUE_in_atom1414);  
-                    stream_TRUE.add(TRUE130);
+                    TRUE131=(Token)match(input,TRUE,FOLLOW_TRUE_in_atom1417);  
+                    stream_TRUE.add(TRUE131);
 
 
 
@@ -5336,7 +5360,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 215:8: -> ^( Boolean TRUE )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:215:11: ^( Boolean TRUE )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:215:11: ^( Boolean TRUE )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Boolean, "Boolean"), root_1);
@@ -5352,10 +5376,10 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:216:3: FALSE
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:216:3: FALSE
                     {
-                    FALSE131=(Token)match(input,FALSE,FOLLOW_FALSE_in_atom1426);  
-                    stream_FALSE.add(FALSE131);
+                    FALSE132=(Token)match(input,FALSE,FOLLOW_FALSE_in_atom1429);  
+                    stream_FALSE.add(FALSE132);
 
 
 
@@ -5372,7 +5396,7 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 216:9: -> ^( Boolean FALSE )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:216:12: ^( Boolean FALSE )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:216:12: ^( Boolean FALSE )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(Boolean, "Boolean"), root_1);
@@ -5388,58 +5412,58 @@ public class CalParser extends Parser {
                     }
                     break;
                 case 7 :
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:3: LBRACKET ( expression ( COMMA expression )* )? RBRACKET
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:3: LBRACKET ( expression ( COMMA expression )* )? RBRACKET
                     {
-                    LBRACKET132=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_atom1438);  
-                    stream_LBRACKET.add(LBRACKET132);
+                    LBRACKET133=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_atom1441);  
+                    stream_LBRACKET.add(LBRACKET133);
 
-                    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:12: ( expression ( COMMA expression )* )?
-                    int alt46=2;
-                    int LA46_0 = input.LA(1);
+                    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:12: ( expression ( COMMA expression )* )?
+                    int alt47=2;
+                    int LA47_0 = input.LA(1);
 
-                    if ( ((LA46_0>=QID && LA46_0<=LBRACKET)||LA46_0==LPAREN||(LA46_0>=MINUS && LA46_0<=NOT)||(LA46_0>=FLOAT && LA46_0<=FALSE)) ) {
-                        alt46=1;
+                    if ( ((LA47_0>=QID && LA47_0<=LBRACKET)||LA47_0==LPAREN||(LA47_0>=MINUS && LA47_0<=NOT)||(LA47_0>=FLOAT && LA47_0<=FALSE)) ) {
+                        alt47=1;
                     }
-                    switch (alt46) {
+                    switch (alt47) {
                         case 1 :
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:13: expression ( COMMA expression )*
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:13: expression ( COMMA expression )*
                             {
-                            pushFollow(FOLLOW_expression_in_atom1441);
-                            expression133=expression();
+                            pushFollow(FOLLOW_expression_in_atom1444);
+                            expression134=expression();
 
                             state._fsp--;
 
-                            stream_expression.add(expression133.getTree());
-                            // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:24: ( COMMA expression )*
-                            loop45:
+                            stream_expression.add(expression134.getTree());
+                            // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:24: ( COMMA expression )*
+                            loop46:
                             do {
-                                int alt45=2;
-                                int LA45_0 = input.LA(1);
+                                int alt46=2;
+                                int LA46_0 = input.LA(1);
 
-                                if ( (LA45_0==COMMA) ) {
-                                    alt45=1;
+                                if ( (LA46_0==COMMA) ) {
+                                    alt46=1;
                                 }
 
 
-                                switch (alt45) {
+                                switch (alt46) {
                             	case 1 :
-                            	    // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:25: COMMA expression
+                            	    // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:25: COMMA expression
                             	    {
-                            	    COMMA134=(Token)match(input,COMMA,FOLLOW_COMMA_in_atom1444);  
-                            	    stream_COMMA.add(COMMA134);
+                            	    COMMA135=(Token)match(input,COMMA,FOLLOW_COMMA_in_atom1447);  
+                            	    stream_COMMA.add(COMMA135);
 
-                            	    pushFollow(FOLLOW_expression_in_atom1446);
-                            	    expression135=expression();
+                            	    pushFollow(FOLLOW_expression_in_atom1449);
+                            	    expression136=expression();
 
                             	    state._fsp--;
 
-                            	    stream_expression.add(expression135.getTree());
+                            	    stream_expression.add(expression136.getTree());
 
                             	    }
                             	    break;
 
                             	default :
-                            	    break loop45;
+                            	    break loop46;
                                 }
                             } while (true);
 
@@ -5449,8 +5473,8 @@ public class CalParser extends Parser {
 
                     }
 
-                    RBRACKET136=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_atom1452);  
-                    stream_RBRACKET.add(RBRACKET136);
+                    RBRACKET137=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_atom1455);  
+                    stream_RBRACKET.add(RBRACKET137);
 
 
 
@@ -5467,12 +5491,12 @@ public class CalParser extends Parser {
                     root_0 = (Object)adaptor.nil();
                     // 217:55: -> ^( List ( expression )* )
                     {
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:58: ^( List ( expression )* )
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:58: ^( List ( expression )* )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(List, "List"), root_1);
 
-                        // C:\\Work\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:65: ( expression )*
+                        // D:\\Work\\orcc\\trunk\\eclipse\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:217:65: ( expression )*
                         while ( stream_expression.hasNext() ) {
                             adaptor.addChild(root_1, stream_expression.nextTree());
 
@@ -5519,17 +5543,17 @@ public class CalParser extends Parser {
     public static final BitSet FOLLOW_RBRACKET_in_network246 = new BitSet(new long[]{0x0000010000000000L});
     public static final BitSet FOLLOW_LPAREN_in_network252 = new BitSet(new long[]{0x0000022000000000L});
     public static final BitSet FOLLOW_parameters_in_network254 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_network257 = new BitSet(new long[]{0x2000102000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_network257 = new BitSet(new long[]{0x4000102000000000L});
     public static final BitSet FOLLOW_portSignature_in_network261 = new BitSet(new long[]{0x0000040000000000L});
-    public static final BitSet FOLLOW_COLON_in_network263 = new BitSet(new long[]{0x0814280000000000L});
-    public static final BitSet FOLLOW_oneImport_in_network267 = new BitSet(new long[]{0x0814280000000000L});
+    public static final BitSet FOLLOW_COLON_in_network263 = new BitSet(new long[]{0x1014280000000000L});
+    public static final BitSet FOLLOW_oneImport_in_network267 = new BitSet(new long[]{0x1014280000000000L});
     public static final BitSet FOLLOW_varDeclSection_in_network270 = new BitSet(new long[]{0x0014080000000000L});
     public static final BitSet FOLLOW_entitySection_in_network275 = new BitSet(new long[]{0x0010080000000000L});
     public static final BitSet FOLLOW_structureSection_in_network278 = new BitSet(new long[]{0x0000080000000000L});
     public static final BitSet FOLLOW_END_in_network283 = new BitSet(new long[]{0x0000000000000000L});
     public static final BitSet FOLLOW_EOF_in_network285 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_inputPorts_in_portSignature324 = new BitSet(new long[]{0x0000100000000000L});
-    public static final BitSet FOLLOW_DOUBLE_EQUAL_ARROW_in_portSignature326 = new BitSet(new long[]{0x2000002000000000L});
+    public static final BitSet FOLLOW_DOUBLE_EQUAL_ARROW_in_portSignature326 = new BitSet(new long[]{0x4000002000000000L});
     public static final BitSet FOLLOW_outputPorts_in_portSignature328 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_portDecls_in_inputPorts341 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_portDecls_in_outputPorts366 = new BitSet(new long[]{0x0000000000000002L});
@@ -5537,8 +5561,8 @@ public class CalParser extends Parser {
     public static final BitSet FOLLOW_varDecl_in_varDeclSection394 = new BitSet(new long[]{0x0000402000000002L});
     public static final BitSet FOLLOW_MUTABLE_in_varDecl407 = new BitSet(new long[]{0x0000002000000000L});
     public static final BitSet FOLLOW_typeAndId_in_varDecl410 = new BitSet(new long[]{0x0003800000000000L});
-    public static final BitSet FOLLOW_EQ_in_varDecl416 = new BitSet(new long[]{0x8000016000000000L,0x00000000000003E1L});
-    public static final BitSet FOLLOW_COLON_EQUAL_in_varDecl420 = new BitSet(new long[]{0x8000016000000000L,0x00000000000003E1L});
+    public static final BitSet FOLLOW_EQ_in_varDecl416 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C3L});
+    public static final BitSet FOLLOW_COLON_EQUAL_in_varDecl420 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C3L});
     public static final BitSet FOLLOW_expression_in_varDecl423 = new BitSet(new long[]{0x0002000000000000L});
     public static final BitSet FOLLOW_SEMICOLON_in_varDecl452 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ENTITIES_in_entitySection460 = new BitSet(new long[]{0x0000002000000000L});
@@ -5555,7 +5579,7 @@ public class CalParser extends Parser {
     public static final BitSet FOLLOW_COMMA_in_entityPars534 = new BitSet(new long[]{0x0000002000000000L});
     public static final BitSet FOLLOW_entityPar_in_entityPars536 = new BitSet(new long[]{0x0008000000000002L});
     public static final BitSet FOLLOW_QID_in_entityPar550 = new BitSet(new long[]{0x0000800000000000L});
-    public static final BitSet FOLLOW_EQ_in_entityPar552 = new BitSet(new long[]{0x8000016000000000L,0x00000000000003E1L});
+    public static final BitSet FOLLOW_EQ_in_entityPar552 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C3L});
     public static final BitSet FOLLOW_expression_in_entityPar554 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_STRUCTURE_in_structureSection580 = new BitSet(new long[]{0x0000002000000000L});
     public static final BitSet FOLLOW_structureStmt_in_structureSection582 = new BitSet(new long[]{0x0000002000000002L});
@@ -5571,96 +5595,97 @@ public class CalParser extends Parser {
     public static final BitSet FOLLOW_attributeDecl_in_attributeSection695 = new BitSet(new long[]{0x0100002000000000L});
     public static final BitSet FOLLOW_RBRACE_in_attributeSection698 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_QID_in_attributeDecl712 = new BitSet(new long[]{0x0000840000000000L});
-    public static final BitSet FOLLOW_EQ_in_attributeDecl715 = new BitSet(new long[]{0x8000016000000000L,0x00000000000003E1L});
+    public static final BitSet FOLLOW_EQ_in_attributeDecl715 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C3L});
     public static final BitSet FOLLOW_expression_in_attributeDecl717 = new BitSet(new long[]{0x0002000000000000L});
     public static final BitSet FOLLOW_SEMICOLON_in_attributeDecl719 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_COLON_in_attributeDecl742 = new BitSet(new long[]{0x0000002000000000L});
     public static final BitSet FOLLOW_type_in_attributeDecl744 = new BitSet(new long[]{0x0002000000000000L});
     public static final BitSet FOLLOW_SEMICOLON_in_attributeDecl746 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_packageRule_in_actor777 = new BitSet(new long[]{0x0A00000000000000L});
-    public static final BitSet FOLLOW_oneImport_in_actor780 = new BitSet(new long[]{0x0A00000000000000L});
-    public static final BitSet FOLLOW_ACTOR_in_actor783 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_QID_in_actor785 = new BitSet(new long[]{0x0000010000000000L});
-    public static final BitSet FOLLOW_LPAREN_in_actor789 = new BitSet(new long[]{0x0000022000000000L});
-    public static final BitSet FOLLOW_parameters_in_actor791 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_actor794 = new BitSet(new long[]{0x2000102000000000L});
-    public static final BitSet FOLLOW_portSignature_in_actor798 = new BitSet(new long[]{0x0000040000000000L});
-    public static final BitSet FOLLOW_COLON_in_actor800 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000000000FFFFFFL});
-    public static final BitSet FOLLOW_EOF_in_actor805 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PACKAGE_in_packageRule834 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_QID_in_packageRule836 = new BitSet(new long[]{0x0002000000000000L});
-    public static final BitSet FOLLOW_SEMICOLON_in_packageRule838 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IMPORT_in_oneImport848 = new BitSet(new long[]{0x1000002000000000L});
-    public static final BitSet FOLLOW_set_in_oneImport850 = new BitSet(new long[]{0x0002000000000000L});
-    public static final BitSet FOLLOW_SEMICOLON_in_oneImport858 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typeAndId_in_parameter868 = new BitSet(new long[]{0x0000800000000002L});
-    public static final BitSet FOLLOW_EQ_in_parameter873 = new BitSet(new long[]{0x8000016000000000L,0x00000000000003E1L});
-    public static final BitSet FOLLOW_expression_in_parameter875 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_parameter_in_parameters909 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_COMMA_in_parameters912 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_parameter_in_parameters914 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_MULTI_in_portDecl931 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_typeAndId_in_portDecl934 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_portDecl_in_portDecls949 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_COMMA_in_portDecls952 = new BitSet(new long[]{0x2000002000000000L});
-    public static final BitSet FOLLOW_portDecl_in_portDecls954 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_typeAndId_in_mainParameter972 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_mainParameter974 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QID_in_typeAndId991 = new BitSet(new long[]{0x0000016000000002L});
-    public static final BitSet FOLLOW_typeRest_in_typeAndId996 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_QID_in_typeAndId1001 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QID_in_type1045 = new BitSet(new long[]{0x0000014000000002L});
-    public static final BitSet FOLLOW_typeRest_in_type1047 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LBRACKET_in_typeRest1070 = new BitSet(new long[]{0x000000A000000000L});
-    public static final BitSet FOLLOW_typePars_in_typeRest1072 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_RBRACKET_in_typeRest1075 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_typeRest1086 = new BitSet(new long[]{0x0000022000000000L});
-    public static final BitSet FOLLOW_typeAttrs_in_typeRest1088 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_typeRest1091 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typeAttr_in_typeAttrs1103 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_COMMA_in_typeAttrs1106 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_typeAttr_in_typeAttrs1108 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_QID_in_typeAttr1122 = new BitSet(new long[]{0x0000840000000000L});
-    public static final BitSet FOLLOW_typeAttrRest_in_typeAttr1124 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_COLON_in_typeAttrRest1135 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_type_in_typeAttrRest1137 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_EQ_in_typeAttrRest1149 = new BitSet(new long[]{0x8000016000000000L,0x00000000000003E1L});
-    public static final BitSet FOLLOW_expression_in_typeAttrRest1151 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typePar_in_typePars1170 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_COMMA_in_typePars1173 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_typePar_in_typePars1175 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_QID_in_typePar1189 = new BitSet(new long[]{0x4000000000000002L});
-    public static final BitSet FOLLOW_LT_in_typePar1192 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_type_in_typePar1194 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_mainExpression1217 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_mainExpression1219 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_factor_in_expression1234 = new BitSet(new long[]{0x8000000000000002L,0x000000000000001EL});
-    public static final BitSet FOLLOW_binop_in_expression1237 = new BitSet(new long[]{0x8000016000000000L,0x00000000000003E1L});
-    public static final BitSet FOLLOW_factor_in_expression1239 = new BitSet(new long[]{0x8000000000000002L,0x000000000000001EL});
-    public static final BitSet FOLLOW_MINUS_in_unop1251 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_unop1257 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PLUS_in_binop1277 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_binop1283 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TIMES_in_binop1289 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DIV_in_binop1295 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_XOR_in_binop1301 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_term_in_factor1318 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_unop_in_factor1322 = new BitSet(new long[]{0x0000016000000000L,0x00000000000003E0L});
-    public static final BitSet FOLLOW_term_in_factor1324 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_atom_in_term1341 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_term1347 = new BitSet(new long[]{0x8000016000000000L,0x00000000000003E1L});
-    public static final BitSet FOLLOW_expression_in_term1349 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_term1351 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QID_in_atom1366 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FLOAT_in_atom1378 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INTEGER_in_atom1390 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_in_atom1402 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TRUE_in_atom1414 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FALSE_in_atom1426 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LBRACKET_in_atom1438 = new BitSet(new long[]{0x800001E000000000L,0x00000000000003E1L});
-    public static final BitSet FOLLOW_expression_in_atom1441 = new BitSet(new long[]{0x0008008000000000L});
-    public static final BitSet FOLLOW_COMMA_in_atom1444 = new BitSet(new long[]{0x8000016000000000L,0x00000000000003E1L});
-    public static final BitSet FOLLOW_expression_in_atom1446 = new BitSet(new long[]{0x0008008000000000L});
-    public static final BitSet FOLLOW_RBRACKET_in_atom1452 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_packageRule_in_actor777 = new BitSet(new long[]{0x1600000000000000L});
+    public static final BitSet FOLLOW_oneImport_in_actor780 = new BitSet(new long[]{0x1600000000000000L});
+    public static final BitSet FOLLOW_NATIVE_in_actor783 = new BitSet(new long[]{0x0400000000000000L});
+    public static final BitSet FOLLOW_ACTOR_in_actor786 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_QID_in_actor788 = new BitSet(new long[]{0x0000010000000000L});
+    public static final BitSet FOLLOW_LPAREN_in_actor792 = new BitSet(new long[]{0x0000022000000000L});
+    public static final BitSet FOLLOW_parameters_in_actor794 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_actor797 = new BitSet(new long[]{0x4000102000000000L});
+    public static final BitSet FOLLOW_portSignature_in_actor801 = new BitSet(new long[]{0x0000040000000000L});
+    public static final BitSet FOLLOW_COLON_in_actor803 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x0000000001FFFFFFL});
+    public static final BitSet FOLLOW_EOF_in_actor808 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PACKAGE_in_packageRule837 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_QID_in_packageRule839 = new BitSet(new long[]{0x0002000000000000L});
+    public static final BitSet FOLLOW_SEMICOLON_in_packageRule841 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IMPORT_in_oneImport851 = new BitSet(new long[]{0x2000002000000000L});
+    public static final BitSet FOLLOW_set_in_oneImport853 = new BitSet(new long[]{0x0002000000000000L});
+    public static final BitSet FOLLOW_SEMICOLON_in_oneImport861 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeAndId_in_parameter871 = new BitSet(new long[]{0x0000800000000002L});
+    public static final BitSet FOLLOW_EQ_in_parameter876 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C3L});
+    public static final BitSet FOLLOW_expression_in_parameter878 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_parameter_in_parameters912 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_COMMA_in_parameters915 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_parameter_in_parameters917 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_MULTI_in_portDecl934 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_typeAndId_in_portDecl937 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_portDecl_in_portDecls952 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_COMMA_in_portDecls955 = new BitSet(new long[]{0x4000002000000000L});
+    public static final BitSet FOLLOW_portDecl_in_portDecls957 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_typeAndId_in_mainParameter975 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_mainParameter977 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QID_in_typeAndId994 = new BitSet(new long[]{0x0000016000000002L});
+    public static final BitSet FOLLOW_typeRest_in_typeAndId999 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_QID_in_typeAndId1004 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QID_in_type1048 = new BitSet(new long[]{0x0000014000000002L});
+    public static final BitSet FOLLOW_typeRest_in_type1050 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LBRACKET_in_typeRest1073 = new BitSet(new long[]{0x000000A000000000L});
+    public static final BitSet FOLLOW_typePars_in_typeRest1075 = new BitSet(new long[]{0x0000008000000000L});
+    public static final BitSet FOLLOW_RBRACKET_in_typeRest1078 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_typeRest1089 = new BitSet(new long[]{0x0000022000000000L});
+    public static final BitSet FOLLOW_typeAttrs_in_typeRest1091 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_typeRest1094 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeAttr_in_typeAttrs1106 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_COMMA_in_typeAttrs1109 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_typeAttr_in_typeAttrs1111 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_QID_in_typeAttr1125 = new BitSet(new long[]{0x0000840000000000L});
+    public static final BitSet FOLLOW_typeAttrRest_in_typeAttr1127 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_COLON_in_typeAttrRest1138 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_type_in_typeAttrRest1140 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_EQ_in_typeAttrRest1152 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C3L});
+    public static final BitSet FOLLOW_expression_in_typeAttrRest1154 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typePar_in_typePars1173 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_COMMA_in_typePars1176 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_typePar_in_typePars1178 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_QID_in_typePar1192 = new BitSet(new long[]{0x8000000000000002L});
+    public static final BitSet FOLLOW_LT_in_typePar1195 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_type_in_typePar1197 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_mainExpression1220 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_mainExpression1222 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_factor_in_expression1237 = new BitSet(new long[]{0x0000000000000002L,0x000000000000003DL});
+    public static final BitSet FOLLOW_binop_in_expression1240 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C3L});
+    public static final BitSet FOLLOW_factor_in_expression1242 = new BitSet(new long[]{0x0000000000000002L,0x000000000000003DL});
+    public static final BitSet FOLLOW_MINUS_in_unop1254 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_unop1260 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PLUS_in_binop1280 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MINUS_in_binop1286 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TIMES_in_binop1292 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DIV_in_binop1298 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_XOR_in_binop1304 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_term_in_factor1321 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_unop_in_factor1325 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C0L});
+    public static final BitSet FOLLOW_term_in_factor1327 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_atom_in_term1344 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_term1350 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C3L});
+    public static final BitSet FOLLOW_expression_in_term1352 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_term1354 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QID_in_atom1369 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FLOAT_in_atom1381 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INTEGER_in_atom1393 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_in_atom1405 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TRUE_in_atom1417 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FALSE_in_atom1429 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LBRACKET_in_atom1441 = new BitSet(new long[]{0x000001E000000000L,0x00000000000007C3L});
+    public static final BitSet FOLLOW_expression_in_atom1444 = new BitSet(new long[]{0x0008008000000000L});
+    public static final BitSet FOLLOW_COMMA_in_atom1447 = new BitSet(new long[]{0x0000016000000000L,0x00000000000007C3L});
+    public static final BitSet FOLLOW_expression_in_atom1449 = new BitSet(new long[]{0x0008008000000000L});
+    public static final BitSet FOLLOW_RBRACKET_in_atom1455 = new BitSet(new long[]{0x0000000000000002L});
 
 }
