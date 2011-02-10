@@ -44,11 +44,11 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  */
 public class CustomPeek extends SpecificInstruction implements TargetContainer {
 
-	private int tokenIndex;
-
 	private Port port;
 
 	private Variable target;
+
+	private int tokenIndex;
 
 	public CustomPeek(Location location, Port port, int tokenIndex,
 			Variable target) {
@@ -81,6 +81,10 @@ public class CustomPeek extends SpecificInstruction implements TargetContainer {
 		this.target = target;
 	}
 
+	public boolean isCustomPeek(){
+		return true;
+	}
+
 	/**
 	 * Sets the port used by this FIFO operation.
 	 * 
@@ -101,7 +105,7 @@ public class CustomPeek extends SpecificInstruction implements TargetContainer {
 	public void setTarget(Variable target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
-
+	
 	/**
 	 * Sets the index of the token used by this FIFO operation.
 	 * 

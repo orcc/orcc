@@ -47,10 +47,10 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
 public class TernaryOperation extends SpecificInstruction implements
 		TargetContainer {
 
-	private Variable target;
 	private Expression conditionValue;
-	private Expression trueValue;
 	private Expression falseValue;
+	private Variable target;
+	private Expression trueValue;
 
 	public TernaryOperation(Location location, Variable target,
 			Expression conditionValue, Expression trueValue,
@@ -99,6 +99,10 @@ public class TernaryOperation extends SpecificInstruction implements
 		this.target = target;
 	}
 
+	public boolean isTernaryOperation() {
+		return true;
+	}
+
 	public void setConditionValue(Expression conditionValue) {
 		this.conditionValue = conditionValue;
 	}
@@ -115,7 +119,7 @@ public class TernaryOperation extends SpecificInstruction implements
 	public void setTrueValue(Expression trueValue) {
 		this.trueValue = trueValue;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getTarget() + " = " + getConditionValue() + " ? "

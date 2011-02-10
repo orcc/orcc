@@ -152,4 +152,8 @@ public class AssignIndex extends SpecificInstruction implements
 	public void setTarget(LocalVariable target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
+	
+	public boolean isAssignIndex(){
+		return true;
+	}
 }
