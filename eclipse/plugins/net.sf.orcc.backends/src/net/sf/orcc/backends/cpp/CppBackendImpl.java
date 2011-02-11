@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -200,27 +199,10 @@ public class CppBackendImpl extends AbstractBackend {
 	protected boolean printActor(Actor actor) throws OrccException {
 		boolean res = false;
 		try {
-
-			List<String> packages = actor.getPackageAsList();
-			Iterator<String> it = packages.iterator();
-
-			String name;
-			if(!packages.isEmpty()) {
-			StringBuffer sb = new StringBuffer();
-			if (it.hasNext()) {
-				sb.append(it.next());
-				while (it.hasNext()) {
-					sb.append(File.separator);
-					sb.append(it.next());
-				}
-			}
-			String hierPath = path + File.separator + sb.toString();
-			new File(hierPath).mkdirs();
-
-			name = hierPath + File.separator + actor.getSimpleName();
-			} else {
-				name = path + File.separator + actor.getSimpleName();
-			}
+			String hier = path + File.separator
+					+ actor.getPackage().replace('.', File.separatorChar);
+			new File(hier).mkdirs();
+			String name = hier + File.separator + actor.getSimpleName();
 			
 			if (printHeader) {
 				printer.loadGroups("Cpp_actorDecl");

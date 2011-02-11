@@ -30,9 +30,12 @@ find_library(CALaka_LIBRARY CALaka HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 find_library(SystemActor_LIBRARY SystemActor HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 find_library(Thread_LIBRARY Thread HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 
+find_library(ImageToolbox_LIBRARY ImageToolbox HINTS $ENV{ImageToolboxDIR} PATH_SUFFIXES lib)
+
+set(ImageToolbox_INCLUDE_DIR "$ENV{ImageToolboxDIR}/include")
+
 find_path(CAL_INCLUDE_DIR actoraka.h HINTS $ENV{CALDIR} PATH_SUFFIXES include include/CAL)
 
-find_package(SDL REQUIRED)
 
 <if(needSerDes)>
 find_path(CAL_SOURCE_DIR wrapperaka.cpp HINTS $ENV{CALDIR} PATH_SUFFIXES src src/CAL)
@@ -40,10 +43,38 @@ find_library(AdaptorFactory_LIBRARY AdaptorFactory HINTS $ENV{CALDIR} PATH_SUFFI
 add_library(Wrapper STATIC "${CAL_SOURCE_DIR}/wrapperaka.cpp")
 <endif>
 
+
+set(includes
+${CMAKE_SOURCE_DIR}
+${CAL_INCLUDE_DIR}
+)
+
+set(libraries
+${CALaka_LIBRARY}
+${SystemActor_LIBRARY}
+${Thread_LIBRARY}
+)
+
+<if(needSerDes)>
+set(libraries ${libraries} Wrapper ${AdaptorFactory_LIBRARY}
+<endif>
+
+
+if(SDL_DISPLAY)
+find_package(SDL REQUIRED)
+set(includes ${includes} ${SDL_INCLUDE_DIR})	
+set(libraries ${libraries} ${SDL_LIBRARY})
+endif()
+
+if(OpenCV_DISPLAY)
+find_package(OpenCV REQUIRED)
+set(includes ${includes} ${SDL_INCLUDE_DIR} ${ImageToolbox_INCLUDE_DIR} ${OpenCV_INCLUDE_DIR})
+set(libraries ${libraries} ${ImageToolbox_LIBRARY} ${OpenCV_LIBS})
+endif()
+
+
 include_directories(
-	${CMAKE_SOURCE_DIR}
-	${CAL_INCLUDE_DIR}
-	${SDL_INCLUDE_DIR}
+${includes}
 )
 
 
@@ -57,14 +88,7 @@ add_dependencies(<network.name> Wrapper)
 <endif>
 
 target_link_libraries(<network.name>
-<if(needSerDes)>
-Wrapper
-${AdaptorFactory_LIBRARY}
-<endif>
-${CALaka_LIBRARY}
-${SystemActor_LIBRARY}
-${Thread_LIBRARY}
-${SDL_LIBRARY}
+${libraries}
 )
 
 >>

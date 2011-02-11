@@ -19,9 +19,6 @@
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
-      <Attribute kind="Value" name="partName">
-         <Expr kind="Literal" literal-kind="String" value="x86_0/core0"/>
-      </Attribute>
    </Instance>
    <Instance id="source">
       <!-- ************************* -->
@@ -31,9 +28,6 @@
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
-      <Attribute kind="Value" name="partName">
-         <Expr kind="Literal" literal-kind="String" value="x86_0/core0"/>
-      </Attribute>
    </Instance>
    <Instance id="display">
       <!-- ************************* -->
@@ -55,9 +49,6 @@
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
-      <Attribute kind="Value" name="partName">
-         <Expr kind="Literal" literal-kind="String" value="x86_0/core1"/>
-      </Attribute>
    </Instance>
    <!-- ************************************** -->
    <!-- Connections of the Graph               -->

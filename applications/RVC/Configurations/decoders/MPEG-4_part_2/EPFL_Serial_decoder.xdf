@@ -208,9 +208,6 @@
       <Parameter name="SEARCHWIN_IN_MB">
          <Expr kind="Literal" literal-kind="Integer" value="3"/>
       </Parameter>
-      <Attribute kind="Value" name="partName">
-         <Expr kind="Literal" literal-kind="String" value="x86_0/core1"/>
-      </Attribute>
    </Instance>
    <!-- ************************************** -->
    <!-- Connections of the Graph               -->

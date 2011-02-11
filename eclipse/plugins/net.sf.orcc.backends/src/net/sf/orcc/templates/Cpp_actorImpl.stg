@@ -80,12 +80,7 @@ StateVarAllocation(variable) ::= <<
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 StateVarDestruction(variable) ::= <<
-<if(variable.assignable)
-><if (variable.type.dimensions)
->delete [] <variable>;<
-endif><
-endif>
-
+<if(variable.assignable)><if (variable.type.dimensions)>delete [] <variable>;<endif><endif>
 >>
 
 
