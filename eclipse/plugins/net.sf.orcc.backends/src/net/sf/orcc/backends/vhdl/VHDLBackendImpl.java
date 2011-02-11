@@ -176,8 +176,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 		transformActors(actors);
 		printActors(actors);
 
-		// print network
-		write("Printing network...\n");
+		// print network and subnetworks
+		write("Printing network and subnetworks...\n");
 		printNetwork(network);
 	}
 
@@ -242,6 +242,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 			printer.printNetwork(outputName, network, false, fifoSize);
 
 			for (Network subNetwork : network.getNetworks()) {
+				new BroadcastAdder().transform(subNetwork);				
 				outputName = path + File.separator + "Design" + File.separator
 						+ subNetwork.getName() + ".vhd";
 				printer.printNetwork(outputName, subNetwork, false, fifoSize);

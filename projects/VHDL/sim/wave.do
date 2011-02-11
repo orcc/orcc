@@ -16,14 +16,14 @@ add wave -noupdate -color {Orange Red} -radix decimal /tb_xilinx_idct2d/xilinx_i
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/y1_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/y1_ack
 add wave -noupdate -divider <NULL>
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/actor_data
-add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/actor_send
-add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/actor_rdy
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/network_data
-add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/network_send
-add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/network_ack
-add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/management
-add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comArbiter_Y0/data_in_reg
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comarbiter_y0/actor_data
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comarbiter_y0/actor_send
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comarbiter_y0/actor_rdy
+add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comarbiter_y0/network_data
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comarbiter_y0/network_send
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comarbiter_y0/network_ack
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comarbiter_y0/management
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/rowsort/comarbiter_y0/data_in_reg
 add wave -noupdate -divider <NULL>
 add wave -noupdate -divider farimerge
 add wave -noupdate -divider <NULL>
@@ -46,18 +46,15 @@ add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fair
 add wave -noupdate -color {Orange Red} -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/y1_data
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/y1_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/y1_ack
-add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/rowout_data
+add wave -noupdate -color {Orange Red} -format Literal /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/rowout_data
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/rowout_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/rowout_ack
 add wave -noupdate -divider <NULL>
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/actor_data
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/actor_send
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/actor_rdy
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/network_data
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/network_send
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/network_ack
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/management
-add wave -noupdate -color Magenta -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/comArbiter_Y0/data_in_reg
+add wave -noupdate -color Gold /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/fsm
+add wave -noupdate -divider <NULL>
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/y0_rdy
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/y1_rdy
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/fairmerge/rowout_rdy
 add wave -noupdate -divider <NULL>
 add wave -noupdate -divider Broadcast
 add wave -noupdate -divider <NULL>
@@ -65,9 +62,9 @@ add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fa
 add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/input_send
 add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/input_ack
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/output_data
-add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/output_send
-add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/output_ack
-add wave -noupdate -color magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/internalack
+add wave -noupdate -color {Orange Red} -expand -subitemconfig {/tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/output_send(1) {-color #ffff45450000 -height 16} /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/output_send(0) {-color #ffff45450000 -height 16}} /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/output_send
+add wave -noupdate -color {Orange Red} -expand -subitemconfig {/tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/output_ack(1) {-color #ffff45450000 -height 16} /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/output_ack(0) {-color #ffff45450000 -height 16}} /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/output_ack
+add wave -noupdate -color magenta -expand -subitemconfig {/tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/internalack(1) {-color #ffff0000ffff -height 16} /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/internalack(0) {-color #ffff0000ffff -height 16}} /tb_xilinx_idct2d/xilinx_idct2d_orcc/broadcast_fairmerge_rowout/internalack
 add wave -noupdate -divider <NULL>
 add wave -noupdate -divider idct1D
 add wave -noupdate -divider <NULL>
@@ -77,7 +74,7 @@ add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/idct1d/x0_ac
 add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/idct1d/x1_data
 add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/idct1d/x1_send
 add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/idct1d/x1_ack
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/idct1d/row_data
+add wave -noupdate -color Cyan -format Literal /tb_xilinx_idct2d/xilinx_idct2d_orcc/idct1d/row_data
 add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/idct1d/row_send
 add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/idct1d/row_ack
 add wave -noupdate -divider <NULL>
@@ -137,35 +134,17 @@ add wave -noupdate -color {Orange red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/idct
 add wave -noupdate -divider <NULL>
 add wave -noupdate -divider downsample
 add wave -noupdate -divider <NULL>
-add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r_data
+add wave -noupdate -color cyan -format Literal /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r_data
 add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r_send
 add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r_ack
 add wave -noupdate -divider <NULL>
-add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r2_data
+add wave -noupdate -color {Orange Red} -format Literal /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r2_data
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r2_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r2_ack
 add wave -noupdate -divider <NULL>
-add wave -noupdate -divider trans
-add wave -noupdate -divider <NULL>
-add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x0_data
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x0_send
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x0_ack
-add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x1_data
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x1_send
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x1_ack
-add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x2_data
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x2_send
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x2_ack
-add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x3_data
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x3_send
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x3_ack
-add wave -noupdate -divider <NULL>
-add wave -noupdate -color {Orange red} -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y0_data
-add wave -noupdate -color {Orange red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y0_send
-add wave -noupdate -color {Orange red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y0_ack
-add wave -noupdate -color {Orange red} -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y1_data
-add wave -noupdate -color {Orange red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y1_send
-add wave -noupdate -color {Orange red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y1_ack
+add wave -noupdate -color Magenta -format Literal -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r2_idata
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r2_isend
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/downsample/r2_rdy
 add wave -noupdate -divider <NULL>
 add wave -noupdate -divider sep
 add wave -noupdate -divider <NULL>
@@ -181,7 +160,7 @@ add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/x2_ack
 add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/x3_data
 add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/x3_send
 add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/x3_ack
-add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/row_data
+add wave -noupdate -color Cyan -format Literal /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/row_data
 add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/row_send
 add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/row_ack
 add wave -noupdate -divider <NULL>
@@ -209,6 +188,40 @@ add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/
 add wave -noupdate -color {Orange Red} -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/c3_data
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/c3_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/c3_ack
+add wave -noupdate -divider <NULL>
+add wave -noupdate -color Gold /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/untagged_0_go
+add wave -noupdate -color Gold /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/untagged_1_go
+add wave -noupdate -divider <NULL>
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/r0_rdy
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/r1_rdy
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/r2_rdy
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/r3_rdy
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/c0_rdy
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/c1_rdy
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/c2_rdy
+add wave -noupdate -color Magenta /tb_xilinx_idct2d/xilinx_idct2d_orcc/sep/c3_rdy
+add wave -noupdate -divider <NULL>
+add wave -noupdate -divider trans
+add wave -noupdate -divider <NULL>
+add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x0_data
+add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x0_send
+add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x0_ack
+add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x1_data
+add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x1_send
+add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x1_ack
+add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x2_data
+add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x2_send
+add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x2_ack
+add wave -noupdate -color Cyan -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x3_data
+add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x3_send
+add wave -noupdate -color Cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/x3_ack
+add wave -noupdate -divider <NULL>
+add wave -noupdate -color {Orange red} -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y0_data
+add wave -noupdate -color {Orange red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y0_send
+add wave -noupdate -color {Orange red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y0_ack
+add wave -noupdate -color {Orange red} -radix decimal /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y1_data
+add wave -noupdate -color {Orange red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y1_send
+add wave -noupdate -color {Orange red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/trans/y1_ack
 add wave -noupdate -divider <NULL>
 add wave -noupdate -divider retrans
 add wave -noupdate -divider <NULL>
@@ -242,7 +255,7 @@ add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/o_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/o_ack
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {1035 ns} 0}
+WaveRestoreCursors {{Cursor 1} {1442 ns} 0}
 configure wave -namecolwidth 222
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -257,4 +270,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {653 ns}
+WaveRestoreZoom {0 ns} {2464 ns}
