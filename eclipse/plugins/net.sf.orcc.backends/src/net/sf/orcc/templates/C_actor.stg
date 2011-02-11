@@ -124,6 +124,14 @@ endif>
 >>
 
 printReadEnd(readEnd) ::= <<
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+{
+	int i;
+	for (i = 0; i \< <readEnd.numTokens>; i++) {
+		fprintf(file_<readEnd.port.name>, "%<printFormatType(readEnd.port.type)>\n", <readEnd.target>[i]);
+	}
+}
+<endif>
 
 fifo_<readEnd.port.type>_read_end(<instance.id>_<readEnd.port>, <readEnd.numTokens>);
 numTokens_<readEnd.port.name> -= <readEnd.numTokens>;
@@ -147,7 +155,12 @@ printWrite(write) ::= <<
 
 printWriteEnd(writeEnd) ::= <<
 <if(options.("net.sf.orcc.backends.enableTrace"))>
-fifo_<writeEnd.port.type>_trace(<instance.id>_<writeEnd.port>, <writeEnd.target>_buf, "<instance.id>_<writeEnd.port>.txt", <writeEnd.numTokens>);
+{
+	int i;
+	for (i = 0; i \< <writeEnd.numTokens>; i++) {
+		fprintf(file_<writeEnd.port.name>, "%<printFormatType(writeEnd.port.type)>\n", <writeEnd.target>[i]);
+	}
+}
 <endif>
 
 fifo_<writeEnd.port.type>_write_end(<instance.id>_<writeEnd.port>, <writeEnd.target>_buf, <writeEnd.numTokens>);
@@ -256,6 +269,22 @@ printGetNumTokens() ::= <<
 }>
 >>
 
+printOpenFiles() ::= <<
+<instance.actor.inputs.list:
+	{ port | file_<port.name> = fopen("<instance.id>_<port.name>.txt", "a");
+}><instance.actor.outputs.list:
+	{ port | file_<port.name> = fopen("<instance.id>_<port.name>.txt", "a");
+}>
+>>
+
+printCloseFiles() ::= <<
+<instance.actor.inputs.list:
+	{ port | fclose(file_<port.name>);
+}><instance.actor.outputs.list:
+	{ port | fclose(file_<port.name>);
+}>
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
@@ -266,7 +295,10 @@ if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
 		si-\>num_firings = i;
 		si-\>reason = full;
 		si-\>ports = ports;
-		break;
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+		<printCloseFiles()>
+<endif>
+		return;
 	}
 	<endif>
 	<action.body>();
@@ -283,6 +315,9 @@ else
 >si-\>num_firings = i;
 si-\>reason = starved;
 si-\>ports = 0x0<instance.actor.templateData.maskInputs>;
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+<printCloseFiles()>
+<endif>
 return;<
 endif>
 >>
@@ -292,6 +327,9 @@ void <name>(struct schedinfo_s *si) {
 	int i = 0;
 
 	<printGetNumTokens()>
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+	<printOpenFiles()>
+<endif>
 
 	while (1) {
 		<printActions(actions)>
@@ -311,6 +349,9 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 		si-\>num_firings = i;
 		si-\>reason = full;
 		si-\>ports = ports;
+		<if(options.("net.sf.orcc.backends.enableTrace"))>
+		<printCloseFiles()>
+		<endif>
 		return;
 	}
 	<endif>
@@ -330,6 +371,9 @@ else
 si-\>num_firings = i;
 si-\>reason = starved;
 si-\>ports = 0x0<instance.actor.templateData.maskInputsTransition.(transition)>;
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+<printCloseFiles()>
+<endif>
 return;<
 endif>
 >>
@@ -387,6 +431,9 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	<printGetNumTokens()>
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+	<printOpenFiles()>
+<endif>
 
 	// jump to FSM state 
 	<printSwitch(fsm.transitions)>
@@ -416,9 +463,6 @@ instance(instance, options) ::= <<
 #include "orcc.h"
 #include "orcc_fifo.h"
 #include "orcc_util.h"
-<if(options.("net.sf.orcc.backends.enableTrace"))>
-#include "orcc_trace.h"
-<endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
@@ -426,11 +470,18 @@ instance(instance, options) ::= <<
 }>
 <instance.actor.inputs.list: { port | static int numTokens_<port.name>;
 }>
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+<instance.actor.inputs.list: { port | FILE *file_<port.name>;
+}>
+<endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
 <instance.actor.outputs.list: { port | extern struct fifo_<port.type>_s *<instance.id>_<port.name>;
 }>
-
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+<instance.actor.outputs.list: { port | FILE *file_<port.name>;
+}>
+<endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Parameter values of the instance
 <parameters(instance.parameters)>
