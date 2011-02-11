@@ -17,8 +17,11 @@ endif>
 PrintInputPorts(port) ::= <<
 <portType(port=port, IOtype=" in  ", dataType="data")>
 <port.name>_send  : in  std_logic;
-<port.name>_ack   : out  std_logic;
-
+<if(last(port.name))
+><port.name>_ack   : out  std_logic<
+else
+><port.name>_ack   : out  std_logic;<
+endif>
 >>
 
 PrintOutputPorts(port) ::= <<
@@ -488,13 +491,13 @@ end process;
 sensitivity(actor) ::= <<
 <actor.inputs.list: {port|<port.name>_send}; separator=", "><
 if(actor.inputs.list)
-><if(actor.outputs.list || actor.templateData)
+><if(actor.outputs.list || actor.templateData || actor.actionScheduler.fsm)
 >, <
 endif><
 endif
 ><actor.outputs.list: {port|<port.name>_rdy}; separator=", "><
 if(actor.outputs.list)
-><if(actor.actionScheduler.fsm || actor.templateData)
+><if(actor.actionScheduler.fsm || actor.templateData || actor.actionScheduler.fsm)
 >, <
 endif><
 endif
@@ -693,9 +696,10 @@ entity <actor.simpleName> is
   port (
   -- Inputs
   clock    : in  std_logic;
-  reset_n  : in  std_logic;
-  <actor.inputs.list: PrintInputPorts()>  -- Outputs
-  <actor.outputs.list: PrintOutputPorts(); separator=";\n">);  
+  reset_n  : in  std_logic<if(actor.inputs.list || actor.outputs.list)>;<endif>
+  <actor.inputs.list: PrintInputPorts(); separator=";\n"><if(actor.inputs.list && actor.outputs.list)>;<endif>
+  -- Outputs
+  <actor.outputs.list: PrintOutputPorts(); separator=";\n">);
 end <actor.simpleName>;
 
 
@@ -718,13 +722,10 @@ architecture rtl_<actor.simpleName> of <actor.simpleName> is
   <actor.procs.list: {proc|<function(procedure=proc)>}; separator="\n"><
 endif>
 
-  ---------------------------------------------------------------------------
+  <if(actor.actionScheduler.fsm)
+  >  ---------------------------------------------------------------------------
   -- FSM
   ---------------------------------------------------------------------------
-  type FSM_out_type is (waitSend, checkAck, waitAck);
-  <actor.outputs.list : {port| signal <port.name>FSM_out : FSM_out_type;}; separator="\n">
-  <if(actor.actionScheduler.fsm)
-  >  --
   type FSM_type is (<actor.actionScheduler.fsm.states: {state|s_<state>}; separator=", ">);
   signal FSM : FSM_type;<
   endif>
