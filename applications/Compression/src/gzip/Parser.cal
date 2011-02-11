@@ -13,7 +13,7 @@ actor Parser() uint(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(size
 	bool fname;
 	bool fcomment;
 	
-	List(type:String, size=14) os_strings =
+	String os_strings[14] =
 		[ "FAT filesystem (MS-DOS, OS/2, NT/Win32)",
 		"Amiga", "VMS (or OpenVMS)", "Unix", "VM/CMS", "Atari TOS", "HPFS filesystem (OS/2, NT)",
 		"Macintosh", "Z-System", "CP/M", "TOPS-20", "NTFS filesystem (NT)", "QDOS", "Acorn RISCOS" ];
@@ -32,12 +32,12 @@ actor Parser() uint(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(size
 	do
 		// check id
 		if id1 != 0x1f || id2 != 0x8b then
-			fail("bad magic number");
+			println("bad magic number");
 		end
 
 		// check deflate method
 		if cm != 8 then
-			fail("unknown compression method");
+			println("unknown compression method");
 		end
 
 		ftext := get_flag(flg, 0x01);
@@ -116,7 +116,7 @@ actor Parser() uint(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(size
 	flag.hcrc: action I:[crc1, crc2] ==>
 	do
 		if (crc & 0xFFFF) != ((crc2 << 8) | crc1) then
-			fail("bad header CRC");
+			println("bad header CRC");
 		end
 	end
 

@@ -18,11 +18,11 @@ actor Inflate() int(size=8) C ==> int(size=8) D:
 	// compression type
 	uint(size=2) btype;
 
-	List(type:int, size=16) bl_count;
-	List(type:int, size=16) next_code;
-	List(type:int, size=288) tree_len;
-	List(type:int, size=288) tree_code;
-	List(type:int, size=512) invtree_code := [ 0 : for int i in 0 .. 511 ];
+	int bl_count[16];
+	int next_code[16];
+	int tree_len[288];
+	int tree_code[288];
+	int invtree_code[512] := [ 0 : for int i in 0 .. 511 ];
 	
 	procedure set_len(int from, int to, int bitlen)
 	var
