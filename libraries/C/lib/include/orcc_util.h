@@ -49,4 +49,9 @@ void wait_for_key();
 // print usage
 void print_usage();
 
+// specific to Microsoft Visual Studio
+// disable warnings about fopen
+#define _CRT_SECURE_NO_WARNINGS
+#pragma warning (disable:4996)
+
 #endif
