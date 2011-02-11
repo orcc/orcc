@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="idct2d" x="307" y="233"/>
+      <vertex id="gen_data" x="169" y="231"/>
+      <vertex id="sink" x="471" y="242"/>
+   </vertices>
+</layout>

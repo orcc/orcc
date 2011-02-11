@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><XDF name="TestTrace">
+   <!-- ************************************** -->
+   <!-- Input ports of the Graph               -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Output ports of the Graph              -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Variables and Parameters of the Graph  -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Instances of the Graph                 -->
+   <!-- ************************************** -->
+   <Instance id="idct2d">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="GEN_124_algo_Idct1d"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="ROW">
+         <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+      </Parameter>
+   </Instance>
+   <Instance id="gen_data">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="tb.GenData"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="sink">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Sink"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <!-- ************************************** -->
+   <!-- Connections of the Graph               -->
+   <!-- ************************************** -->
+   <Connection dst="idct2d" dst-port="X" src="gen_data" src-port="O"/>
+   <Connection dst="sink" dst-port="I" src="idct2d" src-port="Y"/>
+</XDF>

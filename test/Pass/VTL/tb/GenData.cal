@@ -1,0 +1,10 @@
+package tb;
+
+actor GenData () ==> int O :
+
+	List(type:int, size=8) stimulus = [ 1, 2, 3, 4, 5, 6, 7, 8 ];
+
+	action ==> O:[ stimulus ] repeat #stimulus
+	end
+
+end
