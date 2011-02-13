@@ -86,7 +86,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="MPEG.MPEG4.part10.Algo_Interp_SeparableSixTapQuarterPelAVC"/>
+      <Class name="Proprietary.IETR.MPEG4.part10.Algo_Interp_SeparableSixTapQuarterPelAVC"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->

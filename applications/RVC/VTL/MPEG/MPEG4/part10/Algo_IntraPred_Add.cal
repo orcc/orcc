@@ -13,27 +13,24 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
- 
-This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
- 
+Add value from input X with value from input Y to output Z
+Jerome GORIN IETR/ARTEMIS
+gorinje@gmail.com
 *****************************************************************************/
 
 package MPEG.MPEG4.part10;
 
-actor Algo_Merge_4x4_to_16x16_norasterscan () int(size=9) X ==> int(size=9) Y :
-
+actor Algo_IntraPred_Add () 
+		int(size=9) X, 
+		int(size=9) Y 
+				==> 
+				int(size=9) Z :
   
-  Reorder:action X:[ x ] repeat 64 ==> Y:[ buff] repeat 64
-  var
- 	 List( type:int(size=16), size=64 ) buff := [ 0 : for int i in 0 .. 63 ]
-  do    
-   foreach int l in 0 .. 3 do
-    foreach int n in 0 .. 3 do
-      foreach int i in 0 .. 3 do
-	        buff[i+n*4+l*16] := x[i+n*16+l*4];
-	    end
-      end
-    end
+  // Clip the value higher than 255 and lower to 0
+  function clip(int x)-->int :
+    if x > 255 then 255 else if x < 0 then 0 else x end end
   end
-
+  
+  Add:action X:[x], Y:[y] ==> Z:[clip(x + y)]
+  end
 end

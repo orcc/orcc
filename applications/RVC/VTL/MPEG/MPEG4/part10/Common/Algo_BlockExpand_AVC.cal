@@ -53,7 +53,7 @@ Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre (IETR/INSA of Rennes)
-package Proprietary.IETR.MPEG4.part10.Common;
+package MPEG.MPEG4.part10.Common;
 
 import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 

@@ -1,6 +1,6 @@
 /********************************************************************************
 
-This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
 ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
 Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
 Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
@@ -13,27 +13,77 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
- 
-This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
- 
 *****************************************************************************/
-
 package MPEG.MPEG4.part10;
 
-actor Algo_Merge_4x4_to_16x16_norasterscan () int(size=9) X ==> int(size=9) Y :
+actor Algo_RefIdxtoPOC()
+	int (size=32) RefList,
+	uint(size=4)  RefIdx,
+	bool          NewList
+		==>
+	uint(size=32) POCtoRead
+		:
 
-  
-  Reorder:action X:[ x ] repeat 64 ==> Y:[ buff] repeat 64
-  var
- 	 List( type:int(size=16), size=64 ) buff := [ 0 : for int i in 0 .. 63 ]
-  do    
-   foreach int l in 0 .. 3 do
-    foreach int n in 0 .. 3 do
-      foreach int i in 0 .. 3 do
-	        buff[i+n*4+l*16] := x[i+n*16+l*4];
-	    end
-      end
-    end
-  end
+	List(type:uint(size=32), size=16) RefPoc;
 
+	uint(size=5)  SizeList;
+	uint(size=5)  CountRead;
+	bool  LastPicID:=false;
+
+	ReadSizeList: action 
+			RefList :[ SizeRefList ]
+				==>
+		do
+			SizeList  := SizeRefList;
+			CountRead := 0;
+		end
+
+
+	ReadRefList: action
+			RefList :[ PocList , FrameNum ]
+				==>
+		guard
+			CountRead < SizeList
+		do
+			RefPoc[CountRead] := PocList;
+			CountRead         := CountRead + 1;
+		end
+
+
+	ReadRefListDone: action ==>
+		end
+
+
+	GetReadAddr: action
+			RefIdx    :[ ListIdx ],
+			NewList :[ValPicID]
+				==>
+			POCtoRead :[ RefPoc[ListIdx] ]
+		guard
+			ValPicID = LastPicID
+		end
+
+
+	NewPic: action
+			NewList :[ValPicID]
+				==>
+		guard
+			ValPicID != LastPicID
+		do
+			LastPicID := ValPicID;
+		end
+
+	schedule fsm ReadSizeList:
+
+		ReadSizeList  (ReadSizeList      )-->ReadRefList;
+		ReadRefList   (ReadRefList       )-->ReadRefList;
+		ReadRefList   (ReadRefListDone   )-->GetReadAddr;
+
+		GetReadAddr   (GetReadAddr       )-->GetReadAddr;
+		GetReadAddr   (NewPic            )-->ReadSizeList;
+	end
+
+	priority
+		ReadRefList     > ReadRefListDone;
+	end
 end

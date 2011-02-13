@@ -33,7 +33,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_Merger420_AVC"/>
+      <Class name="MPEG.MPEG4.part10.Mgnt_Merger420_AVC"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->

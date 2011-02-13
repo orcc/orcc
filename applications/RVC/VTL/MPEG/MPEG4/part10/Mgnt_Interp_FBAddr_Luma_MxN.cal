@@ -51,114 +51,110 @@
  * This copyright notice must be included in all copies or derivative works. 
  * Copyright (c) ISO/IEC 2006-2010.
  */
-// Algo_Interp_EighthPelBilinear.cal
-//
-// Author: He-Yuan Lin
-//
-// Fractional chroma sample interpolation for motion compensation of AVC
 
+//Modified by Florian DECOLOGNE (IETR) : 15/09/08 : 
+//Mgnt_FBAddr_Luma_MxN --> Mgnt_Interp_FBAddr_Luma_MxN
+
+//Modified by Endri Bezati <endri.bezati@insa-rennes.fr>
+//Modified the "size" correctly to work with orcc
 package MPEG.MPEG4.part10;
 
-actor Algo_Interp_EighthPelBilinear() 
-		int(size=16) Mv, 
-		uint(size=8) RD, 
-		uint(size=6) PartSZ 
-				==> 
-		uint(size=8) Interp:
+actor Mgnt_Interp_FBAddr_Luma_MxN ()
+		int (size=9)  Coef_ACR_i,
+		uint(size=13) CurrMbAddr,
+		uint(size=3) MbPartIdx,
+		uint (size=8) Mb_Type,
+		uint(size=13) PicSizeInMb,
+		uint(size=6) PartSZ,
+		bool Write_Done
+		==>
+		int (size=9)  Coef_ACR_o,
+		bool PicID
+	:
+  int count:=0;
+  int currMB                := 0;
+  int pic_size              := 0;
+  bool ValPicID     := false;
+  
 
-  int(size=32) x ;
-  int(size=32) y ;
-  int(size=32) o_x ;
-  int(size=32) o_y ;
-  int(size=32) x_index ;
-  int(size=32) y_index ;
-  int temp;
-  int width;
-  int height;
-
-  List( type:uint(size=8), size=289 ) inbuf := [ 0 : for int i in 0 .. 288 ];
-
-  procedure compensate( )
-  begin  
-      temp := (8-x_index)*(8-y_index)*inbuf[ ( o_x) + ( o_y) * 17 ]+ (x_index)*(8-y_index)* inbuf[ ( 1 + o_x) + (o_y) * 17 ];
-      temp := temp + (8-x_index)*(y_index)*inbuf[ ( 0 + o_x) + ( 1 + o_y) * 17 ]+x_index*y_index*inbuf [ ( 1 + o_x) + ( 1 + o_y) * 17 ] + 32;
-      temp := rshift (temp,6);
-  end
-
-  get_fract_x: action Mv:[ MovementVector ] ==>
-  do
-    x := 0;
-    y := 0;
-    o_x := 0;
-    o_y := 0;
-    x_index := MovementVector & 7;
-  end
-
-  get_fract_y: action Mv:[ MovementVector ] ==>
-  do
-    y_index := MovementVector & 7;
-  end
-
-  getwidth: action PartSZ:[ f ] ==>
-  do
-    width :=f/2;
-  end
-
-  getheight: action PartSZ:[ f ] ==>
-  do
-    height :=f/2;
-  end
-
-  // fetch (width+1)x(height+1) pixels
-  fetch: action RD:[d] ==>
+  //Mb_Type_NOK : Consume the token, nothing else to do 
+  Mb_Type_NOK :action Mb_Type:[a],  PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
   guard 
-   x < (width+1) and y < (height+1)
+  	a != 2
   do
-   inbuf[y * 17 + x] := d;
-   x := x + 1;
-   if x >= (width+1) then
-      x := 0;
-      y := y + 1;
-   end
-  end
-
-  done: action ==>
-  guard
-    o_y = height
+  	currMB:=valCurrMbAddr;
+  	pic_size:=c;
   end
   
-  // interpolation according to MODE
-  process: action ==> Interp:[ p ]
+  //Mb_Type_OK : Enable the prediction 
+  Mb_Type_OK :action Mb_Type:[a], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr],  Coef_ACR_i:[coef] repeat 16 * 16 ==> Coef_ACR_o:[coef] repeat 16 * 16 
   guard
-    x = 0 and y = (height+1)
-  var 
-	uint(size=8) p
+  	a = 2
+  do 
+  	currMB:=valCurrMbAddr;
+  	pic_size:=c;
+  end
+  
+  get_pos: action MbPartIdx:[idx], PartSZ:[ width, height ] ==>PicID :[ValPicID]
   do
-   compensate();
-   p := temp;
-   o_x := o_x + 1;
-   if o_x >= width then
-      o_x := 0;
-      o_y := o_y + 1;
-    end
+    count := if width=16 and height=16 then
+       count+rshift(width,2)*rshift(height,2)
+    else 
+    if height = 16 and width = 8 then //mode16x8
+   	  if idx = 0 then 4 else 16 end 
+    else 
+    if height = 8 and width = 16 then //mode 8x16
+      count+rshift(width,2)*rshift(height,2)
+    else 
+    if height = 8 and width = 8 then // mode8x8
+      count+rshift(width,2)*rshift(height,2)
+    else 
+    if height = 8 and width = 4 then //mode 8x4
+      count+1+lshift(idx,1)
+    else 
+    if height = 4 and width = 8 then //mode 4x8
+      count+rshift(width,2)*rshift(height,2)
+    else // if mbpart_h = 4 and mbpart_w = 4 then mode4x4 
+      count+rshift(width,2)*rshift(height,2)
+    end end end end end end;
+    
+    
+  end
+  
+  MB_done: action ==>
+  guard
+    count = 16
+  do
+  	count:=0;
+  end
+  
+  MB_Ndone: action ==>
   end
 
-  schedule fsm get_fract_x:
-    get_fract_x  ( get_fract_x ) --> get_fract_y;
-
-    get_fract_y  ( get_fract_y ) --> getwidth;
-
-    getwidth     ( getwidth    ) --> getheight;
-
-    getheight    ( getheight   ) --> interpolate;
-
-    interpolate  ( fetch       ) --> interpolate;
-    interpolate  ( done        ) --> get_fract_x;
-    interpolate  ( process     ) --> interpolate;
+  PIC_done: action Write_Done:[w_done]==> PicID     : [ValPicID]
+  guard currMB=pic_size-1
+  do
+  	ValPicID := not(ValPicID);
   end
+
+  PIC_Ndone: action ==>
+  guard currMB<pic_size-1
+  end
+
+  schedule fsm get_MB:
+    get_MB      		( Mb_Type_NOK       	) --> get_pic_done;
+    get_pic_done   		( PIC_done       		) --> get_MB;
+    get_pic_done   		( PIC_Ndone       		) --> get_MB;
+    get_MB      		( Mb_Type_OK        	) --> get_pos;
+    get_pos        		( get_pos        		) --> MB_done;
+    MB_done      		( MB_done         		) --> get_pic_done;
+    MB_done      		( MB_Ndone         		) --> get_pos;
+   end
 
   priority
-    done >  fetch > process  ;
+     Mb_Type_OK > Mb_Type_NOK;
+     MB_done    > MB_Ndone ;
+     PIC_done > PIC_Ndone;
   end
 
 end

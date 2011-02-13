@@ -1,0 +1,179 @@
+/***********************************************************************
+
+This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+
+
+This FU remove emulation_prevention_three_byte, send the RBSP bytes and the number of rbsp bytes between 2 NAL.
+
+***********************************************************************/
+//Modified by Damien de Saint Jorre IETR/INSA of Rennes
+
+package MPEG.MPEG4.part10.Common;
+
+actor Algo_NALU ()
+		uint(size = 8) bits8
+			==>
+		uint (size = 8)            bits_rbsp8,
+		uint(size = SZ_NB_RBSP) nb_rbsp_bytes
+			:
+
+/*
+*
+* Global variables
+*
+*/
+
+		uint(size = 32)         SZ_NB_RBSP          = 32; /* >= log2(NB_RBSP_BYTE_MAX) */
+		uint(size = SZ_NB_RBSP) NB_RBSP_BYTE_MAX    = 500000;
+		uint(size = 2)          byte_count         := 0;  /* nb byte(s) stored in fifo */
+		uint(size = 8)          fifo_lsb           := 0;
+		uint(size = 8)          fifo_msb           := 0;
+		uint(size = 8)          prev_byte_fifo     := 255; /*Previous fifo_msb. Permit to know if the 
+		                                                     start code was 00 00 00 01 or 00 00 01*/
+		uint(size = SZ_NB_RBSP) nb_bytes_mem       := 0;  /* nb byte(s) stored in Input_Bitstream */
+		uint(size = SZ_NB_RBSP) nb_bytes_in_rbsp   := 0;
+		uint(size = SZ_NB_RBSP) nb_bytes_sent      := 0;
+		uint(size = 2)          start_code         := 0;
+		bool                    nb_rbsp_byte_ready := false;
+		List (type: int(size = 8), size = NB_RBSP_BYTE_MAX) Input_Bitstream;
+
+/*
+*
+* Actions
+*
+*/
+
+	/* Fill the fifo which permit to detect an emul prevention 3 byte */
+	fill_fifo: action 
+			bits8:[b]
+				==>
+		do
+			fifo_msb   := fifo_lsb;
+			fifo_lsb   := b;
+			byte_count := byte_count + 1;
+		end /* fill_fifo */
+
+	/* Delete bytes added in the rbsp*/
+	delete_emul_3_byte: action
+			bits8:[b]
+				==>
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3)
+		do
+			byte_count       := 0;
+			Input_Bitstream[nb_bytes_mem] := 0;
+			if(nb_bytes_mem - 1 < NB_RBSP_BYTE_MAX) then
+				Input_Bitstream[nb_bytes_mem + 1] := 0;
+				nb_bytes_mem := nb_bytes_mem + 1;
+				nb_bytes_in_rbsp := nb_bytes_in_rbsp + 1;
+			end
+			nb_bytes_in_rbsp := nb_bytes_in_rbsp + 1;
+			nb_bytes_mem     := nb_bytes_mem + 1;
+		end /* delete_emul_3_byte */
+
+	/* Save RBSP and start code bytes in a buffer */
+	mem_received_byte: action
+			bits8:[b]
+				==>
+		guard
+			nb_bytes_mem < NB_RBSP_BYTE_MAX,
+			nb_rbsp_byte_ready = false,
+			not((fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3))
+		do
+			Input_Bitstream[nb_bytes_mem] := fifo_msb;
+			nb_bytes_mem                  := nb_bytes_mem + 1;
+			if(start_code = 1) then
+				nb_bytes_in_rbsp := nb_bytes_in_rbsp + 1;
+			end
+			if( (fifo_msb = 0) and (fifo_lsb = 0) and  (b = 1) ) then // if it's a start code
+				start_code := start_code + 1;
+				if(start_code = 2) then //if we have data to sent
+					nb_rbsp_byte_ready := true;
+					nb_bytes_sent      := 0;
+					/* The byte 01 of the start code is still in the fifo.
+					   2 bytes (00 01) of the current start code, 1 byte of the next start
+					   code (00) and the NALU header are included in nb_bytes_in_rbsp*/
+					nb_bytes_in_rbsp   := nb_bytes_in_rbsp - 4;
+					if(prev_byte_fifo = 0) then 
+						nb_bytes_in_rbsp   := nb_bytes_in_rbsp - 1; //The start code is 00 00 00 01 !!
+					end
+				end
+			end
+			prev_byte_fifo := fifo_msb;
+			fifo_msb       := fifo_lsb;
+			fifo_lsb       := b;
+		end /* mem_received_byte */
+
+
+	/* the buffer is full => we stop the program */
+	buffer_overflow: action ==>
+		guard
+			nb_bytes_mem >= NB_RBSP_BYTE_MAX
+		end
+
+	/* send the nb_rbsp */
+	send_nb_rbsp_bytes: action
+				==>
+			nb_rbsp_bytes:[nb_bytes_in_rbsp]
+		guard
+			nb_rbsp_byte_ready = true
+		do
+			nb_rbsp_byte_ready := false;
+		end /* send_nb_rbsp_bytes */
+
+
+	/* send the rbsp */
+	send_rbsp: action
+				==>
+			bits_rbsp8:[out_rbsp]
+		guard
+			nb_bytes_sent < nb_bytes_mem
+		var
+			int(size = 8) out_rbsp
+		do
+			out_rbsp      := Input_Bitstream[nb_bytes_sent];
+			nb_bytes_sent := nb_bytes_sent + 1;
+		end /* send_rbsp */
+
+	/* send of rbsp finished */
+	send_rbsp_done: action ==>
+		do
+			start_code       := 1;
+			nb_bytes_mem     := 0;
+			nb_bytes_in_rbsp := 0;
+		end
+
+/*
+*
+* Scheduler
+*
+*/
+	schedule fsm get_bytes_or_send_nb_rbsp:
+		fill_fifo1                (fill_fifo          )-->fill_fifo2;
+		fill_fifo2                (fill_fifo          )-->get_bytes_or_send_nb_rbsp;
+		get_bytes_or_send_nb_rbsp (delete_emul_3_byte )-->fill_fifo1;
+		get_bytes_or_send_nb_rbsp (mem_received_byte  )-->get_bytes_or_send_nb_rbsp;
+		get_bytes_or_send_nb_rbsp (buffer_overflow    )-->undefined;
+		get_bytes_or_send_nb_rbsp (send_nb_rbsp_bytes )-->send_rbsp;
+		send_rbsp                 (send_rbsp          )-->send_rbsp;
+		send_rbsp                 (send_rbsp_done     )-->get_bytes_or_send_nb_rbsp;
+	end
+
+	priority
+	mem_received_byte>delete_emul_3_byte>send_nb_rbsp_bytes>buffer_overflow;
+	send_rbsp>send_rbsp_done;
+//		send_nb_rbsp_bytes > send_rbsp > delete_emul_3_byte > mem_received_byte;
+	end /* priority */
+
+end /* actor */

@@ -80,7 +80,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="MPEG.MPEG4.part10.Algo_Interp_EighthPelBilinear"/>
+      <Class name="Proprietary.IETR.MPEG4.part10.Algo_Interp_EighthPelBilinear"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->

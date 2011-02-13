@@ -56,7 +56,7 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Mickael Raulet IETR/INSA of Rennes
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes
 
-package Proprietary.IETR.MPEG4.part10.Common;
+package MPEG.MPEG4.part10.Common;
 
 actor Algo_RefList (bool DEBUG)
 	uint(size=31) RefReordering,
@@ -80,10 +80,9 @@ actor Algo_RefList (bool DEBUG)
 */
 	uint(size=2) REFLIST0_PRED    = 0;
 	uint(size=2) REFLIST0_BI_PRED = 1;
-//	uint(size=2) REFLIST1_BI_PRED = 2;
 
-	bool DEBUG_INPUT  = false;
-	bool DEBUG_OUTPUT = false;
+//	bool DEBUG_INPUT  = false;
+//	bool DEBUG_OUTPUT = false;
 
 /*
 *
@@ -226,14 +225,6 @@ actor Algo_RefList (bool DEBUG)
 			NbSTRead       := 0;
 			NbSTCount      := ValSzSTList;
 			ValMovedFrame  := frame_num;
-			if(DEBUG and DEBUG_INPUT)then 
-				println("Input RefList FraNum: "+frame_num);
-				println("Input RefList POC: "+ValPOC);
-				println("Input RefList MaxFrameNum: "+MaxFrNu);
-				println("Input RefList EmptyDPB: "+IsIDR_Pic);
-				println("Input RefList SzShortTermList: "+ValSzSTList);
-				println("Input RefList RefListType: "+ValRefListType);
-			end
 		end
 
 
@@ -268,9 +259,6 @@ actor Algo_RefList (bool DEBUG)
 							end
 						end
 					end
-				end
-				if(DEBUG and DEBUG_INPUT)then 
-					println("Input RefList LongTermList: "+ValLongTerm[j]);
 				end
 			end
 		end
@@ -309,9 +297,6 @@ actor Algo_RefList (bool DEBUG)
 				end
 			end
 			NbSTRead     := NbSTRead + 1;
-			if(DEBUG and DEBUG_INPUT)then 
-				println("Input RefList ShortTermList: "+ValShortTerm);
-			end
 		end
 
 
@@ -406,12 +391,6 @@ actor Algo_RefList (bool DEBUG)
 					end
 				end
 			end
-			if(DEBUG and DEBUG_INPUT)then 
-				println("Input RefList NbRefFrame: "+ValIDxMax);
-			end
-			if(DEBUG and DEBUG_OUTPUT)then 
-				println("Output RefList RefList: "+NumMaxListRefFrame);
-			end
 			//Indicates that nothing in RefList has been sent
 			CounterRefListTab := 0;
 		end
@@ -430,9 +409,6 @@ actor Algo_RefList (bool DEBUG)
 				int (size=32)                    RefBuffer,
 				uint(size=4)                     IdxLastPocInf := -1
 		do
-			if(DEBUG and DEBUG_INPUT)then 
-				println("Input RefList NbRefFrame: "+ValIDxMax);
-			end
 			//IdxCurrentPic = Nb short term and long term ref
 			if(ValIDxMax < NbPOC - 1) then
 				NumMaxListRefFrame := ValIDxMax;
@@ -504,9 +480,6 @@ actor Algo_RefList (bool DEBUG)
 				end
 				j := j + 1;
 			end
-			if(DEBUG and DEBUG_OUTPUT)then 
-				println("Output RefList RefList: "+NumMaxListRefFrame);
-			end
 			//Indicates that nothing in RefList has been sent
 			CounterRefListTab := 0;
 		end
@@ -517,10 +490,6 @@ actor Algo_RefList (bool DEBUG)
 				==>
 		guard
 			reordering_flag = 0
-		do
-			if(DEBUG and DEBUG_INPUT)then 
-				println("Input RefList RefReordering: "+reordering_flag);
-			end
 		end
 
 
@@ -530,10 +499,6 @@ actor Algo_RefList (bool DEBUG)
 				==> 
 		guard
 			reordering_flag = 1
-		do
-			if(DEBUG and DEBUG_INPUT)then 
-				println("Input RefList RefReordering: "+reordering_flag);
-			end
 		end
 
 
@@ -551,9 +516,6 @@ actor Algo_RefList (bool DEBUG)
 			uint(size=31) frame_num,
 			int (size=32) ValMovedIdx  
 		do
-			if(DEBUG and DEBUG_INPUT)then 
-				println("Input RefList RefReordering: "+reordering_of_pic_nums_idc+" ; "+abs_diff_pic_num_minus1);
-			end
 			//Compute the value of the re-mapped reference picture
 			if (reordering_of_pic_nums_idc = 0) then 
 				ValMovedFrame := ValMovedFrame - abs_diff_pic_num_minus1 - 1 ; 
@@ -602,9 +564,6 @@ actor Algo_RefList (bool DEBUG)
 				NumMaxListRefFrame := NumMaxListRefFrame - 1;
 			//	println("RefListSent:"+FrameNumList[ValMovedIdx]+" Poc:"+POCList[ValMovedIdx]);
 			end
-			if(DEBUG and DEBUG_OUTPUT)then 
-				println("Output RefList RefList: "+poc + " ; " + frame_num);
-			end
 
 		end
 
@@ -621,9 +580,6 @@ actor Algo_RefList (bool DEBUG)
 			int (size=32) poc,
 			uint(size=31) frame_num
 		do
-			if(DEBUG and DEBUG_INPUT)then 
-				println("Input RefList RefReordering: "+reordering_of_pic_nums_idc+" ; "+idx_LTList);
-			end
 			//Search the location of the reference picture in the RefList
 			foreach int i in 0 .. NumMaxListRefFrame-1
 			do
@@ -646,9 +602,6 @@ actor Algo_RefList (bool DEBUG)
 			frame_num := FrameNumList[ValLTList[idx_LTList]];
 		//	println("RefListSent; FrNu:"+FrameNumList[ValLTList[idx_LTList]]+" Poc:"+POCList[ValLTList[idx_LTList]]);
 			CounterRefListTab := CounterRefListTab + 1;
-			if(DEBUG and DEBUG_OUTPUT)then 
-				println("Output RefList RefList: "+poc + " ; " + frame_num);
-			end
 		end
 
 
@@ -658,10 +611,6 @@ actor Algo_RefList (bool DEBUG)
 				==>
 		guard 
 			reordering_of_pic_nums_idc = 3
-		do
-			if(DEBUG and DEBUG_INPUT)then 
-				println("Input RefList RefReordering: "+reordering_of_pic_nums_idc);
-			end
 		end
 
 
@@ -679,9 +628,6 @@ actor Algo_RefList (bool DEBUG)
 			frame_num := FrameNumList[RefIdx[CounterRefListTab]];
 			//println("RefListSent:"+FrameNumList[RefIdx[CounterRefListTab]]);
 			CounterRefListTab := CounterRefListTab + 1;
-			if(DEBUG and DEBUG_OUTPUT) then
-				println("Output RefList RefList: "+poc + " ; " + frame_num);
-			end
 		end
 
 

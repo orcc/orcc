@@ -14,6 +14,6 @@
       <vertex id="Generate_Inter_Info" x="477" y="1973"/>
       <vertex id="CavlcExpand" x="520" y="291"/>
       <vertex id="Mgnt_Display" x="666" y="1443"/>
-      <vertex id="IntraPredSplit" x="494" y="100"/>
+      <vertex id="IntraPredSplit" x="495" y="111"/>
    </vertices>
 </layout>

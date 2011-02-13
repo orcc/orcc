@@ -13,27 +13,58 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
- 
-This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
- 
 *****************************************************************************/
-
+//Modified by Damien de Saint Jorre IETR/INSA of Rennes (France)
 package MPEG.MPEG4.part10;
 
-actor Algo_Merge_4x4_to_16x16_norasterscan () int(size=9) X ==> int(size=9) Y :
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
+actor SelectMbForLuma () 
+	uint(size=6)  Mb_Type,
+
+	int (size=9) MbFromIntra4x4,
+	int (size=9) MbFromIntra16x16,
+	int (size=9) MbFromInter,
+	int(size=9)  MbFromPcm
+		==>
+	uint(size=8)  MbOut
+		:
+
+	GetIntra4x4:action
+		Mb_Type        :[MbType],
+		MbFromIntra4x4 :[x] repeat 256
+			==>
+		MbOut          :[x] repeat 256
+	guard
+    	MbType = BLOCK_TYPE_I_NxN
+	end
   
-  Reorder:action X:[ x ] repeat 64 ==> Y:[ buff] repeat 64
-  var
- 	 List( type:int(size=16), size=64 ) buff := [ 0 : for int i in 0 .. 63 ]
-  do    
-   foreach int l in 0 .. 3 do
-    foreach int n in 0 .. 3 do
-      foreach int i in 0 .. 3 do
-	        buff[i+n*4+l*16] := x[i+n*16+l*4];
-	    end
-      end
-    end
-  end
-
+	GetIntra16x16:action 
+		Mb_Type          :[MbType],
+		MbFromIntra16x16 :[x] repeat 256
+			==>
+		MbOut            :[x] repeat 256 
+	guard
+    	MbType >= BLOCK_TYPE_INTRA_16x16_MIN,
+    	MbType <= BLOCK_TYPE_INTRA_16x16_MAX
+	end
+  
+	GetInter:action
+		Mb_Type     :[MbType],
+		MbFromInter :[x] repeat 256
+			==>
+		MbOut       :[x] repeat 256
+	guard
+    	MbType > BLOCK_TYPE_INTRA_MAX
+	end
+	
+	GetPCM: action
+		Mb_Type   :[MbType],
+		MbFromPcm :[x] repeat 256
+			==>
+		MbOut     :[x] repeat 256
+	guard
+    	MbType = BLOCK_TYPE_I_PCM
+	end
+	
 end

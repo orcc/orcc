@@ -18,7 +18,7 @@ Edge are provided from bottom to top, then corner, then left to right
 Jerome GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
-package Proprietary.IETR.MPEG4.part10;
+package MPEG.MPEG4.part10;
 
 import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
 import MPEG.Common.Imp_PictureInfo.*;

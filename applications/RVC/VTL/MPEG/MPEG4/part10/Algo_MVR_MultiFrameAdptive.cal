@@ -1,0 +1,212 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Florian Decologne (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
+package MPEG.MPEG4.part10;
+
+actor Algo_MVR_MultiFrameAdptive () 
+		uint(size=3) mbPartIdx,
+		uint(size=6) PartSZ,
+		uint(size=4) refIdxLX,
+		uint(size=3) refIdxLXN,
+		int(size=16) mvLX 
+		==> 
+		int(size=16) mvpLX 
+		:
+
+
+  int(size=3) mbPartIdxt;
+  int(size=6) MbPartWidth;
+  int(size=6) MbPartHeight;
+  int(size=3) refIdxL0t;  
+  int(size=3) refIdxL0At;
+  int(size=3) refIdxL0Bt;
+  int(size=3) refIdxL0Ct;
+  List(type:int(size=16),size=2) mvL0tA := [0,0];
+  List(type:int(size=16),size=2) mvL0tB := [0,0]; 
+  List(type:int(size=16),size=2) mvL0tC := [0,0]; 
+  List(type:int(size=16),size=2) mvpL0t := [0,0];
+
+
+  function middle( int a, int b, int c ) --> int :
+  if ((a>=b and b>=c) or (c>=b and b>=a)) then b
+  else if ((b>=c and c>=a) or (a>=c and c>=b))  then c
+       else a
+       end
+  end
+  end
+
+  start: action mbPartIdx:[idx] ==>
+  do
+     mbPartIdxt:=idx;
+  end
+
+  readrefIdx0: action refIdxLX:[idx] ==>
+  do
+    refIdxL0t:=idx;
+  end
+  
+  
+  readwidth: action PartSZ:[w] ==>
+  do
+    MbPartWidth:=w;
+  end
+
+  readheight: action PartSZ:[h] ==>
+  do
+    MbPartHeight:=h;
+  end  
+  
+  readrefIdxA0: action refIdxLXN:[idx]==>
+  do
+    refIdxL0At:=idx;
+  end
+  
+  readrefIdxB0: action refIdxLXN:[idx]==>
+  do
+    refIdxL0Bt:=idx;
+  end
+
+  readrefIdxC0: action refIdxLXN:[idx]==>
+  do
+    refIdxL0Ct:=idx;
+  end
+
+  readmvLA0: action mvLX:[mvx, mvy]==>
+  do
+    mvL0tA[0]:=mvx;
+    mvL0tA[1]:=mvy;
+  end
+
+  readmvLB0: action mvLX:[mvx, mvy]==>
+  do
+    mvL0tB[0]:=mvx;
+    mvL0tB[1]:=mvy;
+  end
+  
+  readmvLC0: action mvLX:[mvx, mvy]==>
+  do
+    mvL0tC[0]:=mvx;
+    mvL0tC[1]:=mvy;
+  end  
+
+  
+  wpredmv1: action ==>
+  guard
+    (MbPartWidth=16 and MbPartHeight=8 and mbPartIdxt=0 and refIdxL0Bt=refIdxL0t) 
+  do
+    mvpL0t[0]:=mvL0tB[0];
+    mvpL0t[1]:=mvL0tB[1];
+  end
+  
+  wpredmv2: action ==>
+  guard
+    (MbPartWidth=16 and MbPartHeight=8 and mbPartIdxt=1 and refIdxL0At=refIdxL0t) 
+  do
+    mvpL0t[0]:=mvL0tA[0];
+    mvpL0t[1]:=mvL0tA[1];
+  end  
+  
+  wpredmv3: action ==>
+  guard
+    (MbPartWidth=8 and MbPartHeight=16 and mbPartIdxt=0 and refIdxL0At=refIdxL0t)
+  do
+    mvpL0t[0]:=mvL0tA[0];
+    mvpL0t[1]:=mvL0tA[1];
+  end  
+  
+  wpredmv4: action ==>
+  guard
+    (MbPartWidth=8 and MbPartHeight=16 and mbPartIdxt=1 and refIdxL0Ct=refIdxL0t)
+  do
+    mvpL0t[0]:=mvL0tC[0];
+    mvpL0t[1]:=mvL0tC[1];
+  end   
+  
+  wpredmv5: action ==>
+  do
+    mvpL0t[0]:=middle( mvL0tA[0], mvL0tB[0], mvL0tC[0] );
+    mvpL0t[1]:=middle( mvL0tA[1], mvL0tB[1], mvL0tC[1] );
+  end
+  
+  writemv0: action ==> mvpLX:[mvpL0t[0],mvpL0t[1]]
+  end
+  
+  schedule fsm start :
+    start       	( start         ) --> readrefIdx0;
+    readrefIdx0 	( readrefIdx0 	) --> readwidth;
+    readwidth   	( readwidth 	) --> readrefIdxA0;
+    readrefIdxA0	( readrefIdxA0 	) --> readrefIdxB0;
+    readrefIdxB0	( readrefIdxB0 	) --> readrefIdxC0;    
+    readrefIdxC0	( readrefIdxC0 	) --> readmvLA0;
+    readmvLA0   	( readmvLA0 	) --> readmvLB0;
+    readmvLB0   	( readmvLB0 	) --> readmvLC0;
+    readmvLC0   	( readmvLC0 	)--> readheight;
+    readheight  	( readheight 	) --> calpredmv;
+    
+    calpredmv   	( wpredmv1 		) --> writemv0;
+    calpredmv   	( wpredmv2		) --> writemv0;    
+    calpredmv   	( wpredmv3 		) --> writemv0;
+    calpredmv   	( wpredmv4 		) --> writemv0;
+    calpredmv   	( wpredmv5 		) --> writemv0;   
+     
+    writemv0    	( writemv0 		) --> start;
+ 
+  end
+
+  priority
+  
+    wpredmv1 > wpredmv2 > wpredmv3 > wpredmv4 > wpredmv5;
+    
+  end
+
+end

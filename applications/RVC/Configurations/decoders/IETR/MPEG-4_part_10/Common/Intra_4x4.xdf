@@ -105,7 +105,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="MPEG.MPEG4.part10.Algo_Merge_4x4_to_16x16_norasterscan"/>
+      <Class name="Proprietary.IETR.MPEG4.part10.Algo_Merge_4x4_to_16x16_norasterscan"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -123,7 +123,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Buffer_Neighbour_4x4"/>
+      <Class name="MPEG.MPEG4.part10.Buffer_Neighbour_4x4"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->

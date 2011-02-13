@@ -17,23 +17,22 @@ This copyright notice must be included in all copies or derivative works. Copyri
 This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
  
 *****************************************************************************/
-
 package MPEG.MPEG4.part10;
 
-actor Algo_Merge_4x4_to_16x16_norasterscan () int(size=9) X ==> int(size=9) Y :
+actor Algo_Split_16x16_to_4x4_norasterscan () int(size=9) X ==> int(size=9) Y :
 
+  //Tab containing the 16x16 macroblock
+  List( type:int(size=16), size=64 ) buff := [ 0 : for int i in 0 .. 63 ];
   
-  Reorder:action X:[ x ] repeat 64 ==> Y:[ buff] repeat 64
-  var
- 	 List( type:int(size=16), size=64 ) buff := [ 0 : for int i in 0 .. 63 ]
+  action X:[ x ] repeat 64 ==> Y:[buff] repeat 64
   do    
    foreach int l in 0 .. 3 do
     foreach int n in 0 .. 3 do
       foreach int i in 0 .. 3 do
-	        buff[i+n*4+l*16] := x[i+n*16+l*4];
+	        buff[i+n*16+l*4] := x[i+n*4+l*16];
 	    end
       end
     end
+   
   end
-
 end

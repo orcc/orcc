@@ -57,11 +57,11 @@
 //
 // Fractional chroma sample interpolation for motion compensation of AVC
 
-package MPEG.MPEG4.part10;
+package Proprietary.IETR.MPEG4.part10;
 
 actor Algo_Interp_EighthPelBilinear() 
 		int(size=16) Mv, 
-		uint(size=8) RD, 
+		uint(size=8) ReadResult, 
 		uint(size=6) PartSZ 
 				==> 
 		uint(size=8) Interp:
@@ -110,7 +110,7 @@ actor Algo_Interp_EighthPelBilinear()
   end
 
   // fetch (width+1)x(height+1) pixels
-  fetch: action RD:[d] ==>
+  fetch: action ReadResult:[d] ==>
   guard 
    x < (width+1) and y < (height+1)
   do

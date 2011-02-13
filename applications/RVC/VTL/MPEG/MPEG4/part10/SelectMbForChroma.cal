@@ -13,27 +13,52 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
- 
-This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
- 
 *****************************************************************************/
+package MPEG.MPEG4.part10;
 
-package Proprietary.IETR.MPEG4.part10;
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Algo_Split_16x16_to_4x4_norasterscan () int(size=9) X ==> int(size=9) Y :
+actor SelectMbForChroma ()
+	uint(size=6)  Mb_Type,
 
+	int (size=9) MbFromIntra,
+	int (size=9) MbFromInter,
+	int(size=9)  MbFromPcm
+		==>
+	uint(size=8)  MbOut
+		:
+
+  /*
+	GetIntra4x4:action X0:[x] repeat 8*8 ==> X:[x] repeat 8*8
+	guard
+    	sel = 0
+	end
+  */
+	GetIntra16x16:action
+			Mb_Type     :[MbType],
+			MbFromIntra :[x] repeat 64
+				==>
+			MbOut       :[x] repeat 64 
+		guard
+			MbType <= BLOCK_TYPE_INTRA_MAX,
+			MbType != BLOCK_TYPE_I_PCM
+		end
   
-  action X:[ x ] repeat 64 ==> Y:[buff] repeat 64
-  var
-	  List( type:int(size=9), size=64 ) buff := [ 0 : for int i in 0 .. 63 ]
-  do    
-   foreach int l in 0 .. 3 do
-    foreach int n in 0 .. 3 do
-      foreach int i in 0 .. 3 do
-	        buff[i+n*16+l*4] := x[i+n*4+l*16];
-	    end
-      end
-    end
-   
-  end
+	GetInter:action
+			Mb_Type     :[MbType],
+			MbFromInter :[x] repeat 64
+				==>
+			MbOut       :[x] repeat 64
+		guard
+	    	MbType > BLOCK_TYPE_INTRA_MAX
+		end
+	
+	GetPCM: action
+			Mb_Type   :[MbType],
+			MbFromPcm :[x] repeat 64
+				==>
+			MbOut     :[x] repeat 64
+		guard
+			MbType = BLOCK_TYPE_I_PCM
+		end
 end

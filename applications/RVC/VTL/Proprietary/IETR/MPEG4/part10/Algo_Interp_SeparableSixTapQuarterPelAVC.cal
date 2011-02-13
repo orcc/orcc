@@ -59,12 +59,12 @@
 
 //Modified by Damien de Saint Jorre ; IETR/INSA of Rennes (France)
 
-package MPEG.MPEG4.part10;
+package Proprietary.IETR.MPEG4.part10;
 import MPEG.Common.Imp_Math.*;
 
 actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	int (size=16) Mv,
-	uint(size=8)  RD,
+	uint(size=8)  ReadResult,
 	uint(size=6)  PartSZ
 		==>
 	uint(size=8)  Interp
@@ -253,7 +253,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	end
 
 	GetPixVal.Launch: action
-			RD:[d]
+			ReadResult:[d]
 				==>
 		guard
 			y < (height+5)

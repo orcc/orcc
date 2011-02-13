@@ -306,7 +306,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_DemuxParserInfoForBlocks_Chroma"/>
+      <Class name="MPEG.MPEG4.part10.Algo_DemuxParserInfoForBlocks_Chroma"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->

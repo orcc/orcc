@@ -55,7 +55,7 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Mederic Blestel and Endri Bezati IETR/INSA of Rennes
 //Modified by Mickael Raulet IETR/INSA of Rennes
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes
-package Proprietary.IETR.MPEG4.part10.Common;
+package MPEG.MPEG4.part10.Common;
 
 import MPEG.Common.Imp_Math.*;
 
@@ -204,9 +204,6 @@ actor Algo_MMCO ()
 				ShortTermCount         := ShortTermCount + 1;
 				false_frame_num        := (false_frame_num + 1) mod ValMaxFrameNum;
 			end
-			if(DEBUG_OUTPUT)then
-				println("Output Mmco SzShortTermList: "+ShortTermCount);
-			end
 		end
 
 
@@ -286,9 +283,6 @@ actor Algo_MMCO ()
 			LongTermCount    := 0;
 			LTList           := [-1 :for int s in 0 .. 15];
 			NbFrameDel       := 0;
-			if(DEBUG_INPUT)then
-				println("input Mmco Mmco:"+NotIdr+" ; "+is_long_term);
-			end
 		end
 
 
@@ -299,9 +293,6 @@ actor Algo_MMCO ()
 			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 0)
 		do
 			FlagLongTerm := 0;
-			if(DEBUG_INPUT)then
-				println("input Mmco Mmco:"+NotIdr+" ; "+adaptive_ref_pic_marking_mode_flag);
-			end
 		end
 
 
@@ -312,9 +303,6 @@ actor Algo_MMCO ()
 			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 1)
 		do
 			FlagLongTerm := 0;
-			if(DEBUG_INPUT)then
-				println("input Mmco Mmco:"+NotIdr+" ; "+adaptive_ref_pic_marking_mode_flag);
-			end
 		end
 
 
