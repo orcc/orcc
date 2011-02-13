@@ -1,0 +1,10 @@
+package net.sf.orcc.test.actors;
+
+actor Actor1 () ==> :
+
+	action ==>
+	do
+		println("x");
+	end
+
+end
