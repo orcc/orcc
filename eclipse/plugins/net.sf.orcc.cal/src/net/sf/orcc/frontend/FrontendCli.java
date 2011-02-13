@@ -64,7 +64,7 @@ public class FrontendCli {
 	 */
 	public static void main(String[] args) {
 		if (args.length == 2) {
-			System.out.println("doing setup of CAL Xtext parser");
+			System.out.println("setup of CAL Xtext parser");
 			Injector injector = new CalStandaloneSetup()
 					.createInjectorAndDoEMFRegistration();
 			FrontendCli fe = injector.getInstance(FrontendCli.class);
