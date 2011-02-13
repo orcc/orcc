@@ -54,29 +54,42 @@ public class StaticDirectedGraph {
 	private DirectedGraph<Vertex, Connection> dynamicGraph;
 	private DirectedGraph<Vertex, DefaultEdge> staticGraph;
 
+	/**
+	 * Create a new static directed graph from a dynamic directed graph.
+	 * 
+	 * @param graph
+	 *            a directed graph from a network
+	 */
 	public StaticDirectedGraph(DirectedGraph<Vertex, Connection> graph) {
 		dynamicGraph = graph;
 		staticGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(
 				DefaultEdge.class);
 		adjacentVertices = new HashMap<Vertex, LinkedHashSet<Vertex>>();
 
+		// Compute every successor of vertex from dynamic graph
 		setAdjacentVertices();
+
+		// Add all static vertex in the static graph
 		addStaticVertex();
+
+		// Find static edge in the graph
 		addStaticEdge();
 	}
-	
-	public DirectedGraph<Vertex, DefaultEdge> getStaticGraph(){
-		return staticGraph;
-	}
 
+	/**
+	 * Add static edge from dynamic graph to the static graph
+	 */
 	private void addStaticEdge() {
 		for (Vertex vertex : staticGraph.vertexSet()) {
+			// Get all successors of the static vertex
 			LinkedHashSet<Vertex> adjVertices = adjacentVertices.get(vertex);
 			for (Vertex adjVertex : adjVertices) {
 				if (staticGraph.containsVertex(adjVertex)) {
+					// Two static vertex are connected
 					Boolean exist = findStaticPaths(vertex, adjVertex);
 
 					if (exist) {
+						// A static path between these two vertex is existing
 						staticGraph.addEdge(vertex, adjVertex);
 					}
 
@@ -86,6 +99,9 @@ public class StaticDirectedGraph {
 		}
 	}
 
+	/**
+	 * Add static vertex from dynamic graph to the static graph
+	 */
 	private void addStaticVertex() {
 		for (Vertex vertex : dynamicGraph.vertexSet()) {
 			if (vertex.isInstance()) {
@@ -103,6 +119,15 @@ public class StaticDirectedGraph {
 		}
 	}
 
+	/**
+	 * Return the adjacent nodes of a vertex.
+	 * 
+	 * @param vertex
+	 *            the vertex to get adjacent node from.
+	 * 
+	 * 
+	 * @return a Linked list of all adjacent vertices.
+	 */
 	private LinkedList<Vertex> adjacentNodes(Vertex vertex) {
 		LinkedHashSet<Vertex> adjacent = adjacentVertices.get(vertex);
 		if (adjacent == null) {
@@ -111,6 +136,16 @@ public class StaticDirectedGraph {
 		return new LinkedList<Vertex>(adjacent);
 	}
 
+	/**
+	 * Find a static path between the last vertex of a LinkedList and the given
+	 * vertex using breadth-first search.
+	 * 
+	 * @param visited
+	 *            a LinkedList of all vertices already visited.
+	 * 
+	 * 
+	 * @return true if the paths found are static, otherwise false.
+	 */
 	private Boolean findPaths(LinkedList<Vertex> visited, Vertex end) {
 		LinkedList<Vertex> nodes = adjacentNodes(visited.getLast());
 
@@ -146,12 +181,40 @@ public class StaticDirectedGraph {
 		return true;
 	}
 
+	/**
+	 * Return true if all the paths from a vertex to an other are statics.
+	 * 
+	 * @param source
+	 *            the source vertex
+	 * 
+	 * @param target
+	 *            the target vertex
+	 * 
+	 * @return True if all the paths are detected as static otherwise false.
+	 */
 	private Boolean findStaticPaths(Vertex source, Vertex target) {
 		LinkedList<Vertex> visited = new LinkedList<Vertex>();
 		visited.add(source);
 		return findPaths(visited, target);
 	}
 
+	/**
+	 * Returns the resulting static graph.
+	 * 
+	 * @return the static graph
+	 */
+	public DirectedGraph<Vertex, DefaultEdge> getStaticGraph() {
+		return staticGraph;
+	}
+
+	/**
+	 * Return true if the given path as only static actors.
+	 * 
+	 * @param path
+	 *            the path to check
+	 * 
+	 * @return True if the path is detected as static otherwise false.
+	 */
 	private Boolean isStaticPath(LinkedList<Vertex> path) {
 		for (Vertex node : path) {
 			if (!staticGraph.containsVertex(node)) {
@@ -162,6 +225,9 @@ public class StaticDirectedGraph {
 		return true;
 	}
 
+	/**
+	 * Set all the adjacent vertices from all vertices of the graph
+	 */
 	private void setAdjacentVertices() {
 		// Iterate though all connection of dynamic graph to determine direct
 		// successor
