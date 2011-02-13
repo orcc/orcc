@@ -2,11 +2,6 @@ package gzip;
 
 actor Parser() uint(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(size=8) BDATA, bool END:
 
-	procedure fail(String reason)
-	begin
-		println(reason);
-	end
-
 	bool ftext;
 	bool fhcrc;
 	bool fextra;
@@ -73,12 +68,12 @@ actor Parser() uint(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(size
 
 	read_not_zero: action I:[c] ==> HDATA:[ c ]
 	end
-	
+
 	read_done: action ==>
 	guard
 		count = max_count
 	end
-	
+
 	read_not_done: action I:[c] ==> HDATA:[ c ]
 	do
 		count := count + 1;

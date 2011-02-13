@@ -20,18 +20,32 @@ actor Inflate() int(size=8) C ==> int(size=8) D:
 
 	int bl_count[16];
 	int next_code[16];
-	int tree_len[288];
-	int tree_code[288];
-	int invtree_code[512] := [ 0 : for int i in 0 .. 511 ];
+
+	// utility function	
+	procedure print_bin(int number, int numbits)
+	var
+		int bit
+	begin
+		foreach int i in 1 .. numbits do
+			bit := selectbit(number, numbits - i);
+			if bit != 0 then
+				print(1);
+			else
+				print(0);
+			end
+		end
+		println();
+	end
+
+	int tree_value_len[288];
+	int tree_value_code[288];
+	int inv_value_code[512] := [ 0 : for int i in 0 .. 511 ];
 	
 	procedure set_len(int from, int to, int bitlen)
-	var
-		int n := from
 	begin
-		while n <= to do
-    		tree_len[n] := bitlen;
+		foreach int n in from .. to do
+    		tree_value_len[n] := bitlen;
     		bl_count[bitlen] := bl_count[bitlen] + 1;
-			n := n + 1;
 		end
 	end
 	
@@ -56,30 +70,47 @@ actor Inflate() int(size=8) C ==> int(size=8) D:
 		end
 	end
 	
-	procedure print_bin(int number, int numbits)
-	var
-		int bit
-	begin
-		foreach int i in 1 .. numbits do
-			bit := selectbit(number, numbits - i);
-			if bit != 0 then
-				print(1);
-			else
-				print(0);
-			end
-		end
-		println();
-	end
-	
 	procedure step3(int max_code)
 	var
 		int len := 0
 	begin
 		foreach int n in 0 .. max_code do
-			len := tree_len[n];
+			len := tree_value_len[n];
 			if len != 0 then
-				tree_code[n] := next_code[len];
-				invtree_code[tree_code[n]] := n;
+				tree_value_code[n] := next_code[len];
+				inv_value_code[tree_value_code[n]] := n;
+				next_code[len] := next_code[len] + 1;
+			end
+		end
+	end
+	
+	int tree_dist_len[32];
+	int tree_dist_code[32];
+	int inv_dist_code[32] := [ 0 : for int i in 0 .. 31 ];
+	
+	procedure set_len_dist(int from, int to, int bitlen)
+	begin
+		foreach int n in from .. to do
+    		tree_dist_len[n] := bitlen;
+    		bl_count[bitlen] := bl_count[bitlen] + 1;
+		end
+	end
+	
+	procedure step1_dist()
+	begin
+		bl_count := [ 0 : for int bits in 0 .. MAX_BITS ];
+		set_len_dist(0, 31, 5);
+	end
+	
+	procedure step3_dist(int max_code)
+	var
+		int len := 0
+	begin
+		foreach int n in 0 .. max_code do
+			len := tree_dist_len[n];
+			if len != 0 then
+				tree_dist_code[n] := next_code[len];
+				inv_dist_code[tree_dist_code[n]] := n;
 				next_code[len] := next_code[len] + 1;
 			end
 		end
@@ -90,6 +121,10 @@ actor Inflate() int(size=8) C ==> int(size=8) D:
 		step1();
 		step2();
 		step3(287);
+		
+		step1_dist();
+		step2();
+		step3_dist(31);
 	end
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -157,28 +192,39 @@ actor Inflate() int(size=8) C ==> int(size=8) D:
 	guard
 		count = len
 	end
-	
+
 	///////////////////////////////////////////////////////////////////////////
-	// fixed Huffman coding
-	bool done_decoding;
-	int(size=8) value_len;
-	int(size=9) value;
-	
+	// fixed trees
+
 	fixed_huffman: action ==>
 	guard
 		btype = STATIC_TREES
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	// value Huffman decoding
+
+	bool done_decoding;
+	uint(size=8) value_len;
+	uint(size=9) value;
+	
+	start_huffman: action ==>
 	do
+		println();
+		println("start_huffman");
 		done_decoding := false;
 		value := 0;
 		value_len := 0;
-		println();
+	end
+
+	done.huffman: action ==>
+	guard
+		done_decoding
+	do
+		value := inv_value_code[value];
 	end
 	
-	done.fixed: action ==>
-	guard done_decoding
-	end
-	
-	loop.fixed: action ==>
+	loop.huffman: action ==>
 	guard
 		need_bits(1)
 	var
@@ -190,14 +236,145 @@ actor Inflate() int(size=8) C ==> int(size=8) D:
 		print("code_len = " + value_len + ", bit read = " + bit + ", code = ");
 		print_bin(value, 9);
 		
-		println("invtree_code[" + value + "] = " + invtree_code[value]);
-		println("tree_len[" + invtree_code[value] + "] = " + tree_len[invtree_code[value]]);
+		println("invtree_code[" + value + "] = " + inv_value_code[value]);
+		println("tree_len[" + inv_value_code[value] + "] = " + tree_value_len[inv_value_code[value]]);
 		
-		done_decoding := (value_len = tree_len[invtree_code[value]]);
+		done_decoding := (value_len = tree_value_len[inv_value_code[value]]);
 		bits_read(1);
 	end
 	
-	output_value: action ==> D:[0]
+	///////////////////////////////////////////////////////////////////////////
+	// value_decoded
+
+	decoded.output: action ==> D:[value]
+	guard
+		value < 256
+	do
+		println("decoded.output");
+	end
+
+	decoded.block_end: action ==>
+	guard
+		value = 256
+	do
+		println("decoded.block_end");
+	end
+
+	decoded.length: action ==>
+	do
+		println("decoded.length");
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	// decode length
+	
+	int length;
+	
+	uint(size=3) length_extra[29] := [
+		0, 0, 0, 0, 0, 0, 0, 0,
+		1, 1, 1, 1,
+		2, 2, 2, 2,
+		3, 3, 3, 3,
+		4, 4, 4, 4,
+		5, 5, 5, 5,
+		0 ];
+	
+	uint(size=9) length_start[29] := [
+		3, 4, 5, 6, 7, 8, 9, 10,
+		11, 13, 15, 17,
+		19, 23, 27, 31,
+		35, 43, 51, 59,
+		67, 83, 99, 115,
+		131, 163, 195, 227,
+		258 ];
+	
+	decode_length: action ==>
+	guard
+		need_bits(length_extra[value - 257])
+	var
+		int relative = value - 257,
+		int num_extra = length_extra[value - 257]
+	do
+		length := length_start[relative] + selectbits(bits, 0, num_extra);
+		println("relative = " + relative + ", num_extra = " + num_extra + ", length = " + length);
+		bits_read(num_extra);
+	end
+	
+	///////////////////////////////////////////////////////////////////////////
+	// distance Huffman decoding
+
+	done.distance: action ==>
+	guard
+		done_decoding
+	do
+		value := inv_dist_code[value];
+	end
+
+	loop.distance: action ==>
+	guard
+		need_bits(1)
+	var
+		uint(size=1) bit = selectbit(bits, 0)
+	do
+		value := (value << 1) | bit;
+		value_len := value_len + 1;
+		
+		print("code_len = " + value_len + ", bit read = " + bit + ", code = ");
+		print_bin(value, 9);
+		
+		println("inv_dist_code[" + value + "] = " + inv_dist_code[value]);
+		println("tree_len[" + inv_dist_code[value] + "] = " + tree_dist_len[inv_dist_code[value]]);
+		
+		done_decoding := (value_len = tree_dist_len[inv_dist_code[value]]);
+		bits_read(1);
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	// decode distance
+	
+	int distance;
+	
+	uint(size=3) distance_extra[30] := [
+		0, 0, 0, 0,
+		1, 1,
+		2, 2,
+		3, 3,
+		4, 4,
+		5, 5,
+		6, 6,
+		7, 7,
+		8, 8,
+		9, 9,
+		10, 10,
+		11, 11,
+		12, 12,
+		13, 13 ];
+	
+	uint(size=9) distance_start[30] := [
+		1, 2, 3, 4,
+		5, 7,
+		9, 13,
+		17, 25,
+		33, 49,
+		65, 97,
+		129, 193,
+		257, 385,
+		513, 769,
+		1025, 1537,
+		2049, 3073,
+		4097, 6145,
+		8193, 12289,
+		16385, 24577 ];
+	
+	decode_distance: action ==>
+	guard
+		need_bits(distance_extra[value])
+	var
+		int num_extra = distance_extra[value]
+	do
+		distance := distance_start[value] + selectbits(bits, 0, num_extra);
+		println("num_extra = " + num_extra + ", distance = " + distance);
+		bits_read(num_extra);
 	end
 
 	///////////////////////////////////////////////////////////////////////////
@@ -209,24 +386,40 @@ actor Inflate() int(size=8) C ==> int(size=8) D:
 
 		new_block (read.header) --> body;
 		new_block (load) --> new_block;
-		
-		body (uncompressed) --> uncompressed;
-		body (fixed_huffman) --> fixed;
 
+		// decode uncompressed value
+		body (uncompressed) --> uncompressed;
 		uncompressed (read_uc_len) --> uncompressed_loop;
 		uncompressed_loop (loop.uc) --> uncompressed_loop;
 		uncompressed_loop (done.uc) --> start;
 
-		fixed (done.fixed) --> fixed_decoded;
-		fixed (loop.fixed) --> fixed;
-		fixed (load) --> fixed;
+		// decode value encoded with Huffman tree
+		body (fixed_huffman) --> decode_init;
+		decode_init (start_huffman) --> decode;
+		decode (done.huffman) --> value_decoded;
+		decode (loop.huffman) --> decode;
+		decode (load) --> decode;
 
-		fixed_decoded (fixed_huffman) --> fixed;
+		// do something based on decoded value
+		value_decoded (decoded.output) --> body;
+		value_decoded (decoded.block_end) --> start;
+		value_decoded (decoded.length) --> decode_length;
+		
+		// decode length
+		decode_length (decode_length) --> decode_distance_init;
+		decode_length (load) --> decode_length;
+		
+		// decode distance
+		decode_distance_init (start_huffman) --> decode_distance;
+		decode_distance (done.distance) --> decode_init;
+		decode_distance (loop.distance) --> decode_distance;
+		decode_distance (load) --> decode_distance;
 	end
-	
+
 	priority
 		is_final > other;
 		done > loop > read > load;
+		decoded.output > decoded.block_end > decoded.length;
 	end
 
 end
