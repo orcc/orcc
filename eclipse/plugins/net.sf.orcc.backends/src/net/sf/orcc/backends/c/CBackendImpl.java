@@ -56,6 +56,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.tools.classifier.ActorClassifier;
+import net.sf.orcc.tools.merger2.ActorMerger2;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
 /**
@@ -191,12 +192,6 @@ public class CBackendImpl extends AbstractBackend {
 			network.mergeActors();
 		}
 		
-		//Experimental
-		boolean merge2 = getAttribute("net.sf.orcc.backends.merge2", false);
-		if (merge2) {
-			
-		}
-
 		// until now, printer is default printer
 		printer = new STPrinter();
 		printer.loadGroups("C_actor");
@@ -206,8 +201,15 @@ public class CBackendImpl extends AbstractBackend {
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
-		printInstances(network);
 
+		//Experimental
+		boolean merge2 = getAttribute("net.sf.orcc.backends.merge2", false);
+		if (merge2) {
+			new ActorMerger2().transform(network);
+		}
+
+		printInstances(network);
+		
 		// print network
 		write("Printing network...\n");
 		printNetwork(network);
