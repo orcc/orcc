@@ -351,18 +351,6 @@ void createArchives(map<string,Module*>* modules){
 	}
 }
 
-bool isNative(std::string package){
-	if (package.compare("System")== 0){
-		return true;	
-	}
-
-	if (package.compare("std")== 0){
-		return true;	
-	}
-
-	return false;
-}
-
 //main function of Jade toolbox
 int main(int argc, char **argv) {
 	sys::PrintStackTraceOnErrorSignal();
@@ -379,21 +367,17 @@ int main(int argc, char **argv) {
 	cl::list<string>::iterator itFile;
 	map<string,Module*> modules;
 
-	for (itFile=ActorFiles.begin() ; itFile != ActorFiles.end(); itFile++){
-		if(isNative(PackageMng::getFirstPackage(*itFile))){
-			continue;
-		}
-		
+	for (itFile=ActorFiles.begin() ; itFile != ActorFiles.end(); itFile++){	
 		sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(*itFile));
 
 		if (!fullFilePath.exists()){
-			cout <<"Actor "<< itFile->c_str() << "not found.\n";
+			cerr <<"Actor "<< itFile->c_str() << "not found.\n";
 		}
 
 		Module* mod = ParseIRFile(fullFilePath.c_str(), Err, Context);
 
 		if (!fullFilePath.exists()){
-			cout <<"Error when parsing "<< itFile->c_str() << ".\n";
+			cerr <<"Error when parsing "<< itFile->c_str() << ".\n";
 		}
 		modules.insert(pair<string,Module*>(*itFile, mod));
 	}

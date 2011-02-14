@@ -210,7 +210,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// Add list of actor
 		for (Actor actor : actors) {
-			cmdList.add(actor.getName());
+			if (!actor.isNative()){
+				cmdList.add(actor.getName());
+			}
 		}
 
 		String[] cmd = cmdList.toArray(new String[] {});
