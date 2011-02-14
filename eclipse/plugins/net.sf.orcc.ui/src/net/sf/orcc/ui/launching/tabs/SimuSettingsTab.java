@@ -44,7 +44,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -65,21 +64,9 @@ public class SimuSettingsTab extends OrccAbstractSettingsTab {
 		optionWidgets = new HashMap<String, List<OptionWidget>>();
 	}
 
-	@Override
-	protected void createControlPlugin(Font font, Composite parent) {
-		final Group group = new Group(parent, SWT.NONE);
-		group.setFont(font);
-		group.setText("&Simulator:");
-		group.setLayout(new GridLayout(3, false));
-		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		group.setLayoutData(data);
-
-		createControlOutputSimulator(font, group);
-	}
-
-	private void createControlOutputSimulator(final Font font, final Group group) {
+	private void createControlOutputSimulator(final Group group) {
 		Label lbl = new Label(group, SWT.NONE);
-		lbl.setFont(font);
+		lbl.setFont(getFont());
 		lbl.setText("Select a simulator:");
 		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, true);
 		lbl.setLayoutData(data);
@@ -102,6 +89,18 @@ public class SimuSettingsTab extends OrccAbstractSettingsTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
+	}
+
+	@Override
+	protected void createControlPlugin(Composite parent) {
+		final Group group = new Group(parent, SWT.NONE);
+		group.setFont(getFont());
+		group.setText("&Simulator:");
+		group.setLayout(new GridLayout(3, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		group.setLayoutData(data);
+
+		createControlOutputSimulator(group);
 	}
 
 	@Override

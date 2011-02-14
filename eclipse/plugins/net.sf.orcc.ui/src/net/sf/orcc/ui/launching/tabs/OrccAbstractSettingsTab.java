@@ -54,6 +54,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -72,10 +73,19 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
+/**
+ * This class groups fields that are common to {@link RunSettingsTab} and
+ * {@link SimuSettingsTab}.
+ * 
+ * @author Pierre-Laurent Lagalaye
+ * 
+ */
 public abstract class OrccAbstractSettingsTab extends
 		AbstractLaunchConfigurationTab implements ModifyListener {
 
 	protected Combo comboPlugin;
+
+	private Composite composite;
 
 	protected Group groupOptions;
 
@@ -87,6 +97,13 @@ public abstract class OrccAbstractSettingsTab extends
 
 	protected boolean updateLaunchConfiguration;
 
+	/**
+	 * Method called when the "Browse..." button is clicked. Shows a selection
+	 * dialog with projects available in the workspace.
+	 * 
+	 * @param shell
+	 *            a shell
+	 */
 	private void browseProject(Shell shell) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
 				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
@@ -132,8 +149,12 @@ public abstract class OrccAbstractSettingsTab extends
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NONE);
-		setControl(composite);
+		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL
+				| SWT.V_SCROLL);
+		setControl(sc);
+
+		composite = new Composite(sc, SWT.NONE);
+		sc.setContent(composite);
 
 		Font font = parent.getFont();
 		composite.setFont(font);
@@ -144,21 +165,27 @@ public abstract class OrccAbstractSettingsTab extends
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		composite.setLayoutData(data);
 
-		createControlProject(font, composite);
-		createControlPlugin(font, composite);
-		createControlOption(font, composite);
+		createControlProject(composite);
+		createControlPlugin(composite);
+		createControlOption(composite);
 		createOptions();
 	}
 
-	private void createControlBrowseProject(Font font, final Group group) {
+	/**
+	 * Creates the control for Browse project.
+	 * 
+	 * @param group
+	 *            parent group
+	 */
+	private void createControlBrowseProject(final Group group) {
 		textProject = new Text(group, SWT.BORDER | SWT.SINGLE);
-		textProject.setFont(font);
+		textProject.setFont(composite.getFont());
 		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		textProject.setLayoutData(data);
 		textProject.addModifyListener(this);
 
 		Button buttonBrowse = new Button(group, SWT.PUSH);
-		buttonBrowse.setFont(font);
+		buttonBrowse.setFont(composite.getFont());
 		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		buttonBrowse.setLayoutData(data);
 		buttonBrowse.setText("&Browse...");
@@ -170,9 +197,15 @@ public abstract class OrccAbstractSettingsTab extends
 		});
 	}
 
-	protected void createControlOption(Font font, Composite parent) {
+	/**
+	 * Creates the control for options.
+	 * 
+	 * @param parent
+	 *            parent composite
+	 */
+	protected void createControlOption(Composite parent) {
 		groupOptions = new Group(parent, SWT.NONE);
-		groupOptions.setFont(font);
+		groupOptions.setFont(getFont());
 		groupOptions.setText("&Options:");
 
 		GridLayout layout = new GridLayout(1, false);
@@ -184,17 +217,29 @@ public abstract class OrccAbstractSettingsTab extends
 		groupOptions.setLayoutData(data);
 	}
 
-	abstract protected void createControlPlugin(Font font, Composite parent);
+	/**
+	 * Creates control for the selected plug-in: back-end or simulator.
+	 * 
+	 * @param parent
+	 *            parent composite
+	 */
+	abstract protected void createControlPlugin(Composite parent);
 
-	private void createControlProject(Font font, Composite parent) {
+	/**
+	 * Creates the control for the project selection.
+	 * 
+	 * @param parent
+	 *            parent composite
+	 */
+	private void createControlProject(Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
-		group.setFont(font);
+		group.setFont(getFont());
 		group.setText("&Project:");
 		group.setLayout(new GridLayout(2, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
 
-		createControlBrowseProject(font, group);
+		createControlBrowseProject(group);
 	}
 
 	/**
@@ -210,9 +255,13 @@ public abstract class OrccAbstractSettingsTab extends
 		}
 	}
 
-	@Override
-	public String getName() {
-		return null;
+	/**
+	 * Returns the font of this tab.
+	 * 
+	 * @return the font of this tab
+	 */
+	final protected Font getFont() {
+		return composite.getFont();
 	}
 
 	/**
@@ -273,6 +322,8 @@ public abstract class OrccAbstractSettingsTab extends
 				List<OptionWidget> widgets = optionWidgets.get(plugin);
 				OptionWidgetManager.showOptions(widgets);
 			}
+
+			updateSize();
 		} catch (CoreException e) {
 			e.printStackTrace();
 			updateLaunchConfiguration = true;
@@ -346,7 +397,11 @@ public abstract class OrccAbstractSettingsTab extends
 		super.updateLaunchConfigurationDialog();
 	}
 
-	protected void updateOptionSelection() {
+	/**
+	 * Updates the selection of options and the size of the composite to show
+	 * scrollbars if necessary.
+	 */
+	final protected void updateOptionSelection() {
 		if (!plugin.isEmpty()) {
 			List<OptionWidget> widgets = optionWidgets.get(plugin);
 			OptionWidgetManager.hideOptions(widgets);
@@ -358,5 +413,16 @@ public abstract class OrccAbstractSettingsTab extends
 			List<OptionWidget> widgets = optionWidgets.get(plugin);
 			OptionWidgetManager.showOptions(widgets);
 		}
+
+		updateSize();
 	}
+
+	/**
+	 * Updates the size of the composite. Will make scrollbars appear if
+	 * necessary.
+	 */
+	private void updateSize() {
+		composite.setSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+	}
+
 }

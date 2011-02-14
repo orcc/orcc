@@ -47,7 +47,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -65,7 +64,7 @@ import org.eclipse.swt.widgets.Text;
  * "Orcc compilation".
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class RunSettingsTab extends OrccAbstractSettingsTab {
@@ -90,9 +89,9 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 		}
 	}
 
-	private void createControlOutputBackend(final Font font, final Group group) {
+	private void createControlOutputBackend(final Group group) {
 		Label lbl = new Label(group, SWT.NONE);
-		lbl.setFont(font);
+		lbl.setFont(getFont());
 		lbl.setText("Select a backend:");
 		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, true);
 		lbl.setLayoutData(data);
@@ -117,21 +116,21 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 		});
 	}
 
-	private void createControlOutputFolder(Font font, final Group group) {
+	private void createControlOutputFolder(final Group group) {
 		Label lbl = new Label(group, SWT.NONE);
-		lbl.setFont(font);
+		lbl.setFont(getFont());
 		lbl.setText("Output folder:");
 		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 		lbl.setLayoutData(data);
 
 		textOutput = new Text(group, SWT.BORDER | SWT.SINGLE);
-		textOutput.setFont(font);
+		textOutput.setFont(getFont());
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		textOutput.setLayoutData(data);
 		textOutput.addModifyListener(this);
 
 		Button buttonBrowse = new Button(group, SWT.PUSH);
-		buttonBrowse.setFont(font);
+		buttonBrowse.setFont(getFont());
 		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		buttonBrowse.setLayoutData(data);
 		buttonBrowse.setText("&Browse...");
@@ -144,16 +143,16 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 	}
 
 	@Override
-	protected void createControlPlugin(Font font, Composite parent) {
+	protected void createControlPlugin(Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
-		group.setFont(font);
+		group.setFont(getFont());
 		group.setText("&Backend:");
 		group.setLayout(new GridLayout(3, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
 
-		createControlOutputBackend(font, group);
-		createControlOutputFolder(font, group);
+		createControlOutputBackend(group);
+		createControlOutputFolder(group);
 	}
 
 	@Override
