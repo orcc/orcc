@@ -347,7 +347,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_InterPred"/>
+      <Class name="MPEG.MPEG4.part10.Mgnt_InterPred"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->

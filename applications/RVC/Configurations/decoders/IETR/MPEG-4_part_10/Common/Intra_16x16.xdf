@@ -72,7 +72,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_Intra_16x16"/>
+      <Class name="MPEG.MPEG4.part10.Mgnt_Intra_16x16"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -108,7 +108,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Buffer_Neighbour_FullMb"/>
+      <Class name="MPEG.MPEG4.part10.Buffer_Neighbour_FullMb"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->

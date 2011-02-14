@@ -114,7 +114,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Algo_Split_16x16_to_4x4_norasterscan"/>
+      <Class name="MPEG.MPEG4.part10.Algo_Split_16x16_to_4x4_norasterscan"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
