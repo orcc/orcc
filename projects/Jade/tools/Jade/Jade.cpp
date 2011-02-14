@@ -279,6 +279,7 @@ int main(int argc, char **argv) {
 			cout << "> Exiting console mode.\n";
 		}
 	} else if (ScFile != ""){
+		//Scenario mode 
 		if (Verbose){
 			cout << "> Starting scenario mode :\n";
 		}

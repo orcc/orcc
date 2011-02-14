@@ -150,7 +150,7 @@ bool Manager::runLoadEvent(LoadEvent* loadEvent){
 
 	//Loading decoder
 	int id = loadEvent->getId();
-	engine->load(network, 0);
+	engine->load(network, id);
 
 	//Store resulting network
 	networks.insert(pair<int, Network*>(id, network));

@@ -351,6 +351,17 @@ void createArchives(map<string,Module*>* modules){
 	}
 }
 
+bool isNative(std::string package){
+	if (package.compare("System")== 0){
+		return true;	
+	}
+
+	if (package.compare("std")== 0){
+		return true;	
+	}
+
+	return false;
+}
 
 //main function of Jade toolbox
 int main(int argc, char **argv) {
@@ -369,7 +380,7 @@ int main(int argc, char **argv) {
 	map<string,Module*> modules;
 
 	for (itFile=ActorFiles.begin() ; itFile != ActorFiles.end(); itFile++){
-		if(PackageMng::getFirstPackage(*itFile).compare("System") == 0){
+		if(isNative(PackageMng::getFirstPackage(*itFile))){
 			continue;
 		}
 		
@@ -377,14 +388,12 @@ int main(int argc, char **argv) {
 
 		if (!fullFilePath.exists()){
 			cout <<"Actor "<< itFile->c_str() << "not found.\n";
-			exit(0);
 		}
 
 		Module* mod = ParseIRFile(fullFilePath.c_str(), Err, Context);
 
 		if (!fullFilePath.exists()){
 			cout <<"Error when parsing "<< itFile->c_str() << ".\n";
-			exit(0);
 		}
 		modules.insert(pair<string,Module*>(*itFile, mod));
 	}

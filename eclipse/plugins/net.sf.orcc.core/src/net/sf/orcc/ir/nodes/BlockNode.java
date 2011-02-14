@@ -198,7 +198,7 @@ public final class BlockNode extends AbstractNode implements
 	/**
 	 * Appends a list of instruction to the end of this block.
 	 * 
-	 * @param instruction
+	 * @param instructions
 	 *            a list of instruction
 	 */
 	public void addAll(List<Instruction> instructions) {

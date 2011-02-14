@@ -31,7 +31,9 @@ package net.sf.orcc.tools.merger2;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.Connection;
@@ -39,6 +41,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -74,6 +77,21 @@ public class StaticDirectedGraph {
 
 		// Find static edge in the graph
 		addStaticEdge();
+		
+		//Refine graph by removing potentially dynamic paths
+		refineStaticGraph();
+		
+		/*try {
+			//Output resulting graph
+			DOTExporter<Vertex, DefaultEdge> exporter = new DOTExporter<Vertex, DefaultEdge>();
+			FileWriter file;
+			
+			file = new FileWriter("D:/projet/orcc_decoder/C/Xilinx (merger)/test.dot");
+			exporter.export(file, staticGraph);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 	}
 
 	/**
@@ -85,20 +103,15 @@ public class StaticDirectedGraph {
 			LinkedHashSet<Vertex> adjVertices = adjacentVertices.get(vertex);
 			for (Vertex adjVertex : adjVertices) {
 				if (staticGraph.containsVertex(adjVertex)) {
-					// Two static vertex are connected
-					Boolean exist = findStaticPaths(vertex, adjVertex);
-
-					if (exist) {
-						// A static path between these two vertex is existing
-						staticGraph.addEdge(vertex, adjVertex);
-					}
-
+					// A static path between these two vertex is existing
+					staticGraph.addEdge(vertex, adjVertex);
 				}
 			}
 
 		}
 	}
-
+	
+	
 	/**
 	 * Add static vertex from dynamic graph to the static graph
 	 */
@@ -137,14 +150,14 @@ public class StaticDirectedGraph {
 	}
 
 	/**
-	 * Find a static path between the last vertex of a LinkedList and the given
+	 * Find a dynamic path between the last vertex of a LinkedList and the given
 	 * vertex using breadth-first search.
 	 * 
 	 * @param visited
 	 *            a LinkedList of all vertices already visited.
 	 * 
 	 * 
-	 * @return true if the paths found are static, otherwise false.
+	 * @return true if the paths found is dynamic, otherwise false.
 	 */
 	private Boolean findPaths(LinkedList<Vertex> visited, Vertex end) {
 		LinkedList<Vertex> nodes = adjacentNodes(visited.getLast());
@@ -157,7 +170,7 @@ public class StaticDirectedGraph {
 			if (node.equals(end)) {
 				visited.add(node);
 				if (!isStaticPath(visited)) {
-					return false;
+					return true;
 				}
 
 				visited.removeLast();
@@ -171,31 +184,14 @@ public class StaticDirectedGraph {
 				continue;
 			}
 			visited.addLast(node);
-			if (!findPaths(visited, end)) {
-				return false;
+			if (findPaths(visited, end)) {
+				return true;
 			}
 
 			visited.removeLast();
 		}
 
-		return true;
-	}
-
-	/**
-	 * Return true if all the paths from a vertex to an other are statics.
-	 * 
-	 * @param source
-	 *            the source vertex
-	 * 
-	 * @param target
-	 *            the target vertex
-	 * 
-	 * @return True if all the paths are detected as static otherwise false.
-	 */
-	private Boolean findStaticPaths(Vertex source, Vertex target) {
-		LinkedList<Vertex> visited = new LinkedList<Vertex>();
-		visited.add(source);
-		return findPaths(visited, target);
+		return false;
 	}
 
 	/**
@@ -205,6 +201,23 @@ public class StaticDirectedGraph {
 	 */
 	public DirectedGraph<Vertex, DefaultEdge> getStaticGraph() {
 		return staticGraph;
+	}
+
+	/**
+	 * Return true if a path between two vertices is dynamic.
+	 * 
+	 * @param source
+	 *            the source vertex
+	 * 
+	 * @param target
+	 *            the target vertex
+	 * 
+	 * @return True if a dynamic path is detected.
+	 */
+	private Boolean hasDynamicPaths(Vertex source, Vertex target) {
+		LinkedList<Vertex> visited = new LinkedList<Vertex>();
+		visited.add(source);
+		return findPaths(visited, target);
 	}
 
 	/**
@@ -223,6 +236,27 @@ public class StaticDirectedGraph {
 		}
 
 		return true;
+	}
+
+	private void refineStaticGraph(){
+		ConnectivityInspector<Vertex, DefaultEdge> inspector = new ConnectivityInspector<Vertex, DefaultEdge>(
+				staticGraph);
+		List<Set<Vertex>> regions = inspector.connectedSets();
+		
+		for (Set<Vertex> region : regions){
+			//Examine if a region contains dynamic paths
+			
+			for (Vertex source : region){
+				for (Vertex target : region){
+					if (source != target){
+						// Two static vertex are connected
+						if (hasDynamicPaths(source, target)){
+							staticGraph.removeEdge(source, target);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**
