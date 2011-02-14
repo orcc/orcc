@@ -56,7 +56,7 @@ public class TemplateGroupLoader {
 	public static STGroup loadGroup(String... groupNames) {
 		STGroup group = null;
 
-		ClassLoader cl = Activator.getDefault().getClass().getClassLoader();
+		ClassLoader cl = TemplateGroupLoader.class.getClassLoader();
 		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(cl);
 
@@ -73,7 +73,7 @@ public class TemplateGroupLoader {
 			group.importTemplates(previous);
 			group.load();
 		}
-		
+
 		Thread.currentThread().setContextClassLoader(oldCl);
 
 		return group;
