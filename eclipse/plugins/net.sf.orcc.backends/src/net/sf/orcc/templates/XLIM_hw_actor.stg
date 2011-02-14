@@ -1,3 +1,5 @@
+import "net/sf/orcc/templates/XLIM_sw_actor.stg"
+
 ///////////////////////////////////////////////////////////////////////////////
 // Override XLIM Templates For XLIM Hardware Generation
 
@@ -50,7 +52,7 @@ fpgaType() ::=<<
 >>
 
 // Adding the fpgaType ST to the design
-design() ::= <<
+design(instance) ::= <<
 \<!-- /<first(instance.hierarchicalClass)>/<PrintHierarchicalPath(instance.hierarchicalId)> --\>
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
