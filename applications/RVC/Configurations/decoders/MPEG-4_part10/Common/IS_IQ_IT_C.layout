@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="QP_C" x="377" y="70"/>
+      <vertex id="ScalingList" x="377" y="292"/>
+      <vertex id="CoefDCR_C" x="190" y="130"/>
+      <vertex id="CoefAC_C" x="57" y="232"/>
+      <vertex id="CoefACR_C" x="1003" y="181"/>
+      <vertex id="Algo_IS_Zigzag_4x4" x="190" y="223"/>
+      <vertex id="Mgnt_IQ_Chroma" x="377" y="163"/>
+      <vertex id="Algo_IQ_QSAndSLAndIDCTScaler_4x4" x="612" y="145"/>
+      <vertex id="IT4x4" x="892" y="172"/>
+   </vertices>
+</layout>

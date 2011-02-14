@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="CoefDCR_L" x="189" y="106"/>
+      <vertex id="CoefAC_L" x="57" y="208"/>
+      <vertex id="QP" x="397" y="70"/>
+      <vertex id="ScalingList" x="397" y="163"/>
+      <vertex id="MbTyoe" x="189" y="310"/>
+      <vertex id="CoefACR_L" x="1018" y="200"/>
+      <vertex id="Algo_IS_Zigzag_4x4_AC" x="189" y="199"/>
+      <vertex id="Mgnt_IQ_INTRA16x16" x="397" y="256"/>
+      <vertex id="Algo_IQ_QSAndSLAndIDCTScaler_4x4" x="627" y="164"/>
+      <vertex id="IT4x4" x="907" y="191"/>
+   </vertices>
+</layout>

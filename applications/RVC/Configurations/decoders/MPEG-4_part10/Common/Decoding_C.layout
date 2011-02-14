@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="CoefDC" x="57" y="1916"/>
+      <vertex id="QP" x="57" y="614"/>
+      <vertex id="ScalingList" x="57" y="2009"/>
+      <vertex id="CoefAC" x="57" y="2102"/>
+      <vertex id="CurrMbAddr" x="194" y="92"/>
+      <vertex id="PredMode" x="194" y="185"/>
+      <vertex id="FirstMbInSlice" x="194" y="278"/>
+      <vertex id="Mb_TypeC" x="194" y="371"/>
+      <vertex id="PicWidthInMB" x="194" y="464"/>
+      <vertex id="POC" x="194" y="557"/>
+      <vertex id="PicSizeInMb" x="194" y="671"/>
+      <vertex id="LOCATION" x="194" y="764"/>
+      <vertex id="MV" x="194" y="857"/>
+      <vertex id="MbPartHeight" x="194" y="950"/>
+      <vertex id="MbPartIdx" x="194" y="1043"/>
+      <vertex id="MbPartWidth" x="194" y="1136"/>
+      <vertex id="PartSZ" x="194" y="1229"/>
+      <vertex id="RefList" x="194" y="1322"/>
+      <vertex id="RefIdx" x="194" y="1415"/>
+      <vertex id="slice_alpha_c0_offset" x="194" y="1508"/>
+      <vertex id="LFDisable" x="194" y="1601"/>
+      <vertex id="CodedBlockPattern" x="194" y="1694"/>
+      <vertex id="ref_idx_in" x="194" y="1787"/>
+      <vertex id="mv_in" x="194" y="1880"/>
+      <vertex id="slice_beta_offset" x="194" y="2138"/>
+      <vertex id="I_PCM_C" x="194" y="2231"/>
+      <vertex id="ConstrainedIFlag" x="194" y="2324"/>
+      <vertex id="DelList" x="194" y="2417"/>
+      <vertex id="IsIDR" x="194" y="2603"/>
+      <vertex id="BlocksSize" x="133" y="1018"/>
+      <vertex id="MbLocation" x="87" y="804"/>
+      <vertex id="NeighbourAvail" x="78" y="860"/>
+      <vertex id="PocToDisplay" x="103" y="1424"/>
+      <vertex id="Display" x="626" y="1229"/>
+      <vertex id="PRED_C" x="387" y="977"/>
+      <vertex id="RES_C" x="194" y="1973"/>
+   </vertices>
+</layout>

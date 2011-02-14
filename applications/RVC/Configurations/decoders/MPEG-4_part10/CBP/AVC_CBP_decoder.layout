@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="bits8" x="57" y="1198"/>
+      <vertex id="Display_L" x="582" y="556"/>
+      <vertex id="Display_Cb" x="582" y="1198"/>
+      <vertex id="Display_Cr" x="582" y="1831"/>
+      <vertex id="Width" x="357" y="91"/>
+      <vertex id="Height" x="357" y="184"/>
+      <vertex id="FUN_Parser" x="164" y="811"/>
+      <vertex id="Decoding_Y" x="682" y="295"/>
+      <vertex id="Decode_U" x="845" y="930"/>
+      <vertex id="Decode_V" x="828" y="1526"/>
+   </vertices>
+</layout>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="MbPartIdx" x="57" y="154"/>
+      <vertex id="MbPartWidth" x="475" y="70"/>
+      <vertex id="MbPartHeigth" x="475" y="163"/>
+      <vertex id="RD_C" x="209" y="304"/>
+      <vertex id="PartSZ" x="57" y="247"/>
+      <vertex id="Coef_AC" x="334" y="417"/>
+      <vertex id="MB4x4Pred_C" x="1048" y="481"/>
+      <vertex id="Algo_Interp_EighthPelBilinear" x="475" y="277"/>
+      <vertex id="Algo_Interp_split_MB_C" x="711" y="184"/>
+      <vertex id="Algo_Add" x="916" y="463"/>
+      <vertex id="MV" x="214" y="364"/>
+   </vertices>
+</layout>

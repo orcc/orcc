@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><XDF name="IT4x4">
+   <!-- ************************************** -->
+   <!-- Input ports of the Graph               -->
+   <!-- ************************************** -->
+   <Port kind="Input" name="X">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
+         </Entry>
+      </Type>
+   </Port>
+   <!-- ************************************** -->
+   <!-- Output ports of the Graph              -->
+   <!-- ************************************** -->
+   <Port kind="Output" name="Y">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
+         </Entry>
+      </Type>
+   </Port>
+   <!-- ************************************** -->
+   <!-- Variables and Parameters of the Graph  -->
+   <!-- ************************************** -->
+   <Decl kind="Param" name="SAMPLE_SIZE">
+      <Type name="int"/>
+   </Decl>
+   <!-- ************************************** -->
+   <!-- Instances of the Graph                 -->
+   <!-- ************************************** -->
+   <Instance id="Algo_IT4x4_1d_0">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="MPEG.MPEG4.part10.Algo_IT4x4_1d"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="Algo_Transpose4x4_0">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="MPEG.MPEG4.part10.Algo_Transpose4x4"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="Algo_IT4x4_1d_1">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="MPEG.MPEG4.part10.Algo_IT4x4_1d"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="Algo_Transpose4x4_1">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="MPEG.MPEG4.part10.Algo_Transpose4x4"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="Algo_IT4x4_Addshift">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="MPEG.MPEG4.part10.Algo_IT4x4_Addshift"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <!-- ************************************** -->
+   <!-- Connections of the Graph               -->
+   <!-- ************************************** -->
+   <Connection dst="Algo_IT4x4_1d_0" dst-port="X" src="" src-port="X"/>
+   <Connection dst="" dst-port="Y" src="Algo_IT4x4_Addshift" src-port="Y"/>
+   <Connection dst="Algo_Transpose4x4_0" dst-port="X" src="Algo_IT4x4_1d_0" src-port="Y"/>
+   <Connection dst="Algo_IT4x4_1d_1" dst-port="X" src="Algo_Transpose4x4_0" src-port="Y"/>
+   <Connection dst="Algo_Transpose4x4_1" dst-port="X" src="Algo_IT4x4_1d_1" src-port="Y"/>
+   <Connection dst="Algo_IT4x4_Addshift" dst-port="X" src="Algo_Transpose4x4_1" src-port="Y"/>
+</XDF>

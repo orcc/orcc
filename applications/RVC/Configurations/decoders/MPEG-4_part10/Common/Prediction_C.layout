@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="CurrMbAddr" x="227" y="89"/>
+      <vertex id="PicWidthInMb" x="515" y="1070"/>
+      <vertex id="PredMode" x="1385" y="1691"/>
+      <vertex id="FirstMbInSlice" x="515" y="1184"/>
+      <vertex id="PicSizeInMb" x="227" y="758"/>
+      <vertex id="MbPartHeigth" x="968" y="71"/>
+      <vertex id="MbPartWidth" x="968" y="164"/>
+      <vertex id="MbPartIdx" x="227" y="1013"/>
+      <vertex id="RefIdx" x="515" y="146"/>
+      <vertex id="Coef_ACR" x="57" y="1655"/>
+      <vertex id="LOCATION" x="515" y="473"/>
+      <vertex id="MV" x="515" y="332"/>
+      <vertex id="PartSZ" x="227" y="851"/>
+      <vertex id="POC" x="781" y="614"/>
+      <vertex id="RefList" x="515" y="239"/>
+      <vertex id="Mb_TypeC" x="227" y="1766"/>
+      <vertex id="slice_beta_offset" x="515" y="1277"/>
+      <vertex id="slice_alpha_c0_offset" x="515" y="1370"/>
+      <vertex id="LFDisable" x="515" y="1463"/>
+      <vertex id="CodedBlockPattern" x="515" y="1556"/>
+      <vertex id="QP" x="515" y="1649"/>
+      <vertex id="ref_idx_in" x="515" y="1742"/>
+      <vertex id="mv_in" x="515" y="1835"/>
+      <vertex id="I_PCM_C" x="1180" y="701"/>
+      <vertex id="ConstrainedIFlag" x="57" y="1748"/>
+      <vertex id="DelList" x="781" y="707"/>
+      <vertex id="IsIDR" x="781" y="800"/>
+      <vertex id="BlocksSize" x="57" y="1841"/>
+      <vertex id="MbLocation" x="57" y="2027"/>
+      <vertex id="NeighbourAvail" x="57" y="1934"/>
+      <vertex id="PocToDisplay" x="781" y="893"/>
+      <vertex id="Display_C" x="1180" y="794"/>
+      <vertex id="Intra8x8" x="1542" y="1883"/>
+      <vertex id="Inter" x="1180" y="887"/>
+      <vertex id="Buffer_inter" x="968" y="524"/>
+      <vertex id="Select_chroma" x="1385" y="1784"/>
+      <vertex id="Deblocking_Filter" x="781" y="1213"/>
+      <vertex id="RefIdxtoPOC" x="781" y="278"/>
+      <vertex id="Mgnt_interPred" x="781" y="446"/>
+      <vertex id="Mgnt_Interp_FBAddr_Chroma_MxN" x="515" y="788"/>
+      <vertex id="Algo_DemuxChroma" x="227" y="1859"/>
+   </vertices>
+</layout>

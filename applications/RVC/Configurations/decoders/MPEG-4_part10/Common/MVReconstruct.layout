@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="CurrMbAddr" x="57" y="70"/>
+      <vertex id="MbPartIdx" x="57" y="721"/>
+      <vertex id="RefIdx" x="57" y="628"/>
+      <vertex id="MbPartWidth" x="57" y="163"/>
+      <vertex id="MbPartHeigth" x="57" y="256"/>
+      <vertex id="MvRes" x="425" y="682"/>
+      <vertex id="PicWidthInMb" x="57" y="349"/>
+      <vertex id="MbIntraFlag" x="57" y="442"/>
+      <vertex id="FirstMbInSlice" x="57" y="535"/>
+      <vertex id="MV" x="797" y="527"/>
+      <vertex id="LOCATION" x="425" y="199"/>
+      <vertex id="PartSZ" x="425" y="292"/>
+      <vertex id="mv_out" x="425" y="385"/>
+      <vertex id="ref_idx" x="425" y="775"/>
+      <vertex id="Mgnt_MVR" x="211" y="361"/>
+      <vertex id="Algo_MVR_MultiFrameAdptive" x="425" y="499"/>
+      <vertex id="Algo_Add" x="666" y="525"/>
+   </vertices>
+</layout>

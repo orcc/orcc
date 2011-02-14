@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="PredMode" x="83" y="494"/>
+      <vertex id="MB_IN" x="81" y="246"/>
+      <vertex id="Coef_ACR" x="501" y="503"/>
+      <vertex id="Mb_Type" x="71" y="335"/>
+      <vertex id="ConstrainedIFlag" x="64" y="387"/>
+      <vertex id="MbLocation" x="68" y="278"/>
+      <vertex id="IsIntraFlag" x="84" y="428"/>
+      <vertex id="NeighbourAvail" x="75" y="462"/>
+      <vertex id="MB_intraPred16x16" x="1068" y="472"/>
+      <vertex id="Mgnt_Intra_16x16" x="424" y="294"/>
+      <vertex id="Algo_IntraPred_LUMA_16x16" x="661" y="325"/>
+      <vertex id="Algo_Add_16x16" x="896" y="454"/>
+      <vertex id="Buffer_Neighbour_FullMb" x="209" y="224"/>
+   </vertices>
+</layout>

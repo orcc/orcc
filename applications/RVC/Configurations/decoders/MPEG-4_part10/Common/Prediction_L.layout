@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="CurrMbAddr" x="227" y="405"/>
+      <vertex id="PicWidthInMb" x="778" y="185"/>
+      <vertex id="PredMode" x="57" y="1016"/>
+      <vertex id="FirstMbInSlice" x="1387" y="71"/>
+      <vertex id="MbPartIdx" x="227" y="989"/>
+      <vertex id="RefIdx" x="525" y="394"/>
+      <vertex id="MbPartWidth" x="965" y="674"/>
+      <vertex id="MbPartHeigth" x="965" y="767"/>
+      <vertex id="PicSizeInMb" x="227" y="312"/>
+      <vertex id="Coef_ACR" x="57" y="1109"/>
+      <vertex id="LOCATION" x="525" y="935"/>
+      <vertex id="MV" x="525" y="1307"/>
+      <vertex id="PartSZ" x="227" y="878"/>
+      <vertex id="POC" x="778" y="320"/>
+      <vertex id="RefList" x="525" y="487"/>
+      <vertex id="Mb_Type" x="227" y="1394"/>
+      <vertex id="QP" x="1387" y="236"/>
+      <vertex id="LFDisable" x="1387" y="383"/>
+      <vertex id="slice_alpha_c0_offset" x="1387" y="497"/>
+      <vertex id="slice_beta_offset" x="1387" y="590"/>
+      <vertex id="CodedBlockPattern" x="1387" y="683"/>
+      <vertex id="ref_idx_in" x="1387" y="776"/>
+      <vertex id="mv_in" x="1387" y="869"/>
+      <vertex id="I_PCM_Y" x="1177" y="836"/>
+      <vertex id="ConstrainedIFlag" x="57" y="1202"/>
+      <vertex id="DelList" x="778" y="581"/>
+      <vertex id="IsIDR" x="778" y="674"/>
+      <vertex id="MbLocation" x="57" y="1388"/>
+      <vertex id="BlocksSize" x="57" y="1493"/>
+      <vertex id="NeighbourAvail" x="57" y="1295"/>
+      <vertex id="PocToDisplay" x="778" y="767"/>
+      <vertex id="Display_L" x="1177" y="383"/>
+      <vertex id="Inter" x="1177" y="929"/>
+      <vertex id="Select" x="1387" y="1139"/>
+      <vertex id="Intra_16x16" x="525" y="1070"/>
+      <vertex id="Intra_4x4" x="525" y="1400"/>
+      <vertex id="Deblocking_Filter" x="1580" y="332"/>
+      <vertex id="RefIdxtoPOC" x="778" y="413"/>
+      <vertex id="DemuxParserInfos" x="224" y="1101"/>
+      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="525" y="695"/>
+      <vertex id="Mgnt_inter_Pred" x="778" y="881"/>
+      <vertex id="Buffer_inter" x="965" y="350"/>
+   </vertices>
+</layout>
