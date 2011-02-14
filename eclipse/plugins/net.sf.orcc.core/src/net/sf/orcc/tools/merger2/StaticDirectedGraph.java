@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.tools.merger2;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -42,6 +44,7 @@ import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
+import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -81,7 +84,7 @@ public class StaticDirectedGraph {
 		//Refine graph by removing potentially dynamic paths
 		refineStaticGraph();
 		
-		/*try {
+		try {
 			//Output resulting graph
 			DOTExporter<Vertex, DefaultEdge> exporter = new DOTExporter<Vertex, DefaultEdge>();
 			FileWriter file;
@@ -91,7 +94,7 @@ public class StaticDirectedGraph {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 	}
 
 	/**
@@ -251,7 +254,8 @@ public class StaticDirectedGraph {
 					if (source != target){
 						// Two static vertex are connected
 						if (hasDynamicPaths(source, target)){
-							staticGraph.removeEdge(source, target);
+							//Separate this actor from the static region
+							//TODO : Find something reliable
 						}
 					}
 				}

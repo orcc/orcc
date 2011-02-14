@@ -291,10 +291,13 @@ StateVar* IRParser::parseStateVar(MDNode* node){
 
 Expr* IRParser::parseExpr(MDNode* node){
 	Value* value = node->getOperand(0);
-	if (isa<ConstantInt>(value)){
-		return new IntExpr(Context, cast<ConstantInt>(value));
-	}else if (isa<ConstantArray>(value)){
-		return new ListExpr(Context, cast<ConstantArray>(value));
+	
+	//Get type of the value
+	const Type* type = value->getType();
+	if (isa<IntegerType>(type)){
+		return new IntExpr(Context, cast<Constant>(value));
+	}else if (isa<ArrayType>(type)){
+		return new ListExpr(Context, cast<Constant>(value));
 	}else{
 		cout << "Unsupported type of expression \n";
 		exit(1);

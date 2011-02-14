@@ -80,7 +80,7 @@ public:
 	 *  @param value : llvm::ConstantInt value of the IntExpr.
      *
      */
-	IntExpr(llvm::LLVMContext &C, llvm::ConstantInt* value) : Expr(C){
+	IntExpr(llvm::LLVMContext &C, llvm::Constant* value) : Expr(C){
 		this->constantVal = value;
 	};
 
@@ -122,7 +122,7 @@ private:
 	/** Value of IntExpr */
 	int value;
 	
-	llvm::ConstantInt* constantVal;
+	llvm::Constant* constantVal;
 };
 
 #endif
