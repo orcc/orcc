@@ -56,6 +56,10 @@ public class TemplateGroupLoader {
 	public static STGroup loadGroup(String... groupNames) {
 		STGroup group = null;
 
+		ClassLoader cl = Activator.getDefault().getClass().getClassLoader();
+		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(cl);
+
 		String root = groupNames[0];
 		String groupPath = "net/sf/orcc/templates/" + root + ".stg";
 		group = new STGroupFile(groupPath);
@@ -69,6 +73,8 @@ public class TemplateGroupLoader {
 			group.importTemplates(previous);
 			group.load();
 		}
+		
+		Thread.currentThread().setContextClassLoader(oldCl);
 
 		return group;
 	}
