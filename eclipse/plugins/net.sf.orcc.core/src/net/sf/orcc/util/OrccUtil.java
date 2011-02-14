@@ -147,14 +147,14 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Returns the output location of the given project.
+	 * Returns the output folder of the given project.
 	 * 
 	 * @param project
 	 *            a project
-	 * @return the output location of the given project, or <code>null</code> if
+	 * @return the output folder of the given project, or <code>null</code> if
 	 *         none is found
 	 */
-	public static String getOutputFolder(IProject project) {
+	public static IFolder getOutputFolder(IProject project) {
 		IJavaProject javaProject = JavaCore.create(project);
 		if (!javaProject.exists()) {
 			return null;
@@ -164,7 +164,7 @@ public class OrccUtil {
 		try {
 			path = javaProject.getOutputLocation();
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			return root.getFile(path).getLocation().toOSString();
+			return root.getFolder(path);
 		} catch (JavaModelException e) {
 			return null;
 		}
@@ -178,9 +178,9 @@ public class OrccUtil {
 	 *            a project
 	 * @return the output location of the given project, or an empty list
 	 */
-	public static List<String> getOutputFolders(IProject project)
+	public static List<IFolder> getOutputFolders(IProject project)
 			throws CoreException {
-		List<String> vtlFolders = new ArrayList<String>();
+		List<IFolder> vtlFolders = new ArrayList<IFolder>();
 
 		IJavaProject javaProject = JavaCore.create(project);
 		if (!javaProject.exists()) {
@@ -191,19 +191,55 @@ public class OrccUtil {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		for (String name : javaProject.getRequiredProjectNames()) {
 			IProject refProject = root.getProject(name);
-			String outputFolder = getOutputFolder(refProject);
+			IFolder outputFolder = getOutputFolder(refProject);
 			if (outputFolder != null) {
 				vtlFolders.add(outputFolder);
 			}
 		}
 
 		// add output folders of this project
-		String outputFolder = getOutputFolder(project);
+		IFolder outputFolder = getOutputFolder(project);
 		if (outputFolder != null) {
 			vtlFolders.add(outputFolder);
 		}
 
 		return vtlFolders;
+	}
+
+	/**
+	 * Returns the output location of the given project.
+	 * 
+	 * @param project
+	 *            a project
+	 * @return the output location of the given project, or <code>null</code> if
+	 *         none is found
+	 */
+	public static String getOutputPath(IProject project) {
+		IFolder folder = getOutputFolder(project);
+		if (folder == null) {
+			return null;
+		} else {
+			return folder.getLocation().toOSString();
+		}
+	}
+
+	/**
+	 * Returns the output locations of the given project and the project it
+	 * references in its build path.
+	 * 
+	 * @param project
+	 *            a project
+	 * @return the output location of the given project, or an empty list
+	 */
+	public static List<String> getOutputPaths(IProject project)
+			throws CoreException {
+		List<String> vtlPaths = new ArrayList<String>();
+		List<IFolder> vtlFolders = getOutputFolders(project);
+		for (IFolder folder : vtlFolders) {
+			vtlPaths.add(folder.getLocation().toOSString());
+		}
+
+		return vtlPaths;
 	}
 
 	/**

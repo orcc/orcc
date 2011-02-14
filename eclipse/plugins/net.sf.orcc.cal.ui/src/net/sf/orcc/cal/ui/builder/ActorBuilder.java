@@ -44,6 +44,7 @@ import net.sf.orcc.ui.OrccProjectNature;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -99,11 +100,21 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			return;
 		}
 
-		String outputFolder = OrccUtil.getOutputFolder(project);
+		IFolder outputFolder = OrccUtil.getOutputFolder(project);
 		if (outputFolder == null) {
 			return;
 		}
-		frontend.setOutputFolder(outputFolder);
+
+		// if build is cleaning, remove output folder completely
+		BuildType type = context.getBuildType();
+		if (type == BuildType.CLEAN) {
+			// first refresh so that everything can be removed by delete
+			outputFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
+			outputFolder.delete(true, null);
+		}
+
+		// set output folder
+		frontend.setOutputFolder(outputFolder.getLocation().toOSString());
 
 		// whether IR is to be pretty-printed or not
 		String compactIR = project.getPersistentProperty(PRETTYPRINT_JSON);

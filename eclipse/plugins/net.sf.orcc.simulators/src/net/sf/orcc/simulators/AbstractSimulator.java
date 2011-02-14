@@ -773,7 +773,7 @@ public abstract class AbstractSimulator implements Simulator {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IProject project = root.getProject(name);
 
-			vtlFolders = OrccUtil.getOutputFolders(project);
+			vtlFolders = OrccUtil.getOutputPaths(project);
 
 			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			xdfFile = configuration.getAttribute(XDF_FILE, "");

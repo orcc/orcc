@@ -87,6 +87,13 @@ public class Frontend {
 		}
 	}
 
+	/**
+	 * Sets the output folder to the given absolute path. The method will create
+	 * the folder if it does not exist.
+	 * 
+	 * @param outputFolder
+	 *            absolute path of an output folder
+	 */
 	public void setOutputFolder(String outputFolder) {
 		this.outputFolder = new File(outputFolder);
 		if (!this.outputFolder.exists()) {

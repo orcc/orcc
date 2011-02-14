@@ -123,7 +123,7 @@ public class BackendFactory extends PluginFactory {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = root.getProject(name);
 
-		List<String> vtlFolders = OrccUtil.getOutputFolders(project);
+		List<String> vtlFolders = OrccUtil.getOutputPaths(project);
 
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)
