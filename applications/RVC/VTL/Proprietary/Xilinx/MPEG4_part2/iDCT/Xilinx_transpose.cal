@@ -47,14 +47,36 @@ int(size=sz) Y0 , int(size=sz) Y1 :
 
 	int sz = 16;
 
-	List(type: List(type: List(type: int(size=sz), size=8), size=8), size=2) mem := [ [ [ 0 : for
-	int k in 1 .. 8 ] : for int j in 1 .. 8 ] : for int i in 1 .. 2 ];
+	int(size=sz) mem[2][8][8] :=
+		[ [ [ 0 : for int k in 1 .. 8 ] : for int j in 1 .. 8 ] : for int i in 1 .. 2 ];
 
 	int rcount := 0;
 
 	int ccount := 0;
 
 	int select := 0;
+
+	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ] ==>
+	guard
+		rcount < 64
+	var
+		int row = rshift(rcount, 3) , int quad = bitand(rshift(rcount, 2), 1)
+	do
+	// { 0, 7, 3, 4 }
+		// { 1, 6, 2, 5 }
+		if quad = 0 then
+			mem[select][row][0] := a;
+			mem[select][row][7] := b;
+			mem[select][row][3] := c;
+			mem[select][row][4] := d;
+		else
+			mem[select][row][1] := a;
+			mem[select][row][6] := b;
+			mem[select][row][2] := c;
+			mem[select][row][5] := d;
+		end
+		rcount := rcount + 4;
+	end
 
 	action ==> Y0:[ mem[i][a][col] ], Y1:[ mem[i][b][col] ]
 	guard
@@ -92,28 +114,6 @@ int(size=sz) Y0 , int(size=sz) Y1 :
 			end
 		end;
 		ccount := ccount - 2;
-	end
-
-	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ] ==>
-	guard
-		rcount < 64
-	var
-		int row = rshift(rcount, 3) , int quad = bitand(rshift(rcount, 2), 1)
-	do
-	// { 0, 7, 3, 4 }
-		// { 1, 6, 2, 5 }
-		if quad = 0 then
-			mem[select][row][0] := a;
-			mem[select][row][7] := b;
-			mem[select][row][3] := c;
-			mem[select][row][4] := d;
-		else
-			mem[select][row][1] := a;
-			mem[select][row][6] := b;
-			mem[select][row][2] := c;
-			mem[select][row][5] := d;
-		end
-		rcount := rcount + 4;
 	end
 
 	action ==>

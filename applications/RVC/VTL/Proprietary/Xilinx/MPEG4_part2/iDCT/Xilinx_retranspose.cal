@@ -50,23 +50,14 @@ int(size=isz) X3 ==> int(size=osz) Y :
 
 	int osz = 10;
 
-	//List[ List[ List[ int(size=osz) ] ] ] mem :=
-	List(type: int(size=osz), size=128) mem := [ 0 : for int k in 1 .. 128 ];
+	int(size=osz) mem[2][8][8] := 
+          [ [ [0 : for int k in 1 .. 8 ] : for int j in 1 .. 8 ] : for int i in 1 .. 2 ];
 
 	int rcount := 0;
 
 	int ccount := 0;
 
 	int select := 0;
-
-	action ==> Y:[ mem[i * 64 + row * 8 + col] ]
-	guard
-		ccount > 0
-	var
-		int col = rshift(64 - ccount, 3) , int row = bitand(64 - ccount, 7) , int i = bitxor(select, 1)
-	do
-		ccount := ccount - 1;
-	end
 
 	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ] ==>
 	guard
@@ -76,18 +67,27 @@ int(size=isz) X3 ==> int(size=osz) Y :
 	do
 	// { 0, 7, 3, 4 }
 		// { 1, 6, 2, 5 }
-		if quad = 0 then
-			mem[select * 64 + row * 8 + 0] := a;
-			mem[select * 64 + row * 8 + 7] := b;
-			mem[select * 64 + row * 8 + 3] := c;
-			mem[select * 64 + row * 8 + 4] := d;
+		if  quad = 0 then
+			mem[select][row][0] := a;
+			mem[select][row][7] := b;
+			mem[select][row][3] := c;
+			mem[select][row][4] := d;
 		else
-			mem[select * 64 + row * 8 + 1] := a;
-			mem[select * 64 + row * 8 + 6] := b;
-			mem[select * 64 + row * 8 + 2] := c;
-			mem[select * 64 + row * 8 + 5] := d;
+			mem[select][row][1] := a;
+			mem[select][row][6] := b;
+			mem[select][row][2] := c;
+			mem[select][row][5] := d;
 		end
 		rcount := rcount + 4;
+	end
+
+	action ==> Y:[ mem[i][row][col] ]
+	guard
+		ccount > 0
+	var
+		int col = rshift(64 - ccount, 3) , int row = bitand(64 - ccount, 7) , int i = bitxor(select, 1)
+	do
+		ccount := ccount - 1;
 	end
 
 	action ==>
