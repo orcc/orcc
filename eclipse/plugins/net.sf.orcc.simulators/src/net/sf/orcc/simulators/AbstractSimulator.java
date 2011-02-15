@@ -562,6 +562,10 @@ public abstract class AbstractSimulator implements Simulator {
 	public void run() throws OrccRuntimeException {
 		// Loop until the simulator has terminated
 		while (state != SimulatorState.TERMINATED) {
+			if (process.getProgressMonitor().isCanceled()) {
+				return;
+			}
+
 			// Synchronous behavior : check propertyChanges (events)
 			// for transitions and apply current state action
 			SimulatorMessage msg = messageQueue.peek();
