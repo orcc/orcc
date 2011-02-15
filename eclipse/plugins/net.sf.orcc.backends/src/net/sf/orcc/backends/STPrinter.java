@@ -47,7 +47,6 @@ import net.sf.orcc.network.Network;
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.debug.DebugST;
 
 /**
  * This class defines a printer that uses StringTemplate.
@@ -150,9 +149,6 @@ public final class STPrinter {
 	public void loadGroup(String groupName) {
 		group = TemplateGroupLoader.loadGroup(groupName);
 
-		// set to "true" to inspect template
-		STGroup.debug = false;
-
 		// register renderers
 		group.registerRenderer(Expression.class, new ExpressionRenderer());
 		group.registerRenderer(Type.class, new TypeRenderer());
@@ -178,21 +174,14 @@ public final class STPrinter {
 				return true;
 			}
 
-			if (STGroup.debug) {
-				DebugST template = (DebugST) group.getInstanceOf("actor");
-				template.add("actor", actor);
-				template.add("options", options);
-				template.inspect();
-			} else {
-				ST template = group.getInstanceOf("actor");
-				template.add("actor", actor);
-				template.add("options", options);
+			ST template = group.getInstanceOf("actor");
+			template.add("actor", actor);
+			template.add("options", options);
 
-				byte[] b = template.render(80).getBytes();
-				OutputStream os = new FileOutputStream(fileName);
-				os.write(b);
-				os.close();
-			}
+			byte[] b = template.render(80).getBytes();
+			OutputStream os = new FileOutputStream(fileName);
+			os.write(b);
+			os.close();
 		}
 
 		return false;
@@ -222,7 +211,6 @@ public final class STPrinter {
 			}
 
 			ST template = group.getInstanceOf("instance");
-
 			template.add("instance", instance);
 			template.add("options", options);
 
