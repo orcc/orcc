@@ -193,23 +193,23 @@ if (not endfile (sim_file_<instance.id>_<port.name>) and <port.name>_send = '1')
 if(port.type.bool)
 >    if (input_bit = 1) then
       assert (<port.name>_data = '1')
-        report "incorrectly value computed : 0 instead of : 1"
+        report "on port <port.name> incorrectly value computed : '0' instead of : '1'"
         severity error;
     else
       assert (<port.name>_data = '0')
-        report "incorrectly value computed : 1 instead of : 0"
+        report "on port <port.name> incorrectly value computed : '1' instead of : '0'"
         severity error;                
     end if;<
 else
 ><if(port.type.int)
   >    assert (<port.name>_data  = std_logic_vector(to_signed(input_bit, <port.type.size>)))
-      -- report "incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " instead of :" & to_string(input_bit)
-      report "incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
+      -- report "on <port.name> incorrectly value computed : " & to_string(to_integer(to_signed(<port.name>_data))) & " instead of :" & to_string(input_bit)
+      report "on port <port.name> incorrectly value computed : " & str(to_integer(signed(<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
   <else
   >    assert (<port.name>_data  = std_logic_vector(to_unsigned(input_bit, <port.type.size>)))
-      report "Incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
-      --report "Incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
+      report "on port <port.name> incorrectly value computed : " & to_string(to_integer(to_unsigned(<port.name>_data))) & " instead of :" & to_string(input_bit)
+      --report "on port <port.name> incorrectly value computed : " & str(to_integer(unsigned(<port.name>_data))) & " instead of :" & str(input_bit)
       severity error;
   <endif
   ><endif
