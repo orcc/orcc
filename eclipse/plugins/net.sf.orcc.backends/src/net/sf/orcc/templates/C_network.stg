@@ -59,6 +59,44 @@ declareBroadcasts(instances) ::= <<
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Declare predecessors and successors
+
+Neighbor(port) ::= <<
+&<GetInstanceId(map.(port))>
+>>
+
+Neighbors(map, ports) ::= <<
+<ports: Neighbor(); separator=", ">
+>>
+
+goDeclarePredSucc(inputs, outputs) ::= <<
+<if(!inputs.empty)
+>struct actor_s *<GetInstanceId(instance)>_predecessors[] = {<Neighbors(map=network.predecessorsMap.(instance), ports=inputs)>};
+<endif><
+if(!outputs.empty)
+>struct actor_s *<GetInstanceId(instance)>_successors[] = {<Neighbors(map=network.successorsMap.(instance), ports=outputs)>};
+<endif>
+>>
+
+goDeclarePredsSuccs(instance, incoming, outgoing) ::= <<
+<if (instance.actor)
+><goDeclarePredSucc(inputs=instance.actor.inputs.list,
+                    outputs=instance.actor.outputs.list)><
+elseif (instance.broadcast)
+><goDeclarePredSucc(inputs=instance.broadcast.inputs.list,
+                   outputs=instance.broadcast.outputs.list)><
+endif>
+>>
+
+declarePredsSuccs(instances) ::= <<
+<instances:
+  {inst | <goDeclarePredsSuccs(instance=inst,
+    incoming=network.incomingMap.(inst),
+    outgoing=network.outgoingMap.(inst))>}>
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
 
 allocateFifoType(type, size, count) ::= <<
@@ -147,7 +185,9 @@ elseif (instance.broadcast)><instance.broadcast.numOutputs><else>0<endif>
 fillActorStruct(instance) ::= <<
 
 struct actor_s <GetInstanceId(instance)> = {"<GetInstanceId(instance)>", <GetInstanceId(instance)>_scheduler, <
-NumInputs(instance)>, <NumOutputs(instance)>, NULL, NULL};
+NumInputs(instance)>, <NumOutputs(instance)>, <
+if(instance.actor.inputs.list.empty || !options.newScheduler)>NULL<else><GetInstanceId(instance)>_predecessors<endif>, <
+if(instance.actor.outputs.list.empty || !options.newScheduler)>NULL<else><GetInstanceId(instance)>_successors<endif>};
 >>
 
 fillActorsStructs(instances) ::= <<
@@ -184,7 +224,7 @@ printInitializes(instances) ::= <<
 <instances: printInitialize()>
 >>
 
-printSchedulers(isPointer=false) ::= <<
+printScheduler(isPointer=false) ::= <<
 struct actor_s *my_actor;
 struct schedinfo_s si;
 
@@ -219,12 +259,19 @@ while (1) {
 }
 <else>
 while (1) {
-	my_actor = sched_get_next(<if(!isPointer)>&<endif>sched);    
+	my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(<if(!isPointer)>&<endif>sched);    
 	si.num_firings = 0;
 	my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
 	printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
+	<if (options.newScheduler)>
+	if (si.reason == full <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
+		sched_add_successors(<if(!isPointer)>&<endif>sched, my_actor, si.ports);
+	} else if (si.reason == starved <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
+		sched_add_predecessors(<if(!isPointer)>&<endif>sched, my_actor, si.ports);
+	}
+	<endif>
 }
 <endif>
 >>
@@ -235,7 +282,7 @@ while (1) {
 printThread() ::= <<
 void *thread_scheduler(void *data) {
 	struct scheduler_s *sched = (struct scheduler_s *) data;
-	<printSchedulers(isPointer="true")>
+	<printScheduler(isPointer="true")>
 }
 >>
 
@@ -316,11 +363,13 @@ network(debugFifos, fifoSize, network, options) ::= <<
 <declareInitializes(network.instances)>
 <declareSchedulers(network.instances)>
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of a struct actor for each actor
-
 <declareActors(network.instances)>
+
+////////////////////////////////////////////////////////////////////////////////
+// Declaration of the predecessors and successors of each actor
+<if(options.newScheduler)><declarePredsSuccs(network.instances)><endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of the actors array
@@ -342,6 +391,8 @@ static void scheduler() {
 	<printInitializes(network.instances)>
 	
 	<options.threads.keys: {th | sched_init(&sched_<th>, sizeof(actors_<th>) / sizeof(actors_<th>[0]), actors_<th>, NULL);}; separator="\n">
+	
+	<if(options.newScheduler)>sched_add_schedulable(source.sched, &source);<endif>
 	
 	<options.threads.keys: {th | threadCreate(thread_<th>, thread_scheduler, sched_<th>, thread_id_<th>);}; separator="\n">
 
@@ -407,11 +458,12 @@ static void scheduler() {
 static void scheduler() {
 	struct scheduler_s sched;
 	<printInitializes(network.instances)>
+	
+	<if(options.newScheduler)>sched_add_schedulable(&sched, &source);<endif>
 
 	sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL);
-	{
-		<printSchedulers()>
-	}
+	
+	<printScheduler()>
 }
 <endif>
 

@@ -154,7 +154,8 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
-		boolean normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		boolean normalize = getAttribute("net.sf.orcc.backends.normalize",
+				false);
 
 		if (classify) {
 			new ActorClassifier().transform(actor);
@@ -191,7 +192,7 @@ public class CBackendImpl extends AbstractBackend {
 		if (merge) {
 			network.mergeActors();
 		}
-		
+
 		// until now, printer is default printer
 		printer = new STPrinter();
 		printer.loadGroup("C_actor");
@@ -202,14 +203,14 @@ public class CBackendImpl extends AbstractBackend {
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 
-		//Experimental
+		// Experimental
 		boolean merge2 = getAttribute("net.sf.orcc.backends.merge2", false);
 		if (merge2) {
 			new ActorMerger2().transform(network);
 		}
 
 		printInstances(network);
-		
+
 		// print network
 		write("Printing network...\n");
 		printNetwork(network);
@@ -236,14 +237,8 @@ public class CBackendImpl extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) throws OrccException {
 		try {
-			String networkTemplate;
-			boolean useNewScheduler = getAttribute(
-					"net.sf.orcc.backends.newScheduler", false);
-			if (useNewScheduler) {
-				networkTemplate = "C_network_newScheduler";
-			} else {
-				networkTemplate = "C_network";
-			}
+			printer.getOptions().put("newScheduler",
+					getAttribute("net.sf.orcc.backends.newScheduler", false));
 
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);
@@ -253,7 +248,7 @@ public class CBackendImpl extends AbstractBackend {
 
 			String outputName = path + File.separator + network.getName()
 					+ ".c";
-			printer.loadGroup(networkTemplate);
+			printer.loadGroup("C_network");
 			printer.printNetwork(outputName, network, false, fifoSize);
 
 			new CMakePrinter().printCMake(path, network, needPthreads);
