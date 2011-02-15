@@ -33,8 +33,8 @@ printNetPortsInput(port) ::= <<
 
 printNetPortsOutput(port) ::= <<
 <portType(port=port, IOtype=" out ", dataType="data")>
-<port.name>_send   : out std_logic;
-<port.name>_ack    : in  std_logic;
+<port.name>_send  : out std_logic;
+<port.name>_ack   : in  std_logic;
 >>
 
 
@@ -260,15 +260,15 @@ checkBroadcast(instance) ::= <<
 <if (instance.broadcast)
 ><printBroadcast(name=instance.id,
 				 inputs=instance.broadcast.inputs.list,
-                 outputs=instance.broadcast.outputs.list)><
-endif>
+                 outputs=instance.broadcast.outputs.list)>
+<endif>
 >>
 
 printBroadcast(name, inputs, outputs) ::= <<
 broadcast_<name> : entity work.broadcast
-    generic map (
-      width =\> <if(instance.broadcast.type.bool)>1<else><instance.broadcast.type.size><endif>,
-      size  =\> <instance.broadcast.numOutputs>)
+  generic map (
+    width =\> <if(instance.broadcast.type.bool)>1<else><instance.broadcast.type.size><endif>,
+    size  =\> <instance.broadcast.numOutputs>)
   port map (
 <if(!inputs.empty)>
     <network.incomingMap.(instance):{connection | <printInputs(connection=connection, map=network.predecessorsMap.(instance), 
@@ -287,6 +287,15 @@ broadcast_<name> : entity work.broadcast
 <endif>
     clock         =\> clock,
     reset_n       =\> reset_n);
+    --
+    <outgoingMap.(instance) : {connection | <printBroadToOut( connection=connection, map=network.successorsMap.(instance),
+    														  vmap=network.targetMap.(connection))>}; separator="\n">
+>>
+
+printBroadToOut(connection, map, vmap) ::= <<
+<if(!map.(connection.source))
+><vmap.port>_data \<= <name>_fromBroad_data;<
+endif>
 >>
 
 printBroadcastOutputs(connection, i0, map, vmap, control) ::= <<
