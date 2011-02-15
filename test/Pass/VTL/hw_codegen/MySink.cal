@@ -1,0 +1,35 @@
+package hw_codegen;
+
+actor MySink() int I1, int I2 ==> int O:
+
+	int sum;
+
+	loop1: action I1:[x1] ==>
+	do
+		sum := x1;
+	end
+	
+	loop2: action I2:[x2] ==> O:[x2]
+	do
+		sum := sum + x2;
+	end
+	
+	loop3: action ==> O:[sum]
+	end
+	
+	init_a1: action ==> O:[1]
+	end
+	
+	init_a2: action ==> O:[2]
+	end
+	
+	schedule fsm init1:
+		init1 (init_a1) --> init2;
+		init2 (init_a2) --> body1;
+	
+		body1 (loop1) --> body2;
+		body2 (loop2) --> body3;
+		body3 (loop3) --> body1;
+	end
+
+end

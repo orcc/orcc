@@ -1,0 +1,8 @@
+package hw_codegen;
+
+actor Dummy() int I1, int I2 ==> int O1, int O2:
+
+	action I1:[x], I2:[y] ==> O1:[x], O2:[y]
+	end
+
+end

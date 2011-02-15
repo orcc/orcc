@@ -1,0 +1,32 @@
+package hw_codegen;
+
+actor MySource() int I ==> int O1, int O2 :
+
+	int my_x;
+
+	a0: action I:[x] ==>
+	do
+		my_x := x;
+	end
+	
+	a1.something: action I:[x] ==> O1:[my_x], O2:[x]
+	end
+	
+	a1.other: action ==> O1:[my_x]
+	end
+	
+	a1.other_bis: action I:[x] ==> O2:[x]
+	end
+	
+	schedule fsm s0:
+		s0 (a0) --> s1;
+		s1 (a1.something) --> s0;
+		s1 (a1.other) --> s1_bis;
+		s1_bis (a1.other_bis) --> s0;
+	end
+	
+	priority
+		a1.something > a1.other;
+	end
+
+end
