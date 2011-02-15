@@ -125,7 +125,7 @@ struct actor_s <instances: declareActor(); wrap, separator=", ">;
 
 declareActorArray(instance) ::= "&<GetInstanceId(instance)>"
 
-declareActorsArray(thread,instances) ::= <<
+declareActorsArray(instances,thread=false) ::= <<
 struct actor_s *actors<if(thread)>_<thread><endif>[] = {<instances: declareActorArray(); wrap, separator=", ">};
 >>
 
@@ -184,7 +184,7 @@ printInitializes(instances) ::= <<
 <instances: printInitialize()>
 >>
 
-printSchedulers(isPointer) ::= <<
+printSchedulers(isPointer=false) ::= <<
 struct actor_s *my_actor;
 struct schedinfo_s si;
 
@@ -235,7 +235,7 @@ while (1) {
 printThread() ::= <<
 void *thread_scheduler(void *data) {
 	struct scheduler_s *sched = (struct scheduler_s *) data;
-	<printSchedulers("true")>
+	<printSchedulers(isPointer="true")>
 }
 >>
 
@@ -271,12 +271,7 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #include "SDL.h"
 #endif
 
-<if (options.needPthreads)>
-#ifndef _WIN32
-#define __USE_GNU
-#endif
-<endif>
-<if (options.needDynamicMapping)>
+<if (options.needDynamicMapping || options.needPthreads)>
 #ifndef _WIN32
 #define __USE_GNU
 #endif
@@ -286,12 +281,10 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #include "orcc_fifo.h"
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
-<if (options.needPthreads)>
+<if (options.needPthreads || options.needDynamicMapping)>
 #include "orcc_thread.h"
-
 <endif>
 <if(options.needDynamicMapping)>
-#include "orcc_thread.h"
 #include "orcc_genetic.h"
 
 #define THREAD_NB <options.threadsNb>
@@ -336,7 +329,7 @@ network(debugFifos, fifoSize, network, options) ::= <<
 
 <if(options.needPthreads)>
 
-<options.threads.keys: {th | <declareActorsArray(thread=th,instances=options.threads.(th))>}; separator="\n">
+<options.threads.keys: {th | <declareActorsArray(instances=options.threads.(th),thread=th)>}; separator="\n">
 
 <printThread()>
 
