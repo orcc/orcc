@@ -194,7 +194,7 @@ public class CBackendImpl extends AbstractBackend {
 		
 		// until now, printer is default printer
 		printer = new STPrinter();
-		printer.loadGroups("C_actor");
+		printer.loadGroup("C_actor");
 		printer.setExpressionPrinter(CExpressionPrinter.class);
 		printer.setTypePrinter(CTypePrinter.class);
 		printer.setOptions(getAttributes());
@@ -236,16 +236,13 @@ public class CBackendImpl extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) throws OrccException {
 		try {
-			String[] networkTemplates;
+			String networkTemplate;
 			boolean useNewScheduler = getAttribute(
 					"net.sf.orcc.backends.newScheduler", false);
 			if (useNewScheduler) {
-				networkTemplates = new String[2];
-				networkTemplates[0] = "C_network";
-				networkTemplates[1] = "C_network_newScheduler";
+				networkTemplate = "C_network_newScheduler";
 			} else {
-				networkTemplates = new String[1];
-				networkTemplates[0] = "C_network";
+				networkTemplate = "C_network";
 			}
 
 			// Add broadcasts before printing
@@ -256,7 +253,7 @@ public class CBackendImpl extends AbstractBackend {
 
 			String outputName = path + File.separator + network.getName()
 					+ ".c";
-			printer.loadGroups(networkTemplates);
+			printer.loadGroup(networkTemplate);
 			printer.printNetwork(outputName, network, false, fifoSize);
 
 			new CMakePrinter().printCMake(path, network, needPthreads);

@@ -121,16 +121,6 @@ else
 endif>
 >>
 
-Decrement(decrement) ::= <<
-
-<decrement.target>--;
->>
-
-Increment(increment) ::= <<
-
-<increment.target>++;
->>
-
 Load(load) ::= <<
 
 <load.target> = <load.source><load.indexes : {index | [<index>]}>;
@@ -145,11 +135,6 @@ Read(read) ::= <<
 <if (read.target)>
 chan_<instance.id>_<read.port>?<read.target>[0];
 <endif>
->>
-
-SelfAssignment(selfAssign) ::= <<
-
-<selfAssign.target> <selfAssign.op.text>= <selfAssign.value>;
 >>
 
 Store(store) ::= <<

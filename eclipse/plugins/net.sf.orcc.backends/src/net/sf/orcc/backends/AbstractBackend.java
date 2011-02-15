@@ -181,12 +181,18 @@ public abstract class AbstractBackend implements Backend {
 		write("Parsing XDF network...\n");
 		Network network = new XDFParser(inputFile).parseNetwork();
 		network.updateIdentifiers();
+		if (process.getProgressMonitor().isCanceled()) {
+			return;
+		}
 
 		write("Instantiating actors...\n");
 		network.instantiate(vtlFolders);
 		Network.clearActorPool();
 		write("Instantiation done\n");
 
+		if (process.getProgressMonitor().isCanceled()) {
+			return;
+		}
 		doXdfCodeGeneration(network);
 	}
 
@@ -233,7 +239,7 @@ public abstract class AbstractBackend implements Backend {
 	private int executeTasks(List<Callable<Boolean>> tasks)
 			throws OrccException {
 		// creates the pool
-		int nThreads = Runtime.getRuntime().availableProcessors();
+		int nThreads = 1; // Runtime.getRuntime().availableProcessors();
 		ExecutorService pool = Executors.newFixedThreadPool(nThreads);
 		try {
 			// invokes all tasks and wait for them to complete
@@ -415,6 +421,10 @@ public abstract class AbstractBackend implements Backend {
 				InputStream in = new FileInputStream(file);
 				Actor actor = new IRParser().parseActor(in);
 				actors.add(actor);
+
+				if (process.getProgressMonitor().isCanceled()) {
+					break;
+				}
 			}
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
@@ -452,6 +462,9 @@ public abstract class AbstractBackend implements Backend {
 
 				@Override
 				public Boolean call() throws OrccException {
+					if (process.getProgressMonitor().isCanceled()) {
+						return false;
+					}
 					return printActor(actor);
 				}
 

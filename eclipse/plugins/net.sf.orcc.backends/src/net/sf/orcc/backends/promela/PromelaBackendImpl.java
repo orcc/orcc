@@ -94,7 +94,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		network.flatten();
 
 		printer = new STPrinter();
-		printer.loadGroups("PROMELA_actor");
+		printer.loadGroup("PROMELA_actor");
 		printer.setExpressionPrinter(PromelaExprPrinter.class);
 		printer.setTypePrinter(PromelaTypePrinter.class);
 
@@ -132,7 +132,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	private void printNetwork(Network network) throws OrccException {
 		String outputName = path + File.separator + "main_" + network.getName()
 				+ ".pml";
-		printer.loadGroups("PROMELA_network");
+		printer.loadGroup("PROMELA_network");
 		try {
 			printer.printNetwork(outputName, network, false, fifoSize);
 		} catch (IOException e) {

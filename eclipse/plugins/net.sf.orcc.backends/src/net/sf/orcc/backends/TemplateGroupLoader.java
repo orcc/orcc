@@ -41,38 +41,22 @@ import org.stringtemplate.v4.STGroupFile;
 public class TemplateGroupLoader {
 
 	/**
-	 * Loads a group. Hierarchy must be specified:
-	 * <p>
-	 * For a group G2 that extends a group G1 that extends a group G0, this
-	 * method should be called as: loadGroup(G0, G1, G2) to properly load and
-	 * return G2.
-	 * </p>
+	 * Loads a template group.
 	 * 
-	 * @param groupNames
-	 *            the names of the groups to load, starting from the root of the
-	 *            hierarchy (if any)
-	 * @return
+	 * @param groupName
+	 *            the name of the group to load
+	 * @return a StringTemplate group
 	 */
-	public static STGroup loadGroup(String... groupNames) {
+	public static STGroup loadGroup(String groupName) {
 		STGroup group = null;
 
 		ClassLoader cl = TemplateGroupLoader.class.getClassLoader();
 		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
 		Thread.currentThread().setContextClassLoader(cl);
 
-		String root = groupNames[0];
-		String groupPath = "net/sf/orcc/templates/" + root + ".stg";
+		String groupPath = "net/sf/orcc/templates/" + groupName + ".stg";
 		group = new STGroupFile(groupPath);
 		group.load();
-
-		for (int i = 1; i < groupNames.length; i++) {
-			String groupName = groupNames[i];
-			STGroup previous = group;
-			groupPath = "net/sf/orcc/templates/" + groupName + ".stg";
-			group = new STGroupFile(groupPath);
-			group.importTemplates(previous);
-			group.load();
-		}
 
 		Thread.currentThread().setContextClassLoader(oldCl);
 

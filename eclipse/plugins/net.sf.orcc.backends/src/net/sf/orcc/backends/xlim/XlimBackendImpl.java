@@ -126,9 +126,9 @@ public class XlimBackendImpl extends AbstractBackend {
 		if (hardwareGen) {
 			fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType", "xc2vp30-7-ff1152");			
 			printer.getOptions().put("fpgaType", fpgaType);
-			printer.loadGroups("XLIM_sw_actor", "XLIM_hw_actor");
+			printer.loadGroup("XLIM_hw_actor");
 		} else {
-			printer.loadGroups("XLIM_sw_actor");
+			printer.loadGroup("XLIM_sw_actor");
 		}
 
 		printer.setExpressionPrinter(XlimExprPrinter.class);
@@ -158,10 +158,10 @@ public class XlimBackendImpl extends AbstractBackend {
 			String outputName = path + File.separator + network.getName();
 			if (hardwareGen) {
 				outputName += ".vhd";
-				printer.loadGroups("XLIM_hw_network");
+				printer.loadGroup("XLIM_hw_network");
 			} else {
 				outputName += ".c";
-				printer.loadGroups("XLIM_sw_network");
+				printer.loadGroup("XLIM_sw_network");
 			}
 
 			printer.printNetwork(outputName, network, false, fifoSize);

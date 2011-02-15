@@ -95,7 +95,7 @@ public class JavaBackendImpl extends AbstractBackend {
 		List<Actor> actors = parseActors(files);
 
 		printer = new STPrinter();
-		printer.loadGroups("C_actor", "Java_actor");
+		printer.loadGroup("Java_actor");
 		printer.setExpressionPrinter(CppExprPrinter.class);
 		printer.setTypePrinter(JavaTypePrinter.class);
 
@@ -137,7 +137,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	 */
 	protected void printNetwork(Network network) throws OrccException {
 		try {
-			printer.loadGroups("C_network", "Java_network");
+			printer.loadGroup("Java_network");
 
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);

@@ -1,3 +1,5 @@
+import "net/sf/orcc/templates/C_actor.stg"
+
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,12 +104,12 @@ memcpy(<variable>, tmp_<variable>, <variable.type.dimensions> * sizeof(<variable
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-Assign(assign) ::= <<
+printAssign(assign) ::= <<
 
 <assign.target> = <assign.value>;
 >>
 
-PrintParameter(parameter)::= <<
+printParameter(parameter)::= <<
 <if (parameter.stringExpr)
 >"<parameter>"<
 else
@@ -115,30 +117,20 @@ else
 endif>
 >>
 
-Call(call) ::= <<
+printCall(call) ::= <<
 
-<if(call.print)>std::cout \<\< <call.parameters: PrintParameter(); separator=" << ">;<
+<if(call.print)>std::cout \<\< <call.parameters: printParameter(); separator=" << ">;<
 else
 ><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
 endif>
 >>
 
-Decrement(decrement) ::= <<
-
-<decrement.target>--;
->>
-
-Increment(increment) ::= <<
-
-<increment.target>++;
->>
-
-Load(load) ::= <<
+printLoad(load) ::= <<
 
 <load.target> = <load.source><load.indexes : {index | [<index>]}>;
 >>
 
-Peek(peek) ::= <<
+printPeek(peek) ::= <<
 
 <if(peek.unit)>
 m_poTabIn[<actor.simpleName>_<peek.port>]-\>peek(<peek.target>);<\n>
@@ -147,7 +139,7 @@ m_poTabIn[<actor.simpleName>_<peek.port>]-\>peek(<peek.target>, <peek.numTokens>
 <endif>
 >>
 
-Read(read) ::= <<
+printRead(read) ::= <<
 
 <if (read.target)>
 <if(read.unit)>
@@ -163,27 +155,22 @@ m_arrAvailStatus[<actor.simpleName>_<read.port>] -= <read.numTokens>;
 <endif>
 >>
 
-ReadEnd(readEnd) ::= <<
+printReadEnd(readEnd) ::= <<
 >>
 
-Return(return) ::= <<
+printReturn(return) ::= <<
 
 <if(return.value)>
 return <return.value>;
 <endif>
 >>
 
-SelfAssignment(selfAssign) ::= <<
-
-<selfAssign.target> <selfAssign.op.text>= <selfAssign.value>;
->>
-
-Store(store) ::= <<
+printStore(store) ::= <<
 
 <store.target><store.indexes : {index | [<index>]}> = <store.value>;
 >>
 
-Write(write) ::= <<
+printWrite(write) ::= <<
 
 <if(write.unit)>
 m_poTabOut[<actor.simpleName>_<write.port>]-\>put(<write.target>);<\n>
@@ -196,7 +183,7 @@ m_arrRoomStatus[<actor.simpleName>_<write.port>] -= <write.numTokens>;
 
 >>
 
-WriteEnd(writeEnd) ::= <<
+printWriteEnd(writeEnd) ::= <<
 
 >>
 
@@ -204,38 +191,55 @@ WriteEnd(writeEnd) ::= <<
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-instructions(instructions) ::= <<
-<instructions: {instruction | <(instruction.class.simpleName)(instruction)>}>
+///////////////////////////////////////////////////////////////////////////////
+// Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+printInstructions(instructions) ::= <<
+<instructions: {instr | <
+if (instr.assign)><printAssign(assign=instr)><
+elseif (instr.call)><printCall(call=instr)><
+elseif (instr.load)><printLoad(load=instr)><
+elseif (instr.peek)><printPeek(peek=instr)><
+elseif (instr.read)><printRead(read=instr)><
+elseif (instr.readEnd)><printReadEnd(readEnd=instr)><
+elseif (instr.return)><printReturn(return=instr)><
+elseif (instr.store)><printStore(store=instr)><
+elseif (instr.write)><printWrite(write=instr)><
+elseif (instr.writeEnd)><printWriteEnd(writeEnd=instr)><
+endif>}>
 >>
 
-nodes(nodes) ::= <<
-<nodes: {node | <(node.class.simpleName)(node)>}>
+printNodes(nodes) ::= <<
+<nodes: {node | <if (node.blockNode)><printBlockNode(node)><
+elseif (node.ifNode)><printIfNode(node)><
+elseif (node.whileNode)><printWhileNode(node)><
+endif>}>
+>>
+
+// block node
+printBlockNode(blockNode) ::= <<
+<printInstructions(blockNode.instructions)>
 >>
 
 // if node
-BlockNode(blockNode) ::= <<
-
-<instructions(blockNode.instructions)>
->>
-
-// if node
-IfNode(ifNode) ::= <<
+printIfNode(ifNode) ::= <<
 
 if (<ifNode.value>) {
-	<nodes(ifNode.thenNodes)>
+	<printNodes(ifNode.thenNodes)>
 }<if(ifNode.elseNodes)> else {
-	<nodes(ifNode.elseNodes)>
+	<printNodes(ifNode.elseNodes)>
 }<endif>
-<BlockNode(ifNode.joinNode)>
+<printBlockNode(ifNode.joinNode)>
 >>
 
 // while node
-WhileNode(whileNode) ::= <<
+printWhileNode(whileNode) ::= <<
 
 while (<whileNode.value>) {
-	<nodes(whileNode.nodes)>
+	<printNodes(whileNode.nodes)>
 }
-<BlockNode(whileNode.joinNode)>
+<printBlockNode(whileNode.joinNode)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -250,7 +254,7 @@ procedure(procedure) ::= <<
 	<procedure.locals.list: {local | <variableDeclaration(local)>;<\n>}>
 
 <endif>
-	<procedure.nodes: {node | <(node.class.simpleName)(node)>}>}
+	<printNodes(procedure.nodes)>}
 
 >>
 

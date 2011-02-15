@@ -205,10 +205,10 @@ public class CppBackendImpl extends AbstractBackend {
 			String name = hier + File.separator + actor.getSimpleName();
 			
 			if (printHeader) {
-				printer.loadGroups("Cpp_actorDecl");
+				printer.loadGroup("Cpp_actorDecl");
 				printer.printActor(name + ".h", actor);
 			} else {
-				printer.loadGroups("Cpp_actorImpl");
+				printer.loadGroup("Cpp_actorImpl");
 				printer.printActor(name + ".cpp", actor);
 			}
 
@@ -240,7 +240,7 @@ public class CppBackendImpl extends AbstractBackend {
 			String outputName = path + File.separator + network.getName()
 					+ ".cpp";
 
-			printer.loadGroups("Cpp_network");
+			printer.loadGroup("Cpp_network");
 			printer.printNetwork(outputName, network, false, fifoSize);
 
 			cmakePrinter.printCMake(path, network, needSerDes);

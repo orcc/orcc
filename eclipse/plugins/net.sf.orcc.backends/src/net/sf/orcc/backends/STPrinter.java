@@ -140,15 +140,15 @@ public final class STPrinter {
 	}
 
 	/**
-	 * Loads the given template groups.
+	 * Loads the given template group.
 	 * 
-	 * @param groupNames
-	 *            names of the template groups
+	 * @param groupName
+	 *            name of the template group
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public void loadGroups(String... groupNames) {
-		group = TemplateGroupLoader.loadGroup(groupNames);
+	public void loadGroup(String groupName) {
+		group = TemplateGroupLoader.loadGroup(groupName);
 
 		// set to "true" to inspect template
 		STGroup.debug = false;

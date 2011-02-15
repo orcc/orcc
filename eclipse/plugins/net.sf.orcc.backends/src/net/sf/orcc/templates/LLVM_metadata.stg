@@ -1,3 +1,73 @@
+///////////////////////////////////////////////////////////////////////////////
+// FIFO declaration
+///////////////////////////////////////////////////////////////////////////////
+
+fifoName(port) ::= <<
+<if(port.type.uint)
+> %struct.fifo_<fifoType(port)>_s* <
+else
+> %struct.fifo_<fifoType(port)>_s* <
+endif>
+>>
+
+fifoType(port) ::= <<
+i<port.type.size>
+>>
+
+fifo(port) ::= <<
+@<port.name> = global <fifoName(port)> null
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Constants
+///////////////////////////////////////////////////////////////////////////////
+
+ConstantValue(type, const) ::= <<
+<if(type.list)> <Constant(constant = const, type = type, iterator = type.sizeIterator)> <else> <Constant(constant = const, type="", iterator="")> <endif>
+>>
+
+Constant(constant, type, iterator) ::= <<
+<if(constant.listExpr)
+> <ListExpr(constant = constant, type = type, iterator = iterator)> <
+else
+> <(constant.class.simpleName)(constant)> <
+endif>
+>>
+
+BoolExpr(constant) ::= <<
+<if (constant.value)>1<else>0<endif>
+>>
+
+IntExpr(constant) ::= <<
+<constant>
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+ListExpr(constant, type, iterator) ::= <<
+[<iterator, constant.value: {iterator, value | <type.type> <if(value)> <Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)> <else> zeroinitializer <endif> }; wrap, separator=", ">]
+>>
+
+StringExpr(constant) ::= <<
+c"<constant>"
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// argument type declaration
+///////////////////////////////////////////////////////////////////////////////
+
+argumentTypeDeclaration(variable) ::= <<
+<if(variable.type.list)
+><variable.type>*<
+else
+><variable.type><
+endif>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// metadata
+///////////////////////////////////////////////////////////////////////////////
+
 decl_MD(actor) ::= <<
 !source = !{<source_decl_MD(actor)>}
 !name = !{<name_decl_MD(actor)>}

@@ -162,7 +162,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		printer = new STPrinter(getAttribute(DEBUG_MODE, true));
-		printer.loadGroups("VHDL_actor");
+		printer.loadGroup("VHDL_actor");
 		printer.setExpressionPrinter(VHDLExpressionPrinter.class);
 		printer.setTypePrinter(VHDLTypePrinter.class);
 
@@ -220,7 +220,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	private void printNetwork(Network network) throws OrccException {
-		printer.loadGroups("VHDL_testbench");
+		printer.loadGroup("VHDL_testbench");
 
 		File folder = new File(path + File.separator + "Testbench");
 		if (!folder.exists()) {
@@ -232,7 +232,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		printTestbench(instance);
 
 		try {
-			printer.loadGroups("VHDL_network");
+			printer.loadGroup("VHDL_network");
 
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);
