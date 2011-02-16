@@ -231,12 +231,7 @@ void *scheduler(void *data) {
 	struct schedinfo_s si;
 	<if(options.needDynamicMapping)>
 	
-	clock_t start, end;
-	
-	<endif>
-	hwloc_set_cpubind(sched-\>topology, sched-\>cpuset, HWLOC_CPUBIND_THREAD);
-	<if(options.needDynamicMapping)>
-	
+	clock_t start, end;	
 	semaphoreWait(sched-\>sem_thread); 
 	start = clock ();
 	
@@ -397,11 +392,7 @@ static void launcher() {
 <if(options.needDynamicMapping || options.needPthreads)>
 	int i;
 	
-	int depth;
-    hwloc_topology_t topology;
-    hwloc_cpuset_t cpusets[THREAD_NB];
-    hwloc_obj_t obj;
-	
+	cpu_set_t cpuset; 
 	thread_struct threads[THREAD_NB]<if(options.needDynamicMapping)>, thread_monitor<endif>;
 	thread_id_struct threads_id[THREAD_NB]<if(options.needDynamicMapping)>, thread_monitor_id<endif>;
 	
@@ -420,29 +411,19 @@ static void launcher() {
 	int actors_size[] = {<options.threads.keys: {th | sizeof(actors_<th>) / sizeof(actors_<th>[0])}; separator=", ">};
 	<endif>
 	
-	/* Allocate and initialize topology object. */
-	hwloc_topology_init(&topology);
-	/* Perform the topology detection. */
-	hwloc_topology_load(topology);
-	/* Get depth of CPU cores. */
-	depth = hwloc_get_type_or_below_depth(topology, HWLOC_OBJ_CORE);
-	
-	for(i=0; i \< THREAD_NB; i++){
-		obj = hwloc_get_obj_by_depth(topology, depth, i);
-		cpusets[i] = hwloc_bitmap_dup(obj-\>cpuset);
-		hwloc_bitmap_singlify(cpusets[i]);
-	}
-	
 	<printInitializes(network.instances)>
 	
 	for(i=0; i \< THREAD_NB; i++){
-		sched_init(&schedulers[i], <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>, topology, cpusets[i]);
+		sched_init(&schedulers[i], <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
 	}
 	
 	<if(options.newScheduler && !options.needDynamicMapping)>sched_add_schedulable(source.sched, &source);<endif>
 	
+	clear_cpu_set(cpuset);
+	
 	for(i=0; i \< THREAD_NB; i++){
 		threadCreate(threads[i], scheduler, schedulers[i], threads_id[i]);
+		set_affinity(cpuset, i, threads[i]);
 	}
 	<if(options.needDynamicMapping)>
 	threadCreate(thread_monitor, monitor, monitoring, thread_monitor_id);
@@ -455,29 +436,14 @@ static void launcher() {
 	threadJoin(thread_monitor);
 	<endif>
 <else>
-	int depth;
-    hwloc_topology_t topology;
-    hwloc_cpuset_t cpuset;
-    hwloc_obj_t obj;
-    
-    /* Allocate and initialize topology object. */
-	hwloc_topology_init(&topology);
-	/* Perform the topology detection. */
-	hwloc_topology_load(topology);
-	/* Get depth of CPU cores. */
-	depth = hwloc_get_type_or_below_depth(topology, HWLOC_OBJ_CORE);
-
 	struct scheduler_s sched;
-	
-	obj = hwloc_get_obj_by_depth(topology, depth, 0);
-	cpuset = hwloc_bitmap_dup(obj-\>cpuset);
-	hwloc_bitmap_singlify(cpuset);
 	
 	<printInitializes(network.instances)>
 
-	sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL, topology, cpuset);
+	sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL);
 	
 	<if(options.newScheduler)>sched_add_schedulable(&sched, &source);<endif>
+		
 	(*scheduler)((void*) &sched);
 <endif>
 }
