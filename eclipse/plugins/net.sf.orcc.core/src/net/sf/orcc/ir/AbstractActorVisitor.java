@@ -250,7 +250,10 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	@Override
 	public void visit(Return returnInstr) {
 		if (visitFull) {
-			returnInstr.getValue().accept(this);
+			Expression expr = returnInstr.getValue();
+			if (expr != null) {
+				expr.accept(this);
+			}
 		}
 	}
 
