@@ -44,12 +44,10 @@ public class ActorMerger2 implements INetworkTransformation {
 	@Override
 	public void transform(Network network) throws OrccException {
 
-		StaticDirectedGraphTransformation staticGraphTransformation = new StaticDirectedGraphTransformation();
-		staticGraphTransformation.transform(network);
-
-		StaticRegionAnalyzer staticRegionAnalyzer = new StaticRegionAnalyzer(
-				staticGraphTransformation.getStaticDirectedGraph());
-		staticRegionAnalyzer.transform(network);
+		StaticRegionMerger regionMerger = new StaticRegionMerger(
+				new StaticGraph(network));
+		
+		regionMerger.transform(network);
 	}
 
 }

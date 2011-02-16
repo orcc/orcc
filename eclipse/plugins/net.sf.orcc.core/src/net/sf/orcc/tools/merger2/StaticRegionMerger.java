@@ -28,48 +28,65 @@
  */
 package net.sf.orcc.tools.merger2;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.transformations.INetworkTransformation;
+import net.sf.orcc.tools.merger.TopologicalSorter;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.DirectedSubgraph;
 
 /**
- * This class find the possible static path between two vertex of a graph.
+ * This class transform a StaticDirectedGraph into Static Region of network.
  * 
  * 
  * @author Jérôme Gorin
  * 
  */
-public class StaticRegion {
-	private DirectedGraph<Vertex, Connection> dynamicGraph;
-	Map<Vertex, Integer> repetitionVector;
-	private DirectedGraph<Vertex, DefaultWeightedEdge> staticGraph;
-	Set<Vertex> vertices;
-	
-	public StaticRegion(Network network, DirectedGraph<Vertex, DefaultWeightedEdge> staticGraph, Set<Vertex> region){
-		this.dynamicGraph = network.getGraph();
+public class StaticRegionMerger implements INetworkTransformation {
+
+	private Network network;
+	private StaticGraph staticGraph;
+
+	public StaticRegionMerger(StaticGraph staticGraph) {
 		this.staticGraph = staticGraph;
-		this.vertices = region;
 	}
-	
-	public Boolean isValid(){
-		List<Vertex> candidates = new ArrayList<Vertex>(vertices);
-		
-		while (candidates.size() > 1){
-			Vertex candidate1 = candidates.get(0);
-			for(DefaultWeightedEdge edge : staticGraph.outgoingEdgesOf(candidate1)){
-				Vertex candidate2 = staticGraph.getEdgeTarget(edge);
-				
+
+	private void mergeRegion(Set<Vertex> region,
+			Map<Vertex, Integer> repetitionFactor) throws OrccException {
+		DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
+				network.getGraph(), region, null);
+
+		List<Vertex> sort = new TopologicalSorter(subgraph).topologicalSort();
+
+	}
+
+	private void mergeStaticRegions() throws OrccException {
+		while (staticGraph.hasRegions()) {
+			// Get first static region of the graph
+			Set<Vertex> region = staticGraph.getRegions().get(0);
+
+			SDFCompositionAnalyzer compositionAnalyzer = new SDFCompositionAnalyzer(
+					network, staticGraph, region);
+
+			if (compositionAnalyzer.isValid()) {
+				mergeRegion(region, compositionAnalyzer.getRepetitionFactor());
 			}
+
+			staticGraph.updateRegion(region);
 		}
-		
-		return true;
+	}
+
+	@Override
+	public void transform(Network network) throws OrccException {
+		this.network = network;
+
+		mergeStaticRegions();
 	}
 }

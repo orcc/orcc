@@ -28,12 +28,16 @@
  */
 package net.sf.orcc.tools.merger2;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.util.Rational;
 
 import org.jgrapht.DirectedGraph;
 
@@ -47,29 +51,102 @@ import org.jgrapht.DirectedGraph;
  */
 public class SDFCompositionAnalyzer {
 	private DirectedGraph<Vertex, Connection> graph;
-	private List<List<Vertex>> paths;
-	private int repetitionFactor;
-	private Vertex source;
-	private Vertex target;
-
-	public SDFCompositionAnalyzer(Network network, Vertex source,
-			Vertex target, List<List<Vertex>> paths) {
+	Set<Vertex> region;
+	Map<Vertex, Integer> repetitionFactor;
+	private StaticGraph staticGraph;
+	
+	public SDFCompositionAnalyzer(Network network,  StaticGraph staticGraph, Set<Vertex> region) {
 		this.graph = network.getGraph();
-		this.source = source;
-		this.target = target;
-		this.paths = paths;
+		this.region = region;
+		this.staticGraph = staticGraph;
+		repetitionFactor = new HashMap<Vertex, Integer>();
+		
+		composeSDF();
 	}
 
-	public Boolean isMergeable() {
+	private void addRepetitionFactor(Vertex vertex, int factor){
+		if (repetitionFactor.containsKey(vertex)){
+			//Multiply the oldFactor by the new factor
+			int oldfactor = repetitionFactor.get(vertex);
+			factor = oldfactor * factor;
+		}
+		
+		repetitionFactor.put(vertex, factor);
+	}
+	
+	private Rational calculateRate(Connection connection){
+		int comsuption = getComsuptionRate(connection);
+		int production = getProductionRate(connection);
+		return new Rational(production, comsuption);
+	}
+
+	private void composeSDF(){
+		for (Vertex vertex : region){
+			Set<Vertex> staticNeighbours = staticGraph.getStaticNeighbour(vertex);
+			
+			for(Vertex neighbour : staticNeighbours){
+				setRepetitionFactor(vertex, neighbour);
+			}
+		}
+		
+	}
+	
+	private int getComsuptionRate(Connection connection){
+		Vertex vertex = graph.getEdgeTarget(connection);
+		CSDFMoC moc = getCSDFMoC(vertex);
+		
+		return moc.getNumTokensConsumed(connection.getTarget());
+	}
+	
+	private CSDFMoC getCSDFMoC(Vertex vertex){
+		if (!vertex.isInstance()){
+			//Error of analysis
+			return null;
+		}
+		
+		Instance instance = vertex.getInstance();
+		
+		//TODO extend this process to QSDF
+		return (CSDFMoC)instance.getActor().getMoC();
+	}
+	
+	private int getProductionRate(Connection connection){
+		Vertex vertex = graph.getEdgeSource(connection);
+		CSDFMoC moc = getCSDFMoC(vertex);
+		return moc.getNumTokensProduced(connection.getSource());
+		
+	}
+	
+	public Map<Vertex, Integer> getRepetitionFactor() {
+		return repetitionFactor;
+	}
+	
+	public Boolean isValid() {
 		return true;
 	}
-
-	public Integer setRepetitionFactor() {
+	
+	private Boolean setRepetitionFactor(Vertex source, Vertex target) {
 		Set<Connection> connections = graph.getAllEdges(source, target);
-
+		Rational rational = null;
+		
 		for (Connection connection : connections) {
-
+			Rational result = calculateRate(connection);
+			
+			if (rational == null){
+				//This is the reference rational
+				rational = result;
+			}else if (!rational.equals(result)){
+				// Merging is inconsistent
+				return false;
+			}			
 		}
-		return 0;
+		
+		//Merging is consistent set number of repetition of each vertex
+		addRepetitionFactor(source, rational.getNumerator());
+		addRepetitionFactor(source, rational.getDenominator());
+		
+		return true;
 	}
+	
+	
 }
