@@ -55,86 +55,95 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * @author Nicolas Siret
  * 
  */
-public class TransformConditionals extends AbstractActorVisitor
-		implements ExpressionInterpreter {
+public class TransformConditionals extends AbstractActorVisitor {
 
-	@Override
-	public Object interpret(BinaryExpr expr, Object... args) {
-		Expression e1 = (Expression) expr.getE1().accept(this);
-		Expression e2 = (Expression) expr.getE2().accept(this);
-		BinaryOp op = expr.getOp();
-		Type type = expr.getType();
-		return new BinaryExpr(e1, op, e2, type);
-	}
+	private class TransformExpressionInterpreter implements
+			ExpressionInterpreter {
 
-	@Override
-	public Object interpret(BoolExpr expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(FloatExpr expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(IntExpr expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(ListExpr expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(StringExpr expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(UnaryExpr expr, Object... args) {
-		UnaryOp op = expr.getOp();
-		Expression subExpr = expr.getExpr();
-		if (op == UnaryOp.LOGIC_NOT) {
-			if (subExpr.isVarExpr()) {
-				// "not a" => "a = false"
-				return new BinaryExpr(subExpr, BinaryOp.EQ,
-						new BoolExpr(false),
-						IrFactory.eINSTANCE.createTypeBool());
-			} else {
-				// "not (expr)" => "(expr) = false"
-				subExpr = (Expression) subExpr.accept(this);
-				return new BinaryExpr(subExpr, BinaryOp.EQ,
-						new BoolExpr(false),
-						IrFactory.eINSTANCE.createTypeBool());
-			}
-		} else {
-			subExpr = (Expression) subExpr.accept(this);
+		@Override
+		public Object interpret(BinaryExpr expr, Object... args) {
+			Expression e1 = (Expression) expr.getE1().accept(
+					(ExpressionInterpreter) this);
+			Expression e2 = (Expression) expr.getE2().accept(this);
+			BinaryOp op = expr.getOp();
 			Type type = expr.getType();
-			return new UnaryExpr(op, subExpr, type);
+			return new BinaryExpr(e1, op, e2, type);
 		}
-	}
 
-	@Override
-	public Object interpret(VarExpr expr, Object... args) {
-		if (expr.getType().isBool()) {
-			return new BinaryExpr(expr, BinaryOp.EQ, new BoolExpr(true),
-					IrFactory.eINSTANCE.createTypeBool());
-		} else {
+		@Override
+		public Object interpret(BoolExpr expr, Object... args) {
 			return expr;
 		}
+
+		@Override
+		public Object interpret(FloatExpr expr, Object... args) {
+			return expr;
+		}
+
+		@Override
+		public Object interpret(IntExpr expr, Object... args) {
+			return expr;
+		}
+
+		@Override
+		public Object interpret(ListExpr expr, Object... args) {
+			return expr;
+		}
+
+		@Override
+		public Object interpret(StringExpr expr, Object... args) {
+			return expr;
+		}
+
+		@Override
+		public Object interpret(UnaryExpr expr, Object... args) {
+			UnaryOp op = expr.getOp();
+			Expression subExpr = expr.getExpr();
+			if (op == UnaryOp.LOGIC_NOT) {
+				if (subExpr.isVarExpr()) {
+					// "not a" => "a = false"
+					return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(
+							false), IrFactory.eINSTANCE.createTypeBool());
+				} else {
+					// "not (expr)" => "(expr) = false"
+					subExpr = (Expression) subExpr.accept(this);
+					return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(
+							false), IrFactory.eINSTANCE.createTypeBool());
+				}
+			} else {
+				subExpr = (Expression) subExpr.accept(this);
+				Type type = expr.getType();
+				return new UnaryExpr(op, subExpr, type);
+			}
+		}
+
+		@Override
+		public Object interpret(VarExpr expr, Object... args) {
+			if (expr.getType().isBool()) {
+				return new BinaryExpr(expr, BinaryOp.EQ, new BoolExpr(true),
+						IrFactory.eINSTANCE.createTypeBool());
+			} else {
+				return expr;
+			}
+		}
+
+	}
+
+	private ExpressionInterpreter exprInterpreter;
+
+	public TransformConditionals() {
+		exprInterpreter = new TransformExpressionInterpreter();
 	}
 
 	@Override
 	public void visit(IfNode node) {
-		node.setValue((Expression) node.getValue().accept(this));
+		node.setValue((Expression) node.getValue().accept(exprInterpreter));
 		super.visit(node);
 	}
 
 	@Override
 	public void visit(WhileNode node) {
-		node.setValue((Expression) node.getValue().accept(this));
+		node.setValue((Expression) node.getValue().accept(exprInterpreter));
 		super.visit(node);
 	}
 

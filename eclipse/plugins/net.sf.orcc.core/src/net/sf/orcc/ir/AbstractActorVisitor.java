@@ -31,6 +31,15 @@ package net.sf.orcc.ir;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionVisitor;
+import net.sf.orcc.ir.expr.FloatExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
@@ -54,8 +63,8 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractActorVisitor implements NodeVisitor,
-		InstructionVisitor, ActorVisitor {
+public abstract class AbstractActorVisitor implements ActorVisitor,
+		ExpressionVisitor, InstructionVisitor, NodeVisitor {
 
 	protected Actor actor;
 
@@ -66,6 +75,30 @@ public abstract class AbstractActorVisitor implements NodeVisitor,
 	protected ListIterator<CFGNode> itNode;
 
 	protected Procedure procedure;
+
+	private final boolean visitFull;
+
+	/**
+	 * Creates a new abstract actor visitor that visits all nodes and
+	 * instructions of all procedures (including the ones referenced by
+	 * actions).
+	 */
+	public AbstractActorVisitor() {
+		visitFull = false;
+	}
+
+	/**
+	 * Creates a new abstract actor visitor that visits all nodes and
+	 * instructions of all procedures (including the ones referenced by
+	 * actions), and may also visit all the expressions if
+	 * <code>visitFull</code> is <code>true</code>.
+	 * 
+	 * @param visitFull
+	 *            when <code>true</code>, visits all the expressions
+	 */
+	public AbstractActorVisitor(boolean visitFull) {
+		this.visitFull = visitFull;
+	}
 
 	/**
 	 * Visits the given action.
@@ -101,6 +134,15 @@ public abstract class AbstractActorVisitor implements NodeVisitor,
 
 	@Override
 	public void visit(Assign assign) {
+		if (visitFull) {
+			assign.getValue().accept(this);
+		}
+	}
+
+	@Override
+	public void visit(BinaryExpr expr, Object... args) {
+		expr.getE1().accept(this, args);
+		expr.getE2().accept(this, args);
 	}
 
 	@Override
@@ -114,14 +156,36 @@ public abstract class AbstractActorVisitor implements NodeVisitor,
 	}
 
 	@Override
+	public void visit(BoolExpr expr, Object... args) {
+	}
+
+	@Override
 	public void visit(Call call) {
+		if (visitFull) {
+			visit(call.getProcedure());
+			for (Expression expr : call.getParameters()) {
+				expr.accept(this);
+			}
+		}
+	}
+
+	@Override
+	public void visit(FloatExpr expr, Object... args) {
 	}
 
 	@Override
 	public void visit(IfNode ifNode) {
+		if (visitFull) {
+			ifNode.getValue().accept(this);
+		}
+
 		visit(ifNode.getThenNodes());
 		visit(ifNode.getElseNodes());
 		visit(ifNode.getJoinNode());
+	}
+
+	@Override
+	public void visit(IntExpr expr, Object... args) {
 	}
 
 	/**
@@ -142,7 +206,16 @@ public abstract class AbstractActorVisitor implements NodeVisitor,
 	}
 
 	@Override
+	public void visit(ListExpr expr, Object... args) {
+	}
+
+	@Override
 	public void visit(Load load) {
+		if (visitFull) {
+			for (Expression expr : load.getIndexes()) {
+				expr.accept(this);
+			}
+		}
 	}
 
 	@Override
@@ -151,6 +224,11 @@ public abstract class AbstractActorVisitor implements NodeVisitor,
 
 	@Override
 	public void visit(PhiAssignment phi) {
+		if (visitFull) {
+			for (Expression expr : phi.getValues()) {
+				expr.accept(this);
+			}
+		}
 	}
 
 	/**
@@ -171,6 +249,9 @@ public abstract class AbstractActorVisitor implements NodeVisitor,
 
 	@Override
 	public void visit(Return returnInstr) {
+		if (visitFull) {
+			returnInstr.getValue().accept(this);
+		}
 	}
 
 	@Override
@@ -180,10 +261,34 @@ public abstract class AbstractActorVisitor implements NodeVisitor,
 
 	@Override
 	public void visit(Store store) {
+		if (visitFull) {
+			for (Expression expr : store.getIndexes()) {
+				expr.accept(this);
+			}
+
+			store.getValue().accept(this);
+		}
+	}
+
+	@Override
+	public void visit(StringExpr expr, Object... args) {
+	}
+
+	@Override
+	public void visit(UnaryExpr expr, Object... args) {
+		expr.getExpr().accept(this, args);
+	}
+
+	@Override
+	public void visit(VarExpr expr, Object... args) {
 	}
 
 	@Override
 	public void visit(WhileNode whileNode) {
+		if (visitFull) {
+			whileNode.getValue().accept(this);
+		}
+
 		visit(whileNode.getNodes());
 		visit(whileNode.getJoinNode());
 	}

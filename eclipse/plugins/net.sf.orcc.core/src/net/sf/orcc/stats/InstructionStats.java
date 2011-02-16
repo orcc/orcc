@@ -31,6 +31,7 @@ package net.sf.orcc.stats;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -39,7 +40,6 @@ import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.stats.util.FullActorVisitor;
 
 /**
  * This class define a network analyzer that compute instruction statistics
@@ -50,8 +50,13 @@ import net.sf.orcc.stats.util.FullActorVisitor;
  */
 public class InstructionStats {
 
-	private class InstructionStatsBuilder extends FullActorVisitor {
+	private class InstructionStatsBuilder extends AbstractActorVisitor {
+
 		private InstructionStatsElement statsElement;
+		
+		public InstructionStatsBuilder() {
+			super(true);
+		}
 
 		public void buildInstructionStats(Actor actor,
 				InstructionStatsElement statsElement) {
