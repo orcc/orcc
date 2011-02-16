@@ -1020,8 +1020,7 @@ public class AstTransformer {
 				context.getMapGlobals().put(global, local);
 			}
 
-			List<Expression> indexes = new ArrayList<Expression>(0);
-			Load load = new Load(local, new Use(global), indexes);
+			Load load = new Load(local, new Use(global));
 			addInstruction(load);
 		}
 	}
@@ -1154,8 +1153,7 @@ public class AstTransformer {
 		for (Variable global : context.getSetGlobalsToLoad()) {
 			LocalVariable local = context.getMapGlobals().get(global);
 
-			List<Expression> indexes = new ArrayList<Expression>(0);
-			Load load = new Load(local, new Use(global), indexes);
+			Load load = new Load(local, new Use(global));
 			BlockNode block = BlockNode.getFirst(context.getProcedure());
 			block.add(i, load);
 			i++;
