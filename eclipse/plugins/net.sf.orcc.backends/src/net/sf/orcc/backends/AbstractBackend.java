@@ -181,7 +181,7 @@ public abstract class AbstractBackend implements Backend {
 		write("Parsing XDF network...\n");
 		Network network = new XDFParser(inputFile).parseNetwork();
 		network.updateIdentifiers();
-		if (process.getProgressMonitor().isCanceled()) {
+		if (isCanceled()) {
 			return;
 		}
 
@@ -190,7 +190,7 @@ public abstract class AbstractBackend implements Backend {
 		Network.clearActorPool();
 		write("Instantiation done\n");
 
-		if (process.getProgressMonitor().isCanceled()) {
+		if (isCanceled()) {
 			return;
 		}
 		doXdfCodeGeneration(network);
@@ -402,6 +402,19 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	/**
+	 * Returns true if this process has been canceled.
+	 * 
+	 * @return true if this process has been canceled
+	 */
+	protected boolean isCanceled() {
+		if (process == null) {
+			return false;
+		} else {
+			return process.getProgressMonitor().isCanceled();
+		}
+	}
+
+	/**
 	 * Parses the given file list and returns a list of actors.
 	 * 
 	 * @param files
@@ -422,7 +435,7 @@ public abstract class AbstractBackend implements Backend {
 				Actor actor = new IRParser().parseActor(in);
 				actors.add(actor);
 
-				if (process.getProgressMonitor().isCanceled()) {
+				if (isCanceled()) {
 					break;
 				}
 			}
@@ -462,7 +475,7 @@ public abstract class AbstractBackend implements Backend {
 
 				@Override
 				public Boolean call() throws OrccException {
-					if (process.getProgressMonitor().isCanceled()) {
+					if (isCanceled()) {
 						return false;
 					}
 					return printActor(actor);
