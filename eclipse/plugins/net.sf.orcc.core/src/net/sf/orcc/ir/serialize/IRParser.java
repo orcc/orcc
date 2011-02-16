@@ -121,6 +121,7 @@ import net.sf.orcc.util.Scope;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
@@ -132,6 +133,10 @@ import com.google.gson.JsonPrimitive;
  * 
  */
 public class IRParser {
+
+	private static final String JSON_ERR_MSG = "JSON error probably caused by"
+			+ " a change in the IR serialization format,"
+			+ " please try to clean/rebuild your actors";
 
 	final private Map<Tag, Action> actions;
 
@@ -334,6 +339,10 @@ public class IRParser {
 					nativeFlag, stateVars, procs, actions, initializes, sched);
 
 			return actor;
+		} catch (IllegalStateException e) {
+			throw new OrccException(JSON_ERR_MSG);
+		} catch (JsonParseException e) {
+			throw new OrccException(JSON_ERR_MSG);
 		} finally {
 			try {
 				// closes the input stream
