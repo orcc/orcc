@@ -140,7 +140,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		boolean needDynamicMapping = getAttribute(
 				"net.sf.orcc.backends.dynamicMapping", false);
-		needPthreads = (threads.keySet().size() > 1) || needDynamicMapping;
+		needPthreads = (threads.keySet().size() > 1);
 
 		if (needDynamicMapping) {
 			printer.getOptions().put("needDynamicMapping", needDynamicMapping);
@@ -149,6 +149,7 @@ public class CBackendImpl extends AbstractBackend {
 		} else {
 			printer.getOptions().put("needPthreads", needPthreads);
 			printer.getOptions().put("threads", threads);
+			printer.getOptions().put("threadsNb", threads.size());
 		}
 	}
 

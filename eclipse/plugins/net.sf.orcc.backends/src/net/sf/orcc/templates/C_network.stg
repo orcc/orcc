@@ -203,11 +203,11 @@ extern void <instance.id>_initialize();
 <endif>
 >>
 
-declareActorsInitializes(instances) ::= <<
+declareInstancesInitializes(instances) ::= <<
 <instances: actorInitialize()>
 >>
 
-declareActorsSchedulers(instances) ::= <<
+declareActionsSchedulers(instances) ::= <<
 <instances: {inst | extern void <inst.id>_scheduler(struct schedinfo_s *si);}; separator="\n">
 >>
 
@@ -259,7 +259,7 @@ void *scheduler(void *data) {
 				}
 			}
 		}
-		<endif>
+		<else>
 		si.num_firings = 0;
 		my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
@@ -272,23 +272,8 @@ void *scheduler(void *data) {
 			sched_add_predecessors(sched, my_actor, si.ports);
 		}
 		<endif>
+		<endif>
 	}
-}
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// main
-
-printMain() ::= <<
-int main(int argc, char *argv[]) {
-  init_orcc(argc, argv);
-  
-  launcher();
-
-  printf("End of simulation! Press a key to continue\n");
-  wait_for_key();
-
-  return 0;
 }
 >>
 
@@ -323,8 +308,12 @@ network(debugFifos, fifoSize, network, options) ::= <<
 <endif>
 <if(options.needDynamicMapping)>
 #include "orcc_genetic.h"
+<endif>
 
+<if (options.needPthreads || options.needDynamicMapping)>
 #define THREAD_NB <options.threadsNb>
+<endif>
+<if(options.needDynamicMapping)>
 #define SYNC_DELAY 3
 
 #define POPULATION_SIZE 20
@@ -340,9 +329,12 @@ network(debugFifos, fifoSize, network, options) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
+
 <allocateFifos(network.connections)>
+
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO pointer assignments
+
 <assignFifos(network.connections)>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -350,15 +342,18 @@ network(debugFifos, fifoSize, network, options) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
-<declareActorsInitializes(network.instances)>
-<declareActorsSchedulers(network.instances)>
+
+<declareInstancesInitializes(network.instances)>
+<declareActionsSchedulers(network.instances)>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of a struct actor for each actor
+
 <declareActors(network.instances)>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of the predecessors and successors of each actor
+
 <if(options.newScheduler)><declarePredsSuccs(network.instances)><endif>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -367,48 +362,35 @@ network(debugFifos, fifoSize, network, options) ::= <<
 <fillActorsStructs(network.instances)>
 
 <if(options.needPthreads)>
-
 <options.threads.keys: {th | <declareActorsArray(instances=options.threads.(th),thread=th)>}; separator="\n">
+
+struct actor_s **actors[] = {<options.threads.keys: {th | actors_<th>}; separator=", ">};
+<else>
+<declareActorsArray(instances=network.instances)>
+<endif>
+
+<if (options.needDynamicMapping)>
+extern void remove_fps_printing();
+<endif>
+
+////////////////////////////////////////////////////////////////////////////////
+// Actor scheduler
 
 <printScheduler()>
 
-static void launcher() {
-	cpu_set_t cpuset;
-	thread_struct <options.threads.keys: {th | thread_<th>}; separator=", ">;
-	thread_id_struct <options.threads.keys: {th | thread_id_<th>}; separator=", ">;
-	struct scheduler_s <options.threads.keys: {th | sched_<th>}; separator=", ">;
-	
-	<printInitializes(network.instances)>
-	
-	<options.threads.keys: {th | sched_init(&sched_<th>, sizeof(actors_<th>) / sizeof(actors_<th>[0]), actors_<th>, NULL);}; separator="\n">
-	
-	<if(options.newScheduler)>sched_add_schedulable(source.sched, &source);<endif>
-	
-	<options.threads.keys: {th | threadCreate(thread_<th>, scheduler, sched_<th>, thread_id_<th>);}; separator="\n">
-
-	clear_cpu_set(cpuset);
-	<options.threads.keys: {th | set_affinity(cpuset, <i0>, thread_<th>);}; separator="\n">
-
-	<options.threads.keys: {th | threadJoin(thread_<th>);}; separator="\n">
-}
-
-<elseif(options.needDynamicMapping)>
-
-<declareActorsArray(instances=network.instances)>
-
-extern void remove_fps_printing();
-
-
-<printScheduler>
+////////////////////////////////////////////////////////////////////////////////
+// Initializer and launcher
 
 static void launcher() {
+<if(options.needDynamicMapping || options.needPthreads)>
 	int i;
 	
 	cpu_set_t cpuset;
-	thread_struct threads[THREAD_NB], thread_monitor;
-	thread_id_struct threads_id[THREAD_NB], thread_monitor_id;
+	thread_struct threads[THREAD_NB]<if(options.needDynamicMapping)>, thread_monitor<endif>;
+	thread_id_struct threads_id[THREAD_NB]<if(options.needDynamicMapping)>, thread_monitor_id<endif>;
 	
 	struct scheduler_s schedulers[THREAD_NB];
+	<if(options.needDynamicMapping)>
 	struct sync_s sched_sync;
 	struct genetic_s genetic_info;
 	struct monitor_s monitoring;
@@ -417,12 +399,15 @@ static void launcher() {
 	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB);
 	monitor_init(&monitoring, &sched_sync, &genetic_info);
 	
+	remove_fps_printing();
+	<else>
+	int actors_size[] = {<options.threads.keys: {th | sizeof(actors_<th>) / sizeof(actors_<th>[0])}; separator=", ">};
+	<endif>
+	
 	<printInitializes(network.instances)>
 	
-	remove_fps_printing();
-	
 	for(i=0; i \< THREAD_NB; i++){
-		sched_init(&schedulers[i], sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);
+		sched_init(&schedulers[i], <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
 	}
 	
 	<if(options.newScheduler)>sched_add_schedulable(source.sched, &source);<endif>
@@ -430,8 +415,10 @@ static void launcher() {
 	for(i=0; i \< THREAD_NB; i++){
 		threadCreate(threads[i], scheduler, schedulers[i], threads_id[i]);
 	}
+	<if(options.needDynamicMapping)>
 	threadCreate(thread_monitor, monitor, monitoring, thread_monitor_id);
-
+	<endif>
+	
 	clear_cpu_set(cpuset);
 	for(i=0; i \< THREAD_NB; i++){
 		set_affinity(cpuset, i, threads[i]);
@@ -440,19 +427,10 @@ static void launcher() {
 	for(i=0; i \< THREAD_NB; i++){
 		threadJoin(threads[i]);
 	}
+	<if(options.needDynamicMapping)>
 	threadJoin(thread_monitor);
-}
-
+	<endif>
 <else>
-
-////////////////////////////////////////////////////////////////////////////////
-// Actor scheduler
-
-<declareActorsArray(instances=network.instances)>
-
-<printScheduler()>
-
-static void launcher() {
 	struct scheduler_s sched;
 	
 	<printInitializes(network.instances)>
@@ -461,12 +439,22 @@ static void launcher() {
 	
 	<if(options.newScheduler)>sched_add_schedulable(&sched, &source);<endif>
 	(*scheduler)((void*) &sched);
-}
 <endif>
+}
 
 ////////////////////////////////////////////////////////////////////////////////
+// Main
 
-<printMain()>
+int main(int argc, char *argv[]) {
+  init_orcc(argc, argv);
+  
+  launcher();
+
+  printf("End of simulation! Press a key to continue\n");
+  wait_for_key();
+
+  return 0;
+}
 
 >>
 
