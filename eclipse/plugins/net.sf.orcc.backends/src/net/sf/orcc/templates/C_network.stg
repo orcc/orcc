@@ -232,7 +232,7 @@ void *scheduler(void *data) {
 	<if(options.needDynamicMapping)>
 	
 	clock_t start, end;	
-	semaphoreWait(sched-\>sem_thread); 
+	semaphore_wait(sched-\>sem_thread); 
 	start = clock ();
 	
 	<endif>
@@ -240,8 +240,8 @@ void *scheduler(void *data) {
 		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched);
 		<if(options.needDynamicMapping)>
 		if(my_actor == NULL){
-			semaphoreSet(sched-\>sync-\>sem_monitor);
-			semaphoreWait(sched-\>sem_thread);
+			semaphore_set(sched-\>sync-\>sem_monitor);
+			semaphore_wait(sched-\>sem_thread);
 			start = clock ();
 	  	}
 	  	else{
@@ -260,8 +260,8 @@ void *scheduler(void *data) {
 			if(sched-\>sync-\>active_sync){
 				end = clock ();
 				if((((end - start) / (double)CLOCKS_PER_SEC) \>= SYNC_DELAY)){
-					semaphoreSet(sched-\>sync-\>sem_monitor);
-					semaphoreWait(sched-\>sem_thread);
+					semaphore_set(sched-\>sync-\>sem_monitor);
+					semaphore_wait(sched-\>sem_thread);
 					start = clock ();
 				}
 			}
@@ -300,11 +300,9 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #include "SDL.h"
 #endif
 
-<if (options.needDynamicMapping || options.needPthreads)>
 #ifndef _WIN32
 #define __USE_GNU
 #endif
-<endif>
 
 #include "orcc.h"
 #include "orcc_fifo.h"
@@ -422,21 +420,26 @@ static void launcher() {
 	clear_cpu_set(cpuset);
 	
 	for(i=0; i \< THREAD_NB; i++){
-		threadCreate(threads[i], scheduler, schedulers[i], threads_id[i]);
-		set_affinity(cpuset, i, threads[i]);
+		thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
+		set_thread_affinity(cpuset, i, threads[i]);
 	}
 	<if(options.needDynamicMapping)>
-	threadCreate(thread_monitor, monitor, monitoring, thread_monitor_id);
+	thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
 	<endif>
 	
 	for(i=0; i \< THREAD_NB; i++){
-		threadJoin(threads[i]);
+		thread_join(threads[i]);
 	}
 	<if(options.needDynamicMapping)>
-	threadJoin(thread_monitor);
+	thread_join(thread_monitor);
 	<endif>
 <else>
+	cpu_set_t cpuset; 
+
 	struct scheduler_s sched;
+	
+	clear_cpu_set(cpuset);
+	set_this_process_affinity(cpuset, 0);
 	
 	<printInitializes(network.instances)>
 

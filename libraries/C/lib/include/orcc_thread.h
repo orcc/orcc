@@ -35,10 +35,11 @@
 	// Thread
 	typedef long cpu_set_t;
 	#define clear_cpu_set(cpuset) cpuset = 0
-	#define set_affinity(cpuset, proc_num, thread) SetThreadAffinityMask(thread, proc_num)
+	#define set_thread_affinity(cpuset, proc_num, thread) SetThreadAffinityMask(thread, proc_num)
+	#define set_this_process_affinity(cpuset, proc_num) 
 	
-	#define threadCreate(thread, function, argument, id) thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) function, (LPVOID) &(argument), 0, &(id))
-	#define threadJoin(thread) WaitForSingleObject(thread, INFINITE)
+	#define thread_create(thread, function, argument, id) thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) function, (LPVOID) &(argument), 0, &(id))
+	#define thread_join(thread) WaitForSingleObject(thread, INFINITE)
 	
 	#define thread_struct HANDLE
 	#define thread_id_struct DWORD
@@ -46,10 +47,10 @@
 	// Semaphore
 	#define MAX_SEM_COUNT 10
 	
-	#define semaphoreCreate(semaphore, number) semaphore = CreateSemaphore(NULL, number, MAX_SEM_COUNT, NULL)
-	#define semaphoreWait(semaphore) WaitForSingleObject(semaphore, INFINITE)
-	#define semaphoreSet(semaphore) ReleaseSemaphore(semaphore, 1, NULL)
-	#define semaphoreDestroy(semaphore) CloseHandle(semaphore)
+	#define semaphore_create(semaphore, number) semaphore = CreateSemaphore(NULL, number, MAX_SEM_COUNT, NULL)
+	#define semaphore_wait(semaphore) WaitForSingleObject(semaphore, INFINITE)
+	#define semaphore_set(semaphore) ReleaseSemaphore(semaphore, 1, NULL)
+	#define semaphore_destroy(semaphore) CloseHandle(semaphore)
 	
 	#define semaphore_struct HANDLE
 	
@@ -60,23 +61,27 @@
 	
 	// Thread
 	#define clear_cpu_set(cpuset) CPU_ZERO(&(cpuset))
-	#define set_affinity(cpuset, proc_num, thread) {						\
+	#define set_thread_affinity(cpuset, proc_num, thread) {					\
 			CPU_SET(proc_num, &(cpuset));									\
 			pthread_setaffinity_np(thread, sizeof(cpu_set_t), &(cpuset));	\
 	}
+	#define set_this_process_affinity(cpuset, proc_num) {					\
+			CPU_SET(proc_num, &(cpuset));									\
+			sched_setaffinity(0, sizeof(cpu_set_t), &(cpuset));				\
+	}
 
 	
-	#define threadCreate(thread, function, argument, id) id = pthread_create(&(thread), NULL, function, (void *) &(argument))
-	#define threadJoin(thread) pthread_join(thread, NULL);
+	#define thread_create(thread, function, argument, id) id = pthread_create(&(thread), NULL, function, (void *) &(argument))
+	#define thread_join(thread) pthread_join(thread, NULL);
 	
 	#define thread_struct pthread_t
 	#define thread_id_struct int
 	
 	// Semaphore
-	#define semaphoreCreate(semaphore, number) sem_init(&(semaphore), 0, (number))
-	#define semaphoreWait(semaphore) sem_wait(&(semaphore))
-	#define semaphoreSet(semaphore) sem_post(&(semaphore))
-	#define semaphoreDestroy(semaphore) sem_destroy(&(semaphore))
+	#define semaphore_create(semaphore, number) sem_init(&(semaphore), 0, (number))
+	#define semaphore_wait(semaphore) sem_wait(&(semaphore))
+	#define semaphore_set(semaphore) sem_post(&(semaphore))
+	#define semaphore_destroy(semaphore) sem_destroy(&(semaphore))
 	
 	#define semaphore_struct sem_t
 #endif

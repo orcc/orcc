@@ -32,7 +32,7 @@
 #include "orcc_thread.h"
 
 void sync_init(struct sync_s *sync) {
-	semaphoreCreate(sync->sem_monitor, 0);
+	semaphore_create(sync->sem_monitor, 0);
 	sync->active_sync = 1;
 }
 

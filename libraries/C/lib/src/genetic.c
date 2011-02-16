@@ -384,12 +384,12 @@ void *monitor(void *data) {
 		}
 		// wakeup all threads
 		for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
-			semaphoreSet(monitoring->genetic_info->schedulers[i].sem_thread);
+			semaphore_set(monitoring->genetic_info->schedulers[i].sem_thread);
 		}
 
 		// wait threads synchro
 		for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
-			semaphoreWait(monitoring->sync->sem_monitor);
+			semaphore_wait(monitoring->sync->sem_monitor);
 		}
 		backup_partial_end_info();
 
@@ -417,7 +417,7 @@ void *monitor(void *data) {
 	active_fps_printing();
 
 	for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
-		semaphoreSet(monitoring->genetic_info->schedulers[i].sem_thread);
+		semaphore_set(monitoring->genetic_info->schedulers[i].sem_thread);
 	}
 
 	return NULL;
