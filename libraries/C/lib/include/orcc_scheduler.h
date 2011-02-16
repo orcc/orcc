@@ -29,6 +29,8 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#include <hwloc.h>
+
 #include "orcc_fifo.h"
 #include "orcc_thread.h"
 
@@ -60,6 +62,8 @@ struct scheduler_s {
 	int next_else_schedulable;
 	struct sync_s *sync;
 	semaphore_struct sem_thread;
+	hwloc_topology_t topology;
+	hwloc_cpuset_t cpuset;
 };
 
 #include "orcc_scheduler.inl"
@@ -67,7 +71,7 @@ struct scheduler_s {
 /**
  * Initializes the given scheduler.
  */
-void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors, struct sync_s *sync);
+void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors, struct sync_s *sync, hwloc_topology_t topology, hwloc_cpuset_t cpuset);
 void sched_reinit(struct scheduler_s *sched, int num_actors, struct actor_s **actors);
 
 #endif

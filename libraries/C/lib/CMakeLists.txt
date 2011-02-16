@@ -5,11 +5,15 @@ cmake_minimum_required (VERSION 2.8)
 project (orcc)
 
 # Common packages required
+find_library(hwloc_LIBRARY hwloc)
+find_file(hwloc_INCLUDE_DIR hwloc)
+
 find_package(SDL REQUIRED)
 find_package(SDL_image REQUIRED)
 
 # Common include directories
 include_directories(${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR})
+include_directories(${HWLOC_INCLUDE_DIR})
 
 # Orcc library
 include_directories(${orcc_SOURCE_DIR}/include)

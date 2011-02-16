@@ -11,7 +11,7 @@
 /**
  * Initializes the given scheduler.
  */
-void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors, struct sync_s *sync) {
+void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors, struct sync_s *sync, hwloc_topology_t topology, hwloc_cpuset_t cpuset) {
 	int i;
 	sched->actors = actors;
 	sched->sync = sync;
@@ -25,6 +25,8 @@ void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **acto
 		}
 	}
 	semaphoreCreate(sched->sem_thread, 0);
+	sched->topology = topology;
+	sched->cpuset = cpuset;
 }
 
 /**
@@ -39,5 +41,8 @@ void sched_reinit(struct scheduler_s *sched, int num_actors, struct actor_s **ac
 	sched->next_else_schedulable = 0;
 	for(i=0; i<num_actors; i++){
 		actors[i]->sched = sched;
+		if(!strcmp(actors[i]->name,"source")){
+			sched_add_schedulable(sched, actors[i]);
+		}
 	}
 }

@@ -20,6 +20,9 @@ project (<network.name>)
 find_library(orcc_LIBRARY orcc)
 find_file(orcc_INCLUDE_DIR orcc)
 
+find_library(hwloc_LIBRARY hwloc)
+find_file(hwloc_INCLUDE_DIR hwloc)
+
 find_package(SDL REQUIRED)
 find_package(SDL_image REQUIRED)
 <if (needPthreads)>
@@ -28,6 +31,7 @@ find_package(Threads REQUIRED)
 
 # Common include directories
 include_directories(${orcc_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR})
+include_directories(${HWLOC_INCLUDE_DIR})
 
 set(filenames
 <network.name>.c
@@ -35,6 +39,6 @@ set(filenames
 
 add_executable(<network.name> ${filenames})
 
-target_link_libraries(<network.name> ${orcc_LIBRARY} ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY}<if (needPthreads)> ${CMAKE_THREAD_LIBS_INIT}<endif>)
+target_link_libraries(<network.name> ${orcc_LIBRARY} ${hwloc_LIBRARY} ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY}<if (needPthreads)> ${CMAKE_THREAD_LIBS_INIT}<endif>)
 
 >>

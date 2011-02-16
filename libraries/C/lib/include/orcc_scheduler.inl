@@ -40,10 +40,10 @@ static struct actor_s *sched_get_next(struct scheduler_s *sched) {
 	if (sched->num_actors == 0) {
 		return NULL;
 	}
-	actor = sched->actors[sched->next_schedulable];
-	sched->next_schedulable++;
-	if (sched->next_schedulable == sched->num_actors) {
-		sched->next_schedulable = 0;
+	actor = sched->actors[sched->next_else_schedulable];
+	sched->next_else_schedulable++;
+	if (sched->next_else_schedulable == sched->num_actors) {
+		sched->next_else_schedulable = 0;
 	}
 	return actor;
 }
@@ -58,11 +58,7 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 	if (sched->next_schedulable == sched->next_entry) {
 		// static actors list is used when schedulable list is empty
 		// (used only in multicore context)
-		actor = sched->actors[sched->next_else_schedulable];
-		sched->next_else_schedulable++;
-		if (sched->next_else_schedulable == sched->num_actors) {
-			sched->next_else_schedulable = 0;
-		}
+		actor = sched_get_next(sched);
 	} else {
 		actor = sched->schedulable[sched->next_schedulable];
 		sched->next_schedulable++;
