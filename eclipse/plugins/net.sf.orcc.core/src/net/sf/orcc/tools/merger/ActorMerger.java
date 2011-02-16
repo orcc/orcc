@@ -126,9 +126,8 @@ public class ActorMerger implements INetworkTransformation {
 
 				BinaryExpr incr = new BinaryExpr(new VarExpr(new Use(readVar)),
 						BinaryOp.PLUS, new IntExpr(cns), null);
-				List<Expression> indexes = new ArrayList<Expression>();
 
-				Store store = new Store(readVar, indexes, incr);
+				Store store = new Store(readVar, incr);
 				currentBlock.add(store);
 			}
 		}
@@ -144,8 +143,7 @@ public class ActorMerger implements INetworkTransformation {
 				BinaryExpr incr = new BinaryExpr(new VarExpr(new Use(readVar)),
 						BinaryOp.PLUS, new IntExpr(prd), null);
 
-				List<Expression> indexes = new ArrayList<Expression>();
-				Store store = new Store(readVar, indexes, incr);
+				Store store = new Store(readVar,  incr);
 				currentBlock.add(store);
 			}
 		}
@@ -354,10 +352,8 @@ public class ActorMerger implements INetworkTransformation {
 			Variable write = actor.getStateVars().get(var.getName() + "_w");
 
 			BlockNode block = BlockNode.getLast(procedure, nodes);
-			block.add(new Store(read, new ArrayList<Expression>(), new IntExpr(
-					0)));
-			block.add(new Store(write, new ArrayList<Expression>(),
-					new IntExpr(0)));
+			block.add(new Store(read, new IntExpr(0)));
+			block.add(new Store(write, new IntExpr(0)));
 		}
 
 		createReads(procedure);

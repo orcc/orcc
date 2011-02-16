@@ -129,7 +129,9 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 				ListIterator<CFGNode> itNode) {
 			String newActionName = getNewStateName();
 			nextAction = createNewAction(condition, newActionName);
-			new CodeMover().moveNodes(itNode, nextAction.getBody());
+			CodeMover mover = new CodeMover();
+			mover.setTargetProcedure(nextAction.getBody());
+			mover.visitNodes(itNode);
 		}
 
 		@Override

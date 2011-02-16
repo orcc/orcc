@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.instructions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Cast;
@@ -62,6 +63,10 @@ public class Store extends AbstractInstruction implements TargetContainer,
 		setIndexes(indexes);
 		setTarget(target);
 		setValue(value);
+	}
+
+	public Store(Variable target, Expression value) {
+		this(target, new ArrayList<Expression>(0), value);
 	}
 
 	public Store(Variable target, List<Expression> indexes, Expression value) {

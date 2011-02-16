@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.instructions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Cast;
@@ -55,6 +56,10 @@ public class Load extends AbstractInstruction implements LocalTargetContainer,
 	private Use source;
 
 	private LocalVariable target;
+
+	public Load(LocalVariable target, Use source) {
+		this(target, source, new ArrayList<Expression>(0));
+	}
 
 	public Load(LocalVariable target, Use source, List<Expression> indexes) {
 		this(new Location(), target, source, indexes);

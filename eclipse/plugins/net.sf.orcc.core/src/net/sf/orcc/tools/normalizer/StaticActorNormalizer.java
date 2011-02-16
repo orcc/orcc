@@ -185,10 +185,9 @@ public class StaticActorNormalizer {
 				Variable varCount = stateVars.get(port.getName() + "_count");
 				Use use = new Use(varCount);
 
-				Store store = new Store(varCount, new ArrayList<Expression>(),
-						new BinaryExpr(new VarExpr(use), BinaryOp.PLUS,
-								new IntExpr(tokens),
-								IrFactory.eINSTANCE.createTypeInt(32)));
+				Store store = new Store(varCount, new BinaryExpr(new VarExpr(
+						use), BinaryOp.PLUS, new IntExpr(tokens),
+						IrFactory.eINSTANCE.createTypeInt(32)));
 				instrs.add(store);
 
 			}
@@ -247,8 +246,7 @@ public class StaticActorNormalizer {
 			stateVars.put(actor.getFile(), varCount.getLocation(),
 					varCount.getName(), varCount);
 
-			Store store = new Store(varCount, new ArrayList<Expression>(),
-					new IntExpr(0));
+			Store store = new Store(varCount, new IntExpr(0));
 			block.add(store);
 		}
 	}

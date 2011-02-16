@@ -7,6 +7,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -14,7 +15,6 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
@@ -26,8 +26,10 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -168,8 +170,11 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 			nextAction = createNewAction(new BoolExpr(true), newActionName);
 
 			// move code
-			new CodeMover().moveBlock(itInstruction, nextAction.getBody());
-			new CodeMover().moveNodes(itNode, nextAction.getBody());
+			itInstruction.previous();
+			CodeMover mover = new CodeMover();
+			mover.setTargetProcedure(nextAction.getBody());
+			mover.visit(itInstruction);
+			mover.visitNodes(itNode);
 
 			// update transitions
 			replaceTransition(nextAction);
@@ -208,28 +213,70 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 	 */
 	protected class CodeMover extends AbstractActorVisitor {
 
+		private BlockNode targetBlock;
+
+		private Procedure targetProcedure;
+
 		public CodeMover() {
+			// visit expressions too
+			super(true);
 		}
 
-		public void moveBlock(ListIterator<Instruction> itInstruction,
-				Procedure newProc) {
-			// move instructions
-			BlockNode block = BlockNode.getLast(newProc);
-			Instruction instruction = itInstruction.previous();
-			itInstruction.remove();
-			block.add(instruction);
+		public void setTargetProcedure(Procedure procedure) {
+			this.targetProcedure = procedure;
+		}
+
+		@Override
+		public void visit(BlockNode blockNode) {
+			visit(blockNode.listIterator());
+		}
+
+		public void visit(ListIterator<Instruction> itInstruction) {
+			targetBlock = BlockNode.getLast(targetProcedure);
 			while (itInstruction.hasNext()) {
-				instruction = itInstruction.next();
+				Instruction instruction = itInstruction.next();
 				itInstruction.remove();
-				block.add(instruction);
+				instruction.accept(this);
+
+				targetBlock.add(instruction);
 			}
 		}
 
-		public void moveNodes(ListIterator<CFGNode> itNode, Procedure newProc) {
+		@Override
+		public void visit(VarExpr expr, Object... args) {
+			LocalVariable variable = (LocalVariable) expr.getVar()
+					.getVariable();
+			if (variable.getInstruction().isLoad()) {
+				if (targetProcedure.getLocals().contains(variable.getName())) {
+					return;
+				}
+
+				// no need to add another state variable, will just add the load
+				// to the target block
+				LocalVariable duplicate = new LocalVariable(
+						variable.isAssignable(), variable.getIndex(),
+						variable.getLocation(), variable.getBaseName(),
+						variable.getType());
+
+				OrderedMap<String, LocalVariable> variables = targetProcedure
+						.getLocals();
+				variables.put(duplicate.getName(), duplicate);
+				expr.setVar(new Use(duplicate));
+
+				Load load = (Load) variable.getInstruction();
+				Load duplicateLoad = new Load(duplicate, new Use(load
+						.getSource().getVariable()));
+				targetBlock.add(duplicateLoad);
+			}
+		}
+
+		public void visitNodes(ListIterator<CFGNode> itNode) {
 			while (itNode.hasNext()) {
 				CFGNode node = itNode.next();
 				itNode.remove();
-				newProc.getNodes().add(node);
+				node.accept(this);
+
+				targetProcedure.getNodes().add(node);
 			}
 		}
 
