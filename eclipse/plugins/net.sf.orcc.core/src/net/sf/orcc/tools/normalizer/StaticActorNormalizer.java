@@ -71,7 +71,7 @@ import net.sf.orcc.util.OrderedMap;
  * This class defines a normalizer for static actors.
  * 
  * @author Matthieu Wipliez
- * @autho  Jerome Gorin
+ * @autho Jerome Gorin
  * 
  */
 public class StaticActorNormalizer {
@@ -160,38 +160,39 @@ public class StaticActorNormalizer {
 		public void visit(SimplePattern pattern) {
 			BlockNode block = BlockNode.getLast(procedure, nodes);
 			Action action = pattern.getAction();
-			
-			//Call the action corresponding to the pattern
+
+			// Call the action corresponding to the pattern
 			Call call = new Call(new Location(), null, pattern.getAction()
 					.getBody(), new ArrayList<Expression>());
-			
-			//Update variable counter index
+
+			// Update variable counter index
 			List<Instruction> indexIn = updateIndex(action.getInputPattern());
 			List<Instruction> indexOut = updateIndex(action.getOutputPattern());
-			
-			//Add all instructions
+
+			// Add all instructions
 			block.add(call);
 			block.addAll(indexIn);
 			block.addAll(indexOut);
 		}
-		
-		private List<Instruction> updateIndex(Pattern pattern){
+
+		private List<Instruction> updateIndex(Pattern pattern) {
 			List<Instruction> instrs = new ArrayList<Instruction>();
-			
-			for (Entry<Port, Integer> entry : pattern.entrySet()){
+
+			for (Entry<Port, Integer> entry : pattern.entrySet()) {
 				Port port = entry.getKey();
 				Integer tokens = entry.getValue();
-							
+
 				Variable varCount = stateVars.get(port.getName() + "_count");
 				Use use = new Use(varCount);
-				
-				Store store = new Store(varCount, new ArrayList<Expression>(), new BinaryExpr(
-						new VarExpr(use), BinaryOp.PLUS, new IntExpr(tokens),
-						IrFactory.eINSTANCE.createTypeInt(32)));
+
+				Store store = new Store(varCount, new ArrayList<Expression>(),
+						new BinaryExpr(new VarExpr(use), BinaryOp.PLUS,
+								new IntExpr(tokens),
+								IrFactory.eINSTANCE.createTypeInt(32)));
 				instrs.add(store);
 
 			}
-			
+
 			return instrs;
 		}
 
@@ -207,7 +208,7 @@ public class StaticActorNormalizer {
 
 	private CSDFMoC staticCls;
 
-	private OrderedMap<String, Variable> variables;
+	private OrderedMap<String, LocalVariable> variables;
 
 	/**
 	 * Creates a new normalizer
@@ -277,7 +278,7 @@ public class StaticActorNormalizer {
 		// all action scheduler now just return true
 		for (Action action : actor.getActions()) {
 			Procedure scheduler = action.getScheduler();
-			Iterator<Variable> it = scheduler.getLocals().iterator();
+			Iterator<LocalVariable> it = scheduler.getLocals().iterator();
 			while (it.hasNext()) {
 				it.next();
 				it.remove();
@@ -315,12 +316,12 @@ public class StaticActorNormalizer {
 	 */
 	private Procedure createBody() {
 		Location location = new Location();
-		variables = new OrderedMap<String, Variable>();
+		variables = new OrderedMap<String, LocalVariable>();
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		Procedure procedure = new Procedure(ACTION_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeVoid(),
-				new OrderedMap<String, Variable>(), variables, nodes);
+				new OrderedMap<String, LocalVariable>(), variables, nodes);
 
 		// add state variables
 		addStateVariables(procedure, staticCls.getInputPattern());
@@ -356,9 +357,9 @@ public class StaticActorNormalizer {
 	 */
 	private void createInputCondition(BlockNode block) {
 		Expression value;
-		Iterator<Variable> it = variables.iterator();
+		Iterator<LocalVariable> it = variables.iterator();
 		if (it.hasNext()) {
-			LocalVariable previous = (LocalVariable) it.next();
+			LocalVariable previous = it.next();
 			value = new VarExpr(new Use(previous, block));
 
 			while (it.hasNext()) {
@@ -403,12 +404,12 @@ public class StaticActorNormalizer {
 	 */
 	private Procedure createScheduler() {
 		Location location = new Location();
-		variables = new OrderedMap<String, Variable>();
+		variables = new OrderedMap<String, LocalVariable>();
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),
-				new OrderedMap<String, Variable>(), variables, nodes);
+				new OrderedMap<String, LocalVariable>(), variables, nodes);
 
 		BlockNode block = new BlockNode(procedure);
 		nodes.add(block);
@@ -433,11 +434,12 @@ public class StaticActorNormalizer {
 			Variable var = stateVars.get(port.getName());
 
 			Write write = new Write(port, numTokens, var);
-			
-			//Avoid this instructions to be removed by the Dead Code transformation
+
+			// Avoid this instructions to be removed by the Dead Code
+			// transformation
 			var.setInstruction(write);
 			var.addUse(write);
-			
+
 			block.add(write);
 		}
 	}

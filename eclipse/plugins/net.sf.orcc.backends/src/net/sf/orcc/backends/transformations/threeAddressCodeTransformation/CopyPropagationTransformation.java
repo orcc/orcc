@@ -139,7 +139,7 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 	 *            a map of variable
 	 */
 	private void removeVariables(Map<Variable, Expression> variables) {
-		OrderedMap<String, Variable> lovalVars = procedure.getLocals();
+		OrderedMap<String, LocalVariable> lovalVars = procedure.getLocals();
 
 		for (Map.Entry<Variable, Expression> entry : copyVars.entrySet()) {
 			Variable var = entry.getKey();
@@ -205,7 +205,8 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 	public void visit(PhiAssignment phi) {
 		List<Expression> values = phi.getValues();
 		LocalVariable target = phi.getTarget();
-		OrderedMap<String, Variable> parameters = procedure.getParameters();
+		OrderedMap<String, LocalVariable> parameters = procedure
+				.getParameters();
 
 		// Visit expressions of value of phi
 		visitExpressions(values);

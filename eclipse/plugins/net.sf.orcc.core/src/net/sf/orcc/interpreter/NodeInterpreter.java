@@ -204,7 +204,7 @@ public class NodeInterpreter extends AbstractActorVisitor {
 				}
 			}
 		} else {
-			List<Variable> procParams = proc.getParameters().getList();
+			List<LocalVariable> procParams = proc.getParameters().getList();
 			for (int i = 0; i < callParams.size(); i++) {
 				Variable procVar = procParams.get(i);
 				procVar.setValue((Expression) callParams.get(i).accept(

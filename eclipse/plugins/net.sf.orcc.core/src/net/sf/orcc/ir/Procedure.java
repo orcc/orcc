@@ -93,7 +93,7 @@ public class Procedure extends AbstractLocalizable {
 	/**
 	 * ordered map of local variables
 	 */
-	private OrderedMap<String, Variable> locals;
+	private OrderedMap<String, LocalVariable> locals;
 
 	/**
 	 * the name of this procedure
@@ -113,7 +113,7 @@ public class Procedure extends AbstractLocalizable {
 	/**
 	 * ordered map of parameters
 	 */
-	private OrderedMap<String, Variable> parameters;
+	private OrderedMap<String, LocalVariable> parameters;
 
 	private Expression result;
 
@@ -138,8 +138,8 @@ public class Procedure extends AbstractLocalizable {
 	 *            The procedure local variables.
 	 */
 	public Procedure(String name, boolean nativeFlag, Location location,
-			Type returnType, OrderedMap<String, Variable> parameters,
-			OrderedMap<String, Variable> locals, List<CFGNode> nodes) {
+			Type returnType, OrderedMap<String, LocalVariable> parameters,
+			OrderedMap<String, LocalVariable> locals, List<CFGNode> nodes) {
 		super(location);
 		this.nativeFlag = nativeFlag;
 		this.nodes = nodes;
@@ -166,9 +166,9 @@ public class Procedure extends AbstractLocalizable {
 		super(location);
 		this.nativeFlag = false;
 		this.nodes = new ArrayList<CFGNode>();
-		this.locals = new OrderedMap<String, Variable>();
+		this.locals = new OrderedMap<String, LocalVariable>();
 		this.name = name;
-		this.parameters = new OrderedMap<String, Variable>();
+		this.parameters = new OrderedMap<String, LocalVariable>();
 		this.returnType = returnType;
 	}
 
@@ -199,7 +199,7 @@ public class Procedure extends AbstractLocalizable {
 	 * 
 	 * @return the local variables of this procedure as an ordered map
 	 */
-	public OrderedMap<String, Variable> getLocals() {
+	public OrderedMap<String, LocalVariable> getLocals() {
 		return locals;
 	}
 
@@ -226,7 +226,7 @@ public class Procedure extends AbstractLocalizable {
 	 * 
 	 * @return the parameters of this procedure as an ordered map
 	 */
-	public OrderedMap<String, Variable> getParameters() {
+	public OrderedMap<String, LocalVariable> getParameters() {
 		return parameters;
 	}
 
@@ -279,7 +279,7 @@ public class Procedure extends AbstractLocalizable {
 	public LocalVariable newTempLocalVariable(String file, Type type,
 			String hint) {
 		String name = hint;
-		Variable variable = locals.get(name);
+		LocalVariable variable = locals.get(name);
 		int i = 0;
 		while (variable != null) {
 			name = hint + i;

@@ -33,7 +33,6 @@ import java.util.Iterator;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.util.OrderedMap;
@@ -48,10 +47,10 @@ public class RemoveReadWrites extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Procedure procedure) {
-		OrderedMap<String, Variable> locals = procedure.getLocals();
-		Iterator<Variable> it = locals.iterator();
+		OrderedMap<String, LocalVariable> locals = procedure.getLocals();
+		Iterator<LocalVariable> it = locals.iterator();
 		while (it.hasNext()) {
-			LocalVariable local = (LocalVariable) it.next();
+			LocalVariable local = it.next();
 			if (local.isPort()) {
 				it.remove();
 			}

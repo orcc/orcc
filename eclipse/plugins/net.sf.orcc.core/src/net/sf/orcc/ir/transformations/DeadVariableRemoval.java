@@ -185,10 +185,10 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			changed = false;
 
 			// first shot: removes locals not used by any instruction
-			OrderedMap<String, Variable> locals = procedure.getLocals();
-			Iterator<Variable> it = locals.iterator();
+			OrderedMap<String, LocalVariable> locals = procedure.getLocals();
+			Iterator<LocalVariable> it = locals.iterator();
 			while (it.hasNext()) {
-				LocalVariable local = (LocalVariable) it.next();
+				LocalVariable local = it.next();
 				if (!local.isUsed() && local.getInstruction() == null
 						&& local.getInstructions() == null) {
 					changed = true;

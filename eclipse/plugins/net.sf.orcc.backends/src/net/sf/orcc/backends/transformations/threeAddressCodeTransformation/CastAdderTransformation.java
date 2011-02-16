@@ -226,7 +226,7 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 		List<Expression> parameters = call.getParameters();
 		Procedure procedure = call.getProcedure();
 		if (!procedure.isNative()) {
-			List<Variable> variables = call.getProcedure().getParameters()
+			List<LocalVariable> variables = call.getProcedure().getParameters()
 					.getList();
 
 			for (Expression parameter : parameters) {

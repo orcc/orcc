@@ -457,26 +457,25 @@ public class IRParser {
 	 * {@link GlobalVariable} is a {@link Variable} with an optional reference
 	 * to a constant that contain the variable's initial value.
 	 * 
-	 * @param list
+	 * @param array
 	 *            A list of JSON-encoded {@link GlobalVariable}.
 	 * @return A {@link List}&lt;{@link GlobalVariable}&gt;.
 	 */
 	private OrderedMap<String, GlobalVariable> parseGlobalVariables(
-			JsonArray array) throws OrccException {
+			JsonArray arrayGlobals) throws OrccException {
 		OrderedMap<String, GlobalVariable> stateVars = new OrderedMap<String, GlobalVariable>();
-		for (JsonElement element : array) {
-			JsonArray stateArray = element.getAsJsonArray();
+		for (JsonElement element : arrayGlobals) {
+			JsonArray array = element.getAsJsonArray();
 
-			String name = stateArray.get(0).getAsString();
-			boolean assignable = stateArray.get(1).getAsBoolean();
+			String name = array.get(0).getAsString();
+			boolean assignable = array.get(1).getAsBoolean();
 
-			Location location = parseLocation(stateArray.get(2)
-					.getAsJsonArray());
-			Type type = parseType(stateArray.get(3));
+			Location location = parseLocation(array.get(2).getAsJsonArray());
+			Type type = parseType(array.get(3));
 
 			Expression init = null;
-			if (!stateArray.get(4).isJsonNull()) {
-				init = parseExpr(stateArray.get(4));
+			if (!array.get(4).isJsonNull()) {
+				init = parseExpr(array.get(4));
 			}
 
 			GlobalVariable stateVar = new GlobalVariable(location, type, name,
@@ -724,34 +723,34 @@ public class IRParser {
 	}
 
 	/**
-	 * Returns a variable definition using objects returned by the given
-	 * iterator.
+	 * Parses the given list as a list of local variables. A
+	 * {@link LocalVariable} is a {@link Variable} with an SSA index.
 	 * 
 	 * @param array
-	 *            an array that contains a variable definition
-	 * @return A {@link LocalVariable}
+	 *            A list of JSON-encoded {@link LocalVariable}.
+	 * @return A {@link List}&lt;{@link LocalVariable}&gt;.
 	 */
-	private LocalVariable parseLocalVariable(JsonArray array)
-			throws OrccException {
-		String name = array.get(0).getAsString();
-		boolean assignable = array.get(1).getAsBoolean();
-		int index = array.get(2).getAsInt();
-		Location loc = parseLocation(array.get(3).getAsJsonArray());
-		Type type = parseType(array.get(4));
+	private OrderedMap<String, LocalVariable> parseLocalVariables(
+			JsonArray arrayVars) throws OrccException {
+		OrderedMap<String, LocalVariable> localVars = new OrderedMap<String, LocalVariable>();
+		for (JsonElement element : arrayVars) {
+			JsonArray array = element.getAsJsonArray();
 
-		LocalVariable varDef = new LocalVariable(assignable, index, loc, name,
-				type);
+			String name = array.get(0).getAsString();
+			boolean assignable = array.get(1).getAsBoolean();
+			int index = array.get(2).getAsInt();
+			Location loc = parseLocation(array.get(3).getAsJsonArray());
+			Type type = parseType(array.get(4));
 
-		// register the variable definition
-		variables.put(file, loc, varDef.getName(), varDef);
+			LocalVariable varDef = new LocalVariable(assignable, index, loc,
+					name, type);
+			localVars.put(file, loc, varDef.getName(), varDef);
 
-		return varDef;
-	}
-
-	private void parseLocalVariables(JsonArray array) throws OrccException {
-		for (JsonElement element : array) {
-			parseLocalVariable(element.getAsJsonArray());
+			// register the variable definition
+			variables.put(file, loc, varDef.getName(), varDef);
 		}
+
+		return localVars;
 	}
 
 	/**
@@ -932,11 +931,11 @@ public class IRParser {
 		Location location = parseLocation(array.get(2).getAsJsonArray());
 		Type returnType = parseType(array.get(3));
 		variables = new Scope<String, Variable>(variables, true);
-		OrderedMap<String, Variable> parameters = variables;
-		parseLocalVariables(array.get(4).getAsJsonArray());
+		OrderedMap<String, LocalVariable> parameters = parseLocalVariables(array
+				.get(4).getAsJsonArray());
 		variables = new Scope<String, Variable>(variables, false);
-		OrderedMap<String, Variable> locals = variables;
-		parseLocalVariables(array.get(5).getAsJsonArray());
+		OrderedMap<String, LocalVariable> locals = parseLocalVariables(array
+				.get(5).getAsJsonArray());
 
 		procedure = new Procedure(name, external, location, returnType,
 				parameters, locals, null);

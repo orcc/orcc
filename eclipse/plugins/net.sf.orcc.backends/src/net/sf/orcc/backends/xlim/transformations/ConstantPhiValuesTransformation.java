@@ -34,7 +34,6 @@ import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -50,14 +49,14 @@ import net.sf.orcc.util.OrderedMap;
  * @author Herve Yviquel
  * 
  */
-public class ConstantPhiValuesTransformation extends
-		AbstractActorVisitor {
+public class ConstantPhiValuesTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(PhiAssignment phi) {
 		List<Expression> values = phi.getValues();
 		LocalVariable target = phi.getTarget();
-		OrderedMap<String, Variable> parameters = procedure.getParameters();
+		OrderedMap<String, LocalVariable> parameters = procedure
+				.getParameters();
 
 		// Remove local variable with index = 0 from value
 		for (Expression value : values) {

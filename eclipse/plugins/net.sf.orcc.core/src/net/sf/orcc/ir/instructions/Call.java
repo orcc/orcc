@@ -39,7 +39,6 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -96,7 +95,7 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 	 */
 	public List<Cast> getParamCast() {
 		List<Cast> casts = new ArrayList<Cast>();
-		List<Variable> varParams = this.getProcedure().getParameters()
+		List<LocalVariable> varParams = this.getProcedure().getParameters()
 				.getList();
 
 		for (int i = 0; i < parameters.size(); i++) {
