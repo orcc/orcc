@@ -71,12 +71,15 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	 */
 	private class OrccMonitor implements IStreamMonitor {
 
+		private String contents;
+
 		private ListenerList list;
 
 		/**
 		 * Creates a new monitor.
 		 */
 		public OrccMonitor() {
+			contents = "";
 			list = new ListenerList();
 		}
 
@@ -87,7 +90,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 		@Override
 		public String getContents() {
-			synchronized (contents) {
+			synchronized (this) {
 				return contents;
 			}
 		}
@@ -104,7 +107,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		 *            a string
 		 */
 		private void write(String text) {
-			synchronized (contents) {
+			synchronized (this) {
 				contents += text;
 			}
 
@@ -145,8 +148,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 	private ILaunchConfiguration configuration;
 
-	private String contents;
-
 	private ILaunch launch;
 
 	private IProgressMonitor monitor;
@@ -160,7 +161,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		this.configuration = configuration;
 		this.launch = launch;
 		this.monitor = monitor;
-		contents = "";
 		proxy = new OrccProxy();
 	}
 
@@ -275,7 +275,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 				write("Launching Orcc backend...\n");
 				launchBackend();
 				write("Orcc backend done.");
-			}else if (option.equals("simulator") || option.equals("debugger")) {
+			} else if (option.equals("simulator") || option.equals("debugger")) {
 				monitor.subTask("Launching simulator...");
 				write("\n");
 				write("*********************************************"
