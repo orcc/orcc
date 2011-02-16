@@ -28,6 +28,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
@@ -217,13 +218,63 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 
 		private Procedure targetProcedure;
 
+		/**
+		 * Creates a new code mover
+		 */
 		public CodeMover() {
 			// visit expressions too
 			super(true);
 		}
 
+		/**
+		 * Moves local variable used by the given instruction to the target
+		 * procedure.
+		 * 
+		 * @param instruction
+		 *            an instruction
+		 * @param variable
+		 *            a variable
+		 */
+		private void moveLocalVariable(Instruction instruction,
+				LocalVariable variable) {
+			instruction.getBlock().getProcedure().getLocals()
+					.remove(variable.getName());
+			targetProcedure.getLocals().put(variable.getName(), variable);
+		}
+
+		/**
+		 * Sets the target procedure, ie the procedure in which the code mover
+		 * will move instructions and nodes.
+		 * 
+		 * @param procedure
+		 *            the target procedure
+		 */
 		public void setTargetProcedure(Procedure procedure) {
 			this.targetProcedure = procedure;
+		}
+
+		private void updateExpr(LocalVariable variable, VarExpr expr, Load load) {
+			// no need to add another state variable, will just add the load
+			// to the target block
+			LocalVariable duplicate = new LocalVariable(
+					variable.isAssignable(), variable.getIndex(),
+					variable.getLocation(), variable.getBaseName(),
+					variable.getType());
+
+			OrderedMap<String, LocalVariable> variables = targetProcedure
+					.getLocals();
+			variables.put(duplicate.getName(), duplicate);
+			expr.setVar(new Use(duplicate));
+
+			Load duplicateLoad = new Load(duplicate, new Use(load.getSource()
+					.getVariable()));
+			targetBlock.add(duplicateLoad);
+		}
+
+		@Override
+		public void visit(Assign assign) {
+			moveLocalVariable(assign, assign.getTarget());
+			super.visit(assign);
 		}
 
 		@Override
@@ -231,6 +282,11 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 			visit(blockNode.listIterator());
 		}
 
+		/**
+		 * Visits a list iterator of instructions.
+		 * 
+		 * @param itInstruction
+		 */
 		public void visit(ListIterator<Instruction> itInstruction) {
 			targetBlock = BlockNode.getLast(targetProcedure);
 			while (itInstruction.hasNext()) {
@@ -243,33 +299,39 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 		}
 
 		@Override
+		public void visit(Load load) {
+			moveLocalVariable(load, load.getTarget());
+			super.visit(load);
+		}
+
+		@Override
 		public void visit(VarExpr expr, Object... args) {
 			LocalVariable variable = (LocalVariable) expr.getVar()
 					.getVariable();
 			if (variable.getInstruction().isLoad()) {
-				if (targetProcedure.getLocals().contains(variable.getName())) {
-					return;
-				}
-
-				// no need to add another state variable, will just add the load
-				// to the target block
-				LocalVariable duplicate = new LocalVariable(
-						variable.isAssignable(), variable.getIndex(),
-						variable.getLocation(), variable.getBaseName(),
-						variable.getType());
-
-				OrderedMap<String, LocalVariable> variables = targetProcedure
-						.getLocals();
-				variables.put(duplicate.getName(), duplicate);
-				expr.setVar(new Use(duplicate));
-
 				Load load = (Load) variable.getInstruction();
-				Load duplicateLoad = new Load(duplicate, new Use(load
-						.getSource().getVariable()));
-				targetBlock.add(duplicateLoad);
+				if (load.getIndexes().isEmpty()
+						&& !targetProcedure.getLocals().contains(
+								variable.getName())) {
+					// only update for load of state scalars not already treated
+					updateExpr(variable, expr, load);
+				}
+			} else if (variable.getInstruction().isAssign()) {
+
 			}
 		}
 
+		@Override
+		public void visit(Write write) {
+			moveLocalVariable(write, (LocalVariable) write.getTarget());
+		}
+
+		/**
+		 * Visits a list iterator of nodes.
+		 * 
+		 * @param itNode
+		 *            a list iterator of nodes
+		 */
 		public void visitNodes(ListIterator<CFGNode> itNode) {
 			while (itNode.hasNext()) {
 				CFGNode node = itNode.next();
