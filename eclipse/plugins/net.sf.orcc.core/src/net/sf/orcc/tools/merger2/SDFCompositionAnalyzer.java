@@ -28,9 +28,7 @@
  */
 package net.sf.orcc.tools.merger2;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.network.Connection;
@@ -38,38 +36,40 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DefaultWeightedEdge;
 
 /**
- * This class find the possible static path between two vertex of a graph.
+ * This class follows the four conditions introduced by pino's theorem for
+ * clustering two SDF actors.
  * 
  * 
  * @author Jérôme Gorin
  * 
  */
-public class StaticRegion {
-	private DirectedGraph<Vertex, Connection> dynamicGraph;
-	Map<Vertex, Integer> repetitionVector;
-	private DirectedGraph<Vertex, DefaultWeightedEdge> staticGraph;
-	Set<Vertex> vertices;
-	
-	public StaticRegion(Network network, DirectedGraph<Vertex, DefaultWeightedEdge> staticGraph, Set<Vertex> region){
-		this.dynamicGraph = network.getGraph();
-		this.staticGraph = staticGraph;
-		this.vertices = region;
+public class SDFCompositionAnalyzer {
+	private DirectedGraph<Vertex, Connection> graph;
+	private List<List<Vertex>> paths;
+	private int repetitionFactor;
+	private Vertex source;
+	private Vertex target;
+
+	public SDFCompositionAnalyzer(Network network, Vertex source,
+			Vertex target, List<List<Vertex>> paths) {
+		this.graph = network.getGraph();
+		this.source = source;
+		this.target = target;
+		this.paths = paths;
 	}
-	
-	public Boolean isValid(){
-		List<Vertex> candidates = new ArrayList<Vertex>(vertices);
-		
-		while (candidates.size() > 1){
-			Vertex candidate1 = candidates.get(0);
-			for(DefaultWeightedEdge edge : staticGraph.outgoingEdgesOf(candidate1)){
-				Vertex candidate2 = staticGraph.getEdgeTarget(edge);
-				
-			}
-		}
-		
+
+	public Boolean isMergeable() {
 		return true;
+	}
+
+	public Integer setRepetitionFactor() {
+		Set<Connection> connections = graph.getAllEdges(source, target);
+
+		for (Connection connection : connections) {
+
+		}
+		return 0;
 	}
 }

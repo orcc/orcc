@@ -29,12 +29,8 @@
 package net.sf.orcc.tools.merger2;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.INetworkTransformation;
-
-import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a network transformation that merges actors.
@@ -44,14 +40,16 @@ import org.jgrapht.DirectedGraph;
  * 
  */
 public class ActorMerger2 implements INetworkTransformation {
-	private DirectedGraph<Vertex, Connection> graph;
-	private StaticDirectedGraph staticGraph;
 
 	@Override
 	public void transform(Network network) throws OrccException {
-		graph = network.getGraph();
-		staticGraph = new StaticDirectedGraph(graph);
-		new StaticRegionAnalyzer(staticGraph).getStaticRegions();
+
+		StaticDirectedGraphTransformation staticGraphTransformation = new StaticDirectedGraphTransformation();
+		staticGraphTransformation.transform(network);
+
+		StaticRegionAnalyzer staticRegionAnalyzer = new StaticRegionAnalyzer(
+				staticGraphTransformation.getStaticDirectedGraph());
+		staticRegionAnalyzer.transform(network);
 	}
 
 }

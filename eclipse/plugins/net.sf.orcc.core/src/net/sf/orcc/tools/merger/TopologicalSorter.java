@@ -53,45 +53,6 @@ import org.jgrapht.alg.CycleDetector;
  */
 public class TopologicalSorter {
 
-	private static class TimeStamp {
-
-		static int currentTime = 0;
-		private int finish;
-		private int start;
-
-		public TimeStamp(int discovered, int finished) {
-			this.start = discovered;
-			this.finish = finished;
-		}
-
-		public int getFinished() {
-			return finish;
-		}
-
-		@SuppressWarnings("unused")
-		public int getStarted() {
-			return start;
-		}
-
-		public void setFinished(int finished) {
-			this.finish = finished;
-		}
-	};
-	
-	private class TimeStampComparator implements Comparator<Vertex> {
-
-		private Map<Vertex, TimeStamp> map;
-
-		public TimeStampComparator(Map<Vertex, TimeStamp> map) {
-			this.map = map;
-		}
-
-		public int compare(Vertex v1, Vertex v2) {
-			return map.get(v2).getFinished() - map.get(v1).getFinished();
-		}
-
-	};
-	
 	private class DFS {
 		
 		private Set<Vertex> defined = new HashSet<Vertex>();
@@ -136,6 +97,45 @@ public class TopologicalSorter {
 
 	};
 	
+	private static class TimeStamp {
+
+		static int currentTime = 0;
+		private int finish;
+		private int start;
+
+		public TimeStamp(int discovered, int finished) {
+			this.start = discovered;
+			this.finish = finished;
+		}
+
+		public int getFinished() {
+			return finish;
+		}
+
+		@SuppressWarnings("unused")
+		public int getStarted() {
+			return start;
+		}
+
+		public void setFinished(int finished) {
+			this.finish = finished;
+		}
+	};
+	
+	private class TimeStampComparator implements Comparator<Vertex> {
+
+		private Map<Vertex, TimeStamp> map;
+
+		public TimeStampComparator(Map<Vertex, TimeStamp> map) {
+			this.map = map;
+		}
+
+		public int compare(Vertex v1, Vertex v2) {
+			return map.get(v2).getFinished() - map.get(v1).getFinished();
+		}
+
+	};
+	
 	private DirectedGraph<Vertex, Connection> graph;
 
 	public TopologicalSorter(DirectedGraph<Vertex, Connection> graph) {
@@ -150,5 +150,4 @@ public class TopologicalSorter {
 	public List<Vertex> topologicalSort() throws OrccException {
 		return new DFS(graph).orderedByFinishingTime();
 	}
-
 }

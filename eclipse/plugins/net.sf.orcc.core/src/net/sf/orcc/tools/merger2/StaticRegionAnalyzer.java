@@ -32,11 +32,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.transformations.INetworkTransformation;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
-import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 /**
  * This class transform a StaticDirectedGraph into Static Region of network.
@@ -45,24 +48,29 @@ import org.jgrapht.graph.DefaultEdge;
  * @author Jérôme Gorin
  * 
  */
-public class StaticRegionAnalyzer {
+public class StaticRegionAnalyzer implements INetworkTransformation {
 
-	private DirectedGraph<Vertex, DefaultEdge> staticGraph;
+	private Network network;
 
-	public StaticRegionAnalyzer(StaticDirectedGraph graph) {
-		staticGraph = graph.getStaticGraph();
+	private DirectedGraph<Vertex, DefaultWeightedEdge> staticGraph;
+
+	List<StaticRegion> staticRegions;
+
+	public StaticRegionAnalyzer(DirectedGraph<Vertex, DefaultWeightedEdge> directedGraph) {
+		staticGraph = directedGraph;
+		staticRegions = new ArrayList<StaticRegion>();
 	}
 
-	public List<StaticRegion> getStaticRegions() {
-		List<StaticRegion> staticRegions = new ArrayList<StaticRegion>();
+	private void detectStaticRegions() {
 
-		ConnectivityInspector<Vertex, DefaultEdge> inspector = new ConnectivityInspector<Vertex, DefaultEdge>(
+		ConnectivityInspector<Vertex, DefaultWeightedEdge> inspector = new ConnectivityInspector<Vertex, DefaultWeightedEdge>(
 				staticGraph);
 		List<Set<Vertex>> regions = inspector.connectedSets();
 
 		for (Set<Vertex> region : regions) {
 			if (regions.size() > 1) {
-				StaticRegion staticRegion = new StaticRegion(region);
+				StaticRegion staticRegion = new StaticRegion(network,
+						staticGraph, region);
 				if (staticRegion.isValid()) {
 					staticRegions.add(staticRegion);
 				} else {
@@ -71,6 +79,13 @@ public class StaticRegionAnalyzer {
 				}
 			}
 		}
-		return staticRegions;
+	}
+
+	@Override
+	public void transform(Network network) throws OrccException {
+		this.network = network;
+		
+		detectStaticRegions();
+
 	}
 }
