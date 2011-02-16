@@ -114,7 +114,11 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 			splitNodes(new BoolExpr(true), ifNode.getElseNodes().listIterator());
 			addTransition(forkSourceName, joinTargetName, nextAction);
 
-			// add join to original target state
+			// move join node to main list
+			itNode.add(ifNode.getJoinNode());
+			itNode.previous(); // so that next() will return the join node
+			
+			// move all nodes (including join node) to join action
 			splitNodes(new BoolExpr(true), itNode);
 			addTransition(joinTargetName, oldTargetName, nextAction);
 			sourceName = oldTargetName;
