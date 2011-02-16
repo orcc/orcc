@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.c;
 
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 
 import java.io.File;
@@ -168,7 +169,11 @@ public class CBackendImpl extends AbstractBackend {
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new DeadVariableRemoval(false),
 				new RenameTransformation(this.transformations),
-				new PhiRemoval(), new MoveReadsWritesTransformation() };
+				new PhiRemoval(),
+
+				// new MultipleArrayAccessTransformation(),
+
+				new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -194,7 +199,7 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		// until now, printer is default printer
-		printer = new STPrinter();
+		printer = new STPrinter(getAttribute(DEBUG_MODE, true));
 		printer.loadGroup("C_actor");
 		printer.setExpressionPrinter(CExpressionPrinter.class);
 		printer.setTypePrinter(CTypePrinter.class);
