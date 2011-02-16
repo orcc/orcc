@@ -99,10 +99,8 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 			String oldTargetName = targetName;
 
 			// replaces existing transition by a transition to a "fork" state
-			removeTransition(sourceName, currentAction);
-
 			String forkSourceName = sourceName + "_fork";
-			addTransition(sourceName, forkSourceName, currentAction);
+			replaceTarget(sourceName, currentAction, forkSourceName);
 
 			// remove this IfNode from action before "fork"
 			itNode.remove();

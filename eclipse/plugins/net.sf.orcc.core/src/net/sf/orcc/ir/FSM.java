@@ -270,7 +270,7 @@ public class FSM {
 	 *            name of the target state
 	 */
 	public void addTransition(String source, Action action, String target) {
-		State tgtState = states.get(target);
+		State tgtState = addState(target);
 
 		Transition transition = transitions.get(source);
 		List<NextStateInfo> nextState = transition.getNextStateInfo();
@@ -398,7 +398,7 @@ public class FSM {
 			NextStateInfo info = it.next();
 			if (info.getAction() == action) {
 				// updates target state of this transition
-				info.targetState = states.get(newTargetName);
+				info.targetState = addState(newTargetName);
 			}
 		}
 	}

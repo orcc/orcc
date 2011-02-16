@@ -292,17 +292,42 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 	 * Removes the transition <code>source</code> -&gt; <code>target</code> with
 	 * the given action.
 	 * 
+	 * @param source
+	 *            name of source state
 	 * @param action
 	 *            an action
 	 */
-	final public void removeTransition(String sourceName, Action action) {
+	final public void removeTransition(String source, Action action) {
 		// add an FSM if the actor does not have one
 		if (fsm == null) {
 			addFsm();
 		}
 
 		// remove transition
-		fsm.removeTransition(sourceName, action);
+		fsm.removeTransition(source, action);
+	}
+
+	/**
+	 * Replaces the target of the transition from the state whose name is given
+	 * by <code>source</code> and whose action equals to the given action by a
+	 * target state with the given name.
+	 * 
+	 * @param source
+	 *            name of source state
+	 * @param action
+	 *            action associated with the transition
+	 * @param newTargetName
+	 *            name of the new target state
+	 */
+	final public void replaceTarget(String source, Action action,
+			String newTargetName) {
+		// add an FSM if the actor does not have one
+		if (fsm == null) {
+			addFsm();
+		}
+
+		// remove transition
+		fsm.replaceTarget(source, action, newTargetName);
 	}
 
 	@Override
