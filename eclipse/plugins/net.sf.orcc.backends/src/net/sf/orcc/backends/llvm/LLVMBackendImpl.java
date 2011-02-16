@@ -144,6 +144,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 		// transforms and prints actors
 		transformActors(actors);
 		printActors(actors);
+		
+		if (isCanceled()) {
+			return;
+		}
 
 		// Finalize actor generation
 		write("Finalize actors...\n");
