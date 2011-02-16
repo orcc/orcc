@@ -312,7 +312,7 @@ public class ActorMerger implements INetworkTransformation {
 		OrderedMap<String, GlobalVariable> stateVars = getStateVariables();
 
 		OrderedMap<String, Procedure> procs = new OrderedMap<String, Procedure>();
-		OrderedMap<String, Variable> parameters = new OrderedMap<String, Variable>();
+		OrderedMap<String, GlobalVariable> parameters = new OrderedMap<String, GlobalVariable>();
 		List<Action> actions = new ArrayList<Action>();
 		List<Action> initializes = new ArrayList<Action>();
 		ActionScheduler sched = new ActionScheduler(actions, null);

@@ -69,7 +69,7 @@ public class Actor implements Comparable<Actor> {
 
 	private OrderedMap<String, Port> outputs;
 
-	private OrderedMap<String, ? extends Variable> parameters;
+	private OrderedMap<String, GlobalVariable> parameters;
 
 	private OrderedMap<String, Procedure> procs;
 
@@ -105,10 +105,9 @@ public class Actor implements Comparable<Actor> {
 	 *            an action scheduler
 	 */
 	public Actor(String name, String file,
-			OrderedMap<String, ? extends Variable> parameters,
+			OrderedMap<String, GlobalVariable> parameters,
 			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
-			boolean nativeFlag,
-			OrderedMap<String, GlobalVariable> stateVars,
+			boolean nativeFlag, OrderedMap<String, GlobalVariable> stateVars,
 			OrderedMap<String, Procedure> procs, List<Action> actions,
 			List<Action> initializes, ActionScheduler scheduler) {
 		this.actions = actions;
@@ -257,7 +256,7 @@ public class Actor implements Comparable<Actor> {
 	 * 
 	 * @return the ordered map of parameters
 	 */
-	public OrderedMap<String, ? extends Variable> getParameters() {
+	public OrderedMap<String, GlobalVariable> getParameters() {
 		return parameters;
 	}
 

@@ -300,8 +300,8 @@ public class IRParser {
 			file = obj.get(KEY_SOURCE_FILE).getAsString();
 			String name = obj.get(KEY_NAME).getAsString();
 
-			OrderedMap<String, Variable> parameters = variables;
-			parseParameters(obj.get(KEY_PARAMETERS).getAsJsonArray());
+			JsonArray array = obj.get(KEY_PARAMETERS).getAsJsonArray();
+			OrderedMap<String, GlobalVariable> parameters = parseGlobalVariables(array);
 			variables = new Scope<String, Variable>(variables, true);
 
 			boolean nativeFlag = obj.get(KEY_NATIVE).getAsBoolean();
@@ -309,8 +309,8 @@ public class IRParser {
 			inputs = parsePorts(obj.get(KEY_INPUTS).getAsJsonArray());
 			outputs = parsePorts(obj.get(KEY_OUTPUTS).getAsJsonArray());
 
-			JsonArray array = obj.get(KEY_STATE_VARS).getAsJsonArray();
-			OrderedMap<String, GlobalVariable> stateVars = parseStateVars(array);
+			array = obj.get(KEY_STATE_VARS).getAsJsonArray();
+			OrderedMap<String, GlobalVariable> stateVars = parseGlobalVariables(array);
 
 			array = obj.get(KEY_PROCEDURES).getAsJsonArray();
 			for (JsonElement element : array) {
@@ -441,6 +441,44 @@ public class IRParser {
 		}
 
 		return fsm;
+	}
+
+	/**
+	 * Parses the given list as a list of global variables. A
+	 * {@link GlobalVariable} is a {@link Variable} with an optional reference
+	 * to a constant that contain the variable's initial value.
+	 * 
+	 * @param list
+	 *            A list of JSON-encoded {@link GlobalVariable}.
+	 * @return A {@link List}&lt;{@link GlobalVariable}&gt;.
+	 */
+	private OrderedMap<String, GlobalVariable> parseGlobalVariables(
+			JsonArray array) throws OrccException {
+		OrderedMap<String, GlobalVariable> stateVars = new OrderedMap<String, GlobalVariable>();
+		for (JsonElement element : array) {
+			JsonArray stateArray = element.getAsJsonArray();
+
+			String name = stateArray.get(0).getAsString();
+			boolean assignable = stateArray.get(1).getAsBoolean();
+
+			Location location = parseLocation(stateArray.get(2)
+					.getAsJsonArray());
+			Type type = parseType(stateArray.get(3));
+
+			Expression init = null;
+			if (!stateArray.get(4).isJsonNull()) {
+				init = parseExpr(stateArray.get(4));
+			}
+
+			GlobalVariable stateVar = new GlobalVariable(location, type, name,
+					assignable, init);
+			stateVars.put(file, location, name, stateVar);
+
+			// register the state variable
+			variables.put(file, location, name, stateVar);
+		}
+
+		return stateVars;
 	}
 
 	/**
@@ -677,6 +715,37 @@ public class IRParser {
 	}
 
 	/**
+	 * Returns a variable definition using objects returned by the given
+	 * iterator.
+	 * 
+	 * @param array
+	 *            an array that contains a variable definition
+	 * @return A {@link LocalVariable}
+	 */
+	private LocalVariable parseLocalVariable(JsonArray array)
+			throws OrccException {
+		String name = array.get(0).getAsString();
+		boolean assignable = array.get(1).getAsBoolean();
+		int index = array.get(2).getAsInt();
+		Location loc = parseLocation(array.get(3).getAsJsonArray());
+		Type type = parseType(array.get(4));
+
+		LocalVariable varDef = new LocalVariable(assignable, index, loc, name,
+				type);
+
+		// register the variable definition
+		variables.put(file, loc, varDef.getName(), varDef);
+
+		return varDef;
+	}
+
+	private void parseLocalVariables(JsonArray array) throws OrccException {
+		for (JsonElement element : array) {
+			parseLocalVariable(element.getAsJsonArray());
+		}
+	}
+
+	/**
 	 * Parses the given JSON array as a Location
 	 * 
 	 * @param array
@@ -800,25 +869,6 @@ public class IRParser {
 		return new WhileNode(loc, procedure, condition, nodes, joinNode);
 	}
 
-	private void parseParameters(JsonArray array) throws OrccException {
-		for (JsonElement element : array) {
-			JsonArray varDefArray = element.getAsJsonArray();
-
-			JsonArray details = varDefArray.get(0).getAsJsonArray();
-			String name = details.get(0).getAsString();
-
-			Location location = parseLocation(varDefArray.get(1)
-					.getAsJsonArray());
-			Type type = parseType(varDefArray.get(2));
-
-			GlobalVariable parameter = new GlobalVariable(location, type, name,
-					false);
-
-			// register the state variable
-			variables.put(file, location, name, parameter);
-		}
-	}
-
 	private Pattern parsePattern(OrderedMap<String, Port> ports, JsonArray array)
 			throws OrccException {
 		Pattern pattern = new Pattern();
@@ -874,10 +924,10 @@ public class IRParser {
 		Type returnType = parseType(array.get(3));
 		variables = new Scope<String, Variable>(variables, true);
 		OrderedMap<String, Variable> parameters = variables;
-		parseVarDefs(array.get(4).getAsJsonArray());
+		parseLocalVariables(array.get(4).getAsJsonArray());
 		variables = new Scope<String, Variable>(variables, false);
 		OrderedMap<String, Variable> locals = variables;
-		parseVarDefs(array.get(5).getAsJsonArray());
+		parseLocalVariables(array.get(5).getAsJsonArray());
 
 		procedure = new Procedure(name, external, location, returnType,
 				parameters, locals, null);
@@ -891,46 +941,6 @@ public class IRParser {
 		AbstractNode.resetLabelCount();
 
 		return procedure;
-	}
-
-	/**
-	 * Parses the given list as a list of state variables. A
-	 * {@link StateVariable} is a {@link LocalVariable} with an optional
-	 * reference to a constant that contain the variable's initial value.
-	 * 
-	 * @param list
-	 *            A list of JSON-encoded {@link LocalVariable}.
-	 * @return A {@link List}&lt;{@link StateVariable}&gt;.
-	 */
-	private OrderedMap<String, GlobalVariable> parseStateVars(JsonArray array)
-			throws OrccException {
-		OrderedMap<String, GlobalVariable> stateVars = new OrderedMap<String, GlobalVariable>();
-		for (JsonElement element : array) {
-			JsonArray stateArray = element.getAsJsonArray();
-
-			JsonArray varDefArray = stateArray.get(0).getAsJsonArray();
-			JsonArray details = varDefArray.get(0).getAsJsonArray();
-			String name = details.get(0).getAsString();
-			boolean assignable = details.get(1).getAsBoolean();
-
-			Location location = parseLocation(varDefArray.get(1)
-					.getAsJsonArray());
-			Type type = parseType(varDefArray.get(2));
-
-			Expression init = null;
-			if (!stateArray.get(1).isJsonNull()) {
-				init = parseExpr(stateArray.get(1));
-			}
-
-			GlobalVariable stateVar = new GlobalVariable(location, type, name,
-					assignable, init);
-			stateVars.put(file, location, name, stateVar);
-
-			// register the state variable
-			variables.put(file, location, name, stateVar);
-		}
-
-		return stateVars;
 	}
 
 	/**
@@ -974,38 +984,6 @@ public class IRParser {
 		}
 
 		throw new OrccException("Invalid type definition: " + element);
-	}
-
-	/**
-	 * Returns a variable definition using objects returned by the given
-	 * iterator.
-	 * 
-	 * @param array
-	 *            an array that contains a variable definition
-	 * @return A {@link LocalVariable}
-	 */
-	private LocalVariable parseVarDef(JsonArray array) throws OrccException {
-		JsonArray details = array.get(0).getAsJsonArray();
-		String name = details.get(0).getAsString();
-		boolean assignable = details.get(1).getAsBoolean();
-		int index = details.get(2).getAsInt();
-
-		Location loc = parseLocation(array.get(1).getAsJsonArray());
-		Type type = parseType(array.get(2));
-
-		LocalVariable varDef = new LocalVariable(assignable, index, loc, name,
-				type);
-
-		// register the variable definition
-		variables.put(file, loc, varDef.getName(), varDef);
-
-		return varDef;
-	}
-
-	private void parseVarDefs(JsonArray array) throws OrccException {
-		for (JsonElement element : array) {
-			parseVarDef(element.getAsJsonArray());
-		}
 	}
 
 	private Use parseVarUse(JsonArray array) throws OrccException {

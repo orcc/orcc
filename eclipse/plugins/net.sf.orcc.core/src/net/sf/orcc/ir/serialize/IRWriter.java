@@ -734,11 +734,11 @@ public class IRWriter {
 
 		obj.addProperty(KEY_SOURCE_FILE, actor.getFile());
 		obj.addProperty(KEY_NAME, actor.getName());
-		obj.add(KEY_PARAMETERS, writeParameters(actor.getParameters()));
+		obj.add(KEY_PARAMETERS, writeGlobalVariables(actor.getParameters()));
 		obj.add(KEY_INPUTS, writePorts(actor.getInputs()));
 		obj.add(KEY_OUTPUTS, writePorts(actor.getOutputs()));
 		obj.addProperty(KEY_NATIVE, actor.isNative());
-		obj.add(KEY_STATE_VARS, writeStateVariables(actor.getStateVars()));
+		obj.add(KEY_STATE_VARS, writeGlobalVariables(actor.getStateVars()));
 		obj.add(KEY_PROCEDURES, writeProcedures(actor.getProcs()));
 
 		obj.add(KEY_ACTIONS, writeActions(actor.getActions()));
@@ -792,6 +792,32 @@ public class IRWriter {
 	}
 
 	/**
+	 * Serializes the given global variable declaration to JSON.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return
+	 */
+	private JsonArray writeGlobalVariable(GlobalVariable variable) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(variable.getName()));
+		array.add(new JsonPrimitive(variable.isAssignable()));
+		array.add(writeLocation(variable.getLocation()));
+		array.add(writeType(variable.getType()));
+
+		Expression constant = variable.getInitialValue();
+		if (constant == null) {
+			array.add(null);
+		} else {
+			JsonElement constantValue = writeExpression(constant);
+			array.add(constantValue);
+		}
+
+		return array;
+	}
+
+	/**
 	 * Serializes the given variable declaration to JSON.
 	 * 
 	 * @param variable
@@ -801,12 +827,9 @@ public class IRWriter {
 	private JsonArray writeLocalVariable(LocalVariable variable) {
 		JsonArray array = new JsonArray();
 
-		JsonArray details = new JsonArray();
-		array.add(details);
-		details.add(new JsonPrimitive(variable.getBaseName()));
-		details.add(new JsonPrimitive(variable.isAssignable()));
-		details.add(new JsonPrimitive(variable.getIndex()));
-
+		array.add(new JsonPrimitive(variable.getBaseName()));
+		array.add(new JsonPrimitive(variable.isAssignable()));
+		array.add(new JsonPrimitive(variable.getIndex()));
 		array.add(writeLocation(variable.getLocation()));
 		array.add(writeType(variable.getType()));
 
@@ -824,44 +847,6 @@ public class IRWriter {
 		JsonArray array = new JsonArray();
 		for (Variable variable : variables) {
 			array.add(writeLocalVariable((LocalVariable) variable));
-		}
-		return array;
-	}
-
-	/**
-	 * Serializes the given variable declaration to JSON.
-	 * 
-	 * @param variable
-	 *            a variable
-	 * @return
-	 */
-	private JsonArray writeParameter(GlobalVariable variable) {
-		JsonArray variableArray = new JsonArray();
-
-		JsonArray details = new JsonArray();
-		variableArray.add(details);
-
-		details.add(new JsonPrimitive(variable.getName()));
-		details.add(new JsonPrimitive(variable.isAssignable()));
-
-		variableArray.add(writeLocation(variable.getLocation()));
-		variableArray.add(writeType(variable.getType()));
-
-		return variableArray;
-	}
-
-	/**
-	 * Writes the given ordered map of state variables.
-	 * 
-	 * @param variables
-	 *            an ordered map of variables
-	 * @return a JSON array
-	 */
-	private JsonArray writeParameters(
-			OrderedMap<String, ? extends Variable> variables) {
-		JsonArray array = new JsonArray();
-		for (Variable variable : variables) {
-			array.add(writeParameter((GlobalVariable) variable));
 		}
 		return array;
 	}
@@ -927,51 +912,17 @@ public class IRWriter {
 	}
 
 	/**
-	 * Serializes the given variable declaration to JSON.
-	 * 
-	 * @param variable
-	 *            a variable
-	 * @return
-	 */
-	private JsonArray writeStateVariable(GlobalVariable variable) {
-		JsonArray array = new JsonArray();
-
-		// variable
-		JsonArray variableArray = new JsonArray();
-		array.add(variableArray);
-
-		JsonArray details = new JsonArray();
-		variableArray.add(details);
-
-		details.add(new JsonPrimitive(variable.getName()));
-		details.add(new JsonPrimitive(variable.isAssignable()));
-
-		variableArray.add(writeLocation(variable.getLocation()));
-		variableArray.add(writeType(variable.getType()));
-
-		Expression constant = variable.getInitialValue();
-		if (constant == null) {
-			array.add(null);
-		} else {
-			JsonElement constantValue = writeExpression(constant);
-			array.add(constantValue);
-		}
-
-		return array;
-	}
-
-	/**
-	 * Writes the given ordered map of state variables.
+	 * Writes the given ordered map of global variables.
 	 * 
 	 * @param variables
-	 *            an ordered map of variables
+	 *            an ordered map of global variables
 	 * @return a JSON array
 	 */
-	private JsonArray writeStateVariables(
+	private JsonArray writeGlobalVariables(
 			OrderedMap<String, GlobalVariable> variables) {
 		JsonArray array = new JsonArray();
 		for (GlobalVariable variable : variables) {
-			array.add(writeStateVariable(variable));
+			array.add(writeGlobalVariable(variable));
 		}
 		return array;
 	}
