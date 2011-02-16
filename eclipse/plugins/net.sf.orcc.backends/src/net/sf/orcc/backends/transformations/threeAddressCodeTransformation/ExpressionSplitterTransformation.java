@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -58,7 +59,6 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * Split expression and effective node that contains more than one fundamental
@@ -69,7 +69,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * 
  */
 public class ExpressionSplitterTransformation extends
-		AbstractActorTransformation {
+		AbstractActorVisitor {
 
 	private class ExpressionSplitter extends AbstractExpressionInterpreter {
 
@@ -167,9 +167,9 @@ public class ExpressionSplitterTransformation extends
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		this.file = actor.getFile();
-		super.transform(actor);
+		super.visit(actor);
 	}
 
 	@Override

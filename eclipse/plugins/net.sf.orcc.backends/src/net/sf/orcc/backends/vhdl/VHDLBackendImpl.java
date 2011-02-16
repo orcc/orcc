@@ -52,7 +52,7 @@ import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transformations.VariableRedimension;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -97,7 +97,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		evaluateInitializeActions(actor);
 
-		ActorTransformation[] transformationsCodegen = {
+		ActorVisitor[] transformationsCodegen = {
 				new InlineTransformation(true, false),
 
 				// cleanup code
@@ -139,12 +139,12 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new RenameTransformation(adjacentUnderscores, "_") };
 
 		// applies transformations
-		for (ActorTransformation transformation : transformationsCodegen) {
-			transformation.transform(actor);
+		for (ActorVisitor transformation : transformationsCodegen) {
+			transformation.visit(actor);
 		}
 
 		VHDLTemplateData templateData = new VHDLTemplateData();
-		templateData.transform(actor);
+		templateData.visit(actor);
 		actor.setTemplateData(templateData.getVariablesList());
 
 		// remove initialization procedure (we could do better)

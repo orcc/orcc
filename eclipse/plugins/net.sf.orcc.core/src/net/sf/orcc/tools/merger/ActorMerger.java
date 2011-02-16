@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -67,7 +68,6 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -89,7 +89,7 @@ import org.jgrapht.graph.DirectedSubgraph;
  */
 public class ActorMerger implements INetworkTransformation {
 
-	private class ModifyLoadStoreIndexes extends AbstractActorTransformation {
+	private class ModifyLoadStoreIndexes extends AbstractActorVisitor {
 
 		private String id;
 
@@ -102,7 +102,7 @@ public class ActorMerger implements INetworkTransformation {
 		}
 
 		@Override
-		public void transform(Actor actor) {
+		public void visit(Actor actor) {
 			this.actor = actor;
 			for (Procedure proc : actor.getProcs()) {
 				loads = new HashMap<Variable, Integer>();
@@ -243,7 +243,7 @@ public class ActorMerger implements INetworkTransformation {
 						body.getNodes());
 				actor.getProcs().put(proc.getName(), proc);
 			}
-			new ModifyLoadStoreIndexes(id).transform(actor);
+			new ModifyLoadStoreIndexes(id).visit(actor);
 		}
 	}
 
@@ -648,7 +648,7 @@ public class ActorMerger implements INetworkTransformation {
 
 			for (Vertex vertex : vertices) {
 				Actor actor = vertex.getInstance().getActor();
-				new RemoveReadWrites().transform(actor);
+				new RemoveReadWrites().visit(actor);
 			}
 
 			mergeActors(vertices);

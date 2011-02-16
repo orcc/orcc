@@ -30,6 +30,7 @@ package net.sf.orcc.ir.transformations;
 
 import java.util.List;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Procedure;
@@ -45,7 +46,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * @author Jerome Gorin
  * 
  */
-public class BuildCFG extends AbstractActorTransformation {
+public class BuildCFG extends AbstractActorVisitor {
 
 	/**
 	 * This class defines a CFG builder.

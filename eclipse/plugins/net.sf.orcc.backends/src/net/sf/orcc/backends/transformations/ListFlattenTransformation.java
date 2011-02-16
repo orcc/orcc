@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.backends.instructions.AssignIndex;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
@@ -48,7 +49,6 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines an actor transformation that transforms declarations and
@@ -60,7 +60,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Herve Yviquel
  * 
  */
-public class ListFlattenTransformation extends AbstractActorTransformation {
+public class ListFlattenTransformation extends AbstractActorVisitor {
 
 	private boolean applyToLocalLists;
 	private boolean applyToDeclarations;
@@ -176,7 +176,7 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		if (applyToDeclarations) {
 			// VHDL synthesizers don't support multi-dimensional memory yet
 			for (GlobalVariable variable : actor.getStateVars()) {
@@ -188,7 +188,7 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 			}
 		}
 
-		super.transform(actor);
+		super.visit(actor);
 	}
 
 	@Override

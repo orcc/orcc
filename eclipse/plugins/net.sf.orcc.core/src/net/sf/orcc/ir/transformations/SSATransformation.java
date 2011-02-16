@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -63,7 +64,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * @author Matthieu Wipliez
  * 
  */
-public class SSATransformation extends AbstractActorTransformation {
+public class SSATransformation extends AbstractActorVisitor {
 
 	/**
 	 * This class replaces uses of a given variables by another variable

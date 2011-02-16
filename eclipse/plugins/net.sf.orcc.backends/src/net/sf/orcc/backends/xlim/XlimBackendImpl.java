@@ -51,7 +51,7 @@ import net.sf.orcc.backends.xlim.transformations.TernaryOperationAdder;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimInlineTransformation;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
@@ -86,7 +86,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = {
+		ActorVisitor[] transformations = {
 				new ArrayInitializeTransformation(),
 				new TernaryOperationAdder(),
 				new XlimInlineTransformation(true, true),
@@ -99,8 +99,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new ConstantPhiValuesTransformation(),
 				new MoveLiteralIntegers(), new VariableRenamer() };
 
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
+		for (ActorVisitor transformation : transformations) {
+			transformation.visit(actor);
 		}
 
 	}

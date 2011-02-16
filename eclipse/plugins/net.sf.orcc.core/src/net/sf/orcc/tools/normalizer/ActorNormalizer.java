@@ -29,7 +29,7 @@
 package net.sf.orcc.tools.normalizer;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.moc.MoC;
 
 /**
@@ -40,7 +40,7 @@ import net.sf.orcc.moc.MoC;
  * @author Jerome Gorin
  * 
  */
-public class ActorNormalizer implements ActorTransformation {
+public class ActorNormalizer implements ActorVisitor {
 
 	/**
 	 * Creates a new normalizer
@@ -49,7 +49,7 @@ public class ActorNormalizer implements ActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		MoC clasz = actor.getMoC();
 		if (clasz.isCSDF()) {
 			new StaticActorNormalizer(actor).normalize();

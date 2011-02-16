@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
@@ -55,7 +56,6 @@ import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -66,7 +66,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Jerome GORIN
  * 
  */
-public class CopyPropagationTransformation extends AbstractActorTransformation {
+public class CopyPropagationTransformation extends AbstractActorVisitor {
 
 	private class ExpressionCopy extends AbstractExpressionInterpreter {
 

@@ -240,8 +240,8 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 	private boolean conditionalPhase;
 
 	@Override
-	public void transform(Actor actor) {
-		super.transform(actor);
+	public void visit(Actor actor) {
+		super.visit(actor);
 
 		// first we split conditional branches that contain multiple accesses
 		conditionalPhase = true;

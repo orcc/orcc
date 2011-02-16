@@ -37,6 +37,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM.State;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -51,7 +52,6 @@ import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.util.UniqueEdge;
 
@@ -68,7 +68,7 @@ import org.jgrapht.DirectedGraph;
  * @author Matthieu Wipliez
  * 
  */
-public class SDFActionsMerger extends AbstractActorTransformation {
+public class SDFActionsMerger extends AbstractActorVisitor {
 
 	private Actor actor;
 
@@ -247,7 +247,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 //		this.actor = actor;
 //		this.file = actor.getFile();
 //

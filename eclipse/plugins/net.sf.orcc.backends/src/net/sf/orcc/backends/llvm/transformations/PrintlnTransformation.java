@@ -31,6 +31,7 @@ package net.sf.orcc.backends.llvm.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -45,7 +46,6 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -56,7 +56,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Jerome GORIN
  * 
  */
-public class PrintlnTransformation extends AbstractActorTransformation {
+public class PrintlnTransformation extends AbstractActorVisitor {
 
 	/**
 	 * Change characters in strings to fit LLVM constraints
@@ -110,7 +110,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 	private int strCnt;
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		strCnt = 0;
 		stateVars = actor.getStateVars();
 		OrderedMap<String, Procedure> procs = actor.getProcs();

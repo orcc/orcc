@@ -327,10 +327,10 @@ public class StaticActorNormalizer {
 		addStateVariables(procedure, staticCls.getOutputPattern());
 
 		// change accesses to FIFO
-		new ChangeFifoArrayAccess().transform(actor);
+		new ChangeFifoArrayAccess().visit(actor);
 
 		// removes read/writes
-		new RemoveReadWrites().transform(actor);
+		new RemoveReadWrites().visit(actor);
 
 		// add read instructions for input pattern
 		createReads(procedure);

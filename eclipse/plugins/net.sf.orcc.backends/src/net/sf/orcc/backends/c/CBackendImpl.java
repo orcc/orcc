@@ -46,7 +46,7 @@ import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -160,13 +160,13 @@ public class CBackendImpl extends AbstractBackend {
 				false);
 
 		if (classify) {
-			new ActorClassifier().transform(actor);
+			new ActorClassifier().visit(actor);
 			if (normalize) {
-				new ActorNormalizer().transform(actor);
+				new ActorNormalizer().visit(actor);
 			}
 		}
 
-		ActorTransformation[] transformations = { new TypeSizeTransformation(),
+		ActorVisitor[] transformations = { new TypeSizeTransformation(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new DeadVariableRemoval(false),
 				new RenameTransformation(this.transformations),
@@ -176,8 +176,8 @@ public class CBackendImpl extends AbstractBackend {
 
 				new MoveReadsWritesTransformation() };
 
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
+		for (ActorVisitor transformation : transformations) {
+			transformation.visit(actor);
 		}
 
 		CTemplateData data = new CTemplateData();

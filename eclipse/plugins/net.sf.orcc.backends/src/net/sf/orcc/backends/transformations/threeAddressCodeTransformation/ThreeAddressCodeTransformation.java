@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.transformations.BuildCFG;
 
 /**
@@ -52,16 +52,16 @@ import net.sf.orcc.ir.transformations.BuildCFG;
  * @author Jerome GORIN
  * 
  */
-public class ThreeAddressCodeTransformation extends AbstractActorTransformation {
+public class ThreeAddressCodeTransformation extends AbstractActorVisitor {
 	@Override
-	public void transform(Actor actor) {
-		ActorTransformation[] transformations = {
+	public void visit(Actor actor) {
+		ActorVisitor[] transformations = {
 				new CopyPropagationTransformation(),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(false) };
 
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
+		for (ActorVisitor transformation : transformations) {
+			transformation.visit(actor);
 		}
 	}
 

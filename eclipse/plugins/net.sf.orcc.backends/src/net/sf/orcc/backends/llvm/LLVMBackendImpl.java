@@ -52,7 +52,7 @@ import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.tools.classifier.ActorClassifier;
@@ -109,21 +109,21 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		if (classify) {
-			new ActorClassifier().transform(actor);
+			new ActorClassifier().visit(actor);
 
 			if (normalize) {
-				new ActorNormalizer().transform(actor);
+				new ActorNormalizer().visit(actor);
 			}
 		}
 
-		ActorTransformation[] transformations = { new TypeSizeTransformation(),
+		ActorVisitor[] transformations = { new TypeSizeTransformation(),
 				new BoolToIntTransformation(), new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
 				new ThreeAddressCodeTransformation(),
 				new MoveReadsWritesTransformation(), new AddGEPTransformation() };
 
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
+		for (ActorVisitor transformation : transformations) {
+			transformation.visit(actor);
 		}
 
 		// Organize medata information for the current actor

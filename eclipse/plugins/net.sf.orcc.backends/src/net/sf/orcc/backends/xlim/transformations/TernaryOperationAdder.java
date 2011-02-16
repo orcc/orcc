@@ -31,6 +31,7 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.ListIterator;
 
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -43,7 +44,6 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * 
@@ -53,13 +53,13 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Herve Yviquel
  * 
  */
-public class TernaryOperationAdder extends AbstractActorTransformation {
+public class TernaryOperationAdder extends AbstractActorVisitor {
 
 	private BlockNode newBlockNode;
 	private LocalVariable condVar;
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			if (!proc.getReturnType().isVoid()) {
 				newBlockNode = new BlockNode(proc);

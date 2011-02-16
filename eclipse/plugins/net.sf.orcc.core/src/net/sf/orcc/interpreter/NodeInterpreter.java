@@ -34,6 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -58,7 +59,6 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;
@@ -71,7 +71,7 @@ import net.sf.orcc.util.OrccUtil;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class NodeInterpreter extends AbstractActorTransformation {
+public class NodeInterpreter extends AbstractActorVisitor {
 
 	private boolean blockReturn;
 

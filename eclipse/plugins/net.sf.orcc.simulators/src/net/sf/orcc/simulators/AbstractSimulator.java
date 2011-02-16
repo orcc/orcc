@@ -53,7 +53,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
@@ -514,12 +514,12 @@ public abstract class AbstractSimulator implements Simulator {
 					InputStream in = new FileInputStream(instance.getFile());
 					Actor actorIR = new IRParser().parseActor(in);
 					// Apply some simplification transformations
-					ActorTransformation[] transformations = {
+					ActorVisitor[] transformations = {
 							new DeadGlobalElimination(),
 							new DeadCodeElimination(),
 							new DeadVariableRemoval(false) };
-					for (ActorTransformation transformation : transformations) {
-						transformation.transform(actorIR);
+					for (ActorVisitor transformation : transformations) {
+						transformation.visit(actorIR);
 					}
 
 					simuActorInstance = createSimuActorInstance(

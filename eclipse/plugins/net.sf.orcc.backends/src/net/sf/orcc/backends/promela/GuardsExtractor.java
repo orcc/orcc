@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -46,14 +47,13 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * 
  * @author Ghislain Roquier
  * 
  */
-public class GuardsExtractor extends AbstractActorTransformation {
+public class GuardsExtractor extends AbstractActorVisitor {
 
 	private Action currAction;
 
@@ -145,7 +145,7 @@ public class GuardsExtractor extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		for (Action action : actor.getActions()) {
 			currAction = action;
 			guardList = new ArrayList<Expression>();

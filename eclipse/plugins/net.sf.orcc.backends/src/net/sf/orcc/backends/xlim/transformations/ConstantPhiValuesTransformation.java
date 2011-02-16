@@ -31,6 +31,7 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.List;
 
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Variable;
@@ -39,7 +40,6 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -51,7 +51,7 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class ConstantPhiValuesTransformation extends
-		AbstractActorTransformation {
+		AbstractActorVisitor {
 
 	@Override
 	public void visit(PhiAssignment phi) {

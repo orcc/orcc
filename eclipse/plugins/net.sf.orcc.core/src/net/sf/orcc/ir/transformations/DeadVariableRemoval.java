@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
@@ -52,7 +53,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadVariableRemoval extends AbstractActorTransformation {
+public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	protected boolean changed;
 	private boolean keepTokenSwallowerVariable;

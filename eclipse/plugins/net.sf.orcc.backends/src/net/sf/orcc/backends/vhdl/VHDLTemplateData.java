@@ -33,12 +33,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines a map that returns, for each action, the variables that
@@ -48,7 +48,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Nicolas Siret
  * 
  */
-public class VHDLTemplateData extends AbstractActorTransformation {
+public class VHDLTemplateData extends AbstractActorVisitor {
 
 	private Set<String> strings;
 
@@ -66,7 +66,7 @@ public class VHDLTemplateData extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		for (Action action : actor.getActions()) {
 			visit(action.getScheduler());
 		}

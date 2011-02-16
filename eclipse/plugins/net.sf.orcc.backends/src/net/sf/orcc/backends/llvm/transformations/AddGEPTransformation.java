@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.backends.llvm.instructions.GEP;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -43,7 +44,6 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * Add GetElementPtr instructions in actor IR.
@@ -52,7 +52,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Jerome Gorin
  * 
  */
-public class AddGEPTransformation extends AbstractActorTransformation {
+public class AddGEPTransformation extends AbstractActorVisitor {
 
 	private String file;
 
@@ -77,9 +77,9 @@ public class AddGEPTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		this.file = actor.getFile();
-		super.transform(actor);
+		super.visit(actor);
 	}
 
 	@Override

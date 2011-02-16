@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.backends.xlim.instructions.CustomPeek;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -46,7 +47,6 @@ import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * 
@@ -56,9 +56,9 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Herve Yviquel
  * 
  */
-public class CustomPeekAdder extends AbstractActorTransformation {
+public class CustomPeekAdder extends AbstractActorVisitor {
 
-	private class NeededPeekFinder extends AbstractActorTransformation {
+	private class NeededPeekFinder extends AbstractActorVisitor {
 
 		private List<CustomPeek> neededPeeks;
 		private Peek originalPeek;
@@ -82,7 +82,7 @@ public class CustomPeekAdder extends AbstractActorTransformation {
 		}
 	}
 
-	private class VariableReplacer extends AbstractActorTransformation {
+	private class VariableReplacer extends AbstractActorVisitor {
 		private Variable addedVariable;
 		private Variable removedVariable;
 
@@ -115,7 +115,7 @@ public class CustomPeekAdder extends AbstractActorTransformation {
 	private List<Load> unusedLoads;
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		this.actor = actor;
 
 		itAction = actor.getActions().listIterator();

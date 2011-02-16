@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
@@ -44,7 +45,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadGlobalElimination extends AbstractActorTransformation {
+public class DeadGlobalElimination extends AbstractActorVisitor {
 
 	/**
 	 * Removes the given instructions that store to an unused state variable.
@@ -66,7 +67,7 @@ public class DeadGlobalElimination extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		OrderedMap<String, GlobalVariable> stateVariables = actor.getStateVars();
 		Iterator<GlobalVariable> it = stateVariables.iterator();
 		while (it.hasNext()) {

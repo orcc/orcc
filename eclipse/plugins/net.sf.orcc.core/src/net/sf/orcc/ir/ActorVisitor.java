@@ -28,24 +28,20 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.OrccException;
-
 /**
- * This interface defines how a transformation can be applied on an actor.
+ * This interface defines a visitor for an actor.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface ActorTransformation {
+public interface ActorVisitor {
 
 	/**
-	 * Transforms the given actor in-place.
+	 * Visits the given actor.
 	 * 
 	 * @param actor
 	 *            an actor
-	 * @throws OrccException
-	 *             if the transformation fails
 	 */
-	public void transform(Actor actor);
+	public void visit(Actor actor);
 
 }

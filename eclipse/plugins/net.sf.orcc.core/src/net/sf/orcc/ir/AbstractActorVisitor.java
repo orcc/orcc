@@ -26,17 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.transformations;
+package net.sf.orcc.ir;
 
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
@@ -54,14 +48,14 @@ import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
- * This abstract class implements an no-op transformation on an actor. This
- * class should be extended by classes that implement actor transformations.
+ * This abstract class implements a no-op visitor on an actor. This class should
+ * be extended by classes that implement actor visitors and transformations.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractActorTransformation implements NodeVisitor,
-		InstructionVisitor, ActorTransformation {
+public abstract class AbstractActorVisitor implements NodeVisitor,
+		InstructionVisitor, ActorVisitor {
 
 	protected Actor actor;
 
@@ -73,8 +67,19 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 
 	protected Procedure procedure;
 
+	/**
+	 * Visits the given action.
+	 * 
+	 * @param action
+	 *            an action
+	 */
+	public void visit(Action action) {
+		visit(action.getBody());
+		visit(action.getScheduler());
+	}
+
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		this.actor = actor;
 
 		for (Procedure proc : actor.getProcs()) {
@@ -92,17 +97,6 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 			Action action = itAction.next();
 			visit(action);
 		}
-	}
-
-	/**
-	 * Visits the given action.
-	 * 
-	 * @param action
-	 *            an action
-	 */
-	public void visit(Action action) {
-		visit(action.getBody());
-		visit(action.getScheduler());
 	}
 
 	@Override

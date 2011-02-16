@@ -39,7 +39,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -128,15 +128,15 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
-			new ActorClassifier().transform(actor);
+			new ActorClassifier().visit(actor);
 		}
 
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+		ActorVisitor[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(false),
 				new PhiRemoval() };
 
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
+		for (ActorVisitor transformation : transformations) {
+			transformation.visit(actor);
 		}
 	}
 

@@ -14,6 +14,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
@@ -27,7 +28,6 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -40,7 +40,7 @@ import org.jgrapht.DirectedGraph;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class ActionSplitter extends AbstractActorTransformation {
+public abstract class ActionSplitter extends AbstractActorVisitor {
 
 	/**
 	 * This class contains an abstract branch visitor.
@@ -48,7 +48,7 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	protected class AbstractBranchVisitor extends AbstractActorTransformation {
+	protected class AbstractBranchVisitor extends AbstractActorVisitor {
 
 		/**
 		 * name of the branch being visited
@@ -206,7 +206,7 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	protected class CodeMover extends AbstractActorTransformation {
+	protected class CodeMover extends AbstractActorVisitor {
 
 		public CodeMover() {
 		}
@@ -331,7 +331,7 @@ public abstract class ActionSplitter extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		this.actor = actor;
 		stateNames = new HashMap<String, Integer>();
 	}

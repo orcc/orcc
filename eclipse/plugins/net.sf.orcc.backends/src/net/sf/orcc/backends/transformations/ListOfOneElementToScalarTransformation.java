@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.transformations;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
@@ -40,7 +41,6 @@ import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines an actor transformation that replace list of one element
@@ -50,7 +50,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * 
  */
 public class ListOfOneElementToScalarTransformation extends
-		AbstractActorTransformation {
+		AbstractActorVisitor {
 
 	@Override
 	public void visit(Read read) {

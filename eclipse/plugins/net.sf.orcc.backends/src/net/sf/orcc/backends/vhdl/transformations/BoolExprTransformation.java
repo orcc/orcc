@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -48,7 +49,6 @@ import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines an actor transformation that transforms assignments whose
@@ -75,7 +75,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Nicolas Siret
  * 
  */
-public class BoolExprTransformation extends AbstractActorTransformation {
+public class BoolExprTransformation extends AbstractActorVisitor {
 
 	private int tempVarCount;
 

@@ -30,12 +30,12 @@ package net.sf.orcc.tools.transformations;
 
 import java.util.Iterator;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -44,7 +44,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class RemoveReadWrites extends AbstractActorTransformation {
+public class RemoveReadWrites extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Procedure procedure) {

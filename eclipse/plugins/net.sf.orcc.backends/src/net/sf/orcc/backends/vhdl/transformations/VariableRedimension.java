@@ -30,12 +30,12 @@ package net.sf.orcc.backends.vhdl.transformations;
 
 import java.util.List;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines an actor transformation that modify the dimension of size
@@ -44,7 +44,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Nicolas Siret
  * 
  */
-public class VariableRedimension extends AbstractActorTransformation {
+public class VariableRedimension extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Procedure procedure) {

@@ -80,7 +80,7 @@ public class Frontend {
 	public void compile(String file, AstActor astActor) throws OrccException {
 		try {
 			Actor actor = actorTransformer.transform(file, astActor);
-			new SSATransformation().transform(actor);
+			new SSATransformation().visit(actor);
 			new IRWriter(actor).write(outputFolder.toString(), prettyPrint);
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();

@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.transformations;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -40,7 +41,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * @author Matthieu Wipliez
  * 
  */
-public class BlockCombine extends AbstractActorTransformation {
+public class BlockCombine extends AbstractActorVisitor {
 
 	private BlockNode previous;
 

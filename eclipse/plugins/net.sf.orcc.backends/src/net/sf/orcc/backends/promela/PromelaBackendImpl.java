@@ -39,7 +39,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -74,13 +74,13 @@ public class PromelaBackendImpl extends AbstractBackend {
 	
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { 
+		ActorVisitor[] transformations = { 
 				new GuardsExtractor(guards, peeks, loads), new PhiRemoval(),
 				new DeadCodeElimination(),
 				new DeadVariableRemoval(false)};
 
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
+		for (ActorVisitor transformation : transformations) {
+			transformation.visit(actor);
 		}
 	}
 

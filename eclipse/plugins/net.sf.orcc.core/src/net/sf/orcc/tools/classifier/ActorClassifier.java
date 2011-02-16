@@ -36,7 +36,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
@@ -68,7 +68,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
  * @author Matthieu Wipliez
  * 
  */
-public class ActorClassifier implements ActorTransformation {
+public class ActorClassifier implements ActorVisitor {
 
 	private Actor actor;
 
@@ -117,7 +117,7 @@ public class ActorClassifier implements ActorTransformation {
 			showMarker();
 		} else {
 			// merges actions with the same input/output pattern together
-			new SDFActionsMerger().transform(actor);
+			new SDFActionsMerger().visit(actor);
 
 			// first tries SDF with *all* the actions of the actor
 			moc = classifySDF(actions);
@@ -405,7 +405,7 @@ public class ActorClassifier implements ActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		this.actor = actor;
 		classify();
 		actor = null;

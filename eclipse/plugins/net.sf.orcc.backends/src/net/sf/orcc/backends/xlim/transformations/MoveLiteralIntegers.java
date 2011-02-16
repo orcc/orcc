@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -54,7 +55,6 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * 
@@ -66,7 +66,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Herve Yviquel
  * 
  */
-public class MoveLiteralIntegers extends AbstractActorTransformation {
+public class MoveLiteralIntegers extends AbstractActorVisitor {
 
 	private ExpressionInterpreter exprInterpreter = new AbstractExpressionInterpreter() {
 
@@ -127,9 +127,9 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	private String file;
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		this.file = actor.getFile();
-		super.transform(actor);
+		super.visit(actor);
 	}
 
 	@Override

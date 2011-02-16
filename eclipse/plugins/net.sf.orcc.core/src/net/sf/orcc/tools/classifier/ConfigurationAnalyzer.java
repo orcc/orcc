@@ -38,6 +38,7 @@ import java.util.Set;
 import jp.ac.kobe_u.cs.cream.DefaultSolver;
 import jp.ac.kobe_u.cs.cream.IntVariable;
 import jp.ac.kobe_u.cs.cream.Solution;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -50,7 +51,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.nodes.NodeVisitor;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines a configuration analyzer.
@@ -66,7 +66,7 @@ public class ConfigurationAnalyzer {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class PeekVisitor extends AbstractActorTransformation {
+	private class PeekVisitor extends AbstractActorVisitor {
 
 		private Set<Port> candidates;
 

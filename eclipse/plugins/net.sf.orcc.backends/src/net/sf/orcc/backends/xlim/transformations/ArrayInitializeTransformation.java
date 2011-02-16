@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.xlim.transformations;
 
 import net.sf.orcc.interpreter.NodeInterpreter;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -38,7 +39,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * 
@@ -48,7 +48,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Herve Yviquel
  * 
  */
-public class ArrayInitializeTransformation extends AbstractActorTransformation {
+public class ArrayInitializeTransformation extends AbstractActorVisitor {
 
 	private class SpecialNodeInterpreter extends NodeInterpreter {
 
@@ -71,7 +71,7 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		// Initialize value field if there is an initial value
 		for (Variable stateVar : actor.getStateVars()) {
 			Expression initConst = ((GlobalVariable) stateVar)

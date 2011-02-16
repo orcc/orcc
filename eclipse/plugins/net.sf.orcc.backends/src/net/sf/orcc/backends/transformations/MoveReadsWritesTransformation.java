@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.backends.instructions.ReadEnd;
 import net.sf.orcc.backends.instructions.WriteEnd;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
@@ -40,7 +41,6 @@ import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines a transformation that move writes to the beginning of an
@@ -51,7 +51,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Jerome Gorin
  * 
  */
-public class MoveReadsWritesTransformation extends AbstractActorTransformation {
+public class MoveReadsWritesTransformation extends AbstractActorVisitor {
 
 	private List<Instruction> readEnds;
 

@@ -36,6 +36,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -67,7 +68,6 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines an actor transformation that inline the functions and/or
@@ -76,7 +76,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Herve Yviquel
  * 
  */
-public class InlineTransformation extends AbstractActorTransformation {
+public class InlineTransformation extends AbstractActorVisitor {
 
 	protected class InlineCloner implements NodeInterpreter,
 			InstructionInterpreter, ExpressionInterpreter {

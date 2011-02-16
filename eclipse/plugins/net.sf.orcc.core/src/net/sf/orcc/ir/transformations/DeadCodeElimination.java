@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -51,7 +52,7 @@ import net.sf.orcc.ir.nodes.IfNode;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadCodeElimination extends AbstractActorTransformation {
+public class DeadCodeElimination extends AbstractActorVisitor {
 
 	private void addNodes(List<CFGNode> nodes, BlockNode join, int index) {
 		itNode.previous();
@@ -94,12 +95,12 @@ public class DeadCodeElimination extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		// remove dead ifs and whiles
-		super.transform(actor);
+		super.visit(actor);
 
 		// combines adjacent blocks that may have been created
-		new BlockCombine().transform(actor);
+		new BlockCombine().visit(actor);
 	}
 
 	@Override

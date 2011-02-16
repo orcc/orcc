@@ -35,7 +35,6 @@ import java.util.Set;
 
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -52,7 +51,7 @@ public class Procedure extends AbstractLocalizable {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class ProcVisitor extends AbstractActorTransformation {
+	private class ProcVisitor extends AbstractActorVisitor {
 
 		private Set<GlobalVariable> loadedVariables;
 

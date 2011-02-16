@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.transformations;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.IrFactory;
@@ -36,7 +37,6 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -46,10 +46,10 @@ import net.sf.orcc.util.OrderedMap;
  * @author Jerome GORIN
  * 
  */
-public class BoolToIntTransformation extends AbstractActorTransformation {
+public class BoolToIntTransformation extends AbstractActorVisitor {
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 
 		// Set port to i32
 		visitPort(actor.getInputs());

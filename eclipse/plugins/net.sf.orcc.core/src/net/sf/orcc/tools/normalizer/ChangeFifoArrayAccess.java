@@ -30,6 +30,7 @@ package net.sf.orcc.tools.normalizer;
 
 import java.util.List;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
@@ -43,7 +44,6 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -54,14 +54,14 @@ import net.sf.orcc.util.OrderedMap;
  * @author Jerome Gorin
  * 
  */
-public class ChangeFifoArrayAccess extends AbstractActorTransformation {
+public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 
 	private OrderedMap<String, GlobalVariable> stateVars;
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		stateVars = actor.getStateVars();
-		super.transform(actor);
+		super.visit(actor);
 	}
 
 	private void updateIndex(Variable var, Instruction instr,

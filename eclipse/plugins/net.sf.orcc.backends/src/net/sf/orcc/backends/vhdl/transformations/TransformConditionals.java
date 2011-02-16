@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
@@ -44,7 +45,6 @@ import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines an actor transformation that transform the simple
@@ -55,7 +55,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * @author Nicolas Siret
  * 
  */
-public class TransformConditionals extends AbstractActorTransformation
+public class TransformConditionals extends AbstractActorVisitor
 		implements ExpressionInterpreter {
 
 	@Override

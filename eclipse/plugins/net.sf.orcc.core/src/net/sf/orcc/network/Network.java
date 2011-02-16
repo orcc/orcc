@@ -644,7 +644,7 @@ public class Network {
 	 */
 	public void normalizeActors() throws OrccException {
 		for (Actor actor : getActors()) {
-			new ActorNormalizer().transform(actor);
+			new ActorNormalizer().visit(actor);
 		}
 	}
 

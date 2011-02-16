@@ -30,6 +30,7 @@ package net.sf.orcc.ir.transformations;
 
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -55,7 +56,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class PhiRemoval extends AbstractActorTransformation {
+public class PhiRemoval extends AbstractActorVisitor {
 
 	private class PhiRemover extends AbstractInstructionVisitor {
 

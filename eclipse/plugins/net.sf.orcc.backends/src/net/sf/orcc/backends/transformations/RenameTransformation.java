@@ -31,10 +31,10 @@ package net.sf.orcc.backends.transformations;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -45,7 +45,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class RenameTransformation extends AbstractActorTransformation {
+public class RenameTransformation extends AbstractActorVisitor {
 
 	private final Pattern pattern;
 
@@ -92,11 +92,11 @@ public class RenameTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
 
-		super.transform(actor);
+		super.visit(actor);
 	}
 
 	@Override

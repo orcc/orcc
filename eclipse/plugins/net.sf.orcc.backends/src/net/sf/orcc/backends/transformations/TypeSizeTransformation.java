@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.transformations;
 
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -35,7 +36,6 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -45,7 +45,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Jerome Gorin
  * 
  */
-public class TypeSizeTransformation extends AbstractActorTransformation {
+public class TypeSizeTransformation extends AbstractActorVisitor {
 
 	private void checkType(Type type) {
 		int size;
@@ -83,13 +83,13 @@ public class TypeSizeTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void visit(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
 		checkVariables(actor.getInputs());
 		checkVariables(actor.getOutputs());
 
-		super.transform(actor);
+		super.visit(actor);
 	}
 
 	@Override
