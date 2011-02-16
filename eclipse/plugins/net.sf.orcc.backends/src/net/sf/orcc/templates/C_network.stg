@@ -195,19 +195,19 @@ fillActorsStructs(instances) ::= <<
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// declares initialize and scheduler functions
+// declares initialize and scheduler actors functions
 
-initialize(instance) ::= <<
+actorInitialize(instance) ::= <<
 <if (instance.actor && !instance.actor.initializes.empty)>
 extern void <instance.id>_initialize();
 <endif>
 >>
 
-declareInitializes(instances) ::= <<
-<instances: initialize()>
+declareActorsInitializes(instances) ::= <<
+<instances: actorInitialize()>
 >>
 
-declareSchedulers(instances) ::= <<
+declareActorsSchedulers(instances) ::= <<
 <instances: {inst | extern void <inst.id>_scheduler(struct schedinfo_s *si);}; separator="\n">
 >>
 
@@ -224,65 +224,55 @@ printInitializes(instances) ::= <<
 <instances: printInitialize()>
 >>
 
-printScheduler(isPointer=false) ::= <<
-struct actor_s *my_actor;
-struct schedinfo_s si;
-
-<if(options.needDynamicMapping)>
-clock_t start, end;
-
-semaphoreWait(sched-\>sem_thread); 
-start = clock ();
-
-while (1) {
-	my_actor = sched_get_next(<if(!isPointer)>&<endif>sched);
-	if(my_actor == NULL){
-		semaphoreSet(sched-\>sync-\>sem_monitor);
-		semaphoreWait(sched-\>sem_thread);
-		start = clock ();
-  	}
-  	else{
+printScheduler() ::= <<
+void *scheduler(void *data) {
+	struct scheduler_s *sched = (struct scheduler_s *) data;
+	struct actor_s *my_actor;
+	struct schedinfo_s si;
+	<if(options.needDynamicMapping)>
+	
+	clock_t start, end;
+	semaphoreWait(sched-\>sem_thread); 
+	start = clock ();
+	
+	<endif>
+	while (1) {
+		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched);
+		<if(options.needDynamicMapping)>
+		if(my_actor == NULL){
+			semaphoreSet(sched-\>sync-\>sem_monitor);
+			semaphoreWait(sched-\>sem_thread);
+			start = clock ();
+	  	}
+	  	else{
+			si.num_firings = 0;
+			my_actor-\>sched_func(&si);
+#ifdef PRINT_FIRINGS
+			printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
+#endif
+			if(sched-\>sync-\>active_sync){
+				end = clock ();
+				if((((end - start) / (double)CLOCKS_PER_SEC) \>= SYNC_DELAY)){
+					semaphoreSet(sched-\>sync-\>sem_monitor);
+					semaphoreWait(sched-\>sem_thread);
+					start = clock ();
+				}
+			}
+		}
+		<endif>
 		si.num_firings = 0;
 		my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
 		printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
-		if(sched-\>sync-\>active_sync){
-			end = clock ();
-			if((((end - start) / (double)CLOCKS_PER_SEC) \>= SYNC_DELAY)){
-				semaphoreSet(sched-\>sync-\>sem_monitor);
-				semaphoreWait(sched-\>sem_thread);
-				start = clock ();
-			}
+		<if (options.newScheduler)>
+		if (si.reason == full <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
+			sched_add_successors(sched, my_actor, si.ports);
+		} else if (si.reason == starved <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
+			sched_add_predecessors(sched, my_actor, si.ports);
 		}
+		<endif>
 	}
-}
-<else>
-while (1) {
-	my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(<if(!isPointer)>&<endif>sched);    
-	si.num_firings = 0;
-	my_actor-\>sched_func(&si);
-#ifdef PRINT_FIRINGS
-	printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
-#endif
-	<if (options.newScheduler)>
-	if (si.reason == full <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
-		sched_add_successors(<if(!isPointer)>&<endif>sched, my_actor, si.ports);
-	} else if (si.reason == starved <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
-		sched_add_predecessors(<if(!isPointer)>&<endif>sched, my_actor, si.ports);
-	}
-	<endif>
-}
-<endif>
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// threads
-
-printThread() ::= <<
-void *thread_scheduler(void *data) {
-	struct scheduler_s *sched = (struct scheduler_s *) data;
-	<printScheduler(isPointer="true")>
 }
 >>
 
@@ -293,7 +283,7 @@ printMain() ::= <<
 int main(int argc, char *argv[]) {
   init_orcc(argc, argv);
   
-  scheduler();
+  launcher();
 
   printf("End of simulation! Press a key to continue\n");
   wait_for_key();
@@ -360,8 +350,8 @@ network(debugFifos, fifoSize, network, options) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
-<declareInitializes(network.instances)>
-<declareSchedulers(network.instances)>
+<declareActorsInitializes(network.instances)>
+<declareActorsSchedulers(network.instances)>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of a struct actor for each actor
@@ -380,9 +370,9 @@ network(debugFifos, fifoSize, network, options) ::= <<
 
 <options.threads.keys: {th | <declareActorsArray(instances=options.threads.(th),thread=th)>}; separator="\n">
 
-<printThread()>
+<printScheduler()>
 
-static void scheduler() {
+static void launcher() {
 	cpu_set_t cpuset;
 	thread_struct <options.threads.keys: {th | thread_<th>}; separator=", ">;
 	thread_id_struct <options.threads.keys: {th | thread_id_<th>}; separator=", ">;
@@ -394,7 +384,7 @@ static void scheduler() {
 	
 	<if(options.newScheduler)>sched_add_schedulable(source.sched, &source);<endif>
 	
-	<options.threads.keys: {th | threadCreate(thread_<th>, thread_scheduler, sched_<th>, thread_id_<th>);}; separator="\n">
+	<options.threads.keys: {th | threadCreate(thread_<th>, scheduler, sched_<th>, thread_id_<th>);}; separator="\n">
 
 	clear_cpu_set(cpuset);
 	<options.threads.keys: {th | set_affinity(cpuset, <i0>, thread_<th>);}; separator="\n">
@@ -409,9 +399,9 @@ static void scheduler() {
 extern void remove_fps_printing();
 
 
-<printThread()>
+<printScheduler>
 
-static void scheduler() {
+static void launcher() {
 	int i;
 	
 	cpu_set_t cpuset;
@@ -433,7 +423,12 @@ static void scheduler() {
 	
 	for(i=0; i \< THREAD_NB; i++){
 		sched_init(&schedulers[i], sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);
-		threadCreate(threads[i], thread_scheduler, schedulers[i], threads_id[i]);
+	}
+	
+	<if(options.newScheduler)>sched_add_schedulable(source.sched, &source);<endif>
+	
+	for(i=0; i \< THREAD_NB; i++){
+		threadCreate(threads[i], scheduler, schedulers[i], threads_id[i]);
 	}
 	threadCreate(thread_monitor, monitor, monitoring, thread_monitor_id);
 
@@ -455,15 +450,17 @@ static void scheduler() {
 
 <declareActorsArray(instances=network.instances)>
 
-static void scheduler() {
+<printScheduler()>
+
+static void launcher() {
 	struct scheduler_s sched;
-	<printInitializes(network.instances)>
 	
-	<if(options.newScheduler)>sched_add_schedulable(&sched, &source);<endif>
+	<printInitializes(network.instances)>
 
 	sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL);
 	
-	<printScheduler()>
+	<if(options.newScheduler)>sched_add_schedulable(&sched, &source);<endif>
+	(*scheduler)((void*) &sched);
 }
 <endif>
 
