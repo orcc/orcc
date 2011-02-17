@@ -111,4 +111,12 @@ public interface CFGNode extends User {
 	 */
 	boolean isWhileNode();
 
+	/**
+	 * Sets the procedure this node belongs to.
+	 * 
+	 * @param procedure
+	 *            the procedure this node belongs to
+	 */
+	public void setProcedure(Procedure procedure);
+
 }

@@ -156,4 +156,9 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 		return false;
 	}
 
+	@Override
+	public void setProcedure(Procedure procedure) {
+		this.procedure = procedure;
+	}
+
 }
