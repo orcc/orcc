@@ -36,9 +36,11 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines methods to move code (blocks and instructions) from one
@@ -84,7 +86,12 @@ public class CodeMover extends AbstractActorVisitor {
 	private void moveLocalVariable(Instruction instruction,
 			LocalVariable variable) {
 		procedure.getLocals().remove(variable.getName());
-		targetProcedure.getLocals().put(variable.getName(), variable);
+
+		OrderedMap<String, LocalVariable> locals = targetProcedure.getLocals();
+		if (!locals.contains(variable.getName())) {
+			// this test handles the case of assignments created by PhiRemoval
+			locals.put(variable.getName(), variable);
+		}
 	}
 
 	/**
@@ -120,9 +127,15 @@ public class CodeMover extends AbstractActorVisitor {
 	}
 
 	@Override
+	public void visit(Call call) {
+		moveLocalVariable(call, call.getTarget());
+	}
+
+	@Override
 	public void visit(BlockNode blockNode) {
 		this.procedure = blockNode.getProcedure();
-		moveInstructions(blockNode.listIterator());
+		super.visit(blockNode);
+		blockNode.setProcedure(targetProcedure);
 	}
 
 	@Override
