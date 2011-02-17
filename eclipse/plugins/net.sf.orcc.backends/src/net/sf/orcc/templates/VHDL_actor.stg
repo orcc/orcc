@@ -88,12 +88,9 @@ endif>
 // Init at reset
 ///////////////////////////////////////////////////////////////////////////////
 stateConst(variable) ::= <<
-<if(variable.initialized && !variable.type.list)
-  ><if(variable.assignable)
->    <variable> \<= <variable.initialValue>;
-<
-  endif><
-endif>
+<if(variable.initialized && variable.assignable &&!variable.type.list)>
+    <variable> \<= <variable.initialValue>;
+<endif>
 >>
 
 
@@ -102,41 +99,27 @@ endif>
 // Print cast operations (when source.size != target.size)
 ///////////////////////////////////////////////////////////////////////////////
 CastStore(target, value, cast)::= <<
-<
-if(cast.extended)
+<if(cast.extended)
 ><target> := <value><
 else
-><
-  if(target.type.uint)
->
-<target> := ucast(<value>, <value.type.size>, <target.type.size>)<  
+><if(target.type.uint)
+><target> := ucast(<value>, <value.type.size>, <target.type.size>)<  
   else
->
-<target> := cast(<value>, <value.type.size>, <target.type.size>)<  
-  endif
-><
-endif
->
-
+><target> := cast(<value>, <value.type.size>, <target.type.size>)<  
+  endif><
+endif>
 >>
 
 CastLoad(target, source, cast)::= <<
-<
-if(cast.extended)
+<if(cast.extended)
 ><target> := <source><
 else
-><
-  if(target.type.uint)
->
-<target> := ucast(<source>, <source.type.size>, <target.variable.type.size>)<
+><if(target.type.uint)
+><target> := ucast(<source>, <source.type.size>, <target.variable.type.size>)<
   else
->
-<target> := cast(<source>, <source.type.size>, <target.variable.type.size>)<
-  endif
-><
-endif
->
-
+><target> := cast(<source>, <source.type.size>, <target.variable.type.size>)<
+  endif><
+endif>
 >>
 
 
@@ -161,36 +144,27 @@ AssignIndex(AssignIndex) ::= <<
 
 Call(call) ::= <<
 
-<
-if(call.target)
->
-<call.target> := <call.procedure>(<call.procedure.loadedVariables: {var | <var>, }><call.parameters: {param | <param>, }>'1');<
+<if(call.target)
+><call.target> := <call.procedure>(<call.procedure.loadedVariables: {var | <var>, }><call.parameters: {param | <param>, }>'1');<
 elseif(call.parameters)
->
-<call.procedure>(<call.parameters; separator=", ">, '1');<
+><call.procedure>(<call.parameters; separator=", ">, '1');<
 else
->
-<call.procedure>('1');<
-endif
->
+><call.procedure>('1');<
+endif>
 >>
 
 Load(load) ::= <<
 
 <if(load.indexes)
-><
-  if(load.source.variable.port)
-  ><
-    if(load.cast)
-><CastLoad(target=load.target, source=load.source, cast=load.cast)>;<
+><if(load.source.variable.port)
+   ><if(load.cast)
+     ><CastLoad(target=load.target, source=load.source, cast=load.cast)>;<
     else
-><load.target> := <load.source>;<
-    endif
-  ><
+     ><load.target> := <load.source>;<
+    endif><
   else
-><load.target> := <load.source>(<load.indexes : {index | <index>}; separator=", ">);<
-  endif
-><
+   ><load.target> := <load.source>(<load.indexes : {index | <index>}; separator=", ">);<
+  endif><
 else
 ><load.target> := <load.source>;<
 endif>
@@ -199,21 +173,17 @@ endif>
 Peek(peek) ::= <<
 
 <if(peek.unit)
-  ><
-  if(peek.target.type.bool)
-><peek.target> := <peek.port>_data;<
-  else
-  ><
-    if(peek.target.type.int)
-><peek.target> := to_integer(signed(<peek.port>_data));<
+  ><if(peek.target.type.bool)
+     ><peek.target> := <peek.port>_data;<
     else
-><peek.target> := to_integer(unsigned(<peek.port>_data));<
-    endif
-  ><
-  endif
-><
+     ><if(peek.target.type.int)
+        ><peek.target> := to_integer(signed(<peek.port>_data));<
+       else
+        ><peek.target> := to_integer(unsigned(<peek.port>_data));<
+       endif><
+    endif><
 else
->-- peek multiple token not coded yet<
+  >-- peek multiple token not coded yet<
 endif
 >
 
@@ -221,22 +191,16 @@ endif
 
 Read(read) ::= <<
 
-<
-if(read.unit)
-><
-  if(read.target.type.bool)
-  >
-<read.target> := <read.port>_data;<
-  elseif(read.target.type.int)
-  >
-<read.target> := to_integer(signed(<read.port>_data));<
-  elseif (read.target)
-  >
-<read.target> := to_integer(unsigned(<read.port>_data));<
-  endif
-  ><
+<if(read.unit)
+  ><if(read.target.type.bool)
+     ><read.target> := <read.port>_data;<
+   elseif(read.target.type.int)
+     ><read.target> := to_integer(signed(<read.port>_data));<
+   elseif (read.target)
+     ><read.target> := to_integer(unsigned(<read.port>_data));<
+   endif><
 else
->-- read multiple token not coded yet<
+  >-- read multiple token not coded yet<
 endif>
 >>
 
@@ -245,40 +209,29 @@ endif>
 // is called
 Return(return) ::= <<
 
-<
-if(return.value)
-><
-  if(transformReturn)
->
-<procedure>_go := <return.value>;<
+<if(return.value)
+><  if(transformReturn)
+><procedure>_go := <return.value>;<
   else
->
-return <return.value>;<
-  endif
-><
+>return <return.value>;<
+  endif><
 endif>
 >>
 
 Store(store) ::= <<
 
 <if(store.indexes)
-><
-  if(store.target.port)
-  ><
-    if(store.cast)
-><CastStore(value=store.value, target=store.target, cast=store.cast)>;<
-    else
-><store.target> := <store.value>;<
-    endif
-  ><
-  else
->
-<store.target>(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;<
-  endif
-><
+ ><if(store.target.port)
+   ><if(store.cast)
+      ><CastStore(value=store.value, target=store.target, cast=store.cast)>;<
+     else
+      ><store.target> := <store.value>;<
+     endif><
+   else
+    ><store.target>(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;<
+   endif><
 else
->
-<store.target> \<= <store.value>;<
+ ><store.target> \<= <store.value>;<
 endif>
 >>
 
