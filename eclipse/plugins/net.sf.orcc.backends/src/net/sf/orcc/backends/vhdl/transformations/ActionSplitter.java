@@ -120,6 +120,9 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 					ActionSplitter.this.actor.getFile(),
 					IrFactory.eINSTANCE.createTypeBool(), "result");
 			result.setIndex(1);
+			scheduler.getLocals().remove(result.getBaseName());
+			scheduler.getLocals().put(result.getName(), result);
+			
 			BlockNode block = new BlockNode(scheduler);
 			block.add(new Assign(result, condition));
 			block.add(new Return(new VarExpr(new Use(result))));

@@ -61,7 +61,7 @@ public class DataMover extends AbstractActorVisitor {
 
 	private BlockNode targetBlock;
 
-	private Map<String, GlobalVariable> variableMap;
+	private Map<LocalVariable, GlobalVariable> variableMap;
 
 	/**
 	 * Creates a new code mover
@@ -71,22 +71,26 @@ public class DataMover extends AbstractActorVisitor {
 		super(true);
 
 		this.actor = actor;
-		variableMap = new HashMap<String, GlobalVariable>();
+		variableMap = new HashMap<LocalVariable, GlobalVariable>();
 	}
 
 	private void storeLoadLocalVariable(LocalVariable target, VarExpr expr,
 			Instruction instruction) {
-		GlobalVariable stateVar = variableMap.get(target.getName());
-		if (stateVar == null) {
-			stateVar = new GlobalVariable(target.getLocation(),
-					target.getType(), "g_" + target.getBaseName(), true);
-
-			actor.getStateVars().put(stateVar.getName(), stateVar);
-
-			variableMap.put(target.getName(), stateVar);
-		}
-
 		if (!procedure.getLocals().contains(target.getName())) {
+			GlobalVariable stateVar = variableMap.get(target);
+			if (stateVar == null) {
+				stateVar = actor.getStateVars()
+						.get("g_" + target.getBaseName());
+				if (stateVar == null) {
+					stateVar = new GlobalVariable(target.getLocation(),
+							target.getType(), "g_" + target.getBaseName(), true);
+
+					actor.getStateVars().put(stateVar.getName(), stateVar);
+				}
+
+				variableMap.put(target, stateVar);
+			}
+
 			LocalVariable duplicate = new LocalVariable(target.isAssignable(),
 					target.getIndex(), target.getLocation(),
 					target.getBaseName(), target.getType());
@@ -99,7 +103,6 @@ public class DataMover extends AbstractActorVisitor {
 			duplicateLoad.setBlock(targetBlock);
 			itInstruction.previous();
 			itInstruction.add(duplicateLoad);
-			itInstruction.next();
 		}
 	}
 
@@ -120,7 +123,6 @@ public class DataMover extends AbstractActorVisitor {
 		duplicateLoad.setBlock(targetBlock);
 		itInstruction.previous();
 		itInstruction.add(duplicateLoad);
-		itInstruction.next();
 	}
 
 	@Override
