@@ -21,6 +21,9 @@
          <option
                id="net.sf.orcc.backends.enableTrace">
          </option>
+         <option
+               id="net.sf.orcc.backends.coDesign">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.java.JavaBackendImpl"
@@ -215,6 +218,12 @@
                      id="O3">
                </comboBoxItem>
             </comboBox>
+         </option>
+         <option
+               defaultValue="false"
+               id="net.sf.orcc.backends.coDesign"
+               name="Co-Design">
+            <checkBox></checkBox>
          </option>
    </extension>
 

@@ -142,6 +142,11 @@ public class Network {
 	private OrderedMap<String, GlobalVariable> variables;
 
 	/**
+	 * holds template-specific data.
+	 */
+	private Object templateData;
+
+	/**
 	 * Creates a new network.
 	 */
 	public Network(String file) {
@@ -199,7 +204,7 @@ public class Network {
 					n++;
 					portToNumberOfReadersMap.remove(srcPort);
 					portToNumberOfReadersMap.put(srcPort, n);
-					numberOfConnectionReadersMap.put(connection, n-1);
+					numberOfConnectionReadersMap.put(connection, n - 1);
 				}
 			}
 			numberOfReadersMap.put(instance, portToNumberOfReadersMap);
@@ -413,6 +418,17 @@ public class Network {
 	}
 
 	/**
+	 * Returns a map that associates each network input port to the number of
+	 * readers.
+	 * 
+	 * @return a map that associates each network input port to the number of
+	 *         readers
+	 */
+	public Map<Port, Integer> getInputNumberOfReadersMap() {
+		return numberOfInputReadersMap;
+	}
+
+	/**
 	 * Returns the list of this network's input ports
 	 * 
 	 * @return the list of this network's input ports
@@ -481,26 +497,6 @@ public class Network {
 	}
 
 	/**
-	 * Returns a map that associates each output port to the number of readers.
-	 * 
-	 * @return a map that associates each output port to the number of readers
-	 */
-	public Map<Instance, Map<Port, Integer>> getNumberOfReadersMap() {
-		return numberOfReadersMap;
-	}
-
-	/**
-	 * Returns a map that associates each network input port to the number of
-	 * readers.
-	 * 
-	 * @return a map that associates each network input port to the number of
-	 *         readers
-	 */
-	public Map<Port, Integer> getInputNumberOfReadersMap() {
-		return numberOfInputReadersMap;
-	}
-
-	/**
 	 * Returns a map that associates each broadcast/fan-out connection the
 	 * number of readers.
 	 * 
@@ -510,6 +506,15 @@ public class Network {
 
 	public Map<Connection, Integer> getNumberOfConnectionReadersMap() {
 		return numberOfConnectionReadersMap;
+	}
+
+	/**
+	 * Returns a map that associates each output port to the number of readers.
+	 * 
+	 * @return a map that associates each output port to the number of readers
+	 */
+	public Map<Instance, Map<Port, Integer>> getNumberOfReadersMap() {
+		return numberOfReadersMap;
 	}
 
 	/**
@@ -600,6 +605,15 @@ public class Network {
 	}
 
 	/**
+	 * Returns an object with template-specific data.
+	 * 
+	 * @return an object with template-specific data
+	 */
+	public Object getTemplateData() {
+		return templateData;
+	}
+
+	/**
 	 * Returns the list of this network's variables
 	 * 
 	 * @return the list of this network's variables
@@ -666,6 +680,17 @@ public class Network {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Sets the template data associated with this network. Template data should
+	 * hold data that is specific to a given template.
+	 * 
+	 * @param templateData
+	 *            an object with template-specific data
+	 */
+	public void setTemplateData(Object templateData) {
+		this.templateData = templateData;
 	}
 
 	@Override

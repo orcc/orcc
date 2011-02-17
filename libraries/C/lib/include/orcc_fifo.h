@@ -106,4 +106,6 @@ static struct FIFO_S(type) fifo_##count = { (size) + 1, array_##count, 0, 0 };
 #include "orcc_generic_fifo.h"
 #undef T
 
+#include "orcc_fifo_socket.h"
+
 #endif

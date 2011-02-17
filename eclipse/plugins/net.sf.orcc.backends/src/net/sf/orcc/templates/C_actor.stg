@@ -113,13 +113,13 @@ printLoad(load) ::= <<
 
 printPeek(peek) ::= <<
 
-<peek.target> = fifo_<peek.port.type>_peek(<instance.id>_<peek.port>, <peek.target>_buf, <peek.numTokens>);
+<peek.target> = fifo<printMedium(peek.port)>_<peek.port.type>_peek(<instance.id>_<peek.port>, <peek.target>_buf, <peek.numTokens>);
 >>
 
 printRead(read) ::= <<
 
 <if (read.target)
-><read.target> = fifo_<read.port.type>_read(<instance.id>_<read.port>, <read.target>_buf, <read.numTokens>);<
+><read.target> = fifo<printMedium(read.port)>_<read.port.type>_read(<instance.id>_<read.port>, <read.target>_buf, <read.numTokens>);<
 endif>
 >>
 
@@ -133,7 +133,7 @@ printReadEnd(readEnd) ::= <<
 }
 <endif>
 
-fifo_<readEnd.port.type>_read_end(<instance.id>_<readEnd.port>, <readEnd.numTokens>);
+fifo<printMedium(readEnd.port)>_<readEnd.port.type>_read_end(<instance.id>_<readEnd.port>, <readEnd.numTokens>);
 numTokens_<readEnd.port.name> -= <readEnd.numTokens>;
 >>
 
@@ -150,7 +150,7 @@ printStore(store) ::= <<
 
 printWrite(write) ::= <<
 
-<write.target> = fifo_<write.port.type>_write(<instance.id>_<write.port>, <write.target>_buf, <write.numTokens>);
+<write.target> = fifo<printMedium(write.port)>_<write.port.type>_write(<instance.id>_<write.port>, <write.target>_buf, <write.numTokens>);
 >>
 
 printWriteEnd(writeEnd) ::= <<
@@ -163,7 +163,7 @@ printWriteEnd(writeEnd) ::= <<
 }
 <endif>
 
-fifo_<writeEnd.port.type>_write_end(<instance.id>_<writeEnd.port>, <writeEnd.target>_buf, <writeEnd.numTokens>);
+fifo<printMedium(writeEnd.port)>_<writeEnd.port.type>_write_end(<instance.id>_<writeEnd.port>, <writeEnd.target>_buf, <writeEnd.numTokens>);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -248,7 +248,7 @@ printAction(action) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPatternPort(port) ::= <<
-if (!fifo_<port.type>_has_room(<instance.id>_<port>, <pattern.(port)>)) {
+if (!fifo<printMedium(port)>_<port.type>_has_room(<instance.id>_<port>, <pattern.(port)>)) {
 	ports |= 0x0<instance.actor.templateData.maskOutput.(port)>;
 }
 >>
@@ -265,7 +265,7 @@ checkInputPattern(pattern) ::= <<
 
 printGetNumTokens() ::= <<
 <instance.actor.inputs.list:
-	{ port | numTokens_<port.name> = fifo_<port.type>_get_num_tokens(<instance.id>_<port>);
+	{ port | numTokens_<port.name> = fifo<printMedium(port)>_<port.type>_get_num_tokens(<instance.id>_<port>);
 }>
 >>
 
@@ -453,8 +453,11 @@ parameters(parameters) ::= <<
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-instance(instance, options) ::= <<
-// <instance.hierarchicalPath>
+printMedium(port) ::=<<
+<instance.actor.templateData.portMedium.(instance).(port).value>
+>>
+
+instance(instance, network, options) ::= <<
 // Source file is "<instance.actor.file>"
 
 #include \<stdio.h\>
@@ -466,7 +469,7 @@ instance(instance, options) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-<instance.actor.inputs.list: { port | extern struct fifo_<port.type>_s *<instance.id>_<port.name>;
+<instance.actor.inputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<instance.id>_<port.name>;
 }>
 <instance.actor.inputs.list: { port | static int numTokens_<port.name>;
 }>
@@ -476,7 +479,7 @@ instance(instance, options) ::= <<
 <endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-<instance.actor.outputs.list: { port | extern struct fifo_<port.type>_s *<instance.id>_<port.name>;
+<instance.actor.outputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<instance.id>_<port.name>;
 }>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 <instance.actor.outputs.list: { port | FILE *file_<port.name>;

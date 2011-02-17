@@ -55,10 +55,15 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.transformations.BroadcastAdder;
+import net.sf.orcc.network.transformations.NetworkSplitter;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.merger2.ActorMerger2;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
+
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.graph.DirectedMultigraph;
 
 /**
  * C back-end.
@@ -79,8 +84,13 @@ public class CBackendImpl extends AbstractBackend {
 		main(CBackendImpl.class, args);
 	}
 
+	private Map<String, List<Instance>> instancesTarget;
+
+	private DirectedGraph<String, StringAttribute> mediumGraph;
+
 	private boolean needPthreads;
 
+	private Network workingNetwork;
 	/**
 	 * printer is protected in order to be visible to CQuasiBackendImpl
 	 */
@@ -107,7 +117,7 @@ public class CBackendImpl extends AbstractBackend {
 				new HashMap<String, String>());
 
 		// compute the different threads
-		Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
+		instancesTarget = new HashMap<String, List<Instance>>();
 		for (Instance instance : network.getInstances()) {
 			String path = null;
 			if (instance.isActor()) {
@@ -128,28 +138,33 @@ public class CBackendImpl extends AbstractBackend {
 			// get component
 			String component = mapping.get(path);
 			if (component != null) {
-				List<Instance> list = threads.get(component);
+				List<Instance> list = instancesTarget.get(component);
 				if (list == null) {
 					list = new ArrayList<Instance>();
-					threads.put(component, list);
+					instancesTarget.put(component, list);
 				}
 
 				list.add(instance);
 			}
 		}
 
-		boolean needDynamicMapping = getAttribute(
-				"net.sf.orcc.backends.dynamicMapping", false);
-		needPthreads = (threads.keySet().size() > 1);
+		mediumGraph = new DirectedMultigraph<String, StringAttribute>(
+				StringAttribute.class);
+		Set<String> targets = instancesTarget.keySet();
 
-		if (needDynamicMapping) {
-			printer.getOptions().put("needDynamicMapping", needDynamicMapping);
-			printer.getOptions().put("threadsNb",
-					getAttribute("net.sf.orcc.backends.processorsNumber", "1"));
-		} else {
-			printer.getOptions().put("needPthreads", needPthreads);
-			printer.getOptions().put("threads", threads);
-			printer.getOptions().put("threadsNb", threads.size());
+		for (String target : targets) {
+			mediumGraph.addVertex(target);
+		}
+
+		for (String target : targets) {
+			for (String otherTarget : targets) {
+				if (!target.equals(otherTarget)) {
+					mediumGraph.addEdge(target, otherTarget,
+							new StringAttribute("_socket"));
+					mediumGraph.addEdge(otherTarget, target,
+							new StringAttribute("_socket"));
+				}
+			}
 		}
 	}
 
@@ -181,8 +196,39 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		CTemplateData data = new CTemplateData();
-		data.computeTemplateMaps(actor);
+		data.computeTemplateMaps(actor, workingNetwork);
 		actor.setTemplateData(data);
+		workingNetwork.setTemplateData(data);
+	}
+
+	protected void doTransformNetwork(Network network) throws OrccException {
+
+		new BroadcastAdder().transform(network);
+		computeMapping(network);
+		if (getAttribute("net.sf.orcc.backends.coDesign", false)) {
+			printer.getOptions().put("threadsNb", 1);
+			new NetworkSplitter(instancesTarget, mediumGraph)
+					.transform(network);
+		} else {
+
+			boolean needDynamicMapping = getAttribute(
+					"net.sf.orcc.backends.dynamicMapping", false);
+			needPthreads = (instancesTarget.keySet().size() > 1);
+
+			if (needDynamicMapping) {
+				printer.getOptions().put("needDynamicMapping",
+						needDynamicMapping);
+				printer.getOptions().put(
+						"threadsNb",
+						getAttribute("net.sf.orcc.backends.processorsNumber",
+								"1"));
+			} else {
+				printer.getOptions().put("needPthreads", needPthreads);
+				printer.getOptions().put("threads", instancesTarget);
+				printer.getOptions().put("threadsNb", instancesTarget.size());
+			}
+			network.computeTemplateMaps();
+		}
 	}
 
 	@Override
@@ -206,6 +252,8 @@ public class CBackendImpl extends AbstractBackend {
 		printer.setTypePrinter(CTypePrinter.class);
 		printer.setOptions(getAttributes());
 
+		doTransformNetwork(network);
+		workingNetwork = network;
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 
@@ -227,7 +275,7 @@ public class CBackendImpl extends AbstractBackend {
 		String id = instance.getId();
 		String outputName = path + File.separator + id + ".c";
 		try {
-			return printer.printInstance(outputName, instance);
+			return printer.printInstance(outputName, workingNetwork, instance);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
@@ -245,12 +293,6 @@ public class CBackendImpl extends AbstractBackend {
 		try {
 			printer.getOptions().put("newScheduler",
 					getAttribute("net.sf.orcc.backends.newScheduler", false));
-
-			// Add broadcasts before printing
-			new BroadcastAdder().transform(network);
-
-			// mapping
-			computeMapping(network);
 
 			String outputName = path + File.separator + network.getName()
 					+ ".c";

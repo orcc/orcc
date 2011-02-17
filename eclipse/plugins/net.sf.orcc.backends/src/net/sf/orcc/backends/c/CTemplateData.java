@@ -12,8 +12,16 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
+import net.sf.orcc.network.attributes.IAttribute;
 
 public class CTemplateData {
+
+	private Map<Instance, Map<Port, IAttribute>> portMedium;
+
+	private Map<Instance, Map<Port, IAttribute>> portMediumUpperCase;
 
 	private Map<Transition, String> maskInputs;
 
@@ -66,17 +74,45 @@ public class CTemplateData {
 		}
 	}
 
+	private void buildPortMedium(Network network) {
+		for (Instance instance : network.getInstances()) {
+			if (instance.isActor() || instance.isBroadcast()) {
+				Map<Port, IAttribute> instancePorts = new HashMap<Port, IAttribute>();
+				Map<Port, IAttribute> instancePortsUpperCase = new HashMap<Port, IAttribute>();
+				for (Connection connection : network.getIncomingMap().get(
+						instance)) {
+					instancePorts.put(connection.getTarget(),
+							connection.getAttribute("commMedium"));
+					instancePortsUpperCase.put(connection.getTarget(),
+							connection.getAttribute("commMediumUpperCase"));
+				}
+				for (Connection connection : network.getOutgoingMap().get(
+						instance)) {
+					instancePorts.put(connection.getSource(),
+							connection.getAttribute("commMedium"));
+					instancePortsUpperCase.put(connection.getSource(),
+							connection.getAttribute("commMediumUpperCase"));
+				}
+				portMedium.put(instance, instancePorts);
+				portMediumUpperCase.put(instance, instancePortsUpperCase);
+			}
+		}
+	}
+
 	/**
 	 * Computes the mask map that associate a port mask to a transition. The
 	 * port mask defines the port(s) read by actions in each transition.
 	 */
-	public void computeTemplateMaps(Actor actor) {
+	public void computeTemplateMaps(Actor actor, Network network) {
 		maskInputs = new HashMap<FSM.Transition, String>();
 		maskOutputs = new HashMap<Port, String>();
+		portMedium = new HashMap<Instance, Map<Port, IAttribute>>();
+		portMediumUpperCase = new HashMap<Instance, Map<Port, IAttribute>>();
 
 		buildMaskInputs(actor);
 		buildMaskOutputs(actor);
-		
+		buildPortMedium(network);
+
 		numInputs = actor.getInputs().getLength();
 	}
 
@@ -113,4 +149,11 @@ public class CTemplateData {
 		return maskOutputs;
 	}
 
+	public Map<Instance, Map<Port, IAttribute>> getPortMedium() {
+		return portMedium;
+	}
+
+	public Map<Instance, Map<Port, IAttribute>> getUpperCasePortMedium() {
+		return portMediumUpperCase;
+	}
 }

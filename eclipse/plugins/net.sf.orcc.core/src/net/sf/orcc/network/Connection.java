@@ -102,7 +102,7 @@ public class Connection implements IAttributeContainer {
 	 */
 	public Connection(Port source, Port target,
 			Map<String, IAttribute> attributes) {
-		this.attributes = attributes;
+		this.attributes = new HashMap<String, IAttribute>(attributes);
 		this.source = source;
 		this.target = target;
 	}

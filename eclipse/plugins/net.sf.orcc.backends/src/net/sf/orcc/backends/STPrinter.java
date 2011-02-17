@@ -187,6 +187,11 @@ public final class STPrinter {
 		return false;
 	}
 
+	public boolean printInstance(String fileName, Instance instance)
+			throws IOException {
+		return printInstance(fileName, null, instance);
+	}
+
 	/**
 	 * Prints the given instance to a file whose name is given.
 	 * 
@@ -197,8 +202,8 @@ public final class STPrinter {
 	 * @return <code>true</code> if the instance was cached
 	 * @throws IOException
 	 */
-	public boolean printInstance(String fileName, Instance instance)
-			throws IOException {
+	public boolean printInstance(String fileName, Network network,
+			Instance instance) throws IOException {
 		long lastModified = getLastModifiedHierarchy(instance);
 
 		if (instance.isNetwork()
@@ -212,6 +217,9 @@ public final class STPrinter {
 
 			ST template = group.getInstanceOf("instance");
 			template.add("instance", instance);
+			if (network != null) {
+				template.add("network", network);
+			}
 			template.add("options", options);
 
 			byte[] b = template.render(80).getBytes();
