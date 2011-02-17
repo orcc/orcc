@@ -48,22 +48,69 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 /**
- * This class find the possible static merging in a network.
+ * This class defines a static representation graph to ease the merging of a network.
  * 
  * 
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * 
  */
 public class StaticGraph {
+	/**
+	 * This class represents a static edge with a production and a comsuption.
+	 * 
+	 * 
+	 * @author Jérôme Gorin
+	 * 
+	 */
+	private class StaticEdge extends DefaultEdge {
+		private static final long serialVersionUID = -5886264026878538695L;
+
+		int sourceRate;
+		int targetRate;
+
+		public StaticEdge() {
+			super();
+			sourceRate = 0;
+			targetRate = 0;
+		}
+
+		public int getSourceRate() {
+			return sourceRate;
+		}
+
+		public int getTargetRate() {
+			return targetRate;
+		}
+
+		public void setSourceRate(int rate) {
+			sourceRate = rate;
+		}
+
+		public void setTargetRate(int rate) {
+			targetRate = rate;
+		}
+	}
+
 	private Map<Vertex, LinkedHashSet<Vertex>> adjacentVertices;
 	private DirectedGraph<Vertex, Connection> dynamicGraph;
-	private DirectedGraph<Vertex, DefaultEdge> staticGraph;
 	List<Set<Vertex>> regions;
 
+	private DirectedGraph<Vertex, StaticEdge> staticGraph;
+
+	public void updateNetwork(Vertex source, Vertex target, Vertex mergedVertex){
+		
+	}
+	
+	/**
+	 * Create a static representation of a network
+	 * 
+	 * @param network
+	 *            the Network to subtract the static representation
+	 */
 	public StaticGraph(Network network) {
 		dynamicGraph = network.getGraph();
-		staticGraph = new DefaultDirectedGraph<Vertex, DefaultEdge>(
-				DefaultEdge.class);
+		staticGraph = new DefaultDirectedGraph<Vertex, StaticEdge>(
+				StaticEdge.class);
 		adjacentVertices = new HashMap<Vertex, LinkedHashSet<Vertex>>();
 		regions = new ArrayList<Set<Vertex>>();
 
@@ -75,41 +122,11 @@ public class StaticGraph {
 
 		// Find static edge in the graph
 		addStaticEdge();
-		
+
 		// Remove unconnected static vertex
 		setRegions();
 	}
-	
-	/**
-	 * Set the static regions of the graph
-	 */
-	private void setRegions(){
-		ConnectivityInspector<Vertex, DefaultEdge> inspector = new ConnectivityInspector<Vertex, DefaultEdge>(
-				staticGraph);
-		List<Set<Vertex>> vertices = inspector.connectedSets();
-		List<Vertex> toRemove = new ArrayList<Vertex>();
-		
-		for (Set<Vertex> region : vertices){
-			if (region.size() == 1){
-				//Single vertex, remove it from the graph
-				toRemove.addAll(region);
-			}else{
-				//Store the region
-				regions.add(region);
-			}
-		}
-		
-		staticGraph.removeAllVertices(toRemove);
-	}
 
-	public List<Set<Vertex>> getRegions(){
-		return regions;
-	}
-	
-	public Boolean hasRegions(){
-		return regions.size() != 0;
-	}
-	
 	/**
 	 * Add static edge from dynamic graph to the static graph
 	 */
@@ -119,16 +136,11 @@ public class StaticGraph {
 			LinkedHashSet<Vertex> adjVertices = adjacentVertices.get(vertex);
 			for (Vertex adjVertex : adjVertices) {
 				if (staticGraph.containsVertex(adjVertex)) {
-					staticGraph.addEdge(vertex, adjVertex);
+					staticGraph.addEdge(vertex, adjVertex, new StaticEdge());
 				}
 			}
 
 		}
-	}
-	
-	public void updateRegion(Set<Vertex> region){
-		//TODO : implement a real update of the region
-		regions.remove(region);
 	}
 
 	/**
@@ -152,30 +164,82 @@ public class StaticGraph {
 	}
 
 	/**
-	 * Returns the resulting static graph.
+	 * Get static regions of the network;
 	 * 
-	 * @return the static graph
+	 * @return a List of static regions
 	 */
-	public DirectedGraph<Vertex, DefaultEdge> getStaticGraph() {
-		return staticGraph;
+	public List<Set<Vertex>> getRegions() {
+		return regions;
 	}
-	
+
 	/**
-	 * Returns the static neighbour of the static vertex.
+	 * Get source repetition factor between two vertices.
+	 * 
+	 * @param source
+	 *            the source vertex
+	 * 
+	 * 
+	 * @param target
+	 *            the target Vertex
+	 * 
+	 * @return the source repetition factor
+	 */
+	public int getSourceRate(Vertex source, Vertex target) {
+		StaticEdge staticEdge = staticGraph.getEdge(source, target);
+		return staticEdge.getSourceRate();
+	}
+
+	/**
+	 * Returns the static neighbors of the static vertex.
 	 * 
 	 * @return the static graph
 	 */
-	public Set<Vertex> getStaticNeighbour(Vertex vertex) {
+	public Set<Vertex> getStaticNeighbors(Vertex vertex) {
 		Set<Vertex> neighbours = new HashSet<Vertex>();
 		LinkedHashSet<Vertex> adjVertices = adjacentVertices.get(vertex);
-		
-		for (Vertex adjVertice : adjVertices){
-			if (staticGraph.containsVertex(adjVertice)){
+
+		for (Vertex adjVertice : adjVertices) {
+			if (staticGraph.containsVertex(adjVertice)) {
 				neighbours.add(adjVertice);
 			}
 		}
-		
+
 		return neighbours;
+	}
+
+	/**
+	 * Get all static vertices of the network.
+	 * 
+	 * @return a set of static vertices
+	 */
+	public Set<Vertex> getStaticVertices() {
+		return staticGraph.vertexSet();
+	}
+
+	/**
+	 * Get target repetition factor between two vertices.
+	 * 
+	 * @param source
+	 *            the source vertex
+	 * 
+	 * 
+	 * @param target
+	 *            the target Vertex
+	 * 
+	 * @return the source repetition factor
+	 */
+	public int getTargetRate(Vertex source, Vertex target) {
+		StaticEdge staticEdge = staticGraph.getEdge(source, target);
+		return staticEdge.getTargetRate();
+	}
+
+	/**
+	 * Return true if the network has static regions.
+	 * 
+	 * @return True if the network contains static regions, otherwise false
+	 */
+	public Boolean hasRegions() {
+		return regions.size() != 0;
 	}
 
 	/**
@@ -200,6 +264,55 @@ public class StaticGraph {
 				adjacent.add(target);
 			}
 		}
+	}
+
+	/**
+	 * Set the static regions of the graph
+	 */
+	private void setRegions() {
+		ConnectivityInspector<Vertex, StaticEdge> inspector = new ConnectivityInspector<Vertex, StaticEdge>(
+				staticGraph);
+		List<Set<Vertex>> vertices = inspector.connectedSets();
+		List<Vertex> toRemove = new ArrayList<Vertex>();
+
+		for (Set<Vertex> region : vertices) {
+			if (region.size() == 1) {
+				// Single vertex, remove it from the graph
+				toRemove.addAll(region);
+			} else {
+				// Store the region
+				regions.add(region);
+			}
+		}
+
+		staticGraph.removeAllVertices(toRemove);
+	}
+
+	/**
+	 * Set repetition factor of two vertices.
+	 * 
+	 * @param source
+	 *            the source vertex
+	 * 
+	 * @param production
+	 *            the production rate of the source vertex
+	 * 
+	 * @param target
+	 *            the target Vertex
+	 * 
+	 * @param comsuption
+	 *            the consumption rate of the target Vertex
+	 */
+	public void setRepetitionFactor(Vertex source, int production,
+			Vertex target, int consumption) {
+		StaticEdge staticEdge = staticGraph.getEdge(source, target);
+		staticEdge.setSourceRate(production);
+		staticEdge.setTargetRate(consumption);
+	}
+
+	public void updateRegion(Set<Vertex> region) {
+		// TODO : implement a real update of the region
+		regions.remove(region);
 	}
 
 }

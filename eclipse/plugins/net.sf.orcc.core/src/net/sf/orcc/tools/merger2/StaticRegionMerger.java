@@ -28,19 +28,12 @@
  */
 package net.sf.orcc.tools.merger2;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.INetworkTransformation;
-import net.sf.orcc.tools.merger.TopologicalSorter;
-
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DirectedSubgraph;
 
 /**
  * This class transform a StaticDirectedGraph into Static Region of network.
@@ -53,34 +46,31 @@ public class StaticRegionMerger implements INetworkTransformation {
 
 	private Network network;
 	private StaticGraph staticGraph;
-
+	
 	public StaticRegionMerger(StaticGraph staticGraph) {
 		this.staticGraph = staticGraph;
 	}
 
-	private void mergeRegion(Set<Vertex> region,
-			Map<Vertex, Integer> repetitionFactor) throws OrccException {
-		DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
-				network.getGraph(), region, null);
-
-		List<Vertex> sort = new TopologicalSorter(subgraph).topologicalSort();
-
+	private void mergeRegion(Set<Vertex> region) throws OrccException {
+		InstanceMerger instanceMerger = new InstanceMerger(staticGraph);
+		
+		
+		for (Vertex vertex : region){
+			for (Vertex neighbor : staticGraph.getStaticNeighbors(vertex)){
+				Vertex mergedVertex = instanceMerger.merge(vertex, neighbor);
+				staticGraph.updateNetwork(vertex, neighbor, mergedVertex);
+			}
+		}
+		
 	}
 
 	private void mergeStaticRegions() throws OrccException {
-		while (staticGraph.hasRegions()) {
-			// Get first static region of the graph
-			Set<Vertex> region = staticGraph.getRegions().get(0);
-
 			SDFCompositionAnalyzer compositionAnalyzer = new SDFCompositionAnalyzer(
-					network, staticGraph, region);
+					network, staticGraph);
 
-			if (compositionAnalyzer.isValid()) {
-				mergeRegion(region, compositionAnalyzer.getRepetitionFactor());
+			for (Set<Vertex> region : staticGraph.getRegions()){
+				mergeRegion(region);
 			}
-
-			staticGraph.updateRegion(region);
-		}
 	}
 
 	@Override

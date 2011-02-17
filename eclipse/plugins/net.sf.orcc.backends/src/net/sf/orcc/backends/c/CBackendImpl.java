@@ -59,7 +59,7 @@ import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.network.transformations.NetworkSplitter;
 import net.sf.orcc.tools.classifier.ActorClassifier;
-import net.sf.orcc.tools.merger2.ActorMerger2;
+import net.sf.orcc.tools.merger2.NetworkMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
 import org.jgrapht.DirectedGraph;
@@ -263,7 +263,7 @@ public class CBackendImpl extends AbstractBackend {
 		// Experimental
 		boolean merge2 = getAttribute("net.sf.orcc.backends.merge2", false);
 		if (merge2) {
-			new ActorMerger2().transform(network);
+			new NetworkMerger().transform(network);
 		}
 
 		printInstances(network);

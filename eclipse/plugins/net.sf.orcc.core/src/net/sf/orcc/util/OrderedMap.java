@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Location;
@@ -43,6 +44,7 @@ import net.sf.orcc.ir.Location;
  * variables, and it checks for uniqueness or throw an exception.
  * 
  * @author Matthieu Wipliez
+ * @author Jerome Gorin
  * 
  */
 public class OrderedMap<K, V> implements Iterable<V> {
@@ -104,6 +106,13 @@ public class OrderedMap<K, V> implements Iterable<V> {
 	 */
 	public V get(K name) {
 		return map.get(name);
+	}
+
+	/**
+	 * Returns the corresponding HashMap.
+	 */
+	public LinkedHashMap<K, V> getHashMap() {
+		return map;
 	}
 
 	/**
@@ -200,6 +209,18 @@ public class OrderedMap<K, V> implements Iterable<V> {
 
 		map.put(name, object);
 		modified = true;
+	}
+
+	/**
+	 * Adds a map of object to this ordered map with the given name.
+	 * 
+	 * @param map
+	 *            a map of objects
+	 */
+	public final void putAll(OrderedMap<K, V> map) {
+		for (Entry<K, V> entry : map.getHashMap().entrySet()) {
+			put(entry.getKey(), entry.getValue());
+		}
 	}
 
 	/**

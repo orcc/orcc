@@ -80,16 +80,16 @@ OptLevelO3("O3",
 static cl::list<string>
 ActorFiles(cl::Positional, cl::OneOrMore, cl::desc("Input actors"));
 
-cl::opt<bool> 
+static cl::opt<bool> 
 OutputAssembly("S", cl::desc("Generate LLVM in assembly representation"));
 
-cl::opt<bool> 
+static cl::opt<bool> 
 OutputBitcode("c", cl::desc("Generate LLVM in bytecode representation"));
 
-cl::opt<bool> 
+static cl::opt<bool> 
 OutputArchive("a", cl::desc("Generate package in archives"));
 
-cl::opt<string> 
+static cl::opt<string> 
 LibraryFolder("L", cl::Required, cl::ValueRequired, cl::desc("Input folder of Video Tool Library"));
 
 //Optimization specific options
@@ -368,17 +368,21 @@ int main(int argc, char **argv) {
 	map<string,Module*> modules;
 
 	for (itFile=ActorFiles.begin() ; itFile != ActorFiles.end(); itFile++){	
+		//Iterate though all actors to parse
 		sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(*itFile));
 
 		if (!fullFilePath.exists()){
 			cerr <<"Actor "<< itFile->c_str() << "not found.\n";
 		}
 
+		//Parse IR file
 		Module* mod = ParseIRFile(fullFilePath.c_str(), Err, Context);
 
 		if (!fullFilePath.exists()){
 			cerr <<"Error when parsing "<< itFile->c_str() << ".\n";
 		}
+
+		//Store results
 		modules.insert(pair<string,Module*>(*itFile, mod));
 	}
 
