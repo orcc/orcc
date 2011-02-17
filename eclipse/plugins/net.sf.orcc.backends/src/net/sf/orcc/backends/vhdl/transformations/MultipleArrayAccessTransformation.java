@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -117,7 +118,7 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 			// move join node to main list
 			itNode.add(ifNode.getJoinNode());
 			itNode.previous(); // so that next() will return the join node
-			
+
 			// move all nodes (including join node) to join action
 			splitNodes(new BoolExpr(true), itNode);
 			addTransition(joinTargetName, oldTargetName, nextAction);
@@ -129,9 +130,11 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 				ListIterator<CFGNode> itNode) {
 			String newActionName = getNewStateName();
 			nextAction = createNewAction(condition, newActionName);
-			CodeMover mover = new CodeMover();
-			mover.setTargetProcedure(nextAction.getBody());
-			mover.visitNodes(itNode);
+			actions.add(nextAction);
+
+			CodeMover codeMover = new CodeMover();
+			codeMover.setTargetProcedure(nextAction.getBody());
+			codeMover.moveNodes(itNode);
 		}
 
 		@Override
@@ -233,17 +236,22 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 					numRW.put(variable, 1);
 				} else {
 					splitAction();
+					actions.add(nextAction);
 				}
 			}
 		}
 
 	}
+	
+	private List<Action> actions;
 
 	private boolean conditionalPhase;
 
 	@Override
 	public void visit(Actor actor) {
 		super.visit(actor);
+		
+		actions = new ArrayList<Action>();
 
 		// first we split conditional branches that contain multiple accesses
 		conditionalPhase = true;
@@ -252,6 +260,11 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 		// then we split any action that contain multiple accesses
 		conditionalPhase = false;
 		visitAllActions();
+
+		DataMover mover = new DataMover(actor);
+		for (Action action : actions) {
+			mover.visit(action);
+		}
 	}
 
 	@Override

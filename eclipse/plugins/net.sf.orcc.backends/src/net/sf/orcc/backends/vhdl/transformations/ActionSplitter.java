@@ -1,9 +1,36 @@
+/*
+ * Copyright (c) 2011, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 package net.sf.orcc.backends.vhdl.transformations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,11 +38,9 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -26,11 +51,8 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -172,10 +194,10 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 
 			// move code
 			itInstruction.previous();
-			CodeMover mover = new CodeMover();
-			mover.setTargetProcedure(nextAction.getBody());
-			mover.visit(itInstruction);
-			mover.visitNodes(itNode);
+			CodeMover codeMover = new CodeMover();
+			codeMover.setTargetProcedure(nextAction.getBody());
+			codeMover.moveInstructions(itInstruction);
+			codeMover.moveNodes(itNode);
 
 			// update transitions
 			replaceTransition(nextAction);
@@ -200,145 +222,6 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 				nextAction = null;
 
 				visit(currentAction.getBody());
-			}
-		}
-
-	}
-
-	/**
-	 * This class defines methods to move code (blocks and instructions) from
-	 * one procedure to another.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	protected class CodeMover extends AbstractActorVisitor {
-
-		private BlockNode targetBlock;
-
-		private Procedure targetProcedure;
-
-		/**
-		 * Creates a new code mover
-		 */
-		public CodeMover() {
-			// visit expressions too
-			super(true);
-		}
-
-		/**
-		 * Moves local variable used by the given instruction to the target
-		 * procedure.
-		 * 
-		 * @param instruction
-		 *            an instruction
-		 * @param variable
-		 *            a variable
-		 */
-		private void moveLocalVariable(Instruction instruction,
-				LocalVariable variable) {
-			instruction.getBlock().getProcedure().getLocals()
-					.remove(variable.getName());
-			targetProcedure.getLocals().put(variable.getName(), variable);
-		}
-
-		/**
-		 * Sets the target procedure, ie the procedure in which the code mover
-		 * will move instructions and nodes.
-		 * 
-		 * @param procedure
-		 *            the target procedure
-		 */
-		public void setTargetProcedure(Procedure procedure) {
-			this.targetProcedure = procedure;
-		}
-
-		private void updateExpr(LocalVariable variable, VarExpr expr, Load load) {
-			// no need to add another state variable, will just add the load
-			// to the target block
-			LocalVariable duplicate = new LocalVariable(
-					variable.isAssignable(), variable.getIndex(),
-					variable.getLocation(), variable.getBaseName(),
-					variable.getType());
-
-			OrderedMap<String, LocalVariable> variables = targetProcedure
-					.getLocals();
-			variables.put(duplicate.getName(), duplicate);
-			expr.setVar(new Use(duplicate));
-
-			Load duplicateLoad = new Load(duplicate, new Use(load.getSource()
-					.getVariable()));
-			targetBlock.add(duplicateLoad);
-		}
-
-		@Override
-		public void visit(Assign assign) {
-			moveLocalVariable(assign, assign.getTarget());
-			super.visit(assign);
-		}
-
-		@Override
-		public void visit(BlockNode blockNode) {
-			visit(blockNode.listIterator());
-		}
-
-		/**
-		 * Visits a list iterator of instructions.
-		 * 
-		 * @param itInstruction
-		 */
-		public void visit(ListIterator<Instruction> itInstruction) {
-			targetBlock = BlockNode.getLast(targetProcedure);
-			while (itInstruction.hasNext()) {
-				Instruction instruction = itInstruction.next();
-				itInstruction.remove();
-				instruction.accept(this);
-
-				targetBlock.add(instruction);
-			}
-		}
-
-		@Override
-		public void visit(Load load) {
-			moveLocalVariable(load, load.getTarget());
-			super.visit(load);
-		}
-
-		@Override
-		public void visit(VarExpr expr, Object... args) {
-			LocalVariable variable = (LocalVariable) expr.getVar()
-					.getVariable();
-			if (variable.getInstruction().isLoad()) {
-				Load load = (Load) variable.getInstruction();
-				if (load.getIndexes().isEmpty()
-						&& !targetProcedure.getLocals().contains(
-								variable.getName())) {
-					// only update for load of state scalars not already treated
-					updateExpr(variable, expr, load);
-				}
-			} else if (variable.getInstruction().isAssign()) {
-
-			}
-		}
-
-		@Override
-		public void visit(Write write) {
-			moveLocalVariable(write, (LocalVariable) write.getTarget());
-		}
-
-		/**
-		 * Visits a list iterator of nodes.
-		 * 
-		 * @param itNode
-		 *            a list iterator of nodes
-		 */
-		public void visitNodes(ListIterator<CFGNode> itNode) {
-			while (itNode.hasNext()) {
-				CFGNode node = itNode.next();
-				itNode.remove();
-				node.accept(this);
-
-				targetProcedure.getNodes().add(node);
 			}
 		}
 
