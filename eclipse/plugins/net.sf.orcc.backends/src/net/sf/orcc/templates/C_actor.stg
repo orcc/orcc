@@ -345,7 +345,7 @@ actionTestState(state, restStates) ::= <<
 if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()) {
 	<if (state.action.outputPattern)>
 	<outputPattern(state.action.outputPattern)>
-		_FSM_state = s_<transition.sourceState>;
+		_FSM_state = my_state_<transition.sourceState>;
 		si-\>num_firings = i;
 		si-\>reason = full;
 		si-\>ports = ports;
@@ -367,7 +367,7 @@ schedulingStates(states) ::= <<
 <if (first(states))
 ><actionTestState(state=first(states), restStates=rest(states))><
 else
->_FSM_state = s_<transition.sourceState>;
+>_FSM_state = my_state_<transition.sourceState>;
 si-\>num_firings = i;
 si-\>reason = starved;
 si-\>ports = 0x0<instance.actor.templateData.maskInputsTransition.(transition)>;
@@ -397,7 +397,7 @@ l_<transition.sourceState>:
 
 switchTransition(transition) ::= <<
 
-case s_<transition.sourceState>:
+case my_state_<transition.sourceState>:
 	goto l_<transition.sourceState>;
 >>
 
@@ -413,15 +413,15 @@ default:
 
 schedulerFSM(actions, fsm) ::= <<
 enum states {
-	s_<first(fsm.states)> = 0,
-	<rest(fsm.states) : {state | s_<state>}; separator=",\n">
+	my_state_<first(fsm.states)> = 0,
+	<rest(fsm.states) : {state | my_state_<state>}; separator=",\n">
 };
 
 static char *stateNames[] = {
-	<fsm.states : {state | "s_<state>"}; separator=",\n">
+	<fsm.states : {state | "<state>"}; separator=",\n">
 };
 
-static enum states _FSM_state = s_<fsm.initialState>;
+static enum states _FSM_state = my_state_<fsm.initialState>;
 
 <if(actions)>
 <printActionScheduler(name={<instance.id>_outside_FSM_scheduler}, actions=actions)>

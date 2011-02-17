@@ -104,12 +104,15 @@ public class CBackendImpl extends AbstractBackend {
 	 */
 	public CBackendImpl() {
 		transformations = new HashMap<String, String>();
-		transformations.put("abs", "abs_");
-		transformations.put("getw", "getw_");
-		transformations.put("index", "index_");
-		transformations.put("max", "max_");
-		transformations.put("min", "min_");
-		transformations.put("select", "select_");
+		transformations.put("abs", "abs_my_precious");
+		transformations.put("getw", "getw_my_precious");
+		transformations.put("index", "index_my_precious");
+		transformations.put("max", "max_my_precious");
+		transformations.put("min", "min_my_precious");
+		transformations.put("select", "select_my_precious");
+
+		transformations.put("OUT", "OUT_my_precious");
+		transformations.put("IN", "IN_my_precious");
 	}
 
 	private void computeMapping(Network network) throws OrccException {
