@@ -53,27 +53,20 @@ signal <portType(port=port, IOtype=" ", dataType="idata")>
 >>
 
 signalDeclaration(variable) ::= <<
-<if(variable.port)
->signal <variable> : <variable.type>;
-<else
-><if(!variable.type.list)
-  ><if(!variable.assignable)
-    >constant <variable> : <variable.type> := <variable.initialValue>;
-    <else
+<if(!variable.type.list)
+ ><if(variable.assignable || variable.port)
     >signal <variable> : <variable.type>;
-    <endif><
-  else
-  ><if(!variable.assignable)
-    ><if(variable.initialized)
-      >type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
-constant <variable> : memory_type_<variable> := <variable.initialValue>;
-      <endif><
-    else
-    >type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
-signal <variable> : memory_type_<variable>;
-   <endif><
-  endif><
-endif>
+  <else
+    >constant <variable> : <variable.type> := <variable.initialValue>;
+  <endif><
+else
+  >type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;<\n><
+  if(variable.assignable)
+    >signal <variable> : memory_type_<variable> <if(variable.initialized)>:= <variable.initialValue><endif>;<      
+   else
+    >constant <variable> : memory_type_<variable> <if(variable.initialized)>:= <variable.initialValue><endif>;
+  <endif>
+<endif>
 >>
 
 
@@ -95,7 +88,7 @@ endif>
 // Init at reset
 ///////////////////////////////////////////////////////////////////////////////
 stateConst(variable) ::= <<
-<if(variable.initialized)
+<if(variable.initialized && !variable.type.list)
   ><if(variable.assignable)
 >    <variable> \<= <variable.initialValue>;
 <
