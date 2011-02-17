@@ -1,8 +1,13 @@
 #ifndef _SOCKET_H
 #define _SOCKET_H
 
-	#ifdef WIN32
-		msdql
+	#ifdef _WIN32
+		// no need to include <windows.h> explicitly
+		// <winsock2.h> will include it if necessary
+		#include <winsock2.h>
+
+		typedef int socklen_t;
+		#define sleep(s) Sleep(s)
 	#else
 		#include <sys/types.h>
 		#include <sys/socket.h>

@@ -30,6 +30,12 @@
 #define THREAD_H
 
 #ifdef _WIN32
+	// ok here is some dark Windows magic
+	// we must define WIN32_LEAN_AND_MEAN here so that windows.h will NOT include winsock.h
+	// because later on we include winsock2.h, which conflicts with winsock.h
+	// ...
+	// ...
+	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
 	
 	// Thread

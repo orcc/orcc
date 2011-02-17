@@ -30,6 +30,7 @@
 #ifndef FIFO_SOCKET_H
 #define FIFO_SOCKET_H
 
+#include "socket.h"
 
 // declare FIFO with a size equal to (size)
 #define DECLARE_FIFO_SOCKET(type, size, count) static type array_##count[(size) + 1]; \

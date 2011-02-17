@@ -1,11 +1,3 @@
-#include <stdio.h>
-
-#include "socket.h"
-
-#include "orcc.h"
-#include "orcc_fifo.h"
-#include "orcc_util.h"
-
 struct FIFO_SOCKET_S(T) {
 	int size; /** size of the ringbuffer */
 	T *contents; /** the memory containing the ringbuffer */
@@ -15,20 +7,17 @@ struct FIFO_SOCKET_S(T) {
 };
 
 DECL int FIFO_SOCKET_HAS_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo, int n) {
-	if(fifo->fill_count < n)
-	{
-		if(recv(fifo->Sock, &(fifo->contents[fifo->fill_count]), (n - fifo->fill_count) * sizeof(T), 0) == -1)
-		{
+	if(fifo->fill_count < n) {
+		if(recv(fifo->Sock, (char *) &(fifo->contents[fifo->fill_count]), (n - fifo->fill_count) * sizeof(T), 0) == -1) {
 			//will be managed when socket we will have unblocked read.
 			fprintf(stderr,"socket_GetData() : error.\n");
 			exit(-10);
-		}
-		else
-		{
+		} else {
 			fifo->fill_count = n;
 			return 1;
 		}
 	}
+
 	return 1;
 }
 
@@ -67,14 +56,11 @@ DECL T *FIFO_SOCKET_WRITE(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int n) {
 DECL void FIFO_SOCKET_WRITE_END(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int n) {
 	int err;
 
-	err = send(fifo->Sock, fifo->contents , n * sizeof(T), 0); 
-	if(err == -1)
-	{
+	err = send(fifo->Sock, (char *) fifo->contents, n * sizeof(T), 0);
+	if(err == -1) {
 		fprintf(stderr,"socket_TransmitData() : error.\n");
 		exit(-10);
-	}
-	else
-	{
+	} else {
 		fifo->fill_count =0;
 	}
 }
@@ -84,28 +70,27 @@ DECL void FIFO_SOCKET_INIT(T)(struct FIFO_SOCKET_S(T) *fifo, int IsServer, const
 	struct hostent *hostinfo;
 	SOCKET local_sock;
 
-	if(IsIpv6)
+	if (IsIpv6) {
 		local_sock = socket(AF_INET6, SOCK_STREAM, 0);
-	else
+	} else {
 		local_sock = socket(AF_INET, SOCK_STREAM, 0);
+	}
 
-	if(local_sock == -1)
-	{
+	if (local_sock == -1) {
 		fprintf(stderr,"socket(%s, SOCK_DGRAM, 0) failed.\n",(IsIpv6 ? "AF_INET6" : "AF_INET"));
 		exit(-3);
 	}
 
 	Sin.sin_port = htons(port);
-	if(IsIpv6)
+	if (IsIpv6) {
 		Sin.sin_family = AF_INET6;
-	else
+	} else {
 		Sin.sin_family = AF_INET;
+	}
 
-	if(!IsServer)
-	{
+	if (!IsServer) {
 		hostinfo = gethostbyname(HostName);
-		if (hostinfo == NULL)
-		{
+		if (hostinfo == NULL) {
 			fprintf (stderr, "Unknown host %s.\n", HostName);
 			exit(-4);
 		}
@@ -113,14 +98,12 @@ DECL void FIFO_SOCKET_INIT(T)(struct FIFO_SOCKET_S(T) *fifo, int IsServer, const
 		Sin.sin_addr = *(IN_ADDR *) hostinfo->h_addr;
 
 	
-		while(connect(local_sock,(SOCKADDR *) &Sin, sizeof(SOCKADDR)) == -1)
-		{
+		while(connect(local_sock,(SOCKADDR *) &Sin, sizeof(SOCKADDR)) == -1) {
 			sleep(1);
 		}
+
 		fifo->Sock = local_sock;
-	}
-	else
-	{
+	} else {
 		socklen_t sock_len;
 		SOCKADDR cust_sin;
 
