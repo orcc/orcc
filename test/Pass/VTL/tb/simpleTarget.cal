@@ -1,0 +1,10 @@
+package tb;
+
+actor simpleTarget ()int(size=9) input ==> :
+
+
+	inRead : action input:[in0] ==> 
+	do
+	end
+
+end
