@@ -162,7 +162,6 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	@Override
 	public void visit(Call call) {
 		if (visitFull) {
-			visit(call.getProcedure());
 			for (Expression expr : call.getParameters()) {
 				expr.accept(this);
 			}
