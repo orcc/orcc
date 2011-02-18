@@ -40,6 +40,7 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.util.OrderedMap;
 
@@ -74,31 +75,37 @@ public class DataMover extends AbstractActorVisitor {
 		variableMap = new HashMap<LocalVariable, GlobalVariable>();
 	}
 
-	private void storeLoadLocalVariable(LocalVariable target, VarExpr expr,
-			Instruction instruction) {
-		if (!procedure.getLocals().contains(target.getName())) {
-			GlobalVariable stateVar = variableMap.get(target);
+	/**
+	 * This method adds spill code so that the given variable is stored after it
+	 * has been defined by the given instruction in another procedure and it is
+	 * loaded before it is used in this procedure by the given expression.
+	 * 
+	 * @param variable
+	 * @param expr
+	 * @param instruction
+	 */
+	private void addSpillCode(LocalVariable variable, VarExpr expr) {
+		if (!procedure.getLocals().contains(variable.getName())) {
+			GlobalVariable stateVar = variableMap.get(variable);
 			if (stateVar == null) {
-				stateVar = actor.getStateVars()
-						.get("g_" + target.getBaseName());
-				if (stateVar == null) {
-					stateVar = new GlobalVariable(target.getLocation(),
-							target.getType(), "g_" + target.getBaseName(), true);
-
-					actor.getStateVars().put(stateVar.getName(), stateVar);
-				}
-
-				variableMap.put(target, stateVar);
+				stateVar = getOrAddGlobal(variable);
+				addStoreToGlobal(variable, stateVar);
 			}
 
-			LocalVariable duplicate = new LocalVariable(target.isAssignable(),
-					target.getIndex(), target.getLocation(),
-					target.getBaseName(), target.getType());
+			// duplicates the local variable
+			LocalVariable duplicate = new LocalVariable(
+					variable.isAssignable(), variable.getIndex(),
+					variable.getLocation(), variable.getBaseName(),
+					variable.getType());
 
+			// add it to the locals
 			OrderedMap<String, LocalVariable> variables = procedure.getLocals();
 			variables.put(duplicate.getName(), duplicate);
+
+			// updates the expression
 			expr.setVar(new Use(duplicate));
 
+			// adds a Load
 			Load duplicateLoad = new Load(duplicate, new Use(stateVar));
 			duplicateLoad.setBlock(targetBlock);
 			itInstruction.previous();
@@ -106,23 +113,44 @@ public class DataMover extends AbstractActorVisitor {
 		}
 	}
 
-	private void updateExpr(LocalVariable variable, VarExpr expr, Load load) {
-		// no need to add another state variable, will just add the load
-		// to the target block
+	/**
+	 * Adds a Store of the given local variable to the given global variable.
+	 * 
+	 * @param variable
+	 *            a local variable
+	 * @param stateVar
+	 *            a global variable
+	 */
+	private void addStoreToGlobal(LocalVariable variable,
+			GlobalVariable stateVar) {
+		Store store = new Store(stateVar, new VarExpr(new Use(variable)));
 
-		LocalVariable duplicate = new LocalVariable(variable.isAssignable(),
-				variable.getIndex(), variable.getLocation(),
-				variable.getBaseName(), variable.getType());
+		Instruction instruction = variable.getInstruction();
+		BlockNode block = instruction.getBlock();
+		int index = block.indexOf(instruction);
+		block.add(index + 1, store);
+		variableMap.put(variable, stateVar);
+	}
 
-		OrderedMap<String, LocalVariable> variables = procedure.getLocals();
-		variables.put(duplicate.getName(), duplicate);
-		expr.setVar(new Use(duplicate));
+	/**
+	 * Finds the global variable that matches the given local variable, and if
+	 * it does not exist, creates it.
+	 * 
+	 * @param variable
+	 *            a local variable
+	 * @return the corresponding global variable
+	 */
+	private GlobalVariable getOrAddGlobal(LocalVariable variable) {
+		GlobalVariable stateVar = actor.getStateVars().get(
+				"g_" + variable.getBaseName());
+		if (stateVar == null) {
+			stateVar = new GlobalVariable(variable.getLocation(),
+					variable.getType(), "g_" + variable.getBaseName(), true);
 
-		Load duplicateLoad = new Load(duplicate, new Use(load.getSource()
-				.getVariable()));
-		duplicateLoad.setBlock(targetBlock);
-		itInstruction.previous();
-		itInstruction.add(duplicateLoad);
+			actor.getStateVars().put(stateVar.getName(), stateVar);
+		}
+
+		return stateVar;
 	}
 
 	@Override
@@ -137,22 +165,17 @@ public class DataMover extends AbstractActorVisitor {
 		Instruction instruction = variable.getInstruction();
 		if (instruction != null) {
 			if (instruction.isLoad()) {
-				Load load = (Load) variable.getInstruction();
-				if (load.getIndexes().isEmpty()
-						&& !procedure.getLocals().contains(variable.getName())) {
-					// only update for load of state scalars not already
-					// treated
-					updateExpr(variable, expr, load);
-					return;
+				Load load = (Load) instruction;
+				if (load.getIndexes().isEmpty()) {
+					// registers loaded variables into the variableMap
+					variableMap.put(variable, (GlobalVariable) load.getSource()
+							.getVariable());
 				}
 			}
 
 			if (instruction instanceof LocalTargetContainer) {
-				LocalVariable target = ((LocalTargetContainer) instruction)
-						.getTarget();
-				storeLoadLocalVariable(target, expr, instruction);
+				addSpillCode(variable, expr);
 			}
 		}
 	}
-
 }
