@@ -66,7 +66,7 @@
 	#include <semaphore.h>
 	
 	// Thread
-#ifdef _APPLE
+#ifdef __APPLE__
 	typedef long cpu_set_t;
 	#define clear_cpu_set(cpuset)
 	#define set_thread_affinity(cpuset, proc_num, thread)
