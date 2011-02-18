@@ -106,7 +106,7 @@ network(debugFifos, fifoSize, network, options) ::= <<
 
 init {
 	/*Inputs here*/
-	
+
 	/*Start processes*/
 	atomic{
 		<network.Instances: {instance | run <GetInstanceId(instance)>(/*init_state*/);}; separator="\n">

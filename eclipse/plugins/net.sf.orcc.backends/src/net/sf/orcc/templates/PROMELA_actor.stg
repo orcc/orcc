@@ -7,15 +7,23 @@ arrayDim(values) ::= <<
 >>
 
 printActionName() ::= <<
-printf("<instance.Id>.<action.name>();");
+#ifdef PNAME
+printf("<instance.Id>.<action.name>();\n");
+#endif
 >>
 
 printActionState() ::= <<
-printf("/*<actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>=%d}; separator=";">*/\n", <actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>}; separator=",">);
+<if (actor.stateVars.list)>
+#ifdef PSTATE
+printf("<actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>=%d}; separator=";">\n\n", <actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>}; separator=",">);
+#endif
+<endif>
 >>
 
 printFSMState() ::= <<
-printf("/*state = state_<fsm_nsi.targetState>;*/");
+#ifdef PFSM
+printf("state = state_<fsm_nsi.targetState>;\n");
+#endif
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,7 +75,7 @@ IntExpr(number) ::= <<
 
 // the values of a list: {val1, val2, ..., valn}
 ListExpr(constant) ::= <<
-{<constant.value: Constant(); wrap, separator=", ">}
+0 /* Warning: {<constant.value: Constant(); wrap, separator=", ">}*/
 >>
 
 StringExpr(constant) ::= <<
@@ -233,7 +241,9 @@ schedulerFSM(action) ::= <<
 	<action.body.nodes: { node | <(node.class.simpleName)(node)>}>
 	<outputPattern(action.outputPattern)>
 	state = state_<fsm_nsi.targetState>;
-	<printActionName()><printFSMState()><printActionState()>
+	<printActionName()>
+	<printFSMState()>
+	<printActionState()>
 }
 >>
 
@@ -268,7 +278,8 @@ scheduler(action) ::= <<
 	<inputPattern(action.inputPattern)>
 	<action.body.nodes: { node | <(node.class.simpleName)(node)>}>
 	<outputPattern(action.outputPattern)>
-	<printActionName()><printActionState()>
+	<printActionName()>
+	<printActionState()>
 }	
 >>
 
@@ -337,7 +348,11 @@ proctype <instance.id>(<actor.parameters.list: variableDeclaration(); wrap, sepa
 	od;
 	<else>
 	do
-	<actor.actionScheduler.actions: scheduler(); separator="\n">
+	:: skip -\> 
+	  <actor.actionScheduler.actions: peeks()>
+	  if
+	  <actor.actionScheduler.actions: scheduler(); separator="\n">
+	  fi;
 	od;
 	<endif>
 }

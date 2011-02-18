@@ -37,6 +37,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
@@ -72,9 +73,26 @@ public class PromelaBackendImpl extends AbstractBackend {
 	private Map<Action, List<Peek>> peeks = new HashMap<Action, List<Peek>>();
 	private Map<Action, List<Load>> loads = new HashMap<Action, List<Load>>();
 	
+	private final Map<String, String> transformations;
+
+	/**
+	 * Creates a new instance of the Promela back-end. Initializes the transformation
+	 * hash map.
+	 */
+	public PromelaBackendImpl() {
+		transformations = new HashMap<String, String>();
+		transformations.put("abs", "abs_");
+		transformations.put("getw", "getw_");
+		transformations.put("index", "index_");
+		transformations.put("max", "max_");
+		transformations.put("min", "min_");
+		transformations.put("select", "select_");
+	}
+	
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorVisitor[] transformations = { 
+				new RenameTransformation(this.transformations),
 				new GuardsExtractor(guards, peeks, loads), new PhiRemoval(),
 				new DeadCodeElimination(),
 				new DeadVariableRemoval(false)};
