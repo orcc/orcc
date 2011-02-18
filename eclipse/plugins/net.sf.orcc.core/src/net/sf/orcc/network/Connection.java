@@ -48,7 +48,7 @@ import net.sf.orcc.network.attributes.ValueAttribute;
  * @author Herve Yviquel
  * 
  */
-public class Connection implements IAttributeContainer {
+public class Connection implements IAttributeContainer, Comparable<Connection> {
 
 	/**
 	 * the bufferSize attribute can be attached to a FIFO to specify its size
@@ -129,6 +129,12 @@ public class Connection implements IAttributeContainer {
 	}
 
 	@Override
+	public int compareTo(Connection connection) {
+		Integer this_hashcode = new Integer(this.hashCode());
+		return this_hashcode.compareTo(new Integer(connection.hashCode()));
+	}
+
+	@Override
 	public IAttribute getAttribute(String name) {
 		return attributes.get(name);
 	}
@@ -190,5 +196,4 @@ public class Connection implements IAttributeContainer {
 	public void setTarget(Port target) {
 		this.target = target;
 	}
-
 }

@@ -323,15 +323,39 @@ void *scheduler(void *data) {
 ///////////////////////////////////////////////////////////////////////////////
 // main
 
-printMedium(port,instance) ::= <<
+printMedium(port, instance) ::= <<
 <network.templateData.portMedium.(instance).(port).value>
 >>
 
-printUpperCaseMedium(port,instance) ::= <<
+printUpperCaseMedium(port, instance) ::= <<
 <network.templateData.upperCasePortMedium.(instance).(port).value>
 >>
 
+fifoInit(instance, port) ::= <<
+<if(instance.actor)
+>fifo<printMedium(port,instance)>_<port.type>_init(<instance.id>_<port>,/*To complete !*/);<
+else
+>fifo<printMedium(port,instance)>_<port.type>_init(bcast_<instance.id>_<port>,/*To complete !*/);<
+endif>
+>>
+
+printFifoInit(instances, ports) ::= <<
+<if(first(instances))
+><fifoInit(first(instances), first(ports))>
+<printFifoInit(rest(instances), rest(ports))
+><endif>
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
+
+MediumInclude(medium) ::= <<
+#include "orcc_fifo<medium>.h"
+>>
+
+printMediumInclude(mediums) ::= <<
+<mediums : MediumInclude(); separator="\n">
+>>
+
 // print network
 network(debugFifos, fifoSize, network, options) ::= <<
 
@@ -354,6 +378,7 @@ network(debugFifos, fifoSize, network, options) ::= <<
 
 #include "orcc.h"
 #include "orcc_fifo.h"
+<printMediumInclude(network.templateData.allMediumsAllInstances)>
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
 <if (options.needPthreads || options.needDynamicMapping)>
@@ -504,7 +529,11 @@ static void launcher() {
 
 int main(int argc, char *argv[]) {
   init_orcc(argc, argv);
-  
+
+  <if(network.templateData.listMediumInstances)
+  ><printFifoInit(network.templateData.listMediumInstances, network.templateData.listMediumPorts)
+  ><endif>
+
   launcher();
 
   printf("End of simulation! Press a key to continue\n");

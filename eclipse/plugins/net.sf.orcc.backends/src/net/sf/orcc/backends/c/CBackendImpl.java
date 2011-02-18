@@ -201,7 +201,6 @@ public class CBackendImpl extends AbstractBackend {
 		CTemplateData data = new CTemplateData();
 		data.computeTemplateMaps(actor, workingNetwork);
 		actor.setTemplateData(data);
-		workingNetwork.setTemplateData(data);
 	}
 
 	protected void doTransformNetwork(Network network) throws OrccException {
@@ -232,6 +231,10 @@ public class CBackendImpl extends AbstractBackend {
 			}
 			network.computeTemplateMaps();
 		}
+
+		CTemplateData data = new CTemplateData();
+		data.computeTemplateMaps(network);
+		network.setTemplateData(data);
 	}
 
 	@Override

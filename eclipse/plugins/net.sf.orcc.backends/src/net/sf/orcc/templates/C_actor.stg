@@ -453,6 +453,14 @@ parameters(parameters) ::= <<
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
+MediumInclude(medium) ::= <<
+#include "orcc_fifo<medium>.h"
+>>
+
+printMediumInclude(mediums) ::= <<
+<mediums : MediumInclude(); separator="\n">
+>>
+
 printMedium(port) ::=<<
 <instance.actor.templateData.portMedium.(instance).(port).value>
 >>
@@ -466,7 +474,7 @@ instance(instance, network, options) ::= <<
 #include "orcc.h"
 #include "orcc_fifo.h"
 #include "orcc_util.h"
-
+<printMediumInclude(network.templateData.listAllMedium.(instance))>
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
 <instance.actor.inputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<instance.id>_<port.name>;
