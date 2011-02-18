@@ -37,9 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.OrccUtil;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -62,7 +62,8 @@ public class XlimMappingPrinter {
 	 *             if the template file could not be read
 	 */
 	public XlimMappingPrinter() throws IOException {
-		group = TemplateGroupLoader.loadGroup("XLIM_sw_mapping");
+		group = OrccUtil.loadGroup("XLIM_sw_mapping", "net/sf/orcc/templates/",
+				XlimMappingPrinter.class.getClassLoader());
 	}
 
 	/**
