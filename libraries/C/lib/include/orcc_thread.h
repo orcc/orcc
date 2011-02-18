@@ -66,6 +66,11 @@
 	#include <semaphore.h>
 	
 	// Thread
+#ifdef _APPLE
+	#define clear_cpu_set(cpuset)
+	#define set_thread_affinity(cpuset, proc_num, thread)
+	#define set_this_process_affinity(cpuset, proc_num)
+#else
 	#define clear_cpu_set(cpuset) CPU_ZERO(&(cpuset))
 	#define set_thread_affinity(cpuset, proc_num, thread) {					\
 			CPU_SET(proc_num, &(cpuset));									\
@@ -75,6 +80,7 @@
 			CPU_SET(proc_num, &(cpuset));									\
 			sched_setaffinity(0, sizeof(cpu_set_t), &(cpuset));				\
 	}
+#endif
 
 	
 	#define thread_create(thread, function, argument, id) id = pthread_create(&(thread), NULL, function, (void *) &(argument))
