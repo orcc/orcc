@@ -256,13 +256,17 @@ begin
   <instance.actor.simpleName>_orcc : entity work.<instance.actor.simpleName>
     port map (
       clock      =\> clock,
-      reset_n    =\> reset_n,
-      <instance.actor.inputs.list: signalsInstanciation(); separator=",\n">,
-      <instance.actor.outputs.list: signalsInstanciation(); separator=",\n">);
-      
+      reset_n    =\> reset_n<if(instance.actor.inputs.list || instance.actor.outputs.list)>,<endif>
+      <instance.actor.inputs.list: signalsInstanciation(); separator=",\n"><if(instance.actor.inputs.list && instance.actor.outputs.list)>,<endif>
+      <instance.actor.outputs.list: signalsInstanciation(); separator=",\n"><if(!instance.actor.outputs.list)>    <endif>);
+            
     <init_process()>
-    <waveform_process_in(input=instance.actor.inputs)>
-    <waveform_process_out(output=instance.actor.outputs)>
+    <if(instance.actor.inputs.list)
+    ><waveform_process_in(input=instance.actor.inputs)><
+    endif>
+    <if(instance.actor.outputs.list)
+    ><waveform_process_out(output=instance.actor.outputs)><
+    endif>
 <else>
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
@@ -275,13 +279,17 @@ begin
   <instance.network.name>_orcc : entity work.<instance.network.name>
     port map (
       clock      =\> clock,
-      reset_n    =\> reset_n,
-      <instance.network.inputs.list: signalsInstanciation(); separator=",\n">,
-      <instance.network.outputs.list: signalsInstanciation(); separator=",\n">);
+      reset_n    =\> reset_n<if(instance.network.inputs.list || instance.network.outputs.list)>,<endif>
+      <instance.network.inputs.list: signalsInstanciation(); separator=",\n"><if(instance.network.inputs.list && instance.network.outputs.list)>,<endif>
+      <instance.network.outputs.list: signalsInstanciation(); separator=",\n"><if(!instance.network.outputs.list)>    <endif>);
       
     <init_process()>
-    <waveform_process_in(input=instance.network.inputs)>
-    <waveform_process_out(output=instance.network.outputs)>
+    <if(instance.network.inputs.list)
+    ><waveform_process_in(input=instance.network.inputs)><
+    endif>
+    <if(instance.network.outputs.list)
+    ><waveform_process_out(output=instance.network.outputs)><
+    endif>
 <endif>
 
 end architecture arch_tb_<instance.id>;
