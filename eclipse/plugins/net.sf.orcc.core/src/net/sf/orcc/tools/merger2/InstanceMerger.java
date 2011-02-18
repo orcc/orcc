@@ -28,65 +28,85 @@
  */
 package net.sf.orcc.tools.merger2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * This class defines a transformation that merges a region of static instances into a unique instance.
+ * This class defines a transformation that merges a region of static instances
+ * into a unique instance.
  * 
  * 
  * @author Jérôme Gorin
  * 
  */
 public class InstanceMerger {
-	private String file;
+	private List<Action> actions;
 	private List<Action> initializes;
 	private OrderedMap<String, Port> inputs;
-	private MoC moc;
-	private MoCMerger mocMerger;
-	private String name;
-	private boolean nativeFlag;
 	private int nMerged;
 	private OrderedMap<String, Port> outputs;
 	private OrderedMap<String, GlobalVariable> parameters;
 	private OrderedMap<String, Procedure> procs;
 	private OrderedMap<String, GlobalVariable> stateVars;
-	
-	
-	public InstanceMerger(StaticGraph grap){
+
+	public InstanceMerger(StaticGraph graph) {
 		nMerged = 0;
-		//this.mocMerger = new MoCMerger(staticGraph, region);
 	}
-	
-	private Actor createActor(Instance instance1, Instance instance2){
+
+	private Actor createActor(Instance instance1, Instance instance2) {
+		// Set new properties of the actor
+		String file = "";
+		Boolean nativeFlag = false;
+		String name = "Merged" + nMerged++;
+		initializes = new ArrayList<Action>();
+		inputs = new OrderedMap<String, Port>();
+		outputs = new OrderedMap<String, Port>();
+		parameters = new OrderedMap<String, GlobalVariable>();
+		procs = new OrderedMap<String, Procedure>();
+		stateVars = new OrderedMap<String, GlobalVariable>();
+		actions = new ArrayList<Action>();
+		ActionScheduler scheduler = new ActionScheduler(
+				new ArrayList<Action>(), null);
+
+		// Store properties of each instance
 		storeInstanceProperty(instance1.getActor());
 		storeInstanceProperty(instance2.getActor());
-		return null;
-		
+
+		return new Actor(name, file, parameters, inputs, outputs, nativeFlag,
+				stateVars, procs, actions, initializes, scheduler);
 	}
-	
-	public Vertex merge(Vertex vertex1, Vertex vertex2){
+
+	public Vertex merge(Vertex vertex1, Vertex vertex2) {
+
 		Instance instance1 = vertex1.getInstance();
 		Instance instance2 = vertex2.getInstance();
-		
-		Instance newInstance = new Instance("Merged"+ nMerged++, "");
+
 		Actor newActor = createActor(instance1, instance2);
-		
-		return null;
+
+		Instance newInstance = new Instance("Merged" + nMerged++,
+				newActor.getName());
+
+		return new Vertex(newInstance);
 	}
-	
-	private void storeInstanceProperty(Actor actor){
+
+	private void storeInstanceProperty(Actor actor) {
 		inputs.putAll(actor.getInputs());
 		outputs.putAll(actor.getOutputs());
-		
+		parameters.putAll(actor.getParameters());
+		stateVars.putAll(actor.getStateVars());
+		procs.putAll(actor.getProcs());
+		initializes.addAll(actor.getInitializes());
+		actions.addAll(actor.getActions());
+
 	}
 }

@@ -97,10 +97,6 @@ public class StaticGraph {
 
 	private DirectedGraph<Vertex, StaticEdge> staticGraph;
 
-	public void updateNetwork(Vertex source, Vertex target, Vertex mergedVertex){
-		
-	}
-	
 	/**
 	 * Create a static representation of a network
 	 * 
@@ -126,7 +122,7 @@ public class StaticGraph {
 		// Remove unconnected static vertex
 		setRegions();
 	}
-
+	
 	/**
 	 * Add static edge from dynamic graph to the static graph
 	 */
@@ -308,6 +304,10 @@ public class StaticGraph {
 		StaticEdge staticEdge = staticGraph.getEdge(source, target);
 		staticEdge.setSourceRate(production);
 		staticEdge.setTargetRate(consumption);
+	}
+
+	public void updateNetwork(Vertex source, Vertex target, Vertex mergedVertex){
+		
 	}
 
 	public void updateRegion(Set<Vertex> region) {

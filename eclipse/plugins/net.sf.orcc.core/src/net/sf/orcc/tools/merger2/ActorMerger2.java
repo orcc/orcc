@@ -46,7 +46,7 @@ public class ActorMerger2 implements INetworkTransformation {
 
 		StaticRegionMerger regionMerger = new StaticRegionMerger(
 				new StaticGraph(network));
-		
+
 		regionMerger.transform(network);
 	}
 

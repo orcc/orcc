@@ -58,12 +58,6 @@ public class SDFCompositionAnalyzer {
 		analyseGraph();
 	}
 
-	private Rational calculateRate(Connection connection) {
-		int comsuption = getComsuptionRate(connection);
-		int production = getProductionRate(connection);
-		return new Rational(production, comsuption);
-	}
-
 	private void analyseGraph() {
 		for (Vertex vertex : staticGraph.getStaticVertices()) {
 			Set<Vertex> staticNeighbours = staticGraph
@@ -74,6 +68,12 @@ public class SDFCompositionAnalyzer {
 			}
 		}
 
+	}
+
+	private Rational calculateRate(Connection connection) {
+		int comsuption = getComsuptionRate(connection);
+		int production = getProductionRate(connection);
+		return new Rational(production, comsuption);
 	}
 
 	private int getComsuptionRate(Connection connection) {

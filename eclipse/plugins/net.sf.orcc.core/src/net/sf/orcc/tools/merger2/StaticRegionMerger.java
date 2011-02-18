@@ -46,31 +46,30 @@ public class StaticRegionMerger implements INetworkTransformation {
 
 	private Network network;
 	private StaticGraph staticGraph;
-	
+
 	public StaticRegionMerger(StaticGraph staticGraph) {
 		this.staticGraph = staticGraph;
 	}
 
 	private void mergeRegion(Set<Vertex> region) throws OrccException {
 		InstanceMerger instanceMerger = new InstanceMerger(staticGraph);
-		
-		
-		for (Vertex vertex : region){
-			for (Vertex neighbor : staticGraph.getStaticNeighbors(vertex)){
+
+		for (Vertex vertex : region) {
+			for (Vertex neighbor : staticGraph.getStaticNeighbors(vertex)) {
 				Vertex mergedVertex = instanceMerger.merge(vertex, neighbor);
 				staticGraph.updateNetwork(vertex, neighbor, mergedVertex);
 			}
 		}
-		
+
 	}
 
 	private void mergeStaticRegions() throws OrccException {
-			SDFCompositionAnalyzer compositionAnalyzer = new SDFCompositionAnalyzer(
-					network, staticGraph);
+		SDFCompositionAnalyzer compositionAnalyzer = new SDFCompositionAnalyzer(
+				network, staticGraph);
 
-			for (Set<Vertex> region : staticGraph.getRegions()){
-				mergeRegion(region);
-			}
+		for (Set<Vertex> region : staticGraph.getRegions()) {
+			mergeRegion(region);
+		}
 	}
 
 	@Override
