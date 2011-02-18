@@ -56,7 +56,7 @@ public class CMakePrinter {
 	 *             if the template file could not be read
 	 */
 	public CMakePrinter() throws IOException {
-		group = OrccUtil.loadGroup("CMakeLists", "net/sf/orcc/templates/",
+		group = OrccUtil.loadGroup("C_CMakeLists", "net/sf/orcc/templates/",
 				CMakePrinter.class.getClassLoader());
 	}
 

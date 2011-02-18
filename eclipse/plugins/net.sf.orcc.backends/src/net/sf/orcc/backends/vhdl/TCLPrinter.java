@@ -67,7 +67,7 @@ public class TCLPrinter {
 	 *             if the template file could not be read
 	 */
 	public TCLPrinter() throws IOException {
-		group = OrccUtil.loadGroup("TCLLists", "net/sf/orcc/templates/",
+		group = OrccUtil.loadGroup("VHDL_TCLLists", "net/sf/orcc/templates/",
 				CMakePrinter.class.getClassLoader());
 	}
 
