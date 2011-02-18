@@ -198,8 +198,8 @@ public class CBackendImpl extends AbstractBackend {
 			transformation.visit(actor);
 		}
 
-		CTemplateData data = new CTemplateData();
-		data.computeTemplateMaps(actor, workingNetwork);
+		CActorTemplateData data = new CActorTemplateData();
+		data.computeTemplateMaps(actor);
 		actor.setTemplateData(data);
 	}
 
@@ -232,7 +232,7 @@ public class CBackendImpl extends AbstractBackend {
 			network.computeTemplateMaps();
 		}
 
-		CTemplateData data = new CTemplateData();
+		CNetworkTemplateData data = new CNetworkTemplateData();
 		data.computeTemplateMaps(network);
 		network.setTemplateData(data);
 	}

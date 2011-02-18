@@ -462,7 +462,7 @@ printMediumInclude(mediums) ::= <<
 >>
 
 printMedium(port) ::=<<
-<instance.actor.templateData.portMedium.(instance).(port).value>
+<network.templateData.portMedium.(instance).(port).value>
 >>
 
 instance(instance, network, options) ::= <<
