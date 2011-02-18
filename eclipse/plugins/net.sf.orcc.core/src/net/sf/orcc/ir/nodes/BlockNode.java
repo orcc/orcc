@@ -216,6 +216,19 @@ public final class BlockNode extends AbstractNode implements
 		return instructions;
 	}
 
+	/**
+	 * Returns the index of the given instruction in the list of instructions of
+	 * this block.
+	 * 
+	 * @param instruction
+	 *            an instruction
+	 * @return the index of the given instruction in the list of instructions of
+	 *         this block
+	 */
+	public int indexOf(Instruction instruction) {
+		return instructions.indexOf(instruction);
+	}
+
 	@Override
 	public boolean isBlockNode() {
 		return true;
