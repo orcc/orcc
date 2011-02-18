@@ -15,20 +15,56 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.StringAttribute;
 
+/**
+ * This class allows the string template accessing informations about
+ * application's network
+ * 
+ * @author Damien de Saint Jorre
+ * 
+ */
 public class CNetworkTemplateData {
 
+	/**
+	 * Contains a list of instances corresponding to all connections with an
+	 * other target.
+	 */
 	private List<Instance> listMediumInstances;
 
+	/**
+	 * Contains a list of ports corresponding to all connections with an other
+	 * target.
+	 */
 	private List<Port> listMediumPorts;
 
+	/**
+	 * Map which contains all mediums used for each instance in the network.
+	 */
 	private Map<Instance, List<String>> listMediumUsed;
 
+	/**
+	 * Contains all mediums needed in this network.
+	 */
 	private List<String> listMediumUsedAllInstances;
 
+	/**
+	 * This map links instance's port with a StringAttribute. This
+	 * StringAttribute contains the medium connection when it exists.
+	 */
 	private Map<Instance, Map<Port, IAttribute>> portMedium;
 
+	/**
+	 * This map links instance's port with a StringAttribute. This
+	 * StringAttribute contains the medium (the string is in capital letters)
+	 * connection when it exists.
+	 */
 	private Map<Instance, Map<Port, IAttribute>> portMediumUpperCase;
 
+	/**
+	 * build informations about medium of communication
+	 * 
+	 * @param network
+	 *            a network
+	 */
 	private void buildMediumInfo(Network network) {
 		Map<Connection, Instance> connectionToInstance = new HashMap<Connection, Instance>();
 		Map<Connection, Port> connectionToPort = new HashMap<Connection, Port>();
@@ -40,12 +76,15 @@ public class CNetworkTemplateData {
 				Map<Port, IAttribute> instancePorts = new HashMap<Port, IAttribute>();
 				Map<Port, IAttribute> instancePortsUpperCase = new HashMap<Port, IAttribute>();
 
+				// For all connections in the instance's input
 				for (Connection connection : network.getIncomingMap().get(
 						instance)) {
 					instancePorts.put(connection.getTarget(),
 							connection.getAttribute("commMedium"));
 					instancePortsUpperCase.put(connection.getTarget(),
 							connection.getAttribute("commMediumUpperCase"));
+
+					// if the instance connected is in an other target
 					if (connection.getAttributes().containsKey("commMedium")) {
 						connectionToInstance.put(connection, instance);
 						connectionToPort
@@ -56,12 +95,16 @@ public class CNetworkTemplateData {
 						mediumSet.add(connectionAttribute.getValue());
 					}
 				}
+
+				// For all connections in the instance's output
 				for (Connection connection : network.getOutgoingMap().get(
 						instance)) {
 					instancePorts.put(connection.getSource(),
 							connection.getAttribute("commMedium"));
 					instancePortsUpperCase.put(connection.getSource(),
 							connection.getAttribute("commMediumUpperCase"));
+
+					// if the instance connected is in an other target
 					if (connection.getAttributes().containsKey("commMedium")) {
 						connectionToInstance.put(connection, instance);
 						connectionToPort
@@ -93,6 +136,12 @@ public class CNetworkTemplateData {
 		listMediumUsedAllInstances.addAll(allMedium);
 	}
 
+	/**
+	 * build all informations needed in the template data.
+	 * 
+	 * @param network
+	 *            a network
+	 */
 	public void computeTemplateMaps(Network network) {
 		portMedium = new HashMap<Instance, Map<Port, IAttribute>>();
 		portMediumUpperCase = new HashMap<Instance, Map<Port, IAttribute>>();
@@ -104,26 +153,61 @@ public class CNetworkTemplateData {
 		buildMediumInfo(network);
 	}
 
+	/**
+	 * Return a list of mediums used in the application
+	 * 
+	 * @return list of mediums' name
+	 */
 	public List<String> getAllMediumsAllInstances() {
 		return listMediumUsedAllInstances;
 	}
 
+	/**
+	 * Return a map which inform about all medium used in each instance.
+	 * 
+	 * @return map of instance to a list of medium's name
+	 */
 	public Map<Instance, List<String>> getListAllMedium() {
 		return listMediumUsed;
 	}
 
+	/**
+	 * Returns the list of instances corresponding to instance connected to the
+	 * sorted connections set
+	 * 
+	 * @return a list of instances
+	 */
 	public List<Instance> getListMediumInstances() {
 		return listMediumInstances;
 	}
 
+	/**
+	 * Returns the list of ports corresponding to port connected to the sorted
+	 * connections set
+	 * 
+	 * @return a list of ports
+	 */
 	public List<Port> getListMediumPorts() {
 		return listMediumPorts;
 	}
 
+	/**
+	 * Returns the map of instance's ports to get the communication medium for
+	 * this port
+	 * 
+	 * @return a map of instance's ports to communication medium
+	 */
 	public Map<Instance, Map<Port, IAttribute>> getPortMedium() {
 		return portMedium;
 	}
 
+	/**
+	 * Returns the map of instance's ports to get the communication medium for
+	 * this port
+	 * 
+	 * @return a map of instance's ports to communication medium (the
+	 *         corresponding string is composed by capital letters)
+	 */
 	public Map<Instance, Map<Port, IAttribute>> getUpperCasePortMedium() {
 		return portMediumUpperCase;
 	}

@@ -50,21 +50,49 @@ import org.jgrapht.DirectedGraph;
  * @author Damien de Saint Jorre
  * 
  */
-
 public class NetworkSplitter implements INetworkTransformation {
 
+	/**
+	 * Contains map of targets' name to a list of instances which will be
+	 * launched in.
+	 */
 	private Map<String, List<Instance>> instancesTarget;
-	private DirectedGraph<String, StringAttribute> mediumGraph;
-	private Set<Network> networks;
 
+	/**
+	 * Graph which informs about communications between targets.
+	 */
+	private DirectedGraph<String, StringAttribute> mediumGraph;
+
+	/**
+	 * List of all networks relating to the application
+	 */
+	private List<Network> networks;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param instancesTarget
+	 *            Contains map of targets' name to a list of instances which
+	 *            will be launched in.
+	 * @param mediumGraph
+	 *            Contains graph which informs about communications between
+	 *            targets.
+	 */
 	public NetworkSplitter(Map<String, List<Instance>> instancesTarget,
 			DirectedGraph<String, StringAttribute> mediumGraph) {
 		this.instancesTarget = new HashMap<String, List<Instance>>(
 				instancesTarget);
 		this.mediumGraph = mediumGraph;
-		networks = new HashSet<Network>();
+		networks = new ArrayList<Network>();
 	}
 
+	/**
+	 * Add attributes about communication medium in all connections contained in
+	 * a network.
+	 * 
+	 * @param network
+	 *            network to modify
+	 */
 	private void addCommAttribute(Network network) {
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
 		Set<Vertex> vertexSet = graph.vertexSet();
@@ -108,10 +136,24 @@ public class NetworkSplitter implements INetworkTransformation {
 		}
 	}
 
-	public Set<Network> getNetworks() {
+	/**
+	 * Returns all networks constituting the application
+	 * 
+	 * @return list of networks
+	 */
+	public List<Network> getNetworks() {
 		return networks;
 	}
 
+	/**
+	 * Moving all instances which belong to target from network to a new
+	 * network.
+	 * 
+	 * @param network
+	 *            origin network containing instances' target
+	 * @param target
+	 *            target's name
+	 */
 	private void splitNetwork(Network network, String target) { // Network
 		// Network newNetwork = new Network(network.getName() + "_" + target);
 
@@ -166,6 +208,10 @@ public class NetworkSplitter implements INetworkTransformation {
 		instancesToRemove.addAll(newInstancesTarget);
 	}
 
+	/**
+	 * Split one networks containing many targets'instances into many networks
+	 * containing one target's instances
+	 */
 	@Override
 	public void transform(Network network) throws OrccException {
 		Set<String> targetList = new HashSet<String>(instancesTarget.keySet());

@@ -13,12 +13,29 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
 
+/**
+ * This class allows the string template accessing informations about
+ * application's instances
+ * 
+ * @author Matthieu Wipliez
+ * @author Damien de Saint Jorre
+ * 
+ */
 public class CActorTemplateData {
 
+	/**
+	 * Map that associate an input port mask to a transition
+	 */
 	private Map<Transition, String> maskInputs;
 
+	/**
+	 * Map that associate an output port mask to a transition
+	 */
 	private Map<Port, String> maskOutputs;
 
+	/**
+	 * Contains number of inputs in this instance.
+	 */
 	private int numInputs;
 
 	/**
