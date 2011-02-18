@@ -66,11 +66,14 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 	 */
 	private class ConditionalSplitter extends AbstractBranchVisitor {
 
-		private Map<Variable, Integer> numRW;
+		private Map<Variable, Integer> numReads;
+
+		private Map<Variable, Integer> numWrites;
 
 		public ConditionalSplitter(String sourceName, String targetName) {
 			super(sourceName, targetName);
-			numRW = new HashMap<Variable, Integer>();
+			numReads = new HashMap<Variable, Integer>();
+			numWrites = new HashMap<Variable, Integer>();
 		}
 
 		/**
@@ -79,9 +82,9 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 		 * 
 		 * @return true if one of the values is greater than one
 		 */
-		private boolean hasManyAccesses(Map<?, Integer> map) {
+		private boolean hasManyAccesses(Map<?, Integer> map, int maxNumAccesses) {
 			for (Integer value : map.values()) {
-				if (value > 1) {
+				if (value > maxNumAccesses) {
 					return true;
 				}
 			}
@@ -142,14 +145,18 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 			ListIterator<CFGNode> localItNode = itNode;
 
 			// visit then
-			numRW.clear();
+			numReads.clear();
+			numWrites.clear();
 			visit(ifNode.getThenNodes());
-			boolean thenNeedSplit = hasManyAccesses(numRW);
+			boolean thenNeedSplit = hasManyAccesses(numReads, MAX_NUM_READS)
+					|| hasManyAccesses(numWrites, MAX_NUM_WRITES);
 
 			// visit else
-			numRW.clear();
+			numReads.clear();
+			numWrites.clear();
 			visit(ifNode.getElseNodes());
-			boolean elseNeedSplit = hasManyAccesses(numRW);
+			boolean elseNeedSplit = hasManyAccesses(numReads, MAX_NUM_READS)
+					|| hasManyAccesses(numWrites, MAX_NUM_WRITES);
 
 			// check number of accesses
 			if (thenNeedSplit || elseNeedSplit) {
@@ -160,12 +167,13 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 
 		@Override
 		public void visit(Load load) {
-			visitLoadStore(load.getSource().getVariable(), load.getIndexes());
+			visitLoadStore(load.getSource().getVariable(), load.getIndexes(),
+					numReads);
 		}
 
 		@Override
 		public void visit(Store store) {
-			visitLoadStore(store.getTarget(), store.getIndexes());
+			visitLoadStore(store.getTarget(), store.getIndexes(), numWrites);
 		}
 
 		/**
@@ -176,13 +184,14 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 		 * @param indexes
 		 *            a list of indexes
 		 */
-		private void visitLoadStore(Variable variable, List<Expression> indexes) {
+		private void visitLoadStore(Variable variable,
+				List<Expression> indexes, Map<Variable, Integer> map) {
 			if (!indexes.isEmpty()) {
-				Integer numAccesses = numRW.get(variable);
+				Integer numAccesses = map.get(variable);
 				if (numAccesses == null) {
-					numRW.put(variable, 1);
+					map.put(variable, 1);
 				} else {
-					numRW.put(variable, numAccesses + 1);
+					map.put(variable, numAccesses + 1);
 				}
 			}
 		}
@@ -198,27 +207,33 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 	 */
 	private class UnconditionalSplitter extends AbstractBranchVisitor {
 
-		private Map<Variable, Integer> numRW;
+		private Map<Variable, Integer> numReads;
+
+		private Map<Variable, Integer> numWrites;
 
 		public UnconditionalSplitter(String sourceName, String targetName) {
 			super(sourceName, targetName);
-			numRW = new HashMap<Variable, Integer>();
+			numReads = new HashMap<Variable, Integer>();
+			numWrites = new HashMap<Variable, Integer>();
 		}
 
 		@Override
 		public void visit(Load load) {
-			visitLoadStore(load.getSource().getVariable(), load.getIndexes());
+			visitLoadStore(load.getSource().getVariable(), load.getIndexes(),
+					numReads, MAX_NUM_READS);
 		}
 
 		@Override
 		public void visit(Procedure procedure) {
-			numRW.clear();
+			numReads.clear();
+			numWrites.clear();
 			super.visit(procedure);
 		}
 
 		@Override
 		public void visit(Store store) {
-			visitLoadStore(store.getTarget(), store.getIndexes());
+			visitLoadStore(store.getTarget(), store.getIndexes(), numWrites,
+					MAX_NUM_WRITES);
 		}
 
 		/**
@@ -229,20 +244,43 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 		 * @param indexes
 		 *            a list of indexes
 		 */
-		private void visitLoadStore(Variable variable, List<Expression> indexes) {
+		private void visitLoadStore(Variable variable,
+				List<Expression> indexes, Map<Variable, Integer> map,
+				int maxNumAccesses) {
 			if (!indexes.isEmpty()) {
-				Integer numAccesses = numRW.get(variable);
+				Integer numAccesses = map.get(variable);
 				if (numAccesses == null) {
-					numRW.put(variable, 1);
+					map.put(variable, 1);
 				} else {
-					splitAction();
-					actions.add(nextAction);
+					numAccesses = numAccesses + 1;
+					if (numAccesses > maxNumAccesses) {
+						splitAction();
+						actions.add(nextAction);
+					} else {
+						map.put(variable, numAccesses);
+					}
 				}
 			}
 		}
 
 	}
-	
+
+	/**
+	 * Maximum number of reads that are allowed in one action before splitting
+	 * it. If there are less read accesses to each array than the given number,
+	 * it is not worth splitting the action because the synthesizer will simply
+	 * duplicate RAM blocks.
+	 */
+	private static final int MAX_NUM_READS = 16;
+
+	/**
+	 * Maximum number of writes that are allowed in one action before splitting
+	 * it. Contrary to MAX_NUM_READS, this is only two because we target
+	 * double-port RAM blocks. If we do not split an action after two writes to
+	 * a given array, the synthesizer will complain.
+	 */
+	private static final int MAX_NUM_WRITES = 2;
+
 	private List<Action> actions;
 
 	private boolean conditionalPhase;
@@ -250,7 +288,7 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 	@Override
 	public void visit(Actor actor) {
 		super.visit(actor);
-		
+
 		actions = new ArrayList<Action>();
 
 		// first we split conditional branches that contain multiple accesses
