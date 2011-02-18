@@ -33,8 +33,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.sf.orcc.backends.TemplateGroupLoader;
+import net.sf.orcc.backends.c.CMakePrinter;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.OrccUtil;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -59,7 +60,8 @@ public class CppCMakePrinter {
 	 *             if the template file could not be read
 	 */
 	public CppCMakePrinter() throws IOException {
-		group = TemplateGroupLoader.loadGroup("Cpp_CMakeLists");
+		group = OrccUtil.loadGroup("Cpp_CMakeLists", "net/sf/orcc/templates/",
+				CMakePrinter.class.getClassLoader());
 	}
 
 	/**
@@ -74,7 +76,8 @@ public class CppCMakePrinter {
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
-	public void printCMake(String path, Network network, boolean needSerDes) throws IOException {
+	public void printCMake(String path, Network network, boolean needSerDes)
+			throws IOException {
 		ST template = group.getInstanceOf("Cpp_CMakeLists");
 		template.add("network", network);
 		template.add("needSerDes", needSerDes);

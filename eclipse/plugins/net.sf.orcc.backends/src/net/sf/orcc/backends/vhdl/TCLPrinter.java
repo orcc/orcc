@@ -37,10 +37,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import net.sf.orcc.backends.TemplateGroupLoader;
+import net.sf.orcc.backends.c.CMakePrinter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.OrccUtil;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -66,7 +67,8 @@ public class TCLPrinter {
 	 *             if the template file could not be read
 	 */
 	public TCLPrinter() throws IOException {
-		group = TemplateGroupLoader.loadGroup("TCLLists");
+		group = OrccUtil.loadGroup("TCLLists", "net/sf/orcc/templates/",
+				CMakePrinter.class.getClassLoader());
 	}
 
 	private void computeEntityList(Instance instance) {

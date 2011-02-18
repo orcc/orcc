@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.TemplateGroupLoader;
+import net.sf.orcc.backends.c.CMakePrinter;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.OrccUtil;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -17,7 +18,8 @@ public class CppConfigPrinter {
 	private STGroup group;
 
 	public CppConfigPrinter() throws OrccException {
-		group = TemplateGroupLoader.loadGroup("Cpp_Codesign");
+		group = OrccUtil.loadGroup("Cpp_Codesign", "net/sf/orcc/templates/",
+				CMakePrinter.class.getClassLoader());
 	}
 
 	public void print(String path, Network network) throws IOException {

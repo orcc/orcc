@@ -33,8 +33,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.sf.orcc.backends.TemplateGroupLoader;
+import net.sf.orcc.backends.c.CMakePrinter;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.OrccUtil;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -57,7 +58,8 @@ public class XlimCMakePrinter {
 	 *             if the template file could not be read
 	 */
 	public XlimCMakePrinter() throws IOException {
-		group = TemplateGroupLoader.loadGroup("XLIM_sw_CMakeLists");
+		group = OrccUtil.loadGroup("XLIM_sw_CMakeLists",
+				"net/sf/orcc/templates/", CMakePrinter.class.getClassLoader());
 	}
 
 	/**

@@ -45,6 +45,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 
 /**
  * This class contains utility methods for dealing with resources.
@@ -315,6 +317,29 @@ public class OrccUtil {
 		}
 
 		return builder.toString();
+	}
+
+	/**
+	 * Loads a template group.
+	 * 
+	 * @param groupName
+	 *            the name of the group to load
+	 * @return a StringTemplate group
+	 */
+	public static STGroup loadGroup(String groupName, String path,
+			ClassLoader cl) {
+		STGroup group = null;
+
+		ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(cl);
+
+		String groupPath = path + groupName + ".stg";
+		group = new STGroupFile(groupPath);
+		group.load();
+
+		Thread.currentThread().setContextClassLoader(oldCl);
+
+		return group;
 	}
 
 	/**

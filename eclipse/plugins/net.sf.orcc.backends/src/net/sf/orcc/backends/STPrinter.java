@@ -43,6 +43,7 @@ import net.sf.orcc.ir.expr.ExpressionPrinter;
 import net.sf.orcc.ir.type.TypePrinter;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.OrccUtil;
 
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.ST;
@@ -147,7 +148,8 @@ public final class STPrinter {
 	 *             If the template file could not be read.
 	 */
 	public void loadGroup(String groupName) {
-		group = TemplateGroupLoader.loadGroup(groupName);
+		group = OrccUtil.loadGroup(groupName, "net/sf/orcc/templates/",
+				STPrinter.class.getClassLoader());
 
 		// register renderers
 		group.registerRenderer(Expression.class, new ExpressionRenderer());

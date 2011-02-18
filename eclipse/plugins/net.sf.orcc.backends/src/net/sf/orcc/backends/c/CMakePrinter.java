@@ -33,8 +33,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.OrccUtil;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -56,7 +56,8 @@ public class CMakePrinter {
 	 *             if the template file could not be read
 	 */
 	public CMakePrinter() throws IOException {
-		group = TemplateGroupLoader.loadGroup("CMakeLists");
+		group = OrccUtil.loadGroup("CMakeLists", "net/sf/orcc/templates/",
+				CMakePrinter.class.getClassLoader());
 	}
 
 	/**
