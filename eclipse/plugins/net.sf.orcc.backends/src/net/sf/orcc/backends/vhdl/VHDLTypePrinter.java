@@ -62,7 +62,7 @@ public class VHDLTypePrinter extends TypePrinter {
 		builder.append("integer range ");
 		builder.append(bound - 1);
 		builder.append(" downto -");
-		builder.append(bound);
+		builder.append(bound - 1);
 	}
 
 	/**
