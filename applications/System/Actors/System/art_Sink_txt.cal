@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,10 @@
 
 package System;
 
-native actor art_Display_yuv_width_height (String title, int width, int height) uint(size=8) In, int(size=16) WIDTH, int(size=16) HEIGHT ==> :
+native actor art_Sink_txt (String fileName) int(size=16) In ==> :
+
+	// so the actor scheduler will call an initialize function
+	initialize ==>
+	end
 
 end
