@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="source" x="57" y="70"/>
+      <vertex id="sink" x="439" y="80"/>
+      <vertex id="maatb1" x="182" y="70"/>
+      <vertex id="maatb2" x="188" y="178"/>
+      <vertex id="sink_2" x="412" y="159"/>
+   </vertices>
+</layout>

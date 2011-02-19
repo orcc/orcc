@@ -2,9 +2,22 @@ package tb;
 
 actor GenData () ==> int O :
 
-	List(type:int, size=8) stimulus = [ 1, 2, 3, 4, 5, 6, 7, 8 ];
+	uint(size=4) count := 0;
 
-	action ==> O:[ stimulus ] repeat #stimulus
+	uint(size=4) stimulus[8] = [ 1, 2, 3, 4, 5, 6, 7, 8 ];
+
+	done: action ==>
+	guard
+		count = 8
+	do
+		count := 0;
+	end
+
+	loop: action ==> O:[ v ]
+	var
+		int(size=4) v = stimulus[count]
+	do
+		count := count + 1;
 	end
 
 end

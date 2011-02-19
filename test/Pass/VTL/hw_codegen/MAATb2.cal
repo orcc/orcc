@@ -1,0 +1,51 @@
+package hw_codegen;
+
+actor MAATb2() int I ==> int O :
+
+	uint(size=4) values[16] := [i : for int i in 0 .. 15];
+	
+	uint(size=4) last_i;
+	
+	uint(size=4) val0;
+	uint(size=4) ind0;
+
+	uint(size=4) val1;
+	uint(size=4) ind1;
+
+	a0: action I:[i] ==>
+	do
+		val0 := i;
+		ind0 := i & 15;
+
+		val1 := (i + 1) & 15;
+		ind1 := (i + 1) & 15;
+
+		last_i := (i + i + 1) & 15;
+	end
+
+	a1: action ==>
+	do
+		values[ind0] := val0;
+		values[ind1] := val1;
+		
+		ind0 := (last_i + 4) & 15;
+		ind1 := (last_i + 5) & 15;
+	end
+	
+	a2: action ==>
+	do
+		val0 := values[ind0];
+		val1 := values[ind1];
+	end
+	
+	a3: action ==> O:[val0 + val1]
+	end
+	
+	schedule fsm s0:
+		s0 (a0) --> s1;
+		s1 (a1) --> s2;
+		s2 (a2) --> s3;
+		s3 (a3) --> s0;
+	end
+
+end

@@ -1,0 +1,27 @@
+package hw_codegen;
+
+actor MAATb1() int I ==> int O :
+
+	int values[16] := [i : for int i in 0 .. 15];
+	
+	uint(size=4) last_i;
+
+	a0: action I:[i] ==>
+	do
+		values[i & 15] := i;
+		values[(i + 1) & 15] := i + 1;
+
+		last_i := (i + i + 1) & 15;
+	end
+	
+	a1: action ==> O:[x]
+	var
+		int x = values[(last_i + 4) & 15] + values[(last_i + 5) & 15]
+	end
+	
+	schedule fsm s0:
+		s0 (a0) --> s1;
+		s1 (a1) --> s0;
+	end
+
+end
