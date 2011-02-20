@@ -53,17 +53,13 @@ public class NetworkPrinter {
 
 	private Map<String, Object> options;
 
-	public Map<String, Object> getOptions() {
-		return options;
-	}
-
 	/**
 	 * Creates a new network printer with the template "CMakeLists".
 	 * 
 	 * @param templateName
-	 * 				the name of the template
+	 *            the name of the template
 	 * @throws IOException
-	 * 				if the template file could not be read
+	 *             if the template file could not be read
 	 */
 	public NetworkPrinter(String templateName) throws IOException {
 		group = OrccUtil.loadGroup(templateName, "net/sf/orcc/templates/",
@@ -71,19 +67,23 @@ public class NetworkPrinter {
 		options = new HashMap<String, Object>();
 	}
 
+	public Map<String, Object> getOptions() {
+		return options;
+	}
+
 	/**
 	 * Prints the given network to a file whose name and path are given.
 	 * 
 	 * @param fileName
-	 * 			name of the output file
+	 *            name of the output file
 	 * @param path
-	 * 			path of the output file
+	 *            path of the output file
 	 * @param network
-	 * 			the network to generate code for
+	 *            the network to generate code for
 	 * @param instanceName
-	 * 			name of the root ST rule
+	 *            name of the root ST rule
 	 * @throws IOException
-	 * 			if there is an I/O error
+	 *             if there is an I/O error
 	 */
 	public void print(String fileName, String path, Network network,
 			String instanceName) throws IOException {

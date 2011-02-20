@@ -8,7 +8,7 @@ addActor(actor) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Cpp_CMakeLists
 
-Cpp_CMakeLists(network, needSerDes) ::= <<
+Cpp_CMakeLists(network, options) ::= <<
 # Generated from $network.name$
 
 cmake_minimum_required (VERSION 2.8)
@@ -37,7 +37,7 @@ set(ImageToolbox_INCLUDE_DIR "$ENV{ImageToolboxDIR}/include")
 find_path(CAL_INCLUDE_DIR actoraka.h HINTS $ENV{CALDIR} PATH_SUFFIXES include include/CAL)
 
 
-<if(needSerDes)>
+<if(options.needSerDes)>
 find_path(CAL_SOURCE_DIR wrapperaka.cpp HINTS $ENV{CALDIR} PATH_SUFFIXES src src/CAL)
 find_library(AdaptorFactory_LIBRARY AdaptorFactory HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 add_library(Wrapper STATIC "${CAL_SOURCE_DIR}/wrapperaka.cpp")
@@ -55,7 +55,7 @@ ${SystemActor_LIBRARY}
 ${Thread_LIBRARY}
 )
 
-<if(needSerDes)>
+<if(options.needSerDes)>
 set(libraries ${libraries} Wrapper ${AdaptorFactory_LIBRARY}
 <endif>
 
@@ -83,7 +83,7 @@ add_executable (<network.name>
 <network.actors : addActor()>
 )
 
-<if(needSerDes)>
+<if(options.needSerDes)>
 add_dependencies(<network.name> Wrapper)
 <endif>
 

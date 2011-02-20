@@ -41,6 +41,7 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
@@ -90,13 +91,13 @@ public class CBackendImpl extends AbstractBackend {
 
 	private boolean needPthreads;
 
-	private Network workingNetwork;
 	/**
 	 * printer is protected in order to be visible to CQuasiBackendImpl
 	 */
 	protected STPrinter printer;
-
 	private final Map<String, String> transformations;
+
+	private Network workingNetwork;
 
 	/**
 	 * Creates a new instance of the C back-end. Initializes the transformation
@@ -276,6 +277,12 @@ public class CBackendImpl extends AbstractBackend {
 		printNetwork(network);
 	}
 
+	private void printCMake(Network network) throws IOException {
+		NetworkPrinter networkPrinter = new NetworkPrinter("C_CMakeLists");
+		networkPrinter.getOptions().put("needPthreads", needPthreads);
+		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
+	}
+
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
 		String id = instance.getId();
@@ -305,7 +312,7 @@ public class CBackendImpl extends AbstractBackend {
 			printer.loadGroup("C_network");
 			printer.printNetwork(outputName, network, false, fifoSize);
 
-			new CMakePrinter().printCMake(path, network, needPthreads);
+			printCMake(network);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

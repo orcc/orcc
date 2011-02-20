@@ -37,6 +37,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
@@ -66,8 +67,6 @@ public class CppBackendImpl extends AbstractBackend {
 
 	public static Boolean printHeader = false;
 
-	private boolean needSerDes = false;
-
 	/**
 	 * 
 	 * @param args
@@ -76,26 +75,9 @@ public class CppBackendImpl extends AbstractBackend {
 		main(CppBackendImpl.class, args);
 	}
 
-	private STPrinter printer;
+	private boolean needSerDes = false;
 
-	private void computeMapping(Network network) throws OrccException {
-		Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
-		for (Instance instance : network.getInstances()) {
-			String component = getPartNameAttribute(instance);
-			if (component != null) {
-				List<Instance> list = threads.get(component);
-				if (list == null) {
-					list = new ArrayList<Instance>();
-					threads.put(component, list);
-				}
-				list.add(instance);
-			} else {
-				throw new OrccException("instance " + instance.getId()
-						+ " has no partName attribute!");
-			}
-		}
-		printer.getOptions().put("threads", threads);
-	}
+	private STPrinter printer;
 
 	private void computeFifoKind(Network network) throws OrccException {
 		Map<Connection, Integer> fifoKind = new HashMap<Connection, Integer>();
@@ -122,6 +104,25 @@ public class CppBackendImpl extends AbstractBackend {
 
 		}
 		printer.getOptions().put("fifoKind", fifoKind);
+	}
+
+	private void computeMapping(Network network) throws OrccException {
+		Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
+		for (Instance instance : network.getInstances()) {
+			String component = getPartNameAttribute(instance);
+			if (component != null) {
+				List<Instance> list = threads.get(component);
+				if (list == null) {
+					list = new ArrayList<Instance>();
+					threads.put(component, list);
+				}
+				list.add(instance);
+			} else {
+				throw new OrccException("instance " + instance.getId()
+						+ " has no partName attribute!");
+			}
+		}
+		printer.getOptions().put("threads", threads);
 	}
 
 	@Override
@@ -203,7 +204,7 @@ public class CppBackendImpl extends AbstractBackend {
 					+ actor.getPackage().replace('.', File.separatorChar);
 			new File(hier).mkdirs();
 			String name = hier + File.separator + actor.getSimpleName();
-			
+
 			if (printHeader) {
 				printer.loadGroup("Cpp_actorDecl");
 				printer.printActor(name + ".h", actor);
@@ -218,6 +219,19 @@ public class CppBackendImpl extends AbstractBackend {
 		return res;
 	}
 
+	private void printCMake(Network network) throws IOException {
+		NetworkPrinter networkPrinter = new NetworkPrinter("Cpp_CMakeLists");
+		networkPrinter.getOptions().put("needSerDes", needSerDes);
+		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
+	}
+
+	@SuppressWarnings("unused")
+	private void printConfig(Network network) throws IOException {
+		NetworkPrinter networkPrinter = new NetworkPrinter("Cpp_Codesign");
+		networkPrinter.print("portaddresses.h", path, network, "Cpp_Header");
+		networkPrinter.print("AdaptorConfig.h", path, network, "AdaptorConfig");
+	}
+	
 	/**
 	 * Prints the given network.
 	 * 
@@ -228,8 +242,6 @@ public class CppBackendImpl extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) throws OrccException {
 		try {
-
-			CppCMakePrinter cmakePrinter = new CppCMakePrinter();
 			// compute thread lists if need
 			computeMapping(network);
 			// add wrapper if needed
@@ -243,7 +255,7 @@ public class CppBackendImpl extends AbstractBackend {
 			printer.loadGroup("Cpp_network");
 			printer.printNetwork(outputName, network, false, fifoSize);
 
-			cmakePrinter.printCMake(path, network, needSerDes);
+			printCMake(network);
 
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);

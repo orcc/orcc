@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import net.sf.orcc.backends.c.CMakePrinter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -68,7 +67,7 @@ public class TCLPrinter {
 	 */
 	public TCLPrinter() throws IOException {
 		group = OrccUtil.loadGroup("VHDL_TCLLists", "net/sf/orcc/templates/",
-				CMakePrinter.class.getClassLoader());
+				TCLPrinter.class.getClassLoader());
 	}
 
 	private void computeEntityList(Instance instance) {

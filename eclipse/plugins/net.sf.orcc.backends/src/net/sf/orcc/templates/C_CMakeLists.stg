@@ -10,7 +10,7 @@ printInstance(instance) ::= <<
 endif>
 >>
 
-CMakeLists(network, needPthreads) ::= <<
+CMakeLists(network, options) ::= <<
 # Generated from <network.name>
 
 cmake_minimum_required (VERSION 2.8)
@@ -22,7 +22,7 @@ find_file(orcc_INCLUDE_DIR orcc)
 
 find_package(SDL REQUIRED)
 find_package(SDL_image REQUIRED)
-<if (needPthreads)>
+<if (options.needPthreads)>
 find_package(Threads REQUIRED)
 <endif>
 
@@ -35,6 +35,6 @@ set(filenames
 
 add_executable(<network.name> ${filenames})
 
-target_link_libraries(<network.name> ${orcc_LIBRARY} ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY}<if (needPthreads)> ${CMAKE_THREAD_LIBS_INIT}<endif>)
+target_link_libraries(<network.name> ${orcc_LIBRARY} ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY}<if (options.needPthreads)> ${CMAKE_THREAD_LIBS_INIT}<endif>)
 
 >>

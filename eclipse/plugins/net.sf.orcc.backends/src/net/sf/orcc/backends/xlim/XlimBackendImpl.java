@@ -30,6 +30,7 @@ package net.sf.orcc.backends.xlim;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.ListOfOneElementToScalarTransformation;
@@ -44,8 +46,8 @@ import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
 import net.sf.orcc.backends.xlim.transformations.ArrayInitializeTransformation;
-import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.ConstantPhiValuesTransformation;
+import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
 import net.sf.orcc.backends.xlim.transformations.TernaryOperationAdder;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
@@ -78,16 +80,36 @@ public class XlimBackendImpl extends AbstractBackend {
 		main(XlimBackendImpl.class, args);
 	}
 
-	private STPrinter printer;
+	private String fpgaType;
 
 	private boolean hardwareGen;
-	
-	private String fpgaType;
+
+	private STPrinter printer;
+
+	private Map<Integer, List<Instance>> computeMapping(Network network,
+			Map<String, String> mapping) {
+		Map<Integer, List<Instance>> computedMap = new HashMap<Integer, List<Instance>>();
+
+		for (Instance instance : network.getInstances()) {
+			String path = instance.getHierarchicalPath();
+			String component = mapping.get(path);
+			if (component != null) {
+				int coreId = Integer.parseInt(component.substring(1));
+				List<Instance> actors = computedMap.get(coreId);
+				if (actors == null) {
+					actors = new ArrayList<Instance>();
+					computedMap.put(coreId, actors);
+				}
+				actors.add(instance);
+			}
+		}
+
+		return computedMap;
+	}
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorVisitor[] transformations = {
-				new ArrayInitializeTransformation(),
+		ActorVisitor[] transformations = { new ArrayInitializeTransformation(),
 				new TernaryOperationAdder(),
 				new XlimInlineTransformation(true, true),
 				new ListOfOneElementToScalarTransformation(),
@@ -124,7 +146,8 @@ public class XlimBackendImpl extends AbstractBackend {
 		printer = new STPrinter();
 		printer.setOptions(getAttributes());
 		if (hardwareGen) {
-			fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType", "xc2vp30-7-ff1152");			
+			fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
+					"xc2vp30-7-ff1152");
 			printer.getOptions().put("fpgaType", fpgaType);
 			printer.loadGroup("XLIM_hw_actor");
 		} else {
@@ -142,6 +165,11 @@ public class XlimBackendImpl extends AbstractBackend {
 		printNetwork(network);
 	}
 
+	private void printCMake(Network network) throws IOException {
+		NetworkPrinter networkPrinter = new NetworkPrinter("XLIM_sw_CMakeLists");
+		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
+	}
+
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
 		String id = instance.getId();
@@ -151,6 +179,16 @@ public class XlimBackendImpl extends AbstractBackend {
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
+	}
+
+	private void printMapping(Network network, Map<String, String> mapping)
+			throws IOException {
+		NetworkPrinter networkPrinter = new NetworkPrinter("XLIM_sw_mapping");
+		networkPrinter.getOptions().put("mapping",
+				computeMapping(network, mapping));
+		networkPrinter.getOptions().put("fifoSize", fifoSize);
+		networkPrinter.print(network.getName() + ".xcf", path, network,
+				"mapping");
 	}
 
 	private void printNetwork(Network network) throws OrccException {
@@ -167,14 +205,13 @@ public class XlimBackendImpl extends AbstractBackend {
 			printer.printNetwork(outputName, network, false, fifoSize);
 
 			if (!hardwareGen) {
-				new XlimCMakePrinter().printCMake(path, network);
+				printCMake(network);
 
 				Map<String, String> mapping = getAttribute(
 						OrccLaunchConstants.MAPPING,
 						new HashMap<String, String>());
 				if (!mapping.isEmpty()) {
-					new XlimMappingPrinter().printMapping(path, network,
-							mapping, fifoSize);
+					printMapping(network, mapping);
 				}
 			}
 		} catch (IOException e) {
