@@ -275,7 +275,14 @@ public class CBackendImpl extends AbstractBackend {
 			printer.loadGroup("C_actor");
 
 			workingNetwork = mapTargetsNetworks.get(targetName);
-			path = rootPath + File.separator + targetName;
+
+			if (getAttribute("net.sf.orcc.backends.coDesign", false)) {
+				path = rootPath + File.separator + targetName;
+				File directory = new File(path);
+				if(!directory.exists()) {
+					directory.mkdirs();
+				}
+			}
 
 			List<Actor> actors = workingNetwork.getActors();
 			transformActors(actors);
