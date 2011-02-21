@@ -95,9 +95,12 @@ public class CBackendImpl extends AbstractBackend {
 	 * printer is protected in order to be visible to CQuasiBackendImpl
 	 */
 	protected STPrinter printer;
+
 	private final Map<String, String> transformations;
 
 	private Network workingNetwork;
+
+	private Map<String, Network> mapTargetsNetworks;
 
 	/**
 	 * Creates a new instance of the C back-end. Initializes the transformation
@@ -212,7 +215,7 @@ public class CBackendImpl extends AbstractBackend {
 			printer.getOptions().put("threadsNb", 1);
 			NetworkSplitter netSplit = new NetworkSplitter(instancesTarget, mediumGraph);
 			netSplit.transform(network);
-			workingNetwork = netSplit.getNetworks().get(1);
+			mapTargetsNetworks = netSplit.getNetworksMap();
 		} else {
 
 			boolean needDynamicMapping = getAttribute(
@@ -232,12 +235,16 @@ public class CBackendImpl extends AbstractBackend {
 				printer.getOptions().put("threadsNb", instancesTarget.size());
 			}
 			network.computeTemplateMaps();
-			workingNetwork = network;
+			mapTargetsNetworks = new HashMap<String, Network>();
+			mapTargetsNetworks.put(new String (""), network);
 		}
 
-		CNetworkTemplateData data = new CNetworkTemplateData();
-		data.computeTemplateMaps(workingNetwork);
-		workingNetwork.setTemplateData(data);
+		for(String targetName : mapTargetsNetworks.keySet()) {
+			Network worknet = mapTargetsNetworks.get(targetName);
+			CNetworkTemplateData data = new CNetworkTemplateData();
+			data.computeTemplateMaps(worknet);
+			worknet.setTemplateData(data);
+		}
 	}
 
 	@Override
@@ -262,20 +269,28 @@ public class CBackendImpl extends AbstractBackend {
 		printer.setOptions(getAttributes());
 
 		doTransformNetwork(network);
-		List<Actor> actors = workingNetwork.getActors();
-		transformActors(actors);
 
-		// Experimental
-		boolean merge2 = getAttribute("net.sf.orcc.backends.merge2", false);
-		if (merge2) {
-			new NetworkMerger().transform(workingNetwork);
+		String rootPath = new String(path);
+		for(String targetName : mapTargetsNetworks.keySet()) {
+			printer.loadGroup("C_actor");
+
+			workingNetwork = mapTargetsNetworks.get(targetName);
+			path = rootPath + File.separator + targetName;
+
+			List<Actor> actors = workingNetwork.getActors();
+			transformActors(actors);
+
+			// Experimental
+			boolean merge2 = getAttribute("net.sf.orcc.backends.merge2", false);
+			if (merge2) {
+				new NetworkMerger().transform(workingNetwork);
+			}
+			printInstances(workingNetwork);
+
+			// print network
+			write("Printing network...\n");
+			printNetwork(workingNetwork);
 		}
-
-		printInstances(workingNetwork);
-
-		// print network
-		write("Printing network...\n");
-		printNetwork(workingNetwork);
 	}
 
 	private void printCMake(Network network) throws IOException {
