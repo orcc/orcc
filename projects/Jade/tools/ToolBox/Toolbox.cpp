@@ -348,6 +348,8 @@ void createArchives(map<string,Module*>* modules){
 		}else{
 			archive = itArchive->second;
 		}
+
+		archive->addFileBefore(
 	}
 }
 

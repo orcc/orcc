@@ -132,8 +132,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
-		setBackendOptions();
-
 		List<Actor> actors = parseActors(files);
 
 		printer = new STPrinter(getAttribute(DEBUG_MODE, false));
@@ -144,7 +142,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		// transforms and prints actors
 		transformActors(actors);
 		printActors(actors);
-		
+
 		if (isCanceled()) {
 			return;
 		}
@@ -214,7 +212,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// Add list of actor
 		for (Actor actor : actors) {
-			if (!actor.isNative()){
+			if (!actor.isNative()) {
 				cmdList.add(actor.getName());
 			}
 		}
@@ -230,7 +228,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private void setBackendOptions() throws OrccException {
+	@Override
+	public void setOptions() throws OrccException {
 		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
 		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
 		classify = getAttribute("net.sf.orcc.backends.classify", false);

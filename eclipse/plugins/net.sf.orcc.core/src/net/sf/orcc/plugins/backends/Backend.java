@@ -73,6 +73,14 @@ public interface Backend extends Plugin {
 	void compileXDF(OrccProcess process, String inputFile) throws OrccException;
 
 	/**
+	 * Sets the options of this backends.
+	 * 
+	 * @param outputFolder
+	 *            output folder
+	 */
+	public void setOptions() throws OrccException;
+
+	/**
 	 * Sets the output folder of this back-end. This is the folder where files
 	 * will be generated.
 	 * 

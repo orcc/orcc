@@ -57,7 +57,10 @@ public class StaticRegionMerger implements INetworkTransformation {
 		for (Vertex vertex : region) {
 			for (Vertex neighbor : staticGraph.getStaticNeighbors(vertex)) {
 				Vertex mergedVertex = instanceMerger.merge(vertex, neighbor);
-				staticGraph.updateNetwork(vertex, neighbor, mergedVertex);
+				
+				staticGraph.removeVertex(vertex);
+				staticGraph.removeVertex(neighbor);
+				staticGraph.addVertex(mergedVertex);
 			}
 		}
 

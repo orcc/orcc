@@ -88,11 +88,14 @@ public class InstanceMerger {
 
 	public Vertex merge(Vertex vertex1, Vertex vertex2) {
 
+		//Get instances to merge
 		Instance instance1 = vertex1.getInstance();
 		Instance instance2 = vertex2.getInstance();
 
+		//Create a composite actor
 		Actor newActor = createActor(instance1, instance2);
 
+		//Create the merged instance
 		Instance newInstance = new Instance("Merged" + nMerged++,
 				newActor.getName());
 

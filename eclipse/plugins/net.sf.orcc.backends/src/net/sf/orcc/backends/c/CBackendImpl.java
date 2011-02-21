@@ -75,8 +75,6 @@ import org.jgrapht.graph.DirectedMultigraph;
  */
 public class CBackendImpl extends AbstractBackend {
 
-	public static boolean merge = false;
-
 	/**
 	 * 
 	 * @param args
@@ -85,11 +83,22 @@ public class CBackendImpl extends AbstractBackend {
 		main(CBackendImpl.class, args);
 	}
 
+	protected boolean classify;
+	protected boolean codesign;
+	protected boolean debugMode;
+	protected boolean dynamicMapping;
 	private Map<String, List<Instance>> instancesTarget;
 
+	/**
+	 * C Backend options
+	 */
+	protected Map<String, String> mapping;
 	private DirectedGraph<String, StringAttribute> mediumGraph;
-
+	protected boolean merge;
+	protected boolean merger2;
 	private boolean needPthreads;
+	protected boolean newScheduler;
+	protected boolean normalize;
 
 	/**
 	 * printer is protected in order to be visible to CQuasiBackendImpl
@@ -97,7 +106,6 @@ public class CBackendImpl extends AbstractBackend {
 	protected STPrinter printer;
 
 	private final Map<String, String> transformations;
-
 	private Network workingNetwork;
 
 	private Map<String, Network> mapTargetsNetworks;
@@ -120,8 +128,6 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	private void computeMapping(Network network) throws OrccException {
-		Map<String, String> mapping = getAttribute(MAPPING,
-				new HashMap<String, String>());
 
 		// compute the different threads
 		instancesTarget = new HashMap<String, List<Instance>>();
@@ -177,10 +183,6 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
-		boolean normalize = getAttribute("net.sf.orcc.backends.normalize",
-				false);
-
 		if (classify) {
 			new ActorClassifier().visit(actor);
 			if (normalize) {
@@ -208,23 +210,24 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	protected void doTransformNetwork(Network network) throws OrccException {
+		// Experimental
+		if (merger2) {
+			new NetworkMerger().transform(network);
+		}
 
 		new BroadcastAdder().transform(network);
 		computeMapping(network);
-		if (getAttribute("net.sf.orcc.backends.coDesign", false)) {
+		if (codesign) {
 			printer.getOptions().put("threadsNb", 1);
 			NetworkSplitter netSplit = new NetworkSplitter(instancesTarget, mediumGraph);
 			netSplit.transform(network);
 			mapTargetsNetworks = netSplit.getNetworksMap();
 		} else {
 
-			boolean needDynamicMapping = getAttribute(
-					"net.sf.orcc.backends.dynamicMapping", false);
 			needPthreads = (instancesTarget.keySet().size() > 1);
 
-			if (needDynamicMapping) {
-				printer.getOptions().put("needDynamicMapping",
-						needDynamicMapping);
+			if (dynamicMapping) {
+				printer.getOptions().put("needDynamicMapping", dynamicMapping);
 				printer.getOptions().put(
 						"threadsNb",
 						getAttribute("net.sf.orcc.backends.processorsNumber",
@@ -256,19 +259,16 @@ public class CBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		boolean merge = getAttribute("net.sf.orcc.backends.merge", false);
 		if (merge) {
 			network.mergeActors();
 		}
 
 		// until now, printer is default printer
-		printer = new STPrinter(getAttribute(DEBUG_MODE, true));
+		printer = new STPrinter(debugMode);
 		printer.loadGroup("C_actor");
 		printer.setExpressionPrinter(CExpressionPrinter.class);
 		printer.setTypePrinter(CTypePrinter.class);
 		printer.setOptions(getAttributes());
-
-		doTransformNetwork(network);
 
 		String rootPath = new String(path);
 		for(String targetName : mapTargetsNetworks.keySet()) {
@@ -276,7 +276,7 @@ public class CBackendImpl extends AbstractBackend {
 
 			workingNetwork = mapTargetsNetworks.get(targetName);
 
-			if (getAttribute("net.sf.orcc.backends.coDesign", false)) {
+			if (codesign) {
 				path = rootPath + File.separator + targetName;
 				File directory = new File(path);
 				if(!directory.exists()) {
@@ -286,12 +286,9 @@ public class CBackendImpl extends AbstractBackend {
 
 			List<Actor> actors = workingNetwork.getActors();
 			transformActors(actors);
-
-			// Experimental
-			boolean merge2 = getAttribute("net.sf.orcc.backends.merge2", false);
-			if (merge2) {
-				new NetworkMerger().transform(workingNetwork);
-			}
+			
+			// print instance
+			write("Printing instances...\n");
 			printInstances(workingNetwork);
 
 			// print network
@@ -327,8 +324,7 @@ public class CBackendImpl extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) throws OrccException {
 		try {
-			printer.getOptions().put("newScheduler",
-					getAttribute("net.sf.orcc.backends.newScheduler", false));
+			printer.getOptions().put("newScheduler", newScheduler);
 
 			String outputName = path + File.separator + network.getName()
 					+ ".c";
@@ -339,6 +335,20 @@ public class CBackendImpl extends AbstractBackend {
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
+	}
+
+	@Override
+	public void setOptions() throws OrccException {
+		mapping = getAttribute(MAPPING, new HashMap<String, String>());
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		merge = getAttribute("net.sf.orcc.backends.merge", false);
+		merger2 = getAttribute("net.sf.orcc.backends.merge2", false);
+		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
+		dynamicMapping = getAttribute("net.sf.orcc.backends.dynamicMapping",
+				false);
+		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
+		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
 }

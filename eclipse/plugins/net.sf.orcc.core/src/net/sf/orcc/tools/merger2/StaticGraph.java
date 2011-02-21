@@ -95,7 +95,7 @@ public class StaticGraph {
 	private DirectedGraph<Vertex, Connection> dynamicGraph;
 	List<Set<Vertex>> regions;
 
-	private DirectedGraph<Vertex, StaticEdge> staticGraph;
+	private DirectedGraph<Vertex, StaticEdge> graph;
 
 	/**
 	 * Create a static representation of a network
@@ -105,7 +105,7 @@ public class StaticGraph {
 	 */
 	public StaticGraph(Network network) {
 		dynamicGraph = network.getGraph();
-		staticGraph = new DefaultDirectedGraph<Vertex, StaticEdge>(
+		graph = new DefaultDirectedGraph<Vertex, StaticEdge>(
 				StaticEdge.class);
 		adjacentVertices = new HashMap<Vertex, LinkedHashSet<Vertex>>();
 		regions = new ArrayList<Set<Vertex>>();
@@ -127,12 +127,12 @@ public class StaticGraph {
 	 * Add static edge from dynamic graph to the static graph
 	 */
 	private void addStaticEdge() {
-		for (Vertex vertex : staticGraph.vertexSet()) {
+		for (Vertex vertex : graph.vertexSet()) {
 			// Get all successors of the static vertex
 			LinkedHashSet<Vertex> adjVertices = adjacentVertices.get(vertex);
 			for (Vertex adjVertex : adjVertices) {
-				if (staticGraph.containsVertex(adjVertex)) {
-					staticGraph.addEdge(vertex, adjVertex, new StaticEdge());
+				if (graph.containsVertex(adjVertex)) {
+					graph.addEdge(vertex, adjVertex, new StaticEdge());
 				}
 			}
 
@@ -146,12 +146,15 @@ public class StaticGraph {
 		for (Vertex vertex : dynamicGraph.vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
+				if (instance.getActor() == null){
+					int i = 0;
+				}
 				if (instance.getActor().hasMoC()) {
 					MoC moc = instance.getActor().getMoC();
 
 					// TODO : extend to QSDF
 					if (moc.isCSDF()) {
-						staticGraph.addVertex(vertex);
+						graph.addVertex(vertex);
 					}
 
 				}
@@ -181,7 +184,7 @@ public class StaticGraph {
 	 * @return the source repetition factor
 	 */
 	public int getSourceRate(Vertex source, Vertex target) {
-		StaticEdge staticEdge = staticGraph.getEdge(source, target);
+		StaticEdge staticEdge = graph.getEdge(source, target);
 		return staticEdge.getSourceRate();
 	}
 
@@ -195,7 +198,7 @@ public class StaticGraph {
 		LinkedHashSet<Vertex> adjVertices = adjacentVertices.get(vertex);
 
 		for (Vertex adjVertice : adjVertices) {
-			if (staticGraph.containsVertex(adjVertice)) {
+			if (graph.containsVertex(adjVertice)) {
 				neighbours.add(adjVertice);
 			}
 		}
@@ -209,7 +212,7 @@ public class StaticGraph {
 	 * @return a set of static vertices
 	 */
 	public Set<Vertex> getStaticVertices() {
-		return staticGraph.vertexSet();
+		return graph.vertexSet();
 	}
 
 	/**
@@ -225,7 +228,7 @@ public class StaticGraph {
 	 * @return the source repetition factor
 	 */
 	public int getTargetRate(Vertex source, Vertex target) {
-		StaticEdge staticEdge = staticGraph.getEdge(source, target);
+		StaticEdge staticEdge = graph.getEdge(source, target);
 		return staticEdge.getTargetRate();
 	}
 
@@ -267,7 +270,7 @@ public class StaticGraph {
 	 */
 	private void setRegions() {
 		ConnectivityInspector<Vertex, StaticEdge> inspector = new ConnectivityInspector<Vertex, StaticEdge>(
-				staticGraph);
+				graph);
 		List<Set<Vertex>> vertices = inspector.connectedSets();
 		List<Vertex> toRemove = new ArrayList<Vertex>();
 
@@ -281,7 +284,7 @@ public class StaticGraph {
 			}
 		}
 
-		staticGraph.removeAllVertices(toRemove);
+		graph.removeAllVertices(toRemove);
 	}
 
 	/**
@@ -301,13 +304,19 @@ public class StaticGraph {
 	 */
 	public void setRepetitionFactor(Vertex source, int production,
 			Vertex target, int consumption) {
-		StaticEdge staticEdge = staticGraph.getEdge(source, target);
+		StaticEdge staticEdge = graph.getEdge(source, target);
 		staticEdge.setSourceRate(production);
 		staticEdge.setTargetRate(consumption);
 	}
 
-	public void updateNetwork(Vertex source, Vertex target, Vertex mergedVertex){
-		
+	public void removeVertex(Vertex vertex){
+		graph.removeVertex(vertex);
+		dynamicGraph.removeVertex(vertex);	
+	}
+	
+	public void addVertex(Vertex vertex){
+		graph.addVertex(vertex);
+		dynamicGraph.addVertex(vertex);	
 	}
 
 	public void updateRegion(Set<Vertex> region) {

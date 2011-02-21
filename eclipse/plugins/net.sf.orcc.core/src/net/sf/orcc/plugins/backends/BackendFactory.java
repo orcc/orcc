@@ -117,6 +117,7 @@ public class BackendFactory extends PluginFactory {
 
 		Backend backendObj = (Backend) plugins.get(backend);
 		backendObj.setLaunchConfiguration(configuration);
+		backendObj.setOptions();
 		backendObj.setOutputFolder(outputFolder);
 
 		String name = configuration.getAttribute(PROJECT, "");

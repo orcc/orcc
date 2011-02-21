@@ -107,6 +107,7 @@ public abstract class AbstractBackend implements Backend {
 
 			try {
 				AbstractBackend backend = clasz.newInstance();
+				backend.setOptions();
 				backend.setOutputFolder(outputFolder);
 				backend.compileVTL(null, vtlFolders);
 				backend.compileXDF(null, inputFile);
@@ -551,6 +552,11 @@ public abstract class AbstractBackend implements Backend {
 	@Override
 	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
+	}
+
+	@Override
+	public void setOptions() throws OrccException {
+
 	}
 
 	@Override
