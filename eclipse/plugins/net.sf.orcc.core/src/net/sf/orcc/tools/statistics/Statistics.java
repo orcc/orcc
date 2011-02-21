@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.stats;
+package net.sf.orcc.tools.statistics;
 
 import net.sf.orcc.network.Network;
 
@@ -37,14 +37,14 @@ import net.sf.orcc.network.Network;
  * @author Herve Yviquel
  * 
  */
-public class Stats {
+public class Statistics {
 
-	public static Stats INSTANCE = new Stats();
+	public static Statistics INSTANCE = new Statistics();
 
 	private InstructionStats instructionStats;
 	private MemoryStats memoryStats;
 
-	public Stats() {
+	public Statistics() {
 		memoryStats = new MemoryStats();
 		instructionStats = new InstructionStats();
 	}

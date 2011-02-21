@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.stats;
+package net.sf.orcc.tools.statistics;
 
 import java.util.HashMap;
 import java.util.Map;
