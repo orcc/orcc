@@ -42,7 +42,15 @@
 	typedef long cpu_set_t;
 	#define clear_cpu_set(cpuset) cpuset = 0
 	#define set_thread_affinity(cpuset, proc_num, thread) SetThreadAffinityMask(thread, proc_num)
-	#define set_this_process_affinity(cpuset, proc_num) 
+
+	/**
+	 * Sets the affinity of this process to the given processor.
+	 */
+	static void set_this_process_affinity(cpu_set_t cpuset, int proc_num) {
+		HANDLE hProcess = GetCurrentProcess();
+		DWORD_PTR dwProcessAffinityMask = 1 << proc_num;
+		SetProcessAffinityMask(hProcess, dwProcessAffinityMask);
+	}
 	
 	#define thread_create(thread, function, argument, id) thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) function, (LPVOID) &(argument), 0, &(id))
 	#define thread_join(thread) WaitForSingleObject(thread, INFINITE)
