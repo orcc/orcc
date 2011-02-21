@@ -270,6 +270,10 @@ public class CBackendImpl extends AbstractBackend {
 		printer.setTypePrinter(CTypePrinter.class);
 		printer.setOptions(getAttributes());
 
+		List<Actor> actors = network.getActors();
+		transformActors(actors);
+		doTransformNetwork(network);
+		
 		String rootPath = new String(path);
 		for(String targetName : mapTargetsNetworks.keySet()) {
 			printer.loadGroup("C_actor");
@@ -284,9 +288,6 @@ public class CBackendImpl extends AbstractBackend {
 				}
 			}
 
-			List<Actor> actors = workingNetwork.getActors();
-			transformActors(actors);
-			
 			// print instance
 			write("Printing instances...\n");
 			printInstances(workingNetwork);
@@ -350,5 +351,4 @@ public class CBackendImpl extends AbstractBackend {
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
 		debugMode = getAttribute(DEBUG_MODE, true);
 	}
-
 }
