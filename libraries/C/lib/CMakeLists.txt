@@ -26,7 +26,6 @@ ${orcc_SOURCE_DIR}/src/scheduler.c
 ${orcc_SOURCE_DIR}/src/source.c
 ${orcc_SOURCE_DIR}/src/writer.c
 ${orcc_SOURCE_DIR}/src/source_no_loop.c
-${orcc_SOURCE_DIR}/src/source_genetic.c
 ${orcc_SOURCE_DIR}/src/orcc_util.c
 ${orcc_SOURCE_DIR}/src/thread.c
 ${orcc_SOURCE_DIR}/src/genetic.c

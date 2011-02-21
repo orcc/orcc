@@ -182,6 +182,39 @@ assignFifos(edges) ::= <<
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// clear FIFOs
+
+clearFifoType(type, size, count, port, instance) ::= <<
+fifo_<type>_clear(&fifo_<count>);
+>>
+
+doClearFifo(edge, source, sourcePort, target, targetPort) ::= <<
+<if (source.broadcast || source.actor)>
+<clearFifoType(
+  sourcePort.type, edge.size, network.connectionMap.(edge), sourcePort, source)><else>
+<clearFifoType(
+  targetPort.type, edge.size, network.connectionMap.(edge), targetPort, target)><endif>
+>>
+
+tryClearFifo(edge, src, tgt) ::= <<
+<if (src.instance && tgt.instance)>
+<doClearFifo(
+  edge=edge,
+  source=src.instance, sourcePort=edge.source,
+  target=tgt.instance, targetPort=edge.target)><endif>
+>>
+
+clearFifo(edge) ::= <<
+<tryClearFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
+>>
+
+printClearFifosFunction(edges) ::= <<
+void clear_fifos(){
+	<edges: clearFifo()>
+}
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // Declare actors
 
 declareActor(instance) ::= "<GetInstanceId(instance)>"
@@ -267,9 +300,7 @@ void *scheduler(void *data) {
 	struct schedinfo_s si;
 	<if(options.needDynamicMapping)>
 	
-	clock_t start, end;	
 	semaphore_wait(sched-\>sem_thread); 
-	start = clock ();
 	
 	<endif>
 	while (1) {
@@ -278,7 +309,6 @@ void *scheduler(void *data) {
 		if(my_actor == NULL){
 			semaphore_set(sched-\>sync-\>sem_monitor);
 			semaphore_wait(sched-\>sem_thread);
-			start = clock ();
 	  	}
 	  	else{
 			si.num_firings = 0;
@@ -293,13 +323,9 @@ void *scheduler(void *data) {
 				sched_add_predecessors(sched, my_actor, si.ports);
 			}
 			<endif>
-			if(sched-\>sync-\>active_sync){
-				end = clock ();
-				if((((end - start) / (double)CLOCKS_PER_SEC) \>= SYNC_DELAY)){
-					semaphore_set(sched-\>sync-\>sem_monitor);
-					semaphore_wait(sched-\>sem_thread);
-					start = clock ();
-				}
+			if(source_is_stopped()){
+				semaphore_set(sched-\>sync-\>sem_monitor);
+				semaphore_wait(sched-\>sem_thread);
 			}
 		}
 		<else>
@@ -449,10 +475,14 @@ struct actor_s **actors[] = {<options.threads.keys: {th | actors_<th>}; separato
 
 <if (options.needDynamicMapping)>
 extern void remove_fps_printing();
+extern int source_is_stopped();
+
+<printClearFifosFunction(network.connections)>
 <endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
+
 
 <printScheduler()>
 

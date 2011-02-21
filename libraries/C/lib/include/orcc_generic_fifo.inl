@@ -139,3 +139,8 @@ DECL void FIFO_WRITE_END(T)(struct FIFO_S(T) *fifo, T *buffer, int n) {
 
 	// fifo->fill_count += n;
 }
+
+DECL void FIFO_CLEAR(T)(struct FIFO_S(T) *fifo) {
+	fifo->write_ind = 0;
+	fifo->read_ind = 0;
+}

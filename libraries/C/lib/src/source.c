@@ -71,30 +71,53 @@ void source_initialize() {
 
 extern struct fifo_i8_s *source_O;
 
+static int stop = 0;
+static int genetic = 0;
+
+int source_is_stopped() {
+	return stop;
+}
+
+void source_restart() {
+	stop = 0;
+}
+
+void active_genetic() {
+	genetic = 1;
+}
+
 void source_scheduler(struct schedinfo_s *si) {
 	unsigned char *ptr;
 	int i = 0;
 	int n;
 
-	if (feof(F)) {
-		fseek(F, 0, 0);
-	}
+	if (!(stop && genetic)) {
 
-	while (fifo_i8_has_room(source_O, 1)) {
-		i8 source_O_buf[1];
-		ptr = fifo_i8_write(source_O, source_O_buf, 1);
-		n = fread(ptr, 1, 1, F);
-		if (n < 1) {
-			fseek(F, 0, 0);
-			cnt = 0;
+		while (fifo_i8_has_room(source_O, 1) && !(stop && genetic)) {
+			i8 source_O_buf[1];
+			ptr = fifo_i8_write(source_O, source_O_buf, 1);
 			n = fread(ptr, 1, 1, F);
+			if (n < 1) {
+				if (feof(F)) {
+					rewind(F);
+					cnt = 0;
+					if (!genetic) {
+						n = fread(ptr, 1, 1, F);
+					}
+					stop = 1;
+				}
+			}
+			i++;
+			cnt++;
+			fifo_i8_write_end(source_O, source_O_buf, 1);
 		}
-		i++;
-		cnt++;
-		fifo_i8_write_end(source_O, source_O_buf, 1);
 	}
 
 	si->num_firings = i;
-	si->reason = full;
+	if (stop && genetic) {
+		si->reason = starved;
+	} else {
+		si->reason = full;
+	}
 	si->ports = 0x01; // FIFO connected to first output port is empty
 }

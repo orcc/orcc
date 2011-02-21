@@ -76,5 +76,8 @@ extern float compute_partial_fps();
 extern void backup_partial_start_info();
 extern void backup_partial_end_info();
 extern void active_fps_printing();
+extern void source_restart();
+extern void clear_fifos();
+extern void active_genetic();
 
 #endif

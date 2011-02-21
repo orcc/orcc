@@ -109,6 +109,17 @@ static void print_mapping(individual *ind, struct genetic_s *genetic_info){
 }
 
 
+static void print_actor_list(individual *ind, struct genetic_s *genetic_info){
+	int i;
+	printf("Actor list =\n");
+	for(i=0; i<genetic_info->actors_nb; i++){
+		printf("%i -> %s\n", i, ind->genes[i]->actor->name);
+	}
+	printf("\n\n");
+
+}
+
+
 static int individual_equal(individual* ind1, individual* ind2, struct genetic_s *genetic_info){
 	int i, equal = 1;
 	for(i=0; i<genetic_info->actors_nb && equal; i++){
@@ -369,10 +380,13 @@ void *monitor(void *data) {
 	int i, evalIndNb = 0;
 	population *population;
 
+	active_genetic();
+
 	// Initialize
 	printf("\nGenerate initial population...\n\n");
 	population = initialize_population(monitoring->genetic_info);
 
+	print_actor_list(population->individuals[evalIndNb],monitoring->genetic_info);
 	map_actors_on_threads(population->individuals[evalIndNb], monitoring->genetic_info);
 
 	while (population->generation_nb < monitoring->genetic_info->generation_nb) {
@@ -411,6 +425,9 @@ void *monitor(void *data) {
 			evalIndNb = 0;
 		}
 		map_actors_on_threads(population->individuals[evalIndNb], monitoring->genetic_info);
+
+		source_restart();
+		//clear_fifos();
 	}
 	monitoring->sync->active_sync = 0;
 	write_better_mapping(population,monitoring->genetic_info);
