@@ -170,59 +170,61 @@ public class NetworkSplitter implements INetworkTransformation {
 			newGraph.addVertex(new Vertex(instanceNewGraph));
 		}
 
-		List<Instance> allInstances = new ArrayList<Instance>();
+		Set<Instance> allInstances = new HashSet<Instance>();
 		for (String targetName : instancesTarget.keySet()) {
 			allInstances.addAll(instancesTarget.get(targetName));
 		}
 
 		for (Instance instance : allInstances) {
-			Set<Connection> vertexConnections = oldGraph.edgesOf(new Vertex(
-					instance));
-			boolean RemoveGhostInstance = true;
-			Instance ghostInstance = new Instance("Ghost_" + instance.getId(),
-					"Ghost");
-			Vertex ghostVertex = new Vertex(ghostInstance);
-
-			newGraph.addVertex(ghostVertex);
-			for (Connection connection : vertexConnections) {
-				Vertex sourceVertex = oldGraph.getEdgeSource(connection);
-				Vertex targetVertex = oldGraph.getEdgeTarget(connection);
-
-				if (sourceVertex.isInstance() && targetVertex.isInstance()) {
-					Set<Instance> instanceCollection = new HashSet<Instance>();
-					instanceCollection.add(sourceVertex.getInstance());
-					instanceCollection.add(targetVertex.getInstance());
-
-					// We don't create a new connection. This connection will be
-					// used in two networks, because it's a connection
-					// cross-networks :
-					//
-					// -Network a => Port1 from ActorA ==> connection ==> Port1
-					// from GhostActorB
-					//
-					// -Network b => Port1 from GhostActorA ==> connection ==>
-					// Port1 from ActorB
-					if (instancesNewGraph.contains(sourceVertex.getInstance())
-							&& instancesNewGraph.contains(targetVertex
-									.getInstance())) {
-						newGraph.addEdge(sourceVertex, targetVertex, connection);
-					} else if (instancesNewGraph.contains(sourceVertex
-							.getInstance())) {
-						RemoveGhostInstance = false;
-						newGraph.addEdge(sourceVertex, ghostVertex, connection);
-					} else if (instancesNewGraph.contains(targetVertex
-							.getInstance())) {
-						RemoveGhostInstance = false;
-						newGraph.addEdge(ghostVertex, targetVertex, connection);
+			if(oldGraph.containsVertex(new Vertex(instance))) {
+				Set<Connection> vertexConnections = oldGraph.edgesOf(new Vertex(
+						instance));
+				boolean RemoveGhostInstance = true;
+				Instance ghostInstance = new Instance("Ghost_" + instance.getId(),
+						"Ghost");
+				Vertex ghostVertex = new Vertex(ghostInstance);
+	
+				newGraph.addVertex(ghostVertex);
+				for (Connection connection : vertexConnections) {
+					Vertex sourceVertex = oldGraph.getEdgeSource(connection);
+					Vertex targetVertex = oldGraph.getEdgeTarget(connection);
+	
+					if (sourceVertex.isInstance() && targetVertex.isInstance()) {
+						Set<Instance> instanceCollection = new HashSet<Instance>();
+						instanceCollection.add(sourceVertex.getInstance());
+						instanceCollection.add(targetVertex.getInstance());
+	
+						// We don't create a new connection. This connection will be
+						// used in two networks, because it's a connection
+						// cross-networks :
+						//
+						// -Network a => Port1 from ActorA ==> connection ==> Port1
+						// from GhostActorB
+						//
+						// -Network b => Port1 from GhostActorA ==> connection ==>
+						// Port1 from ActorB
+						if (instancesNewGraph.contains(sourceVertex.getInstance())
+								&& instancesNewGraph.contains(targetVertex
+										.getInstance())) {
+							newGraph.addEdge(sourceVertex, targetVertex, connection);
+						} else if (instancesNewGraph.contains(sourceVertex
+								.getInstance())) {
+							RemoveGhostInstance = false;
+							newGraph.addEdge(sourceVertex, ghostVertex, connection);
+						} else if (instancesNewGraph.contains(targetVertex
+								.getInstance())) {
+							RemoveGhostInstance = false;
+							newGraph.addEdge(ghostVertex, targetVertex, connection);
+						}
 					}
 				}
-			}
-			if (RemoveGhostInstance) {
-				newGraph.removeVertex(ghostVertex);
-			} else {
-				for (String targetName : instancesTarget.keySet()) {
-					if (instancesTarget.get(targetName).contains(instance)) {
-						instancesTarget.get(targetName).add(ghostInstance);
+				if (RemoveGhostInstance) {
+					newGraph.removeVertex(ghostVertex);
+				} else {
+					for (String targetName : instancesTarget.keySet()) {
+						if (instancesTarget.get(targetName).contains(instance)) {
+							instancesTarget.get(targetName).add(ghostInstance);
+						}
 					}
 				}
 			}
