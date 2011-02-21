@@ -210,8 +210,9 @@ public class CBackendImpl extends AbstractBackend {
 		computeMapping(network);
 		if (getAttribute("net.sf.orcc.backends.coDesign", false)) {
 			printer.getOptions().put("threadsNb", 1);
-			new NetworkSplitter(instancesTarget, mediumGraph)
-					.transform(network);
+			NetworkSplitter netSplit = new NetworkSplitter(instancesTarget, mediumGraph);
+			netSplit.transform(network);
+			workingNetwork = netSplit.getNetworks().get(1);
 		} else {
 
 			boolean needDynamicMapping = getAttribute(
@@ -231,11 +232,12 @@ public class CBackendImpl extends AbstractBackend {
 				printer.getOptions().put("threadsNb", instancesTarget.size());
 			}
 			network.computeTemplateMaps();
+			workingNetwork = network;
 		}
 
 		CNetworkTemplateData data = new CNetworkTemplateData();
-		data.computeTemplateMaps(network);
-		network.setTemplateData(data);
+		data.computeTemplateMaps(workingNetwork);
+		workingNetwork.setTemplateData(data);
 	}
 
 	@Override
@@ -260,21 +262,20 @@ public class CBackendImpl extends AbstractBackend {
 		printer.setOptions(getAttributes());
 
 		doTransformNetwork(network);
-		workingNetwork = network;
-		List<Actor> actors = network.getActors();
+		List<Actor> actors = workingNetwork.getActors();
 		transformActors(actors);
 
 		// Experimental
 		boolean merge2 = getAttribute("net.sf.orcc.backends.merge2", false);
 		if (merge2) {
-			new NetworkMerger().transform(network);
+			new NetworkMerger().transform(workingNetwork);
 		}
 
-		printInstances(network);
+		printInstances(workingNetwork);
 
 		// print network
 		write("Printing network...\n");
-		printNetwork(network);
+		printNetwork(workingNetwork);
 	}
 
 	private void printCMake(Network network) throws IOException {

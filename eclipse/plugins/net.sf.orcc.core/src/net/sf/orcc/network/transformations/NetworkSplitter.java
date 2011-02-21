@@ -100,12 +100,12 @@ public class NetworkSplitter implements INetworkTransformation {
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
 				for (Connection connection : graph.edgesOf(vertex)) {
-					if (graph.getEdgeSource(connection).isInstance()
-							&& graph.getEdgeTarget(connection).isInstance()) {
-						Instance sourceInstance = graph.getEdgeSource(
-								connection).getInstance();
-						Instance targetInstance = graph.getEdgeTarget(
-								connection).getInstance();
+					Vertex sourceVertex = graph.getEdgeSource(connection);
+					Vertex targetVertex = graph.getEdgeTarget(connection);
+
+					if (sourceVertex.isInstance() && targetVertex.isInstance()) {
+						Instance sourceInstance = sourceVertex.getInstance();
+						Instance targetInstance = targetVertex.getInstance();
 						String sourceDevice = null;
 						String targetDevice = null;
 
@@ -146,6 +146,151 @@ public class NetworkSplitter implements INetworkTransformation {
 	}
 
 	/**
+	 * Create a new network (and add it to the list of networks) containing all
+	 * instances which are launched in <code>target</code>.
+	 * 
+	 * @param oldNetwork
+	 *            network where are instances to remove.
+	 * @param target
+	 *            target's name.
+	 */
+	private void addNewNetwork(Network oldNetwork, String target) {
+		DirectedGraph<Vertex, Connection> oldGraph = oldNetwork.getGraph();
+		Network newNetwork = new Network(oldNetwork.getFile());
+		newNetwork.setName(oldNetwork.getName() + target);
+		networks.add(newNetwork);
+
+		DirectedGraph<Vertex, Connection> newGraph = newNetwork.getGraph();
+
+		List<Instance> instancesNewGraph = new ArrayList<Instance>(
+				instancesTarget.get(target));
+		for (Instance instanceNewGraph : instancesNewGraph) {
+			// We don't create a new vertex because this one should be removed
+			// in the old graph (it will be done later).
+			newGraph.addVertex(new Vertex(instanceNewGraph));
+		}
+
+		List<Instance> allInstances = new ArrayList<Instance>();
+		for (String targetName : instancesTarget.keySet()) {
+			allInstances.addAll(instancesTarget.get(targetName));
+		}
+
+		for (Instance instance : allInstances) {
+			Set<Connection> vertexConnections = oldGraph.edgesOf(new Vertex(
+					instance));
+			boolean RemoveGhostInstance = true;
+			Instance ghostInstance = new Instance("Ghost_" + instance.getId(),
+					"Ghost");
+			Vertex ghostVertex = new Vertex(ghostInstance);
+
+			newGraph.addVertex(ghostVertex);
+			for (Connection connection : vertexConnections) {
+				Vertex sourceVertex = oldGraph.getEdgeSource(connection);
+				Vertex targetVertex = oldGraph.getEdgeTarget(connection);
+
+				if (sourceVertex.isInstance() && targetVertex.isInstance()) {
+					Set<Instance> instanceCollection = new HashSet<Instance>();
+					instanceCollection.add(sourceVertex.getInstance());
+					instanceCollection.add(targetVertex.getInstance());
+
+					// We don't create a new connection. This connection will be
+					// used in two networks, because it's a connection
+					// cross-networks :
+					//
+					// -Network a => Port1 from ActorA ==> connection ==> Port1
+					// from GhostActorB
+					//
+					// -Network b => Port1 from GhostActorA ==> connection ==>
+					// Port1 from ActorB
+					if (instancesNewGraph.contains(sourceVertex.getInstance())
+							&& instancesNewGraph.contains(targetVertex
+									.getInstance())) {
+						newGraph.addEdge(sourceVertex, targetVertex, connection);
+					} else if (instancesNewGraph.contains(sourceVertex
+							.getInstance())) {
+						RemoveGhostInstance = false;
+						newGraph.addEdge(sourceVertex, ghostVertex, connection);
+					} else if (instancesNewGraph.contains(targetVertex
+							.getInstance())) {
+						RemoveGhostInstance = false;
+						newGraph.addEdge(ghostVertex, targetVertex, connection);
+					}
+				}
+			}
+			if (RemoveGhostInstance) {
+				newGraph.removeVertex(ghostVertex);
+			} else {
+				for (String targetName : instancesTarget.keySet()) {
+					if (instancesTarget.get(targetName).contains(instance)) {
+						instancesTarget.get(targetName).add(ghostInstance);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Remove from <code>network</code>, all instances which are launched in
+	 * target
+	 * 
+	 * @param network
+	 *            network where instances from target have to be removed from
+	 * @param target
+	 *            target's name.
+	 */
+	private void removeInstancesTargetInNetwork(Network network, String target) {
+		DirectedGraph<Vertex, Connection> oldGraph = network.getGraph();
+
+		List<Instance> instancesToRemove = instancesTarget.get(target);
+		List<Instance> instancesTargetForOldGraph = new ArrayList<Instance>();
+
+		for (Instance instanceToDel : instancesToRemove) {
+			if (instanceToDel.isActor() || instanceToDel.isBroadcast()) {
+				Set<Connection> vertexConnections = oldGraph
+						.edgesOf(new Vertex(instanceToDel));
+				boolean removeGhostInstance = true;
+				Instance ghostInstance = new Instance("Ghost_"
+						+ instanceToDel.getId(), "Ghost");
+				Vertex ghostVertex = new Vertex(ghostInstance);
+
+				oldGraph.addVertex(ghostVertex);
+				for (Connection connection : vertexConnections) {
+					Vertex sourceVertex = oldGraph.getEdgeSource(connection);
+					Vertex targetVertex = oldGraph.getEdgeTarget(connection);
+
+					if (sourceVertex.isInstance() && targetVertex.isInstance()) {
+						List<Instance> instanceCollection = new ArrayList<Instance>();
+						instanceCollection.add(sourceVertex.getInstance());
+						instanceCollection.add(targetVertex.getInstance());
+
+						if (instancesToRemove.containsAll(instanceCollection)) {
+							oldGraph.removeEdge(connection);
+						} else {
+							removeGhostInstance = false;
+
+							oldGraph.removeEdge(sourceVertex, targetVertex);
+							if (sourceVertex.equals(new Vertex(instanceToDel))) {
+								oldGraph.addEdge(ghostVertex, targetVertex,
+										connection);
+							} else {
+								oldGraph.addEdge(sourceVertex, ghostVertex,
+										connection);
+							}
+						}
+					}
+				}
+				if (removeGhostInstance) {
+					oldGraph.removeVertex(ghostVertex);
+				} else {
+					instancesTargetForOldGraph.add(ghostInstance);
+				}
+				oldGraph.removeVertex(new Vertex(instanceToDel));
+			}
+		}
+		instancesToRemove.addAll(instancesTargetForOldGraph);
+	}
+
+	/**
 	 * Moving all instances which belong to target from network to a new
 	 * network.
 	 * 
@@ -154,58 +299,9 @@ public class NetworkSplitter implements INetworkTransformation {
 	 * @param target
 	 *            target's name
 	 */
-	private void splitNetwork(Network network, String target) { // Network
-		// Network newNetwork = new Network(network.getName() + "_" + target);
-
-		// DirectedGraph<Vertex, Connection> newGraph = newNetwork.getGraph();
-		DirectedGraph<Vertex, Connection> oldGraph = network.getGraph();
-
-		List<Instance> instancesToRemove = instancesTarget.get(target);
-		List<Instance> newInstancesTarget = new ArrayList<Instance>();
-
-		for (Instance instanceToDel : instancesToRemove) {
-			Set<Connection> vertexConnections = oldGraph.edgesOf(new Vertex(
-					instanceToDel));
-			boolean RemoveGhostInstance = true;
-			Instance ghostInstance = new Instance("Ghost_"
-					+ instanceToDel.getId(), "Ghost");
-			Vertex ghostVertex = new Vertex(ghostInstance);
-
-			oldGraph.addVertex(ghostVertex);
-			for (Connection connection : vertexConnections) {
-				Vertex sourceVertex = oldGraph.getEdgeSource(connection);
-				Vertex targetVertex = oldGraph.getEdgeTarget(connection);
-
-				if (sourceVertex.isInstance() && targetVertex.isInstance()) {
-					List<Instance> instanceCollection = new ArrayList<Instance>();
-					instanceCollection.add(sourceVertex.getInstance());
-					instanceCollection.add(targetVertex.getInstance());
-
-					if (instancesToRemove.containsAll(instanceCollection)) {
-						oldGraph.removeEdge(connection);
-					} else {
-						RemoveGhostInstance = false;
-
-						oldGraph.removeEdge(sourceVertex, targetVertex);
-						if (sourceVertex.equals(new Vertex(instanceToDel))) {
-							oldGraph.addEdge(ghostVertex, targetVertex,
-									connection);
-						} else {
-							oldGraph.addEdge(sourceVertex, ghostVertex,
-									connection);
-						}
-					}
-				}
-			}
-			if (RemoveGhostInstance) {
-				oldGraph.removeVertex(ghostVertex);
-			} else {
-				newInstancesTarget.add(ghostInstance);
-			}
-			oldGraph.removeVertex(new Vertex(instanceToDel));
-		}
-		instancesToRemove.clear();
-		instancesToRemove.addAll(newInstancesTarget);
+	private void splitNetwork(Network network, String target) {
+		addNewNetwork(network, target);
+		removeInstancesTargetInNetwork(network, target);
 	}
 
 	/**
@@ -214,9 +310,10 @@ public class NetworkSplitter implements INetworkTransformation {
 	 */
 	@Override
 	public void transform(Network network) throws OrccException {
-		Set<String> targetList = new HashSet<String>(instancesTarget.keySet());
+		List<String> targetList = new ArrayList<String>(
+				instancesTarget.keySet());
 		if (targetList.size() > 0) {
-			targetList.remove(targetList.toArray()[0]);
+			targetList.remove(0);
 		}
 
 		networks.add(network);
@@ -224,7 +321,9 @@ public class NetworkSplitter implements INetworkTransformation {
 			splitNetwork(network, target);
 		}
 
-		addCommAttribute(network);
-		network.computeTemplateMaps();
+		for (Network workingNetwork : networks) {
+			addCommAttribute(workingNetwork);
+			workingNetwork.computeTemplateMaps();
+		}
 	}
 }
