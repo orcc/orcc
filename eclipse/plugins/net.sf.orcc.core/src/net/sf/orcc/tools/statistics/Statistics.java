@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IRISA
+ * Copyright (c) 2011, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,14 @@
  */
 package net.sf.orcc.tools.statistics;
 
+import java.io.File;
+import java.util.List;
+
+import net.sf.orcc.OrccException;
+import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.tools.AbstractActorAnalyzer;
+import net.sf.orcc.tools.AbstractNetworkAnalyzer;
 
 /**
  * This class define a network analyzer that compute different statistics about
@@ -37,21 +44,42 @@ import net.sf.orcc.network.Network;
  * @author Herve Yviquel
  * 
  */
-public class Statistics {
+public class Statistics extends AbstractNetworkAnalyzer {
 
-	public static Statistics INSTANCE = new Statistics();
+	public static void main(String[] args) {
+		main(Statistics.class, args);
+	}
 
 	private InstructionStats instructionStats;
-	private MemoryStats memoryStats;
 
-	public Statistics() {
+	private MemoryStats memoryStats;
+	public Statistics(AbstractActorAnalyzer actorAnalyzer) {
+		super(actorAnalyzer);
 		memoryStats = new MemoryStats();
 		instructionStats = new InstructionStats();
+	}
+
+	@Override
+	protected void analyze(Connection connection) throws OrccException {
+		// TODO Auto-generated method stub
+
 	}
 
 	public void computeStats(Network network) {
 		memoryStats.computeMemoryStats(network);
 		instructionStats.computeInstructionStats(network);
+	}
+
+	@Override
+	protected void doVtlAnalyzer(List<File> files) throws OrccException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	protected void doXdfAnalyzer(Network network) throws OrccException {
+		// TODO Auto-generated method stub
+
 	}
 
 	public InstructionStats getGraphStats() {
@@ -60,6 +88,12 @@ public class Statistics {
 
 	public MemoryStats getMemoryStats() {
 		return memoryStats;
+	}
+
+	@Override
+	public void importResults() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

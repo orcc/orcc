@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IRISA
+ * Copyright (c) 2011, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

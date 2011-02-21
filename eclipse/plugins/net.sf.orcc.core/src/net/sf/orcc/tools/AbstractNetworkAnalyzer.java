@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +104,30 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		}
 	}
 
+	public void analyzeVTL(OrccProcess process, List<String> vtlFolders)
+			throws OrccException {
+		this.process = process;
+		this.vtlFolders = vtlFolders;
+
+		// lists actors
+		write("Lists actors...\n");
+		List<File> vtlFiles = new ArrayList<File>();
+		for (String folder : vtlFolders) {
+			findFiles(vtlFiles, new File(folder));
+		}
+
+		Collections.sort(vtlFiles, new Comparator<File>() {
+
+			@Override
+			public int compare(File f1, File f2) {
+				return f1.compareTo(f2);
+			}
+
+		});
+		doVtlAnalyzer(vtlFiles);
+
+	}
+
 	@Override
 	final public void analyzeXDF(OrccProcess process, String inputFile)
 			throws OrccException {
@@ -125,12 +152,20 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		doXdfAnalyzer(network);
 	}
 
-	public void analyzeVTL(OrccProcess process, List<String> vtlFolders)
-			throws OrccException {
-
-	}
+	abstract protected void doVtlAnalyzer(List<File> files)
+			throws OrccException;
 
 	abstract protected void doXdfAnalyzer(Network network) throws OrccException;
+
+	private void findFiles(List<File> vtlFiles, File vtl) {
+		for (File file : vtl.listFiles()) {
+			if (file.isDirectory()) {
+				findFiles(vtlFiles, file);
+			} else if (file.getName().endsWith(".json")) {
+				vtlFiles.add(file);
+			}
+		}
+	}
 
 	abstract public void importResults();
 
