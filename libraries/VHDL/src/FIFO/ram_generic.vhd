@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
--- Title      : Gray counter
+-- Title      : Generic dual port RAM
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : gray_cnt.vhd
+-- File       : ram_generic.vhd
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 

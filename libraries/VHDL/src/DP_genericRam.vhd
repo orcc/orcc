@@ -2,7 +2,7 @@
 -- Title      : True Dual Port RAM
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : gray_cnt.vhd
+-- File       : DP_genericRAM.vhd
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : INSA - Rennes
 -- Created    : 
@@ -10,7 +10,6 @@
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
--- Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
 -- Copyright (c) 2009-2010, IETR/INSA of Rennes
 -- All rights reserved.
 -- 
@@ -40,8 +39,7 @@
 -------------------------------------------------------------------------------
 -- Revisions  :
 -- Date        Version  Author       Description
--- 2010-02-09  1.0      Nicolas      Created
--- 2010-02-09  2.0      Nicolas      from Single port to Dual Port
+-- 2011-02-21  1.0      Nicolas      Created
 -------------------------------------------------------------------------------
 
 library ieee;
