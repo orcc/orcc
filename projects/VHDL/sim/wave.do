@@ -244,18 +244,18 @@ add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/retr
 add wave -noupdate -divider <NULL>
 add wave -noupdate -divider Clip
 add wave -noupdate -divider <NULL>
-add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/i_data
+add wave -noupdate -color cyan -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/i_data
 add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/i_send
 add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/i_ack
 add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/signed_data
 add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/signed_send
 add wave -noupdate -color cyan /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/signed_ack
 add wave -noupdate -divider <NULL>
-add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/o_data
+add wave -noupdate -color {Orange Red} -radix unsigned /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/o_data
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/o_send
 add wave -noupdate -color {Orange Red} /tb_xilinx_idct2d/xilinx_idct2d_orcc/clip/o_ack
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {1442 ns} 0}
+WaveRestoreCursors {{Cursor 1} {3535 ns} 0}
 configure wave -namecolwidth 222
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -270,4 +270,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {2464 ns}
+WaveRestoreZoom {3414 ns} {4349 ns}
