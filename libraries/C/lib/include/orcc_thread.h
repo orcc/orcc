@@ -37,11 +37,21 @@
 	// ...
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
-	
+
 	// Thread
 	typedef long cpu_set_t;
+	#define thread_struct HANDLE
+	#define thread_id_struct DWORD
+
 	#define clear_cpu_set(cpuset) cpuset = 0
-	#define set_thread_affinity(cpuset, proc_num, thread) SetThreadAffinityMask(thread, proc_num)
+
+	/**
+	 * Sets the affinity of the given thread to the given processor.
+	 */
+	static void set_thread_affinity(cpu_set_t cpuset, int proc_num, thread_struct hThread) {
+		DWORD_PTR dwThreadAffinityMask = 1 << proc_num;
+		SetThreadAffinityMask(hThread, dwThreadAffinityMask);
+	}
 
 	/**
 	 * Sets the affinity of this process to the given processor.
@@ -54,9 +64,6 @@
 	
 	#define thread_create(thread, function, argument, id) thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) function, (LPVOID) &(argument), 0, &(id))
 	#define thread_join(thread) WaitForSingleObject(thread, INFINITE)
-	
-	#define thread_struct HANDLE
-	#define thread_id_struct DWORD
 	
 	// Semaphore
 	#define MAX_SEM_COUNT 10
