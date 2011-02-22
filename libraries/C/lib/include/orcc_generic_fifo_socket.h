@@ -2,29 +2,33 @@ struct FIFO_SOCKET_S(T) {
 	int size; /** size of the ringbuffer */
 	T *contents; /** the memory containing the ringbuffer */
 	int fill_count;
+	fd_set fdset; 
 
 	SOCKET Sock;
 };
 
-DECL int FIFO_SOCKET_HAS_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo, int n) {
-	if(fifo->fill_count < n) {
-		if(recv(fifo->Sock, (char *) &(fifo->contents[fifo->fill_count]), (n - fifo->fill_count) * sizeof(T), 0) == -1) {
-			//will be managed when socket we will have unblocked read.
-			fprintf(stderr,"socket_GetData() : error.\n");
-			exit(-10);
-		} else {
-			fifo->fill_count = n;
-			return 1;
-		}
-	}
-
-	return 1;
-}
-
 DECL int FIFO_SOCKET_GET_NUM_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo) {
 	//Read socket
-	//return fifo->fill_count;
-	return 1024;
+	if(fifo->fill_count + 100 < fifo->size) {
+		int ret;
+		int nbBytesRead;
+		ret = select(fifo->Sock + 1, &(fifo->fdset), NULL, NULL, NULL);
+		if(ret < 0)
+		{
+			fprintf(stderr,"socket_GetData() : error.\n");
+			exit(-10);
+		}
+		if(ret > 0) {
+			nbBytesRead = recv(fifo->Sock, (char *) &(fifo->contents[fifo->fill_count]), 100 * sizeof(T), 0);
+			if(nbBytesRead == -1) {
+				//will be managed when socket we will have unblocked read.
+				fprintf(stderr,"socket_GetData() : error.\n");
+				exit(-10);
+			}
+			fifo->fill_count += nbBytesRead / sizeof(T);
+		}
+	}
+	return fifo->fill_count;
 }
 
 DECL int FIFO_SOCKET_HAS_ROOM(T)(struct FIFO_SOCKET_S(T) *fifo, int n) {
@@ -43,8 +47,13 @@ DECL T *FIFO_SOCKET_READ(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int n) {
 }
 
 DECL void FIFO_SOCKET_READ_END(T)(struct FIFO_SOCKET_S(T) *fifo, int n) {
-	memmove(fifo->contents, &fifo->contents[n], (fifo->fill_count - n) * sizeof(T));
-	fifo->fill_count -= n;
+	if(fifo->fill_count - n > 0) {
+		memmove(fifo->contents, &fifo->contents[n], (fifo->fill_count - n) * sizeof(T));
+		fifo->fill_count -= n;
+	}
+	else {
+		fifo->fill_count = 0;
+	}
 }
 
 
@@ -69,7 +78,11 @@ DECL void FIFO_SOCKET_INIT(T)(struct FIFO_SOCKET_S(T) *fifo, int IsServer, const
 	SOCKADDR_IN Sin;
 	struct hostent *hostinfo;
 	SOCKET local_sock;
-
+	int i;
+	for(i = 0;i<fifo->size ; i++) {
+		fifo->contents[i] = 62;
+	}
+	FD_ZERO(&(fifo->fdset));
 	if (IsIpv6) {
 		local_sock = socket(AF_INET6, SOCK_STREAM, 0);
 	} else {
@@ -123,4 +136,5 @@ DECL void FIFO_SOCKET_INIT(T)(struct FIFO_SOCKET_S(T) *fifo, int IsServer, const
 		printf("Client connected\n");
 		closesocket(local_sock);
 	}
+	FD_SET(fifo->Sock, &(fifo->fdset));
 }

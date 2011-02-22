@@ -281,6 +281,7 @@ public class CBackendImpl extends AbstractBackend {
 			workingNetwork = mapTargetsNetworks.get(targetName);
 
 			if (codesign) {
+				write("\nPrinting " + targetName + "'s instances\n");
 				path = rootPath + File.separator + targetName;
 				File directory = new File(path);
 				if(!directory.exists()) {

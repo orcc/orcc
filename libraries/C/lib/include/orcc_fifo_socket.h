@@ -34,7 +34,7 @@
 
 // declare FIFO with a size equal to (size)
 #define DECLARE_FIFO_SOCKET(type, size, count) static type array_##count[(size) + 1]; \
-static struct FIFO_SOCKET_S(type) fifo_##count = { (size) + 1, array_##count, 0, 0};
+static struct FIFO_SOCKET_S(type) fifo_##count = { (size) + 1, array_##count, 0, 0, 0};
 
 #define FIFO_SOCKET_S(T) FIFO_SOCKET_S_EXPAND(T)
 #define FIFO_SOCKET_S_EXPAND(T) fifo_socket_##T##_s
@@ -44,9 +44,6 @@ static struct FIFO_SOCKET_S(type) fifo_##count = { (size) + 1, array_##count, 0,
 
 #define FIFO_SOCKET_HAS_ROOM(T) FIFO_SOCKET_HAS_ROOM_EXPAND(T)
 #define FIFO_SOCKET_HAS_ROOM_EXPAND(T) fifo_socket_ ## T ## _has_room
-
-#define FIFO_SOCKET_HAS_TOKENS(T) FIFO_SOCKET_HAS_TOKENS_EXPAND(T)
-#define FIFO_SOCKET_HAS_TOKENS_EXPAND(T) fifo_socket_ ## T ## _has_tokens
 
 #define FIFO_SOCKET_GET_NUM_TOKENS(T) FIFO_SOCKET_GET_NUM_TOKENS_EXPAND(T)
 #define FIFO_SOCKET_GET_NUM_TOKENS_EXPAND(T) fifo_socket_ ## T ## _get_num_tokens
