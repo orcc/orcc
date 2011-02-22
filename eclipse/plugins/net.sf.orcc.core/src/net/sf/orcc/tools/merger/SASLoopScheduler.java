@@ -29,14 +29,50 @@
 
 package net.sf.orcc.tools.merger;
 
+import java.util.List;
+
+import net.sf.orcc.OrccException;
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Vertex;
+
+import org.jgrapht.DirectedGraph;
+
 /**
- * 
- * This interface defines how a transformation can be applied on a schedule.
+ * This class computes a static schedule from the given network. All instances
+ * of the network are assumed to be static (SDF/CSDF). The network classifier is
+ * assumed to be computed first.
  * 
  * @author Ghislain Roquier
- *
+ * 
  */
-public interface IScheduleTransformation {
+public class SASLoopScheduler extends AbstractScheduler {
 
-	public void transform(Schedule schedule);
+	public SASLoopScheduler(DirectedGraph<Vertex, Connection> graph)
+			throws OrccException {
+		super(graph);
+	}
+
+	public Schedule schedule() throws OrccException {
+		Schedule schedule = new Schedule();
+		schedule.setIterationCount(1);
+
+		List<Vertex> sort = new TopologicalSorter(graph).topologicalSort();
+		for (Vertex vertex : sort) {
+			if (vertex.isInstance()) {
+				int rep = repetitionVector.get(vertex);
+				Iterand iterand = null;
+				if (rep > 1) {
+					Schedule subSched = new Schedule();
+					subSched.setIterationCount(repetitionVector.get(vertex));
+					subSched.add(new Iterand(vertex));
+					iterand = new Iterand(subSched);
+				} else {
+					iterand = new Iterand(vertex);
+				}
+				schedule.add(iterand);
+			}
+		}
+		return schedule;
+	}
+
 }

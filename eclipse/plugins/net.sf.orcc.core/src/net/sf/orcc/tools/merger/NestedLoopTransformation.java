@@ -40,14 +40,14 @@ import org.jgrapht.DirectedGraph;
 
 /**
  * 
- * This class computes a looped schedule from a flat schedule in order to
+ * This class computes a looped schedule from a one-level looped schedule in order to
  * mimimize memory usage.
  * 
  * @author Ghislain Roquier
  * 
  */
 
-public class MatrixChainTransformation implements IScheduleTransformation {
+public class NestedLoopTransformation {
 
 	private double[][] m;
 
@@ -59,7 +59,7 @@ public class MatrixChainTransformation implements IScheduleTransformation {
 
 	Schedule schedule;
 
-	public MatrixChainTransformation(DirectedGraph<Vertex, Connection> graph) {
+	public NestedLoopTransformation(DirectedGraph<Vertex, Connection> graph) {
 		this.graph = graph;
 	}
 
@@ -166,7 +166,6 @@ public class MatrixChainTransformation implements IScheduleTransformation {
 		return vertex;
 	}
 
-	@Override
 	public void transform(Schedule schedule) {
 		this.schedule = new Schedule(schedule);
 

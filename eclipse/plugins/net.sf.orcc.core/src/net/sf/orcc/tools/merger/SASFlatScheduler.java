@@ -45,17 +45,14 @@ import org.jgrapht.DirectedGraph;
  * @author Ghislain Roquier
  * 
  */
-public class FlatSASScheduler extends AbstractScheduler {
+public class SASFlatScheduler extends AbstractScheduler {
 
-	public FlatSASScheduler(DirectedGraph<Vertex, Connection> graph)
+	public SASFlatScheduler(DirectedGraph<Vertex, Connection> graph)
 			throws OrccException {
 		super(graph);
 	}
 
 	public Schedule schedule() throws OrccException {
-
-		repetitionVector = new RepetitionVectorAnalyzer(graph)
-				.getRepetitionVector();
 		Schedule schedule = new Schedule();
 		schedule.setIterationCount(1);
 
@@ -63,16 +60,9 @@ public class FlatSASScheduler extends AbstractScheduler {
 		for (Vertex vertex : sort) {
 			if (vertex.isInstance()) {
 				int rep = repetitionVector.get(vertex);
-				Iterand iterand = null;
-				if (rep > 1) {
-					Schedule subSched = new Schedule();
-					subSched.setIterationCount(repetitionVector.get(vertex));
-					subSched.add(new Iterand(vertex));
-					iterand = new Iterand(subSched);
-				} else {
-					iterand = new Iterand(vertex);
+				for (int i = 0; i < rep; i++) {
+					schedule.add(new Iterand(vertex));
 				}
-				schedule.add(iterand);
 			}
 		}
 		return schedule;

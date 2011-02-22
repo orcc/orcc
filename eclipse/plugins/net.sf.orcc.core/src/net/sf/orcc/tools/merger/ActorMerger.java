@@ -641,7 +641,7 @@ public class ActorMerger implements INetworkTransformation {
 			DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
 					graph, vertices, null);
 
-			scheduler = new FlatSASScheduler(subgraph);
+			scheduler = new SASFlatScheduler(subgraph);
 
 			for (Vertex vertex : vertices) {
 				Actor actor = vertex.getInstance().getActor();

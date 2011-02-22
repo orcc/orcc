@@ -59,9 +59,17 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	private boolean stop = false;
 
+	private int depth;
+
+	private int maxDepth;
+
 	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph)
 			throws OrccException {
 		this.graph = graph;
+
+		repetitionVector = new RepetitionVectorAnalyzer(graph)
+				.getRepetitionVector();
+
 		schedule = schedule();
 	}
 
@@ -90,9 +98,10 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	private List<Schedule> getHierarchy(Schedule schedule, Vertex vertex) {
 		List<Schedule> schedules = new LinkedList<Schedule>();
-		Iterator<Iterand> it = schedule.getIterands().iterator();
+
 		stop = false;
 
+		Iterator<Iterand> it = schedule.getIterands().iterator();
 		while (it.hasNext()) {
 			Iterand iterand = it.next();
 			if (iterand.isVertex()) {
@@ -111,10 +120,6 @@ public abstract class AbstractScheduler implements IScheduler {
 
 		return schedules;
 	}
-
-	private int depth;
-
-	private int maxDepth;
 
 	public int getDepth() {
 		depth = maxDepth = 0;

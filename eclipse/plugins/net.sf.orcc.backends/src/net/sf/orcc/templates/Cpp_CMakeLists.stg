@@ -30,10 +30,6 @@ find_library(CALaka_LIBRARY CALaka HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 find_library(SystemActor_LIBRARY SystemActor HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 find_library(Thread_LIBRARY Thread HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 
-find_library(ImageToolbox_LIBRARY ImageToolbox HINTS $ENV{ImageToolboxDIR} PATH_SUFFIXES lib)
-
-set(ImageToolbox_INCLUDE_DIR "$ENV{ImageToolboxDIR}/include")
-
 find_path(CAL_INCLUDE_DIR actoraka.h HINTS $ENV{CALDIR} PATH_SUFFIXES include include/CAL)
 
 
@@ -56,7 +52,7 @@ ${Thread_LIBRARY}
 )
 
 <if(options.needSerDes)>
-set(libraries ${libraries} Wrapper ${AdaptorFactory_LIBRARY}
+set(libraries ${libraries} Wrapper ${AdaptorFactory_LIBRARY})
 <endif>
 
 
@@ -65,13 +61,6 @@ find_package(SDL REQUIRED)
 set(includes ${includes} ${SDL_INCLUDE_DIR})	
 set(libraries ${libraries} ${SDL_LIBRARY})
 endif()
-
-if(OpenCV_DISPLAY)
-find_package(OpenCV REQUIRED)
-set(includes ${includes} ${SDL_INCLUDE_DIR} ${ImageToolbox_INCLUDE_DIR} ${OpenCV_INCLUDE_DIR})
-set(libraries ${libraries} ${ImageToolbox_LIBRARY} ${OpenCV_LIBS})
-endif()
-
 
 include_directories(
 ${includes}
