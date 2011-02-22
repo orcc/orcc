@@ -116,7 +116,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(PromelaExprPrinter.class);
 		printer.setTypePrinter(PromelaTypePrinter.class);
 
-		printer.setOptions(getAttributes()); // need to check what this one does
+		printer.getOptions().putAll(getAttributes()); // need to check what this one does
 		printer.getOptions().put("guards", guards);
 		printer.getOptions().put("peeks", peeks);
 		printer.getOptions().put("loads", loads);

@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -89,7 +90,7 @@ public final class STPrinter {
 	 * Creates a new printer.
 	 */
 	public STPrinter() {
-
+		options = new HashMap<String, Object>();
 	}
 
 	/**
@@ -99,6 +100,7 @@ public final class STPrinter {
 	 *            whether the printer is in debug mode or not.
 	 */
 	public STPrinter(boolean debugMode) {
+		this();
 		this.debugMode = debugMode;
 	}
 
@@ -268,16 +270,6 @@ public final class STPrinter {
 
 	public void setExpressionPrinter(Class<? extends ExpressionPrinter> printer) {
 		this.expressionPrinter = printer;
-	}
-
-	/**
-	 * Set the map of options for the selected backend.
-	 * 
-	 * @param options
-	 *            a map of options
-	 */
-	public void setOptions(Map<String, Object> options) {
-		this.options = options;
 	}
 
 	public void setTypePrinter(Class<? extends TypePrinter> printer) {

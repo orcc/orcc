@@ -153,7 +153,7 @@ public class CppBackendImpl extends AbstractBackend {
 		printer = new STPrinter();
 		printer.setExpressionPrinter(CppExprPrinter.class);
 		printer.setTypePrinter(CppTypePrinter.class);
-		printer.setOptions(getAttributes());
+		printer.getOptions().putAll(getAttributes());
 
 		transformActors(network.getActors());
 

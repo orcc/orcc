@@ -144,7 +144,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
 
 		printer = new STPrinter();
-		printer.setOptions(getAttributes());
+		printer.getOptions().putAll(getAttributes());
 		if (hardwareGen) {
 			fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
 					"xc2vp30-7-ff1152");

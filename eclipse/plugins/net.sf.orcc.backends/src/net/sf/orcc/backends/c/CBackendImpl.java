@@ -307,7 +307,7 @@ public class CBackendImpl extends AbstractBackend {
 		printer.loadGroup("C_actor");
 		printer.setExpressionPrinter(CExpressionPrinter.class);
 		printer.setTypePrinter(CTypePrinter.class);
-		printer.setOptions(getAttributes());
+		printer.getOptions().putAll(getAttributes());
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
