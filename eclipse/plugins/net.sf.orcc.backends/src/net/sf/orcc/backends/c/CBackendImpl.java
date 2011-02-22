@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,6 +49,7 @@ import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -65,6 +67,7 @@ import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.stringtemplate.v4.AttributeRenderer;
 
 /**
  * C back-end.
@@ -83,29 +86,64 @@ public class CBackendImpl extends AbstractBackend {
 		main(CBackendImpl.class, args);
 	}
 
-	protected boolean classify;
-	protected boolean codesign;
-	protected boolean debugMode;
-	protected boolean dynamicMapping;
+	/**
+	 * <code>true</code> if the actors should be classified
+	 */
+	private boolean classify;
+
+	/**
+	 * <code>true</code> if we use co-design
+	 */
+	private boolean codesign;
+
+	private boolean debugMode;
+
+	private boolean dynamicMapping;
+
 	private Map<String, List<Instance>> instancesTarget;
 
 	/**
-	 * C Backend options
+	 * what is this used for?
 	 */
-	protected Map<String, String> mapping;
-	private DirectedGraph<String, StringAttribute> mediumGraph;
-	protected boolean merge;
-	protected boolean merger2;
-	private boolean needPthreads;
-	protected boolean newScheduler;
-	protected boolean normalize;
+	private Map<String, String> mapping;
 
 	/**
-	 * printer is protected in order to be visible to CQuasiBackendImpl
+	 * what is this used for?
 	 */
-	protected STPrinter printer;
+	private DirectedGraph<String, StringAttribute> mediumGraph;
+
+	/**
+	 * what is this used for?
+	 */
+	private boolean merge;
+
+	/**
+	 * what is this used for?
+	 */
+	private boolean merger2;
+
+	/**
+	 * <code>true</code> if the code needs pthreads
+	 */
+	private boolean needPthreads;
+
+	/**
+	 * <code>true</code> if the new scheduler should be used
+	 */
+	private boolean newScheduler;
+
+	/**
+	 * <code>true</code> when we want to normalize
+	 */
+	private boolean normalize;
+
+	/**
+	 * printer used for instances
+	 */
+	private STPrinter printer;
 
 	private final Map<String, String> transformations;
+
 	private Network workingNetwork;
 
 	private Map<String, Network> mapTargetsNetworks;
@@ -209,7 +247,7 @@ public class CBackendImpl extends AbstractBackend {
 		actor.setTemplateData(data);
 	}
 
-	protected void doTransformNetwork(Network network) throws OrccException {
+	private void doTransformNetwork(Network network) throws OrccException {
 		// Experimental
 		if (merger2) {
 			new NetworkMerger().transform(network);
@@ -219,7 +257,8 @@ public class CBackendImpl extends AbstractBackend {
 		computeMapping(network);
 		if (codesign) {
 			printer.getOptions().put("threadsNb", 1);
-			NetworkSplitter netSplit = new NetworkSplitter(instancesTarget, mediumGraph);
+			NetworkSplitter netSplit = new NetworkSplitter(instancesTarget,
+					mediumGraph);
 			netSplit.transform(network);
 			mapTargetsNetworks = netSplit.getNetworksMap();
 		} else {
@@ -239,10 +278,10 @@ public class CBackendImpl extends AbstractBackend {
 			}
 			network.computeTemplateMaps();
 			mapTargetsNetworks = new HashMap<String, Network>();
-			mapTargetsNetworks.put(new String (""), network);
+			mapTargetsNetworks.put(new String(""), network);
 		}
 
-		for(String targetName : mapTargetsNetworks.keySet()) {
+		for (String targetName : mapTargetsNetworks.keySet()) {
 			Network worknet = mapTargetsNetworks.get(targetName);
 			CNetworkTemplateData data = new CNetworkTemplateData();
 			data.computeTemplateMaps(worknet);
@@ -273,18 +312,16 @@ public class CBackendImpl extends AbstractBackend {
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		doTransformNetwork(network);
-		
-		String rootPath = new String(path);
-		for(String targetName : mapTargetsNetworks.keySet()) {
-			printer.loadGroup("C_actor");
 
+		String rootPath = new String(path);
+		for (String targetName : mapTargetsNetworks.keySet()) {
 			workingNetwork = mapTargetsNetworks.get(targetName);
 
 			if (codesign) {
 				write("\nPrinting " + targetName + "'s instances\n");
 				path = rootPath + File.separator + targetName;
 				File directory = new File(path);
-				if(!directory.exists()) {
+				if (!directory.exists()) {
 					directory.mkdirs();
 				}
 			}
@@ -326,12 +363,25 @@ public class CBackendImpl extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) throws OrccException {
 		try {
-			printer.getOptions().put("newScheduler", newScheduler);
+			NetworkPrinter networkPrinter = new NetworkPrinter("C_network");
+			networkPrinter.registerRenderer(Type.class,
+					new AttributeRenderer() {
 
-			String outputName = path + File.separator + network.getName()
-					+ ".c";
-			printer.loadGroup("C_network");
-			printer.printNetwork(outputName, network, false, fifoSize);
+						@Override
+						public String toString(Object o, String arg1,
+								Locale arg2) {
+							CTypePrinter printer = new CTypePrinter();
+							((Type) o).accept(printer);
+							return printer.toString();
+						}
+					});
+
+			networkPrinter.getOptions().put("needPthreads", needPthreads);
+			networkPrinter.getOptions().put("newScheduler", newScheduler);
+			networkPrinter.getOptions().put("fifoSize", fifoSize);
+
+			networkPrinter.print(network.getName() + ".c", path, network,
+					"network");
 
 			printCMake(network);
 		} catch (IOException e) {
@@ -352,4 +402,5 @@ public class CBackendImpl extends AbstractBackend {
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
 		debugMode = getAttribute(DEBUG_MODE, true);
 	}
+
 }

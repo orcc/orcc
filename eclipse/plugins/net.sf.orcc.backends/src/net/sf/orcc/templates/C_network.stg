@@ -391,7 +391,7 @@ printMediumInclude(mediums) ::= <<
 >>
 
 // print network
-network(debugFifos, fifoSize, network, options) ::= <<
+network(network, options) ::= <<
 
 // Generated from "<network.name>"
 
@@ -433,7 +433,7 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #define CROSSOVER_RATIO 0.6
 <endif>
 
-#define SIZE <fifoSize>
+#define SIZE <options.("fifoSize")>
 // #define PRINT_FIRINGS
 
 

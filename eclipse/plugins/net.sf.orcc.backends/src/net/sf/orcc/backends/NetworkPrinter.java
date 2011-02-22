@@ -38,6 +38,8 @@ import java.util.Map;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.util.OrccUtil;
 
+import org.stringtemplate.v4.AttributeRenderer;
+import org.stringtemplate.v4.ModelAdaptor;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
@@ -95,6 +97,32 @@ public class NetworkPrinter {
 		OutputStream os = new FileOutputStream(path + File.separator + fileName);
 		os.write(b);
 		os.close();
+	}
+
+	/**
+	 * Registers a model adaptor for the given types.
+	 * 
+	 * @param attributeType
+	 *            type of attribute
+	 * @param adaptor
+	 *            adaptor
+	 */
+	public void registerModelAdaptor(Class<?> attributeType,
+			ModelAdaptor adaptor) {
+		group.registerModelAdaptor(attributeType, adaptor);
+	}
+
+	/**
+	 * Registers an attribute renderer for the given types.
+	 * 
+	 * @param attributeType
+	 *            type of attribute
+	 * @param renderer
+	 *            renderer
+	 */
+	public void registerRenderer(Class<?> attributeType,
+			AttributeRenderer renderer) {
+		group.registerRenderer(attributeType, renderer);
 	}
 
 }
