@@ -303,7 +303,7 @@ void *scheduler(void *data) {
 	semaphore_wait(sched-\>sem_thread); 
 	
 	<endif>
-	while (1) {
+	while (<if(options.needDynamicMapping)>sched-\>sync-\>active_sync<else>1<endif>) {
 		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched);
 		<if(options.needDynamicMapping)>
 		if(my_actor == NULL){
@@ -418,8 +418,6 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #define THREAD_NB <options.threadsNb>
 <endif>
 <if(options.needDynamicMapping)>
-#define SYNC_DELAY 3
-
 #define POPULATION_SIZE 20
 #define GENERATION_NB 5
 
@@ -566,8 +564,8 @@ int main(int argc, char *argv[]) {
 
   launcher();
 
-  printf("End of simulation! Press a key to continue\n");
-  wait_for_key();
+  printf("End of simulation!<if(!options.needDynamicMapping)> Press a key to continue<endif>\n");
+  <if(!options.needDynamicMapping)>wait_for_key();<endif>
 
   return 0;
 }
