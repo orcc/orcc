@@ -36,11 +36,13 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
@@ -369,13 +371,22 @@ public class StaticGraphAnalyzer {
 	}
 
 	public void updateVertices(List<Vertex> vertices, Vertex equivalentVertex) {
+		Instance eqInstance = equivalentVertex.getInstance();
+		Actor eqActor = eqInstance.getActor();
+		OrderedMap<String, Port> eqInputs = eqActor.getInputs();
+		OrderedMap<String, Port> eqOutputs = eqActor.getOutputs();
 		addVertex(equivalentVertex);
 
 		for (Vertex vertex : vertices) {
 			Instance instance = vertex.getInstance();
-			
+
+			Actor actor = instance.getActor();
 			removeVertex(vertex);
 		}
+	}
+	
+	private void updateConnections(){
+		
 	}
 
 }

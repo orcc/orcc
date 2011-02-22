@@ -73,6 +73,15 @@ public class OrderedMap<K, V> implements Iterable<V> {
 	}
 
 	/**
+	 * Creates a new ordered map with the same mappings as the specified
+	 * OrderedMap.
+	 */
+	public OrderedMap(OrderedMap<K, V> m) {
+		map = new LinkedHashMap<K, V>(m.getHashMap());
+		modified = true;
+	}
+
+	/**
 	 * Removes all the elements from this ordered map.
 	 */
 	public void clear() {
@@ -217,8 +226,8 @@ public class OrderedMap<K, V> implements Iterable<V> {
 	 * @param map
 	 *            a map of objects
 	 */
-	public final void putAll(OrderedMap<K, V> map) {
-		for (Entry<K, V> entry : map.getHashMap().entrySet()) {
+	public final void putAll(OrderedMap<K, V> m) {
+		for (Entry<K, V> entry : m.getHashMap().entrySet()) {
 			put(entry.getKey(), entry.getValue());
 		}
 	}
