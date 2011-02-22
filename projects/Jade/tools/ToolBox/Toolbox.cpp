@@ -301,32 +301,25 @@ void opt(string file, Module* M){
 
   //Write output if need
   std::string ErrorInfo;
-  OwningPtr<tool_output_file> Out;
 
-  if(OutputAssembly || OutputBitcode){
-	Out.reset(new tool_output_file(file.c_str(), ErrorInfo,
-                                   raw_fd_ostream::F_Binary));
-
-	 if (!ErrorInfo.empty()) {
-		 errs() << ErrorInfo << '\n';
-		 exit(1);
-    }
-  }
+  tool_output_file Out(file.c_str(), ErrorInfo,raw_fd_ostream::F_Binary);
 
   if (OutputAssembly){
-      Passes.add(createPrintModulePass(&Out->os()));
+      Passes.add(createPrintModulePass(&Out.os()));
   }else if(OutputBitcode){
-      Passes.add(createBitcodeWriterPass(Out->os()));
+      Passes.add(createBitcodeWriterPass(Out.os()));
   }
- 
+
+  if (!ErrorInfo.empty()) {
+		 errs() << ErrorInfo << '\n';
+		 exit(1);
+  }
+
+
   // Now that we have all of the passes ready, run them.
   Passes.run(*M);
 
-
-  if(OutputAssembly || OutputBitcode){
-	Out->keep();
-  }
-
+  Out.keep();
 }
 
 void createArchives(map<string,Module*>* modules){
@@ -340,7 +333,8 @@ void createArchives(map<string,Module*>* modules){
 		string firstPackage = PackageMng::getFirstPackage(itModule->first);
 
 		itArchive = archives.find(firstPackage);
-
+		
+		// Create a new archive
 		if(itArchive == archives.end()){
 			sys::Path ArchivePath(LibraryFolder + firstPackage+ ".a");
 			archive =  Archive::CreateEmpty(ArchivePath, Context);
@@ -349,7 +343,15 @@ void createArchives(map<string,Module*>* modules){
 			archive = itArchive->second;
 		}
 
-		archive->addFileBefore(
+		sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(itModule->first));
+		std::string errorMsg;
+		archive->addFileBefore(fullFilePath, archive->end(), &errorMsg);		
+	}
+
+	// Write archives to the disk
+	for (itArchive = archives.begin(); itArchive != archives.end(); itArchive++){
+		cout << "Creating : " << itArchive->first << ".a\n";
+		itArchive->second->writeToDisk();
 	}
 }
 
@@ -357,7 +359,7 @@ void createArchives(map<string,Module*>* modules){
 int main(int argc, char **argv) {
 	sys::PrintStackTraceOnErrorSignal();
 	PrettyStackTraceProgram X(argc, argv);
-	
+
 	SMDiagnostic Err;
 	LLVMContext &Context = getGlobalContext();
 	cl::ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
@@ -374,14 +376,16 @@ int main(int argc, char **argv) {
 		sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(*itFile));
 
 		if (!fullFilePath.exists()){
-			cerr <<"Actor "<< itFile->c_str() << "not found.\n";
+			cerr <<"Actor "<< itFile->c_str() << " not found.\n";
+			continue;
 		}
 
 		//Parse IR file
 		Module* mod = ParseIRFile(fullFilePath.c_str(), Err, Context);
 
-		if (!fullFilePath.exists()){
+		if (mod == NULL){
 			cerr <<"Error when parsing "<< itFile->c_str() << ".\n";
+			continue;
 		}
 
 		//Store results
@@ -397,5 +401,5 @@ int main(int argc, char **argv) {
 	if(OutputArchive){
 		createArchives(&modules);
 	}
-		
+	
 }
