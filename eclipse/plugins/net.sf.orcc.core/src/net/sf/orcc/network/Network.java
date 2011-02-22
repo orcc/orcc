@@ -106,7 +106,7 @@ public class Network {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
-	private Map<Instance, List<Connection>> incomingMap;
+	private Map<Instance, Map<Port, Connection>> incomingMap;
 
 	private OrderedMap<String, Port> inputs;
 
@@ -117,19 +117,11 @@ public class Network {
 
 	private String name;
 
-	private Map<Instance, Map<Port, Integer>> numberOfReadersMap;
-
-	private Map<Port, Integer> numberOfInputReadersMap;
-
-	private Map<Connection, Integer> numberOfConnectionReadersMap;
-
-	private Map<Instance, List<Connection>> outgoingMap;
+	private Map<Instance, Map<Port, List<Connection>>> outgoingMap;
 
 	private OrderedMap<String, Port> outputs;
 
 	private Scope<String, GlobalVariable> parameters;
-
-	private Map<Instance, Map<Port, Integer>> portToFifoSizeMap;
 
 	private Map<Instance, Map<Port, Instance>> predecessorsMap;
 
@@ -139,12 +131,12 @@ public class Network {
 
 	private Map<Connection, Vertex> targetMap;
 
-	private OrderedMap<String, GlobalVariable> variables;
-
 	/**
 	 * holds template-specific data.
 	 */
 	private Object templateData;
+
+	private OrderedMap<String, GlobalVariable> variables;
 
 	/**
 	 * Creates a new network.
@@ -169,75 +161,31 @@ public class Network {
 	}
 
 	private void computeIncomingOutgoingMaps() {
-		incomingMap = new HashMap<Instance, List<Connection>>();
-		outgoingMap = new HashMap<Instance, List<Connection>>();
+		incomingMap = new HashMap<Instance, Map<Port, Connection>>();
+		outgoingMap = new HashMap<Instance, Map<Port, List<Connection>>>();
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {
 				// incoming edges
 				Set<Connection> connections = graph.incomingEdgesOf(vertex);
-				List<Connection> incoming = new ArrayList<Connection>(
-						connections);
+				Map<Port, Connection> incoming = new HashMap<Port, Connection>();
+				for (Connection connection : connections) {
+					incoming.put(connection.getTarget(), connection);
+				}
 				incomingMap.put(vertex.getInstance(), incoming);
 
 				// outgoing edges
 				connections = graph.outgoingEdgesOf(vertex);
-				List<Connection> outgoing = new ArrayList<Connection>(
-						connections);
+				Map<Port, List<Connection>> outgoing = new HashMap<Port, List<Connection>>();
+				for (Connection connection : connections) {
+					Port source = connection.getSource();
+					List<Connection> conns = outgoing.get(source);
+					if (conns == null) {
+						conns = new ArrayList<Connection>(1);
+						outgoing.put(source, conns);
+					}
+					conns.add(connection);
+				}
 				outgoingMap.put(vertex.getInstance(), outgoing);
-			}
-		}
-	}
-
-	private void computePortInformationMaps() {
-		numberOfReadersMap = new HashMap<Instance, Map<Port, Integer>>();
-		numberOfConnectionReadersMap = new HashMap<Connection, Integer>();
-		for (Instance instance : outgoingMap.keySet()) {
-			Map<Port, Integer> portToNumberOfReadersMap = new HashMap<Port, Integer>();
-
-			for (Connection connection : outgoingMap.get(instance)) {
-				Port srcPort = connection.getSource();
-				if (portToNumberOfReadersMap.get(srcPort) == null) {
-					portToNumberOfReadersMap.put(srcPort, 1);
-					numberOfConnectionReadersMap.put(connection, 0);
-				} else {
-					int n = portToNumberOfReadersMap.get(srcPort);
-					n++;
-					portToNumberOfReadersMap.remove(srcPort);
-					portToNumberOfReadersMap.put(srcPort, n);
-					numberOfConnectionReadersMap.put(connection, n - 1);
-				}
-			}
-			numberOfReadersMap.put(instance, portToNumberOfReadersMap);
-		}
-
-		portToFifoSizeMap = new HashMap<Instance, Map<Port, Integer>>();
-		for (Instance instance : getIncomingMap().keySet()) {
-			Map<Port, Integer> portToFifoSize = new HashMap<Port, Integer>();
-			for (Connection connection : getIncomingMap().get(instance)) {
-				Port trgtPort = connection.getTarget();
-				Integer fifoSize = connection.getSize();
-				if (fifoSize != null) {
-					portToFifoSize.put(trgtPort, fifoSize);
-				}
-			}
-			portToFifoSizeMap.put(instance, portToFifoSize);
-		}
-
-		numberOfInputReadersMap = new HashMap<Port, Integer>();
-		OrderedMap<String, Port> inputs = this.getInputs();
-		for (Vertex vertex : graph.vertexSet()) {
-			if (vertex.isPort()) {
-				Port port = vertex.getPort();
-				if (inputs.contains(port.getName())) {
-					numberOfInputReadersMap
-							.put(port, graph.outDegreeOf(vertex));
-				}
-				int cp = 0;
-				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
-					numberOfConnectionReadersMap.put(connection, cp);
-					cp++;
-				}
-
 			}
 		}
 	}
@@ -316,8 +264,6 @@ public class Network {
 		computeIncomingOutgoingMaps();
 
 		computePredecessorsSuccessorsMaps();
-
-		computePortInformationMaps();
 	}
 
 	/**
@@ -402,7 +348,7 @@ public class Network {
 	 * @return a map that associates each instance to the list of its incoming
 	 *         edges
 	 */
-	public Map<Instance, List<Connection>> getIncomingMap() {
+	public Map<Instance, Map<Port, Connection>> getIncomingMap() {
 		return incomingMap;
 	}
 
@@ -415,17 +361,6 @@ public class Network {
 	 */
 	public Port getInput(String name) {
 		return inputs.get(name);
-	}
-
-	/**
-	 * Returns a map that associates each network input port to the number of
-	 * readers.
-	 * 
-	 * @return a map that associates each network input port to the number of
-	 *         readers
-	 */
-	public Map<Port, Integer> getInputNumberOfReadersMap() {
-		return numberOfInputReadersMap;
 	}
 
 	/**
@@ -497,34 +432,13 @@ public class Network {
 	}
 
 	/**
-	 * Returns a map that associates each broadcast/fan-out connection the
-	 * number of readers.
-	 * 
-	 * @return a map that associates each broadcast/fan-out connection the
-	 *         number of readers
-	 */
-
-	public Map<Connection, Integer> getNumberOfConnectionReadersMap() {
-		return numberOfConnectionReadersMap;
-	}
-
-	/**
-	 * Returns a map that associates each output port to the number of readers.
-	 * 
-	 * @return a map that associates each output port to the number of readers
-	 */
-	public Map<Instance, Map<Port, Integer>> getNumberOfReadersMap() {
-		return numberOfReadersMap;
-	}
-
-	/**
 	 * Returns a map that associates each instance to the list of its outgoing
 	 * edges.
 	 * 
 	 * @return a map that associates each instance to the list of its outgoing
 	 *         edges
 	 */
-	public Map<Instance, List<Connection>> getOutgoingMap() {
+	public Map<Instance, Map<Port, List<Connection>>> getOutgoingMap() {
 		return outgoingMap;
 	}
 
@@ -555,17 +469,6 @@ public class Network {
 	 */
 	public OrderedMap<String, GlobalVariable> getParameters() {
 		return parameters;
-	}
-
-	/**
-	 * Returns a map that associates each input port to the local specified size
-	 * of its FIFO.
-	 * 
-	 * @return a map that associates each input port to the local specified size
-	 *         of its FIFO
-	 */
-	public Map<Instance, Map<Port, Integer>> getPortToFifoSizeMap() {
-		return portToFifoSizeMap;
 	}
 
 	/**

@@ -114,8 +114,8 @@ public class CNetworkTemplateData {
 				Map<Port, IAttribute> instancePortsUpperCase = new HashMap<Port, IAttribute>();
 
 				// For all connections in the instance's input
-				for (Connection connection : network.getIncomingMap().get(
-						instance)) {
+				for (Connection connection : network.getGraph()
+						.incomingEdgesOf(new Vertex(instance))) {
 					instancePorts.put(connection.getTarget(),
 							connection.getAttribute("commMedium"));
 					instancePortsUpperCase.put(connection.getTarget(),
@@ -134,8 +134,8 @@ public class CNetworkTemplateData {
 				}
 
 				// For all connections in the instance's output
-				for (Connection connection : network.getOutgoingMap().get(
-						instance)) {
+				for (Connection connection : network.getGraph()
+						.outgoingEdgesOf(new Vertex(instance))) {
 					instancePorts.put(connection.getSource(),
 							connection.getAttribute("commMedium"));
 					instancePortsUpperCase.put(connection.getSource(),
