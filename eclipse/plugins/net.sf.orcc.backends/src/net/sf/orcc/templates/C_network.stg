@@ -347,7 +347,7 @@ void *scheduler(void *data) {
 >>
 
 printAddSchedulable(instance) ::= <<
-sched_add_schedulable(source.sched, &<GetInstanceId(instance)>);
+sched_add_schedulable(<GetInstanceId(instance)>.sched, &<GetInstanceId(instance)>);
 >>
 
 printAllAddSchedulable(instances) ::= <<
