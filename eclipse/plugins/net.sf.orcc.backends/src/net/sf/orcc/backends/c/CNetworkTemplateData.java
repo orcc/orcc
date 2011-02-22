@@ -191,7 +191,7 @@ public class CNetworkTemplateData {
 				if (!instancesAnalysed.contains(instanceToCheck)) {
 					sourceDetected = checkSourceInstances(instanceToCheck,
 							instancesAnalysed, network.getGraph());
-					if (!sourceDetected) {
+					if (!sourceDetected && (instanceToCheck.isActor() || instanceToCheck.isBroadcast())) {
 						sourceInstances.add(instanceToCheck);
 					}
 				}
