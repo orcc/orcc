@@ -16,7 +16,7 @@ run_xlim2c(<instance.id>)
 >>
 
 
-CMakeLists(network) ::= <<
+CMakeLists(network, options) ::= <<
 # Generated from <network.name>
 
 cmake_minimum_required (VERSION 2.8)
