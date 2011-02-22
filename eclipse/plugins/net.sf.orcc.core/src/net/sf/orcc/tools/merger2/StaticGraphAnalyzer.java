@@ -30,12 +30,12 @@ package net.sf.orcc.tools.merger2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -48,13 +48,14 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 /**
- * This class defines a static representation graph to ease the merging of a network.
+ * This class defines a static representation graph to ease the merging of a
+ * network.
  * 
  * 
  * @author Jerome Gorin
  * 
  */
-public class StaticGraph {
+public class StaticGraphAnalyzer {
 	/**
 	 * This class represents a static edge with a production and a comsuption.
 	 * 
@@ -93,9 +94,11 @@ public class StaticGraph {
 
 	private Map<Vertex, LinkedHashSet<Vertex>> adjacentVertices;
 	private DirectedGraph<Vertex, Connection> dynamicGraph;
-	List<Set<Vertex>> regions;
 
 	private DirectedGraph<Vertex, StaticEdge> graph;
+
+	private List<Vertex> multipleConnectedVertex;
+	private List<Vertex> singlyConnectedVertex;
 
 	/**
 	 * Create a static representation of a network
@@ -103,12 +106,11 @@ public class StaticGraph {
 	 * @param network
 	 *            the Network to subtract the static representation
 	 */
-	public StaticGraph(Network network) {
+	public StaticGraphAnalyzer(Network network) {
+		// Initialize analyzer variables
 		dynamicGraph = network.getGraph();
-		graph = new DefaultDirectedGraph<Vertex, StaticEdge>(
-				StaticEdge.class);
+		graph = new DefaultDirectedGraph<Vertex, StaticEdge>(StaticEdge.class);
 		adjacentVertices = new HashMap<Vertex, LinkedHashSet<Vertex>>();
-		regions = new ArrayList<Set<Vertex>>();
 
 		// Compute every successor of vertex from dynamic graph
 		setAdjacentVertices();
@@ -119,10 +121,10 @@ public class StaticGraph {
 		// Find static edge in the graph
 		addStaticEdge();
 
-		// Remove unconnected static vertex
-		setRegions();
+		// Calculate properties of the static graph
+		updateGraph();
 	}
-	
+
 	/**
 	 * Add static edge from dynamic graph to the static graph
 	 */
@@ -146,9 +148,6 @@ public class StaticGraph {
 		for (Vertex vertex : dynamicGraph.vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
-				if (instance.getActor() == null){
-					int i = 0;
-				}
 				if (instance.getActor().hasMoC()) {
 					MoC moc = instance.getActor().getMoC();
 
@@ -162,13 +161,49 @@ public class StaticGraph {
 		}
 	}
 
+	public void addVertex(Vertex vertex) {
+		graph.addVertex(vertex);
+		dynamicGraph.addVertex(vertex);
+	}
+
 	/**
-	 * Get static regions of the network;
-	 * 
-	 * @return a List of static regions
+	 * Classify instances connection type
 	 */
-	public List<Set<Vertex>> getRegions() {
-		return regions;
+	private void classifyConnections() {
+		// Erase previous computation
+		singlyConnectedVertex = new ArrayList<Vertex>();
+		multipleConnectedVertex = new ArrayList<Vertex>();
+
+		// Analyse each static vertex to determine its connection
+		for (Vertex vertex : graph.vertexSet()) {
+			Set<StaticEdge> edges = graph.outgoingEdgesOf(vertex);
+
+			if (edges.size() > 1) {
+				// Instance is connected to an multiple other static actor
+				multipleConnectedVertex.add(vertex);
+			} else {
+				// Instance is connected to an only other static actor
+				singlyConnectedVertex.add(vertex);
+			}
+		}
+	}
+
+	/**
+	 * Get vertices connected to multiple others statics vertices.
+	 * 
+	 * @return a List of multiple connected vertex
+	 */
+	public List<Vertex> getMultipleConnectedVertex() {
+		return multipleConnectedVertex;
+	}
+
+	/**
+	 * Get vertices connected to only on other static vertex.
+	 * 
+	 * @return a List of singly connected vertex
+	 */
+	public List<Vertex> getSinglyConnectedVertex() {
+		return singlyConnectedVertex;
 	}
 
 	/**
@@ -193,8 +228,8 @@ public class StaticGraph {
 	 * 
 	 * @return the static graph
 	 */
-	public Set<Vertex> getStaticNeighbors(Vertex vertex) {
-		Set<Vertex> neighbours = new HashSet<Vertex>();
+	public List<Vertex> getStaticNeighbors(Vertex vertex) {
+		List<Vertex> neighbours = new ArrayList<Vertex>();
 		LinkedHashSet<Vertex> adjVertices = adjacentVertices.get(vertex);
 
 		for (Vertex adjVertice : adjVertices) {
@@ -233,12 +268,47 @@ public class StaticGraph {
 	}
 
 	/**
-	 * Return true if the network has static regions.
+	 * Return true if the static graph contains multiple connected vertices.
 	 * 
-	 * @return True if the network contains static regions, otherwise false
+	 * @return true if the static graph contains multiple connected vertices,
+	 *         otherwise false;
 	 */
-	public Boolean hasRegions() {
-		return regions.size() != 0;
+	public Boolean hasMultipleConnectedVertex() {
+		return multipleConnectedVertex.size() != 0;
+	}
+
+	/**
+	 * Return true if the static graph contains singly connected vertices.
+	 * 
+	 * @return true if the static graph contains singly connected vertices,
+	 *         otherwise false;
+	 */
+	public Boolean hasSinglyConnectedVertex() {
+		return singlyConnectedVertex.size() != 0;
+	}
+
+	/**
+	 * Remove isolated static instances
+	 */
+	private void removeSingleInstances() {
+		ConnectivityInspector<Vertex, StaticEdge> inspector = new ConnectivityInspector<Vertex, StaticEdge>(
+				graph);
+		List<Set<Vertex>> vertices = inspector.connectedSets();
+		List<Vertex> toRemove = new ArrayList<Vertex>();
+
+		for (Set<Vertex> region : vertices) {
+			if (region.size() == 1) {
+				// Single vertex, remove it from the graph
+				toRemove.addAll(region);
+			}
+		}
+
+		graph.removeAllVertices(toRemove);
+	}
+
+	public void removeVertex(Vertex vertex) {
+		graph.removeVertex(vertex);
+		dynamicGraph.removeVertex(vertex);
 	}
 
 	/**
@@ -266,28 +336,6 @@ public class StaticGraph {
 	}
 
 	/**
-	 * Set the static regions of the graph
-	 */
-	private void setRegions() {
-		ConnectivityInspector<Vertex, StaticEdge> inspector = new ConnectivityInspector<Vertex, StaticEdge>(
-				graph);
-		List<Set<Vertex>> vertices = inspector.connectedSets();
-		List<Vertex> toRemove = new ArrayList<Vertex>();
-
-		for (Set<Vertex> region : vertices) {
-			if (region.size() == 1) {
-				// Single vertex, remove it from the graph
-				toRemove.addAll(region);
-			} else {
-				// Store the region
-				regions.add(region);
-			}
-		}
-
-		graph.removeAllVertices(toRemove);
-	}
-
-	/**
 	 * Set repetition factor of two vertices.
 	 * 
 	 * @param source
@@ -309,19 +357,25 @@ public class StaticGraph {
 		staticEdge.setTargetRate(consumption);
 	}
 
-	public void removeVertex(Vertex vertex){
-		graph.removeVertex(vertex);
-		dynamicGraph.removeVertex(vertex);	
-	}
-	
-	public void addVertex(Vertex vertex){
-		graph.addVertex(vertex);
-		dynamicGraph.addVertex(vertex);	
+	/**
+	 * Remove isolated static vertices and classify connected static vertices.
+	 */
+	public void updateGraph() {
+		// Remove unconnected static vertex
+		removeSingleInstances();
+
+		// Classify merging case
+		classifyConnections();
 	}
 
-	public void updateRegion(Set<Vertex> region) {
-		// TODO : implement a real update of the region
-		regions.remove(region);
+	public void updateVertices(List<Vertex> vertices, Vertex equivalentVertex) {
+		addVertex(equivalentVertex);
+
+		for (Vertex vertex : vertices) {
+			Instance instance = vertex.getInstance();
+			
+			removeVertex(vertex);
+		}
 	}
 
 }

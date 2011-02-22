@@ -28,8 +28,12 @@
  */
 package net.sf.orcc.tools.merger2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.INetworkTransformation;
 
 /**
@@ -45,10 +49,25 @@ public class NetworkMerger implements INetworkTransformation {
 	@Override
 	public void transform(Network network) throws OrccException {
 
-		StaticRegionMerger regionMerger = new StaticRegionMerger(
-				new StaticGraph(network));
-
-		regionMerger.transform(network);
+		StaticGraphAnalyzer staticGraph = new StaticGraphAnalyzer(network);
+		InstanceMerger merger = new InstanceMerger(network);
+		
+		//Merger simple cases
+		while (staticGraph.hasSinglyConnectedVertex()){
+			List<Vertex> vertices = new ArrayList<Vertex>();
+			
+			//Get an Instance to merge
+			Vertex vertex1 = staticGraph.getSinglyConnectedVertex().get(0);
+			Vertex vertex2 =staticGraph.getStaticNeighbors(vertex1).get(0);
+			
+			//Create list of instance to merge
+			vertices.add(vertex1);
+			vertices.add(vertex2);
+			
+			//Transform network
+			Vertex mergedVertex = merger.getEquivalentVertices(vertices);
+			staticGraph.updateVertices(vertices, mergedVertex);
+		}
 	}
 
 }

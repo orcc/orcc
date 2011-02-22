@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.tools.merger2;
 
+import java.util.List;
 import java.util.Set;
 
 import net.sf.orcc.moc.CSDFMoC;
@@ -49,9 +50,9 @@ import org.jgrapht.DirectedGraph;
  */
 public class SDFCompositionAnalyzer {
 	private DirectedGraph<Vertex, Connection> graph;
-	private StaticGraph staticGraph;
+	private StaticGraphAnalyzer staticGraph;
 
-	public SDFCompositionAnalyzer(Network network, StaticGraph staticGraph) {
+	public SDFCompositionAnalyzer(Network network, StaticGraphAnalyzer staticGraph) {
 		this.graph = network.getGraph();
 		this.staticGraph = staticGraph;
 
@@ -60,7 +61,7 @@ public class SDFCompositionAnalyzer {
 
 	private void analyseGraph() {
 		for (Vertex vertex : staticGraph.getStaticVertices()) {
-			Set<Vertex> staticNeighbours = staticGraph
+			List<Vertex> staticNeighbours = staticGraph
 					.getStaticNeighbors(vertex);
 
 			for (Vertex neighbour : staticNeighbours) {

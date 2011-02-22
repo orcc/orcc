@@ -30,6 +30,7 @@ package net.sf.orcc.tools.merger2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -37,9 +38,13 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.util.OrderedMap;
+
+import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a transformation that merges a region of static instances
@@ -51,6 +56,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class InstanceMerger {
 	private List<Action> actions;
+	private DirectedGraph<Vertex, Connection> graph;
 	private List<Action> initializes;
 	private OrderedMap<String, Port> inputs;
 	private int nMerged;
@@ -59,12 +65,40 @@ public class InstanceMerger {
 	private OrderedMap<String, Procedure> procs;
 	private OrderedMap<String, GlobalVariable> stateVars;
 
-	public InstanceMerger(StaticGraph graph) {
+	public InstanceMerger(Network network) {
 		nMerged = 0;
+		graph = network.getGraph();
 	}
 
-	private Actor createActor(Instance instance1, Instance instance2) {
-		// Set new properties of the actor
+	private void addActorProperty(Actor actor) {
+		parameters.putAll(actor.getParameters());
+		stateVars.putAll(actor.getStateVars());
+		procs.putAll(actor.getProcs());
+		initializes.addAll(actor.getInitializes());
+		actions.addAll(actor.getActions());
+
+	}
+
+	private void compareVertex(Vertex vertex1, Vertex vertex2) {
+		// Get instances to merge
+		Instance instance1 = vertex1.getInstance();
+		Instance instance2 = vertex2.getInstance();
+
+		// Set ports of the merged Actor
+		setExternalPort(instance1.getActor(), instance2.getActor(),
+				graph.getAllEdges(vertex1, vertex2));
+		setExternalPort(instance2.getActor(), instance1.getActor(),
+				graph.getAllEdges(vertex2, vertex1));
+
+		// Set properties of the merged actors
+		addActorProperty(instance1.getActor());
+		addActorProperty(instance2.getActor());
+
+	}
+
+	private Actor createActor(Vertex vertex1, Vertex vertex2) {
+
+		// Create elements of the merged actor
 		String file = "";
 		Boolean nativeFlag = false;
 		String name = "Merged" + nMerged++;
@@ -78,38 +112,54 @@ public class InstanceMerger {
 		ActionScheduler scheduler = new ActionScheduler(
 				new ArrayList<Action>(), null);
 
-		// Store properties of each instance
-		storeInstanceProperty(instance1.getActor());
-		storeInstanceProperty(instance2.getActor());
+		// Set actor property
+		compareVertex(vertex1, vertex2);
 
 		return new Actor(name, file, parameters, inputs, outputs, nativeFlag,
 				stateVars, procs, actions, initializes, scheduler);
 	}
 
-	public Vertex merge(Vertex vertex1, Vertex vertex2) {
+	public Vertex getEquivalentVertices(List<Vertex> vertices) {
 
-		//Get instances to merge
-		Instance instance1 = vertex1.getInstance();
-		Instance instance2 = vertex2.getInstance();
+		if (vertices.size() == 2) {
+			Vertex vertex1 = vertices.get(0);
+			Vertex vertex2 = vertices.get(1);
 
-		//Create a composite actor
-		Actor newActor = createActor(instance1, instance2);
+			// Create a composite actor
+			Actor newActor = createActor(vertex1, vertex2);
 
-		//Create the merged instance
-		Instance newInstance = new Instance("Merged" + nMerged++,
-				newActor.getName());
+			// Create the merged instance
+			Instance newInstance = new Instance("Merged" + nMerged++,
+					newActor.getName());
 
-		return new Vertex(newInstance);
+			return new Vertex(newInstance);
+		}
+
+		return null;
 	}
 
-	private void storeInstanceProperty(Actor actor) {
-		inputs.putAll(actor.getInputs());
-		outputs.putAll(actor.getOutputs());
-		parameters.putAll(actor.getParameters());
-		stateVars.putAll(actor.getStateVars());
-		procs.putAll(actor.getProcs());
-		initializes.addAll(actor.getInitializes());
-		actions.addAll(actor.getActions());
+	private void setExternalPort(Actor actor1, Actor actor2,
+			Set<Connection> connections) {
+		OrderedMap<String, Port> extIn = new OrderedMap<String, Port>(
+				actor2.getInputs());
+		OrderedMap<String, Port> extOut = new OrderedMap<String, Port>(
+				actor1.getOutputs());
+
+		for (Connection connection : connections) {
+			Port source = connection.getSource();
+			Port target = connection.getTarget();
+
+			if (extOut.contains(source.getName())) {
+				extOut.remove(source.getName());
+			}
+
+			if (extIn.contains(target.getName())) {
+				extIn.remove(target.getName());
+			}
+		}
+
+		inputs.putAll(extIn);
+		outputs.putAll(extOut);
 
 	}
 }

@@ -88,9 +88,9 @@ public class MoCMerger {
 	Map<Vertex, MoC> mocList;
 	List<Vertex> region;
 	
-	StaticGraph staticGraph;
+	StaticGraphAnalyzer staticGraph;
 	
-	public MoCMerger(StaticGraph staticGraph, List<Vertex> region){
+	public MoCMerger(StaticGraphAnalyzer staticGraph, List<Vertex> region){
 		this.staticGraph = staticGraph;
 		mocList = new HashMap<Vertex, MoC>();
 		this.region = region;
