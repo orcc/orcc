@@ -101,7 +101,7 @@ if(!outputs.empty)
 <endif>
 >>
 
-goDeclarePredsSuccs(instance, incoming, outgoing) ::= <<
+goDeclarePredsSuccs(instance) ::= <<
 <if (instance.actor)
 ><goDeclarePredSucc(inputs=instance.actor.inputs.list,
                     outputs=instance.actor.outputs.list)><
@@ -112,10 +112,7 @@ endif>
 >>
 
 declarePredsSuccs(instances) ::= <<
-<instances:
-  {inst | <goDeclarePredsSuccs(instance=inst,
-    incoming=network.incomingMap.(inst),
-    outgoing=network.outgoingMap.(inst))>}>
+<instances: {inst | <goDeclarePredsSuccs(instance=inst)>}>
 >>
 
 
