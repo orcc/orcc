@@ -346,6 +346,14 @@ void *scheduler(void *data) {
 }
 >>
 
+printAddSchedulable(instance) ::= <<
+sched_add_schedulable(source.sched, &<GetInstanceId(instance)>);
+>>
+
+printAllAddSchedulable(instances) ::= <<
+<instances: printAddSchedulable(); separator="\n">
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // main
 
@@ -516,7 +524,7 @@ static void launcher() {
 		sched_init(&schedulers[i], <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
 	}
 	
-	<if(options.newScheduler && !options.needDynamicMapping)>sched_add_schedulable(source.sched, &source);<endif>
+	<if(options.newScheduler && !options.needDynamicMapping)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
 	
 	clear_cpu_set(cpuset);
 	
@@ -546,7 +554,7 @@ static void launcher() {
 
 	sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL);
 	
-	<if(options.newScheduler)>sched_add_schedulable(&sched, &source);<endif>
+	<if(options.newScheduler)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
 		
 	(*scheduler)((void*) &sched);
 <endif>

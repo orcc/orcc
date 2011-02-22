@@ -40,8 +40,11 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.StringAttribute;
+
+import org.jgrapht.DirectedGraph;
 
 /**
  * This class allows the string template accessing informations about
@@ -79,6 +82,12 @@ public class CNetworkTemplateData {
 	 * StringAttribute contains the medium connection when it exists.
 	 */
 	private Map<Instance, Map<Port, IAttribute>> portMedium;
+
+	/**
+	 * This list contains all instance which will be launched at the beginning
+	 * of the program
+	 */
+	private List<Instance> sourceInstances;
 
 	/**
 	 * This map links instance's port with a StringAttribute. This
@@ -165,6 +174,96 @@ public class CNetworkTemplateData {
 	}
 
 	/**
+	 * Find out all source instances
+	 * 
+	 * @param network
+	 *            network to analyze
+	 */
+	private void buildSourceInstances(Network network) {
+		Set<Instance> instancesAnalysed = new HashSet<Instance>();
+		Set<Vertex> graphVertex = network.getGraph().vertexSet();
+
+		for (Vertex vertex : graphVertex) {
+			if (vertex.isInstance()) {
+				Instance instanceToCheck = vertex.getInstance();
+				boolean sourceDetected;
+
+				if (!instancesAnalysed.contains(instanceToCheck)) {
+					sourceDetected = checkSourceInstances(instanceToCheck,
+							instancesAnalysed, network.getGraph());
+					if (!sourceDetected) {
+						sourceInstances.add(instanceToCheck);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check if an instance is a source Instance and analyze all instances
+	 * closed to this one.
+	 * 
+	 * @param instanceToCheck
+	 *            instance which will be analyzed
+	 * @param instancesAnalysed
+	 *            Set of instances analyzed in order to prevent multiple
+	 *            analyzes on instances
+	 * @param graph
+	 *            connection graph in order to know predecessors and successors
+	 *            of each instances
+	 * @return
+	 */
+	private boolean checkSourceInstances(Instance instanceToCheck,
+			Set<Instance> instancesAnalysed,
+			DirectedGraph<Vertex, Connection> graph) {
+		if ((instanceToCheck.isActor() || instanceToCheck.isBroadcast())
+				&& !instancesAnalysed.contains(instanceToCheck)) {
+			instancesAnalysed.add(instanceToCheck);
+
+			boolean sourceDetected = false;
+			Set<Connection> connections;
+
+			connections = graph.incomingEdgesOf(new Vertex(instanceToCheck));
+			if (connections.isEmpty()) {
+				sourceInstances.add(instanceToCheck);
+				sourceDetected = true;
+			} else {
+				for (Connection connection : connections) {
+					Vertex inputVertex = graph.getEdgeSource(connection);
+
+					if (inputVertex.isInstance()) {
+						Instance inputInstance = inputVertex.getInstance();
+						boolean result = checkSourceInstances(inputInstance,
+								instancesAnalysed, graph);
+						if (result == true) {
+							sourceDetected = true;
+						}
+					}
+
+				}
+			}
+
+			connections = graph.outgoingEdgesOf(new Vertex(instanceToCheck));
+			if (!connections.isEmpty()) {
+				for (Connection connection : connections) {
+					Vertex inputVertex = graph.getEdgeTarget(connection);
+
+					if (inputVertex.isInstance()) {
+						Instance outputInstance = inputVertex.getInstance();
+						boolean result = checkSourceInstances(outputInstance,
+								instancesAnalysed, graph);
+						if (result == true) {
+							sourceDetected = true;
+						}
+					}
+				}
+			}
+			return sourceDetected;
+		}
+		return false;
+	}
+
+	/**
 	 * build all informations needed in the template data.
 	 * 
 	 * @param network
@@ -177,8 +276,10 @@ public class CNetworkTemplateData {
 		listMediumPorts = new ArrayList<Port>();
 		listMediumUsed = new HashMap<Instance, List<String>>();
 		listMediumUsedAllInstances = new ArrayList<String>();
+		sourceInstances = new ArrayList<Instance>();
 
 		buildMediumInfo(network);
+		buildSourceInstances(network);
 	}
 
 	/**
@@ -227,6 +328,16 @@ public class CNetworkTemplateData {
 	 */
 	public Map<Instance, Map<Port, IAttribute>> getPortMedium() {
 		return portMedium;
+	}
+
+	/**
+	 * Returns a list which contains all the instances to launch at the
+	 * beginning of the program
+	 * 
+	 * @return the list of instances
+	 */
+	public List<Instance> getSourceInstances() {
+		return sourceInstances;
 	}
 
 	/**
