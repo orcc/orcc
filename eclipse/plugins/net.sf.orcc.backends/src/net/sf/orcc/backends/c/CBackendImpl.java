@@ -308,6 +308,7 @@ public class CBackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(CExpressionPrinter.class);
 		printer.setTypePrinter(CTypePrinter.class);
 		printer.getOptions().putAll(getAttributes());
+		printer.getOptions().put("fifoSize", fifoSize);
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);

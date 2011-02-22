@@ -11,12 +11,17 @@ listSize(values) ::= <<
 varDecl(variable) ::= <<
 <
 if(variable.port)
-><variable.type> <variable>_buf<listSize(variable.type.dimensions)>;
-<variable.type> *<variable><
+><if (variable.instruction.write)><variable.type> <variable>_buf<listSize(variable.type.dimensions)>;
+<
+endif><variable.type> *<variable><
 else
 ><variable.type> <variable><listSize(variable.type.dimensions)><
 endif
 >
+>>
+
+getPortName(port) ::= <<
+<instance.id>_<port.name>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,17 +118,18 @@ printLoad(load) ::= <<
 
 printPeek(peek) ::= <<
 
-<peek.target> = fifo<printMedium(peek.port)>_<peek.port.type>_peek(<instance.id>_<peek.port>, <peek.target>_buf, <peek.numTokens>);
+<peek.target> = &tokens_<peek.port.name>[index_<peek.port.name>];
 >>
 
 printRead(read) ::= <<
 
 <if (read.target)
-><read.target> = fifo<printMedium(read.port)>_<read.port.type>_read(<instance.id>_<read.port>, <read.target>_buf, <read.numTokens>);<
-endif>
+><read.target> = &tokens_<read.port.name>[index_<read.port.name>];
+<endif>
 >>
 
 printReadEnd(readEnd) ::= <<
+
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 {
 	int i;
@@ -131,10 +137,9 @@ printReadEnd(readEnd) ::= <<
 		fprintf(file_<readEnd.port.name>, "%<printFormatType(readEnd.port.type)>\n", <readEnd.target>[i]);
 	}
 }
-<endif>
 
-fifo<printMedium(readEnd.port)>_<readEnd.port.type>_read_end(<instance.id>_<readEnd.port>, <readEnd.numTokens>);
-numTokens_<readEnd.port.name> -= <readEnd.numTokens>;
+<endif
+>index_<readEnd.port.name> += <readEnd.numTokens>;
 >>
 
 printReturn(return) ::= <<
@@ -260,20 +265,35 @@ if (ports != 0) {
 >>
 
 checkInputPattern(pattern) ::= <<
-<pattern.keys: { port | numTokens_<port.name> \>= <pattern.(port)> && }>
+<pattern.keys: { port | index_<port.name> \<= numTokens_<port.name> - <pattern.(port)> && }>
 >>
 
-printGetNumTokens() ::= <<
+printGetTokens() ::= <<
+int numTokensPresent;
 <instance.actor.inputs.list:
-	{ port | numTokens_<port.name> = fifo<printMedium(port)>_<port.type>_get_num_tokens(<instance.id>_<port>);
+	{ port | if (numTokens_<port.name> \> 0 && index_<port.name> \> 0) {
+	numTokens_<port.name> -= index_<port.name>;
+	memmove(&tokens_<port.name>[0], &tokens_<port.name>[index_<port.name>], numTokens_<port.name> * sizeof(<port.type>));
+	index_<port.name> = 0;
+\}
+numTokensPresent = fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>);
+if (numTokensPresent \> 0) {
+	if (numTokens_<port.name> + numTokensPresent \> SIZE_<port.name>) {
+		numTokensPresent = SIZE_<port.name> - numTokens_<port.name>;
+	\}
+	fifo<printMedium(port)>_<port.type>_read_copy(<getPortName(port)>, &tokens_<port.name>[numTokens_<port.name>], numTokensPresent);
+	fifo<printMedium(port)>_<port.type>_read_end(<getPortName(port)>, numTokensPresent);
+	numTokens_<port.name> += numTokensPresent;
+\}
+
 }>
 >>
 
 printOpenFiles() ::= <<
 <instance.actor.inputs.list:
-	{ port | file_<port.name> = fopen("<instance.id>_<port.name>.txt", "a");
+	{ port | file_<port.name> = fopen("<getPortName(port)>.txt", "a");
 }><instance.actor.outputs.list:
-	{ port | file_<port.name> = fopen("<instance.id>_<port.name>.txt", "a");
+	{ port | file_<port.name> = fopen("<getPortName(port)>.txt", "a");
 }>
 >>
 
@@ -322,20 +342,10 @@ return;<
 endif>
 >>
 
-printActionScheduler(name, actions) ::= <<
-void <name>(struct schedinfo_s *si) {
-	int i = 0;
-
-	<printGetNumTokens()>
-<if(options.("net.sf.orcc.backends.enableTrace"))>
-	<printOpenFiles()>
-<endif>
-
-	while (1) {
-		<printActions(actions)>
-	}
+printActionLoop(actions) ::= <<
+while (1) {
+	<printActions(actions)>
 }
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -424,13 +434,17 @@ static char *stateNames[] = {
 static enum states _FSM_state = my_state_<fsm.initialState>;
 
 <if(actions)>
-<printActionScheduler(name={<instance.id>_outside_FSM_scheduler}, actions=actions)>
+void <instance.id>_outside_FSM_scheduler(struct schedinfo_s *si) {
+	int i = 0;
+
+	<printActionLoop(actions)>
+}
 <endif>
 
 void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
-	<printGetNumTokens()>
+	<printGetTokens()>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 	<printOpenFiles()>
 <endif>
@@ -461,8 +475,12 @@ printMediumInclude(mediums) ::= <<
 <mediums : MediumInclude(); separator="\n">
 >>
 
-printMedium(port) ::=<<
+printMedium(port) ::= <<
 <network.templateData.portMedium.(instance).(port).value>
+>>
+
+printFifoSize(size) ::= <<
+<if(size)><size><else>SIZE<endif>
 >>
 
 instance(instance, network, options) ::= <<
@@ -475,11 +493,17 @@ instance(instance, network, options) ::= <<
 #include "orcc_fifo.h"
 #include "orcc_util.h"
 <printMediumInclude(network.templateData.listAllMedium.(instance))>
+
+#define SIZE <options.("fifoSize")>
+
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-<instance.actor.inputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<instance.id>_<port.name>;
+<instance.actor.inputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
 }>
-<instance.actor.inputs.list: { port | static int numTokens_<port.name>;
+<instance.actor.inputs.list: { port | static int index_<port.name>;
+static int numTokens_<port.name>;
+#define SIZE_<port.name> <printFifoSize(network.incomingMap.(instance).(port).size)>
+static <port.type> tokens_<port.name>[SIZE_<port.name>];
 }>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 <instance.actor.inputs.list: { port | FILE *file_<port.name>;
@@ -487,7 +511,7 @@ instance(instance, network, options) ::= <<
 <endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-<instance.actor.outputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<instance.id>_<port.name>;
+<instance.actor.outputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
 }>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 <instance.actor.outputs.list: { port | FILE *file_<port.name>;
@@ -519,7 +543,16 @@ void <instance.id>_initialize(struct schedinfo_s *si) {
 <if(instance.actor.actionScheduler.fsm)>
 <schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)>
 <else>
-<printActionScheduler(name={<instance.id>_scheduler}, actions=instance.actor.actionScheduler.actions)>
+void <instance.id>_scheduler(struct schedinfo_s *si) {
+	int i = 0;
+
+	<printGetTokens()>
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+	<printOpenFiles()>
+<endif>
+
+	<printActionLoop(instance.actor.actionScheduler.actions)>
+}
 <endif>
 
 >>

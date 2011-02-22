@@ -89,6 +89,25 @@ DECL T *FIFO_PEEK(T)(struct FIFO_S(T) *fifo, T *buffer, int n) {
 	}
 }
 
+DECL void FIFO_READ_COPY(T)(struct FIFO_S(T) *fifo, T *buffer, int n) {
+	if (fifo->read_ind + n <= fifo->size) {
+		memcpy(buffer, &fifo->contents[fifo->read_ind], n * sizeof(T));
+	} else {
+		int num_end = fifo->size - fifo->read_ind;
+		int num_beginning = n - num_end;
+
+		// Copy the end of the fifo
+		if (num_end != 0) {
+			memcpy(buffer, &fifo->contents[fifo->read_ind], num_end * sizeof(T));
+		}
+
+		// Copy the rest of the data at the beginning of the FIFO
+		if (num_beginning != 0) {
+			memcpy(&buffer[num_end], fifo->contents, num_beginning * sizeof(T));
+		}
+	}
+}
+
 DECL T *FIFO_READ(T)(struct FIFO_S(T) *fifo, T *buffer, int n) {
 	return FIFO_PEEK(T)(fifo, buffer, n);
 }

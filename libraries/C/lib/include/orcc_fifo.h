@@ -68,6 +68,9 @@ static struct FIFO_S(type) fifo_##count = { (size) + 1, array_##count, 0, 0 };
 #define FIFO_READ(T) FIFO_READ_EXPAND(T)
 #define FIFO_READ_EXPAND(T) fifo_ ## T ## _read
 
+#define FIFO_READ_COPY(T) FIFO_READ_COPY_EXPAND(T)
+#define FIFO_READ_COPY_EXPAND(T) fifo_ ## T ## _read_copy
+
 #define FIFO_READ_END(T) FIFO_READ_END_EXPAND(T)
 #define FIFO_READ_END_EXPAND(T) fifo_ ## T ## _read_end
 
