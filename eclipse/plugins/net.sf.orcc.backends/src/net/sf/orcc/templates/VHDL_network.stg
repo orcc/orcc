@@ -237,9 +237,9 @@ printOutputs(connection, map, vmap) ::= <<
 <connection.source>_send     =\> <instance.id>_<connection.source>_send,
 <connection.source>_ack      =\> <instance.id>_<connection.source>_ack,<
 else
-><connection.source>_data     =\> <map.(connection.source).id>_<connection.target>_data,
-<connection.source>_send     =\> <map.(connection.source).id>_<connection.target>_send,
-<connection.source>_ack      =\> <map.(connection.source).id>_<connection.target>_ack,<
+><connection.source>_data     =\> <first(map.(connection.source)).id>_<connection.target>_data,
+<connection.source>_send     =\> <first(map.(connection.source)).id>_<connection.target>_send,
+<connection.source>_ack      =\> <first(map.(connection.source)).id>_<connection.target>_ack,<
 endif><
 else
 ><connection.source>_data     =\> <vmap.port>_data,
@@ -303,7 +303,7 @@ printBroadcastOutputs(connection, i0, map, vmap, control) ::= <<
 ><if(connection.attributes)
 >output_<control>(<i0>) =\> <instance.id>_<connection.source>_<control>,<
 else
->output_<control>(<i0>) =\> <map.(connection.source).id>_<connection.target>_<control>,<
+>output_<control>(<i0>) =\> <first(map.(connection.source)).id>_<connection.target>_<control>,<
 endif><
 else
 >output_<control>(<i0>) =\> <vmap.port>_<control>,<

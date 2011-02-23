@@ -235,14 +235,17 @@ public class Network {
 		successorsMap.put(vertex.getInstance(), succMap);
 		Set<Connection> outgoing = graph.outgoingEdgesOf(vertex);
 		for (Port port : outputs) {
-			List<Instance> instances = new ArrayList<Instance>();
 			for (Connection connection : outgoing) {
 				if (port.equals(connection.getSource())) {
+					List<Instance> instances = succMap.get(port);
+					if (instances == null) {
+						instances = new ArrayList<Instance>(1);
+						succMap.put(port, instances);
+					}
 					instances
 							.add(graph.getEdgeTarget(connection).getInstance());
 				}
 			}
-			succMap.put(port, instances);
 		}
 	}
 
