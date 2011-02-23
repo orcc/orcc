@@ -249,7 +249,7 @@ TraceAka g_oTracer;
 
 <includeActors(network.actors)>
 
-#define SIZE 1024
+#define SIZE 10000
 
 <declareInstances(network.instances)>
 

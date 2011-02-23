@@ -144,14 +144,14 @@ printRead(read) ::= <<
 <if (read.target)>
 <if(read.unit)>
 m_poTabIn[<actor.simpleName>_<read.port>]-\>get(<read.target>);<\n>
-m_arrAvailStatus[<actor.simpleName>_<read.port>] --;
+m_avails[<actor.simpleName>_<read.port>] --;
 <else>
 m_poTabIn[<actor.simpleName>_<read.port>]-\>get(<read.target>, <read.numTokens>);<\n>
-m_arrAvailStatus[<actor.simpleName>_<read.port>] -= <read.numTokens>;
+m_avails[<actor.simpleName>_<read.port>] -= <read.numTokens>;
 <endif>
 <else>
 m_poTabIn[<actor.simpleName>_<read.port>]-\>skip(<read.numTokens>);<\n>
-m_arrAvailStatus[<actor.simpleName>_<read.port>] -= <read.numTokens>;
+m_avails[<actor.simpleName>_<read.port>] -= <read.numTokens>;
 <endif>
 >>
 
@@ -174,10 +174,10 @@ printWrite(write) ::= <<
 
 <if(write.unit)>
 m_poTabOut[<actor.simpleName>_<write.port>]-\>put(<write.target>);<\n>
-m_arrRoomStatus[<actor.simpleName>_<write.port>]--;
+m_rooms[<actor.simpleName>_<write.port>]--;
 <else>
 m_poTabOut[<actor.simpleName>_<write.port>]-\>put(<write.target>, <write.numTokens>);<\n>
-m_arrRoomStatus[<actor.simpleName>_<write.port>] -= <write.numTokens>;
+m_rooms[<actor.simpleName>_<write.port>] -= <write.numTokens>;
 
 <endif>
 
@@ -327,6 +327,9 @@ int <actor.simpleName>::schedule()
 		<schedulingTest(actions)>
 		<endif>
 	}
+	
+	updateFifoStatus();
+	
 	return i;
 }
 
@@ -421,6 +424,9 @@ int <actor.simpleName>::schedule()
 		<switch(fsm.transitions)>
 		<endif>
 	}
+	
+	updateFifoStatus();
+	
 	return i;
 }
 
@@ -518,13 +524,29 @@ void <actor.simpleName>::getFifoStatus()
 <if(actor.inputs.list)>
   	for(int i=0; i\<<actor.simpleName>_nbInputs; i++) 
 	{
-		m_arrAvailStatus[i] = m_poTabIn[i]-\>getCount();
+		m_initialAvails[i] = m_avails[i] = m_poTabIn[i]-\>getCount();
 	}
 <endif>
 <if(actor.outputs.list)>
 	for(int i=0; i\<<actor.simpleName>_nbOutputs; i++) 
 	{
-		m_arrRoomStatus[i] = m_poTabOut[i]-\>getRooms();
+	   m_initialRooms[i] = m_rooms[i] = m_poTabOut[i]-\>getRooms();
+	}
+<endif>
+}
+
+void <actor.simpleName>::updateFifoStatus()
+{
+<if(actor.inputs.list)>
+  	for(int i=0; i\<<actor.simpleName>_nbInputs; i++) 
+	{
+	   m_poTabIn[i]-\>setCount(m_initialAvails[i] - m_avails[i]);
+	}
+<endif>
+<if(actor.outputs.list)>
+	for(int i=0; i\<<actor.simpleName>_nbOutputs; i++) 
+	{
+		m_poTabOut[i]-\>setRooms(m_initialRooms[i] - m_rooms[i]);
 	}
 <endif>
 }

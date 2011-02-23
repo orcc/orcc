@@ -171,13 +171,15 @@ actor(actor, options) ::= <<
 
 	private:
 <if(actor.inputs.list)>
-	const bool hasTokens(int port, int iSize) const {return  (m_arrAvailStatus[port] \>= iSize);};
+	const bool hasTokens(int port, int iSize) const {return  (m_avails[port] \>= iSize);};
 <endif>
 <if(actor.outputs.list)>
-	const bool hasRooms(int port, int iSize) const {return  (m_arrRoomStatus[port] \>= iSize);};
+	const bool hasRooms(int port, int iSize) const {return  (m_rooms[port] \>= iSize);};
 <endif>
 
 	void getFifoStatus();
+
+	void updateFifoStatus();
 
 	private:
 	static const char* className;
@@ -191,10 +193,12 @@ actor(actor, options) ::= <<
 	////////////////////////////////////////////////////////////////////////////////
 	// Fifo Status members
 <if(actor.inputs.list)>
-	int m_arrAvailStatus[<actor.simpleName>_nbInputs];
+	int m_initialAvails[<actor.simpleName>_nbInputs];
+	int m_avails[<actor.simpleName>_nbInputs];
 <endif>
 <if(actor.outputs.list)>
-	int m_arrRoomStatus[<actor.simpleName>_nbOutputs];
+	int m_initialRooms[<actor.simpleName>_nbOutputs];
+	int m_rooms[<actor.simpleName>_nbOutputs];
 <endif>
 	};
 
