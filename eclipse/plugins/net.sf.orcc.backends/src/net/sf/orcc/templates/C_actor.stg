@@ -256,15 +256,15 @@ printAction(action) ::= <<
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-outputPatternPort(port) ::= <<
+printOutputPatternPort(port) ::= <<
 if (!fifo<printMedium(port)>_<port.type>_has_room(<instance.id>_<port>, <pattern.(port)>)) {
-	ports |= 0x0<instance.actor.templateData.maskOutput.(port)>;
+	ports |= 0x0<instance.actor.templateData.maskOutputs.(port)>;
 }
 >>
 
-outputPattern(pattern) ::= <<
+printOutputPattern(pattern) ::= <<
 int ports = 0;
-<pattern.keys: outputPatternPort(); separator="\n">
+<pattern.keys: printOutputPatternPort(); separator="\n">
 if (ports != 0) {
 >>
 
@@ -272,25 +272,32 @@ checkInputPattern(pattern) ::= <<
 <pattern.keys: { port | index_<port.name> \<= numTokens_<port.name> - <pattern.(port)> && }>
 >>
 
-printGetTokens() ::= <<
-int numTokensPresent;
-<instance.actor.inputs.list:
-	{ port | if (numTokens_<port.name> \> 0 && index_<port.name> \> 0) {
-	numTokens_<port.name> -= index_<port.name>;
-	memmove(&tokens_<port.name>[0], &tokens_<port.name>[index_<port.name>], numTokens_<port.name> * sizeof(<port.type>));
-	index_<port.name> = 0;
-\}
-numTokensPresent = fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, <getFifoId(port,instance)>);
-if (numTokensPresent \> 0) {
-	if (numTokens_<port.name> + numTokensPresent \> SIZE_<port.name>) {
-		numTokensPresent = SIZE_<port.name> - numTokens_<port.name>;
-	\}
-	fifo<printMedium(port)>_<port.type>_read_copy(<getPortName(port)>, &tokens_<port.name>[numTokens_<port.name>], <getFifoId(port,instance)>, numTokensPresent);
-	fifo<printMedium(port)>_<port.type>_read_end(<getPortName(port)>, <getFifoId(port,instance)>, numTokensPresent);
-	numTokens_<port.name> += numTokensPresent;
-\}
+printGetTokensFunction(port) ::= <<
 
-}>
+
+static void get_tokens_<port.name>() {
+	int numTokensPresent = fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, <getFifoId(port,instance)>);
+	if (numTokensPresent \> 0) {
+		if (numTokens_<port.name> \> 0 && index_<port.name> \> 0) {
+			numTokens_<port.name> -= index_<port.name>;
+			memmove(&tokens_<port.name>[0], &tokens_<port.name>[index_<port.name>], numTokens_<port.name> * sizeof(<port.type>));
+			index_<port.name> = 0;
+		}
+
+		if (numTokens_<port.name> + numTokensPresent \> SIZE_<port.name>) {
+			numTokensPresent = SIZE_<port.name> - numTokens_<port.name>;
+		}
+		if (numTokensPresent \> 0) {
+			fifo<printMedium(port)>_<port.type>_read_copy(<getPortName(port)>, &tokens_<port.name>[numTokens_<port.name>], <getFifoId(port,instance)>, numTokensPresent);
+			fifo<printMedium(port)>_<port.type>_read_end(<getPortName(port)>, <getFifoId(port,instance)>, numTokensPresent);
+			numTokens_<port.name> += numTokensPresent;
+		}
+	}
+}
+>>
+
+printGetTokensFunctions() ::= <<
+<instance.actor.inputs.list: printGetTokensFunction()>
 >>
 
 printOpenFiles() ::= <<
@@ -315,7 +322,7 @@ printCloseFiles() ::= <<
 actionTest(action, restActions) ::= <<
 if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
 	<if(action.outputPattern)>
-	<outputPattern(pattern=action.outputPattern)>
+	<printOutputPattern(pattern=action.outputPattern)>
 		si-\>num_firings = i;
 		si-\>reason = full;
 		si-\>ports = ports;
@@ -336,12 +343,8 @@ printActions(actions) ::= <<
 <if (first(actions))
 ><actionTest(action=first(actions), restActions=rest(actions))><
 else
->si-\>num_firings = i;
-si-\>reason = starved;
-si-\>ports = 0x0<instance.actor.templateData.maskInputs>;
-<if(options.("net.sf.orcc.backends.enableTrace"))>
-<printCloseFiles()>
-<endif>
+><printTransitionPattern(pattern=instance.actor.templateData.inputPattern,
+	maskInputs=instance.actor.templateData.maskInputs)>
 return;<
 endif>
 >>
@@ -358,7 +361,7 @@ while (1) {
 actionTestState(state, restStates) ::= <<
 if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()) {
 	<if (state.action.outputPattern)>
-	<outputPattern(state.action.outputPattern)>
+	<printOutputPattern(state.action.outputPattern)>
 		_FSM_state = my_state_<transition.sourceState>;
 		si-\>num_firings = i;
 		si-\>reason = full;
@@ -377,17 +380,31 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 }
 >>
 
+printInputPatternPort(port) ::= <<
+if (index_<port.name> \> numTokens_<port.name> - <pattern.(port)>) {
+	get_tokens_<port.name>();
+	ports |= 0x0<maskInputs.(port)>;
+}
+>>
+
+printTransitionPattern(pattern, maskInputs) ::= <<
+int ports = 0;
+<pattern.keys: printInputPatternPort(); separator="\n">
+si-\>num_firings = i;
+si-\>reason = starved;
+si-\>ports = ports;
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+<printCloseFiles()>
+<endif>
+>>
+
 schedulingStates(states) ::= <<
 <if (first(states))
 ><actionTestState(state=first(states), restStates=rest(states))><
 else
->_FSM_state = my_state_<transition.sourceState>;
-si-\>num_firings = i;
-si-\>reason = starved;
-si-\>ports = 0x0<instance.actor.templateData.maskInputsTransition.(transition)>;
-<if(options.("net.sf.orcc.backends.enableTrace"))>
-<printCloseFiles()>
-<endif>
+><printTransitionPattern(pattern=instance.actor.templateData.transitionPattern.(transition),
+	maskInputs=instance.actor.templateData.maskInputs)>
+_FSM_state = my_state_<transition.sourceState>;
 return;<
 endif>
 >>
@@ -448,7 +465,6 @@ void <instance.id>_outside_FSM_scheduler(struct schedinfo_s *si) {
 void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
-	<printGetTokens()>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 	<printOpenFiles()>
 <endif>
@@ -533,6 +549,11 @@ static <port.type> tokens_<port.name>[SIZE_<port.name>];
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
 <instance.actor.actions: printAction()>
+
+////////////////////////////////////////////////////////////////////////////////
+// Get tokens functions
+<printGetTokensFunctions()>
+
 <if(instance.actor.initializes)>
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
@@ -542,6 +563,7 @@ void <instance.id>_initialize(struct schedinfo_s *si) {
 	<printActions(instance.actor.initializes)>
 }
 <endif>
+
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
 <if(instance.actor.actionScheduler.fsm)>
@@ -550,7 +572,6 @@ void <instance.id>_initialize(struct schedinfo_s *si) {
 void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
-	<printGetTokens()>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 	<printOpenFiles()>
 <endif>

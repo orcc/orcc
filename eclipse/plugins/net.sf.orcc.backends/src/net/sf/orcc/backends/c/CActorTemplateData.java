@@ -29,17 +29,17 @@
 package net.sf.orcc.backends.c;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 
 /**
  * This class allows the string template accessing informations about
@@ -52,50 +52,56 @@ import net.sf.orcc.ir.FSM.Transition;
 public class CActorTemplateData {
 
 	/**
-	 * Map that associate an input port mask to a transition
+	 * Minimum input pattern that allows all actions outside of an FSM to fire
 	 */
-	private Map<Transition, String> maskInputs;
+	private Pattern inputPattern;
 
 	/**
-	 * Map that associate an output port mask to a transition
+	 * Map that associates an input port to a mask
+	 */
+	private Map<Port, String> maskInputs;
+
+	/**
+	 * Map that associates an output port to a mask
 	 */
 	private Map<Port, String> maskOutputs;
 
 	/**
-	 * Contains number of inputs in this instance.
+	 * Map that associates a transition with the minimum input pattern that
+	 * allows all actions in the transition to fire
 	 */
-	private int numInputs;
+	private Map<Transition, Pattern> transitionPattern;
+
+	/**
+	 * Builds the input pattern
+	 */
+	private void buildInputPattern(Actor actor) {
+		List<Action> actions = actor.getActionScheduler().getActions();
+
+		for (Action action : actions) {
+			Pattern actionPattern = action.getInputPattern();
+			for (Entry<Port, Integer> entry : actionPattern.entrySet()) {
+				Port port = entry.getKey();
+				Integer numTokens = inputPattern.get(port);
+				if (numTokens == null) {
+					inputPattern.put(entry.getKey(), entry.getValue());
+				} else {
+					int maxNumTokens = Math.max(numTokens, entry.getValue());
+					inputPattern.put(entry.getKey(), maxNumTokens);
+				}
+			}
+		}
+	}
 
 	/**
 	 * Builds the mask inputs map.
 	 */
 	private void buildMaskInputs(Actor actor) {
-		FSM fsm = actor.getActionScheduler().getFsm();
-		if (fsm == null) {
-			return;
-		}
-
-		for (Transition transition : fsm.getTransitions()) {
-			Set<Port> ports = new HashSet<Port>();
-			for (NextStateInfo info : transition.getNextStateInfo()) {
-				Pattern pattern = info.getAction().getInputPattern();
-				for (Entry<Port, Integer> entry : pattern.entrySet()) {
-					ports.add(entry.getKey());
-				}
-			}
-
-			// create the mask
-			int mask = 0;
-			int i = 0;
-			for (Port port : actor.getInputs()) {
-				if (ports.contains(port)) {
-					mask |= (1 << i);
-				}
-
-				i++;
-			}
-
-			maskInputs.put(transition, Integer.toHexString(mask));
+		int i = 0;
+		for (Port port : actor.getInputs()) {
+			int mask = (1 << i);
+			i++;
+			maskInputs.put(port, Integer.toHexString(mask));
 		}
 	}
 
@@ -112,49 +118,88 @@ public class CActorTemplateData {
 	}
 
 	/**
+	 * Builds the transition pattern map.
+	 */
+	private void buildTransitionPattern(Actor actor) {
+		FSM fsm = actor.getActionScheduler().getFsm();
+		if (fsm == null) {
+			return;
+		}
+
+		for (Transition transition : fsm.getTransitions()) {
+			Pattern pattern = new Pattern();
+			for (NextStateInfo info : transition.getNextStateInfo()) {
+				Pattern actionPattern = info.getAction().getInputPattern();
+				for (Entry<Port, Integer> entry : actionPattern.entrySet()) {
+					Port port = entry.getKey();
+					Integer numTokens = pattern.get(port);
+					if (numTokens == null) {
+						pattern.put(entry.getKey(), entry.getValue());
+					} else {
+						int maxNumTokens = Math
+								.max(numTokens, entry.getValue());
+						pattern.put(entry.getKey(), maxNumTokens);
+					}
+				}
+			}
+
+			transitionPattern.put(transition, pattern);
+		}
+	}
+
+	/**
 	 * Computes the mask map that associate a port mask to a transition. The
 	 * port mask defines the port(s) read by actions in each transition.
 	 */
 	public void computeTemplateMaps(Actor actor) {
-		maskInputs = new HashMap<FSM.Transition, String>();
+		inputPattern = new Pattern();
+		maskInputs = new HashMap<Port, String>();
 		maskOutputs = new HashMap<Port, String>();
+		transitionPattern = new HashMap<FSM.Transition, Pattern>();
 
+		buildInputPattern(actor);
 		buildMaskInputs(actor);
 		buildMaskOutputs(actor);
-
-		numInputs = actor.getInputs().getLength();
+		buildTransitionPattern(actor);
 	}
 
 	/**
-	 * Returns the mask for all the input ports of the actor. Bit 0 is set for
-	 * port 0, until bit n is set for port n.
+	 * Returns the minimum input pattern that allows all actions outside of an
+	 * FSM to fire.
 	 * 
-	 * @return an integer mask for all the input ports of the actor
+	 * @return the minimum input pattern that allows all actions outside of an
+	 *         FSM to fire
 	 */
-	public String getMaskInputs() {
-		int mask = (1 << numInputs) - 1;
-		return Integer.toHexString(mask);
+	public Pattern getInputPattern() {
+		return inputPattern;
 	}
 
 	/**
-	 * Returns the map of transition to mask of input ports of the actor read by
-	 * actions in the transition. Bit 0 is set for port 0, until bit n is set
-	 * for port n.
+	 * Returns a map that associates an input port to a mask.
 	 * 
-	 * @return a map of transitions to input ports' masks
+	 * @return a map that associates an input port to a mask
 	 */
-	public Map<Transition, String> getMaskInputsTransition() {
+	public Map<Port, String> getMaskInputs() {
 		return maskInputs;
 	}
 
 	/**
-	 * Returns the mask for the output port of the actor read by actions in the
-	 * given transition. Bit 0 is set for port 0, until bit n is set for port n.
+	 * Returns a map that associates an output port to a mask.
 	 * 
-	 * @return an integer mask for the input ports of the actor read by actions
-	 *         in the given transition
+	 * @return a map that associates an output port to a mask
 	 */
-	public Map<Port, String> getMaskOutput() {
+	public Map<Port, String> getMaskOutputs() {
 		return maskOutputs;
 	}
+
+	/**
+	 * Returns the map of associates a transition with the minimum input pattern
+	 * that allows all actions in the transition to fire.
+	 * 
+	 * @return a map of transitions to pattern
+	 */
+	public Map<Transition, Pattern> getTransitionPattern() {
+		return transitionPattern;
+	}
+
 }
