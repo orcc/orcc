@@ -387,6 +387,7 @@ public class StaticGraphAnalyzer {
 			removeVertex(vertex);
 		}
 		
+		//Connect the merged instance in the network 
 		connectInputs(dstVertex, srcConnections);
 		connectOutputs(dstVertex, dstConnections);
 	}
