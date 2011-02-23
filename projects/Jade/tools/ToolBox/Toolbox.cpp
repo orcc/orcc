@@ -39,6 +39,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <signal.h>
 
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
@@ -48,11 +49,13 @@
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/IRReader.h"
+#include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/PassNameParser.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/StandardPasses.h"
-#include "llvm/System/Signals.h"
 #include "llvm/Target/TargetData.h"
+#include "llvm/Target/TargetSelect.h"
+#include "llvm/System/Signals.h"
 
 #include "Jade/Util/OptionMng.h"
 #include "Jade/Util/PackageMng.h"
@@ -302,12 +305,12 @@ void opt(string file, Module* M){
   //Write output if need
   std::string ErrorInfo;
 
-  tool_output_file Out(file.c_str(), ErrorInfo,raw_fd_ostream::F_Binary);
+  raw_fd_ostream Out(file.c_str(), ErrorInfo,raw_fd_ostream::F_Binary);
 
   if (OutputAssembly){
-      Passes.add(createPrintModulePass(&Out.os()));
-  }else if(OutputBitcode){
-      Passes.add(createBitcodeWriterPass(Out.os()));
+      Passes.add(createPrintModulePass(&Out));
+  }else if(OutputBitcode || OutputArchive){
+      Passes.add(createBitcodeWriterPass(Out));
   }
 
   if (!ErrorInfo.empty()) {
@@ -319,51 +322,66 @@ void opt(string file, Module* M){
   // Now that we have all of the passes ready, run them.
   Passes.run(*M);
 
-  Out.keep();
+  Out.close();
 }
 
 void createArchives(map<string,Module*>* modules){
-	map<string,Archive*> archives;
-	map<string,Archive*>::iterator itArchive;
 	map<string,Module*>::iterator itModule;
 	LLVMContext &Context = getGlobalContext();
-
+	std::string errorMsg;
+	
 	for (itModule = modules->begin(); itModule != modules->end(); itModule++){
 		Archive* archive;
 		string firstPackage = PackageMng::getFirstPackage(itModule->first);
-
-		itArchive = archives.find(firstPackage);
+	
+		sys::Path ArchivePath;
 		
+		if (!ArchivePath.set(LibraryFolder + firstPackage+ ".a"))
+			throw std::string("Archive name invalid ");
+
 		// Create a new archive
-		if(itArchive == archives.end()){
-			sys::Path ArchivePath(LibraryFolder + firstPackage+ ".a");
+		if(!ArchivePath.isArchive()){
+			cout << "Creating : " << ArchivePath.c_str() << "\n";
 			archive =  Archive::CreateEmpty(ArchivePath, Context);
-			archives.insert(pair<string,Archive*>(firstPackage, archive));
 		}else{
-			archive = itArchive->second;
+			archive = Archive::OpenAndLoad(ArchivePath, Context, &errorMsg);
+		}
+
+		if (errorMsg != ""){
+			cerr <<"Error when opening archive "<< ArchivePath.c_str() << "\n";
+			exit(1);
 		}
 
 		sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(itModule->first));
-		std::string errorMsg;
+		
 		archive->addFileBefore(fullFilePath, archive->end(), &errorMsg);		
-	}
+		archive->writeToDisk(true, false, true, &errorMsg);
 
-	// Write archives to the disk
-	for (itArchive = archives.begin(); itArchive != archives.end(); itArchive++){
-		cout << "Creating : " << itArchive->first << ".a\n";
-		itArchive->second->writeToDisk();
+		if (errorMsg != ""){
+			cerr <<"Error when writing actors "<< fullFilePath.c_str() <<" in archive "<< ArchivePath.c_str() << ".\n";
+			exit(1);
+		}
 	}
+}
+
+void clean_exit(int sig){
+	exit(0);
 }
 
 //main function of Jade toolbox
 int main(int argc, char **argv) {
+	LLVMContext &Context = getGlobalContext();
+
 	sys::PrintStackTraceOnErrorSignal();
 	PrettyStackTraceProgram X(argc, argv);
 
 	SMDiagnostic Err;
-	LLVMContext &Context = getGlobalContext();
 	cl::ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
+	llvm_shutdown_obj Y;  // Call llvm_shutdown() on exit.
 	
+	InitializeNativeTarget();
+	
+
 	//Verify options
 	OptionMng::setDirectory(&LibraryFolder);
 

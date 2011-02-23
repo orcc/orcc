@@ -173,7 +173,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 
 		// JadeToolbox is required to finalize actors
-		runJadeToolBox(actors);
+		// Add list of actor
+		for (Actor actor : actors) {
+			if (!actor.isNative()) {
+				runJadeToolBox(actor);
+			}
+		}
 	}
 
 	@Override
@@ -194,7 +199,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private void runJadeToolBox(List<Actor> actors) throws OrccException {
+	private void runJadeToolBox(Actor actor) throws OrccException {
 		List<String> cmdList = new ArrayList<String>();
 		cmdList.add(jadeToolbox);
 		cmdList.add("-" + optLevel);
@@ -210,13 +215,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 			cmdList.add("-a");
 		}
 
-		// Add list of actor
-		for (Actor actor : actors) {
-			if (!actor.isNative()) {
-				cmdList.add(actor.getName());
-			}
-		}
-
+		//Add actor file
+		cmdList.add(actor.getName());
+		
 		String[] cmd = cmdList.toArray(new String[] {});
 
 		// Launch application
