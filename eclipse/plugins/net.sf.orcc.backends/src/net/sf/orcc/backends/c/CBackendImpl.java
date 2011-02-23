@@ -377,9 +377,8 @@ public class CBackendImpl extends AbstractBackend {
 						}
 					});
 
-			networkPrinter.getOptions().put("needPthreads", needPthreads);
 			networkPrinter.getOptions().put("newScheduler", newScheduler);
-			networkPrinter.getOptions().put("fifoSize", fifoSize);
+			networkPrinter.getOptions().putAll(printer.getOptions());
 
 			networkPrinter.print(network.getName() + ".c", path, network,
 					"network");
