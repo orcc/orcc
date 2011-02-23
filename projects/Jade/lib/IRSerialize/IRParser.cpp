@@ -60,6 +60,7 @@
 #include "Jade/Jit/LLVMParser.h"
 #include "Jade/Serialize/IRParser.h"
 #include "Jade/Util/FifoMng.h"
+#include "Jade/Util/PackageMng.h"
 
 
 #include "IRConstant.h"
@@ -91,22 +92,16 @@ IRParser::IRParser(llvm::LLVMContext& C) : Context(C){
 
 
 Actor* IRParser::parseActor(string classz){
-    size_t found=classz.find_last_of(".");;
-	string file;
-	string package;
 
-	if (found!=string::npos){
-		file = classz.substr(found+1);
-		package = classz.substr(0, found);
-	}else {
-		file = classz;
-		package = "";
-	}
+	//Get file and package of the actor
+	string file = PackageMng::getSimpleName(classz);
+	string package = PackageMng::getPackages(classz);
 	
 	//Parse the bitcode
 	Module* module = parser->loadBitcode(package, file);
 
 	if (module == 0){
+		//Module not found
 		cerr << "Error when parsing bytecode";
 		exit(0);
 	}

@@ -41,6 +41,7 @@
 #include "llvm/Support/IRReader.h"
 
 #include "Jade/Jit/LLVMParser.h"
+#include "Jade/Util/PackageMng.h"
 //------------------------------
 
 using namespace llvm;
@@ -57,18 +58,16 @@ LLVMParser::LLVMParser(LLVMContext& C, string directory, bool verbose): Context(
 Module* LLVMParser::loadBitcode(string package, string file) {
 	SMDiagnostic Err;
 
+	//Get filename of the actor
 	sys::Path Filename= getFilename(package, file);
-    //isBitcodeFile
 
 	if (verbose) cout << "Loading '" << Filename.c_str() << "'\n";
-	Module* Result = 0;
-
-	const std::string &FNStr = Filename.c_str();
 	
 	// Load the bitcode...
 	Module *Mod = ParseIRFile(Filename.c_str(), Err, Context);
 
 	if (!Mod) {
+		//Error when parsing module
 		cerr << "Error opening bitcode file: '" << file.c_str() << "\n";
 		exit(1);
 	}
@@ -77,25 +76,30 @@ Module* LLVMParser::loadBitcode(string package, string file) {
 }
 
 sys::Path LLVMParser::getFilename(string packageName, string file){
-	replace(packageName.begin(), packageName.end(), '.', '/' );
-	sys::Path package(directory + packageName);
+	
+	//Verifying if package is existing
+	string package = PackageMng::getFolder(packageName);
+	sys::Path packagePath(directory + package);
 
-	if (!package.exists()){
-		cout << "Package" << package.c_str() << " is required but not found.'\n";
+	if (!packagePath.exists()){
+		//Package doesn't exist
+		cout << "Package" << packagePath.c_str() << " is required but not found.'\n";
 		exit(0);
 	}
 
-	if (package.isArchive()){
-		cout << "Found " << package.c_str() << " as archive.'\n";
+	if (packagePath.isArchive()){
+		//Archive is not supported yet
+		cout << "Found " << packagePath.c_str() << " as archive.'\n";
 		exit(0);
 	}
 
-	sys::Path actorFile(package.str()+"/"+file);
+	//Verifying if file is existing
+	sys::Path actorFile(packagePath.str()+"/"+file);
 
-	if (actorFile.exists()){
-		return actorFile;
+	if (!actorFile.exists()){
+		cout <<  "File  " << file.c_str() << " has not been found in package "<< packageName.c_str() <<".\n";
+		exit(0);
 	}
 	
-	cout <<  "File  " << file.c_str() << " has not been found in package "<< packageName.c_str() <<".\n";
-	exit(0);
+	return actorFile;
 }
