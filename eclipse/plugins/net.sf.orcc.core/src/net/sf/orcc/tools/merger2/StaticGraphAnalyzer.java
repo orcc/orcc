@@ -29,11 +29,13 @@
 package net.sf.orcc.tools.merger2;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
@@ -42,6 +44,7 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.util.MultiMap;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -62,7 +65,7 @@ public class StaticGraphAnalyzer {
 	 * This class represents a static edge with a production and a consumption.
 	 * 
 	 * 
-	 * @author Jérôme Gorin
+	 * @author Jerome Gorin
 	 * 
 	 */
 	private class StaticEdge extends DefaultEdge {
@@ -165,7 +168,7 @@ public class StaticGraphAnalyzer {
 		singlyConnectedVertex = new ArrayList<Vertex>();
 		multipleConnectedVertex = new ArrayList<Vertex>();
 
-		// Analyse each static vertex to determine its connection
+		// Analyze each static vertex to determine its connection
 		for (Vertex vertex : graph.vertexSet()) {
 			Set<StaticEdge> edges = graph.outgoingEdgesOf(vertex);
 
@@ -360,8 +363,8 @@ public class StaticGraphAnalyzer {
 	}
 
 	private void updateNetwork(List<Vertex> srcVertices, Vertex dstVertex) {
-		List<Connection> srcConnections;
-		List<Connection> dstConnections;
+		MultiMap<Vertex, Connection> srcConnections = new MultiMap<Vertex, Connection>();
+		MultiMap<Vertex, Connection> dstConnections = new MultiMap<Vertex, Connection>();
 		
 		//Check connections of the source vertices to keep
 		for (Vertex vertex : srcVertices) {
@@ -370,16 +373,50 @@ public class StaticGraphAnalyzer {
 			Set<Connection> outgoingEdges = dynamicGraph
 					.outgoingEdgesOf(vertex);
 
-			srcConnections = checkInput(incomingEdges, dstVertex);
-			dstConnections = checkOutput(outgoingEdges, dstVertex);
+			//Check connected connections to the vertex
+			MultiMap<Vertex, Connection> inConnections = checkInput(incomingEdges, dstVertex);
+			MultiMap<Vertex, Connection> outConnections = checkOutput(outgoingEdges, dstVertex);
+			
+			//Set connections to add 
+			srcConnections.addAll(inConnections);
+			srcConnections.addAll(outConnections);
 		}
 		
 		// Remove source vertices
 		for (Vertex vertex : srcVertices) {
 			removeVertex(vertex);
 		}
+		
+		connectInputs(dstVertex, srcConnections);
+		connectOutputs(dstVertex, dstConnections);
 	}
 
+	private void connectInputs(Vertex vertex, MultiMap<Vertex, Connection> inputs){
+		for (Entry<Vertex, Collection<Connection>> entry : inputs.entrySet()){
+			Vertex srcVertex = entry.getKey();
+			
+			if (dynamicGraph.containsVertex(srcVertex)){
+				//Source vertex still exist in network
+				for(Connection connection : entry.getValue()){
+					dynamicGraph.addEdge(srcVertex, vertex, connection);
+				}
+			}
+		}
+	}
+	
+	private void connectOutputs(Vertex vertex, MultiMap<Vertex, Connection> inputs){
+		for (Entry<Vertex, Collection<Connection>> entry : inputs.entrySet()){
+			Vertex dstVertex = entry.getKey();
+			
+			if (dynamicGraph.containsVertex(dstVertex)){
+				//Destination vertex still exist in network
+				for(Connection connection : entry.getValue()){
+					dynamicGraph.addEdge(vertex, dstVertex, connection);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Remove isolated static vertices and classify connected static vertices.
 	 */
@@ -404,30 +441,31 @@ public class StaticGraphAnalyzer {
 		classifyConnections();
 	}
 
-	private List<Connection> checkInput(Set<Connection> connections, Vertex vertex) {
+	private MultiMap<Vertex, Connection> checkInput(Set<Connection> connections, Vertex vertex) {
 		//Get inputs of the destination vertex
 		Instance instance = vertex.getInstance();
 		Actor actor = instance.getActor();
 		OrderedMap<String, Port> inputs = actor.getInputs();
 
 		//List of Connections to keep
-		List<Connection> srcConnections = new ArrayList<Connection>();
+		MultiMap<Vertex, Connection> srcConnections = new MultiMap<Vertex, Connection>();
 		
 		for (Connection connection : connections) {
 			//Get target port name of this connection
 			Port target = connection.getTarget();
 			String name = target.getName();
-
+			Vertex src = dynamicGraph.getEdgeSource(connection);
+			
 			if (inputs.contains(name)) {
 				//Target must be connected to the merged instance
-				srcConnections.add(connection);
+				srcConnections.add(src, connection);
 			}
 		}
 		
 		return srcConnections;
 	}
 
-	private List<Connection> checkOutput(Set<Connection> connections, Vertex vertex) {		
+	private MultiMap<Vertex, Connection> checkOutput(Set<Connection> connections, Vertex vertex) {		
 		
 		//Get outputs of the destination vertex
 		Instance instance = vertex.getInstance();
@@ -435,16 +473,17 @@ public class StaticGraphAnalyzer {
 		OrderedMap<String, Port> outputs = actor.getOutputs();
 		
 		//List of Connections to keep
-		List<Connection> dstConnections = new ArrayList<Connection>();
+		MultiMap<Vertex, Connection> dstConnections = new MultiMap<Vertex, Connection>();
 
 		for (Connection connection : connections) {
 			//Get source port name of this connection
-			Port target = connection.getSource();
-			String name = target.getName();
+			Port source = connection.getSource();
+			String name = source.getName();
+			Vertex tgt = dynamicGraph.getEdgeTarget(connection);
 
 			if (outputs.contains(name)) {
 				//Source must be connected to the merged instance
-				dstConnections.add(connection);
+				dstConnections.add(tgt, connection);
 			}
 		}
 		
