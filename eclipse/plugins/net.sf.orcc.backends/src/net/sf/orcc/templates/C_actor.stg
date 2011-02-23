@@ -300,6 +300,11 @@ printGetTokensFunctions() ::= <<
 <instance.actor.inputs.list: printGetTokensFunction()>
 >>
 
+printGetTokens() ::= <<
+<instance.actor.inputs.list: {port|get_tokens_<port.name>();
+}>
+>>
+
 printOpenFiles() ::= <<
 <instance.actor.inputs.list:
 	{ port | file_<port.name> = fopen("<getPortName(port)>.txt", "a");
@@ -382,7 +387,7 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 
 printInputPatternPort(port) ::= <<
 if (index_<port.name> \> numTokens_<port.name> - <pattern.(port)>) {
-	get_tokens_<port.name>();
+	// get_tokens_<port.name>();
 	ports |= 0x0<maskInputs.(port)>;
 }
 >>
@@ -466,6 +471,7 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 	si-\>ports = 0;
 
+	<printGetTokens()>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 	<printOpenFiles()>
 <endif>
@@ -574,6 +580,7 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 	si-\>ports = 0;
 
+	<printGetTokens()>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 	<printOpenFiles()>
 <endif>
