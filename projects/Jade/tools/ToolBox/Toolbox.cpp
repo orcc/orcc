@@ -326,6 +326,8 @@ void opt(string file, Module* M){
 }
 
 void createArchives(map<string,Module*>* modules){
+	map<string,Archive*> archives;
+	map<string,Archive*>::iterator itArchive;
 	map<string,Module*>::iterator itModule;
 	LLVMContext &Context = getGlobalContext();
 	std::string errorMsg;
@@ -333,39 +335,38 @@ void createArchives(map<string,Module*>* modules){
 	for (itModule = modules->begin(); itModule != modules->end(); itModule++){
 		Archive* archive;
 		string firstPackage = PackageMng::getFirstPackage(itModule->first);
+
+		itArchive = archives.find(firstPackage);
 	
-		sys::Path ArchivePath;
-		
-		if (!ArchivePath.set(LibraryFolder + firstPackage+ ".a"))
-			throw std::string("Archive name invalid ");
-
 		// Create a new archive
-		if(!ArchivePath.isArchive()){
-			cout << "Creating : " << ArchivePath.c_str() << "\n";
-			archive =  Archive::CreateEmpty(ArchivePath, Context);
+		if(itArchive == archives.end()){
+			sys::Path ArchivePath(LibraryFolder + firstPackage+ ".a");
+			archive = Archive::CreateEmpty(ArchivePath, Context);
+			archives.insert(pair<string,Archive*>(firstPackage, archive));
 		}else{
-			archive = Archive::OpenAndLoad(ArchivePath, Context, &errorMsg);
+			archive = itArchive->second;
 		}
-
-		if (errorMsg != ""){
-			cerr <<"Error when opening archive "<< ArchivePath.c_str() << "\n";
-			exit(1);
-		}
-
-		sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(itModule->first));
 		
-		archive->addFileBefore(fullFilePath, archive->end(), &errorMsg);		
-		archive->writeToDisk(true, false, true, &errorMsg);
+		// Insert actor in archive
+		sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(itModule->first));
+		archive->addFileBefore(fullFilePath, archive->end(), &errorMsg);
 
-		if (errorMsg != ""){
-			cerr <<"Error when writing actors "<< fullFilePath.c_str() <<" in archive "<< ArchivePath.c_str() << ".\n";
-			exit(1);
-		}
+		if (errorMsg != "")
+			cerr <<"Error when insert actor "<< itModule->first <<" in archive\n";
 	}
-}
 
-void clean_exit(int sig){
-	exit(0);
+	// Write archives to the disk
+	for (itArchive = archives.begin(); itArchive != archives.end(); itArchive++){
+		itArchive->second->writeToDisk(true, false, true, &errorMsg);
+		if (errorMsg != "")
+			cerr <<"Error when creat "<< itArchive->first << ".a\n";
+
+		// Erase all initial files
+		sys::Path erasePath(LibraryFolder + itArchive->first);
+		erasePath.eraseFromDisk(true,&errorMsg);
+		if (errorMsg != "")
+			cerr <<"Error when erase the directory"<< erasePath.str() << "\n";
+	}
 }
 
 //main function of Jade toolbox
@@ -377,7 +378,6 @@ int main(int argc, char **argv) {
 
 	SMDiagnostic Err;
 	cl::ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
-	llvm_shutdown_obj Y;  // Call llvm_shutdown() on exit.
 	
 	InitializeNativeTarget();
 	
