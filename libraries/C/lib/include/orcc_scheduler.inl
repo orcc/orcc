@@ -104,12 +104,14 @@ static void sched_add_predecessors(struct scheduler_s *sched,
 
 static void sched_add_successors(struct scheduler_s *sched,
 		struct actor_s *actor, int ports) {
-	int i, n;
+	int i, j, n;
 	n = actor->num_outputs;
 	for (i = 0; i < n; i++) {
 		if ((ports & (1 << i)) != 0) {
-			struct actor_s *succ = actor->successors[i];
-			sched_add_schedulable(sched, succ);
+			for (j = 0; j < actor->num_successors[i]; j++) {
+				struct actor_s *succ = actor->successors[i][j];
+				sched_add_schedulable(sched, succ);
+			}
 		}
 	}
 }

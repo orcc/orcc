@@ -101,7 +101,7 @@ public class Network {
 	}
 
 	private Map<Connection, Integer> connectionMap;
-	
+
 	private Map<Connection, Integer> connectionMapWithoutBroadcast;
 
 	private String file;
@@ -129,7 +129,7 @@ public class Network {
 
 	private Map<Connection, Vertex> sourceMap;
 
-	private Map<Instance, Map<Port, Instance>> successorsMap;
+	private Map<Instance, Map<Port, List<Instance>>> successorsMap;
 
 	private Map<Connection, Vertex> targetMap;
 
@@ -194,7 +194,7 @@ public class Network {
 
 	private void computePredecessorsSuccessorsMaps() {
 		predecessorsMap = new HashMap<Instance, Map<Port, Instance>>();
-		successorsMap = new HashMap<Instance, Map<Port, Instance>>();
+		successorsMap = new HashMap<Instance, Map<Port, List<Instance>>>();
 
 		// for each instance
 		for (Vertex vertex : graph.vertexSet()) {
@@ -219,26 +219,30 @@ public class Network {
 
 	private void computePredSucc(Vertex vertex,
 			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs) {
-		Map<Port, Instance> map = new LinkedHashMap<Port, Instance>();
-		predecessorsMap.put(vertex.getInstance(), map);
+		Map<Port, Instance> predMap = new LinkedHashMap<Port, Instance>();
+		predecessorsMap.put(vertex.getInstance(), predMap);
 		Set<Connection> incoming = graph.incomingEdgesOf(vertex);
 		for (Port port : inputs) {
 			for (Connection connection : incoming) {
 				if (port.equals(connection.getTarget())) {
-					map.put(port, graph.getEdgeSource(connection).getInstance());
+					predMap.put(port, graph.getEdgeSource(connection)
+							.getInstance());
 				}
 			}
 		}
 
-		map = new LinkedHashMap<Port, Instance>();
-		successorsMap.put(vertex.getInstance(), map);
+		Map<Port, List<Instance>> succMap = new LinkedHashMap<Port, List<Instance>>();
+		successorsMap.put(vertex.getInstance(), succMap);
 		Set<Connection> outgoing = graph.outgoingEdgesOf(vertex);
 		for (Port port : outputs) {
+			List<Instance> instances = new ArrayList<Instance>();
 			for (Connection connection : outgoing) {
 				if (port.equals(connection.getSource())) {
-					map.put(port, graph.getEdgeTarget(connection).getInstance());
+					instances
+							.add(graph.getEdgeTarget(connection).getInstance());
 				}
 			}
+			succMap.put(port, instances);
 		}
 	}
 
@@ -247,8 +251,8 @@ public class Network {
 	 * its source vertex (respectively target vertex).
 	 */
 	public void computeTemplateMaps() {
-		int i,j;
-		
+		int i, j;
+
 		sourceMap = new HashMap<Connection, Vertex>();
 		for (Connection connection : graph.edgeSet()) {
 			sourceMap.put(connection, graph.getEdgeSource(connection));
@@ -268,13 +272,13 @@ public class Network {
 		computeIncomingOutgoingMaps();
 
 		computePredecessorsSuccessorsMaps();
-		
+
 		connectionMapWithoutBroadcast = new HashMap<Connection, Integer>();
 		i = 0;
-		for (Map<Port, List<Connection>> map : outgoingMap.values()){
-			for(List<Connection> connections : map.values()){
+		for (Map<Port, List<Connection>> map : outgoingMap.values()) {
+			for (List<Connection> connections : map.values()) {
 				j = 0;
-				for(Connection connection : connections){
+				for (Connection connection : connections) {
 					connectionMapWithoutBroadcast.put(connection, i);
 					connection.setFifoId(j);
 					j++;
@@ -516,7 +520,7 @@ public class Network {
 	 * 
 	 * @return a map that associates a port to the list of its successors
 	 */
-	public Map<Instance, Map<Port, Instance>> getSuccessorsMap() {
+	public Map<Instance, Map<Port, List<Instance>>> getSuccessorsMap() {
 		return successorsMap;
 	}
 
