@@ -52,6 +52,8 @@ import org.jgrapht.DirectedGraph;
  */
 public class NetworkSplitter implements INetworkTransformation {
 
+	private Integer connectionIdMax;
+
 	/**
 	 * Contains map of targets' name to a list of instances which will be
 	 * launched in.
@@ -84,6 +86,7 @@ public class NetworkSplitter implements INetworkTransformation {
 				instancesTarget);
 		this.mediumGraph = mediumGraph;
 		mapTargetsNetworks = new HashMap<String, Network>();
+		connectionIdMax = 0;
 	}
 
 	/**
@@ -129,20 +132,19 @@ public class NetworkSplitter implements INetworkTransformation {
 									"commMediumUpperCase",
 									new StringAttribute(mediumValue.getValue()
 											.toUpperCase()));
+							if (!connection.getAttributes().containsKey(
+									"connectionId")) {
+								connection.getAttributes()
+										.put("connectionId",
+												new StringAttribute(connectionIdMax
+														.toString()));
+								connectionIdMax++;
+							}
 						}
 					}
 				}
 			}
 		}
-	}
-
-	/**
-	 * Returns all networks constituting the application
-	 * 
-	 * @return list of networks
-	 */
-	public Map<String, Network> getNetworksMap() {
-		return mapTargetsNetworks;
 	}
 
 	/**
@@ -236,6 +238,15 @@ public class NetworkSplitter implements INetworkTransformation {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns all networks constituting the application
+	 * 
+	 * @return list of networks
+	 */
+	public Map<String, Network> getNetworksMap() {
+		return mapTargetsNetworks;
 	}
 
 	/**

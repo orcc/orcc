@@ -332,7 +332,6 @@ public class CBackendImpl extends AbstractBackend {
 			}
 
 			// print instance
-			write("Printing instances...\n");
 			printInstances(workingNetwork);
 
 			// print network

@@ -56,6 +56,11 @@ import org.jgrapht.DirectedGraph;
 public class CNetworkTemplateData {
 
 	/**
+	 * Contains a list of Id of all connections with an other target.
+	 */
+	private List<IAttribute> listConnectionId;
+
+	/**
 	 * Contains a list of instances corresponding to all connections with an
 	 * other target.
 	 */
@@ -169,6 +174,7 @@ public class CNetworkTemplateData {
 		for (Connection connection : allConnections) {
 			listMediumInstances.add(connectionToInstance.get(connection));
 			listMediumPorts.add(connectionToPort.get(connection));
+			listConnectionId.add(connection.getAttribute("connectionId"));
 		}
 		listMediumUsedAllInstances.addAll(allMedium);
 	}
@@ -191,7 +197,9 @@ public class CNetworkTemplateData {
 				if (!instancesAnalysed.contains(instanceToCheck)) {
 					sourceDetected = checkSourceInstances(instanceToCheck,
 							instancesAnalysed, network.getGraph());
-					if (!sourceDetected && (instanceToCheck.isActor() || instanceToCheck.isBroadcast())) {
+					if (!sourceDetected
+							&& (instanceToCheck.isActor() || instanceToCheck
+									.isBroadcast())) {
 						sourceInstances.add(instanceToCheck);
 					}
 				}
@@ -275,6 +283,7 @@ public class CNetworkTemplateData {
 		listMediumInstances = new ArrayList<Instance>();
 		listMediumPorts = new ArrayList<Port>();
 		listMediumUsed = new HashMap<Instance, List<String>>();
+		listConnectionId = new ArrayList<IAttribute>();
 		listMediumUsedAllInstances = new ArrayList<String>();
 		sourceInstances = new ArrayList<Instance>();
 
@@ -298,6 +307,16 @@ public class CNetworkTemplateData {
 	 */
 	public Map<Instance, List<String>> getListAllMedium() {
 		return listMediumUsed;
+	}
+
+	/**
+	 * Returns the list of connectionId corresponding to instance connected to
+	 * the sorted connections set
+	 * 
+	 * @return a list of instances
+	 */
+	public List<IAttribute> getListConnectionId() {
+		return listConnectionId;
 	}
 
 	/**

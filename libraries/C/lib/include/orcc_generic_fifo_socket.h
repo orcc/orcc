@@ -12,7 +12,9 @@ DECL int FIFO_SOCKET_GET_NUM_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo, int reader
 	if(fifo->fill_count + 100 < fifo->size) {
 		int ret;
 		int nbBytesRead;
-		ret = select(fifo->Sock + 1, &(fifo->fdset), NULL, NULL, NULL);
+		struct timeval timeout = { 0, 1 };
+
+		ret = select(fifo->Sock + 1, &(fifo->fdset), NULL, NULL, &timeout);
 		if(ret < 0)
 		{
 			fprintf(stderr,"socket_GetData() : error.\n");
@@ -78,7 +80,7 @@ DECL void FIFO_SOCKET_WRITE_END(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int
 	}
 }
 
-DECL void FIFO_SOCKET_INIT(T)(struct FIFO_SOCKET_S(T) *fifo, int IsServer, const char* HostName, unsigned short port, int IsIpv6) {
+DECL void FIFO_SOCKET_INIT(T)(struct FIFO_SOCKET_S(T) *fifo, int NumId, int IsServer, const char* HostName, unsigned short port, int IsIpv6) {
 	SOCKADDR_IN Sin;
 	struct hostent *hostinfo;
 	SOCKET local_sock;
@@ -98,7 +100,7 @@ DECL void FIFO_SOCKET_INIT(T)(struct FIFO_SOCKET_S(T) *fifo, int IsServer, const
 		exit(-3);
 	}
 
-	Sin.sin_port = htons(port);
+	Sin.sin_port = htons(port + NumId);
 	if (IsIpv6) {
 		Sin.sin_family = AF_INET6;
 	} else {
