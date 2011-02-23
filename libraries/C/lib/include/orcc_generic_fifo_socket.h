@@ -7,7 +7,7 @@ struct FIFO_SOCKET_S(T) {
 	SOCKET Sock;
 };
 
-DECL int FIFO_SOCKET_GET_NUM_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo) {
+DECL int FIFO_SOCKET_GET_NUM_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo, int reader_id) {
 	//Read socket
 	if(fifo->fill_count + 100 < fifo->size) {
 		int ret;
@@ -31,6 +31,10 @@ DECL int FIFO_SOCKET_GET_NUM_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo) {
 	return fifo->fill_count;
 }
 
+DECL void FIFO_SOCKET_READ_COPY(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int reader_id, int n) {
+	memcpy(buffer, fifo->contents, n * sizeof(T));
+}
+
 DECL int FIFO_SOCKET_HAS_ROOM(T)(struct FIFO_SOCKET_S(T) *fifo, int n) {
 	//Will be managed when we will use unblocked write in socket.
 	return (fifo->size - fifo->fill_count) >=n;
@@ -46,7 +50,7 @@ DECL T *FIFO_SOCKET_READ(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int n) {
 	return fifo->contents;
 }
 
-DECL void FIFO_SOCKET_READ_END(T)(struct FIFO_SOCKET_S(T) *fifo, int n) {
+DECL void FIFO_SOCKET_READ_END(T)(struct FIFO_SOCKET_S(T) *fifo, int reader_id, int n) {
 	if(fifo->fill_count - n > 0) {
 		memmove(fifo->contents, &fifo->contents[n], (fifo->fill_count - n) * sizeof(T));
 		fifo->fill_count -= n;

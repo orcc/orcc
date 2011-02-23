@@ -33,7 +33,7 @@
 #include "socket.h"
 
 // declare FIFO with a size equal to (size)
-#define DECLARE_FIFO_SOCKET(type, size, count) static type array_##count[(size) + 1]; \
+#define DECLARE_FIFO_SOCKET(type, size, count, readersnb) static type array_##count[(size) + 1]; \
 static struct FIFO_SOCKET_S(type) fifo_##count = { (size) + 1, array_##count, 0, 0, 0};
 
 #define FIFO_SOCKET_S(T) FIFO_SOCKET_S_EXPAND(T)
@@ -53,6 +53,9 @@ static struct FIFO_SOCKET_S(type) fifo_##count = { (size) + 1, array_##count, 0,
 
 #define FIFO_SOCKET_READ(T) FIFO_SOCKET_READ_EXPAND(T)
 #define FIFO_SOCKET_READ_EXPAND(T) fifo_socket_ ## T ## _read
+
+#define FIFO_SOCKET_READ_COPY(T) FIFO_SOCKET_READ_COPY_EXPAND(T)
+#define FIFO_SOCKET_READ_COPY_EXPAND(T) fifo_socket_ ## T ## _read_copy
 
 #define FIFO_SOCKET_READ_END(T) FIFO_SOCKET_READ_END_EXPAND(T)
 #define FIFO_SOCKET_READ_END_EXPAND(T) fifo_socket_ ## T ## _read_end
