@@ -101,6 +101,8 @@ public class Network {
 	}
 
 	private Map<Connection, Integer> connectionMap;
+	
+	private Map<Connection, Integer> connectionMapWithoutBroadcast;
 
 	private String file;
 
@@ -245,6 +247,8 @@ public class Network {
 	 * its source vertex (respectively target vertex).
 	 */
 	public void computeTemplateMaps() {
+		int i,j;
+		
 		sourceMap = new HashMap<Connection, Vertex>();
 		for (Connection connection : graph.edgeSet()) {
 			sourceMap.put(connection, graph.getEdgeSource(connection));
@@ -256,7 +260,7 @@ public class Network {
 		}
 
 		connectionMap = new HashMap<Connection, Integer>();
-		int i = 0;
+		i = 0;
 		for (Connection connection : graph.edgeSet()) {
 			connectionMap.put(connection, i++);
 		}
@@ -264,6 +268,20 @@ public class Network {
 		computeIncomingOutgoingMaps();
 
 		computePredecessorsSuccessorsMaps();
+		
+		connectionMapWithoutBroadcast = new HashMap<Connection, Integer>();
+		i = 0;
+		for (Map<Port, List<Connection>> map : outgoingMap.values()){
+			for(List<Connection> connections : map.values()){
+				j = 0;
+				for(Connection connection : connections){
+					connectionMapWithoutBroadcast.put(connection, i);
+					connection.setFifoId(j);
+					j++;
+				}
+				i++;
+			}
+		}
 	}
 
 	/**
@@ -312,6 +330,10 @@ public class Network {
 	 */
 	public Map<Connection, Integer> getConnectionMap() {
 		return connectionMap;
+	}
+
+	public Map<Connection, Integer> getConnectionMapWithoutBroadcast() {
+		return connectionMapWithoutBroadcast;
 	}
 
 	/**

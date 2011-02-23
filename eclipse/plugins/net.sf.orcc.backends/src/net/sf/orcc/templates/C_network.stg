@@ -59,12 +59,12 @@ void <GetInstanceId(instance)>_scheduler(struct schedinfo_s *si) {
 	<instance.broadcast.type> *tok_input, input_buf[1],
 	<instance.broadcast.outputList: { n | output_<n>_buf[1], *tok_output_<n>}; separator=",\n">;
 
-	while (fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_has_tokens(<GetInstanceId(instance)>_input, 1)) {
+	while (fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_has_tokens(<GetInstanceId(instance)>_input, 0, 1)) {
 		<printOutputPattern(instance.broadcast.outputList,instance.broadcast.outputs.list)>
 
-		tok_input = fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_read(<GetInstanceId(instance)>_input, input_buf, 1);
+		tok_input = fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_read(<GetInstanceId(instance)>_input, input_buf, 0, 1);
 		<printBroadcastWrite(instance.broadcast.outputList,instance.broadcast.outputs.list)>
-		fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_read_end(<GetInstanceId(instance)>_input, 1);
+		fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_read_end(<GetInstanceId(instance)>_input, 0, 1);
 		<printBroadcastWriteEnd(instance.broadcast.outputList,instance.broadcast.outputs.list)>
 		i++;
 	}
@@ -120,17 +120,15 @@ declarePredsSuccs(instances) ::= <<
 // allocates FIFOs
 
 allocateFifoType(type, size, count, port, instance) ::= <<
-DECLARE_FIFO<printUpperCaseMedium(port,instance)>(<type>, <if(size)><size><else>SIZE<endif>, <count>)
+DECLARE_FIFO<printUpperCaseMedium(port,instance)>(<type>, <if(size)><size><else>SIZE<endif>, <count>, <readers_nb>)
 >>
-
-
 
 doAllocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
 <if (source.broadcast || source.actor)>
 <allocateFifoType(
-  sourcePort.type, edge.size, network.connectionMap.(edge), sourcePort, source)><else>
+  sourcePort.type, edge.size, network.connectionMapWithoutBroadcast.(edge), sourcePort, source)><else>
 <allocateFifoType(
-  targetPort.type, edge.size, network.connectionMap.(edge), targetPort, target)><endif>
+  targetPort.type, edge.size, network.connectionMapWithoutBroadcast.(edge), targetPort, target)><endif>
 >>
 
 tryAllocateFifo(edge, src, tgt) ::= <<
@@ -141,41 +139,45 @@ tryAllocateFifo(edge, src, tgt) ::= <<
   target=tgt.instance, targetPort=edge.target)><endif>
 >>
 
-allocateFifo(edge) ::= <<
+allocateFifo(edge, readers_nb) ::= <<
 <tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
 >>
 
-allocateFifos(edges) ::= <<
-<edges: allocateFifo()>
+allocateFifosWithMap(outgoingMap) ::= <<
+<outgoingMap.keys: { instance | <outgoingMap.(instance).keys: { port | <allocateFifo(first(outgoingMap.(instance).(port)), length(outgoingMap.(instance).(port)))> }> }>
 >>
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
-doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
-<if(source.actor || source.broadcast)>
-struct fifo<printMedium(sourcePort,source)>_<sourcePort.type>_s *<GetInstanceId(source)>_<sourcePort.name> = &fifo_<count>;
-<endif>
-<if(target.actor || target.broadcast)>
-struct fifo<printMedium(targetPort,target)>_<sourcePort.type>_s *<GetInstanceId(target)>_<targetPort.name> = &fifo_<count>;
-<endif>
+doAssignFifo(instance, port, count) ::= <<
+<if(instance.actor || instance.broadcast)>struct fifo<printMedium(port,instance)>_<port.type>_s *<GetInstanceId(instance)>_<port.name> = &fifo_<count>;<endif>
 >>
 
-tryAssignFifo(edge, src, tgt) ::= <<
+tryAssignFifoTgt(edge, src, tgt) ::= <<
+<if (src.instance && tgt.instance)>
+<doAssignFifo(
+  tgt.instance, edge.target,
+  network.connectionMapWithoutBroadcast.(edge))><endif>
+>>
+
+tryAssignFifoSrc(edge, src, tgt) ::= <<
 <if (src.instance && tgt.instance)>
 <doAssignFifo(
   src.instance, edge.source,
-  tgt.instance, edge.target,
-  network.connectionMap.(edge))><endif>
+  network.connectionMapWithoutBroadcast.(edge))><endif>
 >>
 
-assignFifo(edge) ::= <<
-<tryAssignFifo(edge, network.sourceMap.(edge), network.targetMap.(edge))>
+assignFifos(edges, readers_nb) ::= <<
+
+<tryAssignFifoSrc(first(edges), network.sourceMap.(first(edges)), network.targetMap.(first(edges)))>
+<edges: {edge | <tryAssignFifoTgt(edge, network.sourceMap.(edge), network.targetMap.(edge))> }>
+
 >>
 
-assignFifos(edges) ::= <<
-<edges: assignFifo()>
+assignFifosWithMap(outgoingMap) ::= <<
+<outgoingMap.keys: { instance | <outgoingMap.(instance).keys: { port | <assignFifos(outgoingMap.(instance).(port), length(outgoingMap.(instance).(port)))> }> }>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -437,12 +439,12 @@ network(network, options) ::= <<
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
 
-<allocateFifos(network.connections)>
+<allocateFifosWithMap(network.outgoingMap)>
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO pointer assignments
 
-<assignFifos(network.connections)>
+<assignFifosWithMap(network.outgoingMap)>
 
 ////////////////////////////////////////////////////////////////////////////////
 <declareBroadcasts(network.instances)>

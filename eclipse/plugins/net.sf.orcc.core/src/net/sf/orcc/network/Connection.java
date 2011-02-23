@@ -61,10 +61,15 @@ public class Connection implements IAttributeContainer, Comparable<Connection> {
 	private Map<String, IAttribute> attributes;
 
 	/**
+	 * id of associate fifo
+	 */
+	private int fifoId;
+
+	/**
 	 * source port
 	 */
 	private Port source;
-
+	
 	/**
 	 * target port
 	 */
@@ -144,6 +149,10 @@ public class Connection implements IAttributeContainer, Comparable<Connection> {
 		return attributes;
 	}
 
+	public int getFifoId() {
+		return fifoId;
+	}
+
 	/**
 	 * Returns the size of this connection.
 	 * 
@@ -175,6 +184,10 @@ public class Connection implements IAttributeContainer, Comparable<Connection> {
 	 */
 	public Port getTarget() {
 		return target;
+	}
+
+	public void setFifoId(int fifoId) {
+		this.fifoId = fifoId;
 	}
 
 	/**

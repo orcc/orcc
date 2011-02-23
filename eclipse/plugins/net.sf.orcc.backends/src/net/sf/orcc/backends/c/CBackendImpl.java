@@ -253,9 +253,9 @@ public class CBackendImpl extends AbstractBackend {
 			new NetworkMerger().transform(network);
 		}
 
-		new BroadcastAdder().transform(network);
 		computeMapping(network);
 		if (codesign) {
+			new BroadcastAdder().transform(network);
 			printer.getOptions().put("threadsNb", 1);
 			NetworkSplitter netSplit = new NetworkSplitter(instancesTarget,
 					mediumGraph);

@@ -32,7 +32,8 @@ struct FIFO_S(T) {
 	int size; /** size of the ringbuffer */
 	T *contents; /** the memory containing the ringbuffer */
 	
-	int read_ind; /** the current position of the reader */
+	int readers_nb; /** the number of fifo's readers */
+	int* read_inds; /** the current position of the reader */
 	int write_ind; /** the current position of the writer */
 };
 

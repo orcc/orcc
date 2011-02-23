@@ -24,6 +24,10 @@ getPortName(port) ::= <<
 <instance.id>_<port.name>
 >>
 
+getFifoId(port, instance) ::= <<
+<network.incomingMap.(instance).(port).fifoId>
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
@@ -276,13 +280,13 @@ int numTokensPresent;
 	memmove(&tokens_<port.name>[0], &tokens_<port.name>[index_<port.name>], numTokens_<port.name> * sizeof(<port.type>));
 	index_<port.name> = 0;
 \}
-numTokensPresent = fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>);
+numTokensPresent = fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, <getFifoId(port,instance)>);
 if (numTokensPresent \> 0) {
 	if (numTokens_<port.name> + numTokensPresent \> SIZE_<port.name>) {
 		numTokensPresent = SIZE_<port.name> - numTokens_<port.name>;
 	\}
-	fifo<printMedium(port)>_<port.type>_read_copy(<getPortName(port)>, &tokens_<port.name>[numTokens_<port.name>], numTokensPresent);
-	fifo<printMedium(port)>_<port.type>_read_end(<getPortName(port)>, numTokensPresent);
+	fifo<printMedium(port)>_<port.type>_read_copy(<getPortName(port)>, &tokens_<port.name>[numTokens_<port.name>], <getFifoId(port,instance)>, numTokensPresent);
+	fifo<printMedium(port)>_<port.type>_read_end(<getPortName(port)>, <getFifoId(port,instance)>, numTokensPresent);
 	numTokens_<port.name> += numTokensPresent;
 \}
 

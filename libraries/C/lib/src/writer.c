@@ -111,17 +111,17 @@ void writer_scheduler(struct schedinfo_s *si) {
 	// FSM transitions
 
 l_Test:
-	if ( fifo_i32_has_tokens(writer_EOF, 1) ) {
-		pEOF = fifo_i32_read(writer_EOF, EOF_buf, 1);
+	if ( fifo_i32_has_tokens(writer_EOF, 0, 1) ) {
+		pEOF = fifo_i32_read(writer_EOF, EOF_buf, 0, 1);
 		eof_1 = pEOF[0];
 		if (eof_1 == 0) {				
 			i++;
-			fifo_i32_read_end(writer_EOF, 1);
+			fifo_i32_read_end(writer_EOF, 0, 1);
 			goto l_Write;
 		}else{
 			//Exit the program, EOF is reached
 			fclose(F);
-			fifo_i32_read_end(writer_EOF, 1);
+			fifo_i32_read_end(writer_EOF, 0, 1);
 			exit(666);
 		}
 	} else {
@@ -133,15 +133,15 @@ l_Test:
 	}
 
 l_Write:
-	if (fifo_u8_has_tokens(writer_In, 1)) {
-		In = fifo_u8_read(writer_In, In_buf, 1);
+	if (fifo_u8_has_tokens(writer_In, 0, 1)) {
+		In = fifo_u8_read(writer_In, In_buf, 0, 1);
 		wr = In[0];
 	
 		fseek(F,sizeof(u8)*cnt,SEEK_SET);
 		fwrite(&wr,sizeof(u8),1,F);
 		cnt++;	
 		
-		fifo_u8_read_end(writer_In, 1);
+		fifo_u8_read_end(writer_In, 0, 1);
 		
 		i++;
 		goto l_Test;

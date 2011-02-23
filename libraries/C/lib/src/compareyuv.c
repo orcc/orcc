@@ -222,17 +222,17 @@ void Compare_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	while (1) {
-		if (fifo_i16_has_tokens(Compare_WIDTH, 1) && fifo_i16_has_tokens(Compare_HEIGHT, 1)) {
+		if (fifo_i16_has_tokens(Compare_WIDTH, 0, 1) && fifo_i16_has_tokens(Compare_HEIGHT, 0, 1)) {
 			short *ptr, width, height;
 			i16 Compare_HEIGHT_buf[1], Compare_WIDTH_buf[1];
 
-			ptr = fifo_i16_read(Compare_WIDTH, Compare_WIDTH_buf, 1);
+			ptr = fifo_i16_read(Compare_WIDTH, Compare_WIDTH_buf, 0, 1);
 			width = ptr[0] * 16;
-			fifo_i16_read_end(Compare_WIDTH, 1);
+			fifo_i16_read_end(Compare_WIDTH, 0, 1);
 
-			ptr = fifo_i16_read(Compare_HEIGHT, Compare_HEIGHT_buf, 1);
+			ptr = fifo_i16_read(Compare_HEIGHT, Compare_HEIGHT_buf, 0, 1);
 			height = ptr[0] * 16;
-			fifo_i16_read_end(Compare_HEIGHT, 1);
+			fifo_i16_read_end(Compare_HEIGHT, 0, 1);
 
 			if (init == 1) {
 				Compare_init(width, height);
@@ -242,10 +242,10 @@ void Compare_scheduler(struct schedinfo_s *si) {
 			i++;
 		}
 
-		if (fifo_i8_has_tokens(Compare_B, 384) && init == 0) {
+		if (fifo_i8_has_tokens(Compare_B, 0, 384) && init == 0) {
 			i8 Compare_B_buf[384];
-			Compare_write_mb(fifo_i8_read(Compare_B, Compare_B_buf, 384));
-			fifo_i8_read_end(Compare_B, 384);
+			Compare_write_mb(fifo_i8_read(Compare_B, Compare_B_buf, 0, 384));
+			fifo_i8_read_end(Compare_B, 0, 384);
 			i++;
 		} else {
 			break;

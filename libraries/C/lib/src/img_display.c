@@ -87,17 +87,17 @@ static void read_pixel() {
 		SDL_LockSurface(m_image);
 	}
 
-	ptr = fifo_i8_read(img_display_RED, img_display_RED_buf, 1);
+	ptr = fifo_i8_read(img_display_RED, img_display_RED_buf, 0, 1);
 	red = ptr[0];
-	fifo_i8_read_end(img_display_RED, 1);
+	fifo_i8_read_end(img_display_RED, 0, 1);
 
-	ptr = fifo_i8_read(img_display_GREEN, img_display_GREEN_buf, 1);
+	ptr = fifo_i8_read(img_display_GREEN, img_display_GREEN_buf, 0, 1);
 	green = ptr[0];
-	fifo_i8_read_end(img_display_GREEN, 1);
+	fifo_i8_read_end(img_display_GREEN, 0, 1);
 
-	ptr = fifo_i8_read(img_display_BLUE, img_display_BLUE_buf, 1);
+	ptr = fifo_i8_read(img_display_BLUE, img_display_BLUE_buf, 0, 1);
 	blue = ptr[0];
-	fifo_i8_read_end(img_display_BLUE, 1);
+	fifo_i8_read_end(img_display_BLUE, 0, 1);
 
 	pixel = (red << format->Rshift) & format->Rmask
 		| (green << format->Gshift) & format->Gmask
@@ -116,21 +116,21 @@ void img_display_scheduler(struct schedinfo_s *si) {
 	int ports = 0x1f; // FIFOs connected to first five input ports are empty
 
 	int i = 0;
-	if (fifo_i16_has_tokens(img_display_WIDTH, 1) && fifo_i16_has_tokens(img_display_HEIGHT, 1)) {
+	if (fifo_i16_has_tokens(img_display_WIDTH, 0, 1) && fifo_i16_has_tokens(img_display_HEIGHT, 0, 1)) {
 		i16 img_display_HEIGHT_buf[1], img_display_WIDTH_buf[1];
-		short *ptr = fifo_i16_read(img_display_HEIGHT, img_display_HEIGHT_buf, 1);
+		short *ptr = fifo_i16_read(img_display_HEIGHT, img_display_HEIGHT_buf, 0, 1);
 		m_height = ptr[0];
-		fifo_i16_read_end(img_display_HEIGHT, 1);
+		fifo_i16_read_end(img_display_HEIGHT, 0, 1);
 
-		ptr = fifo_i16_read(img_display_WIDTH, img_display_WIDTH_buf, 1);
+		ptr = fifo_i16_read(img_display_WIDTH, img_display_WIDTH_buf, 0, 1);
 		m_width = ptr[0];
-		fifo_i16_read_end(img_display_WIDTH, 1);
+		fifo_i16_read_end(img_display_WIDTH, 0, 1);
 
 		img_display_initialize();
 	}
 
 	while (idx_pixel < m_count) {
-		if (fifo_i8_has_tokens(img_display_RED, 1) && fifo_i8_has_tokens(img_display_GREEN, 1) && fifo_i8_has_tokens(img_display_BLUE, 1)) {
+		if (fifo_i8_has_tokens(img_display_RED, 0, 1) && fifo_i8_has_tokens(img_display_GREEN, 0, 1) && fifo_i8_has_tokens(img_display_BLUE, 0, 1)) {
 			read_pixel();
 			i++;
 		} else {
