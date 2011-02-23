@@ -379,7 +379,7 @@ public class StaticGraphAnalyzer {
 			
 			//Set connections to add 
 			srcConnections.addAll(inConnections);
-			srcConnections.addAll(outConnections);
+			dstConnections.addAll(outConnections);
 		}
 		
 		// Remove source vertices
