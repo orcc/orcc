@@ -64,10 +64,10 @@ endif>
 
 printSignals(inputs, outputs) ::= <<
 <if(!inputs.empty)
-><network.incomingMap.(instance):printInSignals()><
+><network.incomingMap.(instance).values: printInSignals()><
 endif><
 if(!outputs.empty)
-><outgoingMap.(instance) : printOutSignals()><
+><outgoingMap.(instance).values: printOutSignals()><
 endif>
 >>
 
@@ -178,8 +178,8 @@ checkNetworkOrActors(instance) ::= <<
                  <
 elseif (instance.network)
 ><printInstances(name=instance.network.name,
-				 inputs=instance.broadcast.inputs.list,
-                 outputs=instance.broadcast.outputs.list)>
+				 inputs=instance.network.inputs.list,
+                 outputs=instance.network.outputs.list)>
                  
                  <
 endif>
@@ -191,13 +191,13 @@ printInstances(name, inputs, outputs) ::= <<
   port map (
 <if(!inputs.empty)
 >
-    <network.incomingMap.(instance):{connection | <printInputs(connection=connection, map=network.predecessorsMap.(instance), 
+    <network.incomingMap.(instance).values: {connection | <printInputs(connection=connection, map=network.predecessorsMap.(instance), 
 															vmap=network.sourceMap.(connection))>}; separator="\n">
 <
 endif><
 if(!outputs.empty)
 >
-    <outgoingMap.(instance) : {connection | <printOutputs(connection=connection, map=network.successorsMap.(instance), 
+    <outgoingMap.(instance).values: {connection | <printOutputs(connection=connection, map=network.successorsMap.(instance), 
 															vmap=network.targetMap.(connection))>}; separator="\n">
 <
 endif>
