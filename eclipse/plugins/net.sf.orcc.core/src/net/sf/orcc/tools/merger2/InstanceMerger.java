@@ -30,6 +30,7 @@ package net.sf.orcc.tools.merger2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.ir.Action;
@@ -42,6 +43,7 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -71,11 +73,11 @@ public class InstanceMerger {
 	}
 
 	private void addActorProperty(Actor actor) {
-		parameters.putAll(actor.getParameters());
+	/*	parameters.putAll(actor.getParameters());
 		stateVars.putAll(actor.getStateVars());
 		procs.putAll(actor.getProcs());
 		initializes.addAll(actor.getInitializes());
-		actions.addAll(actor.getActions());
+		actions.addAll(actor.getActions());*/
 
 	}
 
@@ -126,13 +128,23 @@ public class InstanceMerger {
 			Vertex vertex2 = vertices.get(1);
 
 			// Create a composite actor
-			Actor newActor = createActor(vertex1, vertex2);
-
+			Actor composite = createActor(vertex1, vertex2);
+			
 			// Create the merged instance
-			Instance newInstance = new Instance("Merged" + nMerged++,
-					newActor.getName());
-
-			return new Vertex(newInstance);
+			Instance compositeInst = new Instance("Merged" + nMerged++,
+					composite.getName());
+			compositeInst.setContents(composite);
+			
+			
+			//Add attributes to the new vertex
+			Instance instance1 = vertex1.getInstance();
+			Instance instance2 = vertex2.getInstance();
+			Map<String, IAttribute> attributes = compositeInst.getAttributes();
+			
+			attributes.putAll(instance1.getAttributes());
+			attributes.putAll(instance2.getAttributes());
+			
+			return new Vertex(compositeInst);
 		}
 
 		return null;

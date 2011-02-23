@@ -58,7 +58,7 @@ public class NetworkMerger implements INetworkTransformation {
 			
 			//Get an Instance to merge
 			Vertex vertex1 = staticGraph.getSinglyConnectedVertex().get(0);
-			Vertex vertex2 =staticGraph.getStaticNeighbors(vertex1).get(0);
+			Vertex vertex2 = staticGraph.getStaticNeighbors(vertex1).get(0);
 			
 			//Create list of instance to merge
 			vertices.add(vertex1);
@@ -66,7 +66,7 @@ public class NetworkMerger implements INetworkTransformation {
 			
 			//Transform network
 			Vertex mergedVertex = merger.getEquivalentVertices(vertices);
-			staticGraph.updateVertices(vertices, mergedVertex);
+			staticGraph.mergeVertices(vertices, mergedVertex);
 		}
 	}
 

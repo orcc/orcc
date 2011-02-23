@@ -59,7 +59,7 @@ import org.jgrapht.graph.DefaultEdge;
  */
 public class StaticGraphAnalyzer {
 	/**
-	 * This class represents a static edge with a production and a comsuption.
+	 * This class represents a static edge with a production and a consumption.
 	 * 
 	 * 
 	 * @author Jérôme Gorin
@@ -111,20 +111,9 @@ public class StaticGraphAnalyzer {
 	public StaticGraphAnalyzer(Network network) {
 		// Initialize analyzer variables
 		dynamicGraph = network.getGraph();
-		graph = new DefaultDirectedGraph<Vertex, StaticEdge>(StaticEdge.class);
-		adjacentVertices = new HashMap<Vertex, LinkedHashSet<Vertex>>();
-
-		// Compute every successor of vertex from dynamic graph
-		setAdjacentVertices();
-
-		// Add all static vertex in the static graph
-		addStaticVertex();
-
-		// Find static edge in the graph
-		addStaticEdge();
 
 		// Calculate properties of the static graph
-		updateGraph();
+		computeStaticGraph();
 	}
 
 	/**
@@ -289,6 +278,17 @@ public class StaticGraphAnalyzer {
 		return singlyConnectedVertex.size() != 0;
 	}
 
+	public void mergeVertices(List<Vertex> srcVertices, Vertex dstVertex) {
+		// Add the destination vertex in network
+		addVertex(dstVertex);
+
+		// Update connections
+		updateNetwork(srcVertices, dstVertex);
+		
+		//Update resulting graph
+		computeStaticGraph();
+	}
+
 	/**
 	 * Remove isolated static instances
 	 */
@@ -359,10 +359,44 @@ public class StaticGraphAnalyzer {
 		staticEdge.setTargetRate(consumption);
 	}
 
+	private void updateNetwork(List<Vertex> srcVertices, Vertex dstVertex) {
+		List<Connection> srcConnections;
+		List<Connection> dstConnections;
+		
+		//Check connections of the source vertices to keep
+		for (Vertex vertex : srcVertices) {
+			Set<Connection> incomingEdges = dynamicGraph
+					.incomingEdgesOf(vertex);
+			Set<Connection> outgoingEdges = dynamicGraph
+					.outgoingEdgesOf(vertex);
+
+			srcConnections = checkInput(incomingEdges, dstVertex);
+			dstConnections = checkOutput(outgoingEdges, dstVertex);
+		}
+		
+		// Remove source vertices
+		for (Vertex vertex : srcVertices) {
+			removeVertex(vertex);
+		}
+	}
+
 	/**
 	 * Remove isolated static vertices and classify connected static vertices.
 	 */
-	public void updateGraph() {
+	public void computeStaticGraph() {
+		//Clear previous computed graph
+		graph = new DefaultDirectedGraph<Vertex, StaticEdge>(StaticEdge.class);
+		adjacentVertices = new HashMap<Vertex, LinkedHashSet<Vertex>>();
+		
+		// Compute every successor of vertex from dynamic graph
+		setAdjacentVertices();
+
+		// Add all static vertex in the static graph
+		addStaticVertex();
+
+		// Find static edge in the graph
+		addStaticEdge();
+		
 		// Remove unconnected static vertex
 		removeSingleInstances();
 
@@ -370,23 +404,51 @@ public class StaticGraphAnalyzer {
 		classifyConnections();
 	}
 
-	public void updateVertices(List<Vertex> vertices, Vertex equivalentVertex) {
-		Instance eqInstance = equivalentVertex.getInstance();
-		Actor eqActor = eqInstance.getActor();
-		OrderedMap<String, Port> eqInputs = eqActor.getInputs();
-		OrderedMap<String, Port> eqOutputs = eqActor.getOutputs();
-		addVertex(equivalentVertex);
+	private List<Connection> checkInput(Set<Connection> connections, Vertex vertex) {
+		//Get inputs of the destination vertex
+		Instance instance = vertex.getInstance();
+		Actor actor = instance.getActor();
+		OrderedMap<String, Port> inputs = actor.getInputs();
 
-		for (Vertex vertex : vertices) {
-			Instance instance = vertex.getInstance();
-
-			Actor actor = instance.getActor();
-			removeVertex(vertex);
-		}
-	}
-	
-	private void updateConnections(){
+		//List of Connections to keep
+		List<Connection> srcConnections = new ArrayList<Connection>();
 		
+		for (Connection connection : connections) {
+			//Get target port name of this connection
+			Port target = connection.getTarget();
+			String name = target.getName();
+
+			if (inputs.contains(name)) {
+				//Target must be connected to the merged instance
+				srcConnections.add(connection);
+			}
+		}
+		
+		return srcConnections;
+	}
+
+	private List<Connection> checkOutput(Set<Connection> connections, Vertex vertex) {		
+		
+		//Get outputs of the destination vertex
+		Instance instance = vertex.getInstance();
+		Actor actor = instance.getActor();
+		OrderedMap<String, Port> outputs = actor.getOutputs();
+		
+		//List of Connections to keep
+		List<Connection> dstConnections = new ArrayList<Connection>();
+
+		for (Connection connection : connections) {
+			//Get source port name of this connection
+			Port target = connection.getSource();
+			String name = target.getName();
+
+			if (outputs.contains(name)) {
+				//Source must be connected to the merged instance
+				dstConnections.add(connection);
+			}
+		}
+		
+		return dstConnections;
 	}
 
 }
