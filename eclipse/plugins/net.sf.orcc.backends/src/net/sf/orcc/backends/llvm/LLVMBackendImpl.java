@@ -37,8 +37,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
@@ -210,12 +212,14 @@ public class LLVMBackendImpl extends AbstractBackend {
 			cmdList.add("-a");
 		}
 
-		// Add list of actor
+			
+		// Add list of package requiered
+		Set<String> packages = new HashSet<String>();
 		for (Actor actor : actors) {
-			if (!actor.isNative()) {
-				cmdList.add(actor.getName());
-			}
+			String firstPackage = actor.getPackageAsList().get(0);
+			packages.add(firstPackage);
 		}
+		cmdList.addAll(packages);
 
 		String[] cmd = cmdList.toArray(new String[] {});
 
