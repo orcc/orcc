@@ -94,18 +94,10 @@ static void sched_add_predecessors(struct scheduler_s *sched,
 		struct actor_s *actor, int ports) {
 	int i, n;
 	n = actor->num_inputs;
-	if (ports == 0) {
-		// add all predecessors. workaround for parseheaders
-		for (i = 0; i < n; i++) {
+	for (i = 0; i < n; i++) {
+		if ((ports & (1 << i)) != 0) {
 			struct actor_s *pred = actor->predecessors[i];
 			sched_add_schedulable(sched, pred);
-		}
-	} else {
-		for (i = 0; i < n; i++) {
-			if ((ports & (1 << i)) != 0) {
-				struct actor_s *pred = actor->predecessors[i];
-				sched_add_schedulable(sched, pred);
-			}
 		}
 	}
 }

@@ -392,7 +392,7 @@ int ports = 0;
 <pattern.keys: printInputPatternPort(); separator="\n">
 si-\>num_firings = i;
 si-\>reason = starved;
-si-\>ports = ports;
+si-\>ports |= ports;
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 <printCloseFiles()>
 <endif>
@@ -464,6 +464,7 @@ void <instance.id>_outside_FSM_scheduler(struct schedinfo_s *si) {
 
 void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
+	si-\>ports = 0;
 
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 	<printOpenFiles()>
@@ -571,6 +572,7 @@ void <instance.id>_initialize(struct schedinfo_s *si) {
 <else>
 void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
+	si-\>ports = 0;
 
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 	<printOpenFiles()>
