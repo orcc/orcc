@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-02-21
+-- Last update: 2011-02-22
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -53,21 +53,19 @@ use work.orcc_package.all;
 
 entity DP_genericRam is
   generic (
-    depth     : integer  := 32;
-    width     : integer  := 32);
+    depth : integer := 32;
+    width : integer := 16);
   port (
     clk        : in  std_logic;
     --
     wren_p1    : in  std_logic;
     address_p1 : in  std_logic_vector(bit_width(depth)-1 downto 0);
     data_p1    : in  std_logic_vector(width -1 downto 0);
-    rden_p1    : in  std_logic;
     q_p1       : out std_logic_vector(width -1 downto 0);
     --
     wren_p2    : in  std_logic;
     address_p2 : in  std_logic_vector(bit_width(depth)-1 downto 0);
     data_p2    : in  std_logic_vector(width -1 downto 0);
-    rden_p2    : in  std_logic;
     q_p2       : out std_logic_vector(width -1 downto 0));
 end DP_genericRam;
 
@@ -81,15 +79,22 @@ architecture arch_DP_genericRam of DP_genericRam is
   -- Internal type declarations
   -----------------------------------------------------------------------------
 
-  type ram_type is array (depth -1 downto 0) of
+  type ram_type is array (0 to depth -1) of
     std_logic_vector(width -1 downto 0);
 
   -----------------------------------------------------------------------------
   -- Internal signal declarations
   -----------------------------------------------------------------------------
-  shared variable ram : ram_type;
-  signal iaddress_p1  : integer range DEPTH - 1 downto 0;
-  signal iaddress_p2  : integer range DEPTH - 1 downto 0;
+  shared variable ram : ram_type := (x"00", x"01", x"02", x"03",
+                                     x"04", x"05", x"06", x"07",
+                                     x"08", x"09", x"0A", x"0B",
+                                     x"0C", x"0D", x"0E", x"0F",
+                                     x"10", x"11", x"12", x"13",
+                                     x"14", x"15", x"16", x"17",
+                                     x"18", x"19", x"1A", x"1B",
+                                     x"1C", x"1D", x"1E", x"1F");
+  signal iaddress_p1 : integer range DEPTH - 1 downto 0;
+  signal iaddress_p2 : integer range DEPTH - 1 downto 0;
   --
   -----------------------------------------------------------------------------
   
@@ -98,45 +103,31 @@ begin
   iaddress_p1 <= to_integer(unsigned(address_p1));
   iaddress_p2 <= to_integer(unsigned(address_p2));
 
-                                        -- read data processes
-  rdData_p1 : process (data_p1, iaddress_p1, wren_p1)
-  begin
-    if (wren_p1 = '0') then
-      q_p1 <= ram(iaddress_p1);
-    else
-      q_p1 <= data_p1;
-    end if;
-  end process rdData_p1;
-
-  rdData_p2 : process (data_p2, iaddress_p2, wren_p2)
-  begin
-    if (wren_p2 = '0') then
-      q_p2 <= ram(iaddress_p2);
-    else
-      q_p2 <= data_p2;
-    end if;
-  end process rdData_p2;
-
-
-                                        -- write data processes
-  wrData_p1 : process (clk)
+                                        -- read and write data processes
+  rdwrData_p1 : process (clk)
   begin
     if rising_edge(clk) then
       --
       if (wren_p1 = '1') then
         ram(iaddress_p1) := data_p1;
+        q_p1             <= data_p1;
+      else
+        q_p1 <= ram(iaddress_p1);
       end if;
     end if;
-  end process wrData_p1;
+  end process rdwrData_p1;
 
-  wrData_p2 : process (clk)
+  rdwrData_p2 : process (clk)
   begin
     if rising_edge(clk) then
       if (wren_p2 = '1') then
         ram(iaddress_p2) := data_p2;
+        q_p2             <= data_p2;
+      else
+        q_p2 <= ram(iaddress_p2);
       end if;
     end if;
-  end process wrData_p2;
+  end process rdwrData_p2;
 
 
 end arch_DP_genericRam;

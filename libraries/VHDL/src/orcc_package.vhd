@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-09-28
+-- Last update: 2011-02-22
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ package body orcc_package is
   function bit_width (op1 : integer) return integer is
     variable arg1 : integer := 0;
   begin
-    while 2**arg1 <= op1 loop
+    while 2**arg1 < op1 loop
       arg1 := arg1 + 1;
     end loop;
     return arg1;
