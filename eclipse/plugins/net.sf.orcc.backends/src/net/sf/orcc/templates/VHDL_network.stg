@@ -197,8 +197,8 @@ printInstances(name, inputs, outputs) ::= <<
 endif><
 if(!outputs.empty)
 >
-    <outgoingMap.(instance).values: {connection | <printOutputs(connection=connection, map=network.successorsMap.(instance), 
-															vmap=network.targetMap.(connection))>}; separator="\n">
+    <outgoingMap.(instance).values: {connections|<connections:{connection | <printOutputs(connection=connection, map=network.successorsMap.(instance), 
+															vmap=network.targetMap.(connection))>}; separator="\n">}; separator="\n">
 <
 endif>
     clock     =\> clock, 
@@ -271,7 +271,7 @@ broadcast_<name> : entity work.broadcast
     size  =\> <instance.broadcast.numOutputs>)
   port map (
 <if(!inputs.empty)>
-    <network.incomingMap.(instance):{connection | <printInputs(connection=connection, map=network.predecessorsMap.(instance), 
+    <network.incomingMap.(instance).values:{connection | <printInputs(connection=connection, map=network.predecessorsMap.(instance), 
 															vmap=network.sourceMap.(connection))>}; separator="\n">
 <endif>
 <if(!outputs.empty)>
