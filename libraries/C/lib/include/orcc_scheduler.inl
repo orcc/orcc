@@ -95,7 +95,7 @@ static void sched_add_predecessors(struct scheduler_s *sched,
 	int i, n;
 	n = actor->num_inputs;
 	for (i = 0; i < n; i++) {
-		if ((ports & (1 << i)) != 0) {
+		if ((ports & (1 << i)) != 0 && actor->predecessors[i] != NULL) {
 			struct actor_s *pred = actor->predecessors[i];
 			sched_add_schedulable(sched, pred);
 		}
@@ -107,7 +107,7 @@ static void sched_add_successors(struct scheduler_s *sched,
 	int i, j, n;
 	n = actor->num_outputs;
 	for (i = 0; i < n; i++) {
-		if ((ports & (1 << i)) != 0) {
+		if ((ports & (1 << i)) != 0 && actor->successors[i] != NULL) {
 			for (j = 0; j < actor->num_successors[i]; j++) {
 				struct actor_s *succ = actor->successors[i][j];
 				sched_add_schedulable(sched, succ);

@@ -85,7 +85,11 @@ declareBroadcasts(instances) ::= <<
 // Declare predecessors and successors
 
 neighbour(instance) ::= <<
-&<GetInstanceId(instance)>
+<if(instance.actor || instance.broadcast)
+  >&<GetInstanceId(instance)
+><else
+  >NULL<
+endif>
 >>
 
 predecessors(map, ports) ::= <<
