@@ -8,16 +8,8 @@ listSize(values) ::= <<
 <values : {value | [<value>]} >
 >>
 
-varDecl(variable) ::= <<
-<
-if(variable.port)
-><if (variable.instruction.write)><variable.type> <variable>_buf<listSize(variable.type.dimensions)>;
-<
-endif><variable.type> *<variable><
-else
-><variable.type> <variable><listSize(variable.type.dimensions)><
-endif
->
+varDecl(variable, sep="") ::= <<
+<if(!variable.port)><variable.type> <variable.name><listSize(variable.type.dimensions)><sep><endif>
 >>
 
 getPortName(port) ::= <<
@@ -117,20 +109,15 @@ endif>
 
 printLoad(load) ::= <<
 
-<load.target> = <load.source><load.indexes : {index | [<index>]}>;
+<if (load.source.variable.port && !load.indexes.empty)
+><load.target> = tokens_<load.source.variable.instruction.port.name>[index_<load.source.variable.instruction.port.name> % SIZE_<load.source.variable.instruction.port.name> + <first(load.indexes)>];<
+else
+><load.target> = <load.source><load.indexes : {index | [<index>]}>;<endif>
 >>
 
-printPeek(peek) ::= <<
+printPeek(peek) ::= ""
 
-<peek.target> = &tokens_<peek.port.name>[index_<peek.port.name>];
->>
-
-printRead(read) ::= <<
-
-<if (read.target)
-><read.target> = &tokens_<read.port.name>[index_<read.port.name>];
-<endif>
->>
+printRead(read) ::= ""
 
 printReadEnd(readEnd) ::= <<
 
@@ -154,13 +141,13 @@ endif>
 
 printStore(store) ::= <<
 
-<store.target><store.indexes : {index | [<index>]}> = <store.value>;
+<if (store.target.port && !store.indexes.empty)
+>tokens_<store.target.instruction.port.name>[index_<store.target.instruction.port.name> % SIZE_<store.target.instruction.port.name> + <first(store.indexes)>] = <store.value>;<
+else
+><store.target><store.indexes : {index | [<index>]}> = <store.value>;<endif>
 >>
 
-printWrite(write) ::= <<
-
-<write.target> = fifo<printMedium(write.port)>_<write.port.type>_write(<instance.id>_<write.port>, <write.target>_buf, <write.numTokens>);
->>
+printWrite(write) ::= ""
 
 printWriteEnd(writeEnd) ::= <<
 <if(options.("net.sf.orcc.backends.enableTrace"))>
@@ -172,7 +159,7 @@ printWriteEnd(writeEnd) ::= <<
 }
 <endif>
 
-fifo<printMedium(writeEnd.port)>_<writeEnd.port.type>_write_end(<instance.id>_<writeEnd.port>, <writeEnd.target>_buf, <writeEnd.numTokens>);
+index_<writeEnd.port.name> += <writeEnd.numTokens>;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -230,13 +217,13 @@ while (<whileNode.value>) {
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
 
-procedure(procedure) ::= <<
+printProcedure(procedure) ::= <<
 <if(!procedure.native)>
 
 static <procedure.returnType> <procedure>(<
-  procedure.parameters.list: {param | <varDecl(param)>}; wrap, anchor, separator=", ">) {
+  procedure.parameters.list: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">) {
 <if(procedure.locals.list)>
-	<procedure.locals.list: {local | <varDecl(local)>;<\n>}>
+	<procedure.locals.list: {local | <varDecl(variable=local,sep=";\n")>}>
 <endif>
 	<printNodes(procedure.nodes)>
 }
@@ -249,7 +236,7 @@ static <procedure.returnType> <procedure>(<
 ///////////////////////////////////////////////////////////////////////////////
 
 printAction(action) ::= <<
-<procedure(action.body)><procedure(action.scheduler)>
+<printProcedure(action.body)><printProcedure(action.scheduler)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -257,7 +244,7 @@ printAction(action) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printOutputPatternPort(port) ::= <<
-if (!fifo<printMedium(port)>_<port.type>_has_room(<instance.id>_<port>, <pattern.(port)>)) {
+if (index_<port.name> + <pattern.(port)> \> numFree_<port.name>) {
 	ports |= 0x0<instance.actor.templateData.maskOutputs.(port)>;
 }
 >>
@@ -269,39 +256,50 @@ if (ports != 0) {
 >>
 
 checkInputPattern(pattern) ::= <<
-<pattern.keys: { port | index_<port.name> \<= numTokens_<port.name> - <pattern.(port)> && }>
+<pattern.keys: { port | index_<port.name> + <pattern.(port)> \<= numTokens_<port.name> && }>
 >>
 
-printGetTokensFunction(port) ::= <<
+printReadTokensFunction(port) ::= <<
 
 
-static void get_tokens_<port.name>() {
-	int numTokensPresent = fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, <getFifoId(port,instance)>);
-	if (numTokensPresent \> 0) {
-		if (numTokens_<port.name> \> 0 && index_<port.name> \> 0) {
-			numTokens_<port.name> -= index_<port.name>;
-			memmove(&tokens_<port.name>[0], &tokens_<port.name>[index_<port.name>], numTokens_<port.name> * sizeof(<port.type>));
-			index_<port.name> = 0;
-		}
-
-		if (numTokens_<port.name> + numTokensPresent \> SIZE_<port.name>) {
-			numTokensPresent = SIZE_<port.name> - numTokens_<port.name>;
-		}
-		if (numTokensPresent \> 0) {
-			fifo<printMedium(port)>_<port.type>_read_copy(<getPortName(port)>, &tokens_<port.name>[numTokens_<port.name>], <getFifoId(port,instance)>, numTokensPresent);
-			fifo<printMedium(port)>_<port.type>_read_end(<getPortName(port)>, <getFifoId(port,instance)>, numTokensPresent);
-			numTokens_<port.name> += numTokensPresent;
-		}
+static void read_<port.name>() {
+	index_<port.name> = 0;
+	numTokens_<port.name> = fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, <getFifoId(port,instance)>);
+	if (numTokens_<port.name> \> 0) {
+		tokens_<port.name> = fifo<printMedium(port)>_<port.type>_read(<getPortName(port)>, buf_<port.name>, <getFifoId(port,instance)>, numTokens_<port.name>);
 	}
+}
+
+static void read_end_<port.name>() {
+	fifo<printMedium(port)>_<port.type>_read_end(<getPortName(port)>, <getFifoId(port,instance)>, index_<port.name>);
 }
 >>
 
-printGetTokensFunctions() ::= <<
-<instance.actor.inputs.list: printGetTokensFunction()>
+printWriteTokensFunction(port) ::= <<
+
+
+static void write_<port.name>() {
+	index_<port.name> = 0;
+	numFree_<port.name> = fifo<printMedium(port)>_<port.type>_get_room(<getPortName(port)>);
+	if (numFree_<port.name> \> 0) {
+		tokens_<port.name> = fifo<printMedium(port)>_<port.type>_write(<getPortName(port)>, buf_<port.name>, numFree_<port.name>);
+	}
+}
+
+static void write_end_<port.name>() {
+	fifo<printMedium(port)>_<port.type>_write_end(<getPortName(port)>, buf_<port.name>, index_<port.name>);
+}
 >>
 
-printGetTokens() ::= <<
-<instance.actor.inputs.list: {port|get_tokens_<port.name>();
+printTokensFunctions() ::= <<
+<instance.actor.inputs.list: printReadTokensFunction()>
+<instance.actor.outputs.list: printWriteTokensFunction()>
+>>
+
+printCallTokenFunctions() ::= <<
+<instance.actor.inputs.list: {port|read_<port.name>();
+}>
+<instance.actor.outputs.list: {port|write_<port.name>();
 }>
 >>
 
@@ -334,7 +332,7 @@ if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 		<printCloseFiles()>
 <endif>
-		return;
+		goto finished;
 	}
 	<endif>
 	<action.body>();
@@ -350,7 +348,7 @@ printActions(actions) ::= <<
 else
 ><printTransitionPattern(pattern=instance.actor.templateData.inputPattern,
 	maskInputs=instance.actor.templateData.maskInputs)>
-return;<
+goto finished;<
 endif>
 >>
 
@@ -371,10 +369,10 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 		si-\>num_firings = i;
 		si-\>reason = full;
 		si-\>ports = ports;
-		<if(options.("net.sf.orcc.backends.enableTrace"))>
+<if(options.("net.sf.orcc.backends.enableTrace"))>
 		<printCloseFiles()>
-		<endif>
-		return;
+<endif>
+		goto finished;
 	}
 	<endif>
 	<state.action.body>();
@@ -387,7 +385,6 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 
 printInputPatternPort(port) ::= <<
 if (index_<port.name> \> numTokens_<port.name> - <pattern.(port)>) {
-	// get_tokens_<port.name>();
 	ports |= 0x0<maskInputs.(port)>;
 }
 >>
@@ -410,7 +407,7 @@ else
 ><printTransitionPattern(pattern=instance.actor.templateData.transitionPattern.(transition),
 	maskInputs=instance.actor.templateData.maskInputs)>
 _FSM_state = my_state_<transition.sourceState>;
-return;<
+goto finished;<
 endif>
 >>
 
@@ -464,6 +461,10 @@ void <instance.id>_outside_FSM_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	<printActionLoop(actions)>
+
+finished:
+	// no read_end/write_end here!
+	return;
 }
 <endif>
 
@@ -471,7 +472,7 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 	si-\>ports = 0;
 
-	<printGetTokens()>
+	<printCallTokenFunctions()>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 	<printOpenFiles()>
 <endif>
@@ -481,6 +482,9 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 
 	// FSM transitions
 <fsm.transitions: printTransition()>
+finished:
+	read_end();
+	write_end();
 }
 
 >>
@@ -510,6 +514,26 @@ printFifoSize(size) ::= <<
 <if(size)><size><else>SIZE<endif>
 >>
 
+printInputPort(port) ::= <<
+static unsigned int index_<port.name>;
+static unsigned int numTokens_<port.name>;
+#define SIZE_<port.name> <printFifoSize(network.incomingMap.(instance).(port).size)>
+static <port.type> buf_<port.name>[SIZE_<port.name> + 1];
+static <port.type> *tokens_<port.name>;
+
+
+>>
+
+printOutputPort(port) ::= <<
+static unsigned int index_<port.name>;
+static unsigned int numFree_<port.name>;
+#define SIZE_<port.name> <printFifoSize(first(network.outgoingMap.(instance).(port)).size)>
+static <port.type> buf_<port.name>[SIZE_<port.name> + 1];
+static <port.type> *tokens_<port.name>;
+
+
+>>
+
 instance(instance, network, options) ::= <<
 // Source file is "<instance.actor.file>"
 
@@ -527,11 +551,7 @@ instance(instance, network, options) ::= <<
 // Input FIFOs
 <instance.actor.inputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
 }>
-<instance.actor.inputs.list: { port | static int index_<port.name>;
-static int numTokens_<port.name>;
-#define SIZE_<port.name> <printFifoSize(network.incomingMap.(instance).(port).size)>
-static <port.type> tokens_<port.name>[SIZE_<port.name>];
-}>
+<instance.actor.inputs.list: printInputPort()>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 <instance.actor.inputs.list: { port | FILE *file_<port.name>;
 }>
@@ -540,6 +560,7 @@ static <port.type> tokens_<port.name>[SIZE_<port.name>];
 // Output FIFOs
 <instance.actor.outputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
 }>
+<instance.actor.outputs.list: printOutputPort()>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 <instance.actor.outputs.list: { port | FILE *file_<port.name>;
 }>
@@ -552,14 +573,24 @@ static <port.type> tokens_<port.name>[SIZE_<port.name>];
 <instance.actor.stateVars.list: stateVar()>
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-<instance.actor.procs.list: procedure()>
+<instance.actor.procs.list: printProcedure()>
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
 <instance.actor.actions: printAction()>
 
 ////////////////////////////////////////////////////////////////////////////////
-// Get tokens functions
-<printGetTokensFunctions()>
+// Token functions
+<printTokensFunctions()>
+
+static void read_end() {
+	<instance.actor.inputs.list: {port|read_end_<port.name>();
+}>
+}
+
+static void write_end() {
+	<instance.actor.outputs.list: {port|write_end_<port.name>();
+}>
+}
 
 <if(instance.actor.initializes)>
 ////////////////////////////////////////////////////////////////////////////////
@@ -568,6 +599,10 @@ static <port.type> tokens_<port.name>[SIZE_<port.name>];
 void <instance.id>_initialize(struct schedinfo_s *si) {
 	int i = 0;
 	<printActions(instance.actor.initializes)>
+
+finished:
+	// no read_end/write_end here!
+	return;
 }
 <endif>
 
@@ -580,12 +615,16 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 	si-\>ports = 0;
 
-	<printGetTokens()>
+	<printCallTokenFunctions()>
 <if(options.("net.sf.orcc.backends.enableTrace"))>
 	<printOpenFiles()>
 <endif>
 
 	<printActionLoop(instance.actor.actionScheduler.actions)>
+
+finished:
+	read_end();
+	write_end();
 }
 <endif>
 

@@ -29,12 +29,12 @@
 
 /** lock free fifo ring buffer structure */
 struct FIFO_S(T) {
-	int size; /** size of the ringbuffer */
+	unsigned int size; /** size of the ringbuffer */
 	T *contents; /** the memory containing the ringbuffer */
 	
-	int readers_nb; /** the number of fifo's readers */
-	int* read_inds; /** the current position of the reader */
-	int write_ind; /** the current position of the writer */
+	unsigned int readers_nb; /** the number of fifo's readers */
+	unsigned int* read_inds; /** the current position of the reader */
+	unsigned int write_ind; /** the current position of the writer */
 };
 
 #include "orcc_generic_fifo.inl"
