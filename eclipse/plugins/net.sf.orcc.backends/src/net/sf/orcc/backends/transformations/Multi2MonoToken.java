@@ -35,12 +35,13 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map.Entry;
 
+import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
 import net.sf.orcc.backends.vhdl.transformations.CodeMover;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -72,8 +73,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Khaled Jerbi
  * 
  */
-public class Multi2MonoToken extends AbstractActorVisitor {
-
+public class Multi2MonoToken extends ActionSplitter {
 	/**
 	 * This class defines a visitor that substitutes process variable names with
 	 * those of the newly defined actions
@@ -118,11 +118,21 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 	}
 
+	private Action done;
+
 	private Type entryType;
 
 	private int inputIndex = 0;
 
+	private int numTokens;
+
 	private Port port;
+
+	private Action process;
+
+	private boolean repeatInput = false;
+
+	private Action store;
 
 	/**
 	 * This method creates an action with the given name.
@@ -131,21 +141,79 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            name of the action
 	 * @return a new action created with the given name
 	 */
-	private Action createAction(String name) {
-		Procedure body = new Procedure(name, new Location(),
-				IrFactory.eINSTANCE.createTypeVoid());
+	private Action createAction(Expression condition, String name) {
+		// scheduler
 		Procedure scheduler = new Procedure("isSchedulable_" + name,
 				new Location(), IrFactory.eINSTANCE.createTypeBool());
+		LocalVariable result = scheduler.newTempLocalVariable(
+				this.actor.getFile(), IrFactory.eINSTANCE.createTypeBool(),
+				"result");
+		result.setIndex(1);
+		scheduler.getLocals().remove(result.getBaseName());
+		scheduler.getLocals().put(result.getName(), result);
 
-		List<String> identifiers = new ArrayList<String>();
-		identifiers.add(name);
-		Tag tag = new Tag(identifiers);
-		Location location = new Location();
-		Pattern inputPattern = new Pattern();
-		Pattern outputPattern = new Pattern();
-		Action newAction = new Action(location, tag, inputPattern,
-				outputPattern, scheduler, body);
-		return newAction;
+		BlockNode block = new BlockNode(scheduler);
+		block.add(new Assign(result, condition));
+		block.add(new Return(new VarExpr(new Use(result))));
+		scheduler.getNodes().add(block);
+
+		// body
+		Procedure body = new Procedure(name, new Location(),
+				IrFactory.eINSTANCE.createTypeVoid());
+		block = new BlockNode(body);
+		block.add(new Return(null));
+		body.getNodes().add(block);
+
+		// tag
+		Tag tag = new Tag();
+		tag.add(name);
+
+		Action action = new Action(new Location(), tag, new Pattern(),
+				new Pattern(), scheduler, body);
+
+		// add action to actor's actions
+		this.actor.getActions().add(action);
+
+		return action;
+	}
+
+	/**
+	 * This method creates the required Store, done and process actions
+	 * 
+	 * @param action
+	 *            the action getting transformed
+	 */
+	public void createActions(Action action) {
+		// itAction.remove();
+
+		for (Entry<Port, Integer> entry : action.getInputPattern().entrySet()) {
+			numTokens = entry.getValue();
+			inputIndex = inputIndex + 1;
+			port = entry.getKey();
+			entryType = entry.getKey().getType();
+
+			if (numTokens > 1) {
+				repeatInput = true;
+				String counterName = action.getName() + "NewReadCounter"
+						+ inputIndex;
+				GlobalVariable counter = createCounter(counterName);
+				String listName = action.getName() + "NewStoreList"
+						+ inputIndex;
+				GlobalVariable tab = createTab(listName, numTokens, entryType);
+
+				store = createStoreAction(action.getName(), numTokens, port,
+						counter, tab);
+				done = createDoneAction(action.getName(), counter, numTokens);
+				process = createProcessAction(action);
+
+				ModifyProcessAction modifyProcessAction = new ModifyProcessAction(
+						tab);
+				modifyProcessAction.visit(process.getBody());
+
+				// remove transformed action
+				this.actor.getActions().remove(0);
+			}
+		}
 	}
 
 	/**
@@ -179,36 +247,14 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private Action createDoneAction(String actionName, GlobalVariable counter,
 			int numTokens) {
-		Action newDoneAction = createAction(actionName + "NewDone");
+		Expression guardValue = new IntExpr(numTokens);
+		Expression counterExpression = new VarExpr(new Use(counter));
+		Expression expression = new BinaryExpr(counterExpression, BinaryOp.EQ,
+				guardValue, IrFactory.eINSTANCE.createTypeBool());
+		Action newDoneAction = createAction(expression, actionName + "NewDone");
 		defineDoneBody(counter, newDoneAction.getBody());
 		defineDoneScheduler(counter, numTokens, newDoneAction.getScheduler());
 		return newDoneAction;
-	}
-
-	/**
-	 * This method creates the required post-transformation FSM
-	 * 
-	 * @param actionName
-	 *            name of the action
-	 * @param store
-	 *            new store action
-	 * @param done
-	 *            new done action
-	 * @param process
-	 *            new process action
-	 */
-	private void createFsm(String actionName, Action store, Action done,
-			Action process) {
-		FSM fsm = new FSM();
-		String storeName = "newStateStore" + actionName;
-		String processName = "newStateProcess" + actionName;
-
-		actor.getActionScheduler().getActions().clear();
-
-		fsm.addTransition(storeName, store, storeName);
-		fsm.addTransition(storeName, done, processName);
-		fsm.addTransition(processName, process, storeName);
-		fsm.setInitialState(storeName);
 	}
 
 	/**
@@ -220,12 +266,12 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @return new process action
 	 */
 	private Action createProcessAction(Action action) {
-		Action newProcessAction = createAction("newProcess_" + action.getName());
+		Expression expression = new IntExpr(1);
+		Action newProcessAction = createAction(expression, "newProcess_"
+				+ action.getName());
 		Procedure body = newProcessAction.getBody();
-		Procedure scheduler = newProcessAction.getScheduler();
 		CodeMover codeMover = new CodeMover();
 
-		// moveBody
 		ListIterator<CFGNode> listIt = action.getBody().getNodes()
 				.listIterator();
 		codeMover.setTargetProcedure(body);
@@ -233,13 +279,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Iterator<LocalVariable> it = action.getBody().getLocals().iterator();
 		moveLocals(it, body);
 
-		// moveScheduler
-		listIt = action.getScheduler().getNodes().listIterator();
-		codeMover.setTargetProcedure(scheduler);
-		codeMover.moveNodes(listIt);
-		it = action.getScheduler().getLocals().iterator();
-		moveLocals(it, scheduler);
 		return newProcessAction;
+
 	}
 
 	/**
@@ -261,10 +302,13 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private Action createStoreAction(String actionName, int numTokens,
 			Port port, GlobalVariable readCounter, GlobalVariable storeList) {
 		String storeName = actionName + port.getName() + "_NewStore";
-		Action newStoreAction = createAction(storeName);
+
+		Expression guardValue = new IntExpr(numTokens);
+		Expression counterExpression = new VarExpr(new Use(readCounter));
+		Expression expression = new BinaryExpr(counterExpression, BinaryOp.LT,
+				guardValue, IrFactory.eINSTANCE.createTypeBool());
+		Action newStoreAction = createAction(expression, storeName);
 		defineStoreBody(port, readCounter, storeList, newStoreAction.getBody());
-		defineStoreScheduler(numTokens, readCounter,
-				newStoreAction.getScheduler());
 		return newStoreAction;
 	}
 
@@ -301,7 +345,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		Store store = new Store(readCounter, new IntExpr(0));
 		bodyNode.add(store);
-		bodyNode.add(new Return(null));
 	}
 
 	/**
@@ -326,20 +369,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		Load schedulerLoad = new Load(counter, new Use(readCounter));
 		blkNode.add(schedulerLoad);
-
-		// create result variable
-		LocalVariable result = new LocalVariable(true, 1, new Location(),
-				"result", IrFactory.eINSTANCE.createTypeBool());
-		locals.put(result.getName(), result);
-
-		// create assign to result variable
-		Expression guardValue = new IntExpr(numTokens);
-		Expression counterExpression = new VarExpr(new Use(counter));
-		Expression value = new BinaryExpr(counterExpression, BinaryOp.EQ,
-				guardValue, IrFactory.eINSTANCE.createTypeBool());
-
-		Assign assign = new Assign(result, value);
-		blkNode.add(assign);
 	}
 
 	/**
@@ -401,41 +430,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Instruction store2 = new Store(readCounter, new VarExpr(new Use(
 				counter2)));
 		bodyNode.add(store2);
-
-		Instruction returnInstruction = new Return(null);
-		bodyNode.add(returnInstruction);
-	}
-
-	/**
-	 * This method creates the instructions for the isSchedulable of the new
-	 * store action
-	 * 
-	 * @param numTokens
-	 *            isSchedulable guard condition for new store action
-	 * @param counter
-	 *            global variable counter
-	 * @param scheduler
-	 *            new store action scheduler
-	 */
-	private void defineStoreScheduler(int numTokens, GlobalVariable counter,
-			Procedure scheduler) {
-		BlockNode blkNode = BlockNode.getFirst(scheduler);
-		OrderedMap<String, LocalVariable> locals = scheduler.getLocals();
-
-		LocalVariable result = new LocalVariable(true, 1, new Location(),
-				"resultStoreScheduler", IrFactory.eINSTANCE.createTypeBool());
-		locals.put(result.getName(), result);
-		Expression guardValue = new IntExpr(numTokens);
-		Expression counterExpression = new VarExpr(new Use(counter));
-		Expression schedulerValue = new BinaryExpr(counterExpression,
-				BinaryOp.LT, guardValue, IrFactory.eINSTANCE.createTypeBool());
-		Instruction schedulerAssign = new Assign(result, schedulerValue);
-		blkNode.add(schedulerAssign);
-
-		Expression SchedulerReturnValue = new VarExpr(new Use(result));
-		Instruction schedulerReturnInstruction = new Return(
-				SchedulerReturnValue);
-		blkNode.add(schedulerReturnInstruction);
 	}
 
 	/**
@@ -456,36 +450,21 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Action action) {
-		itAction.remove();
+	public void visit(Actor actor) {
+		super.visit(actor);
+		visitAllActions();
+	}
 
-		for (Entry<Port, Integer> entry : action.getInputPattern().entrySet()) {
-			int numTokens = entry.getValue();
-			inputIndex = inputIndex + 1;
-			port = entry.getKey();
-			entryType = entry.getKey().getType();
-
-			String counterName = action.getName() + "NewReadCounter"
-					+ inputIndex;
-			GlobalVariable counter = createCounter(counterName);
-			String listName = action.getName() + "NewStoreList" + inputIndex;
-			GlobalVariable tab = createTab(listName, numTokens, entryType);
-
-			Action store = createStoreAction(action.getName(), numTokens, port,
-					counter, tab);
-			itAction.add(store);
-
-			Action done = createDoneAction(action.getName(), counter, numTokens);
-			itAction.add(done);
-
-			Action process = createProcessAction(action);
-			itAction.add(process);
-
-			ModifyProcessAction modifyProcessAction = new ModifyProcessAction(
-					tab);
-			modifyProcessAction.visit(process.getBody());
-
-			createFsm(action.getName(), store, done, process);
+	@Override
+	protected void visit(String sourceName, String targetName, Action action) {
+		createActions(action);
+		if (repeatInput) {
+			removeTransition(sourceName, action);
+			addTransition(sourceName, sourceName, store);
+			String processName = "newStateProcess" + action.getName();
+			addTransition(sourceName, processName, done);
+			addTransition(processName, sourceName, process);
 		}
 	}
+
 }
