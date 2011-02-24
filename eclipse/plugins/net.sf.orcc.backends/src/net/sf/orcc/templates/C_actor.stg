@@ -125,7 +125,7 @@ printReadEnd(readEnd) ::= <<
 {
 	int i;
 	for (i = 0; i \< <readEnd.numTokens>; i++) {
-		fprintf(file_<readEnd.port.name>, "%<printFormatType(readEnd.port.type)>\n", <readEnd.target>[i]);
+		fprintf(file_<readEnd.port.name>, "%<printFormatType(readEnd.port.type)>\n", tokens_<readEnd.port.name>[index_<readEnd.port.name> + i]);
 	}
 }
 
@@ -154,7 +154,7 @@ printWriteEnd(writeEnd) ::= <<
 {
 	int i;
 	for (i = 0; i \< <writeEnd.numTokens>; i++) {
-		fprintf(file_<writeEnd.port.name>, "%<printFormatType(writeEnd.port.type)>\n", <writeEnd.target>[i]);
+		fprintf(file_<writeEnd.port.name>, "%<printFormatType(writeEnd.port.type)>\n", tokens_<writeEnd.port.name>[index_<writeEnd.port.name> + i]);
 	}
 }
 <endif>
@@ -323,9 +323,6 @@ if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
 		si-\>num_firings = i;
 		si-\>reason = full;
 		si-\>ports = ports;
-<if(options.("net.sf.orcc.backends.enableTrace"))>
-		<printCloseFiles()>
-<endif>
 		goto finished;
 	}
 	<endif>
@@ -363,9 +360,6 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 		si-\>num_firings = i;
 		si-\>reason = full;
 		si-\>ports = ports;
-<if(options.("net.sf.orcc.backends.enableTrace"))>
-		<printCloseFiles()>
-<endif>
 		goto finished;
 	}
 	<endif>
@@ -389,9 +383,6 @@ int ports = 0;
 si-\>num_firings = i;
 si-\>reason = starved;
 si-\>ports |= ports;
-<if(options.("net.sf.orcc.backends.enableTrace"))>
-<printCloseFiles()>
-<endif>
 >>
 
 schedulingStates(states) ::= <<
@@ -477,6 +468,9 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	// FSM transitions
 <fsm.transitions: printTransition()>
 finished:
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+	<printCloseFiles()>
+<endif>
 	read_end();
 	write_end();
 }
@@ -615,6 +609,9 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	<printActionLoop(instance.actor.actionScheduler.actions)>
 
 finished:
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+	<printCloseFiles()>
+<endif>
 	read_end();
 	write_end();
 }
