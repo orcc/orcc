@@ -7,12 +7,12 @@ struct FIFO_SOCKET_S(T) {
 	SOCKET Sock;
 };
 
-DECL int FIFO_SOCKET_GET_NUM_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo, int reader_id) {
+DECL int FIFO_SOCKET_GET_NUM_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo, unsigned int reader_id) {
 	//Read socket
 	if(fifo->fill_count + 100 < fifo->size) {
 		int ret;
 		int nbBytesRead;
-		struct timeval timeout = { 0, 1 };
+		struct timeval timeout = { 1, 0 };
 
 		ret = select(fifo->Sock + 1, &(fifo->fdset), NULL, NULL, &timeout);
 		if(ret < 0)
@@ -33,26 +33,26 @@ DECL int FIFO_SOCKET_GET_NUM_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo, int reader
 	return fifo->fill_count;
 }
 
-DECL void FIFO_SOCKET_READ_COPY(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int reader_id, int n) {
+DECL void FIFO_SOCKET_READ_COPY(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, unsigned int reader_id, unsigned int n) {
 	memcpy(buffer, fifo->contents, n * sizeof(T));
 }
 
-DECL int FIFO_SOCKET_HAS_ROOM(T)(struct FIFO_SOCKET_S(T) *fifo, int n) {
+DECL int FIFO_SOCKET_HAS_ROOM(T)(struct FIFO_SOCKET_S(T) *fifo, unsigned int n) {
 	//Will be managed when we will use unblocked write in socket.
 	return (fifo->size - fifo->fill_count) >=n;
 }
 
 
-DECL T *FIFO_SOCKET_PEEK(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int n) {
+DECL T *FIFO_SOCKET_PEEK(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer,unsigned int reader_id, unsigned int n) {
 	return fifo->contents;
 }
 
 
-DECL T *FIFO_SOCKET_READ(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int n) {
+DECL T *FIFO_SOCKET_READ(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, unsigned int reader_id, unsigned int n) {
 	return fifo->contents;
 }
 
-DECL void FIFO_SOCKET_READ_END(T)(struct FIFO_SOCKET_S(T) *fifo, int reader_id, int n) {
+DECL void FIFO_SOCKET_READ_END(T)(struct FIFO_SOCKET_S(T) *fifo, unsigned int reader_id, unsigned int n) {
 	if(fifo->fill_count - n > 0) {
 		memmove(fifo->contents, &fifo->contents[n], (fifo->fill_count - n) * sizeof(T));
 		fifo->fill_count -= n;
@@ -63,12 +63,12 @@ DECL void FIFO_SOCKET_READ_END(T)(struct FIFO_SOCKET_S(T) *fifo, int reader_id, 
 }
 
 
-DECL T *FIFO_SOCKET_WRITE(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int n) {
+DECL T *FIFO_SOCKET_WRITE(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, unsigned int n) {
 	return &fifo->contents[fifo->fill_count];
 }
 
 
-DECL void FIFO_SOCKET_WRITE_END(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, int n) {
+DECL void FIFO_SOCKET_WRITE_END(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, unsigned int n) {
 	int err;
 
 	err = send(fifo->Sock, (char *) fifo->contents, n * sizeof(T), 0);
