@@ -141,12 +141,6 @@ public class AstTransformer {
 
 			// retrieve IR procedure
 			AstFunction astFunction = astCall.getFunction();
-
-			// special case if the function is a built-in function
-			if (astFunction.eContainer() == null) {
-				return transformBuiltinFunction(astCall);
-			}
-
 			if (!mapFunctions.containsKey(astFunction)) {
 				transformFunction(astFunction);
 			}
@@ -446,33 +440,6 @@ public class AstTransformer {
 		public void setTarget(Variable target, List<Expression> indexes) {
 			this.target = target;
 			this.indexes = indexes;
-		}
-
-		/**
-		 * Transforms the given function call to an expression. This method is
-		 * only called when the function is an intrinsic/built-in function (like
-		 * bitand, lshift, etc.)
-		 * 
-		 * @param astCall
-		 *            a call
-		 * @return an IR expression
-		 */
-		private Expression transformBuiltinFunction(AstExpressionCall astCall) {
-			String name = astCall.getFunction().getName();
-			if ("bitnot".equals(name)) {
-				Expression expr = transformExpression(astCall.getParameters()
-						.get(0));
-				return new UnaryExpr(UnaryOp.BITNOT, expr, expr.getType());
-			}
-
-			BinaryOp op = BinaryOp.getOperator(name);
-			if (op == null) {
-				return null;
-			}
-
-			Expression e1 = transformExpression(astCall.getParameters().get(0));
-			Expression e2 = transformExpression(astCall.getParameters().get(1));
-			return new BinaryExpr(e1, op, e2, astCall.getIrType());
 		}
 
 		/**

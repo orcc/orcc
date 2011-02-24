@@ -125,9 +125,6 @@ public class TypeChecker extends CalSwitch<Type> {
 	public Type caseAstExpressionCall(AstExpressionCall astCall) {
 		// built-in function
 		AstFunction function = astCall.getFunction();
-		if (function.eContainer() == null) {
-			return getTypeBuiltin(astCall);
-		}
 
 		// if the function has not been typed, type it
 		Type type = function.getIrType();
@@ -756,47 +753,6 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Returns the type of the given call that is supposedly to a built-in
-	 * function.
-	 * 
-	 * @param astCall
-	 *            a call to a function that is supposedly built-in
-	 * @return a type if the function called is a built-in function, or
-	 *         <code>null</code>
-	 */
-	private Type getTypeBuiltin(AstExpressionCall astCall) {
-		String name = astCall.getFunction().getName();
-		List<AstExpression> parameters = astCall.getParameters();
-		if ("bitnot".equals(name)) {
-			if (parameters.size() != 1) {
-				error("bitnot function takes exactly one parameter", astCall,
-						CalPackage.AST_EXPRESSION_CALL__FUNCTION);
-				return null;
-			}
-			Type type = getType(astCall.getParameters().get(0));
-			return type;
-		}
-
-		BinaryOp op = BinaryOp.getOperator(name);
-		if (op == null) {
-			// unknown operator
-			error("unknown " + name + "function", astCall,
-					CalPackage.AST_EXPRESSION_CALL__FUNCTION);
-			return null;
-		}
-
-		if (parameters.size() != 2) {
-			error(name + " function takes exactly two parameters", astCall,
-					CalPackage.AST_EXPRESSION_CALL__FUNCTION);
-			return null;
-		}
-
-		Type t1 = getType(astCall.getParameters().get(0));
-		Type t2 = getType(astCall.getParameters().get(1));
-		return getTypeBinary(op, t1, t2, astCall, CalPackage.AST_EXPRESSION);
 	}
 
 	/**
