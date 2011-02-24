@@ -393,6 +393,7 @@ OutputsManag() ::= <<
 <actor.outputs.list : printArbiter(); separator="\n\n">
 >>
 
+// instanciate an arbiter which manage the communication between actors.
 printArbiter(port) ::= <<
 comArbiter_<port.name> : entity work.comArbiter
 generic map (
@@ -461,7 +462,7 @@ printTemplateDataScheduler(action) ::= <<
 <procedure(procedure=action.scheduler, transformReturn="true")>
 >>
 
-
+// prints the condition on the ack and go signals according to the input and output pattern
 printActionFire(action) ::= <<
 ((isSchedulable_<action>_go <action.inputPattern.keys : {port| and <port.name>_send }>) = '1') then
 <if(action.inputPattern.keys)

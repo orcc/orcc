@@ -71,6 +71,7 @@ if(!outputs.empty)
 endif>
 >>
 
+// print internal signals when necessary
 printInSignals(connection) ::= <<
 <if (instance.broadcast)
 >
@@ -161,7 +162,6 @@ endif>
 >>
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // print actors and networks instantiation
 ///////////////////////////////////////////////////////////////////////////////
@@ -205,7 +205,13 @@ endif>
     reset_n   =\> reset_n);
 >>
 
-
+/** Print input connection of an instance according to the maps:
+ * 
+ * connection: connection of the instance (e.g. a connection between two instance)
+ * map: contains the predessor of the connection (e.g. another instance)
+ * vmap: contain the source of the connection (e.g. a port of the network)
+ * 
+ */ 
 printInputs(connection, map, vmap) ::= <<
 <if(map.(connection.target))
 ><if(map.(connection.target).broadcast)
@@ -230,6 +236,13 @@ else
 endif>
 >>
 
+/** Print output connections of an instance according to the maps:
+ * 
+ * connection: connection of the instance (e.g. a connection between two instance)
+ * map: contains the successor of the connection (e.g. another instance)
+ * vmap: contain the target of the connection (e.g. a port of the network)
+ * 
+ */ 
 printOutputs(connection, map, vmap) ::= <<
 <if(first(map.(connection.source)))
 ><if(connection.attributes)
@@ -264,6 +277,7 @@ checkBroadcast(instance) ::= <<
 endif>
 >>
 
+// Instanciate a broadcast if necessary
 printBroadcast(name, inputs, outputs) ::= <<
 broadcast_<name> : entity work.broadcast
   generic map (
@@ -303,6 +317,14 @@ printBroadcastOutputs(connections, index, network , instance, control) ::= <<
     			vmap=network.targetMap.(connection), control=control)>}; separator="\n">		
 >>
 
+/** Print output connections of a broadcast to the maps:
+ * 
+ * connection: connection of the instance (e.g. a connection between two instance)
+ * index: index of the output (e.g. 1, 2, 3, ...)
+ * map: contains the successor of the connection (e.g. an instance)
+ * vmap: contain the target of the connection (e.g. a port of the network)
+ * 
+ */ 
 printBroadcastOutput(connection, index, map, vmap, control) ::= <<
 <if(first(map.(connection.source)))
 ><if(connection.attributes)
