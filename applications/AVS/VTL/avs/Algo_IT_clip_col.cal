@@ -61,7 +61,7 @@ actor Algo_IT_clip_col( ) int X ==> int(size=9) Y :
       uint(size=7) rnd = 64
     do  	
       z := [ Clip16( x[i] + rnd ) : for int i in 0 .. 7 ];
-      y := [ rshift( z[i], 7 ) : for int i in 0 .. 7 ]; 
+      y := [ z[i] >> 7 : for int i in 0 .. 7 ]; 
       //println("clip_col="+y[0]+" "+y[1]+" "+y[2]+" "+y[3]+" "+y[4]+" "+y[5]+" "+y[6]+" "+y[7]);
     end
 

@@ -83,19 +83,19 @@ actor Algo_IS_ZigzagOrAlternative_AVSJZ (
   //bool half := false;		      //flag to change buffer
 
   function wa()--> int :
-    bitand(count,63)
-    //bitor( bitand(count,63), if half then 64 else 0 end )	//if half =0 writes to 0-63 else to 64-128
+    (count & 63)
+    //bitor( (count & 63), if half then 64 else 0 end )	//if half =0 writes to 0-63 else to 64-128
   end
 
   function ra( int address )--> int :
-    bitand(address,63)
-    //bitor( bitand(addr,63), if half then 0 else 64 end )	//if half =1 reads from 0-63 else from 64-128
+    (address & 63)
+    //bitor( (addr & 63), if half then 0 else 64 end )	//if half =1 reads from 0-63 else from 64-128
   end
 
   //if it is a new frame, then next to skip width and height cmd.
   check_new_vop: action BTYPE:[cmd] ==>
   guard
-    bitand(NEWVOP, cmd) != 0
+    (NEWVOP & cmd) != 0
   //do
     //println("IS:check_new_vop");
   end
@@ -107,8 +107,8 @@ actor Algo_IS_ZigzagOrAlternative_AVSJZ (
   // if the coeff_coded = 0 then skip IS.
   check_coeff_ncoded: action BTYPE:[cmd] ==>
   guard
-    bitand(NEWVOP,cmd) = 0,
-    bitand( COEFF_CODED, cmd) = 0
+    (NEWVOP & cmd) = 0,
+    (COEFF_CODED & cmd) = 0
   //do
     //println("IS:Coeff_coded = 0. Skip IS!");
   end
@@ -116,8 +116,8 @@ actor Algo_IS_ZigzagOrAlternative_AVSJZ (
   // if the coeff_coded = 1 then IS.
   check_coeff_coded: action BTYPE:[cmd] ==>
   guard
-    bitand(NEWVOP,cmd) = 0,
-    bitand( COEFF_CODED, cmd) != 0
+    (NEWVOP & cmd) = 0,
+    (COEFF_CODED & cmd) != 0
   //do
     //println("IS:Coeff_coded = 1");
   end						

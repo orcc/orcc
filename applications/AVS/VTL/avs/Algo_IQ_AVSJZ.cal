@@ -92,9 +92,9 @@ actor Algo_IQ_AVSJZ(
   
   get_new_qp: action BTYPE:[cmd] ==>
   guard
-    bitand(NEWVOP,cmd) != 0
+    (NEWVOP & cmd) != 0
   do
-    qp := bitand( cmd, QUANT_MASK );
+    qp := (cmd & QUANT_MASK);
     //println("qp "+qp);    
   end
 
@@ -103,8 +103,8 @@ actor Algo_IQ_AVSJZ(
 
   check_coeff_ncoded: action BTYPE:[cmd] ==>
   guard
-    bitand(NEWVOP,cmd) = 0,
-    bitand( COEFF_CODED, cmd) = 0
+    (NEWVOP & cmd) = 0,
+    (COEFF_CODED & cmd) = 0
   //do
     //println("IS:Coeff_coded = 0. Skip IS!");
   end
@@ -116,7 +116,7 @@ actor Algo_IQ_AVSJZ(
   do
     dequant := find_dequant[qp];
     shift := find_shift[qp];
-    round := lshift(1,find_shift[qp]-1);
+    round := 1 << (find_shift[qp]-1);
     count := 0;
     //println("dequant "+dequant+" shift "+shift+" round "+round);
   end
@@ -128,7 +128,7 @@ actor Algo_IQ_AVSJZ(
 
   iq: action IQ_IN:[i] ==> IT_IN:[o]
   var
-    int(size=IT_IN_SZ) o = rshift(( dequant * i + round),shift)
+    int(size=IT_IN_SZ) o = (dequant * i + round) >> shift
   do
     count := count + 1;
     //println("IQ_IN="+i);

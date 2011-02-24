@@ -287,12 +287,12 @@ actor Algo_IntraPred_LUMA_8x8_AVSJZ (
                           [ rshift(PredPixBuffer[31]  + 3*PredPixBuffer[32] + 2, 2)];
     
     */
-    PredPixBuffer_pass[0]:= rshift(3*PredPixBuffer[0] + PredPixBuffer[1] + 2, 2);
+    PredPixBuffer_pass[0]:= (3*PredPixBuffer[0] + PredPixBuffer[1] + 2) >> 2;
     foreach int x in 1 .. 31
     do
-      PredPixBuffer_pass[x]:=  rshift(PredPixBuffer[x-1] + 2*PredPixBuffer[x] + PredPixBuffer[x+1] + 2, 2);
+      PredPixBuffer_pass[x]:=  (PredPixBuffer[x-1] + 2*PredPixBuffer[x] + PredPixBuffer[x+1] + 2) >> 2;
     end
-    PredPixBuffer_pass[32]:= rshift(PredPixBuffer[31]  + 3*PredPixBuffer[32] + 2, 2);
+    PredPixBuffer_pass[32]:= (PredPixBuffer[31]  + 3*PredPixBuffer[32] + 2) >> 2;
     //println("IntraPred_Y:PredPixBuffer="+PredPixBuffer);
     //println("IntraPred_Y:PredPixBuffer_pass="+PredPixBuffer_pass);
     if mode = 0 then //vertical
@@ -317,7 +317,7 @@ actor Algo_IntraPred_LUMA_8x8_AVSJZ (
       //println("IntraPred_Y:f_y_up="+f_y_up);
 
       if left_avail = 1 and up_avail = 1 then
-        predpels := [rshift((f_y_up[i] + f_y_left[j]), 1): for int i in 0 .. 7, for int j in 0 .. 7];
+        predpels := [((f_y_up[i] + f_y_left[j]) >> 1): for int i in 0 .. 7, for int j in 0 .. 7];
       else if left_avail = 1 then
              predpels := [f_y_left[j]: for int i in 0 .. 7, for int j in 0 .. 7];	   
 	      else if up_avail = 1 then
@@ -331,7 +331,7 @@ actor Algo_IntraPred_LUMA_8x8_AVSJZ (
 
     
     if mode = 3 then //down-left
-      predpels := [rshift(( PredPixBuffer_pass[i+j+2+16] + PredPixBuffer_pass[-i-j-2+16] ), 1) : for int i in  0 .. 7, for int j in 0 .. 7];
+      predpels := [((PredPixBuffer_pass[i+j+2+16] + PredPixBuffer_pass[-i-j-2+16]) >> 1) : for int i in  0 .. 7, for int j in 0 .. 7];
       //println("IntraPred_Y:mode="+mode);
       //println("IntraPred_Y:predpels=");
     end

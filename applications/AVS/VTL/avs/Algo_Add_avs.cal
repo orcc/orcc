@@ -61,7 +61,7 @@ actor Algo_Add_avs(
   // Ignore new VOP command
   get_new_vop: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) != 0
+    (cmd & NEWVOP) != 0
   //do
     //count := 0;
     //println("Algo_Add:get_new_vop cmd="+cmd);
@@ -77,9 +77,9 @@ actor Algo_Add_avs(
   // get intra, if coefficients are all zero, skip add.
   get_intra_uncoded: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) = 0,
-    bitand( cmd, INTRA ) != 0,
-    bitand( cmd, COEFF_CODED ) = 0
+    (cmd & NEWVOP) = 0,
+    (cmd & INTRA) != 0,
+    (cmd & COEFF_CODED) = 0
   //do
     //println("Algo_Add:get_intra_uncoded");
   end
@@ -87,9 +87,9 @@ actor Algo_Add_avs(
   // get intra, if coefficients are not all zero, add RES and Pred.
   get_intra_coded: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) = 0,
-    bitand( cmd, INTRA ) != 0,
-    bitand( cmd, COEFF_CODED ) != 0
+    (cmd & NEWVOP) = 0,
+    (cmd & INTRA) != 0,
+    (cmd & COEFF_CODED) != 0
   //do
     //println("Algo_Add:get_intra_coded cmd="+cmd);
   end
@@ -97,17 +97,17 @@ actor Algo_Add_avs(
   // get intra, if coefficients are all zero, skip add.
   get_inter_uncoded: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) = 0,
-    bitand( cmd, INTER ) != 0,
-    bitand( cmd, COEFF_CODED ) = 0
+    (cmd & NEWVOP) = 0,
+    (cmd & INTER) != 0,
+    (cmd & COEFF_CODED) = 0
   end
 
   // get intra, if coefficients are not all zero, add RES and Pred.
   get_inter_coded: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) = 0,
-    bitand( cmd, INTER ) != 0,
-    bitand( cmd, COEFF_CODED ) != 0
+    (cmd & NEWVOP) = 0,
+    (cmd & INTER) != 0,
+    (cmd & COEFF_CODED) != 0
   end
   
   //if coefficients are all zero, skip add.

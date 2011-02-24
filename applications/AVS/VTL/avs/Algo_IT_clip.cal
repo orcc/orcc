@@ -60,7 +60,7 @@ actor Algo_IT_clip( bool ROW ) int X ==> int Y :
       uint(size=7) rnd = if ROW then 4 else 64 end
     do  	
       y := [ Clip16( x[i] + rnd ) : for int i in 0 .. 7 ];
-      y := [ rshift( y[i], if ROW then 3 else 7 end ) : for int i in 0 .. 7 ]; 
+      y := [ y[i] >> if ROW then 3 else 7 end : for int i in 0 .. 7 ]; 
       println("y="+y[0]+" "+y[1]+" "+y[2]+" "+y[3]+" "+y[4]+" "+y[5]+" "+y[6]+" "+y[7]);
     end
 

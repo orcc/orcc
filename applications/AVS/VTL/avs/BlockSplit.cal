@@ -48,7 +48,7 @@ actor BlockSplit (
   // atsrt a new frame
   start: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) != 0
+    (cmd & NEWVOP) != 0
   end
   
   //skip the width and heigth in BTYPE
@@ -59,8 +59,8 @@ actor BlockSplit (
   skip_uncoded: action BTYPE:[ cmd ] ==>
   guard
     //in AVS dc and ac are coded together
-    //bitand( cmd, INTER )  != 0, // An INTER block
-    bitand( cmd, COEFF_CODED ) = 0  // Not COEFF_CODED
+    //(cmd & INTER)  != 0, // An INTER block
+    (cmd & COEFF_CODED) = 0  // Not COEFF_CODED
 
   do 
     comp := comp + 1;    
@@ -72,8 +72,8 @@ actor BlockSplit (
   // neither INTRA nor INTER
   skip_other: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, INTER ) = 0,  // Not an INTER block
-    bitand( cmd, INTRA ) = 0   // Not an INTRA block
+    (cmd & INTER) = 0,  // Not an INTER block
+    (cmd & INTRA) = 0   // Not an INTRA block
   do
     comp := comp + 1;    
     if comp = 6 then

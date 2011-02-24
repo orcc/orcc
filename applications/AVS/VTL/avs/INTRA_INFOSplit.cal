@@ -28,7 +28,7 @@ actor INTRA_INFOSplit(
   //start a new frame
   new_frame : action BTYPE:[cmd] ==>
   guard
-      bitand(cmd,NEWVOP) != 0
+      (cmd & NEWVOP) != 0
   //do
     //println("INTRA_INFOSplit new_frame "+cmd);
   end 
@@ -42,7 +42,7 @@ actor INTRA_INFOSplit(
   //if not INTRA mode, skip the INTRA_INFO_split
   skip_split : action BTYPE:[btype] ==>
   guard
-    bitand(btype,INTRA) = 0
+    (btype & INTRA) = 0
   //do
     //println("INTRA_INFOSplit skip_split "+btype);
   end

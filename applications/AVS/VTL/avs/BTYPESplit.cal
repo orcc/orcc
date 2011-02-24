@@ -34,7 +34,7 @@ actor BTYPESplit(
   // to send the newvop token to the address and add block (arrggg) 
   cmd.newVop : action BTYPE:[cmd] ==> BTYPE_Y:[ cmd ] , BTYPE_U:[ cmd ], BTYPE_V:[ cmd ]
   guard
-    bitand(cmd,NEWVOP) != 0
+    (cmd & NEWVOP) != 0
   //do
     //println("BTYPESplit newVop ");
   end 

@@ -112,13 +112,13 @@ actor Algo_Intra_Luma_Addr_LeftTop_AVSJZ (
 
   // Fuse the macroblock address and the 8x8 block component address to get appropriate address of desired 8x8 block in memory
   function access( int(size=MB_COORD_SZ) p, int(size=3) c ) --> int(size=MB_COORD_SZ+2) :
-    bitor( lshift( p, 2 ), c ) 
+    (p << 2) | c 
   end
 
   // New VOP
   start: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) != 0
+    (cmd & NEWVOP) != 0
   do
     mbx       := 0;
     top_edge  := true;
@@ -142,8 +142,8 @@ actor Algo_Intra_Luma_Addr_LeftTop_AVSJZ (
   // Is an INTRA 8x8 block
   read.intra: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) = 0,
-    bitand( cmd, INTRA ) != 0
+    (cmd & NEWVOP) = 0,
+    (cmd & INTRA) != 0
   do
     coded[ access(ptr,comp) ] := true;
   end

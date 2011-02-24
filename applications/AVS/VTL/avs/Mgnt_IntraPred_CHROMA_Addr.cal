@@ -81,9 +81,9 @@ actor Mgnt_IntraPred_CHROMA_Addr(
   int(size=ADDR_SZ) top_addr;
   
   /* 
-  int(size=ADDR_SZ) top_initial_addr := (lshift(mby,3)-1)*lshift(mb_width,3)+ lshift(mbx,3);
-  int(size=ADDR_SZ) left_initial_addr := lshift(mby,3)*lshift(mb_width,3) + lshift(mbx,3) -1;
-  int(size=ADDR_SZ) top_left_initial_addr := (lshift(mby,3)-1)*lshift(mb_width,3)+ lshift(mbx,3) - 1;
+  int(size=ADDR_SZ) top_initial_addr := ((mby << 3)-1)*(mb_width << 3)+ lshift(mbx,3);
+  int(size=ADDR_SZ) left_initial_addr := (mby << 3)*(mb_width << 3) + lshift(mbx,3) -1;
+  int(size=ADDR_SZ) top_left_initial_addr := ((mby << 3)-1)*(mb_width << 3)+ lshift(mbx,3) - 1;
   */
 
   bool block_left_done;
@@ -98,7 +98,7 @@ actor Mgnt_IntraPred_CHROMA_Addr(
       
   get_new_vop: action BTYPE:[cmd] ==>
   guard
-    bitand( NEWVOP, cmd) != 0
+    (NEWVOP & cmd) != 0
   do
     mbx := 0;
     mby := 0;
@@ -128,13 +128,13 @@ actor Mgnt_IntraPred_CHROMA_Addr(
   get_w: action BTYPE:[w] ==>
   do
     mb_width := w;
-    pic_width := lshift(w,3);
+    pic_width := (w << 3);
   end
   
   get_h: action BTYPE:[h] ==>
   do
     mb_height := h;
-    pic_height := lshift(h,3);
+    pic_height := (h << 3);
   end
   
   get_flag: action ==>
@@ -155,8 +155,8 @@ actor Mgnt_IntraPred_CHROMA_Addr(
   //current block is inter
   get_inter: action BTYPE:[btype] ==>
   guard
-    bitand( btype, NEWVOP ) = 0,
-    bitand( btype, INTER  ) != 0
+    (btype & NEWVOP) = 0,
+    (btype & INTER) != 0
   do
     block_left_done := false;
     block_top_done := false;
@@ -166,8 +166,8 @@ actor Mgnt_IntraPred_CHROMA_Addr(
   //current block is intra
   get_intra: action BTYPE:[btype] ==>
   guard
-    bitand( btype, NEWVOP ) = 0,
-    bitand( btype, INTRA ) != 0
+    (btype & NEWVOP) = 0,
+    (btype & INTRA) != 0
   do
     block_left_done := false;
     block_top_done := false;
@@ -224,7 +224,7 @@ actor Mgnt_IntraPred_CHROMA_Addr(
 
     not left_edge
   var
-    int(size=ADDR_SZ) left_initial_addr := lshift(mby,3)*pic_width + lshift(mbx,3) -1
+    int(size=ADDR_SZ) left_initial_addr := (mby << 3)*pic_width + (mbx << 3) -1
   do
     left_avail := true;
     if(left_addr_count > 7) then
@@ -290,7 +290,7 @@ actor Mgnt_IntraPred_CHROMA_Addr(
     
     not top_edge
   var
-    int(size=ADDR_SZ) top_initial_addr := (lshift(mby,3)-1)*pic_width + lshift(mbx,3)
+    int(size=ADDR_SZ) top_initial_addr := ((mby << 3)-1)*pic_width + (mbx << 3)
   do
     top_avail := true;
     
@@ -364,9 +364,9 @@ actor Mgnt_IntraPred_CHROMA_Addr(
 
     not (top_edge and left_edge)
   var
-    int(size=ADDR_SZ) top_initial_addr := (lshift(mby,3)-1)*pic_width + lshift(mbx,3),
-    int(size=ADDR_SZ) left_initial_addr := lshift(mby,3)*pic_width + lshift(mbx,3) -1,
-    int(size=ADDR_SZ) top_left_initial_addr := (lshift(mby,3)-1)*pic_width + lshift(mbx,3) - 1
+    int(size=ADDR_SZ) top_initial_addr := ((mby << 3)-1)*pic_width + (mbx << 3),
+    int(size=ADDR_SZ) left_initial_addr := (mby << 3)*pic_width + (mbx << 3) -1,
+    int(size=ADDR_SZ) top_left_initial_addr := ((mby << 3)-1)*pic_width + (mbx << 3) - 1
   do
     if left_edge then
       top_left_avail := true;

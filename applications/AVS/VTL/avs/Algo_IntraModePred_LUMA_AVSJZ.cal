@@ -118,7 +118,7 @@ actor Algo_IntraModePred_LUMA_AVSJZ (
   // Check for NEWVOP flag
   start: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) != 0
+    (cmd & NEWVOP) != 0
   do
     mbx := 0;
     mby := 0;
@@ -147,7 +147,7 @@ actor Algo_IntraModePred_LUMA_AVSJZ (
   // skip other BTYPE signal where necessary
   skip: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) = 0
+    (cmd & NEWVOP) = 0
   //do
     //println("Algo_IntraModePred_LUMA_AVSJZ:skip");
   end
@@ -155,8 +155,8 @@ actor Algo_IntraModePred_LUMA_AVSJZ (
   // read INTRA_INFO to predict the intra mode
   get_pred_mode_flag: action INTRA_INFO:[ intra_info ] ==>
   do
-    pred_mode_flag := bitand(intra_info, 1);
-    intra_luma_pred_mode := rshift(intra_info,1);
+    pred_mode_flag := (intra_info & 1);
+    intra_luma_pred_mode := (intra_info >> 1);
     
     //println("Algo_IntraModePred_LUMA_AVSJZ:pred_mode_flag="+pred_mode_flag);
     //println("pred_mode_flag="+pred_mode_flag);
@@ -170,10 +170,10 @@ actor Algo_IntraModePred_LUMA_AVSJZ (
   // [3:1] indicates the intra mode of A/B.
   get_intra_mode: action A:[a], B:[b] ==> IntraLumaPredMode:[mode]
   var
-    int(size=4) is_intra_A = bitand(intra_para_buf[a],1),
-    int(size=4) is_intra_B = bitand(intra_para_buf[b],1),
-    uint(size=3) intraPredModeA_tmp = rshift(intra_para_buf[a],1),
-    uint(size=3) intraPredModeB_tmp = rshift(intra_para_buf[b],1),
+    int(size=4) is_intra_A = intra_para_buf[a] & 1,
+    int(size=4) is_intra_B = intra_para_buf[b] & 1,
+    uint(size=3) intraPredModeA_tmp = intra_para_buf[a] >> 1,
+    uint(size=3) intraPredModeB_tmp = intra_para_buf[b] >> 1,
     bool left_exist_and_intra = (not left_edge) and (is_intra_A=1),
     bool top_exist_and_intra = (not top_edge) and (is_intra_B=1),
 
@@ -209,7 +209,7 @@ actor Algo_IntraModePred_LUMA_AVSJZ (
   
   save_mode:action ==>
   do
-    intra_para_buf [ bitor( ptr, comp) ] :=  bitor( lshift(mode,1), 1);
+    intra_para_buf [ (ptr | comp) ] :=  (mode << 1) | 1;
     //println("Algo_IntraModePred_LUMA_AVSJZ:save_mode");
   end
 

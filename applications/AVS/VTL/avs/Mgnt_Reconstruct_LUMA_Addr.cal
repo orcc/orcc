@@ -72,7 +72,7 @@ actor Mgnt_Reconstruct_LUMA_Addr (
 
    get_new_vop: action BTYPE:[cmd] ==>
    guard
-     bitand( NEWVOP, cmd ) != 0
+     (NEWVOP & cmd) != 0
    do
      write_addr_b0 := 0;
      write_addr_b1 := 0;
@@ -92,20 +92,20 @@ actor Mgnt_Reconstruct_LUMA_Addr (
    get_w: action BTYPE:[w] ==>
    do
      mb_width := w;
-     pic_width := lshift(w,4);
+     pic_width := (w << 4);
      //println("Mgnt_Reconstruct_LUMA_Addr:get_w");
    end
    
    get_h: action BTYPE:[h] ==>
    do
      mb_height := h;
-     pic_height := lshift(h,4);
+     pic_height := (h << 4);
      //println("Mgnt_Reconstruct_LUMA_Addr:get_h");
    end
    
    skip: action BTYPE:[cmd] ==>
    guard
-     bitand(NEWVOP,cmd) = 0
+     (NEWVOP & cmd) = 0
    do
      //println("Mgnt_Reconstruct_LUMA_Addr:skip");
    end
@@ -115,7 +115,7 @@ actor Mgnt_Reconstruct_LUMA_Addr (
      comp = 0,
      not(block_line = 8)
    var
-     int(size=ADDR_SZ) write_initial_addr = lshift(mby,4)*pic_width + lshift(mbx,4),
+     int(size=ADDR_SZ) write_initial_addr = (mby << 4)*pic_width + (mbx << 4),
      int(size=ADDR_SZ) write_initial_addr_b0 = write_initial_addr
    do
      write_addr_b0 := write_initial_addr_b0 + pix_in_block + block_line * pic_width;
@@ -133,7 +133,7 @@ actor Mgnt_Reconstruct_LUMA_Addr (
    guard
      comp = 1
    var
-     int(size=ADDR_SZ) write_initial_addr = lshift(mby,4)*pic_width + lshift(mbx,4),
+     int(size=ADDR_SZ) write_initial_addr = (mby << 4)*pic_width + (mbx << 4),
      int(size=ADDR_SZ) write_initial_addr_b1 = write_initial_addr+8
    do
      write_addr_b1 := write_initial_addr_b1 + pix_in_block + block_line * pic_width;
@@ -149,8 +149,8 @@ actor Mgnt_Reconstruct_LUMA_Addr (
    guard
      comp = 2
    var
-     int(size=ADDR_SZ) write_initial_addr = lshift(mby,4)*pic_width + lshift(mbx,4),
-     int(size=ADDR_SZ) write_initial_addr_b2 = write_initial_addr+lshift(pic_width,3)
+     int(size=ADDR_SZ) write_initial_addr = (mby << 4)*pic_width + (mbx << 4),
+     int(size=ADDR_SZ) write_initial_addr_b2 = write_initial_addr+(pic_width << 3)
    do
      write_addr_b2 := write_initial_addr_b2 + pix_in_block + block_line * pic_width;
      pix_in_block := pix_in_block + 1;
@@ -167,8 +167,8 @@ actor Mgnt_Reconstruct_LUMA_Addr (
      not(block_line=8)
      
    var
-     int(size=ADDR_SZ) write_initial_addr = lshift(mby,4)*pic_width + lshift(mbx,4),
-     int(size=ADDR_SZ) write_initial_addr_b3 = write_initial_addr+lshift(pic_width,3)+8
+     int(size=ADDR_SZ) write_initial_addr = (mby << 4)*pic_width + (mbx << 4),
+     int(size=ADDR_SZ) write_initial_addr_b3 = write_initial_addr+(pic_width << 3)+8
    do
      write_addr_b3 := write_initial_addr_b3 + pix_in_block + block_line * pic_width;
      pix_in_block := pix_in_block + 1;

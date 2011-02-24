@@ -73,7 +73,7 @@ actor Mgnt_Reconstruct_CHROMA_Addr (
    
    get_new_vop: action BTYPE:[cmd] ==>
    guard
-     bitand( NEWVOP, cmd ) != 0
+     (NEWVOP & cmd) != 0
    do
      write_addr := 0;
 
@@ -88,27 +88,27 @@ actor Mgnt_Reconstruct_CHROMA_Addr (
    get_w: action BTYPE:[w] ==>
    do
      mb_width := w;
-     pic_width := lshift(w,3);
+     pic_width := (w << 3);
      //println("Mgnt_Reconstruct_CHROMA_Addr:get_w!");
    end
    
    get_h: action BTYPE:[h] ==>
    do
      mb_height := h;
-     pic_height := lshift(h,3);
+     pic_height := (h << 3);
      //println("Mgnt_Reconstruct_CHROMA_Addr:get_h!");
    end
    
    skip: action BTYPE:[cmd] ==>
    guard
-     bitand(NEWVOP,cmd) = 0
+     (NEWVOP & cmd) = 0
    //do
      //println("Mgnt_Reconstruct_CHROMA_Addr:skip!");
    end
    
    get_addr: action RecData:[rec_data] ==> WA:[write_addr], WD:[rec_data]
    var 
-     int(size=ADDR_SZ) write_initial_addr = lshift(mby,3)*pic_width + lshift(mbx,3)
+     int(size=ADDR_SZ) write_initial_addr = (mby << 3)*pic_width + (mbx << 3)
    do
      write_addr := write_initial_addr + pix_in_block + block_line * pic_width;
      pix_in_block := pix_in_block + 1;

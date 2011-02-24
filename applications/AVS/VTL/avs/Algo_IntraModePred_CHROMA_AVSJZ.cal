@@ -101,7 +101,7 @@ actor Algo_IntraModePred_CHROMA_AVSJZ (
   // Check for NEWVOP flag
   start: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) != 0
+    (cmd & NEWVOP) != 0
   do
     mbx := 0;
     top_edge := true;
@@ -121,13 +121,13 @@ actor Algo_IntraModePred_CHROMA_AVSJZ (
   // skip other BTYPE signal where necessary
   skip: action BTYPE:[ cmd ] ==>
   guard
-    bitand( cmd, NEWVOP ) = 0
+    (cmd & NEWVOP) = 0
   end
 
   // read INTRA_INFO to predict the intra mode
   get_intra_chroma_pred_mode: action INTRA_INFO:[ intra_info ] ==>
   do
-    intra_chroma_pred_mode := rshift(intra_info,1);
+    intra_chroma_pred_mode := (intra_info >> 1);
   end
 
   get_intra_chroma_mode: action ==> IntraChromaPredMode:[mode]

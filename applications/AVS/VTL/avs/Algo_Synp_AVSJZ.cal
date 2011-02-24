@@ -144,7 +144,7 @@ actor Algo_Synp_AVSJZ(
   int SLICE_QP_LENGTH = 6;
   
   function mask_bits( int v, int n ) --> int  :
-    bitand( v, lshift(1,n)-1 )
+    v & ((1 << n) - 1)
   end
   
   int MB_counter:=-1;
@@ -164,7 +164,7 @@ actor Algo_Synp_AVSJZ(
   guard 
     not done_reading_bits()
   do
-    read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if b then 1 else 0 end );
+    read_result_in_progress := (read_result_in_progress << 1) | if b then 1 else 0 end;
     bits_to_read_count := bits_to_read_count - 1;
     bit_count := bit_count + 1;
     // println("bits="+b);
@@ -278,9 +278,9 @@ actor Algo_Synp_AVSJZ(
     done_reading_bits()
   do
     picture_height := mask_bits( read_result(), VERTICAL_SIZE_LENGTH );
-    MB_height := rshift(picture_height, 4);
-    picture_width := rshift( read_result(), HORIZONTAL_SIZE_LENGTH );
-    MB_width := rshift(picture_width, 4);    
+    MB_height := (picture_height >> 4);
+    picture_width := read_result() >> HORIZONTAL_SIZE_LENGTH;
+    MB_width := (picture_width >> 4);    
     if MB_width = 11 then
       MB_NUM := 99;
     else if MB_width = 22 then
@@ -335,7 +335,7 @@ actor Algo_Synp_AVSJZ(
     done_reading_bits()
   do
     bit_rate_upper := mask_bits( read_result(), BIT_RATE_UPPER_LENGTH );
-    bit_rate_lower := rshift( read_result(),  MARKER_LENGTH + BIT_RATE_UPPER_LENGTH );
+    bit_rate_lower := read_result() >> (MARKER_LENGTH + BIT_RATE_UPPER_LENGTH);
     set_bits_to_read( LOW_DELAY_LENGTH + MARKER_LENGTH );
     //println("bit_rate_upper = "+bit_rate_upper);
     //println("bit_rate_lower = "+bit_rate_lower);
@@ -345,7 +345,7 @@ actor Algo_Synp_AVSJZ(
   guard
     done_reading_bits()
   do
-    low_delay := rshift( read_result(),  LOW_DELAY_LENGTH );
+    low_delay := read_result() >> LOW_DELAY_LENGTH;
     set_bits_to_read( BBV_BUFFER_SIZE_LENGTH + 3 );
     //println("low_delay "+low_delay);
   end
@@ -363,9 +363,9 @@ actor Algo_Synp_AVSJZ(
   guard
     done_reading_bits()
   var
-    int stuff_bits := (8 - bitand( bit_count, 7 ))
+    int stuff_bits := (8 - (bit_count & 7))
   do
-    //set_bits_to_read( 8 - bitand( bit_count, 7 ) );
+    //set_bits_to_read( 8 - (bit_count & 7) );
     set_bits_to_read( stuff_bits );
     //println("byte_align:bit_count = " + bit_count);
     //println("stuff_bits = " + stuff_bits);
@@ -582,7 +582,7 @@ actor Algo_Synp_AVSJZ(
   read_user_data_0: action ==>
   guard
     done_reading_bits(),
-    mask_bits( read_result(), USER_DATA_START_CODE_LENGTH_PRE ) != lshift(1,23)
+    mask_bits( read_result(), USER_DATA_START_CODE_LENGTH_PRE ) != (1 << 23)
   do
     set_bits_to_read( USER_DATA_START_CODE_LENGTH_PRE);
     //println("read_user_data_0");
@@ -591,7 +591,7 @@ actor Algo_Synp_AVSJZ(
   read_user_data_1: action ==>
   guard
     done_reading_bits(),
-    mask_bits( read_result(), USER_DATA_START_CODE_LENGTH_PRE ) = lshift(1,23)
+    mask_bits( read_result(), USER_DATA_START_CODE_LENGTH_PRE ) = (1 << 23)
   do
     set_bits_to_read( USER_DATA_START_CODE_LENGTH_TWO_BYTE );
     //println("read_user_data_1");
@@ -668,7 +668,7 @@ end
     vld_end()
   do
     //k=0
-    BBV_check_times := vld_ue( lshift(vld_length(), 1), vld_result());
+    BBV_check_times := vld_ue(vld_length() << 1, vld_result());
     //println("BBV_check_times = " + BBV_check_times);
   end
 
@@ -877,7 +877,7 @@ end
     done_reading_bits(),
     fixed_picture_qp = 0
   do
-    fixed_slice_qp := rshift( read_result(), SLICE_QP_LENGTH );
+    fixed_slice_qp := read_result() >> SLICE_QP_LENGTH;
     slice_qp := mask_bits( read_result(), FIXED_SLICE_QP_LENGTH );
     set_bits_to_read(if not (picture_type=0) then 1 else 0 end);
     //println("fixed_slice_qp="+fixed_slice_qp);
@@ -893,7 +893,7 @@ end
   guard
     done_reading_bits()
   var
-    int(size=BTYPE_SZ) cmd := bitor( NEWVOP, if IS_I_pic then INTRA else INTER end ),
+    int(size=BTYPE_SZ) cmd := NEWVOP | if IS_I_pic then INTRA else INTER end,
     int(size=QP_SZ) qp
   do
     if fixed_picture_qp = 1 then
@@ -906,7 +906,7 @@ end
     //println("BTYPE_new_vop: BTYPE = "+cmd);
     //println("send_new_vop_BTYPE");
 
-    cmd := bitor(cmd, bitand(qp, QUANT_MASK));
+    cmd := cmd | (qp & QUANT_MASK);
   end
 
   send_mb_width_BTYPE: action ==> BTYPE:[MB_width]
@@ -966,14 +966,14 @@ end
     comp < 6 
   var
     int(size=BTYPE_SZ) cmd := INTRA,
-    bool pre_coeff_coded := bitand( cbp,lshift(1,comp) ) != 0
+    bool pre_coeff_coded := (cbp & (1 << comp)) != 0
   do
-    cmd := bitor( cmd, if pre_coeff_coded then COEFF_CODED else 0 end );
+    cmd := cmd | if pre_coeff_coded then COEFF_CODED else 0 end;
     //println("BTYPE for comp"+comp+" ="+cmd);
     	
     comp := comp + 1;
     b_last := false;
-    coeff_coded := bitand( cbp,lshift(1,comp) ) != 0;
+    coeff_coded := (cbp & (1 << comp)) != 0;
     //println("block_done: coeff_coded="+coeff_coded+", "+"comp="+comp);
     
   end
@@ -1049,7 +1049,7 @@ end
     uint(size=INTRA_INFO_SZ) intra_info := 0
   do
     intra_luma_pred_mode := mask_bits( read_result(), 2);
-    intra_info := bitor( lshift(intra_luma_pred_mode,1) , intra_info );
+    intra_info := (intra_luma_pred_mode << 1) | intra_info;
     //println("MB_read_I_mode_Luma_Three: "+b8+" INTRA_INFO="+intra_info); 
     b8 := b8 + 1;
   end
@@ -1072,8 +1072,8 @@ end
   var
     uint(size=INTRA_INFO_SZ) intra_info := 0 
   do 
-    intra_chroma_pred_mode := vld_ue( lshift(vld_length(), 1), vld_result());
-    intra_info := bitor( lshift(intra_chroma_pred_mode,1) , intra_info );
+    intra_chroma_pred_mode := vld_ue(vld_length() << 1, vld_result());
+    intra_info := (intra_chroma_pred_mode << 1) | intra_info;
     //println("MB_read_I_mode_Chroma_two: "+b8+" INTRA_INFO="+intra_info); 
   end
   
@@ -1105,10 +1105,10 @@ end
     //test_x := vld_ue( lshift(vld_length(), 1), vld_result());
     
     //x := if(test_x<64) then test_x else 63 end;
-    x := vld_ue( lshift(vld_length(), 1), vld_result());
+    x := vld_ue(vld_length() << 1, vld_result());
     if picture_type = 0 then y := 0; else y := 1; end
     cbp := CBP_Table[x][y]; 
-    coeff_coded := bitand( cbp,lshift(1,comp) ) != 0;
+    coeff_coded := (cbp & (1 << comp)) != 0;
     
     //println("test_vld_length="+test_vld_length);
     //println("test_vld_result="+test_vld_result);
@@ -1188,7 +1188,7 @@ end
     int levels
   do
     levels := vld_length();
-    run_level := lshift((lshift(1, levels) - 1), grad) + vld_result();
+    run_level := (((1 << levels) - 1) << grad) + vld_result();
     //println("run_level "+run_level);
     if run_level = EOB_Pos_intra[tablenum] then 
       b_last := true;
@@ -1226,12 +1226,12 @@ end
     run_level >= 59
   do
     //println("run_level "+run_level);    
-    run := rshift((run_level - 59), 1);
+    run := ((run_level - 59) >> 1);
     grad := 1;
     maxlevel := 11;
     escape_code := true;
     start_vld();
-    level_flag := bitand(run_level,1);
+    level_flag := (run_level & 1);
     //println("MB_read_intra_blockcoefficient_four: RUN = "+run);
     //println("MB_read_intra_blockcoefficient_two");
   end  
@@ -1246,7 +1246,7 @@ end
     int pre_level
   do
     levels := vld_length();
-    run_level := lshift((lshift(1, levels) - 1), grad) + vld_result();
+    run_level := (((1 << levels) - 1) << grad) + vld_result();
     pre_level := run_level + if run > MaxRun[0][tablenum] then 1 else RefAbsLevel[tablenum][run] end;
     level := if level_flag=1 then -pre_level else pre_level end;
     //println("escape " + level);
@@ -1262,7 +1262,7 @@ end
   guard
     vld_end(),
     MB_mode = 5,
-    //bitand( cbp, lshift( 1,  comp)) >0,
+    //bitand( cbp, (1 << comp)) >0,
     coeff_coded,
     (comp=4) or (comp=5)
   do
@@ -1284,7 +1284,7 @@ end
     int levels
   do
     levels := vld_length();
-    run_level := lshift((lshift(1, levels) - 1), grad) + vld_result();
+    run_level := (((1 << levels) - 1) << grad) + vld_result();
     //println("run_level "+run_level);
     if run_level = EOB_Pos_chroma[tablenum] then 
       b_last := true;
@@ -1318,12 +1318,12 @@ end
     run_level >= 59
   do
     //println("run_level "+run_level);    
-      run := rshift((run_level - 59), 1);
+      run := ((run_level - 59) >> 1);
       grad := 0;
       maxlevel := 11;
       escape_code := true;
       start_vld();   
-      level_flag := bitand(run_level,1);
+      level_flag := (run_level & 1);
       //println("MB_read_chroma_blockcoefficient_two");
       //println("MB_read_chroma_blockcoefficient_four: RUN = "+run);
   end  
@@ -1337,7 +1337,7 @@ end
       int pre_level
     do
       levels := vld_length();
-      run_level := lshift((lshift(1, levels) - 1), grad) + vld_result();
+      run_level := (((1 << levels) - 1) << grad) + vld_result();
       pre_level := run_level + if run > MaxRun[2][tablenum] then 1 else RefAbsLevel[tablenum+14][run] end;
       level := if level_flag=1 then -pre_level else pre_level end;
       //println("escape " + level);
@@ -1371,7 +1371,7 @@ end
   function vld_result() --> int( size=30 ) : Codeword end
   function vld_length() --> int( size=30 ) : CodeLen end
   function vld_end() --> bool : not NewVLD end
-  function vld_ue(int len, int info) --> int : lshift(1, rshift(len, 1))+info-1 end
+  function vld_ue(int len, int info) --> int : (1 << (len >> 1)) + info - 1 end
   
   action bits:[ b ] ==>
   guard
@@ -1397,7 +1397,7 @@ end
     not First_part
   do
     VLD_Counter := VLD_Counter - 1;
-    Codeword := bitor( lshift( Codeword, 1), if b then 1 else 0 end);
+    Codeword := (Codeword << 1) | if b then 1 else 0 end;
     bit_count := bit_count + 1;
     if   (VLD_Counter + grad) = 0 then NewVLD := false; end
     //  println("VLD_Counter2 "+VLD_Counter);
