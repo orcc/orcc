@@ -234,16 +234,48 @@ void clear_fifos(){
 ///////////////////////////////////////////////////////////////////////////////
 // Declare actors
 
-declareActor(instance) ::= "<GetInstanceId(instance)>"
+printActor(instance, addComma) ::= <<
+<if(instance.actor || instance.broadcast)><if(addComma)>, <endif><GetInstanceId(instance)><endif>
+>>
+
+
+declareActor(instances, addComma = false) ::= <<
+<if(rest(instances))
+><printActor(first(instances),addComma)
+><	if(first(instances).actor || first(instances).broadcast)
+><declareActor(rest(instances),"true")
+><	else
+><declareActor(rest(instances),addComma)
+	><endif
+><else
+><printActor(first(instances),addComma)
+><endif>
+>>
+
 declareActors(instances) ::= <<
-struct actor_s <instances: declareActor(); wrap, separator=", ">;
+struct actor_s <declareActor(instances)>;
 
 >>
 
-declareActorArray(instance) ::= "&<GetInstanceId(instance)>"
+printActorAddress(instance, addComma) ::= <<
+<if(instance.actor || instance.broadcast)><if(addComma)>, <endif>&<GetInstanceId(instance)><endif>
+>>
 
-declareActorsArray(instances,thread=false) ::= <<
-struct actor_s *actors<if(thread)>_<thread><endif>[] = {<instances: declareActorArray(); wrap, separator=", ">};
+declareActorArray(instances, addComma = false) ::= <<
+<if(rest(instances))
+><printActorAddress(first(instances),addComma)
+><	if(first(instances).actor || first(instances).broadcast)
+><declareActorArray(rest(instances),"true")
+><	else
+><declareActorArray(rest(instances),addComma)
+	><endif
+><else
+><printActorAddress(first(instances),addComma)
+><endif>
+>>
+
+declareActorsArray(instances, thread=false) ::= <<
+struct actor_s *actors<if(thread)>_<thread><endif>[] = struct actor_s *actors[] = {<declareActorArray(instances)>};
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
