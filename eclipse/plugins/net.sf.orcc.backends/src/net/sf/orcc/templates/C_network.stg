@@ -275,7 +275,7 @@ declareActorArray(instances, addComma = false) ::= <<
 >>
 
 declareActorsArray(instances, thread=false) ::= <<
-struct actor_s *actors<if(thread)>_<thread><endif>[] = struct actor_s *actors[] = {<declareActorArray(instances)>};
+struct actor_s *actors<if(thread)>_<thread><endif>[] = {<declareActorArray(instances)>};
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
