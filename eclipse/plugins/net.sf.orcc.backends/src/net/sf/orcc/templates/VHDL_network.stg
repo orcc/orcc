@@ -231,7 +231,7 @@ endif>
 >>
 
 printOutputs(connection, map, vmap) ::= <<
-<if(map.(connection.source))
+<if(first(map.(connection.source)))
 ><if(connection.attributes)
 ><connection.source>_data     =\> <instance.id>_<connection.source>_data,
 <connection.source>_send     =\> <instance.id>_<connection.source>_send,
@@ -260,8 +260,8 @@ checkBroadcast(instance) ::= <<
 <if (instance.broadcast)
 ><printBroadcast(name=instance.id,
 				 inputs=instance.broadcast.inputs.list,
-                 outputs=instance.broadcast.outputs.list)>
-<endif>
+                 outputs=instance.broadcast.outputs.list)><
+endif>
 >>
 
 printBroadcast(name, inputs, outputs) ::= <<
@@ -289,7 +289,7 @@ broadcast_<name> : entity work.broadcast
     reset_n       =\> reset_n);
     --
     <outgoingMap.(instance).values: {connections|<connections:{connection | <printBroadToOut(connection=connection, map=network.successorsMap.(instance), 
-															vmap=network.targetMap.(connection))>}; separator="\n">}; separator="\n">    														  
+															vmap=network.targetMap.(connection))>}>}>
 >>
 
 printBroadToOut(connection, map, vmap) ::= <<
@@ -304,7 +304,7 @@ printBroadcastOutputs(connections, index, network , instance, control) ::= <<
 >>
 
 printBroadcastOutput(connection, index, map, vmap, control) ::= <<
-<if(map.(connection.source))
+<if(first(map.(connection.source)))
 ><if(connection.attributes)
 >output_<control>(<index>) =\> <instance.id>_<connection.source>_<control>,<
 else
