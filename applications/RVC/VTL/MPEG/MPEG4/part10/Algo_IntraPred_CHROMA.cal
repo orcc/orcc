@@ -189,22 +189,22 @@ actor Algo_IntraPred_CHROMA ()
       	end
       	
       	if left_avail = 1 and up_avail = 1 then
-          	m0 := rshift( s0 + s2 + 4, 3);
-          	m1 := rshift( s1 + 2, 2);
-          	m2 := rshift( s3 + 2, 2);
-         	m3 := rshift( s1 + s3 + 4, 3);
+          	m0 := (s0 + s2 + 4) >> 3;
+          	m1 := (s1 + 2) >> 2;
+          	m2 := (s3 + 2) >> 2;
+         	m3 := (s1 + s3 + 4) >> 3;
       	else 
       		if left_avail = 1 then
-          	m0 := rshift( s2 + 2, 2);
-          	m1 := rshift( s2 + 2, 2);
-          	m2 := rshift( s3 + 2, 2);
-          	m3 := rshift( s3 + 2, 2);
+          	m0 := (s2 + 2) >> 2;
+          	m1 := (s2 + 2) >> 2;
+          	m2 := (s3 + 2) >> 2;
+          	m3 := (s3 + 2) >> 2;
       		else 
       			if up_avail = 1  then
-          			m0 := rshift( s0 + 2, 2);
-          			m1 := rshift( s1 + 2, 2);
-          			m2 := rshift( s0 + 2, 2);
-          			m3 := rshift( s1 + 2, 2);
+          			m0 := (s0 + 2) >> 2;
+          			m1 := (s1 + 2) >> 2;
+          			m2 := (s0 + 2) >> 2;
+          			m3 := (s1 + 2) >> 2;
       			end 
       		end 
 		end
@@ -248,10 +248,10 @@ actor Algo_IntraPred_CHROMA ()
     V := res + (3+1)*(c_left[4+3] - c_up_left);
       
     a:= 16*(c_left[7] + c_up[7]);
-    b:= rshift( 34*H + 32, 6);
-    c:= rshift( 34*V + 32, 6);
+    b:= (34*H + 32) >> 6;
+    c:= (34*V + 32) >> 6;
 
-    mpr := [clip( rshift(a + b*(i-3) + c*(j-3) + 16, 5) , 0 , 255 ): for int i in  0 .. 7, for int j in 0 .. 7];
+    mpr := [clip((a + b*(i-3) + c*(j-3) + 16) >> 5, 0, 255 ): for int i in  0 .. 7, for int j in 0 .. 7];
   end
 
 

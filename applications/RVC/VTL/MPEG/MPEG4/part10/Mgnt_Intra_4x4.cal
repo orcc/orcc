@@ -166,7 +166,7 @@ actor Mgnt_Intra_4x4 ()
 	SendEdge.LeftEdge16:action ==> Y_Left4:[ [left_16x16_edge[s+mb_counter]: for int s in 0 .. 3]]repeat 4
 	guard 
 	  	avail[0] = 1,
-	  	mb_counter mod rshift(16, 2) = 0
+	  	mb_counter mod (16 >> 2) = 0
 	do
 		avail[0] := 0;
 	end 
@@ -175,7 +175,7 @@ actor Mgnt_Intra_4x4 ()
 	SendEdge.LeftEdge4:action ==> Y_Left4:[ [right_4x4_edge[s]: for int s in 0 .. 3] ]repeat 4
 	guard 
 		avail[0] = 1,
-		mb_counter mod rshift(16, 2) != 0
+		mb_counter mod (16 >> 2) != 0
 	do
 		avail[0] := 0;
 	end 

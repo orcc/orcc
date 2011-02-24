@@ -151,7 +151,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	// A -ve means there is no data, so the inverse zigzag may flush its buffer
 	start: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ -2 ]
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		ptr := 1;
 	end
@@ -170,11 +170,11 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	read.inter_ac: action BTYPE:[ cmd ], QP:[ qp ] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ],
 		QUANT:[ s_qp ], PREV_QUANT:[ s_prev_qp ]
 	guard
-		bitand(cmd, INTER) != 0,
-		bitand(cmd, ACCODED) != 0
+		(cmd & INTER) != 0,
+		(cmd & ACCODED) != 0
 	do
 		s_qp := qp;
-		round := bitxor(bitand(s_qp, 1), 1);
+		round := ((s_qp & 1) ^ 1);
 		is_signed := true;
 		s_prev_qp := s_qp;
 		buf_qp[cnt] := s_qp;
@@ -183,7 +183,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	// Any other block except INTRA
 	read.other: action BTYPE:[ cmd ], QP:[ qp ] ==> AC_PRED_DIR:[ -1 ]
 	guard
-		bitand(cmd, INTRA) = 0
+		(cmd & INTRA) = 0
 	end
 
 	// Function to return absolute value
@@ -203,7 +203,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 			8
 		else
 			if s_qp > 4 and s_qp < 25 then
-				rshift(s_qp + 13, 1)
+				(s_qp + 13) >> 1
 			else
 				s_qp - 6
 			end
@@ -220,17 +220,17 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 		int(size=SAMPLE_SZ) dca = dc_buf[a] , int(size=SAMPLE_SZ) dcb = dc_buf[b] ,
 		int(size=SAMPLE_SZ) dcc = dc_buf[c] , int(size=SAMPLE_SZ) horiz = abs(dcb - dcc) ,
 		int(size=SAMPLE_SZ) vert = abs(dca - dcb) , bool top = vert < horiz , int(size=3) s , bool ac =
-		bitand(cmd, ACPRED) != 0
+		(cmd & ACPRED) != 0
 	do
 		s_qp := qp;
 		s_prev_qp := s_qp;
-		round := bitxor(bitand(s_qp, 1), 1);
+		round := ((s_qp & 1) ^ 1);
 		scaler := dc_scaler();
 		dc_pred := ((if top then
 			dcc
 		else
 			dca
-		end) + rshift(scaler, 1)) / scaler;
+		end) + (scaler >> 1)) / scaler;
 		s := if not ac then
 			0
 		else
@@ -253,7 +253,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	// Do dequant on INTER block DC
 	getdc.inter: action QFS_DC:[ dc ] ==>
 	var
-		int(size=SAMPLE_SZ) v = (s_qp * (lshift(abs(dc), 1) + 1)) - round
+		int(size=SAMPLE_SZ) v = (s_qp * ((abs(dc) << 1) + 1)) - round
 	do
 		dc_val := if dc = 0 then
 			0

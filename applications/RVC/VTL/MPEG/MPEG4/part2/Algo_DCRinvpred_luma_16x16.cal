@@ -154,7 +154,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	// A -ve flag  means there is no data, so the inverse zigzag may flush its buffer
 	start: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ -2 ]
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		comp := 0;
 		ptr := 4;
@@ -174,11 +174,11 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	read.inter_ac: action BTYPE:[ cmd ], QP:[ qp ] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ],
 		QUANT:[ s_qp ], PREV_QUANT:[ s_prev_qp ]
 	guard
-		bitand(cmd, INTER) != 0,
-		bitand(cmd, ACCODED) != 0
+		(cmd & INTER) != 0,
+		(cmd & ACCODED) != 0
 	do
 		s_qp := qp;
-		round := bitxor(bitand(s_qp, 1), 1);
+		round := ((s_qp & 1) ^ 1);
 		is_signed := true;
 		s_prev_qp := s_qp;
 		buf_qp[cnt] := s_qp;
@@ -187,9 +187,9 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	// Any other block except INTRA
 	read.other: action BTYPE:[ cmd ], QP:[ qp ] ==> AC_PRED_DIR:[ -1 ]
 	guard
-		bitand(cmd, ACCODED) = 0,
-		bitand(cmd, INTRA) = 0,
-		bitand(cmd, NEWVOP) = 0
+		(cmd & ACCODED) = 0,
+		(cmd & INTRA) = 0,
+		(cmd & NEWVOP) = 0
 	end
 
 	// Function to return absolute value
@@ -227,23 +227,23 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 			a
 		end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[ s_qp ], PREV_QUANT:[ s_prev_qp ]
 	guard
-		bitand(cmd, INTRA) != 0
+		(cmd & INTRA) != 0
 	var
 		int(size=SAMPLE_SZ) dca = dc_buf[a] , int(size=SAMPLE_SZ) dcb = dc_buf[b] ,
 		int(size=SAMPLE_SZ) dcc = dc_buf[c] , int(size=SAMPLE_SZ) horiz = abs(dcb - dcc) ,
 		int(size=SAMPLE_SZ) vert = abs(dca - dcb) , bool top = vert < horiz , int(size=3) s , bool ac =
-		bitand(cmd, ACPRED) != 0
+		(cmd & ACPRED) != 0
 	do
 		s_qp := qp;
 		s_prev_qp := qp;
-		round := bitxor(bitand(s_qp, 1), 1);
+		round := ((s_qp & 1) ^ 1);
 		scaler := dc_scaler();
 		// Retrieve 'dc_scalar'. See ISO/IEC 14496-2 Table 7-1.
 		dc_pred := ((if top then
 			dcc
 		else
 			dca
-		end) + rshift(scaler, 1)) / scaler;
+		end) + (scaler >> 1)) / scaler;
 		// See ISO/IEC 14496-2 Section 7.4.3.2.
 		s := if not ac then
 			0
@@ -281,8 +281,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	// Do inverse prediction and dequant on INTER block DC
 	getdc.inter: action QFS_DC:[ dc ] ==>
 	var
-		int(size=SAMPLE_SZ) v = (s_qp * (lshift(abs(dc), 1) + 1)) - round // See ISO/IEC 14496-2 Section 7.4.4.2.1 (H.263).
-
+		int(size=SAMPLE_SZ) v = (s_qp * ((abs(dc) << 1) + 1)) - round // See ISO/IEC 14496-2 Section 7.4.4.2.1 (H.263).
 	do
 		dc_val := if dc = 0 then
 			0
@@ -326,7 +325,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	var
 		int(size=SAMPLE_SZ) dc = saturate(dc_val)
 	do
-		dc_buf[bitor(ptr, comp)] := dc;
+		dc_buf[(ptr | comp)] := dc;
 	end
 
 	advance: action ==>

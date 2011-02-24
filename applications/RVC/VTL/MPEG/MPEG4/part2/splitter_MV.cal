@@ -21,7 +21,7 @@ int(size=MV_SZ) U , int(size=MV_SZ) V :
 	// Ignore new VOP command
 	newvop: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	end
 
 	// Skip width and height
@@ -31,39 +31,39 @@ int(size=MV_SZ) U , int(size=MV_SZ) V :
 	// Skip btype token
 	skipbtype: action BTYPE:[ btype ] ==>
 	guard
-		bitand(btype, MOTION) = 0,
-		bitand(btype, NEWVOP) = 0
+		(btype & MOTION) = 0,
+		(btype & NEWVOP) = 0
 	end
 
 	// split the vectors
 	B1: action MV:[ mv ] repeat 2, BTYPE:[ btype ] ==> Y:[ mv[0], mv[1] ]
 	guard
-		bitand(btype, MOTION) != 0
+		(btype & MOTION) != 0
 	end
 
 	B2: action MV:[ mv ] repeat 2, BTYPE:[ btype ] ==> Y:[ mv[0], mv[1] ]
 	guard
-		bitand(btype, MOTION) != 0
+		(btype & MOTION) != 0
 	end
 
 	B3: action MV:[ mv ] repeat 2, BTYPE:[ btype ] ==> Y:[ mv[0], mv[1] ]
 	guard
-		bitand(btype, MOTION) != 0
+		(btype & MOTION) != 0
 	end
 
 	B4: action MV:[ mv ] repeat 2, BTYPE:[ btype ] ==> Y:[ mv[0], mv[1] ]
 	guard
-		bitand(btype, MOTION) != 0
+		(btype & MOTION) != 0
 	end
 
 	B5: action MV:[ mv ] repeat 2, BTYPE:[ btype ] ==> U:[ mv[0], mv[1] ]
 	guard
-		bitand(btype, MOTION) != 0
+		(btype & MOTION) != 0
 	end
 
 	B6: action MV:[ mv ] repeat 2, BTYPE:[ btype ] ==> V:[ mv[0], mv[1] ]
 	guard
-		bitand(btype, MOTION) != 0
+		(btype & MOTION) != 0
 	end
 
 	schedule fsm cmd :

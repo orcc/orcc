@@ -63,8 +63,8 @@ actor Algo_IT4x4_1d () int(size=16) X ==> int(size=16) Y :
     buf := [
       x[0] + x[2],
       x[0] - x[2],
-      rshift(x[1],1) - x[3],
-      x[1] + rshift(x[3],1)
+      (x[1] >> 1) - x[3],
+      x[1] + (x[3] >> 1)
     ];
 
     y :=[

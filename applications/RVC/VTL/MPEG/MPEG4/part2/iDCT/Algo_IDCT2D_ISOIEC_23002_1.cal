@@ -33,12 +33,12 @@ SIGNED ==> int(size=9) OUT :
 	do
 	// multiplier-based scaling
 		block1 := [ scale[n] * x[n] : for int n in 0 .. 63 ];
-		block1[0] := block1[0] + lshift(1, 12);
+		block1[0] := block1[0] + (1 << 12);
 		// scaled 1D IDCT for rows and columns
 		idct1d(block1, block2);
 		idct1d(block2, block1);
 		// downshifting
-		block1 := [ rshift(block1[n], 13) : for int n in 0 .. 63 ];
+		block1 := [ (block1[n] >> 13) : for int n in 0 .. 63 ];
 		// clipping
 		block1 := [ clip(block1[n], 0) : for int n in 0 .. 63 ];
 	end
@@ -51,12 +51,12 @@ SIGNED ==> int(size=9) OUT :
 	do
 	// multiplier-based scaling
 		block1 := [ scale[n] * x[n] : for int n in 0 .. 63 ];
-		block1[0] := block1[0] + lshift(1, 12);
+		block1[0] := block1[0] + (1 << 12);
 		// scaled 1D IDCT for rows and columns
 		idct1d(block1, block2);
 		idct1d(block2, block1);
 		// downshifting
-		block1 := [ rshift(block1[n], 13) : for int n in 0 .. 63 ];
+		block1 := [ (block1[n] >> 13) : for int n in 0 .. 63 ];
 		// clipping
 		block1 := [ clip(block1[n], -255) : for int n in 0 .. 63 ];
 	end
@@ -114,38 +114,38 @@ SIGNED ==> int(size=9) OUT :
 
 	function pmul_1_1(int X) --> int
 	var
-		int Temp1 = rshift(X, 3) - rshift(X, 7) :
+		int Temp1 = (X >> 3) - (X >> 7) :
 		X - Temp1
 	end
 
 	function pmul_1_2(int X) --> int
 	var
-		int Temp1 = rshift(X, 3) - rshift(X, 7),
-		int Temp2 = Temp1 - rshift(X, 11) :
-		Temp1 + rshift(Temp2, 1)
+		int Temp1 = (X >> 3) - (X >> 7),
+		int Temp2 = Temp1 - (X >> 11) :
+		Temp1 + (Temp2 >> 1)
 	end
 
 	function pmul_2_1(int X) --> int
 	var
-		int Temp1 = rshift(X, 9) - X :
-		rshift(Temp1, 2) - Temp1
+		int Temp1 = (X >> 9) - X :
+		(Temp1 >> 2) - Temp1
 	end
 
 	function pmul_2_2(int X) --> int :
-		rshift(X, 1)
+		(X >> 1)
 	end
 
 	function pmul_3_1(int X) --> int
 	var
-		int Temp1 = X + rshift(X, 5),
-		int Temp2 = rshift(Temp1, 2) :
-		Temp2 + rshift(X, 4)
+		int Temp1 = X + (X >> 5),
+		int Temp2 = (Temp1 >> 2) :
+		Temp2 + (X >> 4)
 	end
 
 	function pmul_3_2(int X) --> int
 	var
-		int Temp1 = X + rshift(X, 5),
-		int Temp2 = rshift(Temp1, 2) :
+		int Temp1 = X + (X >> 5),
+		int Temp2 = (Temp1 >> 2) :
 		Temp1 - Temp2
 	end
 

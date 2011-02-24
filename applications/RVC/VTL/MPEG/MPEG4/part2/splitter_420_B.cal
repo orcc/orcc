@@ -37,7 +37,7 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 	//  +---+---+  
 	start: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	end
 
 	consume: action BTYPE:[ cmd ] ==>
@@ -45,9 +45,9 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 
 	skip_uncoded: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, INTER) != 0,
+		(cmd & INTER) != 0,
 		// An INTER block
-		bitand(cmd, ACCODED) = 0 // Not ACCODED
+		(cmd & ACCODED) = 0 // Not ACCODED
 
 	do
 		comp := comp + 1;
@@ -58,9 +58,9 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 
 	skip_other: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, INTER) = 0,
+		(cmd & INTER) = 0,
 		// Not an INTER block
-		bitand(cmd, INTRA) = 0 // Not an INTRA block
+		(cmd & INTRA) = 0 // Not an INTRA block
 
 	do
 		comp := comp + 1;

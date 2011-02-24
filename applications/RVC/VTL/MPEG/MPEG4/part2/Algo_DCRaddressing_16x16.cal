@@ -121,13 +121,13 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD
 	// Fuse the macroblock address and the 8x8 block component address to get appropriate address of desired 8x8 block in memory
 	function access(int(size=MB_COORD_SZ) p, int(size=4) c) --> int(size=MB_COORD_SZ + 2) :
 	// JWJ: increased size of c
-		bitor(lshift(p, 2), c)
+		((p << 2) | c)
 	end
 
 	// New VOP
 	start: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		mbx := 0;
 		top_edge := true;
@@ -152,8 +152,8 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD
 	// Is this an INTRA 8x8 block?
 	read.intra: action BTYPE:[ btype ] ==>
 	guard
-		bitand(btype, INTRA) != 0,
-		bitand(btype, NEWVOP) = 0
+		(btype & INTRA) != 0,
+		(btype & NEWVOP) = 0
 	do
 		coded[access(ptr, comp)] := true;
 	end
@@ -161,8 +161,8 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD
 	// Is this not an INTRA 8x8 block?
 	read.other: action BTYPE:[ btype ] ==>
 	guard
-		bitand(btype, INTRA) = 0,
-		bitand(btype, NEWVOP) = 0
+		(btype & INTRA) = 0,
+		(btype & NEWVOP) = 0
 	do
 		coded[access(ptr, comp)] := false;
 	end

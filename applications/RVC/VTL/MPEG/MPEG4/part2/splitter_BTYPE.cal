@@ -17,7 +17,7 @@ int(size=BTYPE_SZ) U , int(size=BTYPE_SZ) V :
 	// to send the newvop token to the address and add block (arrggg) 
 	cmd.newVop: action BTYPE:[ cmd ] ==> Y:[ cmd ], U:[ cmd ], V:[ cmd ]
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	end
 
 	// to delete the token relative to the width and the height

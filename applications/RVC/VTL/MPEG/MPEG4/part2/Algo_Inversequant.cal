@@ -44,7 +44,7 @@ int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 	get_qp: action QP:[ q ], DC:[ i ] ==> OUT:[ i ]
 	do
 		quant := q;
-		round := bitxor(bitand(q, 1), 1);
+		round := (q & 1) ^ 1;
 	end
 
 	function abs(int x) --> int :
@@ -57,7 +57,7 @@ int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 
 	ac: action AC:[ i ] repeat 63 ==> OUT:[ o ] repeat 63
 	var
-		List(type: int(size=SAMPLE_SZ), size=63) v = [ (quant * (lshift(abs(i[j]), 1) + 1)) - round :
+		List(type: int(size=SAMPLE_SZ), size=63) v = [ (quant * ((abs(i[j]) << 1) + 1)) - round :
 		for int j in 0 .. 62 ] , List(type: int(size=SAMPLE_SZ), size=63) o = [ if i[k] = 0 then
 			0
 		else

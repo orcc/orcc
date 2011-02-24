@@ -479,7 +479,7 @@ actor Algo_MMCO ()
 		do
 			LongTermFrameIdx := IdxLTFrame;
 			FlagLongTerm     := 1;
-			LongTermFrameIdx := bitand(LongTermFrameIdx,0x0F);
+			LongTermFrameIdx := (LongTermFrameIdx & 0x0F);
 			if(DEBUG_INPUT)then
 				println("input Mmco Mmco:"+opcode+" ; "+IdxLTFrame);
 			end

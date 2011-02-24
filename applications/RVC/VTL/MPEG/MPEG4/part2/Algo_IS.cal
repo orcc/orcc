@@ -58,28 +58,16 @@ int(size=SAMPLE_SZ) PQF_AC :
 
 	//flag to change buffer
 	function wa() --> int :
-		bitor(bitand(count, 63), if half then
-			64
-		else
-			0
-		end) //if half =0 writes to 0-63 else to 64-128
-
+		(count & 63) | if half then	64 else 0 end //if half =0 writes to 0-63 else to 64-128
 	end
 
 	function ra(int address) --> int :
-		bitor(bitand(address, 63), if half then
-			0
-		else
-			64
-		end) //if half =1 reads from 0-63 else from 64-128
-
+		(address & 63) | if half then 0 else 64 end //if half =1 reads from 0-63 else from 64-128
 	end
 
 	skip: action AC_PRED_DIR:[ i ] ==> //Wait for a valid Inverse Scan
-
 	guard
 		i < 0 //0 --> ZZ; 1-->Alternate Vertical; 2 --> Alternate Horiz
-
 	end
 
 	start: action AC_PRED_DIR:[ i ] ==>
@@ -88,11 +76,9 @@ int(size=SAMPLE_SZ) PQF_AC :
 	do
 		add_buf := i;
 		//Inverse Scan for next block
-
 	end
 
 	done: action ==> //Done reading or writing 64 ac coeffs
-
 	guard
 		count = 64
 	do
@@ -110,7 +96,6 @@ int(size=SAMPLE_SZ) PQF_AC :
 			end
 		end;
 		//List Scanmode pointer for current inv scan for current block
-
 	end
 
 	// If there is not a block in the buffer already, just read in the block
@@ -122,7 +107,6 @@ int(size=SAMPLE_SZ) PQF_AC :
 		//ac coeff in buffer --buf
 		count := count + 1;
 		//inc count
-
 	end
 
 	// If there is a block in the buffer already but no new arrival, just write it out
@@ -144,7 +128,6 @@ int(size=SAMPLE_SZ) PQF_AC :
 		count := count + 1;
 		addr := addr + 1;
 		//println("read in" + buf + "written out" + buf[ ra(Scanmode[ addr] ) ]);
-
 	end
 
 	schedule fsm rest :

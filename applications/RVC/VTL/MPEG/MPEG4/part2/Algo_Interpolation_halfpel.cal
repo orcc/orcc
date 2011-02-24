@@ -28,14 +28,14 @@ int(size=PIX_SZ) MOT :
 		else
 			if flags = 1 then
 			// interpolate y only
-				rshift((p00 + p01 + 1) - round, 1)
+				((p00 + p01 + 1) - round) >> 1
 			else
 				if flags = 2 then
 				// interpolate x only
-					rshift((p00 + p10 + 1) - round, 1)
+					((p00 + p10 + 1) - round) >> 1
 				else
 				// interpolate x and y
-					rshift((p00 + p10 + p01 + p11 + 2) - round, 2)
+					((p00 + p10 + p01 + p11 + 2) - round) >> 2
 				end
 			end
 		end
@@ -53,8 +53,8 @@ int(size=PIX_SZ) MOT :
 	do
 		x := 0;
 		y := 0;
-		flags := rshift(f, 1);
-		round := bitand(f, 1);
+		flags := (f >> 1);
+		round := (f & 1);
 	end
 
 	done: action ==>

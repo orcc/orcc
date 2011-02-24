@@ -93,16 +93,16 @@ actor Algo_Synp_MPEG_4 (
   int VOL_WIDTH_LENGTH                    = 13;
   int VOL_HEIGHT_LENGTH                   = 13;
 
-  //int TIME_INC_RES_MASK                   = lshift( 1, TIME_INC_RES_LENGTH      ) - 1;
+  //int TIME_INC_RES_MASK                   = (1 << TIME_INC_RES_LENGTH) - 1;
   // Note: mask off width, height in units of MBs, not pixels
   //int VOL_WIDTH_MASK                      = lshift( 1, VOL_WIDTH_LENGTH - 4     ) - 1;
   //int VOL_HEIGHT_MASK                     = lshift( 1, VOL_HEIGHT_LENGTH - 4    ) - 1;
-  //int ASPECT_RATIO_INFO_MASK              = lshift( 1, ASPECT_RATIO_INFO_LENGTH ) - 1;
+  //int ASPECT_RATIO_INFO_MASK              = (1 << ASPECT_RATIO_INFO_LENGTH) - 1;
 
   int RUN_LENGTH                          = 6;
-  int RUN_MASK                            = lshift( 1, RUN_LENGTH   ) - 1;
+  int RUN_MASK                            = (1 << RUN_LENGTH) - 1;
   int LEVEL_LENGTH                        = 12;
-  int LEVEL_MASK                          = lshift( 1, LEVEL_LENGTH ) - 1;
+  int LEVEL_MASK                          = (1 << LEVEL_LENGTH) - 1;
 
   // count of misc VOL bits:
   //    interlaced            OBMC_disabled            vol_sprite_usage        not_8_bit
@@ -119,13 +119,13 @@ actor Algo_Synp_MPEG_4 (
   int I_VOP                           = 0;
   int INTRA_DC_VLC_THR_LENGTH         = 3;
   int VOP_FCODE_FOR_LENGTH            = 3;
-  int VOP_FCODE_FOR_MASK              = lshift( 1, VOP_FCODE_FOR_LENGTH ) - 1;
+  int VOP_FCODE_FOR_MASK              = (1 << VOP_FCODE_FOR_LENGTH) - 1;
   int BITS_QUANT                      = 5;
-  int BITS_QUANT_MASK                 = lshift( 1, BITS_QUANT           ) - 1;
+  int BITS_QUANT_MASK                 = (1 << BITS_QUANT) - 1;
   int ESCAPE_CODE                     = 7167;
 
   function mask_bits( int v, int n ) --> int :
-    bitand( v, lshift(1,n)-1 )
+    v & ((1 << n) - 1)
   end
   
   // Utility action to read a specified number of bits.
@@ -147,7 +147,7 @@ actor Algo_Synp_MPEG_4 (
   guard 
     not done_reading_bits()
   do
-    read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if b then 1 else 0 end );
+    read_result_in_progress := (read_result_in_progress << 1) | if b then 1 else 0 end;
     bits_to_read_count := bits_to_read_count - 1;
     bit_count := bit_count + 1;
   end
@@ -220,20 +220,20 @@ actor Algo_Synp_MPEG_4 (
   guard
     done_reading_bits()
   var
-    int(size=TIME_INC_RES_LENGTH+1) time_inc_res := mask_bits( rshift( read_result(), 2 ), TIME_INC_RES_LENGTH ),  // pick out the time_inc_res field
+    int(size=TIME_INC_RES_LENGTH+1) time_inc_res := mask_bits(read_result() >> 2, TIME_INC_RES_LENGTH),  // pick out the time_inc_res field
     int(size=7) count := 0,
     int(size=7) ones  := 0
   do
     while ( count = 0 or time_inc_res != 0 ) do
-      if bitand( time_inc_res, 1 ) = 1 then
+      if (time_inc_res & 1) = 1 then
         ones := ones + 1;
       end
       count := count + 1;
-      time_inc_res := rshift( time_inc_res, 1 );
+      time_inc_res := (time_inc_res >> 1);
     end
     mylog := if ones > 1 then count else count - 1 end;
     mylog := if mylog < 1 then 1 else mylog end;
-    set_bits_to_read(if bitand( read_result(), 1 ) = 1 then
+    set_bits_to_read(if (read_result() & 1) = 1 then
       // fixed vop rate
       //mylog + MARKER_LENGTH 
       mylog
@@ -253,7 +253,7 @@ actor Algo_Synp_MPEG_4 (
   guard
     done_reading_bits()
   do
-    vol_width  := mask_bits( rshift( read_result(), MARKER_LENGTH + 4 ), VOL_WIDTH_LENGTH-4 ); // strip marker and divide by 16
+    vol_width  := mask_bits(read_result() >> (MARKER_LENGTH + 4), VOL_WIDTH_LENGTH-4 ); // strip marker and divide by 16
     set_bits_to_read( VOL_HEIGHT_LENGTH + MARKER_LENGTH );
   end
 
@@ -261,7 +261,7 @@ actor Algo_Synp_MPEG_4 (
   guard
     done_reading_bits()
   do
-    vol_height  := mask_bits( rshift( read_result(), MARKER_LENGTH + 4  ), VOL_HEIGHT_LENGTH ); // strip marker and divide by 16
+    vol_height  := mask_bits(read_result() >> (MARKER_LENGTH + 4), VOL_HEIGHT_LENGTH ); // strip marker and divide by 16
     set_bits_to_read( MISC_BIT_LENGTH );
   end
 
@@ -282,7 +282,7 @@ actor Algo_Synp_MPEG_4 (
 
   byte_align: action ==>
   do
-    set_bits_to_read( 8 - bitand( bit_count, 7 ) );
+    set_bits_to_read( 8 - (bit_count & 7) );
   end
 
   // Note: no check for correct bit stuffing
@@ -363,23 +363,23 @@ actor Algo_Synp_MPEG_4 (
     done_reading_bits()
   var
     bool round := false,
-    int(size=BTYPE_SZ) cmd := bitor( NEWVOP, if prediction_is_IVOP then INTRA else INTER end )
+    int(size=BTYPE_SZ) cmd := NEWVOP | if prediction_is_IVOP then INTRA else INTER end
   do
     if not prediction_is_IVOP then
-      round := bitand( rshift( read_result(), INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 1 ) = 1;
-	  intra_dc_vlc_thr := intra_dc_threshold_table[ bitand( rshift( read_result(), BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 7 ) ];
-      vop_quant := bitand( rshift( read_result(), VOP_FCODE_FOR_LENGTH ), BITS_QUANT_MASK );
-      fcode := bitand( read_result(), VOP_FCODE_FOR_MASK );
+      round := (read_result() >> (INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH) & 1) = 1;
+	  intra_dc_vlc_thr := intra_dc_threshold_table[(read_result() >> (BITS_QUANT + VOP_FCODE_FOR_LENGTH)) & 7];
+      vop_quant := (read_result() >> VOP_FCODE_FOR_LENGTH) & BITS_QUANT_MASK;
+      fcode := read_result() & VOP_FCODE_FOR_MASK;
       // resync_marker_length := 16 + fcode;
     else
-	  intra_dc_vlc_thr := intra_dc_threshold_table[ bitand( rshift( read_result(), BITS_QUANT ), 7 ) ];
-      vop_quant := bitand( read_result(), BITS_QUANT_MASK );
+	  intra_dc_vlc_thr := intra_dc_threshold_table[(read_result() >> BITS_QUANT) & 7];
+      vop_quant := read_result() & BITS_QUANT_MASK;
       fcode := 0;
       // resync_marker_length := 17;
     end
 	prev_quant:=vop_quant;
-    cmd := bitor( cmd, if round then ROUND_TYPE else 0 end );
-    cmd := bitor( cmd, bitand( lshift( fcode, FCODE_SHIFT), FCODE_MASK) );
+    cmd := cmd | if round then ROUND_TYPE else 0 end;
+    cmd := cmd | ((fcode << FCODE_SHIFT) & FCODE_MASK);
 end
 
 send_new_vop_width: action ==> BTYPE: [ vol_width ], WIDTH: [ vol_width ] end
@@ -451,16 +451,16 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   get_mbtype.noac: action ==>
   guard
     vld_success(),
-    bitand( vld_result(), 7 ) != 3,
-    bitand( vld_result(), 7 ) != 4
+    (vld_result() & 7) != 3,
+    (vld_result() & 7) != 4
   var
     int mcbpc = vld_result(),
-    int mcbpc_type = bitand( mcbpc, 7 )
+    int mcbpc_type = (mcbpc & 7)
   do
     btype_is_INTRA := mcbpc_type >= 3;
 	btype_is_Q:= (mcbpc_type = 4) or (mcbpc_type = 1);
     fourmvflag := (mcbpc_type = 2);
-    cbpc := bitand( rshift( mcbpc, 4 ), 3 );
+    cbpc := (mcbpc >> 4) & 3;
     acpredflag := false;
     start_vld_engine( CBPY_START_INDEX );
   end
@@ -470,11 +470,11 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     vld_success()
   var
     int mcbpc = vld_result(),
-    int mcbpc_type = bitand( mcbpc, 7 )
+    int mcbpc_type = (mcbpc & 7)
   do
     btype_is_INTRA := true;
 	btype_is_Q:= (mcbpc_type = 4) or (mcbpc_type = 1);
-    cbpc := bitand( rshift( mcbpc, 4 ), 3 );
+    cbpc := (mcbpc >> 4) & 3;
     acpredflag := b;
     bit_count := bit_count + 1;
     start_vld_engine( CBPY_START_INDEX );
@@ -493,7 +493,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   do
     comp := 0;
     mvcomp := 0;
-    cbp := bitor( lshift( cbpy, 2), cbpc );
+    cbp := (cbpy << 2) | cbpc;
 	if (btype_is_Q) then
 		set_bits_to_read(2);
 	end
@@ -506,7 +506,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     int cbpy = vld_result()
   do
     comp := 0;
-    cbp := bitor( lshift(cbpy, 2), cbpc );
+    cbp := (cbpy << 2) | cbpc;
 	if (btype_is_Q) then
 		set_bits_to_read(2);
 	end
@@ -544,20 +544,20 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   var
     int(size=BTYPE_SZ) cmd := INTRA
   do
-    ac_coded := bitand( cbp, lshift( 1,  5 - comp)) != 0;
-    cmd := bitor( cmd, if ac_coded then ACCODED else 0 end );
-    cmd := bitor( cmd, if acpredflag then ACPRED else 0 end );
+    ac_coded := (cbp & (1 << (5 - comp))) != 0;
+    cmd := cmd | if ac_coded then ACCODED else 0 end;
+    cmd := cmd | if acpredflag then ACPRED else 0 end;
   end
 
-  mb_dispatch_inter_no_ac: action ==> BTYPE:[ bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ], QP:[vop_quant]
+  mb_dispatch_inter_no_ac: action ==> BTYPE:[ INTER | (MOTION | if fourmvflag then FOURMV else 0 end) ], QP:[vop_quant]
   guard
-    bitand( cbp, lshift( 1,  5 - comp)) = 0
+    (cbp & (1 << (5 - comp))) = 0
   do
     ac_coded := false;
     comp := comp + 1;
   end
 
-  mb_dispatch_inter_ac_coded: action ==> BTYPE:[ bitor(bitor( INTER, ACCODED ), bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ], QP:[vop_quant]
+  mb_dispatch_inter_ac_coded: action ==> BTYPE:[ (INTER | ACCODED) | (MOTION | if fourmvflag then FOURMV else 0 end) ], QP:[vop_quant]
   do
     ac_coded := true;
   end
@@ -626,7 +626,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     int(size=14) shift := 1
   do
     while count > 1 do
-      shift := lshift( shift, 1 );
+      shift := (shift << 1);
       count := count - 1;
     end
     msb_result := shift;
@@ -638,8 +638,8 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   var
     int(size=14) v := read_result()
   do
-    if bitand( v, msb_result ) = 0 then
-      v := v + 1 - lshift( msb_result, 1 );
+    if (v & msb_result) = 0 then
+      v := v + 1 - (msb_result << 1);
     end   
     set_bits_to_read( if dc_bits > 8 then MARKER_LENGTH else 0 end );
     b_last := not ac_coded;
@@ -672,12 +672,12 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     int(size=SAMPLE_SZ) level,
     bool last
   do
-    run   := if btype_is_INTRA then bitand( rshift( val, 8), 255)
-                               else bitand( rshift( val, 4), 255) end;
-    last  := if btype_is_INTRA then bitand( rshift( val, 16), 1) != 0
-                               else bitand( rshift( val, 12), 1) != 0 end;
-    level := if btype_is_INTRA then bitand( val, 255)
-                               else bitand( val, 15) end;
+    run   := if btype_is_INTRA then (val >> 8) & 255
+                               else (val >> 4) & 255 end;
+    last  := if btype_is_INTRA then ((val >> 16) & 1) != 0
+                               else ((val >> 12) & 1) != 0 end;
+    level := if btype_is_INTRA then (val & 255)
+                               else (val & 15) end;
     b_last := last;
     bit_count := bit_count + 1;
   end
@@ -721,9 +721,9 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     bool sign,
     bool last
   do
-    last  := bitand( rshift( read_result(), RUN_LENGTH + MARKER_LENGTH + LEVEL_LENGTH + MARKER_LENGTH ), 1          ) != 0;
-    run   := bitand( rshift( read_result(),              MARKER_LENGTH + LEVEL_LENGTH + MARKER_LENGTH ), RUN_MASK   );
-    level := bitand( rshift( read_result(),                                             MARKER_LENGTH ), LEVEL_MASK );
+    last  := ((read_result() >> (RUN_LENGTH + MARKER_LENGTH + LEVEL_LENGTH + MARKER_LENGTH)) & 1) != 0;
+    run   := (read_result() >>              (MARKER_LENGTH + LEVEL_LENGTH + MARKER_LENGTH))  & RUN_MASK  ;
+    level := (read_result() >>                                              MARKER_LENGTH)   & LEVEL_MASK;
     if level >= 2048 then
       sign  := true;
       level := 4096 - level;
@@ -790,8 +790,8 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   var
     int(size=VLD_TABLE_DATA_BITS-2) val = vld_result()
   do
-    level_lookup_inter := inter_max_level( bitand( rshift( val, 12), 1) != 0, bitand( rshift( val, 4), 255));
-    level_lookup_intra := intra_max_level( bitand( rshift( val, 16), 1) != 0, bitand( rshift( val, 8), 255));
+    level_lookup_inter := inter_max_level( ((val >> 12) & 1) != 0, ((val >> 4) & 255));
+    level_lookup_intra := intra_max_level( ((val >> 16) & 1) != 0, ((val >> 8) & 255));
   end
   
   vld_level_lookup: action bits:[sign] ==> VALUE:[if sign then -level else level end], RUN:[run], LAST:[ last ]
@@ -801,12 +801,12 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     int(size=SAMPLE_SZ) level,
     bool last
   do
-    run   := if btype_is_INTRA then bitand( rshift( val, 8), 255)
-                               else bitand( rshift( val, 4), 255) end;
-    last  := if btype_is_INTRA then bitand( rshift( val, 16), 1) != 0
-                               else bitand( rshift( val, 12), 1) != 0 end;
-    level := if btype_is_INTRA then bitand( val, 255) + level_lookup_intra
-                               else bitand( val, 15) + level_lookup_inter end;
+    run   := if btype_is_INTRA then ((val >> 8) & 255)
+                               else ((val >> 4) & 255) end;
+    last  := if btype_is_INTRA then ((val >> 16) & 1) != 0
+                               else ((val >> 12) & 1) != 0 end;
+    level := if btype_is_INTRA then (val & 255) + level_lookup_intra
+                               else (val & 15) + level_lookup_inter end;
     b_last := last;
     bit_count := bit_count + 1;
   end
@@ -861,10 +861,10 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   var
     int(size=VLD_TABLE_DATA_BITS-2) val = vld_result()
   do
-    run_lookup_inter := inter_max_run( bitand( rshift( val, 12), 1) != 0,
-                                   bitand( val, 15) );
-    run_lookup_intra := intra_max_run( bitand( rshift( val, 16), 1) != 0, 
-                                   bitand( val, 255) );
+    run_lookup_inter := inter_max_run( ((val >> 12) & 1) != 0,
+                                   (val & 15) );
+    run_lookup_intra := intra_max_run( ((val >> 16) & 1) != 0, 
+                                   (val & 255) );
   end
   
   vld_run_lookup: action bits:[sign] ==> VALUE:[if sign then -level else level end], RUN:[run], LAST:[ last ]
@@ -874,12 +874,12 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     int(size=SAMPLE_SZ) level,
     bool last
   do
-    last  := if btype_is_INTRA then bitand( rshift( val, 16), 1) != 0
-                               else bitand( rshift( val, 12), 1) != 0 end;                                  
-    level := if btype_is_INTRA then bitand( val, 255)
-                               else bitand( val, 15) end;                                  
-    run   := if btype_is_INTRA then bitand( rshift( val, 8), 255) + run_lookup_intra
-                               else bitand( rshift( val, 4), 255) + run_lookup_inter end + 1;                                  
+    last  := if btype_is_INTRA then ((val >> 16) & 1) != 0
+                               else ((val >> 12) & 1) != 0 end;                                  
+    level := if btype_is_INTRA then (val & 255)
+                               else (val & 15) end;                                  
+    run   := if btype_is_INTRA then ((val >> 8) & 255) + run_lookup_intra
+                               else ((val >> 4) & 255) + run_lookup_inter end + 1;                                  
     b_last := last;
     bit_count := bit_count + 1;
   end
@@ -1097,15 +1097,15 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     vld_index := index;
     vld_codeword := 2;
   end
-  function vld_success() --> bool : bitand(vld_codeword,3) = 0 end
-  function vld_failure() --> bool : bitand(vld_codeword,1) = 1 end
-  function vld_result() --> int( size=VLD_TABLE_DATA_BITS ) : rshift(vld_codeword,2) end
+  function vld_success() --> bool : (vld_codeword & 3) = 0 end
+  function vld_failure() --> bool : (vld_codeword & 1) = 1 end
+  function vld_result() --> int( size=VLD_TABLE_DATA_BITS ) : (vld_codeword >> 2) end
   action bits:[ b ] ==>
   guard
-    bitand(vld_codeword,3) = 2 
+    (vld_codeword & 3) = 2 
   do
     vld_codeword := vld_table[ vld_index + if b then 1 else 0 end ];
-    vld_index := rshift(vld_codeword,2);
+    vld_index := (vld_codeword >> 2);
     bit_count := bit_count + 1;
   end
   do_vld_failure: action ==>
@@ -1130,13 +1130,13 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   test_zero_byte: action ==>
   guard
     done_reading_bits(),
-    bitand( read_result(), 255 ) = 0
+    (read_result() & 255) = 0
   end
 
   test_vo_byte: action ==>
   guard
     done_reading_bits(),
-    bitand( read_result(), 254 ) = 0
+    (read_result() & 254) = 0
   end
 
   test_vol_byte: action ==>
@@ -1163,7 +1163,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   test_one_byte: action ==>
   guard
     done_reading_bits(),
-    bitand( read_result(), 255 ) = 1
+    (read_result() & 255) = 1
   end
 
   request_byte: action ==>

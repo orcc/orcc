@@ -79,7 +79,7 @@
 * Revised:
 *  Author: Jia-Wei Liang, MSOC Lab, NCKU
 *  (E-mail: n2697181@mail.ncku.edu.tw)
-* Author: Micka‘l Raulet (INSA Rennes)
+* Author: Mickaï¿½l Raulet (INSA Rennes)
 * 	add RVC-CAL compliancy 
 * */
 // Mgnt_DBF.cal
@@ -219,7 +219,7 @@ List( type:int( size=4 ), size=32 ) CHROMA_EDGE_ROM = [
 // Arithmetic functions
 //
 function abs( int val ) --> int  :  if (val < 0) then -val else val end end
-function mask_one_bit( int v, int n ) --> int :  rshift( bitand( v, lshift(1,n) ), n ) end
+function mask_one_bit( int v, int n ) --> int :  (v | (1 << n)) >> n end
 function Clip( int Min, int Max, int Val  )--> int :  if (Val < Min) then Min else if (Val > Max) then Max else Val end end end
 function ClipPicId( int Check, int Val ) --> int  :  if (Check < 0) then INT64_MIN else Val end end
 //
@@ -273,8 +273,8 @@ begin
       QP_p := valQP;
     end
   end
-  blkQ := lshift(rshift(yQ, 2), 2) + rshift(xQ, 2);
-  blkP := lshift(rshift(yP, 2), 2) + rshift(xP, 2);
+  blkQ := ((yQ >> 2) << 2) + (xQ >> 2);
+  blkP := ((yP >> 2) << 2) + (xP >> 2);
 end
 
 /*************************************************************
@@ -556,9 +556,9 @@ GetStrengths: action ==> BS:[Strength] repeat 32
         if ((b>0) or (dir=1 and mb_y!=0 and (valLFDisable=0 or slice_nr=up_slice_nr)) 
         		  or (dir=0 and mb_x!=0 and (valLFDisable=0 or slice_nr=left_slice_nr))) then
           foreach int c in 0 .. 3 do
-            idx := lshift(dir,4) + lshift(c,2) + b;
-			xQ := getPixelPosX(lshift(c,2),dir);
-			yQ := getPixelPosY(lshift(c,2),dir);                    
+            idx := (dir << 4) + (c << 2) + b;
+			xQ := getPixelPosX((c << 2),dir);
+			yQ := getPixelPosY((c << 2),dir);                    
 			setNeighbour(xQ - 1 + dir, yQ - dir ,1);			      
 			// Start w/ Strength = 3 or = 4 for Mb-edge
 			if ((b=0) and ((interlace=FRAME) or (dir=0))) then
@@ -634,7 +634,7 @@ EdgeLoops: action ==> BS:[Alist[0],Alist[1],Alist[2],Blist[0],Blist[1],Blist[2]]
 			yQ := getPixelPosY(pel,dir);                    
 			setNeighbour(xQ - 1 + dir, yQ - dir,0);				        
 			// Average QP of the two blocks			      
-			QP_avg := rshift((QP_p + valQP + 1), 1);  
+			QP_avg := ((QP_p + valQP + 1) >> 1);  
 			indexA := Clip(MIN_QP, MAX_QP, QP_avg + alpha_offset);			      
 			indexB := Clip(MIN_QP, MAX_QP, QP_avg + beta_offset);	
 			if useLeft=1 then 

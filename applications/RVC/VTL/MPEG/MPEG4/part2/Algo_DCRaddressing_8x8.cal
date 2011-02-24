@@ -112,7 +112,7 @@ actor Algo_DCRaddressing_8x8 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_S
 	// New VOP
 	start: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		mbx := 0;
 		top_edge := true;
@@ -136,7 +136,7 @@ actor Algo_DCRaddressing_8x8 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_S
 	// Is this an INTRA 8x8 block?
 	read.intra: action BTYPE:[ btype ] ==>
 	guard
-		bitand(btype, INTRA) != 0
+		(btype & INTRA) != 0
 	do
 		coded[ptr] := true;
 	end

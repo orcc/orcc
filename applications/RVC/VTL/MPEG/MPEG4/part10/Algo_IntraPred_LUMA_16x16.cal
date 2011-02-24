@@ -209,10 +209,10 @@ actor Algo_IntraPred_LUMA_16x16 ()
      
     
     a:= 16*(y_left[15] + y_up[15]);
-    b:= rshift( 5*H + 32, 6);
-    c:= rshift( 5*V + 32, 6);
+    b:= (5*H + 32) >> 6;
+    c:= (5*V + 32) >> 6;
 
-    mpr := [clip( rshift(a + b*(i-7) + c*(j-7) + 16, 5) , 0,255 ): for int i in  0 .. 15, for int j in 0 .. 15];
+    mpr := [clip((a + b*(i-7) + c*(j-7) + 16) >> 5, 0, 255): for int i in  0 .. 15, for int j in 0 .. 15];
  end
  		
   schedule fsm start:

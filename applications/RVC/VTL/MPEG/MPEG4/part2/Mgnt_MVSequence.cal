@@ -77,13 +77,13 @@ actor Mgnt_MVSequence (int FOURMV,
 	// c   - component to be accessed
 	function access(int(size=MB_COORD_SZ) mbptr, int(size=4) c) --> int(size=MB_COORD_SZ +
 		3) :
-		bitor(lshift(mbptr, 3), bitand(c, 3))
+		(mbptr << 3) | (c & 3)
 	end
 
 	// New VOP
 	start: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		mbx := 0;
 		top_edge := true;
@@ -107,8 +107,8 @@ actor Mgnt_MVSequence (int FOURMV,
 
 	read.noPredict: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) = 0,
-		comp > 3 or bitand(cmd, INTER) = 0 or bitand(cmd, MOTION) = 0 or (comp != 0 and bitand(cmd, FOURMV)
+		(cmd & NEWVOP) = 0,
+		comp > 3 or (cmd & INTER) = 0 or (cmd & MOTION) = 0 or (comp != 0 and (cmd & FOURMV)
 		= 0)
 	do
 		comp := comp + 1;
@@ -135,9 +135,9 @@ actor Mgnt_MVSequence (int FOURMV,
 	// block 0 left->1   above->2    above_right->3
 	read.predict.y0: action BTYPE:[ cmd ] ==> A:[ access(pl, 1), access(pa, 2), access(par, 2) ]
 	guard
-		bitand(cmd, NEWVOP) = 0,
-		bitand(cmd, INTER) != 0,
-		bitand(cmd, MOTION) != 0,
+		(cmd & NEWVOP) = 0,
+		(cmd & INTER) != 0,
+		(cmd & MOTION) != 0,
 		comp = 0
 	var
 		int(size=MB_COORD_SZ) pl = if mbx = 0 then
@@ -160,10 +160,10 @@ actor Mgnt_MVSequence (int FOURMV,
 	// block 1    0      above->3    above_right->2
 	read.predict.y1: action BTYPE:[ cmd ] ==> A:[ access(ptr, 0), access(pa, 3), access(par, 2) ]
 	guard
-		bitand(cmd, NEWVOP) = 0,
-		bitand(cmd, INTER) != 0,
-		bitand(cmd, MOTION) != 0,
-		bitand(cmd, FOURMV) != 0,
+		(cmd & NEWVOP) = 0,
+		(cmd & INTER) != 0,
+		(cmd & MOTION) != 0,
+		(cmd & FOURMV) != 0,
 		comp = 1
 	var
 		int(size=MB_COORD_SZ) pa = if top_edge then
@@ -182,10 +182,10 @@ actor Mgnt_MVSequence (int FOURMV,
 	// block 2 left->3       0            1
 	read.predict.y2: action BTYPE:[ cmd ] ==> A:[ access(pl, 3), access(ptr, 0), access(ptr, 1) ]
 	guard
-		bitand(cmd, NEWVOP) = 0,
-		bitand(cmd, INTER) != 0,
-		bitand(cmd, MOTION) != 0,
-		bitand(cmd, FOURMV) != 0,
+		(cmd & NEWVOP) = 0,
+		(cmd & INTER) != 0,
+		(cmd & MOTION) != 0,
+		(cmd & FOURMV) != 0,
 		comp = 2
 	var
 		int(size=MB_COORD_SZ) pl = if mbx = 0 then
@@ -201,10 +201,10 @@ actor Mgnt_MVSequence (int FOURMV,
 	read.predict.y3: action BTYPE:[ cmd ] ==> A:[ access(ptr, 2), access(ptr, 0), access(ptr, 1)
 		]
 	guard
-		bitand(cmd, NEWVOP) = 0,
-		bitand(cmd, INTER) != 0,
-		bitand(cmd, MOTION) != 0,
-		bitand(cmd, FOURMV) != 0,
+		(cmd & NEWVOP) = 0,
+		(cmd & INTER) != 0,
+		(cmd & MOTION) != 0,
+		(cmd & FOURMV) != 0,
 		comp = 3
 	do
 		comp := comp + 1;

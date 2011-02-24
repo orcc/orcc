@@ -59,7 +59,7 @@ actor Algo_IT4x4_Addshift () int(size=16) X ==> int(size=16) Y :
   var 
     int(size=16) y
   do
-    y := rshift(x + 32, 6);
+    y := (x + 32) >> 6;
   end
 
 end

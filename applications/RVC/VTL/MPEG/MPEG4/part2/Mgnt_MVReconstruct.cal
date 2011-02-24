@@ -67,9 +67,9 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 	// New VOP
 	start: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	var
-		int(size=4) fcode = rshift(bitand(cmd, FCODE_MASK), FCODE_SHIFT)
+		int(size=4) fcode = (cmd & FCODE_MASK) >> FCODE_SHIFT
 	do
 		mbx := 0;
 		top_edge := true;
@@ -77,10 +77,10 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 		// compute if this is a P_VOP
 		if fcode > 0 then
 			mv_rsize := fcode - 1;
-			mv_range := lshift(1, mv_rsize + 5);
+			mv_range := 1 << (mv_rsize + 5);
 			mv_low := -mv_range;
 			mv_high := mv_range - 1;
-			mv_range := lshift(mv_range, 1);
+			mv_range := (mv_range << 1);
 		end
 	end
 
@@ -98,14 +98,14 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 	// No motion vector
 	read.noMotion: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, INTER) = 0 or bitand(cmd, MOTION) = 0,
-		bitand(cmd, NEWVOP) = 0
+		(cmd & INTER) = 0 or (cmd & MOTION) = 0,
+		(cmd & NEWVOP) = 0
 	var
-		int(size=MB_COORD_SZ + 3) p = bitor(ptr, comp)
+		int(size=MB_COORD_SZ + 3) p = (ptr | comp)
 	do
 		if comp < 4 then
 			buf[p] := 0;
-			buf[bitor(p, Y_SELECT)] := 0;
+			buf[(p | Y_SELECT)] := 0;
 		end
 	end
 
@@ -114,12 +114,12 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 	// Motion vectors - detect fourmv
 	read.motion: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, INTER) != 0,
-		bitand(cmd, MOTION) != 0,
-		bitand(cmd, NEWVOP) = 0
+		(cmd & INTER) != 0,
+		(cmd & MOTION) != 0,
+		(cmd & NEWVOP) = 0
 	do
 		if comp = 0 then
-			fourmv := bitand(cmd, FOURMV) != 0;
+			fourmv := (cmd & FOURMV) != 0;
 			sum_x := 0;
 			sum_y := 0;
 		end
@@ -187,7 +187,7 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 		cpred := buf[t];
 		aptr := bptr;
 		bptr := cptr;
-		cptr := bitor(t, Y_SELECT);
+		cptr := (t | Y_SELECT);
 	end
 
 	do_pred: action ==>
@@ -245,7 +245,7 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 	/*
   get_residual: action MVIN:[s] ==>
   var
-    int(size=MV_SZ) shift = lshift( if mag < 0 then bitnot(mag) else mag - 1 end, mv_rsize) + s + 1,
+    int(size=MV_SZ) shift = lshift( if mag < 0 then ~(mag) else mag - 1 end, mv_rsize) + s + 1,
     int(size=MV_SZ) mv1 = mvcalc( apred, mag, shift ),
     int(size=MV_SZ) mv =  mvclip( mv1 ),
     int(size=MV_SZ+2) sum = sum_x + mv
@@ -264,7 +264,7 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 	get_residual.init: action ==>
 	do
 		res_shift := if mag < 0 then
-			bitnot(mag)
+			~(mag)
 		else
 			mag - 1
 		end;
@@ -275,7 +275,7 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 		int(size=MV_SZ) count := mv_rsize
 	do
 		while count > 0 do
-			res_shift := lshift(res_shift, 1);
+			res_shift := (res_shift << 1);
 			count := count - 1;
 		end
 	end
@@ -312,13 +312,9 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 	guard
 		comp < 4
 	var
-		int(size=MB_COORD_SZ + 3) p = bitor(ptr, comp) , int(size=MV_SZ) t = mv_x
+		int(size=MB_COORD_SZ + 3) p = (ptr | comp) , int(size=MV_SZ) t = mv_x
 	do
-		buf[bitor(p, if x_flag then
-			0
-		else
-			Y_SELECT
-		end)] := mv_x;
+		buf[p | if x_flag then 0 else Y_SELECT end] := mv_x;
 		mv_x := mv_y;
 		mv_y := t;
 		x_flag := not x_flag;
@@ -326,12 +322,8 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 
 	function uvclip_1(int v) --> int
 	var
-		int vv = rshift(v, 1) :
-		bitor(vv, if bitand(v, 3) = 0 then
-			0
-		else
-			1
-		end)
+		int vv = (v >> 1) :
+		vv | if (v & 3) = 0 then 0 else 1 end
 	end
 
 	function uvclip_4(int v) --> int
@@ -342,7 +334,7 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 		else
 			v
 		end,
-		int resv = (absv - lshift(rshift(absv, 4), 4)),
+		int resv = (absv - ((absv >> 4) << 4)),
 		// resv := |v|%16
 		int delta = if resv < 3 then
 			0
@@ -353,7 +345,7 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 				1
 			end
 		end,
-		int vv = lshift(rshift(absv, 4), 1) + delta :
+		int vv = ((absv >> 4) << 1) + delta :
 		if sign then
 			-vv
 		else
