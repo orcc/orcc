@@ -30,21 +30,21 @@ actor Sobel()
   procedure soft_sqrt(int num)
   var
     int op := num,
-    int one := lshift(1, 14), // The second-to-top bit is set: 1L<<30 for long
+    int one := (1 << 14), // The second-to-top bit is set: 1L<<30 for long
     int lres := 0
   begin
     // "one" starts at the highest power of four <= the argument.
     while (one > op) do
-      one := rshift(one, 2);
+      one := (one >> 2);
     end
     
     while (one != 0) do
       if (op >= lres + one) then
         op := op - (lres + one);
-        lres := lres + lshift(one, 1);
+        lres := lres + (one << 1);
       end
-      lres := rshift(lres, 1);
-      one := rshift(one, 2);
+      lres := (lres >> 1);
+      one := (one >> 2);
     end
     
     res := lres;
@@ -117,8 +117,8 @@ actor Sobel()
     val := [ get_pixel(coord[k][0], coord[k][1]) : for int k in 0 .. 8 ];
   
   
-    gx := - val[0] + val[2] - lshift(val[3], 1) + lshift(val[5], 1) - val[6] + val[8];
-    gy := - val[0] - lshift(val[1], 1) - val[2] + val[6] + lshift(val[7], 1) + val[8];
+    gx := - val[0] + val[2] - (val[3] <<  1) + (val[5] << 1) - val[6] + val[8];
+    gy := - val[0] - (val[1] << 1) - val[2] + val[6] + (val[7] << 1) + val[8];
     
     soft_sqrt(gx * gx + gy * gy);
     g := res;
