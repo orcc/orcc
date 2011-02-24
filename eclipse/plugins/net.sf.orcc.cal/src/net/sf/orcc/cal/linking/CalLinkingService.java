@@ -33,13 +33,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.util.URI;
@@ -59,8 +57,6 @@ import org.eclipse.xtext.parsetree.AbstractNode;
  */
 public class CalLinkingService extends DefaultLinkingService {
 
-	private Map<String, AstFunction> functions;
-
 	private Map<String, AstProcedure> procedures;
 
 	private Resource stubsResource = null;
@@ -69,49 +65,10 @@ public class CalLinkingService extends DefaultLinkingService {
 	 * Creates a new CAL linking service which creates builtin functions.
 	 */
 	public CalLinkingService() {
-		functions = new HashMap<String, AstFunction>();
-
-		addFunction("bitand", IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("bitnot", IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("bitor", IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("bitxor", IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("lshift", IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("rshift", IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32),
-				IrFactory.eINSTANCE.createTypeInt(32));
-
 		procedures = new HashMap<String, AstProcedure>();
 
 		addProcedure("print");
 		addProcedure("println");
-	}
-
-	/**
-	 * Adds a new function to the built-in functions map with the given
-	 * parameters types and return type.
-	 * 
-	 * @param name
-	 *            function name
-	 * @param parameters
-	 *            types of function parameters
-	 * @param returnType
-	 *            return type
-	 */
-	private void addFunction(String name, Type returnType, Type... parameters) {
-		AstFunction function;
-		function = CalFactory.eINSTANCE.createAstFunction();
-		function.setName(name);
-		function.setIrType(returnType);
-		functions.put(name, function);
 	}
 
 	/**
@@ -128,31 +85,6 @@ public class CalLinkingService extends DefaultLinkingService {
 		procedure = CalFactory.eINSTANCE.createAstProcedure();
 		procedure.setName(name);
 		procedures.put(name, procedure);
-	}
-
-	/**
-	 * Returns a singleton if <code>name</code> is a builtin function, and an
-	 * empty list otherwise.
-	 * 
-	 * @param context
-	 *            the context in which a function is referenced.
-	 * @param name
-	 *            function name
-	 * @return a list
-	 */
-	private List<EObject> builtinFunction(EObject context, String name) {
-		AstFunction function = functions.get(name);
-		if (function != null) {
-			EObject cter = Util.getTopLevelContainer(context);
-
-			// Attach the stub to the resource that's being parsed
-			Resource res = makeResource(cter.eResource());
-			res.getContents().add(function);
-
-			return Collections.singletonList((EObject) function);
-		}
-
-		return Collections.emptyList();
 	}
 
 	/**
@@ -191,10 +123,7 @@ public class CalLinkingService extends DefaultLinkingService {
 		final EClass requiredType = ref.getEReferenceType();
 		final String s = getCrossRefNodeAsString(node);
 		if (requiredType != null && s != null) {
-			if (CalPackage.Literals.AST_FUNCTION.isSuperTypeOf(requiredType)) {
-				return builtinFunction(context, s);
-			} else if (CalPackage.Literals.AST_PROCEDURE
-					.isSuperTypeOf(requiredType)) {
+			if (CalPackage.Literals.AST_PROCEDURE.isSuperTypeOf(requiredType)) {
 				return builtinProcedure(context, s);
 			} else if (CalPackage.Literals.AST_STATE
 					.isSuperTypeOf(requiredType)) {
