@@ -60,7 +60,7 @@ actor SHA_256(bool IS_SHA256) uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(
 
 	// SHA-224 and SHA-256 function 'Ch'.
 	function Ch(uint(size=32) x, uint(size=32) y, uint(size=32) z) --> uint(size=32):
-		(x & y) ^ ( (bitnot(x) & 0xffffffff) & z) // Orcc bug: We should not manually truncate the experssion value.
+		(x & y) ^ ( (~x & 0xffffffff) & z) // Orcc bug: We should not manually truncate the experssion value.
 	end
 
 	// SHA-224 and SHA-256 function 'Maj'.

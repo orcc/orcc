@@ -60,7 +60,7 @@ actor CBC(uint BLOCK_SIZE=16) uint(size=8) IP1_IV, uint(size=8) IP2_IT, uint(siz
 	action IP2_IT:[byte] ==> OP:[byte]
 	guard readingIT // and itCounter < BLOCK_SIZE
 	do
-		byte := bitxor(byte, feedText[itCounter]);
+		byte := byte ^ feedText[itCounter];
 		itCounter := itCounter + 1;
 		if (itCounter = BLOCK_SIZE) then
 			itCounter := 0;

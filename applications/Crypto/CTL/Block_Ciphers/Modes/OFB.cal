@@ -95,7 +95,7 @@ actor OFB(uint BLOCK_SIZE_CIPHER=16, uint BLOCK_SIZE_MODE=1)
 	action IP2_IT:[byte] ==> OP1_OT:[byte]
 	guard step_index=3
 	do
-		byte := bitxor(byte, outputBlock[itCounter]);
+		byte := byte ^ outputBlock[itCounter];
 		inputBlock[BLOCK_SIZE_CIPHER-BLOCK_SIZE_MODE+itCounter] := outputBlock[itCounter];
 		itCounter := itCounter + 1;
 		if (itCounter = BLOCK_SIZE_MODE) then

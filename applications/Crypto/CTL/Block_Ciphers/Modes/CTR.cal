@@ -80,7 +80,7 @@ actor CTR(uint BLOCK_SIZE_CIPHER=16, uint BLOCK_SIZE_MODE=BLOCK_SIZE_CIPHER, uin
 			// Get the proper increment of the current block.
 			temp := COUNTER_INCREMENT * index;
 			foreach int i in 0 .. BLOCK_SIZE_COUNTER-1 do
-				counter_increment[i] := bitand(temp, 0xff);
+				counter_increment[i] := (temp & 0xff);
 				temp := (temp >> 8);
 			end
 			// Increase the lower part of inputBlock (counter block) by COUNTER_INCREMENT * index
@@ -138,7 +138,7 @@ actor CTR(uint BLOCK_SIZE_CIPHER=16, uint BLOCK_SIZE_MODE=BLOCK_SIZE_CIPHER, uin
 	action IP2_IT:[byte] ==> OP1_OT:[byte]
 	guard step_index=4
 	do
-		byte := bitxor(byte, outputBlock[itCounter]);
+		byte := byte ^ outputBlock[itCounter];
 		itCounter := itCounter + 1;
 		if (itCounter = BLOCK_SIZE_MODE) then
 			itCounter := 0;

@@ -68,7 +68,7 @@ actor ARC4() uint(size=8) IP1_Key, uint(size=8) IP2_Text ==> uint(size=8) OP:
 		i := (i + 1) mod 256;
 		j := (j + S[i]) mod 256;
 		swap(i,j);
-		byte := bitxor(byte, S[(S[i] + S[j]) mod 256]);
+		byte := byte ^ S[(S[i] + S[j]) mod 256];
 	end
 	
 end

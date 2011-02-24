@@ -51,7 +51,7 @@ actor SHA_160() uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
 	// SHA-1 function 'f'.
 	function f(uint(size=32) x, uint(size=32) y, uint(size=32) z, uint t) --> uint(size=32):
 		if t <= 19 then
-			(x & y) ^ ( (bitnot(x) & 0xffffffff) & z) // Orcc bug: We should not manually truncate the experssion value.
+			(x & y) ^ ( (~x & 0xffffffff) & z) // Orcc bug: We should not manually truncate the experssion value.
 		else if t >= 40 and t <= 59 then
 				(x & y) ^ (x & z) ^ (y & z)
 			else

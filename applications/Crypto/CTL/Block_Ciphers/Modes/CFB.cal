@@ -93,7 +93,7 @@ actor CFB(uint BLOCK_SIZE_CIPHER=16, uint BLOCK_SIZE_MODE=1, bool IS_ENCIPHER=tr
 	guard step_index=3
 	var uint(size=8) otByte
 	do
-		otByte := bitxor(itByte, outputBlock[itCounter]);
+		otByte := itByte ^ outputBlock[itCounter];
 		if IS_ENCIPHER then // Encipher
 			inputBlock[BLOCK_SIZE_CIPHER-BLOCK_SIZE_MODE+itCounter] := otByte;
 		else // Decipher
