@@ -119,7 +119,7 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
     qp := x;
     qp_per := qp / 6;
     qp_rem := qp mod 6;
-    qp_sft := lshift(1, 5-qp_per);
+    qp_sft := 1 << (5-qp_per);
   end
 
   read_sl: action ScalingList:[SL] repeat 4*4 ==>
@@ -133,9 +133,9 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
 			==>
 		O:[ [
     			if qp_per < 6 then
-    			  rshift( i[s] * t_LevelScale[16*qp_rem] + qp_sft, 6 - qp_per)
+    			  ( i[s] * t_LevelScale[16*qp_rem] + qp_sft)>>(6 - qp_per)
    				else
-      			  lshift( i[s] * t_LevelScale[16*qp_rem], qp_per - 6)
+      			  ( i[s] * t_LevelScale[16*qp_rem])<<( qp_per - 6)
     			end : for int s in 0 .. 15 
     	  ] ] repeat 16
 	end

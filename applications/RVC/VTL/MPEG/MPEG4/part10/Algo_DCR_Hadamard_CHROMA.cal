@@ -105,9 +105,9 @@ actor Algo_DCR_Hadamard_CHROMA ()
   itrans:
   action levarr:[x] repeat 4 ==> Cof:[[
     if qp_per < 5 then
-      rshift(y[s] * t_LevelScale[16*qp_rem], 5 - qp_per)
+      (y[s] * t_LevelScale[16*qp_rem]) >> (5 - qp_per)
     else
-      lshift(y[s] * t_LevelScale[16*qp_rem], qp_per - 5)
+      (y[s] * t_LevelScale[16*qp_rem]) << (qp_per - 5)
     end :for int s in 0 .. 3]] repeat 4
   var
    List(type:int(size=16), size=4) buf,

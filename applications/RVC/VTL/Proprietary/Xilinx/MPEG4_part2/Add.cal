@@ -58,7 +58,7 @@ int(size=PIX_SZ) VID :
 	// Ignore new VOP command
 	cmd.newVop: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	end
 
 	int(size=8) count := 0;
@@ -66,13 +66,13 @@ int(size=PIX_SZ) VID :
 	// Pure texture
 	cmd.textureOnly: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, INTRA) != 0
+		(cmd & INTRA) != 0
 	end
 
 	// Pure motion
 	cmd.motionOnly: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, ACCODED) = 0
+		(cmd & ACCODED) = 0
 	end
 
 	// Mixed texture and motion

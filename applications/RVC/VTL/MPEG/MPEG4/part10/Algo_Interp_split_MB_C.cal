@@ -87,39 +87,39 @@ actor Algo_Interp_split_MB_C ()
   guard
   	mbpart_w = 8 and mbpart_h = 8
   var 
-    uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 4) + lshift(InverseScan4x4Tab[count] mod 4, 1)
+    uint pixAddr := (InverseScan4x4Tab[count] /4) << 4 + (InverseScan4x4Tab[count] mod 4)<< 1
   do
   	foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
-        MB[pixAddr+i+lshift(j,3)] := v[i+j*mbpart_w];
+        MB[pixAddr+i+(j<<3)] := v[i+j*mbpart_w];
       end
     end
-  	count := count + ( rshift(mbpart_w,1) * rshift(mbpart_h,1) );
+  	count := count + ( (mbpart_w>>1) * (mbpart_h>>1) );
   end
   
   get_data.mode8x4: action INTERP:[ v ] repeat 8*4 ==>
   guard
   	mbpart_w = 8 and mbpart_h = 4
   var 
-    uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 4) + lshift(InverseScan4x4Tab[count] mod 4, 1)
+    uint pixAddr := (InverseScan4x4Tab[count] /4) << 4 + (InverseScan4x4Tab[count] mod 4) << 1
   do
   	foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
-        MB[pixAddr+i+lshift(j,3)] := v[i+j*mbpart_w];
+        MB[pixAddr+i+(j<<3)] := v[i+j*mbpart_w];
       end
     end
-  	count := count + ( rshift(mbpart_w,1) * rshift(mbpart_h,1) );
+  	count := count + ( (mbpart_w>>1) * (mbpart_h>>1) );
   end
   
   get_data.mode4x8: action INTERP:[ v ] repeat 4*8 ==>
   guard
   	mbpart_w = 4 and mbpart_h = 8
   var 
-    uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 4) + lshift(InverseScan4x4Tab[count] mod 4, 1)
+    uint pixAddr := (InverseScan4x4Tab[count] /4)<< 4 + (InverseScan4x4Tab[count] mod 4)<< 1
   do
   	foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
-        MB[pixAddr+i+lshift(j,3)] := v[i+j*mbpart_w];
+        MB[pixAddr+i+(j << 3)] := v[i+j*mbpart_w];
       end
     end
     
@@ -134,15 +134,15 @@ actor Algo_Interp_split_MB_C ()
   guard
   	mbpart_w = 4 and mbpart_h = 4
   var 
-    uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 4) + lshift(InverseScan4x4Tab[count] mod 4, 1)
+    uint pixAddr := (InverseScan4x4Tab[count] /4) << 4 + (InverseScan4x4Tab[count] mod 4) << 1
   do
   	foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
-        MB[pixAddr+i+lshift(j,3)] := v[i+j*mbpart_w];
+        MB[pixAddr+i+(j<<3)] := v[i+j*mbpart_w];
       end
     end
     
-  	count := count + ( rshift(mbpart_w,1) * rshift(mbpart_h,1) );
+  	count := count + ( (mbpart_w>>1) * (mbpart_h>>1) );
   end
   
   
@@ -150,42 +150,42 @@ actor Algo_Interp_split_MB_C ()
   guard
   	mbpart_w = 4 and mbpart_h = 2
   var 
-    uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 4) + lshift(InverseScan4x4Tab[count] mod 4, 1)
+    uint pixAddr := (InverseScan4x4Tab[count] /4) << 4 + (InverseScan4x4Tab[count] mod 4)<< 1
   do
   	foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
-        MB[pixAddr+i+lshift(j,3)] := v[i+j*mbpart_w];
+        MB[pixAddr+i+(j<<3)] := v[i+j*mbpart_w];
       end
     end
-  	count := count + ( rshift(mbpart_w,1) * rshift(mbpart_h,1) );
+  	count := count + ( (mbpart_w>>1) * (mbpart_h>>1) );
   end
   
   get_data.mode2x4: action INTERP:[ v ] repeat 2*4 ==>
   guard
   	mbpart_w = 2 and mbpart_h = 4
   var 
-    uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 4) + lshift(InverseScan4x4Tab[count] mod 4, 1)
+    uint pixAddr := (InverseScan4x4Tab[count] /4)<< 4 + (InverseScan4x4Tab[count] mod 4)<< 1
   do
   	foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
-        MB[pixAddr+i+lshift(j,3)] := v[i+j*mbpart_w];
+        MB[pixAddr+i+(j<<3)] := v[i+j*mbpart_w];
       end
     end
-  	count := count + 1 + lshift(mbpart_idx,1);
+  	count := count + 1 + (mbpart_idx<<1);
   end
   
   get_data.mode2x2: action INTERP:[ v ] repeat 2*2 ==>
   guard
   	mbpart_w = 2 and mbpart_h = 2
   var 
-    uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 4) + lshift(InverseScan4x4Tab[count] mod 4, 1)
+    uint pixAddr := (InverseScan4x4Tab[count] /4) << 4 + (InverseScan4x4Tab[count] mod 4) << 1
   do
   	foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
-        MB[pixAddr+i+lshift(j,3)] := v[i+j*mbpart_w];
+        MB[pixAddr+i+(j<<3)] := v[i+j*mbpart_w];
       end
     end
-  	count := count + ( rshift(mbpart_w,1) * rshift(mbpart_h,1) );
+  	count := count + ( (mbpart_w>>1) * (mbpart_h>>1) );
   end
   
   send_data: action ==> MBPred:[ [MB[s]: for int s in 0 .. 63] ] repeat 64

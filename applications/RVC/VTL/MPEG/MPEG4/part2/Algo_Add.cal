@@ -32,19 +32,19 @@ actor Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ)
 	// Ignore new VOP command
 	cmd.newVop: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	end
 
 	// Pure texture
 	cmd.textureOnly: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, INTRA) != 0
+		(cmd & INTRA) != 0
 	end
 
 	// Pure motion
 	cmd.motionOnly: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, ACCODED) = 0
+		(cmd & ACCODED) = 0
 	end
 
 	// Mixed texture and motion

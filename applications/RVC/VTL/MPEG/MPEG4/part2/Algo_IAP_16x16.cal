@@ -138,24 +138,24 @@ int(size=SAMPLE_SZ) QF_AC :
 
 	copy: action PQF_AC:[ ac ] ==> QF_AC:[ pred ]
 	var
-		int(size=SAMPLE_SZ) pred := ac , int(size=4) v = bitand(count, 7) , int(size=4) h = bitand(
-		rshift(count, 3), 7) , bool top_edge = (h = 0) , bool left_edge = (v = 0) , int(size=5) index = if
+		int(size=SAMPLE_SZ) pred := ac , int(size=4) v = (count & 7) , int(size=4) h = (
+		(count >> 3) & 7) , bool top_edge = (h = 0) , bool left_edge = (v = 0) , int(size=5) index = if
 		top_edge then
 			v
 		else
-			bitor(h, 8)
+			(h | 8)
 		end
 	do
 		if acpred_flag and ((top and top_edge) or ((not top) and left_edge)) then
 			if (s_prev_quant = s_quant) then
-				pred := pred + buf[bitor(lshift(pred_ptr, 4), index)];
+				pred := pred + buf[((pred_ptr << 4) | index)];
 			else
-				pred := pred + divroundnearest(buf[bitor(lshift(pred_ptr, 4), index)] * s_prev_quant,
+				pred := pred + divroundnearest(buf[((pred_ptr << 4) | index)] * s_prev_quant,
 				s_quant);
 			end
 		end
 		if left_edge or top_edge then
-			buf[bitor(lshift(bitor(ptr, comp), 4), index)] := pred;
+			buf[(((ptr| comp) << 4) | index)] := pred;
 		end
 		count := count + 1;
 	end
