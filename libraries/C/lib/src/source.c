@@ -104,6 +104,9 @@ void source_scheduler(struct schedinfo_s *si) {
 					if (!genetic) {
 						n = fread(ptr, 1, 1, F);
 					}
+					else{
+						n = fclose(F);
+					}
 					stop = 1;
 				}
 			}

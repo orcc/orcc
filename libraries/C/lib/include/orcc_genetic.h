@@ -79,5 +79,6 @@ extern void active_fps_printing();
 extern void source_restart();
 extern void clear_fifos();
 extern void active_genetic();
+extern void initialize_instances();
 
 #endif

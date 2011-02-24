@@ -208,7 +208,7 @@ fifo_<type>_clear(&fifo_<count>);
 doClearFifo(edge, source, sourcePort, target, targetPort) ::= <<
 <if (source.broadcast || source.actor)>
 <clearFifoType(
-  sourcePort.type, edge.size, network.connectionMap.(edge), sourcePort, source)><else>
+  sourcePort.type, edge.size, network.connectionMapWithoutBroadcast.(edge), sourcePort, source)><else>
 <clearFifoType(
   targetPort.type, edge.size, network.connectionMap.(edge), targetPort, target)><endif>
 >>
@@ -225,9 +225,13 @@ clearFifo(edge) ::= <<
 <tryClearFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
 >>
 
-printClearFifosFunction(edges) ::= <<
+clearFifosWithMap(outgoingMap) ::= <<
+<outgoingMap.keys: { instance | <outgoingMap.(instance).keys: { port | <clearFifo(first(outgoingMap.(instance).(port)))> }> }>
+>>
+
+printClearFifosFunction() ::= <<
 void clear_fifos(){
-	<edges: clearFifo()>
+	<clearFifosWithMap(network.outgoingMap)>
 }
 >>
 
@@ -340,7 +344,9 @@ printInitialize(instance) ::= <<
 >>
 
 printInitializes(instances) ::= <<
-<instances: printInitialize()>
+void initialize_instances(){
+	<instances: printInitialize()>
+}
 >>
 
 printScheduler() ::= <<
@@ -535,17 +541,18 @@ struct actor_s **actors[] = {<options.threads.keys: {th | actors_<th>}; separato
 extern void remove_fps_printing();
 extern int source_is_stopped();
 
-<printClearFifosFunction(network.connections)>
+<printClearFifosFunction()>
 <endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
 
-
 <printScheduler()>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initializer and launcher
+
+<printInitializes(network.instances)>
 
 static void launcher() {
 <if(options.needDynamicMapping || options.needPthreads)>
@@ -570,7 +577,7 @@ static void launcher() {
 	int actors_size[] = {<options.threads.keys: {th | sizeof(actors_<th>) / sizeof(actors_<th>[0])}; separator=", ">};
 	<endif>
 	
-	<printInitializes(network.instances)>
+	initialize_instances();
 	
 	for(i=0; i \< THREAD_NB; i++){
 		sched_init(&schedulers[i], <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
@@ -602,7 +609,7 @@ static void launcher() {
 	clear_cpu_set(cpuset);
 	set_this_process_affinity(cpuset, 0);
 	
-	<printInitializes(network.instances)>
+	initialize_instances();
 
 	sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL);
 	

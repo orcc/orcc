@@ -442,7 +442,8 @@ void *monitor(void *data) {
 				monitoring->genetic_info);
 
 		source_restart();
-		//clear_fifos();
+		clear_fifos();
+		initialize_instances();
 	}
 	monitoring->sync->active_sync = 0;
 	write_better_mapping(population, monitoring->genetic_info);
