@@ -280,33 +280,38 @@ broadcast_<name> : entity work.broadcast
 <else
 >    output_data    =\> <name>_fromBroad_data,
 <endif>
-    <outgoingMap.(instance) : {connection | <printBroadcastOutputs( connection=connection, i0=i0, map=network.successorsMap.(instance),
-    																vmap=network.targetMap.(connection), control="send")>}; separator="\n">
-    <outgoingMap.(instance) : {connection | <printBroadcastOutputs( connection=connection, i0=i0, map=network.successorsMap.(instance),
-    																vmap=network.targetMap.(connection), control="ack")>}; separator="\n">
+    <outgoingMap.(instance).values: {connections | <printBroadcastOutputs(connections=connections, index=i0, network=network,
+    								instance=instance, control="send")>}; separator="\n">	
+    <outgoingMap.(instance).values: {connections | <printBroadcastOutputs(connections=connections, index=i0, network=network,
+    								instance=instance, control="ack")>}; separator="\n">
 <endif>
     clock         =\> clock,
     reset_n       =\> reset_n);
     --
-    <outgoingMap.(instance) : {connection | <printBroadToOut( connection=connection, map=network.successorsMap.(instance),
-    														  vmap=network.targetMap.(connection))>}; separator="\n">
+    <outgoingMap.(instance).values: {connections|<connections:{connection | <printBroadToOut(connection=connection, map=network.successorsMap.(instance), 
+															vmap=network.targetMap.(connection))>}; separator="\n">}; separator="\n">    														  
 >>
 
 printBroadToOut(connection, map, vmap) ::= <<
-<if(!map.(connection.source))
+<if(vmap.port)
 ><vmap.port>_data \<= <name>_fromBroad_data;<
 endif>
 >>
 
-printBroadcastOutputs(connection, i0, map, vmap, control) ::= <<
+printBroadcastOutputs(connections, index, network , instance, control) ::= <<
+<connections: { connection | <printBroadcastOutput( connection=connection, index=index, map=network.successorsMap.(instance),
+    			vmap=network.targetMap.(connection), control=control)>}; separator="\n">		
+>>
+
+printBroadcastOutput(connection, index, map, vmap, control) ::= <<
 <if(map.(connection.source))
 ><if(connection.attributes)
->output_<control>(<i0>) =\> <instance.id>_<connection.source>_<control>,<
+>output_<control>(<index>) =\> <instance.id>_<connection.source>_<control>,<
 else
->output_<control>(<i0>) =\> <first(map.(connection.source)).id>_<connection.target>_<control>,<
+>output_<control>(<index>) =\> <first(map.(connection.source)).id>_<connection.target>_<control>,<
 endif><
 else
->output_<control>(<i0>) =\> <vmap.port>_<control>,<
+>output_<control>(<index>) =\> <vmap.port>_<control>,<
 endif>
 >>
 
