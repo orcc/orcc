@@ -54,7 +54,7 @@ bool ROW ==> int(size=osz) Y0 , int(size=osz) Y1 :
 
 	/*
   action X0:[a], X1:[b], X2:[c], X3:[d], ROW:[r] ==>
-         Y0:[if r then y0 else rshift(y0,3) end], Y1:[if r then y1 else rshift(y1,3) end]
+         Y0:[if r then y0 else (y0 >> 3) end], Y1:[if r then y1 else (y1 >> 3) end]
   var
     bool s = (count = 0),
     int(size=isz) o = if r then ( if s then  128 else 0 end )
@@ -75,11 +75,10 @@ bool ROW ==> int(size=osz) Y0 , int(size=osz) Y1 :
 			0
 		end , int(size=isz) y0 = (a + d) + o , int(size=isz) y1 = (b - c) + o
 	do
-		count := bitand(count + 1, 3);
+		count := (count + 1) & 3;
 	end
 
-	col: action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ], ROW:[ r ] ==> Y0:[ rshift(y0, 3) ], Y1:[ rshift(y1,
-		3) ]
+	col: action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ], ROW:[ r ] ==> Y0:[ (y0 >> 3) ], Y1:[ y1 >> 3 ]
 	var
 		bool s = (count = 0) , int(size=isz) o = if s then
 			65536
@@ -87,7 +86,7 @@ bool ROW ==> int(size=osz) Y0 , int(size=osz) Y1 :
 			4
 		end , int(size=isz) y0 = (a + d) + o , int(size=isz) y1 = (b - c) + o
 	do
-		count := bitand(count + 1, 3);
+		count := (count + 1) & 3;
 	end
 
 	priority

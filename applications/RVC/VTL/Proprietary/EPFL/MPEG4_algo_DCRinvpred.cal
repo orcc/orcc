@@ -56,7 +56,7 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	// Reconstructed DC coefficient  
 	start: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ -2 ]
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		comp := 0;
 		ptr := 8;
@@ -69,17 +69,17 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	read.inter_ac: action BTYPE:[ cmd ], QP:[ qp ] ==> AC_PRED_DIR:[ 0 ], MODE:[ 0 ], PTR:[ 0 ],
 		SIGNED:[ true ], QUANT:[ s_QP ]
 	guard
-		bitand(cmd, INTER) != 0,
-		bitand(cmd, ACCODED) != 0
+		(cmd & INTER) != 0,
+		(cmd & ACCODED) != 0
 	do
 		is_signed := true;
 		s_QP := qp;
-		round := bitxor(bitand(s_QP, 1), 1);
+		round := bitxor((s_QP & 1), 1);
 	end
 
 	read.other: action BTYPE:[ cmd ], QP:[ qp ] ==> AC_PRED_DIR:[ -1 ]
 	guard
-		bitand(cmd, INTRA) = 0
+		(cmd & INTRA) = 0
 	do
 		s_QP := qp;
 	end
@@ -93,7 +93,7 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	end
 
 	function dc_scaler() --> int(size=SCALER_SZ) :
-		if bitand(comp, 4) = 0 then
+		if (comp & 4) = 0 then
 		// Y component
 			if s_QP > 0 and s_QP < 5 then
 				8
@@ -131,7 +131,7 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 		int(size=SAMPLE_SZ) dca = dc_buf[a] , int(size=SAMPLE_SZ) dcb = dc_buf[b] ,
 		int(size=SAMPLE_SZ) dcc = dc_buf[c] , int(size=SAMPLE_SZ) horiz = abs(dcb - dcc) ,
 		int(size=SAMPLE_SZ) vert = abs(dca - dcb) , bool top = vert < horiz , int(size=3) s , bool ac =
-		bitand(cmd, ACPRED) != 0
+		(cmd & ACPRED) != 0
 	do
 		s_QP := qp;
 		scaler := dc_scaler();
@@ -140,7 +140,7 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 			dcc
 		else
 			dca
-		end) + rshift(scaler, 1)) / scaler;
+		end) + (scaler >> 1)) / scaler;
 		// See ISO/IEC 14496-2 Section 7.4.3.2.
 		s := if not ac then
 			0
@@ -204,7 +204,7 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	var
 		int(size=SAMPLE_SZ) dc = saturate(dc_val)
 	do
-		dc_buf[bitor(ptr, comp)] := dc;
+		dc_buf[(ptr | comp)] := dc;
 	end
 
 	advance: action ==>

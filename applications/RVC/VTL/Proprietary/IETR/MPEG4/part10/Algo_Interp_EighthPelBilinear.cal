@@ -82,7 +82,7 @@ actor Algo_Interp_EighthPelBilinear()
   begin  
       temp := (8-x_index)*(8-y_index)*inbuf[ ( o_x) + ( o_y) * 17 ]+ (x_index)*(8-y_index)* inbuf[ ( 1 + o_x) + (o_y) * 17 ];
       temp := temp + (8-x_index)*(y_index)*inbuf[ ( 0 + o_x) + ( 1 + o_y) * 17 ]+x_index*y_index*inbuf [ ( 1 + o_x) + ( 1 + o_y) * 17 ] + 32;
-      temp := rshift (temp,6);
+      temp := (temp >> 6);
   end
 
   get_fract_x: action Mv:[ MovementVector ] ==>

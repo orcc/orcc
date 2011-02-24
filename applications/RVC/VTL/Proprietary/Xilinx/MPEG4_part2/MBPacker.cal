@@ -62,9 +62,9 @@ actor MBPacker () int(size=PIX_SZ) DI, int(size=32) AI ==> int(size=32) DO , int
 	end
 
 	// Every fourth pixel, emit a 32 bit word
-	data.out: action DI:[ d ] ==> DO:[ bitor(lshift(buf, 8), d) ]
+	data.out: action DI:[ d ] ==> DO:[ (buf << 8) | d ]
 	guard
-		bitand(pix_count, 3) = 3
+		(pix_count & 3) = 3
 	do
 		pix_count := pix_count + 1;
 	end
@@ -72,7 +72,7 @@ actor MBPacker () int(size=PIX_SZ) DI, int(size=32) AI ==> int(size=32) DO , int
 	// Just accumulate pixels
 	data.inp: action DI:[ d ] ==>
 	do
-		buf := bitor(lshift(buf, 8), d);
+		buf := (buf << 8) | d;
 		pix_count := pix_count + 1;
 	end
 

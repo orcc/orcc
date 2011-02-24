@@ -92,7 +92,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	// -ve means there is no data, so the inverse zigzag may flush its buffer
 	start: action BTYPE:[ cmd ] ==> START:[ -2 ]
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		comp := 0;
 		ptr := 8;
@@ -104,8 +104,8 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	read.inter_ac: action BTYPE:[ cmd ], QP:[ qp ] ==> START:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:
 		[ s_QP ]
 	guard
-		bitand(cmd, INTER) != 0,
-		bitand(cmd, ACCODED) != 0
+		(cmd & INTER) != 0,
+		(cmd & ACCODED) != 0
 	do
 		is_signed := true;
 		s_QP := qp;
@@ -114,7 +114,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	// Any other block except INTRA
 	read.other: action BTYPE:[ cmd ], QP:[ qp ] ==> START:[ -1 ]
 	guard
-		bitand(cmd, INTRA) = 0
+		(cmd & INTRA) = 0
 	do
 		s_QP := qp;
 	end
@@ -129,7 +129,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 
 	// Calculate DC scaler for INTRA blocks
 	function dc_scaler() --> int(size=SCALER_SZ) :
-		if bitand(comp, 4) = 0 then
+		if (comp & 4) = 0 then
 		// Y component
 			if s_QP > 0 and s_QP < 5 then
 				8
@@ -150,7 +150,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 				8
 			else
 				if s_QP > 4 and s_QP < 25 then
-					rshift(s_QP + 13, 1)
+					(s_QP + 13) >> 1
 				else
 					s_QP - 6
 				end
@@ -173,7 +173,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 		int(size=SAMPLE_SZ) dca = dc_buf[a] , int(size=SAMPLE_SZ) dcb = dc_buf[b] ,
 		int(size=SAMPLE_SZ) dcc = dc_buf[c] , int(size=SAMPLE_SZ) horiz = abs(dcb - dcc) ,
 		int(size=SAMPLE_SZ) vert = abs(dca - dcb) , bool top = vert < horiz , int(size=3) s , bool ac =
-		bitand(cmd, ACPRED) != 0
+		(cmd & ACPRED) != 0
 	do
 		s_QP := qp;
 		scaler := dc_scaler();
@@ -181,7 +181,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 			dcc
 		else
 			dca
-		end) + rshift(scaler, 1)) / scaler;
+		end) + (scaler >> 1)) / scaler;
 		s := if not ac then
 			0
 		else
@@ -199,7 +199,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	// Do dequant on INTER block DC
 	getdc.inter: action IN:[ dc ] ==>
 	var
-		int(size=SAMPLE_SZ) v = (s_QP * (lshift(abs(dc), 1) + 1)) - round
+		int(size=SAMPLE_SZ) v = (s_QP * ((abs(dc) << 1) + 1)) - round
 	do
 		dc_val := if dc = 0 then
 			0
@@ -241,7 +241,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	var
 		int(size=SAMPLE_SZ) dc = saturate(dc_val)
 	do
-		dc_buf[bitor(ptr, comp)] := dc;
+		dc_buf[(ptr | comp)] := dc;
 	end
 
 	advance: action ==>

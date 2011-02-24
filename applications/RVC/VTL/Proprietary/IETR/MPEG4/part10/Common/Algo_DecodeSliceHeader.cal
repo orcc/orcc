@@ -402,7 +402,7 @@ actor Algo_DecodeSliceHeader()
 			int MaxPicOrderCntLsb,
 			int POC_val
 		do
-			MaxPicOrderCntLsb := lshift(1,SzMaxPocLsb) / 2;
+			MaxPicOrderCntLsb := (1 << SzMaxPocLsb) / 2;
 			if Idr_flag = true then
 				PicOrderCntMsb := 0;
 				prevPicOrderCntLsb := 0;

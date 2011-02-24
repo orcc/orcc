@@ -60,8 +60,8 @@ actor BayerCache()
 	//problem: parameter not allowed, therefore, define list size as constant (i.e. x number of BRAM instantiation)
 	List(type:int(size=8), size = 1024*1024) cache := [0 : for int i in 1 .. 1024*1024]; //cache memory
 	
-	//function getWidth(int(size=32) sizeOfImage) --> int(size=16): bitand(sizeOfImage ,65535) end
-    //function getHeight(int(size=32) sizeOfImage) --> int(size=16): rshift(sizeOfImage ,16) end
+	//function getWidth(int(size=32) sizeOfImage) --> int(size=16): (sizeOfImage & 65535) end
+    //function getHeight(int(size=32) sizeOfImage) --> int(size=16): (sizeOfImage >> 16) end
 	
 	getSZ : action WIDTH:[w],HEIGHT:[h] ==>
     guard getSz = true

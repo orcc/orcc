@@ -126,8 +126,8 @@ actor CheckNaluType()
 			RbspByte     :[ValRbsp]
 				==>
 		do
-			nal_unit_type := bitand( ValRbsp           , 0x1F );
-			nal_ref_idc   := bitand( rshift(ValRbsp,5) , 0x03 );
+			nal_unit_type := (ValRbsp & 0x1F);
+			nal_ref_idc   := (ValRbsp >> 5) & 0x03;
 			if(DEBUG_FLAG_DECODED)then
 				println("nal_unit_type:"+nal_unit_type+"; nal_ref_idc:"+nal_ref_idc);
 			end

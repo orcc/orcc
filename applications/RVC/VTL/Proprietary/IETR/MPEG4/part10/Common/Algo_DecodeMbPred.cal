@@ -128,31 +128,31 @@ actor Algo_DecodeMbPred()
 			uint(size=16) Buff
 		do
 			Buff := ValueOfVLD;
-			Buff := lshift(Buff, 16-CountBit);
+			Buff := Buff << (16-CountBit);
 
 			if(BitMissed > 0)then
-				rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] := rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] + rshift(Buff,16-BitMissed);
+				rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] := rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] + (Buff >> (16-BitMissed));
 				CountBit := CountBit - BitMissed;
-				Buff := lshift(Buff,BitMissed);
+				Buff := (Buff << BitMissed);
 				if(DEBUG_FLAG_DECODED)then
 					println("rem_intraYxY_pred_mode["+(lumaYxYBlkIdx - 1)+"] : "+rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1]);
 				end
 			end
 			while(CountBit > 0)
 			do
-				if(bitand(Buff,0x8000) = 0) then
+				if((Buff & 0x8000) = 0) then
 					CountBit := CountBit - 1;
-					Buff     := lshift(Buff,1);
-					rem_intraYxY_pred_mode[lumaYxYBlkIdx] := rshift(Buff,13);
+					Buff     := (Buff << 1);
+					rem_intraYxY_pred_mode[lumaYxYBlkIdx] := (Buff >> 13);
 					CountBit := CountBit - 3;
-					Buff     := lshift(Buff,3);
+					Buff     := (Buff << 3);
 					if(CountBit >= 0 and DEBUG_FLAG_DECODED)then
 						println("rem_intraYxY_pred_mode["+lumaYxYBlkIdx+"] : "+rem_intraYxY_pred_mode[lumaYxYBlkIdx]);
 					end
 				else
 					rem_intraYxY_pred_mode[lumaYxYBlkIdx] := 15;
 					CountBit := CountBit - 1;
-					Buff     := lshift(Buff,1);
+					Buff     := (Buff << 1);
 					if(DEBUG_FLAG_DECODED)then
 						println("rem_intraYxY_pred_mode["+lumaYxYBlkIdx+"] : -1");
 					end

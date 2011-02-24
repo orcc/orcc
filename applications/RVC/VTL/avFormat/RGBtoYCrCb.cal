@@ -99,18 +99,18 @@ actor RGBtoYCrCb()
 	do
 		//change input from 8-bit to 9-bit for unsigned
 		red_tmp2   := Red;
-		red_tmp    := bitand(red_tmp2, 255);
+		red_tmp    := (red_tmp2 & 255);
 		green_tmp2 := Green;
-		green_tmp  := bitand(green_tmp2, 255);
+		green_tmp  := (green_tmp2 & 255);
 		blue_tmp2  := Blue;
-		blue_tmp   := bitand(blue_tmp2, 255);
+		blue_tmp   := (blue_tmp2 & 255);
 	
 		Luma       := (YR*red_tmp)+(YG*green_tmp)+(YB*blue_tmp); 
-		yt         := rshift(Luma,8)+64;
+		yt         := (Luma >> 8)+64;
 		ChromaRed  := (CrR*red_tmp)-(CrG*green_tmp)-(CrB*blue_tmp);
-		crt        := rshift(ChromaRed,8)+512;
+		crt        := (ChromaRed >> 8)+512;
 		ChromaBlue := (CbB*blue_tmp)-(CbR*red_tmp)-(CbG*green_tmp);
-		cbt        := rshift(ChromaBlue,8)+512;
+		cbt        := (ChromaBlue >> 8)+512;
 		
 		if yt > 0 then
 			if yt < 1023 then

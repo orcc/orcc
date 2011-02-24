@@ -74,7 +74,7 @@ actor Dequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_
 	get_qp: action QP:[ q ], DC:[ i ] ==> OUT:[ i ]
 	do
 		quant := q;
-		round := bitxor(bitand(q, 1), 1);
+		round := (q & 1) ^ 1;
 		count := 0;
 	end
 
@@ -93,8 +93,9 @@ actor Dequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_
 
 	ac: action AC:[ i ] ==> OUT:[ saturate(o) ]
 	var
-		int(size=SAMPLE_SZ) v = (quant * (lshift(abs(i), 1) + 1)) - round , int(size=SAMPLE_SZ) o = if i
-		= 0 then
+		int(size=SAMPLE_SZ) v = quant * ((abs(i) << 1) + 1) - round,
+		int(size=SAMPLE_SZ) o =
+		if i = 0 then
 			0
 		else
 			if i < 0 then

@@ -74,8 +74,8 @@ actor BayerFilter ()
 	int g := 0;
 	int b := 0;
 	
-	//function getWidth(int(size=32) sizeOfImage) --> int(size=16): bitand(sizeOfImage ,65535) end
-    //function getHeight(int(size=32) sizeOfImage) --> int(size=16): rshift(sizeOfImage ,16) end
+	//function getWidth(int(size=32) sizeOfImage) --> int(size=16): (sizeOfImage & 65535) end
+    //function getHeight(int(size=32) sizeOfImage) --> int(size=16): (sizeOfImage >> 16) end
 	
 	getSZ : action WIDTH:[w],HEIGHT:[h] ==> WIDTH_OUT:[w-4],HEIGHT_OUT:[h-4]
     guard getSz = true
@@ -106,19 +106,19 @@ actor BayerFilter ()
 		ind10t := ind10;
 		ind11t := ind11;
 		ind12t := ind12;
-		ind20t := bitand(ind0t,255);
-		ind21t := bitand(ind1t,255);
-		ind22t := bitand(ind2t,255);
-		ind23t := bitand(ind3t,255);
-		ind24t := bitand(ind4t,255);
-		ind25t := bitand(ind5t,255);
-		ind26t := bitand(ind6t,255);
-		ind27t := bitand(ind7t,255);
-		ind28t := bitand(ind8t,255);
-		ind29t := bitand(ind9t,255);
-		ind210t := bitand(ind10t,255);
-		ind211t := bitand(ind11t,255);
-		ind212t := bitand(ind12t,255);
+		ind20t := (ind0t & 255);
+		ind21t := (ind1t & 255);
+		ind22t := (ind2t & 255);
+		ind23t := (ind3t & 255);
+		ind24t := (ind4t & 255);
+		ind25t := (ind5t & 255);
+		ind26t := (ind6t & 255);
+		ind27t := (ind7t & 255);
+		ind28t := (ind8t & 255);
+		ind29t := (ind9t & 255);
+		ind210t := (ind10t & 255);
+		ind211t := (ind11t & 255);
+		ind212t := (ind12t & 255);
 		//println("R");
 		r := ind6;
 		g := (-ind20t + (ind22t << 1) - ind24t + (ind25t << 1) + (ind26t << 2) + (ind27t << 1) - ind28t + (ind210t << 1) - ind212t + 1020) >> 4;
@@ -147,19 +147,19 @@ actor BayerFilter ()
 		ind10t := ind10;
 		ind11t := ind11;
 		ind12t := ind12;
-		ind20t := bitand(ind0t,255);
-		ind21t := bitand(ind1t,255);
-		ind22t := bitand(ind2t,255);
-		ind23t := bitand(ind3t,255);
-		ind24t := bitand(ind4t,255);
-		ind25t := bitand(ind5t,255);
-		ind26t := bitand(ind6t,255);
-		ind27t := bitand(ind7t,255);
-		ind28t := bitand(ind8t,255);
-		ind29t := bitand(ind9t,255);
-		ind210t := bitand(ind10t,255);
-		ind211t := bitand(ind11t,255);
-		ind212t := bitand(ind12t,255);
+		ind20t := (ind0t & 255);
+		ind21t := (ind1t & 255);
+		ind22t := (ind2t & 255);
+		ind23t := (ind3t & 255);
+		ind24t := (ind4t & 255);
+		ind25t := (ind5t & 255);
+		ind26t := (ind6t & 255);
+		ind27t := (ind7t & 255);
+		ind28t := (ind8t & 255);
+		ind29t := (ind9t & 255);
+		ind210t := (ind10t & 255);
+		ind211t := (ind11t & 255);
+		ind212t := (ind12t & 255);
 		//println("G1");
 		r := ((ind20t >> 1) - ind21t - ind23t - ind24t + (ind25t << 2) + ind26t*5 + (ind27t << 2) - ind28t - ind29t - ind211t + (ind212t >> 1) + 1530)*819 >> 14; //filter here
 		g := ind6;
@@ -193,19 +193,19 @@ actor BayerFilter ()
 		ind10t := ind10;
 		ind11t := ind11;
 		ind12t := ind12;
-		ind20t := bitand(ind0t,255);
-		ind21t := bitand(ind1t,255);
-		ind22t := bitand(ind2t,255);
-		ind23t := bitand(ind3t,255);
-		ind24t := bitand(ind4t,255);
-		ind25t := bitand(ind5t,255);
-		ind26t := bitand(ind6t,255);
-		ind27t := bitand(ind7t,255);
-		ind28t := bitand(ind8t,255);
-		ind29t := bitand(ind9t,255);
-		ind210t := bitand(ind10t,255);
-		ind211t := bitand(ind11t,255);
-		ind212t := bitand(ind12t,255);
+		ind20t := (ind0t & 255);
+		ind21t := (ind1t & 255);
+		ind22t := (ind2t & 255);
+		ind23t := (ind3t & 255);
+		ind24t := (ind4t & 255);
+		ind25t := (ind5t & 255);
+		ind26t := (ind6t & 255);
+		ind27t := (ind7t & 255);
+		ind28t := (ind8t & 255);
+		ind29t := (ind9t & 255);
+		ind210t := (ind10t & 255);
+		ind211t := (ind11t & 255);
+		ind212t := (ind12t & 255);
 		//println("G2");
 		r := (-ind20t - ind21t + (ind22t << 2) - ind23t + (ind24t >> 1) + ind26t*5 + (ind28t >> 1) - ind29t + (ind210t << 2) - ind211t - ind212t + 1530)*819 >> 14; //filter here
 		g := ind6;
@@ -234,19 +234,19 @@ actor BayerFilter ()
 		ind10t := ind10;
 		ind11t := ind11;
 		ind12t := ind12;
-		ind20t := bitand(ind0t,255);
-		ind21t := bitand(ind1t,255);
-		ind22t := bitand(ind2t,255);
-		ind23t := bitand(ind3t,255);
-		ind24t := bitand(ind4t,255);
-		ind25t := bitand(ind5t,255);
-		ind26t := bitand(ind6t,255);
-		ind27t := bitand(ind7t,255);
-		ind28t := bitand(ind8t,255);
-		ind29t := bitand(ind9t,255);
-		ind210t := bitand(ind10t,255);
-		ind211t := bitand(ind11t,255);
-		ind212t := bitand(ind12t,255);
+		ind20t := (ind0t & 255);
+		ind21t := (ind1t & 255);
+		ind22t := (ind2t & 255);
+		ind23t := (ind3t & 255);
+		ind24t := (ind4t & 255);
+		ind25t := (ind5t & 255);
+		ind26t := (ind6t & 255);
+		ind27t := (ind7t & 255);
+		ind28t := (ind8t & 255);
+		ind29t := (ind9t & 255);
+		ind210t := (ind10t & 255);
+		ind211t := (ind11t & 255);
+		ind212t := (ind12t & 255);
 		//println("B");
 		g := (-ind20t + (ind22t << 1) - ind24t + (ind25t << 1) + (ind26t << 2) + (ind27t << 1) - ind28t + (ind210t << 1) - ind212t + 1020) >> 4;
 		r := ((ind20t*(-3) >> 1) + (ind21t << 1) + (ind23t << 1) + (ind24t*(-3) >> 1) + ind26t*6 + (ind28t*(-3) >> 1) + (ind29t << 1) + (ind211t << 1) + (ind212t*(-3) >> 1) + 1530)*819 >> 14; //filter here		

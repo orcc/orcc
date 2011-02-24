@@ -81,11 +81,11 @@ actor Algo_DecodeResidualBlock_Cavlc()
 				==>
 			Total_Coeff:[TotalCoeff]
 		do
-			TotalCoeff   := bitand(ValueOfVLD,0xFF);
-			TrailingOnes := rshift(ValueOfVLD,8);
+			TotalCoeff   := (ValueOfVLD & 0xFF);
+			TrailingOnes := (ValueOfVLD >> 8);
 			if(DEBUG_FLAG_DECODED)then
-				println("TotalCoeff : "+bitand(ValueOfVLD,0xFF));
-				println("Trailing Ones : "+rshift(ValueOfVLD,8));
+				println("TotalCoeff : "+(ValueOfVLD & 0xFF));
+				println("Trailing Ones : "+(ValueOfVLD >> 8));
 			end
 			if(TrailingOnes < 3) then
 				levelCode := 2;
@@ -123,7 +123,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		do
 			foreach int i in 0 .. TrailingOnes - 1
 			do
-				trailing_ones_sign_flag := bitand(rshift(ValueOfVLD,TrailingOnes - 1 - i) ,1);
+				trailing_ones_sign_flag := (ValueOfVLD >> (TrailingOnes - 1 - i)) & 1;
 				level[iLoop] := 1 - 2 * trailing_ones_sign_flag;
 				if(DEBUG_FLAG_DECODED)then
 					println("levelT1 : "+level[iLoop]);
@@ -199,27 +199,27 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		do
 			levelCode :=
 				if(level_prefix < 15) then
-					levelCode + lshift(level_prefix, suffixLength)
+					levelCode + (level_prefix << suffixLength)
 				else
-					levelCode + lshift(15, suffixLength)
+					levelCode + (15 << suffixLength)
 				end;
 			levelCode := levelCode + level_suffix;
 			if((level_prefix >= 15) and (suffixLength = 0)) then
 				levelCode := levelCode + 15;
 			end
 			if(level_prefix >= 16) then
-				levelCode := levelCode + lshift(1, level_prefix - 3) - 4096;
+				levelCode := levelCode + (1 << (level_prefix - 3)) - 4096;
 			end
 			if((levelCode mod 2) = 0) then
-				ValLevel     := rshift(levelCode + 2, 1);
+				ValLevel     := (levelCode + 2) >> 1;
 			else
-				ValLevel     := rshift( -levelCode - 1, 1);
+				ValLevel     := (-levelCode - 1) >> 1;
 			end
 
 			if(suffixLength = 0)then
 				suffixLength := 1;
 			end
-			if( (Abs(ValLevel) > lshift(3, suffixLength - 1)) and (suffixLength < 6) ) then
+			if( (Abs(ValLevel) > (3 << suffixLength - 1)) and (suffixLength < 6) ) then
 				suffixLength := suffixLength + 1;
 			end
 			if(DEBUG_FLAG_DECODED)then

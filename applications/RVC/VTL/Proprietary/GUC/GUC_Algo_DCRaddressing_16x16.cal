@@ -116,7 +116,7 @@ actor GUC_Algo_DCRaddressing_16x16 () bool NEW_VOP, int(size=16) WIDTH, int (siz
 	// Fuse the macroblock address and the 8x8 block component address to get appropriate address of desired 8x8 block in memory
 	function access(int(size=MB_COORD_SZ) p, int(size=4) c) --> int(size=MB_COORD_SZ + 2) :
 	// JWJ: increased size of c
-		bitor(lshift(p, 2), c)
+		bitor((p << 2), c)
 	end
 
 	// New VOP

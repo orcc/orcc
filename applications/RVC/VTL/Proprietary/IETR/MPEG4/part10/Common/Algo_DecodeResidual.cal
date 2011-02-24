@@ -155,7 +155,7 @@ actor Algo_DecodeResidual()
 
 	ResLuma_CheckCodedBlockPattern: action ==>
 		guard
-			bitand(CodedBlockPatternLuma,1) = 1
+			(CodedBlockPatternLuma & 1) = 1
 		end
 
 	ResLuma_CheckBmFlagAndEndIdxAndMbType: action
@@ -214,7 +214,7 @@ actor Algo_DecodeResidual()
 			i8x8Loop < 4
 		do
 			i8x8Loop := i8x8Loop + 1;
-			CodedBlockPatternLuma := rshift(CodedBlockPatternLuma, 1);
+			CodedBlockPatternLuma := (CodedBlockPatternLuma >> 1);
 		end
 
 	ResLuma_CheckCavlc8x8: action ==>
@@ -263,7 +263,7 @@ actor Algo_DecodeResidual()
 				//println("\t\t Idx : "+(IdxCurrMb-1)+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]]);
 				nC :=
 					if(MbExists[IdxLeftNeighbour[IdxCurrMb]] and MbExists[IdxAboveNeighbour[IdxCurrMb]])then
-						rshift(TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]] +1, 1)
+						(TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]] + 1) >> 1
 					else
 						TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]]
 					end;
@@ -279,7 +279,7 @@ actor Algo_DecodeResidual()
 					//println("\t\t Idx : "+(IdxCurrMb-1)+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]]);
 					nC :=
 						if(MbExists[IdxLeftNeighbour[IdxCurrMb]] and MbExists[IdxAboveNeighbour[IdxCurrMb]])then
-							rshift(TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]] + 1, 1)
+							(TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]] + 1) >> 1
 						else
 							TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]]
 						end;
@@ -319,7 +319,7 @@ actor Algo_DecodeResidual()
 			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
 			ActorLaunched :[ ActorSelected , ActorSelected ]
 		guard
-			bitand(CodedBlockPatternChroma, 3) != 0,
+			(CodedBlockPatternChroma & 3) != 0,
 			startIdx = 0
 		do
 			Component_type := CHROMA_DC_COMPONENT;
@@ -330,7 +330,7 @@ actor Algo_DecodeResidual()
 
 	ChromaAcComponentPresent: action ==>
 		guard
-			bitand(CodedBlockPatternChroma, 2) != 0,
+			(CodedBlockPatternChroma & 2) != 0,
 			endIdx > 0
 		do
 			Component_type := CHROMA_AC_COMPONENT;

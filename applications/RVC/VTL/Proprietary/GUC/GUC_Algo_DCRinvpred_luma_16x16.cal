@@ -165,7 +165,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 		not(newvop)
 	do
 		s_qp := qp;
-		round := bitxor(bitand(s_qp, 1), 1);
+		round := bitxor((s_qp & 1), 1);
 		is_signed := true;
 		s_prev_qp := s_qp;
 		buf_qp[cnt] := s_qp;
@@ -223,14 +223,14 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	do
 		s_qp := qp;
 		s_prev_qp := qp;
-		round := bitxor(bitand(s_qp, 1), 1);
+		round := bitxor((s_qp & 1), 1);
 		scaler := dc_scaler();
 		// Retrieve 'dc_scalar'. See ISO/IEC 14496-2 Table 7-1.
 		dc_pred := ((if top then
 			dcc
 		else
 			dca
-		end) + rshift(scaler, 1)) / scaler;
+		end) + (scaler >> 1)) / scaler;
 		// See ISO/IEC 14496-2 Section 7.4.3.2.
 		s := if not ac_pred then
 			0
@@ -313,7 +313,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	var
 		int(size=SAMPLE_SZ) dc = saturate(dc_val)
 	do
-		dc_buf[bitor(ptr, comp)] := dc;
+		dc_buf[(ptr | comp)] := dc;
 	end
 
 	advance: action ==>

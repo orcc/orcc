@@ -58,8 +58,8 @@ int(size=csz) C0 , int(size=csz) C1 , int(size=csz) C2 , int(size=csz) C3 :
 		r
 	end
 
-	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ], ROW:[ r ] ==> C0:[ rshift(a, 6) ], C1:[ rshift(b, 6) ], C2
-		:[ rshift(c, 6) ], C3:[ rshift(d, 6) ]
+	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ], ROW:[ r ] ==> C0:[ (a >> 6) ], C1:[ (b >> 6) ], C2
+		:[ (c >> 6) ], C3:[ (d >> 6) ]
 	guard
 		not r
 	end

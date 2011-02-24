@@ -63,7 +63,7 @@ int(size=isz) X3 ==> int(size=osz) Y :
 	guard
 		rcount < 64
 	var
-		int row = rshift(rcount, 3) , int quad = bitand(rshift(rcount, 2), 1)
+		int row = (rcount >> 3) , int quad = (rcount >> 2) & 1
 	do
 	// { 0, 7, 3, 4 }
 		// { 1, 6, 2, 5 }
@@ -85,7 +85,9 @@ int(size=isz) X3 ==> int(size=osz) Y :
 	guard
 		ccount > 0
 	var
-		int col = rshift(64 - ccount, 3) , int row = bitand(64 - ccount, 7) , int i = bitxor(select, 1)
+		int col = (64 - ccount) >> 3,
+		int row = (64 - ccount) & 7,
+		int i = (select ^ 1)
 	do
 		ccount := ccount - 1;
 	end
@@ -94,7 +96,7 @@ int(size=isz) X3 ==> int(size=osz) Y :
 	guard
 		ccount = 0 and rcount = 64
 	do
-		select := bitxor(select, 1);
+		select := (select ^ 1);
 		ccount := 64;
 		rcount := 0;
 	end

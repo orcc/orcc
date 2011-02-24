@@ -80,19 +80,19 @@ actor MPEG4_algo_IAP () int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ +
 
   copy: action PQF_AC:[ ac ] ==> QF_AC:[ pred ]
   var
-    int(size=SAMPLE_SZ) pred := ac , int(size=4) v = bitand(count, 7) ,
-    int(size=4) h = bitand(rshift(count, 3), 7) , bool top_edge = (h = 0) ,
+    int(size=SAMPLE_SZ) pred := ac , int(size=4) v = (count & 7) ,
+    int(size=4) h = bitand((count >> 3), 7) , bool top_edge = (h = 0) ,
     bool left_edge = (v = 0) , int(size=5) index = if top_edge then
       v
     else
-      bitor(h, 8)
+      (h | 8)
     end
   do
     if acpred_flag and ((top and top_edge) or ((not top) and left_edge)) then
-      pred := pred + buf[bitor(lshift(pred_ptr, 4), index)];
+      pred := pred + buf[bitor((pred_ptr << 4), index)];
     end
     if left_edge or top_edge then
-      buf[bitor(lshift(bitor(ptr, comp), 4), index)] := pred;
+      buf[bitor(lshift((ptr | comp), 4), index)] := pred;
     end
     count := count + 1;
   end

@@ -57,7 +57,7 @@ int(size=SAMPLE_SZ) AC :
 
 	ac: action IN:[ x ] ==> AC:[ x ]
 	do
-		count := bitand(count + 1, 63);
+		count := (count + 1) & 63;
 	end
 
 	priority

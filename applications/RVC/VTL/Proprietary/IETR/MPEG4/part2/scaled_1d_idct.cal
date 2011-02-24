@@ -9,38 +9,38 @@ actor scaled_1d_idct () int(size=IN_SZ) In ==> int(size=OUT_SZ) Out :
 
 	function pmul_1_0(int X) --> int
 	var
-		int(size=32) Temp1 = rshift(X, 3) - rshift(X, 7) :
+		int(size=32) Temp1 = (X >> 3) - (X >> 7) :
 		X - Temp1
 	end
 
 	function pmul_1_1(int X) --> int
 	var
-		int(size=32) Temp1 = rshift(X, 3) - rshift(X, 7),
-		int(size=32) Temp2 = Temp1 - rshift(X, 11) :
-		Temp1 + rshift(Temp2, 1)
+		int(size=32) Temp1 = (X >> 3) - (X >> 7),
+		int(size=32) Temp2 = Temp1 - (X >> 11) :
+		Temp1 + (Temp2 >> 1)
 	end
 
 	function pmul_2_0(int X) --> int
 	var
-		int(size=32) Temp1 = rshift(X, 9) - X :
-		rshift(Temp1, 2) - Temp1
+		int(size=32) Temp1 = (X >> 9) - X :
+		(Temp1 >> 2) - Temp1
 	end
 
 	function pmul_2_1(int X) --> int :
-		rshift(X, 1)
+		(X >> 1)
 	end
 
 	function pmul_3_0(int X) --> int
 	var
-		int(size=32) Temp1 = X + rshift(X, 5),
-		int(size=32) Temp2 = rshift(Temp1, 2) :
-		Temp2 + rshift(X, 4)
+		int(size=32) Temp1 = X + (X >> 5),
+		int(size=32) Temp2 = (Temp1 >> 2) :
+		Temp2 + (X >> 4)
 	end
 
 	function pmul_3_1(int X) --> int
 	var
-		int(size=32) Temp1 = X + rshift(X, 5),
-		int(size=32) Temp2 = rshift(Temp1, 2) :
+		int(size=32) Temp1 = X + (X >> 5),
+		int(size=32) Temp2 = (Temp1 >> 2) :
 		Temp1 - Temp2
 	end
 

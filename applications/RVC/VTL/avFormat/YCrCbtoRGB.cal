@@ -69,9 +69,9 @@ actor YCrCbtoRGB()
 		yt2 := y;
 		crt2 := cr;
 		cbt2 := cb;
-		yt := bitand(yt2, t1);
-		crt := bitand(crt2, t1);
-		cbt := bitand(cbt2, t1);
+		yt := (yt2 & t1);
+		crt := (crt2 & t1);
+		cbt := (cbt2 & t1);
 		rt := (((yt-64) << 8) + rv*(crt-512)) >> 10;
 		gt := (((yt-64) << 8) - gu*(cbt-512) - gv*(crt-512)) >> 10;
 		bt := (((yt-64) << 8) + bu*(cbt-512)) >> 10; 

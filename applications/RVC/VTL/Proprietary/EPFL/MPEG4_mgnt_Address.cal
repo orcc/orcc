@@ -104,10 +104,10 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	// Set up for next vop - start reading from the prior write location.
 	procedure advance_vop()
 	begin
-		vop_luma_width := lshift(vop_width, 4);
-		vop_luma_height := lshift(vop_height, 4);
-		vop_chroma_width := lshift(vop_width, 3);
-		vop_chroma_height := lshift(vop_height, 3);
+		vop_luma_width := (vop_width << 4);
+		vop_luma_height := (vop_height << 4);
+		vop_chroma_width := (vop_width << 3);
+		vop_chroma_height := (vop_height << 3);
 		// Read ring buffers now start from previous write location.
 		// Move write location ahead by the offset value.
 		luma_read_ring_start := luma_write_ring_start;
@@ -300,9 +300,9 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 
 	cmd.newVop: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
-		round := bitand(cmd, ROUND_TYPE) != 0;
+		round := (cmd & ROUND_TYPE) != 0;
 	end
 
 	getw: action BTYPE:[ w ] ==>
@@ -319,7 +319,7 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	// Pure texture
 	cmd.noMotion: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, INTRA) != 0
+		(cmd & INTRA) != 0
 	do
 	// Disable motion comp addressing
 		read_count := 81;
@@ -338,13 +338,13 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	//                          bit0 = round
 	cmd.motion: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, MOTION) != 0
+		(cmd & MOTION) != 0
 	end
 
 	getmvx: action MV:[ x ] ==>
 	do
-		interp_x := bitand(x, 1) = 1;
-		mvx := rshift(x, 1);
+		interp_x := (x & 1) = 1;
+		mvx := (x >> 1);
 	end
 
 	getmvy: action MV:[ y ] ==> halfpel:[ if interp_x then
@@ -361,9 +361,9 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 			0
 		end ]
 	var
-		bool interp_y = (bitand(y, 1) = 1)
+		bool interp_y = ((y & 1) = 1)
 	do
-		mvy := rshift(y, 1);
+		mvy := (y >> 1);
 		read_count := 0;
 		read_row := 0;
 		read_col := 0;
@@ -400,7 +400,7 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 		write_count < read_count // this makes these two actions alternate
 
 	var
-		int a = generate_write_addr(bitand(write_count, 7), rshift(write_count, 3))
+		int a = generate_write_addr((write_count & 7), (write_count >> 3))
 	do
 		write_count := write_count + 1;
 	end

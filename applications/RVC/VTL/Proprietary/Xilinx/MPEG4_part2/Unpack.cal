@@ -62,14 +62,14 @@ int(size=PIX_SZ) DO :
 	int INTER = 512;
 
 	function extractByte(int v, int n) --> int :
-		bitand(rshift(v, (3 - n) * 8), 255)
+		(v >> ((3 - n) * 8)) & 255
 	end
 
 	int(size=4) comp;
 
 	cmd.newVop: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		comp := 0;
 		mbx := 0;
@@ -95,25 +95,25 @@ int(size=PIX_SZ) DO :
 
 	cmd.motion: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, bitor(INTER, MOTION)) = bitor(INTER, MOTION) // var int mask = bitor( INTER, MOTION )
+		(cmd & (INTER | MOTION)) = (INTER | MOTION) // var int mask = (INTER | MOTION)
 
 	end
 
 	cmd.noMotion: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, INTER) = INTER
+		(cmd & INTER) = INTER
 	do
 		mvx := 0;
 		count := 0;
 		row := 0;
 		xstart := if comp < 4 then
-			lshift(mbx, 4) + if bitand(comp, 1) != 0 then
+			(mbx << 4) + if (comp & 1) != 0 then
 				8
 			else
 				0
 			end
 		else
-			lshift(mbx, 3)
+			(mbx << 3)
 		end;
 	end
 
@@ -132,19 +132,19 @@ int(size=PIX_SZ) DO :
 	//                          bit0 = round
 	getmvx: action MV:[ v ] ==>
 	var
-		int(size=MV_SZ) vv = rshift(v, 1)
+		int(size=MV_SZ) vv = (v >> 1)
 	do
 		mvx := vv;
 		count := 0;
 		row := 0;
 		xstart := if comp < 4 then
-			vv + lshift(mbx, 4) + if bitand(comp, 1) != 0 then
+			vv + (mbx << 4) + if (comp & 1) != 0 then
 				8
 			else
 				0
 			end
 		else
-			vv + lshift(mbx, 3)
+			vv + (mbx << 3)
 		end;
 	end
 
@@ -171,20 +171,20 @@ int(size=PIX_SZ) DO :
 
 	extract.noRead: action ==> DO:[ extractByte(data, shift) ]
 	guard
-		bitand(xstart + count, 3) != 0,
+		((xstart + count) & 3) != 0,
 		// Must read a new value on quad-word boundary
 		count != 0 // Must read at start of row
 
 	var
 		int(size=MB_COORD_SZ + 4) x = xstart + count , bool left_clip = x < 0 , bool right_clip_luma =
-		bitand(comp, 4) = 0 and rshift(x, 4) > mbw_max , bool right_clip_chroma = bitand(comp, 4) != 0
-		and rshift(x, 3) > mbw_max , int(size=3) shift = if left_clip then
+		(comp & 4) = 0 and (x >> 4) > mbw_max , bool right_clip_chroma = (comp & 4) != 0
+		and (x >> 3) > mbw_max , int(size=3) shift = if left_clip then
 			0
 		else
 			if right_clip_luma or right_clip_chroma then
 				3
 			else
-				bitand(x, 3)
+				(x & 3)
 			end
 		end
 	do
@@ -199,14 +199,14 @@ int(size=PIX_SZ) DO :
 	extract.read: action DI:[ d ] ==> DO:[ extractByte(data, shift) ]
 	var
 		int(size=MB_COORD_SZ + 4) x = xstart + count , bool left_clip = x < 0 , bool right_clip_luma =
-		bitand(comp, 4) = 0 and rshift(x, 4) > mbw_max , bool right_clip_chroma = bitand(comp, 4) != 0
-		and rshift(x, 3) > mbw_max , int(size=3) shift = if left_clip then
+		(comp & 4) = 0 and (x >> 4) > mbw_max , bool right_clip_chroma = (comp & 4) != 0
+		and (x >> 3) > mbw_max , int(size=3) shift = if left_clip then
 			0
 		else
 			if right_clip_luma or right_clip_chroma then
 				3
 			else
-				bitand(x, 3)
+				(x & 3)
 			end
 		end
 	do

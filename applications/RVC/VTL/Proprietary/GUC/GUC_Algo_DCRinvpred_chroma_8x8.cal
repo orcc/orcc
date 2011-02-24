@@ -156,7 +156,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 		btype=1, ac_coded
 	do
 		s_qp := qp;
-		round := bitxor(bitand(s_qp, 1), 1);
+		round := bitxor((s_qp & 1), 1);
 		is_signed := true;
 		s_prev_qp := s_qp;
 		buf_qp[cnt] := s_qp;
@@ -205,13 +205,13 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	do
 		s_qp := qp;
 		s_prev_qp := s_qp;
-		round := bitxor(bitand(s_qp, 1), 1);
+		round := bitxor((s_qp & 1), 1);
 		scaler := dc_scaler();
 		dc_pred := ((if top then
 			dcc
 		else
 			dca
-		end) + rshift(scaler, 1)) / scaler;
+		end) + (scaler >> 1)) / scaler;
 		s := if not acp then
 			0
 		else

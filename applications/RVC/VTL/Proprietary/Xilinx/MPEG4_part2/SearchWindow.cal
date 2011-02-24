@@ -77,7 +77,7 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 	// Reading compensation  = 6 x 3 x 9        ->  162 clocks per macroblock
 	// Required rate is 6 * 64 * 120MHz/93.3MHz -> max. 493 clocks per macroblock
 	function maskBits(int v, int n) --> int :
-		bitand(v, lshift(1, n) - 1)
+		v & ((1 << n) - 1)
 	end
 
 	int LUMA_X_BITS = 4;
@@ -110,10 +110,10 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
 	cmd.newVop: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
-		round := bitand(cmd, ROUND_TYPE) != 0;
-		prediction_is_INTRA := bitand(cmd, INTRA) != 0;
+		round := (cmd & ROUND_TYPE) != 0;
+		prediction_is_INTRA := (cmd & INTRA) != 0;
 		comp := 0;
 		is_motion := false;
 		// ensure that we do not attempt to read MVs when filling 1st search stripe
@@ -148,7 +148,7 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
 	cmd.motion: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, bitor(INTER, MOTION)) = bitor(INTER, MOTION) // var int mask = bitor( INTER, MOTION )
+		(cmd & (INTER | MOTION)) = (INTER | MOTION) // var int mask = (INTER | MOTION)
 
 	do
 		is_motion := true;
@@ -156,7 +156,7 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
 	cmd.noMotion: action BTYPE:[ cmd ] ==> FLAGS:[ 0 ]
 	guard
-		bitand(cmd, INTER) = INTER
+		(cmd & INTER) = INTER
 	do
 		mvx := 0;
 		mvy := 0;
@@ -212,31 +212,30 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 	guard
 		count <= 63
 	var
-		int(size=3) comp_local = maskBits(rshift(count, 4), 2) , int(size=LUMA_Y_BITS + 1) y =
-		maskBits(maskBits(rshift(count, 1), 3) + if bitand(comp_local, 2) != 0 then
+		int(size=3) comp_local = maskBits((count >> 4), 2) , int(size=LUMA_Y_BITS + 1) y =
+		maskBits(maskBits((count >> 1), 3) + if (comp_local & 2) != 0 then
 			8
 		else
 			0
-		end + lshift(y_offset, 4), LUMA_Y_BITS) , int(size=LUMA_X_BITS + 1) x = maskBits(maskBits(
-		count, 1) + if bitand(comp_local, 1) != 0 then
+		end + (y_offset << 4), LUMA_Y_BITS) , int(size=LUMA_X_BITS + 1) x = maskBits(maskBits(
+		count, 1) + if (comp_local & 1) != 0 then
 			2
 		else
 			0
-		end + lshift(mbx_ptr, 2), LUMA_X_BITS)
+		end + (mbx_ptr << 2), LUMA_X_BITS)
 	do
-		luma[lshift(y, LUMA_X_BITS) + x] := d;
+		luma[(y << LUMA_X_BITS) + x] := d;
 		count := count + 1;
 	end
 
 	read.chroma: action DI:[ d ] ==>
 	var
-		int(size=2) comp_local = maskBits(rshift(count, 4), 1) , int(size=CHROMA_Y_BITS + 1) y =
-		maskBits(maskBits(rshift(count, 1), 3) + lshift(y_offset, 3), CHROMA_Y_BITS) ,
-		int(size=CHROMA_X_BITS + 1) x = maskBits(maskBits(count, 1) + lshift(mbx_ptr, 1),
+		int(size=2) comp_local = maskBits((count >> 4), 1) , int(size=CHROMA_Y_BITS + 1) y =
+		maskBits(maskBits((count >> 1), 3) + (y_offset << 3), CHROMA_Y_BITS) ,
+		int(size=CHROMA_X_BITS + 1) x = maskBits(maskBits(count, 1) + (mbx_ptr << 1),
 		CHROMA_X_BITS)
 	do
-		chroma[lshift(comp_local, CHROMA_X_BITS + CHROMA_Y_BITS) + lshift(y, CHROMA_X_BITS) + x]
-		:= d;
+		chroma[(comp_local << (CHROMA_X_BITS + CHROMA_Y_BITS)) + (y << CHROMA_X_BITS) + x] := d;
 		count := count + 1;
 		if count = 96 then
 			count := 0;
@@ -255,8 +254,8 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
 	getmvx: action MV:[ v ] ==>
 	do
-		interp_x := bitand(v, 1) != 0;
-		mvx := rshift(v, 1);
+		interp_x := (v & 1) != 0;
+		mvx := (v >> 1);
 	end
 
 	getmvy: action MV:[ v ] ==> FLAGS:[ f ]
@@ -265,7 +264,7 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 			4
 		else
 			0
-		end + if bitand(v, 1) != 0 then
+		end + if (v & 1) != 0 then
 			2
 		else
 			0
@@ -275,7 +274,7 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 			0
 		end
 	do
-		mvy := rshift(v, 1);
+		mvy := (v >> 1);
 	end
 
 	int(size=3) mvxcount;
@@ -298,16 +297,15 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 		mvycount = 9
 	end
 
-	search.luma: action ==> DO:[ luma[lshift(maskBits(y, LUMA_Y_BITS), LUMA_X_BITS) +
-		maskBits(rshift(x + lshift(mbx_ptr - 2, 4), 2), LUMA_X_BITS)] ]
+	search.luma: action ==> DO:[ luma[(maskBits(y, LUMA_Y_BITS) << LUMA_X_BITS) + maskBits((x + ((mbx_ptr - 2) << 4)) >> 2, LUMA_X_BITS)] ]
 	guard
 		comp <= 3
 	var
-		int(size=MV_SZ + 1) y := mvy + mvycount + if bitand(comp, 2) != 0 then
+		int(size=MV_SZ + 1) y := mvy + mvycount + if (comp & 2) != 0 then
 			8
 		else
 			0
-		end , int(size=MV_SZ + 1) x := mvx + lshift(mvxcount, 2) + if bitand(comp, 1) != 0 then
+		end , int(size=MV_SZ + 1) x := mvx + (mvxcount << 2) + if (comp & 1) != 0 then
 			8
 		else
 			0
@@ -351,13 +349,13 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 		end
 	end
 
-	search.chroma: action ==> DO:[ chroma[lshift(maskBits(comp, 1), CHROMA_X_BITS +
-		CHROMA_Y_BITS) + lshift(maskBits(y, CHROMA_Y_BITS), CHROMA_X_BITS) + maskBits(rshift(x
-		+ lshift(mbx_ptr - 2, 3), 2), CHROMA_X_BITS)] ]
+	search.chroma: action ==> DO:[ chroma[(maskBits(comp, 1) << (CHROMA_X_BITS + CHROMA_Y_BITS)) +
+	(maskBits(y, CHROMA_Y_BITS) << CHROMA_X_BITS) +
+	maskBits((x + ((mbx_ptr - 2) << 3)) >> 2, CHROMA_X_BITS)] ]
 	var
 	//int(size=CHROMA_Y_BITS+1) y = mvy + mvycount,
-		//int(size=CHROMA_X_BITS+1) x = mvx + lshift( mvxcount,2 )
-		int(size=MV_SZ + 1) y := mvy + mvycount , int(size=MV_SZ + 1) x := mvx + lshift(mvxcount, 2)
+		//int(size=CHROMA_X_BITS+1) x = mvx + (mvxcount << 2)
+		int(size=MV_SZ + 1) y := mvy + mvycount , int(size=MV_SZ + 1) x := mvx + (mvxcount << 2)
 	do
 	// Clip to frame
 		if mby = 0 then

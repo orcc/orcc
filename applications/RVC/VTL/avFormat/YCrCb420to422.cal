@@ -69,12 +69,12 @@ actor YCrCb420to422()
 	//Parameters
 	int WidthMAX = 1024; //change to set max length 128
    	
-    //function getWidth(int(size=32) sizeOfImage) --> int(size=16): bitand(sizeOfImage ,65535) end
+    //function getWidth(int(size=32) sizeOfImage) --> int(size=16): (sizeOfImage & 65535) end
     
-    //function getHeight(int(size=32) sizeOfImage) --> int(size=16): rshift(sizeOfImage ,16) end
+    //function getHeight(int(size=32) sizeOfImage) --> int(size=16): (sizeOfImage >> 16) end
    	
    	function tap(int(size=10) a, int(size=10) b) --> int(size=10) : 
-   		rshift(lshift(a,1)+a+b,2)//(3*a+b)/4
+   		((a << 1)+a+b) >> 2 //(3*a+b)/4
    	end 
    	
    	bool beginning := true;		

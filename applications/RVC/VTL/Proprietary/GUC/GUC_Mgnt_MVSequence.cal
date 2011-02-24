@@ -74,7 +74,7 @@ actor GUC_Mgnt_MVSequence ()
 	// c   - component to be accessed
 	function access(int(size=MB_COORD_SZ) mbptr, int(size=4) c) --> int(size=MB_COORD_SZ +
 		3) :
-		bitor(lshift(mbptr, 3), bitand(c, 3))
+		bitor((mbptr << 3), (c & 3))
 	end
 
 	// New VOP

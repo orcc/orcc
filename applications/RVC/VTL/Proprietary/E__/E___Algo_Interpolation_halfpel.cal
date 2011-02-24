@@ -27,36 +27,33 @@ actor E___Algo_Interpolation_halfpel
 	none: action halfpel:[ flags ], RD:[ rd ] repeat 81 ==> MOT:[ 
 		[ rd[9*j+k] : for int j in 0 .. 7, for int k in 0 .. 7] ] repeat 64
 	guard
-		rshift(flags, 1) = 0
+		(flags >> 1) = 0
 	end
 
 	row: action halfpel:[ flags ], RD:[ rd ] repeat 81 ==> MOT:[ 
-		[ rshift(rd[9 * j + k] + rd[9 * (j + 1) + k] + round, 1) : 
-		for int j in 0 .. 7, for int k in 0 .. 7 ] ] repeat 64
+		[ (rd[9 * j + k] + rd[9 * (j + 1) + k] + round) >> 1 : for int j in 0 .. 7, for int k in 0 .. 7 ] ] repeat 64
 	guard
-		rshift(flags, 1) = 1
+		(flags >> 1) = 1
 	var
-		int round := 1 - bitand(flags, 1)
+		int round := 1 - (flags & 1)
 	end
 
 	col: action halfpel:[ flags ], RD:[ rd ] repeat 81 ==> MOT:[ 
-		[ rshift(rd[9 * j + k] + rd[9 * j + k + 1] + round, 1) : 
-		for int j in 0 .. 7, for int k in 0 .. 7 ] ] repeat 64
+		[ (rd[9 * j + k] + rd[9 * j + k + 1] + round) >> 1 : for int j in 0 .. 7, for int k in 0 .. 7 ] ] repeat 64
 	guard
-		rshift(flags, 1) = 2
+		(flags >> 1) = 2
 	var
-		int round := 1 - bitand(flags, 1) 
+		int round := 1 - (flags & 1) 
 	end
 
 	both: action halfpel:[ flags ], RD:[ rd ] repeat 81 ==> MOT:[ 
-		[ rshift(rd[9 *j + k] + rd[9 * j + k + 1] + 
-		rd[9 * (j + 1) + k] + rd[9 * (j + 1) + k + 1] +round, 2) : 
+		[ (rd[9 *j + k] + rd[9 * j + k + 1] + rd[9 * (j + 1) + k] + rd[9 * (j + 1) + k + 1] + round) >> 2 : 
 		for int j in 0 .. 7, for int k in 0 .. 7 ]  ] repeat 64 
    /*
-   * otherwise: rshift(flags,1) = 3
+   * otherwise: (flags >> 1) = 3
    */
 	var
-		int round := 2 - bitand(flags, 1)
+		int round := 2 - (flags & 1)
 	end
 
 	priority

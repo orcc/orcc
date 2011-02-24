@@ -147,9 +147,9 @@ actor Framebuf_w_Address_8X8 (int INTRA,
 	// Start a new VOP by setting VOP parameters and initializing the block scan
 	cmd.newVop: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	var
-		int round = if bitand(cmd, ROUND_TYPE) != 0 then
+		int round = if (cmd & ROUND_TYPE) != 0 then
 			1
 		else
 			0
@@ -196,14 +196,14 @@ actor Framebuf_w_Address_8X8 (int INTRA,
 	// Pure texture
 	cmd.noMotion: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, INTRA) != 0
+		(cmd & INTRA) != 0
 	do
 		advance_block();
 	end
 	// Pure motion
 	cmd.motion: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, MOTION) != 0
+		(cmd & MOTION) != 0
 	end
 	// Encode flags on halfpel: bit2 = interp. x
 
@@ -212,11 +212,10 @@ actor Framebuf_w_Address_8X8 (int INTRA,
 	//                          bit0 = round
 	read_mv: action MV:[ x, y ] ==> halfpel:[ flags ]
 	var
-		int(size=FLAG_SZ) flags = lshift(bitand(x, 1), 2) + lshift(bitand(y, 1), 1) +
-		vop_rounding_mode
+		int(size=FLAG_SZ) flags = ((x & 1) << 2) + ((y & 1) << 1) + vop_rounding_mode
 	do
-		mvx := rshift(x, 1);
-		mvy := rshift(y, 1);
+		mvx := (x >> 1);
+		mvy := (y >> 1);
 	end
 	// No change in the block
 	cmd.neither: action BTYPE:[ cmd ] ==> halfpel:[ 0 ]
@@ -230,8 +229,8 @@ actor Framebuf_w_Address_8X8 (int INTRA,
 		outstanding_writes < max_outstanding_writes
 	var
 		List(type: int(size=PIX_SZ), size=81) rd := [ 0 : for int k in 1 .. 81 ],
-		int x = mbx_read * SAMPLES_PER_MB + 8 * bitand(comp_read, 1) + mvx ,
-		int y := mby_read * SAMPLES_PER_MB + 8 * rshift(comp_read, 1) + mvy , int
+		int x = mbx_read * SAMPLES_PER_MB + 8 * (comp_read & 1) + mvx ,
+		int y := mby_read * SAMPLES_PER_MB + 8 * (comp_read >> 1) + mvy , int
 		clip_left := 0 , int clip_right := 0 , int clip_x := x , int clip_y = if (y <
 		0) then
 			0

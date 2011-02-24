@@ -105,13 +105,13 @@ int(size=MB_COORD_SZ + 3) B , int(size=MB_COORD_SZ + 3) C :
 	end
 
 	function access(int(size=MB_COORD_SZ) p, int(size=4) c) --> int(size=MB_COORD_SZ + 3) :
-		bitor(lshift(p, 3), c)
+		(p << 3) | c
 	end
 
 	// New VOP
 	start: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		mbx := 0;
 		top_edge := true;
@@ -133,7 +133,7 @@ int(size=MB_COORD_SZ + 3) B , int(size=MB_COORD_SZ + 3) C :
 
 	read.intra: action BTYPE:[ btype ] ==>
 	guard
-		bitand(btype, INTRA) != 0
+		(btype & INTRA) != 0
 	do
 		coded[access(ptr, comp)] := true;
 	end

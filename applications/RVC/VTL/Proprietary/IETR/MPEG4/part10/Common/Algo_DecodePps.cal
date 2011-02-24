@@ -374,7 +374,7 @@ actor Algo_DecodePps(bool IsCBP)
 			SzSliceGroupChgCycle[pps_id] := 0;
 			while(ValMaxSliceGroupChgCycle != 0)
 			do
-				ValMaxSliceGroupChgCycle     := rshift(ValMaxSliceGroupChgCycle,1);
+				ValMaxSliceGroupChgCycle     := (ValMaxSliceGroupChgCycle >> 1);
 				SzSliceGroupChgCycle[pps_id] := SzSliceGroupChgCycle[pps_id] + 1;
 			end
 		end

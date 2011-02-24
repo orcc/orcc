@@ -59,7 +59,7 @@ actor MemoryManager () int(size=BTYPE_SZ) BTYPE ==> int(size=32) RA , int(size=3
    end
 */
 	function mask_bits(int v, int n) --> int :
-		bitand(v, lshift(1, n) - 1)
+		v & ((1 << n) - 1)
 	end
 
 	// Frame buffer organization:
@@ -110,21 +110,21 @@ actor MemoryManager () int(size=BTYPE_SZ) BTYPE ==> int(size=32) RA , int(size=3
 	// Get the starting address of a block
 	function address(int f, int y, int x) --> int
 	var
-		int xm = lshift(mask_bits(x, XBITS), XSHIFT),
-		int ym = lshift(mask_bits(y, YBITS), YSHIFT),
-		int fm = lshift(mask_bits(f, FRAMEBITS), FRAMESHIFT) :
-		bitor(fm, bitor(ym, xm))
+		int xm = mask_bits(x, XBITS) << XSHIFT,
+		int ym = mask_bits(y, YBITS) << YSHIFT,
+		int fm = mask_bits(f, FRAMEBITS) << FRAMESHIFT :
+		fm | (ym | xm)
 	end
 
 	// Move the frame counter at the start of the VOP
 	cmd.newVop: action BTYPE:[ cmd ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		(cmd & NEWVOP) != 0
 	do
 		next_mbx := 0;
 		next_mby := 0;
 		comp := 0;
-		prediction_is_IVOP := bitand(cmd, INTRA) != 0;
+		prediction_is_IVOP := (cmd & INTRA) != 0;
 		last_frame := this_frame;
 		this_frame := mask_bits(this_frame + 1, FRAMEBITS);
 	end

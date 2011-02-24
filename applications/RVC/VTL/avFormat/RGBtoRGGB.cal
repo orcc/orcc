@@ -64,8 +64,8 @@ actor RGBtoRGGB()
 		==>
 			int(size=8) RGGB:
     
-    //function getWidth(int(size=32) sizeOfImage) --> int(size=16): bitand(sizeOfImage ,65535) end
-    //function getHeight(int(size=32) sizeOfImage) --> int(size=16): rshift(sizeOfImage ,16) end
+    //function getWidth(int(size=32) sizeOfImage) --> int(size=16): (sizeOfImage & 65535) end
+    //function getHeight(int(size=32) sizeOfImage) --> int(size=16): (sizeOfImage >> 16) end
     
     int(size=16) width := 8;
     int(size=16) height := 8; 

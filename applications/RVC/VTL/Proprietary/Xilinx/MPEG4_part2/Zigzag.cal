@@ -72,19 +72,11 @@ int(size=SAMPLE_SZ) OUT :
 	end
 
 	function wa() --> int :
-		bitor(bitand(count, 63), if half then
-			64
-		else
-			0
-		end)
+		(count & 63) | if half then 64 else 0 end
 	end
 
 	function ra(int addr) --> int :
-		bitor(bitand(addr, 63), if half then
-			0
-		else
-			64
-		end)
+		(addr & 63) | if half then 0 else 64 end
 	end
 
 	// If there is not a block in the buffer already, just read in the block

@@ -163,9 +163,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			Is_MbB_Avail := MbLocyInSlc != 0;
 			Is_MbC_Avail := (MbLocyInSlc >= 1) and (MbLocxInPic + 1 <  PicWidthInMbs);
 			Is_MbD_Avail := (MbLocyInSlc >= 1) and (MbLocxInPic > 0 and (MbLocyInSlc > 1 or MbLocyInSlc = 1 and MbLocxInSlc > 0));
-			TotalCoeffTabLuma[bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)]      := [0: for int i in 0 .. 15];
-			TotalCoeffTabChroma[0][bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)] := [0: for int i in 0 .. 15];
-			TotalCoeffTabChroma[1][bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)] := [0: for int i in 0 .. 15];
+			TotalCoeffTabLuma[(curr_mb_addr & MASK_POW2_PICWIDTH_BLK_PLUS1)]      := [0: for int i in 0 .. 15];
+			TotalCoeffTabChroma[0][(curr_mb_addr & MASK_POW2_PICWIDTH_BLK_PLUS1)] := [0: for int i in 0 .. 15];
+			TotalCoeffTabChroma[1][(curr_mb_addr & MASK_POW2_PICWIDTH_BLK_PLUS1)] := [0: for int i in 0 .. 15];
 			if(DEBUG_FLAG_DECODED)then
 				println("\n\n\n*** New Mb *** Val = "+curr_mb_addr);
 			end
@@ -390,18 +390,18 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			int(size=8) Flags
 		do
 				if(Is_MbA_Avail) then
-					NaTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 5],
-					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 7],
-					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][13],
-					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][15],
-					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 5],
-					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 7],
-					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][13],
-					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][15],
-					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 5],
-					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 7],
-					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][13],
-					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][15]
+					NaTab := [ TotalCoeffTabLuma  [ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][ 5],
+					           TotalCoeffTabLuma  [ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][ 7],
+					           TotalCoeffTabLuma  [ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][13],
+					           TotalCoeffTabLuma  [ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][15],
+					           TotalCoeffTabChroma[0][ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][ 5],
+					           TotalCoeffTabChroma[0][ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][ 7],
+					           TotalCoeffTabChroma[0][ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][13],
+					           TotalCoeffTabChroma[0][ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][15],
+					           TotalCoeffTabChroma[1][ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][ 5],
+					           TotalCoeffTabChroma[1][ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][ 7],
+					           TotalCoeffTabChroma[1][ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][13],
+					           TotalCoeffTabChroma[1][ (curr_mb_addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1][15]
 					         ];
 					LMbExists := true;
 				else
@@ -410,18 +410,18 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 				end
 				if(Is_MbB_Avail)then
 					AMbExists := true;
-					NbTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][10],
-					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][11],
-					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][14],
-					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][15],
-					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][10],
-					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][11],
-					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][14],
-					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][15],
-					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][10],
-					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][11],
-					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][14],
-					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][15]
+					NbTab := [ TotalCoeffTabLuma  [ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][10],
+					           TotalCoeffTabLuma  [ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][11],
+					           TotalCoeffTabLuma  [ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][14],
+					           TotalCoeffTabLuma  [ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][15],
+					           TotalCoeffTabChroma[0][ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][10],
+					           TotalCoeffTabChroma[0][ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][11],
+					           TotalCoeffTabChroma[0][ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][14],
+					           TotalCoeffTabChroma[0][ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][15],
+					           TotalCoeffTabChroma[1][ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][10],
+					           TotalCoeffTabChroma[1][ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][11],
+					           TotalCoeffTabChroma[1][ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][14],
+					           TotalCoeffTabChroma[1][ (curr_mb_addr - PicWidthInMbs) & MASK_POW2_PICWIDTH_BLK_PLUS1][15]
 					         ];
 				else
 					AMbExists := false;
@@ -479,9 +479,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 		do
 			foreach int i in 0 .. 15
 			do
-				TotalCoeffTabLuma[bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)][i]      := CoLu[i];
-				TotalCoeffTabChroma[0][bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)][i] := CoLuChe[i];
-				TotalCoeffTabChroma[1][bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)][i] := CoLuChe[16+i];
+				TotalCoeffTabLuma[(curr_mb_addr & MASK_POW2_PICWIDTH_BLK_PLUS1)][i]      := CoLu[i];
+				TotalCoeffTabChroma[0][(curr_mb_addr & MASK_POW2_PICWIDTH_BLK_PLUS1)][i] := CoLuChe[i];
+				TotalCoeffTabChroma[1][(curr_mb_addr & MASK_POW2_PICWIDTH_BLK_PLUS1)][i] := CoLuChe[16+i];
 			end
 			QpValue := NewQp;
 			Qp_CbValue := NewQpCb;
