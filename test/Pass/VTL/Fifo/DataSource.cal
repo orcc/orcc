@@ -2,26 +2,24 @@ package Fifo;
 
 actor DataSource (int NUM) ==> int O :
 
-	int count := 0;
+	/*uint(size=32) last1 := 1;
+	uint(size=32) last2 := 2;
 
-	done: action ==> O:[ -1 ]
-	guard count = NUM
-	end
-
-	loop: action ==> O:[ current ]
+	action ==> O:[old_last1]
 	var
-		int current = count
+		uint(size=32) old_last1 = last1
+	do
+		last1 := last2;
+		last2 := old_last1 + last2;
+	end*/
+
+	uint(size=32) count := 0;
+
+	action ==> O:[old_count]
+	var
+		uint(size=32) old_count = count
 	do
 		count := count + 1;
-	end
-	
-	schedule fsm s0:
-		s0 (done) --> s1;
-		s0 (loop) --> s0;
-	end
-
-	priority
-		done > loop;
 	end
 
 end

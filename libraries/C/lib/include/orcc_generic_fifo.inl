@@ -68,12 +68,12 @@ DECL int FIFO_HAS_ROOM(T) (struct FIFO_S(T) *fifo, unsigned int n) {
 
 DECL int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo) {
 	// return fifo->size - fifo->fill_count;
-	unsigned int i, tmp, free_room = fifo->size;
+	unsigned int i, tmp, free_room = fifo->size - 1;
 	for (i = 0; i < fifo->readers_nb; i++) {
 		if (fifo->read_inds[i] > fifo->write_ind) {
-			tmp = fifo->read_inds[i] - fifo->write_ind;
+			tmp = fifo->read_inds[i] - fifo->write_ind - 1;
 		} else {
-			tmp = fifo->size - fifo->write_ind + fifo->read_inds[i];
+			tmp = fifo->size - fifo->write_ind + fifo->read_inds[i] - 1;
 		}
 		free_room = tmp < free_room ? tmp : free_room;
 	}

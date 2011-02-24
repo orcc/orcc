@@ -2,26 +2,19 @@ package Fifo;
 
 actor Compute () int I ==> int O :
 
-	int(size=64) sum := 0;
+	int i0;
 
-	do_sum: action I:[i] ==>
+	a0: action I:[i] ==>
 	do
-		sum := sum + i;
+		i0 := i;
 	end
 	
-	print_sum: action I:[i] ==>
-	guard i < 0
-	do
-		println("sum = " + sum);
+	a1: action I:[i] ==> O:[i0 + i]
 	end
 	
 	schedule fsm s0:
-		s0 (do_sum) --> s0;
-		s0 (print_sum) --> s1;
-	end
-	
-	priority
-		print_sum > do_sum;
+		s0 (a0) --> s1;
+		s1 (a1) --> s0;
 	end
 
 end

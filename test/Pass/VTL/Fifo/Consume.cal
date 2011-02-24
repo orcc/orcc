@@ -2,26 +2,9 @@ package Fifo;
 
 actor Consume () int I ==> :
 
-	int(size=64) sum := 0;
-
 	do_sum: action I:[i] ==>
 	do
-		sum := sum + i;
-	end
-	
-	print_sum: action I:[i] ==>
-	guard i < 0
-	do
-		println("sum = " + sum);
-	end
-	
-	schedule fsm s0:
-		s0 (do_sum) --> s0;
-		s0 (print_sum) --> s1;
-	end
-	
-	priority
-		print_sum > do_sum;
+		println("i = " + i);
 	end
 
 end

@@ -263,15 +263,12 @@ printReadTokensFunction(port) ::= <<
 
 
 static void read_<port.name>() {
-	index_<port.name> = 0;
-	numTokens_<port.name> = fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, <getFifoId(port,instance)>);
-	if (numTokens_<port.name> \> 0) {
-		tokens_<port.name> = fifo<printMedium(port)>_<port.type>_read(<getPortName(port)>, buf_<port.name>, <getFifoId(port,instance)>, numTokens_<port.name>);
-	}
+	index_<port.name> = <getPortName(port)>-\>read_inds[<getFifoId(port,instance)>];
+	numTokens_<port.name> = index_<port.name> + fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, <getFifoId(port,instance)>);
 }
 
 static void read_end_<port.name>() {
-	fifo<printMedium(port)>_<port.type>_read_end(<getPortName(port)>, <getFifoId(port,instance)>, index_<port.name>);
+	<getPortName(port)>-\>read_inds[<getFifoId(port,instance)>] = index_<port.name> % SIZE_<port.name>;
 }
 >>
 
@@ -279,15 +276,12 @@ printWriteTokensFunction(port) ::= <<
 
 
 static void write_<port.name>() {
-	index_<port.name> = 0;
-	numFree_<port.name> = fifo<printMedium(port)>_<port.type>_get_room(<getPortName(port)>);
-	if (numFree_<port.name> \> 0) {
-		tokens_<port.name> = fifo<printMedium(port)>_<port.type>_write(<getPortName(port)>, buf_<port.name>, numFree_<port.name>);
-	}
+	index_<port.name> = <getPortName(port)>-\>write_ind;
+	numFree_<port.name> = index_<port.name> + fifo<printMedium(port)>_<port.type>_get_room(<getPortName(port)>);
 }
 
 static void write_end_<port.name>() {
-	fifo<printMedium(port)>_<port.type>_write_end(<getPortName(port)>, buf_<port.name>, index_<port.name>);
+	<getPortName(port)>-\>write_ind = index_<port.name> % SIZE_<port.name>;
 }
 >>
 
@@ -517,9 +511,8 @@ printFifoSize(size) ::= <<
 printInputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numTokens_<port.name>;
-#define SIZE_<port.name> <printFifoSize(network.incomingMap.(instance).(port).size)>
-static <port.type> buf_<port.name>[SIZE_<port.name> + 1];
-static <port.type> *tokens_<port.name>;
+#define SIZE_<port.name> (<printFifoSize(network.incomingMap.(instance).(port).size)> + 1)
+#define tokens_<port.name> <getPortName(port)>-\>contents
 
 
 >>
@@ -527,9 +520,8 @@ static <port.type> *tokens_<port.name>;
 printOutputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numFree_<port.name>;
-#define SIZE_<port.name> <printFifoSize(first(network.outgoingMap.(instance).(port)).size)>
-static <port.type> buf_<port.name>[SIZE_<port.name> + 1];
-static <port.type> *tokens_<port.name>;
+#define SIZE_<port.name> (<printFifoSize(first(network.outgoingMap.(instance).(port)).size)> + 1)
+#define tokens_<port.name> <getPortName(port)>-\>contents
 
 
 >>
