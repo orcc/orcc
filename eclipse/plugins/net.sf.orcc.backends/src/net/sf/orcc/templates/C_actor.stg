@@ -110,7 +110,7 @@ endif>
 printLoad(load) ::= <<
 
 <if (load.source.variable.port && !load.indexes.empty)
-><load.target> = tokens_<load.source.variable.instruction.port.name>[index_<load.source.variable.instruction.port.name> % SIZE_<load.source.variable.instruction.port.name> + <first(load.indexes)>];<
+><load.target> = tokens_<load.source.variable.instruction.port.name>[(index_<load.source.variable.instruction.port.name> + <first(load.indexes)>) % SIZE_<load.source.variable.instruction.port.name>];<
 else
 ><load.target> = <load.source><load.indexes : {index | [<index>]}>;<endif>
 >>
@@ -142,7 +142,7 @@ endif>
 printStore(store) ::= <<
 
 <if (store.target.port && !store.indexes.empty)
->tokens_<store.target.instruction.port.name>[index_<store.target.instruction.port.name> % SIZE_<store.target.instruction.port.name> + <first(store.indexes)>] = <store.value>;<
+>tokens_<store.target.instruction.port.name>[(index_<store.target.instruction.port.name> + <first(store.indexes)>) % SIZE_<store.target.instruction.port.name>] = <store.value>;<
 else
 ><store.target><store.indexes : {index | [<index>]}> = <store.value>;<endif>
 >>
