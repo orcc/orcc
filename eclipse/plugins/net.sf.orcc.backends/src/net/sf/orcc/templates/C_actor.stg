@@ -523,7 +523,7 @@ static char *stateNames[] = {
 	<fsm.states : {state | "<state>"}; separator=",\n">
 };
 
-static enum states _FSM_state = my_state_<fsm.initialState>;
+static enum states _FSM_state;
 >>
 
 parameters(parameters) ::= <<
