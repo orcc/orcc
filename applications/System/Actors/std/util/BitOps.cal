@@ -3,6 +3,14 @@ package std.util;
 unit BitOps :
 
 	/**
+	 * standard bitop functions
+	 */
+	function bitand(int a, int b) --> int : a & b end
+	function bitxor(int a, int b) --> int : a ^ b end
+	function bitor(int a, int b) --> int : a | b end
+	function rshift(int a, int b) --> int : a >> b end
+	function lshift(int a, int b) --> int : a << b end
+    /**
 	 * select one bit from an integer
 	 */
 	function selectbit(int v, int n) --> int :
