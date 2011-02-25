@@ -72,11 +72,11 @@ public class CBroadcastAdder extends BroadcastAdder {
 						if (size != getSize(connec)) {
 							createBroadcast(instance, srcPort, outList);
 							writeListener
-									.writeText("Warning: Different sized FIFOs connected to the port "
+									.writeText("Warning: Different-sized FIFOs connected to port '"
 											+ srcPort.getName()
-											+ " from actor instance "
+											+ "' from '"
 											+ instance.getId()
-											+ " . A broadcast actor is created.\n");
+											+ "'. A broadcast is created.\n");
 							return;
 						}
 					}
