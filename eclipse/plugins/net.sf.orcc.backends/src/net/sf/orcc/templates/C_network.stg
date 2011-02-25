@@ -319,7 +319,7 @@ fillActorsStructs(instances) ::= <<
 // declares initialize and scheduler actors functions
 
 actorInitialize(instance) ::= <<
-<if (instance.actor && !instance.actor.initializes.empty)>
+<if (instance.actor)>
 extern void <instance.id>_initialize();
 <endif>
 >>
