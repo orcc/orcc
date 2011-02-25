@@ -58,7 +58,7 @@ static const <varDecl(variable)> = <Constant(variable.initialValue)>;
 <endif>
 <else>
 <if(variable.type.list)>
-static <varDecl(variable)>_backup = <Constant(variable.initialValue)>;
+static <variable.type> <variable.name>_backup<listSize(variable.type.dimensions)> = <Constant(variable.initialValue)>;
 <endif>
 static <varDecl(variable)>;
 <endif>
