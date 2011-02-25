@@ -106,7 +106,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		return computedMap;
 	}
-
+	
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorVisitor[] transformations = { new ArrayInitializeTransformation(),
@@ -158,13 +158,20 @@ public class XlimBackendImpl extends AbstractBackend {
 		printer.setTypePrinter(XlimTypePrinter.class);
 
 		transformActors(network.getActors());
+		doTransformNetwork(network);
 		printInstances(network);
-
+		
 		// print network
 		write("Printing network...\n");
 		printNetwork(network);
 	}
 
+	private void doTransformNetwork(Network network){
+		XlimHwNetworkTemplateData data = new XlimHwNetworkTemplateData();
+		data.computeTemplateMaps(network);
+		network.setTemplateData(data);
+	}
+	
 	private void printCMake(Network network) throws IOException {
 		NetworkPrinter networkPrinter = new NetworkPrinter("XLIM_sw_CMakeLists");
 		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
