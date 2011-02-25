@@ -586,7 +586,9 @@ public abstract class AbstractBackend implements Backend {
 	 *            a string
 	 */
 	final public void write(String text) {
-		if (process != null) {
+		if (process == null) {
+			System.out.println(text);
+		} else {
 			process.write(text);
 		}
 	}
