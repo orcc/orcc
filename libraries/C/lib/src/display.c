@@ -214,7 +214,9 @@ void display_write_mb(unsigned char tokens[384]) {
 static int init = 0;
 static int sizeinit = 0;
 
-static void display_init() {
+void display_initialize() {
+	m_x = 0;
+	m_y = 0;
 	
 #ifdef NO_DISPLAY
 	// First, initialize SDL's subsystem.
@@ -321,7 +323,7 @@ void display_scheduler(struct schedinfo_s *si) {
 		if (fifo_i8_has_tokens(display_B, 0, 384)&& sizeinit) {
 			i8 display_B_buf[384];
 			if (!init) {
-				display_init();
+				display_initialize();
 			}
 
 			display_write_mb(fifo_i8_read(display_B, display_B_buf, 0, 384));

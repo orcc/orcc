@@ -342,7 +342,7 @@ declareActionsSchedulers(instances) ::= <<
 // print calls to initialize() and scheduler()
 
 printInitialize(instance) ::= <<
-<if (instance.actor && !instance.actor.initializes.empty)
+<if (instance.actor)
 ><instance.id>_initialize();
 <endif>
 >>

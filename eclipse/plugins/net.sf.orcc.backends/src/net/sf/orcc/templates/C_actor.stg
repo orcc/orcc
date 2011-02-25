@@ -50,14 +50,61 @@ StringExpr(constant) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
 <if(variable.initialized)>
-<if(!variable.assignable && !variable.type.list)>
+<if(!variable.assignable)>
+<if(!variable.type.list)>
 #define <variable> <Constant(variable.initialValue)>
 <else>
-static <varDecl(variable)> = <Constant(variable.initialValue)>;
+static const <varDecl(variable)> = <Constant(variable.initialValue)>;
+<endif>
+<else>
+<if(variable.type.list)>
+static <varDecl(variable)>_backup = <Constant(variable.initialValue)>;
+<endif>
+static <varDecl(variable)>;
 <endif>
 <else>
 static <varDecl(variable)>;
 <endif>
+>>
+
+initializeStateVar(variable) ::= <<
+<if(variable.assignable && variable.initialized)>
+<if(!variable.type.list)>
+<variable.name> = <Constant(variable.initialValue)>;
+<else>
+memcpy(<variable.name>, <variable.name>_backup, sizeof(<variable.name>_backup));
+<endif>
+<endif>
+>>
+
+initializeFunction() ::= <<
+<if(instance.actor.initializes)>
+<instance.actor.initializes: printAction()>
+static void initialize(struct schedinfo_s *si) {
+	int i = 0;
+	<if(instance.actor.initializes)>
+	<printActions(instance.actor.initializes)>
+	<endif>
+	
+finished:
+	// no read_end/write_end here!
+	return;
+}
+
+<endif>
+void <instance.id>_initialize(struct schedinfo_s *si) {
+	/* Set initial state to current FSM state */
+	<if(instance.actor.actionScheduler.fsm)>
+	_FSM_state = my_state_<instance.actor.actionScheduler.fsm.initialState>;
+	<endif>
+	
+	/* Set initial value to global variable */
+	<instance.actor.stateVars.list: initializeStateVar()>
+	<if(instance.actor.initializes)>
+	/* Launch CAL initialize procedure */
+	initialize(si);
+	<endif>
+}
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -430,17 +477,6 @@ default:
 >>
 
 schedulerFSM(actions, fsm) ::= <<
-enum states {
-	my_state_<first(fsm.states)> = 0,
-	<rest(fsm.states) : {state | my_state_<state>}; separator=",\n">
-};
-
-static char *stateNames[] = {
-	<fsm.states : {state | "<state>"}; separator=",\n">
-};
-
-static enum states _FSM_state = my_state_<fsm.initialState>;
-
 <if(actions)>
 void <instance.id>_outside_FSM_scheduler(struct schedinfo_s *si) {
 	int i = 0;
@@ -475,6 +511,19 @@ finished:
 	write_end();
 }
 
+>>
+
+statesFSM(fsm) ::= <<
+enum states {
+	my_state_<first(fsm.states)> = 0,
+	<rest(fsm.states) : {state | my_state_<state>}; separator=",\n">
+};
+
+static char *stateNames[] = {
+	<fsm.states : {state | "<state>"}; separator=",\n">
+};
+
+static enum states _FSM_state = my_state_<fsm.initialState>;
 >>
 
 parameters(parameters) ::= <<
@@ -557,6 +606,11 @@ instance(instance, network, options) ::= <<
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
 <instance.actor.stateVars.list: stateVar()>
+<if(instance.actor.actionScheduler.fsm)>
+////////////////////////////////////////////////////////////////////////////////
+// Initial FSM state of the actor
+<statesFSM(fsm=instance.actor.actionScheduler.fsm)>
+<endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
 <instance.actor.procs.list: printProcedure()>
@@ -578,19 +632,9 @@ static void write_end() {
 }>
 }
 
-<if(instance.actor.initializes)>
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-<instance.actor.initializes: printAction()>
-void <instance.id>_initialize(struct schedinfo_s *si) {
-	int i = 0;
-	<printActions(instance.actor.initializes)>
-
-finished:
-	// no read_end/write_end here!
-	return;
-}
-<endif>
+<initializeFunction()>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler

@@ -47,9 +47,13 @@
 
 static FILE *F = NULL;
 static int cnt = 0;
+static int stop;
+static int genetic = 0;
 
 // Called before any *_scheduler function.
 void source_initialize() {
+	stop = 0;
+
 	if (input_file == NULL) {
 		print_usage();
 		fprintf(stderr, "No input file given!\n");
@@ -71,15 +75,8 @@ void source_initialize() {
 
 extern struct fifo_i8_s *source_O;
 
-static int stop = 0;
-static int genetic = 0;
-
 int source_is_stopped() {
 	return stop;
-}
-
-void source_restart() {
-	stop = 0;
 }
 
 void active_genetic() {

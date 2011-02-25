@@ -441,7 +441,6 @@ void *monitor(void *data) {
 		map_actors_on_threads(population->individuals[evalIndNb],
 				monitoring->genetic_info);
 
-		source_restart();
 		clear_fifos();
 		initialize_instances();
 	}
