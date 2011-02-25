@@ -44,6 +44,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
 import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
@@ -64,6 +65,7 @@ import net.sf.orcc.network.transformations.NetworkSplitter;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.merger2.NetworkMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
+import net.sf.orcc.util.WriteListener;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
@@ -255,6 +257,13 @@ public class CBackendImpl extends AbstractBackend {
 
 		if (codesign) {
 			new BroadcastAdder().transform(network);
+		} else {
+			new CBroadcastAdder(new WriteListener() {
+				@Override
+				public void writeText(String text) {
+					write(text);
+				}
+			}, fifoSize).transform(network);
 		}
 
 		computeMapping(network);

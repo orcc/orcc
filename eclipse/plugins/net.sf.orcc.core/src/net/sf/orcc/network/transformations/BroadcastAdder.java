@@ -50,13 +50,30 @@ import org.jgrapht.DirectedGraph;
  * Adds broadcast actors when needed.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
 public class BroadcastAdder implements INetworkTransformation {
 
-	private DirectedGraph<Vertex, Connection> graph;
+	protected DirectedGraph<Vertex, Connection> graph;
 
-	private Set<Connection> toBeRemoved;
+	protected Set<Connection> toBeRemoved;
+
+	protected void createBroadcast(Instance instance, Port port,
+			List<Connection> outList) {
+		// add broadcast vertex
+		Broadcast bcast = new Broadcast(outList.size(), port.getType());
+		String name = instance.getId() + "_" + port.getName();
+		Instance newInst = new Instance(name, "Broadcast");
+		newInst.setContents(bcast);
+		Vertex vertexBCast = new Vertex(newInst);
+		graph.addVertex(vertexBCast);
+
+		// add connections
+		createIncomingConnection(outList.get(0),
+				graph.getEdgeSource(outList.get(0)), vertexBCast);
+		createOutgoingConnections(vertexBCast, outList);
+	}
 
 	/**
 	 * Creates a connection between the source vertex and the broadcast.
@@ -123,8 +140,9 @@ public class BroadcastAdder implements INetworkTransformation {
 	 *            outgoing connections from P(i)
 	 * @throws OrccException
 	 */
-	private void examineConnections(Vertex vertex, Set<Connection> connections,
-			Map<Port, List<Connection>> outMap) throws OrccException {
+	protected void examineConnections(Vertex vertex,
+			Set<Connection> connections, Map<Port, List<Connection>> outMap)
+			throws OrccException {
 		Instance instance = vertex.getInstance();
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSource();
@@ -132,24 +150,13 @@ public class BroadcastAdder implements INetworkTransformation {
 				List<Connection> outList = outMap.get(srcPort);
 				int numOutput = outList.size();
 				if (numOutput > 1) {
-					// add broadcast vertex
-					Broadcast bcast = new Broadcast(numOutput,
-							srcPort.getType());
-					String name = instance.getId() + "_" + srcPort.getName();
-					Instance newInst = new Instance(name, "Broadcast");
-					newInst.setContents(bcast);
-					Vertex vertexBCast = new Vertex(newInst);
-					graph.addVertex(vertexBCast);
-
-					// add connections
-					createIncomingConnection(connection, vertex, vertexBCast);
-					createOutgoingConnections(vertexBCast, outList);
+					createBroadcast(instance, srcPort, outList);
 				}
 			}
 		}
 	}
 
-	private void examineVertex(Vertex vertex) throws OrccException {
+	protected void examineVertex(Vertex vertex) throws OrccException {
 		// make a copy of the existing outgoing connections of vertex because
 		// the set returned is modified when new edges are added
 		Set<Connection> connections = new HashSet<Connection>(
