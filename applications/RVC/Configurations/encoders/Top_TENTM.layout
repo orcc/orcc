@@ -6,6 +6,5 @@
       <vertex id="Extract_yuv" x="173" y="154"/>
       <vertex id="Merger" x="314" y="154"/>
       <vertex id="SPS" x="57" y="181"/>
-      <vertex id="Compare" x="412" y="227"/>
    </vertices>
 </layout>
