@@ -56,6 +56,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
@@ -83,9 +84,9 @@ public class Multi2MonoToken extends ActionSplitter {
 	 */
 	private class ModifyProcessAction extends AbstractActorVisitor {
 
-		private Variable localTable;
-
 		private GlobalVariable tab;
+		
+		private Variable tempTab;
 
 		public ModifyProcessAction(GlobalVariable tab) {
 			this.tab = tab;
@@ -94,24 +95,31 @@ public class Multi2MonoToken extends ActionSplitter {
 		@Override
 		public void visit(Load load) {
 			Use useArray = new Use(tab);
-
-			String name = load.getSource().getVariable().getName();
-			if (name.equals(localTable)) {
+			if (load.getSource().getVariable().getName().equals(port.getName())) {
 				load.setSource(useArray);
+				for (Use use : load.getTarget().getUses()) {
+					if(use.getNode().isInstruction()){
+						Instruction instruction = (Instruction) use.getNode();
+						if (instruction.isStore()){
+							Store storeInstruction = (Store) instruction;
+							tempTab = storeInstruction.getTarget();
+						}
+					}
+				}
+			}
+			if (load.getSource().getVariable().equals(tempTab)){
+				load.getSource().setVariable(tab);
 			}
 		}
 
 		@Override
 		public void visit(Read read) {
-			if (read.getPort() == port) {
-				localTable = read.getTarget();
-			}
 			itInstruction.remove();
 		}
 
 		@Override
 		public void visit(Store store) {
-			if (store.getTarget().getName().equals(localTable)) {
+			if (store.getTarget().equals(tempTab)) {
 				store.setTarget(tab);
 			}
 		}
@@ -183,7 +191,7 @@ public class Multi2MonoToken extends ActionSplitter {
 	 * @param action
 	 *            the action getting transformed
 	 */
-	public void createActions(Action action) {
+	public void createActionsSet(Action action) {
 		// itAction.remove();
 
 		for (Entry<Port, Integer> entry : action.getInputPattern().entrySet()) {
@@ -247,13 +255,16 @@ public class Multi2MonoToken extends ActionSplitter {
 	 */
 	private Action createDoneAction(String actionName, GlobalVariable counter,
 			int numTokens) {
+		LocalVariable localCounter = new LocalVariable(true, 1, new Location(),
+				"local_counter", counter.getType());
+		
 		Expression guardValue = new IntExpr(numTokens);
-		Expression counterExpression = new VarExpr(new Use(counter));
+		Expression counterExpression = new VarExpr(new Use(localCounter));
 		Expression expression = new BinaryExpr(counterExpression, BinaryOp.EQ,
 				guardValue, IrFactory.eINSTANCE.createTypeBool());
 		Action newDoneAction = createAction(expression, actionName + "NewDone");
 		defineDoneBody(counter, newDoneAction.getBody());
-		defineDoneScheduler(counter, numTokens, newDoneAction.getScheduler());
+		defineDoneScheduler(counter, numTokens, newDoneAction.getScheduler(),localCounter);
 		return newDoneAction;
 	}
 
@@ -266,7 +277,7 @@ public class Multi2MonoToken extends ActionSplitter {
 	 * @return new process action
 	 */
 	private Action createProcessAction(Action action) {
-		Expression expression = new IntExpr(1);
+		Expression expression = new BoolExpr(true);
 		Action newProcessAction = createAction(expression, "newProcess_"
 				+ action.getName());
 		Procedure body = newProcessAction.getBody();
@@ -358,17 +369,14 @@ public class Multi2MonoToken extends ActionSplitter {
 	 *            new done action scheduler
 	 */
 	private void defineDoneScheduler(GlobalVariable readCounter, int numTokens,
-			Procedure scheduler) {
+			Procedure scheduler, LocalVariable counter) {
 		BlockNode blkNode = BlockNode.getFirst(scheduler);
 
 		// add local variable and load
 		OrderedMap<String, LocalVariable> locals = scheduler.getLocals();
-		LocalVariable counter = new LocalVariable(true, 1, new Location(),
-				"local_counter", readCounter.getType());
 		locals.put(counter.getName(), counter);
-
 		Load schedulerLoad = new Load(counter, new Use(readCounter));
-		blkNode.add(schedulerLoad);
+		blkNode.add(0,schedulerLoad);
 	}
 
 	/**
@@ -457,7 +465,7 @@ public class Multi2MonoToken extends ActionSplitter {
 
 	@Override
 	protected void visit(String sourceName, String targetName, Action action) {
-		createActions(action);
+		createActionsSet(action);
 		if (repeatInput) {
 			removeTransition(sourceName, action);
 			addTransition(sourceName, sourceName, store);
