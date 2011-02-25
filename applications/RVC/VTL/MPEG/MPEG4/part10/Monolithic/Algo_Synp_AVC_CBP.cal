@@ -579,7 +579,7 @@ actor Algo_Synp_AVC_CBP()
 	
   
 	function mask_bits( int(size=41)v, int(size=41)n ) --> int :
-		bitand( v, (1 << n)-1 )
+		( v & (1 << n)-1 )
 	end
 
 	List (type:bool, size=8 ) bit_read:=[false: for int i in 0 .. 7];
@@ -598,7 +598,7 @@ actor Algo_Synp_AVC_CBP()
 	guard 
 		not done_reading_bits(), bit_read_cnt!=8
 	do
-		read_result_in_progress := bitor( (read_result_in_progress << 1), if bit_read[bit_read_cnt] = true then 1 else 0 end );
+		read_result_in_progress := ( (read_result_in_progress << 1) | if bit_read[bit_read_cnt] = true then 1 else 0 end );
 		bits_to_read_count := bits_to_read_count - 1;
 		bit_count := bit_count + 1;
 		bit_read_cnt := bit_read_cnt + 1;
@@ -628,7 +628,7 @@ actor Algo_Synp_AVC_CBP()
 		bit_read_cnt!=8
 	do
 		VLD_Counter := VLD_Counter - 1;
-		Codeword := bitor( (Codeword << 1), if bit_read[bit_read_cnt] = true then 1 else 0 end);
+		Codeword := ( (Codeword << 1) | if bit_read[bit_read_cnt] = true then 1 else 0 end);
 		bit_count := bit_count + 1;
 		if   VLD_Counter = 0 then NewVLD := false; end
 		bit_read_cnt := bit_read_cnt + 1;
@@ -656,7 +656,7 @@ actor Algo_Synp_AVC_CBP()
 	bit_read_cnt!=8
 	do
 		VLD_Counter := VLD_Counter + 1;
-		Codeword := bitor( (Codeword << 1), if bit_read[bit_read_cnt] = true then 1 else 0 end);
+		Codeword := ( (Codeword << 1) | if bit_read[bit_read_cnt] = true then 1 else 0 end);
 		if CAVLC_type =0 then // coeff_token
 			foreach int i in 0 .. 61 do
 				if nc >=0 and nc < 2 then
@@ -747,7 +747,7 @@ actor Algo_Synp_AVC_CBP()
 		done_reading_bits()
 	do
 		nal_unit_type := mask_bits(read_result(), 5);
-		nal_ref_idc := mask_bits(rshift(read_result(), 5), 2);
+		nal_ref_idc := mask_bits((read_result() >> 5), 2);
 //		println("\t\tParser nal_unit_type "+ nal_unit_type +" nal_ref_idc "+ nal_ref_idc);
 		bit_count := 0;
 	end
@@ -798,8 +798,8 @@ actor Algo_Synp_AVC_CBP()
 	do
 		sps_id := vld_ue();
 		level_idc[sps_id] := mask_bits(read_result(), 8);
-		constraint_set_flag[sps_id] := mask_bits(rshift(read_result(),12), 4);
-		profile_idc[sps_id] := mask_bits(rshift(read_result(),16), 8);
+		constraint_set_flag[sps_id] := mask_bits((read_result() >> 12), 4);
+		profile_idc[sps_id] := mask_bits((read_result() >> 16), 8);
 	end
  
 	 // if profile is not Baseline or Main
@@ -972,7 +972,7 @@ actor Algo_Synp_AVC_CBP()
 		if(Val_Level_IDC < 31) then                          // 1 <= Level Number <= 3
 			if(Val_Level_IDC < 12) then                           // 1 <= Level Number <= 1.1
 				if(   Val_Level_IDC = 10 
-				   or (bitand(level_idc[sps_id],0x10) = 0)) then            // Level Number = 1 or 1b
+				   or ((level_idc[sps_id] & 0x10) = 0)) then            // Level Number = 1 or 1b
 					MaxFS       := 99;
 					Sqrt_8MaxFS := 28;
 					MaxDPB_x_2  := 297;
@@ -1081,7 +1081,7 @@ actor Algo_Synp_AVC_CBP()
 		if(Val_Level_IDC < 31) then                          // 1 <= Level Number <= 3
 			if(Val_Level_IDC < 12) then                           // 1 <= Level Number <= 1.1
 				if(   Val_Level_IDC = 10 
-				   or (bitand(level_idc[sps_id],0x10) = 0)) then            // Level Number = 1 or 1b
+				   or ((level_idc[sps_id] & 0x10) = 0)) then            // Level Number = 1 or 1b
 					MaxFS       := 99;
 					Sqrt_8MaxFS := 28;
 					MaxDPB_x_2  := 297;
@@ -1276,7 +1276,7 @@ actor Algo_Synp_AVC_CBP()
 		done_reading_bits()
 	do
 		pic_order_present_flag[pps_id] := mask_bits(read_result(), 1);
-		entropy_coding_mode_flag[pps_id] := mask_bits(rshift(read_result(),1), 1);
+		entropy_coding_mode_flag[pps_id] := mask_bits((read_result() >> 1), 1);
 		start_vld();
 	end
 
@@ -1406,7 +1406,7 @@ actor Algo_Synp_AVC_CBP()
 	guard
 		done_reading_bits()
 	do
-		weighted_pred_flag[pps_id] := mask_bits(rshift(read_result(),2), 1);
+		weighted_pred_flag[pps_id] := mask_bits((read_result() >> 2), 1);
 		weighted_bipred_idc[pps_id] := mask_bits(read_result(), 2);
 		start_vld();
 	end
@@ -1440,8 +1440,8 @@ actor Algo_Synp_AVC_CBP()
 	guard
 		done_reading_bits()
 	do
-		deblocking_filter_control_present_flag[pps_id] := mask_bits(rshift(read_result(),2), 1);
-		constrained_intra_pred_flag[pps_id] := (mask_bits(rshift(read_result(),1), 1) = 1);
+		deblocking_filter_control_present_flag[pps_id] := mask_bits((read_result() >> 2), 1);
+		constrained_intra_pred_flag[pps_id] := (mask_bits((read_result() >> 1), 1) = 1);
 		redundant_pic_cnt_present_flag[pps_id] := mask_bits(read_result(), 1);
 		set_bits_to_read(8 -  bit_count mod 8); //byte_alignment
 	end 
@@ -1705,7 +1705,7 @@ actor Algo_Synp_AVC_CBP()
 		int TopFieldOrderCnt,
 		int BottomFieldOrderCnt,
 		int POC_val,
-		int MaxPicOrderCntLsb = lshift(1, log2_max_pic_order_cnt_lsb_minus4[sps_id]+4),
+		int MaxPicOrderCntLsb = (1 << log2_max_pic_order_cnt_lsb_minus4[sps_id]+4),
 		int frame_num_offset, 
 		int abs_frame_num, 
 		int expected_delta_per_poc_cycle := 0, 
@@ -1715,7 +1715,7 @@ actor Algo_Synp_AVC_CBP()
 			frame_num_offset := 0;
 		else 
 			if frame_num < prev_frame_num then
-				frame_num_offset := prev_frame_num_offset + lshift(1, 4+log2_max_frame_num_minus4[sps_id]);
+				frame_num_offset := prev_frame_num_offset + (1 << 4+log2_max_frame_num_minus4[sps_id]);
 			else
 				frame_num_offset := prev_frame_num_offset;
 			end
@@ -1759,7 +1759,7 @@ actor Algo_Synp_AVC_CBP()
 				BottomFieldOrderCnt := TopFieldOrderCnt + offset_for_top_to_bottom_field[sps_id] + delta_pic_order_cnt[1];
 				if field_pic_flag = 1 then BottomFieldOrderCnt := BottomFieldOrderCnt +delta_pic_order_cnt[1]; end
 			else // pic_order_cnt_type[sps_id] = 2
-				TopFieldOrderCnt := if nal_unit_type = 5 then 0 else if nal_ref_idc > 0 then lshift(frame_num_offset + frame_num, 1) else lshift(frame_num_offset + frame_num, 1) - 1 end end;
+				TopFieldOrderCnt := if nal_unit_type = 5 then 0 else if nal_ref_idc > 0 then ((frame_num_offset + frame_num) << 1) else ((frame_num_offset + frame_num) << 1) - 1 end end;
 				BottomFieldOrderCnt := TopFieldOrderCnt; 
 			end 
 		end
@@ -2030,7 +2030,7 @@ actor Algo_Synp_AVC_CBP()
 		done_reading_bits()
 	do
 //	println("\t\tParser NalUnitType:"+nal_unit_type);
-		no_output_of_prior_pics_flag := rshift(read_result(),1);
+		no_output_of_prior_pics_flag := (read_result() >> 1);
 		long_term_reference_flag := mask_bits(read_result(),1);
 	end
 
@@ -2039,7 +2039,7 @@ actor Algo_Synp_AVC_CBP()
 		nal_unit_type = 5, first_mb_in_slice!=0,
 		done_reading_bits()
 	do
-		no_output_of_prior_pics_flag := rshift(read_result(),1);
+		no_output_of_prior_pics_flag := (read_result() >> 1);
 		long_term_reference_flag := mask_bits(read_result(),1);
 	end
 
@@ -3629,7 +3629,7 @@ actor Algo_Synp_AVC_CBP()
 	Residual_luma_AC_CodedBlock8x8: action ==>
 	guard
 		i4x4 < 4,
-		rshift(bitand(val_CodedBlockPatternLuma, (1 << i8x8) ), i8x8) = 1 // MB sub part 8x8 != 0
+		((val_CodedBlockPatternLuma & (1 << i8x8) ) >> i8x8) = 1 // MB sub part 8x8 != 0
 	do
 		luma4x4BlkIdx := i4x4 + (i8x8 << 2);
 		//if( !bmFlag && endIdx > 0 &&  MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
@@ -3656,7 +3656,7 @@ actor Algo_Synp_AVC_CBP()
 	Residual_luma_skip_AC_CodedBlock8x8: action ==>  LAST: [true]
 	guard
 		i4x4 < 4,
-		rshift(bitand(val_CodedBlockPatternLuma, (1 << i8x8) ), i8x8) = 0 // MB sub part 8x8 == 0
+		((val_CodedBlockPatternLuma & (1 << i8x8) ) >> i8x8) = 0 // MB sub part 8x8 == 0
 	do
 		luma4x4BlkIdx := i4x4 + (i8x8 << 2);
 		/*
@@ -3886,7 +3886,7 @@ actor Algo_Synp_AVC_CBP()
 					end;
 				end
 			end
-			if top = 1 and left = 1 then nc := rshift(nA + nB +1, 1); else nc := nA + nB ; end
+			if top = 1 and left = 1 then nc := (nA + nB +1 >> 1); else nc := nA + nB ; end
 		end
 		start_CAVLC(0);
 		level := [0 : for int i in 0 .. 15];
@@ -3956,7 +3956,7 @@ actor Algo_Synp_AVC_CBP()
 	var
 		uint levelSuffixSize
 	do
-		levelCode := lshift( if level_prefix < 15 then level_prefix else 15 end, suffixLength );
+		levelCode := ( if level_prefix < 15 then level_prefix else 15 end << suffixLength );
 		if level_prefix = 14 and suffixLength = 0 then levelSuffixSize := 4;
 		else if level_prefix >=15 then levelSuffixSize := level_prefix - 3;
 		else levelSuffixSize := suffixLength; end end
@@ -3974,20 +3974,20 @@ actor Algo_Synp_AVC_CBP()
 		if level_prefix >= 15 and  suffixLength = 0 then levelCode := levelCode +15; end
 
 		// if( level_prefix > = 16 )
-		if level_prefix >= 16 then levelCode := levelCode + lshift( 1,level_prefix - 3 ) - 4096; end
+		if level_prefix >= 16 then levelCode := levelCode + ( 1 << level_prefix - 3 ) - 4096; end
 
 		// if( i = = TrailingOnes( coeff_token ) &&	TrailingOnes( coeff_token ) < 3 )
 		if inc_nb_coeff = TrailingOnes() and	TrailingOnes() < 3 then levelCode := levelCode + 2; end
 
 		// if( levelCode % 2 = = 0 )
-		if (levelCode mod 2) = 0 then level[ inc_nb_coeff ] := rshift( levelCode + 2, 1);
-		else	level[ inc_nb_coeff ] := rshift( -levelCode - 1, 1); end
+		if (levelCode mod 2) = 0 then level[ inc_nb_coeff ] := ( levelCode + 2 >> 1);
+		else	level[ inc_nb_coeff ] := ( -levelCode - 1 >> 1); end
 
 		// if( suffixLength = = 0 )
 		if suffixLength = 0 then suffixLength := 1; end
 
 		//if( Abs( level[ i ] ) > ( 3 << ( suffixLength 1 ) ) &&	suffixLength < 6 )
-		if  Abs(level[ inc_nb_coeff ]) > lshift(3,suffixLength - 1) and suffixLength < 6 then suffixLength := suffixLength +1; end
+		if  Abs(level[ inc_nb_coeff ]) > (3 << suffixLength - 1) and suffixLength < 6 then suffixLength := suffixLength +1; end
 		inc_nb_coeff := inc_nb_coeff +1 ;
 	end
 	//end if
@@ -4089,13 +4089,13 @@ actor Algo_Synp_AVC_CBP()
 	test_one_byte: action ==>
 	guard
 		done_reading_bits(),
-		bitand( read_result(), 255 ) = 1
+		( read_result() & 255 ) = 1
     end
 
 	test_zero_byte: action ==>
 	guard
 		done_reading_bits(),
-		bitand( read_result(), 255 ) = 0
+		( read_result() & 255 ) = 0
     end
 
 	request_byte: action ==>
