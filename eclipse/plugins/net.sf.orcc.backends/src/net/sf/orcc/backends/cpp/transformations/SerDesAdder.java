@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.cpp;
+package net.sf.orcc.backends.cpp.transformations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +47,7 @@ import net.sf.orcc.network.SerDes;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
+import net.sf.orcc.network.transformations.INetworkTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -59,7 +60,7 @@ import org.jgrapht.DirectedGraph;
  * @author Ghislain Roquier
  * 
  */
-public class SerDesAdder {
+public class SerDesAdder implements INetworkTransformation {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
