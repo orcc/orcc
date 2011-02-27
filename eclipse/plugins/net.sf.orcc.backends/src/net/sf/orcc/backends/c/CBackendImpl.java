@@ -349,7 +349,7 @@ public class CBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private void printCMake(Network network) throws IOException {
+	private void printCMake(Network network) {
 		NetworkPrinter networkPrinter = new NetworkPrinter("C_CMakeLists");
 		networkPrinter.getOptions().put("needPthreads", needPthreads);
 		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
@@ -374,31 +374,25 @@ public class CBackendImpl extends AbstractBackend {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	private void printNetwork(Network network) throws OrccException {
-		try {
-			NetworkPrinter networkPrinter = new NetworkPrinter("C_network");
-			networkPrinter.registerRenderer(Type.class,
-					new AttributeRenderer() {
+	private void printNetwork(Network network) {
+		NetworkPrinter networkPrinter = new NetworkPrinter("C_network");
+		networkPrinter.registerRenderer(Type.class, new AttributeRenderer() {
 
-						@Override
-						public String toString(Object o, String arg1,
-								Locale arg2) {
-							CTypePrinter printer = new CTypePrinter();
-							((Type) o).accept(printer);
-							return printer.toString();
-						}
-					});
+			@Override
+			public String toString(Object o, String arg1, Locale arg2) {
+				CTypePrinter printer = new CTypePrinter();
+				((Type) o).accept(printer);
+				return printer.toString();
+			}
+		});
 
-			networkPrinter.getOptions().put("newScheduler", newScheduler);
-			networkPrinter.getOptions().putAll(printer.getOptions());
+		networkPrinter.getOptions().put("newScheduler", newScheduler);
+		networkPrinter.getOptions().putAll(printer.getOptions());
 
-			networkPrinter.print(network.getName() + ".c", path, network,
-					"network");
+		networkPrinter
+				.print(network.getName() + ".c", path, network, "network");
 
-			printCMake(network);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+		printCMake(network);
 	}
 
 	@Override

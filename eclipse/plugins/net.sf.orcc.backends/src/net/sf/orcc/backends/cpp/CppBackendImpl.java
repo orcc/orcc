@@ -219,7 +219,7 @@ public class CppBackendImpl extends AbstractBackend {
 		return res;
 	}
 
-	private void printCMake(Network network) throws IOException {
+	private void printCMake(Network network) {
 		NetworkPrinter networkPrinter = new NetworkPrinter("Cpp_CMakeLists");
 		networkPrinter.getOptions().put("needSerDes", needSerDes);
 		networkPrinter.print("CMakeLists.txt", path, network, "Cpp_CMakeLists");

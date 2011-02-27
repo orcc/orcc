@@ -31,71 +31,71 @@ package net.sf.orcc.backends;
 import java.io.File;
 import java.io.IOException;
 
-import net.sf.orcc.network.Network;
+import net.sf.orcc.ir.Actor;
 
 import org.stringtemplate.v4.ST;
 
 /**
- * This class defines a network printer.
+ * This class defines a actor printer.
  * 
  * @author Herve Yviquel
  * 
  */
-public class NetworkPrinter extends Printer {
+public class ActorPrinter extends Printer {
 
 	private boolean keepUnchangedFiles = false;
 
 	/**
-	 * Creates a new network printer.
+	 * Creates a new actor printer.
 	 * 
 	 * @param templateName
 	 *            the name of the template
 	 */
-	public NetworkPrinter(String templateName) {
+	public ActorPrinter(String templateName) {
 		this(templateName, false);
 	}
 
 	/**
-	 * Creates a new network printer.
+	 * Creates a new actor printer.
 	 * 
 	 * @param templateName
 	 *            the name of the template
 	 * @param keepUnchangedFiles
 	 *            if the printer must keep printing files from unchanged
-	 *            instances
+	 *            actor
 	 */
-	public NetworkPrinter(String templateName, boolean keepUnchangedFiles) {
+	public ActorPrinter(String templateName, boolean keepUnchangedFiles) {
 		super(templateName);
 		this.keepUnchangedFiles = keepUnchangedFiles;
 	}
 
 	/**
-	 * Prints the given network to a file whose name and path are given.
+	 * Prints the given actor to a file whose name and path are given.
 	 * 
 	 * @param fileName
 	 *            name of the output file
 	 * @param path
 	 *            path of the output file
-	 * @param network
-	 *            the network to generate code for
+	 * @param actor
+	 *            the actor to generate code for
 	 * @param instanceName
 	 *            name of the root ST rule
-	 * @return <code>true</code> if the network was cached
+	 * @return <code>true</code> if the actor was cached
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
-	public boolean print(String fileName, String path, Network network,
+	public boolean print(String fileName, String path, Actor actor,
 			String instanceName) {
 		if (keepUnchangedFiles) {
 			// if source file is older than target file, do not generate
-			File sourceFile = new File(network.getFile());
+			File sourceFile = new File(actor.getFile());
 			File targetFile = new File(fileName);
 			if (sourceFile.lastModified() < targetFile.lastModified()) {
 				return true;
 			}
 		}
 		ST template = group.getInstanceOf(instanceName);
-		template.add("network", network);
+		template.add("actor", actor);
 		printTemplate(template, fileName, path);
 		return false;
 	}
