@@ -348,7 +348,7 @@ EdgeLoops: action ==>
 			      xQ := getPixelPosX(pel,dir);
 			      yQ := getPixelPosY(pel,dir);                    
 			      setNeighbour(xQ - 1 + dir, yQ - dir);			      
-			      if (LUMA_CHROMA=8) then  StrengthIdx := ((((pel >> 1)<< 2) + (pel & 1)) & 12);
+			      if (LUMA_CHROMA=8) then  StrengthIdx := (((pel >> 1)<< 2) + (pel & 1)) & 12;
 			      else   StrengthIdx := (pel & 12);  end
 				  StrengthIdx := StrengthIdx + (dir << 4) + edge;				  
 				  if useLeft=1 then indexA:=Alist[1]; indexB:=Blist[1]; 
@@ -409,8 +409,8 @@ EdgeLoops: action ==>
 			              if (LUMA_CHROMA = 16) then  
 			                setLeftPixel(0, Clip(0, MAXVAL_LUMA, L0 + dif),dir);
 			                setRightPixel(0, Clip(0, MAXVAL_LUMA, R0 - dif),dir);			                
-			                if (ap=1) then setLeftPixel(1, L1 + Clip(-C0, C0, (L2 + (RL0 + 1) >> 1 - (L1 << 1))>> 1),dir);  end
-			                if (aq=1) then setRightPixel(1, R1 + Clip(-C0, C0, (R2 + (RL0 + 1)>> 1 - (R1 << 1))>> 1),dir); end
+			                if (ap=1) then setLeftPixel (1, L1 + Clip(-C0, C0, (L2 + ((RL0 + 1) >> 1) - (L1 << 1))>> 1),dir);  end
+			                if (aq=1) then setRightPixel(1, R1 + Clip(-C0, C0, (R2 + ((RL0 + 1)>> 1) - (R1 << 1))>> 1),dir); end
 			              else 
 			                setLeftPixel(0, Clip(0, MAXVAL_CHROMA, L0 + dif),dir);
 			                setRightPixel(0, Clip(0, MAXVAL_CHROMA, R0 - dif),dir);
