@@ -419,7 +419,7 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 >>
 
 printInputPatternPort(port) ::= <<
-if (index_<port.name> \> numTokens_<port.name> - <pattern.(port)>) {
+if (index_<port.name> + <pattern.(port)> \> numTokens_<port.name>) {
 	ports |= 0x0<maskInputs.(port)>;
 }
 >>
