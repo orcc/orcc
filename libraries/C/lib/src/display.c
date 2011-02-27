@@ -45,6 +45,10 @@ extern struct fifo_i8_s *display_B;
 extern struct fifo_i16_s *display_WIDTH;
 extern struct fifo_i16_s *display_HEIGHT;
 
+static int fifo_display_B_id; 
+static int fifo_display_WIDTH_id; 
+static int fifo_display_HEIGHT_id;  
+
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
 
@@ -214,10 +218,8 @@ void display_write_mb(unsigned char tokens[384]) {
 static int init = 0;
 static int sizeinit = 0;
 
-void display_initialize() {
-	m_x = 0;
-	m_y = 0;
-	
+static void display_init() {
+		
 #ifdef NO_DISPLAY
 	// First, initialize SDL's subsystem.
 	if (SDL_Init( SDL_INIT_TIMER ) < 0) {
@@ -267,6 +269,16 @@ void display_initialize() {
 	init = 1;
 }
 
+void display_initialize(int fifo_B_id, int fifo_WIDTH_id, int fifo_HEIGHT_id) {
+	m_x = 0;
+	m_y = 0;
+	fifo_display_B_id = fifo_B_id; 
+	fifo_display_WIDTH_id = fifo_WIDTH_id; 
+	fifo_display_HEIGHT_id = fifo_HEIGHT_id;
+	display_init();
+}
+
+
 static void display_set_video(int width, int height) {
 	if (width == m_width && height == m_height) {
 		// video mode is already good
@@ -304,30 +316,30 @@ void display_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	while (1) {
-		if (fifo_i16_has_tokens(display_WIDTH, 0, 1) && fifo_i16_has_tokens(display_HEIGHT, 0, 1)) {
+		if (fifo_i16_has_tokens(display_WIDTH, fifo_display_WIDTH_id, 1) && fifo_i16_has_tokens(display_HEIGHT, fifo_display_HEIGHT_id, 1)) {
 			short *ptr, width, height;
 			i16 display_WIDTH_buf[1], display_HEIGHT_buf[1];
 
-			ptr = fifo_i16_read(display_WIDTH, display_WIDTH_buf, 0, 1);
+			ptr = fifo_i16_read(display_WIDTH, display_WIDTH_buf, fifo_display_WIDTH_id, 1);
 			width = ptr[0] * 16;
-			fifo_i16_read_end(display_WIDTH, 0, 1);
+			fifo_i16_read_end(display_WIDTH, fifo_display_WIDTH_id, 1);
 
-			ptr = fifo_i16_read(display_HEIGHT, display_HEIGHT_buf, 0, 1);
+			ptr = fifo_i16_read(display_HEIGHT, display_HEIGHT_buf, fifo_display_HEIGHT_id, 1);
 			height = ptr[0] * 16;
-			fifo_i16_read_end(display_HEIGHT, 0, 1);
+			fifo_i16_read_end(display_HEIGHT, fifo_display_HEIGHT_id, 1);
 
 			display_set_video(width, height);
 			i++;
 		}
 
-		if (fifo_i8_has_tokens(display_B, 0, 384)&& sizeinit) {
+		if (fifo_i8_has_tokens(display_B, fifo_display_B_id, 384) && sizeinit) {
 			i8 display_B_buf[384];
 			if (!init) {
-				display_initialize();
+				display_init();
 			}
 
-			display_write_mb(fifo_i8_read(display_B, display_B_buf, 0, 384));
-			fifo_i8_read_end(display_B, 0, 384);
+			display_write_mb(fifo_i8_read(display_B, display_B_buf, fifo_display_B_id, 384));
+			fifo_i8_read_end(display_B, fifo_display_B_id, 384);
 			i++;
 		} else {
 			break;

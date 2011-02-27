@@ -16,10 +16,6 @@ getPortName(port) ::= <<
 <instance.id>_<port.name>
 >>
 
-getFifoId(port, instance) ::= <<
-<network.incomingMap.(instance).(port).fifoId>
->>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,7 +88,11 @@ finished:
 }
 
 <endif>
-void <instance.id>_initialize(struct schedinfo_s *si) {
+void <instance.id>_initialize(<instance.actor.inputs.list: { port | int fifo_<port>_id}; separator=", ">) {
+	<if(instance.actor.initializes)>
+	struct schedinfo_s *si;
+	<endif>
+	
 	/* Set initial state to current FSM state */
 	<if(instance.actor.actionScheduler.fsm)>
 	_FSM_state = my_state_<instance.actor.actionScheduler.fsm.initialState>;
@@ -100,7 +100,11 @@ void <instance.id>_initialize(struct schedinfo_s *si) {
 	
 	/* Set initial value to global variable */
 	<instance.actor.stateVars.list: initializeStateVar()>
+	
+	/* Initialize input FIFOs id */
+	<instance.actor.inputs.list: { port | fifo_<getPortName(port)>_id = fifo_<port>_id; }; separator="\n"> 
 	<if(instance.actor.initializes)>
+	
 	/* Launch CAL initialize procedure */
 	initialize(si);
 	<endif>
@@ -310,12 +314,12 @@ printReadTokensFunction(port) ::= <<
 
 
 static void read_<port.name>() {
-	index_<port.name> = <getPortName(port)>-\>read_inds[<getFifoId(port,instance)>];
-	numTokens_<port.name> = index_<port.name> + fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, <getFifoId(port,instance)>);
+	index_<port.name> = <getPortName(port)>-\>read_inds[fifo_<getPortName(port)>_id];
+	numTokens_<port.name> = index_<port.name> + fifo<printMedium(port)>_<port.type>_get_num_tokens(<getPortName(port)>, fifo_<getPortName(port)>_id);
 }
 
 static void read_end_<port.name>() {
-	<getPortName(port)>-\>read_inds[<getFifoId(port,instance)>] = index_<port.name> % SIZE_<port.name>;
+	<getPortName(port)>-\>read_inds[fifo_<getPortName(port)>_id] = index_<port.name> % SIZE_<port.name>;
 }
 >>
 
@@ -592,7 +596,7 @@ instance(instance, network, options) ::= <<
 }>
 <endif>
 ////////////////////////////////////////////////////////////////////////////////
-// Output FIFOs
+// Input FIFOs
 <instance.actor.outputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
 }>
 <instance.actor.outputs.list: printOutputPort()>
@@ -600,6 +604,11 @@ instance(instance, network, options) ::= <<
 <instance.actor.outputs.list: { port | FILE *file_<port.name>;
 }>
 <endif>
+
+////////////////////////////////////////////////////////////////////////////////
+// Input FIFOs Id
+<instance.actor.inputs.list: { port | static int fifo_<getPortName(port)>_id; }; separator="\n"> 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Parameter values of the instance
 <parameters(instance.parameters)>

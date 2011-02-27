@@ -320,7 +320,7 @@ fillActorsStructs(instances) ::= <<
 
 actorInitialize(instance) ::= <<
 <if (instance.actor)>
-extern void <instance.id>_initialize();
+extern void <instance.id>_initialize(<instance.actor.inputs.list: { port | int fifo_<port>_id}; separator=", ">);
 <endif>
 >>
 
@@ -342,14 +342,12 @@ declareActionsSchedulers(instances) ::= <<
 // print calls to initialize() and scheduler()
 
 printInitialize(instance) ::= <<
-<if (instance.actor)
-><instance.id>_initialize();
-<endif>
+<instance.id>_initialize(<instance.actor.inputs.list: { port | <network.incomingMap.(instance).(port).fifoId>}; separator=",">);
 >>
 
 printInitializes(instances) ::= <<
 void initialize_instances(){
-	<instances: printInitialize()>
+	<instances: {instance|<if(instance.actor)><printInitialize(instance)><endif>}; separator="\n">
 }
 >>
 

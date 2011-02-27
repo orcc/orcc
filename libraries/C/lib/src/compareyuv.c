@@ -52,6 +52,10 @@ extern struct fifo_i8_s *Compare_B;
 extern struct fifo_i16_s *Compare_WIDTH;
 extern struct fifo_i16_s *Compare_HEIGHT;
 
+static int fifo_Compare_B_id; 
+static int fifo_Compare_WIDTH_id; 
+static int fifo_Compare_HEIGHT_id;
+
 #define MAX_WIDTH 704
 #define MAX_HEIGHT 576
 
@@ -216,23 +220,31 @@ static void Compare_init(int width, int height) {
 	Read_YUV_init (width, height, yuv_file);
 }
 
+void Compare_initialize(int fifo_B_id, int fifo_WIDTH_id, int fifo_HEIGHT_id){
+	m_x = 0;
+	m_y = 0;
+	fifo_Compare_B_id = fifo_B_id; 
+	fifo_Compare_WIDTH_id = fifo_WIDTH_id; 
+	fifo_Compare_HEIGHT_id = fifo_HEIGHT_id;
+}
+
 static int init = 1;
 
 void Compare_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	while (1) {
-		if (fifo_i16_has_tokens(Compare_WIDTH, 0, 1) && fifo_i16_has_tokens(Compare_HEIGHT, 0, 1)) {
+		if (fifo_i16_has_tokens(Compare_WIDTH, fifo_Compare_WIDTH_id, 1) && fifo_i16_has_tokens(Compare_HEIGHT, fifo_Compare_HEIGHT_id, 1)) {
 			short *ptr, width, height;
 			i16 Compare_HEIGHT_buf[1], Compare_WIDTH_buf[1];
 
-			ptr = fifo_i16_read(Compare_WIDTH, Compare_WIDTH_buf, 0, 1);
+			ptr = fifo_i16_read(Compare_WIDTH, Compare_WIDTH_buf, fifo_Compare_WIDTH_id, 1);
 			width = ptr[0] * 16;
-			fifo_i16_read_end(Compare_WIDTH, 0, 1);
+			fifo_i16_read_end(Compare_WIDTH, fifo_Compare_WIDTH_id, 1);
 
-			ptr = fifo_i16_read(Compare_HEIGHT, Compare_HEIGHT_buf, 0, 1);
+			ptr = fifo_i16_read(Compare_HEIGHT, Compare_HEIGHT_buf, fifo_Compare_HEIGHT_id, 1);
 			height = ptr[0] * 16;
-			fifo_i16_read_end(Compare_HEIGHT, 0, 1);
+			fifo_i16_read_end(Compare_HEIGHT, fifo_Compare_HEIGHT_id, 1);
 
 			if (init == 1) {
 				Compare_init(width, height);
@@ -242,10 +254,10 @@ void Compare_scheduler(struct schedinfo_s *si) {
 			i++;
 		}
 
-		if (fifo_i8_has_tokens(Compare_B, 0, 384) && init == 0) {
+		if (fifo_i8_has_tokens(Compare_B, fifo_Compare_B_id, 384) && init == 0) {
 			i8 Compare_B_buf[384];
-			Compare_write_mb(fifo_i8_read(Compare_B, Compare_B_buf, 0, 384));
-			fifo_i8_read_end(Compare_B, 0, 384);
+			Compare_write_mb(fifo_i8_read(Compare_B, Compare_B_buf, fifo_Compare_B_id, 384));
+			fifo_i8_read_end(Compare_B, fifo_Compare_B_id, 384);
 			i++;
 		} else {
 			break;
