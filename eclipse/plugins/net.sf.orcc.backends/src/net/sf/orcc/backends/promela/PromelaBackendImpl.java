@@ -37,6 +37,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
