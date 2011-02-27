@@ -320,7 +320,7 @@ fillActorsStructs(instances) ::= <<
 
 actorInitialize(instance) ::= <<
 <if (instance.actor)>
-extern void <instance.id>_initialize(<instance.actor.inputs.list: { port | int fifo_<port>_id}; separator=", ">);
+extern void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int fifo_<port>_id}; separator=", ">);
 <endif>
 >>
 

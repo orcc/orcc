@@ -52,9 +52,9 @@ extern struct fifo_i8_s *Compare_B;
 extern struct fifo_i16_s *Compare_WIDTH;
 extern struct fifo_i16_s *Compare_HEIGHT;
 
-static int fifo_Compare_B_id; 
-static int fifo_Compare_WIDTH_id; 
-static int fifo_Compare_HEIGHT_id;
+static unsigned int fifo_Compare_B_id;
+static unsigned int fifo_Compare_WIDTH_id;
+static unsigned int fifo_Compare_HEIGHT_id;
 
 #define MAX_WIDTH 704
 #define MAX_HEIGHT 576
@@ -220,7 +220,7 @@ static void Compare_init(int width, int height) {
 	Read_YUV_init (width, height, yuv_file);
 }
 
-void Compare_initialize(int fifo_B_id, int fifo_WIDTH_id, int fifo_HEIGHT_id){
+void Compare_initialize(unsigned int fifo_B_id, unsigned int fifo_WIDTH_id, unsigned int fifo_HEIGHT_id){
 	m_x = 0;
 	m_y = 0;
 	fifo_Compare_B_id = fifo_B_id; 

@@ -88,7 +88,7 @@ finished:
 }
 
 <endif>
-void <instance.id>_initialize(<instance.actor.inputs.list: { port | int fifo_<port>_id}; separator=", ">) {
+void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int fifo_<port>_id}; separator=", ">) {
 	<if(instance.actor.initializes)>
 	struct schedinfo_s *si;
 	<endif>
@@ -607,7 +607,7 @@ instance(instance, network, options) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs Id
-<instance.actor.inputs.list: { port | static int fifo_<getPortName(port)>_id; }; separator="\n"> 
+<instance.actor.inputs.list: { port | static unsigned int fifo_<getPortName(port)>_id; }; separator="\n"> 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Parameter values of the instance

@@ -45,9 +45,9 @@ extern struct fifo_i8_s *display_B;
 extern struct fifo_i16_s *display_WIDTH;
 extern struct fifo_i16_s *display_HEIGHT;
 
-static int fifo_display_B_id; 
-static int fifo_display_WIDTH_id; 
-static int fifo_display_HEIGHT_id;  
+static unsigned int fifo_display_B_id;
+static unsigned int fifo_display_WIDTH_id;
+static unsigned int fifo_display_HEIGHT_id;
 
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
@@ -269,7 +269,7 @@ static void display_init() {
 	init = 1;
 }
 
-void display_initialize(int fifo_B_id, int fifo_WIDTH_id, int fifo_HEIGHT_id) {
+void display_initialize(unsigned int fifo_B_id, unsigned int fifo_WIDTH_id, unsigned int fifo_HEIGHT_id) {
 	m_x = 0;
 	m_y = 0;
 	fifo_display_B_id = fifo_B_id; 
