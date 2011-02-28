@@ -3885,7 +3885,7 @@ actor Algo_Synp_AVC_CBP()
 					end;
 				end
 			end
-			if top = 1 and left = 1 then nc := (nA + nB +1 >> 1); else nc := nA + nB ; end
+			if top = 1 and left = 1 then nc := ((nA + nB +1) >> 1); else nc := nA + nB ; end
 		end
 		start_CAVLC(0);
 		level := [0 : for int i in 0 .. 15];
@@ -3973,14 +3973,14 @@ actor Algo_Synp_AVC_CBP()
 		if level_prefix >= 15 and  suffixLength = 0 then levelCode := levelCode +15; end
 
 		// if( level_prefix > = 16 )
-		if level_prefix >= 16 then levelCode := levelCode + ( 1 << level_prefix - 3 ) - 4096; end
+		if level_prefix >= 16 then levelCode := levelCode + ( 1 << (level_prefix - 3) ) - 4096; end
 
 		// if( i = = TrailingOnes( coeff_token ) &&	TrailingOnes( coeff_token ) < 3 )
 		if inc_nb_coeff = TrailingOnes() and	TrailingOnes() < 3 then levelCode := levelCode + 2; end
 
 		// if( levelCode % 2 = = 0 )
-		if (levelCode mod 2) = 0 then level[ inc_nb_coeff ] := ( levelCode + 2 >> 1);
-		else	level[ inc_nb_coeff ] := ( -levelCode - 1 >> 1); end
+		if (levelCode mod 2) = 0 then level[ inc_nb_coeff ] := ( (levelCode + 2) >> 1);
+		else	level[ inc_nb_coeff ] := ( (-levelCode - 1) >> 1); end
 
 		// if( suffixLength = = 0 )
 		if suffixLength = 0 then suffixLength := 1; end
