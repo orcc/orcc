@@ -29,14 +29,13 @@ endif()
 find_library(CALaka_LIBRARY CALaka HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 find_library(SystemActor_LIBRARY SystemActor HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 find_library(Thread_LIBRARY Thread HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
-
 find_path(CAL_INCLUDE_DIR actoraka.h HINTS $ENV{CALDIR} PATH_SUFFIXES include include/CAL)
 
 
 <if(options.needSerDes)>
 find_path(CAL_SOURCE_DIR wrapperaka.cpp HINTS $ENV{CALDIR} PATH_SUFFIXES src src/CAL)
 find_library(AdaptorFactory_LIBRARY AdaptorFactory HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
-add_library(Wrapper STATIC "${CAL_SOURCE_DIR}/wrapperaka.cpp")
+find_library(Wrapper_LIBRARY Wrapper HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 <endif>
 
 
@@ -52,7 +51,7 @@ ${Thread_LIBRARY}
 )
 
 <if(options.needSerDes)>
-set(libraries ${libraries} Wrapper ${AdaptorFactory_LIBRARY})
+set(libraries ${libraries} ${Wrapper_LIBRARY} ${AdaptorFactory_LIBRARY})
 <endif>
 
 
