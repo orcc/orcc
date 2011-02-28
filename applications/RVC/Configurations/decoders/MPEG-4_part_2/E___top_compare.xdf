@@ -55,11 +55,7 @@
     <Connection dst="display" dst-port="B" src="decoder" src-port="VID"/>
     <Connection dst="display" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
     <Connection dst="display" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
-    <Connection dst="Compare" dst-port="B" src="decoder" src-port="VID">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="384"/>
-        </Attribute>
-    </Connection>
+    <Connection dst="Compare" dst-port="B" src="decoder" src-port="VID"/>
     <Connection dst="Compare" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
     <Connection dst="Compare" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
 </XDF>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="GUC_RVC_top_compare">
+<XDF name="GUC_RVC_top">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -39,15 +39,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Compare">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="System.Compare"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -55,7 +46,4 @@
     <Connection dst="display" dst-port="B" src="decoder" src-port="VID"/>
     <Connection dst="display" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
     <Connection dst="display" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
-    <Connection dst="Compare" dst-port="B" src="decoder" src-port="VID"/>
-    <Connection dst="Compare" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
-    <Connection dst="Compare" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
 </XDF>

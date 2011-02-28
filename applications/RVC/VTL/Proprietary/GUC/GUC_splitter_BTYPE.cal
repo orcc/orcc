@@ -28,7 +28,7 @@ bool ACP_Y, bool ACP_U, bool ACP_V:
 		BTYPE_Y:[ btype[0], btype[1], btype[2], btype[3] ], BTYPE_U:[ btype[4] ], BTYPE_V:[ btype[5] ],
 		ACP_Y:[ acp[0], acp[1], acp[2], acp[3] ], ACP_U:[ acp[4] ], ACP_V:[ acp[5] ]
 	guard
-		not (lnewvop[0])
+		lnewvop[0]=false
 	end
 	
 	priority

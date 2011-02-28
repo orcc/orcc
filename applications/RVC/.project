@@ -3,6 +3,7 @@
 	<name>RVC</name>
 	<comment></comment>
 	<projects>
+		<project>System</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
