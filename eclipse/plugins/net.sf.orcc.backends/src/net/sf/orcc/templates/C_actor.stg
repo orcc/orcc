@@ -92,9 +92,9 @@ void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int
 	<if(instance.actor.initializes)>
 	struct schedinfo_s *si;
 	<endif>
+	<if(instance.actor.actionScheduler.fsm)>
 	
 	/* Set initial state to current FSM state */
-	<if(instance.actor.actionScheduler.fsm)>
 	_FSM_state = my_state_<instance.actor.actionScheduler.fsm.initialState>;
 	<endif>
 	
