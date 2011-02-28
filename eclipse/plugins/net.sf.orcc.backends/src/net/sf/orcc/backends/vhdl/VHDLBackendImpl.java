@@ -47,7 +47,6 @@ import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
-import net.sf.orcc.backends.vhdl.transformations.MultipleArrayAccessTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transformations.VariableRedimension;
 import net.sf.orcc.interpreter.ActorInterpreter;
@@ -115,7 +114,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// multiple array accesses in loops
 
 				// transform multiple array accesses
-				new MultipleArrayAccessTransformation(),
+				// new MultipleArrayAccessTransformation(),
 
 				// transform "b := a > b;" statements to if conditionals
 				new BoolExprTransformation(),
@@ -242,7 +241,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 			printer.printNetwork(outputName, network, false, fifoSize);
 
 			for (Network subNetwork : network.getNetworks()) {
-				new BroadcastAdder().transform(subNetwork);				
+				new BroadcastAdder().transform(subNetwork);
 				outputName = path + File.separator + "Design" + File.separator
 						+ subNetwork.getName() + ".vhd";
 				printer.printNetwork(outputName, subNetwork, false, fifoSize);
