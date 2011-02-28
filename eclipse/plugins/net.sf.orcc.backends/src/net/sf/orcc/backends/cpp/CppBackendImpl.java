@@ -100,9 +100,7 @@ public class CppBackendImpl extends AbstractBackend {
 			} else if (!srcName.equals(tgtName)) {
 				kind = 2;
 			}
-
 			fifoKind.put(connection, kind);
-
 		}
 		printer.getOptions().put("fifoKind", fifoKind);
 	}
@@ -225,7 +223,7 @@ public class CppBackendImpl extends AbstractBackend {
 		networkPrinter.getOptions().put("needSerDes", needSerDes);
 		networkPrinter.print("CMakeLists.txt", path, network, "Cpp_CMakeLists");
 	}
-	
+
 	/**
 	 * Prints the given network.
 	 * 
