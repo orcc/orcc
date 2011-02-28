@@ -58,6 +58,7 @@
 //Modified by Endri Bezati <endri.bezati@insa-rennes.fr>
 //Modified the "size" correctly to work with orcc
 package MPEG.MPEG4.part10;
+import std.util.BitOps.*;
 
 actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		int (size=9)  Coef_ACR_i,

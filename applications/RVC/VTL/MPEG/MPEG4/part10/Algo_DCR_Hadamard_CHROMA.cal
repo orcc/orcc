@@ -54,6 +54,7 @@
 
 
 package MPEG.MPEG4.part10;
+import std.util.BitOps.*;
 
 actor Algo_DCR_Hadamard_CHROMA ()
   	int(size=16) levarr, 

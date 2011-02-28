@@ -71,6 +71,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 package MPEG.MPEG4.part10;
 
 import MPEG.Common.Imp_Math.*;
+import std.util.BitOps.*;
 
 actor Algo_IntraPred_CHROMA ()
 		int(size=16) C_LEFT,     // List

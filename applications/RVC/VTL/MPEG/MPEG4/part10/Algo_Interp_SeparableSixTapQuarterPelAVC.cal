@@ -61,6 +61,7 @@
 
 package MPEG.MPEG4.part10;
 import MPEG.Common.Imp_Math.*;
+import std.util.BitOps.*;
 
 actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	int (size=16) Mv,

@@ -18,6 +18,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 //By Endri Bezati <endri.bezati@insa-rennes.fr>
 
 package MPEG.MPEG4.part10;
+import std.util.BitOps.*;
 
 actor Algo_Interp_split_MB () 
 		uint(size=3) MbPartIdx,
@@ -49,7 +50,7 @@ actor Algo_Interp_split_MB ()
   guard
   	mbpart_h = 16 and mbpart_w = 16	
   var 
-    uint pixAddr := (InverseScan4x4Tab[count] /4)<< 6 + (InverseScan4x4Tab[count] mod 4) << 2 
+    uint pixAddr := ((InverseScan4x4Tab[count] /4) << 6) + ((InverseScan4x4Tab[count] mod 4) << 2)
   do
     foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
@@ -65,7 +66,7 @@ actor Algo_Interp_split_MB ()
   guard
   	mbpart_h = 16 and mbpart_w = 8	
   var 
-    uint pixAddr := (InverseScan4x4Tab[count] /4)<< 6 + (InverseScan4x4Tab[count] mod 4) << 2 
+    uint pixAddr := ((InverseScan4x4Tab[count] /4) << 6) + ((InverseScan4x4Tab[count] mod 4) << 2)
   do
     foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
@@ -79,7 +80,7 @@ actor Algo_Interp_split_MB ()
   guard
   	mbpart_h = 8 and mbpart_w = 16	
   var 
-    uint pixAddr := (InverseScan4x4Tab[count] /4)<< 6 + (InverseScan4x4Tab[count] mod 4) << 2 
+    uint pixAddr := ((InverseScan4x4Tab[count] /4) << 6) + ((InverseScan4x4Tab[count] mod 4) << 2)
   do
     foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
@@ -93,7 +94,7 @@ actor Algo_Interp_split_MB ()
   guard
   	mbpart_h = 8 and mbpart_w = 8	
   var 
-    uint pixAddr := (InverseScan4x4Tab[count] /4)<< 6 + (InverseScan4x4Tab[count] mod 4)<< 2 
+    uint pixAddr := ((InverseScan4x4Tab[count] /4) << 6) + ((InverseScan4x4Tab[count] mod 4) << 2)
   do
     foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
@@ -107,7 +108,7 @@ actor Algo_Interp_split_MB ()
   guard
   	mbpart_h = 8 and mbpart_w = 4	
   var 
-    uint pixAddr := (InverseScan4x4Tab[count] /4)<< 6 + (InverseScan4x4Tab[count] mod 4)<< 2 
+    uint pixAddr := ((InverseScan4x4Tab[count] /4) << 6) + ((InverseScan4x4Tab[count] mod 4) << 2)
   do
     foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
@@ -121,7 +122,7 @@ actor Algo_Interp_split_MB ()
   guard
   	mbpart_h = 4 and mbpart_w = 8	
   var 
-    uint pixAddr := (InverseScan4x4Tab[count] /4) <<  6 + (InverseScan4x4Tab[count] mod 4) << 2 
+    uint pixAddr := ((InverseScan4x4Tab[count] /4) << 6) + ((InverseScan4x4Tab[count] mod 4) << 2)
   do
     foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
@@ -135,7 +136,7 @@ actor Algo_Interp_split_MB ()
   guard
   	mbpart_h = 4 and mbpart_w = 4	
   var 
-    uint pixAddr := (InverseScan4x4Tab[count] /4)<< 6 + (InverseScan4x4Tab[count] mod 4)<< 2 
+    uint pixAddr := ((InverseScan4x4Tab[count] /4) << 6) + ((InverseScan4x4Tab[count] mod 4) << 2)
   do
     foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do

@@ -52,6 +52,7 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 package MPEG.MPEG4.part10;
+import std.util.BitOps.*;
 
 actor Mgnt_MVR () 
 	uint(size=3) MbPartIdx,

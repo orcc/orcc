@@ -52,6 +52,7 @@ Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
 package MPEG.MPEG4.part10;
+import std.util.BitOps.*;
 
 actor Algo_IT4x4_1d () int(size=16) X ==> int(size=16) Y :
 

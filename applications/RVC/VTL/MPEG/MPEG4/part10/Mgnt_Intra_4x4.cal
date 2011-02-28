@@ -20,6 +20,7 @@ gorinje@gmail.com
 *****************************************************************************/
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
 package MPEG.MPEG4.part10;
+import std.util.BitOps.*;
 
 actor Mgnt_Intra_4x4 ()
 	uint(size=4)  PredMode,

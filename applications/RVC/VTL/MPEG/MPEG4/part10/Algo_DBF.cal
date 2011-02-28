@@ -94,6 +94,7 @@
 */
 
 package MPEG.MPEG4.part10;
+import std.util.BitOps.*;
 
 actor Algo_DBF (int LUMA_CHROMA) uint(size=8)DB_I,uint(size=6)BS ==> uint(size=8)DB_O : //LUMA_CHROMA luma:=0, chroma:=1
       

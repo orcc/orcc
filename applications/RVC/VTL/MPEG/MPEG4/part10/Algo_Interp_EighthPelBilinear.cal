@@ -58,6 +58,7 @@
 // Fractional chroma sample interpolation for motion compensation of AVC
 
 package MPEG.MPEG4.part10;
+import std.util.BitOps.*;
 
 actor Algo_Interp_EighthPelBilinear() 
 		int(size=16) Mv, 

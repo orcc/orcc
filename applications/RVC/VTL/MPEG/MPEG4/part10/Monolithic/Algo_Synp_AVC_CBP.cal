@@ -57,7 +57,7 @@ FU realizing Syntax Parsing for AVC
 // This FU has been modified by Mickael Raulet (INSA of Rennes) July 2009
 
 package MPEG.MPEG4.part10.Monolithic;
-
+import std.util.BitOps.*;
 import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
 actor Algo_Synp_AVC_CBP()
@@ -108,9 +108,9 @@ actor Algo_Synp_AVC_CBP()
 	uint(size=7) PICHEIGHT=720/16;
 
 
+	
+	
 	uint(size=2) REFLIST0_PRED    = 0;
-	uint(size=2) REFLIST0_BI_PRED = 1;
-	uint(size=2) REFLIST1_BI_PRED = 2;
 	// ********** Read bits ********** //  
 	int(size=9) bits_to_read_count := -1;
 	int(size=41) read_result_in_progress; 
@@ -588,7 +588,6 @@ actor Algo_Synp_AVC_CBP()
 	action bits:[ b ] repeat 8==>
 	guard 
 		bit_read_cnt=8
-	var int byte:=0
 	do
 		bit_read_cnt:=0;
 		bit_read:=[b[i]:for int i in 0 .. 7];
