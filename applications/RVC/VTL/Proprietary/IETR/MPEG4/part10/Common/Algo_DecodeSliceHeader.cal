@@ -23,50 +23,26 @@ actor Algo_DecodeSliceHeader()
 	bool          IsAnIdrPic,
 	uint(size=2)  NalRefIdc,
 	bool          RstPrevFrameNum,
-
 	int (size=32) PpsParameters,
 	int (size=32) SpsParameters
 		==>
 	uint(size=31) FramNumCurrPic,
-
 	int (size=6)  TypeOfVLD,
 	int (size=32) VLDParam,
 	bool          DecodeNextNal,
-
 	uint(size=8)  GetPps,
-
 	bool          RefPicMrk_IsNewPic,
-
 	uint(size=4)  SliceType,
 	bool          Others_IsNewPic,
-
 	uint(size=32) Poc,
-
 	int (size=14) SliceDataParam,
-	
     int (size=16) Width,
     int (size=16) Height
 		:
-
-
-/*   
-*
-* Constants
-*
-*/
-
-//	uint(size=4) SLICE_TYPE_P  = 0;
-//	uint(size=4) SLICE_TYPE_B  = 1;
 	uint(size=4) SLICE_TYPE_I  = 2;
 	uint(size=4) SLICE_TYPE_SP = 3;
 	uint(size=4) SLICE_TYPE_SI = 4;
-
 	bool DEBUG_FLAG_DECODED = false;
-/*
-*
-* State variables
-*
-*/
 
 	//Parameters read
 	List( type:int(size=32), size=2)   delta_pic_order_cnt          := [ 0 : for int i in 0 .. 1];
@@ -122,201 +98,173 @@ actor Algo_DecodeSliceHeader()
 	int (size=32) expectedpoc            := 0;
 	//Slice Data Parameters
 	bool          MbaffFrameFlag := false;
-
 	int (size=32) LoopVal;
-
-
 	bool IsNewPic;
 
-/*   
-*
-* Actions
-*
-*/
-	ResetPrevFrameNum.Launch: action
-			RstPrevFrameNum :[ResetAsked]
-				==>
-		guard
-			IsNewPic
-		do
-			if(ResetAsked) then
-				frame_num := 0;
-			end
+	ResetPrevFrameNum.Launch: action RstPrevFrameNum :[ResetAsked] ==>
+	guard
+		IsNewPic
+	do
+		if(ResetAsked) then
+			frame_num := 0;
 		end
-	ResetPrevFrameNum.Skip: action ==>
-		guard
-			not IsNewPic
-		end
+	end
 
-	ReadSliceType.Asked: action
-			==>
-			//              first_ , slice_ , pic_par
-			TypeOfVLD    :[ VLD_UE , VLD_UE , VLD_UE ]
+	ResetPrevFrameNum.Skip: action ==>
+	guard
+		not IsNewPic
+	end
+
+	//                                          first_ , slice_ , pic_par
+	ReadSliceType.Asked: action ==> TypeOfVLD :[VLD_UE , VLD_UE , VLD_UE]
 	do
 		disable_deblocking_filter_idc := 0;
 		slice_alpha_c0_offset         := 0;
 		slice_beta_offset             := 0;
 	end
 
-
 	ReadSliceType.Done: action
-			ValVLD         :[ValueOfVLD] repeat 3
-				==>
-			SliceDataParam  :[slice_type,ValueOfVLD[0]],
-			GetPps          :[ValueOfVLD[2]],
-			SliceType       :[slice_type],
-			Others_IsNewPic :[IsNewPic]
-		do
-			first_mb_in_slice := ValueOfVLD[0];
-			IsNewPic          := (first_mb_in_slice = 0);
-			slice_type        :=
-				if( ValueOfVLD[1] < 5) then
-					ValueOfVLD[1]
-				else
-					ValueOfVLD[1] - 5
-				end;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tfirst_mb_in_slice:"+first_mb_in_slice);
-				println("\t\tslice_type:       "+ValueOfVLD[1]);
-				println("\t\tpps_id:           "+ValueOfVLD[2]);
-			end
-			//pps_id            := ValueOfVLD[2]; ==> don't need
-			//Ask sps_id
-			//Ask and get separate_colour_plane_flag ==> not implemented in decodeSpsHeader yet !!
+		ValVLD         :[ValueOfVLD] repeat 3
+			==>
+		SliceDataParam  :[slice_type,ValueOfVLD[0]],
+		GetPps          :[ValueOfVLD[2]],
+		SliceType       :[slice_type],
+		Others_IsNewPic :[IsNewPic]
+	do
+		first_mb_in_slice := ValueOfVLD[0];
+		IsNewPic          := (first_mb_in_slice = 0);
+		slice_type        :=
+			if( ValueOfVLD[1] < 5) then
+				ValueOfVLD[1]
+			else
+				ValueOfVLD[1] - 5
+			end;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tfirst_mb_in_slice:"+first_mb_in_slice);
+			println("\t\tslice_type:       "+ValueOfVLD[1]);
+			println("\t\tpps_id:           "+ValueOfVLD[2]);
 		end
-
+		//pps_id            := ValueOfVLD[2]; ==> don't need
+		//Ask sps_id
+		//Ask and get separate_colour_plane_flag ==> not implemented in decodeSpsHeader yet !!
+	end
 
 	SeparateColourPlane.IsEqualToTrue: action
-				==>
-			//           colour_plane_id
-			TypeOfVLD :[ READ_BITS ],
-			VLDParam  :[     2     ]
-		guard
-			separate_colour_plane_flag = true
-		end
-
+			==>
+		//           colour_plane_id
+		TypeOfVLD :[ READ_BITS ],
+		VLDParam  :[     2     ]
+	guard
+		separate_colour_plane_flag = true
+	end
 
 	ReadFrameNum.Asked: action
-			SpsParameters :[SpsParam] repeat 10
-				==>
-			//                frame_num
-			TypeOfVLD :[   READ_BITS   ],
-			VLDParam  :[ log2_max_frame_num ],
-			Width          :[SpsParam[8]],
-			Height         :[SpsParam[9]]
-		do
-			expected_delta_per_poc_cycle           := SpsParam[0];
-			log2_max_frame_num                     := SpsParam[1];
-			num_ref_frames_in_pic_order_cnt_cycle  := SpsParam[2];
-			offset_for_top_to_bottom_field         := SpsParam[3];
-			offset_for_non_ref_pic                 := SpsParam[4];
-			SzMaxPocLsb                            := SpsParam[5];
-			pic_order_cnt_type                     := SpsParam[6];
-			mb_adaptive_frame_field_flag           := GetFlag(SpsParam[7],0);
-			delta_pic_order_always_zero_flag       := GetFlag(SpsParam[7],1);
-			frame_mbs_only_flag                    := GetFlag(SpsParam[7],2);
-		end
-
+		SpsParameters :[SpsParam] repeat 10
+			==>
+		//                frame_num
+		TypeOfVLD :[   READ_BITS   ],
+		VLDParam  :[ log2_max_frame_num ],
+		Width          :[SpsParam[8]],
+		Height         :[SpsParam[9]]
+	do
+		expected_delta_per_poc_cycle           := SpsParam[0];
+		log2_max_frame_num                     := SpsParam[1];
+		num_ref_frames_in_pic_order_cnt_cycle  := SpsParam[2];
+		offset_for_top_to_bottom_field         := SpsParam[3];
+		offset_for_non_ref_pic                 := SpsParam[4];
+		SzMaxPocLsb                            := SpsParam[5];
+		pic_order_cnt_type                     := SpsParam[6];
+		mb_adaptive_frame_field_flag           := GetFlag(SpsParam[7],0);
+		delta_pic_order_always_zero_flag       := GetFlag(SpsParam[7],1);
+		frame_mbs_only_flag                    := GetFlag(SpsParam[7],2);
+	end
 
 	ReadFrameNum.Done.IsNewPic: action
-			ValVLD        :[ValueOfVLD],
-
-			PpsParameters :[PpsParam] repeat 5,
-			IsAnIdrPic    :[IdrPic],
-			NalRefIdc     :[ValNalRefIdc]
-				==>
-			FramNumCurrPic                    :[ValueOfVLD]
-		guard
-			IsNewPic
-		do
-			num_slice_groups                       := PpsParam[0];
-			ValPicInitQp                           := PpsParam[1];
-			SzSliceGroupChgCycle                   := PpsParam[2];
-			slice_group_map_type                   := PpsParam[3];
-			deblocking_filter_control_present_flag := GetFlag(PpsParam[4],0);
-			pic_order_present_flag                 := GetFlag(PpsParam[4],1);
-			redundant_pic_cnt_present_flag         := GetFlag(PpsParam[4],2);
-			entropy_coding_mode_flag               := GetFlag(PpsParam[4],3);
-			prev_frame_num                         := frame_num;
-			Idr_flag                               := IdrPic;
-			nal_ref_idc                            := ValNalRefIdc;
-			frame_num                              := ValueOfVLD;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tframe_num:        "+ValueOfVLD);
-			end
-			LoopVal := 0;
+		ValVLD        :[ValueOfVLD],
+		PpsParameters :[PpsParam] repeat 5,
+		IsAnIdrPic    :[IdrPic],
+		NalRefIdc     :[ValNalRefIdc]
+			==>
+		FramNumCurrPic                    :[ValueOfVLD]
+	guard
+		IsNewPic
+	do
+		num_slice_groups                       := PpsParam[0];
+		ValPicInitQp                           := PpsParam[1];
+		SzSliceGroupChgCycle                   := PpsParam[2];
+		slice_group_map_type                   := PpsParam[3];
+		deblocking_filter_control_present_flag := GetFlag(PpsParam[4],0);
+		pic_order_present_flag                 := GetFlag(PpsParam[4],1);
+		redundant_pic_cnt_present_flag         := GetFlag(PpsParam[4],2);
+		entropy_coding_mode_flag               := GetFlag(PpsParam[4],3);
+		prev_frame_num                         := frame_num;
+		Idr_flag                               := IdrPic;
+		nal_ref_idc                            := ValNalRefIdc;
+		frame_num                              := ValueOfVLD;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tframe_num:        "+ValueOfVLD);
 		end
+		LoopVal := 0;
+	end
 
 	ReadFrameNum.Done.IsNewSlice: action
-			ValVLD        :[ValueOfVLD],
-
-			PpsParameters :[PpsParam] repeat 5,
-			IsAnIdrPic    :[IdrPic],
-			NalRefIdc     :[ValNalRefIdc]
-				==>
-		guard
-			not IsNewPic
-		do
-			num_slice_groups                       := PpsParam[0];
-			ValPicInitQp                           := PpsParam[1];
-			SzSliceGroupChgCycle                   := PpsParam[2];
-			slice_group_map_type                   := PpsParam[3];
-			deblocking_filter_control_present_flag := GetFlag(PpsParam[4],0);
-			pic_order_present_flag                 := GetFlag(PpsParam[4],1);
-			redundant_pic_cnt_present_flag         := GetFlag(PpsParam[4],2);
-			entropy_coding_mode_flag               := GetFlag(PpsParam[4],3);
-			Idr_flag                               := IdrPic;
-			nal_ref_idc                            := ValNalRefIdc;
-			frame_num                              := ValueOfVLD;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tframe_num:        "+ValueOfVLD);
-			end
-			LoopVal := 0;
-		end
-
-
-	GetOff4RefFrameAcc.Launch: action
-			SpsParameters:[ValOffAccumul]
-				==>
-		guard
-			LoopVal <= num_ref_frames_in_pic_order_cnt_cycle
-		do
-			offset_for_ref_frame_accumul[LoopVal] := ValOffAccumul;
-			LoopVal := LoopVal + 1;
-		end
-
-	GetOff4RefFrameAcc.Done: action
+		ValVLD        :[ValueOfVLD],
+		PpsParameters :[PpsParam] repeat 5,
+		IsAnIdrPic    :[IdrPic],
+		NalRefIdc     :[ValNalRefIdc]
 			==>
-		guard
-			LoopVal >= num_ref_frames_in_pic_order_cnt_cycle
+	guard
+		not IsNewPic
+	do
+		num_slice_groups                       := PpsParam[0];
+		ValPicInitQp                           := PpsParam[1];
+		SzSliceGroupChgCycle                   := PpsParam[2];
+		slice_group_map_type                   := PpsParam[3];
+		deblocking_filter_control_present_flag := GetFlag(PpsParam[4],0);
+		pic_order_present_flag                 := GetFlag(PpsParam[4],1);
+		redundant_pic_cnt_present_flag         := GetFlag(PpsParam[4],2);
+		entropy_coding_mode_flag               := GetFlag(PpsParam[4],3);
+		Idr_flag                               := IdrPic;
+		nal_ref_idc                            := ValNalRefIdc;
+		frame_num                              := ValueOfVLD;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tframe_num:        "+ValueOfVLD);
 		end
+		LoopVal := 0;
+	end
 
-	FrameMbsOnly.IsEqualToFalse: action
-				==>
-			//           field_pic_flag
-			TypeOfVLD :[ READ_BITS ],
-			VLDParam  :[     1     ]
-		guard
-			frame_mbs_only_flag = false
+	GetOff4RefFrameAcc.Launch: action SpsParameters:[ValOffAccumul] ==>
+	guard
+		LoopVal <= num_ref_frames_in_pic_order_cnt_cycle
+	do
+		offset_for_ref_frame_accumul[LoopVal] := ValOffAccumul;
+		LoopVal := LoopVal + 1;
+	end
+
+	GetOff4RefFrameAcc.Done: action ==>
+	guard
+		LoopVal >= num_ref_frames_in_pic_order_cnt_cycle
+	end
+
+	//                                             field_pic_flag
+	FrameMbsOnly.IsEqToFalse: action ==> TypeOfVLD :[ READ_BITS ], VLDParam :[1]
+	guard
+		frame_mbs_only_flag = false
+	end
+
+	ReadFieldPicFlag.Done: action ValVLD :[ValueOfVLD] ==>
+	do
+		field_pic_flag := 
+			if(ValueOfVLD = 0) then
+				false
+			else
+				true
+			end;
+		MbaffFrameFlag := (field_pic_flag and mb_adaptive_frame_field_flag);
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tfield_pic_flag:   "+field_pic_flag);
 		end
-
-
-	ReadFieldPicFlag.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		do
-			field_pic_flag := 
-				if(ValueOfVLD = 0) then
-					false
-				else
-					true
-				end;
-			MbaffFrameFlag := (field_pic_flag and mb_adaptive_frame_field_flag);
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tfield_pic_flag:   "+field_pic_flag);
-			end
-		end
-
+	end
 
 	FieldPicFlag.IsEqualToTrue: action
 				==>
@@ -327,258 +275,198 @@ actor Algo_DecodeSliceHeader()
 			field_pic_flag = true
 		end
 
-
-	ReadBottomField.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		do
-			bottom_field_flag :=
-				if(ValueOfVLD = 0)then
-					false
-				else
-					true
-				end;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tbottom_field_flag: "+bottom_field_flag);
-			end
+	ReadBottomField.Done: action ValVLD :[ValueOfVLD] ==>
+	do
+		bottom_field_flag :=
+			if(ValueOfVLD = 0)then
+				false
+			else
+				true
+			end;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tbottom_field_flag: "+bottom_field_flag);
 		end
+	end
 
 
 	IdrFlag.IsEqualToFalse: action ==>
-		guard
-			Idr_flag = false
-		do
-			if(frame_num < prev_frame_num) then
-				frame_num_offset := frame_num_offset + 1 << log2_max_frame_num;
-			end
+	guard
+		Idr_flag = false
+	do
+		if(frame_num < prev_frame_num) then
+			frame_num_offset := frame_num_offset + 1 << log2_max_frame_num;
 		end
+	end
 
+	//                                           idr_pic_id
+	IdrFlag.IsEqualToTrue: action ==> TypeOfVLD :[ VLD_UE ]
+	guard
+		Idr_flag = true
+	do
+		frame_num_offset := 0;
+		frame_num        := 0;
+		prev_frame_num   := 0;
+		PicOrderCntMsb         := 0;
+		prevPicOrderCntLsb     := 0;
+		expectedpoc            := 0;
+	end
 
-	IdrFlag.IsEqualToTrue: action
-				==>
-			//            idr_pic_id
-			TypeOfVLD    :[ VLD_UE ]
-		guard
-			Idr_flag = true
-		do
-			frame_num_offset := 0;
-			frame_num        := 0;
-			prev_frame_num   := 0;
-			PicOrderCntMsb         := 0;
-			prevPicOrderCntLsb     := 0;
-			expectedpoc            := 0;
-			
+	ReadIdrPicId.Done: action ValVLD :[ValueOfVLD] ==>
+	do
+		idr_pic_id := ValueOfVLD;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tidr_pic_id:       "+idr_pic_id);
 		end
-
-
-	ReadIdrPicId.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		do
-			idr_pic_id := ValueOfVLD;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tidr_pic_id:       "+idr_pic_id);
-			end
-		end
-
+	end
 
 	PocType.IsEqualTo0: action
-				==>
-			//           pic_order_cnt_lsb
-			TypeOfVLD :[  READ_BITS  ],
-			VLDParam  :[ SzMaxPocLsb ]
-		guard
-			pic_order_cnt_type = 0
-		end
-
-
-	ReadPocLsb.Done.IsNewPic: action
-			ValVLD :[ValueOfVLD]
-				==>
-			Poc    :[POC_val]
-		guard
-			IsNewPic
-		var
-			int MaxPicOrderCntLsb,
-			int POC_val
-		do
-			MaxPicOrderCntLsb := (1 << SzMaxPocLsb) / 2;
-			if Idr_flag = true then
-				PicOrderCntMsb := 0;
-				prevPicOrderCntLsb := 0;
-			else
-				prevPicOrderCntLsb := pic_order_cnt_lsb;
-			end
-			pic_order_cnt_lsb := ValueOfVLD;
-			if  (pic_order_cnt_lsb < prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) >= MaxPicOrderCntLsb) then
-				PicOrderCntMsb     :=  PicOrderCntMsb + MaxPicOrderCntLsb;
-				prevPicOrderCntLsb := 0;
-			else 
-				if (pic_order_cnt_lsb > prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) > MaxPicOrderCntLsb) then 
-					PicOrderCntMsb := PicOrderCntMsb - MaxPicOrderCntLsb;
-				end
-			end
-			POC_val := PicOrderCntMsb + pic_order_cnt_lsb;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tpic_order_cnt_lsb: "+ValueOfVLD);
-			end
-			if(DEBUG_FLAG_DECODED)then
-				println("PocVal: "+POC_val);
-			end
-		end
-
-
-	ReadPocLsb.Done.IsNewSlice: action
-			ValVLD :[ValueOfVLD]
-				==>
-		guard
-			not IsNewPic
-		end
-
-
-	Check_PicOrPres_FieldPic: action
-				==>
-			//     delta_pic_order_cnt_bottom
-			//                or
-			//      delta_pic_order_cnt[ 1 ]
-			TypeOfVLD    :[ VLD_SE ]
-		guard
-			pic_order_present_flag = true,
-			field_pic_flag         = false
-		end
-
-
-	ReadDeltaPicOrderCntBottom.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		do
-			delta_pic_order_cnt_bottom := ValueOfVLD;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tdelta_pic_order_cnt_bottom: "+delta_pic_order_cnt_bottom);
-			end
-		end
-
-
-	PocType.IsEqualTo2.IsNewPic: action
-				==>
-			Poc    :[POC_val]
-		guard
-			IsNewPic
-		var
-			int POC_val
-		do
-			POC_val :=
-				if(Idr_flag = true) then
-					0
-				else
-					if(nal_ref_idc > 0) then
-						(frame_num_offset + frame_num) * 2
-					else
-						((frame_num_offset + frame_num) * 2) - 1
-					end
-				end;
-			if(DEBUG_FLAG_DECODED)then
-				println("PocVal: "+POC_val);
-			end
-		end
-
-	PocType.IsEqualTo2.IsNewSlice: action ==>
-		guard
-			not IsNewPic
-		end
-
-
-	PocType.IsEqualTo1: action
-				==>
-		guard
-			pic_order_cnt_type = 1
-		var
-			int abs_frame_num,
-			int idx
-		do
-			abs_frame_num :=
-				if(num_ref_frames_in_pic_order_cnt_cycle != 0) then
-					frame_num_offset + frame_num
-				else
-					0
-				end ;
-			if( (nal_ref_idc = 0) and (abs_frame_num > 0) ) then
-				abs_frame_num := abs_frame_num -1;
-			end
-			if(abs_frame_num > 0) then
-				expectedpoc := expected_delta_per_poc_cycle * ((abs_frame_num - 1) / num_ref_frames_in_pic_order_cnt_cycle);
-				idx         := (abs_frame_num - 1) mod num_ref_frames_in_pic_order_cnt_cycle;
-				expectedpoc := expectedpoc + offset_for_ref_frame_accumul[idx];
-			else
-				expectedpoc :=0;
-			end
-			if(nal_ref_idc = 0) then
-				expectedpoc := expectedpoc + offset_for_non_ref_pic;
-			end
-			delta_pic_order_cnt[0] := 0;
-		end
-
-
-	ReadDeltaPicOrCnt0.Asked: action
-				==>
-			//      delta_pic_order_cnt[ 0 ]
-			TypeOfVLD    :[ VLD_SE ]
-		guard
-			pic_order_cnt_type               = 1,
-			not delta_pic_order_always_zero_flag
-		end
-
-
-	ReadDeltaPicOrCnt0.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		do
-			delta_pic_order_cnt[0] := ValueOfVLD;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tdelta_pic_order_cnt[0]: "+delta_pic_order_cnt[0]);
-			end
-		end
-
-
-	ReadDeltaPicOrCnt1.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		do
-			delta_pic_order_cnt[1] := ValueOfVLD;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tdelta_pic_order_cnt[1]: "+delta_pic_order_cnt[1]);
-			end
-		end
-
-
-	CalcPOC4PocType1.IsNewPic: action
 			==>
-		Poc :[POC_val]
+		//           pic_order_cnt_lsb
+		TypeOfVLD :[  READ_BITS  ],
+		VLDParam  :[ SzMaxPocLsb ]
+	guard
+		pic_order_cnt_type = 0
+	end
+
+	ReadPocLsb.Done.IsNewPic: action ValVLD :[ValueOfVLD] ==> Poc :[POC_val]
 	guard
 		IsNewPic
-	var 
-/*		int TopFieldOrderCnt,
-		int BottomFieldOrderCnt,*/
+	var
+		int MaxPicOrderCntLsb,
 		int POC_val
 	do
-	//This code must be checked later and move into ReadDeltaPicOrCnt0.Done and ReadDeltaPicOrCnt1.Done !!!!
-
-/*		TopFieldOrderCnt    := expectedpoc + delta_pic_order_cnt[0];
-		BottomFieldOrderCnt := TopFieldOrderCnt + offset_for_top_to_bottom_field + delta_pic_order_cnt[1];// ==> WTF __
-		if(field_pic_flag = true) then//                                                                             \/
-			BottomFieldOrderCnt := BottomFieldOrderCnt +delta_pic_order_cnt[1];//                             ==> WTF !!!!!
+		MaxPicOrderCntLsb := (1 << SzMaxPocLsb) / 2;
+		if Idr_flag = true then
+			PicOrderCntMsb := 0;
+			prevPicOrderCntLsb := 0;
+		else
+			prevPicOrderCntLsb := pic_order_cnt_lsb;
 		end
-		POC_val :=
-			if(TopFieldOrderCnt < BottomFieldOrderCnt) then
-				TopFieldOrderCnt
-			else
-				BottomFieldOrderCnt
-			end ;*/
-
-		// TopField is always inferior !!!!!
-		POC_val := expectedpoc + delta_pic_order_cnt[0];
+		pic_order_cnt_lsb := ValueOfVLD;
+		if  (pic_order_cnt_lsb < prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) >= MaxPicOrderCntLsb) then
+			PicOrderCntMsb     :=  PicOrderCntMsb + MaxPicOrderCntLsb;
+			prevPicOrderCntLsb := 0;
+		else 
+			if (pic_order_cnt_lsb > prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) > MaxPicOrderCntLsb) then 
+				PicOrderCntMsb := PicOrderCntMsb - MaxPicOrderCntLsb;
+			end
+		end
+		POC_val := PicOrderCntMsb + pic_order_cnt_lsb;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tpic_order_cnt_lsb: "+ValueOfVLD);
+		end
 		if(DEBUG_FLAG_DECODED)then
 			println("PocVal: "+POC_val);
+		end
+	end
+
+	ReadPocLsb.Done.IsNewSlice: action ValVLD :[ValueOfVLD] ==>
+	guard
+		not IsNewPic
+	end
+
+	//                                 delta_pic_order_cnt_bottom
+	//                                            or
+	//                                  delta_pic_order_cnt[ 1 ]
+	Check_PicOrPres_FieldPic: action ==> TypeOfVLD :[ VLD_SE ]
+	guard
+		pic_order_present_flag = true,
+		field_pic_flag         = false
+	end
+
+	ReadDeltaPicOrderCntBottom.Done: action ValVLD :[ValueOfVLD] ==>
+	do
+		delta_pic_order_cnt_bottom := ValueOfVLD;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tdelta_pic_order_cnt_bottom: "+delta_pic_order_cnt_bottom);
+		end
+	end
+
+	PocType.IsEqualTo2.IsNewPic: action ==> Poc :[POC_val]
+	guard
+		IsNewPic
+	var
+		int POC_val
+	do
+		POC_val :=
+			if(Idr_flag = true) then
+				0
+			else
+				if(nal_ref_idc > 0) then
+					(frame_num_offset + frame_num) * 2
+				else
+					((frame_num_offset + frame_num) * 2) - 1
+				end
+			end;
+		if(DEBUG_FLAG_DECODED)then
+			println("PocVal: "+POC_val);
+		end
+	end
+
+	PocType.IsEqualTo2.IsNewSlice: action ==>
+	guard
+		not IsNewPic
+	end
+
+	PocType.IsEqualTo1: action ==>
+	guard
+		pic_order_cnt_type = 1
+	var
+		int abs_frame_num,
+		int idx
+	do
+		abs_frame_num :=
+			if(num_ref_frames_in_pic_order_cnt_cycle != 0) then
+				frame_num_offset + frame_num
+			else
+				0
+			end ;
+		if( (nal_ref_idc = 0) and (abs_frame_num > 0) ) then
+			abs_frame_num := abs_frame_num -1;
+		end
+		if(abs_frame_num > 0) then
+			expectedpoc := expected_delta_per_poc_cycle * ((abs_frame_num - 1) / num_ref_frames_in_pic_order_cnt_cycle);
+			idx         := (abs_frame_num - 1) mod num_ref_frames_in_pic_order_cnt_cycle;
+			expectedpoc := expectedpoc + offset_for_ref_frame_accumul[idx];
+		else
+			expectedpoc :=0;
+		end
+		if(nal_ref_idc = 0) then
+			expectedpoc := expectedpoc + offset_for_non_ref_pic;
+		end
+		delta_pic_order_cnt[0] := 0;
+	end
+
+	//                                      delta_pic_order_cnt[ 0 ]
+	ReadDeltaPicOrCnt0.Asked: action ==> TypeOfVLD :[ VLD_SE ]
+	guard
+		pic_order_cnt_type               = 1,
+		not delta_pic_order_always_zero_flag
+	end
+
+	ReadDeltaPicOrCnt0.Done: action ValVLD :[ValueOfVLD] ==>
+	do
+		delta_pic_order_cnt[0] := ValueOfVLD;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tdelta_pic_order_cnt[0]: "+delta_pic_order_cnt[0]);
+		end
+	end
+
+	ReadDeltaPicOrCnt1.Done: action ValVLD :[ValueOfVLD] ==>
+	do
+		delta_pic_order_cnt[1] := ValueOfVLD;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tdelta_pic_order_cnt[1]: "+delta_pic_order_cnt[1]);
+		end
+	end
+
+	CalcPOC4PocType1.IsNewPic: action ==> Poc :[expectedpoc + 
+	                                             delta_pic_order_cnt[0]]
+	guard
+		IsNewPic
+	do
+		if(DEBUG_FLAG_DECODED)then
+			println("PocVal: "+(expectedpoc+delta_pic_order_cnt[0]));
 		end
 	end
 
@@ -587,217 +475,163 @@ actor Algo_DecodeSliceHeader()
 		not IsNewPic
 	end
 
+	//                                                redundant_pic_cnt
+	RedundPicCntPres.IsEqualToTrue: action ==> TypeOfVLD :[ VLD_UE ]
+	guard
+		redundant_pic_cnt_present_flag = true
+	end
 
-	RedundPicCntPres.IsEqualToTrue: action
-				==>
-			//         redundant_pic_cnt
-			TypeOfVLD    :[ VLD_UE ]
-		guard
-			redundant_pic_cnt_present_flag = true
+	ReadRedunPicCnt.Done: action ValVLD :[ValueOfVLD] ==>
+	do
+		redundant_pic_cnt := ValueOfVLD;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tredundant_pic_cnt: "+redundant_pic_cnt);
 		end
-
-
-	ReadRedunPicCnt.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		do
-			redundant_pic_cnt := ValueOfVLD;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tredundant_pic_cnt: "+redundant_pic_cnt);
-			end
-		end
-
+	end
 
 	RefPicList.Launch: action
-				==>
-			TypeOfVLD :[LAUNCH_ACTOR],
-			VLDParam  :[REF_PIC_LIST]
-		end
+			==>
+		TypeOfVLD :[LAUNCH_ACTOR],
+		VLDParam  :[REF_PIC_LIST]
+	end
 
 	SendSliceDataParameters: action
-				==>
-			SliceDataParam :[if MbaffFrameFlag then 1 else 0 end]
-		end
-
+			==>
+		SliceDataParam :[if MbaffFrameFlag then 1 else 0 end]
+	end
 
 	DecRefPicMarking.Launch: action
-				==>
-			TypeOfVLD          :[LAUNCH_ACTOR],
-			VLDParam           :[DEC_REF_PIC_MARKING],
-			RefPicMrk_IsNewPic :[IsNewPic]
+			==>
+		TypeOfVLD          :[LAUNCH_ACTOR],
+		VLDParam           :[DEC_REF_PIC_MARKING],
+		RefPicMrk_IsNewPic :[IsNewPic]
+	end
+
+	//                                         cabac_init_idc
+	ReadCabacInitDc.Asked: action ==> TypeOfVLD :[ VLD_UE ]
+	guard
+		entropy_coding_mode_flag  = true,
+		slice_type               != SLICE_TYPE_I,
+		slice_type               != SLICE_TYPE_SI
+	end
+
+	ReadCabacInitDc.Done: action ValVLD :[VLDecoding] ==>
+	do
+		cabac_init_idc := VLDecoding;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tcabac_init_idc: "+cabac_init_idc);
 		end
+	end
 
+	//                                         slice_qp_delta
+	ReadSliceQpDelta.Asked: action ==> TypeOfVLD :[ VLD_SE ]
+	end
 
-	ReadCabacInitDc.Asked: action
-				==>
-			//           cabac_init_idc
-			TypeOfVLD    :[ VLD_UE ]
-		guard
-			entropy_coding_mode_flag  = true,
-			slice_type               != SLICE_TYPE_I,
-			slice_type               != SLICE_TYPE_SI
+	ReadSliceQpDelta.Done: action ValVLD :[VLDec] ==> SliceDataParam :[ValOfQp]
+	var
+		int(size=8) ValOfQp
+	do
+		//slice_qp_delta := VLDecoding;
+		ValOfQp      := VLDec + ValPicInitQp;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tslice_qp_delta: "+VLDec);
 		end
-
-
-	ReadCabacInitDc.Done: action
-			ValVLD :[VLDecoding]
-				==>
-		do
-			cabac_init_idc := VLDecoding;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tcabac_init_idc: "+cabac_init_idc);
-			end
-		end
-
-
-	ReadSliceQpDelta.Asked: action
-				==>
-			//          slice_qp_delta
-			TypeOfVLD    :[ VLD_SE ]
-		end
-
-
-	ReadSliceQpDelta.Done: action
-			ValVLD         :[VLDecoding]
-				==>
-			SliceDataParam :[ValueOfQp]
-		var
-			int(size=8) ValueOfQp
-		do
-			//slice_qp_delta := VLDecoding;
-			ValueOfQp      := VLDecoding + ValPicInitQp;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tslice_qp_delta: "+VLDecoding);
-			end
-		end
-
+	end
 
 	Slice_Type.IsEqualToSP: action
-				==>
-			//              sp_for_sw , slice_q
-			TypeOfVLD :[ READ_BITS , VLD_SE ],
-			VLDParam  :[     1              ]
-		guard
-			slice_type = SLICE_TYPE_SP
+			==>
+		//              sp_for_sw , slice_q
+		TypeOfVLD :[ READ_BITS , VLD_SE ],
+		VLDParam  :[     1              ]
+	guard
+		slice_type = SLICE_TYPE_SP
+	end
+
+	ReadSliceSpParameters.Done: action ValVLD :[VLDecoding] repeat 2 ==>
+	do
+		sp_for_switch_flag :=
+			if(VLDecoding[0] = 0)then
+				false
+			else
+				true
+			end;
+		slice_qs_delta := VLDecoding[1];
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tsp_for_switch_flag: "+sp_for_switch_flag);
+			println("\t\tslice_qs_delta: "+slice_qs_delta);
 		end
+	end
 
+	//                                          slice_qs_delta
+	Slice_Type.IsEqualToSI: action ==> TypeOfVLD :[ VLD_SE ]
+	guard
+		slice_type = SLICE_TYPE_SP
+	end
 
-	ReadSliceSpParameters.Done: action
-			ValVLD :[VLDecoding] repeat 2
-				==>
-		do
-			sp_for_switch_flag :=
-				if(VLDecoding[0] = 0)then
-					false
-				else
-					true
-				end;
-			slice_qs_delta := VLDecoding[1];
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tsp_for_switch_flag: "+sp_for_switch_flag);
-				println("\t\tslice_qs_delta: "+slice_qs_delta);
-			end
+	ReadSliceSiParameters.Done: action ValVLD :[VLDecoding] ==>
+	do
+		slice_qs_delta := VLDecoding;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tslice_qs_delta: "+slice_qs_delta);
 		end
+	end
 
+	//                                       slice_qs_delta
+	DeblocFilterPresent: action ==> TypeOfVLD :[ VLD_UE ]
+	guard
+		deblocking_filter_control_present_flag = true
+	end
 
-	Slice_Type.IsEqualToSI: action
-				==>
-			//          slice_qs_delta
-			TypeOfVLD    :[ VLD_SE ]
-		guard
-			slice_type = SLICE_TYPE_SP
+	ReadDisDeblocFilterIdc.Done: action ValVLD :[VLDecoding] ==>
+	do
+		disable_deblocking_filter_idc := VLDecoding;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tdisable_deblocking_filter_idc: "+disable_deblocking_filter_idc);
 		end
+	end
 
+	//                                                       slice_ , slice_
+	DisDeblocFilterIdc.IsNotEqualTo1: action ==> TypeOfVLD :[VLD_SE , VLD_SE]
+	guard
+		disable_deblocking_filter_idc != 1
+	end
 
-	ReadSliceSiParameters.Done: action
-			ValVLD :[VLDecoding]
-				==>
-		do
-			slice_qs_delta := VLDecoding;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tslice_qs_delta: "+slice_qs_delta);
-			end
+	ReadSliceAlphaAndBeta: action ValVLD :[VLDecoding] repeat 2 ==>
+	do
+		slice_alpha_c0_offset := VLDecoding[0] * 2;
+		slice_beta_offset     := VLDecoding[1] * 2;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tslice_alpha_c0_offset_div2: "+VLDecoding[0]);
+			println("\t\tslice_beta_offset_div2: "+VLDecoding[1]);
 		end
-
-
-	DeblocFilterPresent: action
-				==>
-			//          slice_qs_delta
-			TypeOfVLD    :[ VLD_UE ]
-		guard
-			deblocking_filter_control_present_flag = true
-		end
-
-
-	ReadDisDeblocFilterIdc.Done: action
-			ValVLD :[VLDecoding]
-				==>
-		do
-			disable_deblocking_filter_idc := VLDecoding;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tdisable_deblocking_filter_idc: "+disable_deblocking_filter_idc);
-			end
-		end
-
-
-	DisDeblocFilterIdc.IsNotEqualTo1: action
-				==>
-			//              slice_ , slice_
-			TypeOfVLD    :[ VLD_SE , VLD_SE ]
-		guard
-			disable_deblocking_filter_idc != 1
-		end
-
-
-	ReadSliceAlphaAndBeta: action
-			ValVLD :[VLDecoding] repeat 2
-				==>
-		do
-			slice_alpha_c0_offset := VLDecoding[0] * 2;
-			slice_beta_offset     := VLDecoding[1] * 2;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tslice_alpha_c0_offset_div2: "+VLDecoding[0]);
-				println("\t\tslice_beta_offset_div2: "+VLDecoding[1]);
-			end
-		end
-
+	end
 
 	ReadSlcGrpChgCycl.Asked: action
-				==>
-			//            slice_group_change_cycle
-			TypeOfVLD :[       READ_BITS      ],
-			VLDParam  :[ SzSliceGroupChgCycle ]
-		guard
-			num_slice_groups     >  1,
-			slice_group_map_type >= 3,
-			slice_group_map_type <= 5
+			==>
+		//            slice_group_change_cycle
+		TypeOfVLD :[       READ_BITS      ],
+		VLDParam  :[ SzSliceGroupChgCycle ]
+	guard
+		num_slice_groups     >  1,
+		slice_group_map_type >= 3,
+		slice_group_map_type <= 5
+	end
+
+	ReadSlcGrpChgCycl.Done: action ValVLD :[VLDecoding] ==>
+	do
+		slice_group_change_cycle := VLDecoding;
+		if(DEBUG_FLAG_DECODED)then
+			println("\t\tslice_group_change_cycle: "+slice_group_change_cycle);
 		end
-
-
-	ReadSlcGrpChgCycl.Done: action
-			ValVLD             :[VLDecoding]
-				==>
-		do
-			slice_group_change_cycle := VLDecoding;
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tslice_group_change_cycle: "+slice_group_change_cycle);
-			end
-		end
-
+	end
 
 	SendEndSliceHeader: action
-				==>
-			SliceDataParam :[disable_deblocking_filter_idc , slice_beta_offset,
-			                 slice_alpha_c0_offset],
-			TypeOfVLD              :[SKIP_NAL],
-			DecodeNextNal          :[true]
-		end
-
-/*   
-*
-* Scheduler
-*
-*/	
+			==>
+		SliceDataParam :[disable_deblocking_filter_idc , slice_beta_offset,
+		                 slice_alpha_c0_offset],
+		TypeOfVLD              :[SKIP_NAL],
+		DecodeNextNal          :[true]
+	end
 
 	schedule fsm ReadSliceTypeAsked:
 		ReadResetPrevFrameNum          (ResetPrevFrameNum                 )--> ReadSliceTypeAsked;
@@ -814,7 +648,7 @@ actor Algo_DecodeSliceHeader()
 		GetOff4RefFrameAcc             (GetOff4RefFrameAcc.Launch         )--> GetOff4RefFrameAcc;
 		GetOff4RefFrameAcc             (GetOff4RefFrameAcc.Done           )--> CheckFrameMbsOnly;
 
-		CheckFrameMbsOnly              (FrameMbsOnly.IsEqualToFalse       )--> ReadFieldPicFlagDone;
+		CheckFrameMbsOnly              (FrameMbsOnly.IsEqToFalse          )--> ReadFieldPicFlagDone;
 		CheckFrameMbsOnly              (IdrFlag.IsEqualToFalse            )--> CheckPocType;
 		CheckFrameMbsOnly              (IdrFlag.IsEqualToTrue             )--> ReadIdrPicIdDone;
 	
@@ -866,7 +700,6 @@ actor Algo_DecodeSliceHeader()
 		SendSliceDataParameters        (SendSliceDataParameters           )-->                             DecodeDecRefPicMarking;//DecodeWeightedPred;
 		//DecodeWeightedPred           (LaunchWeightedPred                )--> ...;
 
-
 		DecodeDecRefPicMarking         (DecRefPicMarking.Launch           )--> CheckEntropyCodingMode;
 
 		CheckEntropyCodingMode         (ReadCabacInitDc.Asked             )--> ReadCabacInitIdc;
@@ -907,10 +740,9 @@ actor Algo_DecodeSliceHeader()
 
 		EndSliceHeader                 (SendEndSliceHeader                )--> ReadResetPrevFrameNum;
 	end
-
 	priority
 		SeparateColourPlane              > ReadFrameNum;
-		FrameMbsOnly.IsEqualToFalse      > IdrFlag.IsEqualToFalse;
+		FrameMbsOnly.IsEqToFalse         > IdrFlag.IsEqualToFalse;
 		FieldPicFlag.IsEqualToTrue       > IdrFlag.IsEqualToFalse;
 		IdrFlag.IsEqualToFalse           > IdrFlag.IsEqualToTrue;
 		PocType.IsEqualTo0               > PocType.IsEqualTo1;

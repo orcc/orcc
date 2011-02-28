@@ -25,7 +25,6 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	uint(size=5)  TypeOfVLD,
 	int (size=32) VLD_Param,
 	uint(size=5)  Total_Coeff,
-
 	int (size=12) Value,
 	uint(size=4)  Run,
 	bool          Last
@@ -45,269 +44,228 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	uint(size=5)  maxNumCoeff  := 0;
 	uint(size=5)  startIdx     := 0;
 	uint(size=5)  endIdx       := 0;
-
 	List(type: uint(size=8) , size=16) CoeffLevel;
 	List(type: int (size=16), size=3)  level        := [ 0 : for int i in 1 .. 3];
 	List(type: int (size=4) , size=16) run          := [ 0 : for int i in 1 .. 16];
 
-
 	ReadCoeffToken.Asked: action
-			Parameters  :[nC , MaxNumCoeff , StartIdx , EndIdx]
-				==>
-			//        mb_field_decoding_flag
-			TypeOfVLD :[ CAVLC_COEFF_TOKEN ],
-			VLD_Param :[       nC       ]
+		Parameters  :[nC , MaxNumCoeff , StartIdx , EndIdx]
+			==>
+		//        mb_field_decoding_flag
+		TypeOfVLD :[ CAVLC_COEFF_TOKEN ],
+		VLD_Param :[       nC       ]
+	do
+		nC_Val := nC;
+		foreach int i in 0 .. 15
 		do
-			nC_Val := nC;
-			foreach int i in 0 .. 15
-			do
-				CoeffLevel[i] := 0;
-			end
-			startIdx    := StartIdx;
-			endIdx      := EndIdx;
-			maxNumCoeff := MaxNumCoeff;
-			if(DEBUG_FLAG_DECODED)then
-				println("******************** New Block Cavlc***************************");
-				println("nC : "+nC_Val);
-			//	println("startIdx : "+startIdx);
-			//	println("endIdx : "+endIdx);
-			//	println("maxNumCoeff : "+ValMaxNumCoeff);
-			end
-			zerosLeft := 0;
+			CoeffLevel[i] := 0;
 		end
+		startIdx    := StartIdx;
+		endIdx      := EndIdx;
+		maxNumCoeff := MaxNumCoeff;
+		if(DEBUG_FLAG_DECODED)then
+			println("******************** New Block Cavlc***************************");
+			println("nC : "+nC_Val);
+		end
+		zerosLeft := 0;
+	end
 
-	ReadCoeffToken.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-			Total_Coeff:[TotalCoeff]
-		do
-			TotalCoeff   := (ValueOfVLD & 0xFF);
-			TrailingOnes := (ValueOfVLD >> 8);
-			if(DEBUG_FLAG_DECODED)then
-				println("TotalCoeff : "+(ValueOfVLD & 0xFF));
-				println("Trailing Ones : "+(ValueOfVLD >> 8));
-			end
-			if(TrailingOnes < 3) then
-				levelCode := 2;
-			else
-				levelCode := 0;
-			end
+	ReadCoeffToken.Done: action ValVLD :[ValOfVLD] ==> Total_Coeff:[TotalCoeff]
+	do
+		TotalCoeff   := (ValOfVLD & 0xFF);
+		TrailingOnes := (ValOfVLD >> 8);
+		if(DEBUG_FLAG_DECODED)then
+			println("TotalCoeff : "+(ValOfVLD & 0xFF));
+			println("Trailing Ones : "+(ValOfVLD >> 8));
 		end
+		if(TrailingOnes < 3) then
+			levelCode := 2;
+		else
+			levelCode := 0;
+		end
+	end
 
 	CheckTotalCoeff.IsGreaterThan0: action ==>
-		guard
-			TotalCoeff > 0
-		do
-			if((TotalCoeff > 10) and (TrailingOnes < 3)) then
-				suffixLength := 1;
-			else
-				suffixLength := 0;
-			end
-			iLoop     := 0;
+	guard
+		TotalCoeff > 0
+	do
+		if((TotalCoeff > 10) and (TrailingOnes < 3)) then
+			suffixLength := 1;
+		else
+			suffixLength := 0;
 		end
+		iLoop     := 0;
+	end
 
 	ReadTrailingOnesSign.Asked: action
-				==>
-			//     trailing_ones_sign_flag
-			TypeOfVLD :[ READ_BITS ],
-			VLD_Param :[ TrailingOnes ]
-		guard
-			TrailingOnes > 0
-		end
+			==>
+		//     trailing_ones_sign_flag
+		TypeOfVLD :[ READ_BITS ],
+		VLD_Param :[ TrailingOnes ]
+	guard
+		TrailingOnes > 0
+	end
 
-	ReadTrailingOnesSign.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		var
-			uint(size=1) trailing_ones_sign_flag
+	ReadTrailingOnesSign.Done: action ValVLD :[ValueOfVLD] ==>
+	var
+		uint(size=1) trailing_ones_sign_flag
+	do
+		foreach int i in 0 .. TrailingOnes - 1
 		do
-			foreach int i in 0 .. TrailingOnes - 1
-			do
-				trailing_ones_sign_flag := (ValueOfVLD >> (TrailingOnes - 1 - i)) & 1;
-				level[iLoop] := 1 - 2 * trailing_ones_sign_flag;
-				if(DEBUG_FLAG_DECODED)then
-					println("levelT1 : "+level[iLoop]);
-				end
-				iLoop        := iLoop + 1;
+			trailing_ones_sign_flag := (ValueOfVLD >> (TrailingOnes - 1 - i)) & 1;
+			level[iLoop] := 1 - 2 * trailing_ones_sign_flag;
+			if(DEBUG_FLAG_DECODED)then
+				println("levelT1 : "+level[iLoop]);
 			end
-			iLoop := 0;
+			iLoop        := iLoop + 1;
 		end
+		iLoop := 0;
+	end
 
-	SendTrailingOnes: action
-				==>
-			Value :[level[iLoop-1]],
-			Last  :[false]
-		guard
-			iLoop < TrailingOnes
-		do
-			iLoop := iLoop + 1;
-		end
+	SendTrailingOnes: action ==> Value :[level[iLoop-1]], Last :[false]
+	guard
+		iLoop < TrailingOnes
+	do
+		iLoop := iLoop + 1;
+	end
 
-	ReadLevelPrefix.Asked: action
-				==>
-			//              level_prefix
-			TypeOfVLD :[ CAVLC_LEVEL_PREFIX ]
-		guard
-			iLoop < TotalCoeff
-		end
+			//                                      level_prefix
+	ReadLevelPrefix.Asked: action ==> TypeOfVLD :[CAVLC_LEVEL_PREFIX]
+	guard
+		iLoop < TotalCoeff
+	end
 
-	ReadLevelPrefix.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		do
-			//println("\t\tlevel_prefix : "+ValueOfVLD);
-			level_prefix := ValueOfVLD;
-			level_suffix := 0;
-		end
+	ReadLevelPrefix.Done: action ValVLD :[ValueOfVLD] ==>
+	do
+		level_prefix := ValueOfVLD;
+		level_suffix := 0;
+	end
 
 	ReadLevelSuffix.Asked: action
-				==>
-			//            level_suffix
-			TypeOfVLD :[    READ_BITS    ],
-			VLD_Param :[ levelSuffixSize ]
-		guard
-			   level_prefix >= 14
-			or suffixLength  > 0
-		var
-			int levelSuffixSize
-		do
-			if((level_prefix = 14) and (suffixLength = 0) )then
-				levelSuffixSize := 4;
-			else
-				if(level_prefix >= 15) then
-					levelSuffixSize := level_prefix - 3;
-				else
-					levelSuffixSize := suffixLength;
-				end
-			end
-		end
-
-	ReadLevelSuffix.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-		do
-			//println("\t\tlevel_suffix : "+ValueOfVLD);
-			level_suffix := ValueOfVLD;
-		end
-
-	ComputeLevel: action
 			==>
-			Value:[ValLevel],
-			Last  :[false]
-		var
-			int(size=16) ValLevel
-		do
-			levelCode :=
-				if(level_prefix < 15) then
-					levelCode + (level_prefix << suffixLength)
-				else
-					levelCode + (15 << suffixLength)
-				end;
-			levelCode := levelCode + level_suffix;
-			if((level_prefix >= 15) and (suffixLength = 0)) then
-				levelCode := levelCode + 15;
-			end
-			if(level_prefix >= 16) then
-				levelCode := levelCode + (1 << (level_prefix - 3)) - 4096;
-			end
-			if((levelCode mod 2) = 0) then
-				ValLevel     := (levelCode + 2) >> 1;
+		//            level_suffix
+		TypeOfVLD :[    READ_BITS    ],
+		VLD_Param :[ levelSuffixSize ]
+	guard
+		   level_prefix >= 14
+		or suffixLength  > 0
+	var
+		int levelSuffixSize
+	do
+		if((level_prefix = 14) and (suffixLength = 0) )then
+			levelSuffixSize := 4;
+		else
+			if(level_prefix >= 15) then
+				levelSuffixSize := level_prefix - 3;
 			else
-				ValLevel     := (-levelCode - 1) >> 1;
+				levelSuffixSize := suffixLength;
 			end
-
-			if(suffixLength = 0)then
-				suffixLength := 1;
-			end
-			if( (Abs(ValLevel) > (3 << suffixLength - 1)) and (suffixLength < 6) ) then
-				suffixLength := suffixLength + 1;
-			end
-			if(DEBUG_FLAG_DECODED)then
-				println("level : "+ValLevel);
-			end
-			
-			levelCode := 0;
-			iLoop     := iLoop + 1;
 		end
+	end
+
+	ReadLevelSuffix.Done: action ValVLD :[ValueOfVLD] ==>
+	do
+		level_suffix := ValueOfVLD;
+	end
+
+	ComputeLevel: action ==> Value:[ValLevel], Last :[false]
+	var
+		int(size=16) ValLevel
+	do
+		levelCode :=
+			if(level_prefix < 15) then
+				levelCode + (level_prefix << suffixLength)
+			else
+				levelCode + (15 << suffixLength)
+			end;
+		levelCode := levelCode + level_suffix;
+		if((level_prefix >= 15) and (suffixLength = 0)) then
+			levelCode := levelCode + 15;
+		end
+		if(level_prefix >= 16) then
+			levelCode := levelCode + (1 << (level_prefix - 3)) - 4096;
+		end
+		if((levelCode mod 2) = 0) then
+			ValLevel     := (levelCode + 2) >> 1;
+		else
+			ValLevel     := (-levelCode - 1) >> 1;
+		end
+
+		if(suffixLength = 0)then
+			suffixLength := 1;
+		end
+		if( (Abs(ValLevel) > (3 << suffixLength - 1)) and (suffixLength < 6) ) then
+			suffixLength := suffixLength + 1;
+		end
+		if(DEBUG_FLAG_DECODED)then
+			println("level : "+ValLevel);
+		end
+		
+		levelCode := 0;
+		iLoop     := iLoop + 1;
+	end
 
 	ReadTotalZeros.Asked: action
-				==>
-			//               total_zeros
-			TypeOfVLD :[ CAVLC_TOTAL_ZEROS ],
-			VLD_Param :[ maxNumCoeff , TotalCoeff ]
-		guard
-			TotalCoeff < (endIdx - startIdx + 1)
-		end
+			==>
+		//               total_zeros
+		TypeOfVLD :[ CAVLC_TOTAL_ZEROS ],
+		VLD_Param :[ maxNumCoeff , TotalCoeff ]
+	guard
+		TotalCoeff < (endIdx - startIdx + 1)
+	end
 
-	ReadTotalZeros.Done: action
-			ValVLD :[total_zeros]
-				==>
-		do
-			zerosLeft := total_zeros;
-			if(DEBUG_FLAG_DECODED)then
-				println("total_zeros : "+total_zeros);
-			end
+	ReadTotalZeros.Done: action ValVLD :[total_zeros] ==>
+	do
+		zerosLeft := total_zeros;
+		if(DEBUG_FLAG_DECODED)then
+			println("total_zeros : "+total_zeros);
 		end
+	end
 
 	InitiLoop: action ==>
-		do
-			iLoop := 0;
-		end
+	do
+		iLoop := 0;
+	end
 
 	ZerosLeft.GreaterThan0: action
-				==>
-			//            run_before
-			TypeOfVLD :[ CAVLC_RUN_BEFORE ],
-			VLD_Param :[ zerosLeft ]
-		guard
-			iLoop     < TotalCoeff - 1,
-			zerosLeft > 0
-		end
+			==>
+		//            run_before
+		TypeOfVLD :[ CAVLC_RUN_BEFORE ],
+		VLD_Param :[ zerosLeft ]
+	guard
+		iLoop     < TotalCoeff - 1,
+		zerosLeft > 0
+	end
 
-	ReadRunBefore: action
-			ValVLD :[run_before]
-				==>
-			Run    :[run_before]
-		do
-			run[iLoop] := run_before;
-			if(DEBUG_FLAG_DECODED)then
-				println("run_before : "+run_before);
-			end
-			zerosLeft  := zerosLeft - run_before;
-			iLoop      := iLoop + 1;
+	ReadRunBefore: action ValVLD :[run_before] ==> Run :[run_before]
+	do
+		run[iLoop] := run_before;
+		if(DEBUG_FLAG_DECODED)then
+			println("run_before : "+run_before);
 		end
+		zerosLeft  := zerosLeft - run_before;
+		iLoop      := iLoop + 1;
+	end
 
-	SendOthersRun: action
-				==>
-			Run :[ValRun]
-		guard
-			iLoop < TotalCoeff
-		var
-			int(size=16) ValRun
-		do
-			ValRun    := zerosLeft;
-			zerosLeft := 0;
-			if( (maxNumCoeff = 15) and (iLoop = TotalCoeff - 1) )then // The first coeffAC will be replaced by coeffDC
-				ValRun := ValRun + 1;
-			end
-			iLoop     := iLoop + 1;
+	SendOthersRun: action ==> Run :[ValRun]
+	guard
+		iLoop < TotalCoeff
+	var
+		int(size=16) ValRun
+	do
+		ValRun    := zerosLeft;
+		zerosLeft := 0;
+		// The first coeffAC will be replaced by coeffDC
+		if( (maxNumCoeff = 15) and (iLoop = TotalCoeff - 1) )then
+			ValRun := ValRun + 1;
 		end
+		iLoop     := iLoop + 1;
+	end
 
-	SendEndResidualBlock: action
-				==>
-			TypeOfVLD :[ SKIP_NAL ],
-			Last      :[   true   ]
-		do
-			run[TotalCoeff - 1] := zerosLeft;
-			/*
-				coeffNum = -1
-				for( i = TotalCoeff( coeff_token ) - 1; i >= 0; i-- ) {
-				   coeffNum += run[ i ] + 1
-				   coeffLevel[ startIdx + coeffNum ] = level[ i ]
-				}
-			
-			*/
-		end
+	SendEndResidualBlock: action ==> TypeOfVLD :[SKIP_NAL], Last :[true]
+	do
+		run[TotalCoeff - 1] := zerosLeft;
+	end
 
 	schedule fsm ReadCoeffToken_Asked:
 		ReadCoeffToken_Asked (ReadCoeffToken.Asked )--> ReadCoeffTokenDone;
