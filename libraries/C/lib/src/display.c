@@ -275,7 +275,10 @@ void display_initialize(unsigned int fifo_B_id, unsigned int fifo_WIDTH_id, unsi
 	fifo_display_B_id = fifo_B_id; 
 	fifo_display_WIDTH_id = fifo_WIDTH_id; 
 	fifo_display_HEIGHT_id = fifo_HEIGHT_id;
-	display_init();
+
+	if (!init) {
+		display_init();
+	}
 }
 
 
