@@ -42,7 +42,7 @@ struct schedinfo_s {
 
 // declare FIFO with a size equal to (size)
 #define DECLARE_FIFO(type, size, count, readersnb) static type array_##count[(size) + 1]; \
-static int read_inds_##count[readersnb] = {0}; \
+static unsigned int read_inds_##count[readersnb] = {0}; \
 static struct FIFO_S(type) fifo_##count = { (size) + 1, array_##count, readersnb, read_inds_##count, 0 };
 
 #define FIFO_CLEAR(T) FIFO_CLEAR_EXPAND(T)
