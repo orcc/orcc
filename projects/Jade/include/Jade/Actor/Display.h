@@ -168,10 +168,10 @@ private:
 static void set_video(void* ptrDisplay, int width, int height){
 	Display* display = (Display*) ptrDisplay;
 	display->setSize(width, height);
-};
+}
 
 static void write_mb(void* ptrDisplay, unsigned char* tokens) {
 	Display* display = (Display*) ptrDisplay;
 	display->display_write_mb(tokens);
-};
+}
 #endif

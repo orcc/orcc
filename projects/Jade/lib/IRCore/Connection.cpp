@@ -100,7 +100,7 @@ void Connection::setFifo(AbstractFifo* fifo){
 	GlobalVariable* fifoGV = fifo->getGV();
 	srcVar->setInitializer(fifoGV);
 	dstVar->setInitializer(fifoGV);
-};
+}
 
 void Connection::unsetFifo(){
 	//Get GV of the port

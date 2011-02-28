@@ -76,6 +76,6 @@ private:
 static void get_src(void* ptrSource, unsigned char* tokens, int nbTokens) {
 	Source* source = (Source*) ptrSource;
 	source->source_get_src(tokens, nbTokens);
-};
+}
 
 #endif

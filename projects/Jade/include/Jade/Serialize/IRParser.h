@@ -182,7 +182,7 @@ private:
 	 *
 	 * @return the coresponding Expression.
 	 */
-	Expr* IRParser::parseExpr(llvm::MDNode* node);
+	Expr* parseExpr(llvm::MDNode* node);
 
 	/**
 	 * @brief Parses a list of Port

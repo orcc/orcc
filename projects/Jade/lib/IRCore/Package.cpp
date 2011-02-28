@@ -51,4 +51,4 @@ void Package::getAllUnderneathActors(std::map<std::string, Actor*>* underneathAc
 		Package* child = it->second;
 		child->getAllUnderneathActors(underneathActors);
 	}
-};
+}
