@@ -100,7 +100,7 @@ NetworkInputFanoutInstantiation(network) ::=<<
 
 printNetworkFanOutInputInstantiation(port) ::=<<
 f_ni_<port.name> : entity SystemBuilder.Fanout( behavioral )
-generic map ( fanout =\> <network.inputNumberOfReadersMap.(port)>, width =\> <if(port.type.size)><port.type.size><else>1<endif> )
+generic map ( fanout =\> <network.templateData.countNetwokPortBroadcastMap.(port)>, width =\> <if(port.type.size)><port.type.size><else>1<endif> )
 port map (
 <if(port.type.bool)>
 	In_DATA(0) =\> ni_<port.name>_DATA,
@@ -159,7 +159,7 @@ Out_<name> =\> <type>_<target.id>_<port>_<name>,
 >>
 
 printAssignIn(name,type,source,port) ::= <<
-In_<name> =\> <type>_<source.id>_<sourcePort.name>_<name>( <if(network.countBroadcastConnectionMap.(edge))><network.countBroadcastConnectionMap.(edge)><else>0<endif> ),
+In_<name> =\> <type>_<source.id>_<port.name>_<name>( <if(network.countBroadcastConnectionsMap.(edge))><network.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
 >>
 
 printAssignInstatiationIn(type,target,port) ::= <<
@@ -177,7 +177,7 @@ printAssignInstatiationOut(type,source,port) ::= <<
 <if(port.type.bool)>
 	In_DATA(0) =\> <type>_<source.id>_<port.name>_DATA,
 <else>
-	In_DATA =\> <type>_<source.id>_<sourcePort.name>_DATA,
+	In_DATA =\> <type>_<source.id>_<port.name>_DATA,
 <endif>
 	<printAssignIn("SEND",type,source,port)>
 	<printAssignIn("ACK",type,source,port)>
@@ -347,10 +347,10 @@ signal nif_<port.name>_DATA : std_logic;
 <else>
 signal nif_<port.name>_DATA : std_logic_vector(<port.type.size> - 1 downto 0);
 <endif> 
-signal nif_<port.name>_SEND : std_logic_vector(<if(network.countNetwokPortBroadcastMap.(port))><network.countNetwokPortBroadcastMap.(port)><else>1<endif> - 1 downto 0);
-signal nif_<port.name>_ACK : std_logic_vector(<if(network.countNetwokPortBroadcastMap.(port))><network.countNetwokPortBroadcastMap.(port)><else>1<endif> - 1 downto 0);
+signal nif_<port.name>_SEND : std_logic_vector(<if(network.templateData.countNetwokPortBroadcastMap.(port))><network.templateData.countNetwokPortBroadcastMap.(port)><else>1<endif> - 1 downto 0);
+signal nif_<port.name>_ACK : std_logic_vector(<if(network.templateData.countNetwokPortBroadcastMap.(port))><network.templateData.countNetwokPortBroadcastMap.(port)><else>1<endif> - 1 downto 0);
 signal nif_<port.name>_COUNT : std_logic_vector(15 downto 0);
-signal nif_<port.name>_RDY : std_logic_vector(<if(network.countNetwokPortBroadcastMap.(port))><network.countNetwokPortBroadcastMap.(port)><else>1<endif> - 1 downto 0);<\n>
+signal nif_<port.name>_RDY : std_logic_vector(<if(network.templateData.countNetwokPortBroadcastMap.(port))><network.templateData.countNetwokPortBroadcastMap.(port)><else>1<endif> - 1 downto 0);<\n>
 
 >>
 

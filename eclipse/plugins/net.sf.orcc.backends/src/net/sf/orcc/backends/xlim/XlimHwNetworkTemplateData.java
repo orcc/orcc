@@ -30,6 +30,7 @@
 package net.sf.orcc.backends.xlim;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -107,15 +108,26 @@ public class XlimHwNetworkTemplateData {
 	 */
 
 	public void computeActorOutputPortBroadcast(Network network) {
-		/*
-		 * Set<Vertex> graphVertex = network.getGraph().vertexSet();
-		 * 
-		 * for (Vertex vertex : graphVertex) { if (vertex.isInstance()) {
-		 * Set<Connection> connections = network.getGraph()
-		 * .outgoingEdgesOf(vertex); Map<Port, List<Connection>> outgoing = new
-		 * HashMap<Port, List<Connection>>(); for (Connection connection :
-		 * connections) { Port source = connection.getSource(); } } }
-		 */
+
+		Set<Vertex> graphVertex = network.getGraph().vertexSet();
+
+		for (Vertex vertex : graphVertex) {
+			if (vertex.isInstance()) {
+				Map<Port, List<Connection>> outgoing = new HashMap<Port, List<Connection>>();
+				for (Connection connection : network.getGraph()
+						.outgoingEdgesOf(vertex)) {
+					Port source = connection.getSource();
+					List<Connection> conns = outgoing.get(source);
+					int cp = 0;
+					if (conns != null) {
+						for (Connection conx : conns) {
+							countBroadcastConnectionsMap.put(conx, cp++);
+						}
+					}
+				}
+			}
+		}
+
 	}
 
 	/**
