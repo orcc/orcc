@@ -90,7 +90,8 @@ finished:
 <endif>
 void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int fifo_<port>_id}; separator=", ">) {
 	<if(instance.actor.initializes)>
-	struct schedinfo_s *si = NULL;
+	struct schedinfo_s si;
+	si.num_firings = 0;
 	<endif>
 	<if(instance.actor.actionScheduler.fsm)>
 	
@@ -106,7 +107,7 @@ void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int
 	<if(instance.actor.initializes)>
 	
 	/* Launch CAL initialize procedure */
-	initialize(si);
+	initialize(&si);
 	<endif>
 }
 >>
