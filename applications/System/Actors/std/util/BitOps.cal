@@ -10,6 +10,7 @@ unit BitOps :
 	function bitor(int a, int b) --> int : a | b end
 	function rshift(int a, int b) --> int : a >> b end
 	function lshift(int a, int b) --> int : a << b end
+	function bitnot(int a) --> int : -(a) end
     /**
 	 * select one bit from an integer
 	 */
