@@ -90,7 +90,7 @@ finished:
 <endif>
 void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int fifo_<port>_id}; separator=", ">) {
 	<if(instance.actor.initializes)>
-	struct schedinfo_s *si;
+	struct schedinfo_s *si = NULL;
 	<endif>
 	<if(instance.actor.actionScheduler.fsm)>
 	
