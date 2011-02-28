@@ -168,6 +168,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	private void doTransformNetwork(Network network) {
 		XlimHwNetworkTemplateData data = new XlimHwNetworkTemplateData();
+		network.computeTemplateMaps();
 		data.computeTemplateMaps(network);
 		network.setTemplateData(data);
 	}

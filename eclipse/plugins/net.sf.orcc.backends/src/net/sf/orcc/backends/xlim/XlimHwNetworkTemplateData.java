@@ -36,6 +36,7 @@ import java.util.Set;
 
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.util.OrderedMap;
@@ -108,24 +109,16 @@ public class XlimHwNetworkTemplateData {
 	 */
 
 	public void computeActorOutputPortBroadcast(Network network) {
-
-		Set<Vertex> graphVertex = network.getGraph().vertexSet();
-
-		for (Vertex vertex : graphVertex) {
-			if (vertex.isInstance()) {
-				Map<Port, List<Connection>> outgoing = new HashMap<Port, List<Connection>>();
-				for (Connection connection : network.getGraph()
-						.outgoingEdgesOf(vertex)) {
-					Port source = connection.getSource();
-					List<Connection> conns = outgoing.get(source);
-					int cp = 0;
-					if (conns != null) {
-						for (Connection conx : conns) {
-							countBroadcastConnectionsMap.put(conx, cp++);
-						}
-					}
+		Map<Instance, Map<Port, List<Connection>>> val = network
+				.getOutgoingMap();
+		for (Map<Port, List<Connection>> entry : val.values()) {
+			for (List<Connection> ports : entry.values()) {
+				int cp = 0;
+				for (Connection connection : ports) {
+					countBroadcastConnectionsMap.put(connection, cp++);
 				}
 			}
+
 		}
 
 	}
