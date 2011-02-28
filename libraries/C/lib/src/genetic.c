@@ -415,14 +415,18 @@ void *monitor(void *data) {
 		}
 		backup_partial_end_info();
 
-		population->individuals[evalIndNb]->fps = compute_partial_fps();
-		printf("Evaluation of mapping %i = %f fps", evalIndNb,
-				population->individuals[evalIndNb]->fps);
-		if (population->individuals[evalIndNb]->old_fps == -1) {
-			printf("\n");
+		if (is_timeout()) {
+			printf("Evaluation of mapping %i = TIMEOUT\n", evalIndNb);
 		} else {
-			printf(" (old = %f fps)\n",
-					population->individuals[evalIndNb]->old_fps);
+			population->individuals[evalIndNb]->fps = compute_partial_fps();
+			printf("Evaluation of mapping %i = %f fps", evalIndNb,
+					population->individuals[evalIndNb]->fps);
+			if (population->individuals[evalIndNb]->old_fps == -1) {
+				printf("\n");
+			} else {
+				printf(" (old = %f fps)\n",
+						population->individuals[evalIndNb]->old_fps);
+			}
 		}
 
 		evalIndNb++;
@@ -445,7 +449,7 @@ void *monitor(void *data) {
 		initialize_instances();
 	}
 	monitoring->sync->active_sync = 0;
-	write_better_mapping(population, monitoring->genetic_info);
+	//write_better_mapping(population, monitoring->genetic_info);
 	//active_fps_printing();
 
 	for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
