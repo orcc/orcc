@@ -123,7 +123,6 @@ public class Multi2MonoToken extends ActionSplitter {
 				store.setTarget(tab);
 			}
 		}
-
 	}
 
 	private Action done;
@@ -141,6 +140,7 @@ public class Multi2MonoToken extends ActionSplitter {
 	private boolean repeatInput = false;
 
 	private Action store;
+
 
 	/**
 	 * This method creates an action with the given name.
@@ -208,9 +208,9 @@ public class Multi2MonoToken extends ActionSplitter {
 				String listName = action.getName() + "NewStoreList"
 						+ inputIndex;
 				GlobalVariable tab = createTab(listName, numTokens, entryType);
-
 				store = createStoreAction(action.getName(), numTokens, port,
 						counter, tab);
+				store.getInputPattern().put(port, 1);
 				done = createDoneAction(action.getName(), counter, numTokens);
 				process = createProcessAction(action);
 
@@ -313,7 +313,6 @@ public class Multi2MonoToken extends ActionSplitter {
 	private Action createStoreAction(String actionName, int numTokens,
 			Port port, GlobalVariable readCounter, GlobalVariable storeList) {
 		String storeName = actionName + port.getName() + "_NewStore";
-
 		Expression guardValue = new IntExpr(numTokens);
 		Expression counterExpression = new VarExpr(new Use(readCounter));
 		Expression expression = new BinaryExpr(counterExpression, BinaryOp.LT,
