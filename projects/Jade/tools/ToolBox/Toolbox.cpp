@@ -138,6 +138,7 @@ static cl::opt<bool>
 DisableInternalize("disable-internalize",
                    cl::desc("Do not mark all symbols as internal"));
 
+
 //This part is taken as it is from opt tool of LLVM
 inline void addPass(PassManagerBase &PM, Pass *P) {
   // Add the pass to the pass manager...
@@ -325,34 +326,43 @@ void opt(string file, Module* M){
   Out.close();
 }
 
-void createArchives(map<string,Module*>* modules){
+string getFirstFolder(string name){
+	int index = name.find('/');
+
+	if (index == string::npos)
+		return "";
+
+	return name.substr(0, index);
+}
+
+void createArchives(map<sys::Path,string>* filesPath){
 	map<string,Archive*> archives;
 	map<string,Archive*>::iterator itArchive;
-	map<string,Module*>::iterator itModule;
+	map<sys::Path,string>::iterator itPaths;
 	LLVMContext &Context = getGlobalContext();
-	std::string errorMsg;
+	std::string errorMsg;	
 	
-	for (itModule = modules->begin(); itModule != modules->end(); itModule++){
+	for (itPaths = filesPath->begin(); itPaths != filesPath->end(); itPaths++){
 		Archive* archive;
-		string firstPackage = PackageMng::getFirstPackage(itModule->first);
 
-		itArchive = archives.find(firstPackage);
+		itArchive = archives.find(itPaths->second);
 	
 		// Create a new archive
 		if(itArchive == archives.end()){
-			sys::Path ArchivePath(LibraryFolder + firstPackage+ ".a");
+			sys::Path ArchivePath(LibraryFolder + itPaths->second + ".a");
 			archive = Archive::CreateEmpty(ArchivePath, Context);
-			archives.insert(pair<string,Archive*>(firstPackage, archive));
+			archives.insert(pair<string,Archive*>(itPaths->second, archive));
+
 		}else{
 			archive = itArchive->second;
 		}
 		
 		// Insert actor in archive
-		sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(itModule->first));
-		archive->addFileBefore(fullFilePath, archive->end(), &errorMsg);
+		//sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(itPaths->first));
+		archive->addFileBefore(itPaths->first, archive->end(), &errorMsg);
 
 		if (errorMsg != "")
-			cerr <<"Error when insert actor "<< itModule->first <<" in archive\n";
+			cerr <<"Error when insert actor "<< itPaths->first.c_str() <<" in archive\n";
 	}
 
 	// Write archives to the disk
@@ -360,14 +370,45 @@ void createArchives(map<string,Module*>* modules){
 		itArchive->second->writeToDisk(true, false, true, &errorMsg);
 		if (errorMsg != "")
 			cerr <<"Error when creat "<< itArchive->first << ".a\n";
+	}
 
-		// Erase all initial files
-		sys::Path erasePath(LibraryFolder + itArchive->first);
+	// Erase all initial files
+	cl::list<string>::iterator itFile;
+
+	for (itFile=ActorFiles.begin() ; itFile != ActorFiles.end(); itFile++){
+		sys::Path erasePath(LibraryFolder + *itFile);
 		erasePath.eraseFromDisk(true,&errorMsg);
 		if (errorMsg != "")
 			cerr <<"Error when erase the directory"<< erasePath.str() << "\n";
 	}
 }
+
+void recurseMapDirectories(const sys::Path& path, string name, map<sys::Path,string>& result) {
+	string errorMsg;
+	result.clear();
+	set<sys::Path> content;
+	if (path.getDirectoryContents(content, &errorMsg))
+		if (errorMsg != "")
+			cerr <<"Recurse directory error\n";
+
+	std::set<sys::Path>::iterator I;
+	for (I = content.begin() ; I != content.end() ; ++I) {
+		// Make sure it exists and is a directory
+		sys::PathWithStatus PwS(*I);
+		const sys::FileStatus *Status = PwS.getFileStatus(false, &errorMsg);
+		if (errorMsg != "")
+			cerr <<"Recurse directory error\n";
+
+		if (Status->isDir) {
+			map<sys::Path,string> moreResults;
+			recurseMapDirectories(*I, name, moreResults);
+			result.insert(moreResults.begin(), moreResults.end());
+		} else {
+			result.insert(result.begin(), pair<sys::Path,string>(*I,name));
+		}
+	}
+}
+
 
 //main function of Jade toolbox
 int main(int argc, char **argv) {
@@ -385,39 +426,65 @@ int main(int argc, char **argv) {
 	//Verify options
 	OptionMng::setDirectory(&LibraryFolder);
 
-	//Parsing files
+	// Build files Path
+	map<sys::Path,string> filesPath;
 	cl::list<string>::iterator itFile;
-	map<string,Module*> modules;
 
-	for (itFile=ActorFiles.begin() ; itFile != ActorFiles.end(); itFile++){	
-		//Iterate though all actors to parse
-		sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(*itFile));
+	for (itFile=ActorFiles.begin() ; itFile != ActorFiles.end(); itFile++){
+		sys::Path fullFilePath(LibraryFolder + *itFile);
 
 		if (!fullFilePath.exists()){
-			cerr <<"Actor "<< itFile->c_str() << " not found.\n";
+			cerr << "File does not exist: " << itFile->c_str();
+			continue;
+		}
+
+		sys::PathWithStatus PwS(fullFilePath);
+		const sys::FileStatus *si = PwS.getFileStatus(false);
+		if (!si){
+	        cerr << "Can not find statut (file or directory) of " << itFile->c_str();
+			continue;
+		}
+
+		if (si->isDir) {
+			map<sys::Path,string> dirPaths;
+			recurseMapDirectories(fullFilePath, itFile->c_str(), dirPaths);
+			filesPath.insert(dirPaths.begin(),dirPaths.end());
+		} else {
+			filesPath.insert(pair<sys::Path,string>(fullFilePath,itFile->c_str()));
+		}
+	}
+
+	//Parsing files
+	map<sys::Path,string>::iterator itPath;
+	map<string,Module*> modules;
+
+	for (itPath = filesPath.begin() ; itPath != filesPath.end(); itPath++){	
+		//Iterate though all actors to parse
+		if (!itPath->first.exists()){
+			cerr <<"Actor "<< itPath->first.c_str() << " not found.\n";
 			continue;
 		}
 
 		//Parse IR file
-		Module* mod = ParseIRFile(fullFilePath.c_str(), Err, Context);
+		Module* mod = ParseIRFile(itPath->first.c_str(), Err, Context);
 
 		if (mod == NULL){
-			cerr <<"Error when parsing "<< itFile->c_str() << ".\n";
+			cerr <<"Error when parsing "<< itPath->first.c_str() << ".\n";
 			continue;
 		}
 
 		//Store results
-		modules.insert(pair<string,Module*>(*itFile, mod));
+		modules.insert(pair<string,Module*>(itPath->first.c_str(), mod));
 	}
 
 	//Make optimizations
 	map<string,Module*>::iterator itModule;
 	for (itModule=modules.begin() ; itModule != modules.end(); itModule++){
-		opt(LibraryFolder + PackageMng::getFolder(itModule->first), itModule->second);
+		opt(itModule->first, itModule->second);
 	}
 
 	if(OutputArchive){
-		createArchives(&modules);
+		createArchives(&filesPath);
 	}
 	
 }
