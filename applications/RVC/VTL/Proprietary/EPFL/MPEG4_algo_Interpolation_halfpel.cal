@@ -17,6 +17,8 @@
 
 package Proprietary.EPFL;
 
+import std.util.BitOps.*;
+
 actor MPEG4_algo_Interpolation_halfpel () int(size=PIX_SZ) RD,
 int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
 

@@ -1,5 +1,7 @@
 package Proprietary.EPFL;
 
+import std.util.BitOps.*;
+
 actor MPEG4_algo_DCRinvpred (int NEWVOP,
 	int INTRA,
 	int INTER,
