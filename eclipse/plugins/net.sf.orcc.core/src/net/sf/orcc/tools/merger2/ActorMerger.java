@@ -35,16 +35,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.serialize.IRCloner;
-import net.sf.orcc.ir.transformations.RenameTransformation;
+import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.MoC;
 import net.sf.orcc.util.MultiMap;
 import net.sf.orcc.util.OrderedMap;
 
@@ -57,105 +67,44 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class ActorMerger {
 
-	/**
-	 * This class defines a transformation that rename all possible conflicts
-	 * between the composite actor and the candidate to merge with.
-	 * 
-	 * @author Jerome Gorin
-	 * 
-	 */
-	private class ResolveConflictName extends AbstractActorVisitor {
-		private OrderedMap<String, Procedure> refProcs;
-
-		public ResolveConflictName() {
-			this.refProcs = new OrderedMap<String, Procedure>();
-			replacementMap = new HashMap<String, String>();
-
-			// Store all procedure names of the composite actor
-			refProcs.putAll(procs);
-			getProcedures(actions);
-			getProcedures(initializes);
+	private class InternalizeFifoAccess extends AbstractActorVisitor {
+		private Port port;
+		private GlobalVariable variable;
+		
+		public InternalizeFifoAccess(Port port, GlobalVariable variable){
+			this.port = port;
+			this.variable = variable;
 		}
-
-		private void compareVariables(
-				OrderedMap<String, GlobalVariable> refVariables,
-				OrderedMap<String, GlobalVariable> variables) {
-			for (Variable variable : variables) {
-				String name = variable.getName();
-
-				// Check if Global variable name is already used in the
-				// reference actor
-				if (refVariables.contains(name)) {
-					// Name is used set a unique index to the name
-					int index = 0;
-
-					while (refVariables.contains(name + index)) {
-						index++;
-					}
-
-					// Store result in replacement map
-					replacementMap.put(name, name + index);
-				}
-			}
-		}
-
-		private void getProcedures(List<Action> actions) {
-			for (Action action : actions) {
-				// Get all procedures contain in an action
-				Procedure scheduler = action.getScheduler();
-				Procedure body = action.getBody();
-				procs.put(scheduler.getName(), scheduler);
-				procs.put(body.getName(), body);
-			}
-		}
-
-		public void resolve(Actor actor) {
-			// Check conflicts on global variables
-			compareVariables(parameters, actor.getParameters());
-			compareVariables(stateVars, actor.getStateVars());
-
-			// Check all procedures
-			visit(actor);
-
-			if (!replacementMap.isEmpty()) {
-				// Rename all conflicts founds
-				new RenameTransformation(replacementMap).visit(actor);
-			}
-		}
-
+		
 		@Override
-		public void visit(Procedure procedure) {
-			String name = procedure.getName();
-
-			// Check if procedure name is already used in the reference actor
-			if (refProcs.contains(name)) {
-				// Name is used set a unique index to the name
-				int index = 0;
-
-				while (refProcs.contains(name + index)) {
-					index++;
-				}
-
-				// Store result in replacement map
-				replacementMap.put(name, name + index);
-			}
+		public void visit(Write write) {
 		}
-
+		
+		@Override
+		public void visit(Peek peek) {
+		}
+		
+		@Override
+		public void visit(Read read) {
+		}
 	}
-
+	
+	
 	private List<Action> actions;
+	private Actor composite;
 	private List<Action> initializes;
 	private MultiMap<Actor, Port> inputs;
 	private MultiMap<Actor, Port> outputs;
+	private Map<Port, GlobalVariable> internalize;
+	
 	private OrderedMap<String, GlobalVariable> parameters;
 	private OrderedMap<String, Procedure> procs;
-	private Map<String, String> replacementMap;
 	private ActionScheduler scheduler;
-
 	private OrderedMap<String, GlobalVariable> stateVars;
 
 	public ActorMerger(MultiMap<Actor, Port> inputs,
 			MultiMap<Actor, Port> outputs) {
+		this.internalize = new HashMap<Port, GlobalVariable>();
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.parameters = new OrderedMap<String, GlobalVariable>();
@@ -163,23 +112,95 @@ public class ActorMerger {
 		this.procs = new OrderedMap<String, Procedure>();
 		this.initializes = new ArrayList<Action>();
 		this.actions = new ArrayList<Action>();
-	}
-
-	public void add(Actor candidate) {
-		// Clone the actor so to isolate transformations from another possible
-		// instance of this actor
-		Actor clone = new IRCloner(candidate).clone();
-
-		// Resolve potential conflict in names
-		new ResolveConflictName().resolve(clone);
-	}
-
-	public Actor getComposite() {
-		return new Actor("", "", parameters, getPorts(inputs),
+		this.scheduler = new ActionScheduler(actions, null);
+		this.composite = new Actor("", "", parameters, getPorts(inputs),
 				getPorts(outputs), false, stateVars, procs, actions,
 				initializes, scheduler);
 	}
 
+	public void add(Actor candidate, int rate) {
+		// Clone the actor so as to isolate transformations on other
+		// instance of this actor
+		Actor clone = new IRCloner(candidate).clone();
+
+		// Resolve potential conflict in names
+		new ConflictSolver(composite).resolve(clone);
+
+		//Internalize ports not define as extern in composite actor
+		InternalizeInputs(candidate, rate);
+		InternalizeOutputs(candidate, rate);
+		
+		// Add all properties
+		parameters.putAll(clone.getParameters());
+		stateVars.putAll(clone.getStateVars());
+		procs.putAll(clone.getProcs());
+		actions.addAll(clone.getActions());
+		initializes.addAll(clone.getInitializes());
+		
+		//Merge scheduler
+		mergeScheduler(candidate.getActionScheduler(), rate);
+	}
+
+	public Actor getComposite() {
+		return composite;
+	}
+	
+	private void internalizePort(Port port, int tokenSize, Actor candidate){
+		//Check if this port has not been internalize before
+		GlobalVariable portVar;
+		
+		if (internalize.containsKey(port)){
+			portVar = internalize.get(port);
+		}else{
+			//Port has never been internalize, create a new one
+			TypeList typeList = IrFactory.eINSTANCE.createTypeList(tokenSize, port.getType());	
+			portVar = new GlobalVariable(new Location(), typeList, port.getName(), true);
+			
+			stateVars.put(portVar.getName(), portVar);
+		}
+		
+		new InternalizeFifoAccess(port, portVar).visit(candidate);
+	}
+	
+	private void InternalizeOutputs(Actor candidate, int rate){
+		//Get MoC of the current candidate to define the size of the state variable required
+		//TODO: extend to QSDF
+		CSDFMoC moc = (CSDFMoC)candidate.getMoC();
+		
+		for (Port port : candidate.getOutputs()){
+			//Check if the current is external from the composite actor
+			if (outputs.containsKey(candidate)){
+				Collection<Port> externPorts = outputs.get(candidate);
+				if(externPorts.contains(port)){
+					//Port is external
+					continue;
+				}
+			}
+			
+			internalizePort(port, rate * moc.getNumTokensProduced(port), candidate);
+		}
+	}
+	
+	private void InternalizeInputs(Actor candidate, int rate){
+		//Get MoC of the current candidate to define the size of the state variable required
+		//TODO: extend to QSDF
+		CSDFMoC moc = (CSDFMoC)candidate.getMoC();
+		
+		for (Port port : candidate.getInputs()){
+			//Check if the current is external from the composite actor
+			if (inputs.containsKey(candidate)){
+				Collection<Port> externPorts = inputs.get(candidate);
+				if(externPorts.contains(port)){
+					//Port is external
+					continue;
+				}
+			}
+			
+			internalizePort(port, rate * moc.getNumTokensConsumed(port), candidate);
+		}
+	}
+
+	
 	private OrderedMap<String, Port> getPorts(MultiMap<Actor, Port> ports) {
 		OrderedMap<String, Port> orderPorts = new OrderedMap<String, Port>();
 
@@ -190,6 +211,51 @@ public class ActorMerger {
 		}
 
 		return orderPorts;
+	}
+
+	public void mergeFSM(FSM candidate, int rate) {
+		FSM fsm = scheduler.getFsm();
+
+		for (int i = 0; i < rate; i++) {
+			for (Transition transition : candidate.getTransitions()) {
+				// Add source state
+				String source = transition.getSourceState().getName() + i;
+				fsm.addState(source);
+
+				for (NextStateInfo nextState : transition.getNextStateInfo()) {
+					// Add transition
+					String target = nextState.getTargetState().getName() + i;
+					fsm.addState(target);
+
+					fsm.addTransition(source, nextState.getAction(), target);
+				}
+			}
+		}
+	}
+
+	
+	public void mergeScheduler(ActionScheduler candidate, int rate) {
+		List<Action> actions = scheduler.getActions();
+
+		//Add all actions outside an fsm
+		for (int i = 0; i < rate; i++) {
+			actions.addAll(candidate.getActions());
+		}
+
+		if (candidate.getFsm() == null) {
+			// Candidate has no FSM, merging is finished
+			return;
+		}
+
+		if (scheduler.hasFsm()) {
+			// Composite actor has already an FSM
+			mergeFSM(candidate.getFsm(), rate);
+		} else if (candidate.hasFsm()) {
+			// Composite actor has no FSM, take the FSM from candidate
+			FSM fsm = candidate.getFsm();
+			scheduler.setFsm(fsm);
+			mergeFSM(candidate.getFsm(), rate - 1);
+		}
 	}
 
 }

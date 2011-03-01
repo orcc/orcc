@@ -109,8 +109,8 @@ public class IRCloner {
 	private static class ExpressionCloner implements ExpressionInterpreter {
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
-			BinaryOp op = BinaryOp.getOperator(expr.getOp().name());
+		public Object interpret(BinaryExpr expr, Object... args) {			
+			BinaryOp op = BinaryOp.getOperator(expr.getOp().getText());
 			Expression e1 = cloneExpression(expr.getE1());
 			Expression e2 = cloneExpression(expr.getE2());
 			Type type = cloneType(expr.getType());
@@ -150,7 +150,7 @@ public class IRCloner {
 
 		@Override
 		public Object interpret(UnaryExpr expr, Object... args) {
-			UnaryOp op = UnaryOp.getOperator(expr.getOp().name());
+			UnaryOp op = UnaryOp.getOperator(expr.getOp().getText());
 			Expression expression = cloneExpression(expr.getExpr());
 			Type type = cloneType(expr.getType());
 

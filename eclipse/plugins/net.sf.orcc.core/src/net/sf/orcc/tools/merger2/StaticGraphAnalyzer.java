@@ -393,7 +393,7 @@ public class StaticGraphAnalyzer {
 	 * @param dstVertex
 	 *            : the corresponding vertex
 	 */
-	public void mergeVertices(List<Vertex> srcVertices, Vertex dstVertex) {
+	public void mergeVertices(Set<Vertex> srcVertices, Vertex dstVertex) {
 		// Add the destination vertex in network
 		addVertex(dstVertex);
 
@@ -474,7 +474,7 @@ public class StaticGraphAnalyzer {
 		staticEdge.setTargetRate(consumption);
 	}
 
-	private void updateNetwork(List<Vertex> srcVertices, Vertex dstVertex) {
+	private void updateNetwork(Set<Vertex> srcVertices, Vertex dstVertex) {
 		MultiMap<Vertex, Connection> srcConnections = new MultiMap<Vertex, Connection>();
 		MultiMap<Vertex, Connection> dstConnections = new MultiMap<Vertex, Connection>();
 

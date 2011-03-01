@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.tools.merger2;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Network;
@@ -59,19 +59,23 @@ public class NetworkMerger implements INetworkTransformation {
 
 		// Merger simple cases
 		while (staticGraph.hasSinglyConnectedVertex()) {
-			List<Vertex> vertices = new ArrayList<Vertex>();
+			Map<Vertex, Integer> vertices = new HashMap<Vertex, Integer>();
 
 			// Get an Instance to merge
 			Vertex vertex1 = staticGraph.getSinglyConnectedVertex().get(0);
 			Vertex vertex2 = staticGraph.getStaticNeighbors(vertex1).get(0);
 
+			//Get rate of each vertex
+			int sourceRate = staticGraph.getSourceRate(vertex1, vertex2);
+			int targetRate = staticGraph.getTargetRate(vertex1, vertex2);
+			
 			// Create list of instance to merge
-			vertices.add(vertex1);
-			vertices.add(vertex2);
+			vertices.put(vertex1, sourceRate);
+			vertices.put(vertex2, targetRate);
 
 			// Transform network
 			Vertex mergedVertex = merger.getEquivalentVertices(vertices);
-			staticGraph.mergeVertices(vertices, mergedVertex);
+			staticGraph.mergeVertices(vertices.keySet(), mergedVertex);
 		}
 	}
 

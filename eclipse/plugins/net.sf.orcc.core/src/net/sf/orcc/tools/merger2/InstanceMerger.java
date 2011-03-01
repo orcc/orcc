@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.tools.merger2;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.orcc.ir.Actor;
@@ -59,21 +59,25 @@ public class InstanceMerger {
 	int nMerged;
 
 	public InstanceMerger(Network network) {
-		nMerged = 0;
-		graph = network.getGraph();
+		this.nMerged = 0;
+		this.graph = network.getGraph();
 	}
 
-	public Vertex getEquivalentVertices(List<Vertex> vertices) {
+	public Vertex getEquivalentVertices(Map<Vertex, Integer> verticesRate) {
+		// Get the set of vertex to process
+		Set<Vertex> vertices = verticesRate.keySet();
+
 		// Create a composite actor
 		MultiMap<Actor, Port> extInput = getExtInput(vertices);
 		MultiMap<Actor, Port> extOutput = getExtOutput(vertices);
 
 		actorMerger = new ActorMerger(extInput, extOutput);
 
-		for (Vertex vertex : vertices) {
+		for (Entry<Vertex, Integer> entry : verticesRate.entrySet()) {
+			Vertex vertex = entry.getKey();
 			Instance instance = vertex.getInstance();
 
-			actorMerger.add(instance.getActor());
+			actorMerger.add(instance.getActor(), entry.getValue());
 		}
 
 		// Create the merged instance
@@ -88,7 +92,7 @@ public class InstanceMerger {
 		return new Vertex(compositeInst);
 	}
 
-	private MultiMap<Actor, Port> getExtInput(List<Vertex> vertices) {
+	private MultiMap<Actor, Port> getExtInput(Set<Vertex> vertices) {
 		MultiMap<Actor, Port> inputs = new MultiMap<Actor, Port>();
 
 		for (Vertex vertex : vertices) {
@@ -110,7 +114,7 @@ public class InstanceMerger {
 		return inputs;
 	}
 
-	private MultiMap<Actor, Port> getExtOutput(List<Vertex> vertices) {
+	private MultiMap<Actor, Port> getExtOutput(Set<Vertex> vertices) {
 		MultiMap<Actor, Port> outputs = new MultiMap<Actor, Port>();
 
 		for (Vertex vertex : vertices) {
@@ -131,7 +135,7 @@ public class InstanceMerger {
 		return outputs;
 	}
 
-	private void putAttributes(Instance instance, List<Vertex> vertices) {
+	private void putAttributes(Instance instance, Set<Vertex> vertices) {
 		Map<String, IAttribute> attributes = instance.getAttributes();
 
 		for (Vertex vertex : vertices) {
