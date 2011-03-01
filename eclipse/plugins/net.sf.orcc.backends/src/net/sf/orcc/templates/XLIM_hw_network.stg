@@ -495,7 +495,7 @@ printInsancesName(instance) ::=<<
 network(debugFifos, fifoSize, network, options) ::= <<
 <printNetworkInformation(network)>
 
-library ieee, SystemBuilder;
+library ieee, SystemBuilder, openForge;
 use ieee.std_logic_1164.all;
 
 -- ----------------------------------------------------------------------------------
