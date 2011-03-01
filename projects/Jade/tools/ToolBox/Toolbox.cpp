@@ -326,14 +326,6 @@ void opt(string file, Module* M){
   Out.close();
 }
 
-string getFirstFolder(string name){
-	int index = name.find('/');
-
-	if (index == string::npos)
-		return "";
-
-	return name.substr(0, index);
-}
 
 void createArchives(map<sys::Path,string>* filesPath){
 	map<string,Archive*> archives;
@@ -358,7 +350,6 @@ void createArchives(map<sys::Path,string>* filesPath){
 		}
 		
 		// Insert actor in archive
-		//sys::Path fullFilePath(LibraryFolder + PackageMng::getFolder(itPaths->first));
 		archive->addFileBefore(itPaths->first, archive->end(), &errorMsg);
 
 		if (errorMsg != "")
@@ -373,16 +364,19 @@ void createArchives(map<sys::Path,string>* filesPath){
 	}
 
 	// Erase all initial files
-	cl::list<string>::iterator itFile;
+	cl::list<string>::iterator itPack;
 
-	for (itFile=Packages.begin() ; itFile != Packages.end(); itFile++){
-		sys::Path erasePath(LibraryFolder + *itFile);
+	for (itPack=Packages.begin() ; itPack != Packages.end(); itPack++){
+		sys::Path erasePath(LibraryFolder + *itPack);
 		erasePath.eraseFromDisk(true,&errorMsg);
 		if (errorMsg != "")
 			cerr <<"Error when erase the directory"<< erasePath.str() << "\n";
 	}
 }
 
+// This function scans through the package and return all files in that directory (recursively) 
+// with for everyone the name of package. It uses the sys::Path::getDirectoryContent method 
+// to perform the actual directory scans.
 void recurseMapDirectories(const sys::Path& path, string name, map<sys::Path,string>& result) {
 	string errorMsg;
 	result.clear();
@@ -391,7 +385,7 @@ void recurseMapDirectories(const sys::Path& path, string name, map<sys::Path,str
 		if (errorMsg != "")
 			cerr <<"Recurse directory error\n";
 
-	std::set<sys::Path>::iterator I;
+	set<sys::Path>::iterator I;
 	for (I = content.begin() ; I != content.end() ; ++I) {
 		// Make sure it exists and is a directory
 		sys::PathWithStatus PwS(*I);
@@ -404,37 +398,20 @@ void recurseMapDirectories(const sys::Path& path, string name, map<sys::Path,str
 			recurseMapDirectories(*I, name, moreResults);
 			result.insert(moreResults.begin(), moreResults.end());
 		} else {
-			result.insert(result.begin(), pair<sys::Path,string>(*I,name));
+			result.insert(pair<sys::Path,string>(*I,name));
 		}
 	}
 }
 
-
-//main function of Jade toolbox
-int main(int argc, char **argv) {
-	LLVMContext &Context = getGlobalContext();
-
-	sys::PrintStackTraceOnErrorSignal();
-	PrettyStackTraceProgram X(argc, argv);
-
-	SMDiagnostic Err;
-	cl::ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
-	
-	InitializeNativeTarget();
-	
-
-	//Verify options
-	OptionMng::setDirectory(&LibraryFolder);
-
-	// Build files Path
-	map<sys::Path,string> filesPath;
+void buildFilesPath(map<sys::Path,string>* filesPath){
 	cl::list<string>::iterator itPack;
 
 	for (itPack=Packages.begin() ; itPack != Packages.end(); itPack++){
 		sys::Path fullFilePath(LibraryFolder + *itPack);
 
+		// Make sure the package is valid and exist
 		if (!fullFilePath.exists()){
-			cerr << "File does not exist: " << itPack->c_str();
+			cerr << "Package does not exist: " << itPack->c_str();
 			continue;
 		}
 
@@ -445,20 +422,24 @@ int main(int argc, char **argv) {
 			continue;
 		}
 
+		// Create a path for all files in the package
 		if (si->isDir) {
 			map<sys::Path,string> dirPaths;
 			recurseMapDirectories(fullFilePath, itPack->c_str(), dirPaths);
-			filesPath.insert(dirPaths.begin(), dirPaths.end());
+			filesPath->insert(dirPaths.begin(), dirPaths.end());
 		} else {
-			filesPath.insert(pair<sys::Path,string>(fullFilePath, itPack->c_str()));
+			filesPath->insert(pair<sys::Path,string>(fullFilePath, itPack->c_str()));
 		}
 	}
+}
 
-	//Parsing files
+void parseFiles(map<sys::Path,string>* filesPath, map<string,Module*>* modules){
+	LLVMContext &Context = getGlobalContext();
+	
+	SMDiagnostic Err;
 	map<sys::Path,string>::iterator itPath;
-	map<string,Module*> modules;
-
-	for (itPath = filesPath.begin() ; itPath != filesPath.end(); itPath++){	
+	
+	for (itPath = filesPath->begin() ; itPath != filesPath->end(); itPath++){	
 		//Iterate though all actors to parse
 		if (!itPath->first.exists()){
 			cerr <<"Actor "<< itPath->first.c_str() << " not found.\n";
@@ -474,8 +455,29 @@ int main(int argc, char **argv) {
 		}
 
 		//Store results
-		modules.insert(pair<string,Module*>(itPath->first.c_str(), mod));
+		modules->insert(pair<string,Module*>(itPath->first.c_str(), mod));
 	}
+}
+
+//main function of Jade toolbox
+int main(int argc, char **argv) {
+	sys::PrintStackTraceOnErrorSignal();
+	PrettyStackTraceProgram X(argc, argv);
+
+	cl::ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
+	
+	InitializeNativeTarget();
+	
+	//Verify options
+	OptionMng::setDirectory(&LibraryFolder);
+
+	//Build files Path
+	map<sys::Path,string> filesPath;
+	buildFilesPath(&filesPath);
+
+	//Parsing files
+	map<string,Module*> modules;
+	parseFiles(&filesPath, &modules);
 
 	//Make optimizations
 	map<string,Module*>::iterator itModule;
@@ -483,8 +485,8 @@ int main(int argc, char **argv) {
 		opt(itModule->first, itModule->second);
 	}
 
+	//Create archives
 	if(OutputArchive){
 		createArchives(&filesPath);
 	}
-	
 }
