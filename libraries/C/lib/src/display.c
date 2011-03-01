@@ -31,7 +31,7 @@
 #include "orcc.h"
 #include "orcc_fifo.h"
 
-#define NO_DISPLAY
+//#define NO_DISPLAY
 
 #ifdef BENCHMARK
 #include <locale.h>
