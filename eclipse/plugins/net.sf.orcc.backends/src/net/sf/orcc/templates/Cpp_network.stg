@@ -56,13 +56,13 @@ doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 <if (source.actor)
 ><source.id>.connect(ACTOR_PORT_OUT, <source.actor.packageAsList; separator="::">::<source.actor.simpleName>_<sourcePort.name>, fifo_<count>);<
 else
-><source.id>.connect(ACTOR_PORT_OUT, <sourcePort.name>, fifo_<count>);<
+><source.id>.connect(ACTOR_PORT_OUT, <edge.attributes.("fifoId").value>, fifo_<count>);<
 endif>
 
 <if (target.actor)
 ><target.id>.connect(ACTOR_PORT_IN, <target.actor.packageAsList; separator="::">::<target.actor.simpleName>_<targetPort.name>, fifo_<count>);<
 else
-><target.id>.connect(ACTOR_PORT_IN, <targetPort.name>, fifo_<count>);<
+><target.id>.connect(ACTOR_PORT_IN, <edge.attributes.("fifoId").value>, fifo_<count>);<
 endif>
 >>
 
