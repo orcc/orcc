@@ -401,6 +401,7 @@ void *scheduler(void *data) {
 			if(source_is_stopped() || timeout){
 				semaphore_set(sched-\>sync-\>sem_monitor);
 				semaphore_wait(sched-\>sem_thread);
+				clean_cache(CACHE_SIZE);
 				start = clock ();
 			}
 		}
@@ -509,9 +510,11 @@ network(network, options) ::= <<
 #define CROSSOVER_RATIO 0.6
 
 #define TIMEOUT 30
+
+#define CACHE_SIZE 4096
 <endif>
 
-#define SIZE <options.("fifoSize")>
+#define SIZE <options.fifoSize>
 // #define PRINT_FIRINGS
 
 
@@ -562,6 +565,7 @@ struct actor_s **actors[] = {<options.threads.keys: {th | actors_<th>}; separato
 <if (options.needDynamicMapping)>
 extern void remove_fps_printing();
 extern int source_is_stopped();
+extern int clean_cache(int size);
 
 <printClearFifosFunction()>
 

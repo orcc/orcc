@@ -38,6 +38,17 @@
 #include "orcc_thread.h"
 #include "orcc_scheduler.h"
 
+int clean_cache(int size){
+	int i, res;
+	int *table = (int*) malloc(size * sizeof(int));
+	memset(table, 0, size);
+	for(i = 0; i<size; i++){
+		res += table[i];
+	}
+	free(table);
+	return res;
+}
+
 static struct mapping_s* compute_mapping(individual *individual,
 		struct genetic_s *genetic_info) {
 	int i, j, k;
@@ -369,7 +380,7 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 	// Initialize first generation of individuals (constant and random)
 	for (i = 0; (i < genetic_info->population_size) && (i
 			< genetic_info->threads_nb); i++) {
-		pop->individuals[i] = generate_constant_individual(genetic_info, i);
+		pop->individuals[i] = generate_constant_individual(genetic_info, 1);
 	}
 	for (i = genetic_info->threads_nb; i < genetic_info->population_size; i++) {
 		do {
@@ -390,6 +401,7 @@ void *monitor(void *data) {
 	// Initialize
 	printf("\nGenerate initial population...\n\n");
 	population = initialize_population(monitoring->genetic_info);
+	active_fps_printing();
 
 	print_actor_list(population->individuals[evalIndNb],
 			monitoring->genetic_info);

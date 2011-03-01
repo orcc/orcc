@@ -61,8 +61,7 @@ public class ActorPrinter extends Printer {
 	 * @param templateName
 	 *            the name of the template
 	 * @param keepUnchangedFiles
-	 *            if the printer must keep printing files from unchanged
-	 *            actor
+	 *            if the printer must keep printing files from unchanged actor
 	 */
 	public ActorPrinter(String templateName, boolean keepUnchangedFiles) {
 		super(templateName);

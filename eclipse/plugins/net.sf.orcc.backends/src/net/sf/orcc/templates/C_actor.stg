@@ -549,7 +549,7 @@ printMediumInclude(mediums) ::= <<
 >>
 
 printMedium(port) ::= <<
-<network.templateData.portMedium.(instance).(port).value>
+<options.network.templateData.portMedium.(instance).(port).value>
 >>
 
 printFifoSize(size) ::= <<
@@ -559,7 +559,7 @@ printFifoSize(size) ::= <<
 printInputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numTokens_<port.name>;
-#define SIZE_<port.name> (<printFifoSize(network.incomingMap.(instance).(port).size)> + 1)
+#define SIZE_<port.name> (<printFifoSize(options.network.incomingMap.(instance).(port).size)> + 1)
 #define tokens_<port.name> <getPortName(port)>-\>contents
 
 
@@ -568,13 +568,13 @@ static unsigned int numTokens_<port.name>;
 printOutputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numFree_<port.name>;
-#define SIZE_<port.name> (<printFifoSize(first(network.outgoingMap.(instance).(port)).size)> + 1)
+#define SIZE_<port.name> (<printFifoSize(first(options.network.outgoingMap.(instance).(port)).size)> + 1)
 #define tokens_<port.name> <getPortName(port)>-\>contents
 
 
 >>
 
-instance(instance, network, options) ::= <<
+instance(instance, options) ::= <<
 // Source file is "<instance.actor.file>"
 
 #include \<stdio.h\>
@@ -583,7 +583,7 @@ instance(instance, network, options) ::= <<
 #include "orcc.h"
 #include "orcc_fifo.h"
 #include "orcc_util.h"
-<printMediumInclude(network.templateData.listAllMedium.(instance))>
+<printMediumInclude(options.network.templateData.listAllMedium.(instance))>
 
 #define SIZE <options.("fifoSize")>
 

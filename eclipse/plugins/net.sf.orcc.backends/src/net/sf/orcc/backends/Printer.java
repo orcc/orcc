@@ -33,9 +33,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.expr.ExpressionPrinter;
+import net.sf.orcc.ir.type.TypePrinter;
 import net.sf.orcc.util.OrccUtil;
 
 import org.stringtemplate.v4.AttributeRenderer;
@@ -51,9 +57,31 @@ import org.stringtemplate.v4.STGroup;
  */
 public class Printer {
 
+	protected class ExpressionRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			return Printer.this.toString((Expression) o);
+		}
+
+	}
+
+	protected class TypeRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			return Printer.this.toString((Type) o);
+		}
+
+	}
+
+	private Class<? extends ExpressionPrinter> expressionPrinter;
+
 	protected STGroup group;
 
 	protected Map<String, Object> options;
+
+	private Class<? extends TypePrinter> typePrinter;
 
 	/**
 	 * Creates a new printer.
@@ -64,7 +92,10 @@ public class Printer {
 	public Printer(String templateName) {
 		group = OrccUtil.loadGroup(templateName, "net/sf/orcc/templates/",
 				Printer.class.getClassLoader());
+		group.registerRenderer(Expression.class, new ExpressionRenderer());
+		group.registerRenderer(Type.class, new TypeRenderer());
 		options = new HashMap<String, Object>();
+
 	}
 
 	public Map<String, Object> getOptions() {
@@ -124,6 +155,44 @@ public class Printer {
 	public void registerRenderer(Class<?> attributeType,
 			AttributeRenderer renderer) {
 		group.registerRenderer(attributeType, renderer);
+	}
+
+	public void setExpressionPrinter(Class<? extends ExpressionPrinter> printer) {
+		this.expressionPrinter = printer;
+	}
+
+	public void setTypePrinter(Class<? extends TypePrinter> printer) {
+		this.typePrinter = printer;
+	}
+
+	private String toString(Expression expression) {
+		ExpressionPrinter printer;
+		try {
+			printer = expressionPrinter.newInstance();
+		} catch (InstantiationException e) {
+			throw new OrccRuntimeException(
+					"expression printer cannot be instantiated", e);
+		} catch (IllegalAccessException e) {
+			throw new OrccRuntimeException(
+					"expression printer cannot be instantiated", e);
+		}
+		expression.accept(printer, Integer.MAX_VALUE);
+		return printer.toString();
+	}
+
+	private String toString(Type type) {
+		TypePrinter printer;
+		try {
+			printer = typePrinter.newInstance();
+		} catch (InstantiationException e) {
+			throw new OrccRuntimeException(
+					"type printer cannot be instantiated", e);
+		} catch (IllegalAccessException e) {
+			throw new OrccRuntimeException(
+					"type printer cannot be instantiated", e);
+		}
+		type.accept(printer);
+		return printer.toString();
 	}
 
 }

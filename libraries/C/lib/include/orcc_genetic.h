@@ -70,7 +70,7 @@ typedef struct population_s {
 void *monitor(void *data);
 void genetic_init(struct genetic_s *genetic_info, int population_size, int generation_nb, double keep_ratio, double crossover_ratio, struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb, int threads_nb);
 void monitor_init(struct monitor_s *monitoring, struct sync_s *sync, struct genetic_s *genetic_info);
-
+int clean_cache(int size);
 		
 extern float compute_partial_fps();
 extern void backup_partial_start_info();
