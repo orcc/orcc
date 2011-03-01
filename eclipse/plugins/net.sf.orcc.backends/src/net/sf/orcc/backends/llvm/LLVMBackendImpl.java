@@ -216,8 +216,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 		// Add list of package requiered
 		Set<String> packages = new HashSet<String>();
 		for (Actor actor : actors) {
-			String firstPackage = actor.getPackageAsList().get(0);
-			packages.add(firstPackage);
+			if (!actor.isNative()){
+				String firstPackage = actor.getPackageAsList().get(0);
+				packages.add(firstPackage);
+			}
 		}
 		cmdList.addAll(packages);
 

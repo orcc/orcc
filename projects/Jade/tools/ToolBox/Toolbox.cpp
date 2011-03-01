@@ -81,7 +81,7 @@ OptLevelO3("O3",
 
 
 static cl::list<string>
-ActorFiles(cl::Positional, cl::OneOrMore, cl::desc("Input actors"));
+Packages(cl::Positional, cl::OneOrMore, cl::desc("Input actors"));
 
 static cl::opt<bool> 
 OutputAssembly("S", cl::desc("Generate LLVM in assembly representation"));
@@ -375,7 +375,7 @@ void createArchives(map<sys::Path,string>* filesPath){
 	// Erase all initial files
 	cl::list<string>::iterator itFile;
 
-	for (itFile=ActorFiles.begin() ; itFile != ActorFiles.end(); itFile++){
+	for (itFile=Packages.begin() ; itFile != Packages.end(); itFile++){
 		sys::Path erasePath(LibraryFolder + *itFile);
 		erasePath.eraseFromDisk(true,&errorMsg);
 		if (errorMsg != "")
@@ -428,29 +428,29 @@ int main(int argc, char **argv) {
 
 	// Build files Path
 	map<sys::Path,string> filesPath;
-	cl::list<string>::iterator itFile;
+	cl::list<string>::iterator itPack;
 
-	for (itFile=ActorFiles.begin() ; itFile != ActorFiles.end(); itFile++){
-		sys::Path fullFilePath(LibraryFolder + *itFile);
+	for (itPack=Packages.begin() ; itPack != Packages.end(); itPack++){
+		sys::Path fullFilePath(LibraryFolder + *itPack);
 
 		if (!fullFilePath.exists()){
-			cerr << "File does not exist: " << itFile->c_str();
+			cerr << "File does not exist: " << itPack->c_str();
 			continue;
 		}
 
 		sys::PathWithStatus PwS(fullFilePath);
 		const sys::FileStatus *si = PwS.getFileStatus(false);
 		if (!si){
-	        cerr << "Can not find statut (file or directory) of " << itFile->c_str();
+	        cerr << "Can not find statut (file or directory) of " << itPack->c_str();
 			continue;
 		}
 
 		if (si->isDir) {
 			map<sys::Path,string> dirPaths;
-			recurseMapDirectories(fullFilePath, itFile->c_str(), dirPaths);
-			filesPath.insert(dirPaths.begin(),dirPaths.end());
+			recurseMapDirectories(fullFilePath, itPack->c_str(), dirPaths);
+			filesPath.insert(dirPaths.begin(), dirPaths.end());
 		} else {
-			filesPath.insert(pair<sys::Path,string>(fullFilePath,itFile->c_str()));
+			filesPath.insert(pair<sys::Path,string>(fullFilePath, itPack->c_str()));
 		}
 	}
 
