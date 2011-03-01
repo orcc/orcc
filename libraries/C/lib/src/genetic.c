@@ -380,7 +380,7 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 	// Initialize first generation of individuals (constant and random)
 	for (i = 0; (i < genetic_info->population_size) && (i
 			< genetic_info->threads_nb); i++) {
-		pop->individuals[i] = generate_constant_individual(genetic_info, 1);
+		pop->individuals[i] = generate_constant_individual(genetic_info, i);
 	}
 	for (i = genetic_info->threads_nb; i < genetic_info->population_size; i++) {
 		do {
@@ -401,7 +401,7 @@ void *monitor(void *data) {
 	// Initialize
 	printf("\nGenerate initial population...\n\n");
 	population = initialize_population(monitoring->genetic_info);
-	active_fps_printing();
+	//active_fps_printing();
 
 	print_actor_list(population->individuals[evalIndNb],
 			monitoring->genetic_info);
