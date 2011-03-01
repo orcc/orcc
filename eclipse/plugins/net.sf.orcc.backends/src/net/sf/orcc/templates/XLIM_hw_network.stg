@@ -233,9 +233,25 @@ q_ai_<target.id>_<targetPort.name> : entity SystemBuilder.Queue( behavioral )
 generic map( length =\> <if(edge.size)><edge.size><else>1<endif>, width =\> <if(targetPort.type.size)><targetPort.type.size><else>1<endif> )
 
 port map (
-<printAssignInstatiationIn("ai",target,targetPort)>
+<if(targetPort.type.bool)>
+	Out_DATA(0) =\> ai_<target.id>_<targetPort.name>_DATA,
+<else>
+	Out_DATA =\> ai_<target.id>_<targetPort.name>_DATA,
+<endif>
+	Out_SEND =\> ai_<target.id>_<targetPort.name>_SEND,
+	Out_ACK =\> ai_<target.id>_<targetPort.name>_ACK,
+	Out_COUNT =\> ai_<target.id>_<targetPort.name>_COUNT,
+	
+<if(targetPort.type.bool)>
+	In_DATA(0) =\> nif_<src.port>_DATA,
+<else>
+	In_DATA =\> nif_<src.port>_DATA,
+<endif>
+	In_SEND =\> nif_<src.port>_SEND( <if(network.templateData.countBroadcastConnectionsMap.(edge))><network.templateData.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
+	In_ACK =\> nif_<src.port>_ACK( <if(network.templateData.countBroadcastConnectionsMap.(edge))><network.templateData.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
+	In_COUNT =\> nif_<src.port>_COUNT,
+	In_RDY =\> nif_<src.port>_RDY( <if(network.templateData.countBroadcastConnectionsMap.(edge))><network.templateData.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
 
-<printAssignInstatiationOut("nif",target,targetPort)>
 
 	clk =\> clocks(0),
 	reset =\> resets(0)
