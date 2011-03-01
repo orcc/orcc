@@ -25,8 +25,7 @@ actor Algo_DecodeMacroblockLayer()
 
 	uint(size=4) SubMbType,
 
-	uint(size=5)  Total_CoeffLuma,
-	uint(size=5)  Total_CoeffChroma
+	uint(size=5)  TotalCoeffIn
 		==>
 	int (size=6)  TypeOfVLD,
 	int (size=32) VLDParam,
@@ -40,8 +39,7 @@ actor Algo_DecodeMacroblockLayer()
 	//Residual Parameters
 	uint(size=6)  ResParameters,
 
-	uint(size=5)  SData_Total_CoeffLuma,
-	uint(size=5)  SData_Total_CoeffChroma,
+	uint(size=5)  TotalCoeffOut,
 
 	uint(size=6)  MbType,
 	bool          MergeTransfSz8x8,
@@ -282,8 +280,7 @@ actor Algo_DecodeMacroblockLayer()
 			//TypeOfVLD    :[ [BYTE_ALIGNED_REQUIRED] +  [ValTypeOfVLDecod]repeat 256 ],
 			VLDParam  :[ BitDepthChromaTab ] repeat 256,
 
-			SData_Total_CoeffLuma   :[[16: for int s in 0 .. 15]] repeat 16,	
-			SData_Total_CoeffChroma :[[16: for int s in 0 .. 31]] repeat 32,
+			TotalCoeffOut   :[[16: for int s in 0 .. 47]] repeat 48,
 			QpFeedback              :[QpValue , Qp_CbValue , Qp_CrValue],
 
 			IsIPCM :[true]
@@ -543,16 +540,14 @@ actor Algo_DecodeMacroblockLayer()
 		end
 
 	GetResidualCoeffToken: action
-			Total_CoeffLuma  :[CoLu]    repeat 16,
-			Total_CoeffChroma:[CoLuChe] repeat 32//It's the story of a guy, a normal guy ...
+			TotalCoeffIn :[CoLu] repeat 48
 				==>
-			SData_Total_CoeffLuma  :[CoLu]    repeat 16,
-			SData_Total_CoeffChroma:[CoLuChe] repeat 32,
-
+			TotalCoeffOut :[CoLu] repeat 48,
 			cbp_blk :[CbpBlk]
 		var
 			uint(size=16) CbpBlk := 0
 		do
+			//We check all TotalCoeffLuma
 			foreach int i in 0 .. 15
 			do
 				CbpBlk := CbpBlk << 1;
@@ -564,8 +559,7 @@ actor Algo_DecodeMacroblockLayer()
 
 	NoResidual: action
 				==>
-			SData_Total_CoeffLuma   :[[0: for int s in 0 .. 15]] repeat 16,
-			SData_Total_CoeffChroma :[[0: for int s in 0 .. 31]] repeat 32,
+			TotalCoeffOut :[[0: for int s in 0 .. 47]] repeat 48,
 			SkipMacroBlk            :[true],
 			Qp_Y_Cb_Cr              :[QpValue , Qp_CbValue , Qp_CrValue],
 			QpFeedback              :[QpValue , Qp_CbValue , Qp_CrValue]

@@ -568,18 +568,12 @@
         src="DecodeMbPred" src-port="TypeOfVLD"/>
     <Connection dst="Mgnt_DecodePic" dst-port="MbPredNbBitsToRead"
         src="DecodeMbPred" src-port="NbBitsToRead"/>
-    <Connection dst="DecodeResidual" dst-port="Total_Coeff"
-        src="DecodeResidualBlock_Cavlc" src-port="Total_Coeff"/>
     <Connection dst="Mgnt_DecodePic" dst-port="ResBlkCavlcTypeOfVLD"
         src="DecodeResidualBlock_Cavlc" src-port="TypeOfVLD"/>
     <Connection dst="Mgnt_DecodePic" dst-port="ResBlkCavlcVLD_Param"
         src="DecodeResidualBlock_Cavlc" src-port="VLD_Param"/>
     <Connection dst="DecodeResidualBlock_Cavlc" dst-port="ValVLD"
         src="Mgnt_DecodePic" src-port="ResBlkCavlcValVLD"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="Total_CoeffLuma"
-        src="DecodeMacroBlockLayer" src-port="SData_Total_CoeffLuma"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="Total_CoeffChroma"
-        src="DecodeMacroBlockLayer" src-port="SData_Total_CoeffChroma"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="NumRefIdxLXActive"
         src="DecodeRefPicList" src-port="SDataNumRefIdxLXActive"/>
     <Connection dst="Mgnt_DecodePic" dst-port="SubMbPredTypeOfVLD"
@@ -742,8 +736,10 @@
     <Connection dst="" dst-port="MbLocation" src="DecodeSliceData_Cavlc" src-port="MbLocation"/>
     <Connection dst="" dst-port="NeighbourAvail"
         src="DecodeSliceData_Cavlc" src-port="NeighbourAvail"/>
-    <Connection dst="DecodeMacroBlockLayer" dst-port="Total_CoeffLuma"
-        src="DecodeResidual" src-port="TotalCoeffLuma"/>
-    <Connection dst="DecodeMacroBlockLayer" dst-port="Total_CoeffChroma"
-        src="DecodeResidual" src-port="TotalCoeffChroma"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="TotalCoeffIn"
+        src="DecodeResidual" src-port="TotalCoeffOut"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="TotalCoeff"
+        src="DecodeMacroBlockLayer" src-port="TotalCoeffOut"/>
+    <Connection dst="DecodeResidual" dst-port="TotalCoeffIn"
+        src="DecodeResidualBlock_Cavlc" src-port="TotalCoeff"/>
 </XDF>

@@ -64,7 +64,7 @@
       <vertex id="PpsVLDecoding" x="464" y="230"/>
       <vertex id="DecodePps" x="327" y="686"/>
       <vertex id="PicVLDecoding" x="895" y="219"/>
-      <vertex id="DecodePic" x="800" y="490"/>
+      <vertex id="DecodePic" x="805" y="408"/>
       <vertex id="MergeSpsAsk" x="478" y="1069"/>
       <vertex id="SplitSpsInfos" x="504" y="1272"/>
       <vertex id="CheckIsNewSlice" x="694" y="1732"/>

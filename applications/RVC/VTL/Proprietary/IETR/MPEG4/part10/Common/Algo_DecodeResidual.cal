@@ -21,13 +21,12 @@ import MPEG.Common.Imp_ByteOperation.*;
 
 actor Algo_DecodeResidual()
 	uint(size=6)  Parameters,
-	uint(size=5) Total_Coeff
+	uint(size=5) TotalCoeffIn
 		==>
 	int (size=6)  TypeOfVLD,
 	int (size=32) ActorLaunched,
 	int (size=8) ResBlkParameters,
-	uint(size=5) TotalCoeffLuma,
-	uint(size=5) TotalCoeffChroma,
+	uint(size=5) TotalCoeffOut,
 	bool         Skip_Block
 		:
 
@@ -110,7 +109,7 @@ actor Algo_DecodeResidual()
 		IdxCurrMb     := 0;
 	end
 
-	ResLumaOutput.IsLuma: action ==> TotalCoeffLuma:[TotalCoeffTabLuma] repeat 16
+	ResLumaOutput.IsLuma: action ==> TotalCoeffOut:[TotalCoeffTabLuma] repeat 16
 	guard
 		ResidualLumaOutput = RESIDUAL_LUMA_LUMA_OUTPUT
 	do
@@ -245,7 +244,7 @@ actor Algo_DecodeResidual()
 		IdxCurrMb := IdxCurrMb + 1;
 	end
 
-	GetTotalCoeff: action Total_Coeff:[ValTotal_Coeff] ==>
+	GetTotalCoeff: action TotalCoeffIn :[ValTotal_Coeff] ==>
 	do
 		if(Component_type = LUMA_COMPONENT)then
 			TotalCoeffTabLuma[IdxCurrMb - 1]   := ValTotal_Coeff;
@@ -301,7 +300,7 @@ actor Algo_DecodeResidual()
 		IdxCurrMb := 0;
 	end
 
-	SendChromaCoeffToken: action ==> TotalCoeffChroma:[TotCoefChrm] repeat 16
+	SendChromaCoeffToken: action ==> TotalCoeffOut:[TotCoefChrm] repeat 16
 	var
 		List(type:uint(size=5), size=16) TotCoefChrm
 	do
@@ -340,7 +339,7 @@ actor Algo_DecodeResidual()
 
 	ChromaAcComponentNotPresent: action
 			==>
-		TotalCoeffChroma :[[   0: for int i in 0 .. 31]] repeat 32,
+		TotalCoeffOut :[[   0: for int i in 0 .. 31]] repeat 32,
 		Skip_Block       :[[true: for int i in 0 ..  7]] repeat  8
 	guard
 		i8x8Loop < NumC8x8

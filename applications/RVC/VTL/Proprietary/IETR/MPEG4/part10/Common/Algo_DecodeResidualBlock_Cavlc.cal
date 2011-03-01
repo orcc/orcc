@@ -24,7 +24,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		==>
 	uint(size=5)  TypeOfVLD,
 	int (size=32) VLD_Param,
-	uint(size=5)  Total_Coeff,
+	uint(size=5)  TotalCoeff,
 	int (size=12) Value,
 	uint(size=4)  Run,
 	bool          Last
@@ -33,7 +33,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	bool DEBUG_FLAG_DECODED = false;
 
 	int (size=8)  nC_Val;
-	uint(size=8)  TotalCoeff   := 0;
+	uint(size=8)  totalCoeff   := 0;
 	uint(size=8)  TrailingOnes := 0;
 	uint(size=5)  suffixLength := 0;
 	uint(size=32) level_prefix := 0;
@@ -70,9 +70,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		zerosLeft := 0;
 	end
 
-	ReadCoeffToken.Done: action ValVLD :[ValOfVLD] ==> Total_Coeff:[TotalCoeff]
+	ReadCoeffToken.Done: action ValVLD :[ValOfVLD] ==> TotalCoeff:[totalCoeff]
 	do
-		TotalCoeff   := (ValOfVLD & 0xFF);
+		totalCoeff   := (ValOfVLD & 0xFF);
 		TrailingOnes := (ValOfVLD >> 8);
 		if(DEBUG_FLAG_DECODED)then
 			println("TotalCoeff : "+(ValOfVLD & 0xFF));
@@ -87,9 +87,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 
 	CheckTotalCoeff.IsGreaterThan0: action ==>
 	guard
-		TotalCoeff > 0
+		totalCoeff > 0
 	do
-		if((TotalCoeff > 10) and (TrailingOnes < 3)) then
+		if((totalCoeff > 10) and (TrailingOnes < 3)) then
 			suffixLength := 1;
 		else
 			suffixLength := 0;
@@ -132,7 +132,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			//                                      level_prefix
 	ReadLevelPrefix.Asked: action ==> TypeOfVLD :[CAVLC_LEVEL_PREFIX]
 	guard
-		iLoop < TotalCoeff
+		iLoop < totalCoeff
 	end
 
 	ReadLevelPrefix.Done: action ValVLD :[ValueOfVLD] ==>
@@ -209,9 +209,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			==>
 		//               total_zeros
 		TypeOfVLD :[ CAVLC_TOTAL_ZEROS ],
-		VLD_Param :[ maxNumCoeff , TotalCoeff ]
+		VLD_Param :[ maxNumCoeff , totalCoeff ]
 	guard
-		TotalCoeff < (endIdx - startIdx + 1)
+		totalCoeff < (endIdx - startIdx + 1)
 	end
 
 	ReadTotalZeros.Done: action ValVLD :[total_zeros] ==>
@@ -233,7 +233,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		TypeOfVLD :[ CAVLC_RUN_BEFORE ],
 		VLD_Param :[ zerosLeft ]
 	guard
-		iLoop     < TotalCoeff - 1,
+		iLoop     < totalCoeff - 1,
 		zerosLeft > 0
 	end
 
@@ -249,14 +249,14 @@ actor Algo_DecodeResidualBlock_Cavlc()
 
 	SendOthersRun: action ==> Run :[ValRun]
 	guard
-		iLoop < TotalCoeff
+		iLoop < totalCoeff
 	var
 		int(size=16) ValRun
 	do
 		ValRun    := zerosLeft;
 		zerosLeft := 0;
 		// The first coeffAC will be replaced by coeffDC
-		if( (maxNumCoeff = 15) and (iLoop = TotalCoeff - 1) )then
+		if( (maxNumCoeff = 15) and (iLoop = totalCoeff - 1) )then
 			ValRun := ValRun + 1;
 		end
 		iLoop     := iLoop + 1;
@@ -264,7 +264,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 
 	SendEndResidualBlock: action ==> TypeOfVLD :[SKIP_NAL], Last :[true]
 	do
-		run[TotalCoeff - 1] := zerosLeft;
+		run[totalCoeff - 1] := zerosLeft;
 	end
 
 	schedule fsm ReadCoeffToken_Asked:
