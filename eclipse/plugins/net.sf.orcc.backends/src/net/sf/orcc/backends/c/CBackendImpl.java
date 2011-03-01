@@ -44,7 +44,6 @@ import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
 import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
-import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
@@ -52,14 +51,15 @@ import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
+import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.transformations.BroadcastAdder;
+import net.sf.orcc.network.transformations.NetworkClassifier;
 import net.sf.orcc.network.transformations.NetworkSplitter;
-import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.merger2.NetworkMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.WriteListener;
@@ -196,11 +196,8 @@ public class CBackendImpl extends AbstractBackend {
 		replacementMap.put("OUT", "OUT_my_precious");
 		replacementMap.put("IN", "IN_my_precious");
 
-		if (classify) {
-			new ActorClassifier().visit(actor);
-			if (normalize) {
-				new ActorNormalizer().visit(actor);
-			}
+		if (normalize) {
+			new ActorNormalizer().visit(actor);
 		}
 
 		ActorVisitor[] transformations = { new TypeSizeTransformation(),
@@ -220,6 +217,12 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {
+		network.flatten();
+
+		if (classify) {
+			new NetworkClassifier().transform(network);
+		}
+
 		// Experimental
 		if (merger2) {
 			new NetworkMerger().transform(network);
@@ -250,16 +253,17 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
+
+		// Transform the network
+		doTransformNetwork(network);
+
+		// Transform all actors of the network
 		transformActors(network.getActors());
 
-		network.flatten();
-		
 		if (merge) {
 			network.mergeActors();
 		}
 
-		doTransformNetwork(network);
-		
 		network.computeTemplateMaps();
 
 		NetworkPrinter printer = new NetworkPrinter("C_network");

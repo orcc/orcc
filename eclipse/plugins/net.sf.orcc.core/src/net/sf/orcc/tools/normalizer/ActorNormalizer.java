@@ -31,6 +31,7 @@ package net.sf.orcc.tools.normalizer;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.moc.MoC;
+import net.sf.orcc.tools.classifier.ActorClassifier;
 
 /**
  * This class defines an actor transformation that normalizes actors so they can
@@ -50,6 +51,11 @@ public class ActorNormalizer implements ActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
+		if (!actor.hasMoC()){
+			//Actor has not been classified
+			new ActorClassifier().visit(actor);
+		}
+		
 		MoC clasz = actor.getMoC();
 		if (clasz.isCSDF()) {
 			new StaticActorNormalizer(actor).normalize();

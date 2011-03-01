@@ -139,7 +139,7 @@ public class Network {
 	private Object templateData;
 
 	private OrderedMap<String, GlobalVariable> variables;
-
+	
 	/**
 	 * Creates a new network.
 	 */
@@ -418,8 +418,22 @@ public class Network {
 		return instances;
 	}
 
+	/**
+	 * Returns the MoC of the network.
+	 * 
+	 * @return the network MoC.
+	 */
 	public MoC getMoC() {
 		return moc;
+	}
+	
+	/**
+	 * Returns true if this network as a computed MoC
+	 * 
+	 * @return True if the network has MoC, otherwise false
+	 */
+	public Boolean hasMoc(){
+		return moc != null;
 	}
 
 	/**
@@ -576,7 +590,7 @@ public class Network {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	public void mergeActors() throws OrccException {
+	public void mergeActors() throws OrccException {		
 		new ActorMerger().transform(this);
 	}
 

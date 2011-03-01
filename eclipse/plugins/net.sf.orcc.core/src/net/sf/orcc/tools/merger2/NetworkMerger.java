@@ -49,22 +49,27 @@ public class NetworkMerger implements INetworkTransformation {
 	@Override
 	public void transform(Network network) throws OrccException {
 
+		if (!network.hasMoc()) {
+			// Actors of the network has not been classified
+			network.classify();
+		}
+
 		StaticGraphAnalyzer staticGraph = new StaticGraphAnalyzer(network);
 		InstanceMerger merger = new InstanceMerger(network);
-		
-		//Merger simple cases
-		while (staticGraph.hasSinglyConnectedVertex()){
+
+		// Merger simple cases
+		while (staticGraph.hasSinglyConnectedVertex()) {
 			List<Vertex> vertices = new ArrayList<Vertex>();
-			
-			//Get an Instance to merge
+
+			// Get an Instance to merge
 			Vertex vertex1 = staticGraph.getSinglyConnectedVertex().get(0);
 			Vertex vertex2 = staticGraph.getStaticNeighbors(vertex1).get(0);
-			
-			//Create list of instance to merge
+
+			// Create list of instance to merge
 			vertices.add(vertex1);
 			vertices.add(vertex2);
-			
-			//Transform network
+
+			// Transform network
 			Vertex mergedVertex = merger.getEquivalentVertices(vertices);
 			staticGraph.mergeVertices(vertices, mergedVertex);
 		}

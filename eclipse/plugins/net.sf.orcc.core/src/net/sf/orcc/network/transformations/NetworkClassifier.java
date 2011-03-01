@@ -29,6 +29,7 @@
 package net.sf.orcc.network.transformations;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.KPNMoC;
 import net.sf.orcc.moc.MoC;
@@ -42,6 +43,7 @@ import net.sf.orcc.tools.classifier.ActorClassifier;
  * the {@link ActorClassifier} class.
  * 
  * @author Matthieu Wipliez
+ * @author Jerome Gorin
  * 
  */
 public class NetworkClassifier implements INetworkTransformation {
@@ -59,18 +61,24 @@ public class NetworkClassifier implements INetworkTransformation {
 
 		for (Instance instance : network.getInstances()) {
 			if (instance.isActor()) {
-				MoC clasz = instance.getActor().getMoC();
-				if (clasz != null) {
-					if (clasz.isKPN() || clasz.isQuasiStatic()) {
-						if (currentClass < DYNAMIC) {
-							moc = new KPNMoC();
-							currentClass = DYNAMIC;
-						}
-					} else if (clasz.isCSDF()) {
-						if (currentClass < CSDF) {
-							moc = new CSDFMoC();
-							currentClass = CSDF;
-						}
+				Actor actor = instance.getActor();
+				
+				if (!actor.hasMoC()){
+					//Actor has not been classified
+					new ActorClassifier().visit(actor);
+				}
+				
+				MoC clasz = actor.getMoC();
+
+				if (clasz.isKPN() || clasz.isQuasiStatic()) {
+					if (currentClass < DYNAMIC) {
+						moc = new KPNMoC();
+						currentClass = DYNAMIC;
+					}
+				} else if (clasz.isCSDF()) {
+					if (currentClass < CSDF) {
+						moc = new CSDFMoC();
+						currentClass = CSDF;
 					}
 				}
 			}

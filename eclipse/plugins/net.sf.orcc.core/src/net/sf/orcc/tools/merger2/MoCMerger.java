@@ -41,7 +41,8 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
 
 /**
- * This class defines a transformation that merges a region of static instances into a unique instance.
+ * This class defines a transformation that merges a region of static instances
+ * into a unique instance.
  * 
  * 
  * @author Jérôme Gorin
@@ -53,78 +54,79 @@ public class MoCMerger {
 		private MoC sourceMoC;
 		int targetFactor;
 		private MoC targetMoc;
-		
-		public SuperMoC(MoC sourceMoC, int sourceFactor, MoC targetMoc, int targetFactor){
+
+		public SuperMoC(MoC sourceMoC, int sourceFactor, MoC targetMoc,
+				int targetFactor) {
 			this.sourceMoC = sourceMoC;
 			this.targetMoc = targetMoc;
 			this.sourceFactor = sourceFactor;
 			this.targetFactor = targetFactor;
 		}
-		
-		public List<Action> getActions(){
-			List<Action> actions = new ArrayList<Action> ();
+
+		public List<Action> getActions() {
+			List<Action> actions = new ArrayList<Action>();
 			List<Action> sourceActions = getUnderneathActions(sourceMoC);
 			List<Action> targetActions = getUnderneathActions(targetMoc);
-			
-			for (int i = 0 ; i < sourceFactor; i++){
+
+			for (int i = 0; i < sourceFactor; i++) {
 				actions.addAll(sourceActions);
 			}
-			
-			for (int i = 0 ; i < targetFactor; i++){
+
+			for (int i = 0; i < targetFactor; i++) {
 				actions.addAll(targetActions);
 			}
-			
+
 			return actions;
 		}
-		
-		private List<Action> getUnderneathActions(MoC moc){
-			if (moc.isCSDF()){
-				return ((CSDFMoC)moc).getActions();
+
+		private List<Action> getUnderneathActions(MoC moc) {
+			if (moc.isCSDF()) {
+				return ((CSDFMoC) moc).getActions();
 			}
-			
-			return ((SuperMoC)moc).getActions();
+
+			return ((SuperMoC) moc).getActions();
 		}
 	}
+
 	Map<Vertex, MoC> mocList;
 	List<Vertex> region;
-	
+
 	StaticGraphAnalyzer staticGraph;
-	
-	public MoCMerger(StaticGraphAnalyzer staticGraph, List<Vertex> region){
+
+	public MoCMerger(StaticGraphAnalyzer staticGraph, List<Vertex> region) {
 		this.staticGraph = staticGraph;
 		mocList = new HashMap<Vertex, MoC>();
 		this.region = region;
-		
-		for (Vertex vertex : region){
-			for (Vertex neighbor : staticGraph.getStaticNeighbors(vertex)){
+
+		for (Vertex vertex : region) {
+			for (Vertex neighbor : staticGraph.getStaticNeighbors(vertex)) {
 				updateMoC(vertex, neighbor);
 			}
 		}
-		
+
 		SuperMoC moc = (SuperMoC) mocList.get(region.get(0));
 		List<Action> actions = moc.getActions();
-		
-		
-	
+
 	}
-	
-	private MoC getMoC(Vertex vertex){
-		if (mocList.containsKey(vertex)){
-			//MoC is contained in MoC list
+
+	private MoC getMoC(Vertex vertex) {
+		if (mocList.containsKey(vertex)) {
+			// MoC is contained in MoC list
 			return mocList.get(vertex);
 		}
-		
-		//Vertex has not been visited yet, return its real MoC
+
+		// Vertex has not been visited yet, return its real MoC
 		Instance instance = vertex.getInstance();
 		return instance.getActor().getMoC();
 	}
-	
-	private void updateMoC(Vertex source, Vertex target){
+
+	private void updateMoC(Vertex source, Vertex target) {
 		int sourceRate = staticGraph.getSourceRate(source, target);
 		int targetRate = staticGraph.getTargetRate(source, target);
 		MoC sourceMoC = getMoC(source);
 		MoC targetMoC = getMoC(target);
-		SuperMoC superMoC = new SuperMoC(sourceMoC, sourceRate, targetMoC, targetRate);
+		SuperMoC superMoC = new SuperMoC(sourceMoC, sourceRate, targetMoC,
+				targetRate);
 		mocList.put(source, superMoC);
 		mocList.put(target, superMoC);
 	}

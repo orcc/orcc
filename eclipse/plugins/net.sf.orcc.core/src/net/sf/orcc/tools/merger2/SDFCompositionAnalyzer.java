@@ -52,7 +52,8 @@ public class SDFCompositionAnalyzer {
 	private DirectedGraph<Vertex, Connection> graph;
 	private StaticGraphAnalyzer staticGraph;
 
-	public SDFCompositionAnalyzer(Network network, StaticGraphAnalyzer staticGraph) {
+	public SDFCompositionAnalyzer(Network network,
+			StaticGraphAnalyzer staticGraph) {
 		this.graph = network.getGraph();
 		this.staticGraph = staticGraph;
 

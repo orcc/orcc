@@ -49,38 +49,40 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 public class PathFinder {
 	Map<Vertex, LinkedHashSet<Vertex>> adjacentVertices;
 	List<List<Vertex>> dynamicPaths;
-	
+
 	Vertex source;
 	DirectedGraph<Vertex, DefaultWeightedEdge> staticGraph;
 	List<List<Vertex>> staticPaths;
 	Vertex target;
-	
+
 	/**
 	 * Create a new path finder.
 	 * 
 	 * @param source
 	 *            the source vertex
-	 *            
+	 * 
 	 * @param source
 	 *            the target vertex
-	 *            
+	 * 
 	 * @param adjacentVertices
 	 *            A map of successors of vertices
-	 *
+	 * 
 	 * @param staticGraph
 	 *            The corresponding static graph
 	 */
-	public PathFinder(Vertex source, Vertex target, DirectedGraph<Vertex, DefaultWeightedEdge> staticGraph, Map<Vertex, LinkedHashSet<Vertex>> adjacentVertices){
+	public PathFinder(Vertex source, Vertex target,
+			DirectedGraph<Vertex, DefaultWeightedEdge> staticGraph,
+			Map<Vertex, LinkedHashSet<Vertex>> adjacentVertices) {
 		this.source = source;
 		this.target = target;
 		this.adjacentVertices = adjacentVertices;
 		this.staticGraph = staticGraph;
-		
+
 		LinkedList<Vertex> visited = new LinkedList<Vertex>();
 		visited.add(source);
 		findPaths(visited, target);
 	}
-	
+
 	/**
 	 * Return the adjacent nodes of a vertex.
 	 * 
@@ -97,7 +99,7 @@ public class PathFinder {
 		}
 		return new LinkedList<Vertex>(adjacent);
 	}
-	
+
 	/**
 	 * Find a dynamic path between the last vertex of a LinkedList and the given
 	 * vertex using breadth-first search.
@@ -134,26 +136,25 @@ public class PathFinder {
 			visited.removeLast();
 		}
 	}
-	
+
 	public List<List<Vertex>> getAllPaths() {
 		List<List<Vertex>> paths = new ArrayList<List<Vertex>>(staticPaths);
 		paths.addAll(dynamicPaths);
 		return paths;
 	}
-	
-	public List<List<Vertex>> getDynamicPaths(){
+
+	public List<List<Vertex>> getDynamicPaths() {
 		return staticPaths;
 	}
-	
-	public List<List<Vertex>> getStaticPaths(){
+
+	public List<List<Vertex>> getStaticPaths() {
 		return staticPaths;
 	}
-	
-	public boolean hasDynamicPaths(){
+
+	public boolean hasDynamicPaths() {
 		return true;
 	}
-	
-	
+
 	/**
 	 * Return true if the given path as only static actors.
 	 * 

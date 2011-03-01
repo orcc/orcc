@@ -73,12 +73,11 @@ public class InstanceMerger {
 		for (Vertex vertex : vertices) {
 			Instance instance = vertex.getInstance();
 
-			actorMerger.setPrefix(instance.getId());
-			actorMerger.visit(instance.getActor());
+			actorMerger.add(instance.getActor());
 		}
 
 		// Create the merged instance
-		Actor composite = actorMerger.getActor();
+		Actor composite = actorMerger.getComposite();
 		Instance compositeInst = new Instance("Merged" + nMerged++,
 				composite.getName());
 		compositeInst.setContents(composite);

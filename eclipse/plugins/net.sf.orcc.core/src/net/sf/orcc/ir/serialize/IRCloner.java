@@ -30,7 +30,6 @@ package net.sf.orcc.ir.serialize;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -249,7 +248,7 @@ public class IRCloner {
 		@Override
 		public Object interpret(SpecificInstruction specific, Object... args) {
 			throw new OrccRuntimeException(
-					"IR writer cannot write specific instructions");
+					"IR cloner cannot clone specific instructions");
 		}
 
 		@Override
@@ -417,13 +416,16 @@ public class IRCloner {
 		}
 		return cloneInstructions;
 	}
+
 	private static Location cloneLocation(Location location) {
 		return new Location(location.getStartLine(), location.getStartColumn(),
 				location.getEndColumn());
 	}
+
 	private static CFGNode cloneNode(CFGNode node) {
 		return (CFGNode) node.accept(new NodeCloner());
 	}
+
 	/**
 	 * Clone the given nodes.
 	 * 
@@ -439,6 +441,7 @@ public class IRCloner {
 
 		return cloneNodes;
 	}
+
 	/**
 	 * Clone the given type.
 	 * 
@@ -449,6 +452,7 @@ public class IRCloner {
 	private static Type cloneType(Type type) {
 		return (Type) type.accept(new TypeCloner());
 	}
+
 	/**
 	 * Returns the cloned local variable that corresponds to the local variable.
 	 * 
@@ -459,6 +463,7 @@ public class IRCloner {
 	private static LocalVariable getLocalVar(LocalVariable variable) {
 		return localVars.get(variable.getName());
 	}
+
 	/**
 	 * Returns the cloned port that corresponds to the port.
 	 * 
@@ -469,6 +474,7 @@ public class IRCloner {
 	private static Port getPort(Port port) {
 		return ports.get(port.getName());
 	}
+
 	/**
 	 * Returns the cloned procedure that corresponds to the given procedure.
 	 * 
@@ -479,6 +485,7 @@ public class IRCloner {
 	private static Procedure getProcedure(Procedure procedure) {
 		return procs.get(procedure.getName());
 	}
+
 	/**
 	 * Returns the cloned variable that corresponds to the variable.
 	 * 
@@ -501,7 +508,8 @@ public class IRCloner {
 
 		return null;
 	}
-	private Map<String, Action> actions;
+
+	private OrderedMap<String, Action> actions;
 
 	private Actor actor;
 
@@ -519,6 +527,10 @@ public class IRCloner {
 	 */
 	public IRCloner(Actor actor) {
 		this.actor = actor;
+
+		untaggedActions = new ArrayList<Action>();
+		actions = new OrderedMap<String, Action>();
+		ports = new OrderedMap<String, Port>();
 	}
 
 	@Override
@@ -578,7 +590,7 @@ public class IRCloner {
 
 		for (Entry<Port, Integer> entry : pattern.entrySet()) {
 			Port port = ports.get(entry.getKey().getName());
-			pattern.put(port, entry.getValue());
+			clonePattern.put(port, entry.getValue());
 		}
 
 		return clonePattern;
@@ -744,7 +756,7 @@ public class IRCloner {
 		Type type = cloneType(variable.getType());
 
 		return new LocalVariable(variable.isAssignable(), variable.getIndex(),
-				location, variable.getName(), type);
+				location, variable.getBaseName(), type);
 	}
 
 	/**
@@ -776,8 +788,12 @@ public class IRCloner {
 	private Port clonePort(Port port) {
 		Location location = cloneLocation(port.getLocation());
 		Type type = cloneType(port.getType());
+		Port clone = new Port(location, type, port.getName());
 
-		return new Port(location, type, port.getName());
+		// Store the port for a later link
+		ports.put(clone.getName(), clone);
+
+		return clone;
 	}
 
 	/**
@@ -793,7 +809,6 @@ public class IRCloner {
 		for (Port port : ports) {
 			Port clonePort = clonePort(port);
 			cloneMap.put(clonePort.getName(), clonePort);
-			ports.put(clonePort.getName(), clonePort);
 		}
 
 		return cloneMap;
