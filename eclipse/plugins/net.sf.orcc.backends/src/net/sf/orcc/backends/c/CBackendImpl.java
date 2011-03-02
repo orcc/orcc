@@ -201,8 +201,8 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		ActorVisitor[] transformations = { new TypeSizeTransformation(),
-				/*new DeadGlobalElimination(), new DeadCodeElimination(),
-				new DeadVariableRemoval(false),*/
+				new DeadGlobalElimination(), new DeadCodeElimination(),
+				new DeadVariableRemoval(false),
 				new RenameTransformation(replacementMap), new PhiRemoval(),
 				// new MultipleArrayAccessTransformation(),
 				new MoveReadsWritesTransformation() };
