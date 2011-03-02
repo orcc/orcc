@@ -39,22 +39,16 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.serialize.IRCloner;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.moc.MoC;
 import net.sf.orcc.util.MultiMap;
 import net.sf.orcc.util.OrderedMap;
 
@@ -66,37 +60,13 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class ActorMerger {
-
-	private class InternalizeFifoAccess extends AbstractActorVisitor {
-		private Port port;
-		private GlobalVariable variable;
-		
-		public InternalizeFifoAccess(Port port, GlobalVariable variable){
-			this.port = port;
-			this.variable = variable;
-		}
-		
-		@Override
-		public void visit(Write write) {
-		}
-		
-		@Override
-		public void visit(Peek peek) {
-		}
-		
-		@Override
-		public void visit(Read read) {
-		}
-	}
-	
-	
 	private List<Action> actions;
 	private Actor composite;
 	private List<Action> initializes;
 	private MultiMap<Actor, Port> inputs;
-	private MultiMap<Actor, Port> outputs;
 	private Map<Port, GlobalVariable> internalize;
-	
+	private MultiMap<Actor, Port> outputs;
+
 	private OrderedMap<String, GlobalVariable> parameters;
 	private OrderedMap<String, Procedure> procs;
 	private ActionScheduler scheduler;
@@ -126,81 +96,25 @@ public class ActorMerger {
 		// Resolve potential conflict in names
 		new ConflictSolver(composite).resolve(clone);
 
-		//Internalize ports not define as extern in composite actor
+		// Internalize ports not define as extern in composite actor
 		InternalizeInputs(candidate, rate);
 		InternalizeOutputs(candidate, rate);
-		
+
 		// Add all properties
 		parameters.putAll(clone.getParameters());
 		stateVars.putAll(clone.getStateVars());
 		procs.putAll(clone.getProcs());
 		actions.addAll(clone.getActions());
 		initializes.addAll(clone.getInitializes());
-		
-		//Merge scheduler
+
+		// Merge scheduler
 		mergeScheduler(candidate.getActionScheduler(), rate);
 	}
 
 	public Actor getComposite() {
 		return composite;
 	}
-	
-	private void internalizePort(Port port, int tokenSize, Actor candidate){
-		//Check if this port has not been internalize before
-		GlobalVariable portVar;
-		
-		if (internalize.containsKey(port)){
-			portVar = internalize.get(port);
-		}else{
-			//Port has never been internalize, create a new one
-			TypeList typeList = IrFactory.eINSTANCE.createTypeList(tokenSize, port.getType());	
-			portVar = new GlobalVariable(new Location(), typeList, port.getName(), true);
-			
-			stateVars.put(portVar.getName(), portVar);
-		}
-		
-		new InternalizeFifoAccess(port, portVar).visit(candidate);
-	}
-	
-	private void InternalizeOutputs(Actor candidate, int rate){
-		//Get MoC of the current candidate to define the size of the state variable required
-		//TODO: extend to QSDF
-		CSDFMoC moc = (CSDFMoC)candidate.getMoC();
-		
-		for (Port port : candidate.getOutputs()){
-			//Check if the current is external from the composite actor
-			if (outputs.containsKey(candidate)){
-				Collection<Port> externPorts = outputs.get(candidate);
-				if(externPorts.contains(port)){
-					//Port is external
-					continue;
-				}
-			}
-			
-			internalizePort(port, rate * moc.getNumTokensProduced(port), candidate);
-		}
-	}
-	
-	private void InternalizeInputs(Actor candidate, int rate){
-		//Get MoC of the current candidate to define the size of the state variable required
-		//TODO: extend to QSDF
-		CSDFMoC moc = (CSDFMoC)candidate.getMoC();
-		
-		for (Port port : candidate.getInputs()){
-			//Check if the current is external from the composite actor
-			if (inputs.containsKey(candidate)){
-				Collection<Port> externPorts = inputs.get(candidate);
-				if(externPorts.contains(port)){
-					//Port is external
-					continue;
-				}
-			}
-			
-			internalizePort(port, rate * moc.getNumTokensConsumed(port), candidate);
-		}
-	}
 
-	
 	private OrderedMap<String, Port> getPorts(MultiMap<Actor, Port> ports) {
 		OrderedMap<String, Port> orderPorts = new OrderedMap<String, Port>();
 
@@ -211,6 +125,67 @@ public class ActorMerger {
 		}
 
 		return orderPorts;
+	}
+
+	private void InternalizeInputs(Actor candidate, int rate) {
+		// Get MoC of the current candidate to define the size of the state
+		// variable required
+		// TODO: extend to QSDF
+		CSDFMoC moc = (CSDFMoC) candidate.getMoC();
+
+		for (Port port : candidate.getInputs()) {
+			// Check if the current is external from the composite actor
+			if (inputs.containsKey(candidate)) {
+				Collection<Port> externPorts = inputs.get(candidate);
+				if (externPorts.contains(port)) {
+					// Port is external
+					continue;
+				}
+			}
+
+			internalizePort(port, rate * moc.getNumTokensConsumed(port),
+					candidate);
+		}
+	}
+
+	private void InternalizeOutputs(Actor candidate, int rate) {
+		// Get MoC of the current candidate to define the size of the state
+		// variable required
+		// TODO: extend to QSDF
+		CSDFMoC moc = (CSDFMoC) candidate.getMoC();
+
+		for (Port port : candidate.getOutputs()) {
+			// Check if the current is external from the composite actor
+			if (outputs.containsKey(candidate)) {
+				Collection<Port> externPorts = outputs.get(candidate);
+				if (externPorts.contains(port)) {
+					// Port is external
+					continue;
+				}
+			}
+
+			internalizePort(port, rate * moc.getNumTokensProduced(port),
+					candidate);
+		}
+	}
+
+	private void internalizePort(Port port, int tokenSize, Actor candidate) {
+		// Check if this port has not been internalize before
+		GlobalVariable portVar;
+
+		if (internalize.containsKey(port)) {
+			portVar = internalize.get(port);
+		} else {
+			// Port has never been internalize, create a new one
+			TypeList typeList = IrFactory.eINSTANCE.createTypeList(tokenSize,
+					port.getType());
+			portVar = new GlobalVariable(new Location(), typeList,
+					port.getName(), true);
+
+			stateVars.put(portVar.getName(), portVar);
+		}
+
+		new InternalizeFifoAccess(port, portVar).visit(candidate);
 	}
 
 	public void mergeFSM(FSM candidate, int rate) {
@@ -233,11 +208,10 @@ public class ActorMerger {
 		}
 	}
 
-	
 	public void mergeScheduler(ActionScheduler candidate, int rate) {
 		List<Action> actions = scheduler.getActions();
 
-		//Add all actions outside an fsm
+		// Add all actions outside an fsm
 		for (int i = 0; i < rate; i++) {
 			actions.addAll(candidate.getActions());
 		}

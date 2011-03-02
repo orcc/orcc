@@ -54,7 +54,12 @@ import org.jgrapht.DirectedGraph;
 public class InstanceMerger {
 
 	private ActorMerger actorMerger;
-	DirectedGraph<Vertex, Connection> graph;
+	private DirectedGraph<Vertex, Connection> graph;
+	private MultiMap<Actor, Port> extInputs;
+	private MultiMap<Actor, Port> extOutputs;
+	/*private MultiMap<Actor, Port> intInputs;
+	private MultiMap<Actor, Port> intOutputs;
+	private MultiMap<Port, Port> intConnections;*/
 
 	int nMerged;
 
@@ -68,10 +73,10 @@ public class InstanceMerger {
 		Set<Vertex> vertices = verticesRate.keySet();
 
 		// Create a composite actor
-		MultiMap<Actor, Port> extInput = getExtInput(vertices);
-		MultiMap<Actor, Port> extOutput = getExtOutput(vertices);
+		defineInput(vertices);
+		defineOutput(vertices);
 
-		actorMerger = new ActorMerger(extInput, extOutput);
+		actorMerger = new ActorMerger(extInputs, extOutputs);
 
 		for (Entry<Vertex, Integer> entry : verticesRate.entrySet()) {
 			Vertex vertex = entry.getKey();
@@ -92,8 +97,8 @@ public class InstanceMerger {
 		return new Vertex(compositeInst);
 	}
 
-	private MultiMap<Actor, Port> getExtInput(Set<Vertex> vertices) {
-		MultiMap<Actor, Port> inputs = new MultiMap<Actor, Port>();
+	private void defineInput(Set<Vertex> vertices) {
+		extInputs = new MultiMap<Actor, Port>();
 
 		for (Vertex vertex : vertices) {
 			Set<Connection> connections = graph.incomingEdgesOf(vertex);
@@ -105,17 +110,17 @@ public class InstanceMerger {
 					Port input = connection.getTarget();
 					Actor actor = vertex.getInstance().getActor();
 
-					inputs.add(actor, input);
+					extInputs.add(actor, input);
+				}else{
+					
 				}
 			}
 
 		}
-
-		return inputs;
 	}
 
-	private MultiMap<Actor, Port> getExtOutput(Set<Vertex> vertices) {
-		MultiMap<Actor, Port> outputs = new MultiMap<Actor, Port>();
+	private void defineOutput(Set<Vertex> vertices) {
+		extOutputs = new MultiMap<Actor, Port>();
 
 		for (Vertex vertex : vertices) {
 			Set<Connection> connections = graph.outgoingEdgesOf(vertex);
@@ -126,13 +131,13 @@ public class InstanceMerger {
 				if (!vertices.contains(dstVertex)) {
 					Port output = connection.getSource();
 					Actor actor = vertex.getInstance().getActor();
-					outputs.add(actor, output);
+					extOutputs.add(actor, output);
+				}else{
+					
 				}
 			}
 
 		}
-
-		return outputs;
 	}
 
 	private void putAttributes(Instance instance, Set<Vertex> vertices) {
