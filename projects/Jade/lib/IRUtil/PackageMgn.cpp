@@ -99,7 +99,7 @@ string PackageMng::getFirstPackage(string name){
 	int index = name.find('.');
 
 	if (index == string::npos){
-		return "";
+		return name;
 	}
 
 	return name.substr(0, index);

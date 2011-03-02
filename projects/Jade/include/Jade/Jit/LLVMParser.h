@@ -77,18 +77,42 @@ public:
      */
 	llvm::Module* loadBitcode(std::string package, std::string file);
 
+	 /**
+     *  @brief Load and parse the bitcode file in an archive
+	 *
+	 *  Open and load archive then find and read the specified bitcode file of the current 
+	 *  actor and return the corresponding module. 
+	 *
+	 * @param archiveName : archive where is file
+	 * @param file : file to parse
+	 *
+	 * @return the corresponding llvm::Module
+	 *
+     */
+	llvm::Module* loadBitcodeInArchive(llvm::sys::Path archiveName, llvm::sys::Path file);
+
 private:
 	/**
      *  @brief Get the filename of the given file
 	 *
-	 *	Test the presence of a file in folders from the default directory to VTL and tools folder.
-     *
 	 * @param file : string name of the file
 	 *
 	 * @return the corresponding llvm::sys::Path
 	 *
      */
 	llvm::sys::Path getFilename(std::string package, std::string file);
+	
+	/**
+     *  @brief Get the archivename of the given package
+	 *
+	 *  Test the presence of archive from the default directory to VTL.
+     *
+	 * @param file : string name of the archive's package
+	 *
+	 * @return the corresponding llvm::sys::Path
+	 *
+     */
+	llvm::sys::Path getArchivename(std::string package);
 
 	/** default directory of the actor */
 	std::string directory;

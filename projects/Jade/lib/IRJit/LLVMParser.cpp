@@ -38,6 +38,7 @@
 //------------------------------
 #include <iostream>
 
+#include "llvm/Bitcode/Archive.h"
 #include "llvm/Support/IRReader.h"
 
 #include "Jade/Jit/LLVMParser.h"
@@ -57,14 +58,25 @@ LLVMParser::LLVMParser(LLVMContext& C, string directory, bool verbose): Context(
 
 Module* LLVMParser::loadBitcode(string package, string file) {
 	SMDiagnostic Err;
+	Module *Mod;
 
 	//Get filename of the actor
-	sys::Path Filename= getFilename(package, file);
-
-	if (verbose) cout << "Loading '" << Filename.c_str() << "'\n";
+	sys::Path Filename = getFilename(package, file);
 	
-	// Load the bitcode...
-	Module *Mod = ParseIRFile(Filename.c_str(), Err, Context);
+	//Verifying if file is existing, else maybe it is in an archive
+	if (Filename.exists()){
+		// Load the bitcode...
+		Mod = ParseIRFile(Filename.c_str(), Err, Context);
+	}
+	else {
+		//Get archivename of the package
+		sys::Path Archivename = getArchivename(package);
+
+		//Load the bitcode in the archive
+		Mod = loadBitcodeInArchive(Archivename, Filename);
+	}
+
+	if (verbose) cout << "Loading '" << Filename.c_str() << "'\n";	
 
 	if (!Mod) {
 		//Error when parsing module
@@ -72,34 +84,61 @@ Module* LLVMParser::loadBitcode(string package, string file) {
 		exit(1);
 	}
 
+
+	return Mod;
+}
+
+Module* LLVMParser::loadBitcodeInArchive(sys::Path archiveName, sys::Path file) {
+	
+	std::string Error;
+
+	Module* Mod;
+	Archive::iterator itArch;
+	LLVMContext &Context = getGlobalContext();
+
+	//Load archive
+	Archive* archive = Archive::OpenAndLoad(archiveName, Context, &Error);
+	if (Error != "")
+		cerr <<"Error when open archive "<< archiveName.c_str();
+
+	//Find and load module
+	for(itArch=archive->begin(); itArch!=archive->end(); itArch++){
+		if(itArch->getPath() == file){
+			MemoryBuffer *Buffer = MemoryBuffer::getMemBufferCopy(StringRef(itArch->getData(),
+																			itArch->getSize()),
+																  file.str());       
+			
+			Mod = ParseBitcodeFile(Buffer, Context, &Error);
+			if (Error != "")
+				cerr <<"Error when parse actorfile "<< file.c_str() << "in archive" <<archiveName.c_str();
+
+			break;
+		}	
+	}
+
 	return Mod;
 }
 
 sys::Path LLVMParser::getFilename(string packageName, string file){
 	
-	//Verifying if package is existing
 	string package = PackageMng::getFolder(packageName);
 	sys::Path packagePath(directory + package);
 
-	if (!packagePath.exists()){
-		//Package doesn't exist
-		cout << "Package" << packagePath.c_str() << " is required but not found.'\n";
-		exit(0);
-	}
-
-	if (packagePath.isArchive()){
-		//Archive is not supported yet
-		cout << "Found " << packagePath.c_str() << " as archive.'\n";
-		exit(0);
-	}
-
-	//Verifying if file is existing
 	sys::Path actorFile(packagePath.str()+"/"+file);
-
-	if (!actorFile.exists()){
-		cout <<  "File  " << file.c_str() << " has not been found in package "<< packageName.c_str() <<".\n";
-		exit(0);
-	}
 	
 	return actorFile;
+}
+
+sys::Path LLVMParser::getArchivename(string packageName){
+	
+	string firstPackage = PackageMng::getFirstPackage(packageName);
+	sys::Path archiveFile(directory + firstPackage + ".a");
+
+	if(!archiveFile.isArchive()){
+		//Package doesn't exist
+		cout << "Package" << directory << PackageMng::getFolder(packageName) << " is required but not found.'\n";
+		exit(0);
+	}
+
+	return archiveFile;
 }

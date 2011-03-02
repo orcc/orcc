@@ -242,7 +242,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		jadeToolbox = OrccActivator.getDefault().getPreferenceStore()
 				.getString(P_JADETOOLBOX);
-	}
+ 	}
 
 	private void startExec(String[] cmd) throws IOException {
 		Runtime run = Runtime.getRuntime();
