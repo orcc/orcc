@@ -37,7 +37,6 @@
 
 //------------------------------
 #include "Jade/Util/PackageMng.h"
-#include "Jade/Core/Package.h"
 
 #include <algorithm>
 //------------------------------

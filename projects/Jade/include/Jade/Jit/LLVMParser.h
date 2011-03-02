@@ -65,17 +65,18 @@ public:
 	LLVMParser(llvm::LLVMContext& C, std::string directory, bool verbose = false);
 	
 	/**
-     *  @brief Load and parse the bitcode file
+     *  @brief Load and parse the module file
      *
-	 *  Read the specified bitcode file of the current actor and return the corresponding 
-	 *		module. 
+	 *  Read the specified file as an LLVM module. 
+	 *
+	 * @param package : the package that contains the actor
 	 *
 	 * @param file : file to parse
 	 *
 	 * @return the corresponding llvm::Module
 	 *
      */
-	llvm::Module* loadBitcode(std::string package, std::string file);
+	llvm::Module* loadModule(std::string package, std::string file);
 
 	 /**
      *  @brief Load and parse the bitcode file in an archive

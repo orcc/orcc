@@ -98,7 +98,7 @@ Actor* IRParser::parseActor(string classz){
 	string package = PackageMng::getPackages(classz);
 	
 	//Parse the bitcode
-	Module* module = parser->loadBitcode(package, file);
+	Module* module = parser->loadModule(package, file);
 
 	if (module == 0){
 		//Module not found
@@ -112,7 +112,7 @@ Actor* IRParser::parseActor(string classz){
 	
 	// Parse name
 	NamedMDNode* nameNMD =  module->getNamedMetadata(IRConstant::KEY_NAME);
-	MDNode* nameMD =cast<MDNode>(nameNMD->getOperand(0));
+	MDNode* nameMD = cast<MDNode>(nameNMD->getOperand(0));
 	MDString* name = cast<MDString>(nameMD->getOperand(0));
 
 	// Parse actor elements

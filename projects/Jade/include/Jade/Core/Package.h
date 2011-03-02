@@ -39,6 +39,10 @@
 #ifndef PACKAGE_H
 #define PACKAGE_H
 
+namespace llvm{
+	class Archive;
+}
+
 #include "Jade/Core/Actor.h"
 //------------------------------
 
@@ -60,7 +64,10 @@ public:
 	 *
 	 * @param name : name of the Package
      */
-	Package(std::string name){this->name = name;};
+	Package(std::string name){
+		this->name = name;
+		this->archive = NULL;
+	};
 
 	/*!
      *  @brief Constructor
@@ -140,9 +147,23 @@ public:
      */
 	std::map<std::string, Package*>* getChilds(){return &childs;};
 
+	/**
+     *  @brief Return true if this package is represented as an archive.
+	 *
+	 *  @return true if the package is an archive, otherwise false.
+	 *
+     */
+	bool isArchive(){ return archive;};
+
 private:
 	/** Name of the package */
 	std::string name;
+
+	/** Indicate the directory of the package*/
+	std::string directory;
+
+	/** Indicate the archive of the package*/
+	llvm::Archive* archive;
 
 	/** List of actors contains in this package */
 	std::map<std::string, Actor*> actors;

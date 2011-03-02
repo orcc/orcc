@@ -40,6 +40,7 @@
 #define PACKAGEMNG_H
 
 #include "Jade/Core/Actor.h"
+#include "Jade/Core/Package.h"
 //------------------------------
 
 /**
@@ -164,6 +165,10 @@ public:
 	 *
      */
 	static std::map<std::string, Package*>* setPackages(std::map<std::string, Actor*>* actors);
+
+private:
+	/** Package preloaded */
+	std::map<std::string, Package*> packages;
 };
 
 #endif

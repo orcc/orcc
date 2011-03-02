@@ -56,7 +56,7 @@ LLVMParser::LLVMParser(LLVMContext& C, string directory, bool verbose): Context(
 }
 
 
-Module* LLVMParser::loadBitcode(string package, string file) {
+Module* LLVMParser::loadModule(string package, string file) {
 	SMDiagnostic Err;
 	Module *Mod;
 

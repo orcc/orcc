@@ -83,7 +83,7 @@ void FifoMng::parseModules(){
 	LLVMParser parser(Context, getPackageFolder());
 
 	//Parse fifos
-	headerMd = parser.loadBitcode("System", FifoMng::getFifoFilename());
+	headerMd = parser.loadModule("System", FifoMng::getFifoFilename());
 
 	if (headerMd == NULL){
 		cout << "Unable to parse fifo header file";
@@ -91,7 +91,7 @@ void FifoMng::parseModules(){
 	}
 
 	//parse extern functions
-	externFnMd = parser.loadBitcode("System", "Extern");
+	externFnMd = parser.loadModule("System", "Extern");
 
 	if (externFnMd == NULL){
 		cout << "Unable to parse extern functions file";
