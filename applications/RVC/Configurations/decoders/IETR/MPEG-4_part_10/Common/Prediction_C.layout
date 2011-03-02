@@ -32,12 +32,13 @@
       <vertex id="FrameNum" x="980" y="146"/>
       <vertex id="MbLocation" x="4" y="210"/>
       <vertex id="NeighbourAvail" x="20" y="115"/>
-      <vertex id="Display_C" x="1367" y="121"/>
+      <vertex id="Display_C" x="1394" y="606"/>
       <vertex id="Intra8x8" x="522" y="13"/>
       <vertex id="Inter" x="471" y="421"/>
       <vertex id="Buffer_inter" x="1163" y="100"/>
       <vertex id="Select_chroma" x="731" y="317"/>
       <vertex id="Deblocking_Filter" x="987" y="436"/>
       <vertex id="DemuxParserInfos" x="192" y="12"/>
+      <vertex id="DisplayBuffer" x="1244" y="582"/>
    </vertices>
 </layout>

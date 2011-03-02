@@ -20,26 +20,27 @@
       <vertex id="ConstrainedIFlag" x="57" y="815"/>
       <vertex id="DelList" x="977" y="209"/>
       <vertex id="PocToDisplay" x="977" y="302"/>
-      <vertex id="IsIDR" x="977" y="416"/>
+      <vertex id="IsIDR" x="992" y="384"/>
       <vertex id="MacroBlockType" x="57" y="1187"/>
       <vertex id="TransformSize8x8" x="57" y="908"/>
-      <vertex id="PocToRead" x="977" y="509"/>
-      <vertex id="ReadAddress" x="977" y="602"/>
+      <vertex id="PocToRead" x="980" y="485"/>
+      <vertex id="ReadAddress" x="978" y="542"/>
       <vertex id="SubMbType" x="235" y="466"/>
       <vertex id="MbType4Pred" x="235" y="559"/>
       <vertex id="SelectList" x="235" y="652"/>
-      <vertex id="IsNewPicOrSlice" x="977" y="695"/>
-      <vertex id="EnableRead" x="977" y="788"/>
-      <vertex id="FrameNum" x="977" y="881"/>
+      <vertex id="IsNewPicOrSlice" x="952" y="433"/>
+      <vertex id="EnableRead" x="974" y="259"/>
+      <vertex id="FrameNum" x="974" y="351"/>
       <vertex id="MbLocation" x="57" y="1094"/>
       <vertex id="NeighbourAvail" x="57" y="1001"/>
-      <vertex id="Display_L" x="1356" y="416"/>
-      <vertex id="Buffer_inter" x="1150" y="299"/>
+      <vertex id="Display_L" x="1390" y="-40"/>
+      <vertex id="Buffer_inter" x="1204" y="269"/>
       <vertex id="Select" x="784" y="653"/>
       <vertex id="Intra_16x16" x="541" y="785"/>
       <vertex id="Intra_4x4" x="541" y="1027"/>
       <vertex id="Deblocking_Filter" x="977" y="974"/>
       <vertex id="DemuxParserInfos" x="235" y="804"/>
       <vertex id="Inter" x="541" y="403"/>
+      <vertex id="DisplayBuffer" x="1215" y="644"/>
    </vertices>
 </layout>
