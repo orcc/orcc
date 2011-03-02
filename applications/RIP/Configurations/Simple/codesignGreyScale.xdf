@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Top_sobel">
+<XDF name="codesignGreyScale">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -12,47 +12,56 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="ReadImage">
+    <Instance id="readImage">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../VTL/System/ReadImage"/>
+        <Class name="System.ReadImage"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="DisplayImage">
+    <Instance id="displayImage">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../VTL/System/DisplayImage"/>
+        <Class name="System.DisplayImage"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="rgb2y">
+    <Instance id="greyScaler">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../VTL/Common/Conversion/RGBToY"/>
+        <Class name="RIP.ColorSpace.Conversion.RGBToY"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="y2rgb">
+    <Instance id="primaryScaler">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../VTL/Common/Conversion/YToRGB"/>
+        <Class name="RIP.ColorSpace.Conversion.YToRGB"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="sobel">
+    <Instance id="serializer">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../VTL/Common/Sobel/Sobel"/>
+        <Class name="RIP.ColorSpace.SerDes.serRGB"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="deserializer">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="RIP.ColorSpace.SerDes.desRGB"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -60,15 +69,17 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="DisplayImage" dst-port="SizeOfImage"
-        src="ReadImage" src-port="SizeOfImage"/>
-    <Connection dst="rgb2y" dst-port="RED" src="ReadImage" src-port="R"/>
-    <Connection dst="rgb2y" dst-port="GREEN" src="ReadImage" src-port="G"/>
-    <Connection dst="rgb2y" dst-port="BLUE" src="ReadImage" src-port="B"/>
-    <Connection dst="sobel" dst-port="Y" src="rgb2y" src-port="Y"/>
-    <Connection dst="DisplayImage" dst-port="R" src="y2rgb" src-port="RED"/>
-    <Connection dst="DisplayImage" dst-port="G" src="y2rgb" src-port="GREEN"/>
-    <Connection dst="DisplayImage" dst-port="B" src="y2rgb" src-port="BLUE"/>
-    <Connection dst="sobel" dst-port="SizeOfImage" src="ReadImage" src-port="SizeOfImage"/>
-    <Connection dst="y2rgb" dst-port="Y" src="sobel" src-port="GRADIENT"/>
+    <Connection dst="displayImage" dst-port="R" src="primaryScaler" src-port="R"/>
+    <Connection dst="displayImage" dst-port="G" src="primaryScaler" src-port="G"/>
+    <Connection dst="primaryScaler" dst-port="Y" src="greyScaler" src-port="Y"/>
+    <Connection dst="displayImage" dst-port="B" src="primaryScaler" src-port="B"/>
+    <Connection dst="displayImage" dst-port="SizeOfImage"
+        src="readImage" src-port="SizeOfImage"/>
+    <Connection dst="serializer" dst-port="R" src="readImage" src-port="R"/>
+    <Connection dst="serializer" dst-port="G" src="readImage" src-port="G"/>
+    <Connection dst="serializer" dst-port="B" src="readImage" src-port="B"/>
+    <Connection dst="greyScaler" dst-port="R" src="deserializer" src-port="R"/>
+    <Connection dst="greyScaler" dst-port="G" src="deserializer" src-port="G"/>
+    <Connection dst="greyScaler" dst-port="B" src="deserializer" src-port="B"/>
+    <Connection dst="deserializer" dst-port="RGB" src="serializer" src-port="RGB"/>
 </XDF>
