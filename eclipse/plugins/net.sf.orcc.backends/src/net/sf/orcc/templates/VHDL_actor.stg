@@ -62,8 +62,8 @@ signalDeclaration(variable) ::= <<
 else
   >type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;<\n><
   if(variable.assignable)
-    >signal <variable> : memory_type_<variable> <if(variable.initialized)>:= <variable.initialValue><endif>;<      
-   else
+    >signal <variable> : memory_type_<variable> <if(variable.initialized)>:= <variable.initialValue><endif>;
+  <else
     >constant <variable> : memory_type_<variable> <if(variable.initialized)>:= <variable.initialValue><endif>;
   <endif>
 <endif>
@@ -291,10 +291,10 @@ end loop;
 function(procedure) ::= <<
 <if (!procedure.native)
   ><if (procedure.returnType.void)
->procedure <procedure>(<parameters(procedure.parameters.list)>dummy : std_logic) is<
-  else
->function <procedure>(<VarUsed(procedure)><parameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType)> is<
-  endif>
+>procedure <procedure>(<parameters(procedure.parameters.list)>dummy : std_logic) is
+<else
+>function <procedure>(<VarUsed(procedure)><parameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType)> is
+<endif>
   <if(procedure.locals.list)
 ><procedure.locals.list: {variable| <VarInFctDeclaration(variable)>;<\n>}><
   endif>
@@ -666,7 +666,7 @@ architecture rtl_<actor.simpleName> of <actor.simpleName> is
 >  ---------------------------------------------------------------------------
   -- Functions and procedures
   ---------------------------------------------------------------------------
-  <actor.procs.list: {proc|<function(procedure=proc)>}; separator="\n"><
+  <actor.procs.list: {proc|<function(procedure=proc)>}; separator="\n\n"><
 endif>
 
   <if(actor.actionScheduler.fsm)

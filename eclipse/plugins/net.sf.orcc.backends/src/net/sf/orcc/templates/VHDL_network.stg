@@ -67,9 +67,13 @@ printSignals(inputs, outputs) ::= <<
 ><network.incomingMap.(instance).values: printInSignals()><
 endif><
 if(!outputs.empty)
-><outgoingMap.(instance).values: printOutSignals()><
+><outgoingMap.(instance).values: {connections|<connections:{connection | <printOutSignals(connection=connection, map=network.successorsMap.(instance))>}>}><
 endif>
 >>
+
+//<outgoingMap.(instance).values: printOutSignals()>
+
+
 
 // print internal signals when necessary
 printInSignals(connection) ::= <<
@@ -86,15 +90,14 @@ printInSignal(connection, map) ::= <<
 ><SignalType(instance=instance, port=connection.target, dataType="data")>
 signal <instance.id>_<connection.target>_send   : std_logic;
 signal <instance.id>_<connection.target>_ack    : std_logic;
-<
-endif>
+<endif>
 >>
 
-printOutSignals(connection) ::= <<
+printOutSignals(connection, map) ::= <<
 <if (instance.broadcast)
 ><
 else
-><printOutSignal(connection=connection, map=network.successorsMap.(instance))><
+><printOutSignal(connection=connection, map=map)><
 endif>
 >>
 
@@ -103,8 +106,7 @@ printOutSignal(connection, map) ::= <<
 ><SignalType(instance=instance, port=connection.source, dataType="data")>
 signal <instance.id>_<connection.source>_send   : std_logic;
 signal <instance.id>_<connection.source>_ack    : std_logic;
-<
-endif>
+<endif>
 >>
 
 
@@ -112,7 +114,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // Print FIFOs instantiation
 ///////////////////////////////////////////////////////////////////////////////
-assignFifos(edges) ::= << 
+assignFifos(edges) ::= <<
 <edges: assignFifo()>
 >> 
 
@@ -130,34 +132,34 @@ endif>
 >>
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
-<if(edge.size)
->fifo_<count> : entity work.fifo_generic 
-generic map (
-  depth =\> <edge.size>,
+<if(edge.size)>
+fifo_<count> : entity work.fifo_generic 
+  generic map (
+    depth =\> <edge.size>,
   <if(targetPort.type.bool)
 >  width =\> 1)<
   else
 >  width =\> <targetPort.type.size>)<
   endif>
 
-port map (
-  wr_data    =\> <source.id>_<sourcePort.name>_send, 
+  port map (
+    wr_data    =\> <source.id>_<sourcePort.name>_send, 
   <if(targetPort.type.bool)
 >  data_in(0) =\> <source.id>_<sourcePort.name>_data,<\n><
   else
 >  data_in    =\> <source.id>_<sourcePort.name>_data,<\n><
   endif>
-  wr_clk     =\> clock, 
-  wr_ack     =\> <source.id>_<sourcePort.name>_ack, 
+    wr_clk     =\> clock, 
+    wr_ack     =\> <source.id>_<sourcePort.name>_ack, 
   <if(targetPort.type.bool)
 >  data_out(0)=\> <target.id>_<targetPort.name>_data,<\n><
   else
 >  data_out   =\> <target.id>_<targetPort.name>_data,<\n><
   endif
->  rd_clk     =\> clock, 
-  send       =\> <target.id>_<targetPort.name>_send, 
-  rd_ack     =\> <target.id>_<targetPort.name>_ack,  
-  reset_n    =\> reset_n);<
+>    rd_clk     =\> clock, 
+    send       =\> <target.id>_<targetPort.name>_send, 
+    rd_ack     =\> <target.id>_<targetPort.name>_ack,  
+    reset_n    =\> reset_n);<
 endif>
 >>
 
@@ -404,7 +406,6 @@ begin
   -- Broadcast and FIFO instantiation 
   --------------------------------------------------------------------------- 
   <printBroadcasts(network.outgoingMap)>
-  --
   <assignFifos(network.connections)>
   ---------------------------------------------------------------------------
 
