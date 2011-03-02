@@ -357,7 +357,6 @@
         src="DemuxParserInfos" src-port="ConstrI_Intra"/>
     <Connection dst="Intra8x8" dst-port="IsIntraFlag"
         src="DemuxParserInfos" src-port="IsIntraFlag"/>
-    <Connection dst="Buffer_inter" dst-port="POCtoDisplay" src="" src-port="PocToDisplay"/>
     <Connection dst="Intra8x8" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
@@ -379,8 +378,6 @@
     <Connection dst="DemuxParserInfos" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
     <Connection dst="DemuxParserInfos" dst-port="MbLocation" src="" src-port="MbLocation"/>
     <Connection dst="Buffer_inter" dst-port="MbLocation" src="" src-port="MbLocation"/>
-    <Connection dst="DisplayBuffer" dst-port="DelList" src="" src-port="DelList"/>
-    <Connection dst="DisplayBuffer" dst-port="FrameNum" src="" src-port="FrameNum"/>
     <Connection dst="DisplayBuffer" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="DisplayBuffer" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
     <Connection dst="DisplayBuffer" dst-port="POC" src="" src-port="POC"/>

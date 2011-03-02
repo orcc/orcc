@@ -27,10 +27,9 @@ actor DisplayBuffer ( int MB_WIDTH )
 	uint(size=13) PicSizeInMb, 
 	uint          POC,
 	int( size=32) POCtoDisplay,
-	uint(size=8)   WD,
+	uint(size=8)  WD,
 	bool          IsIDR,
-	uint(size=2)  IsNewPicOrSlice,
-	uint(size=31) FrameNum
+	uint(size=2)  IsNewPicOrSlice
 		==>
 	int (size=9)  Display
 		:
@@ -43,8 +42,6 @@ actor DisplayBuffer ( int MB_WIDTH )
 */
 	uint(size=2) IS_NEW_MB    = 0;
 	uint(size=2) IS_NEW_PIC   = 2;
-
-	int (size=32) SENT_DONE       = -2;
 
 	uint(size=32) NB_PIC          = 33;
 	uint(size=32) SZ_NBPIC        = 6; /* >= log2(NB_PIC) */
@@ -99,8 +96,6 @@ actor DisplayBuffer ( int MB_WIDTH )
 			write_done := false;
 		end
 
-
-	//Write_data: 
 	write_data : action
 			WD :[wd] repeat 8 
 				==>
@@ -134,7 +129,6 @@ actor DisplayBuffer ( int MB_WIDTH )
 
 	read_ref_parameters: action
 			POC             :[Valpoc],
-			FrameNum        :[frame_num],
 			IsIDR           :[IsIDRPic]
 				==>
 		var
@@ -236,20 +230,6 @@ actor DisplayBuffer ( int MB_WIDTH )
 			nbMBdisplayForYaxis := 0;
 		end
 
-	ReadDelList.Launch: action
-			DelList:[DelPoc , DelFrame]
-				==>
-		guard
-			DelPoc != SENT_DONE
-		end
-
-
-	ReadDelList.Done: action
-			DelList:[DelVal]
-				==>
-		do
-		end
-
 
 	getNextPOCtoDisplay.launch: action
 			POCtoDisplay :[poc2disp]
@@ -289,10 +269,7 @@ actor DisplayBuffer ( int MB_WIDTH )
 
 		read_write          (write_data               )--> read_write;
 		read_write          (get_writeAddr            )--> read_write;
-		read_write          (write_picture_done       )--> read_del_list;
-
-		read_del_list       (ReadDelList.Launch      )--> read_del_list;
-		read_del_list       (ReadDelList.Done        )--> getNextPOCtoDisplay;
+		read_write          (write_picture_done       )--> getNextPOCtoDisplay;
 
 		getNextPOCtoDisplay (getNextPOCtoDisplay.launch      )--> getidxdisplay;
 		getNextPOCtoDisplay (getNextPOCtoDisplay.sync        )--> read_ref_parameters;
@@ -307,7 +284,6 @@ actor DisplayBuffer ( int MB_WIDTH )
   priority
     write_picture_done         > get_writeAddr       > write_data;
   	Display.done               > Display.chroma      > Display.luma;
-  	ReadDelList.Launch         > ReadDelList.Done;
   	getNextPOCtoDisplay.launch > getNextPOCtoDisplay.sync;
   end
 end
