@@ -45,8 +45,7 @@ actor DisplayBuffer ( int MB_WIDTH )
 	uint(size=32) SZ_NBPIC        = 5; /* >= log2(NB_PIC) */
 	//FIXME! number of MB per line of picture
 
-
-	List(type :List(type: List( type:uint(size=8), size=MAX_PICWIDTH_PX), size=MAX_PICHEIGHT_PX), size=NB_PIC) pic;
+	uint(size=8) picture [NB_PIC][MAX_PICWIDTH_BLK][MAX_PICHEIGHT_BLK][256];
 	List(type:uint(size=32) ,size=NB_PIC) ListPOC       := [ 0    :for int s in 0 .. NB_PIC-1];
 	List(type:bool          ,size=NB_PIC) PicDisplayed  := [true  :for int s in 0 .. NB_PIC-1];
 
@@ -113,8 +112,8 @@ actor DisplayBuffer ( int MB_WIDTH )
 		do
 			PicWidthInMacroB := PICwidthInMb;
 			PicSizeInMacroB  := PICSizeInMb;
-			wa_x_offset := MbLocxInPic * MB_WIDTH;
-			wa_y_offset := MbLocyInPic * MB_WIDTH;
+			wa_x_offset := MbLocxInPic;
+			wa_y_offset := MbLocyInPic;
 		end
 
 	write_data.Luma : action 
@@ -123,12 +122,9 @@ actor DisplayBuffer ( int MB_WIDTH )
 		guard 
 			MB_WIDTH = MB_WIDTH_LUMA
 		do
-			foreach int y in 0 .. MB_WIDTH_LUMA
+			foreach int i in 0 .. MB_WIDTH_LUMA * MB_WIDTH_LUMA - 1
 			do
-				foreach int x in 0 .. MB_WIDTH_LUMA
-				do
-					pic[pic_curr_idx][wa_x_offset + x][wa_y_offset + y] := wd[x + y*MB_WIDTH_LUMA];
-				end
+				picture[pic_curr_idx][wa_x_offset][wa_y_offset][i] := wd[i];
 			end
 		end
 
@@ -138,12 +134,9 @@ actor DisplayBuffer ( int MB_WIDTH )
 		guard 
 			MB_WIDTH = MB_WIDTH_CHROMA
 		do
-			foreach int y in 0 .. MB_WIDTH_CHROMA
+			foreach int i in 0 .. MB_WIDTH_CHROMA * MB_WIDTH_CHROMA - 1
 			do
-				foreach int x in 0 .. MB_WIDTH_CHROMA
-				do
-					pic[pic_curr_idx][wa_x_offset + x][wa_y_offset + y] := wd[x + y*MB_WIDTH_CHROMA];
-				end
+				picture[pic_curr_idx][wa_x_offset][wa_y_offset][i] := wd[i];
 			end
 		end
 
@@ -164,20 +157,11 @@ actor DisplayBuffer ( int MB_WIDTH )
 			IdxNextPOCtoDisplay != -1,
 			MB_WIDTH = MB_WIDTH_CHROMA
 		var
-			uint         CurrAddrInPix,
-			uint         CurrAddrYaxis,
 			List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff := [ 0 :for int t in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ] 
 		do
-			CurrAddrInPix := nbMBdisplayForXaxis * MB_WIDTH_CHROMA + nbMBdisplayForYaxis * MB_WIDTH_CHROMA * MB_WIDTH_CHROMA * PicWidthInMacroB;
-			
-			CurrAddrYaxis := 0;
-			foreach int y in 0 .. (MB_WIDTH_CHROMA-1)
+			foreach int i in 0 .. MB_WIDTH_CHROMA * MB_WIDTH_CHROMA - 1
 			do
-				foreach int x in 0 .. (MB_WIDTH_CHROMA-1)
-				do
-					buff[x + y * MB_WIDTH_CHROMA] := pic[IdxNextPOCtoDisplay][nbMBdisplayForXaxis * MB_WIDTH_CHROMA + x][nbMBdisplayForYaxis * MB_WIDTH_CHROMA + y];
-				end
-				CurrAddrYaxis := CurrAddrYaxis + MB_WIDTH_CHROMA * PicWidthInMacroB;
+				buff[i] := picture[IdxNextPOCtoDisplay][nbMBdisplayForXaxis][nbMBdisplayForYaxis][i];
 			end
 			nbMBdisplayForXaxis := nbMBdisplayForXaxis + 1;
 			if(nbMBdisplayForXaxis = PicWidthInMacroB) then
@@ -194,19 +178,11 @@ actor DisplayBuffer ( int MB_WIDTH )
 			IdxNextPOCtoDisplay != -1,
 			MB_WIDTH != MB_WIDTH_CHROMA
 		var
-			uint         CurrAddrInPix,
-			uint         CurrAddrYaxis,
 			List(type:int(size=16),size = MB_WIDTH_LUMA * MB_WIDTH_LUMA + 1) buff := [ 0 :for int t in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA ] 
 		do
-			CurrAddrInPix := nbMBdisplayForXaxis * MB_WIDTH_LUMA + nbMBdisplayForYaxis * MB_WIDTH_LUMA * MB_WIDTH_LUMA * PicWidthInMacroB;
-			CurrAddrYaxis := 0;
-			foreach int y in 0 .. (MB_WIDTH_LUMA-1)
+			foreach int i in 0 .. MB_WIDTH_LUMA * MB_WIDTH_LUMA - 1
 			do
-				foreach int x in 0 .. (MB_WIDTH_LUMA-1)
-				do
-					buff[x + y * MB_WIDTH_LUMA] := pic[IdxNextPOCtoDisplay][nbMBdisplayForXaxis * MB_WIDTH_LUMA + x][nbMBdisplayForYaxis * MB_WIDTH_LUMA + y];
-				end
-				CurrAddrYaxis := CurrAddrYaxis + MB_WIDTH_LUMA * PicWidthInMacroB;
+				buff[i] := picture[IdxNextPOCtoDisplay][nbMBdisplayForXaxis][nbMBdisplayForYaxis][i];
 			end
 			nbMBdisplayForXaxis := nbMBdisplayForXaxis + 1;
 			if(nbMBdisplayForXaxis = PicWidthInMacroB) then
@@ -257,23 +233,23 @@ actor DisplayBuffer ( int MB_WIDTH )
 		end
   
 	schedule fsm  GetIsNewPic:
-		GetIsNewPic (GetIsNewPic )--> read_ref_parameters;
+		GetIsNewPic         (GetIsNewPic                )--> read_ref_parameters;
 
-		read_ref_parameters (read_ref_parameters      )--> getWriteAddr;
+		read_ref_parameters (read_ref_parameters        )--> getWriteAddr;
 
-		getWriteAddr        (get_writeAddr            )--> WriteData;
-		getWriteAddr          (write_picture_done       )--> getNextPOCtoDisplay;
+		getWriteAddr        (get_writeAddr              )--> WriteData;
+		getWriteAddr        (write_picture_done         )--> getNextPOCtoDisplay;
 
-		WriteData          (write_data               )--> getWriteAddr;
+		WriteData           (write_data                 )--> getWriteAddr;
 
-		getNextPOCtoDisplay (getNextPOCtoDisplay.launch      )--> getidxdisplay;
-		getNextPOCtoDisplay (getNextPOCtoDisplay.sync        )--> read_ref_parameters;
+		getNextPOCtoDisplay (getNextPOCtoDisplay.launch )--> getidxdisplay;
+		getNextPOCtoDisplay (getNextPOCtoDisplay.sync   )--> read_ref_parameters;
 
-		getidxdisplay       (getidxdisplay.launch     )--> Display;
+		getidxdisplay       (getidxdisplay.launch       )--> Display;
 
-		Display             (Display.luma             )--> Display;
-		Display             (Display.chroma           )--> Display;
-		Display             (Display.done             )--> getNextPOCtoDisplay;
+		Display             (Display.luma               )--> Display;
+		Display             (Display.chroma             )--> Display;
+		Display             (Display.done               )--> getNextPOCtoDisplay;
 	end
 
   priority
