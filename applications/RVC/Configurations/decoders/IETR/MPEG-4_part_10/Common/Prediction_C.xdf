@@ -383,8 +383,6 @@
     <Connection dst="DisplayBuffer" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="DisplayBuffer" dst-port="MbLocation" src="" src-port="MbLocation"/>
     <Connection dst="DisplayBuffer" dst-port="POCtoDisplay" src="" src-port="PocToDisplay"/>
-    <Connection dst="DisplayBuffer" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="DisplayBuffer" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="DisplayBuffer" dst-port="WD"
         src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="" dst-port="Display_C" src="DisplayBuffer" src-port="Display"/>
