@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2011-01-12
+-- Last update: 2011-03-02
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -59,72 +59,74 @@ entity controler is
   port (
     reset_n : in  std_logic;
     --
-    rd_clk  : in  std_logic;
-    rd_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
-    --
     wr_clk  : in  std_logic;
     wr_data : in  std_logic;
+    wr_ack  : out std_logic;
     wr_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
     --
+    rd_clk  : in  std_logic;
+    send    : out std_logic;
+    rd_ack  : in  std_logic;
+    rd_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
+    --
     empty   : out std_logic;
-    full    : out std_logic;
-    send    : out std_logic
-    );
+    full    : out std_logic);
 end controler;
 
 -------------------------------------------------------------------------------
 
 architecture archcontroler of controler is
 
-  signal inReadAdd  : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal inWriteAdd : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal iempty     : std_logic;
-  signal rd_data    : std_logic;
-  
+  signal ird_add : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal iwr_add : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal iempty  : std_logic;
+  signal ifull   : std_logic;
+  signal iwr_ack : std_logic;
+
 begin
 
-  empty <= iempty;
-  send  <= not iempty;
+  empty   <= iempty;
+  full    <= ifull;
+  iwr_ack <= wr_data and not ifull;
+  send    <= not iempty;
 
-  -- Address management
-  rd_add  <= inReadAdd;
-  wr_add  <= inWriteAdd;
-  rd_data <= not iempty;
+-- Address management
+  rd_add <= ird_add;
+  wr_add <= iwr_add;
   counter_1 : entity work.counter
     generic map (
       depth => depth)
     port map (
       reset_n => reset_n,
-      rd_clk  => rd_clk,
-      rd_data => rd_data,
       wr_clk  => wr_clk,
-      wr_data => wr_data,
-      rd_add  => inReadAdd,
-      wr_add  => inWriteAdd);
-
+      wr_data => iwr_ack,
+      wr_add  => iwr_add,
+      rd_clk  => rd_clk,
+      rd_data => rd_ack,
+      rd_add  => ird_add);
 
   -- Flags
-  Flag_full : process (inReadAdd, inWriteAdd) is
+  Flag_full : process (ird_add, iwr_add) is
     variable level : integer range depth -1 downto 0 := 0;
   begin
-    if (inWriteAdd <= inReadAdd) then
-      level  := to_integer(unsigned(inReadAdd - inWriteAdd));
+    if (iwr_add < ird_add) then
+      level  := to_integer(unsigned(ird_add - iwr_add));
       iempty <= '0';
-    elsif (inWriteAdd <= inReadAdd) then
+    elsif (iwr_add = ird_add) then
       level  := 0;
       iempty <= '1';
     else
-      level  := (depth -1) - to_integer(unsigned(inWriteAdd - inReadAdd));
+      level  := (depth -1) - to_integer(unsigned(iwr_add - ird_add));
       iempty <= '0';
     end if;
 
     case level is
       when 2 =>
-        full <= '1';
+        ifull <= '1';
       when 1 =>
-        full <= '1';
+        ifull <= '1';
       when others =>
-        full <= '0';
+        ifull <= '0';
     end case;
   end process Flag_full;
 

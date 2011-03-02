@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-11-24
+-- Last update: 2011-03-02
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -57,12 +57,12 @@ entity counter is
     depth : integer := 32);
   port (
     reset_n : in    std_logic;
-    rd_clk  : in    std_logic;
-    rd_data : in    std_logic;
     wr_clk  : in    std_logic;
     wr_data : in    std_logic;
-    rd_add  : inout std_logic_vector(bit_width(depth) -1 downto 0);
-    wr_add  : inout std_logic_vector(bit_width(depth) -1 downto 0));
+    wr_add  : inout std_logic_vector(bit_width(depth) -1 downto 0);
+    rd_clk  : in    std_logic;
+    rd_data : in    std_logic;
+    rd_add  : inout std_logic_vector(bit_width(depth) -1 downto 0));
 end counter;
 
 -------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ end counter;
 architecture archcounter of counter is
 
   constant depth_std : std_logic_vector(bit_width(depth)-1 downto 0)
-    := std_logic_vector(to_unsigned(depth -1, bit_width(depth)));
+ := std_logic_vector(to_unsigned(depth -1, bit_width(depth)));
   
 begin
   

@@ -71,10 +71,6 @@ if(!outputs.empty)
 endif>
 >>
 
-//<outgoingMap.(instance).values: printOutSignals()>
-
-
-
 // print internal signals when necessary
 printInSignals(connection) ::= <<
 <if (instance.broadcast)
