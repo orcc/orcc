@@ -44,6 +44,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
+import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
@@ -112,6 +113,9 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// TODO: While To FSM transformation
 				// must be done before MAAT because MAAT does not handle
 				// multiple array accesses in loops
+				
+				// transforms actions from multi-token to mono-token 
+				new Multi2MonoToken(),
 
 				// transform multiple array accesses
 				// new MultipleArrayAccessTransformation(),
@@ -123,7 +127,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new TransformConditionals(),
 
 				// flattens multi-dimensional arrays
-				new ListFlattenTransformation(true, false, true),
+				//new ListFlattenTransformation(true, false, true),
 
 				// replaces local array of size 1 by scalars
 				new VariableRedimension(),
