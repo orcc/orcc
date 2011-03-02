@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009-2011, Ecole Polytechnique Fédérale de Lausanne
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.xlim;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,8 +37,8 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.ListOfOneElementToScalarTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
@@ -59,7 +58,6 @@ import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.serialize.XDFWriter;
 
 /**
  * This class defines a template-based XLIM back-end.
@@ -81,10 +79,8 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	private String fpgaType;
-
 	private boolean hardwareGen;
-
-	private STPrinter printer;
+	private Map<String, String> mapping;
 
 	private Map<Integer, List<Instance>> computeMapping(Network network,
 			Map<String, String> mapping) {
@@ -135,42 +131,18 @@ public class XlimBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
-		// print network
-		write("Printing network...\n");
-		new XDFWriter(new File(path), network);
-
-		// check if "XLiM Hardware Generation" is selected
-
-		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
-
-		printer = new STPrinter();
-		printer.getOptions().putAll(getAttributes());
-		if (hardwareGen) {
-			fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
-					"xc2vp30-7-ff1152");
-			printer.getOptions().put("fpgaType", fpgaType);
-			printer.loadGroup("XLIM_hw_actor");
-		} else {
-			printer.loadGroup("XLIM_sw_actor");
-		}
-
-		printer.setExpressionPrinter(XlimExprPrinter.class);
-		printer.setTypePrinter(XlimTypePrinter.class);
 
 		transformActors(network.getActors());
-		doTransformNetwork(network);
+
 		printInstances(network);
 
-		// print network
-		write("Printing network...\n");
-		printNetwork(network);
-	}
-
-	private void doTransformNetwork(Network network) {
-		XlimHwNetworkTemplateData data = new XlimHwNetworkTemplateData();
 		network.computeTemplateMaps();
+		XlimHwNetworkTemplateData data = new XlimHwNetworkTemplateData();
 		data.computeTemplateMaps(network);
 		network.setTemplateData(data);
+
+		write("Printing network...\n");
+		printNetwork(network);
 	}
 
 	private void printCMake(Network network) {
@@ -179,14 +151,18 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printInstance(Instance instance) throws OrccException {
-		String id = instance.getId();
-		String outputName = path + File.separator + id + ".xlim";
-		try {
-			return printer.printInstance(outputName, instance);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
+	protected boolean printInstance(Instance instance) {
+		InstancePrinter printer;
+		if (hardwareGen) {
+			printer = new InstancePrinter("XLIM_hw_actor", true);
+			printer.getOptions().put("fpgaType", fpgaType);
+		} else {
+			printer = new InstancePrinter("XLIM_sw_actor", true);
 		}
+		printer.setExpressionPrinter(XlimExprPrinter.class);
+		printer.setTypePrinter(XlimTypePrinter.class);
+		return printer.print(instance.getId() + ".xlim", path, instance,
+				"instance");
 	}
 
 	private void printMapping(Network network, Map<String, String> mapping) {
@@ -198,31 +174,32 @@ public class XlimBackendImpl extends AbstractBackend {
 				"mapping");
 	}
 
-	private void printNetwork(Network network) throws OrccException {
-		try {
-			String outputName = path + File.separator + network.getName();
-			if (hardwareGen) {
-				outputName += ".vhd";
-				printer.loadGroup("XLIM_hw_network");
-			} else {
-				outputName += ".c";
-				printer.loadGroup("XLIM_sw_network");
-			}
-
-			printer.printNetwork(outputName, network, false, fifoSize);
-
-			if (!hardwareGen) {
-				printCMake(network);
-
-				Map<String, String> mapping = getAttribute(
-						OrccLaunchConstants.MAPPING,
-						new HashMap<String, String>());
-				if (!mapping.isEmpty()) {
-					printMapping(network, mapping);
-				}
-			}
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
+	private void printNetwork(Network network) {
+		NetworkPrinter printer;
+		String file = network.getName();
+		if (hardwareGen) {
+			file += ".vhd";
+			printer = new NetworkPrinter("XLIM_hw_network");
+		} else {
+			file += ".c";
+			printer = new NetworkPrinter("XLIM_sw_network");
 		}
+		printer.getOptions().put("fifoSize", fifoSize);
+		printer.print(file, path, "network");
+		if (!hardwareGen) {
+			printCMake(network);
+			if (!mapping.isEmpty()) {
+				printMapping(network, mapping);
+			}
+		}
+	}
+
+	@Override
+	public void setOptions() throws OrccException {
+		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
+		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
+				"xc2vp30-7-ff1152");
+		mapping = getAttribute(OrccLaunchConstants.MAPPING,
+				new HashMap<String, String>());
 	}
 }

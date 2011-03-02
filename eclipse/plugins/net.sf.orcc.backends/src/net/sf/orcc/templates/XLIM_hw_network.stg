@@ -492,7 +492,7 @@ printInsancesName(instance) ::=<<
 --    <instance.id> (<instance.actor.name>) --\> CLK
 >>
 
-network(debugFifos, fifoSize, network, options) ::= <<
+network(network, options) ::= <<
 <printNetworkInformation(network)>
 
 library ieee, SystemBuilder, openForge;

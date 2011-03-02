@@ -2,7 +2,7 @@
 // Root procedure
 /////////////////////////////
 
-network(debugFifos, fifoSize, network, options) ::= <<
+network(network, options) ::= <<
 
 	#include \<stdlib.h\>
 	#include "actors-config.h"
@@ -77,7 +77,7 @@ p<actorInstance.id> = createActorInstance(&ActorClass_<actorInstance.actor.simpl
 <else>
 p<actorInstance.id> = createActorInstance(&ActorClass_<actorInstance.id>);
 <endif>
-<actorInstance.actor.inputs.list : {port | <if(localFifoSize.(port))><initializePort(dir="In",port=port,id=actorInstance.id,n=localFifoSize.(port))><else><initializePort(dir="In",port=port,id=actorInstance.id,n=fifoSize)><endif>}; separator="\n">
+<actorInstance.actor.inputs.list : {port | <if(localFifoSize.(port))><initializePort(dir="In",port=port,id=actorInstance.id,n=localFifoSize.(port))><else><initializePort(dir="In",port=port,id=actorInstance.id,n=options.fifoSize)><endif>}; separator="\n">
 <actorInstance.actor.outputs.list : {port | <initializePort(dir="Out",port=port,id=actorInstance.id,n=length(outgoingMap.(port)))>}; separator="\n">
 <actorInstance.actor.parameters.list : {parameter | <initializeParameter(parameter=parameter,value=actorInstance.parameters.(parameter.name),id=actorInstance.id)>}; separator="\n">
 actorInstances[<index>] = p<actorInstance.id>;
