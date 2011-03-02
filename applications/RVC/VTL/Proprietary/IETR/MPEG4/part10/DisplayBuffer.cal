@@ -45,192 +45,177 @@ actor DisplayBuffer ( int MB_WIDTH )
 	uint(size=32) SZ_NBPIC        = 5; /* >= log2(NB_PIC) */
 	//FIXME! number of MB per line of picture
 
-	uint(size=8) picture [NB_PIC][MAX_PICWIDTH_BLK][MAX_PICHEIGHT_BLK][256];
-	List(type:uint(size=32) ,size=NB_PIC) ListPOC       := [ 0    :for int s in 0 .. NB_PIC-1];
-	List(type:bool          ,size=NB_PIC) PicDisplayed  := [true  :for int s in 0 .. NB_PIC-1];
+	uint(size=8)  picture [NB_PIC][MAX_PICWIDTH_BLK][MAX_PICHEIGHT_BLK][256];
+	uint(size=32) listPOC[NB_PIC]      := [ 0    :for int s in 0 .. NB_PIC-1];
+	bool          picDisplayed[NB_PIC] := [true  :for int s in 0 .. NB_PIC-1];
 
-	int (size=32) pic_curr_idx     := 0;
-	uint(size=7)  PicWidthInMacroB := 0;
-	uint(size=7)  PicHeightInMacroB := 0;
-	uint(size=13) PicSizeInMacroB  := 0;
-
-	/*Write information*/
-	uint(size=21) wa_x_offset      := 0;
-	uint(size=21) wa_y_offset      := 0;
+	int (size=32) picCurrIdx      := 0;
+	uint(size=7)  picWidthInMacroB  := 0;
+	uint(size=7)  picHeightInMacroB := 0;
+	uint(size=13) picSizeInMacroB   := 0;
 
 	/*Display Information*/
-	int(size=14)          nbMBdisplayForXaxis := 0;
-	int(size=14)          nbMBdisplayForYaxis := 0;
-	int(size=32)          NextPOCtoDisplay    := -1;
-	int(size=SZ_NBPIC+1)  IdxNextPOCtoDisplay := -1;
+	int(size=14)         nbMBdisplayForXaxis := 0;
+	int(size=14)         nbMBdisplayForYaxis := 0;
+	int(size=32)         nextPOCtoDisplay    := -1;
+	int(size=SZ_NBPIC+1) idxNextPOCtoDisplay := -1;
 
 
-	GetIsNewPic: action 
-			IsNewPicOrSlice :[is_new_mb_or_slice]
-				==>
-		end
+	GetIsNewPic: action IsNewPicOrSlice :[is_new_mb_or_slice] ==>
+	end
 
-	read_ref_parameters: action
-			POC             :[Valpoc],
-			IsIDR           :[IsIDRPic]
-				==>
-		var
-			bool         idx_selected := false,
-			int(size=32) i            := 0
+	read_ref_parameters: action POC :[Valpoc], IsIDR :[IsIDRPic] ==>
+	var
+		bool         idx_selected := false,
+		int(size=32) i            := 0
+	do
+		picCurrIdx := -1;
+		while((not idx_selected) and (i < NB_PIC))
 		do
-			pic_curr_idx := -1;
-			while((not idx_selected) and (i < NB_PIC))
-			do
-				if(PicDisplayed[i] = true) then
-					idx_selected    := true;
-					pic_curr_idx    := i;
-					if(not IsIDRPic) then
-						ListPOC[i]      := Valpoc;
-					else
-						ListPOC[i]      := 0;
-					end
-					PicDisplayed[i] := false;
+			if(picDisplayed[i] = true) then
+				idx_selected    := true;
+				picCurrIdx    := i;
+				if(not IsIDRPic) then
+					listPOC[i]      := Valpoc;
+				else
+					listPOC[i]      := 0;
 				end
-				i := i + 1;
+				picDisplayed[i] := false;
 			end
-			/*Fix Me!!! ==> exception*/
-			if(pic_curr_idx = -1) then
-				pic_curr_idx    := 0;
-				ListPOC[0]      := Valpoc;
-				PicDisplayed[0] := false;
-			end
+			i := i + 1;
 		end
+		/*Fix Me!!! ==> exception*/
+		if(picCurrIdx = -1) then
+			picCurrIdx    := 0;
+			listPOC[0]      := Valpoc;
+			picDisplayed[0] := false;
+		end
+	end
 
 	get_writeAddr: action
-			MbLocation      :[MbLocxInPic , MbLocyInPic],
-			PicWidthInMb    :[PICwidthInMb],
-			PicSizeInMb     :[PICSizeInMb],
-			IsNewPicOrSlice :[is_new_pic_or_slice]
-				==>
-		guard
-			is_new_pic_or_slice = IS_NEW_MB
-		do
-			PicWidthInMacroB := PICwidthInMb;
-			PicSizeInMacroB  := PICSizeInMb;
-			wa_x_offset := MbLocxInPic;
-			wa_y_offset := MbLocyInPic;
-		end
+		PicWidthInMb    :[PICwidthInMb],
+		PicSizeInMb     :[PICSizeInMb],
+		IsNewPicOrSlice :[is_new_pic_or_slice]
+			==>
+	guard
+		is_new_pic_or_slice = IS_NEW_MB
+	do
+		picWidthInMacroB := PICwidthInMb;
+		picSizeInMacroB  := PICSizeInMb;
+	end
 
 	write_data.Luma : action 
-			WD :[wd] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
-				==>
-		guard 
-			MB_WIDTH = MB_WIDTH_LUMA
+		MbLocation      :[MbLocxInPic , MbLocyInPic],
+		WD :[wd] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
+			==>
+	guard 
+		MB_WIDTH = MB_WIDTH_LUMA
+	do
+		foreach int i in 0 .. MB_WIDTH_LUMA * MB_WIDTH_LUMA - 1
 		do
-			foreach int i in 0 .. MB_WIDTH_LUMA * MB_WIDTH_LUMA - 1
-			do
-				picture[pic_curr_idx][wa_x_offset][wa_y_offset][i] := wd[i];
-			end
+			picture[picCurrIdx][MbLocxInPic][MbLocyInPic][i] := wd[i];
 		end
+	end
 
 	write_data.Chroma : action
-			WD :[wd] repeat  MB_WIDTH_CHROMA*MB_WIDTH_CHROMA
-				==>
-		guard 
-			MB_WIDTH = MB_WIDTH_CHROMA
+		MbLocation      :[MbLocxInPic , MbLocyInPic],
+		WD :[wd] repeat  MB_WIDTH_CHROMA*MB_WIDTH_CHROMA
+			==>
+	guard 
+		MB_WIDTH = MB_WIDTH_CHROMA
+	do
+		foreach int i in 0 .. MB_WIDTH_CHROMA * MB_WIDTH_CHROMA - 1
 		do
-			foreach int i in 0 .. MB_WIDTH_CHROMA * MB_WIDTH_CHROMA - 1
-			do
-				picture[pic_curr_idx][wa_x_offset][wa_y_offset][i] := wd[i];
-			end
+			picture[picCurrIdx][MbLocxInPic][MbLocyInPic][i] := wd[i];
 		end
+	end
 
 	write_picture_done: action
-			IsNewPicOrSlice :[is_new_mb_or_slice]
-				==>
-		guard 
-			is_new_mb_or_slice = IS_NEW_PIC
-		do
-			PicHeightInMacroB := PicSizeInMacroB / PicWidthInMacroB;
-		end
-
-
-	//write MB on the output display
-	Display.chroma:action ==>
-			Display:[ [buff[s] :for int s in 0 .. MB_WIDTH_CHROMA * MB_WIDTH_CHROMA-1] ] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA
-		guard
-			IdxNextPOCtoDisplay != -1,
-			MB_WIDTH = MB_WIDTH_CHROMA
-		var
-			List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff := [ 0 :for int t in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ] 
-		do
-			foreach int i in 0 .. MB_WIDTH_CHROMA * MB_WIDTH_CHROMA - 1
-			do
-				buff[i] := picture[IdxNextPOCtoDisplay][nbMBdisplayForXaxis][nbMBdisplayForYaxis][i];
-			end
-			nbMBdisplayForXaxis := nbMBdisplayForXaxis + 1;
-			if(nbMBdisplayForXaxis = PicWidthInMacroB) then
-				nbMBdisplayForXaxis := 0;
-				nbMBdisplayForYaxis := nbMBdisplayForYaxis + 1;
-			end
-		end
-
+		IsNewPicOrSlice :[is_new_mb_or_slice]
+			==>
+	guard 
+		is_new_mb_or_slice = IS_NEW_PIC
+	do
+		picHeightInMacroB := picSizeInMacroB / picWidthInMacroB;
+	end
 
 	//write MB on the output display
-	Display.luma:action ==>
-			Display:[ [buff[s] :for int s in 0 .. MB_WIDTH_LUMA * MB_WIDTH_LUMA-1] ] repeat MB_WIDTH_LUMA * MB_WIDTH_LUMA
-		guard
-			IdxNextPOCtoDisplay != -1,
-			MB_WIDTH != MB_WIDTH_CHROMA
-		var
-			List(type:int(size=16),size = MB_WIDTH_LUMA * MB_WIDTH_LUMA + 1) buff := [ 0 :for int t in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA ] 
+	Display.chroma: action
+			==>
+		Display :[buff] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA
+	guard
+		idxNextPOCtoDisplay != -1,
+		MB_WIDTH = MB_WIDTH_CHROMA
+	var
+		List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff := [ 0 :for int t in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ] 
+	do
+		foreach int i in 0 .. MB_WIDTH_CHROMA * MB_WIDTH_CHROMA - 1
 		do
-			foreach int i in 0 .. MB_WIDTH_LUMA * MB_WIDTH_LUMA - 1
-			do
-				buff[i] := picture[IdxNextPOCtoDisplay][nbMBdisplayForXaxis][nbMBdisplayForYaxis][i];
-			end
-			nbMBdisplayForXaxis := nbMBdisplayForXaxis + 1;
-			if(nbMBdisplayForXaxis = PicWidthInMacroB) then
-				nbMBdisplayForXaxis := 0;
-				nbMBdisplayForYaxis := nbMBdisplayForYaxis + 1;
-			end
+			buff[i] := picture[idxNextPOCtoDisplay][nbMBdisplayForXaxis][nbMBdisplayForYaxis][i];
 		end
+		nbMBdisplayForXaxis := nbMBdisplayForXaxis + 1;
+		if(nbMBdisplayForXaxis = picWidthInMacroB) then
+			nbMBdisplayForXaxis := 0;
+			nbMBdisplayForYaxis := nbMBdisplayForYaxis + 1;
+		end
+	end
+
+	//write MB on the output display
+	Display.luma:action
+			==>
+		Display:[buff] repeat MB_WIDTH_LUMA * MB_WIDTH_LUMA
+	guard
+		idxNextPOCtoDisplay != -1,
+		MB_WIDTH != MB_WIDTH_CHROMA
+	var
+		List(type:int(size=16),size = MB_WIDTH_LUMA * MB_WIDTH_LUMA + 1) buff := [ 0 :for int t in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA ] 
+	do
+		foreach int i in 0 .. MB_WIDTH_LUMA * MB_WIDTH_LUMA - 1
+		do
+			buff[i] := picture[idxNextPOCtoDisplay][nbMBdisplayForXaxis][nbMBdisplayForYaxis][i];
+		end
+		nbMBdisplayForXaxis := nbMBdisplayForXaxis + 1;
+		if(nbMBdisplayForXaxis = picWidthInMacroB) then
+			nbMBdisplayForXaxis := 0;
+			nbMBdisplayForYaxis := nbMBdisplayForYaxis + 1;
+		end
+	end
 
 	Display.done: action ==>
-		guard
-			nbMBdisplayForYaxis = PicHeightInMacroB
-		do
-			PicDisplayed[IdxNextPOCtoDisplay] := true;
-			NextPOCtoDisplay := -1;
-			IdxNextPOCtoDisplay := -1;
-			nbMBdisplayForXaxis := 0;
-			nbMBdisplayForYaxis := 0;
-		end
+	guard
+		nbMBdisplayForYaxis = picHeightInMacroB
+	do
+		picDisplayed[idxNextPOCtoDisplay] := true;
+		nextPOCtoDisplay := -1;
+		idxNextPOCtoDisplay := -1;
+		nbMBdisplayForXaxis := 0;
+		nbMBdisplayForYaxis := 0;
+	end
 
+	getNextPOCtoDisplay.launch: action POCtoDisplay :[poc2disp] ==>
+	guard
+		poc2disp         != -1
+	do
+		nextPOCtoDisplay := poc2disp;
+	end
 
-	getNextPOCtoDisplay.launch: action
-			POCtoDisplay :[poc2disp]
-				==>
-		guard
-			poc2disp         != -1
-		do
-			NextPOCtoDisplay := poc2disp;
-		end
-
-	getNextPOCtoDisplay.sync: action
-			POCtoDisplay :[poc2disp]
-				==>
-		guard
-			poc2disp         = -1
-		end
+	getNextPOCtoDisplay.sync: action POCtoDisplay :[poc2disp] ==>
+	guard
+		poc2disp         = -1
+	end
 	
 	getidxdisplay.launch: action ==>
+	do
+		idxNextPOCtoDisplay := -1;
+		foreach int i in 0 .. NB_PIC - 1
 		do
-			IdxNextPOCtoDisplay := -1;
-			foreach int i in 0 .. NB_PIC - 1
-			do
-				if(ListPOC[i] = NextPOCtoDisplay)then
-					if(PicDisplayed[i] = false) then
-						IdxNextPOCtoDisplay := i;
-					end
+			if(listPOC[i] = nextPOCtoDisplay)then
+				if(picDisplayed[i] = false) then
+					idxNextPOCtoDisplay := i;
 				end
 			end
 		end
+	end
   
 	schedule fsm  GetIsNewPic:
 		GetIsNewPic         (GetIsNewPic                )--> read_ref_parameters;
@@ -251,10 +236,9 @@ actor DisplayBuffer ( int MB_WIDTH )
 		Display             (Display.chroma             )--> Display;
 		Display             (Display.done               )--> getNextPOCtoDisplay;
 	end
-
-  priority
-    write_picture_done         > get_writeAddr       > write_data;
-  	Display.done               > Display.chroma      > Display.luma;
-  	getNextPOCtoDisplay.launch > getNextPOCtoDisplay.sync;
-  end
+	priority
+		write_picture_done         > get_writeAddr       > write_data;
+		Display.done               > Display.chroma      > Display.luma;
+		getNextPOCtoDisplay.launch > getNextPOCtoDisplay.sync;
+	end
 end
