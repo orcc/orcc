@@ -220,7 +220,7 @@ printThreads(threads) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // network
 
-network(debugFifos, fifoSize, network, options) ::= <<
+network(network, options) ::= <<
 // Generated from "$network.name$"
 
 #include "fifofactory.h"

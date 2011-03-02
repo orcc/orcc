@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009-2011, Ecole Polytechnique Fédérale de Lausanne
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.cpp;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +36,8 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
@@ -76,11 +75,13 @@ public class CppBackendImpl extends AbstractBackend {
 		main(CppBackendImpl.class, args);
 	}
 
+	private boolean classify;
+	private boolean merge;
 	private boolean needSerDes = false;
+	private boolean normalize;
 
-	private STPrinter printer;
-
-	private void computeFifoKind(Network network) throws OrccException {
+	private Map<Connection, Integer> computeFifoKind(Network network)
+			throws OrccException {
 		Map<Connection, Integer> fifoKind = new HashMap<Connection, Integer>();
 		for (Connection connection : network.getConnections()) {
 			int kind = 0;
@@ -95,17 +96,18 @@ public class CppBackendImpl extends AbstractBackend {
 
 			if (src.isSerdes() || tgt.isSerdes()) {
 				needSerDes = true;
-				printer.getOptions().put("needSerDes", needSerDes);
+
 				kind = 1;
 			} else if (!srcName.equals(tgtName)) {
 				kind = 2;
 			}
 			fifoKind.put(connection, kind);
 		}
-		printer.getOptions().put("fifoKind", fifoKind);
+		return fifoKind;
 	}
 
-	private void computeMapping(Network network) throws OrccException {
+	private Map<String, List<Instance>> computeMapping(Network network)
+			throws OrccException {
 		Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
 		for (Instance instance : network.getInstances()) {
 			String component = getPartNameAttribute(instance);
@@ -121,7 +123,7 @@ public class CppBackendImpl extends AbstractBackend {
 						+ " has no partName attribute!");
 			}
 		}
-		printer.getOptions().put("threads", threads);
+		return threads;
 	}
 
 	@Override
@@ -140,6 +142,22 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 	}
 
+	private void doTransformNetwork(Network network) throws OrccException {
+		if (classify) {
+			network.classify();
+			if (normalize) {
+				network.normalizeActors();
+			}
+			if (merge) {
+				network.mergeActors();
+			}
+		}
+
+		// add wrapper if needed
+		new SerDesAdder().transform(network);
+
+	}
+
 	@Override
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
 		// do not generate a C++ VTL
@@ -149,36 +167,11 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		printer = new STPrinter();
-		printer.setExpressionPrinter(CppExprPrinter.class);
-		printer.setTypePrinter(CppTypePrinter.class);
-		printer.getOptions().putAll(getAttributes());
-
 		transformActors(network.getActors());
 
-		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
-		if (classify) {
-			network.classify();
+		doTransformNetwork(network);
 
-			boolean normalize = getAttribute("net.sf.orcc.backends.normalize",
-					false);
-			if (normalize) {
-				network.normalizeActors();
-			}
-
-			boolean merge = getAttribute("net.sf.orcc.backends.merge", false);
-			if (merge) {
-				network.mergeActors();
-			}
-		}
-
-		List<Actor> actors = network.getActors();
-
-		printHeader = true;
-		printActors(actors);
-
-		printHeader = false;
-		printActors(actors);
+		printActors(network.getActors());
 
 		// print network
 		write("Printing network...\n");
@@ -196,26 +189,23 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) throws OrccException {
-		boolean res = false;
-		try {
-			String hier = path + File.separator
-					+ actor.getPackage().replace('.', File.separatorChar);
-			new File(hier).mkdirs();
-			String name = hier + File.separator + actor.getSimpleName();
+	protected boolean printActor(Actor actor) {
+		ActorPrinter actorPrinter = new ActorPrinter("Cpp_actorImpl");
+		ActorPrinter headerPrinter = new ActorPrinter("Cpp_actorDecl");
 
-			if (printHeader) {
-				printer.loadGroup("Cpp_actorDecl");
-				printer.printActor(name + ".h", actor);
-			} else {
-				printer.loadGroup("Cpp_actorImpl");
-				printer.printActor(name + ".cpp", actor);
-			}
+		actorPrinter.setExpressionPrinter(CppExprPrinter.class);
+		actorPrinter.setTypePrinter(CppTypePrinter.class);
+		headerPrinter.setExpressionPrinter(CppExprPrinter.class);
+		headerPrinter.setTypePrinter(CppTypePrinter.class);
 
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
-		return res;
+		String hier = path + File.separator
+				+ actor.getPackage().replace('.', File.separatorChar);
+		new File(hier).mkdirs();
+
+		actorPrinter.print(actor.getSimpleName(), hier, actor, "actor");
+		headerPrinter.print(actor.getSimpleName(), hier, actor, "actor");
+
+		return false;
 	}
 
 	private void printCMake(Network network) {
@@ -233,25 +223,26 @@ public class CppBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	private void printNetwork(Network network) throws OrccException {
-		try {
-			// compute thread lists if need
-			computeMapping(network);
-			// add wrapper if needed
-			new SerDesAdder().transform(network);
-			// compute kind of fifos
-			computeFifoKind(network);
+		NetworkPrinter printer = new NetworkPrinter("Cpp_network");
 
-			String outputName = path + File.separator + network.getName()
-					+ ".cpp";
+		printer.setExpressionPrinter(CppExprPrinter.class);
+		printer.setTypePrinter(CppTypePrinter.class);
 
-			printer.loadGroup("Cpp_network");
-			printer.printNetwork(outputName, network, false, fifoSize);
+		printer.getOptions().put("needSerDes", needSerDes);
+		// compute thread lists if need
+		printer.getOptions().put("threads", computeMapping(network));
+		// compute kind of fifos
+		printer.getOptions().put("fifoKind", computeFifoKind(network));
 
-			printCMake(network);
+		printer.print(network.getName() + ".cpp", path, network, "network");
 
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+		printCMake(network);
 	}
 
+	@Override
+	public void setOptions() throws OrccException {
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		merge = getAttribute("net.sf.orcc.backends.merge", false);
+	}
 }
