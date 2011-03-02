@@ -86,17 +86,18 @@ public class NetworkPrinter extends Printer {
 	 */
 	public boolean print(String fileName, String path, Network network,
 			String instanceName) {
+		String file = path + File.separator + fileName;
 		if (keepUnchangedFiles) {
 			// if source file is older than target file, do not generate
 			File sourceFile = new File(network.getFile());
-			File targetFile = new File(fileName);
+			File targetFile = new File(file);
 			if (sourceFile.lastModified() < targetFile.lastModified()) {
 				return true;
 			}
 		}
 		ST template = group.getInstanceOf(instanceName);
 		template.add("network", network);
-		printTemplate(template, fileName, path);
+		printTemplate(template, file);
 		return false;
 	}
 

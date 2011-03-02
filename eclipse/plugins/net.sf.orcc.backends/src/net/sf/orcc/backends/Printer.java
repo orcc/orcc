@@ -114,16 +114,15 @@ public class Printer {
 	 */
 	public void print(String fileName, String path, String instanceName) {
 		ST template = group.getInstanceOf(instanceName);
-		printTemplate(template, fileName, path);
+		printTemplate(template, path + File.separator + fileName);
 	}
 
-	protected void printTemplate(ST template, String fileName, String path) {
+	protected void printTemplate(ST template, String file) {
 		try {
 			template.add("options", options);
 
 			byte[] b = template.render(80).getBytes();
-			OutputStream os = new FileOutputStream(path + File.separator
-					+ fileName);
+			OutputStream os = new FileOutputStream(file);
 			os.write(b);
 			os.close();
 		} catch (IOException e) {

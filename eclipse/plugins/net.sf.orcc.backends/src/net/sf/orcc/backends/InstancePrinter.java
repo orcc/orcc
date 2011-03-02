@@ -113,12 +113,13 @@ public class InstancePrinter extends Printer {
 	 */
 	public boolean print(String fileName, String path, Instance instance,
 			String instanceName) {
+		String file = path + File.separator + fileName;
 		if (instance.isNetwork()
 				|| (instance.isActor() && !instance.getActor().isNative())) {
 			if (keepUnchangedFiles) {
 				// if source file is older than target file, do not generate
 				long sourceLastModified = getLastModifiedHierarchy(instance);
-				File targetFile = new File(fileName);
+				File targetFile = new File(file);
 				long targetLastModified = targetFile.lastModified();
 				if (sourceLastModified < targetLastModified) {
 					return true;
@@ -126,7 +127,7 @@ public class InstancePrinter extends Printer {
 			}
 			ST template = group.getInstanceOf(instanceName);
 			template.add("instance", instance);
-			printTemplate(template, fileName, path);
+			printTemplate(template, file);
 		}
 		return false;
 	}
