@@ -32,9 +32,29 @@
 
 #include "socket.h"
 
+
+DECL void socket_init() {
+	#ifdef WIN32
+		WSADATA wsa;
+		int err = WSAStartup(MAKEWORD(2, 2), &wsa);
+		if(err < 0) {
+			fprintf(stderr,"WSAStartup failed !");
+			exit(EXIT_FAILURE);
+		}
+	#endif
+}
+
+
+DECL void socket_end() {
+	#ifdef WIN32
+		WSACleanup();
+	#endif
+}
+
 // declare FIFO with a size equal to (size)
-#define DECLARE_FIFO_SOCKET(type, size, count, readersnb) static type array_##count[(size) + 1]; \
-static struct FIFO_SOCKET_S(type) fifo_##count = { (size) + 1, array_##count, 0, 0, 0};
+#define DECLARE_FIFO_SOCKET(type, size, count, readersnb) static type array_##count[size]; \
+static unsigned int read_inds_##count[1] = {0}; \
+static struct FIFO_SOCKET_S(type) fifo_##count = {size, array_##count, 0, 1, read_inds_##count, 0, 0};
 
 #define FIFO_SOCKET_S(T) FIFO_SOCKET_S_EXPAND(T)
 #define FIFO_SOCKET_S_EXPAND(T) fifo_socket_##T##_s
