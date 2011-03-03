@@ -205,6 +205,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 			folder.mkdir();
 		}
 
+		network.computeTemplateMaps();
+		
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printActors(actors);
