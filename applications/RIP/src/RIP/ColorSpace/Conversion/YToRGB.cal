@@ -25,14 +25,16 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package RIP.ColorSpace.Conversion ; import RIP.CoreFunctions.Math.clip.* ; /*
+package RIP.ColorSpace.Conversion ; import RIP.CoreFunctions.Math.clip.* ; 
+/*
  * Author: Richard Thavot <richard.thavot@epfl.ch>
- *
+ *		   Simone Casalebrunet <simone.casalebrunet@epfl.ch>
+ * 
  * Create Date:   2011/03/02
- * Design Name:   RGB2Y
- * Project Name:  libImage
+ * Design Name:   YToRGB 
+ * Project Name:  RIP
  * Tool versions: Orcc
- * Description:   
+ * Description:   rotated of 90 degrees 
  *   
  * Dependencies:
  * 
@@ -41,8 +43,8 @@ package RIP.ColorSpace.Conversion ; import RIP.CoreFunctions.Math.clip.* ; /*
  * Additional Comments:
  * 
  */
-actor YToRGB
-() uint(size=10) Y ==> uint(size=8) R, uint(size=8) G, uint(size=8) B :
+actor YToRGB()
+uint(size=10) Y ==> uint(size=8) R, uint(size=8) G, uint(size=8) B :
 
 	int(size=32) x_max = 232;
 

@@ -26,13 +26,15 @@
  * SUCH DAMAGE.
  */
 package RIP.ColorSpace.Conversion ; import RIP.CoreFunctions.Math.clip.* ; /*
+/*
  * Author: Richard Thavot <richard.thavot@epfl.ch>
- *
+ *		   Simone Casalebrunet <simone.casalebrunet@epfl.ch>
+ * 
  * Create Date:   2011/03/02
- * Design Name:   RGB2Y
- * Project Name:  libImage
+ * Design Name:   RGBToY 
+ * Project Name:  RIP
  * Tool versions: Orcc
- * Description:   
+ * Description:   rotated of 90 degrees 
  *   
  * Dependencies:
  * 
@@ -41,8 +43,8 @@ package RIP.ColorSpace.Conversion ; import RIP.CoreFunctions.Math.clip.* ; /*
  * Additional Comments:
  * 
  */
-actor RGBToY
-() uint(size=8) R, uint(size=8) G, uint(size=8) B ==> uint(size=10) Y :
+actor RGBToY()
+uint(size=8) R, uint(size=8) G, uint(size=8) B ==> uint(size=10) Y :
 
 	int(size=32) y_max = 940;
 
