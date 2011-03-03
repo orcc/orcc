@@ -67,10 +67,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 	/*Write information*/
 	bool          write_done       := true;
-	uint(size=21) wa_x_offset      := 0;
-	uint(size=21) wa_y_offset      := 0;
-	uint(size=11) wa_x             := 0;
-	uint(size=11) wa_y             := 0;
 
 	/*Read Information*/
 	bool                read_done  := true;
@@ -86,48 +82,60 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	bool          ValIsIDR := false;
 
 	GetIsNewPic: action 
-			IsNewPicOrSlice :[is_new_mb_or_slice]
+			IsNewPicOrSlice :[is_new_mb_or_slice],
+			EnableRead      :[enabled_read]
 				==>
 		end
 
 	get_writeAddr: action
-			MbLocation      :[MbLocxInPic , MbLocyInPic],
-			PicWidthInMb    :[PICwidthInMb],
-			PicSizeInMb     :[PICSizeInMb],
-			IsNewPicOrSlice :[is_new_pic_or_slice]
-				==>
-		guard
-			write_done = true,
-			is_new_pic_or_slice = IS_NEW_MB
-		do
-			PicWidthInMacroB := PICwidthInMb;
-			PicSizeInMacroB  := PICSizeInMb;
-			wa_x_offset := MbLocxInPic * MB_WIDTH;
-			wa_y_offset := MbLocyInPic * MB_WIDTH;
-			wa_x       := 0;
-			wa_y       := 0;
-			write_done := false;
-		end
+		PicWidthInMb    :[PICwidthInMb],
+		PicSizeInMb     :[PICSizeInMb],
+		IsNewPicOrSlice :[is_new_pic_or_slice]
+			==>
+	guard
+		write_done = true,
+		is_new_pic_or_slice = IS_NEW_MB
+	do
+		PicWidthInMacroB := PICwidthInMb;
+		PicSizeInMacroB  := PICSizeInMb;
+		write_done := false;
+	end
 
-
-	//Write_data: 
-	write_data : action
-			WD :[wd] repeat 8 
-				==>
-		guard 
-			write_done = false
+	write_data.Luma : action
+		MbLocation :[MbLocxInPic , MbLocyInPic],
+		WD         :[wd] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
+			==>
+	guard
+		write_done = false,
+		MB_WIDTH = MB_WIDTH_LUMA
+	do
+		foreach int y in 0 .. MB_WIDTH_LUMA - 1
 		do
-			foreach int i in 0 .. 7
+			foreach int x in 0 .. MB_WIDTH_LUMA - 1
 			do
-				pic[pic_curr_idx][wa_x_offset + wa_x + i][wa_y_offset + wa_y] := wd[i];
-			end
-			wa_x := wa_x +8;
-			if(wa_x = MB_WIDTH) then
-				wa_y := wa_y +1;
-				wa_x := 0;
-				write_done := (wa_y = MB_WIDTH);
+				pic[pic_curr_idx][MbLocxInPic * MB_WIDTH + x ][MbLocyInPic * MB_WIDTH + y] := wd[y*MB_WIDTH_LUMA + x];
 			end
 		end
+		write_done := true;
+	end
+
+	write_data.Chroma : action 
+		MbLocation :[MbLocxInPic , MbLocyInPic],
+		WD         :[wd] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA
+			==>
+	guard
+		write_done = false,
+		MB_WIDTH = MB_WIDTH_CHROMA
+	do
+		foreach int y in 0 .. MB_WIDTH_CHROMA - 1
+		do
+			foreach int x in 0 .. MB_WIDTH_CHROMA - 1
+			do
+				pic[pic_curr_idx][MbLocxInPic * MB_WIDTH + x ][MbLocyInPic * MB_WIDTH + y] := wd[y*MB_WIDTH_CHROMA + x];
+			end
+		end
+		write_done := true;
+	end
 
 	uint(size=32) ReadTable[32][32];
 
@@ -146,7 +154,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			uint(size=32) Read_addr_x,
 			uint(size=32) Read_addr_y,
 			int idxYMin,
-			int idxXMin
+			int idxXMin,
+			uint i := 0
 		do
 			ra_off_x  := Ra_off_x;
 			ra_off_y  := Ra_off_y;
@@ -156,12 +165,13 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			ra_y      := 0;
 			read_done := false;
 			Ref_idx   := 0;
-			foreach int i in 0 .. NB_PIC-1
+			while(i < NB_PIC and not found)
 			do
 				if( (poc2read=ListPOC[i]) and (frame_num_to_read = ListFrameNum[i]) and (IsAReference[i] = true)) then
 					Ref_idx := i;
 					found := true;
 				end
+				i := i + 1;
 			end
 			if(not found)then
 				println("\nCurrent Poc : "+ListPOC[pic_curr_idx]+" ; Current FrameNum : "+ListFrameNum[pic_curr_idx]);
@@ -216,26 +226,23 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		end
 
 	write_picture_done: action
-			IsNewPicOrSlice :[is_new_mb_or_slice]
+			IsNewPicOrSlice :[is_new_mb_or_slice],
+			EnableRead      :[enabled_read]
 				==>
 		guard 
 			write_done = true,
-			is_new_mb_or_slice = IS_NEW_PIC
+			is_new_mb_or_slice = IS_NEW_PIC,
+			not enabled_read
 		do
 			PictureReady[pic_curr_idx] := true;
-			wa_x        := 0;
-			wa_y        := 0;
 			PicHeightInMacroB := PicSizeInMacroB / PicWidthInMacroB;
 		end
 
 	read_ref_parameters: action
 			POC             :[Valpoc],
 			FrameNum        :[frame_num],
-			IsIDR           :[IsIDRPic],
-			EnableRead      :[enabled_read]
+			IsIDR           :[IsIDRPic]
 				==>
-		guard
-			not enabled_read
 		var
 			bool         idx_selected := false,
 			int(size=32) i            := 0
@@ -315,7 +322,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		read_del_list       (ReadDelList.Done        )--> read_ref_parameters;
 	end
 	priority
-		write_picture_done         > get_writeAddr       > get_readAddr  > write_data     > read_data;
+		get_writeAddr  > write_data     > read_data > get_readAddr > write_picture_done;
 		ReadDelList.Launch         > ReadDelList.Done;
 	end
 end
