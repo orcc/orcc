@@ -353,12 +353,14 @@ int is_timeout(){
 // print calls to initialize() and scheduler()
 
 printInitialize(instance) ::= <<
-<instance.id>_initialize(<instance.actor.inputs.list: { port | <network.incomingMap.(instance).(port).fifoId>}; separator=",">);
+<if(instance.actor)>
+<instance.id>_initialize(<instance.actor.inputs.list: { port | <network.incomingMap.(instance).(port).fifoId>}; separator=",">);<
+endif>
 >>
 
 printInitializes(instances) ::= <<
 void initialize_instances(){
-	<instances: {instance|<if(instance.actor)><printInitialize(instance)><endif>}; separator="\n">
+	<instances: {instance|<printInitialize(instance)>}>
 }
 >>
 
