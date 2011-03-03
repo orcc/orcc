@@ -88,6 +88,7 @@ public class CBackendImpl extends AbstractBackend {
 	private boolean codesign;
 	private boolean debugMode;
 	private boolean dynamicMapping;
+	private boolean enableTrace;
 	private Map<String, List<Instance>> instancesTarget;
 	private Map<String, String> mapping;
 	private Map<String, Network> mapTargetsNetworks;
@@ -99,7 +100,6 @@ public class CBackendImpl extends AbstractBackend {
 	private boolean normalize;
 	private int threadsNb;
 	private Network workingNetwork;
-	private boolean enableTrace;
 
 	private void computeMapping(Network network) {
 
