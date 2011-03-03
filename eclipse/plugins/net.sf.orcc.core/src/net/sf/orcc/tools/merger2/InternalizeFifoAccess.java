@@ -29,6 +29,7 @@
 
 package net.sf.orcc.tools.merger2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
@@ -37,17 +38,19 @@ import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.util.OrderedMap;
 
 public class InternalizeFifoAccess extends AbstractActorVisitor {
+	private List<Variable> localFifoVars;
 	private Port port;
 	private GlobalVariable variable;
 	
@@ -56,35 +59,11 @@ public class InternalizeFifoAccess extends AbstractActorVisitor {
 		this.variable = variable;
 	}
 	
-	@Override
-	public void visit(Write write) {
-		Port target = write.getPort();
-		Variable value = write.getTarget();
-		if(port.getName() == target.getName()){				
-			VarExpr expr = new VarExpr(new Use(value));
-			Store store = new Store(variable,expr);
-			setInstruction(write, store);
-		}
-	}
-	
-	@Override
-	public void visit(Peek peek) {
-		Port source = peek.getPort();
-		Variable value = peek.getTarget();
-		if(port.getName() == source.getName()){
-			Load load = new Load((LocalVariable) value, new Use(value));
-			setInstruction(peek, load);
-		}
-	}
-	
-	@Override
-	public void visit(Read read) {
-		Port source = read.getPort();
-		Variable value = read.getTarget();
-		if(port.getName() == source.getName()){
-			Load load = new Load((LocalVariable) value, new Use(value));
-			setInstruction(read, load);
-		}
+	private void removeInstruction(Instruction instruction){
+		BlockNode node = instruction.getBlock();		
+		List<Instruction> instructions = node.getInstructions();			
+		itInstruction.remove();
+		instructions.remove(instruction);
 	}
 	
 	@Override
@@ -96,12 +75,62 @@ public class InternalizeFifoAccess extends AbstractActorVisitor {
 		super.visit(action);
 	}
 	
+	@Override
+	public void visit(Load load) {
+		Use use = load.getSource();
+		Variable var = use.getVariable();
+		if (!var.isGlobal() && ((LocalVariable) var).isPort() && localFifoVars.contains(var)) {
+			load.setSource(new Use(variable, load));
+			//updateIndex(var, load, load.getIndexes());
+		}
+	}
+	
+	@Override
+	public void visit(Peek peek) {
+		Port source = peek.getPort();
+		if(port.getName() == source.getName()){
+			removeInstruction(peek);
+			localFifoVars.add(peek.getTarget());
+		}
+	}
+	
+	@Override
+	public void visit(Procedure procedure) {
+		localFifoVars = new ArrayList<Variable> ();
+		super.visit(procedure);
 		
-	private void setInstruction(Instruction oldInstruction, Instruction instruction){
-		BlockNode node = oldInstruction.getBlock();
-		instruction.setBlock(node);
+		//Remove locals from procedure
+		OrderedMap<String, LocalVariable> locals = procedure.getLocals();
 		
-		List<Instruction> instructions = node.getInstructions();			
-		instructions.set(instructions.indexOf(oldInstruction), instruction);
+		for (Variable fifoVar : localFifoVars){
+			locals.remove(fifoVar.getName());
+		}
+	}
+	
+	@Override
+	public void visit(Read read) {
+		Port source = read.getPort();
+		if(port.getName() == source.getName()){
+			removeInstruction(read);
+			localFifoVars.add(read.getTarget());
+		}
+	}
+
+	@Override
+	public void visit(Store store) {
+		Variable var = store.getTarget();
+		if (!var.isGlobal() && var.isPort()&& localFifoVars.contains(var)) {
+			store.setTarget(variable);
+			//updateIndex(var, store, store.getIndexes());
+		}
+	}
+		
+	@Override
+	public void visit(Write write) {
+		Port target = write.getPort();
+		if(port.getName() == target.getName()){
+			removeInstruction(write);
+			localFifoVars.add(write.getTarget());
+		}
 	}
 }

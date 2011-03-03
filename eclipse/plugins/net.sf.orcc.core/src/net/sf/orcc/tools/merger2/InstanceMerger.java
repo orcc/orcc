@@ -57,9 +57,7 @@ public class InstanceMerger {
 	private DirectedGraph<Vertex, Connection> graph;
 	private MultiMap<Actor, Port> extInputs;
 	private MultiMap<Actor, Port> extOutputs;
-	/*private MultiMap<Actor, Port> intInputs;
-	private MultiMap<Actor, Port> intOutputs;
-	private MultiMap<Port, Port> intConnections;*/
+	private MultiMap<Port, Port> intPorts;
 
 	int nMerged;
 
@@ -69,6 +67,8 @@ public class InstanceMerger {
 	}
 
 	public Vertex getEquivalentVertices(Map<Vertex, Integer> verticesRate) {
+		intPorts = new MultiMap<Port, Port>();
+		
 		// Get the set of vertex to process
 		Set<Vertex> vertices = verticesRate.keySet();
 
@@ -76,7 +76,7 @@ public class InstanceMerger {
 		defineInput(vertices);
 		defineOutput(vertices);
 
-		actorMerger = new ActorMerger(extInputs, extOutputs);
+		actorMerger = new ActorMerger(extInputs, extOutputs, intPorts);
 
 		for (Entry<Vertex, Integer> entry : verticesRate.entrySet()) {
 			Vertex vertex = entry.getKey();
@@ -101,18 +101,22 @@ public class InstanceMerger {
 		extInputs = new MultiMap<Actor, Port>();
 
 		for (Vertex vertex : vertices) {
+			//Visit all inputs connections of the vertex
 			Set<Connection> connections = graph.incomingEdgesOf(vertex);
 
 			for (Connection connection : connections) {
 				Vertex srcVertex = graph.getEdgeSource(connection);
 
 				if (!vertices.contains(srcVertex)) {
+					// Connection goes outside the static group of vertex
 					Port input = connection.getTarget();
 					Actor actor = vertex.getInstance().getActor();
 
+					// Mark it as external
 					extInputs.add(actor, input);
 				}else{
-					
+					// Mark the port as internal
+					intPorts.add(connection.getSource(), connection.getTarget());
 				}
 			}
 
@@ -123,17 +127,22 @@ public class InstanceMerger {
 		extOutputs = new MultiMap<Actor, Port>();
 
 		for (Vertex vertex : vertices) {
+			//Visit all outputs connections of the vertex
 			Set<Connection> connections = graph.outgoingEdgesOf(vertex);
 
 			for (Connection connection : connections) {
 				Vertex dstVertex = graph.getEdgeTarget(connection);
 
 				if (!vertices.contains(dstVertex)) {
+					// Connection goes outside the static group of vertex
 					Port output = connection.getSource();
 					Actor actor = vertex.getInstance().getActor();
+					
+					// Mark it as external
 					extOutputs.add(actor, output);
 				}else{
-					
+					// Mark the port as internal
+					intPorts.add(connection.getTarget(), connection.getSource());
 				}
 			}
 

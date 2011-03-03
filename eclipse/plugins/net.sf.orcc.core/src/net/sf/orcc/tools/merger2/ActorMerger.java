@@ -66,6 +66,7 @@ public class ActorMerger {
 	private MultiMap<Actor, Port> inputs;
 	private Map<Port, GlobalVariable> internalize;
 	private MultiMap<Actor, Port> outputs;
+	private MultiMap<Port, Port> internalPorts;
 
 	private OrderedMap<String, GlobalVariable> parameters;
 	private OrderedMap<String, Procedure> procs;
@@ -73,10 +74,11 @@ public class ActorMerger {
 	private OrderedMap<String, GlobalVariable> stateVars;
 
 	public ActorMerger(MultiMap<Actor, Port> inputs,
-			MultiMap<Actor, Port> outputs) {
-		this.internalize = new HashMap<Port, GlobalVariable>();
+			MultiMap<Actor, Port> outputs, MultiMap<Port, Port> internalPorts) {
 		this.inputs = inputs;
 		this.outputs = outputs;
+		this.internalPorts = internalPorts;
+		this.internalize = new HashMap<Port, GlobalVariable>();
 		this.parameters = new OrderedMap<String, GlobalVariable>();
 		this.stateVars = new OrderedMap<String, GlobalVariable>();
 		this.procs = new OrderedMap<String, Procedure>();
@@ -128,10 +130,6 @@ public class ActorMerger {
 	}
 
 	private void InternalizeInputs(Actor candidate, int rate) {
-		// Get MoC of the current candidate to define the size of the state
-		// variable required
-		// TODO: extend to QSDF
-		CSDFMoC moc = (CSDFMoC) candidate.getMoC();
 
 		for (Port port : candidate.getInputs()) {
 			// Check if the current is external from the composite actor
@@ -143,17 +141,11 @@ public class ActorMerger {
 				}
 			}
 
-			internalizePort(port, rate * moc.getNumTokensConsumed(port),
-					candidate);
+			internalizePort(port, rate,	candidate);
 		}
 	}
 
 	private void InternalizeOutputs(Actor candidate, int rate) {
-		// Get MoC of the current candidate to define the size of the state
-		// variable required
-		// TODO: extend to QSDF
-		CSDFMoC moc = (CSDFMoC) candidate.getMoC();
-
 		for (Port port : candidate.getOutputs()) {
 			// Check if the current is external from the composite actor
 			if (outputs.containsKey(candidate)) {
@@ -164,27 +156,63 @@ public class ActorMerger {
 				}
 			}
 
-			internalizePort(port, rate * moc.getNumTokensProduced(port),
-					candidate);
+			internalizePort(port, rate,	candidate);
 		}
 	}
 
-	private void internalizePort(Port port, int tokenSize, Actor candidate) {
-		// Check if this port has not been internalize before
-		GlobalVariable portVar;
-
+	private GlobalVariable getInternalStateVar(Port port){		
 		if (internalize.containsKey(port)) {
-			portVar = internalize.get(port);
-		} else {
-			// Port has never been internalize, create a new one
-			TypeList typeList = IrFactory.eINSTANCE.createTypeList(tokenSize,
+			// Port has already been assigned to a state variable
+			return internalize.get(port);
+		}
+		
+		// Look for a state variable assigned to a target
+		for (Port target : internalPorts.get(port)){
+			if (internalize.containsKey(target)){
+				//Target has already been define to a state variable
+				return internalize.get(target);
+			}
+		}
+		
+		// No state variable represents this internal connection
+		return null;
+	}
+	
+	private void internalizePort(Port port, int rate, Actor candidate) {
+		// Check if this port has not been internalize before
+		GlobalVariable portVar = getInternalStateVar(port);
+
+		// Port has never been internalize, create a new one
+		if (portVar == null) {
+			// Get MoC of the current candidate to define the size of the state
+			// variable required
+			// TODO: extend to QSDF
+			CSDFMoC moc = (CSDFMoC) candidate.getMoC();
+			int size = rate * moc.getNumTokensProduced(port);
+			
+			//Set new port var of size tokenSize
+			TypeList typeList = IrFactory.eINSTANCE.createTypeList(size,
 					port.getType());
 			portVar = new GlobalVariable(new Location(), typeList,
 					port.getName(), true);
 
 			stateVars.put(portVar.getName(), portVar);
+		}else{
+			// Increase size of the stateVar by rate
+			TypeList typeList = (TypeList)portVar.getType();
+			
+			int size = typeList.getSize() * rate;
+			typeList.setSize(size);
+			
+			//Update state variable name with current port
+			String name = portVar.getName() + "_" + port.getName();
+			portVar.setName(name);
 		}
-
+		
+		//Remember this state variable as an internal connection
+		internalize.put(port, portVar);
+		
+		// Change fifo access to stateVar access
 		new InternalizeFifoAccess(port, portVar).visit(candidate);
 	}
 

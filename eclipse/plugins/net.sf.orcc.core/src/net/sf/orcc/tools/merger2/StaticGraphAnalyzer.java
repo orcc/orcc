@@ -104,7 +104,7 @@ public class StaticGraphAnalyzer {
 
 	private List<Vertex> multipleConnectedVertex;
 	private List<Vertex> singlyConnectedVertex;
-
+	SDFCompositionAnalyzer analyzer;
 	/**
 	 * Create a static representation of a network
 	 * 
@@ -117,6 +117,9 @@ public class StaticGraphAnalyzer {
 
 		// Calculate properties of the static graph
 		computeStaticGraph();
+		
+		// Analyze composition
+		analyzer = new SDFCompositionAnalyzer(network, this);
 	}
 
 	/**
