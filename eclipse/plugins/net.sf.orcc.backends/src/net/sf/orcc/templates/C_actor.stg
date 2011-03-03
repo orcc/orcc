@@ -173,7 +173,7 @@ printRead(read) ::= ""
 
 printReadEnd(readEnd) ::= <<
 
-<if(options.("net.sf.orcc.backends.enableTrace"))>
+<if(options.enableTrace)>
 {
 	int i;
 	for (i = 0; i \< <readEnd.numTokens>; i++) {
@@ -202,7 +202,7 @@ else
 printWrite(write) ::= ""
 
 printWriteEnd(writeEnd) ::= <<
-<if(options.("net.sf.orcc.backends.enableTrace"))>
+<if(options.enableTrace)>
 {
 	int i;
 	for (i = 0; i \< <writeEnd.numTokens>; i++) {
@@ -499,7 +499,7 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	si-\>ports = 0;
 
 	<printCallTokenFunctions()>
-<if(options.("net.sf.orcc.backends.enableTrace"))>
+<if(options.enableTrace)>
 	<printOpenFiles()>
 <endif>
 
@@ -509,7 +509,7 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	// FSM transitions
 <fsm.transitions: printTransition()>
 finished:
-<if(options.("net.sf.orcc.backends.enableTrace"))>
+<if(options.enableTrace)>
 	<printCloseFiles()>
 <endif>
 	read_end();
@@ -592,7 +592,7 @@ instance(instance, options) ::= <<
 <instance.actor.inputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
 }>
 <instance.actor.inputs.list: printInputPort()>
-<if(options.("net.sf.orcc.backends.enableTrace"))>
+<if(options.enableTrace)>
 <instance.actor.inputs.list: { port | FILE *file_<port.name>;
 }>
 <endif>
@@ -601,7 +601,7 @@ instance(instance, options) ::= <<
 <instance.actor.outputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
 }>
 <instance.actor.outputs.list: printOutputPort()>
-<if(options.("net.sf.orcc.backends.enableTrace"))>
+<if(options.enableTrace)>
 <instance.actor.outputs.list: { port | FILE *file_<port.name>;
 }>
 <endif>
@@ -656,14 +656,14 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	si-\>ports = 0;
 
 	<printCallTokenFunctions()>
-<if(options.("net.sf.orcc.backends.enableTrace"))>
+<if(options.enableTrace)>
 	<printOpenFiles()>
 <endif>
 
 	<printActionLoop(instance.actor.actionScheduler.actions)>
 
 finished:
-<if(options.("net.sf.orcc.backends.enableTrace"))>
+<if(options.enableTrace)>
 	<printCloseFiles()>
 <endif>
 	read_end();

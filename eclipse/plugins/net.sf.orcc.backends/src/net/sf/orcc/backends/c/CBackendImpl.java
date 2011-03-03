@@ -99,6 +99,7 @@ public class CBackendImpl extends AbstractBackend {
 	private boolean normalize;
 	private int threadsNb;
 	private Network workingNetwork;
+	private boolean enableTrace;
 
 	private void computeMapping(Network network) {
 
@@ -310,6 +311,7 @@ public class CBackendImpl extends AbstractBackend {
 		printer.setTypePrinter(CTypePrinter.class);
 		printer.getOptions().put("network", workingNetwork);
 		printer.getOptions().put("fifoSize", fifoSize);
+		printer.getOptions().put("enableTrace", enableTrace);
 		return printer.print(instance.getId() + ".c", path, instance,
 				"instance");
 	}
@@ -328,6 +330,7 @@ public class CBackendImpl extends AbstractBackend {
 		debugMode = getAttribute(DEBUG_MODE, true);
 		threadsNb = Integer.parseInt(getAttribute(
 				"net.sf.orcc.backends.processorsNumber", "1"));
+		enableTrace = getAttribute("net.sf.orcc.backends.enableTrace", false);
 	}
 
 }
