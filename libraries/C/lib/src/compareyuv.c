@@ -64,7 +64,7 @@ static int m_x;
 static int m_y;
 static int m_width;
 static int m_height;
-static int FrameCounter = 0;
+static int FrameCounter;
 static int NumberOfFrames; 
 static unsigned char img_buf_y[MAX_WIDTH * MAX_HEIGHT];
 static unsigned char img_buf_u[MAX_WIDTH * MAX_HEIGHT / 4];
@@ -73,10 +73,9 @@ static unsigned char Y[MAX_WIDTH * MAX_HEIGHT];
 static unsigned char U[MAX_WIDTH * MAX_HEIGHT / 4];
 static unsigned char V[MAX_WIDTH * MAX_HEIGHT / 4];
 static FILE *ptfile ;
-static char *ARG_INPUTFILE = 0;
 static int  xsize_int;
 static int  ysize_int;
-static int  images = 0;
+static int  images;
 
 static int Filesize(FILE *f) {
 	struct stat st;
@@ -220,15 +219,24 @@ static void Compare_init(int width, int height) {
 	Read_YUV_init (width, height, yuv_file);
 }
 
+static int init;
+
 void Compare_initialize(unsigned int fifo_B_id, unsigned int fifo_WIDTH_id, unsigned int fifo_HEIGHT_id){
 	m_x = 0;
 	m_y = 0;
+	init = 1;
+	FrameCounter = 0;
+	images = 0;
 	fifo_Compare_B_id = fifo_B_id; 
 	fifo_Compare_WIDTH_id = fifo_WIDTH_id; 
 	fifo_Compare_HEIGHT_id = fifo_HEIGHT_id;
 }
 
-static int init = 1;
+void Compare_close(){
+	if(ptfile != NULL){
+		fclose(ptfile);
+	}
+}
 
 void Compare_scheduler(struct schedinfo_s *si) {
 	int i = 0;

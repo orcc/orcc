@@ -80,5 +80,6 @@ extern void clear_fifos();
 extern void active_genetic();
 extern void initialize_instances();
 extern int is_timeout();
+extern void Compare_close();
 
 #endif

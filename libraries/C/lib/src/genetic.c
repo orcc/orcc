@@ -457,6 +457,7 @@ void *monitor(void *data) {
 		map_actors_on_threads(population->individuals[evalIndNb],
 				monitoring->genetic_info);
 
+		Compare_close();
 		clear_fifos();
 		initialize_instances();
 	}
