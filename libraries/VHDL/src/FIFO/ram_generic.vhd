@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-11-10
+-- Last update: 2011-03-02
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -80,11 +80,11 @@ architecture arch_RAM_generic of RAM_generic is
   type ram_type is array (depth -1 downto 0) of
     std_logic_vector(width -1 downto 0);
 
-    -----------------------------------------------------------------------------
-    -- Internal signal declarations
-    -----------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  -- Internal signal declarations
+  -----------------------------------------------------------------------------
 
-    signal ram       : ram_type;
+  signal ram       : ram_type := (others => (others => '0'));
   signal adress_wr : integer range DEPTH - 1 downto 0;
   signal adress_rd : integer range DEPTH - 1 downto 0;
   --
@@ -95,7 +95,7 @@ begin
   adress_wr <= to_integer(unsigned(wr_address));
   adress_rd <= to_integer(unsigned(rd_address));
   q         <= ram(adress_rd);
-  
+
   -- purpose: to store the data
   RAM_wr : process (wrclock)
   begin

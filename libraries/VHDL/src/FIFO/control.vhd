@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2011-03-02
+-- Last update: 2011-03-03
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -88,11 +88,12 @@ begin
   empty   <= iempty;
   full    <= ifull;
   iwr_ack <= wr_data and not ifull;
+  wr_ack  <= iwr_ack;
   send    <= not iempty;
+  rd_add  <= ird_add;
+  wr_add  <= iwr_add;
 
--- Address management
-  rd_add <= ird_add;
-  wr_add <= iwr_add;
+-- Address management 
   counter_1 : entity work.counter
     generic map (
       depth => depth)
