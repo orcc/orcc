@@ -284,8 +284,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 		entitySet = new HashSet<String>();
 		computeEntityList(instance);
 
-		printer.getOptions().put("name", instance.getNetwork().getName());
-		printer.getOptions().put("entities", entities);
+		printer.getCustomAttributes().put("name", instance.getNetwork().getName());
+		printer.getCustomAttributes().put("entities", entities);
 
 		printer.print("TCLLists.tcl", path, "TCLLists");
 	}

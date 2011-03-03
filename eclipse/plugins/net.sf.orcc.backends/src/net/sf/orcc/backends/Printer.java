@@ -75,10 +75,11 @@ public class Printer {
 
 	}
 
+	protected Map<String, Object> customAttributes;
+
 	private Class<? extends ExpressionPrinter> expressionPrinter;
 
 	protected STGroup group;
-
 	protected Map<String, Object> options;
 
 	private Class<? extends TypePrinter> typePrinter;
@@ -95,7 +96,11 @@ public class Printer {
 		group.registerRenderer(Expression.class, new ExpressionRenderer());
 		group.registerRenderer(Type.class, new TypeRenderer());
 		options = new HashMap<String, Object>();
+		customAttributes = new HashMap<String, Object>();
+	}
 
+	public Map<String, Object> getCustomAttributes() {
+		return customAttributes;
 	}
 
 	public Map<String, Object> getOptions() {
@@ -120,6 +125,9 @@ public class Printer {
 	protected void printTemplate(ST template, String file) {
 		try {
 			template.add("options", options);
+			for(String attribute : customAttributes.keySet()){
+				template.add(attribute, customAttributes.get(attribute));
+			}
 
 			byte[] b = template.render(80).getBytes();
 			OutputStream os = new FileOutputStream(file);
