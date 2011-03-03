@@ -185,6 +185,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 		}
 	}
 
+	private void doTransformNetwork(Network network) throws OrccException {
+		new BroadcastAdder().transform(network);
+	}
+
 	@Override
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
 		// do not generate a VHDL VTL
@@ -210,6 +214,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		// print network and subnetworks
 		write("Printing network and subnetworks...\n");
+		doTransformNetwork(network);
 		printNetwork(network);
 	}
 
@@ -246,35 +251,29 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	private void printNetwork(Network network) throws OrccException {
-		InstancePrinter instancePrinter = new InstancePrinter("VHDL_testbench");
-
 		File folder = new File(path + File.separator + "Testbench");
 		if (!folder.exists()) {
 			folder.mkdir();
 		}
 
+		InstancePrinter instancePrinter = new InstancePrinter("VHDL_testbench");
 		Instance instance = new Instance(network.getName(), network.getName());
 		instance.setContents(network);
 		printTestbench(instancePrinter, instance);
+		printTCL(instance);
 
 		NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
 		networkPrinter.getOptions().put("fifoSize", fifoSize);
 
-		// Add broadcasts before printing
-		new BroadcastAdder().transform(network);
+		network.computeTemplateMaps();
 
 		networkPrinter.print(network.getName() + ".vhd", path + File.separator
 				+ "Design", network, "network");
 
 		for (Network subNetwork : network.getNetworks()) {
-			new BroadcastAdder().transform(subNetwork);
-			subNetwork.computeTemplateMaps();
 			networkPrinter.print(subNetwork.getName() + ".vhd", path
 					+ File.separator + "Design", subNetwork, "network");
 		}
-
-		printTCL(instance);
-
 	}
 
 	private void printTCL(Instance instance) {

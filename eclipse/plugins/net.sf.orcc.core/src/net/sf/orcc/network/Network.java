@@ -255,6 +255,16 @@ public class Network {
 	 */
 	public void computeTemplateMaps() {
 		int i, j;
+		
+		// Compute template maps of subnetworks  
+		for (Vertex vertex : getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if(instance.isNetwork()){
+					instance.getNetwork().computeTemplateMaps();
+				}
+			}
+		}
 
 		sourceMap = new HashMap<Connection, Vertex>();
 		for (Connection connection : graph.edgeSet()) {

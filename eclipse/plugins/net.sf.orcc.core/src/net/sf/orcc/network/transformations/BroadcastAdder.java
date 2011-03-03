@@ -197,6 +197,12 @@ public class BroadcastAdder implements INetworkTransformation {
 		Set<Vertex> vertexSet = new HashSet<Vertex>(graph.vertexSet());
 
 		for (Vertex vertex : vertexSet) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isNetwork()) {
+					new BroadcastAdder().transform(instance.getNetwork());
+				}
+			}
 			examineVertex(vertex, network);
 		}
 
