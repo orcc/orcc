@@ -47,7 +47,7 @@ import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.Printer;
 import net.sf.orcc.backends.transformations.InlineTransformation;
-import net.sf.orcc.backends.transformations.Multi2MonoToken;
+import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
@@ -145,9 +145,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// must be done before MAAT because MAAT does not handle
 				// multiple array accesses in loops
 
-				// transforms actions from multi-token to mono-token
-				new Multi2MonoToken(),
-
 				// transform multiple array accesses
 				// new MultipleArrayAccessTransformation(),
 
@@ -158,7 +155,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new TransformConditionals(),
 
 				// flattens multi-dimensional arrays
-				// new ListFlattenTransformation(true, false, true),
+				new ListFlattenTransformation(true, false, true),
 
 				// replaces local array of size 1 by scalars
 				new VariableRedimension(),
@@ -206,7 +203,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		}
 
 		network.computeTemplateMaps();
-		
+
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printActors(actors);
@@ -286,7 +283,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 		entitySet = new HashSet<String>();
 		computeEntityList(instance);
 
-		printer.getCustomAttributes().put("name", instance.getNetwork().getName());
+		printer.getCustomAttributes().put("name",
+				instance.getNetwork().getName());
 		printer.getCustomAttributes().put("entities", entities);
 
 		printer.print("TCLLists.tcl", path, "TCLLists");
