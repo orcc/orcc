@@ -32,18 +32,21 @@ package net.sf.orcc.backends.vhdl;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.ActorPrinter;
+import net.sf.orcc.backends.InstancePrinter;
+import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.Printer;
 import net.sf.orcc.backends.transformations.InlineTransformation;
-import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
@@ -81,7 +84,13 @@ public class VHDLBackendImpl extends AbstractBackend {
 		main(VHDLBackendImpl.class, args);
 	}
 
-	private STPrinter printer;
+	private ActorPrinter actorPrinter;
+
+	private boolean debugMode;
+
+	private List<String> entities;
+
+	private HashSet<String> entitySet;
 
 	private final Map<String, String> transformations;
 
@@ -91,6 +100,28 @@ public class VHDLBackendImpl extends AbstractBackend {
 		transformations.put("access", "access_1");
 		transformations.put("component", "component_1");
 		transformations.put("select", "select_1");
+	}
+
+	private void computeEntityList(Instance instance) {
+		if (instance.isActor()) {
+			Actor actor = instance.getActor();
+			String name = actor.getName();
+			if (!entitySet.contains(name)) {
+				entitySet.add(name);
+				entities.add(name);
+			}
+		} else if (instance.isNetwork()) {
+			Network network = instance.getNetwork();
+			String name = network.getName();
+			if (!entitySet.contains(name)) {
+				for (Instance subInstance : network.getInstances()) {
+					computeEntityList(subInstance);
+				}
+
+				entitySet.add(name);
+				entities.add(name);
+			}
+		}
 	}
 
 	@Override
@@ -113,8 +144,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// TODO: While To FSM transformation
 				// must be done before MAAT because MAAT does not handle
 				// multiple array accesses in loops
-				
-				// transforms actions from multi-token to mono-token 
+
+				// transforms actions from multi-token to mono-token
 				new Multi2MonoToken(),
 
 				// transform multiple array accesses
@@ -127,7 +158,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new TransformConditionals(),
 
 				// flattens multi-dimensional arrays
-				//new ListFlattenTransformation(true, false, true),
+				// new ListFlattenTransformation(true, false, true),
 
 				// replaces local array of size 1 by scalars
 				new VariableRedimension(),
@@ -164,10 +195,9 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		printer = new STPrinter(getAttribute(DEBUG_MODE, true));
-		printer.loadGroup("VHDL_actor");
-		printer.setExpressionPrinter(VHDLExpressionPrinter.class);
-		printer.setTypePrinter(VHDLTypePrinter.class);
+		actorPrinter = new ActorPrinter("VHDL_actor", !debugMode);
+		actorPrinter.setExpressionPrinter(VHDLExpressionPrinter.class);
+		actorPrinter.setTypePrinter(VHDLTypePrinter.class);
 
 		// checks output folder exists, and if not creates it
 		File folder = new File(path + File.separator + "Design");
@@ -203,15 +233,9 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) throws OrccException {
-		String id = actor.getName();
-		String outputName = path + File.separator + "Design" + File.separator
-				+ id + ".vhd";
-		try {
-			return printer.printActor(outputName, actor);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+	protected boolean printActor(Actor actor) {
+		return actorPrinter.print(actor.getName() + ".vhd", path
+				+ File.separator + "Design", actor, "actor");
 	}
 
 	/**
@@ -223,7 +247,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	private void printNetwork(Network network) throws OrccException {
-		printer.loadGroup("VHDL_testbench");
+		InstancePrinter instancePrinter = new InstancePrinter("VHDL_testbench");
 
 		File folder = new File(path + File.separator + "Testbench");
 		if (!folder.exists()) {
@@ -232,47 +256,54 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		Instance instance = new Instance(network.getName(), network.getName());
 		instance.setContents(network);
-		printTestbench(instance);
+		printTestbench(instancePrinter, instance);
 
-		try {
-			printer.loadGroup("VHDL_network");
+		NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
+		networkPrinter.getOptions().put("fifoSize", fifoSize);
 
-			// Add broadcasts before printing
-			new BroadcastAdder().transform(network);
+		// Add broadcasts before printing
+		new BroadcastAdder().transform(network);
 
-			String outputName = path + File.separator + "Design"
-					+ File.separator + network.getName() + ".vhd";
-			printer.printNetwork(outputName, network, false, fifoSize);
+		networkPrinter.print(network.getName() + ".vhd", path + File.separator
+				+ "Design", network, "network");
 
-			for (Network subNetwork : network.getNetworks()) {
-				new BroadcastAdder().transform(subNetwork);
-				outputName = path + File.separator + "Design" + File.separator
-						+ subNetwork.getName() + ".vhd";
-				printer.printNetwork(outputName, subNetwork, false, fifoSize);
+		for (Network subNetwork : network.getNetworks()) {
+			new BroadcastAdder().transform(subNetwork);
+			networkPrinter.print(subNetwork.getName() + ".vhd", path
+					+ File.separator + "Design", subNetwork, "network");
+		}
+
+		printTCL(instance);
+
+	}
+
+	private void printTCL(Instance instance) {
+		Printer printer = new Printer("VHDL_TCLLists");
+
+		entities = new ArrayList<String>();
+		entitySet = new HashSet<String>();
+		computeEntityList(instance);
+
+		printer.getOptions().put("name", instance.getNetwork().getName());
+		printer.getOptions().put("entities", entities);
+
+		printer.print("TCLLists.tcl", path, "TCLLists");
+	}
+
+	private void printTestbench(InstancePrinter printer, Instance instance) {
+		printer.print(instance.getId() + "_tb.vhd", path + File.separator
+				+ "Testbench", instance, "instance");
+
+		if (instance.isNetwork()) {
+			Network network = instance.getNetwork();
+			for (Instance subInstance : network.getInstances()) {
+				printTestbench(printer, subInstance);
 			}
-
-			new TCLPrinter().printTCL(path, instance);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
 		}
 	}
 
-	private void printTestbench(Instance instance) throws OrccException {
-		try {
-			String id = instance.getId();
-			String outputName = path + File.separator + "Testbench"
-					+ File.separator + id + "_tb.vhd";
-			printer.printInstance(outputName, instance);
-
-			if (instance.isNetwork()) {
-				Network network = instance.getNetwork();
-				for (Instance subInstance : network.getInstances()) {
-					printTestbench(subInstance);
-				}
-			}
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+	@Override
+	public void setOptions() throws OrccException {
+		debugMode = getAttribute(DEBUG_MODE, false);
 	}
-
 }

@@ -87,7 +87,7 @@ assignFifos(edges) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // print network
 
-network(debugFifos, fifoSize, network, options) ::= <<
+network(network, options) ::= <<
 // Generated from "<network.name>"
 
 #define SIZE 1

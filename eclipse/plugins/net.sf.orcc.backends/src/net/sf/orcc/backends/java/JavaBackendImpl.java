@@ -29,14 +29,14 @@
 package net.sf.orcc.backends.java;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.ActorPrinter;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
@@ -66,9 +66,9 @@ public class JavaBackendImpl extends AbstractBackend {
 		main(JavaBackendImpl.class, args);
 	}
 
-	private STPrinter printer;
-
 	private final Map<String, String> transformations;
+
+	private ActorPrinter actorPrinter;
 
 	public JavaBackendImpl() {
 		transformations = new HashMap<String, String>();
@@ -90,14 +90,18 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	}
 
+	private void doTransformNetwork(Network network) throws OrccException {
+		// Add broadcasts before printing
+		new BroadcastAdder().transform(network);
+	}
+
 	@Override
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		printer = new STPrinter();
-		printer.loadGroup("Java_actor");
-		printer.setExpressionPrinter(CppExprPrinter.class);
-		printer.setTypePrinter(JavaTypePrinter.class);
+		actorPrinter = new ActorPrinter("Java_actor", true);
+		actorPrinter.setExpressionPrinter(CppExprPrinter.class);
+		actorPrinter.setTypePrinter(JavaTypePrinter.class);
 
 		transformActors(actors);
 		printActors(actors);
@@ -105,7 +109,9 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
+		// transform network
 		network.flatten();
+		doTransformNetwork(network);
 
 		// print network
 		write("Printing network...\n");
@@ -113,18 +119,13 @@ public class JavaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) throws OrccException {
+	protected boolean printActor(Actor actor) {
 		// Create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
 
-		// Set output file name for this actor
-		String outputName = folder + File.separator + "Actor_" + actor.getSimpleName()+ ".java";
-		try {
-			return printer.printActor(outputName, actor);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+		return actorPrinter.print("Actor_" + actor.getSimpleName() + ".java",
+				folder, actor, "actor");
 	}
 
 	/**
@@ -136,19 +137,9 @@ public class JavaBackendImpl extends AbstractBackend {
 	 *             if something goes wrong
 	 */
 	protected void printNetwork(Network network) throws OrccException {
-		try {
-			printer.loadGroup("Java_network");
-
-			// Add broadcasts before printing
-			new BroadcastAdder().transform(network);
-
-			String name = network.getName();
-			String outputName = path + File.separator + "Network_" + name
-					+ ".java";
-			printer.printNetwork(outputName, network, false, fifoSize);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+		NetworkPrinter printer = new NetworkPrinter("Java_network");
+		printer.getOptions().put("fifoSize", fifoSize);
+		printer.print("Network_" + network.getName() + ".java", path, "network");
 	}
 
 }

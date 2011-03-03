@@ -120,7 +120,7 @@ assignFifos(edges) ::= <<
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
-network(debugFifos, fifoSize, network, options) ::= <<
+network(network, options) ::= <<
 /**
  * Generated from "<network.name>"
  */
@@ -131,7 +131,7 @@ import net.sf.orcc.runtime.actors.*;
 
 public class Network_<network.name> implements IScheduler {
 
-	public static final int SIZE = <fifoSize>;
+	public static final int SIZE = <options.fifoSize>;
 
 	// FIFO declarations
 	<allocateFifos(network.connections)>

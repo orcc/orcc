@@ -348,7 +348,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // print the network
 ///////////////////////////////////////////////////////////////////////////////
-network(debugFifos, fifoSize, network, options) ::= <<
+network(network, options) ::= <<
 -------------------------------------------------------------------------------
 -- Title      : Configuration: <network.name>
 -- Project    : 
@@ -375,7 +375,7 @@ use ieee.numeric_std.all;
 ------------------------------------------------------------------------------
 entity <network.name> is
   generic (
-  SIZE : integer := <fifoSize>);
+  SIZE : integer := <options.fifoSize>);
   port (
     <printNetworkPorts(network)>
     clock    : in  std_logic;

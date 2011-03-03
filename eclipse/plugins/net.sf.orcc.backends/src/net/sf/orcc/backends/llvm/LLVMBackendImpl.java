@@ -45,7 +45,7 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.llvm.transformations.AddGEPTransformation;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
@@ -82,16 +82,16 @@ public class LLVMBackendImpl extends AbstractBackend {
 	 * Backend options
 	 */
 	private boolean classify;
+	private boolean debugMode;
 	/**
 	 * Path of JadeToolbox executable
 	 */
 	protected String jadeToolbox;
 	private String llvmGenMod;
 	private boolean normalize;
-
 	private String optLevel;
 
-	private STPrinter printer;
+	private ActorPrinter printer;
 	private final Map<String, String> transformations;
 
 	/**
@@ -136,8 +136,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		printer = new STPrinter(getAttribute(DEBUG_MODE, false));
-		printer.loadGroup("LLVM_actor");
+		printer = new ActorPrinter("LLVM_actor", !debugMode);
 		printer.setExpressionPrinter(LLVMExprPrinter.class);
 		printer.setTypePrinter(LLVMTypePrinter.class);
 
@@ -179,21 +178,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) throws OrccException {
+	protected boolean printActor(Actor actor) {
 		// Create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
 
-		// Set output file name for this actor
-		String outputName = folder + File.separator + actor.getSimpleName();
-
-		try {
-			boolean cached = printer.printActor(outputName, actor);
-
-			return cached;
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+		return printer.print(actor.getSimpleName(), folder, actor, "actor");
 	}
 
 	private void runJadeToolBox(List<Actor> actors) throws OrccException {
@@ -212,11 +202,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 			cmdList.add("-a");
 		}
 
-			
 		// Add list of package requiered
 		Set<String> packages = new HashSet<String>();
 		for (Actor actor : actors) {
-			if (!actor.isNative()){
+			if (!actor.isNative()) {
 				String firstPackage = actor.getPackageAsList().get(0);
 				packages.add(firstPackage);
 			}
@@ -242,7 +231,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		jadeToolbox = OrccActivator.getDefault().getPreferenceStore()
 				.getString(P_JADETOOLBOX);
- 	}
+		debugMode = getAttribute(DEBUG_MODE, false);
+	}
 
 	private void startExec(String[] cmd) throws IOException {
 		Runtime run = Runtime.getRuntime();

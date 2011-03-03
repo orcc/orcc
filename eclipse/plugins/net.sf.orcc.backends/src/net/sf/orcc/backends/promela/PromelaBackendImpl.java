@@ -29,14 +29,14 @@
 package net.sf.orcc.backends.promela;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.InstancePrinter;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -68,17 +68,17 @@ public class PromelaBackendImpl extends AbstractBackend {
 		main(PromelaBackendImpl.class, args);
 	}
 
-	private STPrinter printer;
+	private InstancePrinter instancePrinter;
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 	private Map<Action, List<Peek>> peeks = new HashMap<Action, List<Peek>>();
 	private Map<Action, List<Load>> loads = new HashMap<Action, List<Load>>();
-	
+
 	private final Map<String, String> transformations;
 
 	/**
-	 * Creates a new instance of the Promela back-end. Initializes the transformation
-	 * hash map.
+	 * Creates a new instance of the Promela back-end. Initializes the
+	 * transformation hash map.
 	 */
 	public PromelaBackendImpl() {
 		transformations = new HashMap<String, String>();
@@ -89,14 +89,13 @@ public class PromelaBackendImpl extends AbstractBackend {
 		transformations.put("min", "min_");
 		transformations.put("select", "select_");
 	}
-	
+
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorVisitor[] transformations = { 
+		ActorVisitor[] transformations = {
 				new RenameTransformation(this.transformations),
 				new GuardsExtractor(guards, peeks, loads), new PhiRemoval(),
-				new DeadCodeElimination(),
-				new DeadVariableRemoval(false)};
+				new DeadCodeElimination(), new DeadVariableRemoval(false) };
 
 		for (ActorVisitor transformation : transformations) {
 			transformation.visit(actor);
@@ -112,15 +111,13 @@ public class PromelaBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		printer = new STPrinter();
-		printer.loadGroup("PROMELA_actor");
-		printer.setExpressionPrinter(PromelaExprPrinter.class);
-		printer.setTypePrinter(PromelaTypePrinter.class);
+		instancePrinter = new InstancePrinter("PROMELA_actor");
+		instancePrinter.setExpressionPrinter(PromelaExprPrinter.class);
+		instancePrinter.setTypePrinter(PromelaTypePrinter.class);
+		instancePrinter.getOptions().put("guards", guards);
+		instancePrinter.getOptions().put("peeks", peeks);
+		instancePrinter.getOptions().put("loads", loads);
 
-		printer.getOptions().putAll(getAttributes()); // need to check what this one does
-		printer.getOptions().put("guards", guards);
-		printer.getOptions().put("peeks", peeks);
-		printer.getOptions().put("loads", loads);
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printInstances(network);
@@ -129,15 +126,9 @@ public class PromelaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printInstance(Instance actor) throws OrccException {
-		String name = actor.getId();
-		String outputName = path + File.separator + name + ".pml";
-		try {
-			printer.printInstance(outputName, actor);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
-		return false;
+	protected boolean printInstance(Instance instance) {
+		return instancePrinter.print(instance.getId() + ".pml", path, instance,
+				"instance");
 	}
 
 	/**
@@ -148,14 +139,9 @@ public class PromelaBackendImpl extends AbstractBackend {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	private void printNetwork(Network network) throws OrccException {
-		String outputName = path + File.separator + "main_" + network.getName()
-				+ ".pml";
-		printer.loadGroup("PROMELA_network");
-		try {
-			printer.printNetwork(outputName, network, false, fifoSize);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+	private void printNetwork(Network network) {
+		NetworkPrinter printer = new NetworkPrinter("PROMELA_network");
+		printer.print("main_" + network.getName() + ".pml", path, network,
+				"network");
 	}
 }
