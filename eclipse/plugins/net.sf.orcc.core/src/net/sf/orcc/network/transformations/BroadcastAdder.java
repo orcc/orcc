@@ -59,11 +59,11 @@ public class BroadcastAdder implements INetworkTransformation {
 
 	protected Set<Connection> toBeRemoved;
 
-	protected void createBroadcast(Instance instance, Port port,
+	protected void createBroadcast(String id, Port port,
 			List<Connection> outList) {
 		// add broadcast vertex
 		Broadcast bcast = new Broadcast(outList.size(), port.getType());
-		String name = instance.getId() + "_" + port.getName();
+		String name = id + "_" + port.getName();
 		Instance newInst = new Instance(name, "Broadcast");
 		newInst.setContents(bcast);
 		Vertex vertexBCast = new Vertex(newInst);
@@ -141,22 +141,31 @@ public class BroadcastAdder implements INetworkTransformation {
 	 * @throws OrccException
 	 */
 	protected void examineConnections(Vertex vertex,
-			Set<Connection> connections, Map<Port, List<Connection>> outMap)
-			throws OrccException {
-		Instance instance = vertex.getInstance();
-		for (Connection connection : connections) {
-			Port srcPort = connection.getSource();
-			if (srcPort != null) {
-				List<Connection> outList = outMap.get(srcPort);
-				int numOutput = outList.size();
-				if (numOutput > 1) {
-					createBroadcast(instance, srcPort, outList);
+			Set<Connection> connections, Map<Port, List<Connection>> outMap,
+			Network network) throws OrccException {
+		if (vertex.isInstance()) {
+			Instance instance = vertex.getInstance();
+			for (Connection connection : connections) {
+				Port srcPort = connection.getSource();
+				if (srcPort != null) {
+					List<Connection> outList = outMap.get(srcPort);
+					int numOutput = outList.size();
+					if (numOutput > 1) {
+						createBroadcast(instance.getId(), srcPort, outList);
+					}
 				}
+			}
+		} else {
+			if (connections.size() > 1) {
+				Port port = vertex.getPort();
+				createBroadcast(network.getName(), port,
+						new ArrayList<Connection>(connections));
 			}
 		}
 	}
 
-	protected void examineVertex(Vertex vertex) throws OrccException {
+	protected void examineVertex(Vertex vertex, Network network)
+			throws OrccException {
 		// make a copy of the existing outgoing connections of vertex because
 		// the set returned is modified when new edges are added
 		Set<Connection> connections = new HashSet<Connection>(
@@ -175,7 +184,7 @@ public class BroadcastAdder implements INetworkTransformation {
 			outList.add(connection);
 		}
 
-		examineConnections(vertex, connections, outMap);
+		examineConnections(vertex, connections, outMap, network);
 	}
 
 	@Override
@@ -188,9 +197,7 @@ public class BroadcastAdder implements INetworkTransformation {
 		Set<Vertex> vertexSet = new HashSet<Vertex>(graph.vertexSet());
 
 		for (Vertex vertex : vertexSet) {
-			if (vertex.isInstance()) {
-				examineVertex(vertex);
-			}
+			examineVertex(vertex, network);
 		}
 
 		// removes old connections
