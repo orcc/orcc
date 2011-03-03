@@ -231,6 +231,8 @@ public class CBackendImpl extends AbstractBackend {
 
 		if (codesign) {
 			new BroadcastAdder().transform(network);
+
+			// computeMapping(network);
 			NetworkSplitter netSplit = new NetworkSplitter(instancesTarget,
 					mediumGraph);
 			netSplit.transform(network);
@@ -258,24 +260,24 @@ public class CBackendImpl extends AbstractBackend {
 		// Transform the network
 		doTransformNetwork(network);
 
-		// Transform all actors of the network
-		transformActors(network.getActors());
-
-		if (merge) {
-			network.mergeActors();
-		}
-
-		network.computeTemplateMaps();
-
-		NetworkPrinter printer = new NetworkPrinter("C_network");
-		printer.setTypePrinter(CTypePrinter.class);
-
-		computeMapping(network);
-		computeOptions(printer.getOptions());
-
 		String rootPath = new String(path);
 		for (String targetName : mapTargetsNetworks.keySet()) {
 			workingNetwork = mapTargetsNetworks.get(targetName);
+
+			// Transform all actors of the network
+			transformActors(workingNetwork.getActors());
+
+			if (merge) {
+				workingNetwork.mergeActors();
+			}
+
+			workingNetwork.computeTemplateMaps();
+
+			NetworkPrinter printer = new NetworkPrinter("C_network");
+			printer.setTypePrinter(CTypePrinter.class);
+
+			computeMapping(workingNetwork);
+			computeOptions(printer.getOptions());
 
 			if (codesign) {
 				write("\nPrinting " + targetName + "'s instances\n");
@@ -291,7 +293,8 @@ public class CBackendImpl extends AbstractBackend {
 
 			// print network
 			write("Printing network...\n");
-			printer.print(network.getName() + ".c", path, network, "network");
+			printer.print(workingNetwork.getName() + ".c", path,
+					workingNetwork, "network");
 
 			// print CMakeLists
 			printCMake(workingNetwork);

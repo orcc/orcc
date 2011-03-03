@@ -76,19 +76,21 @@ DECL T *FIFO_SOCKET_READ(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, unsigned i
 	return fifo->contents;
 }*/
 
-DECL void FIFO_SOCKET_READ_END(T)(struct FIFO_SOCKET_S(T) *fifo) {
+DECL void FIFO_SOCKET_READ_END(T)(struct FIFO_SOCKET_S(T) *fifo, unsigned int reader_id, unsigned int n) {
+	fifo->read_inds[0] += n;
 	memmove(fifo->contents, &fifo->contents[fifo->read_inds[0]], fifo->read_inds[0] * sizeof(T));
 	fifo->write_ind -= fifo->read_inds[0];
-	fifo->fifo->read_inds[0] = 0;
+	fifo->read_inds[0] = 0;
 }
 
-/*
+
 DECL T *FIFO_SOCKET_WRITE(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, unsigned int n) {
 	return &(fifo->contents[fifo->write_ind]);
 }
-*/
 
-DECL void FIFO_SOCKET_WRITE_END(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer) {
+
+DECL void FIFO_SOCKET_WRITE_END(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, unsigned int n) {
+	fifo->write_ind += n;
 	if(fifo->write_ind >= fifo->size/2) {
 		int ret;
 		int nbBytesWritten;
@@ -112,7 +114,7 @@ DECL void FIFO_SOCKET_WRITE_END(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer) {
 		}
 	}
 }
-/*
+
 DECL void FIFO_SOCKET_INIT(T)(struct FIFO_SOCKET_S(T) *fifo, int NumId, int IsServer, const char* HostName, unsigned short port, int IsIpv6) {
 	SOCKADDR_IN Sin;
 	struct hostent *hostinfo;
@@ -176,4 +178,4 @@ DECL void FIFO_SOCKET_INIT(T)(struct FIFO_SOCKET_S(T) *fifo, int NumId, int IsSe
 		closesocket(local_sock);
 	}
 	FD_SET(fifo->Sock, &(fifo->fdset));
-}*/
+}
