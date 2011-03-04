@@ -1,17 +1,17 @@
 -------------------------------------------------------------------------------
--- Title      : FIFO TOP
+-- Title      : FIFO controler
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : fifo.vhd
--- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
--- Company    : Lead Tech Design
+-- File       : control.vhd
+-- Author     : Nicolas Siret (nicolas.siret@live.fr)
+-- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-03-03
+-- Last update: 2011-03-04
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
+-- Copyright (c) 2009-2011, IETR/INSA of Rennes
 -- Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
--- Copyright (c) 2009-2010, IETR/INSA of Rennes
 -- All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
@@ -77,14 +77,24 @@ end controler;
 
 architecture archcontroler of controler is
 
-  signal ird_add : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal iwr_add : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal iempty  : std_logic;
-  signal ifull   : std_logic;
-  signal iwr_ack : std_logic;
-
+  -----------------------------------------------------------------------------
+  -- Constants and signals declaration
+  -----------------------------------------------------------------------------
+  constant zero    : std_logic_vector(bit_width(depth)-1 downto 0) := (others => '0');
+  constant one     : std_logic_vector(bit_width(depth)-1 downto 0) := (others => '0');
+  constant pfull   : std_logic_vector(bit_width(depth)-1 downto 0) := '0' & one(bit_width(depth)-2 downto 0);
+  constant nfull   : std_logic_vector(bit_width(depth)-1 downto 0) := '1' & zero(bit_width(depth)-2 downto 0);
+  --
+  signal   ird_add : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal   iwr_add : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal   iempty  : std_logic;
+  signal   ifull   : std_logic;
+  signal   iwr_ack : std_logic;
+  signal   level   : std_logic_vector(bit_width(depth)-1 downto 0);
+  ------------------------------------------------------------------------------
+  
 begin
-
+  
   empty   <= iempty;
   full    <= ifull;
   iwr_ack <= wr_data and not ifull;
@@ -92,8 +102,10 @@ begin
   send    <= not iempty;
   rd_add  <= ird_add;
   wr_add  <= iwr_add;
+  --
+  level <= iwr_add - ird_add;
 
--- Address management 
+-- A counter
   counter_1 : entity work.counter
     generic map (
       depth => depth)
@@ -106,30 +118,23 @@ begin
       rd_data => rd_ack,
       rd_add  => ird_add);
 
-  -- Flags
-  Flag_full : process (ird_add, iwr_add) is
-    variable level : integer range depth -1 downto 0 := 0;
+  -- Management of the flags
+  Flags : process (level) is
   begin
-    if (iwr_add < ird_add) then
-      level  := to_integer(unsigned(ird_add - iwr_add));
-      iempty <= '0';
-    elsif (iwr_add = ird_add) then
-      level  := 0;
+    if(level = zero) then
       iempty <= '1';
-    else
-      level  := (depth -1) - to_integer(unsigned(iwr_add - ird_add));
+      ifull  <= '0';
+    elsif(level = pfull) then           -- positive full
       iempty <= '0';
+      ifull  <= '1';
+    elsif(level = nfull) then           -- negative full
+      iempty <= '0';
+      ifull  <= '1';
+    else
+      iempty <= '0';
+      ifull  <= '0';
     end if;
-
-    case level is
-      when 2 =>
-        ifull <= '1';
-      when 1 =>
-        ifull <= '1';
-      when others =>
-        ifull <= '0';
-    end case;
-  end process Flag_full;
+  end process Flags;
 
 end archcontroler;
 

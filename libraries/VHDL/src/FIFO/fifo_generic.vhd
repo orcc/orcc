@@ -2,16 +2,16 @@
 -- Title      : FIFO TOP
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : fifo.vhd
--- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
--- Company    : Lead Tech Design
+-- File       : fifo_generic.vhd
+-- Author     : Nicolas Siret (nicolas.siret@live.fr)
+-- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-03-02
+-- Last update: 2011-03-04
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
--- Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
 -- Copyright (c) 2009-2010, IETR/INSA of Rennes
+-- Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
 -- All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
@@ -104,8 +104,9 @@ begin
       depth => depth,
       width => width)
     port map (
-      rd_address => rd_address,
       q          => data_out,
+      rd_address => rd_address,
+      rdclock      => rd_clk,
       data       => data_in,
       wr_address => wr_address,
       wrclock    => wr_clk,

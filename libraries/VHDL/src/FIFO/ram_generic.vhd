@@ -1,17 +1,17 @@
 -------------------------------------------------------------------------------
 -- Title      : Generic dual port RAM
--- Project    : ORCC
+-- Project    : Orcc
 -------------------------------------------------------------------------------
 -- File       : ram_generic.vhd
--- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
--- Company    : Lead Tech Design
+-- Author     : Nicolas Siret (nicolas.siret@live.fr)
+-- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-03-02
+-- Last update: 2011-03-04
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
+-- Copyright (c) 2009-2011, IETR/INSA of Rennes
 -- Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
--- Copyright (c) 2009-2010, IETR/INSA of Rennes
 -- All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
@@ -57,8 +57,9 @@ entity ram_generic is
     depth : integer := 32;
     width : integer := 32);
   port (
-    rd_address : in  std_logic_vector(bit_width(depth)-1 downto 0);
     q          : out std_logic_vector(width -1 downto 0);
+    rd_address : in  std_logic_vector(bit_width(depth)-1 downto 0);
+    rdclock    : in  std_logic;
     --
     data       : in  std_logic_vector(width -1 downto 0);
     wr_address : in  std_logic_vector(bit_width(depth)-1 downto 0);
@@ -76,17 +77,16 @@ architecture arch_RAM_generic of RAM_generic is
   -----------------------------------------------------------------------------
   -- Internal type declarations
   -----------------------------------------------------------------------------
-
   type ram_type is array (depth -1 downto 0) of
     std_logic_vector(width -1 downto 0);
 
   -----------------------------------------------------------------------------
   -- Internal signal declarations
   -----------------------------------------------------------------------------
-
-  signal ram       : ram_type := (others => (others => '0'));
-  signal adress_wr : integer range DEPTH - 1 downto 0;
-  signal adress_rd : integer range DEPTH - 1 downto 0;
+  signal ram       : ram_type                         := (others => (others => '0'));
+  --
+  signal adress_wr : integer range DEPTH - 1 downto 0 := 0;
+  signal adress_rd : integer range DEPTH - 1 downto 0 := 0;
   --
   -----------------------------------------------------------------------------
   
@@ -94,7 +94,6 @@ begin
 
   adress_wr <= to_integer(unsigned(wr_address));
   adress_rd <= to_integer(unsigned(rd_address));
-  q         <= ram(adress_rd);
 
   -- purpose: to store the data
   RAM_wr : process (wrclock)
@@ -106,6 +105,9 @@ begin
       end if;
     end if;
   end process RAM_wr;
+
+-- purpose: to read the data
+  q <= ram(adress_rd);
 
 end arch_RAM_generic;
 

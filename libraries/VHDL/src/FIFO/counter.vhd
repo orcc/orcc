@@ -1,17 +1,17 @@
 -------------------------------------------------------------------------------
--- Title      : FIFO TOP
+-- Title      : FIFO counter
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : fifo.vhd
--- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
--- Company    : Lead Tech Design
+-- File       : counter.vhd
+-- Author     : Nicolas Siret (nicolas.siret@live.fr)
+-- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-03-02
+-- Last update: 2011-03-04
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
+-- Copyright (c) 2009-2011, IETR/INSA of Rennes
 -- Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
--- Copyright (c) 2009-2010, IETR/INSA of Rennes
 -- All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
@@ -56,33 +56,41 @@ entity counter is
   generic (
     depth : integer := 32);
   port (
-    reset_n : in    std_logic;
-    wr_clk  : in    std_logic;
-    wr_data : in    std_logic;
-    wr_add  : inout std_logic_vector(bit_width(depth) -1 downto 0);
-    rd_clk  : in    std_logic;
-    rd_data : in    std_logic;
-    rd_add  : inout std_logic_vector(bit_width(depth) -1 downto 0));
+    reset_n : in  std_logic;
+    wr_clk  : in  std_logic;
+    wr_data : in  std_logic;
+    wr_add  : out std_logic_vector(bit_width(depth) -1 downto 0);
+    rd_clk  : in  std_logic;
+    rd_data : in  std_logic;
+    rd_add  : out std_logic_vector(bit_width(depth) -1 downto 0));
 end counter;
 
 -------------------------------------------------------------------------------
 
 architecture archcounter of counter is
 
+  -----------------------------------------------------------------------------
+  -- Constants and signals declaration
+  -----------------------------------------------------------------------------
   constant depth_std : std_logic_vector(bit_width(depth)-1 downto 0)
  := std_logic_vector(to_unsigned(depth -1, bit_width(depth)));
+  signal iwr_add : std_logic_vector(bit_width(depth) -1 downto 0);
+  signal ird_add : std_logic_vector(bit_width(depth) -1 downto 0);
+  -------------------------------------------------------------------------------
   
 begin
-  
+  wr_add <= iwr_add;
+  rd_add <= ird_add;
+
   rd_count : process (rd_clk, reset_n) is
   begin
     if reset_n = '0' then
-      rd_add <= (others => '0');
+      ird_add <= (others => '0');
     elsif rising_edge(rd_clk) then
-      if (rd_add = depth_std) and rd_data = '1' then
-        rd_add <= (others => '0');
+      if (ird_add = depth_std) and rd_data = '1' then
+        ird_add <= (others => '0');
       elsif rd_data = '1' then
-        rd_add <= rd_add +'1';
+        ird_add <= ird_add +'1';
       end if;
     end if;
   end process rd_count;
@@ -90,12 +98,12 @@ begin
   wr_count : process (wr_clk, reset_n) is
   begin
     if reset_n = '0' then
-      wr_add <= (others => '0');
+      iwr_add <= (others => '0');
     elsif rising_edge(wr_clk) then
-      if (wr_add = depth_std) and wr_data = '1' then
-        wr_add <= (others => '0');
+      if (iwr_add = depth_std) and wr_data = '1' then
+        iwr_add <= (others => '0');
       elsif wr_data = '1' then
-        wr_add <= wr_add +'1';
+        iwr_add <= iwr_add +'1';
       end if;
     end if;
   end process wr_count;
