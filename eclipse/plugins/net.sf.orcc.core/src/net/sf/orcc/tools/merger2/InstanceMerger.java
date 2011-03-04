@@ -73,10 +73,12 @@ public class InstanceMerger {
 		Set<Vertex> vertices = verticesRate.keySet();
 
 		// Create a composite actor
+		String name = "Merged" + nMerged++;
+		
 		defineInput(vertices);
 		defineOutput(vertices);
 
-		actorMerger = new ActorMerger(extInputs, extOutputs, intPorts);
+		actorMerger = new ActorMerger(name, extInputs, extOutputs, intPorts);
 
 		for (Entry<Vertex, Integer> entry : verticesRate.entrySet()) {
 			Vertex vertex = entry.getKey();
@@ -87,7 +89,7 @@ public class InstanceMerger {
 
 		// Create the merged instance
 		Actor composite = actorMerger.getComposite();
-		Instance compositeInst = new Instance("Merged" + nMerged++,
+		Instance compositeInst = new Instance(name,
 				composite.getName());
 		compositeInst.setContents(composite);
 

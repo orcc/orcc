@@ -156,7 +156,7 @@ public class ActorMerger {
 	private MultiMap<Actor, Port> extOutputs;
 	private List<Action> initializes;
 	private OrderedMap<String, Port> inputs;
-
+	private String name;
 	private MultiMap<Port, Port> IntPorts;
 	private Map<Port, GlobalVariable> intVars;
 	private OrderedMap<String, Port> outputs;
@@ -167,11 +167,12 @@ public class ActorMerger {
 	private ActionScheduler scheduler;
 	private OrderedMap<String, GlobalVariable> stateVars;
 
-	public ActorMerger(MultiMap<Actor, Port> inputs,
+	public ActorMerger(String name, MultiMap<Actor, Port> inputs,
 			MultiMap<Actor, Port> outputs, MultiMap<Port, Port> internalPorts) {
 		this.extInputs = inputs;
 		this.extOutputs = outputs;
 		this.IntPorts = internalPorts;
+		this.name = name;
 		this.intVars = new HashMap<Port, GlobalVariable>();
 		this.parameters = new OrderedMap<String, GlobalVariable>();
 		this.stateVars = new OrderedMap<String, GlobalVariable>();
@@ -207,7 +208,7 @@ public class ActorMerger {
 	}
 
 	public Actor getComposite() {
-		return new Actor("", "", parameters, inputs, outputs, false, stateVars,
+		return new Actor(name, "", parameters, inputs, outputs, false, stateVars,
 				procs, actions, initializes, scheduler);
 	}
 
