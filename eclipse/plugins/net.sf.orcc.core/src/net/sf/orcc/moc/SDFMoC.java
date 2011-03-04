@@ -45,10 +45,16 @@ public class SDFMoC extends CSDFMoC {
 		numberOfPhases = 1;
 	}
 
+	@Override
+	public Object accept(MoCInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+
+	@Override
 	public boolean isSDF() {
 		return true;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

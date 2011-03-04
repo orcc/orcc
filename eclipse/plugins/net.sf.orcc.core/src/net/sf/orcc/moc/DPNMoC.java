@@ -45,6 +45,11 @@ public class DPNMoC extends AbstractMoC {
 	}
 
 	@Override
+	public Object accept(MoCInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+
+	@Override
 	public boolean isDPN() {
 		return true;
 	}

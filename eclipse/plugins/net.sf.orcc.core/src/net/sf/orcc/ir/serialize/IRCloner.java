@@ -88,6 +88,13 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.TypeInterpreter;
+import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.DPNMoC;
+import net.sf.orcc.moc.KPNMoC;
+import net.sf.orcc.moc.MoC;
+import net.sf.orcc.moc.MoCInterpreter;
+import net.sf.orcc.moc.QSDFMoC;
+import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -272,6 +279,70 @@ public class IRCloner {
 	}
 
 	/**
+	 * This class defines a MoC cloner that clones a MoC into a new MoC.
+	 * 
+	 * @author Jerome Gorin
+	 * 
+	 */
+	private static class MoCCloner implements MoCInterpreter {
+
+		@Override
+		public Object interpret(CSDFMoC moc, Object... args) {
+			CSDFMoC csdfMoC = new CSDFMoC();
+			
+			for (Action action : moc.getActions()){
+				csdfMoC.addAction(getAction(action.getTag()));
+			}
+			
+			csdfMoC.setNumberOfPhases(moc.getNumberOfPhases());
+			
+			//Clone pattern consumption/production
+			csdfMoC.setTokenConsumptions(clone);
+			csdfMoC.setTokenProductions(clone);
+			
+			return csdfMoC;
+		}
+
+		@Override
+		public Object interpret(DPNMoC moc, Object... args) {
+			return new DPNMoC();
+		}
+
+		@Override
+		public Object interpret(KPNMoC moc, Object... args) {
+			return new KPNMoC();
+		}
+
+		@Override
+		public Object interpret(QSDFMoC moc, Object... args) {
+			QSDFMoC qsdfMoC = new QSDFMoC();
+			
+			for(Action action : moc.getActions()){
+				SDFMoC sdfMoC = (SDFMoC)cloneMoC(moc.getStaticClass(action));
+				qsdfMoC.addConfiguration(getAction(action.getTag()), sdfMoC);
+			}
+			
+			return qsdfMoC;
+		}
+
+		@Override
+		public Object interpret(SDFMoC moc, Object... args) {
+			SDFMoC sdfMoC = new SDFMoC();
+			
+			for (Action action : moc.getActions()){
+				sdfMoC.addAction(getAction(action.getTag()));
+			}
+			
+			//Clone pattern consumption/production
+			sdfMoC.setTokenConsumptions(clone);
+			sdfMoC.setTokenProductions(clone);
+			
+			return sdfMoC;
+		}
+
+	}
+	
+	/**
 	 * This class defines a node cloner that clones a CFG node into a new CFG
 	 * node.
 	 * 
@@ -374,6 +445,7 @@ public class IRCloner {
 	private static OrderedMap<String, Procedure> procs;
 
 	private static OrderedMap<String, GlobalVariable> stateVars;
+		
 
 	/**
 	 * Clone the given expression into a new Expression.
@@ -425,6 +497,11 @@ public class IRCloner {
 	private static CFGNode cloneNode(CFGNode node) {
 		return (CFGNode) node.accept(new NodeCloner());
 	}
+	
+	private static MoC cloneMoC(MoC moc) {
+		return (MoC) moc.accept(new MoCCloner());
+	}
+
 
 	/**
 	 * Clone the given nodes.
@@ -509,15 +586,17 @@ public class IRCloner {
 		return null;
 	}
 
-	private OrderedMap<String, Action> actions;
+	private static OrderedMap<String, Action> actions;
 
 	private Actor actor;
+	
+	private static Actor clone;
 
 	private OrderedMap<String, Port> inputs;
 
 	private OrderedMap<String, Port> outputs;
 
-	private List<Action> untaggedActions;
+	private static List<Action> untaggedActions;
 
 	/**
 	 * Creates an actor writer on the given actor.
@@ -544,15 +623,22 @@ public class IRCloner {
 		List<Action> actions = cloneActions(actor.getActions());
 
 		List<Action> initializes = cloneInitializes(actor.getInitializes());
-
+			
 		ActionScheduler actionScheduler = cloneActionScheduler(actor
 				.getActionScheduler());
 
-		return new Actor(actor.getName(), actor.getFile(), parameters, inputs,
+		clone = new Actor(actor.getName(), actor.getFile(), parameters, inputs,
 				outputs, actor.isNative(), stateVars, procs, actions,
 				initializes, actionScheduler);
+		
+		//Cloning moc
+		if (actor.hasMoC()){
+			clone.setMoC(cloneMoC(actor.getMoC()));
+		}
+		
+		return clone;
 	}
-
+	
 	/**
 	 * Returns a cloned action from the given action.
 	 * 
@@ -789,7 +875,19 @@ public class IRCloner {
 		Location location = cloneLocation(port.getLocation());
 		Type type = cloneType(port.getType());
 		Port clone = new Port(location, type, port.getName());
-
+		
+		//Clone port token rate
+		int tokensConsummed = port.getNumTokensConsumed();
+		int tokensProduced = port.getNumTokensProduced();
+		
+		if (tokensConsummed > 0 ){
+			clone.increaseTokenConsumption(tokensConsummed);
+		}
+		
+		if (tokensProduced > 0 ){
+			clone.increaseTokenProduction(tokensProduced);
+		}
+		
 		// Store the port for a later link
 		ports.put(clone.getName(), clone);
 
@@ -865,7 +963,7 @@ public class IRCloner {
 	 *            a tag of an action
 	 * @return the action (or initialize) associated with the tag
 	 */
-	private Action getAction(Tag tag) {
+	private static Action getAction(Tag tag) {
 		if (tag.isEmpty()) {
 			// removes the first untagged action found
 			return untaggedActions.remove(0);
@@ -882,7 +980,7 @@ public class IRCloner {
 	 * @param action
 	 *            an action
 	 */
-	private void putAction(Tag tag, Action action) {
+	private static void putAction(Tag tag, Action action) {
 		if (tag.isEmpty()) {
 			untaggedActions.add(action);
 		} else {

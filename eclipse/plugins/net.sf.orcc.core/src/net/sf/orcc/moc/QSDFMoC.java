@@ -48,12 +48,17 @@ import net.sf.orcc.ir.Action;
 public class QSDFMoC extends AbstractMoC {
 
 	private Map<Action, SDFMoC> configurations;
-
+	
 	/**
 	 * Creates a new quasi-static MoC.
 	 */
 	public QSDFMoC() {
 		configurations = new LinkedHashMap<Action, SDFMoC>();
+	}
+
+	@Override
+	public Object accept(MoCInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
 	}
 
 	/**

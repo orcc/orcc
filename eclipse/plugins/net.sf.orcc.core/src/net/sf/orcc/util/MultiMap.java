@@ -29,6 +29,7 @@
 package net.sf.orcc.util;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,7 +109,11 @@ public class MultiMap<K, V> extends AbstractMap<K, Collection<V>> {
 
 	@Override
 	public Collection<V> get(Object key) {
-		return map.get(key);
+		if (map.containsKey(key)) {
+			return map.get(key);
+		} else {
+			return new ArrayList<V>();
+		}
 	}
 
 	@SuppressWarnings("unchecked")

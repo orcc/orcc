@@ -65,6 +65,11 @@ public class CSDFMoC extends AbstractMoC {
 		outputPattern = new Pattern();
 	}
 
+	@Override
+	public Object accept(MoCInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+	
 	/**
 	 * Adds the given action to the list of actions that can be scheduled
 	 * statically.

@@ -45,6 +45,11 @@ public class KPNMoC extends AbstractMoC {
 	}
 
 	@Override
+	public Object accept(MoCInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+
+	@Override
 	public boolean isKPN() {
 		return true;
 	}

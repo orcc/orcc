@@ -99,8 +99,8 @@ public class ActorMerger {
 		new ConflictSolver(composite).resolve(clone);
 
 		// Internalize ports not define as extern in composite actor
-		InternalizeInputs(candidate, rate);
-		InternalizeOutputs(candidate, rate);
+		InternalizeInputs(clone, rate);
+		InternalizeOutputs(clone, rate);
 
 		// Add all properties
 		parameters.putAll(clone.getParameters());

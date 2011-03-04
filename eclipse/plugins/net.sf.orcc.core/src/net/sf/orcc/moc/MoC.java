@@ -32,9 +32,21 @@ package net.sf.orcc.moc;
  * This class defines a Model of Computation.
  * 
  * @author Matthieu Wipliez
+ * @author Jerome Gorin
  * 
  */
 public interface MoC {
+
+	/**
+	 * Accepts the given MoC interpreter.
+	 * 
+	 * @param interpreter
+	 *            an interpreter
+	 * @param args
+	 *            arguments
+	 * @return an object
+	 */
+	Object accept(MoCInterpreter interpreter, Object... args);
 
 	/**
 	 * Returns true if this MoC is CSDF.
