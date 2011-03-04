@@ -50,87 +50,91 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.util.OrderedMap;
 
 public class InternalizeFifoAccess extends AbstractActorVisitor {
+	public class LinksToStateVar extends AbstractActorVisitor {	
+		@Override
+		public void visit(Load load) {
+			Use use = load.getSource();
+			Variable var = use.getVariable();
+			if (localFifoVars.contains(var)) {
+				load.setSource(new Use(variable, load));
+				//updateIndex(var, load, load.getIndexes());
+			}
+		}
+		
+		@Override
+		public void visit(Procedure procedure) {
+			super.visit(procedure);
+			
+			//Remove locals from procedure
+			OrderedMap<String, LocalVariable> locals = procedure.getLocals();
+			
+			for (Variable fifoVar : localFifoVars){
+				locals.remove(fifoVar.getName());
+			}
+		}
+
+		@Override
+		public void visit(Store store) {
+			Variable var = store.getTarget();
+			if (localFifoVars.contains(var)) {
+				store.setTarget(variable);
+				//updateIndex(var, store, store.getIndexes());
+			}
+		}
+	}
+	public class RemoveReadWrite extends AbstractActorVisitor {	
+		private void removeInstruction(Instruction instruction){
+			BlockNode node = instruction.getBlock();		
+			List<Instruction> instructions = node.getInstructions();			
+			itInstruction.remove();
+			instructions.remove(instruction);
+		}
+		
+		@Override
+		public void visit(Peek peek) {
+			Port source = peek.getPort();
+			if(port.getName() == source.getName()){
+				removeInstruction(peek);
+				localFifoVars.add(peek.getTarget());
+			}
+		}
+		
+		@Override
+		public void visit(Read read) {
+			Port source = read.getPort();
+			if(port.getName() == source.getName()){
+				removeInstruction(read);
+				localFifoVars.add(read.getTarget());
+			}
+		}
+		@Override
+		public void visit(Write write) {
+			Port target = write.getPort();
+			if(port.getName() == target.getName()){
+				removeInstruction(write);
+				localFifoVars.add(write.getTarget());
+			}
+		}
+	}
 	private List<Variable> localFifoVars;
+	
 	private Port port;
+	
 	private GlobalVariable variable;
 	
-	public InternalizeFifoAccess(Port port, GlobalVariable variable){
+	public InternalizeFifoAccess(Port port, GlobalVariable variable) {
 		this.port = port;
 		this.variable = variable;
+		this.localFifoVars = new ArrayList<Variable>();		
 	}
-	
-	private void removeInstruction(Instruction instruction){
-		BlockNode node = instruction.getBlock();		
-		List<Instruction> instructions = node.getInstructions();			
-		itInstruction.remove();
-		instructions.remove(instruction);
-	}
-	
+
 	@Override
 	public void visit(Action action) {
 		//Update action pattern
 		action.getInputPattern().remove(port);
 		action.getOutputPattern().remove(port);
 					
-		super.visit(action);
-	}
-	
-	@Override
-	public void visit(Load load) {
-		Use use = load.getSource();
-		Variable var = use.getVariable();
-		if (!var.isGlobal() && ((LocalVariable) var).isPort() && localFifoVars.contains(var)) {
-			load.setSource(new Use(variable, load));
-			//updateIndex(var, load, load.getIndexes());
-		}
-	}
-	
-	@Override
-	public void visit(Peek peek) {
-		Port source = peek.getPort();
-		if(port.getName() == source.getName()){
-			removeInstruction(peek);
-			localFifoVars.add(peek.getTarget());
-		}
-	}
-	
-	@Override
-	public void visit(Procedure procedure) {
-		localFifoVars = new ArrayList<Variable> ();
-		super.visit(procedure);
-		
-		//Remove locals from procedure
-		OrderedMap<String, LocalVariable> locals = procedure.getLocals();
-		
-		for (Variable fifoVar : localFifoVars){
-			locals.remove(fifoVar.getName());
-		}
-	}
-	
-	@Override
-	public void visit(Read read) {
-		Port source = read.getPort();
-		if(port.getName() == source.getName()){
-			removeInstruction(read);
-			localFifoVars.add(read.getTarget());
-		}
-	}
-
-	@Override
-	public void visit(Store store) {
-		Variable var = store.getTarget();
-		if (!var.isGlobal() && var.isPort()&& localFifoVars.contains(var)) {
-			store.setTarget(variable);
-			//updateIndex(var, store, store.getIndexes());
-		}
-	}
-		
-	@Override
-	public void visit(Write write) {
-		Port target = write.getPort();
-		if(port.getName() == target.getName()){
-			removeInstruction(write);
-			localFifoVars.add(write.getTarget());
-		}
+		new RemoveReadWrite().visit(action);
+		new LinksToStateVar().visit(action);
 	}
 }

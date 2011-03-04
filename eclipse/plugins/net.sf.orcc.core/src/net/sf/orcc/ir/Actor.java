@@ -175,6 +175,21 @@ public class Actor implements Comparable<Actor> {
 	public Port getInput(String name) {
 		return inputs.get(name);
 	}
+	
+	/**
+	 * Returns the port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return a port whose name matches the given name
+	 */
+	public Port getPort(String name) {
+		if (inputs.contains(name)){
+			return inputs.get(name);
+		}
+		
+		return outputs.get(name);
+	}
 
 	/**
 	 * Returns the ordered map of input ports.
