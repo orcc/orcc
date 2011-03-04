@@ -324,6 +324,18 @@
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
     </Instance>
+    <Instance id="BufferCurrPic">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.BufferCurrPic"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="MB_WIDTH">
+            <Expr kind="Var" name="MB_WIDTH"/>
+        </Parameter>
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -389,4 +401,8 @@
     <Connection dst="Buffer_inter" dst-port="EnableRead" src="" src-port="EnableRead"/>
     <Connection dst="Buffer_inter" dst-port="ReadAddress" src="" src-port="ReadAddress"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead" src="" src-port="PocToRead"/>
+    <Connection dst="BufferCurrPic" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
+    <Connection dst="BufferCurrPic" dst-port="MbLocation" src="" src-port="MbLocation"/>
+    <Connection dst="BufferCurrPic" dst-port="WD"
+        src="Deblocking_Filter" src-port="WD"/>
 </XDF>

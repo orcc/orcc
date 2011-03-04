@@ -40,5 +40,6 @@
       <vertex id="Deblocking_Filter" x="987" y="436"/>
       <vertex id="DemuxParserInfos" x="192" y="12"/>
       <vertex id="DisplayBuffer" x="1244" y="582"/>
+      <vertex id="BufferCurrPic" x="1167" y="-263"/>
    </vertices>
 </layout>

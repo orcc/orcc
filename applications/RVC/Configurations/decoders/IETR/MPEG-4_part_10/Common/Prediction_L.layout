@@ -42,5 +42,6 @@
       <vertex id="DemuxParserInfos" x="235" y="804"/>
       <vertex id="Inter" x="541" y="403"/>
       <vertex id="DisplayBuffer" x="1215" y="644"/>
+      <vertex id="BuffCurrPic" x="1192" y="-65"/>
    </vertices>
 </layout>
