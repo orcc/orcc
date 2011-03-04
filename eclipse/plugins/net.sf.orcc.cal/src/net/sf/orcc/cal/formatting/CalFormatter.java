@@ -31,6 +31,7 @@ package net.sf.orcc.cal.formatting;
 import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstActionElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstActorElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.AstEntityElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstExpressionCallElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstExpressionIfElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstExpressionIndexElements;
@@ -50,6 +51,7 @@ import net.sf.orcc.cal.services.CalGrammarAccess.AstStatementWhileElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstTypeIntElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstTypeListElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstTypeUintElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.AstUnitElements;
 
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.formatting.impl.AbstractDeclarativeFormatter;
@@ -107,7 +109,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		// "var" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getVarKeyword_7_0(),
-				access.getCommaKeyword_6_2_0());
+				access.getCommaKeyword_7_2_0());
 
 		body(c, access.getDoKeyword_8_0(), access.getEndKeyword_9());
 	}
@@ -161,6 +163,10 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		c.setLinewrap(2).before(access.getEndKeyword_11());
 		c.setLinewrap(2).after(access.getEndKeyword_11());
+
+		c.setLinewrap(2).after(access.getEndKeyword_9_2());
+		c.setIndentation(access.getFsmKeyword_9_1_0_0(),
+				access.getEndKeyword_9_2());
 	}
 
 	/**
@@ -253,6 +259,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	@Override
 	protected void configureFormatting(FormattingConfig c) {
 		f = (CalGrammarAccess) getGrammarAccess();
+		c.setLinewrap(2).before(f.getML_COMMENTRule());
 		c.setLinewrap().after(f.getML_COMMENTRule());
 
 		// Tags
@@ -273,8 +280,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		configureTypeInt(c);
 		configureTypeList(c);
 		configureTypeUint(c);
-
-		c.setLinewrap().before(f.getSL_COMMENTRule());
+		configureUnitBody(c);
 
 		f = null;
 	}
@@ -352,10 +358,13 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configurePorts(FormattingConfig c) {
 		AstActorElements access = f.getAstActorAccess();
 
-		c.setNoLinewrap().around(access.getInputsAssignment_4_0());
-		c.setNoLinewrap().around(access.getInputsAssignment_4_1_1());
-		c.setNoLinewrap().around(access.getOutputsAssignment_6_0());
-		c.setNoLinewrap().around(access.getOutputsAssignment_6_1_1());
+		c.setIndentation(access.getInputsAssignment_4_0(),
+				access.getColonKeyword_7());
+		c.setLinewrap().around(access.getInputsAssignment_4_1_1());
+		c.setIndentation(
+				access.getEqualsSignEqualsSignGreaterThanSignKeyword_5(),
+				access.getColonKeyword_7());
+		c.setLinewrap().around(access.getOutputsAssignment_6_1_1());
 		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
 		c.setNoSpace().before(access.getCommaKeyword_6_1_0());
 	}
@@ -548,6 +557,21 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_1_0());
 		c.setNoLinewrap().around(access.getEqualsSignKeyword_1_2());
 		c.setNoLinewrap().around(access.getRightParenthesisKeyword_1_4());
+	}
+
+	/**
+	 * Configure unit body
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureUnitBody(FormattingConfig c) {
+		AstEntityElements access = f.getAstEntityAccess();
+
+		c.setLinewrap(2).after(access.getSemicolonKeyword_0_2());
+		c.setNoSpace().before(access.getSemicolonKeyword_0_2());
+		
+		c.setLinewrap(2).after(access.getImportsAssignment_1());
 	}
 
 	/**
