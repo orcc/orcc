@@ -1,6 +1,6 @@
 /********************************************************************************
 
-This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
 ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
 Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
 Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
@@ -14,60 +14,45 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-//Modified by Damien de Saint Jorre IETR/INSA of Rennes
 package Proprietary.IETR.MPEG4.part10;
 
 import MPEG.Common.Imp_Math.*;
 import MPEG.Common.Imp_PictureInfo.*;
 
-//Clean this actor (Delete and rewrite it)!!!
 actor BufferCurrPic ( int MB_WIDTH )
-	uint(size=7)  MbLocation,
-	uint(size=8)   WD,
-	uint(size=2)  IsNewPicOrSlice
+	uint(size=7) MbLocation,
+	uint(size=8) WD,
+	uint(size=7) PicWidthInMb,
+	uint(size=2) IsNewPicOrSlice
 		==>
 		:
 
-
-/*
-*
-* CONSTANTS
-*
-*/
 	uint(size=2) IS_NEW_MB    = 0;
 	uint(size=2) IS_NEW_PIC   = 2;
 
-	uint(size=8) picture [1024][512][256];
-
+	uint(size=8)  picture [1024][512][256];
 	uint(size=32) nbMacroBlocks  := 0;
+	uint(size=7)  picWidthInMb;
 
-
-
-	GetIsNewPic: action 
-			IsNewPicOrSlice :[is_new_mb_or_slice]
-				==>
-		end
-
-	get_writeAddr: action
-		IsNewPicOrSlice :[is_new_pic_or_slice]
-			==>
-	guard
-		is_new_pic_or_slice = IS_NEW_MB
-	do
-		nbMacroBlocks := nbMacroBlocks + 1;
+	getIsNewPic: action IsNewPicOrSlice :[isNewMbOrSlice] ==>
 	end
 
-	writeData.Luma : action
-		MbLocation :[MbLocxInPic , MbLocyInPic],
-		WD         :[wd] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
+	writePictureDone: action IsNewPicOrSlice :[isNewMbOrSlice] ==>
+	guard
+		isNewMbOrSlice = IS_NEW_PIC
+	do
+		nbMacroBlocks := 0;
+	end
+
+	getWriteAddr: action
+		PicWidthInMb :[valPicWidthInMb],
+		IsNewPicOrSlice :[isNewMbOrSlice]
 			==>
 	guard
-		MB_WIDTH = MB_WIDTH_LUMA
+		isNewMbOrSlice = IS_NEW_MB
 	do
-		foreach int i in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA - 1
-		do
-			picture[MbLocxInPic][MbLocyInPic][i] := wd[i];
-		end
+		nbMacroBlocks := nbMacroBlocks + 1;
+		picWidthInMb  := valPicWidthInMb;
 	end
 
 	writeData.Chroma : action 
@@ -83,21 +68,25 @@ actor BufferCurrPic ( int MB_WIDTH )
 		end
 	end
 
-	writePictureDone: action
-		IsNewPicOrSlice :[is_new_mb_or_slice]
+	writeData.Luma : action
+		MbLocation :[MbLocxInPic , MbLocyInPic],
+		WD         :[wd] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
 			==>
 	guard
-		is_new_mb_or_slice = IS_NEW_PIC
+		MB_WIDTH = MB_WIDTH_LUMA
 	do
-		nbMacroBlocks := 0;
+		foreach int i in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA - 1
+		do
+			picture[MbLocxInPic][MbLocyInPic][i] := wd[i];
+		end
 	end
   
 	schedule fsm  GetIsNewPic:
-		GetIsNewPic (GetIsNewPic )--> GetNextMb;
+		GetIsNewPic (getIsNewPic      )--> GetNextMb;
 
-		GetNextMb          (get_writeAddr            )--> WriteMb;
-		GetNextMb          (writePictureDone       )--> GetNextMb;
+		GetNextMb   (getWriteAddr     )--> WriteMb;
+		GetNextMb   (writePictureDone )--> GetNextMb;
 
-		WriteMb (writeData )--> GetNextMb;
+		WriteMb     (writeData        )--> GetNextMb;
 	end
 end
