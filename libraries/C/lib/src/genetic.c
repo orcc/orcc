@@ -396,7 +396,9 @@ void *monitor(void *data) {
 	int i, evalIndNb = 0;
 	population *population;
 
-	active_genetic();
+	remove_fps_printing();
+	source_active_genetic();
+	Compare_active_genetic();
 
 	// Initialize
 	printf("\nGenerate initial population...\n\n");

@@ -511,7 +511,7 @@ network(network, options) ::= <<
 #define KEEP_RATIO 0.5
 #define CROSSOVER_RATIO 0.6
 
-#define TIMEOUT 30
+#define TIMEOUT 120
 
 #define CACHE_SIZE 4096
 <endif>
@@ -565,7 +565,6 @@ struct actor_s **actors[] = {<options.threads.keys: {th | actors_<th>}; separato
 <endif>
 
 <if (options.needDynamicMapping)>
-extern void remove_fps_printing();
 extern int source_is_stopped();
 extern int clean_cache(int size);
 
@@ -602,7 +601,6 @@ static void launcher() {
 	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB);
 	monitor_init(&monitoring, &sched_sync, &genetic_info);
 	
-	remove_fps_printing();
 	<else>
 	int actors_size[] = {<options.threads.keys: {th | sizeof(actors_<th>) / sizeof(actors_<th>[0])}; separator=", ">};
 	<endif>

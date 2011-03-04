@@ -77,6 +77,8 @@ static int  xsize_int;
 static int  ysize_int;
 static int  images;
 
+static int genetic = 0;
+
 static int Filesize(FILE *f) {
 	struct stat st;
 	fstat(fileno(f), &st);
@@ -134,7 +136,7 @@ static void DiffUcharImage(const int x_size, const int y_size, const unsigned ch
 					{
 						error++;
 
-						if (error < 100)
+						if (error < 100 && !genetic)
 						{
 							printf("error %3d instead of %3d at position : mb = (%d ; %d) , loc_in_mb = (%d ; %d)\n",
 								test_img_uchar[Idx_pix] , true_img_uchar[Idx_pix], blk_x, blk_y, pix_x, pix_y);
@@ -200,12 +202,14 @@ void Compare_write_mb(unsigned char tokens[384]) {
 	if (m_y == m_height) {
 		m_x = 0;
 		m_y = 0;
-		printf("Frame number %d \n", FrameCounter);
+		if(!genetic){
+			printf("Frame number %d \n", FrameCounter);
+		}
 		Read_YUV(Y, U, V);
 		DiffUcharImage(m_width, m_height, Y, img_buf_y,16, 'Y');
 		DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u,8,'U');
 		DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v,8, 'V');
-		if (NumberOfFrames == FrameCounter){
+		if ((NumberOfFrames == FrameCounter) && !genetic){
 			printf("\nThat's all folks\n");
 			exit(0);
 		}
@@ -217,6 +221,10 @@ static void Compare_init(int width, int height) {
 	m_width = width;
 	m_height = height;
 	Read_YUV_init (width, height, yuv_file);
+}
+
+void Compare_active_genetic() {
+	genetic = 1;
 }
 
 static int init;

@@ -76,10 +76,16 @@ extern float compute_partial_fps();
 extern void backup_partial_start_info();
 extern void backup_partial_end_info();
 extern void active_fps_printing();
-extern void clear_fifos();
-extern void active_genetic();
-extern void initialize_instances();
-extern int is_timeout();
+extern void remove_fps_printing();
+
+extern void source_active_genetic();
+extern void Compare_active_genetic();
 extern void Compare_close();
+
+extern void initialize_instances();
+extern void clear_fifos();
+extern int is_timeout();
+
+
 
 #endif

@@ -45,14 +45,18 @@
 #pragma warning(disable: 4996)
 #endif
 
+#define LOOP_NUMBER 5
+
 static FILE *F = NULL;
 static int cnt = 0;
+static int nb;
 static int stop;
 static int genetic = 0;
 
 // Called before any *_scheduler function.
 void source_initialize() {
 	stop = 0;
+	nb = 0;
 
 	if (input_file == NULL) {
 		print_usage();
@@ -79,7 +83,7 @@ int source_is_stopped() {
 	return stop;
 }
 
-void active_genetic() {
+void source_active_genetic() {
 	genetic = 1;
 }
 
@@ -98,13 +102,14 @@ void source_scheduler(struct schedinfo_s *si) {
 				if (feof(F)) {
 					rewind(F);
 					cnt = 0;
-					if (!genetic) {
+					if (!genetic || (genetic && nb < LOOP_NUMBER)) {
 						n = fread(ptr, 1, 1, F);
+						nb++;
 					}
 					else{
 						n = fclose(F);
+						stop = 1;
 					}
-					stop = 1;
 				}
 			}
 			i++;
