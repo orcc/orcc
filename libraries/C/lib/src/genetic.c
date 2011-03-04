@@ -463,13 +463,9 @@ void *monitor(void *data) {
 		clear_fifos();
 		initialize_instances();
 	}
-	monitoring->sync->active_sync = 0;
 	//write_better_mapping(population, monitoring->genetic_info);
 	//active_fps_printing();
-
-	for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
-		semaphore_set(monitoring->genetic_info->schedulers[i].sem_thread);
-	}
+	exit(0);
 
 	return NULL;
 }
