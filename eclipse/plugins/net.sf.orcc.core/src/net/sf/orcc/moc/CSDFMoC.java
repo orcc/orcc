@@ -69,7 +69,7 @@ public class CSDFMoC extends AbstractMoC {
 	public Object accept(MoCInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);
 	}
-	
+
 	/**
 	 * Adds the given action to the list of actions that can be scheduled
 	 * statically.
@@ -79,6 +79,17 @@ public class CSDFMoC extends AbstractMoC {
 	 */
 	public void addAction(Action action) {
 		actions.add(action);
+	}
+
+	/**
+	 * Adds the given actions to the list of actions that can be scheduled
+	 * statically.
+	 * 
+	 * @param action
+	 *            an action
+	 */
+	public void addActions(List<Action> actions) {
+		this.actions.addAll(actions);
 	}
 
 	/**
@@ -147,8 +158,28 @@ public class CSDFMoC extends AbstractMoC {
 		return true;
 	}
 
+	/**
+	 * Set the input pattern of this CSDF MoC.
+	 * 
+	 * @param pattern
+	 *            the input pattern of this CSDF MoC
+	 */
+	public void setInputPattern(Pattern pattern) {
+		this.inputPattern = pattern;
+	}
+
 	public void setNumberOfPhases(int numberOfPhases) {
 		this.numberOfPhases = numberOfPhases;
+	}
+
+	/**
+	 * Set the output pattern of this CSDF MoC.
+	 * 
+	 * @param pattern
+	 *            set the output pattern
+	 */
+	public void setOutputPattern(Pattern pattern) {
+		this.outputPattern = pattern;
 	}
 
 	/**

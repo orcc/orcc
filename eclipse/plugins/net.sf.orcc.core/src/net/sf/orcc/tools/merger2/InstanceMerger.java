@@ -96,9 +96,10 @@ public class InstanceMerger {
 		// Set instance attributes
 		putAttributes(compositeInst, vertices);
 
+		
 		return new Vertex(compositeInst);
 	}
-
+	
 	private void defineInput(Set<Vertex> vertices) {
 		extInputs = new MultiMap<Actor, Port>();
 

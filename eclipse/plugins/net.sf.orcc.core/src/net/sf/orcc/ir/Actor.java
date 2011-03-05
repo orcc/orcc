@@ -124,6 +124,52 @@ public class Actor implements Comparable<Actor> {
 		this.moc = null;
 	}
 
+	/**
+	 * Creates a new actor with the given MoC.
+	 * 
+	 * @param name
+	 *            actor name
+	 * @param file
+	 *            the RVC-CAL file this actor was defined in
+	 * @param parameters
+	 *            an ordered map of parameters
+	 * @param inputs
+	 *            an ordered map of input ports
+	 * @param outputs
+	 *            an ordered map of output ports
+	 * @param stateVars
+	 *            an ordered map of state variables
+	 * @param procs
+	 *            an ordered map of procedures
+	 * @param actions
+	 *            a list of actions
+	 * @param initializes
+	 *            a list of initialize actions
+	 * @param scheduler
+	 *            an action scheduler
+	 * @param moc
+	 *            a MoC
+	 */
+	public Actor(String name, String file,
+			OrderedMap<String, GlobalVariable> parameters,
+			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
+			boolean nativeFlag, OrderedMap<String, GlobalVariable> stateVars,
+			OrderedMap<String, Procedure> procs, List<Action> actions,
+			List<Action> initializes, ActionScheduler scheduler, MoC moc) {
+		this.actions = actions;
+		this.file = file;
+		this.initializes = initializes;
+		this.inputs = inputs;
+		this.name = name;
+		this.nativeFlag = nativeFlag;
+		this.outputs = outputs;
+		this.parameters = parameters;
+		this.procs = procs;
+		this.actionScheduler = scheduler;
+		this.stateVars = stateVars;
+		this.moc = moc;
+	}
+
 	@Override
 	public int compareTo(Actor actor) {
 		return name.compareTo(actor.getName());
@@ -174,21 +220,6 @@ public class Actor implements Comparable<Actor> {
 	 */
 	public Port getInput(String name) {
 		return inputs.get(name);
-	}
-	
-	/**
-	 * Returns the port whose name matches the given name.
-	 * 
-	 * @param name
-	 *            the port name
-	 * @return a port whose name matches the given name
-	 */
-	public Port getPort(String name) {
-		if (inputs.contains(name)){
-			return inputs.get(name);
-		}
-		
-		return outputs.get(name);
 	}
 
 	/**
@@ -273,6 +304,21 @@ public class Actor implements Comparable<Actor> {
 	 */
 	public OrderedMap<String, GlobalVariable> getParameters() {
 		return parameters;
+	}
+
+	/**
+	 * Returns the port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return a port whose name matches the given name
+	 */
+	public Port getPort(String name) {
+		if (inputs.contains(name)) {
+			return inputs.get(name);
+		}
+
+		return outputs.get(name);
 	}
 
 	/**

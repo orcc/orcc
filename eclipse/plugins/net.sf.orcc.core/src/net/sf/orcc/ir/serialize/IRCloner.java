@@ -107,7 +107,7 @@ import net.sf.orcc.util.OrderedMap;
 public class IRCloner {
 
 	/**
-	 * This class defines an expression cloner that dupplicate an expression to
+	 * This class defines an expression cloner that duplicates an expression to
 	 * a new Expression.
 	 * 
 	 * @author Jerome Gorin
@@ -116,7 +116,7 @@ public class IRCloner {
 	private static class ExpressionCloner implements ExpressionInterpreter {
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {			
+		public Object interpret(BinaryExpr expr, Object... args) {
 			BinaryOp op = BinaryOp.getOperator(expr.getOp().getText());
 			Expression e1 = cloneExpression(expr.getE1());
 			Expression e2 = cloneExpression(expr.getE2());
@@ -174,8 +174,8 @@ public class IRCloner {
 	}
 
 	/**
-	 * This class defines an instruction clones that clone an instruction into a
-	 * new instruction.
+	 * This class defines an instruction cloner that clones an instruction into
+	 * a new instruction.
 	 * 
 	 * @author Jerome Gorin
 	 * 
@@ -289,17 +289,17 @@ public class IRCloner {
 		@Override
 		public Object interpret(CSDFMoC moc, Object... args) {
 			CSDFMoC csdfMoC = new CSDFMoC();
-			
-			for (Action action : moc.getActions()){
+
+			for (Action action : moc.getActions()) {
 				csdfMoC.addAction(getAction(action.getTag()));
 			}
-			
+
 			csdfMoC.setNumberOfPhases(moc.getNumberOfPhases());
-			
-			//Clone pattern consumption/production
+
+			// Clone pattern consumption/production
 			csdfMoC.setTokenConsumptions(clone);
 			csdfMoC.setTokenProductions(clone);
-			
+
 			return csdfMoC;
 		}
 
@@ -316,32 +316,32 @@ public class IRCloner {
 		@Override
 		public Object interpret(QSDFMoC moc, Object... args) {
 			QSDFMoC qsdfMoC = new QSDFMoC();
-			
-			for(Action action : moc.getActions()){
-				SDFMoC sdfMoC = (SDFMoC)cloneMoC(moc.getStaticClass(action));
+
+			for (Action action : moc.getActions()) {
+				SDFMoC sdfMoC = (SDFMoC) cloneMoC(moc.getStaticClass(action));
 				qsdfMoC.addConfiguration(getAction(action.getTag()), sdfMoC);
 			}
-			
+
 			return qsdfMoC;
 		}
 
 		@Override
 		public Object interpret(SDFMoC moc, Object... args) {
 			SDFMoC sdfMoC = new SDFMoC();
-			
-			for (Action action : moc.getActions()){
+
+			for (Action action : moc.getActions()) {
 				sdfMoC.addAction(getAction(action.getTag()));
 			}
-			
-			//Clone pattern consumption/production
+
+			// Clone pattern consumption/production
 			sdfMoC.setTokenConsumptions(clone);
 			sdfMoC.setTokenProductions(clone);
-			
+
 			return sdfMoC;
 		}
 
 	}
-	
+
 	/**
 	 * This class defines a node cloner that clones a CFG node into a new CFG
 	 * node.
@@ -390,7 +390,7 @@ public class IRCloner {
 	}
 
 	/**
-	 * This class defines a type cloner that clone a type.
+	 * This class defines a type cloner that clones a type.
 	 * 
 	 * @author Jerome Gorin
 	 * 
@@ -436,6 +436,10 @@ public class IRCloner {
 
 	}
 
+	private static OrderedMap<String, Action> actions;
+
+	private static Actor clone;
+
 	private static OrderedMap<String, LocalVariable> localVars;
 
 	private static OrderedMap<String, GlobalVariable> parameters;
@@ -445,10 +449,11 @@ public class IRCloner {
 	private static OrderedMap<String, Procedure> procs;
 
 	private static OrderedMap<String, GlobalVariable> stateVars;
-		
+
+	private static List<Action> untaggedActions;
 
 	/**
-	 * Clone the given expression into a new Expression.
+	 * Clones the given expression into a new Expression.
 	 * 
 	 * @param expression
 	 *            the expression to clone
@@ -459,7 +464,7 @@ public class IRCloner {
 	}
 
 	/**
-	 * Clone the given list of expressions whose each member is set to the
+	 * Clones the given list of expressions whose each member is set to the
 	 * result of {@link #cloneExpression(Expression)}.
 	 * 
 	 * @param expressions
@@ -494,17 +499,16 @@ public class IRCloner {
 				location.getEndColumn());
 	}
 
-	private static CFGNode cloneNode(CFGNode node) {
-		return (CFGNode) node.accept(new NodeCloner());
-	}
-	
 	private static MoC cloneMoC(MoC moc) {
 		return (MoC) moc.accept(new MoCCloner());
 	}
 
+	private static CFGNode cloneNode(CFGNode node) {
+		return (CFGNode) node.accept(new NodeCloner());
+	}
 
 	/**
-	 * Clone the given nodes.
+	 * Clones the given nodes.
 	 * 
 	 * @param nodes
 	 *            a list of nodes to clone
@@ -528,6 +532,22 @@ public class IRCloner {
 	 */
 	private static Type cloneType(Type type) {
 		return (Type) type.accept(new TypeCloner());
+	}
+
+	/**
+	 * Returns the action associated with the tag.
+	 * 
+	 * @param tag
+	 *            a tag of an action
+	 * @return the action (or initialize) associated with the tag
+	 */
+	private static Action getAction(Tag tag) {
+		if (tag.isEmpty()) {
+			// removes the first untagged action found
+			return untaggedActions.remove(0);
+		} else {
+			return actions.get(tag.toString());
+		}
 	}
 
 	/**
@@ -586,17 +606,27 @@ public class IRCloner {
 		return null;
 	}
 
-	private static OrderedMap<String, Action> actions;
+	/**
+	 * Stores an action as untagged or not.
+	 * 
+	 * @param tag
+	 *            a tag of an action
+	 * @param action
+	 *            an action
+	 */
+	private static void putAction(Tag tag, Action action) {
+		if (tag.isEmpty()) {
+			untaggedActions.add(action);
+		} else {
+			actions.put(tag.toString(), action);
+		}
+	}
 
 	private Actor actor;
-	
-	private static Actor clone;
 
 	private OrderedMap<String, Port> inputs;
 
 	private OrderedMap<String, Port> outputs;
-
-	private static List<Action> untaggedActions;
 
 	/**
 	 * Creates an actor writer on the given actor.
@@ -623,22 +653,22 @@ public class IRCloner {
 		List<Action> actions = cloneActions(actor.getActions());
 
 		List<Action> initializes = cloneInitializes(actor.getInitializes());
-			
+
 		ActionScheduler actionScheduler = cloneActionScheduler(actor
 				.getActionScheduler());
 
 		clone = new Actor(actor.getName(), actor.getFile(), parameters, inputs,
 				outputs, actor.isNative(), stateVars, procs, actions,
 				initializes, actionScheduler);
-		
-		//Cloning moc
-		if (actor.hasMoC()){
+
+		// Cloning moc
+		if (actor.hasMoC()) {
 			clone.setMoC(cloneMoC(actor.getMoC()));
 		}
-		
+
 		return clone;
 	}
-	
+
 	/**
 	 * Returns a cloned action from the given action.
 	 * 
@@ -772,7 +802,7 @@ public class IRCloner {
 	}
 
 	/**
-	 * Clone a global variable.
+	 * Clones a global variable.
 	 * 
 	 * @param variable
 	 *            the variable to clone
@@ -795,7 +825,7 @@ public class IRCloner {
 	}
 
 	/**
-	 * Clone the given map of global variables.
+	 * Clones the given map of global variables.
 	 * 
 	 * @param variables
 	 *            an OrderedMap of variable to clone
@@ -831,7 +861,7 @@ public class IRCloner {
 	}
 
 	/**
-	 * Clone a local variable.
+	 * Clones a local variable.
 	 * 
 	 * @param variable
 	 *            the variable to clone
@@ -865,7 +895,7 @@ public class IRCloner {
 	}
 
 	/**
-	 * Clone the given port.
+	 * Clones the given port.
 	 * 
 	 * @param port
 	 *            a port
@@ -875,19 +905,19 @@ public class IRCloner {
 		Location location = cloneLocation(port.getLocation());
 		Type type = cloneType(port.getType());
 		Port clone = new Port(location, type, port.getName());
-		
-		//Clone port token rate
+
+		// Clone port token rate
 		int tokensConsummed = port.getNumTokensConsumed();
 		int tokensProduced = port.getNumTokensProduced();
-		
-		if (tokensConsummed > 0 ){
+
+		if (tokensConsummed > 0) {
 			clone.increaseTokenConsumption(tokensConsummed);
 		}
-		
-		if (tokensProduced > 0 ){
+
+		if (tokensProduced > 0) {
 			clone.increaseTokenProduction(tokensProduced);
 		}
-		
+
 		// Store the port for a later link
 		ports.put(clone.getName(), clone);
 
@@ -895,7 +925,7 @@ public class IRCloner {
 	}
 
 	/**
-	 * Clone an ordered map of ports.
+	 * Clones an ordered map of ports.
 	 * 
 	 * @param port
 	 *            the ordered map of ports to clone
@@ -954,38 +984,6 @@ public class IRCloner {
 		}
 
 		return cloneProcedures;
-	}
-
-	/**
-	 * Returns the action associated with the tag.
-	 * 
-	 * @param tag
-	 *            a tag of an action
-	 * @return the action (or initialize) associated with the tag
-	 */
-	private static Action getAction(Tag tag) {
-		if (tag.isEmpty()) {
-			// removes the first untagged action found
-			return untaggedActions.remove(0);
-		} else {
-			return actions.get(tag.toString());
-		}
-	}
-
-	/**
-	 * Stores an action as untagged or not.
-	 * 
-	 * @param tag
-	 *            a tag of an action
-	 * @param action
-	 *            an action
-	 */
-	private static void putAction(Tag tag, Action action) {
-		if (tag.isEmpty()) {
-			untaggedActions.add(action);
-		} else {
-			actions.put(tag.toString(), action);
-		}
 	}
 
 }

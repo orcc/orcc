@@ -48,6 +48,8 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.serialize.IRCloner;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.MoC;
+import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.util.MultiMap;
 import net.sf.orcc.util.OrderedMap;
 
@@ -149,24 +151,40 @@ public class ActorMerger {
 
 	}
 
-	// Composite actor attributes
 	private List<Action> actions;
 	private Actor candidate;
 	private MultiMap<Actor, Port> extInputs;
 	private MultiMap<Actor, Port> extOutputs;
 	private List<Action> initializes;
 	private OrderedMap<String, Port> inputs;
-	private String name;
 	private MultiMap<Port, Port> IntPorts;
 	private Map<Port, GlobalVariable> intVars;
+	private MoC moc;
+	private String name;
 	private OrderedMap<String, Port> outputs;
 	private OrderedMap<String, GlobalVariable> parameters;
 	private OrderedMap<String, Procedure> procs;
-	// Candidates actor attributes
 	private int rate;
 	private ActionScheduler scheduler;
 	private OrderedMap<String, GlobalVariable> stateVars;
+	private OrderedMap<String, Port> toKeep;
 
+	/**
+	 * Creates a new actor merger with the given name, inputs and outputs,
+	 * internal ports are converted into state variable.
+	 * 
+	 * @param name
+	 *            the composite actor name
+	 * 
+	 * @param inputs
+	 *            the inputs of the composite
+	 * 
+	 * @param outputs
+	 *            the outputs of the composite
+	 * 
+	 * @param internalPorts
+	 *            the ports to convert into state variables
+	 */
 	public ActorMerger(String name, MultiMap<Actor, Port> inputs,
 			MultiMap<Actor, Port> outputs, MultiMap<Port, Port> internalPorts) {
 		this.extInputs = inputs;
@@ -182,8 +200,18 @@ public class ActorMerger {
 		this.initializes = new ArrayList<Action>();
 		this.actions = new ArrayList<Action>();
 		this.scheduler = new ActionScheduler(actions, null);
+		this.moc = new CSDFMoC();
 	}
 
+	/**
+	 * Add a new candidate to the composite actor with the given rate.
+	 * 
+	 * @param candidate
+	 *            the candidate actor
+	 * 
+	 * @param rate
+	 *            the rate of the candidate
+	 */
 	public void add(Actor candidate, int rate) {
 		this.rate = rate;
 		this.candidate = candidate;
@@ -195,7 +223,9 @@ public class ActorMerger {
 		// Resolve potential conflict in names
 		new ConflictSolver().resolve(clone);
 
-		// Set composite actor ports and internal states from clone actor
+		// Mark ports to keep from candidate and internal states to add in
+		// composite
+		toKeep = new OrderedMap<String, Port>();
 		transformInputs(clone);
 		transformOutputs(clone);
 
@@ -205,11 +235,20 @@ public class ActorMerger {
 		procs.putAll(clone.getProcs());
 		actions.addAll(clone.getActions());
 		initializes.addAll(clone.getInitializes());
+
+		// Merge MoCs
+		MoC candidateMoC = candidate.getMoC();
+		moc = (MoC) candidateMoC.accept(new MoCMerger(moc, rate, toKeep));
 	}
 
+	/**
+	 * Return the corresponding composite actor.
+	 * 
+	 * @return the corresponding composite actor
+	 */
 	public Actor getComposite() {
-		return new Actor(name, "", parameters, inputs, outputs, false, stateVars,
-				procs, actions, initializes, scheduler);
+		return new Actor(name, "", parameters, inputs, outputs, false,
+				stateVars, procs, actions, initializes, scheduler, moc);
 	}
 
 	private GlobalVariable getInternalStateVar(Port port) {
@@ -271,6 +310,7 @@ public class ActorMerger {
 			if (candidateIns.contains(candidatePort)) {
 				// Port is external
 				inputs.put(port.getName(), port);
+				toKeep.put(port.getName(), port);
 			} else {
 				// Port is internal, merge to state variable
 				GlobalVariable portVar = getInternalStateVar(candidatePort);
@@ -293,6 +333,7 @@ public class ActorMerger {
 			if (candidateOuts.contains(candidatePort)) {
 				// Port is external
 				outputs.put(port.getName(), port);
+				toKeep.put(port.getName(), port);
 			} else {
 				// Port is internal, merge to state variable
 				GlobalVariable portVar = getInternalStateVar(candidatePort);

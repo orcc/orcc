@@ -181,6 +181,7 @@ public class StaticGraphAnalyzer {
 
 			if (inputs.contains(name)) {
 				// Target must be connected to the merged instance
+				connection.setTarget(inputs.get(name));
 				srcConnections.add(src, connection);
 			}
 		}
@@ -207,6 +208,7 @@ public class StaticGraphAnalyzer {
 
 			if (outputs.contains(name)) {
 				// Source must be connected to the merged instance
+				connection.setSource(outputs.get(name));
 				dstConnections.add(tgt, connection);
 			}
 		}
