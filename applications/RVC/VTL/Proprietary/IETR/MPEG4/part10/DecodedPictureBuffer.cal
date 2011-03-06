@@ -1,6 +1,6 @@
 /********************************************************************************
 
-This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
 ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
 Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
 Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
@@ -14,7 +14,7 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-//Modified by Damien de Saint Jorre IETR/INSA of Rennes
+
 package Proprietary.IETR.MPEG4.part10;
 
 import MPEG.Common.Imp_Math.*;
@@ -34,68 +34,158 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 	uint(size=8)  ReadResult
 		:
 
+	int (size=32) SENT_DONE = -2;
+	uint(size=32) NB_PIC    = 33;
+	uint(size=32) SZ_NBPIC  = 6; /* >= log2(NB_PIC) */
 
-/*
-*
-* CONSTANTS
-*
-*/
-
-	int (size=32) SENT_DONE       = -2;
-
-	uint(size=32) NB_PIC          = 33;
-	uint(size=32) SZ_NBPIC        = 6; /* >= log2(NB_PIC) */
-	//FIXME! number of MB per line of picture
-
-
-	List(type :List(type: List( type:uint(size=8), size=512), size=1024), size=NB_PIC) pic;
-	List(type:uint(size=32) ,size=NB_PIC) ListPOC       := [ 0    :for int s in 0 .. NB_PIC-1];
-	List(type:uint(size=31) ,size=NB_PIC) ListFrameNum  := [ 0    :for int s in 0 .. NB_PIC-1];
-	List(type:bool          ,size=NB_PIC) PictureReady  := [false :for int s in 0 .. NB_PIC-1];
-	List(type:bool          ,size=NB_PIC) IsAReference  := [false :for int s in 0 .. NB_PIC-1];
-
-	int (size=32) pic_curr_idx     := 0;
-	uint(size=7)  PicWidthInMacroB := 0;
-	uint(size=7)  PicHeightInMacroB := 0;
-	uint(size=13) PicSizeInMacroB  := 0;
-
-	/*Write information*/
+	uint(size=8)  pictureBuffer[NB_PIC][MAX_PICWIDTH_PX + 4*MB_WIDTH_MAX]
+	                           [MAX_PICHEIGHT_PX + 4*MB_WIDTH_MAX];
+	uint(size=32) listPOC[NB_PIC]      := [ 0    :for int s in 0 .. NB_PIC-1];
+	uint(size=31) listFrameNum[NB_PIC] := [ 0    :for int s in 0 .. NB_PIC-1];
+	bool          pictureReady[NB_PIC] := [false :for int s in 0 .. NB_PIC-1];
+	bool          isAReference[NB_PIC] := [false :for int s in 0 .. NB_PIC-1];
+	uint(size=32) ReadTable[32 * 32];
+	int (size=32) picCurrIdx        := 0;
+	uint(size=7)  picWidthInMacroB  := 0;
+	uint(size=7)  picHeightInMacroB := 0;
+	uint(size=13) picSizeInMacroB   := 0;
 	uint(size=32) nbMacroBlocksWritten := 0;
-
-	/*Read Information*/
-	uint(size=11)       ra_W       := 0;
-	uint(size=11)       ra_H       := 0;
-	int (size=12)       ra_off_x   := 0;
-	int (size=12)       ra_off_y   := 0;
-	uint(size=SZ_NBPIC) Ref_idx    := 0;
-
 	uint(size=16) mbLocXInPic;
 	uint(size=16) mbLocYInPic;
+	bool          isIdr := false;
+	uint(size=32) readIdx;
+	uint(size=32) readIdxMax;
 
-	/*Delete information*/
-	bool          ValIsIDR := false;
+	getIsNewPic: action EnableRead :[enabled_read] ==>
+	end
 
-	GetIsNewPic: action 
-			EnableRead      :[enabled_read]
-				==>
+	readRefParameters: action
+		POC      :[Valpoc],
+		FrameNum :[frame_num],
+		IsIDR    :[IsIDRPic]
+			==>
+	var
+		bool         idxSelected := false,
+		int(size=32) i            := 0
+	do
+		picCurrIdx := -1;
+		while((not idxSelected) and (i < NB_PIC)) do
+			if(isAReference[i] = false) then
+				idxSelected := true;
+				picCurrIdx  := i;
+				if(not IsIDRPic) then
+					listFrameNum[i] := frame_num;
+					listPOC[i]      := Valpoc;
+				else
+					listFrameNum[i] := 0;
+					listPOC[i]      := 0;
+				end
+				isAReference[i] := true;
+				pictureReady[i] := false;
+			end
+			i := i + 1;
 		end
+		isIdr := IsIDRPic;
+		/*Fix Me!!! ==> exception*/
+		if(picCurrIdx = -1) then
+			picCurrIdx      := 0;
+			listPOC[0]      := Valpoc;
+			listFrameNum[0] := frame_num;
+			isAReference[0] := true;
+			pictureReady[0] := false;
+		end
+	end
 
-	writeData.launch.Chroma: action
-		WD :[wd] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA
+	getReadAddr: action
+		ReadAddress :[RaOffX , RaOffY , RAWidth , RAHeight],
+		POCtoRead   :[Poc2Read , FrameNumToRead],
+		EnableRead  :[ReadEnabled]
 			==>
 	guard
-		nbMacroBlocksWritten < PicSizeInMacroB,
+		ReadEnabled
+	var
+		bool found := false,
+		uint i     := 0,
+		uint(size=SZ_NBPIC) refIdx := 0
+	do
+		while(i < NB_PIC and not found) do
+			if( (Poc2Read=listPOC[i]) and (FrameNumToRead = listFrameNum[i])
+				    and (isAReference[i] = true) and i != picCurrIdx) then
+				refIdx := i;
+				found  := true;
+			end
+			i := i + 1;
+		end
+		if(not found) then
+			println("\nCurrent Poc : "+listPOC[picCurrIdx]+
+			        " ; Current FrameNum : "+listFrameNum[picCurrIdx]);
+			println("POC not found :"+Poc2Read+" ; FrameNum : "+FrameNumToRead+"\n");
+				foreach int i in 0 .. NB_PIC-1 do
+					println("Idx n"+i+"; PocVal:"+listPOC[i]+ " ; Frame Num:"
+					        +listFrameNum[i]+" ; is a ref:"+isAReference[i]);
+				end
+			while true do end
+		end
+
+		readIdxMax := 0;
+		foreach int yAddr in RaOffY + 2*MB_WIDTH ..
+			    RaOffY + RAHeight - 1 + 2*MB_WIDTH do
+			foreach int xAddr in RaOffX + 2*MB_WIDTH ..
+				    RaOffX + RAWidth - 1 + 2*MB_WIDTH do
+				ReadTable[readIdxMax] := pictureBuffer[refIdx][xAddr][yAddr];
+				readIdxMax            := readIdxMax + 1;
+			end
+		end
+		readIdx    := 0;
+	end
+
+	readDone: action
+		EnableRead  :[EnabledRead],
+		currPicInfo :[PicSizeInMb , PicWidthInMb]
+			==>
+	guard
+		not EnabledRead
+	do
+		pictureReady[picCurrIdx] := true;
+		picWidthInMacroB     := PicWidthInMb;
+		picSizeInMacroB      := PicSizeInMb;
+		picHeightInMacroB    := picSizeInMacroB / picWidthInMacroB;
+		nbMacroBlocksWritten := 0;
+		mbLocXInPic          := 0;
+		mbLocYInPic          := 0;
+	end
+
+	readData.launch: action ==> ReadResult :[rd]
+	guard 
+		readIdx < readIdxMax
+	var 
+		uint(size=8) rd
+	do
+		rd      := ReadTable[readIdx];
+		readIdx := readIdx + 1;
+	end
+
+	readData.done: action ==>
+	guard
+		readIdx = readIdxMax
+	end
+
+	writeData.launch.Chroma: action
+		WD :[Wd] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA
+			==>
+	guard
+		nbMacroBlocksWritten < picSizeInMacroB,
 		MB_WIDTH = MB_WIDTH_CHROMA
 	do
-		foreach int y in 0 .. MB_WIDTH_CHROMA - 1
-		do
-			foreach int x in 0 .. MB_WIDTH_CHROMA - 1
-			do
-				pic[pic_curr_idx][(mbLocXInPic + 2) * MB_WIDTH_CHROMA + x ][(mbLocYInPic + 2) * MB_WIDTH_CHROMA + y] := wd[y*MB_WIDTH_CHROMA + x];
+		foreach int y in 0 .. MB_WIDTH_CHROMA - 1 do
+			foreach int x in 0 .. MB_WIDTH_CHROMA - 1 do
+				pictureBuffer[picCurrIdx][(mbLocXInPic + 2) * MB_WIDTH_CHROMA + x ]
+				             [(mbLocYInPic + 2) * MB_WIDTH_CHROMA + y] 
+				                 := Wd[y*MB_WIDTH_CHROMA + x];
 			end
 		end
 		mbLocXInPic := mbLocXInPic + 1;
-		if(mbLocXInPic = PicWidthInMacroB) then
+		if(mbLocXInPic = picWidthInMacroB) then
 			mbLocYInPic := mbLocYInPic + 1;
 			mbLocXInPic := 0;
 		end
@@ -103,228 +193,97 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 	end
 
 	writeData.launch.Luma: action
-		WD :[wd] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
+		WD :[Wd] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
 			==>
 	guard
-		nbMacroBlocksWritten < PicSizeInMacroB,
+		nbMacroBlocksWritten < picSizeInMacroB,
 		MB_WIDTH = MB_WIDTH_LUMA
 	do
-		foreach int y in 0 .. MB_WIDTH_LUMA - 1
-		do
-			foreach int x in 0 .. MB_WIDTH_LUMA - 1
-			do
-				pic[pic_curr_idx][(mbLocXInPic + 2) * MB_WIDTH_LUMA + x ][(mbLocYInPic + 2) * MB_WIDTH_LUMA + y] := wd[y*MB_WIDTH_LUMA + x];
+		foreach int y in 0 .. MB_WIDTH_LUMA - 1 do
+			foreach int x in 0 .. MB_WIDTH_LUMA - 1 do
+				pictureBuffer[picCurrIdx][(mbLocXInPic + 2) * MB_WIDTH_LUMA + x ]
+				    [(mbLocYInPic + 2) * MB_WIDTH_LUMA + y]
+				        := Wd[y*MB_WIDTH_LUMA + x];
 			end
 		end
 		mbLocXInPic := mbLocXInPic + 1;
-		if(mbLocXInPic = PicWidthInMacroB) then
+		if(mbLocXInPic = picWidthInMacroB) then
 			mbLocYInPic := mbLocYInPic + 1;
 			mbLocXInPic := 0;
 		end
 		nbMacroBlocksWritten := nbMacroBlocksWritten + 1;
 	end
 
-	uint(size=32) ReadTable[32 * 32];
-
-	get_readAddr: action
-			ReadAddress :[Ra_off_x , Ra_off_y , RAWidth , RAHeight],
-			POCtoRead   :[poc2read , frame_num_to_read],
-			EnableRead  :[read_enabled]
-				==>
-		guard
-			read_enabled
-		var
-			bool found := false,
-			uint i := 0
-		do
-			ra_off_x  := Ra_off_x;
-			ra_off_y  := Ra_off_y;
-			ra_W      := RAWidth;
-			ra_H      := RAHeight;
-			Ref_idx   := 0;
-			while(i < NB_PIC and not found)
-			do
-				if( (poc2read=ListPOC[i]) and (frame_num_to_read = ListFrameNum[i]) and (IsAReference[i] = true) and i != pic_curr_idx) then
-					Ref_idx := i;
-					found := true;
-				end
-				i := i + 1;
-			end
-			if(not found)then
-				println("\nCurrent Poc : "+ListPOC[pic_curr_idx]+" ; Current FrameNum : "+ListFrameNum[pic_curr_idx]);
-				println("POC not found :"+poc2read+" ; FrameNum : "+frame_num_to_read+"\n");
-					foreach int i in 0 .. NB_PIC-1
-					do
-						println("Idx n"+i+"; PocVal:"+ListPOC[i]+ " ; Frame Num:"+ListFrameNum[i]+" ; is a ref:"+IsAReference[i]);
-					end
-				while(true)
-				do
-				end
-			end
-
-			readIdxMax := 0;
-			foreach int y_addr in Ra_off_y + 2*MB_WIDTH .. Ra_off_y + RAHeight - 1 + 2*MB_WIDTH
-			do
-				foreach int x_addr in Ra_off_x + 2*MB_WIDTH .. Ra_off_x + RAWidth - 1 + 2*MB_WIDTH
-				do
-					ReadTable[readIdxMax] := pic[Ref_idx][x_addr][y_addr];
-					readIdxMax := readIdxMax + 1;
-				end
-			end
-			readIdx := 0;
-			readIdxMax := RAWidth * RAHeight;
-		end
-uint(size=32) readIdx;
-uint(size=32) readIdxMax;
-
-	readData.get1Val: action
-				==>
-			ReadResult :[rd]
-		guard 
-			readIdx < readIdxMax
-		var 
-			uint(size=8) rd
-		do
-			rd   := ReadTable[readIdx];
-			readIdx := readIdx + 1;
-		end
-
-	read_data_done: action
-			==>
-		guard
-			readIdx = readIdxMax
-		end
-
-	writeData.done: action
-			==>
+	writeData.done: action ==>
 	guard
-		nbMacroBlocksWritten = PicSizeInMacroB
+		nbMacroBlocksWritten = picSizeInMacroB
 	do
-		foreach int y in 2*MB_WIDTH .. (PicHeightInMacroB + 2) * MB_WIDTH - 1
-		do
-			foreach int x in 0 .. 2*MB_WIDTH - 1
-			do
-				pic[pic_curr_idx][x][y] := pic[pic_curr_idx][2*MB_WIDTH][y];
-				pic[pic_curr_idx][(PicWidthInMacroB + 2) * MB_WIDTH + x][y] := pic[pic_curr_idx][(PicWidthInMacroB + 2) * MB_WIDTH - 1][y];
+		foreach int y in 2*MB_WIDTH .. (picHeightInMacroB + 2) * MB_WIDTH - 1 do
+			foreach int x in 0 .. 2*MB_WIDTH - 1 do
+				pictureBuffer[picCurrIdx][x][y] := pictureBuffer[picCurrIdx]
+				                                       [2*MB_WIDTH][y];
+				pictureBuffer[picCurrIdx][(picWidthInMacroB + 2) * MB_WIDTH + x]
+				    [y] := pictureBuffer[picCurrIdx]
+				               [(picWidthInMacroB + 2) * MB_WIDTH - 1][y];
 			end
 		end
-		foreach int x in 0 .. (PicWidthInMacroB + 4) * MB_WIDTH - 1
-		do
-			foreach int y in 0 .. 2*MB_WIDTH - 1
-			do
-				pic[pic_curr_idx][x][y] := pic[pic_curr_idx][x][2*MB_WIDTH];
-				pic[pic_curr_idx][x][(PicHeightInMacroB + 2) * MB_WIDTH + y] := pic[pic_curr_idx][x][(PicHeightInMacroB + 2) * MB_WIDTH - 1];
+		foreach int x in 0 .. (picWidthInMacroB + 4) * MB_WIDTH - 1 do
+			foreach int y in 0 .. 2*MB_WIDTH - 1 do
+				pictureBuffer[picCurrIdx][x][y] := pictureBuffer[picCurrIdx][x]
+				                                       [2*MB_WIDTH];
+				pictureBuffer[picCurrIdx][x][(picHeightInMacroB + 2) * MB_WIDTH + y]
+				    := pictureBuffer[picCurrIdx][x]
+				           [(picHeightInMacroB + 2) * MB_WIDTH - 1];
 			end
 		end
-		PictureReady[pic_curr_idx] := true;
+		pictureReady[picCurrIdx] := true;
 	end
 
-	readDone: action
-			EnableRead      :[enabled_read],
-			currPicInfo   :[picSizeInMb , picWidthInMb]
-				==>
-		guard
-			not enabled_read
-		do
-			PictureReady[pic_curr_idx] := true;
-			PicWidthInMacroB := picWidthInMb;
-			PicSizeInMacroB  := picSizeInMb;
-			PicHeightInMacroB := PicSizeInMacroB / PicWidthInMacroB;
-			nbMacroBlocksWritten := 0;
-			mbLocXInPic := 0;
-			mbLocYInPic := 0;
-		end
-
-	read_ref_parameters: action
-		POC             :[Valpoc],
-		FrameNum        :[frame_num],
-		IsIDR           :[IsIDRPic]
-			==>
-	var
-		bool         idx_selected := false,
-		int(size=32) i            := 0
+	readDelList.launch: action DelList:[DelPoc , DelFrame] ==>
+	guard
+		DelPoc != SENT_DONE
 	do
-		pic_curr_idx := -1;
-		while((not idx_selected) and (i < NB_PIC))
-		do
-			if(IsAReference[i] = false) then
-				idx_selected    := true;
-				pic_curr_idx    := i;
-				if(not IsIDRPic) then
-					ListFrameNum[i] := frame_num;
-					ListPOC[i]      := Valpoc;
+		foreach int i in 0 .. NB_PIC - 1 do
+			if(listPOC[i]   = DelPoc and listFrameNum[i] = DelFrame) then
+				isAReference[i] := false;
+			end
+		end
+	end
+
+	readDelList.done: action DelList:[DelVal] ==>
+	do
+		if(isIdr)then
+			foreach int i in 0 .. NB_PIC - 1 do
+				if(i != picCurrIdx) then
+					isAReference[i] := false;
 				else
-					ListFrameNum[i] := 0;
-					ListPOC[i]      := 0;
+					listPOC[i]      := 0;
 				end
-				IsAReference[i] := true;
-				PictureReady[i] := false;
 			end
-			i := i + 1;
-		end
-		ValIsIDR := IsIDRPic;
-		/*Fix Me!!! ==> exception*/
-		if(pic_curr_idx = -1) then
-			pic_curr_idx    := 0;
-			ListPOC[0]      := Valpoc;
-			ListFrameNum[0] := frame_num;
-			IsAReference[0] := true;
-			PictureReady[0] := false;
 		end
 	end
-
-	ReadDelList.Launch: action
-			DelList:[DelPoc , DelFrame]
-				==>
-		guard
-			DelPoc != SENT_DONE
-		do
-			foreach int i in 0 .. NB_PIC - 1
-			do
-				if(ListPOC[i]   = DelPoc and ListFrameNum[i] = DelFrame) then
-					IsAReference[i] := false;
-				end
-			end
-		end
-
-
-	ReadDelList.Done: action
-			DelList:[DelVal]
-				==>
-		do
-			if(ValIsIDR)then
-				foreach int i in 0 .. NB_PIC - 1
-				do
-					if(i != pic_curr_idx) then
-						IsAReference[i] := false;
-					else
-						ListPOC[i]      := 0;
-					end
-				end
-			end
-		end
   
 	schedule fsm  GetIsNewPic:
-		GetIsNewPic (GetIsNewPic )--> read_ref_parameters;
+		GetIsNewPic       (getIsNewPic        )--> ReadRefParameters;
 
-		read_ref_parameters (read_ref_parameters      )--> Checkread;
+		ReadRefParameters (readRefParameters  )--> Checkread;
 
-		read (readData    )--> read;
-		read (read_data_done    )--> Checkread;
+		Checkread         (getReadAddr        )--> Read;
+		Checkread         (readDone           )--> Write;
 
-		Checkread (get_readAddr )--> read;
-		Checkread (readDone     )--> write;
+		Read              (readData.launch    )--> Read;
+		Read              (readData.done      )--> Checkread;
 
-		write (writeData.launch )--> write;
-		write (writeData.done )--> read_del_list;
+		Write             (writeData.launch   )--> Write;
+		Write             (writeData.done     )--> ReadDelList;
 
-		read_del_list       (ReadDelList.Launch      )--> read_del_list;
-		read_del_list       (ReadDelList.Done        )--> read_ref_parameters;
+		ReadDelList       (readDelList.launch )--> ReadDelList;
+		ReadDelList       (readDelList.done   )--> ReadRefParameters;
 	end
 	priority
-		ReadDelList.Launch         > ReadDelList.Done;
-		writeData.launch > writeData.done;
-		readData > read_data_done;
-		get_readAddr > readDone;
+		getReadAddr        > readDone;
+		readData.launch    > readData.done;
+		writeData.launch   > writeData.done;
+		readDelList.launch > readDelList.done;
 	end
 end
