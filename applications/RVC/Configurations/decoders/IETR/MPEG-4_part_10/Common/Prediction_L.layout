@@ -23,7 +23,7 @@
       <vertex id="IsIDR" x="992" y="384"/>
       <vertex id="MacroBlockType" x="57" y="1187"/>
       <vertex id="TransformSize8x8" x="57" y="908"/>
-      <vertex id="PocToRead" x="980" y="485"/>
+      <vertex id="FrameToRead" x="980" y="485"/>
       <vertex id="ReadAddress" x="978" y="542"/>
       <vertex id="SubMbType" x="235" y="466"/>
       <vertex id="MbType4Pred" x="235" y="559"/>

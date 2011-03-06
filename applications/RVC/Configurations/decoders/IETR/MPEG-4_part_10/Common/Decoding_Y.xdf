@@ -155,7 +155,7 @@
     <Port kind="Input" name="TransformSize8x8">
         <Type name="bool"/>
     </Port>
-    <Port kind="Input" name="PocToRead">
+    <Port kind="Input" name="FrameToRead">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -334,7 +334,6 @@
     <Connection dst="TEX_L" dst-port="MacroBlockType" src="" src-port="MacroBlockType"/>
     <Connection dst="TEX_L" dst-port="TransformSize8x8" src="" src-port="TransformSize8x8"/>
     <Connection dst="TEX_L" dst-port="PocToDisplay" src="" src-port="PocToDisplay"/>
-    <Connection dst="TEX_L" dst-port="PocToRead" src="" src-port="PocToRead"/>
     <Connection dst="RES_L" dst-port="MbType" src="" src-port="MacroBlockType"/>
     <Connection dst="TEX_L" dst-port="ReadAddress" src="" src-port="ReadAddress"/>
     <Connection dst="TEX_L" dst-port="SubMbType" src="" src-port="SubMbType"/>
@@ -346,4 +345,5 @@
     <Connection dst="TEX_L" dst-port="I_PCM" src="" src-port="I_PCM"/>
     <Connection dst="TEX_L" dst-port="MbLocation" src="" src-port="MbLocation"/>
     <Connection dst="TEX_L" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
+    <Connection dst="TEX_L" dst-port="FrameToRead" src="" src-port="FrameToRead"/>
 </XDF>

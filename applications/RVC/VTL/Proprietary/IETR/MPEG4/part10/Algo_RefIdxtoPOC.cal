@@ -21,7 +21,7 @@ actor Algo_RefIdxtoPOC()
 	uint(size=4)  RefIdx,
 	bool          NewList
 		==>
-	uint(size=32) POCtoRead
+	uint(size=32) FrameToRead
 		:
 
 	List(type:uint(size=32), size=16) RefPoc;
@@ -34,7 +34,7 @@ actor Algo_RefIdxtoPOC()
 			NewList   :[ IsNewPic ],
 			RefIdx    :[ ListIdx  ]
 				==>
-			POCtoRead :[ValPoc , RefFrameNum[ListIdx & 15]]
+			FrameToRead :[RefFrameNum[ListIdx & 15]]
 		guard
 			not IsNewPic
 		var

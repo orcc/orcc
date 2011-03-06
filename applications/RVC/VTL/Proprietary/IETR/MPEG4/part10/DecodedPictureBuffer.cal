@@ -21,10 +21,9 @@ import MPEG.Common.Imp_Math.*;
 import MPEG.Common.Imp_PictureInfo.*;
 
 actor DecodedPictureBuffer ( int MB_WIDTH )
-	uint          POC,
-	uint(size=32) POCtoRead,
+	uint(size=32) FrameToRead,
 	int(size=32)  DelList,
-	uint(size=8)   WD,
+	uint(size=8)  WD,
 	bool          EnableRead,
 	int (size=12) ReadAddress,
 	bool          IsIDR,
@@ -40,10 +39,7 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 
 	uint(size=8)  pictureBuffer[NB_PIC][MAX_PICWIDTH_PX + 4*MB_WIDTH_MAX]
 	                           [MAX_PICHEIGHT_PX + 4*MB_WIDTH_MAX];
-	uint(size=32) listPOC[NB_PIC]      := [ 0    :for int s in 0 .. NB_PIC-1];
-	uint(size=31) listFrameNum[NB_PIC] := [ 0    :for int s in 0 .. NB_PIC-1];
-	bool          pictureReady[NB_PIC] := [false :for int s in 0 .. NB_PIC-1];
-	bool          isAReference[NB_PIC] := [false :for int s in 0 .. NB_PIC-1];
+	int (size=31) listFrameNum[NB_PIC] := [-1    :for int s in 0 .. NB_PIC-1];
 	uint(size=32) ReadTable[32 * 32];
 	int (size=32) picCurrIdx        := 0;
 	uint(size=7)  picWidthInMacroB  := 0;
@@ -52,53 +48,15 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 	uint(size=32) nbMacroBlocksWritten := 0;
 	uint(size=16) mbLocXInPic;
 	uint(size=16) mbLocYInPic;
-	bool          isIdr := false;
 	uint(size=32) readIdx;
 	uint(size=32) readIdxMax;
 
 	getIsNewPic: action EnableRead :[enabled_read] ==>
 	end
 
-	readRefParameters: action
-		POC      :[Valpoc],
-		FrameNum :[frame_num],
-		IsIDR    :[IsIDRPic]
-			==>
-	var
-		bool         idxSelected := false,
-		int(size=32) i            := 0
-	do
-		picCurrIdx := -1;
-		while((not idxSelected) and (i < NB_PIC)) do
-			if(isAReference[i] = false) then
-				idxSelected := true;
-				picCurrIdx  := i;
-				if(not IsIDRPic) then
-					listFrameNum[i] := frame_num;
-					listPOC[i]      := Valpoc;
-				else
-					listFrameNum[i] := 0;
-					listPOC[i]      := 0;
-				end
-				isAReference[i] := true;
-				pictureReady[i] := false;
-			end
-			i := i + 1;
-		end
-		isIdr := IsIDRPic;
-		/*Fix Me!!! ==> exception*/
-		if(picCurrIdx = -1) then
-			picCurrIdx      := 0;
-			listPOC[0]      := Valpoc;
-			listFrameNum[0] := frame_num;
-			isAReference[0] := true;
-			pictureReady[0] := false;
-		end
-	end
-
 	getReadAddr: action
 		ReadAddress :[RaOffX , RaOffY , RAWidth , RAHeight],
-		POCtoRead   :[Poc2Read , FrameNumToRead],
+		FrameToRead :[FrameNumToRead],
 		EnableRead  :[ReadEnabled]
 			==>
 	guard
@@ -109,20 +67,16 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 		uint(size=SZ_NBPIC) refIdx := 0
 	do
 		while(i < NB_PIC and not found) do
-			if( (Poc2Read=listPOC[i]) and (FrameNumToRead = listFrameNum[i])
-				    and (isAReference[i] = true) and i != picCurrIdx) then
+			if FrameNumToRead=listFrameNum[i] then
 				refIdx := i;
 				found  := true;
 			end
 			i := i + 1;
 		end
 		if(not found) then
-			println("\nCurrent Poc : "+listPOC[picCurrIdx]+
-			        " ; Current FrameNum : "+listFrameNum[picCurrIdx]);
-			println("POC not found :"+Poc2Read+" ; FrameNum : "+FrameNumToRead+"\n");
+			println("FrameNum not found : "+FrameNumToRead+"\n");
 				foreach int i in 0 .. NB_PIC-1 do
-					println("Idx n"+i+"; PocVal:"+listPOC[i]+ " ; Frame Num:"
-					        +listFrameNum[i]+" ; is a ref:"+isAReference[i]);
+					println("Idx n"+i+ " ; Frame Num:"+listFrameNum[i]);
 				end
 			while true do end
 		end
@@ -146,7 +100,6 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 	guard
 		not EnabledRead
 	do
-		pictureReady[picCurrIdx] := true;
 		picWidthInMacroB     := PicWidthInMb;
 		picSizeInMacroB      := PicSizeInMb;
 		picHeightInMacroB    := picSizeInMacroB / picWidthInMacroB;
@@ -168,6 +121,40 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 	readData.done: action ==>
 	guard
 		readIdx = readIdxMax
+	end
+
+	readRefParameters: action
+		FrameNum :[frame_num],
+		IsIDR    :[IsIDRPic]
+			==>
+	var
+		bool         idxSelected := false,
+		int(size=32) i            := 0
+	do
+		if(IsIDRPic)then
+			foreach int i in 0 .. NB_PIC - 1 do
+				listFrameNum[i] := -1;
+			end
+		end
+
+		picCurrIdx := -1;
+		while((not idxSelected) and (i < NB_PIC)) do
+			if(listFrameNum[i] < 0) then
+				idxSelected := true;
+				picCurrIdx  := i;
+				if(not IsIDRPic) then
+					listFrameNum[i] := frame_num;
+				else
+					listFrameNum[i] := 0;
+				end
+			end
+			i := i + 1;
+		end
+		/*Fix Me!!! ==> exception*/
+		if(picCurrIdx = -1) then
+			picCurrIdx      := 0;
+			listFrameNum[0] := frame_num;
+		end
 	end
 
 	writeData.launch.Chroma: action
@@ -236,7 +223,6 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 				           [(picHeightInMacroB + 2) * MB_WIDTH - 1];
 			end
 		end
-		pictureReady[picCurrIdx] := true;
 	end
 
 	readDelList.launch: action DelList:[DelPoc , DelFrame] ==>
@@ -244,41 +230,31 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 		DelPoc != SENT_DONE
 	do
 		foreach int i in 0 .. NB_PIC - 1 do
-			if(listPOC[i]   = DelPoc and listFrameNum[i] = DelFrame) then
-				isAReference[i] := false;
+			if(listFrameNum[i] = DelFrame) then
+				listFrameNum[i] := -1;
 			end
 		end
 	end
 
 	readDelList.done: action DelList:[DelVal] ==>
-	do
-		if(isIdr)then
-			foreach int i in 0 .. NB_PIC - 1 do
-				if(i != picCurrIdx) then
-					isAReference[i] := false;
-				else
-					listPOC[i]      := 0;
-				end
-			end
-		end
 	end
   
 	schedule fsm  GetIsNewPic:
-		GetIsNewPic       (getIsNewPic        )--> ReadRefParameters;
-
-		ReadRefParameters (readRefParameters  )--> Checkread;
+		GetIsNewPic       (getIsNewPic        )--> Checkread;
 
 		Checkread         (getReadAddr        )--> Read;
-		Checkread         (readDone           )--> Write;
+		Checkread         (readDone           )--> ReadDelList;
 
 		Read              (readData.launch    )--> Read;
 		Read              (readData.done      )--> Checkread;
 
-		Write             (writeData.launch   )--> Write;
-		Write             (writeData.done     )--> ReadDelList;
-
 		ReadDelList       (readDelList.launch )--> ReadDelList;
 		ReadDelList       (readDelList.done   )--> ReadRefParameters;
+
+		ReadRefParameters (readRefParameters  )--> Write;
+
+		Write             (writeData.launch   )--> Write;
+		Write             (writeData.done     )--> Checkread;
 	end
 	priority
 		getReadAddr        > readDone;

@@ -141,7 +141,7 @@
     <Port kind="Input" name="TransformSize8x8">
         <Type name="bool"/>
     </Port>
-    <Port kind="Input" name="PocToRead">
+    <Port kind="Input" name="FrameToRead">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -382,7 +382,6 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Buffer_inter" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="Deblocking_Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="QP" src="" src-port="QP"/>
@@ -425,7 +424,6 @@
     <Connection dst="Intra_4x4" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Intra_16x16" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
-    <Connection dst="Buffer_inter" dst-port="POCtoRead" src="" src-port="PocToRead"/>
     <Connection dst="Buffer_inter" dst-port="ReadAddress" src="" src-port="ReadAddress"/>
     <Connection dst="Inter" dst-port="SubMbType" src="" src-port="SubMbType"/>
     <Connection dst="Inter" dst-port="MbType" src="" src-port="MbType4Pred"/>
@@ -464,4 +462,5 @@
     <Connection dst="Buffer_inter" dst-port="WD" src="BuffCurrPic" src-port="CurrMbVal"/>
     <Connection dst="Buffer_inter" dst-port="currPicInfo"
         src="BuffCurrPic" src-port="CurrPicInfo"/>
+    <Connection dst="Buffer_inter" dst-port="FrameToRead" src="" src-port="FrameToRead"/>
 </XDF>

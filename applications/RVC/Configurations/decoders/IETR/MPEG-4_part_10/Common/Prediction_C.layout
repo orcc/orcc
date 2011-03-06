@@ -22,7 +22,7 @@
       <vertex id="PocToDisplay" x="969" y="258"/>
       <vertex id="IsIDR" x="996" y="178"/>
       <vertex id="MacroBlockType" x="8" y="241"/>
-      <vertex id="PocToRead" x="979" y="288"/>
+      <vertex id="FrameToRead" x="979" y="288"/>
       <vertex id="ReadAddress" x="975" y="353"/>
       <vertex id="MbType4Pred" x="278" y="473"/>
       <vertex id="SelectList" x="296" y="534"/>

@@ -20,8 +20,8 @@ import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
 actor SelectRefIdx()
 	uint(size=2)  SelectList,
-	uint(size=32) POCtoRead_l0,
-	uint(size=32) POCtoRead_l1,
+	uint(size=32) FrameToReadL0,
+	uint(size=32) FrameToReadL1,
 	bool          NewPic_l0,
 	bool          NewPic_l1
 		==>
@@ -30,38 +30,38 @@ actor SelectRefIdx()
 		:
 
 	SendPocToRead.L0: action
-			SelectList   :[list_selected],
-			POCtoRead_l0 :[Poc0 , FrameNum0],
-			NewPic_l0    :[is_new_pic_l0]
+			SelectList    :[list_selected],
+			FrameToReadL0 :[FrameNum0],
+			NewPic_l0     :[is_new_pic_l0]
 				==>
-			PocToRead    :[Poc0 , FrameNum0],
-			Read4MbPred  :[true]
+			PocToRead   :[FrameNum0],
+			Read4MbPred :[true]
 		guard
 			list_selected = PRED_L0,
 			not is_new_pic_l0
 		end
 
 	SendPocToRead.L1: action
-			SelectList   :[list_selected],
-			POCtoRead_l1 :[Poc1 , FrameNum1],
-			NewPic_l1    :[is_new_pic_l1]
+			SelectList    :[list_selected],
+			FrameToReadL1 :[FrameNum1],
+			NewPic_l1     :[is_new_pic_l1]
 				==>
-			PocToRead    :[Poc1 , FrameNum1],
-			Read4MbPred  :[true]
+			PocToRead   :[FrameNum1],
+			Read4MbPred :[true]
 		guard
 			list_selected = PRED_L1,
 			not is_new_pic_l1
 		end
 
 	SendPocToRead.BiPred: action
-			SelectList   :[list_selected],
-			POCtoRead_l0 :[Poc0 , FrameNum0],
-			POCtoRead_l1 :[Poc1 , FrameNum1],
-			NewPic_l0    :[is_new_pic_l0],
-			NewPic_l1    :[is_new_pic_l1]
+			SelectList    :[list_selected],
+			FrameToReadL0 :[FrameNum0],
+			FrameToReadL1 :[FrameNum1],
+			NewPic_l0     :[is_new_pic_l0],
+			NewPic_l1     :[is_new_pic_l1]
 				==>
-			PocToRead    :[Poc0 , FrameNum0 , Poc1 , FrameNum1],
-			Read4MbPred  :[true,true]
+			PocToRead   :[FrameNum0, FrameNum1],
+			Read4MbPred :[true,true]
 		guard
 			list_selected = BIPRED,
 			not is_new_pic_l0,
@@ -72,7 +72,7 @@ actor SelectRefIdx()
 			NewPic_l0 :[is_new_pic_l0],
 			NewPic_l1 :[is_new_pic_l1]
 				==>
-			Read4MbPred  :[false]
+			Read4MbPred :[false]
 		guard
 			is_new_pic_l0,
 			is_new_pic_l1

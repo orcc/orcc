@@ -1,356 +1,452 @@
-<?xml version="1.0" encoding="UTF-8"?><XDF name="AVC_FREXT_decoder">
-   <!-- ************************************** -->
-   <!-- Input ports of the Graph               -->
-   <!-- ************************************** -->
-   <Port kind="Input" name="bits8">
-      <Type name="uint">
-         <Entry kind="Expr" name="size">
-            <Expr kind="Literal" literal-kind="Integer" value="8"/>
-         </Entry>
-      </Type>
-   </Port>
-   <!-- ************************************** -->
-   <!-- Output ports of the Graph              -->
-   <!-- ************************************** -->
-   <Port kind="Output" name="Display_L">
-      <Type name="int">
-         <Entry kind="Expr" name="size">
-            <Expr kind="Literal" literal-kind="Integer" value="9"/>
-         </Entry>
-      </Type>
-   </Port>
-   <Port kind="Output" name="Display_Cb">
-      <Type name="int">
-         <Entry kind="Expr" name="size">
-            <Expr kind="Literal" literal-kind="Integer" value="9"/>
-         </Entry>
-      </Type>
-   </Port>
-   <Port kind="Output" name="Display_Cr">
-      <Type name="int">
-         <Entry kind="Expr" name="size">
-            <Expr kind="Literal" literal-kind="Integer" value="9"/>
-         </Entry>
-      </Type>
-   </Port>
-   <Port kind="Output" name="Width">
-      <Type name="int">
-         <Entry kind="Expr" name="size">
-            <Expr kind="Literal" literal-kind="Integer" value="16"/>
-         </Entry>
-      </Type>
-   </Port>
-   <Port kind="Output" name="Height">
-      <Type name="int">
-         <Entry kind="Expr" name="size">
-            <Expr kind="Literal" literal-kind="Integer" value="16"/>
-         </Entry>
-      </Type>
-   </Port>
-   <!-- ************************************** -->
-   <!-- Variables and Parameters of the Graph  -->
-   <!-- ************************************** -->
-   <Decl kind="Variable" name="DPBMAXSIZE">
-      <Type name="int"/>
-      <Expr kind="Literal" literal-kind="Integer" value="16"/>
-   </Decl>
-   <Decl kind="Variable" name="Idx_SZ">
-      <Type name="int"/>
-      <Expr kind="Literal" literal-kind="Integer" value="3"/>
-   </Decl>
-   <Decl kind="Variable" name="MODE_SIZE">
-      <Type name="int"/>
-      <Expr kind="Literal" literal-kind="Integer" value="6"/>
-   </Decl>
-   <Decl kind="Variable" name="MV_SIZE">
-      <Type name="int"/>
-      <Expr kind="Literal" literal-kind="Integer" value="16"/>
-   </Decl>
-   <Decl kind="Variable" name="PREDTYPE_SIZE">
-      <Type name="int"/>
-      <Expr kind="Literal" literal-kind="Integer" value="2"/>
-   </Decl>
-   <Decl kind="Variable" name="QUANT_SIZE">
-      <Type name="int"/>
-      <Expr kind="Literal" literal-kind="Integer" value="8"/>
-   </Decl>
-   <Decl kind="Variable" name="SAMPLE_SIZE">
-      <Type name="int"/>
-      <Expr kind="Literal" literal-kind="Integer" value="16"/>
-   </Decl>
-   <!-- ************************************** -->
-   <!-- Instances of the Graph                 -->
-   <!-- ************************************** -->
-   <Instance id="Syn_Parser">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Parser_FREXT"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <Instance id="Decoding_Y">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="../Common/Decoding_Y"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="Idx_SZ">
-         <Expr kind="Var" name="Idx_SZ"/>
-      </Parameter>
-      <Parameter name="MODE_SZ">
-         <Expr kind="Var" name="MODE_SIZE"/>
-      </Parameter>
-      <Parameter name="MV_SZ">
-         <Expr kind="Var" name="MV_SIZE"/>
-      </Parameter>
-      <Parameter name="PREDTYPE_SIZE">
-         <Expr kind="Var" name="PREDTYPE_SIZE"/>
-      </Parameter>
-      <Parameter name="SAMPLE_SIZE">
-         <Expr kind="Var" name="SAMPLE_SIZE"/>
-      </Parameter>
-   </Instance>
-   <Instance id="Decode_U">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="../Common/Decoding_C"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="DPBMAXSIZE">
-         <Expr kind="Var" name="DPBMAXSIZE"/>
-      </Parameter>
-      <Parameter name="Idx_SZ">
-         <Expr kind="Var" name="Idx_SZ"/>
-      </Parameter>
-      <Parameter name="PREDTYPE_SIZE">
-         <Expr kind="Var" name="PREDTYPE_SIZE"/>
-      </Parameter>
-      <Parameter name="QUANT_SIZE">
-         <Expr kind="Var" name="QUANT_SIZE"/>
-      </Parameter>
-      <Parameter name="SAMPLE_SIZE">
-         <Expr kind="Var" name="SAMPLE_SIZE"/>
-      </Parameter>
-   </Instance>
-   <Instance id="Decode_V">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="../Common/Decoding_C"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="DPBMAXSIZE">
-         <Expr kind="Var" name="DPBMAXSIZE"/>
-      </Parameter>
-      <Parameter name="Idx_SZ">
-         <Expr kind="Var" name="Idx_SZ"/>
-      </Parameter>
-      <Parameter name="PREDTYPE_SIZE">
-         <Expr kind="Var" name="PREDTYPE_SIZE"/>
-      </Parameter>
-      <Parameter name="QUANT_SIZE">
-         <Expr kind="Var" name="QUANT_SIZE"/>
-      </Parameter>
-      <Parameter name="SAMPLE_SIZE">
-         <Expr kind="Var" name="SAMPLE_SIZE"/>
-      </Parameter>
-   </Instance>
-   <Instance id="Generate_Inter_Info">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="GenerateInterInfo"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <Instance id="CavlcExpand">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="CavlcBlockExpand"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <Instance id="Mgnt_Display">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_Display"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="Debug">
-         <Expr kind="Literal" literal-kind="Boolean" value="true"/>
-      </Parameter>
-   </Instance>
-   <Instance id="IntraPredSplit">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_IntraPred_Split"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <!-- ************************************** -->
-   <!-- Connections of the Graph               -->
-   <!-- ************************************** -->
-   <Connection dst="Syn_Parser" dst-port="bits8" src="" src-port="bits8"/>
-   <Connection dst="" dst-port="Display_L" src="Decoding_Y" src-port="Display_L"/>
-   <Connection dst="Decoding_Y" dst-port="FirstMbInSlice" src="Syn_Parser" src-port="FirstMbInSlice"/>
-   <Connection dst="Decoding_Y" dst-port="QP" src="Syn_Parser" src-port="QP"/>
-   <Connection dst="Decoding_Y" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
-   <Connection dst="Decoding_Y" dst-port="PicWidthInMb" src="Syn_Parser" src-port="PicWidthInMb"/>
-   <Connection dst="" dst-port="Display_Cb" src="Decode_U" src-port="Display"/>
-   <Connection dst="" dst-port="Display_Cr" src="Decode_V" src-port="Display"/>
-   <Connection dst="" dst-port="Width" src="Syn_Parser" src-port="Width"/>
-   <Connection dst="" dst-port="Height" src="Syn_Parser" src-port="Height"/>
-   <Connection dst="Decoding_Y" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
-   <Connection dst="Decode_U" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
-   <Connection dst="Decode_U" dst-port="PicWidthInMB" src="Syn_Parser" src-port="PicWidthInMb"/>
-   <Connection dst="Decode_U" dst-port="FirstMbInSlice" src="Syn_Parser" src-port="FirstMbInSlice"/>
-   <Connection dst="Decode_V" dst-port="FirstMbInSlice" src="Syn_Parser" src-port="FirstMbInSlice"/>
-   <Connection dst="Decode_V" dst-port="PicWidthInMB" src="Syn_Parser" src-port="PicWidthInMb"/>
-   <Connection dst="Decode_V" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
-   <Connection dst="Decode_U" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
-   <Connection dst="Decode_V" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
-   <Connection dst="Decode_U" dst-port="QP" src="Syn_Parser" src-port="QP_Cb"/>
-   <Connection dst="Decode_V" dst-port="QP" src="Syn_Parser" src-port="QP_Cr"/>
-   <Connection dst="Decode_U" dst-port="PredMode" src="Syn_Parser" src-port="IntraPredModeC"/>
-   <Connection dst="Decode_V" dst-port="PredMode" src="Syn_Parser" src-port="IntraPredModeC"/>
-   <Connection dst="Decoding_Y" dst-port="CodedBlockPattern" src="Syn_Parser" src-port="CodedBlockPattern"/>
-   <Connection dst="Decoding_Y" dst-port="LFDisable" src="Syn_Parser" src-port="LFDisable"/>
-   <Connection dst="Decoding_Y" dst-port="slice_alpha_c0_offset" src="Syn_Parser" src-port="slice_alpha_c0_offset"/>
-   <Connection dst="Decoding_Y" dst-port="slice_beta_offset" src="Syn_Parser" src-port="slice_beta_offset"/>
-   <Connection dst="Decode_U" dst-port="slice_beta_offset" src="Syn_Parser" src-port="slice_beta_offset"/>
-   <Connection dst="Decode_U" dst-port="CodedBlockPattern" src="Syn_Parser" src-port="CodedBlockPattern"/>
-   <Connection dst="Decode_U" dst-port="LFDisable" src="Syn_Parser" src-port="LFDisable"/>
-   <Connection dst="Decode_U" dst-port="slice_alpha_c0_offset" src="Syn_Parser" src-port="slice_alpha_c0_offset"/>
-   <Connection dst="Decode_V" dst-port="slice_alpha_c0_offset" src="Syn_Parser" src-port="slice_alpha_c0_offset"/>
-   <Connection dst="Decode_V" dst-port="slice_beta_offset" src="Syn_Parser" src-port="slice_beta_offset"/>
-   <Connection dst="Decode_V" dst-port="LFDisable" src="Syn_Parser" src-port="LFDisable"/>
-   <Connection dst="Decode_V" dst-port="CodedBlockPattern" src="Syn_Parser" src-port="CodedBlockPattern"/>
-   <Connection dst="Decoding_Y" dst-port="ConstrainedIFlag" src="Syn_Parser" src-port="ConstrainedIFlag"/>
-   <Connection dst="Decode_U" dst-port="ConstrainedIFlag" src="Syn_Parser" src-port="ConstrainedIFlag"/>
-   <Connection dst="Decode_V" dst-port="ConstrainedIFlag" src="Syn_Parser" src-port="ConstrainedIFlag"/>
-   <Connection dst="Decoding_Y" dst-port="MacroBlockType" src="Syn_Parser" src-port="MacroBlockType"/>
-   <Connection dst="Decoding_Y" dst-port="TransformSize8x8" src="Syn_Parser" src-port="TransformSize8x8"/>
-   <Connection dst="Decode_U" dst-port="MacroBlockType" src="Syn_Parser" src-port="MacroBlockType"/>
-   <Connection dst="Decode_V" dst-port="MacroBlockType" src="Syn_Parser" src-port="MacroBlockType"/>
-   <Connection dst="Decoding_Y" dst-port="MbType4Pred" src="Syn_Parser" src-port="MbType4Pred"/>
-   <Connection dst="Decoding_Y" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
-   <Connection dst="Decode_U" dst-port="MbType4Pred" src="Syn_Parser" src-port="MbType4Pred"/>
-   <Connection dst="Decode_V" dst-port="MbType4Pred" src="Syn_Parser" src-port="MbType4Pred"/>
-   <Connection dst="Decode_U" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
-   <Connection dst="Decode_V" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
-   <Connection dst="Decoding_Y" dst-port="IsNewPicOrSlice" src="Syn_Parser" src-port="IsNewPicOrSlice"/>
-   <Connection dst="Decode_U" dst-port="IsNewPicOrSlice" src="Syn_Parser" src-port="IsNewPicOrSlice"/>
-   <Connection dst="Decode_V" dst-port="IsNewPicOrSlice" src="Syn_Parser" src-port="IsNewPicOrSlice"/>
-   <Connection dst="Decoding_Y" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
-   <Connection dst="Decode_U" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
-   <Connection dst="Decode_V" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
-   <Connection dst="Decode_V" dst-port="DelList" src="Generate_Inter_Info" src-port="DelList"/>
-   <Connection dst="Decode_U" dst-port="DelList" src="Generate_Inter_Info" src-port="DelList"/>
-   <Connection dst="Decoding_Y" dst-port="DelList" src="Generate_Inter_Info" src-port="DelList"/>
-   <Connection dst="Decode_V" dst-port="IsIDR" src="Generate_Inter_Info" src-port="EmptyDPB"/>
-   <Connection dst="Decode_U" dst-port="IsIDR" src="Generate_Inter_Info" src-port="EmptyDPB"/>
-   <Connection dst="Decoding_Y" dst-port="IsIDR" src="Generate_Inter_Info" src-port="EmptyDPB"/>
-   <Connection dst="Decode_V" dst-port="MV" src="Generate_Inter_Info" src-port="Mv"/>
-   <Connection dst="Decode_U" dst-port="MV" src="Generate_Inter_Info" src-port="Mv"/>
-   <Connection dst="Decoding_Y" dst-port="MV" src="Generate_Inter_Info" src-port="Mv"/>
-   <Connection dst="Decode_V" dst-port="PartSZ" src="Generate_Inter_Info" src-port="PartSz"/>
-   <Connection dst="Decode_U" dst-port="PartSZ" src="Generate_Inter_Info" src-port="PartSz"/>
-   <Connection dst="Decoding_Y" dst-port="PartSZ" src="Generate_Inter_Info" src-port="PartSz"/>
-   <Connection dst="Decode_V" dst-port="SelectList" src="Generate_Inter_Info" src-port="SelectList"/>
-   <Connection dst="Decode_U" dst-port="SelectList" src="Generate_Inter_Info" src-port="SelectList"/>
-   <Connection dst="Decoding_Y" dst-port="SelectList" src="Generate_Inter_Info" src-port="SelectList"/>
-   <Connection dst="Decode_V" dst-port="mv_in" src="Generate_Inter_Info" src-port="MvDBF"/>
-   <Connection dst="Decode_U" dst-port="mv_in" src="Generate_Inter_Info" src-port="MvDBF"/>
-   <Connection dst="Decoding_Y" dst-port="mv_in" src="Generate_Inter_Info" src-port="MvDBF"/>
-   <Connection dst="Decode_V" dst-port="ref_idx_in" src="Generate_Inter_Info" src-port="RefIdx"/>
-   <Connection dst="Decode_U" dst-port="ref_idx_in" src="Generate_Inter_Info" src-port="RefIdx"/>
-   <Connection dst="Decoding_Y" dst-port="ref_idx_in" src="Generate_Inter_Info" src-port="RefIdx"/>
-   <Connection dst="Decode_V" dst-port="ReadAddress" src="Generate_Inter_Info" src-port="ReadAddress_c"/>
-   <Connection dst="Decode_U" dst-port="ReadAddress" src="Generate_Inter_Info" src-port="ReadAddress_c"/>
-   <Connection dst="Decoding_Y" dst-port="ReadAddress" src="Generate_Inter_Info" src-port="ReadAddress_l"/>
-   <Connection dst="Decoding_Y" dst-port="PocToRead" src="Generate_Inter_Info" src-port="PocToRead"/>
-   <Connection dst="Decode_V" dst-port="PocToRead" src="Generate_Inter_Info" src-port="PocToRead"/>
-   <Connection dst="Decode_U" dst-port="PocToRead" src="Generate_Inter_Info" src-port="PocToRead"/>
-   <Connection dst="Decode_V" dst-port="EnableRead" src="Generate_Inter_Info" src-port="Read4MbPred"/>
-   <Connection dst="Decode_U" dst-port="EnableRead" src="Generate_Inter_Info" src-port="Read4MbPred"/>
-   <Connection dst="Decoding_Y" dst-port="EnableRead" src="Generate_Inter_Info" src-port="Read4MbPred"/>
-   <Connection dst="Generate_Inter_Info" dst-port="CurrMbAddr" src="Syn_Parser" src-port="CurrMbAddr"/>
-   <Connection dst="Generate_Inter_Info" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
-   <Connection dst="Generate_Inter_Info" dst-port="MaxFrameNum" src="Syn_Parser" src-port="MaxFrameNum"/>
-   <Connection dst="Generate_Inter_Info" dst-port="NumRefFrame" src="Syn_Parser" src-port="NumRefFrame"/>
-   <Connection dst="Generate_Inter_Info" dst-port="Poc" src="Syn_Parser" src-port="Poc"/>
-   <Connection dst="Decode_V" dst-port="POC" src="Syn_Parser" src-port="Poc"/>
-   <Connection dst="Decode_U" dst-port="POC" src="Syn_Parser" src-port="Poc"/>
-   <Connection dst="Decoding_Y" dst-port="POC" src="Syn_Parser" src-port="Poc"/>
-   <Connection dst="Generate_Inter_Info" dst-port="Mmco" src="Syn_Parser" src-port="Mmco"/>
-   <Connection dst="Generate_Inter_Info" dst-port="NbRefFrameL0" src="Syn_Parser" src-port="NbRefFrameL0"/>
-   <Connection dst="Generate_Inter_Info" dst-port="NbRefFrameL1" src="Syn_Parser" src-port="NbRefFrameL1"/>
-   <Connection dst="Generate_Inter_Info" dst-port="RefList0Type" src="Syn_Parser" src-port="RefList0Type"/>
-   <Connection dst="Generate_Inter_Info" dst-port="RefList1Type" src="Syn_Parser" src-port="RefList1Type"/>
-   <Connection dst="Generate_Inter_Info" dst-port="MbType" src="Syn_Parser" src-port="MacroBlockType"/>
-   <Connection dst="Generate_Inter_Info" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
-   <Connection dst="Generate_Inter_Info" dst-port="Direct8x8Inference" src="Syn_Parser" src-port="Direct8x8Inference"/>
-   <Connection dst="Generate_Inter_Info" dst-port="DirectSpatialMvPred" src="Syn_Parser" src-port="DirectSpatialMvPred"/>
-   <Connection dst="Generate_Inter_Info" dst-port="FirstMbInSlice" src="Syn_Parser" src-port="FirstMbInSlice"/>
-   <Connection dst="Generate_Inter_Info" dst-port="SubMbPredRefIdxL1" src="Syn_Parser" src-port="SubMbPredRefIdxL1"/>
-   <Connection dst="Generate_Inter_Info" dst-port="SubMbPredMvResL1" src="Syn_Parser" src-port="SubMbPredMvResL1"/>
-   <Connection dst="Generate_Inter_Info" dst-port="SubMbPredMvResL0" src="Syn_Parser" src-port="SubMbPredMvResL0"/>
-   <Connection dst="Generate_Inter_Info" dst-port="PicWidthInMb" src="Syn_Parser" src-port="PicWidthInMb"/>
-   <Connection dst="Generate_Inter_Info" dst-port="NewPic" src="Syn_Parser" src-port="NewPic"/>
-   <Connection dst="Generate_Inter_Info" dst-port="MbType4Prediction" src="Syn_Parser" src-port="MbType4Pred"/>
-   <Connection dst="Generate_Inter_Info" dst-port="MbPredRefIdxL1" src="Syn_Parser" src-port="MbPredRefIdxL1"/>
-   <Connection dst="Generate_Inter_Info" dst-port="MbPredRefIdxL0" src="Syn_Parser" src-port="MbPredRefIdxL0"/>
-   <Connection dst="Generate_Inter_Info" dst-port="MbPredMvResL1" src="Syn_Parser" src-port="MbPredMvResL1"/>
-   <Connection dst="Generate_Inter_Info" dst-port="RefReorderingL0" src="Syn_Parser" src-port="RefReorderingL0"/>
-   <Connection dst="Generate_Inter_Info" dst-port="RefReorderingL1" src="Syn_Parser" src-port="RefReorderingL1"/>
-   <Connection dst="Generate_Inter_Info" dst-port="SubMbPredRefIdxL0" src="Syn_Parser" src-port="SubMbPredRefIdxL0"/>
-   <Connection dst="Generate_Inter_Info" dst-port="MbPredMvResL0" src="Syn_Parser" src-port="MbPredMvResL0"/>
-   <Connection dst="CavlcExpand" dst-port="MbType" src="Syn_Parser" src-port="MacroBlockType"/>
-   <Connection dst="CavlcExpand" dst-port="Last" src="Syn_Parser" src-port="CavlcLast"/>
-   <Connection dst="CavlcExpand" dst-port="Run" src="Syn_Parser" src-port="CavlcRun"/>
-   <Connection dst="CavlcExpand" dst-port="Value" src="Syn_Parser" src-port="CavlcValue"/>
-   <Connection dst="Decode_U" dst-port="CoefAC" src="CavlcExpand" src-port="CoefAC_Cb"/>
-   <Connection dst="Decode_V" dst-port="CoefAC" src="CavlcExpand" src-port="CoefAC_Cr"/>
-   <Connection dst="Decoding_Y" dst-port="CoefAC_L" src="CavlcExpand" src-port="CoefAC_L"/>
-   <Connection dst="Decode_U" dst-port="CoefDC" src="CavlcExpand" src-port="CoefDC_Cb"/>
-   <Connection dst="Decode_V" dst-port="CoefDC" src="CavlcExpand" src-port="CoefDC_Cr"/>
-   <Connection dst="Decoding_Y" dst-port="CoefDC_L" src="CavlcExpand" src-port="CoefDC_L"/>
-   <Connection dst="Decode_V" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
-   <Connection dst="Decode_U" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
-   <Connection dst="Decoding_Y" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
-   <Connection dst="Mgnt_Display" dst-port="Poc" src="Syn_Parser" src-port="Poc"/>
-   <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="Syn_Parser" src-port="MaxDpbSize"/>
-   <Connection dst="Mgnt_Display" dst-port="EmptyDpb" src="Generate_Inter_Info" src-port="EmptyDPB"/>
-   <Connection dst="IntraPredSplit" dst-port="MbIntraFlag" src="Syn_Parser" src-port="MbIntraFlag"/>
-   <Connection dst="IntraPredSplit" dst-port="IntraPredMode" src="Syn_Parser" src-port="IntraPredMode"/>
-   <Connection dst="IntraPredSplit" dst-port="ConstrainedIFlag" src="Syn_Parser" src-port="ConstrainedIFlag"/>
-   <Connection dst="Syn_Parser" dst-port="ResetPrevFrameNum" src="Generate_Inter_Info" src-port="EmptyDPB"/>
-   <Connection dst="Decoding_Y" dst-port="PredMode" src="IntraPredSplit" src-port="PredMode"/>
-   <Connection dst="Decode_U" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_U"/>
-   <Connection dst="Decode_V" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_V"/>
-   <Connection dst="Decoding_Y" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_Y"/>
-   <Connection dst="IntraPredSplit" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
-   <Connection dst="Generate_Inter_Info" dst-port="MbLoc" src="Syn_Parser" src-port="MbLocation"/>
-   <Connection dst="IntraPredSplit" dst-port="NeighbourAvail" src="Syn_Parser" src-port="NeighbourAvail"/>
-   <Connection dst="Generate_Inter_Info" dst-port="NeighbourAvail" src="Syn_Parser" src-port="NeighbourAvail"/>
-   <Connection dst="Decoding_Y" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
-   <Connection dst="Decoding_Y" dst-port="NeighbourAvail" src="Syn_Parser" src-port="NeighbourAvail"/>
-   <Connection dst="Decode_U" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
-   <Connection dst="Decode_V" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
-   <Connection dst="Decode_U" dst-port="NeighbourAvail" src="Syn_Parser" src-port="NeighbourAvail"/>
-   <Connection dst="Decode_V" dst-port="NeighbourAvail" src="Syn_Parser" src-port="NeighbourAvail"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="AVC_FREXT_decoder">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="bits8">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="Display_L">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Display_Cb">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Display_Cr">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Width">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Height">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <Decl kind="Variable" name="DPBMAXSIZE">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="16"/>
+    </Decl>
+    <Decl kind="Variable" name="Idx_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="3"/>
+    </Decl>
+    <Decl kind="Variable" name="MODE_SIZE">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="6"/>
+    </Decl>
+    <Decl kind="Variable" name="MV_SIZE">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="16"/>
+    </Decl>
+    <Decl kind="Variable" name="PREDTYPE_SIZE">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="2"/>
+    </Decl>
+    <Decl kind="Variable" name="QUANT_SIZE">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="8"/>
+    </Decl>
+    <Decl kind="Variable" name="SAMPLE_SIZE">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="16"/>
+    </Decl>
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="Syn_Parser">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Parser_FREXT"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Decoding_Y">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../Common/Decoding_Y"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
+        <Parameter name="MODE_SZ">
+            <Expr kind="Var" name="MODE_SIZE"/>
+        </Parameter>
+        <Parameter name="MV_SZ">
+            <Expr kind="Var" name="MV_SIZE"/>
+        </Parameter>
+        <Parameter name="PREDTYPE_SIZE">
+            <Expr kind="Var" name="PREDTYPE_SIZE"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SIZE">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Decode_U">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../Common/Decoding_C"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="DPBMAXSIZE">
+            <Expr kind="Var" name="DPBMAXSIZE"/>
+        </Parameter>
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
+        <Parameter name="PREDTYPE_SIZE">
+            <Expr kind="Var" name="PREDTYPE_SIZE"/>
+        </Parameter>
+        <Parameter name="QUANT_SIZE">
+            <Expr kind="Var" name="QUANT_SIZE"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SIZE">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Decode_V">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../Common/Decoding_C"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="DPBMAXSIZE">
+            <Expr kind="Var" name="DPBMAXSIZE"/>
+        </Parameter>
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
+        <Parameter name="PREDTYPE_SIZE">
+            <Expr kind="Var" name="PREDTYPE_SIZE"/>
+        </Parameter>
+        <Parameter name="QUANT_SIZE">
+            <Expr kind="Var" name="QUANT_SIZE"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SIZE">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Generate_Inter_Info">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="GenerateInterInfo"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="CavlcExpand">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="CavlcBlockExpand"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Mgnt_Display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_Display"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="Debug">
+            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+        </Parameter>
+    </Instance>
+    <Instance id="IntraPredSplit">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_IntraPred_Split"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="Syn_Parser" dst-port="bits8" src="" src-port="bits8"/>
+    <Connection dst="" dst-port="Display_L" src="Decoding_Y" src-port="Display_L"/>
+    <Connection dst="Decoding_Y" dst-port="FirstMbInSlice"
+        src="Syn_Parser" src-port="FirstMbInSlice"/>
+    <Connection dst="Decoding_Y" dst-port="QP" src="Syn_Parser" src-port="QP"/>
+    <Connection dst="Decoding_Y" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
+    <Connection dst="Decoding_Y" dst-port="PicWidthInMb"
+        src="Syn_Parser" src-port="PicWidthInMb"/>
+    <Connection dst="" dst-port="Display_Cb" src="Decode_U" src-port="Display"/>
+    <Connection dst="" dst-port="Display_Cr" src="Decode_V" src-port="Display"/>
+    <Connection dst="" dst-port="Width" src="Syn_Parser" src-port="Width"/>
+    <Connection dst="" dst-port="Height" src="Syn_Parser" src-port="Height"/>
+    <Connection dst="Decoding_Y" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
+    <Connection dst="Decode_U" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
+    <Connection dst="Decode_U" dst-port="PicWidthInMB" src="Syn_Parser" src-port="PicWidthInMb"/>
+    <Connection dst="Decode_U" dst-port="FirstMbInSlice"
+        src="Syn_Parser" src-port="FirstMbInSlice"/>
+    <Connection dst="Decode_V" dst-port="FirstMbInSlice"
+        src="Syn_Parser" src-port="FirstMbInSlice"/>
+    <Connection dst="Decode_V" dst-port="PicWidthInMB" src="Syn_Parser" src-port="PicWidthInMb"/>
+    <Connection dst="Decode_V" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
+    <Connection dst="Decode_U" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
+    <Connection dst="Decode_V" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
+    <Connection dst="Decode_U" dst-port="QP" src="Syn_Parser" src-port="QP_Cb"/>
+    <Connection dst="Decode_V" dst-port="QP" src="Syn_Parser" src-port="QP_Cr"/>
+    <Connection dst="Decode_U" dst-port="PredMode" src="Syn_Parser" src-port="IntraPredModeC"/>
+    <Connection dst="Decode_V" dst-port="PredMode" src="Syn_Parser" src-port="IntraPredModeC"/>
+    <Connection dst="Decoding_Y" dst-port="CodedBlockPattern"
+        src="Syn_Parser" src-port="CodedBlockPattern"/>
+    <Connection dst="Decoding_Y" dst-port="LFDisable" src="Syn_Parser" src-port="LFDisable"/>
+    <Connection dst="Decoding_Y" dst-port="slice_alpha_c0_offset"
+        src="Syn_Parser" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="Decoding_Y" dst-port="slice_beta_offset"
+        src="Syn_Parser" src-port="slice_beta_offset"/>
+    <Connection dst="Decode_U" dst-port="slice_beta_offset"
+        src="Syn_Parser" src-port="slice_beta_offset"/>
+    <Connection dst="Decode_U" dst-port="CodedBlockPattern"
+        src="Syn_Parser" src-port="CodedBlockPattern"/>
+    <Connection dst="Decode_U" dst-port="LFDisable" src="Syn_Parser" src-port="LFDisable"/>
+    <Connection dst="Decode_U" dst-port="slice_alpha_c0_offset"
+        src="Syn_Parser" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="Decode_V" dst-port="slice_alpha_c0_offset"
+        src="Syn_Parser" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="Decode_V" dst-port="slice_beta_offset"
+        src="Syn_Parser" src-port="slice_beta_offset"/>
+    <Connection dst="Decode_V" dst-port="LFDisable" src="Syn_Parser" src-port="LFDisable"/>
+    <Connection dst="Decode_V" dst-port="CodedBlockPattern"
+        src="Syn_Parser" src-port="CodedBlockPattern"/>
+    <Connection dst="Decoding_Y" dst-port="ConstrainedIFlag"
+        src="Syn_Parser" src-port="ConstrainedIFlag"/>
+    <Connection dst="Decode_U" dst-port="ConstrainedIFlag"
+        src="Syn_Parser" src-port="ConstrainedIFlag"/>
+    <Connection dst="Decode_V" dst-port="ConstrainedIFlag"
+        src="Syn_Parser" src-port="ConstrainedIFlag"/>
+    <Connection dst="Decoding_Y" dst-port="MacroBlockType"
+        src="Syn_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Decoding_Y" dst-port="TransformSize8x8"
+        src="Syn_Parser" src-port="TransformSize8x8"/>
+    <Connection dst="Decode_U" dst-port="MacroBlockType"
+        src="Syn_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Decode_V" dst-port="MacroBlockType"
+        src="Syn_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Decoding_Y" dst-port="MbType4Pred" src="Syn_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Decoding_Y" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
+    <Connection dst="Decode_U" dst-port="MbType4Pred" src="Syn_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Decode_V" dst-port="MbType4Pred" src="Syn_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Decode_U" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
+    <Connection dst="Decode_V" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
+    <Connection dst="Decoding_Y" dst-port="IsNewPicOrSlice"
+        src="Syn_Parser" src-port="IsNewPicOrSlice"/>
+    <Connection dst="Decode_U" dst-port="IsNewPicOrSlice"
+        src="Syn_Parser" src-port="IsNewPicOrSlice"/>
+    <Connection dst="Decode_V" dst-port="IsNewPicOrSlice"
+        src="Syn_Parser" src-port="IsNewPicOrSlice"/>
+    <Connection dst="Decoding_Y" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
+    <Connection dst="Decode_U" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
+    <Connection dst="Decode_V" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
+    <Connection dst="Decode_V" dst-port="DelList"
+        src="Generate_Inter_Info" src-port="DelList"/>
+    <Connection dst="Decode_U" dst-port="DelList"
+        src="Generate_Inter_Info" src-port="DelList"/>
+    <Connection dst="Decoding_Y" dst-port="DelList"
+        src="Generate_Inter_Info" src-port="DelList"/>
+    <Connection dst="Decode_V" dst-port="IsIDR"
+        src="Generate_Inter_Info" src-port="EmptyDPB"/>
+    <Connection dst="Decode_U" dst-port="IsIDR"
+        src="Generate_Inter_Info" src-port="EmptyDPB"/>
+    <Connection dst="Decoding_Y" dst-port="IsIDR"
+        src="Generate_Inter_Info" src-port="EmptyDPB"/>
+    <Connection dst="Decode_V" dst-port="MV" src="Generate_Inter_Info" src-port="Mv"/>
+    <Connection dst="Decode_U" dst-port="MV" src="Generate_Inter_Info" src-port="Mv"/>
+    <Connection dst="Decoding_Y" dst-port="MV" src="Generate_Inter_Info" src-port="Mv"/>
+    <Connection dst="Decode_V" dst-port="PartSZ"
+        src="Generate_Inter_Info" src-port="PartSz"/>
+    <Connection dst="Decode_U" dst-port="PartSZ"
+        src="Generate_Inter_Info" src-port="PartSz"/>
+    <Connection dst="Decoding_Y" dst-port="PartSZ"
+        src="Generate_Inter_Info" src-port="PartSz"/>
+    <Connection dst="Decode_V" dst-port="SelectList"
+        src="Generate_Inter_Info" src-port="SelectList"/>
+    <Connection dst="Decode_U" dst-port="SelectList"
+        src="Generate_Inter_Info" src-port="SelectList"/>
+    <Connection dst="Decoding_Y" dst-port="SelectList"
+        src="Generate_Inter_Info" src-port="SelectList"/>
+    <Connection dst="Decode_V" dst-port="mv_in"
+        src="Generate_Inter_Info" src-port="MvDBF"/>
+    <Connection dst="Decode_U" dst-port="mv_in"
+        src="Generate_Inter_Info" src-port="MvDBF"/>
+    <Connection dst="Decoding_Y" dst-port="mv_in"
+        src="Generate_Inter_Info" src-port="MvDBF"/>
+    <Connection dst="Decode_V" dst-port="ref_idx_in"
+        src="Generate_Inter_Info" src-port="RefIdx"/>
+    <Connection dst="Decode_U" dst-port="ref_idx_in"
+        src="Generate_Inter_Info" src-port="RefIdx"/>
+    <Connection dst="Decoding_Y" dst-port="ref_idx_in"
+        src="Generate_Inter_Info" src-port="RefIdx"/>
+    <Connection dst="Decode_V" dst-port="ReadAddress"
+        src="Generate_Inter_Info" src-port="ReadAddress_c"/>
+    <Connection dst="Decode_U" dst-port="ReadAddress"
+        src="Generate_Inter_Info" src-port="ReadAddress_c"/>
+    <Connection dst="Decoding_Y" dst-port="ReadAddress"
+        src="Generate_Inter_Info" src-port="ReadAddress_l"/>
+    <Connection dst="Decode_V" dst-port="EnableRead"
+        src="Generate_Inter_Info" src-port="Read4MbPred"/>
+    <Connection dst="Decode_U" dst-port="EnableRead"
+        src="Generate_Inter_Info" src-port="Read4MbPred"/>
+    <Connection dst="Decoding_Y" dst-port="EnableRead"
+        src="Generate_Inter_Info" src-port="Read4MbPred"/>
+    <Connection dst="Generate_Inter_Info" dst-port="CurrMbAddr"
+        src="Syn_Parser" src-port="CurrMbAddr"/>
+    <Connection dst="Generate_Inter_Info" dst-port="FrameNum"
+        src="Syn_Parser" src-port="FrameNum"/>
+    <Connection dst="Generate_Inter_Info" dst-port="MaxFrameNum"
+        src="Syn_Parser" src-port="MaxFrameNum"/>
+    <Connection dst="Generate_Inter_Info" dst-port="NumRefFrame"
+        src="Syn_Parser" src-port="NumRefFrame"/>
+    <Connection dst="Generate_Inter_Info" dst-port="Poc"
+        src="Syn_Parser" src-port="Poc"/>
+    <Connection dst="Decode_V" dst-port="POC" src="Syn_Parser" src-port="Poc"/>
+    <Connection dst="Decode_U" dst-port="POC" src="Syn_Parser" src-port="Poc"/>
+    <Connection dst="Decoding_Y" dst-port="POC" src="Syn_Parser" src-port="Poc"/>
+    <Connection dst="Generate_Inter_Info" dst-port="Mmco"
+        src="Syn_Parser" src-port="Mmco"/>
+    <Connection dst="Generate_Inter_Info" dst-port="NbRefFrameL0"
+        src="Syn_Parser" src-port="NbRefFrameL0"/>
+    <Connection dst="Generate_Inter_Info" dst-port="NbRefFrameL1"
+        src="Syn_Parser" src-port="NbRefFrameL1"/>
+    <Connection dst="Generate_Inter_Info" dst-port="RefList0Type"
+        src="Syn_Parser" src-port="RefList0Type"/>
+    <Connection dst="Generate_Inter_Info" dst-port="RefList1Type"
+        src="Syn_Parser" src-port="RefList1Type"/>
+    <Connection dst="Generate_Inter_Info" dst-port="MbType"
+        src="Syn_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Generate_Inter_Info" dst-port="SubMbType"
+        src="Syn_Parser" src-port="SubMbType"/>
+    <Connection dst="Generate_Inter_Info" dst-port="Direct8x8Inference"
+        src="Syn_Parser" src-port="Direct8x8Inference"/>
+    <Connection dst="Generate_Inter_Info" dst-port="DirectSpatialMvPred"
+        src="Syn_Parser" src-port="DirectSpatialMvPred"/>
+    <Connection dst="Generate_Inter_Info" dst-port="FirstMbInSlice"
+        src="Syn_Parser" src-port="FirstMbInSlice"/>
+    <Connection dst="Generate_Inter_Info" dst-port="SubMbPredRefIdxL1"
+        src="Syn_Parser" src-port="SubMbPredRefIdxL1"/>
+    <Connection dst="Generate_Inter_Info" dst-port="SubMbPredMvResL1"
+        src="Syn_Parser" src-port="SubMbPredMvResL1"/>
+    <Connection dst="Generate_Inter_Info" dst-port="SubMbPredMvResL0"
+        src="Syn_Parser" src-port="SubMbPredMvResL0"/>
+    <Connection dst="Generate_Inter_Info" dst-port="PicWidthInMb"
+        src="Syn_Parser" src-port="PicWidthInMb"/>
+    <Connection dst="Generate_Inter_Info" dst-port="NewPic"
+        src="Syn_Parser" src-port="NewPic"/>
+    <Connection dst="Generate_Inter_Info" dst-port="MbType4Prediction"
+        src="Syn_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Generate_Inter_Info" dst-port="MbPredRefIdxL1"
+        src="Syn_Parser" src-port="MbPredRefIdxL1"/>
+    <Connection dst="Generate_Inter_Info" dst-port="MbPredRefIdxL0"
+        src="Syn_Parser" src-port="MbPredRefIdxL0"/>
+    <Connection dst="Generate_Inter_Info" dst-port="MbPredMvResL1"
+        src="Syn_Parser" src-port="MbPredMvResL1"/>
+    <Connection dst="Generate_Inter_Info" dst-port="RefReorderingL0"
+        src="Syn_Parser" src-port="RefReorderingL0"/>
+    <Connection dst="Generate_Inter_Info" dst-port="RefReorderingL1"
+        src="Syn_Parser" src-port="RefReorderingL1"/>
+    <Connection dst="Generate_Inter_Info" dst-port="SubMbPredRefIdxL0"
+        src="Syn_Parser" src-port="SubMbPredRefIdxL0"/>
+    <Connection dst="Generate_Inter_Info" dst-port="MbPredMvResL0"
+        src="Syn_Parser" src-port="MbPredMvResL0"/>
+    <Connection dst="CavlcExpand" dst-port="MbType" src="Syn_Parser" src-port="MacroBlockType"/>
+    <Connection dst="CavlcExpand" dst-port="Last" src="Syn_Parser" src-port="CavlcLast"/>
+    <Connection dst="CavlcExpand" dst-port="Run" src="Syn_Parser" src-port="CavlcRun"/>
+    <Connection dst="CavlcExpand" dst-port="Value" src="Syn_Parser" src-port="CavlcValue"/>
+    <Connection dst="Decode_U" dst-port="CoefAC" src="CavlcExpand" src-port="CoefAC_Cb"/>
+    <Connection dst="Decode_V" dst-port="CoefAC" src="CavlcExpand" src-port="CoefAC_Cr"/>
+    <Connection dst="Decoding_Y" dst-port="CoefAC_L" src="CavlcExpand" src-port="CoefAC_L"/>
+    <Connection dst="Decode_U" dst-port="CoefDC" src="CavlcExpand" src-port="CoefDC_Cb"/>
+    <Connection dst="Decode_V" dst-port="CoefDC" src="CavlcExpand" src-port="CoefDC_Cr"/>
+    <Connection dst="Decoding_Y" dst-port="CoefDC_L" src="CavlcExpand" src-port="CoefDC_L"/>
+    <Connection dst="Decode_V" dst-port="PocToDisplay"
+        src="Mgnt_Display" src-port="POCtoDisplay"/>
+    <Connection dst="Decode_U" dst-port="PocToDisplay"
+        src="Mgnt_Display" src-port="POCtoDisplay"/>
+    <Connection dst="Decoding_Y" dst-port="PocToDisplay"
+        src="Mgnt_Display" src-port="POCtoDisplay"/>
+    <Connection dst="Mgnt_Display" dst-port="Poc" src="Syn_Parser" src-port="Poc"/>
+    <Connection dst="Mgnt_Display" dst-port="MaxDPBSize"
+        src="Syn_Parser" src-port="MaxDpbSize"/>
+    <Connection dst="Mgnt_Display" dst-port="EmptyDpb"
+        src="Generate_Inter_Info" src-port="EmptyDPB"/>
+    <Connection dst="IntraPredSplit" dst-port="MbIntraFlag"
+        src="Syn_Parser" src-port="MbIntraFlag"/>
+    <Connection dst="IntraPredSplit" dst-port="IntraPredMode"
+        src="Syn_Parser" src-port="IntraPredMode"/>
+    <Connection dst="IntraPredSplit" dst-port="ConstrainedIFlag"
+        src="Syn_Parser" src-port="ConstrainedIFlag"/>
+    <Connection dst="Syn_Parser" dst-port="ResetPrevFrameNum"
+        src="Generate_Inter_Info" src-port="EmptyDPB"/>
+    <Connection dst="Decoding_Y" dst-port="PredMode"
+        src="IntraPredSplit" src-port="PredMode"/>
+    <Connection dst="Decode_U" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_U"/>
+    <Connection dst="Decode_V" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_V"/>
+    <Connection dst="Decoding_Y" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_Y"/>
+    <Connection dst="IntraPredSplit" dst-port="MbLocation"
+        src="Syn_Parser" src-port="MbLocation"/>
+    <Connection dst="Generate_Inter_Info" dst-port="MbLoc"
+        src="Syn_Parser" src-port="MbLocation"/>
+    <Connection dst="IntraPredSplit" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
+    <Connection dst="Generate_Inter_Info" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
+    <Connection dst="Decoding_Y" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
+    <Connection dst="Decoding_Y" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
+    <Connection dst="Decode_U" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
+    <Connection dst="Decode_V" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
+    <Connection dst="Decode_U" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
+    <Connection dst="Decode_V" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
+    <Connection dst="Decoding_Y" dst-port="FrameToRead"
+        src="Generate_Inter_Info" src-port="FrameToRead"/>
+    <Connection dst="Decode_U" dst-port="FrameToRead"
+        src="Generate_Inter_Info" src-port="FrameToRead"/>
+    <Connection dst="Decode_V" dst-port="FrameToRead"
+        src="Generate_Inter_Info" src-port="FrameToRead"/>
 </XDF>

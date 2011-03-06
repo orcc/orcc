@@ -37,7 +37,7 @@
       <vertex id="PartSz" x="960" y="147"/>
       <vertex id="MvDBF" x="976" y="221"/>
       <vertex id="RefIdx" x="976" y="255"/>
-      <vertex id="PocToRead" x="1427" y="254"/>
+      <vertex id="FrameToRead" x="1427" y="254"/>
       <vertex id="ReadAddress_l" x="1398" y="118"/>
       <vertex id="ReadAddress_c" x="1399" y="88"/>
       <vertex id="SelectList" x="961" y="189"/>
@@ -47,7 +47,7 @@
       <vertex id="MVReconstruct" x="666" y="6"/>
       <vertex id="RefList1" x="756" y="905"/>
       <vertex id="RefIdxL0ToPoc" x="1018" y="377"/>
-      <vertex id="RefIdxL1ToPoc" x="1044" y="573"/>
+      <vertex id="RefIdxL1ToPoc" x="1018" y="573"/>
       <vertex id="SelectRefIdx" x="1207" y="232"/>
       <vertex id="Mgnt_InterPred" x="1206" y="61"/>
    </vertices>
