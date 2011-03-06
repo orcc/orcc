@@ -254,7 +254,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_DPB"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.DecodedPictureBuffer"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -383,8 +383,6 @@
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="Buffer_inter" dst-port="POC" src="" src-port="POC"/>
-    <Connection dst="Buffer_inter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
-    <Connection dst="Buffer_inter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="QP" src="" src-port="QP"/>
@@ -429,11 +427,9 @@
     <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead" src="" src-port="PocToRead"/>
     <Connection dst="Buffer_inter" dst-port="ReadAddress" src="" src-port="ReadAddress"/>
-    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="Inter" dst-port="SubMbType" src="" src-port="SubMbType"/>
     <Connection dst="Inter" dst-port="MbType" src="" src-port="MbType4Pred"/>
     <Connection dst="Inter" dst-port="SelectList" src="" src-port="SelectList"/>
-    <Connection dst="Buffer_inter" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
     <Connection dst="Buffer_inter" dst-port="EnableRead" src="" src-port="EnableRead"/>
     <Connection dst="Buffer_inter" dst-port="FrameNum" src="" src-port="FrameNum"/>
     <Connection dst="Inter" dst-port="ReadResult" src="Buffer_inter" src-port="ReadResult"/>
@@ -453,7 +449,6 @@
     <Connection dst="Intra_16x16" dst-port="NeighbourAvail"
         src="DemuxParserInfos" src-port="NeighbourAvail16x16"/>
     <Connection dst="DemuxParserInfos" dst-port="MbLocation" src="" src-port="MbLocation"/>
-    <Connection dst="Buffer_inter" dst-port="MbLocation" src="" src-port="MbLocation"/>
     <Connection dst="DisplayBuffer" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="" dst-port="Display_L" src="DisplayBuffer" src-port="Display"/>
     <Connection dst="DisplayBuffer" dst-port="IsIDR" src="" src-port="IsIDR"/>
@@ -465,4 +460,8 @@
     <Connection dst="BuffCurrPic" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
     <Connection dst="BuffCurrPic" dst-port="MbLocation" src="" src-port="MbLocation"/>
     <Connection dst="BuffCurrPic" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
+    <Connection dst="BuffCurrPic" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
+    <Connection dst="Buffer_inter" dst-port="WD" src="BuffCurrPic" src-port="CurrMbVal"/>
+    <Connection dst="Buffer_inter" dst-port="currPicInfo"
+        src="BuffCurrPic" src-port="CurrPicInfo"/>
 </XDF>
