@@ -86,6 +86,12 @@ static int Filesize(FILE *f) {
 }
 
 static void Read_YUV_init(int xsize, int ysize, char * filename) {
+	if (filename == NULL) {
+		print_usage();
+		fprintf(stderr, "No yuv file given! (used by compareyuv actor).\n");
+		wait_for_key();
+		exit(1);
+	}
 	ptfile = fopen(filename, "rb");
 	if (ptfile == NULL) {
 		printf("Cannot open yuv_file concatenated input file '%s' for reading\n", filename);
