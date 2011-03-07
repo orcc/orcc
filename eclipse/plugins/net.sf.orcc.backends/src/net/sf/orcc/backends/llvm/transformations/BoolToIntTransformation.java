@@ -32,7 +32,7 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
@@ -40,17 +40,43 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * Change port of type bool declaration into port of type i32
- * 
+ * Change port of type bool declaration into port of type i32.
  * 
  * @author Jerome GORIN
- * 
  */
 public class BoolToIntTransformation extends AbstractActorVisitor {
 
+	private void changeType(Variable variable) {
+		TypeList listType = (TypeList) variable.getType();
+		if (listType.getElementType().isBool()) {
+			listType.setType(IrFactory.eINSTANCE.createTypeInt(32));
+		}
+	}
+
+	@Override
+	public void visit(Action action) {
+		// input pattern
+		Pattern pattern = action.getInputPattern();
+		for (Port port : pattern.getPorts()) {
+			Variable variable = pattern.getVariable(port);
+			changeType(variable);
+
+			variable = pattern.getPeeked(port);
+			if (variable != null) {
+				changeType(variable);
+			}
+		}
+
+		// output pattern
+		pattern = action.getOutputPattern();
+		for (Port port : pattern.getPorts()) {
+			Variable variable = pattern.getVariable(port);
+			changeType(variable);
+		}
+	}
+
 	@Override
 	public void visit(Actor actor) {
-
 		// Set port to i32
 		visitPort(actor.getInputs());
 		visitPort(actor.getOutputs());
@@ -68,19 +94,6 @@ public class BoolToIntTransformation extends AbstractActorVisitor {
 		for (Action action : actor.getInitializes()) {
 			visit(action.getBody());
 			visit(action.getScheduler());
-		}
-	}
-
-	@Override
-	public void visit(Procedure procedure) {
-		// Transform Local boolean Variable assigned to port into int Variable
-		for (Variable var : procedure.getLocals()) {
-			if (((LocalVariable) var).isPort()) {
-				TypeList listType = (TypeList) var.getType();
-				if (listType.getElementType().isBool()) {
-					listType.setType(IrFactory.eINSTANCE.createTypeInt(32));
-				}
-			}
 		}
 	}
 

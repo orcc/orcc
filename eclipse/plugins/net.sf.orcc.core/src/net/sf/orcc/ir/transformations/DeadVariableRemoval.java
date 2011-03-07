@@ -66,9 +66,8 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	public void visit(Assign assign) {
 		LocalVariable variable = assign.getTarget();
 		if (!variable.isUsed()) {
-
 			// do not remove assign to variables that are used by writes
-			if (variable.isPort()) {
+			if (isPort(variable)) {
 				return;
 			}
 
@@ -89,9 +88,8 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 		if (call.hasResult()) {
 			LocalVariable variable = call.getTarget();
 			if (!variable.isUsed()) {
-
 				// do not remove call to variables that are used by writes
-				if (variable.isPort()) {
+				if (isPort(variable)) {
 					return;
 				}
 
@@ -113,7 +111,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 		LocalVariable target = load.getTarget();
 		if (!target.isUsed()) {
 			// do not remove loads to variables that are used by writes
-			if (target.isPort()) {
+			if (isPort(target)) {
 				return;
 			}
 
@@ -135,7 +133,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 		Variable variable = peek.getTarget();
 		if (!variable.isUsed()) {
 			// do not remove peek to variables that are used by writes
-			if (variable.isPort()) {
+			if (!variable.isGlobal() && isPort((LocalVariable) variable)) {
 				return;
 			}
 
@@ -153,10 +151,10 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(PhiAssignment phi) {
-		Variable variable = phi.getTarget();
+		LocalVariable variable = phi.getTarget();
 		if (!variable.isUsed()) {
 			// do not remove phi to variables that are used by writes
-			if (variable.isPort()) {
+			if (isPort(variable)) {
 				return;
 			}
 
@@ -206,7 +204,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 		if (variable != null && !variable.isUsed()
 				&& !keepTokenSwallowerVariable) {
 			// do not remove read to variables that are used by writes
-			if (variable.isPort()) {
+			if (!variable.isGlobal() && isPort((LocalVariable) variable)) {
 				return;
 			}
 
@@ -227,8 +225,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 		if (!target.isUsed()) {
 			// do not remove stores to variables that are used by writes, or
 			// variables that are parameters
-			if (target.isPort()
-					|| procedure.getParameters().contains(target.getName())) {
+			if (!target.isGlobal() && isPort((LocalVariable) target)) {
 				return;
 			}
 

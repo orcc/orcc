@@ -85,7 +85,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 	public void visit(Load load) {
 		Use use = load.getSource();
 		Variable var = use.getVariable();
-		if (!var.isGlobal() && ((LocalVariable) var).isPort()) {
+		if (!var.isGlobal() && isPort((LocalVariable) var)) {
 			load.setSource(new Use(stateVars.get(var.getName()), load));
 			updateIndex(var, load, load.getIndexes());
 		}
@@ -94,7 +94,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 	@Override
 	public void visit(Store store) {
 		Variable var = store.getTarget();
-		if (!var.isGlobal() && var.isPort()) {
+		if (!var.isGlobal() && isPort((LocalVariable) var)) {
 			store.setTarget(stateVars.get(var.getName()));
 			updateIndex(var, store, store.getIndexes());
 		}

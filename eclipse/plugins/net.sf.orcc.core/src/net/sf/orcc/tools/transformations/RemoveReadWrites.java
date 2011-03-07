@@ -28,14 +28,9 @@
  */
 package net.sf.orcc.tools.transformations;
 
-import java.util.Iterator;
-
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines a transform that removes reads and writes.
@@ -44,20 +39,6 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class RemoveReadWrites extends AbstractActorVisitor {
-
-	@Override
-	public void visit(Procedure procedure) {
-		OrderedMap<String, LocalVariable> locals = procedure.getLocals();
-		Iterator<LocalVariable> it = locals.iterator();
-		while (it.hasNext()) {
-			LocalVariable local = it.next();
-			if (local.isPort()) {
-				it.remove();
-			}
-		}
-
-		super.visit(procedure);
-	}
 
 	@Override
 	public void visit(Read read) {

@@ -29,9 +29,9 @@
 package net.sf.orcc.backends.xlim.instructions;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalTargetContainer;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.TargetContainer;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
@@ -45,14 +45,17 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * 
  */
 public class TernaryOperation extends SpecificInstruction implements
-		TargetContainer {
+		LocalTargetContainer {
 
 	private Expression conditionValue;
+
 	private Expression falseValue;
-	private Variable target;
+
+	private LocalVariable target;
+
 	private Expression trueValue;
 
-	public TernaryOperation(Location location, Variable target,
+	public TernaryOperation(Location location, LocalVariable target,
 			Expression conditionValue, Expression trueValue,
 			Expression falseValue) {
 		super(location);
@@ -62,7 +65,7 @@ public class TernaryOperation extends SpecificInstruction implements
 		setFalseValue(falseValue);
 	}
 
-	public TernaryOperation(Variable target, Expression conditionValue,
+	public TernaryOperation(LocalVariable target, Expression conditionValue,
 			Expression trueValue, Expression falseValue) {
 		this(new Location(), target, conditionValue, trueValue, falseValue);
 	}
@@ -86,7 +89,7 @@ public class TernaryOperation extends SpecificInstruction implements
 	}
 
 	@Override
-	public Variable getTarget() {
+	public LocalVariable getTarget() {
 		return target;
 	}
 
@@ -95,7 +98,7 @@ public class TernaryOperation extends SpecificInstruction implements
 	}
 
 	@Override
-	public void internalSetTarget(Variable target) {
+	public void internalSetTarget(LocalVariable target) {
 		this.target = target;
 	}
 
@@ -112,7 +115,7 @@ public class TernaryOperation extends SpecificInstruction implements
 	}
 
 	@Override
-	public void setTarget(Variable target) {
+	public void setTarget(LocalVariable target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 

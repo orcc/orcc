@@ -667,9 +667,10 @@ public class IRWriter {
 			if (peeked == null) {
 				patternArray.add(new JsonNull());
 			} else {
-				patternArray.add(writeVariable(peeked));
+				patternArray.add(writeLocalVariable((LocalVariable) peeked));
 			}
-			patternArray.add(writeVariable(pattern.getVariable(port)));
+			patternArray.add(writeLocalVariable((LocalVariable) pattern
+					.getVariable(port)));
 		}
 
 		return array;

@@ -121,7 +121,6 @@ import net.sf.orcc.util.Scope;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
@@ -239,13 +238,24 @@ public class IRParser {
 			tag.add(tagArray.get(i).getAsString());
 		}
 
-		Procedure scheduler = parseProc(array.get(3).getAsJsonArray());
+		variables = new Scope<String, Variable>(variables, true);
+		Pattern ip = parsePattern(inputs, array.get(1).getAsJsonArray());
+		Pattern op = parsePattern(outputs, array.get(2).getAsJsonArray());
+
 		Procedure body = parseProc(array.get(4).getAsJsonArray());
 
-		Pattern ip = parsePattern(inputs, body.getLocals(),
-				scheduler.getLocals(), array.get(1).getAsJsonArray());
-		Pattern op = parsePattern(outputs, body.getLocals(), null, array.get(2)
-				.getAsJsonArray());
+		// add peeked variables
+		variables = new Scope<String, Variable>(variables, true);
+		for (Port port : ip.getPorts()) {
+			Variable peeked = ip.getPeeked(port);
+			if (peeked != null) {
+				variables.put(file, peeked.getLocation(), peeked.getName(),
+						peeked);
+			}
+		}
+		Procedure scheduler = parseProc(array.get(3).getAsJsonArray());
+
+		variables = variables.getParent().getParent();
 
 		Action action = new Action(body.getLocation(), tag, ip, op, scheduler,
 				body);
@@ -352,9 +362,7 @@ public class IRParser {
 					nativeFlag, stateVars, procs, actions, initializes, sched);
 
 			return actor;
-		} catch (IllegalStateException e) {
-			throw new OrccException(JSON_ERR_MSG);
-		} catch (JsonParseException e) {
+		} catch (RuntimeException e) {
 			throw new OrccException(JSON_ERR_MSG);
 		} finally {
 			try {
@@ -735,6 +743,17 @@ public class IRParser {
 		return write;
 	}
 
+	private LocalVariable parseLocalVariable(JsonArray array)
+			throws OrccException {
+		String name = array.get(0).getAsString();
+		boolean assignable = array.get(1).getAsBoolean();
+		int index = array.get(2).getAsInt();
+		Location loc = parseLocation(array.get(3).getAsJsonArray());
+		Type type = parseType(array.get(4));
+
+		return new LocalVariable(assignable, index, loc, name, type);
+	}
+
 	/**
 	 * Parses the given list as a list of local variables. A
 	 * {@link LocalVariable} is a {@link Variable} with an SSA index.
@@ -749,18 +768,11 @@ public class IRParser {
 		for (JsonElement element : arrayVars) {
 			JsonArray array = element.getAsJsonArray();
 
-			String name = array.get(0).getAsString();
-			boolean assignable = array.get(1).getAsBoolean();
-			int index = array.get(2).getAsInt();
-			Location loc = parseLocation(array.get(3).getAsJsonArray());
-			Type type = parseType(array.get(4));
-
-			LocalVariable varDef = new LocalVariable(assignable, index, loc,
-					name, type);
-			localVars.put(file, loc, varDef.getName(), varDef);
+			LocalVariable varDef = parseLocalVariable(array);
+			localVars.put(file, varDef.getLocation(), varDef.getName(), varDef);
 
 			// register the variable definition
-			variables.put(file, loc, varDef.getName(), varDef);
+			variables.put(file, varDef.getLocation(), varDef.getName(), varDef);
 		}
 
 		return localVars;
@@ -890,9 +902,7 @@ public class IRParser {
 		return new WhileNode(loc, procedure, condition, nodes, joinNode);
 	}
 
-	private Pattern parsePattern(OrderedMap<String, Port> ports,
-			OrderedMap<String, LocalVariable> bodyLocals,
-			OrderedMap<String, LocalVariable> schedulerLocals, JsonArray array)
+	private Pattern parsePattern(OrderedMap<String, Port> ports, JsonArray array)
 			throws OrccException {
 		Pattern pattern = new Pattern();
 		for (int i = 0; i < array.size(); i++) {
@@ -903,14 +913,18 @@ public class IRParser {
 			pattern.setNumTokens(port, numTokens);
 
 			if (!patternArray.get(2).isJsonNull()) {
-				String peekedName = getVariableName(patternArray.get(2)
+				LocalVariable peeked = parseLocalVariable(patternArray.get(2)
 						.getAsJsonArray());
-				pattern.setPeeked(port, schedulerLocals.get(peekedName));
+				pattern.setPeeked(port, peeked);
 			}
 
-			String variableName = getVariableName(patternArray.get(3)
+			LocalVariable variable = parseLocalVariable(patternArray.get(3)
 					.getAsJsonArray());
-			pattern.setVariable(port, bodyLocals.get(variableName));
+			pattern.setVariable(port, variable);
+
+			// register the variable definition
+			variables.put(file, variable.getLocation(), variable.getName(),
+					variable);
 		}
 
 		return pattern;

@@ -385,14 +385,10 @@ public class ActorTransformer {
 	 */
 	private LocalVariable createPortVariable(Port port, int numTokens) {
 		// create the variable to hold the tokens
-		Context context = astTransformer.getContext();
-		LocalVariable target = new LocalVariable(true, 0, context
-				.getProcedure().getLocation(), port.getName(),
+		Location location = astTransformer.getContext().getProcedure()
+				.getLocation();
+		return new LocalVariable(true, 0, location, port.getName(),
 				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()));
-		context.getProcedure().getLocals()
-				.put(file, target.getLocation(), target.getName(), target);
-
-		return target;
 	}
 
 	/**

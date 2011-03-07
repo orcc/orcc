@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
-
 /**
  * This class represents a variable. A variable has a location, a type, a name
  * and a list of uses. It may be global or not, assignable or not. It has a list
@@ -253,17 +251,6 @@ public class Variable {
 	 */
 	public boolean isGlobal() {
 		return global;
-	}
-
-	/**
-	 * Returns true if this variable is assigned to by one instruction that is a
-	 * peek, read(end), write(end).
-	 * 
-	 * @return true if this variable is assigned to by one instruction that is a
-	 *         peek, read(end), write(end)
-	 */
-	public boolean isPort() {
-		return (instruction instanceof AbstractFifoInstruction);
 	}
 
 	/**

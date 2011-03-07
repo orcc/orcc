@@ -9,7 +9,7 @@ listSize(values) ::= <<
 >>
 
 varDecl(variable, sep="") ::= <<
-<if(!variable.port)><variable.type> <variable.name><listSize(variable.type.dimensions)><sep><endif>
+<variable.type> <variable.name><listSize(variable.type.dimensions)><sep>
 >>
 
 getPortName(port) ::= <<

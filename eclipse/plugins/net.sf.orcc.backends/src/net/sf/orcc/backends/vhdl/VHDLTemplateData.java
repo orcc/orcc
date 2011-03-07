@@ -75,7 +75,7 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 	@Override
 	public void visit(Load node) {
 		Variable var = node.getSource().getVariable();
-		if (!var.isPort() && !var.getType().isList() && var.isAssignable()) {
+		if (!var.getType().isList() && var.isAssignable()) {
 			strings.add(var.getName());
 		}
 	}

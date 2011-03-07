@@ -1,7 +1,7 @@
 package net.sf.orcc.backends.xlim.transformations;
 
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -16,11 +16,11 @@ public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 		if (specific instanceof TernaryOperation) {
 			TernaryOperation ternaryOperation = (TernaryOperation) specific;
 
-			Variable variable = ternaryOperation.getTarget();
+			LocalVariable variable = ternaryOperation.getTarget();
 			if (!variable.isUsed()) {
 				// do not remove ternaryOperation to variables that are used by
 				// writes
-				if (variable.isPort()) {
+				if (isPort(variable)) {
 					return;
 				}
 
