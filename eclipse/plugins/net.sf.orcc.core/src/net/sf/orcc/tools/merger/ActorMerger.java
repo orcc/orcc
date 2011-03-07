@@ -152,8 +152,7 @@ public class ActorMerger implements INetworkTransformation {
 		public void visit(Load load) {
 			Use use = load.getSource();
 			Variable var = use.getVariable();
-			if (!var.isGlobal()
-					&& procedure.getLocals().contains(var.getName())) {
+			if (!var.isGlobal() && isPort((LocalVariable) var)) {
 				int cns = portsMap.get(id + var.getName())
 						.getNumTokensConsumed();
 				var = internalBuffersMap.get(id + var.getName());
@@ -172,8 +171,7 @@ public class ActorMerger implements INetworkTransformation {
 		@Override
 		public void visit(Store store) {
 			Variable var = store.getTarget();
-			if (!var.isGlobal()
-					&& procedure.getLocals().contains(var.getName())) {
+			if (!var.isGlobal() && isPort((LocalVariable) var)) {
 				int prd = portsMap.get(id + var.getName())
 						.getNumTokensProduced();
 				var = internalBuffersMap.get(id + var.getName());

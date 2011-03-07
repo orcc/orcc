@@ -174,7 +174,7 @@ fifo_<port.name>.writeEnd(<numTokens>, <port.name>);
 // Procedure and actions
 ///////////////////////////////////////////////////////////////////////////////
 
-procedure(procedure) ::= <<
+printProcedure(procedure,action="") ::= <<
 <if(!procedure.native)>
 
 private <procedure.returnType> <procedure>(<procedure.parameters.list: {parameter | <variableDeclaration(parameter)>}; wrap, anchor, separator=", ">) {
@@ -197,7 +197,7 @@ private void <action.body.name>() {
 	<action.outputPattern.keys: { port |<printWriteEnd(port=port, numTokens=action.outputPattern.(port))>}>
 }
 
-<printProcedure(action.scheduler)>
+<printProcedure(procedure=action.scheduler, action=action)>
 >>
 
 
@@ -382,12 +382,12 @@ public class Actor_<actor.simpleName> implements IActor {
 	}
 	
 	// Functions/procedures
-	<actor.procs.list: procedure()>
+	<actor.procs.list: printProcedure()>
 	// Actions
-	<actor.actions: action()>
+	<actor.actions: printAction()>
 <if(actor.initializes)>
 	// Initializes
-	<actor.initializes: action()>
+	<actor.initializes: printAction()>
 <endif>
 	@Override
 	public void initialize() {
@@ -418,14 +418,6 @@ public class Actor_<actor.simpleName> implements IActor {
 
 }
 
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Action
-///////////////////////////////////////////////////////////////////////////////
-
-action(action) ::= <<
-<procedure(action.body)><procedure(action.scheduler)>
 >>
 
 

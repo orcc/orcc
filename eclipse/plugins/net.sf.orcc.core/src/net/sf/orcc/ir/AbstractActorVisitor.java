@@ -66,6 +66,11 @@ import net.sf.orcc.ir.nodes.WhileNode;
 public abstract class AbstractActorVisitor implements ActorVisitor,
 		ExpressionVisitor, InstructionVisitor, NodeVisitor {
 
+	/**
+	 * current action being visited (if any).
+	 */
+	protected Action action;
+
 	protected Actor actor;
 
 	protected ListIterator<Action> itAction;
@@ -74,6 +79,9 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 
 	protected ListIterator<CFGNode> itNode;
 
+	/**
+	 * current procedure being visited
+	 */
 	protected Procedure procedure;
 
 	private final boolean visitFull;
@@ -109,8 +117,12 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 *         parameters of the current procedure
 	 */
 	final public boolean isPort(LocalVariable variable) {
-		return (!procedure.getLocals().contains(variable.getName()) && !procedure
-				.getParameters().contains(variable.getName()));
+		if (action != null) {
+			return action.getInputPattern().contains(variable)
+					|| action.getOutputPattern().contains(variable);
+		}
+
+		return false;
 	}
 
 	/**
@@ -120,8 +132,10 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 *            an action
 	 */
 	public void visit(Action action) {
+		this.action = action;
 		visit(action.getBody());
 		visit(action.getScheduler());
+		this.action = null;
 	}
 
 	@Override

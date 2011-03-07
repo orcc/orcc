@@ -109,6 +109,22 @@ public class Pattern {
 		return ports.contains(port);
 	}
 
+	/**
+	 * Returns <code>true</code> if this pattern contains the given variable.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return <code>true</code> if this pattern contains the given variable
+	 */
+	public boolean contains(Variable variable) {
+		return inverseVariableMap.containsKey(variable);
+	}
+
+	/**
+	 * Returns the inverse variable map.
+	 * 
+	 * @return the inverse variable map
+	 */
 	public Map<Variable, Port> getInverseVariableMap() {
 		return inverseVariableMap;
 	}

@@ -176,10 +176,6 @@ else
 endif>
 >>
 
-printPeek(peek) ::= ""
-
-printRead(read) ::= ""
-
 printReadEnd(port, numTokens) ::= <<
 
 <if(options.enableTrace)>
@@ -209,8 +205,6 @@ else
 endif>
 >>
 
-printWrite(write) ::= ""
-
 printWriteEnd(port, numTokens) ::= <<
 
 <if(options.enableTrace)>
@@ -234,11 +228,8 @@ printInstructions(instructions) ::= <<
 if (instr.assign)><printAssign(assign=instr)><
 elseif (instr.call)><printCall(call=instr)><
 elseif (instr.load)><printLoad(load=instr)><
-elseif (instr.peek)><printPeek(peek=instr)><
-elseif (instr.read)><printRead(read=instr)><
 elseif (instr.return)><printReturn(return=instr)><
 elseif (instr.store)><printStore(store=instr)><
-elseif (instr.write)><printWrite(write=instr)><
 endif>}>
 >>
 
@@ -278,7 +269,7 @@ while (<whileNode.value>) {
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
 
-printProcedure(procedure) ::= <<
+printProcedure(procedure,action="") ::= <<
 <if(!procedure.native)>
 
 static <procedure.returnType> <procedure.name>(<
@@ -306,7 +297,7 @@ static void <action.body.name>() {
 	<action.outputPattern.ports: { port |<printWriteEnd(port=port, numTokens=action.outputPattern.numTokensMap.(port))>}>
 }
 
-<printProcedure(action.scheduler)>
+<printProcedure(procedure=action.scheduler, action=action)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
