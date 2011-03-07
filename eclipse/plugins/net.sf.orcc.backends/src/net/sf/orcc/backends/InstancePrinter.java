@@ -111,8 +111,8 @@ public class InstancePrinter extends Printer {
 	 *            name of the root ST rule
 	 * @return <code>true</code> if the instance was cached
 	 */
-	public boolean print(String fileName, String path, Instance instance,
-			String instanceName) {
+	public boolean printInstance(String fileName, String path,
+			Instance instance, String instanceName) {
 		String file = path + File.separator + fileName;
 		if (instance.isNetwork()
 				|| (instance.isActor() && !instance.getActor().isNative())) {

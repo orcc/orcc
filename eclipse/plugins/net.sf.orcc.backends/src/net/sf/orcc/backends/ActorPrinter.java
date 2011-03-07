@@ -83,7 +83,7 @@ public class ActorPrinter extends Printer {
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
-	public boolean print(String fileName, String path, Actor actor,
+	public boolean printActor(String fileName, String path, Actor actor,
 			String instanceName) {
 		String file = path + File.separator + fileName;
 		if (keepUnchangedFiles) {

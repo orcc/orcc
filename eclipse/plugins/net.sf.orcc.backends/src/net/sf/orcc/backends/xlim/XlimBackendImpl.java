@@ -147,7 +147,8 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	private void printCMake(Network network) {
 		NetworkPrinter networkPrinter = new NetworkPrinter("XLIM_sw_CMakeLists");
-		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
+		networkPrinter.printNetwork("CMakeLists.txt", path, network,
+				"CMakeLists");
 	}
 
 	@Override
@@ -161,8 +162,8 @@ public class XlimBackendImpl extends AbstractBackend {
 		}
 		printer.setExpressionPrinter(XlimExprPrinter.class);
 		printer.setTypePrinter(XlimTypePrinter.class);
-		return printer.print(instance.getId() + ".xlim", path, instance,
-				"instance");
+		return printer.printInstance(instance.getId() + ".xlim", path,
+				instance, "instance");
 	}
 
 	private void printMapping(Network network, Map<String, String> mapping) {
@@ -170,7 +171,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		networkPrinter.getOptions().put("mapping",
 				computeMapping(network, mapping));
 		networkPrinter.getOptions().put("fifoSize", fifoSize);
-		networkPrinter.print(network.getName() + ".xcf", path, network,
+		networkPrinter.printNetwork(network.getName() + ".xcf", path, network,
 				"mapping");
 	}
 
@@ -184,8 +185,10 @@ public class XlimBackendImpl extends AbstractBackend {
 			file += ".c";
 			printer = new NetworkPrinter("XLIM_sw_network");
 		}
+		printer.setExpressionPrinter(XlimExprPrinter.class);
+		printer.setTypePrinter(XlimTypePrinter.class);
 		printer.getOptions().put("fifoSize", fifoSize);
-		printer.print(file, path, "network");
+		printer.printNetwork(file, path, network, "network");
 		if (!hardwareGen) {
 			printCMake(network);
 			if (!mapping.isEmpty()) {
