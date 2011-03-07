@@ -29,6 +29,7 @@
 package net.sf.orcc.tools.merger2;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
@@ -58,13 +59,29 @@ public class NetworkMerger implements INetworkTransformation {
 		InstanceMerger merger = new InstanceMerger(network);
 
 		// Merger simple cases
-		while (staticGraph.hasSinglyConnectedVertex()) {
+		//while (staticGraph.hasSinglyConnectedVertex()) {
 			Map<Vertex, Integer> vertices = new HashMap<Vertex, Integer>();
 
-			// Get an Instance to merge
-			Vertex vertex1 = staticGraph.getSinglyConnectedVertex().get(0);
-			Vertex vertex2 = staticGraph.getStaticNeighbors(vertex1).get(0);
+			// Get two Instances to merge
+			Vertex vertex1 = null;
+			Vertex vertex2 = null;
+			for (Vertex vertex : staticGraph.getSinglyConnectedVertex()){
+				//Find only static successors
+				List<Vertex> neighbours = staticGraph.getStaticNeighbors(vertex);
+				
+				if (!neighbours.isEmpty()){
+					// Vertex1 and vertex2 are statics, and well ordered
+					vertex1 = vertex;
+					vertex2 = neighbours.get(0);
+					break;
+				}
+			}
 
+			if ((vertex1 == null)&& (vertex2 == null)){
+				// No static regions found
+				return ;
+			}			
+			
 			//Get rate of each vertex
 			int sourceRate = staticGraph.getSourceRate(vertex1, vertex2);
 			int targetRate = staticGraph.getTargetRate(vertex1, vertex2);
@@ -76,7 +93,7 @@ public class NetworkMerger implements INetworkTransformation {
 			// Transform network
 			Vertex mergedVertex = merger.getEquivalentVertices(vertices);
 			staticGraph.mergeVertices(vertices.keySet(), mergedVertex);
-		}
+		//}
 	}
 
 }

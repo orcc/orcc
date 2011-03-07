@@ -44,6 +44,7 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.util.MultiMap;
 import net.sf.orcc.util.OrderedMap;
 
@@ -98,13 +99,14 @@ public class StaticGraphAnalyzer {
 	}
 
 	private Map<Vertex, LinkedHashSet<Vertex>> adjacentVertices;
+	SDFCompositionAnalyzer analyzer;
+
 	private DirectedGraph<Vertex, Connection> dynamicGraph;
 
 	private DirectedGraph<Vertex, StaticEdge> graph;
-
 	private List<Vertex> multipleConnectedVertex;
 	private List<Vertex> singlyConnectedVertex;
-	SDFCompositionAnalyzer analyzer;
+
 	/**
 	 * Create a static representation of a network
 	 * 
@@ -117,7 +119,7 @@ public class StaticGraphAnalyzer {
 
 		// Calculate properties of the static graph
 		computeStaticGraph();
-		
+
 		// Analyze composition
 		analyzer = new SDFCompositionAnalyzer(network, this);
 	}
@@ -164,7 +166,7 @@ public class StaticGraphAnalyzer {
 	}
 
 	private MultiMap<Vertex, Connection> checkInput(
-			Set<Connection> connections, Vertex vertex) {
+			Set<Connection> connections, Set<Vertex> srcVertices, Vertex vertex) {
 		// Get inputs of the destination vertex
 		Instance instance = vertex.getInstance();
 		Actor actor = instance.getActor();
@@ -180,9 +182,18 @@ public class StaticGraphAnalyzer {
 			Vertex src = dynamicGraph.getEdgeSource(connection);
 
 			if (inputs.contains(name)) {
-				// Target must be connected to the merged instance
-				connection.setTarget(inputs.get(name));
-				srcConnections.add(src, connection);
+				// Remove previous connection
+				Port source = connection.getSource();
+				Map<String, IAttribute> attributes = connection.getAttributes();
+
+				if (!srcVertices.contains(src)) {
+					// Connect the merged instance
+					// TODO : Update fifo size
+					Port newTarget = inputs.get(name);
+					Connection newConnection = new Connection(source,
+							newTarget, attributes);
+					srcConnections.add(src, newConnection);
+				}
 			}
 		}
 
@@ -190,7 +201,7 @@ public class StaticGraphAnalyzer {
 	}
 
 	private MultiMap<Vertex, Connection> checkOutput(
-			Set<Connection> connections, Vertex vertex) {
+			Set<Connection> connections, Set<Vertex> srcVertices, Vertex vertex) {
 
 		// Get outputs of the destination vertex
 		Instance instance = vertex.getInstance();
@@ -207,9 +218,18 @@ public class StaticGraphAnalyzer {
 			Vertex tgt = dynamicGraph.getEdgeTarget(connection);
 
 			if (outputs.contains(name)) {
-				// Source must be connected to the merged instance
-				connection.setSource(outputs.get(name));
-				dstConnections.add(tgt, connection);
+				// Remove previous connection
+				Port target = connection.getTarget();
+				Map<String, IAttribute> attributes = connection.getAttributes();
+
+				if (!srcVertices.contains(tgt)) {
+					// Connect the merged instance
+					// TODO : Update fifo size
+					Port newSource = outputs.get(name);
+					Connection newConnection = new Connection(newSource,
+							target, attributes);
+					dstConnections.add(tgt, newConnection);
+				}
 			}
 		}
 
@@ -485,16 +505,17 @@ public class StaticGraphAnalyzer {
 
 		// Check connections of the source vertices to keep
 		for (Vertex vertex : srcVertices) {
+			// Check incomingEdges from the vertex to remove
 			Set<Connection> incomingEdges = dynamicGraph
-					.incomingEdgesOf(vertex);
-			Set<Connection> outgoingEdges = dynamicGraph
-					.outgoingEdgesOf(vertex);
-
-			// Check connected connections to the vertex
+			.incomingEdgesOf(vertex);
 			MultiMap<Vertex, Connection> inConnections = checkInput(
-					incomingEdges, dstVertex);
+					incomingEdges, srcVertices, dstVertex);
+
+			// Check outgoingEdges from the vertex to remove
+			Set<Connection> outgoingEdges = dynamicGraph
+			.outgoingEdgesOf(vertex);
 			MultiMap<Vertex, Connection> outConnections = checkOutput(
-					outgoingEdges, dstVertex);
+					outgoingEdges, srcVertices, dstVertex);
 
 			// Set connections to add
 			srcConnections.addAll(inConnections);
