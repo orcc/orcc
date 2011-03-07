@@ -31,7 +31,6 @@ package net.sf.orcc.backends.c;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -76,20 +75,21 @@ public class CActorTemplateData {
 	 * Builds the input pattern
 	 */
 	private void buildInputPattern(Actor actor) {
-		if(actor.getActionScheduler() != null){
+		if (actor.getActionScheduler() != null) {
 			List<Action> actions = actor.getActionScheduler().getActions();
-	
+
 			for (Action action : actions) {
 				Pattern actionPattern = action.getInputPattern();
-				for (Entry<Port, Integer> entry : actionPattern.entrySet()) {
-					Port port = entry.getKey();
-					Integer numTokens = inputPattern.get(port);
+				for (Port port : actionPattern.getPorts()) {
+					Integer numTokens = inputPattern.getNumTokens(port);
 					if (numTokens == null) {
-						inputPattern.put(entry.getKey(), entry.getValue());
+						numTokens = actionPattern.getNumTokens(port);
 					} else {
-						int maxNumTokens = Math.max(numTokens, entry.getValue());
-						inputPattern.put(entry.getKey(), maxNumTokens);
+						numTokens = Math.max(numTokens,
+								actionPattern.getNumTokens(port));
 					}
+
+					inputPattern.setNumTokens(port, numTokens);
 				}
 			}
 		}
@@ -123,10 +123,10 @@ public class CActorTemplateData {
 	 * Builds the transition pattern map.
 	 */
 	private void buildTransitionPattern(Actor actor) {
-		if (actor.getActionScheduler() == null){
+		if (actor.getActionScheduler() == null) {
 			return;
 		}
-		
+
 		FSM fsm = actor.getActionScheduler().getFsm();
 		if (fsm == null) {
 			return;
@@ -136,16 +136,16 @@ public class CActorTemplateData {
 			Pattern pattern = new Pattern();
 			for (NextStateInfo info : transition.getNextStateInfo()) {
 				Pattern actionPattern = info.getAction().getInputPattern();
-				for (Entry<Port, Integer> entry : actionPattern.entrySet()) {
-					Port port = entry.getKey();
-					Integer numTokens = pattern.get(port);
+				for (Port port : actionPattern.getPorts()) {
+					Integer numTokens = pattern.getNumTokens(port);
 					if (numTokens == null) {
-						pattern.put(entry.getKey(), entry.getValue());
+						numTokens = actionPattern.getNumTokens(port);
 					} else {
-						int maxNumTokens = Math
-								.max(numTokens, entry.getValue());
-						pattern.put(entry.getKey(), maxNumTokens);
+						numTokens = Math.max(numTokens,
+								actionPattern.getNumTokens(port));
 					}
+
+					pattern.setNumTokens(port, numTokens);
 				}
 			}
 

@@ -64,7 +64,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
@@ -126,6 +125,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -657,12 +657,19 @@ public class IRWriter {
 	 */
 	private JsonArray writeActionPattern(Pattern pattern) {
 		JsonArray array = new JsonArray();
-		for (Entry<Port, Integer> entry : pattern.entrySet()) {
+		for (Port port : pattern.getPorts()) {
 			JsonArray patternArray = new JsonArray();
 			array.add(patternArray);
 
-			patternArray.add(new JsonPrimitive(entry.getKey().getName()));
-			patternArray.add(new JsonPrimitive(entry.getValue().intValue()));
+			patternArray.add(new JsonPrimitive(port.getName()));
+			patternArray.add(new JsonPrimitive(pattern.getNumTokens(port)));
+			Variable peeked = pattern.getPeeked(port);
+			if (peeked == null) {
+				patternArray.add(new JsonNull());
+			} else {
+				patternArray.add(writeVariable(peeked));
+			}
+			patternArray.add(writeVariable(pattern.getVariable(port)));
 		}
 
 		return array;
@@ -818,6 +825,22 @@ public class IRWriter {
 	}
 
 	/**
+	 * Writes the given ordered map of global variables.
+	 * 
+	 * @param variables
+	 *            an ordered map of global variables
+	 * @return a JSON array
+	 */
+	private JsonArray writeGlobalVariables(
+			OrderedMap<String, GlobalVariable> variables) {
+		JsonArray array = new JsonArray();
+		for (GlobalVariable variable : variables) {
+			array.add(writeGlobalVariable(variable));
+		}
+		return array;
+	}
+
+	/**
 	 * Serializes the given variable declaration to JSON.
 	 * 
 	 * @param variable
@@ -908,22 +931,6 @@ public class IRWriter {
 		JsonArray array = new JsonArray();
 		for (Procedure procedure : procedures) {
 			array.add(writeProcedure(procedure));
-		}
-		return array;
-	}
-
-	/**
-	 * Writes the given ordered map of global variables.
-	 * 
-	 * @param variables
-	 *            an ordered map of global variables
-	 * @return a JSON array
-	 */
-	private JsonArray writeGlobalVariables(
-			OrderedMap<String, GlobalVariable> variables) {
-		JsonArray array = new JsonArray();
-		for (GlobalVariable variable : variables) {
-			array.add(writeGlobalVariable(variable));
 		}
 		return array;
 	}

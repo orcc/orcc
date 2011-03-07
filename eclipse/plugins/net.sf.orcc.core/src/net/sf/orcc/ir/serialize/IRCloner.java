@@ -30,7 +30,6 @@ package net.sf.orcc.ir.serialize;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
@@ -704,9 +703,11 @@ public class IRCloner {
 			OrderedMap<String, Port> ports) {
 		Pattern clonePattern = new Pattern();
 
-		for (Entry<Port, Integer> entry : pattern.entrySet()) {
-			Port port = ports.get(entry.getKey().getName());
-			clonePattern.put(port, entry.getValue());
+		for (Port port : pattern.getPorts()) {
+			Port clonedPort = ports.get(port.getName());
+			clonePattern.setNumTokens(clonedPort, pattern.getNumTokens(port));
+			clonePattern.setPeeked(clonedPort, pattern.getPeeked(port));
+			clonePattern.setVariable(clonedPort, pattern.getVariable(port));
 		}
 
 		return clonePattern;

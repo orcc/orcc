@@ -143,7 +143,7 @@ public class ActorMerger implements INetworkTransformation {
 				BinaryExpr incr = new BinaryExpr(new VarExpr(new Use(readVar)),
 						BinaryOp.PLUS, new IntExpr(prd), null);
 
-				Store store = new Store(readVar,  incr);
+				Store store = new Store(readVar, incr);
 				currentBlock.add(store);
 			}
 		}
@@ -287,12 +287,12 @@ public class ActorMerger implements INetworkTransformation {
 	private Action createAction() throws OrccException {
 		Pattern inputPattern = new Pattern();
 		for (Port port : actor.getInputs()) {
-			inputPattern.put(port, port.getNumTokensConsumed());
+			inputPattern.setNumTokens(port, port.getNumTokensConsumed());
 		}
 
 		Pattern outputPattern = new Pattern();
 		for (Port port : actor.getOutputs()) {
-			outputPattern.put(port, port.getNumTokensProduced());
+			outputPattern.setNumTokens(port, port.getNumTokensProduced());
 		}
 
 		return new Action(new Location(), new Tag(), inputPattern,

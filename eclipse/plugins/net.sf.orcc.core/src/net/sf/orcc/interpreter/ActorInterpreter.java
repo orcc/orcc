@@ -143,7 +143,8 @@ public class ActorInterpreter {
 	 */
 	protected boolean checkOutputPattern(Pattern outputPattern) {
 		if (outputPattern != null) {
-			for (Entry<Port, Integer> entry : outputPattern.entrySet()) {
+			for (Entry<Port, Integer> entry : outputPattern.getNumTokensMap()
+					.entrySet()) {
 				Port outputPort = entry.getKey();
 				Integer nbOfTokens = entry.getValue();
 				if (!ioFifos.get(outputPort.getName()).hasRoom(nbOfTokens)) {
@@ -296,14 +297,15 @@ public class ActorInterpreter {
 	 */
 	protected boolean isSchedulable(Action action) {
 		// check tokens
-		for (Entry<Port, Integer> entry : action.getInputPattern().entrySet()) {
+		for (Entry<Port, Integer> entry : action.getInputPattern()
+				.getNumTokensMap().entrySet()) {
 			Fifo fifo = ioFifos.get(entry.getKey().getName());
 			boolean hasTok = fifo.hasTokens(entry.getValue());
 			if (!hasTok) {
 				return false;
 			}
 		}
-		
+
 		Expression isSchedulable = interpretProc(action.getScheduler());
 		if (isSchedulable != null && isSchedulable.isBooleanExpr()) {
 			return ((BoolExpr) isSchedulable).getValue();

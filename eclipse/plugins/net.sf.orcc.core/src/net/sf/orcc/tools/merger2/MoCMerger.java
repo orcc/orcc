@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.tools.merger2;
 
-import java.util.Map.Entry;
-
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
@@ -80,17 +78,16 @@ public class MoCMerger extends AbstractMoCInterpreter {
 	}
 
 	private void updatePattern(Pattern source, Pattern candidate) {
-		for (Entry<Port, Integer> entry : candidate.entrySet()) {
-			Port port = entry.getKey();
+		for (Port port : candidate.getPorts()) {
 			if (ports.contains(port.getName())) {
 				// Port has to be kept, update pattern
-				Integer tokens = rate * entry.getValue();
+				Integer tokens = rate * candidate.getNumTokens(port);
 
-				if (source.containsKey(port)) {
-					tokens = tokens + source.get(port);
+				if (source.contains(port)) {
+					tokens = tokens + source.getNumTokens(port);
 				}
 
-				source.put(port, tokens);
+				source.setNumTokens(port, tokens);
 			}
 		}
 	}

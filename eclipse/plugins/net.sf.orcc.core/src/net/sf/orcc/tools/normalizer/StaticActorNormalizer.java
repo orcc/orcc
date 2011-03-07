@@ -31,7 +31,6 @@ package net.sf.orcc.tools.normalizer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -178,9 +177,8 @@ public class StaticActorNormalizer {
 		private List<Instruction> updateIndex(Pattern pattern) {
 			List<Instruction> instrs = new ArrayList<Instruction>();
 
-			for (Entry<Port, Integer> entry : pattern.entrySet()) {
-				Port port = entry.getKey();
-				Integer tokens = entry.getValue();
+			for (Port port : pattern.getPorts()) {
+				Integer tokens = pattern.getNumTokens(port);
 
 				Variable varCount = stateVars.get(port.getName() + "_count");
 				Use use = new Use(varCount);
@@ -229,9 +227,8 @@ public class StaticActorNormalizer {
 	 */
 	private void addStateVariables(Procedure procedure, Pattern pattern) {
 		BlockNode block = BlockNode.getLast(procedure);
-		for (Entry<Port, Integer> entry : pattern.entrySet()) {
-			Port port = entry.getKey();
-			int numTokens = entry.getValue();
+		for (Port port : pattern.getPorts()) {
+			int numTokens = pattern.getNumTokens(port);
 
 			Type type = IrFactory.eINSTANCE.createTypeList(numTokens,
 					port.getType());
@@ -384,9 +381,8 @@ public class StaticActorNormalizer {
 	private void createReads(Procedure procedure) {
 		Pattern inputPattern = staticCls.getInputPattern();
 		BlockNode block = BlockNode.getLast(procedure);
-		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
-			Port port = entry.getKey();
-			int numTokens = entry.getValue();
+		for (Port port : inputPattern.getPorts()) {
+			int numTokens = inputPattern.getNumTokens(port);
 			Variable var = stateVars.get(port.getName());
 
 			Read read = new Read(port, numTokens, var);
@@ -426,9 +422,8 @@ public class StaticActorNormalizer {
 	private void createWrites(Procedure procedure) {
 		Pattern outputPattern = staticCls.getOutputPattern();
 		BlockNode block = BlockNode.getLast(procedure);
-		for (Entry<Port, Integer> entry : outputPattern.entrySet()) {
-			Port port = entry.getKey();
-			int numTokens = entry.getValue();
+		for (Port port : outputPattern.getPorts()) {
+			int numTokens = outputPattern.getNumTokens(port);
 			Variable var = stateVars.get(port.getName());
 
 			Write write = new Write(port, numTokens, var);

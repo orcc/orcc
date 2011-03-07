@@ -122,7 +122,7 @@ public class CSDFMoC extends AbstractMoC {
 	 * @return the number of tokens consumed by this port.
 	 */
 	public int getNumTokensConsumed(Port port) {
-		Integer numTokens = inputPattern.get(port);
+		Integer numTokens = inputPattern.getNumTokens(port);
 		if (numTokens == null) {
 			return 0;
 		}
@@ -137,7 +137,7 @@ public class CSDFMoC extends AbstractMoC {
 	 * @return the number of tokens written to this port.
 	 */
 	public int getNumTokensProduced(Port port) {
-		Integer numTokens = outputPattern.get(port);
+		Integer numTokens = outputPattern.getNumTokens(port);
 		if (numTokens == null) {
 			return 0;
 		}
@@ -190,7 +190,7 @@ public class CSDFMoC extends AbstractMoC {
 	 */
 	public void setTokenConsumptions(Actor actor) {
 		for (Port port : actor.getInputs()) {
-			inputPattern.put(port, port.getNumTokensConsumed());
+			inputPattern.setNumTokens(port, port.getNumTokensConsumed());
 		}
 	}
 
@@ -202,7 +202,7 @@ public class CSDFMoC extends AbstractMoC {
 	 */
 	public void setTokenProductions(Actor actor) {
 		for (Port port : actor.getOutputs()) {
-			outputPattern.put(port, port.getNumTokensProduced());
+			outputPattern.setNumTokens(port, port.getNumTokensProduced());
 		}
 	}
 

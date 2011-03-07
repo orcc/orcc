@@ -193,23 +193,34 @@ public class IRParser {
 	 * given JSON array.
 	 * 
 	 * @param array
-	 *            an array that contains a variable name, suffix, and SSA index
+	 *            an array that contains a variable name and SSA index
 	 * @return the variable associated with the name
 	 * @throws OrccException
 	 *             if a semantic error occurs
 	 */
 	private Variable getVariable(JsonArray array) throws OrccException {
-		String name = array.get(0).getAsString();
-		int index = array.get(1).getAsInt();
-
-		// retrieve the variable definition
-		String indexStr = (index == 0) ? "" : "_" + index;
-		String varName = name + indexStr;
+		String varName = getVariableName(array);
 		Variable varDef = variables.get(varName);
 		if (varDef == null) {
 			throw new OrccException("unknown variable: " + varName);
 		}
 		return varDef;
+	}
+
+	/**
+	 * Returns the name of the variable represented by the given JSON array.
+	 * 
+	 * @param array
+	 *            an array that contains a variable name and SSA index
+	 * @return the name of the variable represented by the given JSON array
+	 */
+	private String getVariableName(JsonArray array) {
+		String name = array.get(0).getAsString();
+		int index = array.get(1).getAsInt();
+
+		// retrieve the variable definition
+		String indexStr = (index == 0) ? "" : "_" + index;
+		return name + indexStr;
 	}
 
 	/**
@@ -228,11 +239,13 @@ public class IRParser {
 			tag.add(tagArray.get(i).getAsString());
 		}
 
-		Pattern ip = parsePattern(inputs, array.get(1).getAsJsonArray());
-		Pattern op = parsePattern(outputs, array.get(2).getAsJsonArray());
-
 		Procedure scheduler = parseProc(array.get(3).getAsJsonArray());
 		Procedure body = parseProc(array.get(4).getAsJsonArray());
+
+		Pattern ip = parsePattern(inputs, body.getLocals(),
+				scheduler.getLocals(), array.get(1).getAsJsonArray());
+		Pattern op = parsePattern(outputs, body.getLocals(), null, array.get(2)
+				.getAsJsonArray());
 
 		Action action = new Action(body.getLocation(), tag, ip, op, scheduler,
 				body);
@@ -877,14 +890,27 @@ public class IRParser {
 		return new WhileNode(loc, procedure, condition, nodes, joinNode);
 	}
 
-	private Pattern parsePattern(OrderedMap<String, Port> ports, JsonArray array)
+	private Pattern parsePattern(OrderedMap<String, Port> ports,
+			OrderedMap<String, LocalVariable> bodyLocals,
+			OrderedMap<String, LocalVariable> schedulerLocals, JsonArray array)
 			throws OrccException {
 		Pattern pattern = new Pattern();
 		for (int i = 0; i < array.size(); i++) {
 			JsonArray patternArray = array.get(i).getAsJsonArray();
 			Port port = ports.get(patternArray.get(0).getAsString());
+
 			int numTokens = patternArray.get(1).getAsInt();
-			pattern.put(port, numTokens);
+			pattern.setNumTokens(port, numTokens);
+
+			if (!patternArray.get(2).isJsonNull()) {
+				String peekedName = getVariableName(patternArray.get(2)
+						.getAsJsonArray());
+				pattern.setPeeked(port, schedulerLocals.get(peekedName));
+			}
+
+			String variableName = getVariableName(patternArray.get(3)
+					.getAsJsonArray());
+			pattern.setVariable(port, bodyLocals.get(variableName));
 		}
 
 		return pattern;

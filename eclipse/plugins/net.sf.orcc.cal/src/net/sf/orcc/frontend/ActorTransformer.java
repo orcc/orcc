@@ -336,7 +336,7 @@ public class ActorTransformer {
 			Assign assign = new Assign(result, new BoolExpr(true));
 			addInstruction(assign);
 		} else {
-			transformInputPatternPeek(astAction);
+			transformInputPatternPeek(astAction, inputPattern);
 			// local variables are not transformed because they are not
 			// supposed to be available for guards
 			// astTransformer.transformLocalVariables(astAction.getVariables());
@@ -418,7 +418,7 @@ public class ActorTransformer {
 						.evaluateAsInteger(astRepeat);
 				totalConsumption *= repeat;
 			}
-			inputPattern.put(port, totalConsumption);
+			inputPattern.setNumTokens(port, totalConsumption);
 		}
 	}
 
@@ -445,7 +445,7 @@ public class ActorTransformer {
 						.evaluateAsInteger(astRepeat);
 				totalConsumption *= repeat;
 			}
-			outputPattern.put(port, totalConsumption);
+			outputPattern.setNumTokens(port, totalConsumption);
 		}
 	}
 
@@ -601,7 +601,7 @@ public class ActorTransformer {
 		fillsInputPattern(astAction, inputPattern);
 		fillsOutputPattern(astAction, outputPattern);
 
-		transformActionBody(astAction, body);
+		transformActionBody(astAction, body, inputPattern, outputPattern);
 		transformActionScheduler(astAction, scheduler, inputPattern);
 
 		// creates IR action and add it to action list
@@ -619,16 +619,17 @@ public class ActorTransformer {
 	 * @param body
 	 *            the procedure that will contain the body
 	 */
-	private void transformActionBody(AstAction astAction, Procedure body) {
+	private void transformActionBody(AstAction astAction, Procedure body,
+			Pattern inputPattern, Pattern outputPattern) {
 		Context oldContext = astTransformer.newContext(body);
 
 		for (AstInputPattern pattern : astAction.getInputs()) {
-			transformInputPattern(pattern, Read.class);
+			transformInputPattern(pattern, inputPattern, Read.class);
 		}
 
 		astTransformer.transformLocalVariables(astAction.getVariables());
 		astTransformer.transformStatements(astAction.getStatements());
-		transformOutputPattern(astAction);
+		transformOutputPattern(astAction, outputPattern);
 
 		astTransformer.restoreContext(oldContext);
 		astTransformer.addReturn(body, null);
@@ -714,7 +715,8 @@ public class ActorTransformer {
 	 * @param pattern
 	 *            an input pattern
 	 */
-	private void transformInputPattern(AstInputPattern pattern, Class<?> clasz) {
+	private void transformInputPattern(AstInputPattern pattern,
+			Pattern irInputPattern, Class<?> clasz) {
 		Context context = astTransformer.getContext();
 		Port port = mapPorts.get(pattern.getPort());
 		List<AstVariable> tokens = pattern.getTokens();
@@ -731,6 +733,11 @@ public class ActorTransformer {
 
 		// create port variable
 		LocalVariable variable = createPortVariable(port, totalConsumption);
+		if (clasz == Peek.class) {
+			irInputPattern.setPeeked(port, variable);
+		} else {
+			irInputPattern.setVariable(port, variable);
+		}
 
 		// add the peek/read
 		try {
@@ -765,7 +772,8 @@ public class ActorTransformer {
 	 * @param astAction
 	 *            an AST action
 	 */
-	private void transformInputPatternPeek(final AstAction astAction) {
+	private void transformInputPatternPeek(final AstAction astAction,
+			Pattern inputPattern) {
 		final Set<AstInputPattern> patterns = new HashSet<AstInputPattern>();
 		VoidSwitch peekVariables = new VoidSwitch() {
 
@@ -788,7 +796,7 @@ public class ActorTransformer {
 
 		// add peeks for each pattern of the patterns set
 		for (AstInputPattern pattern : patterns) {
-			transformInputPattern(pattern, Peek.class);
+			transformInputPattern(pattern, inputPattern, Peek.class);
 		}
 	}
 
@@ -799,7 +807,8 @@ public class ActorTransformer {
 	 * @param astAction
 	 *            an AST action
 	 */
-	private void transformOutputPattern(AstAction astAction) {
+	private void transformOutputPattern(AstAction astAction,
+			Pattern irOutputPattern) {
 		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
 		for (AstOutputPattern pattern : astOutputPattern) {
 			Port port = mapPorts.get(pattern.getPort());
@@ -817,6 +826,7 @@ public class ActorTransformer {
 
 			// create port variable
 			LocalVariable variable = createPortVariable(port, totalConsumption);
+			irOutputPattern.setVariable(port, variable);
 
 			// store tokens
 			actionStoreTokens(variable, values, repeat);
