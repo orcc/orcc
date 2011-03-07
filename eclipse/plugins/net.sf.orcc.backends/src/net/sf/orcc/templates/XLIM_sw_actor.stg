@@ -576,7 +576,7 @@ actionTest(action) ::= <<
 	\<module kind="then"\>
 		<if(action.outputPattern)>
 		\<!-- Last outputPattern --\>
-		<outputPatternDecision(index=length(action.outputPattern.keys),action=action); separator="\n">
+		<outputPatternDecision(index=length(action.outputPattern.numTokensMap.keys),action=action); separator="\n">
 			\<module kind="then"\>
 				<actionCall(action)>
 			\</module\>
@@ -643,7 +643,7 @@ actionTestState(nextState) ::= <<
 	\<module kind="then"\>
 		<if(nextState.action.outputPattern)>
 		\<!-- Last outputPattern --\>
-		<outputPatternDecisionState(index=length(nextState.action.outputPattern.keys),action=nextState.action,state=transition.sourceState); separator="\n">
+		<outputPatternDecisionState(index=length(nextState.action.outputPattern.numTokensMap.keys),action=nextState.action,state=transition.sourceState); separator="\n">
 			\<module kind="then"\>
 				<actionCall(nextState.action)>
 				<actionCallState(nextState)>
@@ -689,12 +689,12 @@ isSchedulableTest(action) ::= <<
 
 
 outputPatternTest(action) ::= <<
-<outputPattern(pattern=action.outputPattern,action=action)>
+<outputPattern(pattern=action.outputPattern.numTokensMap,action=action)>
 >>
 
 inputPatternTest(action) ::= <<
 <if(action.inputPattern)>
-<inputPattern(pattern=action.inputPattern,action=action)>
+<inputPattern(pattern=action.inputPattern.numTokensMap,action=action)>
 \<operation kind="$and"\>
 	\<port dir="in" source="inputPattern_<instance.id>_<action>_decision"/\>
 	\<port dir="in" source="isSchedulable_<action>_go"/\>
