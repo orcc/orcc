@@ -202,8 +202,8 @@ public class CppBackendImpl extends AbstractBackend {
 				+ actor.getPackage().replace('.', File.separatorChar);
 		new File(hier).mkdirs();
 
-		actorPrinter.printActor(actor.getSimpleName(), hier, actor, "actor");
-		headerPrinter.printActor(actor.getSimpleName(), hier, actor, "actor");
+		actorPrinter.print(actor.getSimpleName(), hier, actor, "actor");
+		headerPrinter.print(actor.getSimpleName(), hier, actor, "actor");
 
 		return false;
 	}
@@ -211,8 +211,7 @@ public class CppBackendImpl extends AbstractBackend {
 	private void printCMake(Network network) {
 		NetworkPrinter networkPrinter = new NetworkPrinter("Cpp_CMakeLists");
 		networkPrinter.getOptions().put("needSerDes", needSerDes);
-		networkPrinter.printNetwork("CMakeLists.txt", path, network,
-				"Cpp_CMakeLists");
+		networkPrinter.print("CMakeLists.txt", path, network, "Cpp_CMakeLists");
 	}
 
 	/**
@@ -235,8 +234,7 @@ public class CppBackendImpl extends AbstractBackend {
 		// compute kind of fifos
 		printer.getOptions().put("fifoKind", computeFifoKind(network));
 
-		printer.printNetwork(network.getName() + ".cpp", path, network,
-				"network");
+		printer.print(network.getName() + ".cpp", path, network, "network");
 
 		printCMake(network);
 	}

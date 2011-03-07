@@ -299,7 +299,7 @@ public class CBackendImpl extends AbstractBackend {
 
 			// print network
 			write("Printing network...\n");
-			printer.printNetwork(workingNetwork.getName() + ".c", path,
+			printer.print(workingNetwork.getName() + ".c", path,
 					workingNetwork, "network");
 
 			// print CMakeLists
@@ -309,8 +309,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	private void printCMake(Network network) {
 		NetworkPrinter networkPrinter = new NetworkPrinter("C_CMakeLists");
-		networkPrinter.printNetwork("CMakeLists.txt", path, network,
-				"CMakeLists");
+		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
 	}
 
 	@Override
@@ -321,7 +320,7 @@ public class CBackendImpl extends AbstractBackend {
 		printer.getOptions().put("network", workingNetwork);
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.getOptions().put("enableTrace", enableTrace);
-		return printer.printInstance(instance.getId() + ".c", path, instance,
+		return printer.print(instance.getId() + ".c", path, instance,
 				"instance");
 	}
 

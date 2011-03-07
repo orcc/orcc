@@ -183,8 +183,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
 
-		return printer
-				.printActor(actor.getSimpleName(), folder, actor, "actor");
+		return printer.print(actor.getSimpleName(), folder, actor, "actor");
 	}
 
 	private void runJadeToolBox(List<Actor> actors) throws OrccException {

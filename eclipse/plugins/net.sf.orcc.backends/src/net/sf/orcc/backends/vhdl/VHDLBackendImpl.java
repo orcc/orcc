@@ -238,7 +238,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		return actorPrinter.printActor(actor.getName() + ".vhd", path
+		return actorPrinter.print(actor.getName() + ".vhd", path
 				+ File.separator + "Design", actor, "actor");
 	}
 
@@ -267,11 +267,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		network.computeTemplateMaps();
 
-		networkPrinter.printNetwork(network.getName() + ".vhd", path
-				+ File.separator + "Design", network, "network");
+		networkPrinter.print(network.getName() + ".vhd", path + File.separator
+				+ "Design", network, "network");
 
 		for (Network subNetwork : network.getNetworks()) {
-			networkPrinter.printNetwork(subNetwork.getName() + ".vhd", path
+			networkPrinter.print(subNetwork.getName() + ".vhd", path
 					+ File.separator + "Design", subNetwork, "network");
 		}
 	}
@@ -291,8 +291,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	private void printTestbench(InstancePrinter printer, Instance instance) {
-		printer.printInstance(instance.getId() + "_tb.vhd", path
-				+ File.separator + "Testbench", instance, "instance");
+		printer.print(instance.getId() + "_tb.vhd", path + File.separator
+				+ "Testbench", instance, "instance");
 
 		if (instance.isNetwork()) {
 			Network network = instance.getNetwork();

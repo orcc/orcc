@@ -124,8 +124,8 @@ public class JavaBackendImpl extends AbstractBackend {
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
 
-		return actorPrinter.printActor("Actor_" + actor.getSimpleName()
-				+ ".java", folder, actor, "actor");
+		return actorPrinter.print("Actor_" + actor.getSimpleName() + ".java",
+				folder, actor, "actor");
 	}
 
 	/**

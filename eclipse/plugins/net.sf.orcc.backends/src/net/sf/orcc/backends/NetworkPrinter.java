@@ -84,7 +84,7 @@ public class NetworkPrinter extends Printer {
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
-	public boolean printNetwork(String fileName, String path, Network network,
+	public boolean print(String fileName, String path, Network network,
 			String instanceName) {
 		String file = path + File.separator + fileName;
 		if (keepUnchangedFiles) {

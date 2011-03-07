@@ -127,8 +127,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) {
-		return instancePrinter.printInstance(instance.getId() + ".pml", path,
-				instance, "instance");
+		return instancePrinter.print(instance.getId() + ".pml", path, instance,
+				"instance");
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) {
 		NetworkPrinter printer = new NetworkPrinter("PROMELA_network");
-		printer.printNetwork("main_" + network.getName() + ".pml", path,
-				network, "network");
+		printer.print("main_" + network.getName() + ".pml", path, network,
+				"network");
 	}
 }
