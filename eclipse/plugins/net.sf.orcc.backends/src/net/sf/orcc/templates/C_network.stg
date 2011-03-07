@@ -387,9 +387,9 @@ void *scheduler(void *data) {
 			printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
 			<if (options.newScheduler)>
-			if (si.reason == full <if(options.threads)>&& si.num_firings \>0<endif>) {
+			if (si.reason == full && si.num_firings) {
 				sched_add_successors(sched, my_actor, si.ports);
-			} else if (si.reason == starved <if(options.threads)>&& si.num_firings \>0<endif>) {
+			} else if (si.reason == starved && si.num_firings) {
 				sched_add_predecessors(sched, my_actor, si.ports);
 			}
 			<endif>
@@ -409,9 +409,9 @@ void *scheduler(void *data) {
 		printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
 		<if (options.newScheduler)>
-		if (si.reason == full <if(options.threads)>&& si.num_firings \>0<endif>) {
+		if (si.reason == full <if(options.threads)>&& si.num_firings<endif>) {
 			sched_add_successors(sched, my_actor, si.ports);
-		} else if (si.reason == starved <if(options.threads)>&& si.num_firings \>0<endif>) {
+		} else if (si.reason == starved <if(options.threads)>&& si.num_firings<endif>) {
 			sched_add_predecessors(sched, my_actor, si.ports);
 		}
 		<endif>
