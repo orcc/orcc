@@ -36,6 +36,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.util.WriteListener;
@@ -57,9 +58,10 @@ public class CBroadcastAdder extends BroadcastAdder {
 		this.defaultFifoSize = defaultFifoSize;
 	}
 
+	@Override
 	protected void examineConnections(Vertex vertex,
-			Set<Connection> connections, Map<Port, List<Connection>> outMap)
-			throws OrccException {
+			Set<Connection> connections, Map<Port, List<Connection>> outMap,
+			Network network) throws OrccException {
 		Instance instance = vertex.getInstance();
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSource();
