@@ -132,6 +132,9 @@ public class CBackendImpl extends AbstractBackend {
 				}
 
 				list.add(instance);
+			} else {
+				write("Warning: The instance '" + instance.getId()
+						+ "' is not mapped.\n");
 			}
 		}
 
