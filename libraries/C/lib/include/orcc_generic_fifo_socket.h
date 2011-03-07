@@ -104,7 +104,7 @@ DECL T *FIFO_SOCKET_READ(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, unsigned i
 
 DECL void FIFO_SOCKET_READ_END(T)(struct FIFO_SOCKET_S(T) *fifo, unsigned int reader_id, unsigned int n) {
 	fifo->read_inds[0] += n;
-	memmove(fifo->contents, &fifo->contents[fifo->read_inds[0]], fifo->read_inds[0] * sizeof(T));
+	memmove(fifo->contents, &fifo->contents[fifo->read_inds[0]], (fifo->write_ind - fifo->read_inds[0]) * sizeof(T));
 	fifo->write_ind -= fifo->read_inds[0];
 	fifo->read_inds[0] = 0;
 }
@@ -131,7 +131,6 @@ DECL void FIFO_SOCKET_WRITE_END(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer, uns
 		if(ret > 0) {
 			nbBytesWritten = send(fifo->Sock, (char *) fifo->contents, (fifo->size/2) * sizeof(T), 0);
 			if(nbBytesWritten == -1) {
-				//will be managed when socket we will have unblocked read.
 				fprintf(stderr,"socket_WriteData() : error.\n");
 				exit(-10);
 			}
