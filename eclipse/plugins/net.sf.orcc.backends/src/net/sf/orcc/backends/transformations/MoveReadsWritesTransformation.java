@@ -31,16 +31,11 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.backends.instructions.ReadEnd;
-import net.sf.orcc.backends.instructions.WriteEnd;
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
 
 /**
  * This class defines a transformation that move writes to the beginning of an
@@ -53,60 +48,27 @@ import net.sf.orcc.ir.nodes.IfNode;
  */
 public class MoveReadsWritesTransformation extends AbstractActorVisitor {
 
-	private List<Instruction> readEnds;
-
 	private List<Instruction> writes;
 
 	public MoveReadsWritesTransformation() {
 		writes = new ArrayList<Instruction>();
-		readEnds = new ArrayList<Instruction>();
 	}
 
 	@Override
 	public void visit(Procedure procedure) {
 		super.visit(procedure);
 
-		List<CFGNode> nodes = procedure.getNodes();
-
 		// add writes at the beginning of the node list, and read at the ends
 		BlockNode.getFirst(procedure).getInstructions().addAll(0, writes);
 
-		// Put readend nodes before last instruction in the last block.
-		// In the general case the last block is expected to contain a return
-		// instruction in functions/procedures and actions.
-		// HOWEVER (this is something that we should change in the front-end),
-		// the last block is expected to be empty in isSchedulable functions,
-		// thus the "numInstructions > 0" test.
-		BlockNode block;
-		CFGNode last = nodes.get(nodes.size() - 1);
-		if (last instanceof BlockNode) {
-			block = (BlockNode) last;
-		} else if (last instanceof IfNode) {
-			block = ((IfNode) last).getJoinNode();
-		} else {
-			block = new BlockNode(procedure);
-			nodes.add(block);
-		}
-
-		List<Instruction> instructions = block.getInstructions();
-		int numInstructions = instructions.size();
-		instructions.addAll(numInstructions > 0 ? numInstructions - 1 : 0,
-				readEnds);
-
 		// clears the lists
 		writes.clear();
-		readEnds.clear();
-	}
-
-	@Override
-	public void visit(Read read) {
-		readEnds.add(new ReadEnd(read));
 	}
 
 	@Override
 	public void visit(Write write) {
 		writes.add(write);
-		itInstruction.set(new WriteEnd(write));
+		itInstruction.remove();
 	}
 
 }
