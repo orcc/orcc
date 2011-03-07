@@ -95,7 +95,6 @@ public class CBackendImpl extends AbstractBackend {
 	private DirectedGraph<String, StringAttribute> mediumGraph;
 	private boolean merge;
 	private boolean merger2;
-	private boolean needPthreads;
 	private boolean newScheduler;
 	private boolean normalize;
 	private int threadsNb;
@@ -164,18 +163,15 @@ public class CBackendImpl extends AbstractBackend {
 
 		if (codesign) {
 			options.put("threadsNb", 1);
-
 		} else {
-
-			needPthreads = (instancesTarget.keySet().size() > 1);
-
 			if (dynamicMapping) {
 				options.put("needDynamicMapping", dynamicMapping);
 				options.put("threadsNb", threadsNb);
 			} else {
-				options.put("needPthreads", needPthreads);
-				options.put("threads", instancesTarget);
-				options.put("threadsNb", instancesTarget.size());
+				if (instancesTarget != null) {
+					options.put("threads", instancesTarget);
+					options.put("threadsNb", instancesTarget.size());
+				}
 			}
 		}
 
@@ -279,7 +275,14 @@ public class CBackendImpl extends AbstractBackend {
 			NetworkPrinter printer = new NetworkPrinter("C_network");
 			printer.setTypePrinter(CTypePrinter.class);
 
-			computeMapping(workingNetwork);
+			instancesTarget = null;
+			for (String mappedThing : mapping.values()) {
+				if (!mappedThing.isEmpty()) {
+					computeMapping(workingNetwork);
+					break;
+				}
+			}
+
 			computeOptions(printer.getOptions());
 
 			if (codesign) {
@@ -306,7 +309,6 @@ public class CBackendImpl extends AbstractBackend {
 
 	private void printCMake(Network network) {
 		NetworkPrinter networkPrinter = new NetworkPrinter("C_CMakeLists");
-		networkPrinter.getOptions().put("needPthreads", needPthreads);
 		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
 	}
 

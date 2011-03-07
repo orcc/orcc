@@ -387,9 +387,9 @@ void *scheduler(void *data) {
 			printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
 			<if (options.newScheduler)>
-			if (si.reason == full <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
+			if (si.reason == full <if(options.threads)>&& si.num_firings \>0<endif>) {
 				sched_add_successors(sched, my_actor, si.ports);
-			} else if (si.reason == starved <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
+			} else if (si.reason == starved <if(options.threads)>&& si.num_firings \>0<endif>) {
 				sched_add_predecessors(sched, my_actor, si.ports);
 			}
 			<endif>
@@ -409,9 +409,9 @@ void *scheduler(void *data) {
 		printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
 		<if (options.newScheduler)>
-		if (si.reason == full <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
+		if (si.reason == full <if(options.threads)>&& si.num_firings \>0<endif>) {
 			sched_add_successors(sched, my_actor, si.ports);
-		} else if (si.reason == starved <if(options.needPthreads)>&& si.num_firings \>0<endif>) {
+		} else if (si.reason == starved <if(options.threads)>&& si.num_firings \>0<endif>) {
 			sched_add_predecessors(sched, my_actor, si.ports);
 		}
 		<endif>
@@ -489,14 +489,14 @@ network(network, options) ::= <<
 <printMediumInclude(network.templateData.allMediumsAllInstances)>
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
-<if (options.needPthreads || options.needDynamicMapping)>
+<if (options.threads || options.needDynamicMapping)>
 #include "orcc_thread.h"
 <endif>
 <if(options.needDynamicMapping)>
 #include "orcc_genetic.h"
 <endif>
 
-<if (options.needPthreads || options.needDynamicMapping)>
+<if (options.threads || options.needDynamicMapping)>
 #define THREAD_NB <options.threadsNb>
 <endif>
 <if(options.needDynamicMapping)>
@@ -551,7 +551,7 @@ network(network, options) ::= <<
 
 <fillActorsStructs(network.instances)>
 
-<if(options.needPthreads)>
+<if(options.threads)>
 <options.threads.keys: {th | <declareActorsArray(instances=options.threads.(th),thread=th)>}; separator="\n">
 
 struct actor_s **actors[] = {<options.threads.keys: {th | actors_<th>}; separator=", ">};
@@ -579,7 +579,7 @@ extern int clean_cache(int size);
 <printInitializes(network.instances)>
 
 static void launcher() {
-<if(options.needDynamicMapping || options.needPthreads)>
+<if(options.needDynamicMapping || options.threads)>
 	int i;
 	
 	cpu_set_t cpuset; 
