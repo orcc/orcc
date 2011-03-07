@@ -236,8 +236,11 @@ public class ActorMerger {
 		initializes.addAll(clone.getInitializes());
 
 		// Merge MoCs
-		MoC candidateMoC = candidate.getMoC();
-		moc = (MoC) candidateMoC.accept(new MoCMerger(moc, rate, toKeep));
+		MoC cloneMoC = clone.getMoC();
+		moc = (MoC) cloneMoC.accept(new MoCMerger(moc, rate, toKeep));
+
+		// Create corresponding action scheduler
+		scheduler = (ActionScheduler) moc.accept(new SchedulerMerger());
 	}
 
 	/**

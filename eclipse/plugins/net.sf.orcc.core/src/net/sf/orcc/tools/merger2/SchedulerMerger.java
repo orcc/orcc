@@ -28,69 +28,34 @@
  */
 package net.sf.orcc.tools.merger2;
 
-import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
+import java.util.ArrayList;
+
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ActionScheduler;
+import net.sf.orcc.ir.FSM;
 import net.sf.orcc.moc.AbstractMoCInterpreter;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.moc.MoC;
-import net.sf.orcc.moc.SDFMoC;
-import net.sf.orcc.util.OrderedMap;
 
 /**
- * This class defines a transformation that merge to MoC.
+ * This class defines a transformation that take a MoC as input and returns the
+ * corresponding ActionScheduler.
  * 
  * @author Jerome Gorin
  * 
  */
-public class MoCMerger extends AbstractMoCInterpreter {
-	private CSDFMoC mergedMoC;
-	private OrderedMap<String, Port> ports;
-	private int rate;
-
-	public MoCMerger(MoC moc, int rate, OrderedMap<String, Port> ports) {
-		if (!moc.isCSDF()) {
-			throw new OrccRuntimeException(
-					"Only SDF/CSDF actors are allowed in merger 2");
-		}
-
-		mergedMoC = (CSDFMoC) moc;
-		this.ports = ports;
-		this.rate = rate;
-	}
+public class SchedulerMerger extends AbstractMoCInterpreter {
 
 	@Override
 	public Object interpret(CSDFMoC moc, Object... args) {
-		// Merge the two CSDF
-		for (int i = 0; i < rate; i++){
-			mergedMoC.addActions(moc.getActions());
-			mergedMoC.setNumberOfPhases(mergedMoC.getNumberOfPhases()
-					+ moc.getNumberOfPhases());
+		FSM fsm = new FSM();
+		int stateId = 0;
 		
-			updatePattern(mergedMoC.getInputPattern(), moc.getInputPattern());
-			updatePattern(mergedMoC.getOutputPattern(), moc.getOutputPattern());
+		fsm.setInitialState("s"+stateId);
+		
+		for (Action action : moc.getActions()){
+			fsm.addTransition("s"+stateId, action, "s"+ stateId++);
 		}
-
-		return mergedMoC;
-	}
-
-	@Override
-	public Object interpret(SDFMoC moc, Object... args) {
-		return this.interpret((CSDFMoC) moc);
-	}
-
-	private void updatePattern(Pattern source, Pattern candidate) {
-		for (Port port : candidate.getPorts()) {
-			if (ports.contains(port.getName())) {
-				// Port has to be kept, update pattern
-				Integer tokens = candidate.getNumTokens(port);
-
-				if (source.contains(port)) {
-					tokens = tokens + source.getNumTokens(port);
-				}
-
-				source.setNumTokens(port, tokens);
-			}
-		}
+		
+		return new ActionScheduler(new ArrayList<Action>(), fsm);
 	}
 }
