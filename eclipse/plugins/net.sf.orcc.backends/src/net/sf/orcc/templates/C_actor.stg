@@ -159,12 +159,21 @@ else
 endif>
 >>
 
+getPort(variable) ::= <<
+<if (action.inputPattern.inverseVariableMap.(variable))
+><action.inputPattern.inverseVariableMap.(variable).name><
+else
+><action.outputPattern.inverseVariableMap.(variable).name><
+endif>
+>>
+
 printLoad(load) ::= <<
 
-<if (load.source.variable.port && !load.indexes.empty)
-><load.target> = tokens_<load.source.variable.instruction.port.name>[(index_<load.source.variable.instruction.port.name> + <first(load.indexes)>) % SIZE_<load.source.variable.instruction.port.name>];<
+<if (action.inputPattern.inverseVariableMap.(load.source.variable) || action.outputPattern.inverseVariableMap.(load.source.variable))
+><load.target> = tokens_<getPort(load.source.variable)>[(index_<getPort(load.source.variable)> + <first(load.indexes)>) % SIZE_<getPort(load.source.variable)>];<
 else
-><load.target> = <load.source><load.indexes : {index | [<index>]}>;<endif>
+><load.target> = <load.source><load.indexes : {index | [<index>]}>;<
+endif>
 >>
 
 printPeek(peek) ::= ""
@@ -193,10 +202,11 @@ endif>
 
 printStore(store) ::= <<
 
-<if (store.target.port && !store.indexes.empty)
->tokens_<store.target.instruction.port.name>[(index_<store.target.instruction.port.name> + <first(store.indexes)>) % SIZE_<store.target.instruction.port.name>] = <store.value>;<
+<if (action.inputPattern.inverseVariableMap.(store.target) || action.outputPattern.inverseVariableMap.(store.target))
+>tokens_<getPort(store.target)>[(index_<getPort(store.target)> + <first(store.indexes)>) % SIZE_<getPort(store.target)>] = <store.value>;<
 else
-><store.target><store.indexes : {index | [<index>]}> = <store.value>;<endif>
+><store.target><store.indexes : {index | [<index>]}> = <store.value>;<
+endif>
 >>
 
 printWrite(write) ::= ""

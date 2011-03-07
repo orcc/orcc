@@ -48,6 +48,8 @@ public class Pattern {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private Map<Variable, Port> inverseVariableMap;
+
 	private Map<Port, Integer> numTokensMap;
 
 	private Map<Port, Variable> peekedMap;
@@ -61,13 +63,15 @@ public class Pattern {
 		numTokensMap = new LinkedHashMap<Port, Integer>();
 		peekedMap = new LinkedHashMap<Port, Variable>();
 		variableMap = new LinkedHashMap<Port, Variable>();
+		inverseVariableMap = new LinkedHashMap<Variable, Port>();
 	}
 
 	public Pattern(int initialCapacity) {
 		ports = new ArrayList<Port>(initialCapacity);
 		numTokensMap = new LinkedHashMap<Port, Integer>(initialCapacity);
-		variableMap = new LinkedHashMap<Port, Variable>(initialCapacity);
 		peekedMap = new LinkedHashMap<Port, Variable>(initialCapacity);
+		variableMap = new LinkedHashMap<Port, Variable>(initialCapacity);
+		inverseVariableMap = new LinkedHashMap<Variable, Port>(initialCapacity);
 	}
 
 	/**
@@ -91,6 +95,7 @@ public class Pattern {
 		numTokensMap.clear();
 		peekedMap.clear();
 		variableMap.clear();
+		inverseVariableMap.clear();
 	}
 
 	/**
@@ -101,7 +106,11 @@ public class Pattern {
 	 * @return <code>true</code> if this pattern contains the given port
 	 */
 	public boolean contains(Port port) {
-		return (ports.contains(port));
+		return ports.contains(port);
+	}
+
+	public Map<Variable, Port> getInverseVariableMap() {
+		return inverseVariableMap;
 	}
 
 	/**
@@ -221,6 +230,12 @@ public class Pattern {
 		numTokensMap.remove(port);
 		peekedMap.remove(port);
 		variableMap.remove(port);
+
+		for (Entry<Variable, Port> entry : inverseVariableMap.entrySet()) {
+			if (entry.getValue() == port) {
+				inverseVariableMap.remove(entry.getKey());
+			}
+		}
 	}
 
 	/**
@@ -233,7 +248,7 @@ public class Pattern {
 	 */
 	public void setNumTokens(Port port, int numTokens) {
 		checkPortPresence(port);
-		this.numTokensMap.put(port, numTokens);
+		numTokensMap.put(port, numTokens);
 	}
 
 	/**
@@ -246,7 +261,8 @@ public class Pattern {
 	 */
 	public void setPeeked(Port port, Variable peeked) {
 		checkPortPresence(port);
-		this.peekedMap.put(port, peeked);
+		peekedMap.put(port, peeked);
+		inverseVariableMap.put(peeked, port);
 	}
 
 	/**
@@ -261,7 +277,8 @@ public class Pattern {
 	 */
 	public void setVariable(Port port, Variable variable) {
 		checkPortPresence(port);
-		this.variableMap.put(port, variable);
+		variableMap.put(port, variable);
+		inverseVariableMap.put(variable, port);
 	}
 
 }
