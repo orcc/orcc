@@ -125,8 +125,8 @@ public class SDFCompositionAnalyzer {
 		}
 
 		// Merging is consistent set number of repetition of each vertex
-		staticGraph.setRepetitionFactor(source, rational.getNumerator(),
-				target, rational.getDenominator());
+		staticGraph.setRepetitionFactor(source, rational.getDenominator(),
+				target, rational.getNumerator());
 		return true;
 	}
 
