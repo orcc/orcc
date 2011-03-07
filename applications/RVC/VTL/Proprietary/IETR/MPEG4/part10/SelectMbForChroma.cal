@@ -28,6 +28,13 @@ actor SelectMbForChroma ()
 	uint(size=8)  MbOut
 		:
 
+	uint(size=16) mbType;
+
+	GetMbType: action Mb_Type :[valMbType] ==>
+	do
+		mbType := valMbType;
+	end
+
   /*
 	GetIntra4x4:action X0:[x] repeat 8*8 ==> X:[x] repeat 8*8
 	guard
@@ -35,30 +42,38 @@ actor SelectMbForChroma ()
 	end
   */
 	GetIntra16x16:action
-			Mb_Type     :[MbType],
 			MbFromIntra :[x] repeat 64
 				==>
 			MbOut       :[x] repeat 64 
 		guard
-			MbType <= BLOCK_TYPE_INTRA_MAX,
-			MbType != BLOCK_TYPE_I_PCM
+			mbType <= BLOCK_TYPE_INTRA_MAX,
+			mbType != BLOCK_TYPE_I_PCM
 		end
   
-	GetInter:action
-			Mb_Type     :[MbType],
+	GetInter: action
 			MbFromInter :[x] repeat 64
 				==>
 			MbOut       :[x] repeat 64
 		guard
-	    	MbType > BLOCK_TYPE_INTRA_MAX
+	    	mbType > BLOCK_TYPE_INTRA_MAX
 		end
 	
 	GetPCM: action
-			Mb_Type   :[MbType],
 			MbFromPcm :[x] repeat 64
 				==>
 			MbOut     :[x] repeat 64
 		guard
-			MbType = BLOCK_TYPE_I_PCM
+			mbType = BLOCK_TYPE_I_PCM
 		end
+
+	schedule fsm GetMbType:
+		GetMbType (GetMbType )--> GetMacroBlock;
+
+		GetMacroBlock (GetIntra16x16 )--> GetMbType;
+		GetMacroBlock (GetInter )--> GetMbType;
+		GetMacroBlock (GetPCM )--> GetMbType;
+	end
+	priority
+		GetInter > GetIntra16x16 > GetPCM;
+	end
 end
