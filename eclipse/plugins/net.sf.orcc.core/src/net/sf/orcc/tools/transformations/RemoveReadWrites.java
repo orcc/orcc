@@ -64,14 +64,12 @@ public class RemoveReadWrites extends AbstractActorVisitor {
 		if (read.getTarget() != null) {
 			read.getTarget().removeUse(read);
 		}
-		read.getPort().removeUse(read);
 		itInstruction.remove();
 	}
 
 	@Override
 	public void visit(Write write) {
 		write.getTarget().removeUse(write);
-		write.getPort().removeUse(write);
 		itInstruction.remove();
 	}
 

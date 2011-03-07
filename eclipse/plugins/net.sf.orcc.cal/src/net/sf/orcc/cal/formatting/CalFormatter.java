@@ -51,7 +51,6 @@ import net.sf.orcc.cal.services.CalGrammarAccess.AstStatementWhileElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstTypeIntElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstTypeListElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstTypeUintElements;
-import net.sf.orcc.cal.services.CalGrammarAccess.AstUnitElements;
 
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.formatting.impl.AbstractDeclarativeFormatter;

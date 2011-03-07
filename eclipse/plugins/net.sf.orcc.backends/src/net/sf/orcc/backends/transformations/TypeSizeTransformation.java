@@ -30,6 +30,7 @@ package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
@@ -46,6 +47,12 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class TypeSizeTransformation extends AbstractActorVisitor {
+
+	private void checkPorts(OrderedMap<String, Port> ports) {
+		for (Port port : ports) {
+			checkType(port.getType());
+		}
+	}
 
 	private void checkType(Type type) {
 		int size;
@@ -86,8 +93,8 @@ public class TypeSizeTransformation extends AbstractActorVisitor {
 	public void visit(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
-		checkVariables(actor.getInputs());
-		checkVariables(actor.getOutputs());
+		checkPorts(actor.getInputs());
+		checkPorts(actor.getOutputs());
 
 		super.visit(actor);
 	}

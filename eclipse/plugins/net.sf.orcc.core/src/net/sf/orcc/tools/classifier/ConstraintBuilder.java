@@ -40,6 +40,9 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
@@ -399,7 +402,13 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 
 	@Override
 	public void visit(Peek peek) {
-		associateVariable(peek.getTarget(), peek.getPort());
+		Variable source = variables.get(peek.getTarget());
+		if (source == null) {
+			Port port = peek.getPort();
+			source = new LocalVariable(true, 0, new Location(), port.getName(),
+					port.getType());
+			variables.put(peek.getTarget(), source);
+		}
 	}
 
 	/**

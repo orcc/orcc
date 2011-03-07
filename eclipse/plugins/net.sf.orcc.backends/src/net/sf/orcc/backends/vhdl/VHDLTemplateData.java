@@ -81,9 +81,8 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Peek node) {
-		Variable port = node.getPort();
-		String name = port.getName() + "_data";
+	public void visit(Peek peek) {
+		String name = peek.getPort().getName() + "_data";
 		strings.add(name);
 	}
 

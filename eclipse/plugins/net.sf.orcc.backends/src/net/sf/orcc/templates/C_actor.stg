@@ -88,7 +88,7 @@ finished:
 }
 
 <endif>
-void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int fifo_<port>_id}; separator=", ">) {
+void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int fifo_<port.name>_id}; separator=", ">) {
 	<if(instance.actor.initializes)>
 	struct schedinfo_s si;
 	si.num_firings = 0;
@@ -103,7 +103,7 @@ void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int
 	<instance.actor.stateVars.list: initializeStateVar()>
 	
 	/* Initialize input FIFOs id */
-	<instance.actor.inputs.list: { port | fifo_<getPortName(port)>_id = fifo_<port>_id; }; separator="\n"> 
+	<instance.actor.inputs.list: { port | fifo_<getPortName(port)>_id = fifo_<port.name>_id; }; separator="\n"> 
 	<if(instance.actor.initializes)>
 	
 	/* Launch CAL initialize procedure */

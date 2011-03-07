@@ -35,7 +35,17 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public class Port extends Variable {
+public class Port {
+
+	/**
+	 * port location
+	 */
+	private Location location;
+
+	/**
+	 * port name
+	 */
+	private String name;
 
 	/**
 	 * the number of tokens consumed by this port.
@@ -48,6 +58,11 @@ public class Port extends Variable {
 	private int tokensProduced;
 
 	/**
+	 * port type
+	 */
+	private Type type;
+
+	/**
 	 * Creates a new port with the given location, type, and name.
 	 * 
 	 * @param location
@@ -58,7 +73,9 @@ public class Port extends Variable {
 	 *            the port name
 	 */
 	public Port(Location location, Type type, String name) {
-		super(location, type, name, true);
+		this.location = location;
+		this.type = type;
+		this.name = name;
 	}
 
 	/**
@@ -67,6 +84,24 @@ public class Port extends Variable {
 	 */
 	public Port(Port port) {
 		this(port.getLocation(), port.getType(), port.getName());
+	}
+
+	/**
+	 * Returns the location of this port.
+	 * 
+	 * @return the location of this port
+	 */
+	public Location getLocation() {
+		return location;
+	}
+
+	/**
+	 * Returns the name of this port.
+	 * 
+	 * @return the name of this port
+	 */
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -85,6 +120,15 @@ public class Port extends Variable {
 	 */
 	public int getNumTokensProduced() {
 		return tokensProduced;
+	}
+
+	/**
+	 * Returns the type of this port.
+	 * 
+	 * @return the type of this port
+	 */
+	public Type getType() {
+		return type;
 	}
 
 	/**
@@ -133,6 +177,31 @@ public class Port extends Variable {
 	 */
 	public void resetTokenProduction() {
 		tokensProduced = 0;
+	}
+
+	/**
+	 * Sets the name of this port.
+	 * 
+	 * @param name
+	 *            the new name of this port
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * Sets the type of this port.
+	 * 
+	 * @param type
+	 *            the new type of this port
+	 */
+	public void setType(Type type) {
+		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 
 }

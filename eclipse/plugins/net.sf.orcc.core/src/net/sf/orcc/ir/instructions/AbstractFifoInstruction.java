@@ -117,13 +117,7 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 	 *            the port used by this FIFO operation
 	 */
 	public void setPort(Port port) {
-		if (this.port != null) {
-			this.port.removeUse(this);
-		}
 		this.port = port;
-		if (port != null) {
-			port.addUse(this);
-		}
 	}
 
 	@Override

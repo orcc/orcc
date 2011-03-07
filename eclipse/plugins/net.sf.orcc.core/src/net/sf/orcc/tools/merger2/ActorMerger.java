@@ -49,7 +49,6 @@ import net.sf.orcc.ir.serialize.IRCloner;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.util.MultiMap;
 import net.sf.orcc.util.OrderedMap;
 
