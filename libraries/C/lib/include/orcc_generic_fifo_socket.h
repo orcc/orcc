@@ -40,7 +40,7 @@ DECL int FIFO_SOCKET_GET_NUM_TOKENS(T)(struct FIFO_SOCKET_S(T) *fifo, unsigned i
 }*/
 
 DECL int FIFO_SOCKET_HAS_ROOM(T)(struct FIFO_SOCKET_S(T) *fifo, unsigned int n) {
-	// Code of write_end :(
+
 	if(fifo->write_ind >= fifo->size/2) {
 		int ret;
 		int nbBytesWritten;
@@ -66,6 +66,32 @@ DECL int FIFO_SOCKET_HAS_ROOM(T)(struct FIFO_SOCKET_S(T) *fifo, unsigned int n) 
 	return (fifo->size - fifo->write_ind) >=n;
 }
 
+DECL int FIFO_SOCKET_GET_ROOM(T)(struct FIFO_SOCKET_S(T) *fifo) {
+
+	if(fifo->write_ind >= fifo->size/2) {
+		int ret;
+		int nbBytesWritten;
+		struct timeval timeout = { 1, 0 };
+
+		ret = select(fifo->Sock + 1, NULL,  &(fifo->fdset), NULL, &timeout);
+		if(ret < 0)
+		{
+			fprintf(stderr,"socket_WriteData() : error.\n");
+			exit(-10);
+		}
+		if(ret > 0) {
+			nbBytesWritten = send(fifo->Sock, (char *) fifo->contents, (fifo->size/2) * sizeof(T), 0);
+			if(nbBytesWritten == -1) {
+				//will be managed when socket we will have unblocked read.
+				fprintf(stderr,"socket_WriteData() : error.\n");
+				exit(-10);
+			}
+			memmove(fifo->contents, &(fifo->contents[nbBytesWritten / sizeof(T)]), nbBytesWritten);
+			fifo->write_ind -= nbBytesWritten / sizeof(T);
+		}
+	}
+	return fifo->size - fifo->write_ind;
+}
 /*
 DECL T *FIFO_SOCKET_PEEK(T)(struct FIFO_SOCKET_S(T) *fifo, T *buffer,unsigned int reader_id, unsigned int n) {
 	return fifo->contents;
