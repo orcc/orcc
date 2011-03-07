@@ -24,52 +24,39 @@ actor Algo_RefIdxtoPOC()
 	uint(size=32) FrameToRead
 		:
 
-	List(type:uint(size=32), size=16) RefPoc;
-	List(type:uint(size=32), size=16) RefFrameNum;
-
+	uint(size=32) RefFrameNum[16];
 	uint(size=6)  SizeList;
 	uint(size=6)  CountRead;
 
 	SendIdxAsked: action
-			NewList   :[ IsNewPic ],
-			RefIdx    :[ ListIdx  ]
-				==>
-			FrameToRead :[RefFrameNum[ListIdx & 15]]
-		guard
-			not IsNewPic
-		var
-			uint(size=32) ValPoc
-		do
-			ValPoc := RefPoc[ListIdx & 15];
-		end
+		NewList   :[ IsNewPic ],
+		RefIdx    :[ ListIdx  ]
+			==>
+		FrameToRead :[RefFrameNum[ListIdx & 15]]
+	guard
+		not IsNewPic
+	end
 
 
-	NewListAsked: action
-			NewList :[ IsNewPic ]
-				==>
-		guard
-			IsNewPic
-		end
+	NewListAsked: action NewList :[ IsNewPic ] ==>
+	guard
+		IsNewPic
+	end
 
-	ReadSizeList: action 
-			RefList :[ SizeRefList ]
-				==>
-		do
-			SizeList  := SizeRefList;
-			CountRead := 0;
-		end
+	ReadSizeList: action RefList :[ SizeRefList ] ==>
+	do
+		SizeList  := SizeRefList;
+		CountRead := 0;
+	end
 
 
-	ReadRefList: action
-			RefList :[ PocList , FrameNum]
-				==>
-		guard
-			CountRead < SizeList
-		do
-			RefPoc[CountRead]      := PocList;
-			RefFrameNum[CountRead] := FrameNum;
-			CountRead              := CountRead + 1;
-		end
+	ReadRefList: action RefList :[FrameNum] ==>
+	guard
+		CountRead < SizeList
+	do
+		RefFrameNum[CountRead] := FrameNum;
+		CountRead              := CountRead + 1;
+	end
 
 
 	ReadRefListDone: action ==>

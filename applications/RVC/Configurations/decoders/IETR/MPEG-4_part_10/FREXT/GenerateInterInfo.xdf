@@ -393,10 +393,6 @@
     <Connection dst="" dst-port="ReadAddress_c" src="Mgnt_InterPred" src-port="ReadAddr_c"/>
     <Connection dst="" dst-port="SelectList" src="MVReconstruct" src-port="SelectList"/>
     <Connection dst="" dst-port="FrameToRead" src="SelectRefIdx" src-port="PocToRead"/>
-    <Connection dst="SelectRefIdx" dst-port="NewPic_l0"
-        src="MVReconstruct" src-port="NewListL0"/>
-    <Connection dst="SelectRefIdx" dst-port="NewPic_l1"
-        src="MVReconstruct" src-port="NewListL1"/>
     <Connection dst="" dst-port="Read4MbPred" src="SelectRefIdx" src-port="Read4MbPred"/>
     <Connection dst="" dst-port="DelList" src="MMCO" src-port="DelList"/>
     <Connection dst="MVReconstruct" dst-port="DelList" src="MMCO" src-port="DelList"/>
@@ -443,4 +439,8 @@
         src="RefIdxL0ToPoc" src-port="FrameToRead"/>
     <Connection dst="SelectRefIdx" dst-port="FrameToReadL1"
         src="RefIdxL1ToPoc" src-port="FrameToRead"/>
+    <Connection dst="SelectRefIdx" dst-port="NewPicL0"
+        src="MVReconstruct" src-port="NewListL0"/>
+    <Connection dst="SelectRefIdx" dst-port="NewPicL1"
+        src="MVReconstruct" src-port="NewListL1"/>
 </XDF>

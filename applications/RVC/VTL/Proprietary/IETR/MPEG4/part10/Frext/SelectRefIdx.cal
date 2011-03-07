@@ -22,8 +22,8 @@ actor SelectRefIdx()
 	uint(size=2)  SelectList,
 	uint(size=32) FrameToReadL0,
 	uint(size=32) FrameToReadL1,
-	bool          NewPic_l0,
-	bool          NewPic_l1
+	bool          NewPicL0,
+	bool          NewPicL1
 		==>
 	uint(size=32) PocToRead,
 	bool          Read4MbPred
@@ -32,7 +32,7 @@ actor SelectRefIdx()
 	SendPocToRead.L0: action
 			SelectList    :[list_selected],
 			FrameToReadL0 :[FrameNum0],
-			NewPic_l0     :[is_new_pic_l0]
+			NewPicL0     :[is_new_pic_l0]
 				==>
 			PocToRead   :[FrameNum0],
 			Read4MbPred :[true]
@@ -44,7 +44,7 @@ actor SelectRefIdx()
 	SendPocToRead.L1: action
 			SelectList    :[list_selected],
 			FrameToReadL1 :[FrameNum1],
-			NewPic_l1     :[is_new_pic_l1]
+			NewPicL1     :[is_new_pic_l1]
 				==>
 			PocToRead   :[FrameNum1],
 			Read4MbPred :[true]
@@ -57,8 +57,8 @@ actor SelectRefIdx()
 			SelectList    :[list_selected],
 			FrameToReadL0 :[FrameNum0],
 			FrameToReadL1 :[FrameNum1],
-			NewPic_l0     :[is_new_pic_l0],
-			NewPic_l1     :[is_new_pic_l1]
+			NewPicL0     :[is_new_pic_l0],
+			NewPicL1     :[is_new_pic_l1]
 				==>
 			PocToRead   :[FrameNum0, FrameNum1],
 			Read4MbPred :[true,true]
@@ -69,8 +69,8 @@ actor SelectRefIdx()
 		end
 
 	SendNewPoc: action
-			NewPic_l0 :[is_new_pic_l0],
-			NewPic_l1 :[is_new_pic_l1]
+			NewPicL0 :[is_new_pic_l0],
+			NewPicL1 :[is_new_pic_l1]
 				==>
 			Read4MbPred :[false]
 		guard

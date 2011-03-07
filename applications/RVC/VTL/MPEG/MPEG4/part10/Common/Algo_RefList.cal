@@ -506,13 +506,12 @@ actor Algo_RefList (bool DEBUG)
 	read_reordering_of_pic_nums_idc_0or1: action
 			RefReordering :[reordering_of_pic_nums_idc, abs_diff_pic_num_minus1]
 				==>
-			RefList:[poc , frame_num]
+			RefList:[frame_num]
 		guard 
 			(reordering_of_pic_nums_idc = 0 or reordering_of_pic_nums_idc = 1) 
 		var
 			uint(size=4)  ValidxRefList := 0,
 			bool          IsInRefList := false,
-			int (size=32) poc,
 			uint(size=31) frame_num,
 			int (size=32) ValMovedIdx  
 		do
@@ -547,8 +546,7 @@ actor Algo_RefList (bool DEBUG)
 				do
 					RefIdx[ValidxRefList - i] := RefIdx[ValidxRefList - i - 1];
 				end
-				//We send the Poc value of the next element
-				poc       := POCList[ValMovedIdx];
+				//We send the FrameNum of the next element
 				frame_num := FrameNumList[ValMovedIdx];
 				CounterRefListTab := CounterRefListTab + 1;
 			else
@@ -558,7 +556,6 @@ actor Algo_RefList (bool DEBUG)
 						ValMovedIdx    := i;
 					end
 				end
-				poc       := POCList[ValMovedIdx];
 				frame_num := FrameNumList[ValMovedIdx];
 				CounterRefListTab := CounterRefListTab + 1;
 				NumMaxListRefFrame := NumMaxListRefFrame - 1;
@@ -572,12 +569,11 @@ actor Algo_RefList (bool DEBUG)
 	read_reordering_of_pic_nums_idc_2: action
 			RefReordering:[reordering_of_pic_nums_idc, idx_LTList]
 				==>
-			RefList:[poc , frame_num]
+			RefList:[frame_num]
 		guard 
 			reordering_of_pic_nums_idc = 2
 		var
 			uint(size=4)  ValidxRefList := 0,
-			int (size=32) poc,
 			uint(size=31) frame_num
 		do
 			//Search the location of the reference picture in the RefList
@@ -598,7 +594,6 @@ actor Algo_RefList (bool DEBUG)
 			end
 
 			//We send the Poc value of the next element
-			poc       := POCList[ValLTList[idx_LTList]];
 			frame_num := FrameNumList[ValLTList[idx_LTList]];
 		//	println("RefListSent; FrNu:"+FrameNumList[ValLTList[idx_LTList]]+" Poc:"+POCList[ValLTList[idx_LTList]]);
 			CounterRefListTab := CounterRefListTab + 1;
@@ -617,14 +612,12 @@ actor Algo_RefList (bool DEBUG)
 	//Send the RefList
 	SendRefList: action 
 				==>
-			RefList:[poc , frame_num]
+			RefList:[frame_num]
 		guard
 			CounterRefListTab < NumMaxListRefFrame 
 		var
-			int (size = 32) poc,
 			uint(size = 31) frame_num
 		do
-			poc       := POCList[RefIdx[CounterRefListTab]];
 			frame_num := FrameNumList[RefIdx[CounterRefListTab]];
 			//println("RefListSent:"+FrameNumList[RefIdx[CounterRefListTab]]);
 			CounterRefListTab := CounterRefListTab + 1;
