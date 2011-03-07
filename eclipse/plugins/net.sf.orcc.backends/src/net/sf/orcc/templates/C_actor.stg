@@ -171,18 +171,18 @@ printPeek(peek) ::= ""
 
 printRead(read) ::= ""
 
-printReadEnd(readEnd) ::= <<
+printReadEnd(port, numTokens) ::= <<
 
 <if(options.enableTrace)>
 {
 	int i;
-	for (i = 0; i \< <readEnd.numTokens>; i++) {
-		fprintf(file_<readEnd.port.name>, "%<printFormatType(readEnd.port.type)>\n", tokens_<readEnd.port.name>[index_<readEnd.port.name> + i]);
+	for (i = 0; i \< <numTokens>; i++) {
+		fprintf(file_<port.name>, "%<printFormatType(port.type)>\n", tokens_<port.name>[index_<port.name> + i]);
 	}
 }
 
 <endif
->index_<readEnd.port.name> += <readEnd.numTokens>;
+>index_<port.name> += <numTokens>;
 >>
 
 printReturn(return) ::= <<
@@ -201,17 +201,18 @@ else
 
 printWrite(write) ::= ""
 
-printWriteEnd(writeEnd) ::= <<
+printWriteEnd(port, numTokens) ::= <<
+
 <if(options.enableTrace)>
 {
 	int i;
-	for (i = 0; i \< <writeEnd.numTokens>; i++) {
-		fprintf(file_<writeEnd.port.name>, "%<printFormatType(writeEnd.port.type)>\n", tokens_<writeEnd.port.name>[index_<writeEnd.port.name> + i]);
+	for (i = 0; i \< <numTokens>; i++) {
+		fprintf(file_<port.name>, "%<printFormatType(port.type)>\n", tokens_<port.name>[index_<port.name> + i]);
 	}
 }
 <endif>
 
-index_<writeEnd.port.name> += <writeEnd.numTokens>;
+index_<port.name> += <numTokens>;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -225,11 +226,9 @@ elseif (instr.call)><printCall(call=instr)><
 elseif (instr.load)><printLoad(load=instr)><
 elseif (instr.peek)><printPeek(peek=instr)><
 elseif (instr.read)><printRead(read=instr)><
-elseif (instr.readEnd)><printReadEnd(readEnd=instr)><
 elseif (instr.return)><printReturn(return=instr)><
 elseif (instr.store)><printStore(store=instr)><
 elseif (instr.write)><printWrite(write=instr)><
-elseif (instr.writeEnd)><printWriteEnd(writeEnd=instr)><
 endif>}>
 >>
 
@@ -272,7 +271,7 @@ while (<whileNode.value>) {
 printProcedure(procedure) ::= <<
 <if(!procedure.native)>
 
-static <procedure.returnType> <procedure>(<
+static <procedure.returnType> <procedure.name>(<
   procedure.parameters.list: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">) {
 <if(procedure.locals.list)>
 	<procedure.locals.list: {local | <varDecl(variable=local,sep=";\n")>}>
@@ -288,7 +287,16 @@ static <procedure.returnType> <procedure>(<
 ///////////////////////////////////////////////////////////////////////////////
 
 printAction(action) ::= <<
-<printProcedure(action.body)><printProcedure(action.scheduler)>
+static void <action.body.name>() {
+<if(action.body.locals.list)>
+	<action.body.locals.list: {local | <varDecl(variable=local,sep=";\n")>}>
+<endif>
+	<printNodes(action.body.nodes)>
+	<action.inputPattern.keys: { port |<printReadEnd(port=port, numTokens=action.inputPattern.(port))>}>
+	<action.outputPattern.keys: { port |<printWriteEnd(port=port, numTokens=action.outputPattern.(port))>}>
+}
+
+<printProcedure(action.scheduler)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -155,9 +155,6 @@ m_avails[<actor.simpleName>_<read.port>] -= <read.numTokens>;
 <endif>
 >>
 
-printReadEnd(readEnd) ::= <<
->>
-
 printReturn(return) ::= <<
 
 <if(return.value)>
@@ -183,10 +180,6 @@ m_rooms[<actor.simpleName>_<write.port>] -= <write.numTokens>;
 
 >>
 
-printWriteEnd(writeEnd) ::= <<
-
->>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
@@ -202,11 +195,9 @@ elseif (instr.call)><printCall(call=instr)><
 elseif (instr.load)><printLoad(load=instr)><
 elseif (instr.peek)><printPeek(peek=instr)><
 elseif (instr.read)><printRead(read=instr)><
-elseif (instr.readEnd)><printReadEnd(readEnd=instr)><
 elseif (instr.return)><printReturn(return=instr)><
 elseif (instr.store)><printStore(store=instr)><
 elseif (instr.write)><printWrite(write=instr)><
-elseif (instr.writeEnd)><printWriteEnd(writeEnd=instr)><
 endif>}>
 >>
 

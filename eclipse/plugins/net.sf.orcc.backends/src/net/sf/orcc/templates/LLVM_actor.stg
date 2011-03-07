@@ -274,33 +274,6 @@ Write(write) ::= <<
 
 >>
 
-HasRoom(result, action, port, numToken) ::= <<
-
-%<port>_<action> = <LoadOp(ty=fifoName(port), pointer={@<port>})>
-%<result>32 = <CallOp(ty="i32", fnptrval={fifo_<fifoType(port)>_has_room}, function_args={<fifoName(port)> %<port>_<action>, i32 <numToken>})>
-%<result> = trunc i32 %<result>32 to i1
->>
-
-HasTokens(hasTokens) ::= <<
-
-<LoadLocalPort(hasTokens)>
-%<hasTokens.target>32 = <CallOp(ty="i32", fnptrval={fifo_<fifoType(hasTokens.port)>_has_tokens}, function_args={<fifoName(hasTokens.port)> %local_<hasTokens.port><hasTokens.block.label>, i32 <hasTokens.numTokens>})>
-%<hasTokens.target> = trunc i32 %<hasTokens.target>32 to i1
->>
-
-WriteEnd(writeEnd) ::= <<
-
-%end_<writeEnd.port> = <LoadOp(ty=fifoName(writeEnd.port), pointer={@<writeEnd.port>})>
-<CallOp(ty ="void", fnptrval={fifo_<fifoType(writeEnd.port)>_write_end}, function_args={<fifoName(writeEnd.port)> %end_<writeEnd.port>, i32 <writeEnd.numTokens>})>
->>
-
-
-ReadEnd(readEnd) ::= <<
-
-%end_<readEnd.port> = <LoadOp(ty=fifoName(readEnd.port), pointer={@<readEnd.port>})>
-<CallOp(ty ="void", fnptrval={fifo_<fifoType(readEnd.port)>_read_end}, function_args={<fifoName(readEnd.port)> %end_<readEnd.port>, i32 <readEnd.numTokens>})>
->>
-
 Return(return) ::= <<
 
 <if(return.value)><

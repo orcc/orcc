@@ -138,16 +138,16 @@ printPeek(peek) ::= <<
 printRead(read) ::= <<
 
 <if (read.target)
->int <read.port>_Index = fifo_<read.port>.getReadIndex(<read.numTokens>);
-<read.target> = fifo_<read.port>.getReadArray(<read.numTokens>);<
+>int <read.port.name>_Index = fifo_<read.port.name>.getReadIndex(<read.numTokens>);
+<read.target> = fifo_<read.port.name>.getReadArray(<read.numTokens>);<
 else
->fifo_<read.port>.getReadIndex(<read.numTokens>);
-fifo_<read.port>.getReadArray(<read.numTokens>);<endif>
+>fifo_<read.port.name>.getReadIndex(<read.numTokens>);
+fifo_<read.port.name>.getReadArray(<read.numTokens>);<endif>
 >>
 
-printReadEnd(readEnd) ::= <<
+printReadEnd(port, numTokens) ::= <<
 
-fifo_<readEnd.port>.readEnd(<readEnd.numTokens>);
+fifo_<port.name>.readEnd(<numTokens>);
 >>
 
 printStore(store) ::= <<
@@ -161,13 +161,13 @@ else
 // write instruction
 printWrite(write) ::= <<
 
-<write.target> = fifo_<write.port>.getWriteArray(<write.numTokens>);
-int <write.port>_Index = fifo_<write.port>.getWriteIndex(<write.numTokens>);
+<write.target> = fifo_<write.port.name>.getWriteArray(<write.numTokens>);
+int <write.port>_Index = fifo_<write.port.name>.getWriteIndex(<write.numTokens>);
 >>
 
-printWriteEnd(writeEnd) ::= <<
+printWriteEnd(port, numTokens) ::= <<
 
-fifo_<writeEnd.port>.writeEnd(<writeEnd.numTokens>, <writeEnd.target>);
+fifo_<port.name>.writeEnd(<numTokens>, <port.name>);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,6 +185,19 @@ private <procedure.returnType> <procedure>(<procedure.parameters.list: {paramete
 }
 
 <endif>
+>>
+
+printAction(action) ::= <<
+private void <action.body.name>() {
+<if(action.body.locals.list)>
+	<action.body.locals.list: {local | <variableDeclarationInit(local)>;<\n>}>
+<endif>
+	<printNodes(action.body.nodes)>
+	<action.inputPattern.keys: { port |<printReadEnd(port=port, numTokens=action.inputPattern.(port))>}>
+	<action.outputPattern.keys: { port |<printWriteEnd(port=port, numTokens=action.outputPattern.(port))>}>
+}
+
+<printProcedure(action.scheduler)>
 >>
 
 
