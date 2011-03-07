@@ -292,8 +292,8 @@ static void <action.body.name>() {
 	<action.body.locals.list: {local | <varDecl(variable=local,sep=";\n")>}>
 <endif>
 	<printNodes(action.body.nodes)>
-	<action.inputPattern.keys: { port |<printReadEnd(port=port, numTokens=action.inputPattern.(port))>}>
-	<action.outputPattern.keys: { port |<printWriteEnd(port=port, numTokens=action.outputPattern.(port))>}>
+	<action.inputPattern.ports: { port |<printReadEnd(port=port, numTokens=action.inputPattern.numTokensMap.(port))>}>
+	<action.outputPattern.ports: { port |<printWriteEnd(port=port, numTokens=action.outputPattern.numTokensMap.(port))>}>
 }
 
 <printProcedure(action.scheduler)>
@@ -304,19 +304,19 @@ static void <action.body.name>() {
 ///////////////////////////////////////////////////////////////////////////////
 
 printOutputPatternPort(port) ::= <<
-if (index_<port.name> + <pattern.(port)> \> numFree_<port.name>) {
+if (index_<port.name> + <pattern.numTokensMap.(port)> \> numFree_<port.name>) {
 	ports |= 0x0<instance.actor.templateData.maskOutputs.(port)>;
 }
 >>
 
 printOutputPattern(pattern) ::= <<
 int ports = 0;
-<pattern.keys: printOutputPatternPort(); separator="\n">
+<pattern.ports: printOutputPatternPort(); separator="\n">
 if (ports != 0) {
 >>
 
 checkInputPattern(pattern) ::= <<
-<pattern.keys: { port | index_<port.name> + <pattern.(port)> \<= numTokens_<port.name> && }>
+<pattern.ports: { port | index_<port.name> + <pattern.numTokensMap.(port)> \<= numTokens_<port.name> && }>
 >>
 
 printReadTokensFunction(port) ::= <<
@@ -432,14 +432,14 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 >>
 
 printInputPatternPort(port) ::= <<
-if (index_<port.name> + <pattern.(port)> \> numTokens_<port.name>) {
+if (index_<port.name> + <pattern.numTokensMap.(port)> \> numTokens_<port.name>) {
 	ports |= 0x0<maskInputs.(port)>;
 }
 >>
 
 printTransitionPattern(pattern, maskInputs) ::= <<
 int ports = 0;
-<pattern.keys: printInputPatternPort(); separator="\n">
+<pattern.ports: printInputPatternPort(); separator="\n">
 si-\>num_firings = i;
 si-\>reason = starved;
 si-\>ports |= ports;
