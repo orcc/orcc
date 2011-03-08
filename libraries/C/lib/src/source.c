@@ -88,22 +88,19 @@ void source_active_genetic() {
 }
 
 void source_scheduler(struct schedinfo_s *si) {
-	unsigned char *ptr;
 	int i = 0;
 	int n;
 
 	if (!(stop && genetic)) {
-
 		while (fifo_i8_has_room(source_O, 1) && !(stop && genetic)) {
-			i8 source_O_buf[1];
-			ptr = fifo_i8_write(source_O, source_O_buf, 1);
-			n = fread(ptr, 1, 1, F);
+			unsigned char buf[1];
+			n = fread(&buf, 1, 1, F);
 			if (n < 1) {
 				if (feof(F)) {
 					rewind(F);
 					cnt = 0;
 					if (!genetic || (genetic && nb < LOOP_NUMBER)) {
-						n = fread(ptr, 1, 1, F);
+						n = fread(&buf, 1, 1, F);
 						nb++;
 					}
 					else{
@@ -114,7 +111,8 @@ void source_scheduler(struct schedinfo_s *si) {
 			}
 			i++;
 			cnt++;
-			fifo_i8_write_end(source_O, source_O_buf, 1);
+
+			fifo_i8_write_1(source_O, buf[0]);
 		}
 	}
 

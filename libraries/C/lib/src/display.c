@@ -166,7 +166,7 @@ void display_show_image(void) {
 	}
 }
 
-void display_write_mb(unsigned char tokens[384]) {
+void display_write_mb() {
 	int i, j, cnt, base;
 
 	//printf("display_write_mb (%i, %i)\n", m_x, m_y);
@@ -176,7 +176,7 @@ void display_write_mb(unsigned char tokens[384]) {
 
 	for (i = 0; i < 16; i++) {
 		for (j = 0; j < 16; j++) {
-			int tok = tokens[cnt];
+			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
 			int idx = base + i * m_width + j;
 			cnt++;
 			img_buf_y[idx] = tok;
@@ -186,7 +186,7 @@ void display_write_mb(unsigned char tokens[384]) {
 	base = m_y / 2 * m_width / 2 + m_x / 2;
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
-			int tok = tokens[cnt];
+			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
 			int idx = base + i * m_width / 2 + j;
 			cnt++;
 			img_buf_u[idx] = tok;
@@ -195,7 +195,7 @@ void display_write_mb(unsigned char tokens[384]) {
 
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
-			int tok = tokens[cnt];
+			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
 			int idx = base + i * m_width / 2 + j;
 			cnt++;
 			img_buf_v[idx] = tok;
@@ -320,30 +320,20 @@ void display_scheduler(struct schedinfo_s *si) {
 
 	while (1) {
 		if (fifo_i16_has_tokens(display_WIDTH, fifo_display_WIDTH_id, 1) && fifo_i16_has_tokens(display_HEIGHT, fifo_display_HEIGHT_id, 1)) {
-			short *ptr, width, height;
-			i16 display_WIDTH_buf[1], display_HEIGHT_buf[1];
-
-			ptr = fifo_i16_read(display_WIDTH, display_WIDTH_buf, fifo_display_WIDTH_id, 1);
-			width = ptr[0] * 16;
-			fifo_i16_read_end(display_WIDTH, fifo_display_WIDTH_id, 1);
-
-			ptr = fifo_i16_read(display_HEIGHT, display_HEIGHT_buf, fifo_display_HEIGHT_id, 1);
-			height = ptr[0] * 16;
-			fifo_i16_read_end(display_HEIGHT, fifo_display_HEIGHT_id, 1);
+			short width = fifo_i16_read_1(display_WIDTH, fifo_display_WIDTH_id) * 16;
+			short height = fifo_i16_read_1(display_HEIGHT, fifo_display_HEIGHT_id) * 16;
 
 			display_set_video(width, height);
 			i++;
 		}
 
 		if (fifo_i8_has_tokens(display_B, fifo_display_B_id, 384) && sizeinit) {
-			i8 display_B_buf[384];
 			if (!init) {
 				display_init();
 			}
 
-			display_write_mb(fifo_i8_read(display_B, display_B_buf, fifo_display_B_id, 384));
-			fifo_i8_read_end(display_B, fifo_display_B_id, 384);
-			i++;
+			display_write_mb();
+			i += 384;
 		} else {
 			break;
 		}

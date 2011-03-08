@@ -329,7 +329,7 @@ static void read_<port.name>() {
 }
 
 static void read_end_<port.name>() {
-	<getPortName(port)>-\>read_inds[fifo_<getPortName(port)>_id] = index_<port.name> % SIZE_<port.name>;
+	<getPortName(port)>-\>read_inds[fifo_<getPortName(port)>_id] = index_<port.name>;
 }
 >>
 
@@ -342,7 +342,7 @@ static void write_<port.name>() {
 }
 
 static void write_end_<port.name>() {
-	<getPortName(port)>-\>write_ind = index_<port.name> % SIZE_<port.name>;
+	<getPortName(port)>-\>write_ind = index_<port.name>;
 }
 >>
 
@@ -521,8 +521,8 @@ finished:
 <if(options.enableTrace)>
 	<printCloseFiles()>
 <endif>
-	read_end();
-	write_end();
+	<instance.actor.inputs.list: {port|read_end_<port.name>();}; separator="\n">
+	<instance.actor.outputs.list: {port|write_end_<port.name>();}; separator="\n">
 }
 
 >>
@@ -568,7 +568,7 @@ printFifoSize(size) ::= <<
 printInputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numTokens_<port.name>;
-#define SIZE_<port.name> (<printFifoSize(options.network.incomingMap.(instance).(port).size)> + 1)
+#define SIZE_<port.name> <printFifoSize(options.network.incomingMap.(instance).(port).size)>
 #define tokens_<port.name> <getPortName(port)>-\>contents
 
 
@@ -577,7 +577,7 @@ static unsigned int numTokens_<port.name>;
 printOutputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numFree_<port.name>;
-#define SIZE_<port.name> (<printFifoSize(first(options.network.outgoingMap.(instance).(port)).size)> + 1)
+#define SIZE_<port.name> <printFifoSize(first(options.network.outgoingMap.(instance).(port)).size)>
 #define tokens_<port.name> <getPortName(port)>-\>contents
 
 
@@ -641,16 +641,6 @@ instance(instance, options) ::= <<
 // Token functions
 <printTokensFunctions()>
 
-static void read_end() {
-	<instance.actor.inputs.list: {port|read_end_<port.name>();
-}>
-}
-
-static void write_end() {
-	<instance.actor.outputs.list: {port|write_end_<port.name>();
-}>
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
 <initializeFunction()>
@@ -675,8 +665,8 @@ finished:
 <if(options.enableTrace)>
 	<printCloseFiles()>
 <endif>
-	read_end();
-	write_end();
+	<instance.actor.inputs.list: {port|read_end_<port.name>();}; separator="\n">
+	<instance.actor.outputs.list: {port|write_end_<port.name>();}; separator="\n">
 }
 <endif>
 

@@ -41,9 +41,9 @@ struct schedinfo_s {
 };
 
 // declare FIFO with a size equal to (size)
-#define DECLARE_FIFO(type, size, count, readersnb) static type array_##count[(size) + 1]; \
+#define DECLARE_FIFO(type, size, count, readersnb) static type array_##count[(size)]; \
 static unsigned int read_inds_##count[readersnb] = {0}; \
-static struct FIFO_S(type) fifo_##count = { (size) + 1, array_##count, readersnb, read_inds_##count, 0 };
+static struct FIFO_S(type) fifo_##count = { (size), array_##count, readersnb, read_inds_##count, 0 };
 
 #define FIFO_CLEAR(T) FIFO_CLEAR_EXPAND(T)
 #define FIFO_CLEAR_EXPAND(T) fifo_ ## T ## _clear
@@ -63,23 +63,11 @@ static struct FIFO_S(type) fifo_##count = { (size) + 1, array_##count, readersnb
 #define FIFO_GET_NUM_TOKENS(T) FIFO_GET_NUM_TOKENS_EXPAND(T)
 #define FIFO_GET_NUM_TOKENS_EXPAND(T) fifo_ ## T ## _get_num_tokens
 
-#define FIFO_PEEK(T) FIFO_PEEK_EXPAND(T)
-#define FIFO_PEEK_EXPAND(T) fifo_ ## T ## _peek
-
 #define FIFO_READ(T) FIFO_READ_EXPAND(T)
-#define FIFO_READ_EXPAND(T) fifo_ ## T ## _read
-
-#define FIFO_READ_COPY(T) FIFO_READ_COPY_EXPAND(T)
-#define FIFO_READ_COPY_EXPAND(T) fifo_ ## T ## _read_copy
-
-#define FIFO_READ_END(T) FIFO_READ_END_EXPAND(T)
-#define FIFO_READ_END_EXPAND(T) fifo_ ## T ## _read_end
+#define FIFO_READ_EXPAND(T) fifo_ ## T ## _read_1
 
 #define FIFO_WRITE(T) FIFO_WRITE_EXPAND(T)
-#define FIFO_WRITE_EXPAND(T) fifo_ ## T ## _write
-
-#define FIFO_WRITE_END(T) FIFO_WRITE_END_EXPAND(T)
-#define FIFO_WRITE_END_EXPAND(T) fifo_ ## T ## _write_end
+#define FIFO_WRITE_EXPAND(T) fifo_ ## T ## _write_1
 
 #define T i8
 #include "orcc_generic_fifo.h"
