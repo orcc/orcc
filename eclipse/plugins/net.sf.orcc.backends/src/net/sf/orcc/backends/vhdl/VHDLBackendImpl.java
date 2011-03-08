@@ -51,7 +51,6 @@ import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
-import net.sf.orcc.backends.vhdl.transformations.VariableRedimension;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
@@ -156,9 +155,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 				// flattens multi-dimensional arrays
 				new ListFlattenTransformation(true, false, true),
-
-				// replaces local array of size 1 by scalars
-				new VariableRedimension(),
 
 				// renames variables so we can inline them in the template
 				// should remain after other transformations
@@ -304,6 +300,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	public void setOptions() throws OrccException {
-		debugMode = getAttribute(DEBUG_MODE, false);
+		debugMode = getAttribute(DEBUG_MODE, true);
 	}
+
 }

@@ -54,7 +54,7 @@ signal <portType(port=port, IOtype=" ", dataType="idata")>
 
 signalDeclaration(variable) ::= <<
 <if(!variable.type.list)
- ><if(variable.assignable || variable.port)
+ ><if(variable.assignable)
     >signal <variable> : <variable.type>;
   <else
     >constant <variable> : <variable.type> := <variable.initialValue>;
@@ -76,9 +76,9 @@ else
 ///////////////////////////////////////////////////////////////////////////////
 VarDeclaration(variable) ::= <<
 <if(variable.type.list)
->-- error !!!!! variable <variable> : <variable.type> (0 to <listSize(variable.type.dimensions)> -1)<
+>-- error !!!!! variable <variable.name> : <variable.type> (0 to <listSize(variable.type.dimensions)> -1)<
 else
->variable <variable> : <variable.type><
+>variable <variable.name> : <variable.type><
 endif>
 >>
 
@@ -127,7 +127,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
-Assign(assign) ::= <<
+printAssign(assign) ::= <<
 
 <if (assign.cast)
 ><CastStore(target=assign.target, value=assign.value, cast=assign.cast)>;<
@@ -137,12 +137,12 @@ endif
 >
 >>
 
-AssignIndex(AssignIndex) ::= <<
+printAssignIndex(assignIndex) ::= <<
 
-<AssignIndex.target> := to_integer(unsigned(<AssignIndex.indexes: {index | std_logic_vector(to_unsigned(<index>, <index.type.size>))}; separator=" & ">));
+<assignIndex.target> := to_integer(unsigned(<assignIndex.indexes: {index | std_logic_vector(to_unsigned(<index>, <index.type.size>))}; separator=" & ">));
 >>
 
-Call(call) ::= <<
+printCall(call) ::= <<
 
 <if(call.target)
 ><call.target> := <call.procedure>(<call.procedure.loadedVariables: {var | <var>, }><call.parameters: {param | <param>, }>'1');<
@@ -153,14 +153,22 @@ else
 endif>
 >>
 
-Load(load) ::= <<
+getPort(variable) ::= <<
+<if (action.inputPattern.inverseVariableMap.(variable))
+><action.inputPattern.inverseVariableMap.(variable).name><
+else
+><action.outputPattern.inverseVariableMap.(variable).name><
+endif>
+>>
+
+printLoad(load) ::= <<
 
 <if(load.indexes)
-><if(load.source.variable.port)
-   ><if(load.cast)
-     ><CastLoad(target=load.target, source=load.source, cast=load.cast)>;<
+><if (action.inputPattern.inverseVariableMap.(load.source.variable) || action.outputPattern.inverseVariableMap.(load.source.variable))
+  ><if(load.cast)
+     ><CastLoad(target=load.target, source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;<
     else
-     ><load.target> := <load.source>;<
+     ><load.target> := <procedure.name>_<getPort(load.source.variable)>;<
     endif><
   else
    ><load.target> := <load.source>(<load.indexes : {index | <index>}; separator=", ">);<
@@ -170,16 +178,16 @@ else
 endif>
 >>
 
-Peek(peek) ::= <<
+printPeek(peek) ::= <<
 
 <if(peek.unit)
   ><if(peek.target.type.bool)
-     ><peek.target> := <peek.port>_data;<
+     ><procedure.name>_<peek.target> := <peek.port>_data;<
     else
      ><if(peek.target.type.int)
-        ><peek.target> := to_integer(signed(<peek.port>_data));<
+        ><procedure.name>_<peek.target> := to_integer(signed(<peek.port>_data));<
        else
-        ><peek.target> := to_integer(unsigned(<peek.port>_data));<
+        ><procedure.name>_<peek.target> := to_integer(unsigned(<peek.port>_data));<
        endif><
     endif><
 else
@@ -189,15 +197,15 @@ endif
 
 >>
 
-Read(read) ::= <<
+printRead(read) ::= <<
 
 <if(read.unit)
   ><if(read.target.type.bool)
-     ><read.target> := <read.port>_data;<
+     ><procedure.name>_<read.target> := <read.port>_data;<
    elseif(read.target.type.int)
-     ><read.target> := to_integer(signed(<read.port>_data));<
+     ><procedure.name>_<read.target> := to_integer(signed(<read.port>_data));<
    elseif (read.target)
-     ><read.target> := to_integer(unsigned(<read.port>_data));<
+     ><procedure.name>_<read.target> := to_integer(unsigned(<read.port>_data));<
    endif><
 else
   >-- read multiple token not coded yet<
@@ -207,7 +215,7 @@ endif>
 // a "return" must be transformed when the attribute "transformReturn"
 // is present, which normally only occurs when printActionSchedulerInline
 // is called
-Return(return) ::= <<
+printReturn(return) ::= <<
 
 <if(return.value)
 ><  if(transformReturn)
@@ -218,14 +226,14 @@ Return(return) ::= <<
 endif>
 >>
 
-Store(store) ::= <<
+printStore(store) ::= <<
 
 <if(store.indexes)
- ><if(store.target.port)
-   ><if(store.cast)
-      ><CastStore(value=store.value, target=store.target, cast=store.cast)>;<
+ ><if (action.inputPattern.inverseVariableMap.(store.target) || action.outputPattern.inverseVariableMap.(store.target))
+  ><if(store.cast)
+      ><CastStore(value=store.value, target={<procedure.name>_<getPort(store.target)>}, cast=store.cast)>;<
      else
-      ><store.target> := <store.value>;<
+      ><procedure.name>_<getPort(store.target)> := <store.value>;<
      endif><
    else
     ><store.target>(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;<
@@ -235,7 +243,7 @@ else
 endif>
 >>
 
-Write(write) ::= <<
+printWrite(write) ::= <<
 
 <if(write.target.type.bool)
 ><write.port>_idata \<= <write.target>;<
@@ -252,34 +260,47 @@ endif>
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 printInstructions(instructions) ::= <<
-<instructions: {inst | <(inst.class.simpleName)(inst)>}>
+<instructions: {instr | <
+if (instr.assign)><printAssign(assign=instr)><
+elseif (instr.assignIndex)><printAssignIndex(assignIndex=instr)><
+elseif (instr.call)><printCall(call=instr)><
+elseif (instr.load)><printLoad(load=instr)><
+elseif (instr.peek)><printPeek(peek=instr)><
+elseif (instr.read)><printRead(read=instr)><
+elseif (instr.return)><printReturn(return=instr)><
+elseif (instr.store)><printStore(store=instr)><
+elseif (instr.write)><printWrite(write=instr)><
+endif>}>
 >>
 
 printNodes(nodes) ::= <<
-<nodes: {node | <(node.class.simpleName)(node)>}>
+<nodes: {node | <if (node.blockNode)><printBlockNode(node)><
+elseif (node.ifNode)><printIfNode(node)><
+elseif (node.whileNode)><printWhileNode(node)><
+endif>}>
 >>
 
 // if node
-BlockNode(blockNode) ::= <<
+printBlockNode(blockNode) ::= <<
 <printInstructions(blockNode.instructions)>
 >>
 
 // if node
-IfNode(ifNode) ::= <<
+printIfNode(ifNode) ::= <<
 
 if (<ifNode.value>) then
   <printNodes(ifNode.thenNodes)><if(ifNode.elseNodes)>
 else
   <printNodes(ifNode.elseNodes)>
 end if;<endif>
-<BlockNode(ifNode.joinNode)>
+<printBlockNode(ifNode.joinNode)>
 >>
 
 // while node
-WhileNode(whileNode) ::= <<
+printWhileNode(whileNode) ::= <<
 
 while (<whileNode.value>) loop
-  <printNodes(whileNode.nodes)><BlockNode(whileNode.joinNode)>
+  <printNodes(whileNode.nodes)><printBlockNode(whileNode.joinNode)>
 end loop;
 >>
 
@@ -291,9 +312,9 @@ end loop;
 function(procedure) ::= <<
 <if (!procedure.native)
   ><if (procedure.returnType.void)
->procedure <procedure>(<parameters(procedure.parameters.list)>dummy : std_logic) is
+>procedure <procedure>(<printParameters(procedure.parameters.list)>dummy : std_logic) is
 <else
->function <procedure>(<VarUsed(procedure)><parameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType)> is
+>function <procedure>(<VarUsed(procedure)><printParameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType)> is
 <endif>
   <if(procedure.locals.list)
 ><procedure.locals.list: {variable| <VarInFctDeclaration(variable)>;<\n>}><
@@ -309,26 +330,24 @@ VarUsed(procedure) ::= <<
 <procedure.loadedVariables: functionParameter(); wrap>
 >>
 
-parameters(procedure) ::= <<
+printParameters(procedure) ::= <<
 <procedure.parameters.list: functionParameter()>
 >>
 
 functionParameter(variable) ::= <<
-<if(!variable.type.list)
-><variable> : <typeFunction(variable.type)>; <
-else
+<if(variable.type.list)
 >-- error !!!!! type memory type<
+else
+><variable.name> : <typeFunction(variable.type)>; <
 endif
 >
 >>
 
 VarInFctDeclaration(variable) ::= <<
-<if(variable.port)
->variable <variable> : <typeFunction(variable.type)><
-elseif(!variable.type.list)
->variable <variable> : <typeFunction(variable.type)><
-else
+<if(variable.type.list)
 >-- error !!!!! type memory_type<
+else
+>variable <variable.name> : <typeFunction(variable.type)><
 endif>
 >>
 
@@ -356,7 +375,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
-procedure(procedure, transformReturn) ::= <<
+printProcedure(procedure, transformReturn) ::= <<
 <printNodes(procedure.nodes)>
 >>
 
@@ -366,19 +385,9 @@ printLocals(procedure) ::= <<
 endif>
 >>
 
-printActionLocalSchedul(action) ::= <<
-<printLocals(action.scheduler)
->variable <action.scheduler>_go : std_logic;
-
->>
-
-printActionLocalBody(action) ::= <<
-<printLocals(action.body)>
->>
-
 // prints the body of the given action "inline" (ie not within a function)
 printActionBodyInline(action) ::= <<
-<procedure(procedure=action.body, transformReturn="true")>
+<printProcedure(procedure=action.body, transformReturn="true")>
 >>
 
 
@@ -414,10 +423,15 @@ port map (
 // Actor VHDL Architecture - Scheduler process
 ///////////////////////////////////////////////////////////////////////////////
 Actor_Scheduler(actor) ::= <<
-<actor.simpleName>_sceduler : process(<sensitivity(actor)>)
-  <actor.actions : printActionLocalSchedul()>--
+<actor.simpleName>_scheduler : process(<sensitivity(actor)>)
+  <actor.actions : { action |<printLocals(action.scheduler)>
+variable <action.scheduler>_go : std_logic;
+<action.inputPattern.ports: { port |<if(action.inputPattern.peekedMap.(port))>variable <action.scheduler.name>_<port.name> : <port.type>;
+<endif>}>
+}>--
 begin
-  <actor.actions: printTemplateDataScheduler(); separator="\n\n">
+  <actor.actions: {action|-- test if "<action>" action is schedulable
+<printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n\n">
 
   --
   -- Test the action's inputs to fire (or not) an action  
@@ -454,12 +468,6 @@ if(actor.templateData && actor.actionScheduler.fsm)
 elseif(actor.actionScheduler.fsm)
 >FSM<
 endif>
->>
-
-// prints the scheduler of the given action according to the actor's template data
-printTemplateDataScheduler(action) ::= <<
--- test if "<action>" action is schedulable
-<procedure(procedure=action.scheduler, transformReturn="true")>
 >>
 
 // prints the condition on the ack and go signals according to the input and output pattern
@@ -515,7 +523,10 @@ actionFire(nextstate) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 Actor_Exec(actor) ::= <<
 <actor.simpleName>_execute : process (reset_n, clock) is
-  <actor.actions: printActionLocalBody()>  --
+  <actor.actions: {action |<printLocals(action.body)>
+<action.inputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;}>
+<action.outputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;}>
+}>  --
 begin
   if reset_n = '0' then
 <if(actor.stateVars.list)
@@ -540,7 +551,7 @@ end process <actor.simpleName>_execute;
 
 >>
 
-actionTestSceduler(action) ::= <<
+actionTestScheduler(action) ::= <<
 (<action>_go = '1') then
   -- body of "<action>" action
   <printActionBodyInline(action)>  --<actor.outputs.list: writeManagement()>
@@ -572,7 +583,7 @@ executeCore(actions) ::= <<
 
 // just to have a correct indentation
 executeIndent(actions) ::= <<
-    <actions: actionTestSceduler(); separator="\nelsif ">
+    <actions: actionTestScheduler(); separator="\nelsif ">
     end if;
 >>
 
@@ -601,7 +612,7 @@ switchTransition(transition) ::= <<
 >>
 
 actionTestState(nextState) ::= <<
-      <actionTestSceduler(nextState.action)>
+      <actionTestScheduler(nextState.action)>
         FSM \<= s_<nextState.targetState>;
 >>
 
