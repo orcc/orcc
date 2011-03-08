@@ -36,7 +36,6 @@ import java.util.ListIterator;
 import java.util.Map.Entry;
 
 import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
-import net.sf.orcc.backends.vhdl.transformations.CodeMover;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -171,6 +170,8 @@ public class Multi2MonoToken extends ActionSplitter {
 	private Action process;
 
 	private boolean repeatInput = false;
+	
+	private boolean repeatOutput = false;
 
 	// private boolean repeatOutput = false;
 
@@ -233,122 +234,6 @@ public class Multi2MonoToken extends ActionSplitter {
 			String targetName) {
 		scanInputs(action, sourceName, targetName);
 		scanOutputs(action, sourceName, targetName);
-	}
-
-	/**
-	 * For every Input of the action this method creates the new required
-	 * actions
-	 * 
-	 * @param action
-	 *            action to transform
-	 * @param sourceName
-	 *            name of the source state of the action in the actor fsm
-	 * @param targetName
-	 *            name of the target state of the action in the actor fsm
-	 */
-	private void scanInputs(Action action, String sourceName, String targetName) {
-		for (Entry<Port, Integer> verifEntry : action.getInputPattern()
-				.entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
-			if (verifNumTokens > 1) {
-				repeatInput = true;
-				process = createProcessAction(action);
-				String processName = "newStateProcess" + action.getName();
-				addTransition(processName, targetName, process);
-				process.getOutputPattern().put(port, 1);
-
-				// if input repeat detected --> treat all input ports
-				for (Entry<Port, Integer> entry : action.getInputPattern()
-						.entrySet()) {
-					numTokens = entry.getValue();
-					inputIndex = inputIndex + 1;
-					port = entry.getKey();
-					entryType = entry.getKey().getType();
-					String counterName = action.getName() + "NewStoreCounter"
-							+ inputIndex;
-					GlobalVariable counter = createCounter(counterName);
-					String listName = action.getName() + "NewStoreList"
-							+ inputIndex;
-					GlobalVariable tab = createTab(listName, entryType);
-					store = createStoreAction(action.getName(), counter, tab);
-					store.getInputPattern().put(port, 1);
-
-					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
-							tab);
-					modifyProcessAction.visit(process.getBody());
-
-					addTransition(sourceName, sourceName, store);
-
-					// create a new store done action once
-					if (inputIndex == 1) {
-						done = createDoneAction(action.getName()
-								+ "newStoreDone", counter, numTokens);
-						addTransition(sourceName, processName, done);
-					} else {
-						// the new done action already exists --> modify
-						// schedulability
-						modifyDoneAction(counter, inputIndex);
-					}
-				}
-				// remove the transformed action
-				this.actor.getActions().remove(0);
-				break;
-			}
-		}
-	}
-
-	private void scanOutputs(Action action, String sourceName, String targetName) {
-		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
-				.entrySet()) {
-			int verifNumTokens = verifEntry.getValue();
-			if (verifNumTokens > 1) {
-				// repeatOutput = true;
-				String processName = "newStateProcess" + action.getName();
-				String writeName = "newStateWrite" + action.getName();
-
-				// create new process action if not created while treating
-				// inputs
-				if (!repeatInput) {
-					process = createProcessAction(action);
-					addTransition(processName, writeName, process);
-				} else {
-					fsm.replaceTarget(processName, process, writeName);
-					process.getOutputPattern().clear();
-				}
-				for (Entry<Port, Integer> entry : action.getOutputPattern()
-						.entrySet()) {
-					numTokens = entry.getValue();
-					outputIndex = outputIndex + 1;
-					port = entry.getKey();
-					entryType = entry.getKey().getType();
-					String counterName = action.getName() + "NewWriteCounter"
-							+ outputIndex;
-					GlobalVariable counter = createCounter(counterName);
-					String listName = action.getName() + "NewWriteList"
-							+ outputIndex;
-					GlobalVariable tab = createTab(listName, entryType);
-					write = createWriteAction(action.getName(), counter, tab);
-					write.getOutputPattern().put(port, 1);
-
-					ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
-							tab);
-					modifyProcessActionWrite.visit(process.getBody());
-
-					addTransition(writeName, writeName, write);
-
-					// create a new write done action once
-					if (outputIndex == 1) {
-						done = createDoneAction(action.getName()
-								+ "newWriteDone", counter, numTokens);
-						addTransition(writeName, targetName, done);
-					} else {
-						modifyDoneAction(counter, outputIndex);
-					}
-				}
-				break;
-			}
-		}
-
 	}
 
 	/**
@@ -445,12 +330,10 @@ public class Multi2MonoToken extends ActionSplitter {
 		Action newProcessAction = createAction(expression, "newProcess_"
 				+ action.getName());
 		Procedure body = newProcessAction.getBody();
-		CodeMover codeMover = new CodeMover();
 
 		ListIterator<CFGNode> listIt = action.getBody().getNodes()
 				.listIterator();
-		codeMover.setTargetProcedure(body);
-		codeMover.moveNodes(listIt);
+		moveNodes(listIt, body);
 		Iterator<LocalVariable> it = action.getBody().getLocals().iterator();
 		moveLocals(it, body);
 
@@ -674,7 +557,7 @@ public class Multi2MonoToken extends ActionSplitter {
 		OrderedMap<String, LocalVariable> schedulerLocals = done.getScheduler()
 				.getLocals();
 		LocalVariable localCounter = new LocalVariable(true, portIndex,
-				new Location(), "localCounter", counter.getType());
+				new Location(), "localCounterModif", counter.getType());
 		schedulerLocals.put(localCounter.getName(), localCounter);
 
 		Instruction load = new Load(localCounter, new Use(counter));
@@ -719,6 +602,142 @@ public class Multi2MonoToken extends ActionSplitter {
 		}
 	}
 
+	public void moveNodes(ListIterator<CFGNode> itNode, Procedure newProc) {
+		while (itNode.hasNext()) {
+			CFGNode node = itNode.next();
+			itNode.remove();
+			newProc.getNodes().add(node);
+		}
+	}
+
+	/**
+	 * For every Input of the action this method creates the new required
+	 * actions
+	 * 
+	 * @param action
+	 *            action to transform
+	 * @param sourceName
+	 *            name of the source state of the action in the actor fsm
+	 * @param targetName
+	 *            name of the target state of the action in the actor fsm
+	 */
+	private void scanInputs(Action action, String sourceName, String targetName) {
+		for (Entry<Port, Integer> verifEntry : action.getInputPattern()
+				.getNumTokensMap().entrySet()) {
+			int verifNumTokens = verifEntry.getValue();
+			if (verifNumTokens > 1) {
+				repeatInput = true;
+				process = createProcessAction(action);
+				String processName = "newStateProcess" + action.getName();
+				addTransition(processName, targetName, process);
+				// move action's Output pattern to new process action
+				process.getOutputPattern().getNumTokensMap()
+						.putAll(action.getOutputPattern().getNumTokensMap());
+				process.getOutputPattern().getPorts()
+						.addAll(action.getOutputPattern().getPorts());
+				process.getOutputPattern().getVariableMap()
+						.putAll(action.getOutputPattern().getVariableMap());
+				process.getOutputPattern()
+						.getInverseVariableMap()
+						.putAll(action.getOutputPattern()
+								.getInverseVariableMap());
+
+				// if input repeat detected --> treat all input ports
+				for (Entry<Port, Integer> entry : action.getInputPattern()
+						.getNumTokensMap().entrySet()) {
+					numTokens = entry.getValue();
+					inputIndex = inputIndex + 1;
+					port = entry.getKey();
+					entryType = entry.getKey().getType();
+					String counterName = action.getName() + "NewStoreCounter"
+							+ inputIndex;
+					GlobalVariable counter = createCounter(counterName);
+					String listName = action.getName() + "NewStoreList"
+							+ inputIndex;
+					GlobalVariable tab = createTab(listName, entryType);
+					store = createStoreAction(action.getName(), counter, tab);
+					store.getInputPattern().setNumTokens(port, 1);
+
+					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
+							tab);
+					modifyProcessAction.visit(process.getBody());
+
+					addTransition(sourceName, sourceName, store);
+
+					// create a new store done action once
+					if (inputIndex == 1) {
+						done = createDoneAction(action.getName()
+								+ "newStoreDone", counter, numTokens);
+						addTransition(sourceName, processName, done);
+					} else {
+						// the new done action already exists --> modify
+						// schedulability
+						modifyDoneAction(counter, inputIndex);
+					}
+				}
+				// remove the transformed action
+				this.actor.getActions().remove(action);
+				break;
+			}
+		}
+		inputIndex = 0;
+	}
+
+	private void scanOutputs(Action action, String sourceName, String targetName) {
+		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
+				.getNumTokensMap().entrySet()) {
+			int verifNumTokens = verifEntry.getValue();
+			if (verifNumTokens > 1) {
+				repeatOutput = true;
+				String processName = "newStateProcess" + action.getName();
+				String writeName = "newStateWrite" + action.getName();
+
+				// create new process action if not created while treating
+				// inputs
+				if (!repeatInput) {
+					process = createProcessAction(action);
+					addTransition(processName, writeName, process);
+					this.actor.getActions().remove(action);
+				} else {
+					fsm.replaceTarget(processName, process, writeName);
+					process.getOutputPattern().clear();
+				}
+				for (Entry<Port, Integer> entry : action.getOutputPattern()
+						.getNumTokensMap().entrySet()) {
+					numTokens = entry.getValue();
+					outputIndex = outputIndex + 1;
+					port = entry.getKey();
+					entryType = entry.getKey().getType();
+					String counterName = action.getName() + "NewWriteCounter"
+							+ outputIndex;
+					GlobalVariable counter = createCounter(counterName);
+					String listName = action.getName() + "NewWriteList"
+							+ outputIndex;
+					GlobalVariable tab = createTab(listName, entryType);
+					write = createWriteAction(action.getName(), counter, tab);
+					write.getOutputPattern().setNumTokens(port, 1);
+
+					ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
+							tab);
+					modifyProcessActionWrite.visit(process.getBody());
+
+					addTransition(writeName, writeName, write);
+
+					// create a new write done action once
+					if (outputIndex == 1) {
+						done = createDoneAction(action.getName()
+								+ "newWriteDone", counter, numTokens);
+						addTransition(writeName, targetName, done);
+					} else {
+						modifyDoneAction(counter, outputIndex);
+					}
+				}
+				break;
+			}
+		}
+		outputIndex = 0;
+	}
+
 	@Override
 	public void visit(Actor actor) {
 		super.visit(actor);
@@ -730,6 +749,12 @@ public class Multi2MonoToken extends ActionSplitter {
 		createActionsSet(action, sourceName, targetName);
 		if (repeatInput) {
 			removeTransition(sourceName, action);
+			repeatInput = false;
+		} else {
+			if (repeatOutput) {
+				removeTransition(sourceName, action);
+				repeatOutput = false;
+			}
 		}
 	}
 
