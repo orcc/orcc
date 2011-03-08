@@ -532,8 +532,9 @@ actionFire(nextstate) ::= <<
 Actor_Exec(actor) ::= <<
 <actor.simpleName>_execute : process (reset_n, clock) is
   <actor.actions: {action |<printLocals(action.body)>
-<action.inputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;}>
-<action.outputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;}>
+<action.inputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;
+}><action.outputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;
+}>
 }>  --
 begin
   if reset_n = '0' then
