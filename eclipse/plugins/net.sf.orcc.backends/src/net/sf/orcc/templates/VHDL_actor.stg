@@ -98,14 +98,14 @@ stateConst(variable) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Print cast operations (when source.size != target.size)
 ///////////////////////////////////////////////////////////////////////////////
-CastStore(target, value, cast)::= <<
+CastStore(target, targetSize, value, cast)::= <<
 <if(cast.extended)
 ><target> := <value><
 else
 ><if(target.type.uint)
-><target> := ucast(<value>, <value.type.size>, <target.type.size>)<  
+><target> := ucast(<value>, <value.type.size>, <targetSize>)<  
   else
-><target> := cast(<value>, <value.type.size>, <target.type.size>)<  
+><target> := cast(<value>, <value.type.size>, <targetSize>)<  
   endif><
 endif>
 >>
@@ -115,9 +115,9 @@ CastLoad(target, source, cast)::= <<
 ><target> := <source><
 else
 ><if(target.type.uint)
-><target> := ucast(<source>, <source.type.size>, <target.variable.type.size>)<
+><target> := ucast(<source>, <source.type.size>, <target.type.size>)<
   else
-><target> := cast(<source>, <source.type.size>, <target.variable.type.size>)<
+><target> := cast(<source>, <source.type.size>, <target.type.size>)<
   endif><
 endif>
 >>
@@ -130,7 +130,7 @@ endif>
 printAssign(assign) ::= <<
 
 <if (assign.cast)
-><CastStore(target=assign.target, value=assign.value, cast=assign.cast)>;<
+><CastStore(target=assign.target, targetSize=assign.target.type.size, value=assign.value, cast=assign.cast)>;<
 else
 ><assign.target> := <assign.value>;<
 endif
@@ -158,6 +158,14 @@ getPort(variable) ::= <<
 ><action.inputPattern.inverseVariableMap.(variable).name><
 else
 ><action.outputPattern.inverseVariableMap.(variable).name><
+endif>
+>>
+
+getPortSize(variable) ::= <<
+<if (action.inputPattern.inverseVariableMap.(variable))
+><action.inputPattern.inverseVariableMap.(variable).type.size><
+else
+><action.outputPattern.inverseVariableMap.(variable).type.size><
 endif>
 >>
 
@@ -231,7 +239,7 @@ printStore(store) ::= <<
 <if(store.indexes)
  ><if (action.inputPattern.inverseVariableMap.(store.target) || action.outputPattern.inverseVariableMap.(store.target))
   ><if(store.cast)
-      ><CastStore(value=store.value, target={<procedure.name>_<getPort(store.target)>}, cast=store.cast)>;<
+      ><CastStore(value=store.value, target={<procedure.name>_<getPort(store.target)>}, targetSize={<getPortSize(store.target)>}, cast=store.cast)>;<
      else
       ><procedure.name>_<getPort(store.target)> := <store.value>;<
      endif><
