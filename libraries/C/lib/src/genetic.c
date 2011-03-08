@@ -39,7 +39,7 @@
 #include "orcc_scheduler.h"
 
 int clean_cache(int size){
-	int i, res;
+	int i, res = 0;
 	int *table = (int*) malloc(size * sizeof(int));
 	memset(table, 0, size);
 	for(i = 0; i<size; i++){
