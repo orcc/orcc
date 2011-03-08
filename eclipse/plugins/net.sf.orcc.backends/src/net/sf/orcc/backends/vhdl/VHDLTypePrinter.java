@@ -62,7 +62,14 @@ public class VHDLTypePrinter extends TypePrinter {
 		builder.append("integer range ");
 		builder.append(bound - 1);
 		builder.append(" downto -");
-		builder.append(bound - 1);
+
+		if (bound < 2147483647) {
+			// up to 1073741824, fine
+			builder.append(bound);
+		} else {
+			// because Altera only allows bounds down to"-2147483647"
+			builder.append(bound - 1);
+		}
 	}
 
 	/**
