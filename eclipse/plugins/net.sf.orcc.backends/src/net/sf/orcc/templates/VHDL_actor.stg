@@ -181,10 +181,10 @@ endif>
 printPeek(peek) ::= <<
 
 <if(peek.unit)
-  ><if(peek.target.type.bool)
+  ><if(peek.port.type.bool)
      ><procedure.name>_<peek.target> := <peek.port>_data;<
     else
-     ><if(peek.target.type.int)
+     ><if(peek.port.type.int)
         ><procedure.name>_<peek.target> := to_integer(signed(<peek.port>_data));<
        else
         ><procedure.name>_<peek.target> := to_integer(unsigned(<peek.port>_data));<
@@ -200,11 +200,11 @@ endif
 printRead(read) ::= <<
 
 <if(read.unit)
-  ><if(read.target.type.bool)
+  ><if(read.port.type.bool)
      ><procedure.name>_<read.target> := <read.port>_data;<
-   elseif(read.target.type.int)
+   elseif(read.port.type.int)
      ><procedure.name>_<read.target> := to_integer(signed(<read.port>_data));<
-   elseif (read.target)
+   elseif (read.port.type.uint)
      ><procedure.name>_<read.target> := to_integer(unsigned(<read.port>_data));<
    endif><
 else
@@ -245,12 +245,12 @@ endif>
 
 printWrite(write) ::= <<
 
-<if(write.target.type.bool)
-><write.port>_idata \<= <write.target>;<
-elseif(write.target.type.int)
-><write.port>_idata \<= std_logic_vector(to_signed(<write.target>, <write.port.type.size>));<
+<if(write.port.type.bool)
+><write.port>_idata \<= <procedure.name>_<write.target>;<
+elseif(write.port.type.int)
+><write.port>_idata \<= std_logic_vector(to_signed(<procedure.name>_<write.target>, <write.port.type.size>));<
 else
-><write.port>_idata \<= std_logic_vector(to_unsigned(<write.target>, <write.port.type.size>));<
+><write.port>_idata \<= std_logic_vector(to_unsigned(<procedure.name>_<write.target>, <write.port.type.size>));<
 endif>
 >>
 
