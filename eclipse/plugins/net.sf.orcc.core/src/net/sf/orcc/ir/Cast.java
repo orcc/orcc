@@ -64,6 +64,14 @@ public class Cast {
 
 	private Type target;
 
+	/**
+	 * Creates a cast from source type to target type.
+	 * 
+	 * @param source
+	 *            source type
+	 * @param target
+	 *            target type
+	 */
 	public Cast(Type source, Type target) {
 		this.source = source;
 		this.target = target;
