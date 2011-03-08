@@ -64,6 +64,40 @@
             </option>
          </checkBox>
       </option>
+      <option
+            defaultValue="O0"
+            description="Set level of optimization"
+            id="net.sf.orcc.simulators.optLevel"
+            name="Optimization level:">
+         <comboBox>
+            <comboBoxItem
+                  id="O0">
+            </comboBoxItem>
+            <comboBoxItem
+                  id="O1">
+            </comboBoxItem>
+            <comboBoxItem
+                  id="O2">
+            </comboBoxItem>
+            <comboBoxItem
+                  id="O3">
+            </comboBoxItem>
+         </comboBox>
+      </option>
+      <option
+            defaultValue="Round-Robin"
+            description="Select a model of execution for the given network"
+            id="net.sf.orcc.simulators.scheduler"
+            name="Select a scheduler:">
+         <comboBox>
+            <comboBoxItem
+                  id="Round-Robin">
+            </comboBoxItem>
+            <comboBoxItem
+                  id="Data-driven">
+            </comboBoxItem>
+         </comboBox>
+      </option>
    </extension>
    <extension
          point="net.sf.orcc.core.simulators">
@@ -97,6 +131,12 @@
          </option>
          <option
                id="net.sf.orcc.simulators.enableComparison">
+         </option>
+         <option
+               id="net.sf.orcc.simulators.scheduler">
+         </option>
+         <option
+               id="net.sf.orcc.simulators.optLevel">
          </option>
       </simulator>
    </extension>

@@ -13,10 +13,10 @@
                id="net.sf.orcc.backends.classify">
          </option>
          <option
-               id="net.sf.orcc.backends.normalize">
+               id="net.sf.orcc.backends.merger2">
          </option>
          <option
-               id="net.sf.orcc.backends.merger2">
+               id="net.sf.orcc.backends.normalize">
          </option>
          <option
                id="net.sf.orcc.backends.newScheduler">
@@ -46,6 +46,9 @@
          </option>
          <option
                id="net.sf.orcc.backends.classify">
+         </option>
+         <option
+               id="net.sf.orcc.backends.normalize">
          </option>
       </backend>
       <backend
