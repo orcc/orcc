@@ -13,6 +13,12 @@
                id="net.sf.orcc.backends.classify">
          </option>
          <option
+               id="net.sf.orcc.backends.normalize">
+         </option>
+         <option
+               id="net.sf.orcc.backends.merger2">
+         </option>
+         <option
                id="net.sf.orcc.backends.newScheduler">
          </option>
          <option
@@ -100,23 +106,9 @@
             <checkBox>
                <option
                      defaultValue="false"
-                     id="net.sf.orcc.backends.normalize"
-                     description="Transform actors to higher-level"
-                     name="Transform actors to higher-level">
-                  <checkBox></checkBox>
-               </option>
-               <option
-                     defaultValue="false"
                      description="When activated, static actors will be merged together"
                      id="net.sf.orcc.backends.merge"
                      name="Merge static actors together (unique instantiation of actors is required).">
-                  <checkBox></checkBox>
-               </option>
-               <option
-                     defaultValue="false"
-                     description="When activated, static actors will be merged together"
-                     id="net.sf.orcc.backends.merge2"
-                     name="(EXPERIMENTAL) New version of merger for static actors">
                   <checkBox></checkBox>
                </option>
             </checkBox>
@@ -223,6 +215,20 @@
                defaultValue="false"
                id="net.sf.orcc.backends.coDesign"
                name="Co-Design">
+            <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Transform actors to higher-level"
+               id="net.sf.orcc.backends.normalize"
+               name="Transform actors to higher-level">
+            <checkBox></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="When activated, static actors will be merged together"
+               id="net.sf.orcc.backends.merger2"
+               name="New version of merger">
             <checkBox></checkBox>
          </option>
    </extension>

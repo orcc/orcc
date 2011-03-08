@@ -330,7 +330,7 @@ public class CBackendImpl extends AbstractBackend {
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		merge = getAttribute("net.sf.orcc.backends.merge", false);
-		merger2 = getAttribute("net.sf.orcc.backends.merge2", false);
+		merger2 = getAttribute("net.sf.orcc.backends.merger2", false);
 		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
 		dynamicMapping = getAttribute("net.sf.orcc.backends.dynamicMapping",
 				false);
