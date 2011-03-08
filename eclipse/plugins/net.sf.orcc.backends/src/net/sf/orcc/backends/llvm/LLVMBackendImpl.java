@@ -179,6 +179,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
+		if (actor.isNative()){
+			// Do not generate native actor
+			return true;
+		}
+		
 		// Create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
