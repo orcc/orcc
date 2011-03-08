@@ -28,41 +28,48 @@
  */
 
 /**
-@brief Implementation of class Action
+@brief Description of the Action interface
 @author Jerome Gorin
-@file Action.cpp
+@file Pattern.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#include "Jade/Core/Actor/Action.h"
-#include "Jade/Core/Actor/ActionTag.h"
-#include "Jade/Core/Actor/Pattern.h"
-#include "Jade/Core/Actor/Procedure.h"
+#ifndef PATTERN_H
+#define PATTERN_H
+
 //------------------------------
 
-using namespace std;
+/**
+ * @brief  This class defines a pattern. A pattern contains a map of port ports and the number
+ * of tokens produced/consumed by each of them along with their corresponding variable in the actor.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+class Pattern {
+public:
 
-string Action::getName(){
-	if(tag->isEmpty()){
-		return body->getName();
+	/**
+	 *
+	 * @brief Constructor
+	 *
+	 * Creates a new action.
+	 * 
+	 * @param location : Location of the action
+	 *
+	 * @param tag: action Tag
+	 *
+	 * @param scheduler : Procedure that computes scheduling information
+	 *
+	 * @param body : Procedure that holds the body of the action
+	 */
+	Pattern() {
 	}
 
-	string str;
-	list<string>::iterator it;
-	list<string>* identifiers = tag->getIdentifiers();
-	for ( it= identifiers->begin() ; it != identifiers->end(); it++ ){
-		str.append(*it);
-		str.append("_");
-	}
+	~Pattern();
 
-	return str;
-}
+};
 
-Action::~Action(){
-	delete tag;
-	delete body;
-	delete scheduler;
-
-}
+#endif

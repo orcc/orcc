@@ -168,7 +168,7 @@ public:
 
 private:
 	/** Package preloaded */
-	std::map<std::string, Package*> packages;
+	static std::map<std::string, Package*> packages;
 };
 
 #endif

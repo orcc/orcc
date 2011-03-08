@@ -41,7 +41,6 @@
 #include <algorithm>
 //------------------------------
 
-
 using namespace std;
 
 string PackageMng::getFolder(Actor* actor){
