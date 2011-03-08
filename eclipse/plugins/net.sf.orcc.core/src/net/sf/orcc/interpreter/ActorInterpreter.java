@@ -134,6 +134,20 @@ public class ActorInterpreter {
 	}
 
 	/**
+	 * Allocates the variables of the given pattern.
+	 * 
+	 * @param pattern
+	 *            a pattern
+	 */
+	private void allocatePattern(Pattern pattern) {
+		for (Port port : pattern.getPorts()) {
+			Variable variable = pattern.getVariable(port);
+			variable.setValue((Expression) variable.getType().accept(
+					listAllocator));
+		}
+	}
+
+	/**
 	 * Returns true if the action has no output pattern, or if it has an output
 	 * pattern and there is enough room in the FIFOs to satisfy it.
 	 * 
@@ -161,6 +175,10 @@ public class ActorInterpreter {
 	 * @param action
 	 */
 	public void execute(Action action) {
+		// allocate patterns
+		allocatePattern(action.getInputPattern());
+		allocatePattern(action.getOutputPattern());
+		
 		// Interpret the whole action
 		interpretProc(action.getBody());
 	}
@@ -303,6 +321,16 @@ public class ActorInterpreter {
 			boolean hasTok = fifo.hasTokens(entry.getValue());
 			if (!hasTok) {
 				return false;
+			}
+		}
+
+		// allocates peeked variables
+		Pattern pattern = action.getInputPattern();
+		for (Port port : pattern.getPorts()) {
+			Variable peeked = pattern.getPeeked(port);
+			if (peeked != null) {
+				peeked.setValue((Expression) peeked.getType().accept(
+						listAllocator));
 			}
 		}
 
