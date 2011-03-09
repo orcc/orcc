@@ -32,7 +32,7 @@
 #include "orcc_fifo.h"
 #include "orcc_thread.h"
 
-#define MAX_ACTORS 1000
+#define MAX_ACTORS 1024
 
 struct conn_s {
 	struct fifo_s *fifo;
@@ -56,8 +56,8 @@ struct scheduler_s {
 	int num_actors;
 	struct actor_s **actors;
 	struct actor_s *schedulable[MAX_ACTORS];
-	int next_entry;
-	int next_schedulable;
+	unsigned int next_entry;
+	unsigned int next_schedulable;
 	int next_else_schedulable;
 	struct sync_s *sync;
 	semaphore_struct sem_thread;

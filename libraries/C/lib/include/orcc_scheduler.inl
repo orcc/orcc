@@ -60,11 +60,8 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 		// (used only in multicore context)
 		actor = sched_get_next(sched);
 	} else {
-		actor = sched->schedulable[sched->next_schedulable];
+		actor = sched->schedulable[sched->next_schedulable % MAX_ACTORS];
 		sched->next_schedulable++;
-		if (sched->next_schedulable >= MAX_ACTORS) {
-			sched->next_schedulable = 0;
-		}
 		// actor is not a member of the list anymore
 		actor->in_list = 0;
 	}
@@ -80,12 +77,8 @@ static void sched_add_schedulable(struct scheduler_s *sched,
 	// only add the actor in the schedulable list if it is not already there
 	// like a list.contains(actor) but in O(1) instead of O(n)
 	if (!actor->in_list && (sched == actor->sched)) {
-		sched->schedulable[sched->next_entry] = actor;
+		sched->schedulable[sched->next_entry % MAX_ACTORS] = actor;
 		sched->next_entry++;
-		if (sched->next_entry >= MAX_ACTORS) {
-			sched->next_entry = 0;
-		}
-
 		actor->in_list = 1;
 	}
 }
