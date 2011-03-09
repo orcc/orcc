@@ -32,6 +32,9 @@ import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DEBUG;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
+
+import java.math.BigInteger;
+
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -51,7 +54,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Spinner;
 
 /**
  * This class defines a tab for options.
@@ -63,13 +66,13 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 
 	protected Button debugMode;
 
-	protected Text fifoSize;
+	protected Spinner spinner;
 
 	protected void createButton(Font font, Button button, String text,
 			String tooltip) {
 		button.setFont(font);
-		GridData data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		data.horizontalSpan = 2;
+		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		data.horizontalSpan = 4;
 		button.setLayoutData(data);
 		button.setText(text);
 		button.setToolTipText(tooltip);
@@ -101,17 +104,35 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 	protected void createFifoSize(Font font, Group group) {
 		Label label = new Label(group, SWT.NONE);
 		label.setFont(font);
-		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, true);
+		GridData data = new GridData(SWT.CENTER, SWT.CENTER, false, true);
 		label.setLayoutData(data);
-		label.setText("Default FIFO size: ");
+		label.setText("Default FIFO size: 2 to the power of");
 
-		fifoSize = new Text(group, SWT.BORDER | SWT.SINGLE);
+		spinner = new Spinner(group, SWT.WRAP);
+		spinner.setFont(font);
+		data = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		spinner.setLayoutData(data);
+		spinner.setMinimum(0);
+		spinner.setMaximum(30);
+		spinner.setIncrement(1);
+		spinner.setPageIncrement(8);
+		
+		label = new Label(group, SWT.NONE);
+		label.setFont(font);
+		data = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		label.setLayoutData(data);
+		label.setText("=");
+
+		final Label fifoSize = new Label(group, SWT.CENTER);
 		fifoSize.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		data = new GridData(SWT.CENTER, SWT.CENTER, false, true);
 		fifoSize.setLayoutData(data);
-		fifoSize.addModifyListener(new ModifyListener() {
+
+		spinner.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
+				int exponent = spinner.getSelection();
+				fifoSize.setText(String.valueOf(1 << exponent));
 				updateLaunchConfigurationDialog();
 			}
 		});
@@ -121,7 +142,7 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
 		group.setText("&Options:");
-		group.setLayout(new GridLayout(2, false));
+		group.setLayout(new GridLayout(4, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
 
@@ -149,35 +170,11 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 			debugMode.setSelection(selected);
 
 			int size = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-			fifoSize.setText(Integer.toString(size));
+			int exponent = BigInteger.valueOf(size).bitLength() - 1;
+			spinner.setSelection(exponent);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public boolean isValid(ILaunchConfiguration launchConfig) {
-		String value = fifoSize.getText();
-		if (value.isEmpty()) {
-			setErrorMessage("The default FIFO size field must have a value");
-			return false;
-		}
-
-		int size = 0;
-		try {
-			size = Integer.parseInt(value);
-		} catch (NumberFormatException e) {
-			setErrorMessage("The default FIFO size field must contain a valid integer");
-			return false;
-		}
-
-		if (size <= 0) {
-			setErrorMessage("The default FIFO size must be greater than 0");
-			return false;
-		}
-
-		setErrorMessage(null);
-		return true;
 	}
 
 	@Override
@@ -186,8 +183,8 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 			boolean selected = debugMode.getSelection();
 			configuration.setAttribute(DEBUG_MODE, selected);
 
-			String text = fifoSize.getText();
-			configuration.setAttribute(FIFO_SIZE, Integer.parseInt(text));
+			int exponent = spinner.getSelection();
+			configuration.setAttribute(FIFO_SIZE, 1 << exponent);
 		}
 	}
 

@@ -55,7 +55,7 @@ public class SimuOptionsTab extends OptionsTab {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
 		group.setText("&Options:");
-		group.setLayout(new GridLayout(2, false));
+		group.setLayout(new GridLayout(4, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
 
@@ -76,7 +76,8 @@ public class SimuOptionsTab extends OptionsTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
 			int size = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-			fifoSize.setText(Integer.toString(size));
+			int exponent = Integer.bitCount(size);
+			spinner.setSelection(exponent);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -85,8 +86,8 @@ public class SimuOptionsTab extends OptionsTab {
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		if (isValid(configuration)) {
-			String text = fifoSize.getText();
-			configuration.setAttribute(FIFO_SIZE, Integer.parseInt(text));
+			int exponent = spinner.getSelection();
+			configuration.setAttribute(FIFO_SIZE, 1 << exponent);
 		}
 	}
 
