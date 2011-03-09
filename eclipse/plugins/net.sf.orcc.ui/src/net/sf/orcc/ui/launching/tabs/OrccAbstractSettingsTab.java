@@ -422,6 +422,7 @@ public abstract class OrccAbstractSettingsTab extends
 	 * necessary.
 	 */
 	private void updateSize() {
+		groupOptions.setSize(groupOptions.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		composite.setSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
