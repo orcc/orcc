@@ -53,7 +53,7 @@ Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre (IETR/INSA of Rennes)
-package MPEG.MPEG4.part10.Common;
+package Proprietary.IETR.MPEG4.part10.Common;
 
 import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
@@ -98,12 +98,14 @@ actor Algo_BlockExpand_AVC ()
 			MbType :[mb_type]
 				==>
 		guard
-			mb_type = BLOCK_TYPE_I_PCM or mb_type = BLOCK_TYPE_P_SKIP
+			mb_type = BLOCK_TYPE_I_PCM
 		end
 
 	ReadBlockSize: action
 			MbType :[mb_type]
 				==>
+		guard
+			mb_type != BLOCK_TYPE_I_PCM
 		do
 			LumaMBSize       :=
 				if(Is_Intra_16x16(mb_type))then
@@ -352,6 +354,5 @@ actor Algo_BlockExpand_AVC ()
 		SendChromaAC.Launch     > SendChromaAC.LastBlock_UComponent > SendChromaAC.LastBlock_VComponent;
 		isLumaAC_4x4            > isLumaAC_16x16                    > isChromaAC;
 		isChromaAC              > isChromaDC                        > isLumaDC_16x16;
-		SkipBlock               > ReadBlockSize;
 	end
 end

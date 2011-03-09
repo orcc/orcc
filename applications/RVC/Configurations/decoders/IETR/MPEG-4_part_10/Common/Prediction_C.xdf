@@ -307,7 +307,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="MPEG.MPEG4.part10.Algo_DemuxParserInfoForBlocks_Chroma"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_DemuxParserInfoForBlocks_Chroma"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -362,10 +362,6 @@
     <Connection dst="Select_chroma" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="DemuxParserInfos" dst-port="ConstrainedIFlag"
         src="" src-port="ConstrainedIFlag"/>
-    <Connection dst="Intra8x8" dst-port="ConstrainedIFlag"
-        src="DemuxParserInfos" src-port="ConstrI_Intra"/>
-    <Connection dst="Intra8x8" dst-port="IsIntraFlag"
-        src="DemuxParserInfos" src-port="IsIntraFlag"/>
     <Connection dst="Intra8x8" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
     <Connection dst="Inter" dst-port="MbType" src="" src-port="MbType4Pred"/>

@@ -15,7 +15,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
-package MPEG.MPEG4.part10;
+package Proprietary.IETR.MPEG4.part10;
 
 import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
@@ -34,7 +34,7 @@ actor Mgnt_IQ_INTRA16x16()
 			MbType :[mb_type]
 				==>
 		guard
-			mb_type = BLOCK_TYPE_I_PCM or mb_type = BLOCK_TYPE_P_SKIP 
+			mb_type = BLOCK_TYPE_I_PCM
 		end
 
 	HasDCCoeff: action

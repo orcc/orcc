@@ -21,66 +21,58 @@ actor Algo_RefIdxtoPOC()
 	uint(size=4)  RefIdx,
 	bool          NewList
 		==>
-	uint(size=32) POCtoRead
+	uint(size=32) FrameToRead
 		:
 
-	List(type:uint(size=32), size=16) RefPoc;
+	uint(size=32) RefFrameNum[16];
+	uint(size=6)  SizeList;
+	uint(size=6)  CountRead;
 
-	uint(size=5)  SizeList;
-	uint(size=5)  CountRead;
-	bool  LastPicID:=false;
-
-	ReadSizeList: action 
-			RefList :[ SizeRefList ]
-				==>
-		do
-			SizeList  := SizeRefList;
-			CountRead := 0;
-		end
+	SendIdxAsked: action
+		NewList   :[ IsNewPic ],
+		RefIdx    :[ ListIdx  ]
+			==>
+		FrameToRead :[RefFrameNum[ListIdx & 15]]
+	guard
+		IsNewPic
+	end
 
 
-	ReadRefList: action
-			RefList :[ PocList , FrameNum ]
-				==>
-		guard
-			CountRead < SizeList
-		do
-			RefPoc[CountRead] := PocList;
-			CountRead         := CountRead + 1;
-		end
+	NewListAsked: action NewList :[ IsNewPic ] ==>
+	guard
+		not IsNewPic
+	end
+
+	ReadSizeList: action RefList :[ SizeRefList ] ==>
+	do
+		SizeList  := SizeRefList;
+		CountRead := 0;
+	end
+
+
+	ReadRefList: action RefList :[FrameNum] ==>
+	guard
+		CountRead < SizeList
+	do
+		RefFrameNum[CountRead] := FrameNum;
+		CountRead              := CountRead + 1;
+	end
 
 
 	ReadRefListDone: action ==>
-		end
-
-
-	GetReadAddr: action
-			RefIdx    :[ ListIdx ],
-			NewList :[ValPicID]
-				==>
-			POCtoRead :[ RefPoc[ListIdx] ]
 		guard
-			ValPicID = LastPicID
+			CountRead = SizeList
 		end
 
+	schedule fsm GetCommand:
 
-	NewPic: action
-			NewList :[ValPicID]
-				==>
-		guard
-			ValPicID != LastPicID
-		do
-			LastPicID := ValPicID;
-		end
+		GetCommand   ( NewListAsked    )--> ReadSizeList;
+		GetCommand   ( SendIdxAsked    )--> GetCommand;
 
-	schedule fsm ReadSizeList:
+		ReadSizeList ( ReadSizeList    )--> ReadRefList;
 
-		ReadSizeList  (ReadSizeList      )-->ReadRefList;
-		ReadRefList   (ReadRefList       )-->ReadRefList;
-		ReadRefList   (ReadRefListDone   )-->GetReadAddr;
-
-		GetReadAddr   (GetReadAddr       )-->GetReadAddr;
-		GetReadAddr   (NewPic            )-->ReadSizeList;
+		ReadRefList  ( ReadRefList     )--> ReadRefList;
+		ReadRefList  ( ReadRefListDone )--> GetCommand;
 	end
 
 	priority

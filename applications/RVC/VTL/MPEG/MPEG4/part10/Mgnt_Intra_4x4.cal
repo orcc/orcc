@@ -26,9 +26,7 @@ actor Mgnt_Intra_4x4 ()
 	uint(size=4)  PredMode,
 	uint(size=16) EDGE,
 	int(size=9)  MB_4X4,
-	bool          NeighbourAvail,
-	bool ConstrainedIFlag,
-	bool IsIntraFlag
+	bool          NeighbourAvail
 		==> 
 		uint(size=1) Avail,
 		uint(size=4) PredMode4x4,
@@ -72,33 +70,18 @@ actor Mgnt_Intra_4x4 ()
 	//Mb_Type_OK : Enable the prediction 
 	MbTypeOK:action
 		NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail],
-		ConstrainedIFlag:[c_intra_flag],
-	  	PredMode:[v] repeat 16,
-	  	IsIntraFlag :[is_intra_flag] repeat 4
+	  	PredMode:[v] repeat 16
 	  		==>
 		  	PredMode4x4:[[v[t_scan2_Index[s]]:for int s in 0 .. 15] ] repeat 16
-	var
-		uint(size=2) CURR_MB = 1,
-
-		bool intra_top_left
 	do
 		//Initialize counter
 		mb_counter := 0;
 
-		intra_top_left := is_intra_flag[3];
 		//Set 16x16 the available edge
-		left_16x16_avail := if (not NeighbourA_Avail) then 0 else 
-								if (is_intra_flag[CURR_MB-1] or not(c_intra_flag)) then 1 else 0 end   
-							end;
-		top_16x16_avail := if (not NeighbourB_Avail) then 0 else  
-								if (is_intra_flag[CURR_MB] or not(c_intra_flag)) then 1 else 0 end   
-							end;
-		topRight_16x16_avail := if (not NeighbourC_Avail)  then 0 else   
-									if (is_intra_flag[CURR_MB+1] or not(c_intra_flag)) then 1 else 0 end   
-								end;
-		topLeft_16x16_avail :=  if top_16x16_avail=0 and top_16x16_avail=0 then 0 else    
-									if (intra_top_left or not(c_intra_flag)) then 1 else 0 end   
-								end;
+		left_16x16_avail := if NeighbourA_Avail then 1 else 0 end;
+		top_16x16_avail := if NeighbourB_Avail then 1 else 0 end;
+		topRight_16x16_avail := if NeighbourC_Avail then 1 else 0 end;
+		topLeft_16x16_avail :=  if NeighbourD_Avail then 1 else 0 end;
 		 
 		 
 		//Set available edge for each 4x4 mb
@@ -167,7 +150,7 @@ actor Mgnt_Intra_4x4 ()
 	SendEdge.LeftEdge16:action ==> Y_Left4:[ [left_16x16_edge[s+mb_counter]: for int s in 0 .. 3]]repeat 4
 	guard 
 	  	avail[0] = 1,
-	  	mb_counter mod (16 >> 2) = 0
+	  	mb_counter mod rshift(16, 2) = 0
 	do
 		avail[0] := 0;
 	end 
@@ -176,7 +159,7 @@ actor Mgnt_Intra_4x4 ()
 	SendEdge.LeftEdge4:action ==> Y_Left4:[ [right_4x4_edge[s]: for int s in 0 .. 3] ]repeat 4
 	guard 
 		avail[0] = 1,
-		mb_counter mod (16 >> 2) != 0
+		mb_counter mod rshift(16, 2) != 0
 	do
 		avail[0] := 0;
 	end 

@@ -48,31 +48,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="CurrMbAddr">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="PicWidthInMb">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="7"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="PicSizeInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="FirstMbInSlice">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
@@ -90,13 +69,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="MbPartWidth">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -108,13 +80,6 @@
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="Mb_Type">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
@@ -150,13 +115,6 @@
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="6"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="Mb_TypeC">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
@@ -209,48 +167,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="slice_alpha_c0_offset">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="slice_beta_offset">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="LFDisable">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="CodedBlockPattern">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="mv_out">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="ref_idx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="I_PCM_Y">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -282,13 +198,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefList">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="IsIDR">
         <Type name="bool"/>
     </Port>
@@ -313,6 +222,47 @@
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="FrameNum">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="isNewPic">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Output" name="enableRead">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Output" name="PocToRead">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="BS_Luma">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="BS_Cr">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="BS_Cb">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
@@ -451,19 +401,59 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="RefIdxtoPoc">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="MPEG.MPEG4.part10.Algo_RefIdxtoPOC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Mgnt_DBF_param_Luma">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="MPEG.MPEG4.part10.Mgnt_DBF_param"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="LUMA_CHROMA">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Mgnt_DBF_param_Cb">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="MPEG.MPEG4.part10.Mgnt_DBF_param"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="LUMA_CHROMA">
+            <Expr kind="Literal" literal-kind="Integer" value="8"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Mgnt_DBF_param_Cr">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="MPEG.MPEG4.part10.Mgnt_DBF_param"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="LUMA_CHROMA">
+            <Expr kind="Literal" literal-kind="Integer" value="8"/>
+        </Parameter>
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="Algo_NALU" dst-port="bits8" src="" src-port="bits8"/>
     <Connection dst="" dst-port="ScalingList" src="Algo_Synp_AVC" src-port="ScalingList"/>
-    <Connection dst="" dst-port="QP" src="Algo_Synp_AVC" src-port="QP"/>
-    <Connection dst="" dst-port="CurrMbAddr" src="Algo_Synp_AVC" src-port="CurrMbAddr"/>
     <Connection dst="" dst-port="PicWidthInMb" src="Algo_Synp_AVC" src-port="PicWidthInMb"/>
-    <Connection dst="" dst-port="PicSizeInMb" src="Algo_Synp_AVC" src-port="PicSizeInMb"/>
-    <Connection dst="" dst-port="FirstMbInSlice" src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
     <Connection dst="" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
     <Connection dst="" dst-port="MbPartIdx" src="Algo_Synp_AVC" src-port="MbPartIdx"/>
-    <Connection dst="" dst-port="RefIdx" src="Algo_Synp_AVC" src-port="RefIdx"/>
     <Connection dst="" dst-port="MbPartWidth" src="Algo_Synp_AVC" src-port="MbPartWidth"/>
     <Connection dst="" dst-port="MbPartHeigth" src="Algo_Synp_AVC" src-port="MbPartHeigth"/>
     <Connection dst="" dst-port="PredMode" src="Algo_IntraPred_Split" src-port="PredMode"/>
@@ -495,16 +485,7 @@
     <Connection dst="MVReconstruct" dst-port="RefIdx"
         src="Algo_Synp_AVC" src-port="RefIdx"/>
     <Connection dst="MVReconstruct" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
-    <Connection dst="" dst-port="QP_Cb" src="Algo_Synp_AVC" src-port="QP_Cb"/>
-    <Connection dst="" dst-port="QP_Cr" src="Algo_Synp_AVC" src-port="QP_Cr"/>
     <Connection dst="" dst-port="IntraPredModeC" src="Algo_Synp_AVC" src-port="IntraPredModeC"/>
-    <Connection dst="" dst-port="slice_alpha_c0_offset"
-        src="Algo_Synp_AVC" src-port="slice_alpha_c0_offset"/>
-    <Connection dst="" dst-port="slice_beta_offset" src="Algo_Synp_AVC" src-port="slice_beta_offset"/>
-    <Connection dst="" dst-port="LFDisable" src="Algo_Synp_AVC" src-port="LFDisable"/>
-    <Connection dst="" dst-port="mv_out" src="MVReconstruct" src-port="mv_out"/>
-    <Connection dst="" dst-port="ref_idx" src="MVReconstruct" src-port="ref_idx"/>
-    <Connection dst="" dst-port="CodedBlockPattern" src="Algo_Synp_AVC" src-port="cbp_blk"/>
     <Connection dst="MVReconstruct" dst-port="FirstMbInSlice"
         src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
     <Connection dst="Algo_Parser_IPCM" dst-port="I_PCM"
@@ -515,8 +496,6 @@
     <Connection dst="" dst-port="ConstrainedIFlag" src="Algo_Synp_AVC" src-port="ConstrainedIFlag"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="ConstrainedIFlag"
         src="Algo_Synp_AVC" src-port="ConstrainedIFlag"/>
-    <Connection dst="" dst-port="Mb_TypeC" src="Algo_IntraPred_Split" src-port="MbTypeC"/>
-    <Connection dst="" dst-port="Mb_Type" src="Algo_IntraPred_Split" src-port="MbType"/>
     <Connection dst="Algo_MMCO" dst-port="MaxFrameNum"
         src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
     <Connection dst="" dst-port="DelList" src="Algo_MMCO" src-port="DelList"/>
@@ -531,7 +510,6 @@
         src="Algo_Synp_AVC" src-port="NumRefFrame"/>
     <Connection dst="Algo_RefList0" dst-port="NbRefFrame"
         src="Algo_Synp_AVC" src-port="Nb_RefFrame_l0"/>
-    <Connection dst="" dst-port="RefList" src="Algo_RefList0" src-port="RefList"/>
     <Connection dst="Algo_RefList0" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
     <Connection dst="Algo_RefList0" dst-port="ShortTermList"
@@ -575,4 +553,77 @@
     <Connection dst="Mgnt_Display" dst-port="Poc" src="Algo_Synp_AVC" src-port="POC"/>
     <Connection dst="Mgnt_Display" dst-port="EmptyDpb" src="Algo_MMCO" src-port="EmptyDPB"/>
     <Connection dst="" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
+    <Connection dst="" dst-port="FrameNum" src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
+    <Connection dst="RefIdxtoPoc" dst-port="RefList" src="Algo_RefList0" src-port="RefList"/>
+    <Connection dst="RefIdxtoPoc" dst-port="RefIdx" src="Algo_Synp_AVC" src-port="RefIdx"/>
+    <Connection dst="" dst-port="enableRead" src="Algo_Synp_AVC" src-port="enableRead"/>
+    <Connection dst="RefIdxtoPoc" dst-port="NewList" src="Algo_Synp_AVC" src-port="enableRead"/>
+    <Connection dst="" dst-port="isNewPic" src="Algo_Synp_AVC" src-port="isNewPic"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="RefIdx"
+        src="MVReconstruct" src-port="ref_idx"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="MV"
+        src="MVReconstruct" src-port="mv_out"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="LFDisable"
+        src="Algo_Synp_AVC" src-port="LFDisable"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="MbType"
+        src="Algo_Synp_AVC" src-port="MbType"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="Alpha_offset"
+        src="Algo_Synp_AVC" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="Beta_offset"
+        src="Algo_Synp_AVC" src-port="slice_beta_offset"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="FirstMbInSlice"
+        src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="Cbp_blk"
+        src="Algo_Synp_AVC" src-port="cbp_blk"/>
+    <Connection dst="" dst-port="BS_Luma" src="Mgnt_DBF_param_Luma" src-port="BS"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="MbLocation"
+        src="Algo_Synp_AVC" src-port="MbLocation"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="Alpha_offset"
+        src="Algo_Synp_AVC" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="Alpha_offset"
+        src="Algo_Synp_AVC" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="Beta_offset"
+        src="Algo_Synp_AVC" src-port="slice_beta_offset"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="Beta_offset"
+        src="Algo_Synp_AVC" src-port="slice_beta_offset"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="Cbp_blk"
+        src="Algo_Synp_AVC" src-port="cbp_blk"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="Cbp_blk"
+        src="Algo_Synp_AVC" src-port="cbp_blk"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="FirstMbInSlice"
+        src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="FirstMbInSlice"
+        src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="LFDisable"
+        src="Algo_Synp_AVC" src-port="LFDisable"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="LFDisable"
+        src="Algo_Synp_AVC" src-port="LFDisable"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="MV"
+        src="MVReconstruct" src-port="mv_out"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="MV"
+        src="MVReconstruct" src-port="mv_out"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="RefIdx"
+        src="MVReconstruct" src-port="ref_idx"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="RefIdx"
+        src="MVReconstruct" src-port="ref_idx"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="MbType"
+        src="Algo_Synp_AVC" src-port="MbType"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="MbType"
+        src="Algo_Synp_AVC" src-port="MbType"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="MbLocation"
+        src="Algo_Synp_AVC" src-port="MbLocation"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="MbLocation"
+        src="Algo_Synp_AVC" src-port="MbLocation"/>
+    <Connection dst="" dst-port="BS_Cb" src="Mgnt_DBF_param_Cb" src-port="BS"/>
+    <Connection dst="" dst-port="BS_Cr" src="Mgnt_DBF_param_Cr" src-port="BS"/>
+    <Connection dst="" dst-port="QP_Cb" src="Mgnt_DBF_param_Cb" src-port="QPo"/>
+    <Connection dst="Mgnt_DBF_param_Cb" dst-port="QPi"
+        src="Algo_Synp_AVC" src-port="QP_Cb"/>
+    <Connection dst="" dst-port="QP_Cr" src="Mgnt_DBF_param_Cr" src-port="QPo"/>
+    <Connection dst="Mgnt_DBF_param_Cr" dst-port="QPi"
+        src="Algo_Synp_AVC" src-port="QP_Cr"/>
+    <Connection dst="" dst-port="QP" src="Mgnt_DBF_param_Luma" src-port="QPo"/>
+    <Connection dst="Mgnt_DBF_param_Luma" dst-port="QPi"
+        src="Algo_Synp_AVC" src-port="QP"/>
+    <Connection dst="" dst-port="PocToRead" src="RefIdxtoPoc" src-port="FrameToRead"/>
 </XDF>

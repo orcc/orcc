@@ -5,8 +5,6 @@
       <vertex id="Coef_ACR" x="150" y="339"/>
       <vertex id="MB_IN" x="55" y="69"/>
       <vertex id="Mb_Type" x="49" y="129"/>
-      <vertex id="ConstrainedIFlag" x="341" y="38"/>
-      <vertex id="IsIntraFlag" x="351" y="94"/>
       <vertex id="MbLocation" x="40" y="102"/>
       <vertex id="NeighbourAvail" x="336" y="121"/>
       <vertex id="MBPred_intra_4x4" x="1045" y="318"/>

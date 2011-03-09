@@ -405,19 +405,11 @@
     <Connection dst="Select" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="DemuxParserInfos" dst-port="ConstrainedIFlag"
         src="" src-port="ConstrainedIFlag"/>
-    <Connection dst="Intra_4x4" dst-port="ConstrainedIFlag"
-        src="DemuxParserInfos" src-port="ConstrI_Intra_4x4"/>
-    <Connection dst="Intra_16x16" dst-port="ConstrainedIFlag"
-        src="DemuxParserInfos" src-port="ConstrI_Intra_16x16"/>
     <Connection dst="DemuxParserInfos" dst-port="PredMode" src="" src-port="PredMode"/>
     <Connection dst="Intra_4x4" dst-port="PredMode"
         src="DemuxParserInfos" src-port="PredMode_4x4"/>
     <Connection dst="Intra_16x16" dst-port="PredMode"
         src="DemuxParserInfos" src-port="PredMode_16x16"/>
-    <Connection dst="Intra_4x4" dst-port="IsIntraFlag"
-        src="DemuxParserInfos" src-port="IsIntraFlag_4x4"/>
-    <Connection dst="Intra_16x16" dst-port="IsIntraFlag"
-        src="DemuxParserInfos" src-port="IsIntraFlag_16x16"/>
     <Connection dst="Inter" dst-port="Coef_ACR" src="DemuxParserInfos" src-port="Coef_ACR_Inter"/>
     <Connection dst="Inter" dst-port="MV" src="" src-port="MV"/>
     <Connection dst="Inter" dst-port="PartSZ" src="" src-port="PartSZ"/>

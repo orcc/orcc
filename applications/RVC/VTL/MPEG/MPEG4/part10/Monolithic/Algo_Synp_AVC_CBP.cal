@@ -57,8 +57,9 @@ FU realizing Syntax Parsing for AVC
 // This FU has been modified by Mickael Raulet (INSA of Rennes) July 2009
 
 package MPEG.MPEG4.part10.Monolithic;
-import std.util.BitOps.*;
+
 import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import std.util.BitOps.*;
 
 actor Algo_Synp_AVC_CBP()
 		bool bits, 
@@ -75,7 +76,6 @@ actor Algo_Synp_AVC_CBP()
 			int(size=8) QP_Cr, 
 			uint(size=13) CurrMbAddr, 
 			uint(size=7) PicWidthInMb, 
-			uint(size=13) PicSizeInMb, 
 			uint(size=13) FirstMbInSlice, 
 			uint POC, 
 			uint(size=3) MbPartIdx, 
@@ -101,7 +101,9 @@ actor Algo_Synp_AVC_CBP()
 			uint(size=8) SizeDPBMax,
 			uint(size=6) MbType,
 			uint(size=7) MbLocation,
-			bool NeighbourAvail
+			bool NeighbourAvail,
+			bool isNewPic,
+			bool enableRead
 		:
   	// FIXME! Maximum size of a line in macroclock
   	uint(size=7) PICWIDTH =1280/16;
@@ -752,25 +754,23 @@ actor Algo_Synp_AVC_CBP()
 	end
  
 	look_for_other_header: action ==>
-	guard
-		nal_unit_type != 7 and nal_unit_type != 8 and nal_unit_type != 5 and nal_unit_type != 1
 	end
  
-	look_for_Sps_header: action ==>
+	look_for.Sps_header: action ==>
 	guard
 		nal_unit_type = 7
 	do
 		set_bits_to_read(24); //8 + 1+1+1+1 + 4 + 8
 	end
 
-	look_for_Pps_header: action ==>
+	look_for.Pps_header: action ==>
 	guard
 		nal_unit_type = 8
 	do
 		start_vld();
 	end
  
-	look_for_Slice_header: action ==>
+	look_for.Slice_header: action ==>
 	guard
 		nal_unit_type = 5 or nal_unit_type = 1
 	do
@@ -1473,7 +1473,7 @@ actor Algo_Synp_AVC_CBP()
 	*************************************************************/
 
 
-	read_SliceH_slice_type: action ==> WIDTH:[pic_width_in_mbs_minus1[sps_id] + 1], HEIGHT:[pic_height_in_map_units_minus1[sps_id] + 1]
+	read_SliceH_slice_type: action ==> 
 	guard
 		vld_end()
 	do
@@ -1697,7 +1697,7 @@ actor Algo_Synp_AVC_CBP()
 	guard first_mb_in_slice!=0
 	end
 
-	CalcPOC: action ==> POC :[POC_val], SizeDPBMax :[MaxDPBSz[sps_id]]
+	CalcPOC: action ==> POC :[POC_val], SizeDPBMax :[MaxDPBSz[sps_id]],isNewPic:[true], enableRead:[false], WIDTH:[pic_width_in_mbs_minus1[sps_id] + 1], HEIGHT:[pic_height_in_map_units_minus1[sps_id] + 1]
 	guard first_mb_in_slice=0
 	var 
 		int PicOrderCntMsb,
@@ -2466,8 +2466,9 @@ actor Algo_Synp_AVC_CBP()
 	read_SliceD_mb_skip_run_done1.I_BLOCK: action 
 		==> 
 			CurrMbAddr:[mb_addr],
+			isNewPic:[false],
 			PicWidthInMb:[PicWidthInMbs],
-			PicSizeInMb:[PicSizeInMbs],
+			//PicSizeInMb:[PicSizeInMbs],
 			FirstMbInSlice:[first_mb_in_slice],
 			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
 			slice_beta_offset:[val_slice_beta_offset],
@@ -2477,15 +2478,16 @@ actor Algo_Synp_AVC_CBP()
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
+			//ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
 			RefIdx:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0], 
-			LAST:[[true: for int t in 0 .. 26 ]] repeat 27,
+			//LAST:[[true: for int t in 0 .. 26 ]] repeat 27,
 			MbType:[BLOCK_TYPE_P_SKIP],
+			enableRead:[true],
 			NeighbourAvail:[Is_MbA_Avail , Is_MbB_Avail , Is_MbC_Avail , Is_MbD_Avail],
 			MbLocation:[mb_x, mb_y]
 	guard
@@ -2516,8 +2518,9 @@ actor Algo_Synp_AVC_CBP()
 	read_SliceD_mb_skip_run_done1.P_BLOCK: action 
 		==> 
 			CurrMbAddr:[mb_addr],
+			isNewPic:[false],
 			PicWidthInMb:[PicWidthInMbs],
-			PicSizeInMb:[PicSizeInMbs],
+			//PicSizeInMb:[PicSizeInMbs],
 			FirstMbInSlice:[first_mb_in_slice],
 			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
 			slice_beta_offset:[val_slice_beta_offset],
@@ -2527,14 +2530,15 @@ actor Algo_Synp_AVC_CBP()
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
+			//ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
 			RefIdx:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
-			MvRes:[0,0], 
-			LAST:[[true: for int t in 0 .. 25 ]] repeat 26,
+			MvRes:[0,0],
+			enableRead:[true],
+			//LAST:[[true: for int t in 0 .. 25 ]] repeat 26,
 			NeighbourAvail:[Is_MbA_Avail , Is_MbB_Avail , Is_MbC_Avail , Is_MbD_Avail],
 			MbType:[BLOCK_TYPE_P_SKIP],
 			MbLocation:[mb_x, mb_y]
@@ -2624,8 +2628,9 @@ actor Algo_Synp_AVC_CBP()
 	send_data_position_information_is_ipcm: action 
 		==> 
 			CurrMbAddr:[mb_addr],
+			isNewPic:[false],
 			PicWidthInMb:[PicWidthInMbs],
-			PicSizeInMb:[PicSizeInMbs],
+			//PicSizeInMb:[PicSizeInMbs],
 			FirstMbInSlice:[first_mb_in_slice],
 			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
 			slice_beta_offset:[val_slice_beta_offset],
@@ -2659,8 +2664,9 @@ actor Algo_Synp_AVC_CBP()
 	send_data_position_information: action 
 		==> 
 			CurrMbAddr:[mb_addr],
+			isNewPic:[false],
 			PicWidthInMb:[PicWidthInMbs],
-			PicSizeInMb:[PicSizeInMbs],
+			//PicSizeInMb:[PicSizeInMbs],
 			FirstMbInSlice:[first_mb_in_slice],
 			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
 			slice_beta_offset:[val_slice_beta_offset],
@@ -3154,7 +3160,7 @@ actor Algo_Synp_AVC_CBP()
 	end
 	//   for( subMbPartIdx = 0; subMbPartIdx < NumSubMbPart( sub_mb_type[ mbPartIdx ] ); subMbPartIdx++)
 	//     for( compIdx = 0; compIdx < 2; compIdx++ )
-	read_sub_MB_pred_mvd_l0_done0: action ==> MbPartIdx:[subMbPartIdx], RefIdx:[ref_idx_l0[mbPartIdx]], MbPartWidth:[SubMbPartWidthHeigth(0)], MbPartHeigth:[SubMbPartWidthHeigth(1)]
+	read_sub_MB_pred_mvd_l0_done0: action ==> MbPartIdx:[subMbPartIdx], RefIdx:[ref_idx_l0[mbPartIdx]], MbPartWidth:[SubMbPartWidthHeigth(0)], MbPartHeigth:[SubMbPartWidthHeigth(1)], enableRead:[true]
 	guard
 		subMbPartIdx < NumSubMbPart()
 	do
@@ -3413,7 +3419,7 @@ actor Algo_Synp_AVC_CBP()
 		if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
 	end
 
-	read_MB_pred_ref_idx_l0_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
+	read_MB_pred_ref_idx_l0_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)], enableRead:[true]
 	guard
 		(slice_num_ref_idx_l0_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l0_active_minus1 > 1 and vld_end())
 	do
@@ -3422,7 +3428,7 @@ actor Algo_Synp_AVC_CBP()
 	end
 
 	//else
-	read_MB_pred_skip_ref_idx_l0: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
+	read_MB_pred_skip_ref_idx_l0: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)], enableRead:[true]
 	guard
 		mbPartIdx < NumMbPart()
 	do
@@ -4147,9 +4153,9 @@ actor Algo_Synp_AVC_CBP()
 		//
 		look_for_which_Header                         	( look_for_which_Header								) --> find_header;
 		find_header	  									( look_for_other_header								) --> search_start_code;
-		find_header	  									( look_for_Sps_header	  							) --> read_Sps_id;
-		find_header	  									( look_for_Pps_header	  							) --> read_Pps_seq_parameter_set_id;
-		find_header	  									( look_for_Slice_header	  							) --> read_SliceH_slice_type;
+		find_header	  									( look_for.Sps_header	  							) --> read_Sps_id;
+		find_header	  									( look_for.Pps_header	  							) --> read_Pps_seq_parameter_set_id;
+		find_header	  									( look_for.Slice_header	  							) --> read_SliceH_slice_type;
 
 		// read Sps header
 		read_Sps_id	  										( read_Sps_id	    								) --> read_Sps_id_done;
@@ -4193,17 +4199,10 @@ actor Algo_Synp_AVC_CBP()
 		read_Pps_num_slice_groups_minus1					( read_Pps_num_slice_groups_minus1				  	) --> look_Pps_slice_group_map_type; 			  
 		look_Pps_slice_group_map_type						( read_Pps_slice_group_map_type                     ) --> read_Pps_check_slice_group_map_type;
 		read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type0;
-		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type1;
-		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type2;
-		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type345;
-		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type6;
-		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_check_slice_group_map_type0				( read_Pps_run_length_minus1						) --> read_Pps_check_slice_group_map_type0;
-		//gorinje read_Pps_check_slice_group_map_type0				( read_Pps_run_length_minus1						) --> read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_check_slice_group_map_type1				( read_Pps_check_slice_group_map_type1				) --> read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_check_slice_group_map_type2				( read_Pps_top_left	                                ) --> read_Pps_bottom_right;
 		read_Pps_bottom_right								( read_Pps_bottom_right								) --> read_Pps_check_slice_group_map_type2;
-		//gorinje read_Pps_bottom_right								( read_Pps_bottom_right								) --> read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_check_slice_group_map_type345				( read_Pps_slice_group_change_direction_flag		) --> read_Pps_slice_group_change_rate_minus1;
 		read_Pps_slice_group_change_rate_minus1			    ( read_Pps_slice_group_change_rate_minus1	        ) --> read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_check_slice_group_map_type6				( read_Pps_pic_size_in_map_units_minus1				) --> search_start_code; //not yet realized
@@ -4504,6 +4503,7 @@ actor Algo_Synp_AVC_CBP()
 	end
 
 	priority
+		look_for > look_for_other_header;
 		read_Sps_chroma_format_idc > read_Sps_log2_max_frame_num_minus4 ;
 		read_SliceH_read_colour_plane_id > read_SliceH_frame_num ;
 		read_SliceH_pred_weight_table > read_SliceH_skip_pred_weight_table;

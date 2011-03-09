@@ -25,10 +25,8 @@ import MPEG.Common.Imp_PictureInfo.*;
 
 actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	bool          NeighbourAvail,
-	bool          IsIntraFlag,
 	uint(size=4)  PredMode,
-	uint(size=16) EDGE,
-	bool          ConstrainedIFlag 
+	uint(size=16) EDGE
 		==> 
 		uint(size=1) Avail,
 		uint(size=4) PredMode_I,
@@ -46,9 +44,9 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	List( type:uint(size=1), size=3 ) avail := [ 0 : for int i in 0 .. 2 ];
 	
 	// Available 16x16 edge for prediction
-	uint(size=1) left_16x16_avail := 0;
-	uint(size=1) top_16x16_avail := 0;
-	uint(size=1) topLeft_16x16_avail := 0;
+	bool left_16x16_avail := false;
+	bool top_16x16_avail := false;
+	bool topLeft_16x16_avail := false;
 
 
 	
@@ -58,26 +56,14 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	//Mb_Type_OK : Enable the prediction 
 	MbTypeOK:action
 		NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail],
-		ConstrainedIFlag:[c_intra_flag],
-		PredMode:[v],
-		IsIntraFlag :[is_intra_flag] repeat 3
+		PredMode:[v]
 			==>
 		PredMode_I:[v]
-	var
-		uint(size=2) CURR_POS = 1,
-  		bool intra_top_left
 	do
-		intra_top_left:=is_intra_flag[2];
 		//Set 16x16 the available edge
-		left_16x16_avail := if not NeighbourA_Avail then 0 else 
-								if (is_intra_flag[CURR_POS-1] or c_intra_flag=false) then 1 else 0 end   
-							end;
-		top_16x16_avail := if not NeighbourB_Avail then 0 else 
-								if (is_intra_flag[CURR_POS] or c_intra_flag=false) then 1 else 0 end   
-							end;
-		topLeft_16x16_avail :=  if not NeighbourD_Avail then 0 else 
-									if (intra_top_left or c_intra_flag=false) then 1 else 0 end   
-								end;
+		left_16x16_avail := NeighbourA_Avail;
+		top_16x16_avail := NeighbourB_Avail;
+		topLeft_16x16_avail :=  NeighbourD_Avail;
 
 	end
 
@@ -109,11 +95,11 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	InitAvail:action ==> Avail:[ [ avail[s] : for int s in 0 .. 2 ] ] repeat 3
 	do
 		//edge available for left
-		avail[0] := left_16x16_avail;
+		avail[0] := if left_16x16_avail then 1 else 0 end;
 		//edge available for top
-		avail[1] := top_16x16_avail;
+		avail[1] := if top_16x16_avail then 1 else 0 end;
 		//edge available for top left
-		avail[2] := topLeft_16x16_avail;
+		avail[2] := if topLeft_16x16_avail then 1 else 0 end;
   	end
   
 	//**** Send neighbouring pixel value ****

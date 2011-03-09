@@ -1,0 +1,140 @@
+/********************************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+
+*****************************************************************************/
+package MPEG.MPEG4.part10.Common;
+
+import MPEG.Common.Imp_Math.*;
+import MPEG.Common.Imp_PictureInfo.*;
+
+actor BufferCurrPic ( int MB_WIDTH )
+	uint(size=7) MbLocation,
+	uint(size=8) WD,
+	uint(size=7) PicWidthInMb,
+	bool IsNewPicOrSlice
+		==>
+	uint(size=32) CurrPicInfo,
+	uint(size=8) CurrMbVal
+		:
+
+	bool IS_NEW_MB    = false;
+	bool IS_NEW_PIC   = true;
+
+	uint(size=8)  picture [1024 * 512][256];
+	uint(size=32) nbMacroBlocksWritten := 0;
+	uint(size=32) nbMacroBlocksSent    := 0;
+	uint(size=7)  picWidthInMb;
+
+	getIsNewPic: action IsNewPicOrSlice :[isNewMbOrSlice] ==>
+	end
+
+	writePictureDone: action
+		IsNewPicOrSlice :[isNewMbOrSlice]
+			==>
+		CurrPicInfo :[nbMacroBlocksWritten, picWidthInMb]
+	guard
+		isNewMbOrSlice = IS_NEW_PIC
+	end
+
+	getWriteAddr: action
+		PicWidthInMb :[valPicWidthInMb],
+		IsNewPicOrSlice :[isNewMbOrSlice]
+			==>
+	guard
+		isNewMbOrSlice = IS_NEW_MB
+	do
+		nbMacroBlocksWritten := nbMacroBlocksWritten + 1;
+		picWidthInMb         := valPicWidthInMb;
+	end
+
+	writeData.Chroma : action 
+		MbLocation :[MbLocxInPic , MbLocyInPic],
+		WD         :[wd] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA
+			==>
+	guard
+		MB_WIDTH = MB_WIDTH_CHROMA
+	do
+		foreach int i in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA - 1
+		do
+			picture[MbLocyInPic * picWidthInMb + MbLocxInPic][i] := wd[i];
+		end
+	end
+
+	writeData.Luma : action
+		MbLocation :[MbLocxInPic , MbLocyInPic],
+		WD         :[wd] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
+			==>
+	guard
+		MB_WIDTH = MB_WIDTH_LUMA
+	do
+		foreach int i in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA - 1
+		do
+			picture[MbLocyInPic * picWidthInMb + MbLocxInPic][i] := wd[i];
+		end
+	end
+
+	sendPicture.launch.Chroma : action
+			==>
+		CurrMbVal :[currMbVal] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA
+	guard
+		nbMacroBlocksSent < nbMacroBlocksWritten,
+		MB_WIDTH = MB_WIDTH_CHROMA
+	var
+		uint(size=8) currMbVal[MB_WIDTH_CHROMA*MB_WIDTH_CHROMA]
+	do
+		foreach int i in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA - 1
+		do
+			currMbVal[i] := picture[nbMacroBlocksSent][i];
+		end
+		nbMacroBlocksSent := nbMacroBlocksSent + 1;
+	end
+
+	sendPicture.launch.Luma : action
+			==>
+		CurrMbVal :[currMbVal] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
+	guard
+		nbMacroBlocksSent < nbMacroBlocksWritten,
+		MB_WIDTH = MB_WIDTH_LUMA
+	var
+		uint(size=8) currMbVal[MB_WIDTH_LUMA*MB_WIDTH_LUMA]
+	do
+		foreach int i in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA - 1
+		do
+			currMbVal[i] := picture[nbMacroBlocksSent][i];
+		end
+		nbMacroBlocksSent := nbMacroBlocksSent + 1;
+	end
+
+	sendPicture.done : action ==>
+	guard
+		nbMacroBlocksSent = nbMacroBlocksWritten
+	do
+		nbMacroBlocksSent    := 0;
+		nbMacroBlocksWritten := 0;
+	end
+
+
+	schedule fsm  GetIsNewPic:
+		GetIsNewPic (getIsNewPic      )--> GetNextMb;
+
+		GetNextMb   (getWriteAddr     )--> WriteMb;
+		GetNextMb   (writePictureDone )--> SendPicture;
+
+		WriteMb     (writeData        )--> GetNextMb;
+
+		SendPicture (sendPicture.launch )--> SendPicture;
+		SendPicture (sendPicture.done )--> GetNextMb;
+	end
+end
