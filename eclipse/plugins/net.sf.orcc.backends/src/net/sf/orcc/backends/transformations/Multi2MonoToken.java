@@ -170,7 +170,7 @@ public class Multi2MonoToken extends ActionSplitter {
 	private Action process;
 
 	private boolean repeatInput = false;
-	
+
 	private boolean repeatOutput = false;
 
 	// private boolean repeatOutput = false;
@@ -364,8 +364,19 @@ public class Multi2MonoToken extends ActionSplitter {
 		Expression counterExpression = new VarExpr(new Use(readCounter));
 		Expression expression = new BinaryExpr(counterExpression, BinaryOp.LT,
 				guardValue, IrFactory.eINSTANCE.createTypeBool());
+
+		LocalVariable localINPUT = new LocalVariable(true, 0, new Location(),
+				port.getName(), IrFactory.eINSTANCE.createTypeList(1,
+						port.getType()));
 		Action newStoreAction = createAction(expression, storeName);
-		defineStoreBody(readCounter, storeList, newStoreAction.getBody());
+		defineStoreBody(readCounter, storeList, newStoreAction.getBody(),
+				localINPUT);
+
+		// add input pattern
+		Pattern pattern = newStoreAction.getInputPattern();
+		pattern.setNumTokens(port, 1);
+		pattern.setVariable(port, localINPUT);
+		pattern.getVariableMap().put(port, localINPUT);
 		return newStoreAction;
 	}
 
@@ -407,7 +418,16 @@ public class Multi2MonoToken extends ActionSplitter {
 		Expression expression = new BinaryExpr(counterExpression, BinaryOp.LT,
 				guardValue, IrFactory.eINSTANCE.createTypeBool());
 		Action newWriteAction = createAction(expression, writeName);
-		defineWriteBody(writeCounter, writeList, newWriteAction.getBody());
+
+		LocalVariable OUTPUT = new LocalVariable(true, 0, new Location(),
+				port.getName() + "OUTPUT", IrFactory.eINSTANCE.createTypeList(
+						1, port.getType()));
+		defineWriteBody(writeCounter, writeList, newWriteAction.getBody(),
+				OUTPUT);
+		// add output pattern
+		newWriteAction.getOutputPattern().setNumTokens(port, 1);
+		newWriteAction.getOutputPattern().setVariable(port, OUTPUT);
+		newWriteAction.getOutputPattern().getVariableMap().put(port, OUTPUT);
 		return newWriteAction;
 	}
 
@@ -424,7 +444,7 @@ public class Multi2MonoToken extends ActionSplitter {
 	 *            new store action body
 	 */
 	private void defineStoreBody(GlobalVariable readCounter,
-			GlobalVariable storeList, Procedure body) {
+			GlobalVariable storeList, Procedure body, LocalVariable localINPUT) {
 		BlockNode bodyNode = BlockNode.getFirst(body);
 
 		OrderedMap<String, LocalVariable> locals = body.getLocals();
@@ -435,9 +455,6 @@ public class Multi2MonoToken extends ActionSplitter {
 		Instruction load1 = new Load(counter, readCounterUse);
 		bodyNode.add(load1);
 
-		LocalVariable localINPUT = new LocalVariable(true, 0, new Location(),
-				port.getName(), IrFactory.eINSTANCE.createTypeList(1,
-						port.getType()));
 		locals.put(localINPUT.getName(), localINPUT);
 		Instruction read = new Read(port, 1, localINPUT);
 		localINPUT.setInstruction(read);
@@ -484,7 +501,7 @@ public class Multi2MonoToken extends ActionSplitter {
 	 */
 
 	private void defineWriteBody(GlobalVariable writeCounter,
-			GlobalVariable writeList, Procedure body) {
+			GlobalVariable writeList, Procedure body, LocalVariable OUTPUT) {
 		BlockNode bodyNode = BlockNode.getFirst(body);
 		OrderedMap<String, LocalVariable> locals = body.getLocals();
 		LocalVariable counter1 = new LocalVariable(true, outputIndex,
@@ -522,9 +539,6 @@ public class Multi2MonoToken extends ActionSplitter {
 		Instruction assign2 = new Assign(counter2, assign2Value);
 		bodyNode.add(assign2);
 
-		LocalVariable OUTPUT = new LocalVariable(true, 0, new Location(),
-				port.getName() + "OUTPUT", IrFactory.eINSTANCE.createTypeList(
-						1, port.getType()));
 		locals.put(OUTPUT.getName(), OUTPUT);
 		VarExpr store1Expression = new VarExpr(new Use(out));
 		List<Expression> store1Index = new ArrayList<Expression>(1);
@@ -631,16 +645,7 @@ public class Multi2MonoToken extends ActionSplitter {
 				String processName = "newStateProcess" + action.getName();
 				addTransition(processName, targetName, process);
 				// move action's Output pattern to new process action
-				process.getOutputPattern().getNumTokensMap()
-						.putAll(action.getOutputPattern().getNumTokensMap());
-				process.getOutputPattern().getPorts()
-						.addAll(action.getOutputPattern().getPorts());
-				process.getOutputPattern().getVariableMap()
-						.putAll(action.getOutputPattern().getVariableMap());
-				process.getOutputPattern()
-						.getInverseVariableMap()
-						.putAll(action.getOutputPattern()
-								.getInverseVariableMap());
+				moveOutputPattern(action, process);
 
 				// if input repeat detected --> treat all input ports
 				for (Entry<Port, Integer> entry : action.getInputPattern()
@@ -656,8 +661,6 @@ public class Multi2MonoToken extends ActionSplitter {
 							+ inputIndex;
 					GlobalVariable tab = createTab(listName, entryType);
 					store = createStoreAction(action.getName(), counter, tab);
-					store.getInputPattern().setNumTokens(port, 1);
-
 					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
 							tab);
 					modifyProcessAction.visit(process.getBody());
@@ -681,6 +684,16 @@ public class Multi2MonoToken extends ActionSplitter {
 			}
 		}
 		inputIndex = 0;
+	}
+
+	private void moveOutputPattern(Action source, Action target) {
+		Pattern targetPattern = target.getOutputPattern();
+		Pattern sourcePattern = source.getOutputPattern();
+		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
+		targetPattern.getPorts().addAll(sourcePattern.getPorts());
+		targetPattern.getVariableMap().putAll(sourcePattern.getVariableMap());
+		targetPattern.getInverseVariableMap().putAll(
+				sourcePattern.getInverseVariableMap());
 	}
 
 	private void scanOutputs(Action action, String sourceName, String targetName) {
