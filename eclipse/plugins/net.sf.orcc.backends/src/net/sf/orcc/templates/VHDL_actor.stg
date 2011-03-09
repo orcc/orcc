@@ -53,23 +53,58 @@ signal <portType(port=port, IOtype=" ", dataType="idata")>
 >>
 
 signalDeclaration(variable) ::= <<
-<if(!variable.type.list)
- ><if(variable.assignable)
-    >signal <variable> : <variable.type>;
-  <else
-    >constant <variable> : <variable.type> := <variable.initialValue>;
-  <endif><
-else
-  >type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;<\n><
-  if(variable.assignable)
-    >signal <variable> : memory_type_<variable> <if(variable.initialized)>:= <variable.initialValue><endif>;
-  <else
-    >constant <variable> : memory_type_<variable> <if(variable.initialized)>:= <variable.initialValue><endif>;
-  <endif>
+<if(variable.type.list)>
+<if(variable.assignable)>
+-- RAM signals for "<variable.name>"
+signal <variable.name>_wren_p1       : std_logic;
+signal <variable.name>_address_p1    : std_logic_vector(bit_width(<listSize(variable.type.dimensions)>)-1 downto 0);
+signal <variable.name>_data_p1       : std_logic_vector(<variable.type.type.size> -1 downto 0);
+signal <variable.name>_q_p1          : std_logic_vector(<variable.type.type.size> -1 downto 0);
+signal <variable.name>_wren_p2       : std_logic;
+signal <variable.name>_address_p2    : std_logic_vector(bit_width(<listSize(variable.type.dimensions)>)-1 downto 0);
+signal <variable.name>_data_p2       : std_logic_vector(<variable.type.type.size> -1 downto 0);
+signal <variable.name>_q_p2          : std_logic_vector(<variable.type.type.size> -1 downto 0);
+
+<else>
+type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
+constant <variable> : memory_type_<variable><if(variable.initialized)> := <variable.initialValue><endif>;
+<endif>
+<else>
+<if(variable.assignable)>
+signal <variable.name> : <variable.type>;
+<else>
+constant <variable> : <variable.type> := <variable.initialValue>;
+<endif>
 <endif>
 >>
 
+ramDeclaration(variable) ::= <<
+<if(variable.type.list)>
+<if(variable.assignable)>
+<if(actor.templateData.customInitMap.(variable))>
+-- custom init of arrays not supported
+<else>
+-- RAM instantiation for "<variable.name>"
+DP_genericRam_<variable.name> : entity work.DP_genericRam
+  generic map (
+    depth =\> <listSize(variable.type.dimensions)>,
+    width =\> <variable.type.type.size>,
+    initVal =\> <actor.templateData.initValueMap.(variable)>)
+  port map (
+    clk        =\> clock,
+    wren_p1    =\> <variable.name>_wren_p1,
+    address_p1 =\> <variable.name>_address_p1,
+    data_p1    =\> <variable.name>_data_p1,
+    q_p1       =\> <variable.name>_q_p1,
+    wren_p2    =\> <variable.name>_wren_p2,
+    address_p2 =\> <variable.name>_address_p2,
+    data_p2    =\> <variable.name>_data_p2,
+    q_p2       =\> <variable.name>_q_p2);
 
+<endif>
+<endif>
+<endif>
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print variables
@@ -683,6 +718,8 @@ begin
   <Actor_Exec(actor)>
 
   <OutputsManag()>
+  
+  <actor.stateVars.list: ramDeclaration()>
 
 end architecture rtl_<actor.simpleName>;
 
