@@ -1,0 +1,279 @@
+
+
+/**
+ * This software module was originally developed by 
+ * Paul Schumacher (Xilinx Inc.), 
+ * in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+ * for reference purposes and its performance may not have been optimized. 
+ * This software module is an implementation of one or more tools as 
+ * specified by the ISO/IEC 23002-4.
+ * 
+ * ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+ * license to copy, distribute, and make derivative works of this software 
+ * module or modifications thereof for use in implementations of the 
+ * ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+ * 
+ * Those intending to use this software module in products are advised that 
+ * its use may infringe existing patents. ISO/IEC have no liability for use 
+ * of this software module or modifications thereof.
+ * 
+ * Copyright is not released for products that do not conform to audiovisual 
+ * and image-coding related ITU Recommendations and/or ISO/IEC International 
+ * Standards. 
+ * 
+ * Assurance that the originally developed software module can be used 
+ * (1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+ * (2) to develop the ISO/IEC 23002-4: 
+ *
+ *
+ * Xilinx Inc. grants ISO/IEC all rights necessary to 
+ * include the originally developed software module or modifications thereof 
+ * in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+ * worldwide, non-exclusive, copyright license to copy, distribute, and make 
+ * derivative works for use in implementations of the ISO/IEC 23002-4 in 
+ * products that satisfy conformance criteria (if any), and to the extent 
+ * that such originally developed software module or portions of it are 
+ * included in the ISO/IEC 23002-4.  To the extent that NCKU
+ * owns patent rights that would be required to make, use, or 
+ * sell the originally developed software module or portions thereof 
+ * included in the ISO/IEC 23002-4 in a conforming product, NCKU will assure the ISO/IEC that it is willing to 
+ * negotiate licenses under reasonable and non-discriminatory terms and 
+ * conditions with applicants throughout the world.
+ *
+ * ISO/IEC gives You a free license to this software module or modifications 
+ * thereof for the sole  purpose of developing the ISO/IEC 23002-4.
+ * 
+ * NCKU retains full right to modify and use the 
+ * code for its own purpose, assign or donate the code to a third party and 
+ * to inhibit third parties from using the code for products that do not 
+ * conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+ * Standards. 
+ * 
+ * This copyright notice must be included in all copies or derivative works. 
+ * Copyright (c) ISO/IEC 2006-2010.
+ */
+
+/*
+* Author: Paul Schumacher, Xilinx Research Labs 
+*         (Email: paul.schumacher@xilinx.com)
+*
+*
+* Description:
+*   This design performs the in-loop deblocking filter for an AVC video 
+*   coder.  Tokens on the inputs and outputs of this block contain maps 
+*   (similar to structures) for easier interfacing.  One token on 'mbIn' is 
+*   assumed to contain the contents of a single macroblock (MB) including the 
+*   input YUV values as well as the MB parameters.  This design assumes raster 
+*   order of MBs (see below).  One token on 'imgParams' contains a map of 
+*   parameters for one frame or field.
+*
+*   The 'mbDataOut' and 'StrengthOut' outputs each produce one token per MB.
+*   One token on 'mbDataOut' is a map containing the (x,y) position (in MB
+*   coordinates) as well as arrays of YUV 4:2:0 output data.  'StrengthOut'
+*   should be used for debug only and produces a map of strength values and
+*   important parameters for debug purposes.
+*
+*   Note that the following modes are not supported by this revision of the 
+*   design:
+*     * MBAFF (Macroblock Adaptive Field/Frame mode)
+*     * only 4:2:0 format is supported
+*     * > 8-bit video
+
+* Revised:
+*  Author: Jia-Wei Liang, MSOC Lab, NCKU
+*  (E-mail: n2697181@mail.ncku.edu.tw)
+* Author: Micka‘l Raulet (INSA Rennes)
+* 	add RVC-CAL compliancy 
+* */
+// Mgnt_DBF.cal
+// Description: The management part of deblocking filter without mbaff
+package MPEG.MPEG4.part10;
+
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
+
+import MPEG.Common.Imp_PictureInfo.* ;
+
+import std.util.BitOps.* ;
+
+actor Mgnt_DBF_Chroma (int LUMA_CHROMA) uint(size=8) Z,
+	uint(size=7) MbLocation,
+	uint(size=8) DB_O
+	==> uint(size=8) DB_I,
+		uint(size=8) WD :
+
+		/*
+ 	 * Constants
+ 	 */
+	int SAMPLE_SZ = 16;
+
+	/*
+	 * State Variables
+	 */
+	List(type: List(type: uint(size=SAMPLE_SZ), size=8), size=8) curr_mb := [ [
+	0 : for int j in 0 .. 8 - 1 ] : for int i in 0 .. 8 - 1 ]; //
+
+
+	/*
+* Image parameters
+*/
+	uint(size=8) MB_Width := 1;
+
+	bool first_line := true; // x-coordinate of current macroblock using luma pixel coordinates/16
+	uint(size=8) mb_x := 0; // y-coordinate of current macroblock using luma pixel coordinates/16
+	uint(size=8) mb_y := 0;
+
+	List(type: List(type: List(type: uint(size=SAMPLE_SZ), size=8), size=8), size=MAX_PICWIDTH_PX) upFifo_mb
+	:= [ [ [ 0 : for int i in 0 .. 8 - 1 ] : for int j in 0 .. 8 - 1 ] : for int
+	l in 0 .. MAX_PICWIDTH_PX - 1 ]; //
+
+
+	/*************************************************************
+ *************************************************************
+ ********        Deblocking Filter: Actions           ********
+ *************************************************************
+ *************************************************************/
+	ReadMB: action MbLocation:[ Mbx, Mby ] ==>
+	do
+		mb_x := Mbx;
+		mb_y := Mby; // determine the size of a line of MBs
+		MB_Width := if MB_Width < mb_x then
+			mb_x
+		else
+			MB_Width
+		end;
+	end
+
+	DBI: action Z:[ v ] repeat 8 * 8 ==> DB_I:[ buff ] repeat (8 + 4) * (8 +
+		4)
+	var
+		List(type: uint(size=SAMPLE_SZ), size=144) buff
+	do
+		if (mb_y != 0) then
+			first_line := false;
+			foreach int y in 0 .. 4 - 1 do
+				foreach int x in 0 .. 8 - 1 do
+					buff[y * 12 + x + 4] := upFifo_mb[mb_x][y + 4][x];
+				end
+			end
+		else
+			foreach int y in 0 .. 4 - 1 do
+				foreach int x in 0 .. 8 - 1 do
+					buff[y * 12 + x + 4] := 0;
+				end
+			end
+		end
+		if (mb_x != 0) then
+			foreach int y in 0 .. 8 - 1 do
+				foreach int x in 0 .. 4 - 1 do
+					buff[(y + 4) * 12 + x] := upFifo_mb[mb_x - 1][y][x + 4];
+				end
+			end
+		else
+			foreach int y in 0 .. 8 - 1 do
+				foreach int x in 0 .. 4 - 1 do
+					buff[(y + 4) * 12 + x] := 0;
+				end
+			end
+		end
+		foreach int y in 0 .. 8 - 1 do
+			foreach int x in 0 .. 8 - 1 do
+				buff[(y + 4) * 12 + x + 4] := v[y * 8 + x];
+			end
+		end
+	end
+
+	DBO: action DB_O:[ v ] repeat (8 + 4) * (8 + 4) ==>
+	do
+		foreach int y in 0 .. 8 - 1 do
+			foreach int x in 0 .. 8 - 1 do
+				curr_mb[y][x] := v[x + 4 + (y + 4) * 12];
+			end
+		end
+		if (mb_x > 0) then
+			foreach int y in 0 .. 8 - 1 do
+				foreach int x in 0 .. 4 - 1 do
+					upFifo_mb[mb_x - 1][y][x + 4] := v[(x) + (y + 4) * 12];
+				end
+			end
+		end
+		foreach int y in 0 .. 4 - 1 do
+			foreach int x in 0 .. 8 - 1 do
+				upFifo_mb[mb_x][y + 4][x] := v[x + 4 + y * 12];
+			end
+		end
+	end
+
+	SkipOut: action ==>
+	guard
+		mb_y = 0
+	do
+		foreach int y in 0 .. 8 - 1 do
+			foreach int x in 0 .. 8 - 1 do
+				upFifo_mb[mb_x][y][x] := curr_mb[y][x];
+			end
+		end
+	end
+
+	OutMB: action ==> WD:[ buff ] repeat 8 * 8
+	var
+		List(type: uint(size=SAMPLE_SZ), size=8 * 8) buff
+	do
+		foreach int y in 0 .. 8 - 1 do
+			foreach int x in 0 .. 8 - 1 do
+				buff[x + y * 8] := upFifo_mb[mb_x][y][x];
+			end
+		end
+		foreach int y in 0 .. 8 - 1 do
+			foreach int x in 0 .. 8 - 1 do
+				upFifo_mb[mb_x][y][x] := curr_mb[y][x];
+			end
+		end
+	end //
+
+
+	/*
+* Completed w/ Macroblock
+*/
+	flush_fifo: action ==> WD:[ buff ] repeat 8 * 8
+	guard
+		mb_y = 0,
+		not(first_line)
+	var
+		List(type: uint(size=SAMPLE_SZ), size=8 * 8) buff
+	do
+		foreach int y in 0 .. 8 - 1 do
+			foreach int x in 0 .. 8 - 1 do
+				buff[x + y * 8] := upFifo_mb[mb_x][y][x];
+			end
+		end
+		mb_x := mb_x + 1;
+	end
+
+	flush_done: action ==>
+	guard
+		mb_y = 0,
+		not(first_line),
+		mb_x = MB_Width + 1
+	do
+		mb_x := 0;
+		first_line := true;
+	end ///////////////////////
+	// Schedule/Priority //
+	///////////////////////
+	schedule fsm ReadMB :
+		ReadMB ( ReadMB ) --> flush_fifo;
+		flush_fifo ( flush_done ) --> DBI;
+		flush_fifo ( flush_fifo ) --> flush_fifo;
+		flush_fifo ( DBI ) --> DBO;
+		DBI ( DBI ) --> DBO;
+		DBO ( DBO ) --> OutMB;
+		OutMB ( OutMB ) --> ReadMB;
+		OutMB ( SkipOut ) --> ReadMB;
+	end
+
+	priority
+		flush_done > flush_fifo > DBI;
+		SkipOut > OutMB;
+	end
+
+end
