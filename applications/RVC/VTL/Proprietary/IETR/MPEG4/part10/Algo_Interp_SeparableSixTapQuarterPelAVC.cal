@@ -79,9 +79,8 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
   int width;
   int height;
   int temp;
-  int temp2;
-  uint(size=8) TabPix[21*4][21*4];
-  List( type:int(size=32), size=6 ) half_pel := [ 0 : for int i in 0 .. 5 ];
+  uint(size=8)  TabPix[21*4][21*4];
+  int (size=32) TabIntermPix[21*4][21*4];
 
 	function SixTapFilter(int a1, int b1, int c1, int c2, int b2, int a2)
 				-->
@@ -123,12 +122,9 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				end
 			end
 			if(xFrac = 2)then
-				foreach int n in 0 .. 5
-				do
-					half_pel[n] := SixTapFilter( TabPix[4*x_idx][4*(n + y_idx)]     , TabPix[4*(1 + x_idx)][4*(n + y_idx)] , TabPix[4*(2 + x_idx)][4*(n + y_idx)],
-					                             TabPix[4*(3 + x_idx)][4*(n + y_idx)] , TabPix[4*(4 + x_idx)][4*(n + y_idx)] , TabPix[4*(5 + x_idx)][4*(n + y_idx)]);
-				end
-				temp := SixTapFilter(half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
+				temp := SixTapFilter(TabIntermPix[4*(2+x_idx)+2][4*y_idx]    , TabIntermPix[4*(2+x_idx)+2][4*(1+y_idx)] ,
+				                     TabIntermPix[4*(2+x_idx)+2][4*(2+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(3+y_idx)] ,
+				                     TabIntermPix[4*(2+x_idx)+2][4*(4+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(5+y_idx)]);
 				temp := (temp + 512) >> 10;
 				temp := clip(temp , 0,255);
 				if yFrac = 1 then 
@@ -143,12 +139,9 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 					temp := ComputeQuarterPixel(TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)],TabPix[4*(2 + x_idx)][4*(2 + y_idx)]);
 				else
 					if yFrac = 2 then
-						foreach int n in 0 .. 5
-						do
-							half_pel[n] := SixTapFilter( TabPix[4*x_idx][4*(n + y_idx)]     , TabPix[4*(1 + x_idx)][4*(n + y_idx)] , TabPix[4*(2 + x_idx)][4*(n + y_idx)],
-							                             TabPix[4*(3 + x_idx)][4*(n + y_idx)] , TabPix[4*(4 + x_idx)][4*(n + y_idx)] , TabPix[4*(5 + x_idx)][4*(n + y_idx)]);
-						end
-						temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
+						temp := SixTapFilter(TabIntermPix[4*(2+x_idx)+2][4*y_idx]    , TabIntermPix[4*(2+x_idx)+2][4*(1+y_idx)] ,
+						                     TabIntermPix[4*(2+x_idx)+2][4*(2+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(3+y_idx)] ,
+						                     TabIntermPix[4*(2+x_idx)+2][4*(4+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(5+y_idx)]);
 						temp  := (temp + 512) >> 10;
 						temp  := clip(temp , 0,255);
 						temp  := ComputeQuarterPixel(temp,TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]);
@@ -168,12 +161,9 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 					temp := ComputeQuarterPixel(TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)],TabPix[4*(3 + x_idx)][4*(2 + y_idx)]);
 				else
 					if yFrac = 2 then
-						foreach int n in 0 .. 5
-						do
-							half_pel[n] := SixTapFilter( TabPix[4*x_idx][4*(n + y_idx)]     , TabPix[4*(1 + x_idx)][4*(n + y_idx)] , TabPix[4*(2 + x_idx)][4*(n + y_idx)],
-							                             TabPix[4*(3 + x_idx)][4*(n + y_idx)] , TabPix[4*(4 + x_idx)][4*(n + y_idx)] , TabPix[4*(5 + x_idx)][4*(n + y_idx)]);
-						end
-						temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
+						temp := SixTapFilter(TabIntermPix[4*(2+x_idx)+2][4*y_idx]    , TabIntermPix[4*(2+x_idx)+2][4*(1+y_idx)] ,
+						                     TabIntermPix[4*(2+x_idx)+2][4*(2+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(3+y_idx)] ,
+						                     TabIntermPix[4*(2+x_idx)+2][4*(4+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(5+y_idx)]);
 						temp  := (temp+512) >> 10;
 						temp  := clip(temp , 0,255);
 						temp  := ComputeQuarterPixel(temp,TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]);
@@ -249,6 +239,23 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 					    ComputeHalfPixel(TabPix[4*x][4*y],       TabPix[4*(1 + x)][4*y],
 					                     TabPix[4*(2 + x)][4*y], TabPix[4*(3 + x)][4*y],
 					                     TabPix[4*(4 + x)][4*y], TabPix[4*(5 + x)][4*y]);
+				end
+			end
+		end
+
+		if(   (xFrac=2 and yFrac != 0)
+		   or (xFrac=1 and yFrac = 2)
+		   or (xFrac=3 and yFrac = 2))then
+			xMin := 0;
+			xMax := width - 1;
+			yMin := 0;
+			yMax := height + 4;
+			foreach int x in xMin .. xMax
+			do
+				foreach int y in yMin .. yMax
+				do
+					TabIntermPix[4*(2 + x) + 2][4*y] := SixTapFilter( TabPix[4*x][4*y]     , TabPix[4*(1 + x)][4*y] , TabPix[4*(2 + x)][4*y],
+					                                  TabPix[4*(3 + x)][4*y] , TabPix[4*(4 + x)][4*y] , TabPix[4*(5 + x)][4*y]);
 				end
 			end
 		end
