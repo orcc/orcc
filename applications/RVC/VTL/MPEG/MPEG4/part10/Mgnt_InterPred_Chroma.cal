@@ -20,8 +20,6 @@
 //Modified by Damien de Saint Jorre (IETR/Insa of Rennes)
 package MPEG.MPEG4.part10;
 
-import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.* ;
-
 actor Mgnt_InterPred_Chroma()
 	uint(size=6)  PartSZ,
 	int (size=16) MV,
