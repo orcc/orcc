@@ -4,7 +4,6 @@
       <vertex id="PicWidthInMb" x="784" y="188"/>
       <vertex id="PredMode" x="57" y="629"/>
       <vertex id="FirstMbInSlice" x="784" y="374"/>
-      <vertex id="PicSizeInMb" x="784" y="281"/>
       <vertex id="Coef_ACR" x="57" y="722"/>
       <vertex id="MV" x="235" y="280"/>
       <vertex id="PartSZ" x="235" y="373"/>

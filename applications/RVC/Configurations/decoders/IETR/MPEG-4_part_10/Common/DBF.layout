@@ -14,7 +14,7 @@
       <vertex id="LFDisable" x="36" y="194"/>
       <vertex id="FirstMbInSlice" x="21" y="162"/>
       <vertex id="WD" x="403" y="183"/>
-      <vertex id="Algo_DBF" x="244" y="6"/>
+      <vertex id="Algo_DBF" x="270" y="37"/>
       <vertex id="Mgnt_DBF" x="227" y="113"/>
    </vertices>
 </layout>

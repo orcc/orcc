@@ -24,13 +24,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="PicSizeInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="Coef_ACR">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -305,7 +298,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="DBF"/>
+        <Class name="DBF_Luma"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -382,8 +375,6 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Deblocking_Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
-    <Connection dst="Deblocking_Filter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="QP" src="" src-port="QP"/>
     <Connection dst="Deblocking_Filter" dst-port="LFDisable" src="" src-port="LFDisable"/>
     <Connection dst="Deblocking_Filter" dst-port="Alpha_offset" src="" src-port="slice_alpha_c0_offset"/>
@@ -455,4 +446,5 @@
     <Connection dst="Buffer_inter" dst-port="currPicInfo"
         src="BuffCurrPic" src-port="CurrPicInfo"/>
     <Connection dst="Buffer_inter" dst-port="FrameToRead" src="" src-port="FrameToRead"/>
+    <Connection dst="Deblocking_Filter" dst-port="MbLocation" src="" src-port="MbLocation"/>
 </XDF>

@@ -217,7 +217,6 @@
     <Connection dst="" dst-port="Display_Cr" src="Decode_V" src-port="Display"/>
     <Connection dst="" dst-port="Width" src="Syn_Parser" src-port="Width"/>
     <Connection dst="" dst-port="Height" src="Syn_Parser" src-port="Height"/>
-    <Connection dst="Decoding_Y" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
     <Connection dst="Decode_U" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
     <Connection dst="Decode_U" dst-port="PicWidthInMB" src="Syn_Parser" src-port="PicWidthInMb"/>
     <Connection dst="Decode_U" dst-port="FirstMbInSlice"

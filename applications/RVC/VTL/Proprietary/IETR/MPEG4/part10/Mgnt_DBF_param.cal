@@ -1,0 +1,659 @@
+
+
+/**
+ * This software module was originally developed by 
+ * Paul Schumacher (Xilinx Inc.), 
+ * in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+ * for reference purposes and its performance may not have been optimized. 
+ * This software module is an implementation of one or more tools as 
+ * specified by the ISO/IEC 23002-4.
+ * 
+ * ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+ * license to copy, distribute, and make derivative works of this software 
+ * module or modifications thereof for use in implementations of the 
+ * ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+ * 
+ * Those intending to use this software module in products are advised that 
+ * its use may infringe existing patents. ISO/IEC have no liability for use 
+ * of this software module or modifications thereof.
+ * 
+ * Copyright is not released for products that do not conform to audiovisual 
+ * and image-coding related ITU Recommendations and/or ISO/IEC International 
+ * Standards. 
+ * 
+ * Assurance that the originally developed software module can be used 
+ * (1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+ * (2) to develop the ISO/IEC 23002-4: 
+ *
+ *
+ * Xilinx Inc. grants ISO/IEC all rights necessary to 
+ * include the originally developed software module or modifications thereof 
+ * in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+ * worldwide, non-exclusive, copyright license to copy, distribute, and make 
+ * derivative works for use in implementations of the ISO/IEC 23002-4 in 
+ * products that satisfy conformance criteria (if any), and to the extent 
+ * that such originally developed software module or portions of it are 
+ * included in the ISO/IEC 23002-4.  To the extent that NCKU
+ * owns patent rights that would be required to make, use, or 
+ * sell the originally developed software module or portions thereof 
+ * included in the ISO/IEC 23002-4 in a conforming product, NCKU will assure the ISO/IEC that it is willing to 
+ * negotiate licenses under reasonable and non-discriminatory terms and 
+ * conditions with applicants throughout the world.
+ *
+ * ISO/IEC gives You a free license to this software module or modifications 
+ * thereof for the sole  purpose of developing the ISO/IEC 23002-4.
+ * 
+ * NCKU retains full right to modify and use the 
+ * code for its own purpose, assign or donate the code to a third party and 
+ * to inhibit third parties from using the code for products that do not 
+ * conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+ * Standards. 
+ * 
+ * This copyright notice must be included in all copies or derivative works. 
+ * Copyright (c) ISO/IEC 2006-2010.
+ */
+
+/*
+* Author: Paul Schumacher, Xilinx Research Labs 
+*         (Email: paul.schumacher@xilinx.com)
+*
+*
+* Description:
+*   This design performs the in-loop deblocking filter for an AVC video 
+*   coder.  Tokens on the inputs and outputs of this block contain maps 
+*   (similar to structures) for easier interfacing.  One token on 'mbIn' is 
+*   assumed to contain the contents of a single macroblock (MB) including the 
+*   input YUV values as well as the MB parameters.  This design assumes raster 
+*   order of MBs (see below).  One token on 'imgParams' contains a map of 
+*   parameters for one frame or field.
+*
+*   The 'mbDataOut' and 'StrengthOut' outputs each produce one token per MB.
+*   One token on 'mbDataOut' is a map containing the (x,y) position (in MB
+*   coordinates) as well as arrays of YUV 4:2:0 output data.  'StrengthOut'
+*   should be used for debug only and produces a map of strength values and
+*   important parameters for debug purposes.
+*
+*   Note that the following modes are not supported by this revision of the 
+*   design:
+*     * MBAFF (Macroblock Adaptive Field/Frame mode)
+*     * only 4:2:0 format is supported
+*     * > 8-bit video
+
+* Revised:
+*  Author: Jia-Wei Liang, MSOC Lab, NCKU
+*  (E-mail: n2697181@mail.ncku.edu.tw)
+* Author: Micka‘l Raulet (INSA Rennes)
+* 	add RVC-CAL compliancy 
+* */
+// Mgnt_DBF.cal
+// Description: The management part of deblocking filter without mbaff
+package Proprietary.IETR.MPEG4.part10;
+
+import MPEG.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
+
+import MPEG.Common.Imp_PictureInfo.* ;
+
+import std.util.BitOps.* ;
+
+actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
+	uint(size=13) FirstMbInSlice,
+	uint(size=6) MbType,
+	uint(size=16) Cbp_blk,
+	int(size=6) Alpha_offset,
+	int(size=6) Beta_offset,
+	int(size=8) QP,
+	int(size=16) MV,
+	uint(size=4) RefIdx,
+	uint(size=2) LFDisable
+	==> uint(size=6) BS
+	 : ///////////////
+// Constants //
+///////////////
+//FIXME! number of MB per line of picture
+	int SAMPLE_SZ = 16;
+
+	int INT64_MIN = -32768;
+
+	int MIN_QP = 0;
+
+	int MAX_QP = 51;
+
+	/*
+	 * State Variables
+	 */
+	uint(size=4) left_mb_type;
+
+	int left_cbp_blk;
+
+	uint(size=8) left_QP;
+
+	uint(size=13) left_slice_nr := 0;
+
+	uint(size=4) up_mb_type;
+
+	int up_cbp_blk;
+
+	uint(size=8) up_QP;
+
+	uint(size=13) up_slice_nr := 0;
+
+	uint(size=5) blkP;
+
+	uint(size=5) blkQ; //
+	// Image parameters
+	//
+	// MBs from top to bottom of one frame of current image
+	uint(size=2) valLFDisable := 0; // option to disable filtering for image or across slices
+	uint(size=13) firstmbinslice := 0;
+
+	uint(size=13) slice_nr := 0; // Macroblock parameters
+	uint(size=8) valQP := 0; // Quantization parameter: value between 0 and 51 inclusive
+	int(size=6) alpha_offset := 0; // Alpha QP offset. Between -12 and 12, equal to 2*slice_alpha_c0_offset_div2 from H.264 specification 
+	int(size=6) beta_offset := 0; // Beta QP offset. Between -12 and 12, equal to 2*slice_beta_offset_div2 from H.264 specification 
+	uint(size=4) mb_type := 0; // Mb_type as tabulated in section 7 of the H.264 specification 
+	uint(size=16) cbp_blk := 0; // One bit per 4x4 block in the current macroblock
+	// (high indicates non-zero transform coefficient levels for thiis 4x4 pixel block)
+	uint(size=8) mb_x := 0; // x-coordinate of current macroblock using luma pixel coordinates/16
+	uint(size=8) mb_y := 0; // y-coordinate of current macroblock using luma pixel coordinates/16
+	List(type: uint(size=6), size=3) Alist := [ 0 : for int i in 0 .. 3 - 1 ]; //curr,left,up
+	List(type: uint(size=6), size=3) Blist := [ 0 : for int i in 0 .. 3 - 1 ]; //curr,left,up
+	List(type: int, size=16) list0_ref_pic_id := [ 0 : for int i in 0 .. 16 - 1 ];
+
+	List(type: int, size=16) list0_refPicIDX := [ 0 : for int i in 0 .. 16 - 1 ];
+
+	List(type: int, size=16) list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
+
+	List(type: int, size=16) list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
+
+	List(type: int, size=16) left_list0_ref_pic_id := [ 0 : for int i in 0 .. 16 -
+	1 ];
+
+	List(type: int, size=16) left_list0_refPicIDX := [ 0 : for int i in 0 .. 16 -
+	1 ];
+
+	List(type: int, size=16) left_list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
+
+	List(type: int, size=16) left_list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
+
+	List(type: int, size=16) up_list0_ref_pic_id := [ 0 : for int i in 0 .. 16 - 1
+	];
+
+	List(type: int, size=16) up_list0_refPicIDX := [ 0 : for int i in 0 .. 16 - 1
+	];
+
+	List(type: int, size=16) up_list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
+
+	List(type: int, size=16) up_list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
+
+	uint(size=1) StrengthNotZero := 0;
+
+	uint(size=1) useLeft := 0;
+
+	uint(size=1) useUp := 0;
+
+	uint(size=3) mvlimit = 4;
+
+	uint(size=3) edge_curr := 0;
+
+	int xQ := 0;
+
+	int yQ := 0;
+
+	int xP := 0;
+
+	int yP := 0;
+
+	int QP_p := 0;
+
+	int mb_type_p := 0;
+
+	int cbp_blk_p := 0;
+
+	List(type: uint(size=3), size=32) Strength := [ 0 : for int i in 0 .. 32 - 1
+	];
+
+	List(type: uint(size=SAMPLE_SZ), size=MAX_PICWIDTH_PX) upFifo_mb_type := [ 0 :
+	for int l in 0 .. MAX_PICWIDTH_PX - 1 ];
+
+	List(type: uint(size=SAMPLE_SZ), size=MAX_PICWIDTH_PX) upFifo_cbp_blk := [ 0 :
+	for int l in 0 .. MAX_PICWIDTH_PX - 1 ];
+
+	List(type: uint(size=SAMPLE_SZ), size=MAX_PICWIDTH_PX) upFifo_valQP := [ 0 :
+	for int l in 0 .. MAX_PICWIDTH_PX - 1 ];
+
+	List(type: List(type: int(size=SAMPLE_SZ), size=16), size=MAX_PICWIDTH_PX) upFifo_list0_MV0
+	:= [ [ 0 : for int l in 0 .. 16 - 1 ] : for int i in 0 .. MAX_PICWIDTH_PX - 1
+	];
+
+	List(type: List(type: int(size=SAMPLE_SZ), size=16), size=MAX_PICWIDTH_PX) upFifo_list0_MV1
+	:= [ [ 0 : for int l in 0 .. 16 - 1 ] : for int i in 0 .. MAX_PICWIDTH_PX - 1
+	];
+
+	List(type: List(type: int(size=SAMPLE_SZ), size=16), size=MAX_PICWIDTH_PX) upFifo_list0_ref_pic_id
+	:= [ [ 0 : for int l in 0 .. 16 - 1 ] : for int i in 0 .. MAX_PICWIDTH_PX - 1
+	];
+
+	List(type: List(type: int(size=SAMPLE_SZ), size=16), size=MAX_PICWIDTH_PX) upFifo_list0_refPicIDX
+	:= [ [ 0 : for int l in 0 .. 16 - 1 ] : for int i in 0 .. MAX_PICWIDTH_PX - 1
+	];
+
+	List(type: uint(size=SAMPLE_SZ), size=MAX_PICWIDTH_PX) upFifo_slice_nr := [ 0
+	: for int l in 0 .. MAX_PICWIDTH_PX - 1 ];
+
+	/*
+	 * Functions
+	 * 
+	 * Arithmetic functions
+	 */
+	function abs(int val) --> int :
+		if (val < 0) then
+			-val
+		else
+			val
+		end
+	end
+
+	function mask_one_bit(int v, int n) --> int :
+		rshift(bitand(v, lshift(1, n)), n)
+	end
+
+	function Clip(int Min, int Max, int Val) --> int :
+		if (Val < Min) then
+			Min
+		else
+			if (Val > Max) then
+				Max
+			else
+				Val
+			end
+		end
+	end
+
+	function ClipPicId(int Check, int Val) --> int :
+		if (Check < 0) then
+			INT64_MIN
+		else
+			Val
+		end
+	end
+
+	function mv(int ptype, int blknum, int component) --> int :
+		if (useLeft = 1 and ptype = 1) then
+			if (component = 0) then
+				left_list0_MV0[blknum]
+			else
+				left_list0_MV1[blknum]
+			end
+		else
+			if (useUp = 1 and ptype = 1) then
+				if (component = 0) then
+					up_list0_MV0[blknum]
+				else
+					up_list0_MV1[blknum]
+				end
+			else
+				if (component = 0) then
+					list0_MV0[blknum]
+				else
+					list0_MV1[blknum]
+				end
+			end
+		end
+	end
+
+	function ref_idx(int ptype, int blknum) --> int :
+		if (useLeft = 1 and ptype = 1) then
+			left_list0_refPicIDX[blknum]
+		else
+			if (useUp = 1 and ptype = 1) then
+				up_list0_refPicIDX[blknum]
+			else
+				list0_refPicIDX[blknum]
+			end
+		end
+	end
+
+	function ref_pic_id(int ptype, int blknum) --> int :
+		if (useLeft = 1 and ptype = 1) then
+			left_list0_ref_pic_id[blknum]
+		else
+			if (useUp = 1 and ptype = 1) then
+				up_list0_ref_pic_id[blknum]
+			else
+				list0_ref_pic_id[blknum]
+			end
+		end
+	end
+
+	/*
+	 * Get the X position in the current MB (0 to 15)
+	 */
+	function getPixelPosX(int pel, int dir) --> int :
+		if (dir = 1) then
+			pel
+		else
+			4 * edge_curr
+		end
+	end
+
+	/* 
+	 * Get the Y position in the current MB (0 to 15)
+	 */
+	function getPixelPosY(int pel, int dir) --> int :
+		if (dir = 1) then
+			if (edge_curr < 4) then
+				4 * edge_curr
+			else
+				1
+			end
+		else
+			pel
+		end
+	end
+
+	/*
+	 * Set the neighbour (used in GetStrengths)
+	 * NOTE: only options are: within current MB, use left MB,
+	 * or use up/top MB
+	 */
+	procedure setNeighbour(int xN, int yN, int sth)
+	var
+		int width_mb
+	begin
+		if (sth = 0) then
+			width_mb := LUMA_CHROMA;
+		else
+			width_mb := 16;
+		end
+		useLeft := 0;
+		useUp := 0;
+		if (xN < 0) then // only used when dir=0 & edge=0
+			xP := width_mb + xN; // -1 becomes 15, -2 becomes 14, etc.
+			yP := yN;
+			mb_type_p := left_mb_type;
+			cbp_blk_p := left_cbp_blk;
+			useLeft := 1;
+		else
+			if (yN < 0) then // only used when dir=1 & edge=0
+				xP := xN;
+				yP := width_mb + yN;
+				mb_type_p := up_mb_type;
+				cbp_blk_p := up_cbp_blk;
+				useUp := 1;
+			else
+				xP := xN;
+				yP := yN;
+				mb_type_p := mb_type;
+				cbp_blk_p := cbp_blk;
+			end
+		end
+		blkQ := lshift(rshift(yQ, 2), 2) + rshift(xQ, 2);
+		blkP := lshift(rshift(yP, 2), 2) + rshift(xP, 2);
+	end
+
+	/*
+	 * Deblocking Filter: Actions
+	 */
+	ReadMB.Inter: action FirstMbInSlice:[ mb0 ], MbLocation:[ Mbx, Mby ], MbType:[
+		Mbtype ], QP:[ b ], Cbp_blk:[ c ], Alpha_offset:[ d ], Beta_offset:[ e ],
+		RefIdx:[ f ] repeat 16, MV:[ g ] repeat 32, LFDisable:[ j ] ==>
+	guard
+		not(Mbtype >= BLOCK_TYPE_INTRA_MIN and Mbtype <= BLOCK_TYPE_INTRA_MAX)
+	do
+		mb_x := Mbx;
+		mb_y := Mby;
+		mb_type := 2;
+		valQP := b;
+		cbp_blk := c;
+		alpha_offset := d;
+		beta_offset := e;
+		list0_refPicIDX := [ 0 : for int i in 0 .. 16 - 1 ];
+		list0_ref_pic_id := [ f[m] : for int m in 0 .. 16 - 1 ];
+		foreach int i in 0 .. 15 do
+			list0_MV0[i] := g[i * 2];
+			list0_MV1[i] := g[i * 2 + 1];
+		end
+		valLFDisable := j;
+		if (firstmbinslice != mb0) then
+			firstmbinslice := mb0;
+			slice_nr := slice_nr + 1;
+		end
+	end
+
+	ReadMB.Intra: action FirstMbInSlice:[ mb0 ], MbLocation:[ Mbx, Mby ], MbType:[
+		Mbtype ], QP:[ b ], Cbp_blk:[ c ], Alpha_offset:[ d ], Beta_offset:[ e ],
+		LFDisable:[ j ] ==>
+	guard
+		Mbtype >= BLOCK_TYPE_INTRA_MIN and Mbtype <= BLOCK_TYPE_INTRA_MAX,
+		Mbtype != BLOCK_TYPE_I_PCM
+	do
+		mb_x := Mbx;
+		mb_y := Mby;
+		mb_type := 1;
+		valQP := b;
+		cbp_blk := c;
+		alpha_offset := d;
+		beta_offset := e;
+		list0_refPicIDX := [ -1 : for int i in 0 .. 15 ];
+		list0_ref_pic_id := [ 0 : for int i in 0 .. 16 - 1 ];
+		list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
+		list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
+		valLFDisable := j;
+		if (firstmbinslice != mb0) then
+			firstmbinslice := mb0;
+			slice_nr := slice_nr + 1;
+		end
+	end
+
+	ReadMB.IPCM: action FirstMbInSlice:[ mb0 ], MbLocation:[ Mbx, Mby ], MbType:[
+		Mbtype ], Cbp_blk:[ c ], Alpha_offset:[ d ], Beta_offset:[ e ], LFDisable:[ j
+		] ==>
+	guard
+		Mbtype = BLOCK_TYPE_I_PCM
+	do
+		mb_x := Mbx;
+		mb_y := Mby;
+		mb_type := 4;
+		valQP := valQP;
+		cbp_blk := c;
+		alpha_offset := d;
+		beta_offset := e;
+		list0_refPicIDX := [ -1 : for int i in 0 .. 15 ];
+		list0_ref_pic_id := [ 0 : for int i in 0 .. 16 - 1 ];
+		list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
+		list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
+		valLFDisable := j;
+	end
+
+	StartMB: action ==>
+	do
+		if (mb_y != 0) then
+			up_mb_type := upFifo_mb_type[mb_x];
+			up_cbp_blk := upFifo_cbp_blk[mb_x];
+			up_QP := upFifo_valQP[mb_x];
+			up_slice_nr := upFifo_slice_nr[mb_x];
+			up_list0_MV1 := [ upFifo_list0_MV1[mb_x][i] : for int i in 0 .. 16 - 1 ];
+			up_list0_MV0 := [ upFifo_list0_MV0[mb_x][i] : for int i in 0 .. 16 - 1 ];
+			up_list0_ref_pic_id := [ upFifo_list0_ref_pic_id[mb_x][i] : for int i in 0
+			.. 16 - 1 ];
+			up_list0_refPicIDX := [ upFifo_list0_refPicIDX[mb_x][i] : for int i in 0 ..
+			16 - 1 ];
+		else
+			up_mb_type := 0;
+			up_cbp_blk := 0;
+			up_QP := 0;
+			up_slice_nr := 0;
+			up_list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
+			up_list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
+			up_list0_ref_pic_id := [ 0 : for int i in 0 .. 16 - 1 ];
+			up_list0_refPicIDX := [ 0 : for int i in 0 .. 16 - 1 ];
+		end
+		if (mb_x != 0) then
+			left_mb_type := upFifo_mb_type[mb_x - 1];
+			left_cbp_blk := upFifo_cbp_blk[mb_x - 1];
+			left_QP := upFifo_valQP[mb_x - 1];
+			left_slice_nr := upFifo_slice_nr[mb_x - 1];
+			left_list0_MV1 := [ upFifo_list0_MV1[mb_x - 1][i] : for int i in 0 .. 16 - 1
+			];
+			left_list0_MV0 := [ upFifo_list0_MV0[mb_x - 1][i] : for int i in 0 .. 16 - 1
+			];
+			left_list0_ref_pic_id := [ upFifo_list0_ref_pic_id[mb_x - 1][i] : for int i
+			in 0 .. 16 - 1 ];
+			left_list0_refPicIDX := [ upFifo_list0_refPicIDX[mb_x - 1][i] : for int i in
+			0 .. 16 - 1 ];
+		else
+			left_mb_type := 0;
+			left_cbp_blk := 0;
+			left_QP := 0;
+			left_slice_nr := 0;
+			left_list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
+			left_list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
+			left_list0_ref_pic_id := [ 0 : for int i in 0 .. 16 - 1 ];
+			left_list0_refPicIDX := [ 0 : for int i in 0 .. 16 - 1 ];
+		end
+	end
+
+	SkipMB: action ==> BS:[ [ 0 : for int i in 0 .. 37 ] ] repeat 38
+	guard
+		(valLFDisable = 1)
+	end
+
+	/* 
+	 * Get strengths for this MB (32 total values)
+	 */
+	GetStrengths: action ==> BS:[ Strength ] repeat 32
+	var
+		uint(size=5) idx,
+		int ref_p0,
+		int ref_q0,
+		List(type: uint(size=5), size=32) routine := [ 0 : for int l in 0 .. 32 - 1 ]
+	do
+		StrengthNotZero := 0;
+		Strength := [ 0 : for int i in 0 .. 32 - 1 ]; // Initialize
+		foreach int dir in 0 .. 1 do // vertical edges, then horizontal edges
+			foreach int b in 0 .. 3 do
+				edge_curr := b;
+				if ((b > 0) or (dir = 1 and mb_y != 0 and (valLFDisable = 0 or slice_nr =
+				up_slice_nr)) or (dir = 0 and mb_x != 0 and (valLFDisable = 0 or slice_nr =
+				left_slice_nr))) then
+					foreach int c in 0 .. 3 do
+						idx := lshift(dir, 4) + lshift(c, 2) + b;
+						xQ := getPixelPosX(lshift(c, 2), dir);
+						yQ := getPixelPosY(lshift(c, 2), dir);
+						setNeighbour(xQ - 1 + dir, yQ - dir, 1); // Start w/ Strength = 3 or = 4 for Mb-edge
+						if (b = 0) then
+							Strength[idx] := 4;
+							routine[idx] := 1;
+						else
+							Strength[idx] := 3;
+							routine[idx] := 2;
+						end
+						if (mb_type_p = 2 and mb_type = 2) then // Check if either P & Q have coeffs in them
+							if ((mask_one_bit(cbp_blk, blkQ) != 0) or (mask_one_bit(cbp_blk_p, blkP)
+							!= 0)) then
+								Strength[idx] := 2;
+								routine[idx] := 3;
+							else // if no coefs, but vector difference >= 1 set Strength=1 
+							// if this is a mixed mode edge then one set of reference pictures will be frame and the
+							// other will be field
+								ref_p0 := ClipPicId(ref_idx(0, blkQ), ref_pic_id(0, blkQ));
+								ref_q0 := ClipPicId(ref_idx(1, blkP), ref_pic_id(1, blkP));
+								if (ref_p0 = ref_q0) then
+									if ((abs(mv(0, blkQ, 0) - mv(1, blkP, 0)) >= 4) or (abs(mv(0, blkQ, 1)
+									- mv(1, blkP, 1)) >= mvlimit)) then
+										Strength[idx] := 1;
+										routine[idx] := 5;
+									else
+										Strength[idx] := 0;
+										routine[idx] := 6;
+									end
+								else
+									Strength[idx] := 1;
+									routine[idx] := 7;
+								end
+							end //cbp
+						end //intra			      
+						if (Strength[idx] != 0) then
+							StrengthNotZero := 1;
+						end
+					end // while (j<4)
+				end // if-then    		
+			end // while (edge<4)    	
+		end // while (dir<2)    
+
+	end
+
+	ZeroStrengths: action ==> BS:[ [ 0 : for int i in 0 .. 5 ] ] repeat 6
+	guard
+		(StrengthNotZero = 0)
+	end
+
+	/*
+	* Edge Loops
+	*/
+	EdgeLoops: action ==> BS:[ Alist[0], Alist[1], Alist[2], Blist[0], Blist[1],
+		Blist[2] ]
+	var
+		int indexA,
+		int indexB,
+		int QP_avg
+	do
+		Alist := [ 0 : for int i in 0 .. 3 - 1 ];
+		Blist := [ 0 : for int i in 0 .. 3 - 1 ];
+		QP_p := left_QP; //use_left
+		QP_avg := rshift((QP_p + valQP + 1), 1);
+		indexA := Clip(MIN_QP, MAX_QP, QP_avg + alpha_offset);
+		indexB := Clip(MIN_QP, MAX_QP, QP_avg + beta_offset);
+		Alist[1] := indexA;
+		Blist[1] := indexB;
+		QP_p := up_QP; //use_up
+		QP_avg := rshift((QP_p + valQP + 1), 1);
+		indexA := Clip(MIN_QP, MAX_QP, QP_avg + alpha_offset);
+		indexB := Clip(MIN_QP, MAX_QP, QP_avg + beta_offset);
+		Alist[2] := indexA;
+		Blist[2] := indexB;
+		QP_p := valQP; // otherwise
+		QP_avg := rshift((QP_p + valQP + 1), 1);
+		indexA := Clip(MIN_QP, MAX_QP, QP_avg + alpha_offset);
+		indexB := Clip(MIN_QP, MAX_QP, QP_avg + beta_offset);
+		Alist[0] := indexA;
+		Blist[0] := indexB;
+	end // EdgeLoops
+
+
+	/*
+	 * Completed w/ Macroblock
+	 */
+	DoneMB: action ==>
+	do
+		upFifo_valQP[mb_x] := valQP;
+		upFifo_mb_type[mb_x] := mb_type;
+		upFifo_cbp_blk[mb_x] := cbp_blk;
+		upFifo_slice_nr[mb_x] := slice_nr;
+		upFifo_list0_MV1[mb_x] := [ list0_MV1[i] : for int i in 0 .. 16 - 1 ];
+		upFifo_list0_MV0[mb_x] := [ list0_MV0[i] : for int i in 0 .. 16 - 1 ];
+		upFifo_list0_ref_pic_id[mb_x] := [ list0_ref_pic_id[i] : for int i in 0 .. 16
+		- 1 ];
+		upFifo_list0_refPicIDX[mb_x] := [ list0_refPicIDX[i] : for int i in 0 .. 16 -
+		1 ];
+	end
+
+	/*
+	 * Schedule/Priority
+	 */
+	schedule fsm ReadMB :
+		ReadMB ( ReadMB ) --> StartMB;
+		StartMB ( StartMB ) --> SkipMB;
+		SkipMB ( SkipMB ) --> DoneMB;
+		SkipMB ( GetStrengths ) --> ZeroStrengths;
+		ZeroStrengths ( ZeroStrengths ) --> DoneMB;
+		ZeroStrengths ( EdgeLoops ) --> DoneMB;
+		DoneMB ( DoneMB ) --> ReadMB;
+	end
+
+	priority
+		SkipMB > GetStrengths;
+		ZeroStrengths > EdgeLoops;
+	end
+
+end
