@@ -33,7 +33,10 @@ import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -370,6 +373,19 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			try {
 				network = new XDFParser(xdfFile).parseNetwork();
 				network.updateIdentifiers();
+				
+				Set<String> instances = new HashSet<String>();
+				for (Instance instance : network.getInstances()) {
+					instances.add(instance.getHierarchicalPath());
+				}
+				
+				Iterator<Entry<String, String>> it = mapping.entrySet().iterator();
+				while (it.hasNext()) {
+					Entry<String, String> entry = it.next();
+					if (!instances.contains(entry.getKey())) {
+						it.remove();
+					}
+				}
 			} catch (OrccException e) {
 				e.printStackTrace();
 			}
@@ -395,7 +411,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-
+		configuration.setAttribute(MAPPING, new HashMap<String, String>());
 	}
 
 }
