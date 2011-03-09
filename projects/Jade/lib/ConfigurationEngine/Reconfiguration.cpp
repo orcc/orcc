@@ -46,7 +46,9 @@
 
 using namespace std;
 
-Reconfiguration::Reconfiguration(Decoder* decoder, Configuration* configuration){
+Reconfiguration::Reconfiguration(Decoder* decoder, Configuration* configuration, bool verbose){
+	this->verbose = verbose;
+
 	//Set properties
 	this->refConfiguration = decoder->getConfiguration();
 	this->curConfiguration = configuration;

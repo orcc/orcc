@@ -37,6 +37,7 @@
 
 //------------------------------
 #include <map>
+#include <iostream>
 
 #include "Reconfiguration.h"
 #include "Connector.h"
@@ -55,7 +56,8 @@
 using namespace std;
 using namespace llvm;
 
-ConfigurationEngine::ConfigurationEngine(llvm::LLVMContext& C) : Context(C){
+ConfigurationEngine::ConfigurationEngine(llvm::LLVMContext& C, bool verbose) : Context(C){
+	this->verbose = verbose;
 }
 
 void ConfigurationEngine::configure(Decoder* decoder){
@@ -86,13 +88,19 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	clearConnections(decoder);
 
 	//Process reconfiguration scenario
-	Reconfiguration reconfiguration(decoder, configuration);
+	Reconfiguration reconfiguration(decoder, configuration, verbose);
 
 	//Remove unused instances
 	IRUnwriter unwriter(decoder);
 
+	
 	//Iterate though all instances to remove
 	list<Instance*>* removes = reconfiguration.getToRemove();
+	
+	if (verbose){
+		cout << "Detected " << removes->size() << " useless instance, remove them from current decoder. \n";
+	}
+
 	for (it = removes->begin(); it != removes->end(); it++){
 		unwriter.remove(*it);
 	}
@@ -110,6 +118,11 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	
 	//Iterate though all instances to add
 	list<Instance*>* adds = reconfiguration.getToAdd();
+
+	if (verbose){
+		cout << "Detected " << adds->size() << " instance to add. \n";
+	}
+
 	for (it = adds->begin(); it != adds->end(); it++){
 		writer.write(*it);
 	}
@@ -118,6 +131,10 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	list<pair<Instance*, Instance*> >::iterator itKeep;
 	list<pair<Instance*, Instance*> >* keeps = reconfiguration.getToKeep();
 	
+	if (verbose){
+		cout << "Detected " << keeps->size() << " instance to keep, create links. \n";
+	}
+
 	IRLinker linker(decoder);
 	linker.link(keeps);
 	

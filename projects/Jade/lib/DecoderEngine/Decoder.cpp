@@ -96,7 +96,7 @@ void Decoder::setConfiguration(Configuration* newConfiguration){
 	}
 
 	//Reconfigure the decoder
-	ConfigurationEngine engine(Context);
+	ConfigurationEngine engine(Context, verbose);
 	engine.reconfigure(this, newConfiguration);
 	if (verbose){
 		cout<< "---> Reconfiguring times of engines takes " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

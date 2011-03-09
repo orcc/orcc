@@ -63,7 +63,7 @@ public:
      *
 	 * Creates a new configuration engine.
      */
-	ConfigurationEngine(llvm::LLVMContext& C);
+	ConfigurationEngine(llvm::LLVMContext& C, bool verbose = false);
 
 	/*!
      *  @brief Instanciate a configuration of decoder
@@ -110,6 +110,9 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** Display messages */
+	bool verbose;
 
 };
 

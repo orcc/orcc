@@ -60,7 +60,7 @@ public:
 	 * @param network : the original network to reconfigure
 	 *
      */
-	Reconfiguration(Decoder* decoder, Configuration* configuration);
+	Reconfiguration(Decoder* decoder, Configuration* configuration, bool verbose = false);
 
 	/**
      *  @brief Get instance to remove from the decoder
@@ -169,6 +169,9 @@ private:
 	std::list<Instance*> toRemove;
 	std::list<Instance*> toAdd;
 	std::list<std::pair<Instance*, Instance*> > toKeep;
+
+	/** Display messages */
+	bool verbose;
 };
 
 #endif
