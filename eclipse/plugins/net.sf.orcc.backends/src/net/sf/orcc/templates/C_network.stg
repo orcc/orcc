@@ -378,9 +378,10 @@ void *scheduler(void *data) {
 	<endif>
 	while (1) {
 		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched<if(options.newScheduler)>, <if(options.needDynamicMapping || options.threads)>THREAD_NB<else>1<endif><endif>);
-		<if(options.needDynamicMapping)>
-		if(my_actor != NULL){				
+		if(my_actor != NULL){
+			<if(options.needDynamicMapping)>				
 	  		timeout = 0;
+	  		<endif>
 			si.num_firings = 0;
 			my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
@@ -394,6 +395,7 @@ void *scheduler(void *data) {
 			}
 			<endif>
 		}
+		<if(options.needDynamicMapping)>
 		end = clock ();
 		timeout = ((end - start) / (double)CLOCKS_PER_SEC) \>= TIMEOUT;
 		if(source_is_stopped() || timeout){
@@ -401,21 +403,6 @@ void *scheduler(void *data) {
 			semaphore_wait(sched-\>sem_thread);
 			clean_cache(CACHE_SIZE);
 			start = clock ();
-		}
-		<else>
-		if(my_actor != NULL){
-			si.num_firings = 0;
-			my_actor-\>sched_func(&si);
-#ifdef PRINT_FIRINGS
-			printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
-#endif
-			<if (options.newScheduler)>
-			if (si.reason == full) {
-				sched_add_successors(sched, my_actor, si.ports);
-			} else if (si.reason == starved) {
-				sched_add_predecessors(sched, my_actor, si.ports);
-			}
-			<endif>
 		}
 		<endif>
 	}
