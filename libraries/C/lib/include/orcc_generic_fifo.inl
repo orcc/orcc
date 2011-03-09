@@ -55,7 +55,8 @@ DECL unsigned int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo) {
 	unsigned int max_num_tokens = 0;
 
 	for (i = 0; i < fifo->readers_nb; i++) {
-		max_num_tokens = max(max_num_tokens, fifo->write_ind - fifo->read_inds[i]);
+		unsigned int num_tokens = fifo->write_ind - fifo->read_inds[i];
+		max_num_tokens = max_num_tokens > num_tokens ? max_num_tokens : num_tokens;
 	}
 
 	return fifo->size - max_num_tokens;
