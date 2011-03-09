@@ -80,6 +80,14 @@ public class Tag implements Iterable<String> {
 	public Tag(List<String> identifiers) {
 		this.identifiers = new ArrayList<String>(identifiers);
 	}
+	
+	/**
+	 * Creates a tag from a single identifier.
+	 */
+	public Tag(String identifier) {
+		identifiers = new ArrayList<String>();
+		add(identifier);
+	}
 
 	/**
 	 * Adds an identifier to this tag.

@@ -159,7 +159,8 @@ public class ActorMerger {
 	private OrderedMap<String, Port> inputs;
 	private MultiMap<Port, Port> IntPorts;
 	private Map<Port, GlobalVariable> intVars;
-	private Map<GlobalVariable, GlobalVariable> varCounts;
+	private Map<GlobalVariable, GlobalVariable> readCounts;
+	private Map<GlobalVariable, GlobalVariable> writeCounts;
 	private MoC moc;
 	private String name;
 	private OrderedMap<String, Port> outputs;
@@ -193,7 +194,8 @@ public class ActorMerger {
 		this.IntPorts = internalPorts;
 		this.name = name;
 		this.intVars = new HashMap<Port, GlobalVariable>();
-		this.varCounts = new HashMap<GlobalVariable, GlobalVariable>();
+		this.readCounts = new HashMap<GlobalVariable, GlobalVariable>();
+		this.writeCounts = new HashMap<GlobalVariable, GlobalVariable>();
 		this.parameters = new OrderedMap<String, GlobalVariable>();
 		this.stateVars = new OrderedMap<String, GlobalVariable>();
 		this.inputs = new OrderedMap<String, Port>();
@@ -241,9 +243,6 @@ public class ActorMerger {
 		// Merge MoCs
 		MoC cloneMoC = clone.getMoC();
 		moc = (MoC) cloneMoC.accept(new MoCMerger(moc, rate, toKeep));
-
-		// Create corresponding action scheduler
-		scheduler = (ActionScheduler) moc.accept(new SchedulerMerger());
 	}
 
 	/**
@@ -252,6 +251,9 @@ public class ActorMerger {
 	 * @return the corresponding composite actor
 	 */
 	public Actor getComposite() {
+		// Create corresponding action scheduler
+		scheduler = (ActionScheduler) moc.accept(new SchedulerMerger(actions, readCounts, writeCounts));
+		
 		return new Actor(name, "", parameters, inputs, outputs, false,
 				stateVars, procs, actions, initializes, scheduler, moc);
 	}
@@ -271,7 +273,8 @@ public class ActorMerger {
 	
 	private GlobalVariable internalizePort(Port port, GlobalVariable portVar,
 			Actor actor) {
-		GlobalVariable varCount;
+		GlobalVariable readCount;
+		GlobalVariable writeCount;
 		
 		// Port has never been internalize, create a new one
 		if (portVar == null) {
@@ -287,19 +290,30 @@ public class ActorMerger {
 			portVar = new GlobalVariable(new Location(), typeList,
 					port.getName(), true);
 
-			// Create an associated counter access
-			varCount = new GlobalVariable(new Location(),
+			// Create an associated read counter access
+			readCount = new GlobalVariable(new Location(),
 					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
-							+ "_count", true, new IntExpr(0));
+							+ "_read", true, new IntExpr(0));
+			
+			// Create an associated write counter access
+			readCount = new GlobalVariable(new Location(),
+					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
+							+ "_read", true, new IntExpr(0));
+			writeCount = new GlobalVariable(new Location(),
+					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
+							+ "_write", true, new IntExpr(0));
 			
 			
 			// Add both variables in state vars
-			stateVars.put(varCount.getName(), varCount);
+			stateVars.put(readCount.getName(), readCount);
+			stateVars.put(writeCount.getName(), writeCount);
 			stateVars.put(portVar.getName(), portVar);
-			varCounts.put(portVar, varCount);
+			readCounts.put(portVar, readCount);
+			writeCounts.put(portVar, writeCount);
 		} else {
-			//Get associated var counter
-			varCount =  varCounts.get(portVar);
+			//Get associated state counters
+			readCount =  readCounts.get(portVar);
+			writeCount = writeCounts.get(portVar);
 			
 			// Increase size of the stateVar by rate
 			TypeList typeList = (TypeList) portVar.getType();
@@ -310,11 +324,12 @@ public class ActorMerger {
 			// Update state variable name with current port
 			String name = portVar.getName() + "_" + port.getName();
 			portVar.setName(name);
-			varCount.setName(name+ "_count");
+			readCount.setName(name+ "_read");
+			writeCount.setName(name+ "_write");
 		}
 
 		// Change fifo access to stateVar access
-		new InternalizeFifoAccess(port, portVar, varCount).visit(actor);
+		new InternalizeFifoAccess(port, portVar, readCount, writeCount).visit(actor);
 
 		return portVar;
 	}

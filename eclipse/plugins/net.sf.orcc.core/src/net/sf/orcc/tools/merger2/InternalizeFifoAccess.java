@@ -40,6 +40,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -48,26 +49,30 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 public class InternalizeFifoAccess extends AbstractActorVisitor {
 	private List<Variable> localFifoVars;
 	private Port port;
 
-	private GlobalVariable varCount;
+	private Procedure body;
+	private GlobalVariable readCount;
+	private GlobalVariable writeCount;
 	private GlobalVariable variable;
 
 	public InternalizeFifoAccess(Port port, GlobalVariable variable,
-			GlobalVariable varCount) {
+			GlobalVariable readCount, GlobalVariable writeCount) {
 		this.port = port;
 		this.variable = variable;
-		this.varCount = varCount;
+		this.readCount = readCount;
+		this.writeCount = writeCount;
 		this.localFifoVars = new ArrayList<Variable>();
 	}
 
-	private void setIndex(Instruction instr, List<Expression> indexes) {
+	private void setIndex(GlobalVariable count, Instruction instr, List<Expression> indexes) {
 
 		if (indexes.size() < 2) {
-			Use use = new Use(varCount, instr);
+			Use use = new Use(count, instr);
 			BinaryExpr expr = new BinaryExpr(new VarExpr(use), BinaryOp.PLUS,
 					indexes.get(0), IrFactory.eINSTANCE.createTypeInt(32));
 
@@ -76,41 +81,69 @@ public class InternalizeFifoAccess extends AbstractActorVisitor {
 		} else {
 			System.err.println("TODO index");
 		}
-
-		Use use = new Use(varCount);
-
-		Store store = new Store(varCount, new BinaryExpr(new VarExpr(use),
-				BinaryOp.PLUS, new IntExpr(1),
-				IrFactory.eINSTANCE.createTypeInt(32)));
-
-		itInstruction.add(store);
 	}
 
 	@Override
-	public void visit(Action action) {
-		// Update action pattern
-		Pattern input = action.getInputPattern();
-		Pattern output = action.getOutputPattern();
-
-		localFifoVars.add(input.getVariable(port));
-		localFifoVars.add(input.getPeeked(port));
-
-		localFifoVars.add(output.getVariable(port));
-		localFifoVars.add(output.getPeeked(port));
-
+	public void visit(Action action) {	
+		// Get action pattern
+		this.body = action.getBody();
+		int consumed = updatePattern(action.getInputPattern());
+		int produced = updatePattern(action.getOutputPattern());
+		
+		// Port has not been found in both patterns
+		if (localFifoVars.size()==0){
+			// Nothing to do
+			return;
+		}
+		
 		super.visit(action);
 
-		action.getInputPattern().remove(port);
-		action.getOutputPattern().remove(port);
+		// Update counter
+		updateCounter(readCount, consumed);
+		updateCounter(writeCount, produced);
 	}
 
+	private void updateCounter(GlobalVariable counter, int nbTokens){
+		if (nbTokens == 0 ){
+			// Update is useless
+			return;
+		}
+		
+		BlockNode node = BlockNode.getLast(body);
+		
+		Use use = new Use(counter);
+		
+		Store store = new Store(counter, new BinaryExpr(new VarExpr(
+				use), BinaryOp.PLUS, new IntExpr(nbTokens),
+				IrFactory.eINSTANCE.createTypeInt(32)));
+		node.add(store);
+		
+	}
+	
+	private int updatePattern(Pattern pattern){
+		if (!pattern.contains(port)){
+			//Current port is not contains in the pattern
+			return 0;
+		}
+		
+		//Get information from pattern
+		int tokens = pattern.getNumTokens(port);
+		localFifoVars.add(pattern.getVariable(port));
+		localFifoVars.add(pattern.getPeeked(port));
+		
+		//Remove pattern
+		pattern.remove(port);
+		
+		return tokens;
+	}
+	
 	@Override
 	public void visit(Load load) {
 		Use use = load.getSource();
 		Variable var = use.getVariable();
 		if (localFifoVars.contains(var)) {
 			load.setSource(new Use(variable, load));
-			setIndex(load, load.getIndexes());
+			setIndex(readCount, load, load.getIndexes());
 		}
 	}
 
@@ -119,7 +152,7 @@ public class InternalizeFifoAccess extends AbstractActorVisitor {
 		Variable var = store.getTarget();
 		if (localFifoVars.contains(var)) {
 			store.setTarget(variable);
-			setIndex(store, store.getIndexes());
+			setIndex(writeCount, store, store.getIndexes());
 		}
 	}
 }
