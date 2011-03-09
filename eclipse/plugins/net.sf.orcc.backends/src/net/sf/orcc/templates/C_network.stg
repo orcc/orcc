@@ -387,9 +387,9 @@ void *scheduler(void *data) {
 			printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
 			<if (options.newScheduler)>
-			if (si.reason == full && si.num_firings) {
+			if (si.reason == full) {
 				sched_add_successors(sched, my_actor, si.ports);
-			} else if (si.reason == starved && si.num_firings) {
+			} else if (si.reason == starved) {
 				sched_add_predecessors(sched, my_actor, si.ports);
 			}
 			<endif>
@@ -403,16 +403,18 @@ void *scheduler(void *data) {
 			start = clock ();
 		}
 		<else>
-		si.num_firings = 0;
-		my_actor-\>sched_func(&si);
+		if(my_actor != NULL){
+			si.num_firings = 0;
+			my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
-		printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
+			printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
-		<if (options.newScheduler)>
-		if (si.reason == full <if(options.threads)>&& si.num_firings<endif>) {
-			sched_add_successors(sched, my_actor, si.ports);
-		} else if (si.reason == starved <if(options.threads)>&& si.num_firings<endif>) {
-			sched_add_predecessors(sched, my_actor, si.ports);
+			<if (options.newScheduler)>
+			if (si.reason == full) {
+				sched_add_successors(sched, my_actor, si.ports);
+			} else if (si.reason == starved) {
+				sched_add_predecessors(sched, my_actor, si.ports);
+			}
 		}
 		<endif>
 		<endif>
@@ -603,7 +605,7 @@ static void launcher() {
 	initialize_instances();
 	
 	for(i=0; i \< THREAD_NB; i++){
-		sched_init(&schedulers[i], <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
+		sched_init(&schedulers[i], i, THREAD_NB, <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
 	}
 	
 	<if(options.newScheduler && !options.needDynamicMapping)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
@@ -634,7 +636,7 @@ static void launcher() {
 	
 	initialize_instances();
 
-	sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL);
+	sched_init(&sched, 0, 1, sizeof(actors) / sizeof(actors[0]), actors, NULL);
 	
 	<if(options.newScheduler)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
 		

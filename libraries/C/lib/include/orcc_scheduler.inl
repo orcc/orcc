@@ -49,16 +49,51 @@ static struct actor_s *sched_get_next(struct scheduler_s *sched) {
 }
 
 /**
+ * add the actor to the schedulable list
+ */
+static void sched_add_schedulable(struct scheduler_s *sched,
+		struct actor_s *actor) {
+	// only add the actor in the schedulable list if it is not already there
+	// like a list.contains(actor) but in O(1) instead of O(n)
+	if (!actor->in_list) {
+		if (sched == actor->sched) {
+			sched->schedulable[sched->next_entry % MAX_ACTORS] = actor;
+			sched->next_entry++;
+			actor->in_list = 1;
+		} else {
+			struct waiting_s *wait =
+					actor->sched->waiting_schedulable[actor->sched->id];
+			wait->waiting_actors[wait->next_entry % MAX_ACTORS] = actor;
+			wait->next_entry++;
+		}
+	}
+}
+
+static void sched_add_waiting_list(struct scheduler_s *sched) {
+	int i;
+	for (i = 0; i < sched->schedulers_nb; i++) {
+		struct waiting_s *wait = sched->waiting_schedulable[i];
+		while (wait->next_entry - wait->next_waiting > 0) {
+			sched_add_schedulable(sched,
+					wait->waiting_actors[wait->next_waiting % MAX_ACTORS]);
+			wait->next_waiting++;
+		}
+	}
+}
+
+/**
  * Returns the next schedulable actor, or NULL if no actor is schedulable.
  * The actor is removed from the schedulable list.
  * This method is used by the data/demand driven scheduler.
  */
 static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 	struct actor_s *actor;
+	sched_add_waiting_list(sched);
 	if (sched->next_schedulable == sched->next_entry) {
-		// static actors list is used when schedulable list is empty
+		/*// static actors list is used when schedulable list is empty
 		// (used only in multicore context)
-		actor = sched_get_next(sched);
+		actor = sched_get_next(sched);*/
+		return NULL;
 	} else {
 		actor = sched->schedulable[sched->next_schedulable % MAX_ACTORS];
 		sched->next_schedulable++;
@@ -67,20 +102,6 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 	}
 
 	return actor;
-}
-
-/**
- * add the actor to the schedulable list
- */
-static void sched_add_schedulable(struct scheduler_s *sched,
-		struct actor_s *actor) {
-	// only add the actor in the schedulable list if it is not already there
-	// like a list.contains(actor) but in O(1) instead of O(n)
-	if (!actor->in_list && (sched == actor->sched)) {
-		sched->schedulable[sched->next_entry % MAX_ACTORS] = actor;
-		sched->next_entry++;
-		actor->in_list = 1;
-	}
 }
 
 static void sched_add_predecessors(struct scheduler_s *sched,

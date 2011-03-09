@@ -53,14 +53,23 @@ struct actor_s {
 };
 
 struct scheduler_s {
+	int id;
+	int schedulers_nb;
 	int num_actors;
 	struct actor_s **actors;
 	struct actor_s *schedulable[MAX_ACTORS];
 	unsigned int next_entry;
 	unsigned int next_schedulable;
 	int next_else_schedulable;
+	struct waiting_s **waiting_schedulable;
 	struct sync_s *sync;
 	semaphore_struct sem_thread;
+};
+
+struct waiting_s {
+	unsigned int next_entry;
+	unsigned int next_waiting;
+	struct actor_s *waiting_actors[MAX_ACTORS];
 };
 
 #include "orcc_scheduler.inl"
@@ -68,7 +77,8 @@ struct scheduler_s {
 /**
  * Initializes the given scheduler.
  */
-void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors, struct sync_s *sync);
+void sched_init(struct scheduler_s *sched, int id, int schedulers_nb,
+		int num_actors, struct actor_s **actors, struct sync_s *sync);
 void sched_reinit(struct scheduler_s *sched, int num_actors, struct actor_s **actors);
 
 #endif
