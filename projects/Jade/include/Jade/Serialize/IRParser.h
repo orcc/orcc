@@ -75,7 +75,7 @@ public:
 	 * @param fifo : AbstractFifo used in actors of the VTL
 	 *
      */
-	IRParser(llvm::LLVMContext& C);
+	IRParser(llvm::LLVMContext& C,  std::string VTLDir);
 
 	~IRParser();
 
@@ -313,6 +313,9 @@ private:
 	/** list of ports of the current actor */
 	std::map<std::string, Port*>* inputs;
 	std::map<std::string, Port*>* outputs;
+
+	/** VTL directory */
+	 std::string VTLDir;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

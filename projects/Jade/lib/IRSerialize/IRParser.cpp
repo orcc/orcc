@@ -69,8 +69,6 @@
 using namespace std;
 using namespace llvm;
 
-extern cl::opt<std::string> VTLDir;
-
 // Define MDNode keys
 const std::string IRConstant::KEY_ACTION_SCHED = "action_scheduler";
 const std::string IRConstant::KEY_ACTIONS= "actions";
@@ -84,10 +82,11 @@ const std::string IRConstant::KEY_SOURCE_FILE= "source_file";
 const std::string IRConstant::KEY_STATE_VARS= "state_variables";
 
 
-IRParser::IRParser(llvm::LLVMContext& C) : Context(C){
+IRParser::IRParser(llvm::LLVMContext& C, string VTLDir) : Context(C){
 	this->inputs = NULL;
 	this->outputs = NULL;
 	this->parser = 	new LLVMParser(Context, VTLDir);
+	this->VTLDir = VTLDir;
 }
 
 

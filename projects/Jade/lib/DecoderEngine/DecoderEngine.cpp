@@ -76,7 +76,7 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 	FifoMng::setFifoTy(fifo, library);
 
 	//Load IR Parser
-	irParser = new IRParser(C);
+	irParser = new IRParser(C, library);
 }
 
 DecoderEngine::~DecoderEngine(){
