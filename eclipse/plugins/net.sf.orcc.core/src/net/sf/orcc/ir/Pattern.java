@@ -244,14 +244,12 @@ public class Pattern {
 	public void remove(Port port) {
 		ports.remove(port);
 		numTokensMap.remove(port);
-		peekedMap.remove(port);
-		variableMap.remove(port);
+		Variable peek = peekedMap.remove(port);
+		Variable variable = variableMap.remove(port);
 
-		for (Entry<Variable, Port> entry : inverseVariableMap.entrySet()) {
-			if (entry.getValue() == port) {
-				inverseVariableMap.remove(entry.getKey());
-			}
-		}
+		//Remove peek and variable entry from inverseVariableMap
+		inverseVariableMap.remove(peek);
+		inverseVariableMap.remove(variable);
 	}
 
 	/**
