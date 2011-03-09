@@ -398,12 +398,11 @@ void *monitor(void *data) {
 
 	remove_fps_printing();
 	source_active_genetic();
-	Compare_active_genetic();
+	//Compare_active_genetic();
 
 	// Initialize
 	printf("\nGenerate initial population...\n\n");
 	population = initialize_population(monitoring->genetic_info);
-	//active_fps_printing();
 
 	print_actor_list(population->individuals[evalIndNb],
 			monitoring->genetic_info);
@@ -459,7 +458,7 @@ void *monitor(void *data) {
 		map_actors_on_threads(population->individuals[evalIndNb],
 				monitoring->genetic_info);
 
-		Compare_close();
+		//Compare_close();
 		clear_fifos();
 		initialize_instances();
 	}
