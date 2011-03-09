@@ -69,6 +69,9 @@ static void sched_add_schedulable(struct scheduler_s *sched,
 	}
 }
 
+/**
+ * add the actor to the schedulable list
+ */
 static void sched_add_waiting_list(struct scheduler_s *sched) {
 	int i;
 	for (i = 0; i < sched->schedulers_nb; i++) {
@@ -88,11 +91,9 @@ static void sched_add_waiting_list(struct scheduler_s *sched) {
  */
 static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 	struct actor_s *actor;
+	// check if other schedulers were sended some schedulable actors
 	sched_add_waiting_list(sched);
 	if (sched->next_schedulable == sched->next_entry) {
-		/*// static actors list is used when schedulable list is empty
-		// (used only in multicore context)
-		actor = sched_get_next(sched);*/
 		return NULL;
 	} else {
 		actor = sched->schedulable[sched->next_schedulable % MAX_ACTORS];
