@@ -440,6 +440,8 @@ public class IRCloner {
 	private static Actor clone;
 
 	private static OrderedMap<String, LocalVariable> localVars;
+	
+	private static OrderedMap<String, Variable> patternVars;
 
 	private static OrderedMap<String, GlobalVariable> parameters;
 
@@ -494,6 +496,10 @@ public class IRCloner {
 	}
 
 	private static Location cloneLocation(Location location) {
+		if (location == null){
+			return location;
+		}
+		
 		return new Location(location.getStartLine(), location.getStartColumn(),
 				location.getEndColumn());
 	}
@@ -557,7 +563,12 @@ public class IRCloner {
 	 * @return the corresponding cloned local variable
 	 */
 	private static LocalVariable getLocalVar(LocalVariable variable) {
-		return localVars.get(variable.getName());
+		if (localVars.contains(variable.getName())){
+			return localVars.get(variable.getName());
+		}
+		
+		// The local variable corresponds to a pattern
+		return (LocalVariable)patternVars.get(variable.getName());
 	}
 
 	/**
@@ -676,7 +687,8 @@ public class IRCloner {
 	 * @return a clone action
 	 */
 	private Action cloneAction(Action action) {
-
+		patternVars = new OrderedMap<String, Variable>();
+		
 		Location location = cloneLocation(action.getLocation());
 		Tag tag = cloneActionTag(action.getTag());
 		Pattern inputPattern = cloneActionPattern(action.getInputPattern(),
@@ -704,13 +716,40 @@ public class IRCloner {
 		Pattern clonePattern = new Pattern();
 
 		for (Port port : pattern.getPorts()) {
-			Port clonedPort = ports.get(port.getName());
+			Port clonedPort = getPort(port);
 			clonePattern.setNumTokens(clonedPort, pattern.getNumTokens(port));
-			clonePattern.setPeeked(clonedPort, pattern.getPeeked(port));
-			clonePattern.setVariable(clonedPort, pattern.getVariable(port));
+			
+			//Clone pattern variables
+			Variable peeked = pattern.getPeeked(port);		
+			if(peeked != null){
+				clonePattern.setPeeked(clonedPort, clonePatternVar(peeked));
+			}
+			
+			Variable var = pattern.getVariable(port);
+			if(var != null){
+				clonePattern.setVariable(clonedPort, clonePatternVar(var));
+			}
 		}
 
 		return clonePattern;
+	}
+	
+	/**
+	 * Returns a clone of the given pattern variable.
+	 * 
+	 * @param patternVar
+	 *            a variable of a pattern;
+	 * 
+	 * @return the cloned pattern variable
+	 */
+	private LocalVariable clonePatternVar(Variable patternVar) {
+		//Clone variables associated to ports
+		LocalVariable cloneVar = cloneLocalVariable((LocalVariable)patternVar);
+		
+		//Store the cloned variable
+		patternVars.put(cloneVar.getName(), cloneVar);
+		
+		return cloneVar;
 	}
 
 	/**
