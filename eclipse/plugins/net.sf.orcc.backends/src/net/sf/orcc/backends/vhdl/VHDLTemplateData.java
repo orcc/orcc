@@ -29,20 +29,20 @@
 package net.sf.orcc.backends.vhdl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 
 /**
- * This class defines a map that returns, for each action, the variables that
- * are loaded by its scheduler procedure.
+ * This class defines template data for the VHDL back-end.
  * 
  * @author Matthieu Wipliez
  * @author Nicolas Siret
@@ -50,10 +50,58 @@ import net.sf.orcc.ir.instructions.Peek;
  */
 public class VHDLTemplateData extends AbstractActorVisitor {
 
-	private Set<String> strings;
+	/**
+	 * This class defines a visitor that computes the sensitivity list of the
+	 * scheduler process.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class SensitivityComputer extends AbstractActorVisitor {
+
+		@Override
+		public void visit(Actor actor) {
+			for (Port port : actor.getInputs()) {
+				signals.add(port.getName() + "_send");
+			}
+
+			for (Port port : actor.getOutputs()) {
+				signals.add(port.getName() + "_rdy");
+			}
+
+			for (Action action : actor.getActions()) {
+				visit(action.getScheduler());
+			}
+
+			if (actor.getActionScheduler().hasFsm()) {
+				signals.add("FSM");
+			}
+		}
+
+		@Override
+		public void visit(Load node) {
+			Variable var = node.getSource().getVariable();
+			if (!var.getType().isList() && var.isAssignable()) {
+				signals.add(var.getName());
+			}
+		}
+
+		@Override
+		public void visit(Peek peek) {
+			String name = peek.getPort().getName() + "_data";
+			signals.add(name);
+		}
+
+	}
+
+	/**
+	 * the set of signals that appear in the sensitivity list of the scheduler
+	 * process.
+	 */
+	private Set<String> signals;
 
 	public VHDLTemplateData() {
-		strings = new HashSet<String>();
+		signals = new LinkedHashSet<String>();
 	}
 
 	/**
@@ -61,29 +109,18 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 	 * 
 	 * @return the list of variables
 	 */
-	public List<String> getVariablesList() {
-		return new ArrayList<String>(strings);
+	public List<String> getSignals() {
+		return new ArrayList<String>(signals);
 	}
 
-	@Override
-	public void visit(Actor actor) {
-		for (Action action : actor.getActions()) {
-			visit(action.getScheduler());
-		}
-	}
-
-	@Override
-	public void visit(Load node) {
-		Variable var = node.getSource().getVariable();
-		if (!var.getType().isList() && var.isAssignable()) {
-			strings.add(var.getName());
-		}
-	}
-
-	@Override
-	public void visit(Peek peek) {
-		String name = peek.getPort().getName() + "_data";
-		strings.add(name);
+	/**
+	 * Initializes the template data from the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	public void initializeFrom(Actor actor) {
+		new SensitivityComputer().visit(actor);
 	}
 
 }

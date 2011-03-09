@@ -431,7 +431,7 @@ port map (
 // Actor VHDL Architecture - Scheduler process
 ///////////////////////////////////////////////////////////////////////////////
 Actor_Scheduler(actor) ::= <<
-<actor.simpleName>_scheduler : process(<sensitivity(actor)>)
+<actor.simpleName>_scheduler : process(<actor.templateData.signals; wrap, anchor, separator=", ">)
   <actor.actions : { action |<printLocals(action.scheduler)>
 variable <action.scheduler>_go : std_logic;
 <action.inputPattern.ports: { port |<if(action.inputPattern.peekedMap.(port))>variable <action.scheduler.name>_<port.name> : <port.type>;
@@ -454,28 +454,6 @@ endif>
 
 end process;
 
->>
-
-// print the sensitivity list of the actor
-sensitivity(actor) ::= <<
-<actor.inputs.list: {port|<port.name>_send}; separator=", "><
-if(actor.inputs.list)
-><if(actor.outputs.list || actor.templateData || actor.actionScheduler.fsm)
->, <
-endif><
-endif
-><actor.outputs.list: {port|<port.name>_rdy}; separator=", "><
-if(actor.outputs.list)
-><if(actor.actionScheduler.fsm || actor.templateData || actor.actionScheduler.fsm)
->, <
-endif><
-endif
-><actor.templateData: {d|<d>}; separator=", "><
-if(actor.templateData && actor.actionScheduler.fsm)    
->, FSM<
-elseif(actor.actionScheduler.fsm)
->FSM<
-endif>
 >>
 
 // prints the condition on the ack and go signals according to the input and output pattern

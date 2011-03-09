@@ -171,8 +171,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 		}
 
 		VHDLTemplateData templateData = new VHDLTemplateData();
-		templateData.visit(actor);
-		actor.setTemplateData(templateData.getVariablesList());
+		templateData.initializeFrom(actor);
+		actor.setTemplateData(templateData);
 
 		// remove initialization procedure (we could do better)
 		Procedure initProc = actor.getProcs().get("_initialize");
