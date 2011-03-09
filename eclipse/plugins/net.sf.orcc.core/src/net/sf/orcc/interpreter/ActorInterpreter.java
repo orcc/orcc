@@ -78,7 +78,7 @@ public class ActorInterpreter {
 	 */
 	private Map<String, Fifo> ioFifos;
 
-	private ListAllocator listAllocator;
+	protected ListAllocator listAllocator;
 
 	/**
 	 * Interpretation and evaluation tools

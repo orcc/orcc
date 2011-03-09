@@ -38,6 +38,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 
 /**
@@ -91,6 +92,16 @@ public class AbstractInterpreter extends ActorInterpreter {
 	@Override
 	protected boolean isSchedulable(Action action) {
 		// unlike parent, do not check the number of tokens present on FIFOs
+
+		// allocates peeked variables
+		Pattern pattern = action.getInputPattern();
+		for (Port port : pattern.getPorts()) {
+			Variable peeked = pattern.getPeeked(port);
+			if (peeked != null) {
+				peeked.setValue((Expression) peeked.getType().accept(
+						listAllocator));
+			}
+		}
 
 		// check isSchedulable procedure
 		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(true);
