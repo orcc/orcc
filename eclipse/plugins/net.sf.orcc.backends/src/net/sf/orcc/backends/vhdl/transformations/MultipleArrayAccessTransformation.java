@@ -266,18 +266,14 @@ public class MultipleArrayAccessTransformation extends ActionSplitter {
 	}
 
 	/**
-	 * Maximum number of reads that are allowed in one action before splitting
-	 * it. If there are less read accesses to each array than the given number,
-	 * it is not worth splitting the action because the synthesizer will simply
-	 * duplicate RAM blocks.
+	 * Maximum number of writes that are allowed in one action before splitting
+	 * it. We use double-port RAM, so this value is "2".
 	 */
-	private static final int MAX_NUM_READS = 16;
+	private static final int MAX_NUM_READS = 2;
 
 	/**
 	 * Maximum number of writes that are allowed in one action before splitting
-	 * it. Contrary to MAX_NUM_READS, this is only two because we target
-	 * double-port RAM blocks. If we do not split an action after two writes to
-	 * a given array, the synthesizer will complain.
+	 * it. We use double-port RAM, so this value is "2".
 	 */
 	private static final int MAX_NUM_WRITES = 2;
 
