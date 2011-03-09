@@ -38,8 +38,8 @@
       <vertex id="MvDBF" x="976" y="221"/>
       <vertex id="RefIdx" x="976" y="255"/>
       <vertex id="FrameToRead" x="1427" y="254"/>
-      <vertex id="ReadAddress_l" x="1398" y="118"/>
-      <vertex id="ReadAddress_c" x="1399" y="88"/>
+      <vertex id="ReadAddress_l" x="1373" y="97"/>
+      <vertex id="ReadAddress_c" x="1374" y="67"/>
       <vertex id="SelectList" x="961" y="189"/>
       <vertex id="Read4MbPred" x="1420" y="283"/>
       <vertex id="MMCO" x="145" y="735"/>
@@ -49,6 +49,6 @@
       <vertex id="RefIdxL0ToPoc" x="1018" y="377"/>
       <vertex id="RefIdxL1ToPoc" x="1018" y="573"/>
       <vertex id="SelectRefIdx" x="1207" y="232"/>
-      <vertex id="Mgnt_InterPred" x="1206" y="61"/>
+      <vertex id="Mgnt_InterPred" x="1191" y="48"/>
    </vertices>
 </layout>

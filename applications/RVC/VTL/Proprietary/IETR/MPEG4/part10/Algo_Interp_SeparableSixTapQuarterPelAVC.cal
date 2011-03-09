@@ -1,63 +1,18 @@
-/**
- * This software module was originally developed by 
- * He-Yuan Lin (NCKU), 
- * in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
- * for reference purposes and its performance may not have been optimized. 
- * This software module is an implementation of one or more tools as 
- * specified by the ISO/IEC 23002-4.
- * 
- * ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
- * license to copy, distribute, and make derivative works of this software 
- * module or modifications thereof for use in implementations of the 
- * ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
- * 
- * Those intending to use this software module in products are advised that 
- * its use may infringe existing patents. ISO/IEC have no liability for use 
- * of this software module or modifications thereof.
- * 
- * Copyright is not released for products that do not conform to audiovisual 
- * and image-coding related ITU Recommendations and/or ISO/IEC International 
- * Standards. 
- * 
- * Assurance that the originally developed software module can be used 
- * (1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
- * (2) to develop the ISO/IEC 23002-4: 
- *
- *
- * NCKU grants ISO/IEC all rights necessary to 
- * include the originally developed software module or modifications thereof 
- * in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
- * worldwide, non-exclusive, copyright license to copy, distribute, and make 
- * derivative works for use in implementations of the ISO/IEC 23002-4 in 
- * products that satisfy conformance criteria (if any), and to the extent 
- * that such originally developed software module or portions of it are 
- * included in the ISO/IEC 23002-4.  To the extent that NCKU
- * owns patent rights that would be required to make, use, or 
- * sell the originally developed software module or portions thereof 
- * included in the ISO/IEC 23002-4 in a conforming product, NCKU
- * Rennes will assure the ISO/IEC that it is willing to 
- * negotiate licenses under reasonable and non-discriminatory terms and 
- * conditions with applicants throughout the world.
- *
- * ISO/IEC gives You a free license to this software module or modifications 
- * thereof for the sole  purpose of developing the ISO/IEC 23002-4.
- * 
- * NCKU Rennes retains full right to modify and use the 
- * code for its own purpose, assign or donate the code to a third party and 
- * to inhibit third parties from using the code for products that do not 
- * conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
- * Standards. 
- * 
- * This copyright notice must be included in all copies or derivative works. 
- * Copyright (c) ISO/IEC 2006-2010.
- */
-// Algo_Interp_SeparableSixTapQuarterPeAVC.cal
-//
-// Author: He-Yuan Lin
-//
-// Fractional luma sample interpolation for motion compensation of AVC
+/***********************************************************************
 
-//Modified by Damien de Saint Jorre ; IETR/INSA of Rennes (France)
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
 
 package Proprietary.IETR.MPEG4.part10;
 import MPEG.Common.Imp_Math.*;
@@ -122,16 +77,11 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				end
 			end
 			if(xFrac = 2)then
-				temp := SixTapFilter(TabIntermPix[4*(2+x_idx)+2][4*y_idx]    , TabIntermPix[4*(2+x_idx)+2][4*(1+y_idx)] ,
-				                     TabIntermPix[4*(2+x_idx)+2][4*(2+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(3+y_idx)] ,
-				                     TabIntermPix[4*(2+x_idx)+2][4*(4+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(5+y_idx)]);
-				temp := (temp + 512) >> 10;
-				temp := clip(temp , 0,255);
 				if yFrac = 1 then 
-					temp := ComputeQuarterPixel(temp,TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)]);
+					temp := ComputeQuarterPixel(TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2],TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)]);
 				end
 				if yFrac = 3 then
-					temp  := ComputeQuarterPixel(temp,TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)]);
+					temp  := ComputeQuarterPixel(TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2],TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)]);
 				end
 			end
 			if xFrac = 1 then
@@ -139,12 +89,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 					temp := ComputeQuarterPixel(TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)],TabPix[4*(2 + x_idx)][4*(2 + y_idx)]);
 				else
 					if yFrac = 2 then
-						temp := SixTapFilter(TabIntermPix[4*(2+x_idx)+2][4*y_idx]    , TabIntermPix[4*(2+x_idx)+2][4*(1+y_idx)] ,
-						                     TabIntermPix[4*(2+x_idx)+2][4*(2+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(3+y_idx)] ,
-						                     TabIntermPix[4*(2+x_idx)+2][4*(4+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(5+y_idx)]);
-						temp  := (temp + 512) >> 10;
-						temp  := clip(temp , 0,255);
-						temp  := ComputeQuarterPixel(temp,TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]);
+						temp  := ComputeQuarterPixel(TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2],TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]);
 					end
 					if yFrac = 1 then
 						temp  := ComputeQuarterPixel(TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)],TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]);
@@ -161,12 +106,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 					temp := ComputeQuarterPixel(TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)],TabPix[4*(3 + x_idx)][4*(2 + y_idx)]);
 				else
 					if yFrac = 2 then
-						temp := SixTapFilter(TabIntermPix[4*(2+x_idx)+2][4*y_idx]    , TabIntermPix[4*(2+x_idx)+2][4*(1+y_idx)] ,
-						                     TabIntermPix[4*(2+x_idx)+2][4*(2+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(3+y_idx)] ,
-						                     TabIntermPix[4*(2+x_idx)+2][4*(4+y_idx)], TabIntermPix[4*(2+x_idx)+2][4*(5+y_idx)]);
-						temp  := (temp+512) >> 10;
-						temp  := clip(temp , 0,255);
-						temp  := ComputeQuarterPixel(temp,TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]);
+						temp  := ComputeQuarterPixel(TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2],TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]);
 					end
 					if yFrac = 1 then
 						temp  := ComputeQuarterPixel(TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)],TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]);
@@ -184,7 +124,8 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 		uint(size=32) xMin,
 		uint(size=32) xMax,
 		uint(size=32) yMin,
-		uint(size=32) yMax
+		uint(size=32) yMax,
+		int ValIntermPix
 	begin
 		if(    xFrac = 0
 		   or (xFrac = 1 and yFrac  = 0)
@@ -259,6 +200,23 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				end
 			end
 		end
+
+		if(   (xFrac=2 and yFrac != 0)
+		   or (xFrac=1 and yFrac  = 2)
+		   or (xFrac=3 and yFrac  = 2))then
+			
+			foreach int x in 0 + 2 .. width - 1 + 2
+			do
+				foreach int y in 0  .. height - 1
+				do
+					ValIntermPix := SixTapFilter(TabIntermPix[4*x+2][4*y]    , TabIntermPix[4*x+2][4*(1+y)] ,
+					                                       TabIntermPix[4*x+2][4*(2+y)], TabIntermPix[4*x+2][4*(3+y)] ,
+					                                       TabIntermPix[4*x+2][4*(4+y)], TabIntermPix[4*x+2][4*(5+y)]);
+					ValIntermPix := (ValIntermPix + 512) >> 10;
+					TabPix[4*x+2][4*(y + 2) + 2] := clip(ValIntermPix , 0,255);
+				end
+			end
+		end
 	end
 
 	GetMv: action Mv:[ Mv_x , Mv_y ] ==>
@@ -296,7 +254,8 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			if(xFrac != 0 or yFrac != 0) then
 				interpolation();
 				if(    not(xFrac=0 and yFrac=2)
-				   and not(xFrac=2 and yFrac=0)) then
+				   and not(xFrac=2 and yFrac=0)
+				   and not(xFrac=2 and yFrac=2)) then
 					foreach int x in 0 .. width - 1
 					do
 						foreach int y in 0 .. height - 1
