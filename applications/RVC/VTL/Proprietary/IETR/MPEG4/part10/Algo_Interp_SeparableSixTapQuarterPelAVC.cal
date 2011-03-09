@@ -110,43 +110,36 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			)
 		end
 
-	procedure compensate(uint(size=5)x_idx, uint(size=5)y_idx)
+	procedure compensate2(uint(size=5)x_idx, uint(size=5)y_idx)
 		begin
 			if(xFrac = 0)then
 				if yFrac != 0 then 
-		 			temp := ComputeHalfPixel(TabPix[4*(2 + x_idx)][4*y_idx]     , TabPix[4*(2 + x_idx)][4*1 + 4*y_idx] , TabPix[4*2 + 4*x_idx][4*2 + 4*y_idx] ,
-					                         TabPix[4*(2 + x_idx)][4*(3 + y_idx)] , TabPix[4*(2 + x_idx)][4*(4 + y_idx)] , TabPix[4*(2 + x_idx)][4*(5 + y_idx)]);
 					if yFrac = 1 then
-						temp := ComputeQuarterPixel(temp,TabPix[4*(2 + x_idx)][4*(2 + y_idx)]);
+						temp := ComputeQuarterPixel(TabPix[4*(2 + x_idx)][4*(2 + y_idx)+2],TabPix[4*(2 + x_idx)][4*(2 + y_idx)]);
 					end
 					if yFrac = 3 then
-						temp := ComputeQuarterPixel(temp,TabPix[4*(2 + x_idx)][4*(3 + y_idx)]);
+						temp := ComputeQuarterPixel(TabPix[4*(2 + x_idx)][4*(2 + y_idx)+2],TabPix[4*(2 + x_idx)][4*(3 + y_idx)]);
 					end
 				end
 			end
 			if(xFrac = 2)then
-				if yFrac = 0 then
-					temp := ComputeHalfPixel( TabPix[4*x_idx][4*(2 + y_idx)]     , TabPix[4*(1 + x_idx)][4*(2 + y_idx)] , TabPix[4*(2 + x_idx)][4*(2 + y_idx)],
-					                          TabPix[4*(3 + x_idx)][4*(2 + y_idx)] , TabPix[4*(4 + x_idx)][4*(2 + y_idx)] , TabPix[4*(5 + x_idx)][4*(2 + y_idx)]);
-				else
-					foreach int n in 0 .. 5
-					do
-						half_pel[n] := SixTapFilter( TabPix[4*x_idx][4*(n + y_idx)]     , TabPix[4*(1 + x_idx)][4*(n + y_idx)] , TabPix[4*(2 + x_idx)][4*(n + y_idx)],
-						                             TabPix[4*(3 + x_idx)][4*(n + y_idx)] , TabPix[4*(4 + x_idx)][4*(n + y_idx)] , TabPix[4*(5 + x_idx)][4*(n + y_idx)]);
-					end
-					temp := SixTapFilter(half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
-					temp := (temp + 512) >> 10;
-					temp := clip(temp , 0,255);
-					if yFrac = 1 then 
-						temp2 := ComputeHalfPixel( TabPix[4*x_idx][4*(2 + y_idx)]     , TabPix[4*(1 + x_idx)][4*(2 + y_idx)] , TabPix[4*(2 + x_idx)][4*(2 + y_idx)],
-						                           TabPix[4*(3 + x_idx)][4*(2 + y_idx)] , TabPix[4*(4 + x_idx)][4*(2 + y_idx)] , TabPix[4*(5 + x_idx)][4*(2 + y_idx)]);
-						temp := ComputeQuarterPixel(temp,temp2);
-					end
-					if yFrac = 3 then
-						temp2 := ComputeHalfPixel( TabPix[4*x_idx][4*(3 + y_idx)]     , TabPix[4*(1 + x_idx)][4*(3 + y_idx)] , TabPix[4*(2 + x_idx)][4*(3 + y_idx)] ,
-						                           TabPix[4*(3 + x_idx)][4*(3 + y_idx)] , TabPix[4*(4 + x_idx)][4*(3 + y_idx)] , TabPix[4*(5 + x_idx)][4*(3 + y_idx)]);
-						temp  := ComputeQuarterPixel(temp,temp2);
-					end
+				foreach int n in 0 .. 5
+				do
+					half_pel[n] := SixTapFilter( TabPix[4*x_idx][4*(n + y_idx)]     , TabPix[4*(1 + x_idx)][4*(n + y_idx)] , TabPix[4*(2 + x_idx)][4*(n + y_idx)],
+					                             TabPix[4*(3 + x_idx)][4*(n + y_idx)] , TabPix[4*(4 + x_idx)][4*(n + y_idx)] , TabPix[4*(5 + x_idx)][4*(n + y_idx)]);
+				end
+				temp := SixTapFilter(half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
+				temp := (temp + 512) >> 10;
+				temp := clip(temp , 0,255);
+				if yFrac = 1 then 
+					temp2 := ComputeHalfPixel( TabPix[4*x_idx][4*(2 + y_idx)]     , TabPix[4*(1 + x_idx)][4*(2 + y_idx)] , TabPix[4*(2 + x_idx)][4*(2 + y_idx)],
+					                           TabPix[4*(3 + x_idx)][4*(2 + y_idx)] , TabPix[4*(4 + x_idx)][4*(2 + y_idx)] , TabPix[4*(5 + x_idx)][4*(2 + y_idx)]);
+					temp := ComputeQuarterPixel(temp,temp2);
+				end
+				if yFrac = 3 then
+					temp2 := ComputeHalfPixel( TabPix[4*x_idx][4*(3 + y_idx)]     , TabPix[4*(1 + x_idx)][4*(3 + y_idx)] , TabPix[4*(2 + x_idx)][4*(3 + y_idx)] ,
+					                           TabPix[4*(3 + x_idx)][4*(3 + y_idx)] , TabPix[4*(4 + x_idx)][4*(3 + y_idx)] , TabPix[4*(5 + x_idx)][4*(3 + y_idx)]);
+					temp  := ComputeQuarterPixel(temp,temp2);
 				end
 			end
 			if xFrac = 1 then
@@ -211,14 +204,43 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 					end
 				end
 			end
+			if xFrac != 0 or yFrac != 0 then
+				TabPix[4*(2 + x_idx) + xFrac][4*(2 + y_idx) + yFrac] := temp;
+			end
 		end
+
+	procedure compensate()
+	begin
+		if(xFrac = 0)then
+			foreach int x in 0 + 2 .. width - 1 + 2
+			do
+				foreach int y in 0 .. height - 1
+				do
+					TabPix[4*x][4*(2 + y) + 2] :=
+					    ComputeHalfPixel(TabPix[4*x][4*y],       TabPix[4*x][4*(1 + y)] ,
+					                     TabPix[4*x][4*(2 + y)], TabPix[4*x][4*(3 + y)] ,
+					                     TabPix[4*x][4*(4 + y)], TabPix[4*x][4*(5 + y)]);
+				end
+			end
+		end
+		if(yFrac = 0)then
+			foreach int x in 0 .. width - 1
+			do
+				foreach int y in 0 + 2 .. height - 1 + 2
+				do
+					TabPix[4*(2 + x) + 2][4*y] :=
+					    ComputeHalfPixel(TabPix[4*x][4*y],       TabPix[4*(1 + x)][4*y],
+					                     TabPix[4*(2 + x)][4*y], TabPix[4*(3 + x)][4*y],
+					                     TabPix[4*(4 + x)][4*y], TabPix[4*(5 + x)][4*y]);
+				end
+			end
+		end
+	end
 
 	GetMv: action Mv:[ Mv_x , Mv_y ] ==>
 	do
 		x := 0;
 		y := 0;
-		o_x := 0;
-		o_y := 0;
 		xFrac := Mv_x & 3;
 		yFrac := Mv_y & 3;
 	end
@@ -246,6 +268,24 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	GetPixVal.Done: action ==>
 		guard
 			y >= height +5
+		do
+			if(xFrac != 0 or yFrac != 0) then
+				compensate();
+				if(    not(xFrac=0 and yFrac=2)
+				   and not(xFrac=2 and yFrac=0)) then
+					foreach int x in 0 .. width - 1
+					do
+						foreach int y in 0 .. height - 1
+						do
+							compensate2(x,y);
+						end
+					end
+				end
+			end
+			o_x := xFrac;
+			o_y := yFrac;
+			height := height * 4;
+			width := width * 4;
 		end
 
 	Interpolate.Launch: action ==> Interp:[ p ]
@@ -254,22 +294,17 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 		var 
 			uint(size=8) p
 		do
-			compensate(o_x,o_y);
-			if xFrac = 0 and yFrac = 0 then
-				p:= TabPix[o_x*4 + 8 + xFrac][o_y*4 + 8 + yFrac];
-			else
-				p := temp;
-			end
-			o_x := o_x + 1;
+			p:= TabPix[o_x + 8][o_y + 8];
+			o_x := o_x + 4;
 			if o_x >= width then
-				o_x := 0;
-				o_y := o_y + 1;
+				o_x := xFrac;
+				o_y := o_y + 4;
 			end
 		end
 
 	Interpolate.Done: action ==>
 		guard
-			o_y = height
+			o_y >= height
 		end
 
   schedule fsm GetMv:
