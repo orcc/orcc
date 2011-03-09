@@ -34,107 +34,92 @@ import java.util.List;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.util.OrderedMap;
 
 public class InternalizeFifoAccess extends AbstractActorVisitor {
-	public class LinksToStateVar extends AbstractActorVisitor {	
-		@Override
-		public void visit(Load load) {
-			Use use = load.getSource();
-			Variable var = use.getVariable();
-			if (localFifoVars.contains(var)) {
-				load.setSource(new Use(variable, load));
-				//updateIndex(var, load, load.getIndexes());
-			}
-		}
-		
-		@Override
-		public void visit(Procedure procedure) {
-			super.visit(procedure);
-			
-			//Remove locals from procedure
-			OrderedMap<String, LocalVariable> locals = procedure.getLocals();
-			
-			for (Variable fifoVar : localFifoVars){
-				locals.remove(fifoVar.getName());
-			}
-		}
-
-		@Override
-		public void visit(Store store) {
-			Variable var = store.getTarget();
-			if (localFifoVars.contains(var)) {
-				store.setTarget(variable);
-				//updateIndex(var, store, store.getIndexes());
-			}
-		}
-	}
-	public class RemoveReadWrite extends AbstractActorVisitor {	
-		private void removeInstruction(Instruction instruction){
-			BlockNode node = instruction.getBlock();		
-			List<Instruction> instructions = node.getInstructions();			
-			itInstruction.remove();
-			instructions.remove(instruction);
-		}
-		
-		@Override
-		public void visit(Peek peek) {
-			Port source = peek.getPort();
-			if(port.getName() == source.getName()){
-				removeInstruction(peek);
-				localFifoVars.add(peek.getTarget());
-			}
-		}
-		
-		@Override
-		public void visit(Read read) {
-			Port source = read.getPort();
-			if(port.getName() == source.getName()){
-				removeInstruction(read);
-				localFifoVars.add(read.getTarget());
-			}
-		}
-		@Override
-		public void visit(Write write) {
-			Port target = write.getPort();
-			if(port.getName() == target.getName()){
-				removeInstruction(write);
-				localFifoVars.add(write.getTarget());
-			}
-		}
-	}
 	private List<Variable> localFifoVars;
-	
 	private Port port;
-	
+
+	private GlobalVariable varCount;
 	private GlobalVariable variable;
-	
-	public InternalizeFifoAccess(Port port, GlobalVariable variable) {
+
+	public InternalizeFifoAccess(Port port, GlobalVariable variable,
+			GlobalVariable varCount) {
 		this.port = port;
 		this.variable = variable;
-		this.localFifoVars = new ArrayList<Variable>();		
+		this.varCount = varCount;
+		this.localFifoVars = new ArrayList<Variable>();
+	}
+
+	private void setIndex(Instruction instr, List<Expression> indexes) {
+
+		if (indexes.size() < 2) {
+			Use use = new Use(varCount, instr);
+			BinaryExpr expr = new BinaryExpr(new VarExpr(use), BinaryOp.PLUS,
+					indexes.get(0), IrFactory.eINSTANCE.createTypeInt(32));
+
+			indexes.set(0, expr);
+
+		} else {
+			System.err.println("TODO index");
+		}
+
+		Use use = new Use(varCount);
+
+		Store store = new Store(varCount, new BinaryExpr(new VarExpr(use),
+				BinaryOp.PLUS, new IntExpr(1),
+				IrFactory.eINSTANCE.createTypeInt(32)));
+
+		itInstruction.add(store);
 	}
 
 	@Override
 	public void visit(Action action) {
-		//Update action pattern
+		// Update action pattern
+		Pattern input = action.getInputPattern();
+		Pattern output = action.getOutputPattern();
+
+		localFifoVars.add(input.getVariable(port));
+		localFifoVars.add(input.getPeeked(port));
+
+		localFifoVars.add(output.getVariable(port));
+		localFifoVars.add(output.getPeeked(port));
+
+		super.visit(action);
+
 		action.getInputPattern().remove(port);
 		action.getOutputPattern().remove(port);
-					
-		new RemoveReadWrite().visit(action);
-		new LinksToStateVar().visit(action);
+	}
+
+	@Override
+	public void visit(Load load) {
+		Use use = load.getSource();
+		Variable var = use.getVariable();
+		if (localFifoVars.contains(var)) {
+			load.setSource(new Use(variable, load));
+			setIndex(load, load.getIndexes());
+		}
+	}
+
+	@Override
+	public void visit(Store store) {
+		Variable var = store.getTarget();
+		if (localFifoVars.contains(var)) {
+			store.setTarget(variable);
+			setIndex(store, store.getIndexes());
+		}
 	}
 }

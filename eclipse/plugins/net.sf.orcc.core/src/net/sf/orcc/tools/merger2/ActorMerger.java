@@ -45,6 +45,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.serialize.IRCloner;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.moc.CSDFMoC;
@@ -158,6 +159,7 @@ public class ActorMerger {
 	private OrderedMap<String, Port> inputs;
 	private MultiMap<Port, Port> IntPorts;
 	private Map<Port, GlobalVariable> intVars;
+	private Map<GlobalVariable, GlobalVariable> varCounts;
 	private MoC moc;
 	private String name;
 	private OrderedMap<String, Port> outputs;
@@ -191,6 +193,7 @@ public class ActorMerger {
 		this.IntPorts = internalPorts;
 		this.name = name;
 		this.intVars = new HashMap<Port, GlobalVariable>();
+		this.varCounts = new HashMap<GlobalVariable, GlobalVariable>();
 		this.parameters = new OrderedMap<String, GlobalVariable>();
 		this.stateVars = new OrderedMap<String, GlobalVariable>();
 		this.inputs = new OrderedMap<String, Port>();
@@ -265,9 +268,11 @@ public class ActorMerger {
 		// No state variable represents this internal connection
 		return null;
 	}
-
+	
 	private GlobalVariable internalizePort(Port port, GlobalVariable portVar,
 			Actor actor) {
+		GlobalVariable varCount;
+		
 		// Port has never been internalize, create a new one
 		if (portVar == null) {
 			// Get MoC of the current candidate to define the size of the state
@@ -282,8 +287,20 @@ public class ActorMerger {
 			portVar = new GlobalVariable(new Location(), typeList,
 					port.getName(), true);
 
+			// Create an associated counter access
+			varCount = new GlobalVariable(new Location(),
+					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
+							+ "_count", true, new IntExpr(0));
+			
+			
+			// Add both variables in state vars
+			stateVars.put(varCount.getName(), varCount);
 			stateVars.put(portVar.getName(), portVar);
+			varCounts.put(portVar, varCount);
 		} else {
+			//Get associated var counter
+			varCount =  varCounts.get(portVar);
+			
 			// Increase size of the stateVar by rate
 			TypeList typeList = (TypeList) portVar.getType();
 
@@ -293,10 +310,11 @@ public class ActorMerger {
 			// Update state variable name with current port
 			String name = portVar.getName() + "_" + port.getName();
 			portVar.setName(name);
+			varCount.setName(name+ "_count");
 		}
 
 		// Change fifo access to stateVar access
-		new InternalizeFifoAccess(port, portVar).visit(actor);
+		new InternalizeFifoAccess(port, portVar, varCount).visit(actor);
 
 		return portVar;
 	}
