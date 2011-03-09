@@ -16,7 +16,6 @@ void sched_init(struct scheduler_s *sched, int id, int schedulers_nb,
 	int i;
 
 	sched->id = id;
-	sched->schedulers_nb = schedulers_nb;
 
 	sched->num_actors = num_actors;
 	sched->actors = actors;
@@ -44,7 +43,7 @@ void sched_init(struct scheduler_s *sched, int id, int schedulers_nb,
 /**
  * Reinitialize the given scheduler with new actors list.
  */
-void sched_reinit(struct scheduler_s *sched, int num_actors,
+void sched_reinit(struct scheduler_s *sched, int schedulers_nb, int num_actors,
 		struct actor_s **actors) {
 	int i;
 
@@ -60,7 +59,7 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 	sched->next_schedulable = 0;
 	sched->next_else_schedulable = 0;
 
-	for (i = 0; i < sched->schedulers_nb; i++) {
+	for (i = 0; i < schedulers_nb; i++) {
 		sched->waiting_schedulable[i]->next_entry = 0;
 		sched->waiting_schedulable[i]->next_waiting = 0;
 	}

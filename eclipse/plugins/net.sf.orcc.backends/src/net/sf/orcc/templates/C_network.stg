@@ -377,7 +377,7 @@ void *scheduler(void *data) {
 	
 	<endif>
 	while (1) {
-		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched);
+		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched<if(options.newScheduler)>, <if(options.needDynamicMapping || options.threads)>THREAD_NB<else>1<endif><endif>);
 		<if(options.needDynamicMapping)>
 		if(my_actor != NULL){				
 	  		timeout = 0;
@@ -415,8 +415,8 @@ void *scheduler(void *data) {
 			} else if (si.reason == starved) {
 				sched_add_predecessors(sched, my_actor, si.ports);
 			}
+			<endif>
 		}
-		<endif>
 		<endif>
 	}
 }

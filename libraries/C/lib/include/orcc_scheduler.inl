@@ -72,9 +72,9 @@ static void sched_add_schedulable(struct scheduler_s *sched,
 /**
  * add the actor to the schedulable list
  */
-static void sched_add_waiting_list(struct scheduler_s *sched) {
+static void sched_add_waiting_list(struct scheduler_s *sched, int schedulers_nb) {
 	int i;
-	for (i = 0; i < sched->schedulers_nb; i++) {
+	for (i = 0; i < schedulers_nb; i++) {
 		struct waiting_s *wait = sched->waiting_schedulable[i];
 		while (wait->next_entry - wait->next_waiting > 0) {
 			sched_add_schedulable(sched,
@@ -89,10 +89,13 @@ static void sched_add_waiting_list(struct scheduler_s *sched) {
  * The actor is removed from the schedulable list.
  * This method is used by the data/demand driven scheduler.
  */
-static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
+static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
+		int schedulers_nb) {
 	struct actor_s *actor;
 	// check if other schedulers were sended some schedulable actors
-	sched_add_waiting_list(sched);
+	if (schedulers_nb > 1) {
+		sched_add_waiting_list(sched, schedulers_nb);
+	}
 	if (sched->next_schedulable == sched->next_entry) {
 		return NULL;
 	} else {

@@ -54,7 +54,6 @@ struct actor_s {
 
 struct scheduler_s {
 	int id;
-	int schedulers_nb;
 	int num_actors;
 	struct actor_s **actors;
 	struct actor_s *schedulable[MAX_ACTORS];
@@ -79,6 +78,7 @@ struct waiting_s {
  */
 void sched_init(struct scheduler_s *sched, int id, int schedulers_nb,
 		int num_actors, struct actor_s **actors, struct sync_s *sync);
-void sched_reinit(struct scheduler_s *sched, int num_actors, struct actor_s **actors);
+void sched_reinit(struct scheduler_s *sched, int schedulers_nb, int num_actors,
+		struct actor_s **actors);
 
 #endif

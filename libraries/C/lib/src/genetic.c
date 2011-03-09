@@ -38,11 +38,11 @@
 #include "orcc_thread.h"
 #include "orcc_scheduler.h"
 
-int clean_cache(int size){
+int clean_cache(int size) {
 	int i, res = 0;
 	int *table = (int*) malloc(size * sizeof(int));
 	memset(table, 0, size);
-	for(i = 0; i<size; i++){
+	for (i = 0; i < size; i++) {
 		res += table[i];
 	}
 	free(table);
@@ -54,8 +54,8 @@ static struct mapping_s* compute_mapping(individual *individual,
 	int i, j, k;
 	struct mapping_s *mapping = (struct mapping_s*) malloc(
 			sizeof(struct mapping_s));
-	mapping->actors_per_threads = (int*) malloc(genetic_info->threads_nb
-			* sizeof(int));
+	mapping->actors_per_threads = (int*) malloc(
+			genetic_info->threads_nb * sizeof(int));
 	mapping->actors_mapping = (struct actor_s***) malloc(
 			genetic_info->threads_nb * sizeof(struct actor_s **));
 
@@ -71,10 +71,10 @@ static struct mapping_s* compute_mapping(individual *individual,
 			}
 		}
 
-		mapping->actors_mapping[i] = (struct actor_s**) malloc(k
-				* sizeof(struct actor_s*));
-		memcpy(mapping->actors_mapping[i], actors_tmp, k
-				* sizeof(struct actor_s*));
+		mapping->actors_mapping[i] = (struct actor_s**) malloc(
+				k * sizeof(struct actor_s*));
+		memcpy(mapping->actors_mapping[i], actors_tmp,
+				k * sizeof(struct actor_s*));
 		mapping->actors_per_threads[i] = k;
 		free(actors_tmp);
 	}
@@ -205,10 +205,10 @@ static void crossover(individual **children, individual **parents,
 
 	children[0] = (individual*) malloc(sizeof(individual));
 	children[1] = (individual*) malloc(sizeof(individual));
-	children[0]->genes = (gene**) malloc(genetic_info->actors_nb
-			* sizeof(gene*));
-	children[1]->genes = (gene**) malloc(genetic_info->actors_nb
-			* sizeof(gene*));
+	children[0]->genes = (gene**) malloc(
+			genetic_info->actors_nb * sizeof(gene*));
+	children[1]->genes = (gene**) malloc(
+			genetic_info->actors_nb * sizeof(gene*));
 	children[0]->fps = -1;
 	children[0]->old_fps = -1;
 	children[1]->fps = -1;
@@ -285,7 +285,7 @@ static void map_actors_on_threads(individual *individual,
 	struct mapping_s *mapping = compute_mapping(individual, genetic_info);
 
 	for (i = 0; i < genetic_info->threads_nb; i++) {
-		sched_reinit(&genetic_info->schedulers[i],
+		sched_reinit(&genetic_info->schedulers[i], genetic_info->threads_nb,
 				mapping->actors_per_threads[i], mapping->actors_mapping[i]);
 	}
 }
