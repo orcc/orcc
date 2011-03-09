@@ -297,4 +297,9 @@ public class Pattern {
 		inverseVariableMap.put(variable, port);
 	}
 
+	@Override
+	public String toString() {
+		return numTokensMap.toString();
+	}
+
 }
