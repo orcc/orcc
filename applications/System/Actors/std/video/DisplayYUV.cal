@@ -22,9 +22,9 @@ actor DisplayYUV()
 		==>
 		:
 
-//	native procedure displayYUV_setSize(int(size=16) pictureWidth, int(size=16) pictureSize);
-//	native procedure displayYUV_displayPicture(uint(size=8) pictureBuffer[42][256], int(size=16) pictureWidth, int(size=16) pictureSize);
-//	native procedure displayYUV_init();
+	native procedure displayYUV_setSize(int(size=16) pictureWidth, int(size=16) pictureSize) end
+	native procedure displayYUV_displayPicture(uint(size=8) pictureBuffer[42][256], int(size=16) pictureWidth, int(size=16) pictureSize) end
+	native procedure displayYUV_init() end
 
 	uint(size=8) pictureBuffer[2280000][256];
 	int(size=16) pictureWidth       := 0;
