@@ -294,7 +294,7 @@ static void display_set_video(int width, int height) {
 #ifndef NO_DISPLAY
 	printf("set display to %ix%i\n", width, height);
 
-	m_screen = SDL_SetVideoMode(m_width, m_height, 24, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	m_screen = SDL_SetVideoMode(m_width, m_height, 0, 0);
 	if (m_screen == NULL) {
 		fprintf(stderr, "Couldn't set %ix%ix24 video mode: %s\n", m_width, m_height,
 			SDL_GetError());
