@@ -379,9 +379,7 @@ void *scheduler(void *data) {
 	while (1) {
 		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched<if(options.newScheduler)>, <if(options.needDynamicMapping || options.threads)>THREAD_NB<else>1<endif><endif>);
 		if(my_actor != NULL){
-			<if(options.needDynamicMapping)>				
-	  		timeout = 0;
-	  		<endif>
+			<if(options.needDynamicMapping)>timeout = 0;<endif>
 			si.num_firings = 0;
 			my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
