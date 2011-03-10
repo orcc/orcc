@@ -97,7 +97,8 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
 		sched_add_waiting_list(sched, schedulers_nb);
 	}
 	if (sched->next_schedulable == sched->next_entry) {
-		return NULL;
+		// static actors list is used when schedulable list is empty
+		actor = sched_get_next(sched);
 	} else {
 		actor = sched->schedulable[sched->next_schedulable % MAX_ACTORS];
 		sched->next_schedulable++;
