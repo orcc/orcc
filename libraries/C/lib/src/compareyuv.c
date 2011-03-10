@@ -161,7 +161,7 @@ static void DiffUcharImage(const int x_size, const int y_size, const unsigned ch
 	//   printf("OK\n");
 }
 
-void Compare_write_mb(unsigned char tokens[384]) {
+void Compare_write_mb() {
 	int i, j, cnt, base, idx;
 
 	//printf("display_write_mb (%i, %i)\n", m_x, m_y);
@@ -171,7 +171,7 @@ void Compare_write_mb(unsigned char tokens[384]) {
 
 	for (i = 0; i < 16; i++) {
 		for (j = 0; j < 16; j++) {
-			int tok = tokens[cnt];
+			int tok = fifo_i8_read_1(Compare_B, fifo_Compare_B_id);
 			cnt++;
 
 			idx = base + i * m_width + j;
@@ -182,7 +182,7 @@ void Compare_write_mb(unsigned char tokens[384]) {
 	base = m_y / 2 * m_width / 2 + m_x / 2;
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
-			int tok = tokens[cnt];
+			int tok = fifo_i8_read_1(Compare_B, fifo_Compare_B_id);
 			cnt++;
 
 			idx = base + i * m_width / 2 + j;
@@ -192,7 +192,7 @@ void Compare_write_mb(unsigned char tokens[384]) {
 
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
-			int tok = tokens[cnt];
+			int tok = fifo_i8_read_1(Compare_B, fifo_Compare_B_id);
 			cnt++;
 			idx = base + i * m_width / 2 + j;
 			img_buf_v[idx] = tok;
@@ -257,16 +257,9 @@ void Compare_scheduler(struct schedinfo_s *si) {
 
 	while (1) {
 		if (fifo_i16_has_tokens(Compare_WIDTH, fifo_Compare_WIDTH_id, 1) && fifo_i16_has_tokens(Compare_HEIGHT, fifo_Compare_HEIGHT_id, 1)) {
-			short *ptr, width, height;
-			i16 Compare_HEIGHT_buf[1], Compare_WIDTH_buf[1];
-
-			ptr = fifo_i16_read(Compare_WIDTH, Compare_WIDTH_buf, fifo_Compare_WIDTH_id, 1);
-			width = ptr[0] * 16;
-			fifo_i16_read_end(Compare_WIDTH, fifo_Compare_WIDTH_id, 1);
-
-			ptr = fifo_i16_read(Compare_HEIGHT, Compare_HEIGHT_buf, fifo_Compare_HEIGHT_id, 1);
-			height = ptr[0] * 16;
-			fifo_i16_read_end(Compare_HEIGHT, fifo_Compare_HEIGHT_id, 1);
+			short width, height;
+			width = fifo_i16_read_1(Compare_WIDTH, fifo_Compare_WIDTH_id) * 16;
+			height = fifo_i16_read_1(Compare_HEIGHT, fifo_Compare_HEIGHT_id) * 16;
 
 			if (init == 1) {
 				Compare_init(width, height);
@@ -278,9 +271,8 @@ void Compare_scheduler(struct schedinfo_s *si) {
 
 		if (fifo_i8_has_tokens(Compare_B, fifo_Compare_B_id, 384) && init == 0) {
 			i8 Compare_B_buf[384];
-			Compare_write_mb(fifo_i8_read(Compare_B, Compare_B_buf, fifo_Compare_B_id, 384));
-			fifo_i8_read_end(Compare_B, fifo_Compare_B_id, 384);
-			i++;
+			Compare_write_mb();
+			i+=384;
 		} else {
 			break;
 		}
