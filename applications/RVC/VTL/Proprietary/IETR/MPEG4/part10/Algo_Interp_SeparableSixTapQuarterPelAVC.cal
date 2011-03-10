@@ -146,64 +146,49 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			do
 				foreach int y_idx in 0 .. height - 1
 				do
-					if(xFrac = 0)then
-						if yFrac = 1 then
-							pix1 := TabPix[4*(2 + x_idx)][4*(2 + y_idx)+2];
-							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx)];
-						end
-						if yFrac = 3 then
-							pix1 := TabPix[4*(2 + x_idx)][4*(2 + y_idx)+2];
-							pix2 := TabPix[4*(2 + x_idx)][4*(3 + y_idx)];
-						end
-					end
-					if xFrac = 1 then
-						if yFrac = 0 then
-							pix1 := TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)];
-							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx)];
-						end
-						if yFrac = 1 then
-							pix1 := TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)];
-							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2];
-						end
-						if yFrac = 2 then
-							pix1 := TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2];
-							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2];
-						end
-						if yFrac = 3 then
-							pix1 := TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)];
-							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2];
-						end
-					end
-					if(xFrac = 2)then
-						if yFrac = 1 then
-							pix1 := TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2];
-							pix2 := TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)];
-						end
-						if yFrac = 3 then
-							pix1 := TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2];
-							pix2 := TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)];
-						end
-					end
-					if xFrac = 3 then
-						if yFrac = 0 then
-							pix1 := TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)];
-							pix2 := TabPix[4*(3 + x_idx)][4*(2 + y_idx)];
-						end
-						if yFrac = 2 then
-							pix1 := TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2];
-							pix2 := TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2];
-						end
-						if yFrac = 1 then
-							pix1 := TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)];
-							pix2 := TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2];
-						end
-						if yFrac = 3 then
-							pix1 := TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)];
-							pix2 := TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2];
-						end
-					end
-					pixComputed  := ComputeQuarterPixel(pix1,pix2);
-					TabPix[4*(2 + x_idx) + xFrac][4*(2 + y_idx) + yFrac] := pixComputed;
+
+					pix1 :=
+						if(   (xFrac=1 and yFrac<2) or(xFrac=2 and yFrac=1)
+						   or (xFrac=3 and yFrac=0))then
+							TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)]
+
+						else if(xFrac!= 0 and yFrac=3)then
+							TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)]
+
+						else if(  (xFrac=1 and yFrac=2)
+						       or (xFrac=3 and yFrac=2))then
+							TabPix[4*(2 + x_idx)+2][4*(2 + y_idx) + 2]
+
+						else if(xFrac=0)then
+							if(yFrac=1)then
+								TabPix[4*(2 + x_idx)][4*(2 + y_idx)]
+							else
+								TabPix[4*(2 + x_idx)][4*(3 + y_idx)]
+							end
+
+						else
+							TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)]
+						end end end end;
+
+					pix2 :=
+						if(xFrac=0 or (xFrac=1 and yFrac!=0))then
+							TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]
+	
+						else if(xFrac=3 and yFrac!=0)then
+							TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]
+	
+						else if(xFrac=2)then
+							TabPix[4*(2 + x_idx)+2][4*(2 + y_idx) + 2]
+	
+						else if(xFrac=1 and yFrac=0)then
+							TabPix[4*(2 + x_idx)][4*(2 + y_idx)]
+	
+						else
+							TabPix[4*(3 + x_idx)][4*(2 + y_idx)]
+						end end end end;
+
+					TabPix[4*(2 + x_idx) + xFrac][4*(2 + y_idx) + yFrac] :=
+						ComputeQuarterPixel(pix1,pix2);
 				end
 			end
 		end
