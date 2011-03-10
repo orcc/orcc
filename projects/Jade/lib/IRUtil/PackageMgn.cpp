@@ -36,15 +36,24 @@
 */
 
 //------------------------------
+#include "llvm/Module.h"
+#include "llvm/Bitcode/Archive.h"
+
 #include "Jade/Util/PackageMng.h"
 
 #include <algorithm>
+#include <iostream>
 //------------------------------
 
 using namespace std;
+using namespace llvm;
+
+//Init membres static
+map<string, Package*>* PackageMng::packages = new map<string, Package*>();
+
 
 string PackageMng::getFolder(Actor* actor){
-	return getFolder(getPackages(actor));
+	return getFolder(getPackagesName(actor));
 }
 
 string PackageMng::getFolder(string package){
@@ -52,11 +61,11 @@ string PackageMng::getFolder(string package){
 	return package;
 }
 
-string PackageMng::getPackages(Actor* actor){
-	return getPackages(actor->getName());
+string PackageMng::getPackagesName(Actor* actor){
+	return getPackagesName(actor->getName());
 }
 
-string PackageMng::getPackages(string name){
+string PackageMng::getPackagesName(string name){
 	int index = name.rfind('.');
 
 	if (index == string::npos){
@@ -67,24 +76,24 @@ string PackageMng::getPackages(string name){
 }
 
 list<std::string> PackageMng::getPackageList(Actor* actor){
-	return getPackageList(actor->getName());
+	string actorPackageName = PackageMng::getPackagesName(actor->getName());
+	return getPackageList(actorPackageName);
 }
 
 list<std::string> PackageMng::getPackageList(string name){
 	list<string> packageList;
-	string packages = getPackages(name);
 
-	int index = packages.find('.');
+	int index = name.find('.');
 
 	//Split string separate by a .
 	while (index != string::npos){
-		packageList.push_back(packages.substr(0, index));
-		packages = packages.substr(index+1, packages.size());
-		index = packages.find('.');
+		packageList.push_back(name.substr(0, index));
+		name = name.substr(index+1, name.size());
+		index = name.find('.');
 	}
 
 	//Insert last package
-	packageList.push_back(packages);
+	packageList.push_back(name);
 
 	return packageList;
 }
@@ -117,6 +126,36 @@ string PackageMng::getSimpleName(string name){
 	return name.substr(index + 1);
 }
 
+Package* PackageMng::getPackage(string name){
+	list<string> packageStrs = getPackageList(name);
+
+	map<string, Package*>::iterator itPack;
+	list<string>::iterator itStrPack;
+
+	//Current position of the package
+	map<string, Package*>* packagesPtr = packages;
+	Package* package = NULL;
+
+	//Iterate though the current package hierarchy
+	for (itStrPack = packageStrs.begin(); itStrPack != packageStrs.end(); itStrPack++){
+		itPack = packagesPtr->find(*itStrPack);
+
+		if (itPack == packagesPtr->end()){
+			//Package does not exist, creates one
+			package = new Package(*itStrPack, package);
+			packagesPtr->insert(pair<string, Package*>(*itStrPack, package));
+		}else{
+			//Package found
+			package = itPack->second;
+		}
+
+		//Loop though childs package
+		packagesPtr = package->getChilds();
+	}
+	
+	return package;
+}
+
 map<string, Package*>* PackageMng::setPackages(map<string, Actor*>* actors){
 	map<string, Package*>::iterator itPack;
 	map<string, Actor*>::iterator itAct;
@@ -127,7 +166,7 @@ map<string, Package*>* PackageMng::setPackages(map<string, Actor*>* actors){
 	//Iterate though every actors to determine and order their package
 	for (itAct = actors->begin(); itAct != actors->end(); itAct++){
 		list<string>::iterator itStrPack;
-		list<string> packageStrs = getPackageList(itAct->second);
+		list<string> packageStrs = PackageMng::getPackageList(itAct->second);
 		
 		//Current position of the package
 		map<string, Package*>* packagesPtr = packages;
@@ -156,4 +195,40 @@ map<string, Package*>* PackageMng::setPackages(map<string, Actor*>* actors){
 
 	//Return the resulting map of packages
 	return packages;
+}
+
+Archive* PackageMng::setArchive(Package* package, string VTLDir){
+	Package* parent = package->getParent();
+
+	if(parent){
+		package->setArchive(PackageMng::setArchive(parent, VTLDir));
+		return package->getArchive();
+	}
+	else{
+		string Error;
+		LLVMContext &Context = getGlobalContext();
+		
+		//Get archive file
+		sys::Path archiveFile(VTLDir + package->getName() + ".a");
+
+		//Load archive
+		Archive* archive = Archive::OpenAndLoad(archiveFile, Context, &Error);
+	
+		if (Error != ""){
+			cerr <<"Error when open archive "<< archiveFile.c_str();
+		}
+		
+		package->setArchive(archive);
+
+		return archive;
+	}
+}
+
+void PackageMng::setActor(Actor* actor){
+	//Load the required package
+	string actorPackage = PackageMng::getPackagesName(actor->getName());
+	Package* package = PackageMng::getPackage(actorPackage);
+
+	//Keep actor in the package
+	package->insertUnderneath(actor);
 }

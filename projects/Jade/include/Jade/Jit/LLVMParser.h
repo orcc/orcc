@@ -42,6 +42,8 @@
 #include "llvm/Module.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/System/Signals.h"
+#include "llvm/Bitcode/Archive.h"
+#include "Jade/Core/Package.h"
 //------------------------------
 
 
@@ -76,7 +78,7 @@ public:
 	 * @return the corresponding llvm::Module
 	 *
      */
-	llvm::Module* loadModule(std::string package, std::string file);
+	llvm::Module* loadModule(Package* package, std::string file);
 
 	 /**
      *  @brief Load and parse the bitcode file in an archive
@@ -84,36 +86,15 @@ public:
 	 *  Open and load archive then find and read the specified bitcode file of the current 
 	 *  actor and return the corresponding module. 
 	 *
-	 * @param archiveName : archive where is file
+	 * @param archive : archive where is file
 	 * @param file : file to parse
 	 *
 	 * @return the corresponding llvm::Module
 	 *
      */
-	llvm::Module* loadBitcodeInArchive(llvm::sys::Path archiveName, llvm::sys::Path file);
+	llvm::Module* loadBitcodeInArchive(llvm::Archive* archive, llvm::sys::Path file);
 
 private:
-	/**
-     *  @brief Get the filename of the given file
-	 *
-	 * @param file : string name of the file
-	 *
-	 * @return the corresponding llvm::sys::Path
-	 *
-     */
-	llvm::sys::Path getFilename(std::string package, std::string file);
-	
-	/**
-     *  @brief Get the archivename of the given package
-	 *
-	 *  Test the presence of archive from the default directory to VTL.
-     *
-	 * @param file : string name of the archive's package
-	 *
-	 * @return the corresponding llvm::sys::Path
-	 *
-     */
-	llvm::sys::Path getArchivename(std::string package);
 
 	/** default directory of the actor */
 	std::string directory;

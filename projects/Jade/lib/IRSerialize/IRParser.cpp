@@ -91,10 +91,10 @@ IRParser::IRParser(llvm::LLVMContext& C, string VTLDir) : Context(C){
 
 
 Actor* IRParser::parseActor(string classz){
-
 	//Get file and package of the actor
 	string file = PackageMng::getSimpleName(classz);
-	string package = PackageMng::getPackages(classz);
+	string packageName = PackageMng::getPackagesName(classz);
+	Package* package = PackageMng::getPackage(packageName);
 	
 	//Parse the bitcode
 	Module* module = parser->loadModule(package, file);

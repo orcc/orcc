@@ -44,6 +44,7 @@ namespace llvm{
 }
 
 #include "Jade/Core/Actor.h"
+
 //------------------------------
 
 /**
@@ -66,6 +67,7 @@ public:
      */
 	Package(std::string name){
 		this->name = name;
+		this->parent = NULL;
 		this->archive = NULL;
 	};
 
@@ -81,7 +83,16 @@ public:
 	Package(std::string name, Package* parent){
 		this->name = name;
 		this->parent = parent;
-	
+		if(parent){
+			this->parent = parent;
+			this->directory = parent->getDirectory() + "/" + name;
+			this->archive = parent->getArchive();
+		}
+		else{
+			this->parent = NULL;
+			this->directory = name;
+			this->archive = NULL;
+		}
 	};
 
 	~Package(){};
@@ -109,9 +120,20 @@ public:
 	};
 
 	/*!
+     *  @brief Package is represented as an archive.
+     *
+     *  Insert an archive of this package
+	 *   
+	 *  @param actor : archive contains by the package
+     */
+	void setArchive(llvm::Archive* archive){
+		this->archive = archive; 
+	};
+
+	/*!
      *  @brief Get all underneath actors.
      *
-     *  Set all actors contained in this package and its child package.
+     *  Get all actors contained in this package and its child package.
 	 *   
 	 *  @param underneathActors : a list of Actors where to contains underneath actors
      */
@@ -128,6 +150,16 @@ public:
 	std::map<std::string, Actor*>* getUnderneathActors(){return &actors;}
 
 	/**
+     *  @brief Get archive contained in this package
+	 *
+	 *  Get archive contained in this package
+	 *
+	 *  @return the archive contains in this package
+	 *
+     */
+	llvm::Archive* getArchive(){return archive;}
+
+	/**
      *  @brief Getter of package name
 	 *
 	 *  Return the string name of the package
@@ -138,11 +170,31 @@ public:
 	std::string getName(){return name;};
 
 	/**
+     *  @brief Getter of package directory
+	 *
+	 *  Return the string directory of the package
+	 *
+	 *  @return directory of the package
+	 *
+     */
+	std::string getDirectory(){return directory;};
+
+	/**
+     *  @brief Getter of parent package
+	 *
+	 *  Return the parent of this package
+	 *
+	 *  @return the package containing this package
+	 *
+     */
+	Package* getParent(){return parent;};
+	
+	/**
      *  @brief Getter of child package
 	 *
 	 *  Return the child of this package
 	 *
-	 *  @return name of the package
+	 *  @return a list of packages contains in this package
 	 *
      */
 	std::map<std::string, Package*>* getChilds(){return &childs;};

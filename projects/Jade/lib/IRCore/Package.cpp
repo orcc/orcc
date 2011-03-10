@@ -36,6 +36,8 @@
 */
 
 //------------------------------
+#include <iostream>
+
 #include "Jade/Core/Package.h"
 //------------------------------
 
@@ -52,3 +54,4 @@ void Package::getAllUnderneathActors(std::map<std::string, Actor*>* underneathAc
 		child->getAllUnderneathActors(underneathActors);
 	}
 }
+

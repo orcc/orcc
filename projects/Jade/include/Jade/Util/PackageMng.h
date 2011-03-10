@@ -74,24 +74,24 @@ public:
 	static std::string getFolder(std::string package);
 
 	/**
-     * @brief Get all packages from the given actor
+     * @brief Get all packages name from the given actor
 	 *
 	 * @param actor : the actor to get the package from
 	 *
-	 * @return the corresponding packages
+	 * @return the corresponding packages name
 	 *
      */
-	static std::string getPackages(Actor* actor);
+	static std::string getPackagesName(Actor* actor);
 
 	/**
-     * @brief Get all packages from the name of an actor
+     * @brief Get all packages name from the name of an actor
 	 *
 	 * @param name : name of the actor
 	 *
-	 * @return the corresponding packages
+	 * @return the corresponding packages name
 	 *
      */
-	static std::string getPackages(std::string name);
+	static std::string getPackagesName(std::string name);
 
 	/**
      * @brief Get a list of package string from the given actor
@@ -155,6 +155,19 @@ public:
 	static std::string getSimpleName(std::string name);
 
 	/**
+     * @brief Get package from the given package name
+	 *
+	 *	If the package does not existe, create a map 
+	 *  of package representing the dependance of name
+	 *
+	 * @param name : the required package name
+	 *
+	 * @return the corresponding requiered package
+	 *
+     */
+	static Package* getPackage(std::string name);
+
+	/**
      * @brief Set a map of packages
 	 *
 	 *	Create a map of package representing the dependance of a list of actors
@@ -166,9 +179,30 @@ public:
      */
 	static std::map<std::string, Package*>* setPackages(std::map<std::string, Actor*>* actors);
 
+	/**
+     * @brief Set archive of package
+	 *
+	 *	Set archive recurcively for all parents
+	 *
+	 * @param package : the package containing the archive
+	 *
+	 * @return the corresponding archive
+	 *
+     */
+	static llvm::Archive* PackageMng::setArchive(Package* package, std::string VTLDir);
+
+	/**
+     * @brief Set actor in the required package
+	 *
+	 * @param actor : the actor to set in package
+	 *
+     */
+	static void PackageMng::setActor(Actor* actor);
+
 private:
 	/** Package preloaded */
-	static std::map<std::string, Package*> packages;
+	static std::map<std::string, Package*>* packages;
+
 };
 
 #endif

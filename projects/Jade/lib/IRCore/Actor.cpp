@@ -61,6 +61,11 @@ Actor::Actor(string name, Module* module, string file, map<string, Port*>* input
 	this->parameters = parameters;
 	this->procedures = procedures;
 	this->actionScheduler = actionScheduler;
+	
+	//Only actors with a file name are put in the package manager
+	if(!this->file.empty()){
+		PackageMng::setActor(this);
+	}
 }
 
 Actor::~Actor (){
@@ -126,7 +131,7 @@ Port* Actor::getInput(string portName){
 }
 
 string Actor::getPackage() {
-	return PackageMng::getPackages(this);
+	return PackageMng::getPackagesName(this);
 }
 
 string Actor::getSimpleName() {

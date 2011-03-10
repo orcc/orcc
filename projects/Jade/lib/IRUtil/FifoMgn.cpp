@@ -50,6 +50,7 @@
 #include "Jade/Jit/LLVMParser.h"
 #include "Jade/Jit/LLVMWriter.h"
 #include "Jade/Util/FifoMng.h"
+#include "Jade/Util/PackageMng.h"
 //------------------------------
 
 using namespace std;
@@ -83,7 +84,8 @@ void FifoMng::parseModules(){
 	LLVMParser parser(Context, getPackageFolder());
 
 	//Parse fifos
-	headerMd = parser.loadModule("System", FifoMng::getFifoFilename());
+	Package* packageSystem = PackageMng::getPackage("System");
+	headerMd = parser.loadModule(packageSystem, FifoMng::getFifoFilename());
 
 	if (headerMd == NULL){
 		cout << "Unable to parse fifo header file";
@@ -91,7 +93,7 @@ void FifoMng::parseModules(){
 	}
 
 	//parse extern functions
-	externFnMd = parser.loadModule("System", "Extern");
+	externFnMd = parser.loadModule(packageSystem, "Extern");
 
 	if (externFnMd == NULL){
 		cout << "Unable to parse extern functions file";

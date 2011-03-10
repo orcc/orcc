@@ -56,24 +56,28 @@ LLVMParser::LLVMParser(LLVMContext& C, string directory, bool verbose): Context(
 }
 
 
-Module* LLVMParser::loadModule(string package, string file) {
+Module* LLVMParser::loadModule(Package* package, string file) {
 	SMDiagnostic Err;
 	Module *Mod;
 
 	//Get filename of the actor
-	sys::Path Filename = getFilename(package, file);
-	
-	//Verifying if file is existing, else maybe it is in an archive
-	if (Filename.exists()){
-		// Load the bitcode...
-		Mod = ParseIRFile(Filename.c_str(), Err, Context);
-	}
-	else {
-		//Get archivename of the package
-		sys::Path Archivename = getArchivename(package);
+	sys::Path Filename(directory + package->getDirectory() + "/" + file);
 
-		//Load the bitcode in the archive
-		Mod = loadBitcodeInArchive(Archivename, Filename);
+	//Load the bitcode
+	//Archive case
+	if(!Filename.exists()){
+		Archive* archive;
+		if (package->isArchive()){
+			archive = package->getArchive();
+		}
+		else{
+			archive = PackageMng::setArchive(package, directory);
+		}
+		Mod = loadBitcodeInArchive(archive, Filename);
+	}
+	//Other case
+	else{
+		Mod = ParseIRFile(Filename.c_str(), Err, Context);
 	}
 
 	if (verbose) cout << "Loading '" << Filename.c_str() << "'\n";	
@@ -84,25 +88,18 @@ Module* LLVMParser::loadModule(string package, string file) {
 		exit(1);
 	}
 
-
 	return Mod;
 }
 
-Module* LLVMParser::loadBitcodeInArchive(sys::Path archiveName, sys::Path file) {
-	
+Module* LLVMParser::loadBitcodeInArchive(Archive* archive, sys::Path file) {
 	std::string Error;
 
-	Module* Mod;
+	Module* Mod = NULL;
 	Archive::iterator itArch;
 	LLVMContext &Context = getGlobalContext();
 
-	//Load archive
-	Archive* archive = Archive::OpenAndLoad(archiveName, Context, &Error);
-	if (Error != "")
-		cerr <<"Error when open archive "<< archiveName.c_str();
-
 	//Find and load module
-	for(itArch=archive->begin(); itArch!=archive->end(); itArch++){
+	for(itArch = archive->begin(); itArch != archive->end(); itArch++){
 		if(itArch->getPath() == file){
 			MemoryBuffer *Buffer = MemoryBuffer::getMemBufferCopy(StringRef(itArch->getData(),
 																			itArch->getSize()),
@@ -110,35 +107,11 @@ Module* LLVMParser::loadBitcodeInArchive(sys::Path archiveName, sys::Path file) 
 			
 			Mod = ParseBitcodeFile(Buffer, Context, &Error);
 			if (Error != "")
-				cerr <<"Error when parse actorfile "<< file.c_str() << "in archive" <<archiveName.c_str();
+				cerr <<"Error when parse actorfile "<< file.c_str() << "in archive" <<archive->getPath().c_str();
 
 			break;
 		}	
 	}
 
 	return Mod;
-}
-
-sys::Path LLVMParser::getFilename(string packageName, string file){
-	
-	string package = PackageMng::getFolder(packageName);
-	sys::Path packagePath(directory + package);
-
-	sys::Path actorFile(packagePath.str()+"/"+file);
-	
-	return actorFile;
-}
-
-sys::Path LLVMParser::getArchivename(string packageName){
-	
-	string firstPackage = PackageMng::getFirstPackage(packageName);
-	sys::Path archiveFile(directory + firstPackage + ".a");
-
-	if(!archiveFile.isArchive()){
-		//Package doesn't exist
-		cout << "Package" << directory << PackageMng::getFolder(packageName) << " is required but not found.'\n";
-		exit(0);
-	}
-
-	return archiveFile;
 }
