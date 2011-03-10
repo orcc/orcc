@@ -373,13 +373,19 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			try {
 				network = new XDFParser(xdfFile).parseNetwork();
 				network.updateIdentifiers();
-				
+
 				Set<String> instances = new HashSet<String>();
 				for (Instance instance : network.getInstances()) {
 					instances.add(instance.getHierarchicalPath());
 				}
-				
-				Iterator<Entry<String, String>> it = mapping.entrySet().iterator();
+				for (Network subNetwork : network.getNetworks()) {
+					for (Instance instance : subNetwork.getInstances()) {
+						instances.add(instance.getHierarchicalPath());
+					}
+				}
+
+				Iterator<Entry<String, String>> it = mapping.entrySet()
+						.iterator();
 				while (it.hasNext()) {
 					Entry<String, String> entry = it.next();
 					if (!instances.contains(entry.getKey())) {
