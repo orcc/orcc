@@ -99,11 +99,13 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
 	if (sched->next_schedulable == sched->next_entry) {
 		// static actors list is used when schedulable list is empty
 		actor = sched_get_next(sched);
+		sched->round_robin = 1;
 	} else {
 		actor = sched->schedulable[sched->next_schedulable % MAX_ACTORS];
 		sched->next_schedulable++;
 		// actor is not a member of the list anymore
 		actor->in_list = 0;
+		sched->round_robin = 0;
 	}
 
 	return actor;

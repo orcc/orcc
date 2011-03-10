@@ -63,6 +63,7 @@ struct scheduler_s {
 	struct waiting_s **waiting_schedulable;
 	struct sync_s *sync;
 	semaphore_struct sem_thread;
+	int round_robin;
 };
 
 struct waiting_s {

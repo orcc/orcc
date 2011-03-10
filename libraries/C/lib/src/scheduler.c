@@ -27,6 +27,7 @@ void sched_init(struct scheduler_s *sched, int id, int schedulers_nb,
 	sched->next_entry = 0;
 	sched->next_schedulable = 0;
 	sched->next_else_schedulable = 0;
+	sched->round_robin = 1;
 
 	sched->waiting_schedulable = (struct waiting_s **) calloc(schedulers_nb,
 			sizeof(struct waiting_s *));
@@ -53,6 +54,7 @@ void sched_reinit(struct scheduler_s *sched, int schedulers_nb, int num_actors,
 	sched->next_entry = 0;
 	sched->next_schedulable = 0;
 	sched->next_else_schedulable = 0;
+	sched->round_robin = 1;
 
 	for (i = 0; i < num_actors; i++) {
 		actors[i]->sched = sched;
