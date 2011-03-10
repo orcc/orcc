@@ -52,7 +52,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -86,7 +85,7 @@ public class Multi2MonoToken extends ActionSplitter {
 
 		private GlobalVariable tab;
 
-		private Variable tempTab;
+		// private Variable tempTab;
 
 		public ModifyProcessActionStore(GlobalVariable tab) {
 			this.tab = tab;
@@ -98,33 +97,28 @@ public class Multi2MonoToken extends ActionSplitter {
 			if (load.getSource().getVariable().getName().equals(port.getName())) {
 				Use useArray = new Use(tab);
 				load.setSource(useArray);
-				for (Use use : load.getTarget().getUses()) {
-					if (use.getNode().isInstruction()) {
-						Instruction instruction = (Instruction) use.getNode();
-						if (instruction.isStore()) {
-							Store storeInstruction = (Store) instruction;
-							tempTab = storeInstruction.getTarget();
-						}
-					}
-				}
+				/*
+				 * for (Use use : load.getTarget().getUses()) { if
+				 * (use.getNode().isInstruction()) { Instruction instruction =
+				 * (Instruction) use.getNode(); if (instruction.isStore()) {
+				 * Store storeInstruction = (Store) instruction; tempTab =
+				 * storeInstruction.getTarget(); } } }
+				 */
 			}
-			if (load.getSource().getVariable().equals(tempTab)) {
-				load.getSource().setVariable(tab);
-			}
+			/*
+			 * if (load.getSource().getVariable().equals(tempTab)) {
+			 * load.getSource().setVariable(tab); }
+			 */
 		}
 
 		@Override
 		public void visit(Read read) {
 			itInstruction.remove();
 		}
-
-		@Override
-		public void visit(Store store) {
-			if (store.getTarget().equals(tempTab)) {
-				store.setTarget(tab);
-			}
-		}
-
+		/*
+		 * @Override public void visit(Store store) { if
+		 * (store.getTarget().equals(tempTab)) { store.setTarget(tab); } }
+		 */
 	}
 
 	/**
@@ -172,8 +166,6 @@ public class Multi2MonoToken extends ActionSplitter {
 	private boolean repeatInput = false;
 
 	private boolean repeatOutput = false;
-
-	// private boolean repeatOutput = false;
 
 	private LocalVariable result;
 
@@ -376,7 +368,6 @@ public class Multi2MonoToken extends ActionSplitter {
 		Pattern pattern = newStoreAction.getInputPattern();
 		pattern.setNumTokens(port, 1);
 		pattern.setVariable(port, localINPUT);
-		pattern.getVariableMap().put(port, localINPUT);
 		return newStoreAction;
 	}
 
@@ -425,9 +416,9 @@ public class Multi2MonoToken extends ActionSplitter {
 		defineWriteBody(writeCounter, writeList, newWriteAction.getBody(),
 				OUTPUT);
 		// add output pattern
-		newWriteAction.getOutputPattern().setNumTokens(port, 1);
-		newWriteAction.getOutputPattern().setVariable(port, OUTPUT);
-		newWriteAction.getOutputPattern().getVariableMap().put(port, OUTPUT);
+		Pattern pattern = newWriteAction.getOutputPattern();
+		pattern.setNumTokens(port, 1);
+		pattern.setVariable(port, OUTPUT);
 		return newWriteAction;
 	}
 
@@ -455,7 +446,7 @@ public class Multi2MonoToken extends ActionSplitter {
 		Instruction load1 = new Load(counter, readCounterUse);
 		bodyNode.add(load1);
 
-		locals.put(localINPUT.getName(), localINPUT);
+		// locals.put(localINPUT.getName(), localINPUT);
 		Instruction read = new Read(port, 1, localINPUT);
 		localINPUT.setInstruction(read);
 		bodyNode.add(read);
@@ -539,7 +530,7 @@ public class Multi2MonoToken extends ActionSplitter {
 		Instruction assign2 = new Assign(counter2, assign2Value);
 		bodyNode.add(assign2);
 
-		locals.put(OUTPUT.getName(), OUTPUT);
+		// locals.put(OUTPUT.getName(), OUTPUT);
 		VarExpr store1Expression = new VarExpr(new Use(out));
 		List<Expression> store1Index = new ArrayList<Expression>(1);
 		store1Index.add(new IntExpr(0));
@@ -616,12 +607,40 @@ public class Multi2MonoToken extends ActionSplitter {
 		}
 	}
 
+	/**
+	 * This method moves the nodes of a procedure to another using a CFGNode
+	 * iterator
+	 * 
+	 * @param itNode
+	 *            source node iterator
+	 * @param newProc
+	 *            target procedure
+	 */
 	public void moveNodes(ListIterator<CFGNode> itNode, Procedure newProc) {
 		while (itNode.hasNext()) {
 			CFGNode node = itNode.next();
 			itNode.remove();
 			newProc.getNodes().add(node);
 		}
+	}
+
+	/**
+	 * This method clones the output patterns from a source action to a target
+	 * one
+	 * 
+	 * @param source
+	 *            source action
+	 * @param target
+	 *            target action
+	 */
+	private void moveOutputPattern(Action source, Action target) {
+		Pattern targetPattern = target.getOutputPattern();
+		Pattern sourcePattern = source.getOutputPattern();
+		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
+		targetPattern.getPorts().addAll(sourcePattern.getPorts());
+		targetPattern.getVariableMap().putAll(sourcePattern.getVariableMap());
+		targetPattern.getInverseVariableMap().putAll(
+				sourcePattern.getInverseVariableMap());
 	}
 
 	/**
@@ -684,16 +703,6 @@ public class Multi2MonoToken extends ActionSplitter {
 			}
 		}
 		inputIndex = 0;
-	}
-
-	private void moveOutputPattern(Action source, Action target) {
-		Pattern targetPattern = target.getOutputPattern();
-		Pattern sourcePattern = source.getOutputPattern();
-		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
-		targetPattern.getPorts().addAll(sourcePattern.getPorts());
-		targetPattern.getVariableMap().putAll(sourcePattern.getVariableMap());
-		targetPattern.getInverseVariableMap().putAll(
-				sourcePattern.getInverseVariableMap());
 	}
 
 	private void scanOutputs(Action action, String sourceName, String targetName) {
