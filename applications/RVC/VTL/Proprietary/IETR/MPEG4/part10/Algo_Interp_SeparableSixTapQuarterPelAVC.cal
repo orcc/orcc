@@ -13,8 +13,8 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
-
 package Proprietary.IETR.MPEG4.part10;
+
 import MPEG.Common.Imp_Math.*;
 
 actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
@@ -25,35 +25,35 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	uint(size=8)  Interp
 		:
 
-  int(size=32) x ;
-  int(size=32) y ;
-  int(size=32) o_x ;
-  int(size=32) o_y ;
-  int(size=32) xFrac;
-  int(size=32) yFrac;
-  int width;
-  int height;
-  uint(size=8)  TabPix[21*4][21*4];
-  int (size=32) TabIntermPix[21*4][21*4];
+  int (size=32) x ;
+  int (size=32) y ;
+  int (size=32) xFrac;
+  int (size=32) yFrac;
+  int (size=32) xMax;
+  int (size=32) yMax;
+  int (size=32) width;
+  int (size=32) height;
+  uint(size=8)  tabPix[21*4][21*4];
+  int (size=32) tabIntermPix[21*4][21*4];
 
-	function SixTapFilter(int a1, int b1, int c1, int c2, int b2, int a2)
+	function sixTapFilter(int a1, int b1, int c1, int c2, int b2, int a2)
 				-->
 			int
 		:
 			a1 - (5 * b1) + (20 * c1) + (20 * c2) - (5 * b2) + a2
 		end
 
-	function ComputeHalfPixel(int a1, int b1, int c1, int c2, int b2, int a2)
+	function computeHalfPixel(int a1, int b1, int c1, int c2, int b2, int a2)
 				-->
 			int
 		:
 			clip(
-				( SixTapFilter(a1,b1,c1,c2,b2,a2) + 16 ) >> 5,
+				( sixTapFilter(a1,b1,c1,c2,b2,a2) + 16 ) >> 5,
 				0,255
 			)
 		end
 
-	function ComputeQuarterPixel(int HalfPixel1, int HalfPixel2)
+	function computeQuarterPixel(int HalfPixel1, int HalfPixel2)
 				-->
 			int
 		:
@@ -69,7 +69,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 		uint(size=32) xMax,
 		uint(size=32) yMin,
 		uint(size=32) yMax,
-		int ValIntermPix
+		int valIntermPix
 	begin
 		if(xFrac = 0 or xFrac = 1 or xFrac = 3)then
 			if(xFrac = 3 and yFrac != 0)then
@@ -83,10 +83,10 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			do
 				foreach int y in 0 .. height - 1
 				do
-					TabPix[4*x][4*(2 + y) + 2] :=
-					    ComputeHalfPixel(TabPix[4*x][4*y],       TabPix[4*x][4*(1 + y)] ,
-					                     TabPix[4*x][4*(2 + y)], TabPix[4*x][4*(3 + y)] ,
-					                     TabPix[4*x][4*(4 + y)], TabPix[4*x][4*(5 + y)]);
+					tabPix[4*x][4*(2 + y) + 2] :=
+					    computeHalfPixel(tabPix[4*x][4*y],       tabPix[4*x][4*(1 + y)] ,
+					                     tabPix[4*x][4*(2 + y)], tabPix[4*x][4*(3 + y)] ,
+					                     tabPix[4*x][4*(4 + y)], tabPix[4*x][4*(5 + y)]);
 				end
 			end
 		end
@@ -102,10 +102,10 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			do
 				foreach int y in yMin .. yMax
 				do
-					TabPix[4*(2 + x) + 2][4*y] :=
-					    ComputeHalfPixel(TabPix[4*x][4*y],       TabPix[4*(1 + x)][4*y],
-					                     TabPix[4*(2 + x)][4*y], TabPix[4*(3 + x)][4*y],
-					                     TabPix[4*(4 + x)][4*y], TabPix[4*(5 + x)][4*y]);
+					tabPix[4*(2 + x) + 2][4*y] :=
+					    computeHalfPixel(tabPix[4*x][4*y],       tabPix[4*(1 + x)][4*y],
+					                     tabPix[4*(2 + x)][4*y], tabPix[4*(3 + x)][4*y],
+					                     tabPix[4*(4 + x)][4*y], tabPix[4*(5 + x)][4*y]);
 				end
 			end
 		end
@@ -115,19 +115,22 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			do
 				foreach int y in 0 .. height + 4
 				do
-					TabIntermPix[4*(2 + x) + 2][4*y] := SixTapFilter( TabPix[4*x][4*y]     , TabPix[4*(1 + x)][4*y] , TabPix[4*(2 + x)][4*y],
-					                                  TabPix[4*(3 + x)][4*y] , TabPix[4*(4 + x)][4*y] , TabPix[4*(5 + x)][4*y]);
+					tabIntermPix[4*(2 + x) + 2][4*y] :=
+						sixTapFilter(tabPix[4*x][4*y]      , tabPix[4*(1 + x)][4*y],
+						             tabPix[4*(2 + x)][4*y], tabPix[4*(3 + x)][4*y],
+						             tabPix[4*(4 + x)][4*y], tabPix[4*(5 + x)][4*y]);
 				end
 			end
 			foreach int x in 0 + 2 .. width - 1 + 2
 			do
 				foreach int y in 0  .. height - 1
 				do
-					ValIntermPix := SixTapFilter(TabIntermPix[4*x+2][4*y]    , TabIntermPix[4*x+2][4*(1+y)] ,
-					                                       TabIntermPix[4*x+2][4*(2+y)], TabIntermPix[4*x+2][4*(3+y)] ,
-					                                       TabIntermPix[4*x+2][4*(4+y)], TabIntermPix[4*x+2][4*(5+y)]);
-					ValIntermPix := (ValIntermPix + 512) >> 10;
-					TabPix[4*x+2][4*(y + 2) + 2] := clip(ValIntermPix , 0,255);
+					valIntermPix :=
+						sixTapFilter(tabIntermPix[4*x+2][4*y]    , tabIntermPix[4*x+2][4*(1+y)] ,
+						             tabIntermPix[4*x+2][4*(2+y)], tabIntermPix[4*x+2][4*(3+y)] ,
+						             tabIntermPix[4*x+2][4*(4+y)], tabIntermPix[4*x+2][4*(5+y)]);
+					valIntermPix := (valIntermPix + 512) >> 10;
+					tabPix[4*x+2][4*(y + 2) + 2] := clip(valIntermPix , 0, 255);
 				end
 			end
 		end
@@ -135,7 +138,6 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 
 	procedure computeQuarterPix()
 	var
-		int  pixComputed,
 		uint pix1,
 		uint pix2
 	begin
@@ -150,123 +152,122 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 					pix1 :=
 						if(   (xFrac=1 and yFrac<2) or(xFrac=2 and yFrac=1)
 						   or (xFrac=3 and yFrac=0))then
-							TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)]
+							tabPix[4*(2 + x_idx)+2][4*(2 + y_idx)]
 
 						else if(xFrac!= 0 and yFrac=3)then
-							TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)]
+							tabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)]
 
 						else if(  (xFrac=1 and yFrac=2)
 						       or (xFrac=3 and yFrac=2))then
-							TabPix[4*(2 + x_idx)+2][4*(2 + y_idx) + 2]
+							tabPix[4*(2 + x_idx)+2][4*(2 + y_idx) + 2]
 
 						else if(xFrac=0)then
 							if(yFrac=1)then
-								TabPix[4*(2 + x_idx)][4*(2 + y_idx)]
+								tabPix[4*(2 + x_idx)][4*(2 + y_idx)]
 							else
-								TabPix[4*(2 + x_idx)][4*(3 + y_idx)]
+								tabPix[4*(2 + x_idx)][4*(3 + y_idx)]
 							end
 
 						else
-							TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)]
+							tabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)]
 						end end end end;
 
 					pix2 :=
 						if(xFrac=0 or (xFrac=1 and yFrac!=0))then
-							TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]
+							tabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]
 	
 						else if(xFrac=3 and yFrac!=0)then
-							TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]
+							tabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]
 	
 						else if(xFrac=2)then
-							TabPix[4*(2 + x_idx)+2][4*(2 + y_idx) + 2]
+							tabPix[4*(2 + x_idx)+2][4*(2 + y_idx) + 2]
 	
 						else if(xFrac=1 and yFrac=0)then
-							TabPix[4*(2 + x_idx)][4*(2 + y_idx)]
+							tabPix[4*(2 + x_idx)][4*(2 + y_idx)]
 	
 						else
-							TabPix[4*(3 + x_idx)][4*(2 + y_idx)]
+							tabPix[4*(3 + x_idx)][4*(2 + y_idx)]
 						end end end end;
 
-					TabPix[4*(2 + x_idx) + xFrac][4*(2 + y_idx) + yFrac] :=
-						ComputeQuarterPixel(pix1,pix2);
+					tabPix[4*(2 + x_idx) + xFrac][4*(2 + y_idx) + yFrac] :=
+						computeQuarterPixel(pix1,pix2);
 				end
 			end
 		end
 	end
 
-	GetMv: action Mv:[ Mv_x , Mv_y ] ==>
+	getMv: action Mv:[Mv_x , Mv_y] ==>
 	do
-		x := 0;
-		y := 0;
 		xFrac := Mv_x & 3;
 		yFrac := Mv_y & 3;
 	end
 
-	GetSize: action PartSZ:[ PartWidth, PartHeight ] ==>
+	getSize: action PartSZ:[PartWidth, PartHeight] ==>
 	do
 		width  := PartWidth;
 		height := PartHeight;
+		x := 0;
+		y := 0;
+		xMax   := 4*(width+5);
+		yMax   := 4*(height+5);
 	end
 
-	GetPixVal.Launch: action
-			ReadResult:[d]
-				==>
-		guard
-			y < (height+5)
-		do
-			TabPix[4*x][4*y] := d;
-			x := x + 1;
-			if x >= (width+5) then
-				x := 0;
-				y := y + 1;
-			end
+	getPixVal.launch: action ReadResult:[d] ==>
+	guard
+		y < yMax
+	do
+		tabPix[x][y] := d;
+		x := x + 4;
+		if x >= xMax then
+			x := 0;
+			y := y + 4;
 		end
+	end
 
-	GetPixVal.Done: action ==>
-		guard
-			y >= height +5
-		do
-			if(xFrac != 0 or yFrac != 0) then
-				computeHalfPix();
-				computeQuarterPix();
-			end
-			o_x := xFrac;
-			o_y := yFrac;
-			height := height * 4;
-			width := width * 4;
+	getPixVal.done: action ==>
+	guard
+		y >= yMax
+	do
+		if(xFrac != 0 or yFrac != 0) then
+			computeHalfPix();
+			computeQuarterPix();
 		end
+		x    := xFrac + 8;
+		y    := yFrac + 8;
+		xMax := width*4 + 8;
+		yMax := height*4 + 8;
+	end
 
-	Interpolate.Launch: action ==> Interp:[ p ]
-		guard
-			o_y < height
-		var 
-			uint(size=8) p
-		do
-			p:= TabPix[o_x + 8][o_y + 8];
-			o_x := o_x + 4;
-			if o_x >= width then
-				o_x := xFrac;
-				o_y := o_y + 4;
-			end
-		end
+	sendInterpolation.launch: action ==> Interp:[interpVal]
+	guard
+		y < yMax
+	var 
+		uint(size=8) interpVal
+	do
+		interpVal := tabPix[x][y];
 
-	Interpolate.Done: action ==>
-		guard
-			o_y >= height
+		x := x + 4;
+		if x >= xMax then
+			x := xFrac + 8;
+			y := y + 4;
 		end
+	end
+
+	sendInterpolation.done: action ==>
+	end
 
   schedule fsm GetMv:
-    GetMv       (GetMv              )--> GetSize;
+    GetMv             (getMv                    )--> GetSize;
+    GetSize           (getSize                  )--> GetValue;
 
-    GetSize     (GetSize            )--> GetValue;
+	GetValue          (getPixVal.launch         )--> GetValue;
+	GetValue          (getPixVal.done           )--> SendInterpolation;
 
-	GetValue    (GetPixVal.Launch   )--> GetValue;
-	GetValue    (GetPixVal.Done     )--> Interpolate;
-
-    Interpolate (Interpolate.Launch )--> Interpolate;
-    Interpolate (Interpolate.Done   )--> GetMv;
+    SendInterpolation (sendInterpolation.launch )--> SendInterpolation;
+    SendInterpolation (sendInterpolation.done   )--> GetMv;
   end
   priority
- 	 GetPixVal.Launch > GetPixVal.Done;
+ 	 getPixVal.launch         > getPixVal.done;
+ 	 sendInterpolation.launch > sendInterpolation.done;
   end
 end
