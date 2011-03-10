@@ -571,8 +571,6 @@
         src="Algo_Synp_AVC" src-port="slice_alpha_c0_offset"/>
     <Connection dst="Mgnt_DBF_param_Luma" dst-port="Beta_offset"
         src="Algo_Synp_AVC" src-port="slice_beta_offset"/>
-    <Connection dst="Mgnt_DBF_param_Luma" dst-port="FirstMbInSlice"
-        src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
     <Connection dst="Mgnt_DBF_param_Luma" dst-port="Cbp_blk"
         src="Algo_Synp_AVC" src-port="cbp_blk"/>
     <Connection dst="" dst-port="BS_Luma" src="Mgnt_DBF_param_Luma" src-port="BS"/>
@@ -590,10 +588,6 @@
         src="Algo_Synp_AVC" src-port="cbp_blk"/>
     <Connection dst="Mgnt_DBF_param_Cr" dst-port="Cbp_blk"
         src="Algo_Synp_AVC" src-port="cbp_blk"/>
-    <Connection dst="Mgnt_DBF_param_Cb" dst-port="FirstMbInSlice"
-        src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
-    <Connection dst="Mgnt_DBF_param_Cr" dst-port="FirstMbInSlice"
-        src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
     <Connection dst="Mgnt_DBF_param_Cb" dst-port="LFDisable"
         src="Algo_Synp_AVC" src-port="LFDisable"/>
     <Connection dst="Mgnt_DBF_param_Cr" dst-port="LFDisable"

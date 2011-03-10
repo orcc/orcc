@@ -96,7 +96,6 @@ import MPEG.Common.Imp_PictureInfo.* ;
 import std.util.BitOps.* ;
 
 actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
-	uint(size=13) FirstMbInSlice,
 	uint(size=6) MbType,
 	uint(size=16) Cbp_blk,
 	int(size=6) Alpha_offset,
@@ -127,15 +126,11 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 
 	uint(size=8) left_QP;
 
-	uint(size=13) left_slice_nr := 0;
-
 	uint(size=4) up_mb_type;
 
 	int up_cbp_blk;
 
 	uint(size=8) up_QP;
-
-	uint(size=13) up_slice_nr := 0;
 
 	uint(size=5) blkP;
 
@@ -144,9 +139,6 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 	//
 	// MBs from top to bottom of one frame of current image
 	uint(size=2) valLFDisable := 0; // option to disable filtering for image or across slices
-	uint(size=13) firstmbinslice := 0;
-
-	uint(size=13) slice_nr := 0; // Macroblock parameters
 	uint(size=8) valQP := 0; // Quantization parameter: value between 0 and 51 inclusive
 	int(size=6) alpha_offset := 0; // Alpha QP offset. Between -12 and 12, equal to 2*slice_alpha_c0_offset_div2 from H.264 specification 
 	int(size=6) beta_offset := 0; // Beta QP offset. Between -12 and 12, equal to 2*slice_beta_offset_div2 from H.264 specification 
@@ -203,8 +195,6 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 
 	int yP := 0;
 
-	int QP_p := 0;
-
 	int mb_type_p := 0;
 
 	int cbp_blk_p := 0;
@@ -237,8 +227,8 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 	:= [ [ 0 : for int l in 0 .. 16 - 1 ] : for int i in 0 .. MAX_PICWIDTH_PX - 1
 	];
 
-	List(type: uint(size=SAMPLE_SZ), size=MAX_PICWIDTH_PX) upFifo_slice_nr := [ 0
-	: for int l in 0 .. MAX_PICWIDTH_PX - 1 ];
+//	List(type: uint(size=SAMPLE_SZ), size=MAX_PICWIDTH_PX) upFifo_slice_nr := [ 0
+//	: for int l in 0 .. MAX_PICWIDTH_PX - 1 ];
 
 	/*
 	 * Functions
@@ -356,19 +346,12 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 	 * NOTE: only options are: within current MB, use left MB,
 	 * or use up/top MB
 	 */
-	procedure setNeighbour(int xN, int yN, int sth)
-	var
-		int width_mb
+	procedure setNeighbour(int xN, int yN)
 	begin
-		if (sth = 0) then
-			width_mb := LUMA_CHROMA;
-		else
-			width_mb := 16;
-		end
 		useLeft := 0;
 		useUp := 0;
 		if (xN < 0) then // only used when dir=0 & edge=0
-			xP := width_mb + xN; // -1 becomes 15, -2 becomes 14, etc.
+			xP := 16 + xN; // -1 becomes 15, -2 becomes 14, etc.
 			yP := yN;
 			mb_type_p := left_mb_type;
 			cbp_blk_p := left_cbp_blk;
@@ -376,7 +359,7 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 		else
 			if (yN < 0) then // only used when dir=1 & edge=0
 				xP := xN;
-				yP := width_mb + yN;
+				yP := 16 + yN;
 				mb_type_p := up_mb_type;
 				cbp_blk_p := up_cbp_blk;
 				useUp := 1;
@@ -394,7 +377,7 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 	/*
 	 * Deblocking Filter: Actions
 	 */
-	ReadMB.PSkip: action FirstMbInSlice:[ mb0 ], MbLocation:[ Mbx, Mby ], MbType:[
+	ReadMB.PSkip: action MbLocation:[ Mbx, Mby ], MbType:[
 		Mbtype ], QPi:[ b ], Cbp_blk:[ c ], Alpha_offset:[ d ], Beta_offset:[ e ], RefIdx:[ f ]
 		repeat 16, MV:[ g ] repeat 32, LFDisable:[ j ] ==>
 	guard
@@ -414,13 +397,9 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 			list0_MV1[i] := g[i * 2 + 1];
 		end
 		valLFDisable := j;
-		if (firstmbinslice != mb0) then
-			firstmbinslice := mb0;
-			slice_nr := slice_nr + 1;
-		end
 	end
 
-	ReadMB.Inter: action FirstMbInSlice:[ mb0 ], MbLocation:[ Mbx, Mby ], MbType:[
+	ReadMB.Inter: action MbLocation:[ Mbx, Mby ], MbType:[
 		Mbtype ], QPi:[ b ], Cbp_blk:[ c ], Alpha_offset:[ d ], Beta_offset:[ e ],
 		RefIdx:[ f ] repeat 16, MV:[ g ] repeat 32, LFDisable:[ j ] ==> QPo:[ b ]
 	guard
@@ -441,13 +420,9 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 			list0_MV1[i] := g[i * 2 + 1];
 		end
 		valLFDisable := j;
-		if (firstmbinslice != mb0) then
-			firstmbinslice := mb0;
-			slice_nr := slice_nr + 1;
-		end
 	end
 
-	ReadMB.Intra: action FirstMbInSlice:[ mb0 ], MbLocation:[ Mbx, Mby ], MbType:[
+	ReadMB.Intra: action MbLocation:[ Mbx, Mby ], MbType:[
 		Mbtype ], QPi:[ b ], Cbp_blk:[ c ], Alpha_offset:[ d ], Beta_offset:[ e ],
 		LFDisable:[ j ] ==> QPo:[ b ]
 	guard
@@ -467,13 +442,9 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 		list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
 		list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
 		valLFDisable := j;
-		if (firstmbinslice != mb0) then
-			firstmbinslice := mb0;
-			slice_nr := slice_nr + 1;
-		end
 	end
 
-	ReadMB.IPCM: action FirstMbInSlice:[ mb0 ], MbLocation:[ Mbx, Mby ], MbType:[
+	ReadMB.IPCM: action MbLocation:[ Mbx, Mby ], MbType:[
 		Mbtype ], Cbp_blk:[ c ], Alpha_offset:[ d ], Beta_offset:[ e ], LFDisable:[ j
 		] ==>
 	guard
@@ -499,7 +470,6 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 			up_mb_type := upFifo_mb_type[mb_x];
 			up_cbp_blk := upFifo_cbp_blk[mb_x];
 			up_QP := upFifo_valQP[mb_x];
-			up_slice_nr := upFifo_slice_nr[mb_x];
 			up_list0_MV1 := [ upFifo_list0_MV1[mb_x][i] : for int i in 0 .. 16 - 1 ];
 			up_list0_MV0 := [ upFifo_list0_MV0[mb_x][i] : for int i in 0 .. 16 - 1 ];
 			up_list0_ref_pic_id := [ upFifo_list0_ref_pic_id[mb_x][i] : for int i in 0
@@ -510,7 +480,6 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 			up_mb_type := 0;
 			up_cbp_blk := 0;
 			up_QP := 0;
-			up_slice_nr := 0;
 			up_list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
 			up_list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
 			up_list0_ref_pic_id := [ 0 : for int i in 0 .. 16 - 1 ];
@@ -520,7 +489,6 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 			left_mb_type := upFifo_mb_type[mb_x - 1];
 			left_cbp_blk := upFifo_cbp_blk[mb_x - 1];
 			left_QP := upFifo_valQP[mb_x - 1];
-			left_slice_nr := upFifo_slice_nr[mb_x - 1];
 			left_list0_MV1 := [ upFifo_list0_MV1[mb_x - 1][i] : for int i in 0 .. 16 - 1
 			];
 			left_list0_MV0 := [ upFifo_list0_MV0[mb_x - 1][i] : for int i in 0 .. 16 - 1
@@ -533,7 +501,6 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 			left_mb_type := 0;
 			left_cbp_blk := 0;
 			left_QP := 0;
-			left_slice_nr := 0;
 			left_list0_MV1 := [ 0 : for int i in 0 .. 16 - 1 ];
 			left_list0_MV0 := [ 0 : for int i in 0 .. 16 - 1 ];
 			left_list0_ref_pic_id := [ 0 : for int i in 0 .. 16 - 1 ];
@@ -561,14 +528,12 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 		foreach int dir in 0 .. 1 do // vertical edges, then horizontal edges
 			foreach int b in 0 .. 3 do
 				edge_curr := b;
-				if ((b > 0) or (dir = 1 and mb_y != 0 and (valLFDisable = 0 or slice_nr =
-				up_slice_nr)) or (dir = 0 and mb_x != 0 and (valLFDisable = 0 or slice_nr =
-				left_slice_nr))) then
+				if ((b > 0) or (dir = 1 and mb_y != 0) or (dir = 0 and mb_x != 0)) then
 					foreach int c in 0 .. 3 do
 						idx := lshift(dir, 4) + lshift(c, 2) + b;
 						xQ := getPixelPosX(lshift(c, 2), dir);
 						yQ := getPixelPosY(lshift(c, 2), dir);
-						setNeighbour(xQ - 1 + dir, yQ - dir, 1); // Start w/ Strength = 3 or = 4 for Mb-edge
+						setNeighbour(xQ - 1 + dir, yQ - dir); // Start w/ Strength = 3 or = 4 for Mb-edge
 						if (b = 0) then
 							Strength[idx] := 4;
 							routine[idx] := 1;
@@ -624,7 +589,8 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 	var
 		int indexA,
 		int indexB,
-		int QP_avg
+		int QP_avg,
+		int QP_p
 	do
 		Alist := [ 0 : for int i in 0 .. 3 - 1 ];
 		Blist := [ 0 : for int i in 0 .. 3 - 1 ];
@@ -657,7 +623,6 @@ actor Mgnt_DBF_param (int LUMA_CHROMA) uint(size=7) MbLocation,
 		upFifo_valQP[mb_x] := valQP;
 		upFifo_mb_type[mb_x] := mb_type;
 		upFifo_cbp_blk[mb_x] := cbp_blk;
-		upFifo_slice_nr[mb_x] := slice_nr;
 		upFifo_list0_MV1[mb_x] := [ list0_MV1[i] : for int i in 0 .. 16 - 1 ];
 		upFifo_list0_MV0[mb_x] := [ list0_MV0[i] : for int i in 0 .. 16 - 1 ];
 		upFifo_list0_ref_pic_id[mb_x] := [ list0_ref_pic_id[i] : for int i in 0 .. 16
