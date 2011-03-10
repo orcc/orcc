@@ -139,7 +139,7 @@ public class Network {
 	private Object templateData;
 
 	private OrderedMap<String, GlobalVariable> variables;
-	
+
 	/**
 	 * Creates a new network.
 	 */
@@ -255,12 +255,12 @@ public class Network {
 	 */
 	public void computeTemplateMaps() {
 		int i, j;
-		
-		// Compute template maps of subnetworks  
+
+		// Compute template maps of subnetworks
 		for (Vertex vertex : getGraph().vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
-				if(instance.isNetwork()){
+				if (instance.isNetwork()) {
 					instance.getNetwork().computeTemplateMaps();
 				}
 			}
@@ -429,21 +429,38 @@ public class Network {
 	}
 
 	/**
+	 * Returns the list of instances of the given actor in the graph.
+	 * 
+	 * @param actor
+	 *            the actor to get the instance of
+	 * 
+	 * @return a list of instances
+	 */
+	public List<Instance> getInstancesOf(Actor actor) {
+		List<Instance> instances = new ArrayList<Instance>();
+
+		for (Vertex vertex : getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isActor() && instance.getActor() == actor) {
+					instances.add(instance);
+				} else if (instance.isNetwork()) {
+					Network network = instance.getNetwork();
+					instances.addAll(network.getInstancesOf(actor));
+				}
+			}
+		}
+
+		return instances;
+	}
+
+	/**
 	 * Returns the MoC of the network.
 	 * 
 	 * @return the network MoC.
 	 */
 	public MoC getMoC() {
 		return moc;
-	}
-	
-	/**
-	 * Returns true if this network as a computed MoC
-	 * 
-	 * @return True if the network has MoC, otherwise false
-	 */
-	public Boolean hasMoc(){
-		return moc != null;
 	}
 
 	/**
@@ -579,6 +596,15 @@ public class Network {
 	}
 
 	/**
+	 * Returns true if this network as a computed MoC
+	 * 
+	 * @return True if the network has MoC, otherwise false
+	 */
+	public Boolean hasMoc() {
+		return moc != null;
+	}
+
+	/**
 	 * Walks through the hierarchy, instantiate actors, and checks that
 	 * connections actually point to ports defined in actors. Instantiating an
 	 * actor implies first loading it and then giving it the right parameters.
@@ -600,7 +626,7 @@ public class Network {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	public void mergeActors() throws OrccException {		
+	public void mergeActors() throws OrccException {
 		new ActorMerger().transform(this);
 	}
 

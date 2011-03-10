@@ -117,11 +117,11 @@ public class StaticGraphAnalyzer {
 		// Initialize analyzer variables
 		dynamicGraph = network.getGraph();
 
-		// Calculate properties of the static graph
-		computeStaticGraph();
-
 		// Analyze composition
 		analyzer = new SDFCompositionAnalyzer(network, this);
+		
+		// Calculate properties of the static graph
+		computeStaticGraph();
 	}
 
 	/**
@@ -280,6 +280,9 @@ public class StaticGraphAnalyzer {
 
 		// Classify merging case
 		classifyConnections();
+		
+		// Analyze graph
+		analyzer.analyseGraph();
 	}
 
 	private void connectInputs(Vertex vertex,

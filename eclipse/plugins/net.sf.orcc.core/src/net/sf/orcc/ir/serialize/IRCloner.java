@@ -548,8 +548,13 @@ public class IRCloner {
 	 */
 	private static Action getAction(Tag tag) {
 		if (tag.isEmpty()) {
-			// removes the first untagged action found
-			return untaggedActions.remove(0);
+			// Get the first untagged action found
+			Action action = untaggedActions.remove(0); 
+			
+			//Set it to the end of the list
+			untaggedActions.add(action);
+			
+			return action;
 		} else {
 			return actions.get(tag.toString());
 		}

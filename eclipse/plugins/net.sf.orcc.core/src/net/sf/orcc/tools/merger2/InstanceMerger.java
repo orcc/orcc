@@ -34,6 +34,7 @@ import java.util.Set;
 
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.serialize.IRCloner;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -55,6 +56,7 @@ public class InstanceMerger {
 
 	private ActorMerger actorMerger;
 	private DirectedGraph<Vertex, Connection> graph;
+	private Network network;
 	private MultiMap<Actor, Port> extInputs;
 	private MultiMap<Actor, Port> extOutputs;
 	private MultiMap<Port, Port> intPorts;
@@ -64,6 +66,7 @@ public class InstanceMerger {
 	public InstanceMerger(Network network) {
 		this.nMerged = 0;
 		this.graph = network.getGraph();
+		this.network = network;
 	}
 
 	public Vertex getEquivalentVertices(Map<Vertex, Integer> verticesRate) {
@@ -83,8 +86,15 @@ public class InstanceMerger {
 		for (Entry<Vertex, Integer> entry : verticesRate.entrySet()) {
 			Vertex vertex = entry.getKey();
 			Instance instance = vertex.getInstance();
+			Actor actor = instance.getActor();
+			
+			if (network.getInstancesOf(actor).size() > 1){
+				// Clone the actor so as to isolate transformations on other
+				// instance of this actor
+				actor = new IRCloner(actor).clone();
+			}
 
-			actorMerger.add(instance.getActor(), entry.getValue());
+			actorMerger.add(actor, entry.getValue());
 		}
 
 		// Create the merged instance

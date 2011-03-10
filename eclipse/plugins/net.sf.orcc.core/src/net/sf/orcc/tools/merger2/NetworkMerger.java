@@ -59,7 +59,7 @@ public class NetworkMerger implements INetworkTransformation {
 		InstanceMerger merger = new InstanceMerger(network);
 
 		// Merger simple cases
-		//while (staticGraph.hasSinglyConnectedVertex()) {
+		while (staticGraph.hasSinglyConnectedVertex()) {
 			Map<Vertex, Integer> vertices = new HashMap<Vertex, Integer>();
 
 			// Get two Instances to merge
@@ -93,7 +93,7 @@ public class NetworkMerger implements INetworkTransformation {
 			// Transform network
 			Vertex mergedVertex = merger.getEquivalentVertices(vertices);
 			staticGraph.mergeVertices(vertices.keySet(), mergedVertex);
-		//}
+		}
 	}
 
 }

@@ -56,11 +56,9 @@ public class SDFCompositionAnalyzer {
 			StaticGraphAnalyzer staticGraph) {
 		this.graph = network.getGraph();
 		this.staticGraph = staticGraph;
-
-		analyseGraph();
 	}
 
-	private void analyseGraph() {
+	public void analyseGraph() {
 		for (Vertex vertex : staticGraph.getStaticVertices()) {
 			List<Vertex> staticNeighbours = staticGraph
 					.getStaticNeighbors(vertex);
