@@ -54,7 +54,7 @@ import net.sf.orcc.ir.nodes.IfNode;
  * @author Nicolas Siret
  * 
  */
-public class MultipleArrayAccessTransformation extends ActionSplitter {
+public class ArrayToRamTransformation extends ActionSplitter {
 
 	/**
 	 * This class extends the abstract branch visitor by splitting "if"

@@ -50,7 +50,7 @@ import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
-import net.sf.orcc.backends.vhdl.transformations.MultipleArrayAccessTransformation;
+import net.sf.orcc.backends.vhdl.transformations.ArrayToRamTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
@@ -146,7 +146,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// multiple array accesses in loops
 
 				// transform multiple array accesses
-				new MultipleArrayAccessTransformation(),
+				new ArrayToRamTransformation(),
 
 				// transform "b := a > b;" statements to if conditionals
 				new BoolExprTransformation(),

@@ -62,8 +62,10 @@ import net.sf.orcc.ir.instructions.Store;
  */
 public class ListFlattenTransformation extends AbstractActorVisitor {
 
-	private boolean applyToLocalLists;
 	private boolean applyToDeclarations;
+
+	private boolean applyToLocalLists;
+
 	private boolean useUint;
 
 	public ListFlattenTransformation(boolean applyToDeclarations,
@@ -100,10 +102,6 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 	 * 
 	 * @param indexes
 	 *            a list of indexes
-	 * @param iit
-	 *            an indexes iterator
-	 * @param it
-	 *            an instruction iterator
 	 * @param type
 	 *            the instruction type
 	 */
