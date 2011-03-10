@@ -135,7 +135,9 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 
 	procedure computeQuarterPix()
 	var
-		int pixVal
+		int  pixComputed,
+		uint pix1,
+		uint pix2
 	begin
 		if(    not(xFrac=0 and yFrac=2)
 		   and not(xFrac=2 and yFrac=0)
@@ -146,49 +148,62 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				do
 					if(xFrac = 0)then
 						if yFrac = 1 then
-							pixVal := ComputeQuarterPixel(TabPix[4*(2 + x_idx)][4*(2 + y_idx)+2],TabPix[4*(2 + x_idx)][4*(2 + y_idx)]);
+							pix1 := TabPix[4*(2 + x_idx)][4*(2 + y_idx)+2];
+							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx)];
 						end
 						if yFrac = 3 then
-							pixVal := ComputeQuarterPixel(TabPix[4*(2 + x_idx)][4*(2 + y_idx)+2],TabPix[4*(2 + x_idx)][4*(3 + y_idx)]);
+							pix1 := TabPix[4*(2 + x_idx)][4*(2 + y_idx)+2];
+							pix2 := TabPix[4*(2 + x_idx)][4*(3 + y_idx)];
 						end
 					end
 					if xFrac = 1 then
 						if yFrac = 0 then
-							pixVal := ComputeQuarterPixel(TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)],TabPix[4*(2 + x_idx)][4*(2 + y_idx)]);
+							pix1 := TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)];
+							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx)];
 						end
 						if yFrac = 1 then
-							pixVal  := ComputeQuarterPixel(TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)],TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]);
+							pix1 := TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)];
+							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2];
 						end
 						if yFrac = 2 then
-							pixVal  := ComputeQuarterPixel(TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2],TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]);
+							pix1 := TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2];
+							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2];
 						end
 						if yFrac = 3 then
-							pixVal  := ComputeQuarterPixel(TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)],TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2]);
+							pix1 := TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)];
+							pix2 := TabPix[4*(2 + x_idx)][4*(2 + y_idx) + 2];
 						end
 					end
 					if(xFrac = 2)then
-						if yFrac = 1 then 
-							pixVal := ComputeQuarterPixel(TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2],TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)]);
+						if yFrac = 1 then
+							pix1 := TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2];
+							pix2 := TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)];
 						end
 						if yFrac = 3 then
-							pixVal  := ComputeQuarterPixel(TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2],TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)]);
+							pix1 := TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2];
+							pix2 := TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)];
 						end
 					end
 					if xFrac = 3 then
 						if yFrac = 0 then
-							pixVal := ComputeQuarterPixel(TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)],TabPix[4*(3 + x_idx)][4*(2 + y_idx)]);
+							pix1 := TabPix[4*(2 + x_idx)+2][4*(2 + y_idx)];
+							pix2 := TabPix[4*(3 + x_idx)][4*(2 + y_idx)];
 						end
 						if yFrac = 2 then
-							pixVal  := ComputeQuarterPixel(TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2],TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]);
+							pix1 := TabPix[4*(x_idx + 2)+2][4*(y_idx + 2) + 2];
+							pix2 := TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2];
 						end
 						if yFrac = 1 then
-							pixVal  := ComputeQuarterPixel(TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)],TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]);
+							pix1 := TabPix[4*(2 + x_idx) + 2][4*(2 + y_idx)];
+							pix2 := TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2];
 						end
 						if yFrac = 3 then
-							pixVal  := ComputeQuarterPixel(TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)],TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2]);
+							pix1 := TabPix[4*(2 + x_idx) + 2][4*(3 + y_idx)];
+							pix2 := TabPix[4*(3 + x_idx)][4*(2 + y_idx) + 2];
 						end
 					end
-					TabPix[4*(2 + x_idx) + xFrac][4*(2 + y_idx) + yFrac] := pixVal;
+					pixComputed  := ComputeQuarterPixel(pix1,pix2);
+					TabPix[4*(2 + x_idx) + xFrac][4*(2 + y_idx) + yFrac] := pixComputed;
 				end
 			end
 		end
