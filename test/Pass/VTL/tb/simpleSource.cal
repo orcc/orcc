@@ -34,7 +34,7 @@ int(size=13) Out, bool OutBool:
 
 	outGen : action ==> Out:[ mem0[index]], OutBool:[ mem1[index]]
 	do
-		index := bitand(index + 1, 127);
+		index := (index + 1) & 127;
 	end
 
 end
