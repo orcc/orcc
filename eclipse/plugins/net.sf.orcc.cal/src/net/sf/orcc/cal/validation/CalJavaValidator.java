@@ -523,7 +523,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 		}.doSwitch(Util.getTopLevelContainer(function));
 
-		if (!used) {
+		if (!used && !function.isNative()) {
 			warning("The function " + function.getName() + " is never called",
 					CalPackage.AST_FUNCTION__NAME);
 		}
@@ -593,7 +593,25 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		// do not warn about unused actor parameters
 		// used for system actors
 		EReference reference = variable.eContainmentFeature();
-		if (!used && reference != CalPackage.eINSTANCE.getAstActor_Parameters()) {
+		if (!used) {
+			if (reference == CalPackage.eINSTANCE.getAstActor_Parameters()) {
+				return;
+			}
+			
+			if (variable.eContainer() instanceof AstFunction) {
+				AstFunction function = (AstFunction) variable.eContainer();
+				if (function.isNative()) {
+					return;
+				}
+			}
+			
+			if (variable.eContainer() instanceof AstProcedure) {
+				AstProcedure procedure = (AstProcedure) variable.eContainer();
+				if (procedure.isNative()) {
+					return;
+				}
+			}
+			
 			warning("The variable " + variable.getName() + " is never read",
 					CalPackage.AST_VARIABLE__NAME);
 		}
@@ -701,7 +719,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 		}.doSwitch(Util.getTopLevelContainer(procedure));
 
-		if (!used) {
+		if (!used && procedure.eContainer() instanceof AstActor && !procedure.isNative()) {
 			warning("The procedure " + procedure.getName() + " is never called",
 					CalPackage.AST_PROCEDURE__NAME);
 		}
