@@ -97,28 +97,13 @@ public class Multi2MonoToken extends ActionSplitter {
 			if (load.getSource().getVariable().getName().equals(port.getName())) {
 				Use useArray = new Use(tab);
 				load.setSource(useArray);
-				/*
-				 * for (Use use : load.getTarget().getUses()) { if
-				 * (use.getNode().isInstruction()) { Instruction instruction =
-				 * (Instruction) use.getNode(); if (instruction.isStore()) {
-				 * Store storeInstruction = (Store) instruction; tempTab =
-				 * storeInstruction.getTarget(); } } }
-				 */
 			}
-			/*
-			 * if (load.getSource().getVariable().equals(tempTab)) {
-			 * load.getSource().setVariable(tab); }
-			 */
 		}
 
 		@Override
 		public void visit(Read read) {
 			itInstruction.remove();
 		}
-		/*
-		 * @Override public void visit(Store store) { if
-		 * (store.getTarget().equals(tempTab)) { store.setTarget(tab); } }
-		 */
 	}
 
 	/**
