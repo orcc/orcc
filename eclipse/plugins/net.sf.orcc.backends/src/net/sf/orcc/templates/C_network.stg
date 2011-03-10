@@ -371,6 +371,7 @@ void *scheduler(void *data) {
 	struct schedinfo_s si;
 	<if(options.needDynamicMapping)>
 	
+	int i = 0;
 	clock_t start, end;	
 	semaphore_wait(sched-\>sem_thread);
 	start = clock ();
@@ -379,7 +380,6 @@ void *scheduler(void *data) {
 	while (1) {
 		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched<if(options.newScheduler)>, <if(options.needDynamicMapping || options.threads)>THREAD_NB<else>1<endif><endif>);
 		if(my_actor != NULL){
-			<if(options.needDynamicMapping)>timeout = 0;<endif>
 			si.num_firings = 0;
 			my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
@@ -394,12 +394,17 @@ void *scheduler(void *data) {
 			<endif>
 		}
 		<if(options.needDynamicMapping)>
-		end = clock ();
-		timeout = ((end - start) / (double)CLOCKS_PER_SEC) \>= TIMEOUT;
+		i++;
+		if(i \> STEP_BW_CHK){
+			end = clock ();
+			timeout = ((end - start) / (double)CLOCKS_PER_SEC) \>= TIMEOUT;
+			i = 0;
+		}
 		if(source_is_stopped() || timeout){
 			semaphore_set(sched-\>sync-\>sem_monitor);
-			semaphore_wait(sched-\>sem_thread);
 			clean_cache(CACHE_SIZE);
+			semaphore_wait(sched-\>sem_thread);
+			timeout = 0;
 			start = clock ();
 		}
 		<endif>
@@ -494,6 +499,7 @@ network(network, options) ::= <<
 #define CROSSOVER_RATIO 0.6
 
 #define TIMEOUT 120
+#define STEP_BW_CHK 1000000
 
 #define CACHE_SIZE 4096
 <endif>
