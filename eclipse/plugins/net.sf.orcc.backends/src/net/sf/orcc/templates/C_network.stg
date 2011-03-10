@@ -388,7 +388,7 @@ void *scheduler(void *data) {
 			<if (options.newScheduler)>
 			if (si.reason == full<if(options.needDynamicMapping || options.threads)> && (si.num_firings || !sched-\>round_robin)<endif>) {
 				sched_add_successors(sched, my_actor, si.ports);
-			} else if (si.reason<if(options.needDynamicMapping || options.threads)> == starved && (si.num_firings || !sched-\>round_robin)<endif>) {
+			} else if (si.reason == starved<if(options.needDynamicMapping || options.threads)> && (si.num_firings || !sched-\>round_robin)<endif>) {
 				sched_add_predecessors(sched, my_actor, si.ports);
 			}
 			<endif>
