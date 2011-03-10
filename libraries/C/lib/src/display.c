@@ -40,30 +40,13 @@ FILE * pFile;
 static Uint32 tInit = 0;
 #endif
 
-
-extern struct fifo_i8_s *display_B;
-extern struct fifo_i16_s *display_WIDTH;
-extern struct fifo_i16_s *display_HEIGHT;
-
-static unsigned int fifo_display_B_id;
-static unsigned int fifo_display_WIDTH_id;
-static unsigned int fifo_display_HEIGHT_id;
-
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
-
-#define MAX_WIDTH 720
-#define MAX_HEIGHT 576
-
 
 static int m_x;
 static int m_y;
 static int m_width;
 static int m_height;
-
-static unsigned char img_buf_y[MAX_WIDTH * MAX_HEIGHT];
-static unsigned char img_buf_u[MAX_WIDTH * MAX_HEIGHT / 4];
-static unsigned char img_buf_v[MAX_WIDTH * MAX_HEIGHT / 4];
 
 static void press_a_key(int code) {
 	char buf[2];
@@ -115,7 +98,7 @@ void active_fps_printing(){
 
 static Uint32 t;
 
-void display_show_image(void) {
+void displayYUV_displayPicture(unsigned char **pictureBuffer, unsigned short pictureWidth, unsigned short pictureSize) {
 	SDL_Rect rect = { 0, 0, m_width, m_height };
 
 	int t2;
@@ -128,9 +111,9 @@ void display_show_image(void) {
 		press_a_key(-1);
 	}
 
-	memcpy(m_overlay->pixels[0], img_buf_y, m_width * m_height );
-	memcpy(m_overlay->pixels[1], img_buf_u, m_width * m_height / 4 );
-	memcpy(m_overlay->pixels[2], img_buf_v, m_width * m_height / 4 );
+	memcpy(m_overlay->pixels[0], pictureBuffer[0], m_width * m_height );
+	memcpy(m_overlay->pixels[1], pictureBuffer[1], m_width * m_height / 4 );
+	memcpy(m_overlay->pixels[2], pictureBuffer[2], m_width * m_height / 4 );
 
 	SDL_UnlockYUVOverlay(m_overlay);
 	SDL_DisplayYUVOverlay(m_overlay, &rect);
@@ -166,60 +149,7 @@ void display_show_image(void) {
 	}
 }
 
-void display_write_mb() {
-	int i, j, cnt, base;
-
-	//printf("display_write_mb (%i, %i)\n", m_x, m_y);
-
-	cnt = 0;
-	base = m_y * m_width + m_x;
-
-	for (i = 0; i < 16; i++) {
-		for (j = 0; j < 16; j++) {
-			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
-			int idx = base + i * m_width + j;
-			cnt++;
-			img_buf_y[idx] = tok;
-		}
-	}
-
-	base = m_y / 2 * m_width / 2 + m_x / 2;
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
-			int idx = base + i * m_width / 2 + j;
-			cnt++;
-			img_buf_u[idx] = tok;
-		}
-	}
-
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
-			int idx = base + i * m_width / 2 + j;
-			cnt++;
-			img_buf_v[idx] = tok;
-		}
-	}
-
-	m_x += 16;
-	if (m_x == m_width) {
-		m_x = 0;
-		m_y += 16;
-	}
-
-	if (m_y == m_height) {
-		m_x = 0;
-		m_y = 0;
-		display_show_image();
-	}
-}
-
-static int init = 0;
-static int sizeinit = 0;
-
-static void display_init() {
-		
+void displayYUV_init() {
 #ifdef NO_DISPLAY
 	// First, initialize SDL's subsystem.
 	if (SDL_Init( SDL_INIT_TIMER ) < 0) {
@@ -265,24 +195,9 @@ static void display_init() {
 
 	atexit(SDL_Quit);
 	atexit(print_fps_avg);
-
-	init = 1;
 }
 
-void display_initialize(unsigned int fifo_B_id, unsigned int fifo_WIDTH_id, unsigned int fifo_HEIGHT_id) {
-	m_x = 0;
-	m_y = 0;
-	fifo_display_B_id = fifo_B_id; 
-	fifo_display_WIDTH_id = fifo_WIDTH_id; 
-	fifo_display_HEIGHT_id = fifo_HEIGHT_id;
-
-	if (!init) {
-		display_init();
-	}
-}
-
-
-static void display_set_video(int width, int height) {
+void displayYUV_setSize(int width, int height) {
 	if (width == m_width && height == m_height) {
 		// video mode is already good
 		return;
@@ -305,41 +220,11 @@ static void display_set_video(int width, int height) {
 		SDL_FreeYUVOverlay(m_overlay);
 	}
 
-	m_overlay = SDL_CreateYUVOverlay(m_width, m_height, SDL_IYUV_OVERLAY, m_screen);
+	m_overlay = SDL_CreateYUVOverlay(m_width, m_height, SDL_YV12_OVERLAY, m_screen);
 	if (m_overlay == NULL) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 		press_a_key(-1);
 	}
 #endif
-
-	sizeinit = 1;
 }
 
-void display_scheduler(struct schedinfo_s *si) {
-	int i = 0;
-
-	while (1) {
-		if (fifo_i16_has_tokens(display_WIDTH, fifo_display_WIDTH_id, 1) && fifo_i16_has_tokens(display_HEIGHT, fifo_display_HEIGHT_id, 1)) {
-			short width = fifo_i16_read_1(display_WIDTH, fifo_display_WIDTH_id) * 16;
-			short height = fifo_i16_read_1(display_HEIGHT, fifo_display_HEIGHT_id) * 16;
-
-			display_set_video(width, height);
-			i++;
-		}
-
-		if (fifo_i8_has_tokens(display_B, fifo_display_B_id, 384) && sizeinit) {
-			if (!init) {
-				display_init();
-			}
-
-			display_write_mb();
-			i += 384;
-		} else {
-			break;
-		}
-	}
-
-	si->num_firings = i;
-	si->reason = starved;
-	si->ports = 0x07; // FIFOs connected to first three input ports are empty
-}

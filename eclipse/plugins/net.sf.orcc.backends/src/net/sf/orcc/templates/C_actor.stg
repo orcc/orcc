@@ -270,8 +270,10 @@ while (<whileNode.value>) {
 ///////////////////////////////////////////////////////////////////////////////
 
 printProcedure(procedure,action="") ::= <<
-<if(!procedure.native)>
-
+<if(procedure.native)>
+extern <procedure.returnType> <procedure.name>(<
+  procedure.parameters.list: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">);
+<else>
 static <procedure.returnType> <procedure.name>(<
   procedure.parameters.list: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">) {
 <if(procedure.locals.list)>

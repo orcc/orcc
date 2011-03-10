@@ -22,11 +22,61 @@ actor DisplayYUV()
 		==>
 		:
 
+	uint MAX_WIDTH = 720;
+	uint MAX_HEIGHT = 576;
+	
+	/**
+	
+	C code for write_mb
+	
+	cnt = 0;
+	base = m_y * m_width + m_x;
+
+	for (i = 0; i < 16; i++) {
+		for (j = 0; j < 16; j++) {
+			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
+			int idx = base + i * m_width + j;
+			cnt++;
+			img_buf_y[idx] = tok;
+		}
+	}
+
+	base = m_y / 2 * m_width / 2 + m_x / 2;
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < 8; j++) {
+			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
+			int idx = base + i * m_width / 2 + j;
+			cnt++;
+			img_buf_u[idx] = tok;
+		}
+	}
+
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < 8; j++) {
+			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
+			int idx = base + i * m_width / 2 + j;
+			cnt++;
+			img_buf_v[idx] = tok;
+		}
+	}
+	*/
+
+	/**
+	 * Sets size of display. Sizes are in (MB or pixels?)
+	 */
 	native procedure displayYUV_setSize(int(size=16) pictureWidth, int(size=16) pictureSize) end
-	native procedure displayYUV_displayPicture(uint(size=8) pictureBuffer[42][256], int(size=16) pictureWidth, int(size=16) pictureSize) end
+
+	/**
+	 * Displays a picture. Sizes are in (MB or pixels?). 
+	 */
+	native procedure displayYUV_displayPicture(uint(size=8) pictureBuffer[3][MAX_WIDTH * MAX_HEIGHT], int(size=16) pictureWidth, int(size=16) pictureSize) end
+
+	/**
+	 * Inits the given display.
+	 */
 	native procedure displayYUV_init() end
 
-	uint(size=8) pictureBuffer[2280000][256];
+	uint(size=8) pictureBuffer[3][MAX_WIDTH * MAX_HEIGHT];
 	int(size=16) pictureWidth       := 0;
 	int(size=16) pictureHeight      := 0;
 	int(size=32) pictureSize        := 0;
@@ -36,7 +86,7 @@ actor DisplayYUV()
 
 	initialize ==>
 	do
-		//DisplayYUV_init();
+		displayYUV_init();
 	end
 
 	getPictureSize: action
@@ -59,7 +109,7 @@ actor DisplayYUV()
 	do
 		foreach int i in 0 .. 255
 		do
-			pictureBuffer[nbBlockGot][i] := Bytes[i];
+			// pictureBuffer[nbBlockGot][i] := Bytes[i];
 		end
 		nbBlockGot := nbBlockGot + 1;
 	end
@@ -68,7 +118,7 @@ actor DisplayYUV()
 	do
 		foreach int i in 0 .. 63
 		do
-			pictureBuffer[nbBlockGot - 1][i] := Bytes[i];
+			// pictureBuffer[nbBlockGot - 1][i] := Bytes[i];
 		end
 	end
 
@@ -77,9 +127,9 @@ actor DisplayYUV()
 		nbBlockGot >= pictureSize
 	do
 		if(pictureSizeChanged)then
-			//displayYUV_setSize(width,height);
+			displayYUV_setSize(16 * pictureWidth, 16 * pictureHeight);
 		end
-		//displayYUV_displayPicture(pictureBuffer,width,height);
+		displayYUV_displayPicture(pictureBuffer, 16 * pictureWidth, 16 * pictureHeight);
 	end
 
 	schedule fsm GetPictureSize:
@@ -92,6 +142,7 @@ actor DisplayYUV()
 
 		GetChroma2Block (getPixValue.launch.Chroma )--> GetLumaBlock;
 	end
+
 	priority
 		getPixValue > displayPicture;
 	end
