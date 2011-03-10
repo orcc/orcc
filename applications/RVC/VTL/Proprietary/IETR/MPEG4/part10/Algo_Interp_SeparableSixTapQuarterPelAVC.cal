@@ -25,16 +25,16 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	uint(size=8)  Interp
 		:
 
-  int (size=32) x ;
-  int (size=32) y ;
-  int (size=32) xFrac;
-  int (size=32) yFrac;
-  int (size=32) xMax;
-  int (size=32) yMax;
-  int (size=32) width;
-  int (size=32) height;
-  uint(size=8)  tabPix[21*4][21*4];
-  int (size=32) tabIntermPix[21*4][21*4];
+	int (size=32) x ;
+	int (size=32) y ;
+	int (size=32) xFrac;
+	int (size=32) yFrac;
+	int (size=32) xMax;
+	int (size=32) yMax;
+	int (size=32) width;
+	int (size=32) height;
+	uint(size=8)  tabPix[21*4][21*4];
+	int (size=32) tabIntermPix[21*4][21*4];
 
 	function sixTapFilter(int a1, int b1, int c1, int c2, int b2, int a2)
 				-->
