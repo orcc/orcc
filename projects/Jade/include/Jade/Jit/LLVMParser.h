@@ -86,16 +86,26 @@ private:
 	/**
      *  @brief Load and parse the bitcode file in an archive
 	 *
-	 *  Open and load archive then find and read the specified bitcode file of the current 
+	 *  Find and read the specified bitcode file of the current 
 	 *  actor and return the corresponding module. 
 	 *
-	 * @param archive : archive where is file
+	 * @param package : package where is the archive
 	 * @param file : file to parse
 	 *
 	 * @return the corresponding llvm::Module
 	 *
      */
-	llvm::Module* loadBitcodeInArchive(llvm::Archive* archive, llvm::sys::Path file);
+	llvm::Module* loadBitcodeInArchive(Package* package, llvm::sys::Path file);
+
+	/**
+     *  @brief Open archive of package given
+	 *
+	 *  Open archive and set it in package and all parents
+	 *
+	 * @param package : package which will be the archive
+	 *
+     */
+	void LLVMParser::openArchive(Package* package);
 
 	/** default directory of the actor */
 	std::string directory;

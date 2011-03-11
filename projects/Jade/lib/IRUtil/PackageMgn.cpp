@@ -61,6 +61,16 @@ string PackageMng::getFolder(string package){
 	return package;
 }
 
+string PackageMng::getFirstFolder(string name){
+	int index = name.find('/');
+
+	if (index == string::npos){
+		return name;
+	}
+
+	return name.substr(0, index);
+}
+
 string PackageMng::getPackagesName(Actor* actor){
 	return getPackagesName(actor->getName());
 }
@@ -127,10 +137,11 @@ string PackageMng::getSimpleName(string name){
 }
 
 Package* PackageMng::getPackage(string name){
-	list<string> packageStrs = getPackageListName(name);
-
 	map<string, Package*>::iterator itPack;
 	list<string>::iterator itStrPack;
+	
+	//Get list of packages name to have
+	list<string> packageStrs = getPackageListName(name);
 
 	//Current position of the package
 	map<string, Package*>* packagesPtr = packages;
@@ -197,30 +208,16 @@ map<string, Package*>* PackageMng::setPackages(map<string, Actor*>* actors){
 	return packages;
 }
 
-Archive* PackageMng::setArchive(Package* package, string VTLDir){
+void PackageMng::setArchive(Package* package){
 	Package* parent = package->getParent();
 
-	if(parent){
-		package->setArchive(PackageMng::setArchive(parent, VTLDir));
-		return package->getArchive();
-	}
-	else{
-		string Error;
-		LLVMContext &Context = getGlobalContext();
-		
-		//Get archive file
-		sys::Path archiveFile(VTLDir + package->getName() + ".a");
+	//Set archive in all parents
+	while(parent){
+		Archive* archive = package->getArchive();
+		parent->setArchive(archive);
 
-		//Load archive
-		Archive* archive = Archive::OpenAndLoad(archiveFile, Context, &Error);
-	
-		if (Error != ""){
-			cerr <<"Error when open archive "<< archiveFile.c_str();
-		}
-		
-		package->setArchive(archive);
-
-		return archive;
+		package = parent;
+		parent = package->getParent();
 	}
 }
 

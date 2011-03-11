@@ -66,14 +66,10 @@ Module* LLVMParser::loadModule(Package* package, string file) {
 	//Load the bitcode
 	//Archive case
 	if(!Filename.exists()){
-		Archive* archive;
-		if (package->isArchive()){
-			archive = package->getArchive();
+		if(!package->isArchive()){
+			openArchive(package);
 		}
-		else{
-			archive = PackageMng::setArchive(package, directory);
-		}
-		Mod = loadBitcodeInArchive(archive, Filename);
+		Mod = loadBitcodeInArchive(package, Filename);
 	}
 	//Other case
 	else{
@@ -91,12 +87,13 @@ Module* LLVMParser::loadModule(Package* package, string file) {
 	return Mod;
 }
 
-Module* LLVMParser::loadBitcodeInArchive(Archive* archive, sys::Path file) {
+Module* LLVMParser::loadBitcodeInArchive(Package* package, sys::Path file) {
 	std::string Error;
+	LLVMContext &Context = getGlobalContext();
 
 	Module* Mod = NULL;
+	Archive* archive = package->getArchive();
 	Archive::iterator itArch;
-	LLVMContext &Context = getGlobalContext();
 
 	//Find and load module
 	for(itArch = archive->begin(); itArch != archive->end(); itArch++){
@@ -114,4 +111,23 @@ Module* LLVMParser::loadBitcodeInArchive(Archive* archive, sys::Path file) {
 	}
 
 	return Mod;
+}
+
+void LLVMParser::openArchive(Package* package){
+	std::string Error;
+	LLVMContext &Context = getGlobalContext();
+
+	//Get archive file
+	string archiveName = PackageMng::getFirstFolder(package->getDirectory()) + ".a";
+	sys::Path archiveFile(directory + archiveName);
+
+	//Load archive
+	package->setArchive(Archive::OpenAndLoad(archiveFile, Context, &Error));
+	
+	if (Error != ""){
+		cerr <<"Error when open archive "<< archiveFile.c_str();
+	}
+
+	//Set archive on all parents of package
+	PackageMng::setArchive(package);
 }

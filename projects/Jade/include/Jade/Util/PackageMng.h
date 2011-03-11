@@ -74,6 +74,16 @@ public:
 	static std::string getFolder(std::string package);
 
 	/**
+     * @brief Get first folser from a folder
+	 *
+	 * @param folder : the folder to get the first
+	 *
+	 * @return the corresponding first folder
+	 *
+     */
+	static std::string getFirstFolder(std::string folder);
+
+	/**
      * @brief Get all packages name from the given actor
 	 *
 	 * @param actor : the actor to get the package from
@@ -182,14 +192,12 @@ public:
 	/**
      * @brief Set archive of package
 	 *
-	 *	Set archive recurcively for all parents
+	 *	Set archive for all parents of given package
 	 *
 	 * @param package : the package containing the archive
 	 *
-	 * @return the corresponding archive
-	 *
      */
-	static llvm::Archive* setArchive(Package* package, std::string VTLDir);
+	static void setArchive(Package* package);
 
 	/**
      * @brief Set actor in the required package
