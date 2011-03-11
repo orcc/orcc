@@ -177,6 +177,6 @@ StateVar* Actor::getStateVar(std::string name){
 }
 
 bool Actor::isSystem(){
-	string firstPackage = PackageMng::getFirstPackage(this);
+	string firstPackage = PackageMng::getFirstPackageName(this);
 	return firstPackage.compare("System")== 0;
 }

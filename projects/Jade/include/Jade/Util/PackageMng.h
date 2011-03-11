@@ -101,7 +101,7 @@ public:
 	 * @return the corresponding list of package
 	 *
      */
-	static std::list<std::string> getPackageList(Actor* actor);
+	static std::list<std::string> getPackageListName(Actor* actor);
 
 	/**
      * @brief Get a list of package string from the name of an actor
@@ -111,7 +111,7 @@ public:
 	 * @return the corresponding list of package
 	 *
      */
-	static std::list<std::string> getPackageList(std::string name);
+	static std::list<std::string> getPackageListName(std::string name);
 
 
 	/**
@@ -122,7 +122,7 @@ public:
 	 * @return the corresponding packages
 	 *
      */
-	static std::string getFirstPackage(Actor* actor);
+	static std::string getFirstPackageName(Actor* actor);
 
 	/**
      * @brief Get first package from the name of an actor
@@ -132,7 +132,7 @@ public:
 	 * @return the corresponding first package
 	 *
      */
-	static std::string getFirstPackage(std::string name);
+	static std::string getFirstPackageName(std::string name);
 
 	/**
      * @brief Get the simple name of the given actor
@@ -189,7 +189,7 @@ public:
 	 * @return the corresponding archive
 	 *
      */
-	static llvm::Archive* PackageMng::setArchive(Package* package, std::string VTLDir);
+	static llvm::Archive* setArchive(Package* package, std::string VTLDir);
 
 	/**
      * @brief Set actor in the required package
@@ -197,7 +197,7 @@ public:
 	 * @param actor : the actor to set in package
 	 *
      */
-	static void PackageMng::setActor(Actor* actor);
+	static void setActor(Actor* actor);
 
 private:
 	/** Package preloaded */

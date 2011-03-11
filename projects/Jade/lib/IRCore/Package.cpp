@@ -43,6 +43,21 @@
 
 using namespace std;
 
+Package::Package(std::string name, Package* parent){
+	this->name = name;
+	this->parent = parent;
+	if(parent){
+	this->parent = parent;
+	this->directory = parent->getDirectory() + "/" + name;
+	this->archive = parent->getArchive();
+	}
+	else{
+		this->parent = NULL;
+		this->directory = name;
+		this->archive = NULL;
+	}
+}
+
 void Package::getAllUnderneathActors(std::map<std::string, Actor*>* underneathActors){
 	//Add actors of this package
 	underneathActors->insert(actors.begin(), actors.end());

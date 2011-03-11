@@ -80,7 +80,10 @@ public:
      */
 	llvm::Module* loadModule(Package* package, std::string file);
 
-	 /**
+
+private:
+
+	/**
      *  @brief Load and parse the bitcode file in an archive
 	 *
 	 *  Open and load archive then find and read the specified bitcode file of the current 
@@ -93,8 +96,6 @@ public:
 	 *
      */
 	llvm::Module* loadBitcodeInArchive(llvm::Archive* archive, llvm::sys::Path file);
-
-private:
 
 	/** default directory of the actor */
 	std::string directory;

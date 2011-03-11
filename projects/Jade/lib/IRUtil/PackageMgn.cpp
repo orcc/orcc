@@ -75,12 +75,12 @@ string PackageMng::getPackagesName(string name){
 	return name.substr(0, index);
 }
 
-list<std::string> PackageMng::getPackageList(Actor* actor){
+list<std::string> PackageMng::getPackageListName(Actor* actor){
 	string actorPackageName = PackageMng::getPackagesName(actor->getName());
-	return getPackageList(actorPackageName);
+	return getPackageListName(actorPackageName);
 }
 
-list<std::string> PackageMng::getPackageList(string name){
+list<std::string> PackageMng::getPackageListName(string name){
 	list<string> packageList;
 
 	int index = name.find('.');
@@ -98,11 +98,11 @@ list<std::string> PackageMng::getPackageList(string name){
 	return packageList;
 }
 
-string PackageMng::getFirstPackage(Actor* actor){
-	return getFirstPackage(actor->getName());
+string PackageMng::getFirstPackageName(Actor* actor){
+	return getFirstPackageName(actor->getName());
 }
 
-string PackageMng::getFirstPackage(string name){
+string PackageMng::getFirstPackageName(string name){
 	int index = name.find('.');
 
 	if (index == string::npos){
@@ -127,7 +127,7 @@ string PackageMng::getSimpleName(string name){
 }
 
 Package* PackageMng::getPackage(string name){
-	list<string> packageStrs = getPackageList(name);
+	list<string> packageStrs = getPackageListName(name);
 
 	map<string, Package*>::iterator itPack;
 	list<string>::iterator itStrPack;
@@ -166,7 +166,7 @@ map<string, Package*>* PackageMng::setPackages(map<string, Actor*>* actors){
 	//Iterate though every actors to determine and order their package
 	for (itAct = actors->begin(); itAct != actors->end(); itAct++){
 		list<string>::iterator itStrPack;
-		list<string> packageStrs = PackageMng::getPackageList(itAct->second);
+		list<string> packageStrs = PackageMng::getPackageListName(itAct->second);
 		
 		//Current position of the package
 		map<string, Package*>* packagesPtr = packages;

@@ -80,20 +80,7 @@ public:
 	 *
 	 * @param parent : parent of the current Package
      */
-	Package(std::string name, Package* parent){
-		this->name = name;
-		this->parent = parent;
-		if(parent){
-			this->parent = parent;
-			this->directory = parent->getDirectory() + "/" + name;
-			this->archive = parent->getArchive();
-		}
-		else{
-			this->parent = NULL;
-			this->directory = name;
-			this->archive = NULL;
-		}
-	};
+	Package(std::string name, Package* parent);
 
 	~Package(){};
 
