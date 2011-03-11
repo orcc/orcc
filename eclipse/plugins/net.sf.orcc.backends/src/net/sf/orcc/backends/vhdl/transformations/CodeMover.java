@@ -38,7 +38,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.util.OrderedMap;
 
@@ -141,11 +140,6 @@ public class CodeMover extends AbstractActorVisitor {
 	@Override
 	public void visit(Load load) {
 		moveLocalVariable(load, load.getTarget());
-	}
-
-	@Override
-	public void visit(Write write) {
-		moveLocalVariable(write, (LocalVariable) write.getTarget());
 	}
 
 }

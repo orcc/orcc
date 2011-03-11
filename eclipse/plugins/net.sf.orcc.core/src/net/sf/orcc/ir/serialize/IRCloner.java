@@ -75,13 +75,10 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
@@ -211,30 +208,12 @@ public class IRCloner {
 		}
 
 		@Override
-		public Object interpret(Peek peek, Object... args) {
-			Location location = cloneLocation(peek.getLocation());
-			Variable target = getVar(peek.getTarget());
-			Port port = getPort(peek.getPort());
-
-			return new Peek(location, port, peek.getNumTokens(), target);
-		}
-
-		@Override
 		public Object interpret(PhiAssignment phi, Object... args) {
 			Location location = cloneLocation(phi.getLocation());
 			LocalVariable target = getLocalVar(phi.getTarget());
 			List<Expression> values = cloneExpressions(phi.getValues());
 
 			return new PhiAssignment(location, target, values);
-		}
-
-		@Override
-		public Object interpret(Read read, Object... args) {
-			Location location = cloneLocation(read.getLocation());
-			Variable target = getVar(read.getTarget());
-			Port port = getPort(read.getPort());
-
-			return new Read(location, port, read.getNumTokens(), target);
 		}
 
 		@Override
@@ -267,14 +246,6 @@ public class IRCloner {
 			return new Store(location, target, indexes, value);
 		}
 
-		@Override
-		public Object interpret(Write write, Object... args) {
-			Location location = cloneLocation(write.getLocation());
-			Variable target = getVar(write.getTarget());
-			Port port = getPort(write.getPort());
-
-			return new Write(location, port, write.getNumTokens(), target);
-		}
 	}
 
 	/**
@@ -440,7 +411,7 @@ public class IRCloner {
 	private static Actor clone;
 
 	private static OrderedMap<String, LocalVariable> localVars;
-	
+
 	private static OrderedMap<String, Variable> patternVars;
 
 	private static OrderedMap<String, GlobalVariable> parameters;
@@ -496,10 +467,10 @@ public class IRCloner {
 	}
 
 	private static Location cloneLocation(Location location) {
-		if (location == null){
+		if (location == null) {
 			return location;
 		}
-		
+
 		return new Location(location.getStartLine(), location.getStartColumn(),
 				location.getEndColumn());
 	}
@@ -549,11 +520,11 @@ public class IRCloner {
 	private static Action getAction(Tag tag) {
 		if (tag.isEmpty()) {
 			// Get the first untagged action found
-			Action action = untaggedActions.remove(0); 
-			
-			//Set it to the end of the list
+			Action action = untaggedActions.remove(0);
+
+			// Set it to the end of the list
 			untaggedActions.add(action);
-			
+
 			return action;
 		} else {
 			return actions.get(tag.toString());
@@ -568,12 +539,12 @@ public class IRCloner {
 	 * @return the corresponding cloned local variable
 	 */
 	private static LocalVariable getLocalVar(LocalVariable variable) {
-		if (localVars.contains(variable.getName())){
+		if (localVars.contains(variable.getName())) {
 			return localVars.get(variable.getName());
 		}
-		
+
 		// The local variable corresponds to a pattern
-		return (LocalVariable)patternVars.get(variable.getName());
+		return (LocalVariable) patternVars.get(variable.getName());
 	}
 
 	/**
@@ -693,7 +664,7 @@ public class IRCloner {
 	 */
 	private Action cloneAction(Action action) {
 		patternVars = new OrderedMap<String, Variable>();
-		
+
 		Location location = cloneLocation(action.getLocation());
 		Tag tag = cloneActionTag(action.getTag());
 		Pattern inputPattern = cloneActionPattern(action.getInputPattern(),
@@ -723,22 +694,22 @@ public class IRCloner {
 		for (Port port : pattern.getPorts()) {
 			Port clonedPort = getPort(port);
 			clonePattern.setNumTokens(clonedPort, pattern.getNumTokens(port));
-			
-			//Clone pattern variables
-			Variable peeked = pattern.getPeeked(port);		
-			if(peeked != null){
+
+			// Clone pattern variables
+			Variable peeked = pattern.getPeeked(port);
+			if (peeked != null) {
 				clonePattern.setPeeked(clonedPort, clonePatternVar(peeked));
 			}
-			
+
 			Variable var = pattern.getVariable(port);
-			if(var != null){
+			if (var != null) {
 				clonePattern.setVariable(clonedPort, clonePatternVar(var));
 			}
 		}
 
 		return clonePattern;
 	}
-	
+
 	/**
 	 * Returns a clone of the given pattern variable.
 	 * 
@@ -748,12 +719,12 @@ public class IRCloner {
 	 * @return the cloned pattern variable
 	 */
 	private LocalVariable clonePatternVar(Variable patternVar) {
-		//Clone variables associated to ports
-		LocalVariable cloneVar = cloneLocalVariable((LocalVariable)patternVar);
-		
-		//Store the cloned variable
+		// Clone variables associated to ports
+		LocalVariable cloneVar = cloneLocalVariable((LocalVariable) patternVar);
+
+		// Store the cloned variable
 		patternVars.put(cloneVar.getName(), cloneVar);
-		
+
 		return cloneVar;
 	}
 

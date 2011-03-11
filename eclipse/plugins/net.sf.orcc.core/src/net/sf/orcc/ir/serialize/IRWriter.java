@@ -35,12 +35,9 @@ import static net.sf.orcc.ir.serialize.IRConstants.EXPR_VAR;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_ASSIGN;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_CALL;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_LOAD;
-import static net.sf.orcc.ir.serialize.IRConstants.INSTR_PEEK;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_PHI;
-import static net.sf.orcc.ir.serialize.IRConstants.INSTR_READ;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_RETURN;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_STORE;
-import static net.sf.orcc.ir.serialize.IRConstants.INSTR_WRITE;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTIONS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTION_SCHED;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INITIALIZES;
@@ -101,18 +98,14 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
@@ -259,11 +252,6 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(Peek peek, Object... args) {
-			return visitFifoInstruction(INSTR_PEEK, peek);
-		}
-
-		@Override
 		public Object interpret(PhiAssignment phi, Object... args) {
 			JsonArray array = new JsonArray();
 
@@ -274,11 +262,6 @@ public class IRWriter {
 			array.add(writeExpressions(phi.getValues()));
 
 			return array;
-		}
-
-		@Override
-		public Object interpret(Read read, Object... args) {
-			return visitFifoInstruction(INSTR_READ, read);
 		}
 
 		@Override
@@ -314,62 +297,6 @@ public class IRWriter {
 			array.add(writeVariable(store.getTarget()));
 			array.add(writeExpressions(store.getIndexes()));
 			array.add(writeExpression(store.getValue()));
-
-			return array;
-		}
-
-		@Override
-		public Object interpret(Write write, Object... args) {
-			return visitFifoInstruction(INSTR_WRITE, write);
-		}
-
-		/**
-		 * Visits the given FIFO instruction.
-		 * 
-		 * @param name
-		 *            name of the instruction as indicated in
-		 *            {@link IRConstants}. Expected to be the name of a
-		 *            hasTokens, peek, read, write.
-		 * @param instr
-		 *            the {@link AbstractFifoInstruction} we want to visit
-		 * @param object
-		 *            the object passed in args[0], expected to be the target
-		 *            JSON array
-		 */
-		private JsonArray visitFifoInstruction(String name,
-				AbstractFifoInstruction instr) {
-			return visitFifoOperation(name, instr.getLocation(),
-					instr.getTarget(), instr.getPort(), instr.getNumTokens());
-		}
-
-		/**
-		 * Visits the given FIFO operation.
-		 * 
-		 * @param name
-		 *            name of the instruction as indicated in
-		 *            {@link IRConstants}. Expected to be the name of a
-		 *            hasTokens, peek, read, write.
-		 * @param location
-		 *            the location
-		 * @param target
-		 *            the target variable
-		 * @param port
-		 *            the source port
-		 * @param numTokens
-		 *            the number of tokens
-		 * @param array
-		 *            the target JSON array
-		 */
-		private JsonArray visitFifoOperation(String name, Location location,
-				Variable target, Port port, int numTokens) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(name));
-			array.add(writeLocation(location));
-
-			array.add(writeVariable(target));
-			array.add(new JsonPrimitive(port.getName()));
-			array.add(new JsonPrimitive(numTokens));
 
 			return array;
 		}

@@ -70,17 +70,6 @@ public interface InstructionInterpreter {
 	public Object interpret(Load load, Object... args);
 
 	/**
-	 * Interprets a peek instruction.
-	 * 
-	 * @param peek
-	 *            a peek instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(Peek peek, Object... args);
-
-	/**
 	 * Interprets a phi assignment instruction.
 	 * 
 	 * @param phi
@@ -90,17 +79,6 @@ public interface InstructionInterpreter {
 	 * @return an object
 	 */
 	public Object interpret(PhiAssignment phi, Object... args);
-
-	/**
-	 * Interprets a read instruction.
-	 * 
-	 * @param read
-	 *            a read instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(Read read, Object... args);
 
 	/**
 	 * Interprets a return instruction.
@@ -134,16 +112,5 @@ public interface InstructionInterpreter {
 	 * @return an object
 	 */
 	public Object interpret(Store store, Object... args);
-
-	/**
-	 * Interprets a write instruction.
-	 * 
-	 * @param write
-	 *            a write instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(Write write, Object... args);
 
 }

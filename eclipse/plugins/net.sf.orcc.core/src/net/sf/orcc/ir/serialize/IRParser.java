@@ -35,12 +35,9 @@ import static net.sf.orcc.ir.serialize.IRConstants.EXPR_VAR;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_ASSIGN;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_CALL;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_LOAD;
-import static net.sf.orcc.ir.serialize.IRConstants.INSTR_PEEK;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_PHI;
-import static net.sf.orcc.ir.serialize.IRConstants.INSTR_READ;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_RETURN;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_STORE;
-import static net.sf.orcc.ir.serialize.IRConstants.INSTR_WRITE;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTIONS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTION_SCHED;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INITIALIZES;
@@ -105,12 +102,9 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -586,27 +580,6 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the given JSON array as a Peek instruction
-	 * 
-	 * @param loc
-	 *            location information
-	 * @param array
-	 *            a JSON array
-	 * @return a Peek instruction
-	 * @throws OrccException
-	 */
-	private Peek parseInstrPeek(Location loc, JsonArray array)
-			throws OrccException {
-		Variable target = getVariable(array.get(2).getAsJsonArray());
-		String fifoName = array.get(3).getAsString();
-		Port port = inputs.get(fifoName);
-		int numTokens = array.get(4).getAsInt();
-		Peek peek = new Peek(loc, port, numTokens, target);
-		target.setInstruction(peek);
-		return peek;
-	}
-
-	/**
 	 * Parses the given JSON array as a Phi instruction
 	 * 
 	 * @param loc
@@ -625,27 +598,6 @@ public class IRParser {
 		PhiAssignment phi = new PhiAssignment(loc, target, values);
 		target.setInstruction(phi);
 		return phi;
-	}
-
-	/**
-	 * Parses the given JSON array as a Read instruction
-	 * 
-	 * @param loc
-	 *            location information
-	 * @param array
-	 *            a JSON array
-	 * @return a Read instruction
-	 * @throws OrccException
-	 */
-	private Read parseInstrRead(Location loc, JsonArray array)
-			throws OrccException {
-		Variable target = getVariable(array.get(2).getAsJsonArray());
-		String fifoName = array.get(3).getAsString();
-		Port port = inputs.get(fifoName);
-		int numTokens = array.get(4).getAsInt();
-		Read read = new Read(loc, port, numTokens, target);
-		target.setInstruction(read);
-		return read;
 	}
 
 	/**
@@ -705,42 +657,15 @@ public class IRParser {
 			return parseInstrCall(loc, array);
 		} else if (name.equals(INSTR_LOAD)) {
 			return parseInstrLoad(loc, array);
-		} else if (name.equals(INSTR_PEEK)) {
-			return parseInstrPeek(loc, array);
 		} else if (name.equals(INSTR_PHI)) {
 			return parseInstrPhi(loc, array);
-		} else if (name.equals(INSTR_READ)) {
-			return parseInstrRead(loc, array);
 		} else if (name.equals(INSTR_RETURN)) {
 			return parseInstrReturn(loc, array);
 		} else if (name.equals(INSTR_STORE)) {
 			return parseInstrStore(loc, array);
-		} else if (name.equals(INSTR_WRITE)) {
-			return parseInstrWrite(loc, array);
 		}
 
 		throw new OrccException("unknown instruction type: " + name);
-	}
-
-	/**
-	 * Parses the given JSON array as a Write instruction
-	 * 
-	 * @param loc
-	 *            location information
-	 * @param array
-	 *            a JSON array
-	 * @return a Write instruction
-	 * @throws OrccException
-	 */
-	private Write parseInstrWrite(Location loc, JsonArray array)
-			throws OrccException {
-		Variable target = getVariable(array.get(2).getAsJsonArray());
-		String fifoName = array.get(3).getAsString();
-		Port port = outputs.get(fifoName);
-		int numTokens = array.get(4).getAsInt();
-		Write write = new Write(loc, port, numTokens, target);
-		target.setInstruction(write);
-		return write;
 	}
 
 	private LocalVariable parseLocalVariable(JsonArray array)

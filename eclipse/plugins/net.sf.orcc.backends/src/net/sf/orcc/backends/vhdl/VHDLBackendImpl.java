@@ -134,7 +134,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// cleanup code
 				new DeadGlobalElimination(),
 				new DeadCodeElimination(),
-				new DeadVariableRemoval(false),
+				new DeadVariableRemoval(),
 
 				// out-of-SSA transformation
 				// must be done before WTF and MAAT passes because having phis

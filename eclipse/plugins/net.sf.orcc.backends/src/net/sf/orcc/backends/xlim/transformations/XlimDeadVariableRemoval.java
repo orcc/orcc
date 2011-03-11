@@ -8,10 +8,7 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 
 public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 
-	public XlimDeadVariableRemoval(boolean keepTokenSwallowerVariable) {
-		super(keepTokenSwallowerVariable);
-	}
-
+	@Override
 	public void visit(SpecificInstruction specific) {
 		if (specific instanceof TernaryOperation) {
 			TernaryOperation ternaryOperation = (TernaryOperation) specific;

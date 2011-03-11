@@ -50,17 +50,11 @@ public interface IRConstants {
 
 	public static final String INSTR_LOAD = "load";
 
-	public static final String INSTR_PEEK = "peek";
-
 	public static final String INSTR_PHI = "phi";
-
-	public static final String INSTR_READ = "read";
 
 	public static final String INSTR_RETURN = "return";
 
 	public static final String INSTR_STORE = "store";
-
-	public static final String INSTR_WRITE = "write";
 
 	public static final String KEY_ACTION_SCHED = "action scheduler";
 

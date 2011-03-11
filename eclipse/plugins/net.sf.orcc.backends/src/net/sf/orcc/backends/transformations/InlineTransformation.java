@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFGNode;
@@ -57,13 +56,10 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
@@ -197,12 +193,6 @@ public class InlineTransformation extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(Peek peek, Object... args) {
-			throw new OrccRuntimeException(peek.getLocation(),
-					"Error: Peek call in function or procedure body.");
-		}
-
-		@Override
 		public Object interpret(PhiAssignment phi, Object... args) {
 			LocalVariable target = (LocalVariable) variableToLocalVariableMap
 					.get(phi.getTarget());
@@ -214,12 +204,6 @@ public class InlineTransformation extends AbstractActorVisitor {
 					values);
 			Use.addUses(p, values);
 			return p;
-		}
-
-		@Override
-		public Object interpret(Read read, Object... args) {
-			throw new OrccRuntimeException(read.getLocation(),
-					"Error: Read call in function or procedure body.");
 		}
 
 		@Override
@@ -317,12 +301,6 @@ public class InlineTransformation extends AbstractActorVisitor {
 					condition, nodes, joinNode);
 			Use.addUses(whileNode, condition);
 			return whileNode;
-		}
-
-		@Override
-		public Object interpret(Write write, Object... args) {
-			throw new OrccRuntimeException(write.getLocation(),
-					"Error: Write call in function or procedure body.");
 		}
 
 	}

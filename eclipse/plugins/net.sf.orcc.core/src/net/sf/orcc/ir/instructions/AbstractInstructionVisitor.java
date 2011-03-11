@@ -51,15 +51,7 @@ public abstract class AbstractInstructionVisitor implements InstructionVisitor {
 	}
 
 	@Override
-	public void visit(Peek node) {
-	}
-
-	@Override
 	public void visit(PhiAssignment node) {
-	}
-
-	@Override
-	public void visit(Read node) {
 	}
 
 	@Override
@@ -68,10 +60,6 @@ public abstract class AbstractInstructionVisitor implements InstructionVisitor {
 
 	@Override
 	public void visit(Store node) {
-	}
-
-	@Override
-	public void visit(Write node) {
 	}
 
 }

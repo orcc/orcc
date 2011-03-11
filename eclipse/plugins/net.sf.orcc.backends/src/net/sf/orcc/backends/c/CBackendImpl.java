@@ -43,7 +43,6 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
-import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
@@ -202,10 +201,8 @@ public class CBackendImpl extends AbstractBackend {
 
 		ActorVisitor[] transformations = { new TypeSizeTransformation(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new DeadVariableRemoval(false),
-				new RenameTransformation(replacementMap), new PhiRemoval(),
-				// new MultipleArrayAccessTransformation(),
-				new MoveReadsWritesTransformation() };
+				new DeadVariableRemoval(),
+				new RenameTransformation(replacementMap), new PhiRemoval() };
 
 		for (ActorVisitor transformation : transformations) {
 			transformation.visit(actor);

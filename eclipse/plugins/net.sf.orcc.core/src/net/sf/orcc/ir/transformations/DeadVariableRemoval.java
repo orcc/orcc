@@ -41,9 +41,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
 
@@ -56,11 +54,6 @@ import net.sf.orcc.util.OrderedMap;
 public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	protected boolean changed;
-	private boolean keepTokenSwallowerVariable;
-
-	public DeadVariableRemoval(boolean keepTokenSwallowerVariable) {
-		this.keepTokenSwallowerVariable = keepTokenSwallowerVariable;
-	}
 
 	@Override
 	public void visit(Assign assign) {
@@ -129,27 +122,6 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Peek peek) {
-		Variable variable = peek.getTarget();
-		if (!variable.isUsed()) {
-			// do not remove peek to variables that are used by writes
-			if (!variable.isGlobal() && isPort((LocalVariable) variable)) {
-				return;
-			}
-
-			// clean up uses
-			peek.setTarget(null);
-			peek.setPort(null);
-
-			// remove instruction
-			itInstruction.remove();
-
-			procedure.getLocals().remove(variable.getName());
-			changed = true;
-		}
-	}
-
-	@Override
 	public void visit(PhiAssignment phi) {
 		LocalVariable variable = phi.getTarget();
 		if (!variable.isUsed()) {
@@ -195,27 +167,6 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			}
 
 			super.visit(procedure);
-		}
-	}
-
-	@Override
-	public void visit(Read read) {
-		Variable variable = read.getTarget();
-		if (variable != null && !variable.isUsed()
-				&& !keepTokenSwallowerVariable) {
-			// do not remove read to variables that are used by writes
-			if (!variable.isGlobal() && isPort((LocalVariable) variable)) {
-				return;
-			}
-
-			// clean up target
-			read.setTarget(null);
-
-			// do not remove read instruction because it has side-effects!
-
-			// remove target
-			procedure.getLocals().remove(variable.getName());
-			changed = true;
 		}
 	}
 

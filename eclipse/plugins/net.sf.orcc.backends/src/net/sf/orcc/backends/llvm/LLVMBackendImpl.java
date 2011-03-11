@@ -49,7 +49,6 @@ import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.llvm.transformations.AddGEPTransformation;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
-import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
@@ -122,7 +121,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new BoolToIntTransformation(), new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
 				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation(), new AddGEPTransformation() };
+				new AddGEPTransformation() };
 
 		for (ActorVisitor transformation : transformations) {
 			transformation.visit(actor);
@@ -179,11 +178,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		if (actor.isNative()){
+		if (actor.isNative()) {
 			// Do not generate native actor
 			return true;
 		}
-		
+
 		// Create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();

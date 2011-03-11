@@ -61,28 +61,12 @@ public interface InstructionVisitor {
 	public void visit(Load load);
 
 	/**
-	 * Visits a peek instruction.
-	 * 
-	 * @param peek
-	 *            a peek instruction
-	 */
-	public void visit(Peek peek);
-
-	/**
 	 * Visits a phi assignment instruction.
 	 * 
 	 * @param phi
 	 *            a phi assignment instruction
 	 */
 	public void visit(PhiAssignment phi);
-
-	/**
-	 * Visits a read instruction.
-	 * 
-	 * @param read
-	 *            a read instruction
-	 */
-	public void visit(Read read);
 
 	/**
 	 * Visits a return instruction.
@@ -107,13 +91,5 @@ public interface InstructionVisitor {
 	 *            a store instruction
 	 */
 	public void visit(Store store);
-
-	/**
-	 * Visits a write instruction.
-	 * 
-	 * @param write
-	 *            a write instruction
-	 */
-	public void visit(Write write);
 
 }

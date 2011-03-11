@@ -76,14 +76,10 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.ActionList;
@@ -620,7 +616,7 @@ public class ActorTransformer {
 		Context oldContext = astTransformer.newContext(body);
 
 		for (AstInputPattern pattern : astAction.getInputs()) {
-			transformInputPattern(pattern, inputPattern, Read.class);
+			transformInputPattern(pattern, inputPattern, false);
 		}
 
 		astTransformer.transformLocalVariables(astAction.getVariables());
@@ -712,7 +708,7 @@ public class ActorTransformer {
 	 *            an input pattern
 	 */
 	private void transformInputPattern(AstInputPattern pattern,
-			Pattern irInputPattern, Class<?> clasz) {
+			Pattern irInputPattern, boolean peek) {
 		Context context = astTransformer.getContext();
 		Port port = mapPorts.get(pattern.getPort());
 		List<AstVariable> tokens = pattern.getTokens();
@@ -729,24 +725,10 @@ public class ActorTransformer {
 
 		// create port variable
 		LocalVariable variable = createPortVariable(port, totalConsumption);
-		if (clasz == Peek.class) {
+		if (peek) {
 			irInputPattern.setPeeked(port, variable);
 		} else {
 			irInputPattern.setVariable(port, variable);
-		}
-
-		// add the peek/read
-		try {
-			Object obj = clasz.newInstance();
-			AbstractFifoInstruction instr = (AbstractFifoInstruction) obj;
-			instr.setPort(port);
-			instr.setNumTokens(totalConsumption);
-			instr.setTarget(variable);
-			addInstruction(instr);
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
 		}
 
 		// declare tokens
@@ -792,7 +774,7 @@ public class ActorTransformer {
 
 		// add peeks for each pattern of the patterns set
 		for (AstInputPattern pattern : patterns) {
-			transformInputPattern(pattern, inputPattern, Peek.class);
+			transformInputPattern(pattern, inputPattern, true);
 		}
 	}
 
@@ -826,10 +808,6 @@ public class ActorTransformer {
 
 			// store tokens
 			actionStoreTokens(variable, values, repeat);
-
-			// add the write
-			Write write = new Write(port, totalConsumption, variable);
-			addInstruction(write);
 		}
 	}
 

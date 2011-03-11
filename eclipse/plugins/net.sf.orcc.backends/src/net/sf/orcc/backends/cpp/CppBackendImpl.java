@@ -134,7 +134,7 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 
 		ActorVisitor[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(false),
+				new DeadCodeElimination(), new DeadVariableRemoval(),
 				new PhiRemoval() };
 
 		for (ActorVisitor transformation : transformations) {

@@ -44,13 +44,10 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
@@ -245,10 +242,6 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(Peek peek) {
-	}
-
-	@Override
 	public void visit(PhiAssignment phi) {
 		if (visitFull) {
 			for (Expression expr : phi.getValues()) {
@@ -267,10 +260,6 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 		this.procedure = procedure;
 		List<CFGNode> nodes = procedure.getNodes();
 		visit(nodes);
-	}
-
-	@Override
-	public void visit(Read read) {
 	}
 
 	@Override
@@ -320,10 +309,6 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 
 		visit(whileNode.getNodes());
 		visit(whileNode.getJoinNode());
-	}
-
-	@Override
-	public void visit(Write write) {
 	}
 
 }
