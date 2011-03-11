@@ -65,11 +65,6 @@ actor DisplayYUV()
 	*/
 
 	/**
-	 * Sets size of display. Sizes are in (MB or pixels?)
-	 */
-	native procedure displayYUV_setSize(int(size=16) pictureWidth, int(size=16) pictureSize) end
-
-	/**
 	 * Displays a picture. Sizes are in (MB or pixels?). 
 	 */
 	native procedure displayYUV_displayPicture(uint(size=8) pictureBufferY[MAX_WIDTH * MAX_HEIGHT], uint(size=8) pictureBufferU[MAX_WIDTH * MAX_HEIGHT],
@@ -80,13 +75,13 @@ actor DisplayYUV()
 	 */
 	native procedure displayYUV_init() end
 
+
 	uint(size=8)  pictureBufferY[MAX_WIDTH * MAX_HEIGHT];
 	uint(size=8)  pictureBufferU[MAX_WIDTH * MAX_HEIGHT];
 	uint(size=8)  pictureBufferV[MAX_WIDTH * MAX_HEIGHT];
 	int (size=16) pictureWidth       := 0;
 	int (size=16) pictureHeight      := 0;
 	int (size=32) pictureSize        := 0;
-	bool          pictureSizeChanged := false;
 	int (size=32) nbBlockGot         := 0;
 	uint(size=2)  chromaComponent    := 0;
 	uint(size=12) xIdx;
@@ -103,11 +98,8 @@ actor DisplayYUV()
 		Height :[HeightValue]
 			==>
 	do
-		if(WidthValue != pictureWidth or HeightValue != pictureHeight) then
-			pictureWidth       := WidthValue;
-			pictureHeight      := HeightValue;
-			pictureSizeChanged := true;
-		end
+		pictureWidth       := WidthValue;
+		pictureHeight      := HeightValue;
 		pictureSize := pictureWidth * pictureHeight;
 		nbBlockGot  := 0;
 		xIdx := 0;
@@ -156,9 +148,6 @@ actor DisplayYUV()
 	guard
 		nbBlockGot >= pictureSize
 	do
-		if(pictureSizeChanged)then
-			displayYUV_setSize(16 * pictureWidth, 16 * pictureHeight);
-		end
 		displayYUV_displayPicture(pictureBufferY, pictureBufferU, pictureBufferV, 16 * pictureWidth, 16 * pictureHeight);
 	end
 

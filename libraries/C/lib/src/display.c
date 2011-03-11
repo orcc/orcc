@@ -98,7 +98,38 @@ void active_fps_printing(){
 
 static Uint32 t;
 
-void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU, unsigned char *pictureBufferV, unsigned short pictureWidth, unsigned short pictureSize) {
+static void displayYUV_setSize(int width, int height) {
+	if (width == m_width && height == m_height) {
+		// video mode is already good
+		return;
+	}
+
+	m_width = width;
+	m_height = height;
+	
+#ifndef NO_DISPLAY
+	printf("set display to %ix%i\n", width, height);
+
+	m_screen = SDL_SetVideoMode(m_width, m_height, 0, 0);
+	if (m_screen == NULL) {
+		fprintf(stderr, "Couldn't set %ix%ix24 video mode: %s\n", m_width, m_height,
+			SDL_GetError());
+		press_a_key(-1);
+	}
+
+	if (m_overlay != NULL) {
+		SDL_FreeYUVOverlay(m_overlay);
+	}
+
+	m_overlay = SDL_CreateYUVOverlay(m_width, m_height, SDL_YV12_OVERLAY, m_screen);
+	if (m_overlay == NULL) {
+		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
+		press_a_key(-1);
+	}
+#endif
+}
+
+void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU, unsigned char *pictureBufferV, unsigned short pictureWidth, unsigned short pictureHeight) {
 	SDL_Rect rect = { 0, 0, m_width, m_height };
 
 	int t2;
@@ -106,6 +137,7 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pic
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef NO_DISPLAY
+	displayYUV_setSize(pictureWidth, pictureHeight);
 	if (SDL_LockYUVOverlay(m_overlay) < 0) {
 		fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
 		press_a_key(-1);
@@ -195,36 +227,5 @@ void displayYUV_init() {
 
 	atexit(SDL_Quit);
 	atexit(print_fps_avg);
-}
-
-void displayYUV_setSize(int width, int height) {
-	if (width == m_width && height == m_height) {
-		// video mode is already good
-		return;
-	}
-
-	m_width = width;
-	m_height = height;
-	
-#ifndef NO_DISPLAY
-	printf("set display to %ix%i\n", width, height);
-
-	m_screen = SDL_SetVideoMode(m_width, m_height, 0, 0);
-	if (m_screen == NULL) {
-		fprintf(stderr, "Couldn't set %ix%ix24 video mode: %s\n", m_width, m_height,
-			SDL_GetError());
-		press_a_key(-1);
-	}
-
-	if (m_overlay != NULL) {
-		SDL_FreeYUVOverlay(m_overlay);
-	}
-
-	m_overlay = SDL_CreateYUVOverlay(m_width, m_height, SDL_YV12_OVERLAY, m_screen);
-	if (m_overlay == NULL) {
-		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
-		press_a_key(-1);
-	}
-#endif
 }
 
