@@ -65,6 +65,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -188,14 +189,12 @@ public class IRParser {
 	 * @param array
 	 *            an array that contains a variable name and SSA index
 	 * @return the variable associated with the name
-	 * @throws OrccException
-	 *             if a semantic error occurs
 	 */
-	private Variable getVariable(JsonArray array) throws OrccException {
+	private Variable getVariable(JsonArray array) {
 		String varName = getVariableName(array);
 		Variable varDef = variables.get(varName);
 		if (varDef == null) {
-			throw new OrccException("unknown variable: " + varName);
+			throw new OrccRuntimeException("unknown variable: " + varName);
 		}
 		return varDef;
 	}
@@ -222,10 +221,8 @@ public class IRParser {
 	 * @param array
 	 *            an array that defines an action
 	 * @return an action
-	 * @throws OrccException
-	 *             if a semantic error occurs
 	 */
-	private Action parseAction(JsonArray array) throws OrccException {
+	private Action parseAction(JsonArray array) {
 		JsonArray tagArray = array.get(0).getAsJsonArray();
 		Tag tag = new Tag();
 		for (int i = 0; i < tagArray.size(); i++) {
@@ -263,10 +260,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array whose each entry encodes an action
 	 * @return a list of actions
-	 * @throws OrccException
-	 *             if a semantic error occurs
 	 */
-	private List<Action> parseActions(JsonArray array) throws OrccException {
+	private List<Action> parseActions(JsonArray array) {
 		List<Action> actions = new ArrayList<Action>();
 		for (int i = 0; i < array.size(); i++) {
 			actions.add(parseAction(array.get(i).getAsJsonArray()));
@@ -282,11 +277,8 @@ public class IRParser {
 	 *            an array whose first entry is a list of actions and whose
 	 *            second entry is a JSON-encoded FSM
 	 * @return an action scheduler
-	 * @throws OrccException
-	 *             if a semantic error occurs
 	 */
-	private ActionScheduler parseActionScheduler(JsonArray array)
-			throws OrccException {
+	private ActionScheduler parseActionScheduler(JsonArray array) {
 		JsonArray actionArray = array.get(0).getAsJsonArray();
 		List<Action> actions = new ArrayList<Action>();
 		for (JsonElement element : actionArray) {
@@ -368,7 +360,7 @@ public class IRParser {
 		}
 	}
 
-	private Expression parseExpr(JsonElement element) throws OrccException {
+	private Expression parseExpr(JsonElement element) {
 		if (element.isJsonPrimitive()) {
 			JsonPrimitive primitive = element.getAsJsonPrimitive();
 			if (primitive.isBoolean()) {
@@ -396,14 +388,15 @@ public class IRParser {
 			} else if (name.equals(EXPR_LIST)) {
 				return parseExprList(array);
 			} else {
-				throw new OrccException("Invalid expression kind: " + name);
+				throw new OrccRuntimeException("Invalid expression kind: "
+						+ name);
 			}
 		}
 
-		throw new OrccException("Invalid expression: " + element);
+		throw new OrccRuntimeException("Invalid expression: " + element);
 	}
 
-	private BinaryExpr parseExprBinary(JsonArray array) throws OrccException {
+	private BinaryExpr parseExprBinary(JsonArray array) {
 		String name = array.get(1).getAsString();
 		Expression e1 = parseExpr(array.get(2));
 		Expression e2 = parseExpr(array.get(3));
@@ -412,7 +405,7 @@ public class IRParser {
 		return new BinaryExpr(e1, op, e2, type);
 	}
 
-	private ListExpr parseExprList(JsonArray array) throws OrccException {
+	private ListExpr parseExprList(JsonArray array) {
 		int size = array.size();
 		List<Expression> exprs = new ArrayList<Expression>(size - 1);
 		for (int i = 1; i < size; i++) {
@@ -421,7 +414,7 @@ public class IRParser {
 		return new ListExpr(exprs);
 	}
 
-	private List<Expression> parseExprs(JsonArray array) throws OrccException {
+	private List<Expression> parseExprs(JsonArray array) {
 		int length = array.size();
 		List<Expression> exprs = new ArrayList<Expression>(length);
 		for (JsonElement element : array) {
@@ -431,7 +424,7 @@ public class IRParser {
 		return exprs;
 	}
 
-	private UnaryExpr parseExprUnary(JsonArray array) throws OrccException {
+	private UnaryExpr parseExprUnary(JsonArray array) {
 		String name = array.get(1).getAsString();
 		Expression expr = parseExpr(array.get(2));
 		Type type = parseType(array.get(3));
@@ -439,7 +432,7 @@ public class IRParser {
 		return new UnaryExpr(op, expr, type);
 	}
 
-	private FSM parseFSM(JsonArray array) throws OrccException {
+	private FSM parseFSM(JsonArray array) {
 		String initialState = array.get(0).getAsString();
 		FSM fsm = new FSM();
 		JsonArray stateArray = array.get(1).getAsJsonArray();
@@ -477,7 +470,7 @@ public class IRParser {
 	 * @return A {@link List}&lt;{@link GlobalVariable}&gt;.
 	 */
 	private OrderedMap<String, GlobalVariable> parseGlobalVariables(
-			JsonArray arrayGlobals) throws OrccException {
+			JsonArray arrayGlobals) {
 		OrderedMap<String, GlobalVariable> stateVars = new OrderedMap<String, GlobalVariable>();
 		for (JsonElement element : arrayGlobals) {
 			JsonArray array = element.getAsJsonArray();
@@ -512,10 +505,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return an Assign instruction
-	 * @throws OrccException
 	 */
-	private Assign parseInstrAssign(Location loc, JsonArray array)
-			throws OrccException {
+	private Assign parseInstrAssign(Location loc, JsonArray array) {
 		Variable var = getVariable(array.get(2).getAsJsonArray());
 		Expression value = parseExpr(array.get(3));
 		LocalVariable local = (LocalVariable) var;
@@ -532,14 +523,12 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return a Call instruction
-	 * @throws OrccException
 	 */
-	private Call parseInstrCall(Location loc, JsonArray array)
-			throws OrccException {
+	private Call parseInstrCall(Location loc, JsonArray array) {
 		String procName = array.get(2).getAsString();
 		Procedure proc = procs.get(procName);
 		if (proc == null) {
-			throw new OrccException(file, loc, "unknown procedure: \""
+			throw new OrccRuntimeException(file, loc, "unknown procedure: \""
 					+ procName + "\"");
 		}
 
@@ -565,10 +554,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return a Load instruction
-	 * @throws OrccException
 	 */
-	private Load parseInstrLoad(Location loc, JsonArray array)
-			throws OrccException {
+	private Load parseInstrLoad(Location loc, JsonArray array) {
 		LocalVariable target = (LocalVariable) getVariable(array.get(2)
 				.getAsJsonArray());
 		Use source = parseVarUse(array.get(3).getAsJsonArray());
@@ -586,11 +573,9 @@ public class IRParser {
 	 *            location information
 	 * @param array
 	 *            a JSON array
-	 * @return a HasTokens instruction
-	 * @throws OrccException
+	 * @return a Phi instruction
 	 */
-	private PhiAssignment parseInstrPhi(Location loc, JsonArray array)
-			throws OrccException {
+	private PhiAssignment parseInstrPhi(Location loc, JsonArray array) {
 		LocalVariable target = (LocalVariable) getVariable(array.get(2)
 				.getAsJsonArray());
 		List<Expression> values = parseExprs(array.get(3).getAsJsonArray());
@@ -608,10 +593,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return a Return instruction
-	 * @throws OrccException
 	 */
-	private Return parseInstrReturn(Location loc, JsonArray array)
-			throws OrccException {
+	private Return parseInstrReturn(Location loc, JsonArray array) {
 		Expression expr = null;
 		if (!array.get(2).isJsonNull()) {
 			expr = parseExpr(array.get(2));
@@ -627,10 +610,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return a Store instruction
-	 * @throws OrccException
 	 */
-	private Store parseInstrStore(Location loc, JsonArray array)
-			throws OrccException {
+	private Store parseInstrStore(Location loc, JsonArray array) {
 		Variable target = getVariable(array.get(2).getAsJsonArray());
 		List<Expression> indexes = parseExprs(array.get(3).getAsJsonArray());
 		Expression value = parseExpr(array.get(4));
@@ -644,10 +625,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return an Instruction
-	 * @throws OrccException
-	 *             if the instruction type is unknown
 	 */
-	private Instruction parseInstruction(JsonArray array) throws OrccException {
+	private Instruction parseInstruction(JsonArray array) {
 		String name = array.get(0).getAsString();
 		Location loc = parseLocation(array.get(1).getAsJsonArray());
 
@@ -665,11 +644,10 @@ public class IRParser {
 			return parseInstrStore(loc, array);
 		}
 
-		throw new OrccException("unknown instruction type: " + name);
+		throw new OrccRuntimeException("unknown instruction type: " + name);
 	}
 
-	private LocalVariable parseLocalVariable(JsonArray array)
-			throws OrccException {
+	private LocalVariable parseLocalVariable(JsonArray array) {
 		String name = array.get(0).getAsString();
 		boolean assignable = array.get(1).getAsBoolean();
 		int index = array.get(2).getAsInt();
@@ -688,7 +666,7 @@ public class IRParser {
 	 * @return A {@link List}&lt;{@link LocalVariable}&gt;.
 	 */
 	private OrderedMap<String, LocalVariable> parseLocalVariables(
-			JsonArray arrayVars) throws OrccException {
+			JsonArray arrayVars) {
 		OrderedMap<String, LocalVariable> localVars = new OrderedMap<String, LocalVariable>();
 		for (JsonElement element : arrayVars) {
 			JsonArray array = element.getAsJsonArray();
@@ -728,10 +706,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return a CFG node
-	 * @throws OrccException
-	 *             if the node type is unknown
 	 */
-	private CFGNode parseNode(JsonArray array) throws OrccException {
+	private CFGNode parseNode(JsonArray array) {
 		String name = array.get(0).getAsString();
 		Location loc = parseLocation(array.get(1).getAsJsonArray());
 
@@ -743,7 +719,7 @@ public class IRParser {
 			return parseNodeWhile(loc, array);
 		}
 
-		throw new OrccException("unknown node type: " + name);
+		throw new OrccRuntimeException("unknown node type: " + name);
 	}
 
 	/**
@@ -754,11 +730,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return a BlockNode
-	 * @throws OrccException
-	 *             if one instruction could not be parsed
 	 */
-	private BlockNode parseNodeBlock(Location loc, JsonArray array)
-			throws OrccException {
+	private BlockNode parseNodeBlock(Location loc, JsonArray array) {
 		BlockNode join = new BlockNode(loc, procedure);
 		for (JsonElement element : array.get(2).getAsJsonArray()) {
 			join.add(parseInstruction(element.getAsJsonArray()));
@@ -775,11 +748,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return an IfNode
-	 * @throws OrccException
-	 *             if an instruction or a node could not be parsed
 	 */
-	private IfNode parseNodeIf(Location loc, JsonArray array)
-			throws OrccException {
+	private IfNode parseNodeIf(Location loc, JsonArray array) {
 		Expression condition = parseExpr(array.get(2));
 		List<CFGNode> thenNodes = parseNodes(array.get(3).getAsJsonArray());
 		List<CFGNode> elseNodes = parseNodes(array.get(4).getAsJsonArray());
@@ -796,10 +766,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return a list of CFG nodes
-	 * @throws OrccException
-	 *             if a node or an instruction could not be parsed
 	 */
-	private List<CFGNode> parseNodes(JsonArray array) throws OrccException {
+	private List<CFGNode> parseNodes(JsonArray array) {
 		List<CFGNode> nodes = new ArrayList<CFGNode>(array.size());
 		for (JsonElement element : array) {
 			nodes.add(parseNode(element.getAsJsonArray()));
@@ -815,11 +783,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return a WhileNode
-	 * @throws OrccException
-	 *             if an instruction or a node could not be parsed
 	 */
-	private WhileNode parseNodeWhile(Location loc, JsonArray array)
-			throws OrccException {
+	private WhileNode parseNodeWhile(Location loc, JsonArray array) {
 		Expression condition = parseExpr(array.get(2));
 		List<CFGNode> nodes = parseNodes(array.get(3).getAsJsonArray());
 		BlockNode joinNode = (BlockNode) parseNode(array.get(4)
@@ -827,8 +792,7 @@ public class IRParser {
 		return new WhileNode(loc, procedure, condition, nodes, joinNode);
 	}
 
-	private Pattern parsePattern(OrderedMap<String, Port> ports, JsonArray array)
-			throws OrccException {
+	private Pattern parsePattern(OrderedMap<String, Port> ports, JsonArray array) {
 		Pattern pattern = new Pattern();
 		for (int i = 0; i < array.size(); i++) {
 			JsonArray patternArray = array.get(i).getAsJsonArray();
@@ -861,11 +825,8 @@ public class IRParser {
 	 * @param array
 	 *            an array of JSON-encoded ports
 	 * @return an ordered map of ports
-	 * @throws OrccException
-	 *             if a semantic error occurs
 	 */
-	private OrderedMap<String, Port> parsePorts(JsonArray array)
-			throws OrccException {
+	private OrderedMap<String, Port> parsePorts(JsonArray array) {
 		OrderedMap<String, Port> ports = new OrderedMap<String, Port>();
 		for (JsonElement element : array) {
 			JsonArray port = element.getAsJsonArray();
@@ -887,9 +848,8 @@ public class IRParser {
 	 * @param array
 	 *            a JSON array
 	 * @return the procedure parsed
-	 * @throws OrccException
 	 */
-	private Procedure parseProc(JsonArray array) throws OrccException {
+	private Procedure parseProc(JsonArray array) {
 		String name = array.get(0).getAsString();
 		boolean external = array.get(1).getAsBoolean();
 
@@ -925,7 +885,7 @@ public class IRParser {
 	 *            with parameters (int, uint, List).
 	 * @return An {@link Type}.
 	 */
-	private Type parseType(JsonElement element) throws OrccException {
+	private Type parseType(JsonElement element) {
 		if (element.isJsonPrimitive()) {
 			String name = element.getAsString();
 			if (name.equals(TypeBool.NAME)) {
@@ -935,7 +895,7 @@ public class IRParser {
 			} else if (name.equals(TypeVoid.NAME)) {
 				return IrFactory.eINSTANCE.createTypeVoid();
 			} else {
-				throw new OrccException("Unknown type: " + name);
+				throw new OrccRuntimeException("Unknown type: " + name);
 			}
 		} else if (element.isJsonArray()) {
 			JsonArray array = element.getAsJsonArray();
@@ -952,14 +912,14 @@ public class IRParser {
 
 				return IrFactory.eINSTANCE.createTypeList(size, subType);
 			} else {
-				throw new OrccException("Unknown type: " + name);
+				throw new OrccRuntimeException("Unknown type: " + name);
 			}
 		}
 
-		throw new OrccException("Invalid type definition: " + element);
+		throw new OrccRuntimeException("Invalid type definition: " + element);
 	}
 
-	private Use parseVarUse(JsonArray array) throws OrccException {
+	private Use parseVarUse(JsonArray array) {
 		Variable varDef = getVariable(array);
 		return new Use(varDef);
 	}

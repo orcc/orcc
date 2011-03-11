@@ -37,13 +37,11 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
@@ -71,7 +69,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	private InstancePrinter instancePrinter;
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
-	private Map<Action, List<Peek>> peeks = new HashMap<Action, List<Peek>>();
+	//private Map<Action, List<Peek>> peeks = new HashMap<Action, List<Peek>>();
 	private Map<Action, List<Load>> loads = new HashMap<Action, List<Load>>();
 
 	private final Map<String, String> transformations;
@@ -94,8 +92,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorVisitor[] transformations = {
 				new RenameTransformation(this.transformations),
-				new GuardsExtractor(guards, peeks, loads), new PhiRemoval(),
-				new DeadCodeElimination(), new DeadVariableRemoval(false) };
+				/*new GuardsExtractor(guards, peeks, loads),*/ new PhiRemoval(),
+				new DeadCodeElimination(), new DeadVariableRemoval() };
 
 		for (ActorVisitor transformation : transformations) {
 			transformation.visit(actor);
@@ -115,7 +113,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		instancePrinter.setExpressionPrinter(PromelaExprPrinter.class);
 		instancePrinter.setTypePrinter(PromelaTypePrinter.class);
 		instancePrinter.getOptions().put("guards", guards);
-		instancePrinter.getOptions().put("peeks", peeks);
+		//instancePrinter.getOptions().put("peeks", peeks);
 		instancePrinter.getOptions().put("loads", loads);
 
 		List<Actor> actors = network.getActors();

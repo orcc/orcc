@@ -40,11 +40,11 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
 
 /**
  * This class defines template data for the VHDL back-end.
@@ -75,7 +75,13 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 			}
 
 			for (Action action : actor.getActions()) {
-				visit(action.getScheduler());
+				Pattern inputPattern = action.getInputPattern();
+				for (Port port : inputPattern.getPorts()) {
+					if (inputPattern.getPeeked(port) != null) {
+						String name = port.getName() + "_data";
+						signals.add(name);
+					}
+				}
 			}
 
 			if (actor.getActionScheduler().hasFsm()) {
@@ -89,12 +95,6 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 			if (!var.getType().isList() && var.isAssignable()) {
 				signals.add(var.getName());
 			}
-		}
-
-		@Override
-		public void visit(Peek peek) {
-			String name = peek.getPort().getName() + "_data";
-			signals.add(name);
 		}
 
 	}

@@ -110,7 +110,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new XlimInlineTransformation(true, true),
 				new ListOfOneElementToScalarTransformation(),
 				new CustomPeekAdder(), new DeadGlobalElimination(),
-				new DeadCodeElimination(), new XlimDeadVariableRemoval(true),
+				new DeadCodeElimination(), new XlimDeadVariableRemoval(),
 				new ListFlattenTransformation(false, true, false),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(true),
