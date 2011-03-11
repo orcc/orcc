@@ -43,15 +43,15 @@ static Uint32 tInit = 0;
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
 
-static int m_x;
-static int m_y;
-static int m_width;
-static int m_height;
-
 static void press_a_key(int code) {
 	char buf[2];
-	printf("Press enter to continue\n");
-	fgets(buf, 2, stdin);
+	char *ptrBuff = NULL;
+
+	printf("Press a key to continue\n");
+	ptrBuff=fgets(buf, 2, stdin);
+	if(ptrBuff == NULL) {
+		fprintf(stderr,"error when using fgets\n");
+	}
 	exit(code);
 }
 
@@ -99,20 +99,13 @@ void active_fps_printing(){
 static Uint32 t;
 
 static void displayYUV_setSize(int width, int height) {
-	if (width == m_width && height == m_height) {
-		// video mode is already good
-		return;
-	}
-
-	m_width = width;
-	m_height = height;
 	
 #ifndef NO_DISPLAY
 	printf("set display to %ix%i\n", width, height);
 
-	m_screen = SDL_SetVideoMode(m_width, m_height, 0, 0);
+	m_screen = SDL_SetVideoMode(width, height, 0, 0);
 	if (m_screen == NULL) {
-		fprintf(stderr, "Couldn't set %ix%ix24 video mode: %s\n", m_width, m_height,
+		fprintf(stderr, "Couldn't set %ix%ix24 video mode: %s\n", width, height,
 			SDL_GetError());
 		press_a_key(-1);
 	}
@@ -121,7 +114,7 @@ static void displayYUV_setSize(int width, int height) {
 		SDL_FreeYUVOverlay(m_overlay);
 	}
 
-	m_overlay = SDL_CreateYUVOverlay(m_width, m_height, SDL_YV12_OVERLAY, m_screen);
+	m_overlay = SDL_CreateYUVOverlay(width, height, SDL_YV12_OVERLAY, m_screen);
 	if (m_overlay == NULL) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 		press_a_key(-1);
@@ -130,22 +123,28 @@ static void displayYUV_setSize(int width, int height) {
 }
 
 void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU, unsigned char *pictureBufferV, unsigned short pictureWidth, unsigned short pictureHeight) {
-	SDL_Rect rect = { 0, 0, m_width, m_height };
+	static unsigned short lastWidth = 0;
+	static unsigned short lastHeight = 0;
+	SDL_Rect rect = { 0, 0, pictureWidth, pictureHeight };
 
 	int t2;
 	SDL_Event event;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef NO_DISPLAY
-	displayYUV_setSize(pictureWidth, pictureHeight);
+	if((pictureHeight != lastHeight) || (pictureWidth != lastWidth)) {
+		displayYUV_setSize(pictureWidth, pictureHeight);
+		lastHeight = pictureHeight;
+		lastWidth  = pictureWidth;
+	}
 	if (SDL_LockYUVOverlay(m_overlay) < 0) {
 		fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
 		press_a_key(-1);
 	}
 
-	memcpy(m_overlay->pixels[0], pictureBufferY, m_width * m_height );
-	memcpy(m_overlay->pixels[1], pictureBufferV, m_width * m_height / 4 );
-	memcpy(m_overlay->pixels[2], pictureBufferU, m_width * m_height / 4 );
+	memcpy(m_overlay->pixels[0], pictureBufferY, pictureWidth * pictureHeight );
+	memcpy(m_overlay->pixels[1], pictureBufferV, pictureWidth * pictureHeight / 4 );
+	memcpy(m_overlay->pixels[2], pictureBufferU, pictureWidth * pictureHeight / 4 );
 
 	SDL_UnlockYUVOverlay(m_overlay);
 	SDL_DisplayYUVOverlay(m_overlay, &rect);
