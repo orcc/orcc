@@ -15,6 +15,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 ***********************************************************************/
 package std.video;
 
+
 actor DisplayYUV()
 	uint(size=8) Byte,
 	int(size=16) Width,
@@ -24,6 +25,8 @@ actor DisplayYUV()
 
 	uint MAX_WIDTH = 720;
 	uint MAX_HEIGHT = 576;
+	uint MB_WIDTH_LUMA = 16;
+	uint MB_WIDTH_CHROMA = 8;
 	
 	/**
 	
@@ -69,19 +72,25 @@ actor DisplayYUV()
 	/**
 	 * Displays a picture. Sizes are in (MB or pixels?). 
 	 */
-	native procedure displayYUV_displayPicture(uint(size=8) pictureBuffer[3][MAX_WIDTH * MAX_HEIGHT], int(size=16) pictureWidth, int(size=16) pictureSize) end
+	native procedure displayYUV_displayPicture(uint(size=8) pictureBufferY[MAX_WIDTH * MAX_HEIGHT], uint(size=8) pictureBufferU[MAX_WIDTH * MAX_HEIGHT],
+	                                           uint(size=8) pictureBufferV[MAX_WIDTH * MAX_HEIGHT], int(size=16) pictureWidth, int(size=16) pictureSize) end
 
 	/**
 	 * Inits the given display.
 	 */
 	native procedure displayYUV_init() end
 
-	uint(size=8) pictureBuffer[3][MAX_WIDTH * MAX_HEIGHT];
-	int(size=16) pictureWidth       := 0;
-	int(size=16) pictureHeight      := 0;
-	int(size=32) pictureSize        := 0;
-	bool         pictureSizeChanged := false;
-	int(size=32) nbBlockGot         := 0;
+	uint(size=8)  pictureBufferY[MAX_WIDTH * MAX_HEIGHT];
+	uint(size=8)  pictureBufferU[MAX_WIDTH * MAX_HEIGHT];
+	uint(size=8)  pictureBufferV[MAX_WIDTH * MAX_HEIGHT];
+	int (size=16) pictureWidth       := 0;
+	int (size=16) pictureHeight      := 0;
+	int (size=32) pictureSize        := 0;
+	bool          pictureSizeChanged := false;
+	int (size=32) nbBlockGot         := 0;
+	uint(size=2)  chromaComponent    := 0;
+	uint(size=12) xIdx;
+	uint(size=12) yIdx;
 
 
 	initialize ==>
@@ -101,25 +110,46 @@ actor DisplayYUV()
 		end
 		pictureSize := pictureWidth * pictureHeight;
 		nbBlockGot  := 0;
+		xIdx := 0;
+		yIdx := 0;
 	end
 
 	getPixValue.launch.Luma: action Byte :[Bytes] repeat 256 ==>
 	guard
 		nbBlockGot < pictureSize
 	do
-		foreach int i in 0 .. 255
+		foreach int y in 0 .. 15
 		do
-			// pictureBuffer[nbBlockGot][i] := Bytes[i];
+			foreach int x in 0 .. 15
+			do
+				pictureBufferY[(yIdx*MB_WIDTH_LUMA+y)*pictureWidth*MB_WIDTH_LUMA+ xIdx*MB_WIDTH_LUMA+x] := Bytes[y*16+x];
+			end
 		end
-		nbBlockGot := nbBlockGot + 1;
+		chromaComponent := 0;
+		nbBlockGot      := nbBlockGot + 1;
 	end
 
 	getPixValue.launch.Chroma: action Byte :[Bytes] repeat 64 ==>
 	do
-		foreach int i in 0 .. 63
+		foreach int y in 0 .. 7
 		do
-			// pictureBuffer[nbBlockGot - 1][i] := Bytes[i];
+			foreach int x in 0 .. 7
+			do
+				if(chromaComponent=0)then
+					pictureBufferU[(yIdx*MB_WIDTH_CHROMA+y)*pictureWidth*MB_WIDTH_CHROMA+ xIdx*MB_WIDTH_CHROMA+x] := Bytes[y*8+x];
+				else
+					pictureBufferV[(yIdx*MB_WIDTH_CHROMA+y)*pictureWidth*MB_WIDTH_CHROMA + xIdx*MB_WIDTH_CHROMA+x] := Bytes[y*8+x];
+				end
+			end
 		end
+		if(chromaComponent != 0)then
+			xIdx := xIdx + 1;
+			if(xIdx = pictureWidth)then
+				xIdx := 0;
+				yIdx := yIdx + 1;
+			end
+		end
+		chromaComponent := 1;
 	end
 
 	displayPicture: action ==>
@@ -129,7 +159,7 @@ actor DisplayYUV()
 		if(pictureSizeChanged)then
 			displayYUV_setSize(16 * pictureWidth, 16 * pictureHeight);
 		end
-		displayYUV_displayPicture(pictureBuffer, 16 * pictureWidth, 16 * pictureHeight);
+		displayYUV_displayPicture(pictureBufferY, pictureBufferU, pictureBufferV, 16 * pictureWidth, 16 * pictureHeight);
 	end
 
 	schedule fsm GetPictureSize:

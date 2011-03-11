@@ -98,7 +98,7 @@ void active_fps_printing(){
 
 static Uint32 t;
 
-void displayYUV_displayPicture(unsigned char **pictureBuffer, unsigned short pictureWidth, unsigned short pictureSize) {
+void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU, unsigned char *pictureBufferV, unsigned short pictureWidth, unsigned short pictureSize) {
 	SDL_Rect rect = { 0, 0, m_width, m_height };
 
 	int t2;
@@ -111,9 +111,9 @@ void displayYUV_displayPicture(unsigned char **pictureBuffer, unsigned short pic
 		press_a_key(-1);
 	}
 
-	memcpy(m_overlay->pixels[0], pictureBuffer[0], m_width * m_height );
-	memcpy(m_overlay->pixels[1], pictureBuffer[1], m_width * m_height / 4 );
-	memcpy(m_overlay->pixels[2], pictureBuffer[2], m_width * m_height / 4 );
+	memcpy(m_overlay->pixels[0], pictureBufferY, m_width * m_height );
+	memcpy(m_overlay->pixels[1], pictureBufferV, m_width * m_height / 4 );
+	memcpy(m_overlay->pixels[2], pictureBufferU, m_width * m_height / 4 );
 
 	SDL_UnlockYUVOverlay(m_overlay);
 	SDL_DisplayYUVOverlay(m_overlay, &rect);
