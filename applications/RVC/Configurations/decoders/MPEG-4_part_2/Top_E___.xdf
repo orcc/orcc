@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="E___top">
+<XDF name="Top_E___">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -34,7 +34,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="System.Display"/>
+        <Class name="std.video.DisplayYUV"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -43,7 +43,7 @@
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="decoder" dst-port="bits" src="source" src-port="O"/>
-    <Connection dst="display" dst-port="B" src="decoder" src-port="VID"/>
-    <Connection dst="display" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
-    <Connection dst="display" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
+    <Connection dst="display" dst-port="Byte" src="decoder" src-port="VID"/>
+    <Connection dst="display" dst-port="Width" src="decoder" src-port="WIDTH"/>
+    <Connection dst="display" dst-port="Height" src="decoder" src-port="HEIGHT"/>
 </XDF>

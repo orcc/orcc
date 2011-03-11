@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="MVG_top">
+<XDF name="Top_Xilinx">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -16,7 +16,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="MVG_decoder"/>
+        <Class name="Xilinx_decoder"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -34,7 +34,16 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-       <Class name="System.Display"/>
+        <Class name="std.video.DisplayYUV"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="ddr">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.Xilinx.MPEG4_part2.DDRModel"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -43,7 +52,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-		<Class name="Proprietary.Xilinx.MPEG4_part2.Mgnt_Merger_xilinx"/>
+        <Class name="Proprietary.Xilinx.MPEG4_part2.Mgnt_Merger_xilinx"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -52,8 +61,20 @@
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="decoder" dst-port="bits" src="source" src-port="O"/>
-    <Connection dst="display" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
-    <Connection dst="display" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
-    <Connection dst="Merger" dst-port="YUV_i" src="decoder" src-port="VID"/>
-    <Connection dst="display" dst-port="B" src="Merger" src-port="YUV"/>
+    <Connection dst="decoder" dst-port="MCD" src="ddr" src-port="RD"/>
+    <Connection dst="ddr" dst-port="WD" src="decoder" src-port="MBD"/>
+    <Connection dst="ddr" dst-port="WA" src="decoder" src-port="MBA"/>
+    <Connection dst="ddr" dst-port="RA" src="decoder" src-port="MCA"/>
+    <Connection dst="display" dst-port="Width" src="decoder" src-port="WIDTH">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="display" dst-port="Height" src="decoder" src-port="HEIGHT">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="Merger" dst-port="YUV_i" src="decoder" src-port="VIDEO"/>
+    <Connection dst="display" dst-port="Byte" src="Merger" src-port="YUV"/>
 </XDF>
