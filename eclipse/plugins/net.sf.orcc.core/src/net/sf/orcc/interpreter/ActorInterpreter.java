@@ -28,11 +28,14 @@
  */
 package net.sf.orcc.interpreter;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -40,6 +43,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -47,7 +51,23 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.runtime.Fifo_String;
+import net.sf.orcc.runtime.Fifo_boolean;
+import net.sf.orcc.runtime.Fifo_int;
+import net.sf.orcc.util.OrccUtil;
 
 /**
  * This class defines an actor that can be interpreted by calling
@@ -57,7 +77,7 @@ import net.sf.orcc.runtime.Fifo;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ActorInterpreter {
+public class ActorInterpreter extends AbstractActorVisitor {
 
 	/**
 	 * Actor's Intermediate Representation duplication for "inline" visiting
@@ -65,30 +85,33 @@ public class ActorInterpreter {
 	 */
 	private Actor actor;
 
+	private boolean blockReturn;
+
+	protected int branch;
+
 	protected ExpressionEvaluator exprInterpreter;
+
+	/**
+	 * Communication fifos map : key = related I/O port name; value =
+	 * Fifo_int/boolean/String
+	 */
+	private Map<String, Fifo> fifos;
 
 	/**
 	 * Actor's FSM current state
 	 */
 	protected String fsmState;
 
-	/**
-	 * Communication fifos map : key = related I/O port name; value =
-	 * Fifo_int/boolean/String
-	 */
-	private Map<String, Fifo> ioFifos;
-
 	protected ListAllocator listAllocator;
-
-	/**
-	 * Interpretation and evaluation tools
-	 */
-	protected NodeInterpreter nodeInterpreter;
 
 	/**
 	 * Actor's constant parameters to be set at initialization time
 	 */
 	private Map<String, Expression> parameters;
+
+	private OrccProcess process;
+
+	private Expression returnValue;
 
 	/**
 	 * Actor's action scheduler
@@ -109,11 +132,6 @@ public class ActorInterpreter {
 			OrccProcess process) {
 		// Set instance name and actor class definition at parent level
 		this.actor = actor;
-
-		// Build a node interpreter for visiting CFG and instructions
-		nodeInterpreter = new NodeInterpreter();
-		nodeInterpreter.setActor(actor);
-		nodeInterpreter.setProcess(process);
 
 		// Create the List allocator for state and procedure local vars
 		this.listAllocator = new ListAllocator();
@@ -161,7 +179,7 @@ public class ActorInterpreter {
 					.entrySet()) {
 				Port outputPort = entry.getKey();
 				Integer nbOfTokens = entry.getValue();
-				if (!ioFifos.get(outputPort.getName()).hasRoom(nbOfTokens)) {
+				if (!fifos.get(outputPort.getName()).hasRoom(nbOfTokens)) {
 					return false;
 				}
 			}
@@ -176,11 +194,32 @@ public class ActorInterpreter {
 	 */
 	public void execute(Action action) {
 		// allocate patterns
-		allocatePattern(action.getInputPattern());
-		allocatePattern(action.getOutputPattern());
-		
+		Pattern inputPattern = action.getInputPattern();
+		Pattern outputPattern = action.getOutputPattern();
+		allocatePattern(inputPattern);
+		allocatePattern(outputPattern);
+
+		for (Port port : inputPattern.getPorts()) {
+			int numTokens = inputPattern.getNumTokens(port);
+			Fifo fifo = fifos.get(port.getName());
+			peekFifo(inputPattern.getVariable(port).getValue(), fifo, numTokens);
+		}
+
 		// Interpret the whole action
 		interpretProc(action.getBody());
+
+		for (Port port : inputPattern.getPorts()) {
+			int numTokens = inputPattern.getNumTokens(port);
+			Fifo fifo = fifos.get(port.getName());
+			fifo.readEnd(numTokens);
+		}
+
+		for (Port port : outputPattern.getPorts()) {
+			int numTokens = outputPattern.getNumTokens(port);
+			Fifo fifo = fifos.get(port.getName());
+			writeFifo(outputPattern.getVariable(port).getValue(), fifo,
+					numTokens);
+		}
 	}
 
 	/**
@@ -233,6 +272,20 @@ public class ActorInterpreter {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the value returned by the last procedure interpreted, or
+	 * <code>null</code>.
+	 * 
+	 * @return the value returned by the last procedure interpreted
+	 */
+	public Expression getReturnValue() {
+		if (blockReturn) {
+			return returnValue;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -297,13 +350,10 @@ public class ActorInterpreter {
 				local.setValue((Expression) type.accept(listAllocator));
 			}
 		}
+		
+		visit(procedure);
 
-		// Interpret procedure body
-		for (CFGNode node : procedure.getNodes()) {
-			node.accept(nodeInterpreter);
-		}
-
-		return nodeInterpreter.getReturnValue();
+		return returnValue;
 	}
 
 	/**
@@ -317,7 +367,7 @@ public class ActorInterpreter {
 		// check tokens
 		for (Entry<Port, Integer> entry : action.getInputPattern()
 				.getNumTokensMap().entrySet()) {
-			Fifo fifo = ioFifos.get(entry.getKey().getName());
+			Fifo fifo = fifos.get(entry.getKey().getName());
 			boolean hasTok = fifo.hasTokens(entry.getValue());
 			if (!hasTok) {
 				return false;
@@ -331,6 +381,9 @@ public class ActorInterpreter {
 			if (peeked != null) {
 				peeked.setValue((Expression) peeked.getType().accept(
 						listAllocator));
+				int numTokens = pattern.getNumTokens(port);
+				Fifo fifo = fifos.get(port.getName());
+				peekFifo(peeked.getValue(), fifo, numTokens);
 			}
 		}
 
@@ -339,6 +392,34 @@ public class ActorInterpreter {
 			return ((BoolExpr) isSchedulable).getValue();
 		} else {
 			return false;
+		}
+	}
+
+	private void peekFifo(Expression value, Fifo fifo, int numTokens) {
+		if (fifo instanceof Fifo_int) {
+			ListExpr target = (ListExpr) value;
+			int[] intTarget = new int[target.getSize()];
+			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
+					fifo.getReadIndex(numTokens), intTarget, 0, numTokens);
+			for (int i = 0; i < intTarget.length; i++) {
+				target.set(i, new IntExpr(intTarget[i]));
+			}
+		} else if (fifo instanceof Fifo_boolean) {
+			ListExpr target = (ListExpr) value;
+			boolean[] boolTarget = new boolean[target.getSize()];
+			System.arraycopy(((Fifo_boolean) fifo).getReadArray(numTokens),
+					fifo.getReadIndex(numTokens), boolTarget, 0, numTokens);
+			for (int i = 0; i < boolTarget.length; i++) {
+				target.set(i, new BoolExpr(boolTarget[i]));
+			}
+		} else if (fifo instanceof Fifo_String) {
+			ListExpr target = (ListExpr) value;
+			String[] stringTarget = new String[target.getSize()];
+			System.arraycopy(((Fifo_String) fifo).getReadArray(numTokens),
+					fifo.getReadIndex(numTokens), stringTarget, 0, numTokens);
+			for (int i = 0; i < stringTarget.length; i++) {
+				target.set(i, new StringExpr(stringTarget[i]));
+			}
 		}
 	}
 
@@ -366,14 +447,23 @@ public class ActorInterpreter {
 	}
 
 	/**
+	 * Sets the actor attribute.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	public void setActor(Actor actor) {
+		this.actor = actor;
+	}
+
+	/**
 	 * Set the communication FIFOs map for interpreter to be able to execute
 	 * read/write accesses.
 	 * 
 	 * @param fifos
 	 */
 	public void setFifos(Map<String, Fifo> fifos) {
-		ioFifos = fifos;
-		nodeInterpreter.setFifos(ioFifos);
+		this.fifos = fifos;
 	}
 
 	/**
@@ -384,6 +474,244 @@ public class ActorInterpreter {
 	 */
 	public void setFsmState(String newState) {
 		fsmState = newState;
+	}
+
+	public void setProcess(OrccProcess process) {
+		this.process = process;
+	}
+
+	@Override
+	public void visit(Assign instr) {
+		try {
+			LocalVariable target = instr.getTarget();
+			target.setValue((Expression) instr.getValue().accept(
+					exprInterpreter));
+		} catch (OrccRuntimeException e) {
+			String file;
+			if (actor == null) {
+				file = "";
+			} else {
+				file = actor.getFile();
+			}
+
+			throw new OrccRuntimeException(file, instr.getLocation(), "", e);
+		}
+	}
+
+	@Override
+	public void visit(Call call) {
+		// Get called procedure
+		Procedure proc = call.getProcedure();
+
+		// Set the input parameters of the called procedure if any
+		List<Expression> callParams = call.getParameters();
+
+		// Special "print" case
+		if (call.isPrint()) {
+			if (process != null) {
+				for (int i = 0; i < callParams.size(); i++) {
+					if (callParams.get(i).isStringExpr()) {
+						// String characters rework for escaped control
+						// management
+						String str = ((StringExpr) callParams.get(i))
+								.getValue();
+						String unescaped = OrccUtil.getUnescapedString(str);
+						process.write(unescaped);
+					} else {
+						Object value = callParams.get(i)
+								.accept(exprInterpreter);
+						process.write(String.valueOf(value));
+					}
+				}
+			}
+		} else {
+			List<LocalVariable> procParams = proc.getParameters().getList();
+			for (int i = 0; i < callParams.size(); i++) {
+				Variable procVar = procParams.get(i);
+				procVar.setValue((Expression) callParams.get(i).accept(
+						exprInterpreter));
+			}
+
+			// Allocate procedure local List variables
+			for (Variable local : proc.getLocals()) {
+				Type type = local.getType();
+				if (type.isList()) {
+					local.setValue((Expression) type.accept(listAllocator));
+				}
+			}
+
+			// Interpret procedure body
+			for (CFGNode node : proc.getNodes()) {
+				node.accept(this);
+			}
+
+			// Get procedure result if any
+			if (call.hasResult()) {
+				call.getTarget().setValue(returnValue);
+			}
+		}
+	}
+
+	@Override
+	public void visit(IfNode node) {
+		// Interpret first expression ("if" condition)
+		Expression condition = (Expression) node.getValue().accept(
+				exprInterpreter);
+
+		// if (condition is true)
+		if (condition != null && condition.isBooleanExpr()) {
+			int oldBranch = branch;
+			if (((BoolExpr) condition).getValue()) {
+				visit(node.getThenNodes());
+				branch = 0;
+			} else {
+				visit(node.getElseNodes());
+				branch = 1;
+			}
+
+			visit(node.getJoinNode());
+			branch = oldBranch;
+		} else {
+			throw new OrccRuntimeException("Condition not boolean at line "
+					+ node.getLocation().getStartLine() + "\n");
+		}
+	}
+
+	@Override
+	public void visit(Load instr) {
+		LocalVariable target = instr.getTarget();
+		Variable source = instr.getSource().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			target.setValue(source.getValue());
+		} else {
+			try {
+				Expression value = source.getValue();
+				for (Expression index : instr.getIndexes()) {
+					if (value.isListExpr()) {
+						value = ((ListExpr) value).get((IntExpr) index
+								.accept(exprInterpreter));
+					}
+				}
+				target.setValue(value);
+			} catch (IndexOutOfBoundsException e) {
+				throw new OrccRuntimeException(
+						"Array index out of bounds at line "
+								+ instr.getLocation().getStartLine());
+			}
+		}
+	}
+
+	@Override
+	public void visit(PhiAssignment phi) {
+		Expression value = phi.getValues().get(branch);
+		phi.getTarget().setValue((Expression) value.accept(exprInterpreter));
+	}
+
+	@Override
+	public void visit(Return instr) {
+		if (instr.getValue() != null) {
+			this.returnValue = (Expression) instr.getValue().accept(
+					exprInterpreter);
+			this.blockReturn = true;
+		}
+	}
+
+	@Override
+	public void visit(SpecificInstruction instr) {
+		throw new OrccRuntimeException("does not know how to interpret a "
+				+ "specific instruction");
+	}
+
+	@Override
+	public void visit(Store instr) {
+		Variable variable = instr.getTarget();
+		if (instr.getIndexes().isEmpty()) {
+			variable.setValue((Expression) instr.getValue().accept(
+					exprInterpreter));
+		} else {
+			try {
+				Expression target = variable.getValue();
+				Iterator<Expression> it = instr.getIndexes().iterator();
+				IntExpr index = (IntExpr) it.next().accept(exprInterpreter);
+				while (it.hasNext()) {
+					if (target.isListExpr()) {
+						target = ((ListExpr) target).get(index);
+					}
+					index = (IntExpr) it.next().accept(exprInterpreter);
+				}
+
+				if (target.isListExpr()) {
+					Expression value = (Expression) instr.getValue().accept(
+							exprInterpreter);
+					((ListExpr) target).set(index, value);
+				}
+			} catch (IndexOutOfBoundsException e) {
+				throw new OrccRuntimeException(
+						"Array index out of bounds at line "
+								+ instr.getLocation().getStartLine());
+			}
+		}
+	}
+
+	@Override
+	public void visit(WhileNode node) {
+		int oldBranch = branch;
+		branch = 0;
+		visit(node.getJoinNode());
+
+		// Interpret first expression ("while" condition)
+		Expression condition = (Expression) node.getValue().accept(
+				exprInterpreter);
+
+		// while (condition is true) do
+		if (condition != null && condition.isBooleanExpr()) {
+			branch = 1;
+			while (((BoolExpr) condition).getValue()) {
+				visit(node.getNodes());
+				visit(node.getJoinNode());
+
+				// Interpret next value of "while" condition
+				condition = (Expression) node.getValue()
+						.accept(exprInterpreter);
+				if (condition == null || !condition.isBooleanExpr()) {
+					throw new OrccRuntimeException(
+							"Condition not boolean at line "
+									+ node.getLocation().getStartLine() + "\n");
+				}
+			}
+		} else {
+			throw new OrccRuntimeException("Condition not boolean at line "
+					+ node.getLocation().getStartLine() + "\n");
+		}
+
+		branch = oldBranch;
+	}
+
+	private void writeFifo(Expression value, Fifo fifo, int numTokens) {
+		ListExpr target = (ListExpr) value;
+		if (fifo instanceof Fifo_int) {
+			int[] fifoArray = ((Fifo_int) fifo).getWriteArray(numTokens);
+			int index = fifo.getWriteIndex(numTokens);
+			for (Expression obj_elem : target.getValue()) {
+				fifoArray[index++] = ((IntExpr) obj_elem).getIntValue();
+			}
+			((Fifo_int) fifo).writeEnd(numTokens, fifoArray);
+		} else if (fifo instanceof Fifo_boolean) {
+			boolean[] fifoArray = ((Fifo_boolean) fifo)
+					.getWriteArray(numTokens);
+			int index = fifo.getWriteIndex(numTokens);
+			for (Expression obj_elem : target.getValue()) {
+				fifoArray[index++] = ((BoolExpr) obj_elem).getValue();
+			}
+			((Fifo_boolean) fifo).writeEnd(numTokens, fifoArray);
+		} else if (fifo instanceof Fifo_String) {
+			String[] fifoArray = ((Fifo_String) fifo).getWriteArray(numTokens);
+			int index = fifo.getWriteIndex(numTokens);
+			for (Expression obj_elem : target.getValue()) {
+				fifoArray[index++] = ((StringExpr) obj_elem).getValue();
+			}
+			((Fifo_String) fifo).writeEnd(numTokens, fifoArray);
+		}
 	}
 
 }

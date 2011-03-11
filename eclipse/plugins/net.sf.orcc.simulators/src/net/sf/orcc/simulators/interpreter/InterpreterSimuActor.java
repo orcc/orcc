@@ -38,7 +38,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.interpreter.ListAllocator;
-import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -313,11 +312,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 			if (instrStack.size() > 0) {
 				Instruction instr = instrStack.remove(0);
 
-				NodeInterpreter interp = new NodeInterpreter();
-				interp.setActor(actorIR);
-				interp.setFifos(fifos);
-				interp.setProcess(process);
-				instr.accept(interp);
+				System.out.println("TODO");
 
 				if ((instr.getLocation().getStartLine() != lastVisitedLocation
 						.getStartLine())
