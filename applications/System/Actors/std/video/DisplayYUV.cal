@@ -49,9 +49,9 @@ actor DisplayYUV()
 	int (size=16) pictureWidthLuma   := 0;
 	int (size=16) pictureHeightLuma  := 0;
 	uint(size=12) xIdxLuma;
-	uint(size=12) yOffLuma;
-	uint(size=12) yOffChroma;
+	uint(size=32) yOffLuma;
 	uint(size=12) xIdxChroma;
+	uint(size=32) yOffChroma;
 
 
 	initialize ==>
@@ -78,7 +78,7 @@ actor DisplayYUV()
 	guard
 		nbBlockGot < pictureSizeInMb
 	var
-		uint(size=12) yOff := yOffLuma,
+		uint(size=32) yOff := yOffLuma,
 		uint(size=8)  idx  := 0
 	do
 		nbBlockGot      := nbBlockGot + 1;
@@ -97,7 +97,7 @@ actor DisplayYUV()
 
 	getPixValue.launch.Chroma: action Byte :[Bytes] repeat 64 ==>
 	var
-		uint(size=12) yOff := yOffChroma,
+		uint(size=32) yOff := yOffChroma,
 		uint(size=6)  idx  := 0
 	do
 		foreach int y in 0 .. 7
@@ -118,8 +118,8 @@ actor DisplayYUV()
 			if(xIdxLuma = pictureWidthLuma)then
 				xIdxLuma   := 0;
 				xIdxChroma := 0;
-				yOffLuma   := yOffLuma + MB_SIZE_LUMA*pictureWidthLuma;
-				yOffChroma := yOffChroma + MB_SIZE_CHROMA*pictureWidthLuma/2;
+				yOffLuma   := yOffLuma   + MB_SIZE_LUMA   * pictureWidthLuma;
+				yOffChroma := yOffChroma + MB_SIZE_CHROMA * pictureWidthLuma/2;
 			end
 		end
 		chromaComponent := 1;
