@@ -54,8 +54,8 @@
     <Connection dst="AVCDecoder" dst-port="bits8" src="source" src-port="O"/>
     <Connection dst="Merger" dst-port="U" src="AVCDecoder" src-port="Display_Cb"/>
     <Connection dst="Merger" dst-port="V" src="AVCDecoder" src-port="Display_Cr"/>
-    <Connection dst="display" dst-port="B" src="Merger" src-port="YUV"/>
-    <Connection dst="display" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
-    <Connection dst="display" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
     <Connection dst="Merger" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
+    <Connection dst="display" dst-port="Byte" src="Merger" src-port="YUV"/>
+    <Connection dst="display" dst-port="Width" src="AVCDecoder" src-port="Width"/>
+    <Connection dst="display" dst-port="Height" src="AVCDecoder" src-port="Height"/>
 </XDF>

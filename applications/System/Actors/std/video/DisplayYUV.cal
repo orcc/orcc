@@ -25,44 +25,8 @@ actor DisplayYUV()
 
 	uint MAX_WIDTH = 720;
 	uint MAX_HEIGHT = 576;
-	uint MB_WIDTH_LUMA = 16;
-	uint MB_WIDTH_CHROMA = 8;
-	
-	/**
-	
-	C code for write_mb
-	
-	cnt = 0;
-	base = m_y * m_width + m_x;
-
-	for (i = 0; i < 16; i++) {
-		for (j = 0; j < 16; j++) {
-			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
-			int idx = base + i * m_width + j;
-			cnt++;
-			img_buf_y[idx] = tok;
-		}
-	}
-
-	base = m_y / 2 * m_width / 2 + m_x / 2;
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
-			int idx = base + i * m_width / 2 + j;
-			cnt++;
-			img_buf_u[idx] = tok;
-		}
-	}
-
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = fifo_i8_read_1(display_B, fifo_display_B_id);
-			int idx = base + i * m_width / 2 + j;
-			cnt++;
-			img_buf_v[idx] = tok;
-		}
-	}
-	*/
+	uint MB_SIZE_LUMA = 16;
+	uint MB_SIZE_CHROMA = 8;
 
 	/**
 	 * Displays a picture. Sizes are in (MB or pixels?). 
@@ -77,15 +41,17 @@ actor DisplayYUV()
 
 
 	uint(size=8)  pictureBufferY[MAX_WIDTH * MAX_HEIGHT];
-	uint(size=8)  pictureBufferU[MAX_WIDTH * MAX_HEIGHT];
-	uint(size=8)  pictureBufferV[MAX_WIDTH * MAX_HEIGHT];
-	int (size=16) pictureWidth       := 0;
-	int (size=16) pictureHeight      := 0;
-	int (size=32) pictureSize        := 0;
+	uint(size=8)  pictureBufferU[MAX_WIDTH * MAX_HEIGHT / 4];
+	uint(size=8)  pictureBufferV[MAX_WIDTH * MAX_HEIGHT / 4];
+	int (size=32) pictureSizeInMb    := 0;
 	int (size=32) nbBlockGot         := 0;
 	uint(size=2)  chromaComponent    := 0;
-	uint(size=12) xIdx;
-	uint(size=12) yIdx;
+	int (size=16) pictureWidthLuma   := 0;
+	int (size=16) pictureHeightLuma  := 0;
+	uint(size=12) xIdxLuma;
+	uint(size=12) yOffLuma;
+	uint(size=12) yOffChroma;
+	uint(size=12) xIdxChroma;
 
 
 	initialize ==>
@@ -98,47 +64,62 @@ actor DisplayYUV()
 		Height :[HeightValue]
 			==>
 	do
-		pictureWidth       := WidthValue;
-		pictureHeight      := HeightValue;
-		pictureSize := pictureWidth * pictureHeight;
-		nbBlockGot  := 0;
-		xIdx := 0;
-		yIdx := 0;
+		pictureWidthLuma  := WidthValue  * 16;
+		pictureHeightLuma := HeightValue * 16;
+		pictureSizeInMb   := WidthValue * HeightValue;
+		nbBlockGot := 0;
+		xIdxLuma   := 0;
+		xIdxChroma := 0;
+		yOffLuma   := 0;
+		yOffChroma := 0;
 	end
 
 	getPixValue.launch.Luma: action Byte :[Bytes] repeat 256 ==>
 	guard
-		nbBlockGot < pictureSize
+		nbBlockGot < pictureSizeInMb
+	var
+		uint(size=12) yOff := yOffLuma,
+		uint(size=8)  idx  := 0
 	do
+		nbBlockGot      := nbBlockGot + 1;
 		foreach int y in 0 .. 15
 		do
-			foreach int x in 0 .. 15
+			foreach int x in xIdxLuma .. xIdxLuma + 15
 			do
-				pictureBufferY[(yIdx*MB_WIDTH_LUMA+y)*pictureWidth*MB_WIDTH_LUMA+ xIdx*MB_WIDTH_LUMA+x] := Bytes[y*16+x];
+				pictureBufferY[yOff +x] := Bytes[idx];
+				idx := idx + 1;
 			end
+			yOff := yOff + pictureWidthLuma;
 		end
+		xIdxLuma := xIdxLuma + MB_SIZE_LUMA;
 		chromaComponent := 0;
-		nbBlockGot      := nbBlockGot + 1;
 	end
 
 	getPixValue.launch.Chroma: action Byte :[Bytes] repeat 64 ==>
+	var
+		uint(size=12) yOff := yOffChroma,
+		uint(size=6)  idx  := 0
 	do
 		foreach int y in 0 .. 7
 		do
-			foreach int x in 0 .. 7
+			foreach int x in xIdxChroma .. xIdxChroma + 7
 			do
 				if(chromaComponent=0)then
-					pictureBufferU[(yIdx*MB_WIDTH_CHROMA+y)*pictureWidth*MB_WIDTH_CHROMA+ xIdx*MB_WIDTH_CHROMA+x] := Bytes[y*8+x];
+					pictureBufferU[yOff + x] := Bytes[idx];
 				else
-					pictureBufferV[(yIdx*MB_WIDTH_CHROMA+y)*pictureWidth*MB_WIDTH_CHROMA + xIdx*MB_WIDTH_CHROMA+x] := Bytes[y*8+x];
+					pictureBufferV[yOff + x] := Bytes[idx];
 				end
+				idx := idx + 1;
 			end
+			yOff := yOff + pictureWidthLuma/2;
 		end
 		if(chromaComponent != 0)then
-			xIdx := xIdx + 1;
-			if(xIdx = pictureWidth)then
-				xIdx := 0;
-				yIdx := yIdx + 1;
+			xIdxChroma := xIdxChroma + MB_SIZE_CHROMA;
+			if(xIdxLuma = pictureWidthLuma)then
+				xIdxLuma   := 0;
+				xIdxChroma := 0;
+				yOffLuma   := yOffLuma + MB_SIZE_LUMA*pictureWidthLuma;
+				yOffChroma := yOffChroma + MB_SIZE_CHROMA*pictureWidthLuma/2;
 			end
 		end
 		chromaComponent := 1;
@@ -146,9 +127,9 @@ actor DisplayYUV()
 
 	displayPicture: action ==>
 	guard
-		nbBlockGot >= pictureSize
+		nbBlockGot >= pictureSizeInMb
 	do
-		displayYUV_displayPicture(pictureBufferY, pictureBufferU, pictureBufferV, 16 * pictureWidth, 16 * pictureHeight);
+		displayYUV_displayPicture(pictureBufferY, pictureBufferU, pictureBufferV, pictureWidthLuma, pictureHeightLuma);
 	end
 
 	schedule fsm GetPictureSize:
