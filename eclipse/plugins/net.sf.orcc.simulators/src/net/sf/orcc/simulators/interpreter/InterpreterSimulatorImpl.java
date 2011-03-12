@@ -86,8 +86,6 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 		if ("Source".equals(simpleName)) {
 			simuActorInstance = new InterpreterSimuSource(instanceId,
 					stimulusFile, process);
-		} else if ("Display".equals(simpleName)) {
-			simuActorInstance = new InterpreterSimuDisplay(instanceId, process);
 		} else if ("ReadImage".equals(simpleName)) {
 			simuActorInstance = new InterpreterSimuReadImage(instanceId,
 					stimulusFile, process);

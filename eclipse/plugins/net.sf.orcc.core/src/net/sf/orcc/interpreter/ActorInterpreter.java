@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.interpreter;
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.GlobalVariable;
@@ -49,11 +49,16 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.expr.ExpressionInterpreter;
+import net.sf.orcc.ir.expr.FloatExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
@@ -78,6 +83,58 @@ import net.sf.orcc.util.OrccUtil;
  * 
  */
 public class ActorInterpreter extends AbstractActorVisitor {
+
+	private class JavaExpressionConverter implements ExpressionInterpreter {
+
+		@Override
+		public Object interpret(BinaryExpr expr, Object... args) {
+			return null;
+		}
+
+		@Override
+		public Object interpret(BoolExpr expr, Object... args) {
+			return expr.getValue();
+		}
+
+		@Override
+		public Object interpret(FloatExpr expr, Object... args) {
+			return expr.getValue();
+		}
+
+		@Override
+		public Object interpret(IntExpr expr, Object... args) {
+			return expr.getIntValue();
+		}
+
+		@Override
+		public Object interpret(ListExpr expr, Object... args) {
+			Object[] values = new Object[expr.getValue().size()];
+			int i = 0;
+			for (Expression subExpr : expr.getValue()) {
+				if (subExpr != null) {
+					values[i] = subExpr.accept(this);
+				}
+				i++;
+			}
+			return values;
+		}
+
+		@Override
+		public Object interpret(StringExpr expr, Object... args) {
+			return expr.getValue();
+		}
+
+		@Override
+		public Object interpret(UnaryExpr expr, Object... args) {
+			return null;
+		}
+
+		@Override
+		public Object interpret(VarExpr expr, Object... args) {
+			return expr.getVar().getVariable().getValue().accept(this);
+		}
+
+	}
 
 	/**
 	 * Actor's Intermediate Representation duplication for "inline" visiting
@@ -206,7 +263,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 		}
 
 		// Interpret the whole action
-		interpretProc(action.getBody());
+		visit(action.getBody());
 
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
@@ -322,7 +379,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 			// Get initializing procedure if any
 			for (Action action : actor.getInitializes()) {
 				if (isSchedulable(action)) {
-					interpretProc(action.getBody());
+					visit(action.getBody());
 					continue;
 				}
 			}
@@ -333,30 +390,6 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	/**
-	 * Interprets the given procedure.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 * 
-	 * @return an object which contains procedure returned value
-	 */
-	protected Expression interpretProc(Procedure procedure) {
-		// Don't mind about procedure parameters (already set)
-
-		// Allocate local List variables
-		for (Variable local : procedure.getLocals()) {
-			Type type = local.getType();
-			if (type.isList()) {
-				local.setValue((Expression) type.accept(listAllocator));
-			}
-		}
-		
-		visit(procedure);
-
-		return returnValue;
-	}
-
-	/**
 	 * Returns true if the given action is schedulable.
 	 * 
 	 * @param action
@@ -364,18 +397,17 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	 * @return true if the given action is schedulable
 	 */
 	protected boolean isSchedulable(Action action) {
+		Pattern pattern = action.getInputPattern();
 		// check tokens
-		for (Entry<Port, Integer> entry : action.getInputPattern()
-				.getNumTokensMap().entrySet()) {
-			Fifo fifo = fifos.get(entry.getKey().getName());
-			boolean hasTok = fifo.hasTokens(entry.getValue());
+		for (Port port : pattern.getPorts()) {
+			Fifo fifo = fifos.get(port.getName());
+			boolean hasTok = fifo.hasTokens(pattern.getNumTokens(port));
 			if (!hasTok) {
 				return false;
 			}
 		}
 
 		// allocates peeked variables
-		Pattern pattern = action.getInputPattern();
 		for (Port port : pattern.getPorts()) {
 			Variable peeked = pattern.getPeeked(port);
 			if (peeked != null) {
@@ -387,9 +419,9 @@ public class ActorInterpreter extends AbstractActorVisitor {
 			}
 		}
 
-		Expression isSchedulable = interpretProc(action.getScheduler());
-		if (isSchedulable != null && isSchedulable.isBooleanExpr()) {
-			return ((BoolExpr) isSchedulable).getValue();
+		visit(action.getScheduler());
+		if (returnValue != null && returnValue.isBooleanExpr()) {
+			return ((BoolExpr) returnValue).getValue();
 		} else {
 			return false;
 		}
@@ -541,9 +573,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 			}
 
 			// Interpret procedure body
-			for (CFGNode node : proc.getNodes()) {
-				node.accept(this);
-			}
+			visit(proc);
 
 			// Get procedure result if any
 			if (call.hasResult()) {
@@ -605,6 +635,43 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	public void visit(PhiAssignment phi) {
 		Expression value = phi.getValues().get(branch);
 		phi.getTarget().setValue((Expression) value.accept(exprInterpreter));
+	}
+
+	@Override
+	public void visit(Procedure procedure) {
+		if (procedure.isNative()) {
+			int numParams = procedure.getParameters().getLength();
+			Class<?>[] parameterTypes = new Class<?>[numParams];
+			Object[] args = new Object[numParams];
+			int i = 0;
+			for (LocalVariable parameter : procedure.getParameters()) {
+				args[i] = parameter.getValue().accept(
+						new JavaExpressionConverter());
+				parameterTypes[i] = args[i].getClass();
+
+				i++;
+			}
+
+			try {
+				Class<?> clasz = Class.forName(actor.getName());
+				Method method = clasz.getMethod(procedure.getName(),
+						parameterTypes);
+				method.invoke(null, args);
+			} catch (Exception e) {
+				throw new OrccRuntimeException(
+						"exception during native procedure call", e);
+			}
+		} else {
+			// Allocate local List variables
+			for (Variable local : procedure.getLocals()) {
+				Type type = local.getType();
+				if (type.isList()) {
+					local.setValue((Expression) type.accept(listAllocator));
+				}
+			}
+
+			super.visit(procedure);
+		}
 	}
 
 	@Override
