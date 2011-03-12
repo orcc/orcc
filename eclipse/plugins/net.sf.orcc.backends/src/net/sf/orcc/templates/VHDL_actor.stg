@@ -128,12 +128,12 @@ stateConst(variable) ::= <<
 <if(variable.type.list)>
 --
 <variable.name>_wren_p1    \<= '0';
-<variable.name>_address_p1 \<= (others =\> '0');;
-<variable.name>_data_p1    \<= (others =\> '0');;
+<variable.name>_address_p1 \<= (others =\> '0');
+<variable.name>_data_p1    \<= (others =\> '0');
 <variable.name>_q_p1       \<= '0';
 <variable.name>_wren_p2    \<= '0';
-<variable.name>_address_p2 \<= (others =\> '0');;
-<variable.name>_data_p2    \<= (others =\> '0');;
+<variable.name>_address_p2 \<= (others =\> '0');
+<variable.name>_data_p2    \<= (others =\> '0');
 <variable.name>_q_p2       \<= '0';
 <variable.name>_rd_en      \<= '0';
 --
@@ -242,40 +242,6 @@ else
 endif>
 >>
 
-printPeek(peek) ::= <<
-
-<if(peek.unit)
-  ><if(peek.port.type.bool)
-     ><procedure.name>_<peek.target> := <peek.port>_data;<
-    else
-     ><if(peek.port.type.int)
-        ><procedure.name>_<peek.target> := to_integer(signed(<peek.port>_data));<
-       else
-        ><procedure.name>_<peek.target> := to_integer(unsigned(<peek.port>_data));<
-       endif><
-    endif><
-else
-  >-- peek multiple token not coded yet<
-endif
->
-
->>
-
-printRead(read) ::= <<
-
-<if(read.unit)
-  ><if(read.port.type.bool)
-     ><procedure.name>_<read.target> := <read.port>_data;<
-   elseif(read.port.type.int)
-     ><procedure.name>_<read.target> := to_integer(signed(<read.port>_data));<
-   elseif (read.port.type.uint)
-     ><procedure.name>_<read.target> := to_integer(unsigned(<read.port>_data));<
-   endif><
-else
-  >-- read multiple token not coded yet<
-endif>
->>
-
 // a "return" must be transformed when the attribute "transformReturn"
 // is present, which normally only occurs when printActionSchedulerInline
 // is called
@@ -307,18 +273,49 @@ printStore(store) ::= <<
 <endif>
 >>
 
-printWrite(write) ::= <<
+/////////////////////
+// port read/write //
 
-<if(write.port.type.bool)
-><write.port>_idata \<= <procedure.name>_<write.target>;<
-elseif(write.port.type.int)
-><write.port>_idata \<= std_logic_vector(to_signed(<procedure.name>_<write.target>, <write.port.type.size>));<
+printRead(procedure, port, variable) ::= <<
+<if(port)
+><if(port.type.bool)
+><procedure.name>_<variable.name> := <port.name>_data;<
+elseif(port.type.int)
+><procedure.name>_<variable.name> := to_integer(signed(<port.name>_data));<
+elseif(port.type.uint)
+><procedure.name>_<variable.name> := to_integer(unsigned(<port.name>_data));<
+endif
+><endif>
+>>
+
+printWrite(procedure, port, variable) ::= <<
+<if(port.type.bool)
+><port.name>_idata \<= <procedure.name>_<variable.name>;<
+elseif(port.type.int)
+><port.name>_idata \<= std_logic_vector(to_signed(<procedure.name>_<variable.name>, <port.type.size>));<
 else
-><write.port>_idata \<= std_logic_vector(to_unsigned(<procedure.name>_<write.target>, <write.port.type.size>));<
+><port.name>_idata \<= std_logic_vector(to_unsigned(<procedure.name>_<variable.name>, <port.type.size>));<
 endif>
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// RAM
+///////////////////////////////////////////////////////////////////////////////
 
+printRamRead(ramRead) ::= <<
+
+-- RAM READ
+>>
+
+printRamWrite(ramWrite) ::= <<
+
+-- RAM WRITE
+>>
+
+printRamSetAddress(ramSetAddress) ::= <<
+
+-- RAM SET ADDRESS
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
@@ -329,11 +326,12 @@ if (instr.assign)><printAssign(assign=instr)><
 elseif (instr.assignIndex)><printAssignIndex(assignIndex=instr)><
 elseif (instr.call)><printCall(call=instr)><
 elseif (instr.load)><printLoad(load=instr)><
-elseif (instr.peek)><printPeek(peek=instr)><
-elseif (instr.read)><printRead(read=instr)><
 elseif (instr.return)><printReturn(return=instr)><
 elseif (instr.store)><printStore(store=instr)><
-elseif (instr.write)><printWrite(write=instr)><
+
+elseif (instr.ramRead)><printRamRead(ramRead=instr)><
+elseif (instr.ramWrite)><printRamWrite(ramWrite=instr)><
+elseif (instr.ramSetAddress)><printRamSetAddress(ramSetAddress=instr)><
 endif>}>
 >>
 
@@ -449,13 +447,6 @@ printLocals(procedure) ::= <<
 endif>
 >>
 
-// prints the body of the given action "inline" (ie not within a function)
-printActionBodyInline(action) ::= <<
-<printProcedure(procedure=action.body, transformReturn="true")>
->>
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Management of Outputs 
 ///////////////////////////////////////////////////////////////////////////////
@@ -495,11 +486,12 @@ variable <action.scheduler>_go : std_logic;
 }>--
 begin
   <actor.actions: {action|-- test if "<action>" action is schedulable
+<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.peekedMap.(port))>}>
 <printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n\n">
 
   --
   -- Test the action's inputs to fire (or not) an action  
-  <actor.actions : {actions|<actions>_go \<= '0';}; separator="\n">
+  <actor.actions : {action|<action>_go \<= '0';}; separator="\n">
   <actor.inputs.list :{port|<port.name>_ack \<= '0';}; separator="\n">  
 <if(actor.actionScheduler.fsm)    
 >  <printActionFireFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)><
@@ -517,18 +509,18 @@ printActionFire(action) ::= <<
 ((isSchedulable_<action>_go <action.inputPattern.keys : {port| and <port.name>_send }>) = '1') then
 <if(action.inputPattern.keys)
 >< if(action.outputPattern.keys)
->    <action>_go  \<= isSchedulable_<action>_go and <action.outputPattern.keys : {port|<port.name>_rdy}; separator=" and ">;
+>    <action>_go \<= isSchedulable_<action>_go and <action.outputPattern.keys : {port|<port.name>_rdy}; separator=" and ">;
     <action.inputPattern.keys : {
       port|<port.name>_ack \<= isSchedulable_<action>_go and <action.outputPattern.keys : {port|<port.name>_rdy}; separator=" and ">} ; separator=";\n">;<
   else
->    <action>_go  \<= isSchedulable_<action>_go;
+>    <action>_go \<= isSchedulable_<action>_go;
     <action.inputPattern.keys : {port|<port.name>_ack \<= isSchedulable_<action>_go;} ; separator="\n"><
   endif><
 else
 >< if(action.outputPattern.keys)
->    <action>_go  \<= isSchedulable_<action>_go and <action.outputPattern.keys : {port|<port.name>_rdy}; separator=" and ">;<
+>    <action>_go \<= isSchedulable_<action>_go and <action.outputPattern.keys : {port|<port.name>_rdy}; separator=" and ">;<
   else
->    <action>_go  \<= isSchedulable_<action>_go;<
+>    <action>_go \<= isSchedulable_<action>_go;<
   endif><
 endif>  
 >>
@@ -595,10 +587,19 @@ end process <actor.simpleName>_execute;
 
 >>
 
+printActionBody(action) ::= <<
+<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.variableMap.(port))>}
+><printProcedure(procedure=action.body, transformReturn="true")
+><action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.variableMap.(port))>}
+>
+>>
+
 actionTestScheduler(action) ::= <<
 (<action>_go = '1') then
   -- body of "<action>" action
-  <printActionBodyInline(action)>  --<actor.outputs.list: writeManagement()>
+  <printActionBody(action)>
+  --
+  <actor.outputs.list: writeManagement()>
 >>
 
 writeManagement(port) ::= <<
