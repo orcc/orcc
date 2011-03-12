@@ -114,11 +114,7 @@ public class Store extends AbstractInstruction implements TargetContainer,
 		return indexes;
 	}
 
-	/**
-	 * Returns the target of this Store. The target is a {@link Use}.
-	 * 
-	 * @return the target of this Store
-	 */
+	@Override
 	public Variable getTarget() {
 		return target;
 	}
