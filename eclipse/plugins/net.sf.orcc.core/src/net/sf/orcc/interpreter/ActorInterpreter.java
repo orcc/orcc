@@ -142,8 +142,6 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	 */
 	private Actor actor;
 
-	private boolean blockReturn;
-
 	protected int branch;
 
 	protected ExpressionEvaluator exprInterpreter;
@@ -168,7 +166,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 	private OrccProcess process;
 
-	private Expression returnValue;
+	protected Expression returnValue;
 
 	/**
 	 * Actor's action scheduler
@@ -190,18 +188,15 @@ public class ActorInterpreter extends AbstractActorVisitor {
 		// Set instance name and actor class definition at parent level
 		this.actor = actor;
 
-		// Create the List allocator for state and procedure local vars
-		this.listAllocator = new ListAllocator();
-
-		// Create the expression evaluator
-		this.exprInterpreter = new ExpressionEvaluator();
+		listAllocator = new ListAllocator();
+		exprInterpreter = new ExpressionEvaluator();
 
 		// Get actor FSM properties
-		this.sched = actor.getActionScheduler();
+		sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
-			this.fsmState = sched.getFsm().getInitialState().getName();
+			fsmState = sched.getFsm().getInitialState().getName();
 		} else {
-			this.fsmState = "IDLE";
+			fsmState = "IDLE";
 		}
 
 		// Get the parameters value from instance map
@@ -214,7 +209,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	 * @param pattern
 	 *            a pattern
 	 */
-	private void allocatePattern(Pattern pattern) {
+	protected void allocatePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Variable variable = pattern.getVariable(port);
 			variable.setValue((Expression) variable.getType().accept(
@@ -329,20 +324,6 @@ public class ActorInterpreter extends AbstractActorVisitor {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Returns the value returned by the last procedure interpreted, or
-	 * <code>null</code>.
-	 * 
-	 * @return the value returned by the last procedure interpreted
-	 */
-	public Expression getReturnValue() {
-		if (blockReturn) {
-			return returnValue;
-		} else {
-			return null;
-		}
 	}
 
 	/**
@@ -677,9 +658,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	@Override
 	public void visit(Return instr) {
 		if (instr.getValue() != null) {
-			this.returnValue = (Expression) instr.getValue().accept(
-					exprInterpreter);
-			this.blockReturn = true;
+			returnValue = (Expression) instr.getValue().accept(exprInterpreter);
 		}
 	}
 

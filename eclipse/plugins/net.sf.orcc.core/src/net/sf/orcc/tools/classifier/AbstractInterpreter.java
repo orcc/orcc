@@ -29,6 +29,7 @@
 package net.sf.orcc.tools.classifier;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -36,10 +37,18 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
  * This class defines an abstract interpreter of an actor. It refines the
@@ -52,6 +61,143 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	private Action scheduledAction;
 
+	private Map<Port, Expression> configuration;
+
+	private Map<Port, Boolean> portRead;
+
+	private boolean schedulableMode;
+
+	/**
+	 * Sets schedulable mode. When in schedulable mode, evaluations of null
+	 * expressions is forbidden.
+	 * 
+	 * @param schedulableMode
+	 */
+	public void setSchedulableMode(boolean schedulableMode) {
+		this.schedulableMode = schedulableMode;
+		((AbstractExpressionEvaluator) exprInterpreter)
+				.setSchedulableMode(schedulableMode);
+	}
+
+	@Override
+	public void visit(IfNode node) {
+		// Interpret first expression ("if" condition)
+		Expression condition = (Expression) node.getValue().accept(
+				exprInterpreter);
+
+		int oldBranch = branch;
+		if (condition != null && condition.isBooleanExpr()) {
+			if (((BoolExpr) condition).getValue()) {
+				visit(node.getThenNodes());
+				branch = 0;
+			} else {
+				visit(node.getElseNodes());
+				branch = 1;
+			}
+
+		} else {
+			if (schedulableMode) {
+				// only throw exception in schedulable mode
+				throw new OrccRuntimeException("null condition");
+			}
+
+			branch = -1;
+		}
+
+		visit(node.getJoinNode());
+		branch = oldBranch;
+	}
+
+	@Override
+	public void visit(Load instr) {
+		LocalVariable target = instr.getTarget();
+		Variable source = instr.getSource().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			target.setValue(source.getValue());
+		} else {
+			Expression value = source.getValue();
+			for (Expression index : instr.getIndexes()) {
+				if (value != null && value.isListExpr()) {
+					index = (Expression) index.accept(exprInterpreter);
+					if (index == null) {
+						value = null;
+						break;
+					} else {
+						value = ((ListExpr) value).get((IntExpr) index);
+					}
+				}
+			}
+			target.setValue(value);
+		}
+	}
+
+	@Override
+	public void visit(PhiAssignment phi) {
+		if (branch != -1) {
+			super.visit(phi);
+		}
+	}
+
+	@Override
+	public void visit(Store instr) {
+		Variable variable = instr.getTarget();
+		if (instr.getIndexes().isEmpty()) {
+			variable.setValue((Expression) instr.getValue().accept(
+					exprInterpreter));
+		} else {
+			Expression target = variable.getValue();
+			Iterator<Expression> it = instr.getIndexes().iterator();
+			IntExpr index = (IntExpr) it.next().accept(exprInterpreter);
+
+			while (it.hasNext()) {
+				if (target != null && target.isListExpr() && index != null) {
+					target = ((ListExpr) target).get(index);
+				}
+				index = (IntExpr) it.next().accept(exprInterpreter);
+			}
+
+			Expression value = (Expression) instr.getValue().accept(
+					exprInterpreter);
+			if (target != null && target.isListExpr() && index != null) {
+				((ListExpr) target).set(index, value);
+			}
+		}
+	}
+
+	@Override
+	public void visit(WhileNode node) {
+		int oldBranch = branch;
+		branch = 0;
+		visit(node.getJoinNode());
+
+		// Interpret first expression ("while" condition)
+		Expression condition = (Expression) node.getValue().accept(
+				exprInterpreter);
+
+		if (condition != null && condition.isBooleanExpr()) {
+			branch = 1;
+			while (((BoolExpr) condition).getValue()) {
+				visit(node.getNodes());
+				visit(node.getJoinNode());
+
+				// Interpret next value of "while" condition
+				condition = (Expression) node.getValue()
+						.accept(exprInterpreter);
+				if (schedulableMode
+						&& (condition == null || !condition.isBooleanExpr())) {
+					throw new OrccRuntimeException(
+							"Condition not boolean at line "
+									+ node.getLocation().getStartLine() + "\n");
+				}
+			}
+		} else if (schedulableMode) {
+			// only throw exception in schedulable mode
+			throw new OrccRuntimeException("condition is data-dependent");
+		}
+
+		branch = oldBranch;
+	}
+
 	/**
 	 * Creates a new abstract interpreter.
 	 * 
@@ -63,7 +209,6 @@ public class AbstractInterpreter extends ActorInterpreter {
 	public AbstractInterpreter(Actor actor) {
 		super(new HashMap<String, Expression>(), actor, null);
 
-		nodeInterpreter = new AbstractNodeInterpreter();
 		exprInterpreter = new AbstractExpressionEvaluator();
 	}
 
@@ -74,9 +219,37 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	@Override
 	public void execute(Action action) {
+		// allocate patterns
+		Pattern inputPattern = action.getInputPattern();
+		Pattern outputPattern = action.getOutputPattern();
+		allocatePattern(inputPattern);
+		allocatePattern(outputPattern);
+
 		scheduledAction = action;
-		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(false);
-		super.execute(action);
+		setSchedulableMode(false);
+
+		for (Port port : inputPattern.getPorts()) {
+			int numTokens = inputPattern.getNumTokens(port);
+			if (configuration != null && configuration.containsKey(port)
+					&& !portRead.get(port)) {
+				// Should we use a range of values in the spirit of
+				// "Accurate Static Branch Prediction by Value Range Propagation"?
+
+				// in the meantime, we only use the configuration value in the
+				// Peek
+
+				portRead.put(port, true);
+			}
+
+			port.increaseTokenConsumption(numTokens);
+		}
+
+		visit(action.getBody());
+
+		for (Port port : outputPattern.getPorts()) {
+			int numTokens = outputPattern.getNumTokens(port);
+			port.increaseTokenProduction(numTokens);
+		}
 	}
 
 	/**
@@ -100,17 +273,24 @@ public class AbstractInterpreter extends ActorInterpreter {
 			if (peeked != null) {
 				peeked.setValue((Expression) peeked.getType().accept(
 						listAllocator));
+
+				if (configuration != null && configuration.containsKey(port)
+						&& !portRead.get(port)) {
+					ListExpr target = (ListExpr) peeked.getValue();
+					target.set(0, configuration.get(port));
+				}
 			}
 		}
 
 		// check isSchedulable procedure
-		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(true);
-		Expression result = interpretProc(action.getScheduler());
-		if (result == null) {
+		setSchedulableMode(true);
+		visit(action.getScheduler());
+		if (returnValue == null) {
 			throw new OrccRuntimeException("could not determine if action "
 					+ action.toString() + " is schedulable");
 		}
-		return result.isBooleanExpr() && ((BoolExpr) result).getValue();
+		return returnValue.isBooleanExpr()
+				&& ((BoolExpr) returnValue).getValue();
 	}
 
 	/**
@@ -120,8 +300,11 @@ public class AbstractInterpreter extends ActorInterpreter {
 	 *            a configuration as a map of ports and values
 	 */
 	public void setConfiguration(Map<Port, Expression> configuration) {
-		((AbstractNodeInterpreter) nodeInterpreter)
-				.setConfiguration(configuration);
+		this.configuration = configuration;
+		portRead = new HashMap<Port, Boolean>(configuration.size());
+		for (Port port : configuration.keySet()) {
+			portRead.put(port, false);
+		}
 	}
 
 }

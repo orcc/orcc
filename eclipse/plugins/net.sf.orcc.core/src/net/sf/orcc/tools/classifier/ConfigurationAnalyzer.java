@@ -49,7 +49,6 @@ import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 
 /**
