@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.backends.vhdl.instructions.SplitInstruction;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -52,20 +53,20 @@ import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
 
 /**
- * This class contains code that is useful for transformations that split
- * actions in several actions. These transformations are
- * WhileSplitTransformation (WST) and MultipleArrayAccessTransformation (MAAT).
+ * This class defines a transformation that splits actions each time a
+ * SplitInstruction is encountered.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class ActionSplitter extends AbstractActorVisitor {
+public class ActionSplitter extends AbstractActorVisitor {
 
 	/**
 	 * This class contains an abstract branch visitor.
@@ -73,7 +74,7 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	protected class AbstractBranchVisitor extends AbstractActorVisitor {
+	public class AbstractBranchVisitor extends AbstractActorVisitor {
 
 		/**
 		 * name of the branch being visited
@@ -83,22 +84,22 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 		/**
 		 * action being visited
 		 */
-		protected Action currentAction;
+		private Action currentAction;
 
 		/**
 		 * action to visit next (may be null)
 		 */
-		protected Action nextAction;
+		private Action nextAction;
 
 		/**
 		 * name of the source state
 		 */
-		protected String sourceName;
+		private String sourceName;
 
 		/**
 		 * name of the target state
 		 */
-		protected String targetName;
+		private String targetName;
 
 		public AbstractBranchVisitor(String sourceName, String targetName) {
 			this.sourceName = sourceName;
@@ -112,7 +113,7 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 		 *            action name
 		 * @return a new empty action with the given name
 		 */
-		final protected Action createNewAction(Expression condition, String name) {
+		private Action createNewAction(Expression condition, String name) {
 			// scheduler
 			Procedure scheduler = new Procedure("isSchedulable_" + name,
 					new Location(), IrFactory.eINSTANCE.createTypeBool());
@@ -122,7 +123,7 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 			result.setIndex(1);
 			scheduler.getLocals().remove(result.getBaseName());
 			scheduler.getLocals().put(result.getName(), result);
-			
+
 			BlockNode block = new BlockNode(scheduler);
 			block.add(new Assign(result, condition));
 			block.add(new Return(new VarExpr(new Use(result))));
@@ -153,7 +154,7 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 		 * 
 		 * @return a new unique state name
 		 */
-		final protected String getNewStateName() {
+		private String getNewStateName() {
 			String stateName = branchName;
 			Integer count = stateNames.get(stateName);
 			if (count == null) {
@@ -172,7 +173,7 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 		 * @param newAction
 		 *            the newly-created action
 		 */
-		final protected void replaceTransition(Action newAction) {
+		private void replaceTransition(Action newAction) {
 			// add an FSM if the actor does not have one
 			if (fsm == null) {
 				addFsm();
@@ -186,17 +187,27 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 			fsm.addTransition(newStateName, newAction, targetName);
 		}
 
+		@Override
+		public void visit(SpecificInstruction instruction) {
+			if (instruction instanceof SplitInstruction) {
+				splitAction();
+			}
+		}
+
 		/**
 		 * Split the current action
 		 */
-		protected void splitAction() {
+		private void splitAction() {
 			String newActionName = getNewStateName();
 
 			// create new action
 			nextAction = createNewAction(new BoolExpr(true), newActionName);
 
-			// move code
+			// remove the SplitInstruction
 			itInstruction.previous();
+			itInstruction.remove();
+			
+			// move code
 			CodeMover codeMover = new CodeMover();
 			codeMover.setTargetProcedure(nextAction.getBody());
 			codeMover.moveInstructions(itInstruction);
@@ -219,7 +230,7 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 		/**
 		 * Visits the next action(s) without updating the branch name.
 		 */
-		protected void visitInBranch() {
+		private void visitInBranch() {
 			while (nextAction != null) {
 				currentAction = nextAction;
 				nextAction = null;
@@ -247,7 +258,7 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 	 * @param actionScheduler
 	 *            action scheduler
 	 */
-	final public void addFsm() {
+	private void addFsm() {
 		ActionScheduler scheduler = actor.getActionScheduler();
 
 		fsm = new FSM();
@@ -261,74 +272,11 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 		scheduler.setFsm(fsm);
 	}
 
-	/**
-	 * Adds a transition <code>source</code> -&gt; <code>target</code> with the
-	 * given action.
-	 * 
-	 * @param newAction
-	 *            the newly-created action
-	 */
-	final public void addTransition(String sourceName, String targetName,
-			Action newAction) {
-		// add an FSM if the actor does not have one
-		if (fsm == null) {
-			addFsm();
-		}
-
-		// add state
-		fsm.addState(sourceName);
-		fsm.addState(targetName);
-
-		// update transitions
-		fsm.addTransition(sourceName, newAction, targetName);
-	}
-
-	/**
-	 * Removes the transition <code>source</code> -&gt; <code>target</code> with
-	 * the given action.
-	 * 
-	 * @param source
-	 *            name of source state
-	 * @param action
-	 *            an action
-	 */
-	final public void removeTransition(String source, Action action) {
-		// add an FSM if the actor does not have one
-		if (fsm == null) {
-			addFsm();
-		}
-
-		// remove transition
-		fsm.removeTransition(source, action);
-	}
-
-	/**
-	 * Replaces the target of the transition from the state whose name is given
-	 * by <code>source</code> and whose action equals to the given action by a
-	 * target state with the given name.
-	 * 
-	 * @param source
-	 *            name of source state
-	 * @param action
-	 *            action associated with the transition
-	 * @param newTargetName
-	 *            name of the new target state
-	 */
-	final public void replaceTarget(String source, Action action,
-			String newTargetName) {
-		// add an FSM if the actor does not have one
-		if (fsm == null) {
-			addFsm();
-		}
-
-		// remove transition
-		fsm.replaceTarget(source, action, newTargetName);
-	}
-
 	@Override
 	public void visit(Actor actor) {
 		this.actor = actor;
 		stateNames = new HashMap<String, Integer>();
+		visitAllActions();
 	}
 
 	/**
@@ -342,13 +290,16 @@ public abstract class ActionSplitter extends AbstractActorVisitor {
 	 * @param action
 	 *            action associated with transition
 	 */
-	abstract protected void visit(String sourceName, String targetName,
-			Action action);
+	private void visit(String sourceName, String targetName, Action action) {
+		new AbstractBranchVisitor(sourceName, targetName).visit(action);
+		DataMover mover = new DataMover(actor);
+		mover.visit(action);
+	}
 
 	/**
 	 * Visits all actions of this actor.
 	 */
-	protected final void visitAllActions() {
+	private void visitAllActions() {
 		fsm = actor.getActionScheduler().getFsm();
 		if (fsm == null) {
 			// no FSM: simply visit all the actions

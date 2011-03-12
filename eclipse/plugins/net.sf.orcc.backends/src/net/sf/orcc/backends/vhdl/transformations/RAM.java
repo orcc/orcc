@@ -36,38 +36,45 @@ package net.sf.orcc.backends.vhdl.transformations;
  */
 public class RAM {
 
-	private boolean dataReadyPort1;
+	private boolean lastAccessRead;
 
-	private boolean dataReadyPort2;
+	private int lastPortUsed;
+
+	private boolean waitCycleNeeded;
 
 	/**
-	 * @return the dataReadyPort1
+	 * Creates a new RAM.
 	 */
-	public boolean isDataReadyPort1() {
-		return dataReadyPort1;
+	public RAM() {
+		lastPortUsed = 1;
 	}
 
-	/**
-	 * @return the dataReadyPort2
-	 */
-	public boolean isDataReadyPort2() {
-		return dataReadyPort2;
+	public int getLastPortUsed() {
+		return lastPortUsed;
 	}
 
-	/**
-	 * @param dataReadyPort1
-	 *            the dataReadyPort1 to set
-	 */
-	public void setDataReadyPort1(boolean dataReadyPort1) {
-		this.dataReadyPort1 = dataReadyPort1;
+	public boolean isLastAccessRead() {
+		return lastAccessRead;
 	}
 
-	/**
-	 * @param dataReadyPort2
-	 *            the dataReadyPort2 to set
-	 */
-	public void setDataReadyPort2(boolean dataReadyPort2) {
-		this.dataReadyPort2 = dataReadyPort2;
+	public boolean isWaitCycleNeeded() {
+		return waitCycleNeeded;
+	}
+
+	public void setLastAccessRead(boolean lastAccessRead) {
+		this.lastAccessRead = lastAccessRead;
+	}
+
+	public void setLastPortUsed(int lastPortUsed) {
+		if (lastPortUsed != 1 && lastPortUsed != 2) {
+			throw new IllegalArgumentException();
+		}
+
+		this.lastPortUsed = lastPortUsed;
+	}
+
+	public void setWaitCycleNeeded(boolean waitCycleNeeded) {
+		this.waitCycleNeeded = waitCycleNeeded;
 	}
 
 }

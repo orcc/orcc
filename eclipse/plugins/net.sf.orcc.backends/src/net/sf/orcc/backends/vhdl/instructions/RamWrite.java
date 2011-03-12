@@ -28,13 +28,29 @@
  */
 package net.sf.orcc.backends.vhdl.instructions;
 
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.util.CommonNodeOperations;
+
 /**
  * This class defines a specific instruction that writes data to a RAM.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class RamWrite extends RamInstruction {
+public class RamWrite extends RamInstruction implements ValueContainer {
+
+	private Expression value;
+
+	@Override
+	public Expression getValue() {
+		return value;
+	}
+
+	@Override
+	public void internalSetValue(Expression value) {
+		this.value = value;
+	}
 
 	/**
 	 * Returns <code>true</code>. Intended for use in template.
@@ -43,6 +59,11 @@ public class RamWrite extends RamInstruction {
 	 */
 	public boolean isRamWrite() {
 		return true;
+	}
+
+	@Override
+	public void setValue(Expression value) {
+		CommonNodeOperations.setValue(this, value);
 	}
 
 }

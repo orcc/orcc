@@ -277,6 +277,7 @@ printStore(store) ::= <<
 // port read/write //
 
 printRead(procedure, port, variable) ::= <<
+
 <if(port)
 ><if(port.type.bool)
 ><procedure.name>_<variable.name> := <port.name>_data;<
@@ -289,6 +290,7 @@ endif
 >>
 
 printWrite(procedure, port, variable) ::= <<
+
 <if(port.type.bool)
 ><port.name>_idata \<= <procedure.name>_<variable.name>;<
 elseif(port.type.int)
@@ -304,17 +306,18 @@ endif>
 
 printRamRead(ramRead) ::= <<
 
--- RAM READ
+<ramRead.target.name> := <ramRead.variable.name>_q_p<ramRead.port>;
 >>
 
 printRamWrite(ramWrite) ::= <<
 
--- RAM WRITE
+<ramWrite.variable.name>_data_p<ramWrite.port> \<= <ramWrite.value>;
+<ramWrite.variable.name>_wren_p<ramWrite.port> \<= '1';
 >>
 
 printRamSetAddress(ramSetAddress) ::= <<
 
--- RAM SET ADDRESS
+<ramSetAddress.variable.name>_address_p<ramSetAddress.port> \<= <ramSetAddress.indexes: {index | std_logic_vector(to_unsigned(<index>, <index.type.size>))}; separator=" & ">;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

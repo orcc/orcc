@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.vhdl.instructions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
@@ -48,7 +47,6 @@ public class RamSetAddress extends RamInstruction {
 	 * Creates a new RamSetAddress
 	 */
 	public RamSetAddress(List<Expression> indexes) {
-		indexes = new ArrayList<Expression>(1);
 		setIndexes(indexes);
 	}
 

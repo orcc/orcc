@@ -28,13 +28,29 @@
  */
 package net.sf.orcc.backends.vhdl.instructions;
 
+import net.sf.orcc.ir.LocalTargetContainer;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.util.CommonNodeOperations;
+
 /**
  * This class defines a specific instruction that reads data from a RAM.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class RamRead extends RamInstruction {
+public class RamRead extends RamInstruction implements LocalTargetContainer {
+
+	private LocalVariable target;
+
+	@Override
+	public LocalVariable getTarget() {
+		return target;
+	}
+
+	@Override
+	public void internalSetTarget(LocalVariable target) {
+		this.target = target;
+	}
 
 	/**
 	 * Returns <code>true</code>. Intended for use in template.
@@ -43,6 +59,11 @@ public class RamRead extends RamInstruction {
 	 */
 	public boolean isRamRead() {
 		return true;
+	}
+
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
 	}
 
 }

@@ -49,6 +49,7 @@ import net.sf.orcc.backends.Printer;
 import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
+import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.ArrayToRamTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
@@ -147,6 +148,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 				// transform multiple array accesses
 				new ArrayToRamTransformation(),
+				new ActionSplitter(),
 
 				// transform "b := a > b;" statements to if conditionals
 				new BoolExprTransformation(),
