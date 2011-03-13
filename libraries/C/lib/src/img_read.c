@@ -79,9 +79,9 @@ static int idx_pixel = 0;
 static void write_pixels(struct schedinfo_s *si) {
 	int ports = 0;
 
-	int num_red = fifo_u8_get_room(img_read_R);
-	int num_green = fifo_u8_get_room(img_read_G);
-	int num_blue = fifo_u8_get_room(img_read_B);
+	int num_red = fifo_u8_get_room(img_read_R, img_read_R->readers_nb);
+	int num_green = fifo_u8_get_room(img_read_G, img_read_G->readers_nb);
+	int num_blue = fifo_u8_get_room(img_read_B, img_read_B->readers_nb);
 
 	int num_colors = MIN(MIN(MIN(num_red, num_green), num_blue), count - idx_pixel);
 

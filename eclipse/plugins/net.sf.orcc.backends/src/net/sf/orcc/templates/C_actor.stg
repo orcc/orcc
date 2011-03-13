@@ -340,7 +340,7 @@ printWriteTokensFunction(port) ::= <<
 
 static void write_<port.name>() {
 	index_<port.name> = <getPortName(port)>-\>write_ind;
-	numFree_<port.name> = index_<port.name> + fifo<printMedium(port)>_<port.type>_get_room(<getPortName(port)>);
+	numFree_<port.name> = index_<port.name> + fifo<printMedium(port)>_<port.type>_get_room(<getPortName(port)>, NUM_READERS_<port.name>);
 }
 
 static void write_end_<port.name>() {
@@ -567,9 +567,14 @@ printFifoSize(size) ::= <<
 <if(size)><size><else>SIZE<endif>
 >>
 
+getNumReaders(instance, port) ::= <<
+<length(options.network.outgoingMap.(instance).(port))>
+>>
+
 printInputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numTokens_<port.name>;
+#define NUM_READERS_<port.name> <getNumReaders(instance=options.network.predecessorsMap.(instance).(port), port=options.network.incomingMap.(instance).(port).source)>
 #define SIZE_<port.name> <printFifoSize(options.network.incomingMap.(instance).(port).size)>
 #define tokens_<port.name> <getPortName(port)>-\>contents
 
@@ -579,6 +584,7 @@ static unsigned int numTokens_<port.name>;
 printOutputPort(port) ::= <<
 static unsigned int index_<port.name>;
 static unsigned int numFree_<port.name>;
+#define NUM_READERS_<port.name> <getNumReaders(instance, port)>
 #define SIZE_<port.name> <printFifoSize(first(options.network.outgoingMap.(instance).(port)).size)>
 #define tokens_<port.name> <getPortName(port)>-\>contents
 

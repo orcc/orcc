@@ -92,7 +92,7 @@ void source_scheduler(struct schedinfo_s *si) {
 	int n;
 
 	if (!(stop && genetic)) {
-		while (fifo_i8_has_room(source_O, 1) && !(stop && genetic)) {
+		while (fifo_i8_has_room(source_O, source_O->readers_nb, 1) && !(stop && genetic)) {
 			unsigned char buf[1];
 			n = fread(&buf, 1, 1, F);
 			if (n < 1) {

@@ -84,10 +84,10 @@ void source_no_loop_scheduler(struct schedinfo_s *si) {
 		
 		if (!stop){
 			int ports = 0;			
-			if (!fifo_i8_has_room(source_no_loop_O, 1)) {
+			if (!fifo_i8_has_room(source_no_loop_O, source_no_loop_O->readers_nb, 1)) {
 				ports |= 0x01;
 			}
-			if (!fifo_i32_has_room(source_no_loop_EOF, 1)) {
+			if (!fifo_i32_has_room(source_no_loop_EOF, source_no_loop_EOF->readers_nb, 1)) {
 				ports |= 0x02;
 			}
 			if (ports != 0) {
@@ -118,7 +118,7 @@ void source_no_loop_scheduler(struct schedinfo_s *si) {
 			}
 		}else{
 			int ports = 0;
-			if (!fifo_i32_has_room(source_no_loop_EOF, 1)) {
+			if (!fifo_i32_has_room(source_no_loop_EOF, source_no_loop_EOF->readers_nb, 1)) {
 				ports |= 0x02;
 			}
 			if (ports != 0) {

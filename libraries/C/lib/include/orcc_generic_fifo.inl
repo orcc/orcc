@@ -39,9 +39,9 @@ DECL unsigned int FIFO_GET_NUM_TOKENS(T)(struct FIFO_S(T) *fifo, unsigned int re
 	return fifo->write_ind - fifo->read_inds[reader_id];
 }
 
-DECL unsigned int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int n) {
+DECL unsigned int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_readers, unsigned int n) {
 	unsigned int i;
-	for(i = 0; i < fifo->readers_nb; i++) {
+	for(i = 0; i < num_readers; i++) {
 		if (fifo->size + 1 - (fifo->write_ind - fifo->read_inds[i]) <= n) {
 			return 0;
 		}
@@ -50,11 +50,11 @@ DECL unsigned int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int n) {
 	return 1;
 }
 
-DECL unsigned int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo) {
+DECL unsigned int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo, unsigned int num_readers) {
 	unsigned int i;
 	unsigned int max_num_tokens = 0;
 
-	for (i = 0; i < fifo->readers_nb; i++) {
+	for (i = 0; i < num_readers; i++) {
 		unsigned int num_tokens = fifo->write_ind - fifo->read_inds[i];
 		max_num_tokens = max_num_tokens > num_tokens ? max_num_tokens : num_tokens;
 	}
