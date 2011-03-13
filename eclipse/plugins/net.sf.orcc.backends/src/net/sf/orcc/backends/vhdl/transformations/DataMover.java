@@ -31,6 +31,7 @@ package net.sf.orcc.backends.vhdl.transformations;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.backends.vhdl.instructions.RamRead;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
@@ -46,7 +47,7 @@ import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines methods to move data from one procedure to another by
- * Updates the data dependencies of the given procedure.
+ * updating the data dependencies of the given procedure.
  * 
  * <p>
  * This method will import any variable used by expressions in the procedure, by
@@ -170,6 +171,10 @@ public class DataMover extends AbstractActorVisitor {
 					// registers loaded variables into the variableMap
 					variableMap.put(variable, (GlobalVariable) load.getSource()
 							.getVariable());
+				}
+			} else if (instruction instanceof RamRead) {
+				if (targetBlock == instruction.getBlock()) {
+					return;
 				}
 			}
 

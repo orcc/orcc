@@ -278,6 +278,11 @@ public class ActionSplitter extends AbstractActorVisitor {
 		this.actor = actor;
 		stateNames = new HashMap<String, Integer>();
 		visitAllActions();
+
+		DataMover mover = new DataMover(actor);
+		for (Action action : actor.getActions()) {
+			mover.visit(action);
+		}
 	}
 
 	/**
@@ -293,8 +298,6 @@ public class ActionSplitter extends AbstractActorVisitor {
 	 */
 	private void visit(String sourceName, String targetName, Action action) {
 		new AbstractBranchVisitor(sourceName, targetName).visit(action);
-		DataMover mover = new DataMover(actor);
-		mover.visit(action);
 	}
 
 	/**
