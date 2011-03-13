@@ -129,11 +129,11 @@ stateConst(variable) ::= <<
 <variable.name>_wren_p1    \<= '0';
 <variable.name>_address_p1 \<= (others =\> '0');
 <variable.name>_data_p1    \<= (others =\> '0');
-<variable.name>_q_p1       \<= '0';
+<variable.name>_q_p1       \<= (others =\> '0');
 <variable.name>_wren_p2    \<= '0';
 <variable.name>_address_p2 \<= (others =\> '0');
 <variable.name>_data_p2    \<= (others =\> '0');
-<variable.name>_q_p2       \<= '0';
+<variable.name>_q_p2       \<= (others =\> '0');
 --
 <elseif(variable.initialized)>
 <variable.name> \<= <variable.initialValue>;
@@ -259,7 +259,7 @@ endif
 // port read/write //
 
 printRead(procedure, port, variable) ::= <<
-<if(port)
+<if(variable)
 ><if(port.type.bool)
 ><procedure.name>_<variable.name> := <port.name>_data;<
 elseif(port.type.int)
@@ -285,11 +285,24 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 printRamRead(ramRead) ::= <<
-<ramRead.target.name> := <ramRead.variable.name>_q_p<ramRead.port>;
+<ramRead.target.name> := <if(ramRead.variable.type.type.bool)
+><ramRead.value>;<
+elseif(ramRead.variable.type.type.int)
+>to_integer(signed(<ramRead.variable.name>_q_p<ramRead.port>));<
+else
+>to_integer(unsigned(<ramRead.variable.name>_q_p<ramRead.port>));<
+endif>
 >>
 
 printRamWrite(ramWrite) ::= <<
-<ramWrite.variable.name>_data_p<ramWrite.port> \<= <ramWrite.value>;
+<ramWrite.variable.name>_data_p<ramWrite.port> \<= <
+if(ramWrite.variable.type.type.bool)
+><ramWrite.value>;
+<elseif(ramWrite.variable.type.type.int)
+>std_logic_vector(to_signed(<ramWrite.value>, <ramWrite.variable.type.type.size>));
+<else
+>std_logic_vector(to_unsigned(<ramWrite.value>, <ramWrite.variable.type.type.size>));
+<endif>
 <ramWrite.variable.name>_wren_p<ramWrite.port> \<= '1';
 >>
 
@@ -487,19 +500,19 @@ end process;
 
 // prints the condition on the ack and go signals according to the input and output pattern
 printActionFire(action) ::= <<
-((isSchedulable_<action>_go <action.inputPattern.keys : {port| and <port.name>_send }>) = '1') then
-<if(action.inputPattern.keys)
->< if(action.outputPattern.keys)
->    <action>_go \<= isSchedulable_<action>_go and <action.outputPattern.keys : {port|<port.name>_rdy}; separator=" and ">;
-    <action.inputPattern.keys : {
-      port|<port.name>_ack \<= isSchedulable_<action>_go and <action.outputPattern.keys : {port|<port.name>_rdy}; separator=" and ">} ; separator=";\n">;<
+((isSchedulable_<action>_go <action.inputPattern.ports : {port| and <port.name>_send }>) = '1') then
+<if(action.inputPattern.ports)
+>< if(action.outputPattern.ports)
+>    <action>_go \<= isSchedulable_<action>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">;
+    <action.inputPattern.ports : {
+      port|<port.name>_ack \<= isSchedulable_<action>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">} ; separator=";\n">;<
   else
 >    <action>_go \<= isSchedulable_<action>_go;
-    <action.inputPattern.keys : {port|<port.name>_ack \<= isSchedulable_<action>_go;} ; separator="\n"><
+    <action.inputPattern.ports : {port|<port.name>_ack \<= isSchedulable_<action>_go;} ; separator="\n"><
   endif><
 else
->< if(action.outputPattern.keys)
->    <action>_go \<= isSchedulable_<action>_go and <action.outputPattern.keys : {port|<port.name>_rdy}; separator=" and ">;<
+>< if(action.outputPattern.ports)
+>    <action>_go \<= isSchedulable_<action>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">;<
   else
 >    <action>_go \<= isSchedulable_<action>_go;<
   endif><
