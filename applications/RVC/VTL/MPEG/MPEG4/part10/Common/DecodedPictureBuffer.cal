@@ -34,7 +34,7 @@ actor DecodedPictureBuffer ( int MB_WIDTH )
 		:
 
 	int (size=32) SENT_DONE = -2;
-	uint(size=32) NB_PIC    = 17;
+	uint(size=32) NB_PIC    = 16;
 	uint(size=32) SZ_NBPIC  = 6; /* >= log2(NB_PIC) */
 
 	uint(size=8)  pictureBuffer[NB_PIC][MAX_PICWIDTH_PX + 4*MB_WIDTH_MAX]

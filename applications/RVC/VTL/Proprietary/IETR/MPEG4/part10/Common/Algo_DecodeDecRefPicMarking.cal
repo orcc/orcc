@@ -86,12 +86,11 @@ actor Algo_DecodeDecRefPicMarking()
 
 	NalRefIdc.IsEqualTo0.IsNewPic: action
 				==>
-			Mmco :[NotIdr , adaptive_ref_pic_marking_mode_flag]
+			Mmco :[adaptive_ref_pic_marking_mode_flag]
 		guard
 			nal_ref_idc = 0,
 			is_new_pic
 		var
-			uint(size=31) NotIdr = 1,
 			uint(size=31) adaptive_ref_pic_marking_mode_flag = 0
 		end
 

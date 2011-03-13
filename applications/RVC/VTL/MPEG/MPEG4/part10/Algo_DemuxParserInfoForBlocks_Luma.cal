@@ -115,14 +115,23 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			MbLocation   :[MbLocxInPic , MbLocyInPic],
 			NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail]
 				==>
-			NeighbourAvail4x4 :[NeighbourA_Avail && (is_intra[(curr_pos-1) & 0x3F] or not (c_intra_flag)) , NeighbourB_Avail && (is_intra[curr_pos & 0x3F] or not (c_intra_flag)) , NeighbourC_Avail && (is_intra[(curr_pos+1) & 0x3F] or not (c_intra_flag)), NeighbourD_Avail && (intra_top_left or not (c_intra_flag))]
+			NeighbourAvail4x4 :[NeighA, NeighB, NeighC, NeighD]
 		guard
 			not IsNeighbourSent
+		var
+			bool NeighA, 
+			bool NeighB, 
+			bool NeighC, 
+			bool NeighD
 		do
 			curr_pos    := MbLocxInPic;
 			IsNeighbourSent := true;
 			IsIntraSent := true;
 			ConstrISent := true;
+			NeighA := NeighbourA_Avail && (is_intra[(curr_pos-1) & 0x3F] or not (c_intra_flag));
+			NeighB := NeighbourB_Avail && (is_intra[curr_pos & 0x3F] or not (c_intra_flag));
+			NeighC := NeighbourC_Avail && (is_intra[(curr_pos+1) & 0x3F] or not (c_intra_flag)) && NeighB;
+			NeighD := NeighbourD_Avail && (intra_top_left or not (c_intra_flag));
 		end
 
 	SendInfosDone: action ==>
@@ -179,14 +188,23 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			MbLocation   :[MbLocxInPic , MbLocyInPic],
 			NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail]
 				==>
-			NeighbourAvail16x16 :[NeighbourA_Avail && (is_intra[(curr_pos-1) & 0x3F] or not c_intra_flag), NeighbourB_Avail && (is_intra[curr_pos & 0x3F] or not c_intra_flag), NeighbourC_Avail , NeighbourD_Avail && (intra_top_left or not c_intra_flag)]
+			NeighbourAvail16x16 :[NeighA, NeighB, NeighC, NeighD]
 		guard
 			not IsNeighbourSent
+		var
+			bool NeighA, 
+			bool NeighB, 
+			bool NeighC, 
+			bool NeighD
 		do
 			curr_pos    := MbLocxInPic;
 			IsNeighbourSent := true;
 			IsIntraSent := true;
 			ConstrISent := true;
+			NeighA := NeighbourA_Avail && (is_intra[(curr_pos-1) & 0x3F] or not (c_intra_flag));
+			NeighB := NeighbourB_Avail && (is_intra[curr_pos & 0x3F] or not (c_intra_flag));
+			NeighC := NeighbourC_Avail && (is_intra[(curr_pos+1) & 0x3F] or not (c_intra_flag)) && NeighB;
+			NeighD := NeighbourD_Avail && (intra_top_left or not (c_intra_flag));
 		end
 
 

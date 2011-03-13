@@ -1704,7 +1704,7 @@ actor Algo_Synp_AVC_CBP()
 		int TopFieldOrderCnt,
 		int BottomFieldOrderCnt,
 		int POC_val,
-		int MaxPicOrderCntLsb = (1 << log2_max_pic_order_cnt_lsb_minus4[sps_id]+4),
+		int MaxPicOrderCntLsb = (1 << log2_max_pic_order_cnt_lsb_minus4[sps_id]+4)/2,
 		int frame_num_offset, 
 		int abs_frame_num, 
 		int expected_delta_per_poc_cycle := 0, 
@@ -1724,12 +1724,12 @@ actor Algo_Synp_AVC_CBP()
 				prevPicOrderCntMsb := 0;
 				prevPicOrderCntLsb := 0;
 			end
-			if  (pic_order_cnt_lsb < prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) >= (MaxPicOrderCntLsb >> 1)) then
+			if  (pic_order_cnt_lsb < prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) >= (MaxPicOrderCntLsb)) then
 				PicOrderCntMsb :=  prevPicOrderCntMsb + MaxPicOrderCntLsb;
 				prevPicOrderCntMsb := PicOrderCntMsb;
 				prevPicOrderCntLsb := 0;
 			else 
-				if (pic_order_cnt_lsb > prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) > (MaxPicOrderCntLsb >> 1)) then 
+				if (pic_order_cnt_lsb > prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) > (MaxPicOrderCntLsb)) then 
 					PicOrderCntMsb := prevPicOrderCntMsb - MaxPicOrderCntLsb;
 					prevPicOrderCntMsb := PicOrderCntMsb;
 				else

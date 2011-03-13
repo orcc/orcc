@@ -97,14 +97,23 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 			MbLocation   :[MbLocxInPic , MbLocyInPic],
 			NeighbourAvail :[NeighbourA , NeighbourB , NeighbourC , NeighbourD]
 				==>
-			NeighbourAvail_Intra  :[NeighbourA && (is_intra[(curr_pos-1) & 0x3F] or not (c_intra_flag)) , NeighbourB && (is_intra[curr_pos & 0x3F] or not(c_intra_flag)), NeighbourC , NeighbourD && (intra_top_left or not (c_intra_flag))]
+			NeighbourAvail_Intra  :[NeighA, NeighB, NeighC, NeighD]
 		guard
 			not IsNeighbourSent
+		var
+			bool NeighA,
+			bool NeighB,
+			bool NeighC,
+			bool NeighD
 		do
 			curr_pos    := MbLocxInPic;
 			IsIntraSent := true;
 			IsNeighbourSent := true;
 			CstrISent := true;
+			NeighA := NeighbourA && (is_intra[(curr_pos-1) & 0x3F] or not (c_intra_flag));
+			NeighB := NeighbourB && (is_intra[curr_pos & 0x3F] or not(c_intra_flag));
+			NeighC := NeighbourC && (is_intra[(curr_pos+1) & 0x3F] or not(c_intra_flag)) && NeighB;
+			NeighD := NeighbourD && (intra_top_left or not (c_intra_flag));
 		end
 
 	SendInfosDone: action ==>
