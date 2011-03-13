@@ -10,7 +10,6 @@
       <vertex id="MV" x="57" y="814"/>
       <vertex id="RefIdx" x="57" y="907"/>
       <vertex id="LFDisable" x="57" y="1000"/>
-      <vertex id="FirstMbInSlice" x="31" y="597"/>
       <vertex id="MbLocation" x="48" y="302"/>
       <vertex id="WD" x="387" y="470"/>
       <vertex id="Algo_DBF" x="387" y="563"/>

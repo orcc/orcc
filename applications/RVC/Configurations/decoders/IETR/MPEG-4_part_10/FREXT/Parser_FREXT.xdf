@@ -110,13 +110,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="PicSizeInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="FirstMbInSlice">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -509,7 +502,6 @@
     <Connection dst="" dst-port="QP_Cb" src="DecodePic" src-port="QP_Cb"/>
     <Connection dst="" dst-port="IntraPredModeC" src="DecodePic" src-port="IntraPredModeC"/>
     <Connection dst="" dst-port="FirstMbInSlice" src="DecodePic" src-port="FirstMbInSlice"/>
-    <Connection dst="" dst-port="PicSizeInMb" src="DecodePic" src-port="PicSizeInMb"/>
     <Connection dst="" dst-port="PicWidthInMb" src="DecodePic" src-port="PicWidthInMb"/>
     <Connection dst="" dst-port="ConstrainedIFlag" src="DecodePic" src-port="ConstrainedIFlag"/>
     <Connection dst="" dst-port="LFDisable" src="DecodePic" src-port="LFDisable"/>

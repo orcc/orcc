@@ -66,13 +66,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="FirstMbInSlice">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MbLocation">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -155,7 +148,6 @@
     <Connection dst="Mgnt_DBF" dst-port="MV" src="" src-port="MV"/>
     <Connection dst="Mgnt_DBF" dst-port="RefIdx" src="" src-port="RefIdx"/>
     <Connection dst="Mgnt_DBF" dst-port="LFDisable" src="" src-port="LFDisable"/>
-    <Connection dst="Mgnt_DBF" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Mgnt_DBF" dst-port="MbType" src="" src-port="Mbtype"/>
     <Connection dst="Buffer_DBF" dst-port="Z" src="" src-port="Z"/>
     <Connection dst="Buffer_DBF" dst-port="DB_O" src="Algo_DBF" src-port="DB_O"/>

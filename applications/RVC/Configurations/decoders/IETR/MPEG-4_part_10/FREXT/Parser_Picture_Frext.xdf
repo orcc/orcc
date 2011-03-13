@@ -141,13 +141,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="PicSizeInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="FirstMbInSlice">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -630,8 +623,6 @@
         src="DecodeSliceData_Cavlc" src-port="ConstraindedIntraPredFlag"/>
     <Connection dst="" dst-port="PicWidthInMb"
         src="DecodeSliceData_Cavlc" src-port="PicWidthInMb"/>
-    <Connection dst="" dst-port="PicSizeInMb"
-        src="DecodeSliceData_Cavlc" src-port="PicSizeInMb"/>
     <Connection dst="" dst-port="FirstMbInSlice"
         src="DecodeSliceData_Cavlc" src-port="FirstMbInSlice"/>
     <Connection dst="" dst-port="POC" src="DecodeSliceHeader" src-port="Poc"/>

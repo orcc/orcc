@@ -6,10 +6,8 @@
       <vertex id="ScalingList" x="143" y="101"/>
       <vertex id="CoefAC" x="155" y="31"/>
       <vertex id="PredMode" x="556" y="656"/>
-      <vertex id="FirstMbInSlice" x="523" y="169"/>
       <vertex id="PicWidthInMB" x="541" y="562"/>
       <vertex id="POC" x="566" y="469"/>
-      <vertex id="PicSizeInMb" x="548" y="529"/>
       <vertex id="MV" x="571" y="369"/>
       <vertex id="PartSZ" x="560" y="499"/>
       <vertex id="slice_alpha_c0_offset" x="509" y="861"/>

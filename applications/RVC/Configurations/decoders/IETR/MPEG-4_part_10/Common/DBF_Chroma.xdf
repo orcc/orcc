@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="DBF">
+<XDF name="DBF_Chroma">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -7,20 +7,6 @@
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PicWidthInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="7"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PicSizeInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
@@ -80,10 +66,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="FirstMbInSlice">
+    <Port kind="Input" name="MbLocation">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
+                <Expr kind="Literal" literal-kind="Integer" value="7"/>
             </Entry>
         </Type>
     </Port>
@@ -119,7 +105,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_DBF"/>
+        <Class name="MPEG.MPEG4.part10.Algo_DBF_Chroma"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -131,7 +117,19 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_DBF"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_DBF_param"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="LUMA_CHROMA">
+            <Expr kind="Var" name="LUMA_CHROMA"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Buffer_DBF">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="MPEG.MPEG4.part10.Mgnt_DBF_Chroma"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -142,12 +140,7 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Algo_DBF" dst-port="DB_I" src="Mgnt_DBF" src-port="DB_I"/>
     <Connection dst="Algo_DBF" dst-port="BS" src="Mgnt_DBF" src-port="BS"/>
-    <Connection dst="Mgnt_DBF" dst-port="DB_O" src="Algo_DBF" src-port="DB_O"/>
-    <Connection dst="Mgnt_DBF" dst-port="Z" src="" src-port="Z"/>
-    <Connection dst="Mgnt_DBF" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="Mgnt_DBF" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Mgnt_DBF" dst-port="Cbp_blk" src="" src-port="Cbp_blk"/>
     <Connection dst="Mgnt_DBF" dst-port="Alpha_offset" src="" src-port="Alpha_offset"/>
     <Connection dst="Mgnt_DBF" dst-port="Beta_offset" src="" src-port="Beta_offset"/>
@@ -155,7 +148,11 @@
     <Connection dst="Mgnt_DBF" dst-port="MV" src="" src-port="MV"/>
     <Connection dst="Mgnt_DBF" dst-port="RefIdx" src="" src-port="RefIdx"/>
     <Connection dst="Mgnt_DBF" dst-port="LFDisable" src="" src-port="LFDisable"/>
-    <Connection dst="Mgnt_DBF" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Mgnt_DBF" dst-port="MbType" src="" src-port="Mbtype"/>
-    <Connection dst="" dst-port="WD" src="Mgnt_DBF" src-port="WD"/>
+    <Connection dst="Buffer_DBF" dst-port="Z" src="" src-port="Z"/>
+    <Connection dst="Buffer_DBF" dst-port="DB_O" src="Algo_DBF" src-port="DB_O"/>
+    <Connection dst="Algo_DBF" dst-port="DB_I" src="Buffer_DBF" src-port="DB_I"/>
+    <Connection dst="" dst-port="WD" src="Buffer_DBF" src-port="WD"/>
+    <Connection dst="Mgnt_DBF" dst-port="MbLocation" src="" src-port="MbLocation"/>
+    <Connection dst="Buffer_DBF" dst-port="MbLocation" src="" src-port="MbLocation"/>
 </XDF>

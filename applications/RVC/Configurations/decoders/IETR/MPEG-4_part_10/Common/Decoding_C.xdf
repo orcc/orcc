@@ -38,13 +38,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="FirstMbInSlice">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="PicWidthInMB">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -54,13 +47,6 @@
     </Port>
     <Port kind="Input" name="POC">
         <Type name="uint"/>
-    </Port>
-    <Port kind="Input" name="PicSizeInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
     </Port>
     <Port kind="Input" name="MV">
         <Type name="int">
@@ -289,7 +275,6 @@
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="PRED_C" dst-port="PredMode" src="" src-port="PredMode"/>
-    <Connection dst="PRED_C" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="RES_C" dst-port="CoefDC" src="" src-port="CoefDC"/>
     <Connection dst="RES_C" dst-port="ScalingList" src="" src-port="ScalingList"/>
     <Connection dst="RES_C" dst-port="QP" src="" src-port="QP"/>
@@ -298,7 +283,6 @@
     <Connection dst="" dst-port="Display" src="PRED_C" src-port="Display_C"/>
     <Connection dst="PRED_C" dst-port="PicWidthInMb" src="" src-port="PicWidthInMB"/>
     <Connection dst="PRED_C" dst-port="POC" src="" src-port="POC"/>
-    <Connection dst="PRED_C" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="PRED_C" dst-port="MV" src="" src-port="MV"/>
     <Connection dst="PRED_C" dst-port="PartSZ" src="" src-port="PartSZ"/>
     <Connection dst="PRED_C" dst-port="mv_in" src="" src-port="mv_in"/>

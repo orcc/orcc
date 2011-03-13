@@ -17,13 +17,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="FirstMbInSlice">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="Coef_ACR">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -382,7 +375,6 @@
     <Connection dst="Deblocking_Filter" dst-port="Cbp_blk" src="" src-port="CodedBlockPattern"/>
     <Connection dst="Deblocking_Filter" dst-port="MV" src="" src-port="mv_in"/>
     <Connection dst="Deblocking_Filter" dst-port="RefIdx" src="" src-port="ref_idx_in"/>
-    <Connection dst="Deblocking_Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="Buffer_inter" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="DemuxParserInfos" dst-port="MBType" src="" src-port="MacroBlockType"/>

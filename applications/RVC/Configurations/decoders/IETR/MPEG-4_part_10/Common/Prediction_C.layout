@@ -3,8 +3,6 @@
    <vertices>
       <vertex id="PicWidthInMb" x="831" y="239"/>
       <vertex id="PredMode" x="375" y="180"/>
-      <vertex id="FirstMbInSlice" x="812" y="546"/>
-      <vertex id="PicSizeInMb" x="834" y="274"/>
       <vertex id="Coef_ACR" x="48" y="35"/>
       <vertex id="MV" x="326" y="441"/>
       <vertex id="PartSZ" x="307" y="504"/>

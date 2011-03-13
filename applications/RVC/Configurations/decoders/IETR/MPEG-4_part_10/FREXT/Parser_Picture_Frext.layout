@@ -22,7 +22,6 @@
       <vertex id="CodedBlockPattern" x="2184" y="894"/>
       <vertex id="ConstrainedIFlag" x="601" y="866"/>
       <vertex id="PicWidthInMb" x="595" y="1148"/>
-      <vertex id="PicSizeInMb" x="603" y="1118"/>
       <vertex id="FirstMbInSlice" x="600" y="924"/>
       <vertex id="POC" x="586" y="451"/>
       <vertex id="I_PCM_Y" x="1261" y="1269"/>
