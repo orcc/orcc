@@ -142,6 +142,16 @@ public class Action extends AbstractLocalizable {
 		return tag;
 	}
 
+	/**
+	 * Sets the output pattern of this action to the given pattern.
+	 * 
+	 * @param pattern
+	 *            a pattern
+	 */
+	public void setOutputPattern(Pattern pattern) {
+		outputPattern = pattern;
+	}
+
 	@Override
 	public String toString() {
 		return getName();
