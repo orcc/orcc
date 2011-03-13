@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="maat1" x="163" y="84"/>
-      <vertex id="maat2" x="199" y="154"/>
-      <vertex id="maat3" x="250" y="240"/>
-      <vertex id="sink" x="402" y="176"/>
-   </vertices>
-</layout>
