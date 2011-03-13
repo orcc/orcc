@@ -36,6 +36,8 @@ package net.sf.orcc.backends.vhdl.transformations;
  */
 public class RAM {
 
+	private boolean firstAccess;
+
 	private boolean lastAccessRead;
 
 	private int lastPortUsed;
@@ -46,7 +48,7 @@ public class RAM {
 	 * Creates a new RAM.
 	 */
 	public RAM() {
-		lastPortUsed = 1;
+		reset();
 	}
 
 	public int getLastPortUsed() {
@@ -54,14 +56,23 @@ public class RAM {
 	}
 
 	public boolean isLastAccessRead() {
-		return lastAccessRead;
+		return !firstAccess && lastAccessRead;
+	}
+
+	public boolean isLastAccessWrite() {
+		return !firstAccess && !lastAccessRead;
 	}
 
 	public boolean isWaitCycleNeeded() {
 		return waitCycleNeeded;
 	}
 
+	public void reset() {
+		firstAccess = true;
+	}
+
 	public void setLastAccessRead(boolean lastAccessRead) {
+		firstAccess = false;
 		this.lastAccessRead = lastAccessRead;
 	}
 

@@ -135,7 +135,6 @@ stateConst(variable) ::= <<
 <variable.name>_address_p2 \<= (others =\> '0');
 <variable.name>_data_p2    \<= (others =\> '0');
 <variable.name>_q_p2       \<= '0';
-<variable.name>_rd_en      \<= '0';
 --
 <elseif(variable.initialized)>
 <variable.name> \<= <variable.initialValue>;
@@ -147,7 +146,6 @@ resetReadWriteEnable(variable) ::= <<
 <if(variable.assignable && variable.type.list)>
 <variable.name>_wren_p1 \<= '0';
 <variable.name>_wren_p2 \<= '0';
-<variable.name>_rd_en   \<= '0';
 <endif>
 >>
 

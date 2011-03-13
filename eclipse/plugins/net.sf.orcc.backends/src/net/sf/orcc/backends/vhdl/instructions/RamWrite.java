@@ -66,4 +66,10 @@ public class RamWrite extends RamInstruction implements ValueContainer {
 		CommonNodeOperations.setValue(this, value);
 	}
 
+	@Override
+	public String toString() {
+		return getVariable().getName() + "_p" + getPort() + " <= "
+				+ getValue().toString();
+	}
+
 }

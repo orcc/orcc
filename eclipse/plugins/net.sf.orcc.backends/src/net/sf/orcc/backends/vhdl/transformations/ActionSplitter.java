@@ -141,7 +141,8 @@ public class ActionSplitter extends AbstractActorVisitor {
 			tag.add(name);
 
 			Action action = new Action(new Location(), tag, new Pattern(),
-					new Pattern(), scheduler, body);
+					currentAction.getOutputPattern(), scheduler, body);
+			currentAction.setOutputPattern(new Pattern());
 
 			// add action to actor's actions
 			ActionSplitter.this.actor.getActions().add(action);
@@ -187,13 +188,6 @@ public class ActionSplitter extends AbstractActorVisitor {
 			fsm.addTransition(newStateName, newAction, targetName);
 		}
 
-		@Override
-		public void visit(SpecificInstruction instruction) {
-			if (instruction instanceof SplitInstruction) {
-				splitAction();
-			}
-		}
-
 		/**
 		 * Split the current action
 		 */
@@ -206,7 +200,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 			// remove the SplitInstruction
 			itInstruction.previous();
 			itInstruction.remove();
-			
+
 			// move code
 			CodeMover codeMover = new CodeMover();
 			codeMover.setTargetProcedure(nextAction.getBody());
@@ -227,6 +221,13 @@ public class ActionSplitter extends AbstractActorVisitor {
 			visitInBranch();
 		}
 
+		@Override
+		public void visit(SpecificInstruction instruction) {
+			if (instruction instanceof SplitInstruction) {
+				splitAction();
+			}
+		}
+
 		/**
 		 * Visits the next action(s) without updating the branch name.
 		 */
@@ -245,7 +246,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 	 * FSM of the actor. May be null if the actor has no FSM. May be updated if
 	 * an FSM is added to the actor.
 	 */
-	protected FSM fsm;
+	private FSM fsm;
 
 	/**
 	 * Map used to create new unique state names.

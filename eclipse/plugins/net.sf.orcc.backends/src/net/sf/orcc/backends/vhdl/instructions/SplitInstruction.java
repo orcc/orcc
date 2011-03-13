@@ -43,5 +43,10 @@ public class SplitInstruction extends SpecificInstruction {
 	public SplitInstruction() {
 		super(new Location());
 	}
+	
+	@Override
+	public String toString() {
+		return "<split>";
+	}
 
 }

@@ -66,4 +66,10 @@ public class RamRead extends RamInstruction implements LocalTargetContainer {
 		CommonNodeOperations.setTarget(this, target);
 	}
 
+	@Override
+	public String toString() {
+		return getTarget().getName() + " := " + getVariable().getName()
+				+ "_q_p" + getPort();
+	}
+
 }

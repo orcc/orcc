@@ -84,4 +84,10 @@ public class RamSetAddress extends RamInstruction {
 		Use.addUses(this, indexes);
 	}
 
+	@Override
+	public String toString() {
+		return getVariable().getName() + "_address_p" + getPort() + " <= "
+				+ indexes.toString();
+	}
+
 }
