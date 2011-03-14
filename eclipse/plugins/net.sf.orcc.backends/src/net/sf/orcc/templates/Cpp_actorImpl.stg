@@ -130,25 +130,14 @@ printLoad(load) ::= <<
 <load.target> = <load.source><load.indexes : {index | [<index>]}>;
 >>
 
-printPeek(peek) ::= <<
-
-<if(peek.unit)>
-m_poTabIn[<actor.simpleName>_<peek.port>]-\>peek(<peek.target>);<\n>
-<else>
-m_poTabIn[<actor.simpleName>_<peek.port>]-\>peek(<peek.target>, <peek.numTokens>);<\n>
-<endif>
+printPeek(port, variable, numTokens) ::= <<
+m_poTabIn[<actor.simpleName>_<port.name>]-\>peek(<variable.name>, <numTokens>);<\n>
 >>
 
-printRead(read) ::= <<
-
-<if (read.target)>
-<if(read.unit)>
-m_poTabIn[<actor.simpleName>_<read.port>]-\>get(<read.target>);<\n>
-m_avails[<actor.simpleName>_<read.port>] --;
-<else>
-m_poTabIn[<actor.simpleName>_<read.port>]-\>get(<read.target>, <read.numTokens>);<\n>
-m_avails[<actor.simpleName>_<read.port>] -= <read.numTokens>;
-<endif>
+printRead(port, variable, numTokens) ::= <<
+<if(variable)>
+m_poTabIn[<actor.simpleName>_<port.name>]-\>get(<variable.name>, <numTokens>);
+m_avails[<actor.simpleName>_<port.name>] -= <numTokens>;
 <else>
 m_poTabIn[<actor.simpleName>_<read.port>]-\>skip(<read.numTokens>);<\n>
 m_avails[<actor.simpleName>_<read.port>] -= <read.numTokens>;
@@ -167,17 +156,10 @@ printStore(store) ::= <<
 <store.target><store.indexes : {index | [<index>]}> = <store.value>;
 >>
 
-printWrite(write) ::= <<
+printWrite(port, variable, numTokens) ::= <<
 
-<if(write.unit)>
-m_poTabOut[<actor.simpleName>_<write.port>]-\>put(<write.target>);<\n>
-m_rooms[<actor.simpleName>_<write.port>]--;
-<else>
-m_poTabOut[<actor.simpleName>_<write.port>]-\>put(<write.target>, <write.numTokens>);<\n>
-m_rooms[<actor.simpleName>_<write.port>] -= <write.numTokens>;
-
-<endif>
-
+m_poTabOut[<actor.simpleName>_<port.name>]-\>put(<variable.name>, <numTokens>);
+m_rooms[<actor.simpleName>_<port.name>] -= <numTokens>;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -193,11 +175,8 @@ printInstructions(instructions) ::= <<
 if (instr.assign)><printAssign(assign=instr)><
 elseif (instr.call)><printCall(call=instr)><
 elseif (instr.load)><printLoad(load=instr)><
-elseif (instr.peek)><printPeek(peek=instr)><
-elseif (instr.read)><printRead(read=instr)><
 elseif (instr.return)><printReturn(return=instr)><
 elseif (instr.store)><printStore(store=instr)><
-elseif (instr.write)><printWrite(write=instr)><
 endif>}>
 >>
 
@@ -246,15 +225,45 @@ procedure(procedure) ::= <<
 
 <endif>
 	<printNodes(procedure.nodes)>}
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 
+printActionBody(procedure) ::= <<
+<procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
+{
+	<action.inputPattern.ports : {port | <variableDeclaration(action.inputPattern.variableMap.(port))>;}>
+	<action.outputPattern.ports : {port | <variableDeclaration(action.outputPattern.variableMap.(port))>;}>
+	<action.inputPattern.ports : {port | <printRead(port=port, variable=action.inputPattern.variableMap.(port), numTokens=action.inputPattern.numTokensMap.(port))>}>
+
+<if(procedure.locals.list)>
+	<procedure.locals.list: {local | <variableDeclaration(local)>;<\n>}>
+<endif>
+	<printNodes(procedure.nodes)>
+	<action.outputPattern.ports : {port | <printWrite(port=port, variable=action.outputPattern.variableMap.(port), numTokens=action.outputPattern.numTokensMap.(port))>}>
+}
+>>
+
+printActionScheduler(procedure) ::= <<
+<procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
+{
+	<action.inputPattern.ports : {port | <if(action.inputPattern.peekedMap.(port))><variableDeclaration(action.inputPattern.peekedMap.(port))>;<endif>}>
+	<action.inputPattern.ports : {port | <if(action.inputPattern.peekedMap.(port))><printPeek(port=port, variable=action.inputPattern.peekedMap.(port), numTokens=action.inputPattern.numTokensMap.(port))><endif>}>
+
+<if(procedure.locals.list)>
+	<procedure.locals.list: {local | <variableDeclaration(local)>;<\n>}>
+<endif>
+	<printNodes(procedure.nodes)>
+}
+>>
+
 action(action) ::= <<
-<procedure(action.body)><procedure(action.scheduler)>
+<printActionBody(action.body)>
+
+<printActionScheduler(action.scheduler)>
+
 >>
 
 actionTrace(action) ::= <<
@@ -268,11 +277,11 @@ g_oTracer.captureAction(this, "<action.name>");
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-<pattern.keys:{port | hasRooms(<actor.simpleName>_<port>, <pattern.(port)>)}; wrap, anchor, separator=" && ">
+<pattern.ports:{port | hasRooms(<actor.simpleName>_<port.name>, <pattern.numTokensMap.(port)>)}; wrap, anchor, separator=" && ">
 >>
 
 inputPattern(pattern) ::= <<
-<pattern.keys:{port | hasTokens(<actor.simpleName>_<port>, <pattern.(port)>) && }>
+<pattern.ports:{port | hasTokens(<actor.simpleName>_<port.name>, <pattern.numTokensMap.(port)>) && }>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -288,7 +297,7 @@ i++;
 actionTest(action) ::= <<
 if(<inputPattern(action.inputPattern)>isSchedulable_<action>())
 {
-	<if(action.outputPattern)>
+	<if(!action.outputPattern.empty)>
 	if(<outputPattern(pattern=action.outputPattern)>)
 	{
 		<actionCall(action)>
@@ -339,7 +348,7 @@ res = true;
 actionTestState(nextState) ::= <<
 if(<inputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.action>())
 {
-	<if(nextState.action.outputPattern)>
+	<if(!nextState.action.outputPattern.empty)>
 	if(<outputPattern(nextState.action.outputPattern)>)
 	{
 		<actionCallState(nextState)>
