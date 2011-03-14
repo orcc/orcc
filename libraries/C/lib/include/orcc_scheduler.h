@@ -49,18 +49,21 @@ struct actor_s {
 	int *num_successors; /** number of successors: one number per port. */
 	struct actor_s ***successors; /** successors: one pointer to a successors structure per port. */
 	int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
+	int in_waiting; /** idem with the waiting list. */
 	struct scheduler_s *sched; /** scheduler which execute this actor. */
 };
 
 struct scheduler_s {
 	int id;
+	int i;
 	int num_actors;
 	struct actor_s **actors;
 	struct actor_s *schedulable[MAX_ACTORS];
 	unsigned int next_entry;
 	unsigned int next_schedulable;
 	int next_else_schedulable;
-	struct waiting_s **waiting_schedulable;
+	struct waiting_s *waiting_schedulable;
+	struct waiting_s *sending_schedulable;
 	struct sync_s *sync;
 	semaphore_struct sem_thread;
 	int round_robin;
@@ -77,9 +80,10 @@ struct waiting_s {
 /**
  * Initializes the given scheduler.
  */
-void sched_init(struct scheduler_s *sched, int id, int schedulers_nb,
-		int num_actors, struct actor_s **actors, struct sync_s *sync);
-void sched_reinit(struct scheduler_s *sched, int schedulers_nb, int num_actors,
+void sched_init(struct scheduler_s *sched, int id, int num_actors,
+		struct actor_s **actors, struct waiting_s *waiting_schedulable,
+		struct waiting_s *sending_schedulable, struct sync_s *sync);
+void sched_reinit(struct scheduler_s *sched, int num_actors,
 		struct actor_s **actors);
 
 #endif

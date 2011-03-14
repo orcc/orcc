@@ -285,7 +285,7 @@ static void map_actors_on_threads(individual *individual,
 	struct mapping_s *mapping = compute_mapping(individual, genetic_info);
 
 	for (i = 0; i < genetic_info->threads_nb; i++) {
-		sched_reinit(&genetic_info->schedulers[i], genetic_info->threads_nb,
+		sched_reinit(&genetic_info->schedulers[i],
 				mapping->actors_per_threads[i], mapping->actors_mapping[i]);
 	}
 }

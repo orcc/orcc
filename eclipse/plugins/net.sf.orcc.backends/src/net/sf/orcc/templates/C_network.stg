@@ -3,8 +3,7 @@ GetInstanceId(instance) ::= <<
 >>
 
 BroadcastWrite(n,port) ::= <<
-tok_output_<n> = fifo<printMedium(port,instance)>_<instance.broadcast.type>_write(<GetInstanceId(instance)>_output_<n>, output_<n>_buf, 1);
-*tok_output_<n> = *tok_input;
+fifo<printMedium(port,instance)>_<instance.broadcast.type>_write_1(<GetInstanceId(instance)>_output_<n>, tok_input);
 >>
 
 printBroadcastWrite(OutputNum, OutputPorts) ::= <<
@@ -14,19 +13,8 @@ printBroadcastWrite(OutputNum, OutputPorts) ::= <<
 <endif>
 >>
 
-BroadcastWriteEnd(n,port) ::= <<
-fifo<printMedium(port,instance)>_<instance.broadcast.type>_write_end(<GetInstanceId(instance)>_output_<n>, output_<n>_buf, 1);
->>
-
-printBroadcastWriteEnd(OutputNum, OutputPorts) ::= <<
-<if(first(OutputNum))>
-<BroadcastWriteEnd(first(OutputNum),first(OutputPorts))>
-<printBroadcastWriteEnd(rest(OutputNum),rest(OutputPorts))>
-<endif>
->>
-
 outputPatternPort(num, port) ::= <<
-if (!fifo<printMedium(port,instance)>_<instance.broadcast.type>_has_room(<GetInstanceId(instance)>_output_<num>, 1)) {
+if (!fifo<printMedium(port,instance)>_<instance.broadcast.type>_has_room(<GetInstanceId(instance)>_output_<num>, 1, 1)) {
 	ports |= (1 \<\< <num>);
 }
 >>
@@ -56,16 +44,13 @@ declareBroadcast(instance) ::= <<
 >
 void <GetInstanceId(instance)>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	<instance.broadcast.type> *tok_input, input_buf[1],
-	<instance.broadcast.outputList: { n | output_<n>_buf[1], *tok_output_<n>}; separator=",\n">;
+	<instance.broadcast.type> tok_input;
 
 	while (fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_has_tokens(<GetInstanceId(instance)>_input, 0, 1)) {
 		<printOutputPattern(instance.broadcast.outputList,instance.broadcast.outputs.list)>
 
-		tok_input = fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_read(<GetInstanceId(instance)>_input, input_buf, 0, 1);
+		tok_input = fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_read_1(<GetInstanceId(instance)>_input, 0);
 		<printBroadcastWrite(instance.broadcast.outputList,instance.broadcast.outputs.list)>
-		fifo<printMedium(instance.broadcast.input,instance)>_<instance.broadcast.type>_read_end(<GetInstanceId(instance)>_input, 0, 1);
-		<printBroadcastWriteEnd(instance.broadcast.outputList,instance.broadcast.outputs.list)>
 		i++;
 	}
 
@@ -378,12 +363,12 @@ void *scheduler(void *data) {
 	
 	<endif>
 	while (1) {
-		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched<if(options.newScheduler)>, <if(options.needDynamicMapping || options.threads)>THREAD_NB<else>1<endif><endif>);
+		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched);
 		if(my_actor != NULL){
 			si.num_firings = 0;
 			my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
-			printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
+			printf("%2i  %5i\t<if (options.newScheduler)>%5i\t<endif>%s\t%s\n", sched-\>id, si.num_firings, <if (options.newScheduler)>si.ports, <endif>si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
 			<if (options.newScheduler)>
 			if (si.reason == full<if(options.needDynamicMapping || options.threads)> && (si.num_firings || !sched-\>round_robin)<endif>) {
@@ -580,6 +565,7 @@ static void launcher() {
 	thread_id_struct threads_id[THREAD_NB]<if(options.needDynamicMapping)>, thread_monitor_id<endif>;
 	
 	struct scheduler_s schedulers[THREAD_NB];
+	struct waiting_s waiting_schedulables[THREAD_NB];
 	<if(options.needDynamicMapping)>
 	struct sync_s sched_sync;
 	struct genetic_s genetic_info;
@@ -596,7 +582,7 @@ static void launcher() {
 	initialize_instances();
 	
 	for(i=0; i \< THREAD_NB; i++){
-		sched_init(&schedulers[i], i, THREAD_NB, <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
+		sched_init(&schedulers[i], i, <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, &waiting_schedulables[i], &waiting_schedulables[(i+1) % THREAD_NB], <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
 	}
 	
 	<if(options.newScheduler && !options.needDynamicMapping)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
@@ -621,13 +607,14 @@ static void launcher() {
 	cpu_set_t cpuset; 
 
 	struct scheduler_s sched;
+	struct waiting_s waiting_schedulable;
 	
 	clear_cpu_set(cpuset);
 	set_this_process_affinity(cpuset, 0);
 	
 	initialize_instances();
 
-	sched_init(&sched, 0, 1, sizeof(actors) / sizeof(actors[0]), actors, NULL);
+	sched_init(&sched, 0, sizeof(actors) / sizeof(actors[0]), actors, &waiting_schedulable, &waiting_schedulable, NULL);
 	
 	<if(options.newScheduler)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
 		

@@ -49,38 +49,59 @@ static struct actor_s *sched_get_next(struct scheduler_s *sched) {
 }
 
 /**
- * add the actor to the schedulable list
+ * Add the actor to the schedulable or waiting list.
+ * The list is chosen according to associate scheduler of the actor.
  */
 static void sched_add_schedulable(struct scheduler_s *sched,
 		struct actor_s *actor) {
-	// only add the actor in the schedulable list if it is not already there
+	// only add the actor in the lists if it is not already there
 	// like a list.contains(actor) but in O(1) instead of O(n)
 	if (!actor->in_list) {
 		if (sched == actor->sched) {
 			sched->schedulable[sched->next_entry % MAX_ACTORS] = actor;
-			sched->next_entry++;
 			actor->in_list = 1;
-		} else {
-			struct waiting_s *wait =
-					actor->sched->waiting_schedulable[actor->sched->id];
-			wait->waiting_actors[wait->next_entry % MAX_ACTORS] = actor;
-			wait->next_entry++;
+			sched->next_entry++;
+		} else if (!actor->in_waiting) {
+			// this actor isn't launch by this scheduler so it is sent to the next one
+			struct waiting_s *send = sched->sending_schedulable;
+			if (MAX_ACTORS + 1 - (send->next_entry - send->next_waiting) > 1) {
+				send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
+				actor->in_waiting = 1;
+			} else {
+				printf("Error: Waiting FIFO is full...\n");
+			}
+			// need to be place here otherwise the compiler make a wrong optimization
+			send->next_entry++;
 		}
 	}
 }
 
 /**
- * add the actor to the schedulable list
+ * Add waited actors to the schedulable or waiting list.
+ * The list is chosen according to associate scheduler of the actor.
  */
-static void sched_add_waiting_list(struct scheduler_s *sched, int schedulers_nb) {
-	int i;
-	for (i = 0; i < schedulers_nb; i++) {
-		struct waiting_s *wait = sched->waiting_schedulable[i];
-		while (wait->next_entry - wait->next_waiting > 0) {
-			sched_add_schedulable(sched,
-					wait->waiting_actors[wait->next_waiting % MAX_ACTORS]);
-			wait->next_waiting++;
+static void sched_add_waiting_list(struct scheduler_s *sched) {
+	struct actor_s *actor;
+	struct waiting_s *wait = sched->waiting_schedulable;
+	while (wait->next_entry - wait->next_waiting >= 1) {
+		actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
+		if (sched == actor->sched) {
+			sched->schedulable[sched->next_entry % MAX_ACTORS] = actor;
+			actor->in_list = 1;
+			actor->in_waiting = 0;
+			sched->next_entry++;
+		} else {
+			// this actor isn't launch by this scheduler so it is sent to the next one
+			struct waiting_s *send = sched->sending_schedulable;
+			if (MAX_ACTORS + 1 - (send->next_entry - send->next_waiting) > 1) {
+				send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
+			} else {
+				printf("Error: Waiting FIFO is full...\n");
+			}
+			// need to be place here otherwise the compiler make a wrong optimization
+			send->next_entry++;
 		}
+		wait->next_waiting++;
 	}
 }
 
@@ -89,22 +110,19 @@ static void sched_add_waiting_list(struct scheduler_s *sched, int schedulers_nb)
  * The actor is removed from the schedulable list.
  * This method is used by the data/demand driven scheduler.
  */
-static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
-		int schedulers_nb) {
+static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 	struct actor_s *actor;
-	// check if other schedulers were sended some schedulable actors
-	if (schedulers_nb > 1) {
-		sched_add_waiting_list(sched, schedulers_nb);
-	}
+	// check if other schedulers sent some schedulable actors
+	sched_add_waiting_list(sched);
 	if (sched->next_schedulable == sched->next_entry) {
 		// static actors list is used when schedulable list is empty
 		actor = sched_get_next(sched);
 		sched->round_robin = 1;
 	} else {
 		actor = sched->schedulable[sched->next_schedulable % MAX_ACTORS];
-		sched->next_schedulable++;
 		// actor is not a member of the list anymore
 		actor->in_list = 0;
+		sched->next_schedulable++;
 		sched->round_robin = 0;
 	}
 
