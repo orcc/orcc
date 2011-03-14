@@ -1,25 +1,22 @@
 import "net/sf/orcc/templates/LLVM_metadata.stg"
-import "net/sf/orcc/templates/LLVM_header.stg"
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-fifoName(port) ::= <<
-<if(port.type.uint)
-> %struct.fifo_<fifoType(port)>_s* <
-else
-> %struct.fifo_<fifoType(port)>_s* <
-endif>
->>
-
 fifoType(port) ::= <<
 i<port.type.size>
 >>
 
+fifoVar(port, var) ::= <<
+%<var> = bitcast <fifoType(port)>** @<port.name>_ptr to <VarType(var)>*
+
+>>
+
 fifo(port) ::= <<
-@<port.name> = global <fifoName(port)> null
-@<port.name>_ptr = global <fifoType(port)>** null
+@<port.name> = global i8* null
+@<port.name>_ptr = global <fifoType(port)>* null
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -450,6 +447,9 @@ b<label(blockNode)>:
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
+printProcedure(proc) ::= <<
+<procedure(procedure = proc)>
+>>
 
 procedure(procedure, inputPattern = false, outputPattern = false) ::= <<
 <if(!procedure.native)>
@@ -457,6 +457,12 @@ define <procedure.returnType> @<procedure>(<procedure.parameters.list: argumentD
 entry:
 <if(procedure.locals.list)>
 	<procedure.locals.list: variableDeclaration()>
+<endif>
+<if(inputPattern)>
+	<inputPattern.keys: { port | <fifoVar(port=port, var=inputPattern.(port))>}>
+<endif>
+<if(outputPattern)>
+	<outputPattern.keys: { port | <fifoVar(port=port, var=outputPattern.(port))>}>
 <endif>
 <Nodes(trunc(procedure.nodes))>
 <Node(last(procedure.nodes))>
@@ -476,9 +482,9 @@ actorParameter(parameter) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
-
-action(action) ::= <<
-<procedure(action.body)><procedure(action.scheduler)>
+printAction(action) ::= <<
+<procedure(procedure = action.scheduler, inputPattern = action.inputPattern.peekedMap)>
+<procedure(procedure = action.body, inputPattern = action.inputPattern.variableMap, outputPattern = action.outputPattern.variableMap)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -506,17 +512,16 @@ declare i32 @printf(i8* noalias , ...) nounwind
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-<actor.procs.list: procedure()>
+<actor.procs.list: {proc | <procedure(procedure = proc)>}>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
-<actor.actions: action()>
+<actor.actions: printAction()>
 
 ; Initializes
 <if(actor.initializes)>
-<actor.initializes: action()>
+<actor.initializes: printAction()>
 <endif>
 
 <decl_MD(actor)>
 
-<header()> 
 >>

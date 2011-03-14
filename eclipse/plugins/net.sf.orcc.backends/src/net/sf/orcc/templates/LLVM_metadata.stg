@@ -210,7 +210,7 @@ action_MD(actor, action) ::= <<
 
 
 port_MD(actor, port) ::= <<
-<port_decl_MD(actor=actor, port=port)> = metadata !{metadata <Type_decl_MD(actor=actor, var=port)>, <varName_MD(port)>, <fifoName(port)>* @<port.name>}
+<port_decl_MD(actor=actor, port=port)> = metadata !{metadata <Type_decl_MD(actor=actor, var=port)>, <varName_MD(port)>, i8** @<port.name>}
 <Type_MD(actor=actor, var=port)>
 
 >>
