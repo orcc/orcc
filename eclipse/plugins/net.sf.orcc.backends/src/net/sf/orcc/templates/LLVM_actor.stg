@@ -19,7 +19,7 @@ i<port.type.size>
 
 fifo(port) ::= <<
 @<port.name> = global <fifoName(port)> null
-
+@<port.name>_ptr = global <fifoType(port)>** null
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -451,7 +451,7 @@ b<label(blockNode)>:
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
 
-procedure(procedure) ::= <<
+procedure(procedure, inputPattern = false, outputPattern = false) ::= <<
 <if(!procedure.native)>
 define <procedure.returnType> @<procedure>(<procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
