@@ -125,6 +125,11 @@ class HDAGGraph {
 		HDAGVertex* getEdgeTarget(HDAGEdge* edge);
 
 		/**
+		 Returns the source vertex of an edge.
+		*/
+		HDAGVertex* getEdgeSource(HDAGEdge* edge);
+
+		/**
 		 Removes all edges and vertices
 		*/
 		void flush();

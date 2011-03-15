@@ -173,6 +173,20 @@ HDAGVertex* HDAGGraph::getEdgeTarget(HDAGEdge* edge){
 	return NULL;
 }
 
+HDAGVertex* HDAGGraph::getEdgeSource(HDAGEdge* edge){
+	if (edge->getSource() == NULL)
+		return NULL;
+
+	for(int i=0; i<nbVertices; i++){
+		HDAGVertex* currentVertex = vertices[i];
+		if(edge->getSource()->equals(currentVertex)){
+			return currentVertex;
+		}
+	}
+	
+	return NULL;
+}
+
 
 /**
  Removes all edges and vertices
