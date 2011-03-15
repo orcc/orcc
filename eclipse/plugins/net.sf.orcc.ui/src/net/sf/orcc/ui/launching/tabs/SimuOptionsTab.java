@@ -30,7 +30,7 @@ package net.sf.orcc.ui.launching.tabs;
 
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.OrccUiActivator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -64,7 +64,7 @@ public class SimuOptionsTab extends OptionsTab {
 
 	@Override
 	public Image getImage() {
-		return OrccActivator.getImage("icons/orcc_simu.gif");
+		return OrccUiActivator.getImage("icons/orcc.png");
 	}
 
 	@Override

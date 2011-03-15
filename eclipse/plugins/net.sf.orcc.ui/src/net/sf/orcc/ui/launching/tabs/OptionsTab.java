@@ -35,7 +35,7 @@ import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 
 import java.math.BigInteger;
 
-import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.OrccUiActivator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -154,7 +154,7 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public Image getImage() {
-		return OrccActivator.getImage("icons/orcc_run.gif");
+		return OrccUiActivator.getImage("icons/orcc.png");
 	}
 
 	@Override

@@ -44,7 +44,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
-import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.runtime.CoreException;
@@ -348,7 +348,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public Image getImage() {
-		return OrccActivator.getImage("icons/orcc_run.gif");
+		return OrccUiActivator.getImage("icons/orcc.png");
 	}
 
 	@Override

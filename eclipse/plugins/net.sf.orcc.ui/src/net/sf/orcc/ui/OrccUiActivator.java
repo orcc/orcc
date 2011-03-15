@@ -37,10 +37,10 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class OrccActivator extends AbstractUIPlugin {
+public class OrccUiActivator extends AbstractUIPlugin {
 
 	// The shared instance
-	private static OrccActivator plugin;
+	private static OrccUiActivator plugin;
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "net.sf.orcc.ui"; //$NON-NLS-1$
@@ -50,7 +50,7 @@ public class OrccActivator extends AbstractUIPlugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static OrccActivator getDefault() {
+	public static OrccUiActivator getDefault() {
 		return plugin;
 	}
 
@@ -88,7 +88,7 @@ public class OrccActivator extends AbstractUIPlugin {
 	/**
 	 * The constructor
 	 */
-	public OrccActivator() {
+	public OrccUiActivator() {
 	}
 
 	@Override

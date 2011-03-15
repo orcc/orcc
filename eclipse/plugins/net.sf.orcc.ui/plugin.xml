@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
-            icon="icons/orcc_run.gif"
+            icon="icons/orcc.png"
             id="net.sf.orcc.ui.OrccNatureImage"
             natureId="net.sf.orcc.ui.OrccNature">
       </image>
@@ -39,7 +39,7 @@
             category="net.sf.orcc.ui.OrccCategory"
             class="net.sf.orcc.ui.OrccProjectWizard"
             hasPages="true"
-            icon="icons/orcc_run.gif"
+            icon="icons/orcc.png"
             id="net.sf.orcc.ui.newOrccProject"
             name="Project"
             project="true">
@@ -62,6 +62,7 @@
          point="org.eclipse.ui.propertyPages">
       <page
             class="net.sf.orcc.ui.properties.ProjectPropertyPage"
+            icon="icons/orcc.png"
             id="net.sf.orcc.ui.properties.ProjectPropertyPage"
             name="Orcc Settings">
          <enabledWhen>
@@ -100,7 +101,7 @@
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
             class="net.sf.orcc.ui.launching.OrccRunLaunchShortcut"
-            icon="icons/orcc_run.gif"
+            icon="icons/orcc.png"
             id="net.sf.orcc.runLaunchShortcut"
             label="Orcc compilation"
             modes="run">
@@ -136,7 +137,7 @@
       </shortcut>
       <shortcut
             class="net.sf.orcc.ui.launching.OrccSimuLaunchShortcut"
-            icon="icons/orcc_simu.gif"
+            icon="icons/orcc.png"
             id="net.sf.orcc.simuLaunchShortcut"
             label="Orcc simulation"
             modes="run">
@@ -192,12 +193,12 @@
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
             configTypeID="net.sf.orcc.runLaunchConfigurationType"
-            icon="icons/orcc_run.gif"
+            icon="icons/orcc.png"
             id="net.sf.orcc.runLaunchConfigurationTypeImage">
       </launchConfigurationTypeImage>
       <launchConfigurationTypeImage
             configTypeID="net.sf.orcc.simuLaunchConfigurationType"
-            icon="icons/orcc_simu.gif"
+            icon="icons/orcc.png"
             id="orcc plugin.simuLaunchConfigurationTypeImage">
       </launchConfigurationTypeImage>
    </extension>

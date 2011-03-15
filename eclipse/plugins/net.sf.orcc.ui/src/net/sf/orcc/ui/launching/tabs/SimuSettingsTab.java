@@ -35,7 +35,7 @@ import java.util.List;
 
 import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.plugins.simulators.SimulatorFactory;
-import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
 
@@ -116,7 +116,7 @@ public class SimuSettingsTab extends OrccAbstractSettingsTab {
 
 	@Override
 	public Image getImage() {
-		return OrccActivator.getImage("icons/orcc_simu.gif");
+		return OrccUiActivator.getImage("icons/orcc.png");
 	}
 
 	@Override

@@ -37,7 +37,7 @@ import java.util.List;
 
 import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.plugins.backends.BackendFactory;
-import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
 
@@ -178,7 +178,7 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 
 	@Override
 	public Image getImage() {
-		return OrccActivator.getImage("icons/orcc_run.gif");
+		return OrccUiActivator.getImage("icons/orcc.png");
 	}
 
 	@Override

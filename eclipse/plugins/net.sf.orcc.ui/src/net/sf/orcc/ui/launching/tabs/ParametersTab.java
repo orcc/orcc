@@ -33,7 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.PARAMETERS;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.OrccUiActivator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -313,7 +313,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public Image getImage() {
-		return OrccActivator.getImage("icons/orcc_run.gif");
+		return OrccUiActivator.getImage("icons/orcc.png");
 	}
 
 	@Override

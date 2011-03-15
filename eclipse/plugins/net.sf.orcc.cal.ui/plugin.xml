@@ -10,7 +10,7 @@
               contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
               default="true"
               extensions="cal"
-              icon="icons/orcc_run.gif"
+              icon="icons/orcc.png"
               id="net.sf.orcc.cal.Cal"
               name="Cal Editor">
         </editor>

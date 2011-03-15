@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.ui;
 
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -52,43 +49,6 @@ public class OrccActivator extends AbstractUIPlugin {
 	 */
 	public static OrccActivator getDefault() {
 		return plugin;
-	}
-
-	/**
-	 * Returns an image for the image file at the given plug-in relative path.
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the image
-	 */
-	public static Image getImage(String path) {
-		ImageRegistry ir = plugin.getImageRegistry();
-		Image image = ir.get(path);
-		if (image == null) {
-			ImageDescriptor id = imageDescriptorFromPlugin(PLUGIN_ID, path);
-			image = id.createImage();
-			ir.put(path, image);
-		}
-
-		return image;
-	}
-
-	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
-	/**
-	 * The constructor
-	 */
-	public OrccActivator() {
 	}
 
 	@Override
