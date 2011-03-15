@@ -62,10 +62,8 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.network.Connection;
@@ -73,7 +71,6 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.INetworkTransformation;
-import net.sf.orcc.tools.transformations.RemoveReadWrites;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -517,12 +514,11 @@ public class ActorMerger implements INetworkTransformation {
 	 * Creates the read instructions of the static action
 	 */
 	private void createReads(Procedure procedure) {
-		BlockNode block = BlockNode.getLast(procedure);
 		for (Port port : actor.getInputs()) {
 			Variable var = actor.getStateVars().get(port.getName());
 			int numTokens = port.getNumTokensConsumed();
-			Read read = new Read(port, numTokens, var);
-			block.add(read);
+			System.out.println("must read " + numTokens + " tokens from "
+					+ var.getName());
 		}
 	}
 
@@ -549,12 +545,11 @@ public class ActorMerger implements INetworkTransformation {
 	 * Creates the write instructions of the static action
 	 */
 	private void createWrites(Procedure procedure) {
-		BlockNode block = BlockNode.getLast(procedure);
 		for (Port port : actor.getOutputs()) {
 			Variable var = actor.getStateVars().get(port.getName());
 			int numTokens = port.getNumTokensProduced();
-			Write read = new Write(port, numTokens, var);
-			block.add(read);
+			System.out.println("must write " + numTokens + " tokens from "
+					+ var.getName());
 		}
 	}
 
@@ -644,8 +639,8 @@ public class ActorMerger implements INetworkTransformation {
 			scheduler = new SASFlatScheduler(subgraph);
 
 			for (Vertex vertex : vertices) {
-				Actor actor = vertex.getInstance().getActor();
-				new RemoveReadWrites().visit(actor);
+				// Actor actor = vertex.getInstance().getActor();
+				System.out.println("used to remove read writes here " + vertex);
 			}
 
 			mergeActors(vertices);
