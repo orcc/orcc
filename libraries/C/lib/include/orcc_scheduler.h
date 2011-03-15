@@ -70,7 +70,7 @@ struct scheduler_s {
 };
 
 struct waiting_s {
-	unsigned int next_entry;
+	volatile unsigned int next_entry;
 	unsigned int next_waiting;
 	struct actor_s *waiting_actors[MAX_ACTORS];
 };

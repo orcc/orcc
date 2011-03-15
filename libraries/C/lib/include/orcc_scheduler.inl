@@ -64,13 +64,8 @@ static void sched_add_schedulable(struct scheduler_s *sched,
 		} else if (!actor->in_waiting) {
 			// this actor isn't launch by this scheduler so it is sent to the next one
 			struct waiting_s *send = sched->sending_schedulable;
-			if (MAX_ACTORS + 1 - (send->next_entry - send->next_waiting) > 1) {
-				send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
-				actor->in_waiting = 1;
-			} else {
-				printf("Error: Waiting FIFO is full...\n");
-			}
-			// need to be place here otherwise the compiler make a wrong optimization
+			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
+			actor->in_waiting = 1;
 			send->next_entry++;
 		}
 	}
@@ -93,12 +88,7 @@ static void sched_add_waiting_list(struct scheduler_s *sched) {
 		} else {
 			// this actor isn't launch by this scheduler so it is sent to the next one
 			struct waiting_s *send = sched->sending_schedulable;
-			if (MAX_ACTORS + 1 - (send->next_entry - send->next_waiting) > 1) {
-				send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
-			} else {
-				printf("Error: Waiting FIFO is full...\n");
-			}
-			// need to be place here otherwise the compiler make a wrong optimization
+			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
 			send->next_entry++;
 		}
 		wait->next_waiting++;
