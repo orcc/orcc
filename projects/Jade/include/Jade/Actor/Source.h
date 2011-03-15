@@ -57,7 +57,7 @@ public:
 
 	~Source();
 
-	void source_get_src(unsigned char* tokens, int nbTokens);
+	void source_get_src(unsigned char* tokens);
 
 private:
 	/** id of the decoder */
@@ -73,9 +73,9 @@ private:
 	int cnt;
 };
 
-static void get_src(void* ptrSource, unsigned char* tokens, int nbTokens) {
+static void get_src(void* ptrSource, unsigned char* tokens) {
 	Source* source = (Source*) ptrSource;
-	source->source_get_src(tokens, nbTokens);
+	source->source_get_src(tokens);
 }
 
 #endif

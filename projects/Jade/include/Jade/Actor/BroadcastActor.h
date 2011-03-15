@@ -142,7 +142,7 @@ private:
 	 *
 	 *	@param ports : ports of the action
      */
-	std::map<Port*, llvm::ConstantInt*>* createPattern(std::map<std::string, Port*>* ports);
+	Pattern* createPattern(std::map<std::string, Port*>* ports);
 
 	/**
      *  @brief Create a read fifo action in broadcast

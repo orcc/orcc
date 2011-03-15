@@ -218,8 +218,8 @@ Action* IRWriter::writeAction(Action* action){
 		Procedure* newBody = writeProcedure(action->getBody());
 
 		//Write patterns
-		map<Port*, ConstantInt*>* inputPattern = writePattern(action->getInputPattern(), inputs);
-		map<Port*, ConstantInt*>* outputPattern = writePattern(action->getOutputPattern(), outputs);
+		Pattern* inputPattern = writePattern(action->getInputPattern(), inputs);
+		Pattern* outputPattern = writePattern(action->getOutputPattern(), outputs);
 
 		//Create the action
 		return new Action(action->getTag(), inputPattern, outputPattern, newScheduler, newBody);
@@ -231,8 +231,8 @@ Procedure* IRWriter::writeProcedure(Procedure* procedure){
 	return new Procedure(procedure->getName(), procedure->getExternal(), function);
 }
 
-map<Port*, ConstantInt*>* IRWriter::writePattern(map<Port*, ConstantInt*>* pattern, map<string, Port*>* ports){
-	map<Port*, ConstantInt*>::iterator itPattern;
+Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
+/*	map<Port*, ConstantInt*>::iterator itPattern;
 	map<string, Port*>::iterator itPort;
 	map<Port*, ConstantInt*>* newPattern = new map<Port*, ConstantInt*>();
 
@@ -241,7 +241,8 @@ map<Port*, ConstantInt*>* IRWriter::writePattern(map<Port*, ConstantInt*>* patte
 		newPattern->insert(pair<Port*, ConstantInt*>(itPort->second, itPattern->second));
 	}
 
-	return newPattern;
+	return newPattern;*/
+	return NULL;
 }
 
 map<string, Procedure*>* IRWriter::writeProcedures(map<string, Procedure*>* procs){

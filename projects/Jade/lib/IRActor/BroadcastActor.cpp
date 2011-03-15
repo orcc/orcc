@@ -109,8 +109,8 @@ void BroadcastActor::createAction(){
 	ActionTag* actionTag = new ActionTag();
 	Procedure* scheduler = createScheduler();
 	Procedure* body = createBody();
-	map<Port*, ConstantInt*>* inputPattern = createPattern(inputs);
-	map<Port*, ConstantInt*>* outputPattern = createPattern(outputs);
+	Pattern* inputPattern = createPattern(inputs);
+	Pattern* outputPattern = createPattern(outputs);
 	
 	//Add action to the actor
 	Action* action = new Action(actionTag, inputPattern, outputPattern, scheduler, body);
@@ -165,8 +165,8 @@ Procedure* BroadcastActor::createBody(){
 	return new Procedure(name, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);;
 }
 
-map<Port*, ConstantInt*>* BroadcastActor::createPattern(map<string, Port*>* ports){
-	map<string, Port*>::iterator it;
+Pattern* BroadcastActor::createPattern(map<string, Port*>* ports){
+	/*map<string, Port*>::iterator it;
 	map<Port*, ConstantInt*>* pattern = new map<Port*, ConstantInt*>();
 
 	//Set pattern to one token to test on port
@@ -175,7 +175,8 @@ map<Port*, ConstantInt*>* BroadcastActor::createPattern(map<string, Port*>* port
 		pattern->insert(pair<Port*, ConstantInt*>(it->second, one));
 	}
 
-	return pattern;
+	return pattern;*/
+	return NULL;
 }
 
 Value* BroadcastActor::createHasTokenTest(Port* port, BasicBlock* current){

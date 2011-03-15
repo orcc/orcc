@@ -213,13 +213,13 @@ private:
 	 *
 	 * Write the given pattern for an Instance.
 	 * 
-	 * @param action : the pattern to write
+	 * @param pattern : the pattern to write
 	 *
 	 * @param ports : the corresponding ports of the pattern
 	 *
 	 * @return the corresponding pattern in the decoder
 	 */
-	std::map<Port*, llvm::ConstantInt*>* writePattern(std::map<Port*, llvm::ConstantInt*>* pattern, std::map<std::string, Port*>* ports);
+	Pattern* writePattern(Pattern* pattern, std::map<std::string, Port*>* ports);
 
 	/**
 	 * @brief Write a list of procedures

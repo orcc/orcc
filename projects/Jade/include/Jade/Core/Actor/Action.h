@@ -48,6 +48,7 @@ namespace llvm{
 
 #include "Jade/Core/Actor/ActionTag.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
+#include "Jade/Core/Actor/Pattern.h"
 
 class Port;
 class Procedure;
@@ -76,8 +77,7 @@ public:
 	 *
 	 * @param body : Procedure that holds the body of the action
 	 */
-	Action(ActionTag* tag, std::map<Port*, llvm::ConstantInt*>* inputPattern, 
-		std::map<Port*, llvm::ConstantInt*>* outputPattern, Procedure* scheduler, Procedure* body) {
+	Action(ActionTag* tag, Pattern* inputPattern, Pattern* outputPattern, Procedure* scheduler, Procedure* body) {
 		this->tag = tag;
 		this->body = body;
 		this->scheduler = scheduler;
@@ -127,14 +127,14 @@ public:
    	 *
 	 *  @param a map of input pattern
      */
-	std::map<Port*, llvm::ConstantInt*>* getInputPattern(){return inputPattern;};
+	Pattern* getInputPattern(){return inputPattern;};
 
 	/**
      *  @brief return outpur pattern of the action
    	 *
 	 *  @param a map of output pattern
      */
-	std::map<Port*, llvm::ConstantInt*>* getOutputPattern(){return outputPattern;};
+	Pattern* getOutputPattern(){return outputPattern;};
 
 	/**
 	 * @brief Returns action name (tag or body name)
@@ -147,8 +147,8 @@ private:
 	ActionTag* tag;
 	Procedure* body;
 	Procedure* scheduler;
-	std::map<Port*, llvm::ConstantInt*>* inputPattern;
-	std::map<Port*, llvm::ConstantInt*>* outputPattern;
+	Pattern* inputPattern;
+	Pattern* outputPattern;
 };
 
 #endif

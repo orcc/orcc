@@ -128,27 +128,66 @@ Actor* IRParser::parseActor(string classz){
 						parameters, procs, initializes, actions, actionScheduler);
 }
 
-map<Port*, ConstantInt*>* IRParser::parsePattern(map<std::string, Port*>* ports, Value* value){
+Pattern* IRParser::parsePattern(map<std::string, Port*>* ports, Value* value){
 	map<Port*, ConstantInt*>* pattern = new map<Port*, ConstantInt*>();
 	
 	if (value != NULL){
 		MDNode* patternNode = cast<MDNode>(value);
-		map<std::string, Port*>::iterator it;
 
-		for (unsigned i = 0, e = patternNode->getNumOperands(); i != e;) {
+		map<Port*, ConstantInt*>* numTokens = parserNumTokens(ports, patternNode->getOperand(0));
+		map<Port*, Variable*>* varMap = parserVarMap(ports, patternNode->getOperand(1));
+		map<Port*, Variable*>* peekedMap = parserVarMap(ports, patternNode->getOperand(2));
+	}
+
+	return new Pattern();
+}
+
+map<Port*, Variable*>* IRParser::parserVarMap(map<std::string, Port*>* ports, Value* value){
+	map<Port*, Variable*>* varTokens = new map<Port*, Variable*>();
+
+	if (value != NULL){
+		map<string, Port*>::iterator it;
+		MDNode* varPortsNode = cast<MDNode>(value);
+
+		for (unsigned i = 0, e = varPortsNode->getNumOperands(); i != e;) {
 			//Find port of the pattern
-			MDNode* portNode = cast<MDNode>(patternNode->getOperand(i));
+			MDNode* portNode = cast<MDNode>(varPortsNode->getOperand(i));
 			MDString* name = cast<MDString>(portNode->getOperand(1));
 			it = ports->find(name->getString());
-			
-			//Get number of token consummed by this port
-			ConstantInt* numTokens = cast<ConstantInt>(patternNode->getOperand(++i));
-			pattern->insert(pair<Port*, ConstantInt*>(it->second, numTokens));
+			Port* port = it->second;
+
+			//Link with llvm global variable
+			GlobalVariable* globalVariable = cast<GlobalVariable>(varPortsNode->getOperand(++i));
+			Variable* variable = new Variable(port->getType(), name->getString(), true, true, globalVariable);
+			varTokens->insert(pair<Port*, Variable*>(it->second, variable));
 			i++;
 		}
 	}
 
-	return pattern;
+	return varTokens;
+}
+
+map<Port*, ConstantInt*>* IRParser::parserNumTokens(map<std::string, Port*>* ports, Value* value){
+	map<Port*, ConstantInt*>* numTokens = new map<Port*, ConstantInt*>();
+
+	if (value != NULL){
+		map<string, Port*>::iterator it;
+		MDNode* numTokensNode = cast<MDNode>(value);
+
+		for (unsigned i = 0, e = numTokensNode->getNumOperands(); i != e;) {
+			//Find port of the pattern
+			MDNode* portNode = cast<MDNode>(numTokensNode->getOperand(i));
+			MDString* name = cast<MDString>(portNode->getOperand(1));
+			it = ports->find(name->getString());
+
+			//Get number of token consummed/produced by this port
+			ConstantInt* nbTokens = cast<ConstantInt>(numTokensNode->getOperand(++i));
+			numTokens->insert(pair<Port*, ConstantInt*>(it->second, nbTokens));
+			i++;
+		}
+	}
+
+	return numTokens;
 }
 
 map<string, Port*>* IRParser::parsePorts(string key, Module* module){
@@ -330,8 +369,8 @@ Action* IRParser::parseAction(MDNode* node){
 		}
 	}
 
-	map<Port*, ConstantInt*>* ip = parsePattern(inputs, node->getOperand(1));
-	map<Port*, ConstantInt*>* op = parsePattern(outputs, node->getOperand(2));
+	Pattern* ip = parsePattern(inputs, node->getOperand(1));
+	Pattern* op = parsePattern(outputs, node->getOperand(2));
 
 	Procedure* scheduler = parseProc(cast<MDNode>(node->getOperand(3)));
 	Procedure* body = parseProc(cast<MDNode>(node->getOperand(4)));

@@ -232,7 +232,7 @@ void ActionSchedulerAdder::createSchedulerNoFSM(Instance* instance, BasicBlock* 
 }
 
 BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* function, BasicBlock* skipBB, BasicBlock* BB){
-	map<Port*, ConstantInt*>* pattern = action->getInputPattern();
+/*	map<Port*, ConstantInt*>* pattern = action->getInputPattern();
 	
 	//Pattern is empty, return current basic block
 	if (pattern->empty()){
@@ -264,11 +264,12 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* fu
 
 	//Finally branch fire to hasToken block if all inputs have tokens
 	BranchInst* brInst = BranchInst::Create(tokenBB, skipBB, value1, BB);
-	return tokenBB;
+	return tokenBB;*/
+	return NULL;
 }
 
 BasicBlock* ActionSchedulerAdder::createOutputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB){
-	map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
+	/*map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
 
 	//No output pattern return basic block
 	if (outputPattern->empty()){
@@ -301,7 +302,8 @@ BasicBlock* ActionSchedulerAdder::createOutputPattern(Action* action, llvm::Func
 	//Finally branch fire to hasRoom block if all outputs have free room
 	BranchInst* brInst = BranchInst::Create(roomBB, skipBB, value1, BB);
 
-	return roomBB;
+	return roomBB;*/
+	return NULL;
 }
 
 BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* BB, BasicBlock* incBB, Function* function){

@@ -149,7 +149,36 @@ private:
 	 *
 	 * @return a map of patterns.
 	 */
-	std::map<Port*, llvm::ConstantInt*>* parsePattern(std::map<std::string, Port*>* ports, llvm::Value* value);
+	Pattern* parsePattern(std::map<std::string, Port*>* ports, llvm::Value* value);
+
+	/**
+     * @brief parse the tokens links to a pattern
+	 *
+	 * Parses the given llvm::Value as a MDNode representing the number of tokens
+	 *	comsumption/produces by ports.
+	 * 
+	 * @param ports : the ports of the actor
+	 *
+	 * @param node : llvm::Value to parse
+	 *
+	 * @return a map of port and its production/consumption.
+	 */
+	std::map<Port*, llvm::ConstantInt*>* parserNumTokens(std::map<std::string, Port*>* ports, llvm::Value* value);
+
+	/**
+     * @brief parse the variables links to ports
+	 *
+	 * Parses the given llvm::Value as a MDNode representing the variable linked to a port,
+	 *	in a pattern.
+	 * 
+	 * @param ports : the ports of the actor
+	 *
+	 * @param node : llvm::Value to parse
+	 *
+	 * @return a map of port and its associated Variable.
+	 */
+	std::map<Port*, Variable*>* parserVarMap(std::map<std::string, Port*>* ports, llvm::Value* value);
+
 
 	/**
      * @brief parse procedures of a module

@@ -30,7 +30,6 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -91,13 +90,11 @@ public class LLVMTemplateData {
 	 */
 	private Map<Object, Integer> names;
 
+	private Map<Object, Integer> numTokenPattern;
 	/**
 	 * Medata container of patterns
 	 */
 	private Map<Object, Integer> patterns;
-	private Map<Object, Integer> varPattern;
-	private Map<Object, Integer> numTokenPattern;
-
 	/**
 	 * Medata container of ports
 	 */
@@ -112,6 +109,8 @@ public class LLVMTemplateData {
 	 * Medata container of types
 	 */
 	private Map<Object, Integer> types;
+
+	private Map<Object, Integer> varPattern;
 
 	/**
 	 * Medata container of variables
@@ -251,24 +250,18 @@ public class LLVMTemplateData {
 		}
 	}
 
+	private void computeNumTokens(Map<Port, Integer> numTokens) {
+		if (!numTokens.isEmpty()) {
+			numTokenPattern.put(numTokens, id++);
+		}
+	}
+
 	private void computePattern(Pattern pattern) {
 		if (!pattern.isEmpty()) {
 			patterns.put(pattern, id++);
 			computeNumTokens(pattern.getNumTokensMap());
 			computeVars(pattern.getVariableMap());
 			computeVars(pattern.getPeekedMap());
-		}
-	}
-	
-	private void computeNumTokens(Map<Port, Integer> numTokens){
-		if (!numTokens.isEmpty()){
-			numTokenPattern.put(numTokens, id++);
-		}
-	}
-	
-	private void computeVars(Map<Port, Variable> variables){
-		if (!variables.isEmpty()){
-			varPattern.put(variables, id++);
 		}
 	}
 
@@ -292,6 +285,12 @@ public class LLVMTemplateData {
 		vars.put(var, id++);
 		names.put(var.getName(), id++);
 		types.put(var.getType(), id++);
+	}
+
+	private void computeVars(Map<Port, Variable> variables) {
+		if (!variables.isEmpty()) {
+			varPattern.put(variables, id++);
+		}
 	}
 
 	/**
@@ -340,24 +339,6 @@ public class LLVMTemplateData {
 	}
 
 	/**
-	 * get patterns map
-	 * 
-	 * @return a map of pattern information.
-	 */
-	public Map<Object, Integer> getPatterns() {
-		return patterns;
-	}
-	
-	/**
-	 * get the var map of patterns
-	 * 
-	 * @return the var map of patterns.
-	 */
-	public Map<Object, Integer> getVarPattern() {
-		return varPattern;
-	}
-
-	/**
 	 * get the number of tokens map of patterns
 	 * 
 	 * @return the number of tokens map of patterns.
@@ -365,7 +346,16 @@ public class LLVMTemplateData {
 	public Map<Object, Integer> getNumTokenPattern() {
 		return numTokenPattern;
 	}
-	
+
+	/**
+	 * get patterns map
+	 * 
+	 * @return a map of pattern information.
+	 */
+	public Map<Object, Integer> getPatterns() {
+		return patterns;
+	}
+
 	/**
 	 * get port map
 	 * 
@@ -391,6 +381,15 @@ public class LLVMTemplateData {
 	 */
 	public Map<Object, Integer> getTypes() {
 		return types;
+	}
+
+	/**
+	 * get the var map of patterns
+	 * 
+	 * @return the var map of patterns.
+	 */
+	public Map<Object, Integer> getVarPattern() {
+		return varPattern;
 	}
 
 	/**

@@ -70,21 +70,17 @@ void Source::setStimulus(std::string stimulus){
 		}
 }
 
-void Source::source_get_src(unsigned char* tokens, int nbTokens){
+void Source::source_get_src(unsigned char* tokens){
 	int n;
 	
 	if (feof(file)) {
 		fseek(file, 0, 0);
 	}
 
-	for (int i = 0; i < nbTokens; i++){
+	n = fread(tokens, 1, 1, file);
+	if (n < 1) {	
+		fseek(file, 0, 0);
+		cnt = 0;
 		n = fread(tokens, 1, 1, file);
-		if (n < 1) {	
-			fseek(file, 0, 0);
-			cnt = 0;
-			n = fread(tokens, 1, 1, file);
-		}
-		tokens++;
-		cnt++;
 	}
 }
