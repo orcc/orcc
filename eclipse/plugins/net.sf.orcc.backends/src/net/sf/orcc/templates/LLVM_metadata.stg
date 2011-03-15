@@ -42,6 +42,8 @@ decl_MD(actor) ::= <<
 <actor.initializes: {action | <action_MD(actor=actor, action=action)>}>
 <actor.actions: {action | <action_MD(actor=actor, action=action)>}>
 <actor.templateData.patterns.keys: {pattern | <patterns_MD(actor=actor, patterns=pattern)>}>
+<actor.templateData.varPattern.keys: {varPattern | <patterns_vars_MD(actor = actor, vars = varPattern)>}>
+<actor.templateData.numTokenPattern.keys: {numToken | <patterns_numTokens_MD(actor = actor, numTokens = numToken)>}>
 <if(actor.MoC)>
 <MoC_MD(actor)>
 <endif>
@@ -139,6 +141,14 @@ patterns_decl_MD(actor, patterns) ::= <<
 !<actor.templateData.patterns.(patterns)>
 >>
 
+patterns_vars_decl_MD(actor, vars) ::= <<
+!<actor.templateData.varPattern.(vars)>
+>>
+
+patterns_numTokens_decl_MD(actor, numTokens) ::= <<
+!<actor.templateData.numTokenPattern.(numTokens)>
+>>
+
 MoC_decl_MD(actor) ::= <<
 !<actor.templateData.mocs.(actor.MoC)>
 >>
@@ -176,7 +186,25 @@ actions_MD(actor) ::= <<
 >>
 
 patterns_MD(actor, patterns) ::= <<
-<patterns_decl_MD(actor=actor, patterns=patterns)> = metadata !{<patterns.keys: {key | metadata <port_decl_MD(actor=actor, port=key)>, i32 <patterns.(key)>}; separator=", ">}
+<patterns_decl_MD(actor=actor, patterns=patterns)> = metadata !{<
+	if(patterns.numTokensMap)
+	> metadata <patterns_numTokens_decl_MD(actor=actor, numTokens=patterns.numTokensMap)><
+	else > null <endif>, <
+	if(patterns.variableMap)
+	> metadata <patterns_vars_decl_MD(actor=actor, vars=patterns.variableMap)><
+	else > null <endif>, <
+	if(patterns.peekedMap)
+	> metadata <patterns_vars_decl_MD(actor=actor, vars=patterns.peekedMap)><
+	else > null <endif>}
+>>
+
+patterns_vars_MD(actor, vars) ::= <<
+<patterns_vars_decl_MD(actor=actor, vars=vars)> = metadata !{<vars.keys: {key | metadata <port_decl_MD(actor=actor, port=key)>, <fifoType(key)>** <fifoVarName(key)>}; separator=", ">} 
+
+>>
+
+patterns_numTokens_MD(actor, numTokens) ::= <<
+<patterns_numTokens_decl_MD(actor=actor, numTokens=numTokens)> =  metadata !{<numTokens.keys: {key | metadata <port_decl_MD(actor=actor, port=key)>, i32 <numTokens.(key)>}; separator=", ">}
 
 >>
 
@@ -187,12 +215,12 @@ action_MD(actor, action) ::= <<
 	else
 		> metadata <Tag_decl_MD(actor=actor, tag=action.tag)
 	><endif
-	>,<if(first(action.inputPattern.keys))
+	>,<if(!action.inputPattern.empty)
 		> metadata <patterns_decl_MD(actor=actor, patterns=action.inputPattern)><
 	else
 		> null <
 	endif>,<
-	if(first(action.outputPattern.keys))
+	if(!action.outputPattern.empty)
 		> metadata <patterns_decl_MD(actor=actor, patterns=action.outputPattern)><
 	else
 		> null<

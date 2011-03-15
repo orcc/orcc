@@ -30,6 +30,7 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -94,6 +95,8 @@ public class LLVMTemplateData {
 	 * Medata container of patterns
 	 */
 	private Map<Object, Integer> patterns;
+	private Map<Object, Integer> varPattern;
+	private Map<Object, Integer> numTokenPattern;
 
 	/**
 	 * Medata container of ports
@@ -117,9 +120,11 @@ public class LLVMTemplateData {
 
 	public LLVMTemplateData(Actor actor) {
 		ports = new HashMap<Object, Integer>();
-		patterns = new HashMap<Object, Integer>();
 		actions = new HashMap<Object, Integer>();
 		actionScheduler = new HashMap<Object, Integer>();
+		patterns = new HashMap<Object, Integer>();
+		varPattern = new HashMap<Object, Integer>();
+		numTokenPattern = new HashMap<Object, Integer>();
 		procs = new HashMap<Object, Integer>();
 		vars = new HashMap<Object, Integer>();
 		types = new HashMap<Object, Integer>();
@@ -249,6 +254,21 @@ public class LLVMTemplateData {
 	private void computePattern(Pattern pattern) {
 		if (!pattern.isEmpty()) {
 			patterns.put(pattern, id++);
+			computeNumTokens(pattern.getNumTokensMap());
+			computeVars(pattern.getVariableMap());
+			computeVars(pattern.getPeekedMap());
+		}
+	}
+	
+	private void computeNumTokens(Map<Port, Integer> numTokens){
+		if (!numTokens.isEmpty()){
+			numTokenPattern.put(numTokens, id++);
+		}
+	}
+	
+	private void computeVars(Map<Port, Variable> variables){
+		if (!variables.isEmpty()){
+			varPattern.put(variables, id++);
 		}
 	}
 
@@ -327,7 +347,25 @@ public class LLVMTemplateData {
 	public Map<Object, Integer> getPatterns() {
 		return patterns;
 	}
+	
+	/**
+	 * get the var map of patterns
+	 * 
+	 * @return the var map of patterns.
+	 */
+	public Map<Object, Integer> getVarPattern() {
+		return varPattern;
+	}
 
+	/**
+	 * get the number of tokens map of patterns
+	 * 
+	 * @return the number of tokens map of patterns.
+	 */
+	public Map<Object, Integer> getNumTokenPattern() {
+		return numTokenPattern;
+	}
+	
 	/**
 	 * get port map
 	 * 

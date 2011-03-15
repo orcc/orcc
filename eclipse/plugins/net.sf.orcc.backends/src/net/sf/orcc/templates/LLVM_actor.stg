@@ -9,13 +9,16 @@ i<port.type.size>
 >>
 
 fifoVar(port, var) ::= <<
-%<var> = bitcast <fifoType(port)>** @<port.name>_ptr to <VarType(var)>*
+%<var> = bitcast <fifoType(port)>** <fifoVarName(port)> to <VarType(var)>*
+>>
 
+fifoVarName(port) ::= <<
+@<port.name>_ptr
 >>
 
 fifo(port) ::= <<
 @<port.name> = global i8* null
-@<port.name>_ptr = global <fifoType(port)>* null
+<fifoVarName(port)> = global <fifoType(port)>* null
 
 >>
 
