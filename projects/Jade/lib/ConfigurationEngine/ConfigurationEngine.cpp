@@ -65,8 +65,8 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	Configuration* configuration = decoder->getConfiguration();
 
 	// Adding broadcast 
-	BroadcastAdder broadAdder(Context,configuration, decoder);
-	broadAdder.transform();
+	//BroadcastAdder broadAdder(Context,configuration, decoder);
+	//broadAdder.transform();
 
 	//Write instance
 	IRWriter writer(Context, decoder);
@@ -77,8 +77,8 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	}
 
 	// Setting connections of the decoder
-	Connector connector(Context, decoder);
-	connector.setConnections(configuration);
+	//Connector connector(Context, decoder);
+	//connector.setConnections(configuration);
 }
 
 void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configuration){

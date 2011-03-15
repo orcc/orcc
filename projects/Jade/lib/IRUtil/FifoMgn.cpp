@@ -305,28 +305,3 @@ Function* FifoMng::getReadEndFunction(IntegerType* type, Decoder* decoder){
 
 	return it->second;
 }
-
-void FifoMng::refineActor(Actor* actor){
-	refineStructures(actor);
-}
-
-void FifoMng::refineStructures(Actor* actor){
-	
-	map<string, const StructType*>::iterator it;
-	Module* module = actor->getModule();
-
-	for (it = fifoStructs.begin(); it != fifoStructs.end(); ++it){
-		
-		//Get opaquetype of the current fifo in the actor
-		const Type* type = module->getTypeByName(it->first);
-		if (type == NULL){
-			continue;
-		}
-
-		if (type->isAbstract()){	
-			//Refine opaque type of the corresponding fifo structure
-			PATypeHolder Ty(type);
-			cast<DerivedType>(Ty.get())->refineAbstractTypeTo(it->second);
-		}
-	}
-}

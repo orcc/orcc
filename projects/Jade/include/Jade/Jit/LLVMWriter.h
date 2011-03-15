@@ -71,12 +71,31 @@ public:
      */
 	LLVMWriter(std::string prefix, Decoder* decoder);
 
+	
+	/**
+     *  @brief Create a new GlobalVariable in the decoder
+	 *
+	 * @param variable : the GlobalVariable to add
+	 *
+	 * @return the created GlobalVariable.
+	 *
+     */
 	llvm::GlobalVariable* createVariable(llvm::GlobalVariable* variable);
 	llvm::Function* createFunction(llvm::Function* function);
 
 	llvm::Function* addFunctionProtosExternal(const llvm::Function* function);
 	llvm::Function* addFunctionProtosInternal(const llvm::Function* function);
 	bool linkProcedureBody(llvm::Function* function);
+
+	/**
+     *  @brief Add a new GlobalVariable representing a Port in the given decoder
+	 *
+	 * @param port : the Port to add
+	 *
+	 * @return the created GlobalVariable.
+	 *
+     */
+	llvm::GlobalVariable* createPortVariable(Port* port);
 
 	/**
      *  @brief Add a new llvm::Type in the given decoder

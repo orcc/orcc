@@ -259,9 +259,6 @@ map<string, Actor*>* DecoderEngine::parseActors(Configuration* Configuration) {
 		if(itAct == actors.end()){
 			//Actor has not been parsed
 			actor = irParser->parseActor(*it);
-			
-			//Refine actors with the fifo used by the decoder engine
-			//FifoMng::refineActor(actor);
 		}else{
 			//Actor has been parsed
 			actor = itAct->second;

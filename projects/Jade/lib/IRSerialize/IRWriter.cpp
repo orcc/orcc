@@ -81,11 +81,11 @@ bool IRWriter::write(Instance* instance){
 	writeInstance(instance);
 
 	//Adding action scheduler
-	actionSchedulerAdder->transform(instance);
+	//actionSchedulerAdder->transform(instance);
 
 	//Add the instance in the scheduler
-	Scheduler* scheduler = decoder->getScheduler();
-	scheduler->addInstance(instance);
+	//Scheduler* scheduler = decoder->getScheduler();
+	//scheduler->addInstance(instance);
 
 	return true;
 }
@@ -137,7 +137,7 @@ std::map<std::string, Port*>* IRWriter::writePorts(string key, map<string, Port*
 void IRWriter::writePort(string key, Port* port){
 	string name = port->getName();
 	GlobalVariable* portVar = port->getGlobalVariable();
-	GlobalVariable* globalVariable = writer->createVariable(portVar);
+	GlobalVariable* globalVariable = writer->createPortVariable(port);
 	Port* instPort = NULL;
 
 	if (key == IRConstant::KEY_INPUTS){

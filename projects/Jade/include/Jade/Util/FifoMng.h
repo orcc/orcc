@@ -210,15 +210,6 @@ public:
 	 *	@Return the new Fifo
      */
 	static AbstractFifo* getFifo(llvm::LLVMContext& C, Decoder* decoder, llvm::Type* type, int size);
-
-	/**
-	 *  @brief refine Fifos of the actor
-	 *     
-	 *  Set Abstract fifos from the current actor into the Fifo
-	 *
-	 *  @param actor: the Actor to refine
-	 */
-	static void refineActor(Actor* actor);
 	
 	/**
 	 *  @brief Add fifo header
@@ -287,11 +278,6 @@ private:
     * @brief Defines the name of a fifo according to the bitwidth
     */
 	static FifoMng::FifoAccess* getFifoAccess(llvm::IntegerType* type);
-
-	/**
-	 *  @brief refine fifo structures of the actor
-	 */
-	static void refineStructures(Actor* actor);
 
 	/** Fifo type */
 	static FifoTy fifoTy;

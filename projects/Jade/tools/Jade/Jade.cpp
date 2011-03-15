@@ -235,8 +235,11 @@ void startCmdLine(){
 	//Load network
 	engine->load(network, 3);
 
+	if (OutputDir != ""){
+		engine->print(network, "module.txt");
+	}
 	//Run network
-	engine->run(network, VidFile);
+	//engine->run(network, VidFile);
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
 }
