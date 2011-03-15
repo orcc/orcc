@@ -28,8 +28,10 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
-import net.sf.orcc.interpreter.NodeInterpreter;
-import net.sf.orcc.ir.AbstractActorVisitor;
+import java.util.Map;
+
+import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -48,26 +50,22 @@ import net.sf.orcc.ir.instructions.Store;
  * @author Herve Yviquel
  * 
  */
-public class ArrayInitializeTransformation extends AbstractActorVisitor {
+public class ArrayInitializeTransformation extends ActorInterpreter {
 
-	private class SpecialNodeInterpreter extends NodeInterpreter {
-
-		@Override
-		public void visit(Store instr) {
-			Variable target = instr.getTarget();
-			Type type = target.getType();
-			// Allocate value field of list if it is initialized
-			if (type.isList() && target.getValue() == null) {
-				target.setValue((Expression) type.accept(listAllocator));
-			}
-			super.visit(instr);
-		}
+	public ArrayInitializeTransformation(Map<String, Expression> parameters,
+			Actor actor, OrccProcess process) {
+		super(parameters, actor, process);
 	}
 
-	private NodeInterpreter nodeInterpreter;
-
-	public ArrayInitializeTransformation() {
-		nodeInterpreter = new SpecialNodeInterpreter();
+	@Override
+	public void visit(Store instr) {
+		Variable target = instr.getTarget();
+		Type type = target.getType();
+		// Allocate value field of list if it is initialized
+		if (type.isList() && target.getValue() == null) {
+			target.setValue((Expression) type.accept(listAllocator));
+		}
+		super.visit(instr);
 	}
 
 	@Override
@@ -84,7 +82,6 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor {
 		for (Action action : actor.getInitializes()) {
 			for (CFGNode node : action.getBody().getNodes()) {
 				node.accept(this);
-				node.accept(nodeInterpreter);
 			}
 		}
 

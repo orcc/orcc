@@ -56,14 +56,11 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.tools.transformations.RemoveReadWrites;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -377,14 +374,11 @@ public class StaticActorNormalizer {
 	 */
 	private void createReads(Procedure procedure) {
 		Pattern inputPattern = staticCls.getInputPattern();
-		BlockNode block = BlockNode.getLast(procedure);
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
 			Variable var = stateVars.get(port.getName());
-
-			Read read = new Read(port, numTokens, var);
-			var.setInstruction(read);
-			block.add(read);
+			System.out.println("must read " + numTokens + " tokens from "
+					+ var.getName());
 		}
 	}
 
@@ -418,19 +412,11 @@ public class StaticActorNormalizer {
 	 */
 	private void createWrites(Procedure procedure) {
 		Pattern outputPattern = staticCls.getOutputPattern();
-		BlockNode block = BlockNode.getLast(procedure);
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
 			Variable var = stateVars.get(port.getName());
-
-			Write write = new Write(port, numTokens, var);
-
-			// Avoid this instructions to be removed by the Dead Code
-			// transformation
-			var.setInstruction(write);
-			var.addUse(write);
-
-			block.add(write);
+			System.out.println("must write " + numTokens + " tokens from "
+					+ var.getName());
 		}
 	}
 

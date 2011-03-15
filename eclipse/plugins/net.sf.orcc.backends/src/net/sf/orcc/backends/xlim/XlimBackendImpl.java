@@ -53,6 +53,7 @@ import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimInlineTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
@@ -105,7 +106,9 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorVisitor[] transformations = { new ArrayInitializeTransformation(),
+		ActorVisitor[] transformations = {
+				new ArrayInitializeTransformation(
+						new HashMap<String, Expression>(0), actor, null),
 				new TernaryOperationAdder(),
 				new XlimInlineTransformation(true, true),
 				new ListOfOneElementToScalarTransformation(),

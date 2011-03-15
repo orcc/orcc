@@ -36,12 +36,15 @@ import jp.ac.kobe_u.cs.cream.IntDomain;
 import jp.ac.kobe_u.cs.cream.IntVariable;
 import jp.ac.kobe_u.cs.cream.Network;
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -62,7 +65,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 
-public class ConstraintBuilder extends AbstractNodeInterpreter {
+public class ConstraintBuilder extends ActorInterpreter {
 
 	/**
 	 * This class defines a visitor that examines expressions that depend on a
@@ -253,7 +256,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	 */
 	private Map<Variable, Variable> variables;
 
-	public ConstraintBuilder() {
+	public ConstraintBuilder(Actor actor) {
+		super(new HashMap<String, Expression>(0), actor, null);
 		network = new Network();
 		variableConstraints = new HashMap<String, IntVariable>();
 		variables = new HashMap<Variable, Variable>();
@@ -399,17 +403,6 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		associateVariable(load.getTarget(), source);
 	}
 
-	@Override
-	public void visit(Peek peek) {
-		Variable source = variables.get(peek.getTarget());
-		if (source == null) {
-			Port port = peek.getPort();
-			source = new LocalVariable(true, 0, new Location(), port.getName(),
-					port.getType());
-			variables.put(peek.getTarget(), source);
-		}
-	}
-
 	/**
 	 * Visits the given action with the given visitor.
 	 * 
@@ -419,6 +412,19 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	 *            a node visitor
 	 */
 	public void visitAction(Action action) {
+		Pattern pattern = action.getInputPattern();
+		for (Port port : pattern.getPorts()) {
+			Variable peeked = pattern.getPeeked(port);
+			if (peeked != null) {
+				Variable source = variables.get(peeked);
+				if (source == null) {
+					source = new LocalVariable(true, 0, new Location(),
+							port.getName(), port.getType());
+					variables.put(peeked, source);
+				}
+			}
+		}
+
 		Procedure scheduler = action.getScheduler();
 		for (CFGNode node : scheduler.getNodes()) {
 			node.accept(this);

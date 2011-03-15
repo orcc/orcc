@@ -46,6 +46,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -86,8 +87,13 @@ public class ConfigurationAnalyzer {
 		}
 
 		@Override
-		public void visit(Peek peek) {
-			candidates.add(peek.getPort());
+		public void visit(Action action) {
+			Pattern pattern = action.getInputPattern();
+			for (Port port : pattern.getPorts()) {
+				if (pattern.getPeeked(port) != null) {
+					candidates.add(port);
+				}
+			}
 		}
 
 	}
@@ -166,7 +172,7 @@ public class ConfigurationAnalyzer {
 		FSM fsm = actor.getActionScheduler().getFsm();
 		String initialState = fsm.getInitialState().getName();
 		for (NextStateInfo info : fsm.getTransitions(initialState)) {
-			ConstraintBuilder visitor = new ConstraintBuilder();
+			ConstraintBuilder visitor = new ConstraintBuilder(actor);
 
 			// add negated constraints of previous actions
 			visitor.setNegateConstraints(true);

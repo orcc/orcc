@@ -37,10 +37,7 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 
 /**
  * This class defines an actor transformation that replace list of one element
