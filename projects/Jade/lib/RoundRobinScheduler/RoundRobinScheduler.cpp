@@ -57,7 +57,7 @@
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Variable.h"
 #include "Jade/Core/Network/Instance.h"
-#include "Jade/Scheduler/RoundRobinScheduler.h"
+#include "Jade/RoundRobinScheduler/RoundRobinScheduler.h"
 
 #include "Jade/Actor/display.h"
 //------------------------------

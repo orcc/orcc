@@ -51,7 +51,7 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
-#include "Jade/Scheduler/ActionSchedulerAdder.h"
+#include "Jade/RoundRobinScheduler/ActionSchedulerAdder.h"
 #include "Jade/Util/FifoMng.h"
 //------------------------------
 

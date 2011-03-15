@@ -47,7 +47,7 @@ namespace llvm{
 
 class Decoder;
 
-#include "Scheduler.h"
+#include "Jade/Scheduler/Scheduler.h"
 #include "Jade/Jit/LLVMExecution.h"
 //------------------------------
 

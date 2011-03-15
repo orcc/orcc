@@ -47,7 +47,7 @@
 #include "Jade/Core/Network.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Jit/LLVMExecution.h"
-#include "Jade/Scheduler/RoundRobinScheduler.h"
+#include "Jade/RoundRobinScheduler/RoundRobinScheduler.h"
 #include "Jade/Util/FifoMng.h"
 //------------------------------
 

@@ -42,7 +42,7 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Jit/LLVMWriter.h"
 #include "Jade/Serialize/IRWriter.h"
-#include "Jade/Scheduler/ActionSchedulerAdder.h"
+#include "Jade/RoundRobinScheduler/ActionSchedulerAdder.h"
 
 #include "llvm/Module.h"
 
