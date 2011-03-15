@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.preferences;
 
-import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.OrccActivator;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;

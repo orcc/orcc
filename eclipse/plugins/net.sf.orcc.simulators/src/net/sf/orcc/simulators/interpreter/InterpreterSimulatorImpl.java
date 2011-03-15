@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
@@ -47,7 +48,6 @@ import net.sf.orcc.runtime.Fifo_boolean;
 import net.sf.orcc.runtime.Fifo_int;
 import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.SimuActor;
-import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;

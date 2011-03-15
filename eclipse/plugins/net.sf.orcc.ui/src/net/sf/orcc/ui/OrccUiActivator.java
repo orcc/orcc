@@ -85,12 +85,6 @@ public class OrccUiActivator extends AbstractUIPlugin {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
 
-	/**
-	 * The constructor
-	 */
-	public OrccUiActivator() {
-	}
-
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);

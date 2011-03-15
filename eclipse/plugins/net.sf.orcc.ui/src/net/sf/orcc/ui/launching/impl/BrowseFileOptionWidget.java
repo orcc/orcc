@@ -30,8 +30,8 @@ package net.sf.orcc.ui.launching.impl;
 
 import java.io.File;
 
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.plugins.BrowseFileOption;
-import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 

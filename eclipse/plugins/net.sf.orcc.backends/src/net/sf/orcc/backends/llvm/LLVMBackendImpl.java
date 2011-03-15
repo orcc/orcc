@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -58,7 +59,6 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
-import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.util.OrccUtil;
 
 /**

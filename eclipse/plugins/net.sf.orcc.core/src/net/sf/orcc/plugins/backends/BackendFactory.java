@@ -38,10 +38,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.plugins.PluginFactory;
 import net.sf.orcc.plugins.PluginOption;
-import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IProject;

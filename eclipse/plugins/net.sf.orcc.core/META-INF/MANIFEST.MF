@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Orcc core plug-in
 Bundle-SymbolicName: net.sf.orcc.core;singleton:=true
 Bundle-Version: 0.9.3.v20110228
-Bundle-Activator: net.sf.orcc.ui.OrccActivator
+Bundle-Activator: net.sf.orcc.OrccActivator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
@@ -49,5 +49,4 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.tools.merger2,
  net.sf.orcc.tools.normalizer,
  net.sf.orcc.tools.statistics,
- net.sf.orcc.ui,
  net.sf.orcc.util

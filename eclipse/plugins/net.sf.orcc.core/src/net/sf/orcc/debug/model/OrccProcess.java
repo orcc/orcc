@@ -33,10 +33,10 @@ import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
 import java.io.IOException;
 
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.plugins.backends.BackendFactory;
 import net.sf.orcc.plugins.simulators.SimulatorFactory;
-import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;

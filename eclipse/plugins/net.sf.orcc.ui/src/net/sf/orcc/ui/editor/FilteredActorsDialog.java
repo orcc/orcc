@@ -31,7 +31,7 @@ package net.sf.orcc.ui.editor;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFolder;

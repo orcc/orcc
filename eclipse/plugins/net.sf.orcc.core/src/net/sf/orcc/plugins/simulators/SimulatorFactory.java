@@ -33,12 +33,12 @@ import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import java.util.HashMap;
 import java.util.List;
 
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.debug.model.OrccDebugTarget;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.plugins.PluginFactory;
 import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.plugins.simulators.Simulator.SimulatorEvent;
-import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;

@@ -11,7 +11,7 @@
  *******************************************************************************/
 package net.sf.orcc.debug.model;
 
-import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.OrccActivator;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
