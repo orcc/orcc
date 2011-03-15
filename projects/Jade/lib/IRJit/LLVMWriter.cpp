@@ -235,35 +235,9 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
 	for (BasicBlock::iterator II = BB->begin(); II != BB->end(); ++II){ 
 	  // Remap operands.
 	  for (User::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
-		Value *V;
-		
-		if (isa<Function>(*op) && (fifoFns!=NULL)){
-			it = fifoFns->find((*op)->getName());
-
-			if (it != fifoFns->end()){
-				//Link with the corresponding fifo function
-				V = it->second;
-			}else{
-				//Not fifo function, behave normaly
-				V= MapValue(*op, VMap, ModuleLevelChanges);
-				assert(V && "Referenced value not in value map!");
-			}
-		}else{
-			V= MapValue(*op, VMap, ModuleLevelChanges);
-			assert(V && "Referenced value not in value map!");
-		}
+		Value *V = MapValue(*op, VMap, ModuleLevelChanges);
+		assert(V && "Referenced value not in value map!");
 		*op = V;
-	  }
-
-	  // Remap attached metadata.
-	  SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
-	  II->getAllMetadata(MDs);
-	  for (SmallVectorImpl<std::pair<unsigned, MDNode *> >::iterator
-		   MI = MDs.begin(), ME = MDs.end(); MI != ME; ++MI) {
-		Value *Old = MI->second;
-		Value *New = MapValue(Old, VMap, ModuleLevelChanges);
-		if (New != Old)
-		  II->setMetadata(MI->first, cast<MDNode>(New));
 	  }
   }
 }

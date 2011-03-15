@@ -283,9 +283,6 @@ private:
 	/** Source actor */
 	Actor* actor;
 
-	/** Action scheduler adder */
-	ActionSchedulerAdder* actionSchedulerAdder;
-
 	/** Destinated instance */
 	Instance* instance;
 	

@@ -42,7 +42,6 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Jit/LLVMWriter.h"
 #include "Jade/Serialize/IRWriter.h"
-#include "Jade/RoundRobinScheduler/ActionSchedulerAdder.h"
 
 #include "llvm/Module.h"
 
@@ -54,15 +53,9 @@ using namespace llvm;
 
 IRWriter::IRWriter(LLVMContext& C, Decoder* decoder): Context(C){
 	this->decoder = decoder;
-
-	//Set the action scheduler adder
-	this->actionSchedulerAdder = new ActionSchedulerAdder(Context, decoder);
 }
 
 IRWriter::~IRWriter(){
-	
-	delete actionSchedulerAdder;
-	
 	if(!writer){
 		delete writer;
 	}
@@ -79,13 +72,6 @@ bool IRWriter::write(Instance* instance){
 	//Write instance
 	writer = new LLVMWriter(instance->getId()+"_", decoder);	
 	writeInstance(instance);
-
-	//Adding action scheduler
-	//actionSchedulerAdder->transform(instance);
-
-	//Add the instance in the scheduler
-	//Scheduler* scheduler = decoder->getScheduler();
-	//scheduler->addInstance(instance);
 
 	return true;
 }
