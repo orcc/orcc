@@ -133,6 +133,14 @@ public:
 	std::string getClasz(){return clasz;};
 
 	/*!
+     *  @brief Setter of clasz
+     *
+	 * @param clasz: the new clasz of the Instance
+     *
+     */
+	void setClasz(std::string clasz){this->clasz = clasz;};
+
+	/*!
      *  @brief Getter of actor
      *
 	 * @return Actor of this instance

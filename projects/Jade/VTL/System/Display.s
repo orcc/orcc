@@ -55,11 +55,11 @@ declare void @write_mb(i8*, i8*)
 !1 = metadata !{metadata !"System.Display"}
 !2 = metadata !{metadata !27, null}
 
-!3 = metadata !{metadata !4, metadata !"B", i8** @B}
+!3 = metadata !{metadata !4, metadata !"Byte", i8** @B}
 !4 = metadata  !{ i32 8 ,  null }
-!5 = metadata !{metadata !6, metadata !"WIDTH", i8** @WIDTH}
+!5 = metadata !{metadata !6, metadata !"Width", i8** @WIDTH}
 !6 = metadata  !{ i32 16 ,  null }
-!7 = metadata !{metadata !8, metadata !"HEIGHT", i8** @HEIGHT}
+!7 = metadata !{metadata !8, metadata !"Height", i8** @HEIGHT}
 !8 = metadata  !{ i32 16 ,  null }
 !9 = metadata !{metadata !10, metadata !11, null, i8** @display}
 !10 = metadata !{metadata !"display", i1 0, i32 0,  i32 0}

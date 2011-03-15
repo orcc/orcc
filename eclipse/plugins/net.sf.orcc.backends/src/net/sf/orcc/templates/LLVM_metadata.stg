@@ -244,7 +244,7 @@ port_MD(actor, port) ::= <<
 >>
 
 proc_MD(actor, proc) ::= <<
-<proc_decl_MD(actor=actor, proc=proc)> = metadata !{<varName_MD(proc)>, <procExtern_MD(proc)>, <proc.returnType>(<proc.parameters.list: argumentTypeDeclaration(); wrap, anchor, separator=", ">)* @<proc>}
+<proc_decl_MD(actor=actor, proc=proc)> = metadata !{<varName_MD(proc)>, <procNative_MD(proc)>, <proc.returnType>(<proc.parameters.list: argumentTypeDeclaration(); wrap, anchor, separator=", ">)* @<proc>}
 
 >>
 
@@ -310,7 +310,7 @@ Type_MD(actor, var) ::= <<
 >>
 
 Sched_MD(actor, action) ::= <<
-<Sched_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.scheduler)>, <procExtern_MD(action.scheduler)>, i1()* @<action.scheduler>}
+<Sched_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.scheduler)>, <procNative_MD(action.scheduler)>, i1()* @<action.scheduler>}
 
 >>
 
@@ -326,7 +326,7 @@ VarDef_MD(actor, var) ::= <<
 
 
 Body_MD(actor, action) ::= <<
-<Body_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.body)>, <procExtern_MD(action.body)>, void()* @<action.body>}
+<Body_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.body)>, <procNative_MD(action.body)>, void()* @<action.body>}
 
 >>
 
@@ -378,7 +378,7 @@ varIndex_MD(var) ::= <<
 i32 <if(var.index)><var.index><else>0<endif>
 >>
 
-procExtern_MD(proc) ::= <<
+procNative_MD(proc) ::= <<
 <if(proc.native)>i1 1<else>i1 0<endif>
 >>
 

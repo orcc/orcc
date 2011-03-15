@@ -255,7 +255,7 @@ map<string, Actor*>* DecoderEngine::parseActors(Configuration* Configuration) {
 		//Check if actor has been already parsed before
 		Actor* actor = NULL;
 		itAct = actors.find(*it);
-		
+
 		if(itAct == actors.end()){
 			//Actor has not been parsed
 			actor = irParser->parseActor(*it);

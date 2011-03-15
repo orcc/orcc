@@ -83,6 +83,11 @@ void Configuration::setInstances(){
 
 			//Insert actor requiered for this network
 			string clasz = instance->getClasz();
+			//TODO : Support external
+			if (clasz.compare("std.video.DisplayYUV") == 0){
+				clasz = "System.Display";
+				instance->setClasz(clasz);
+			}
 			actorFiles.push_back(clasz);
 		}
 	}
