@@ -100,7 +100,8 @@ void IRLinker::linkPorts(map<string, Port*>* refPorts, map<string, Port*>* ports
 			Port* port = it->second;
 			Port* refPort = itRef->second;
 
-			port->setGlobalVariable(refPort->getGlobalVariable());
+			port->setPtrVar(refPort->getPtrVar());
+			port->setFifoVar(refPort->getFifoVar());
 		}
 
 	}

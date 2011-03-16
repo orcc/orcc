@@ -51,6 +51,7 @@ namespace llvm {
 
 class Actor;
 class AbstractConnector;
+class Variable;
 //------------------------------
 
 
@@ -71,21 +72,6 @@ public:
 	/**
 	 * @brief Constructor
 	 *
-	 * Creates a new Port on an actor with the given location, Type, name and llvm variable.
-	 *
-	 * @param Type		:	the Port Type
-	 * @param name		:	the Port name
-	 * @param variable	:	the llvm variable corresponding to this port
-	 */
-	Port(std::string name, llvm::IntegerType* type, llvm::GlobalVariable* variable){
-		this->name = name; 
-		this->type = type; 
-		this->variable = variable;
-	};
-
-	/**
-	 * @brief Constructor
-	 *
 	 * Creates a new Port on an actor with the given location, Type, name.
 	 *
 	 * @param Type		:	the Port Type
@@ -94,7 +80,8 @@ public:
 	Port(std::string name, llvm::IntegerType* type){
 		this->name = name; 
 		this->type = type; 
-		this->variable = NULL;
+		this->ptrVar = NULL;
+		this->fifoVar = NULL;
 	};
 
 	/**
@@ -154,23 +141,42 @@ public:
 	int getFifoConnectionNb(){return fifos.size();};
 
 	/**
-	 * @brief Getter the of variable
+	 * @brief Getter the port pointer
 	 * 
-	 * Get the llvm::GlobalVariable that corresponds to the Port
+	 * Get the llvm::GlobalVariable that corresponds to the Port pointer
+	 *
+	 * @return the corresponding Variable
+	 */
+	Variable* getPtrVar(){return ptrVar;};
+
+	/**
+	 * @brief Getter fifo variable
+	 * 
+	 * Get the llvm::GlobalVariable that corresponds to the Port fifo
 	 *
 	 * @return corresponding llvm::GlobalVariable
 	 */
-	llvm::GlobalVariable* getGlobalVariable(){return variable;};
+	llvm::GlobalVariable* getFifoVar(){return fifoVar;};
 
 
 	/**
-	 * @brief Setter the of variable
+	 * @brief Setter of the port pointer
 	 * 
-	 * Set the llvm::GlobalVariable that corresponds to the Port
+	 * Set the llvm::GlobalVariable that corresponds to the Port pointer
 	 *
-	 * @param variable : llvm::GlobalVariable that corresponds to the port
+	 * @param variable : llvm::GlobalVariable that corresponds to the port pointer
 	 */
-	void setGlobalVariable(llvm::GlobalVariable* variable){this->variable = variable;};
+	void setPtrVar(Variable* ptrVar){this->ptrVar = ptrVar;};
+
+	/**
+	 * @brief Setter of the port pointer
+	 * 
+	 * Set the Variable that corresponds to the Port pointer
+	 *
+	 * @param variable : the Variable that corresponds to the port pointer
+	 */
+	void setFifoVar(llvm::GlobalVariable* fifoVar){this->fifoVar = fifoVar;};
+
 
 protected:
 	
@@ -190,6 +196,9 @@ protected:
 	std::list<AbstractConnector*> fifos;
 	
 	/** Corresponding global variable*/
-	llvm::GlobalVariable* variable;
+	Variable* ptrVar;
+
+	/** Corresponding global variable*/
+	llvm::GlobalVariable* fifoVar;
 };
 #endif

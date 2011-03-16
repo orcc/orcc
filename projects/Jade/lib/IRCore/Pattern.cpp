@@ -82,6 +82,21 @@ void Pattern::clear(){
 	variableMap->clear();
 }
 
+void Pattern::setNumTokens(Port* port, llvm::ConstantInt* numTokens) {
+	checkPortPresence(port);
+	numTokensMap->insert(pair<Port*, ConstantInt*>(port, numTokens));
+}
+
+void Pattern::setPeeked(Port* port, Variable* peeked) {
+	checkPortPresence(port);
+	peekedMap->insert(pair<Port*, Variable*>(port, peeked));
+}
+
+void Pattern::setVariable(Port* port, Variable* variable) {
+		checkPortPresence(port);
+		variableMap->insert(pair<Port*, Variable*>(port, variable));
+}
+
 void Pattern::remove(Port* port) {
 	ports.erase(port);
 	numTokensMap->erase(port);

@@ -222,6 +222,15 @@ private:
 	Pattern* writePattern(Pattern* pattern, std::map<std::string, Port*>* ports);
 
 	/**
+	 * @brief Write ports pointer
+	 * 
+	 * @param srcPorts : the source pointer to get variable from
+	 *
+	 * @param dstPorts : the destionation ports to write the new variable
+	 */
+	void writePortPtrs(std::map<std::string, Port*>* srcPorts, std::map<std::string, Port*>* dstPorts);
+
+	/**
 	 * @brief Write a list of procedures
 	 *
 	 * Write the given list of procedure for an Instance.

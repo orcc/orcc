@@ -98,10 +98,14 @@ void Connector::setConnection(Connection* connection){
 	GlobalVariable* srcVar = createPortVar(src);
 	GlobalVariable* dstVar = createPortVar(dst);
 
-	//Create a fifo and set it to the connection
+	//Initialize ports with a new fifo
 	AbstractFifo* fifo = FifoMng::getFifo(Context, decoder, src->getType(), connection->getSize());
 	srcVar->setInitializer(fifo->getGV());
 	dstVar->setInitializer(fifo->getGV());
+	
+	// Store the generated variable
+	src->setFifoVar(srcVar);
+	dst->setFifoVar(dstVar);
 }
 
 void Connector::setConnections(Configuration* configuration, LLVMExecution* executionEngine){

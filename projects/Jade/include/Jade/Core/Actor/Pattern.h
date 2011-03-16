@@ -131,6 +131,33 @@ public:
 	 */
 	void remove(Port* port);
 
+	/**
+	 * @brief Sets the number of tokens produced (or consumed) by the given port.
+	 * 
+	 * @param port : a port
+	 *
+	 * @param numTokens :  number of tokens produced (or consumed) by the given port
+	 */
+	void setNumTokens(Port* port, llvm::ConstantInt* numTokens);
+
+	/**
+	 * @brief Sets the variable in which tokens are peeked from the given port.
+	 * 
+	 * @param port : a port
+	 *
+	 * @param peeked : a variable that contains tokens peeked by the given port
+	 */
+	void setPeeked(Port* port, Variable* peeked);
+
+	/**
+	 * @brief Sets the variable that contains tokens produced (or consumed) by the
+	 * given port.
+	 * 
+	 * @param port : a port
+	 * @param variable : the variable that contains tokens produced (or consumed) by
+	 *            the given port
+	 */
+	void setVariable(Port* port, Variable* variable);
 private:
 
 	/**

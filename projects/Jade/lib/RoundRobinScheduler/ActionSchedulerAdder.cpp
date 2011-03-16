@@ -362,7 +362,7 @@ map<FSM::State*, BasicBlock*>* ActionSchedulerAdder::createStates(map<string, FS
 
 CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	//Load selected port
-	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
+	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
 	
 	//Call hasRoom function
 	Function* hasRoomFn = FifoMng::getHasRoomFunction(port->getType(), decoder);
@@ -374,7 +374,7 @@ CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTok
 
 CallInst* ActionSchedulerAdder::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	//Load selected port
-	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
+	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
 	
 	//Call hasToken function
 	Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType(), decoder);

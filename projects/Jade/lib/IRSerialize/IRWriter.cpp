@@ -78,7 +78,14 @@ bool IRWriter::write(Instance* instance){
 
 void IRWriter::writeInstance(Instance* instance){
 	
+	// Get instance ports
+	inputs = instance->getInputs();
+	outputs = instance->getOutputs();
+
 	//Write all instance property
+	writePortPtrs(actor->getInputs(), inputs);
+	writePortPtrs(actor->getOutputs(), outputs);
+
 	stateVars = writeStateVariables(actor->getStateVars());
 	parameters = writeVariables(actor->getParameters());
 	procs = writeProcedures(actor->getProcs());
@@ -97,44 +104,23 @@ void IRWriter::writeInstance(Instance* instance){
 	//Resolve paramaters of this instance
 	instance->solveParameters();
 }
-/*
-std::map<std::string, Port*>* IRWriter::writePorts(string key, map<string, Port*>* ports){
-	map<string, Port*>::iterator it;
-	map<string, Port*>* newPorts = new map<string, Port*>();
 
-	//Iterate though the given ports
-	for (it = ports->begin(); it != ports->end(); ++it){
-		string name = it->first;
-		Port* port = it->second;
+void IRWriter::writePortPtrs(map<string, Port*>* srcPorts, map<string, Port*>* dstPorts){
+	map<string, Port*>::iterator itSrc;
+	map<string, Port*>::iterator itDst;
 
-		//Create and store port for the instance
-		writePort(key, port);
+	for (itSrc = srcPorts->begin(); itSrc != srcPorts->end(); itSrc++){
+		itDst = dstPorts->find(itSrc->first);
+		Port* src = itSrc->second;
+		Port* dst = itDst->second;
+
+		Variable* srcVar = src->getPtrVar();
+		GlobalVariable* globalVar = writer->createVariable(srcVar->getGlobalVariable());
+		Variable* newVar = new Variable(srcVar->getType(), srcVar->getName(), srcVar->isGlobal(), srcVar->isAssignable(), globalVar);
+		dst->setPtrVar(newVar);
 	}
 
-	return newPorts;
 }
-
-void IRWriter::writePort(string key, Port* port){
-	string name = port->getName();
-	GlobalVariable* portVar = port->getGlobalVariable();
-	GlobalVariable* globalVariable = writer->createPortVariable(port);
-	Port* instPort = NULL;
-
-	if (key == IRConstant::KEY_INPUTS){
-		instPort = instance->getInput(name);
-	}else{
-		instPort = instance->getOutput(name);
-	}
-
-	//Port not found
-	if (instPort == NULL){
-		cerr << "Port " << name << " as not been found in instance " << instance->getId();
-		exit(0);
-	}
-
-	//Set global variable to the instance port
-	instPort->setGlobalVariable(globalVariable);
-}*/
 
 map<string, Variable*>* IRWriter::writeVariables(map<string, Variable*>* vars){
 	map<string, Variable*>::iterator it;
@@ -212,17 +198,52 @@ Procedure* IRWriter::writeProcedure(Procedure* procedure){
 }
 
 Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
-/*	map<Port*, ConstantInt*>::iterator itPattern;
 	map<string, Port*>::iterator itPort;
-	map<Port*, ConstantInt*>* newPattern = new map<Port*, ConstantInt*>();
+	Pattern* newPattern = new Pattern();
 
-	for (itPattern = pattern->begin(); itPattern != pattern->end(); itPattern++) {
-		itPort = ports->find(itPattern->first->getName());
-		newPattern->insert(pair<Port*, ConstantInt*>(itPort->second, itPattern->second));
+	//Add number of tokens for each ports
+	map<Port*, ConstantInt*>::iterator itTokens;
+	map<Port*, ConstantInt*>* numTokens = pattern->getNumTokensMap();
+
+	for (itTokens = numTokens->begin(); itTokens != numTokens->end(); itTokens++) {
+		Port* port = itTokens->first;
+		itPort = ports->find(port->getName());
+		
+		newPattern->setNumTokens(itPort->second, itTokens->second);
 	}
 
-	return newPattern;*/
-	return NULL;
+	//Add variable map for each ports
+	map<Port*, Variable*>::iterator itVar;
+	map<Port*, Variable*>* varMap = pattern->getVariableMap();
+
+	for (itVar = varMap->begin(); itVar != varMap->end(); itVar++) {
+		Variable* var = itVar->second;
+
+		//Get corresponding port in instance
+		Port* src = itVar->first;
+		itPort = ports->find(src->getName());
+		Port* dst = itPort->second;
+
+		// Add variable to pattern
+		newPattern->setVariable(dst, dst->getPtrVar());
+	}
+
+	//Add peek map for each ports
+	map<Port*, Variable*>* peekMap = pattern->getPeekedMap();
+
+	for (itVar = peekMap->begin(); itVar != peekMap->end(); itVar++) {
+		Variable* var = itVar->second;
+
+		//Get corresponding port in instance
+		Port* src = itVar->first;
+		itPort = ports->find(src->getName());
+		Port* dst = itPort->second;
+
+		// Add variable to pattern
+		newPattern->setPeeked(dst, dst->getPtrVar());
+	}
+
+	return newPattern;
 }
 
 map<string, Procedure*>* IRWriter::writeProcedures(map<string, Procedure*>* procs){

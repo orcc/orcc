@@ -161,7 +161,7 @@ void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
 }
 
 bool LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
-	void **portGV = (void**)EE->getPointerToGlobalIfAvailable(port->getGlobalVariable());
+	void **portGV = (void**)EE->getPointerToGlobalIfAvailable(port->getFifoVar());
 	
 	//Port has already been compiled
 	if (portGV != NULL){

@@ -82,18 +82,31 @@ void BroadcastActor::createActor(){
 	PointerType* fifoType = (PointerType*)structType->getPointerTo();
 	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(fifoType));
 
-	// Creating input port of name input
+	// Creating input variable of name input
 	string inputName = "input";
-	GlobalVariable* inputVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, name+"_"+inputName);
-	Port* inputPort = new Port(inputName, type, inputVar);
+	GlobalVariable* inputGlobalVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, name+"_"+inputName);
+	
+	//Create a new port
+	Port* inputPort = new Port(inputName, type);
+	Variable* inputVar = new Variable(type, inputName, true, true, inputGlobalVar);
+	inputPort->setPtrVar(inputVar);
+	
+	
 	inputs->insert(pair<string, Port*>(inputPort->getName(), inputPort));
 
 	// Creating output port of name input
 	for (int i = 0; i < numOutputs; i++) {
 		stringstream outputName;
+		
+		// Creating output variable of name output
 		outputName <<name<<"_output_" << i;
-		GlobalVariable* outputVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, outputName.str());
-		Port* outputPort = new Port(outputName.str(), type, outputVar);
+		GlobalVariable* outputGlobalVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, outputName.str());
+
+		//Create a new port
+		Port* outputPort = new Port(outputName.str(), type);
+		Variable* outputVar = new Variable(type, outputName.str(), true, true, outputGlobalVar);
+		
+		outputPort->setPtrVar(outputVar);
 		outputs->insert(pair<string, Port*>(outputPort->getName(), outputPort));
 	}
 
@@ -166,22 +179,24 @@ Procedure* BroadcastActor::createBody(){
 }
 
 Pattern* BroadcastActor::createPattern(map<string, Port*>* ports){
-	/*map<string, Port*>::iterator it;
-	map<Port*, ConstantInt*>* pattern = new map<Port*, ConstantInt*>();
+	map<string, Port*>::iterator it;
+	Pattern* pattern = new Pattern();
 
 	//Set pattern to one token to test on port
 	for (it = ports->begin(); it != ports->end(); it++){
+		Port* port = it->second;
 		ConstantInt* one = ConstantInt::get(Type::getInt32Ty(Context), 1);
-		pattern->insert(pair<Port*, ConstantInt*>(it->second, one));
+
+		pattern->setNumTokens(port, one);
+		pattern->setVariable(port, port->getPtrVar());
 	}
 
-	return pattern;*/
-	return NULL;
+	return pattern;
 }
 
 Value* BroadcastActor::createHasTokenTest(Port* port, BasicBlock* current){
 	//Load port structure
-	LoadInst* inputStruct = new LoadInst(port->getGlobalVariable(), "l"+ port->getName(), current);
+	LoadInst* inputStruct = new LoadInst(port->getPtrVar()->getGlobalVariable(), "l"+ port->getName(), current);
 	
 	// Call hasToken
 	vector<Value*> vector;
@@ -199,7 +214,7 @@ Value* BroadcastActor::createHasTokenTest(Port* port, BasicBlock* current){
 
 Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
 	//Load port structure
-	LoadInst* inputStruct = new LoadInst(port->getGlobalVariable(), "l"+ port->getName(), current);
+	LoadInst* inputStruct = new LoadInst(port->getPtrVar()->getGlobalVariable(), "l"+ port->getName(), current);
 	
 	// Call readPtr
 	vector<Value*> vector;
@@ -216,7 +231,7 @@ Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
 void BroadcastActor::createWriteFifo(Port* port, Value* token ,BasicBlock* current){
 
 	//Load port structure
-	LoadInst* portStruct = new LoadInst(port->getGlobalVariable(), "l"+ port->getName(), current);
+	LoadInst* portStruct = new LoadInst(port->getPtrVar()->getGlobalVariable(), "l"+ port->getName(), current);
 
 	// Call readPtr
 	vector<Value*> vector;
@@ -236,7 +251,7 @@ void BroadcastActor::createWriteFifo(Port* port, Value* token ,BasicBlock* curre
 
 void BroadcastActor::createSetReadEnd(Port* port, BasicBlock* current){
 	//Load port structure
-	LoadInst* inputStruct = new LoadInst(port->getGlobalVariable(), "l"+ port->getName(), current);
+	LoadInst* inputStruct = new LoadInst(port->getPtrVar()->getGlobalVariable(), "l"+ port->getName(), current);
 
 	// Call readPtr
 	vector<Value*> vector;

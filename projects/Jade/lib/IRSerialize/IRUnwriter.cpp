@@ -160,8 +160,11 @@ void IRUnwriter::unwriteProcedures(map<string, Procedure*>* procs){
 
 void IRUnwriter::unwritePort(string key, Port* port){
 	string name = port->getName();
-	GlobalVariable* portVar = port->getGlobalVariable();
-	portVar->eraseFromParent();
+	GlobalVariable* fifoVar = port->getFifoVar();
+	GlobalVariable* ptrVar = port->getPtrVar()->getGlobalVariable();
+
+	fifoVar->eraseFromParent();
+	ptrVar->eraseFromParent();
 }
 
 void IRUnwriter::unwriteActions(list<Action*>* actions){

@@ -90,8 +90,8 @@ IRAttribute* Connection::getAttribute(std::string name){
 
 void Connection::unsetFifo(){
 	//Get GV of the port
-	GlobalVariable* srcVar = source->getGlobalVariable();
-	GlobalVariable* dstVar = target->getGlobalVariable();
+	GlobalVariable* srcVar = source->getFifoVar();
+	GlobalVariable* dstVar = target->getFifoVar();
 	
 	//Remove GV initializer
 	srcVar->setInitializer(NULL);

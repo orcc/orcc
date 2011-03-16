@@ -131,7 +131,7 @@ Actor* IRParser::parseActor(string classz){
 Pattern* IRParser::parsePattern(map<std::string, Port*>* ports, Value* value){
 	// No node for pattern
 	if (value == NULL){
-		return NULL;
+		return new Pattern();
 	}
 	
 	MDNode* patternNode = cast<MDNode>(value);
