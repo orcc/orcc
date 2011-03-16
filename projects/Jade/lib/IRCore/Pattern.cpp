@@ -28,25 +28,63 @@
  */
 
 /**
-@brief Implementation of class Pattern
+@brief Implementation of class Procedure
 @author Jerome Gorin
-@file Pattern.cpp
+@file Procedure.cpp
 @version 1.0
-@date 16/03/2011
+@date 15/11/2010
 */
 
 //------------------------------
-#include "Jade/Core/Actor/Procedure.h"
-
-#include "llvm/Constants.h"
-#include "llvm/Function.h"
+#include "Jade/Core/Actor/Pattern.h"
 //------------------------------
 
-Procedure::~Procedure(){	
+using namespace std;
+using namespace llvm;
 
+Pattern::Pattern(map<Port*, ConstantInt*>* numTokensMap, map<Port*, Variable*>* variableMap, map<Port*, Variable*>* peekedMap){
+	this->numTokensMap = numTokensMap;
+	this->variableMap = variableMap;
+	this->peekedMap = peekedMap;
+
+	//Fill ports with num tokens
+	map<Port*, ConstantInt*>::iterator itTokens;
+	for (itTokens = numTokensMap->begin(); itTokens != numTokensMap->end(); itTokens++){
+		checkPortPresence(itTokens->first);
+	}
+
+	//Fill ports with variable map
+	map<Port*, Variable*>::iterator itVar;
+	for (itVar = variableMap->begin(); itVar != variableMap->end(); itVar++){
+		checkPortPresence(itVar->first);
+	}
+	
+	//Fill ports with peeked map
+	for (itVar = peekedMap->begin(); itVar != peekedMap->end(); itVar++){
+		checkPortPresence(itVar->first);
+	}
 }
 
+Pattern::Pattern(){
+	this->numTokensMap = new map<Port*, ConstantInt*>();
+	this->variableMap = new map<Port*, Variable*>();
+	this->peekedMap = new map<Port*, Variable*>();
+}
 
-bool Procedure::isExternal(){
-	return external->isOne();
+void Pattern::checkPortPresence(Port* port) {
+	ports.insert(port);
+}
+
+void Pattern::clear(){
+	ports.clear();
+	numTokensMap->clear();
+	peekedMap->clear();
+	variableMap->clear();
+}
+
+void Pattern::remove(Port* port) {
+	ports.erase(port);
+	numTokensMap->erase(port);
+	peekedMap->erase(port);
+	variableMap->erase(port);
 }

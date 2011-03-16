@@ -12,5 +12,6 @@ add_library (IRCore
 	Instance.cpp
 	Network.cpp
 	Package.cpp
+	Pattern.cpp
 	Procedure.cpp
  )

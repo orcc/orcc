@@ -129,17 +129,19 @@ Actor* IRParser::parseActor(string classz){
 }
 
 Pattern* IRParser::parsePattern(map<std::string, Port*>* ports, Value* value){
-	map<Port*, ConstantInt*>* pattern = new map<Port*, ConstantInt*>();
-	
-	if (value != NULL){
-		MDNode* patternNode = cast<MDNode>(value);
-
-		map<Port*, ConstantInt*>* numTokens = parserNumTokens(ports, patternNode->getOperand(0));
-		map<Port*, Variable*>* varMap = parserVarMap(ports, patternNode->getOperand(1));
-		map<Port*, Variable*>* peekedMap = parserVarMap(ports, patternNode->getOperand(2));
+	// No node for pattern
+	if (value == NULL){
+		return NULL;
 	}
+	
+	MDNode* patternNode = cast<MDNode>(value);
 
-	return new Pattern();
+	// Parse pattern property
+	map<Port*, ConstantInt*>* numTokens = parserNumTokens(ports, patternNode->getOperand(0));
+	map<Port*, Variable*>* varMap = parserVarMap(ports, patternNode->getOperand(1));
+	map<Port*, Variable*>* peekedMap = parserVarMap(ports, patternNode->getOperand(2));
+
+	return new Pattern(numTokens, varMap, peekedMap);
 }
 
 map<Port*, Variable*>* IRParser::parserVarMap(map<std::string, Port*>* ports, Value* value){

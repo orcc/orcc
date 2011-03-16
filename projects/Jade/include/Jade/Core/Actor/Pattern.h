@@ -38,7 +38,15 @@
 //------------------------------
 #ifndef PATTERN_H
 #define PATTERN_H
+#include <set>
+#include <map>
 
+namespace llvm {
+	class ConstantInt;
+}
+
+class Port;
+class Variable;
 //------------------------------
 
 /**
@@ -55,21 +63,97 @@ public:
 	 *
 	 * @brief Constructor
 	 *
-	 * Creates a new action.
+	 * Creates a new Pattern with the given information.
 	 * 
-	 * @param location : Location of the action
+	 * @param numTokensMap : a Map of production/Consumption
 	 *
-	 * @param tag: action Tag
+	 * @param variableMap: a Map of Port and their associated variables
 	 *
-	 * @param scheduler : Procedure that computes scheduling information
-	 *
-	 * @param body : Procedure that holds the body of the action
+	 * @param peekedMap : a Map of Peeked port and  their associated variables
 	 */
-	Pattern() {
-	}
+	Pattern(std::map<Port*, llvm::ConstantInt*>* numTokensMap, std::map<Port*, Variable*>* variableMap, std::map<Port*, Variable*>* peekedMap);
+
+	/**
+	 *
+	 * @brief Constructor
+	 *
+	 * Creates a new Pattern.
+	 */
+	Pattern();
 
 	~Pattern();
 
+	/**
+	 * @brief Returns true if this pattern is empty.
+	 * 
+	 * @return true if this pattern is empty
+	 */
+	bool isEmpty() {
+		return ports.empty();
+	}
+
+	/**
+	 * Clears this pattern.
+	 */
+	void clear();
+
+	/**
+	 * @brief Returns the number of tokens map.
+	 * 
+	 * @return the number of tokens map
+	 */
+	std::map<Port*, llvm::ConstantInt*>* getNumTokensMap() {
+		return numTokensMap;
+	}
+
+	/**
+	 * @brief Returns the peeked map.
+	 * 
+	 * @return the peeked map
+	 */
+	std::map<Port*, Variable*>* getPeekedMap() {
+		return peekedMap;
+	}
+
+	/**
+	 * @brief Returns the variable map.
+	 * 
+	 * @return the variable map
+	 */
+	std::map<Port*, Variable*>* getVariableMap() {
+		return variableMap;
+	}
+
+	/**
+	 * Removes the given port from this pattern.
+	 * 
+	 * @param port : a port
+	 */
+	void remove(Port* port);
+
+private:
+
+	/**
+	 * @brief Check port presence in the pattern
+	 *
+	 * Checks if the given port is present in the ports list, and adds
+	 * it if necessary.
+	 * 
+	 * @param port : a port
+	 */
+	void checkPortPresence(Port* port);
+
+	/** Num tokens map */
+	std::map<Port*, llvm::ConstantInt*>* numTokensMap;
+	
+	/** Peeked map */
+	std::map<Port*, Variable*>* peekedMap;
+
+	/** Variable map */
+	std::map<Port*, Variable*>* variableMap;
+	
+	/** Set of ports */
+	std::set<Port*> ports;
 };
 
 #endif
