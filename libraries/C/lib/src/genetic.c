@@ -33,7 +33,7 @@
 #include <time.h>
 #include <string.h>
 
-#include "orcc.h"
+#include "orcc_types.h"
 #include "orcc_genetic.h"
 #include "orcc_thread.h"
 #include "orcc_scheduler.h"

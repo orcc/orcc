@@ -29,7 +29,7 @@
 #include "SDL.h"
 #include "SDL_image.h"
 
-#include "orcc.h"
+#include "orcc_types.h"
 #include "orcc_fifo.h"
 #include "orcc_util.h"
 

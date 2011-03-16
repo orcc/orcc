@@ -28,7 +28,6 @@
  */
 #include <stdio.h>
 
-#include "orcc.h"
 #include "orcc_thread.h"
 
 void sync_init(struct sync_s *sync) {
