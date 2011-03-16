@@ -336,7 +336,7 @@ AstTypeString: name='String';
 AstTypeUint: name='uint' ('(' 'size' '=' size = AstExpression ')')?;
 
 AstVariableDeclaration returns AstVariable: type=AstType name=ID
-	('[' dimensions += AstExpression ']' ('[' dimensions += AstExpression ']')*)?; 
+	('[' dimensions += AstExpression ']')*;
 
 AstValuedVariableDeclaration returns AstVariable:
 	AstVariableDeclaration ((constant ?= '=' | ':=') value=AstExpression)?;
