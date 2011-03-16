@@ -18,7 +18,8 @@ project (<network.name>)
 
 # Common packages required
 find_library(orcc_LIBRARY orcc)
-find_file(orcc_INCLUDE_DIR orcc)
+find_path(orcc_INCLUDE_DIR NAMES orcc_fifo.h orcc_types.h
+  PATH_SUFFIXES include/orcc)
 
 find_package(SDL REQUIRED)
 find_package(Threads REQUIRED)
