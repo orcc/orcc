@@ -874,22 +874,26 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Converts the AST type of the variable to the IR type system, and checks
-	 * its initial value is well-typed.
+	 * Checks if the initial value of the variable is convertible to the type of
+	 * the variable. Transforms the type of the variable if it has not been done
+	 * yet.
 	 * 
 	 * @param variable
 	 *            a variable
 	 * @return the type of the variable
 	 */
 	private Type getTypeVariable(AstVariable variable) {
-		Type targetType = new TypeConverter(validator).doSwitch(variable
-				.getType());
-		variable.setIrType(targetType);
+		Type targetType = variable.getIrType();
+		if (targetType == null) {
+			new TypeTransformer(validator).doSwitch(variable);
+			targetType = variable.getIrType();
+		}
 
 		AstExpression value = variable.getValue();
 		if (value != null) {
 			TypeChecker checker = new TypeChecker(validator);
 			Type type = checker.getType(variable.getValue());
+
 			if (!checker.isConvertibleTo(type, targetType)) {
 				error("Type mismatch: cannot convert from " + type + " to "
 						+ targetType, variable, CalPackage.AST_VARIABLE);

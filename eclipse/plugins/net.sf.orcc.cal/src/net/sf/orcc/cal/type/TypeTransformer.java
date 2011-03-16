@@ -128,6 +128,11 @@ public class TypeTransformer extends VoidSwitch {
 
 	@Override
 	public Void caseAstVariable(AstVariable variable) {
+		if (variable.getIrType() != null) {
+			// if the variable has already been converted, do not do it again
+			return null;
+		}
+
 		TypeConverter converter = new TypeConverter(validator);
 		doSwitch(variable.getType());
 
