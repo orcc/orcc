@@ -134,9 +134,6 @@ Load(load) ::= <<
 <load.target> = <load.source><load.indexes : {index | [<index>]}>;
 >>
 
-Peek(peek) ::= <<
-chan_<instance.id>_<peek.port>?\<<peek.target>\>;
->>
 
 Read(read) ::= <<
 
@@ -256,10 +253,7 @@ skip
 >>
 
 peeks(action) ::= <<
-	<options.loads.(action): { p | <p.Target.type> <p.Target>;}>
-	<options.peeks.(action): { p | chan_<instance.id>_<p.port>?\<<p.port>[0]\>;}>
-	<options.loads.(action): { p | <p.Target> = <p.Source>[0];}>
-
+	<action.inputPattern.peekedMap.keys: { key | chan_<instance.id>_<key>?\<<action.inputPattern.peekedMap.(key)>[0]\>;}>
 >>
 
 

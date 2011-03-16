@@ -46,7 +46,7 @@ import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
+
 
 /**
  * 
@@ -59,25 +59,12 @@ public class GuardsExtractor extends AbstractActorVisitor {
 
 	private Map<Action, List<Expression>> guards;
 
-	private Map<Action, List<Peek>> peeks;
-
-	private Map<Action, List<Load>> loads;
-
 	private List<Expression> guardList;
 
 	private List<Load> loadList;
 
-	private List<Load> usedLoadsList;
-
-	private List<Peek> peekList;
-
-	private int peekCnt = 0;
-
-	public GuardsExtractor(Map<Action, List<Expression>> guards,
-			Map<Action, List<Peek>> peeks, Map<Action, List<Load>> loads) {
+	public GuardsExtractor(Map<Action, List<Expression>> guards) {
 		this.guards = guards;
-		this.peeks = peeks;
-		this.loads = loads;
 	}
 
 	// takes the guard from the previous action and negates it and adds it to
@@ -104,30 +91,12 @@ public class GuardsExtractor extends AbstractActorVisitor {
 		ListIterator<Load> loadIter = loadList.listIterator();
 		while (loadIter.hasNext()) {
 			Load ld = loadIter.next();
-			// do not remove the Loads related to Peeks
-			if (isFromPeek(ld)) {
-				usedLoadsList.add(ld);
-				ld.getTarget().setName(
-						ld.getTarget().getBaseName() + "_peek_" + peekCnt++);
-				continue;
-			}
 			ListIterator<Expression> itr = guardList.listIterator();
 			while (itr.hasNext()) {
 				Expression element = itr.next();
 				replaceVarInExpr(element, ld);
 			}
 		}
-	}
-
-	private boolean isFromPeek(Load ld) {
-		ListIterator<Peek> peekIter = peekList.listIterator();
-		while (peekIter.hasNext()) {
-			Peek pk = peekIter.next();
-			if (ld.getSource().getVariable() == pk.getTarget()) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	// recursively searches through the expression and finds if the local
@@ -150,11 +119,7 @@ public class GuardsExtractor extends AbstractActorVisitor {
 			currAction = action;
 			guardList = new ArrayList<Expression>();
 			loadList = new ArrayList<Load>();
-			peekList = new ArrayList<Peek>();
-			usedLoadsList = new ArrayList<Load>();
 			guards.put(currAction, guardList);
-			peeks.put(currAction, peekList);
-			loads.put(currAction, usedLoadsList);
 			visit(action.getScheduler());
 			removeLoads();
 		}
@@ -199,11 +164,6 @@ public class GuardsExtractor extends AbstractActorVisitor {
 	@Override
 	public void visit(Load load) {
 		loadList.add(load);
-	}
-
-	@Override
-	public void visit(Peek peek) {
-		peekList.add(peek);
 	}
 
 }
