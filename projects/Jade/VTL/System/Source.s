@@ -1,4 +1,3 @@
-@O = global i8* null 
 @O_ptr = global i8* null
 @source = global i8* null
 
@@ -31,7 +30,7 @@ declare void @get_src(i8*, i8*)
 !0 = metadata !{metadata !"System/Source"}
 !1 = metadata !{metadata !"System.Source"}
 !2 = metadata !{ metadata !13 ,  null }
-!3 = metadata !{metadata !4, metadata !"O", i8** @O}
+!3 = metadata !{metadata !4, metadata !"O", i8** @O_ptr}
 !4 = metadata  !{ i32 8 ,  null }
 !5 = metadata !{metadata !"get_src", i1 1 , void(i8*, i8*)* @get_src}
 !6 = metadata !{metadata !7, metadata !8, null, i8** @source}
@@ -44,5 +43,5 @@ declare void @get_src(i8*, i8*)
 !12 = metadata  !{metadata !"send_data", i1 0, i32()* @send_data}
 !13 = metadata !{metadata !9}
 !14 = metadata !{metadata !3, i32 1}
-!15 = metadata !{metadata !3, i8** @O_ptr}
+!15 = metadata !{metadata !3}
 

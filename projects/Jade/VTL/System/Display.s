@@ -1,9 +1,6 @@
 @display = global i8* null
-@WIDTH = global i8* null
 @WIDTH_ptr = global i16* null
-@HEIGHT = global i8* null
 @HEIGHT_ptr =global i16* null
-@B = global i8* null
 @B_ptr = global i8* null
 
 define i1 @isSchedulable_get_size() nounwind {
@@ -55,11 +52,11 @@ declare void @write_mb(i8*, i8*)
 !1 = metadata !{metadata !"System.Display"}
 !2 = metadata !{metadata !27, null}
 
-!3 = metadata !{metadata !4, metadata !"Byte", i8** @B}
+!3 = metadata !{metadata !4, metadata !"Byte", i8** @B_ptr}
 !4 = metadata  !{ i32 8 ,  null }
-!5 = metadata !{metadata !6, metadata !"Width", i8** @WIDTH}
+!5 = metadata !{metadata !6, metadata !"Width", i16** @WIDTH_ptr}
 !6 = metadata  !{ i32 16 ,  null }
-!7 = metadata !{metadata !8, metadata !"Height", i8** @HEIGHT}
+!7 = metadata !{metadata !8, metadata !"Height", i16** @HEIGHT_ptr}
 !8 = metadata  !{ i32 16 ,  null }
 !9 = metadata !{metadata !10, metadata !11, null, i8** @display}
 !10 = metadata !{metadata !"display", i1 0, i32 0,  i32 0}
@@ -71,12 +68,12 @@ declare void @write_mb(i8*, i8*)
 !17 = metadata  !{metadata !"isSchedulable_get_data", i1 0, i1()* @isSchedulable_get_data}
 !18 = metadata  !{metadata !"get_data", i1 0, void()* @get_data}
 !19 = metadata !{metadata !3, i32 384}
-!20 = metadata !{metadata !3, i8** @B_ptr}
+!20 = metadata !{metadata !3}
 
 !21 = metadata !{ null, metadata !22, null, metadata !23, metadata !24}
 !22 = metadata !{metadata !25, metadata !26, null}
 !23 = metadata  !{metadata !"isSchedulable_get_size", i1 0, i1()* @isSchedulable_get_size}
 !24 = metadata  !{metadata !"get_size", i1 0, void()* @get_size}
 !25 = metadata !{metadata !5, i32 1, metadata !7, i32 1}
-!26 = metadata !{metadata !5, i16** @WIDTH_ptr, metadata !7, i16** @HEIGHT_ptr}
+!26 = metadata !{metadata !5, metadata !7}
 !27 = metadata !{metadata !21, metadata !15}

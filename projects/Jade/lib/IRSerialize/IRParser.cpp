@@ -159,7 +159,7 @@ map<Port*, Variable*>* IRParser::parserVarMap(map<std::string, Port*>* ports, Va
 			Port* port = it->second;
 
 			//Link with llvm global variable
-			GlobalVariable* globalVariable = cast<GlobalVariable>(varPortsNode->getOperand(++i));
+			GlobalVariable* globalVariable = port->getPtrVar()->getGlobalVariable();
 			Variable* variable = new Variable(port->getType(), name->getString(), true, true, globalVariable);
 			varTokens->insert(pair<Port*, Variable*>(it->second, variable));
 			i++;
@@ -395,10 +395,16 @@ Procedure* IRParser::parseProc(MDNode* node){
 
 
 Port* IRParser::parsePort(MDNode* node){
+	//Get port property
 	Type* type = (Type*)parseType(cast<MDNode>(node->getOperand(0)));
 	MDString* name = cast<MDString>(node->getOperand(1));
+	GlobalVariable* var = cast<GlobalVariable>(node->getOperand(2));
 	
-	return new Port(name->getString(), (IntegerType*)type);
+	//Create the new port
+	Port* newPort = new Port(name->getString(), (IntegerType*)type);
+	newPort->setPtrVar(new Variable(type, name->getString(), true, true, var));
+
+	return newPort;
 }
 
 Type* IRParser::parseType(MDNode* node){
