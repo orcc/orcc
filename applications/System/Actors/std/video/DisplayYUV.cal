@@ -29,7 +29,7 @@ actor DisplayYUV()
 	uint MB_SIZE_CHROMA = 8;
 
 	/**
-	 * Displays a picture. Sizes are in (MB or pixels?). 
+	 * Displays a picture. Sizes are in pixels.
 	 */
 	native procedure displayYUV_displayPicture(uint(size=8) pictureBufferY[MAX_WIDTH * MAX_HEIGHT], uint(size=8) pictureBufferU[MAX_WIDTH * MAX_HEIGHT],
 	                                           uint(size=8) pictureBufferV[MAX_WIDTH * MAX_HEIGHT], int(size=16) pictureWidth, int(size=16) pictureSize) end
