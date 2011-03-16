@@ -114,12 +114,12 @@ unit Imp_MacroBlockInfo :
 	uint(size=3) SZ_4x4   = 6;
 	
 
-	List(type: List(type: uint(size=3),size=2),size=8) MbPartPredMode_P =
+	uint(size=3) MbPartPredMode_P[8][2] =
 		[
 			[PRED_L0,NA],[PRED_L0,PRED_L0],[PRED_L0,PRED_L0],[NA,NA],[NA,NA],[PRED_L0,NA],[NA,NA],[NA,NA]
 		];
 
-	List(type: List(type: uint(size=3),size=2),size=32) MbPartPredMode_B =
+	uint(size=3) MbPartPredMode_B[32][2] =
 		[
 			[DIRECT,NA], [PRED_L0,NA], [PRED_L1,NA], [BIPRED,NA], [PRED_L0,PRED_L0], [PRED_L0,PRED_L0], [PRED_L1,PRED_L1], [PRED_L1,PRED_L1], [PRED_L0,PRED_L1], [PRED_L0,PRED_L1],
 			[PRED_L1,PRED_L0], [PRED_L1,PRED_L0], [PRED_L0,BIPRED], [PRED_L0,BIPRED], [PRED_L1,BIPRED], [PRED_L1,BIPRED], [BIPRED,PRED_L0], [BIPRED,PRED_L0], [BIPRED,PRED_L1], [BIPRED,PRED_L1],
@@ -127,7 +127,7 @@ unit Imp_MacroBlockInfo :
 			[NA,NA], [NA,NA]
 		];
 
-	List(type: List(type: uint(size=3), size=16), size=2) SubMbPartPredMode =
+	uint(size=3) SubMbPartPredMode[2][16] =
 		[
 			[DIRECT, PRED_L0, PRED_L1, BIPRED, PRED_L0, PRED_L0, PRED_L1, PRED_L1, BIPRED, BIPRED,
 			 PRED_L0, PRED_L1, BIPRED, NA, NA, NA],
@@ -135,12 +135,12 @@ unit Imp_MacroBlockInfo :
 			 0, 0, 0, 0, 0, 0]
 		];
 
-	List(type: uint(size=3),size=8) NumMbPart_P =
+	uint(size=3) NumMbPart_P[8] =
 		[
 			1,2,2,4,4,1,1,1
 		];
 
-	List(type: uint(size=3),size=32) NumMbPart_B =
+	uint(size=3) NumMbPart_B[32] =
 		[
 			16,1,1,1,2,2,2,2,2,2,
 			 2,2,2,2,2,2,2,2,2,2,
@@ -148,18 +148,18 @@ unit Imp_MacroBlockInfo :
 			 1,1
 		];
 
-	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPartTab =
+	uint(size=3) NumSubMbPartTab[2][16] =
 		[
 			[4, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
 			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		];
 
-	List(type: uint(size=3),size=8) SizeMb_P =
+	uint(size=3) SizeMb_P[8] =
 		[
 			SZ_16x16, SZ_16x8, SZ_8x16, SZ_8x8, SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16
 		];
 
-	List(type: uint(size=3),size=32) SizeMb_B =
+	uint(size=3) SizeMb_B[32] =
 		[
 			 SZ_4x4, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
 			SZ_16x8,  SZ_8x16,  SZ_16x8,  SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
@@ -167,7 +167,7 @@ unit Imp_MacroBlockInfo :
 			 SZ_8x8,  SZ_8x8
 		];
 
-	List(type: List(type: uint(size=3), size=16), size=2) SizeSubMb =
+	uint(size=3) SizeSubMb[2][16] =
 		[
 			[SZ_4x4, SZ_8x8, SZ_8x8, SZ_8x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8,
 			 SZ_4x4, SZ_4x4, SZ_4x4, 0, 0, 0],

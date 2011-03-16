@@ -55,7 +55,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 unit Imp_CavlcLookUpTables :
 
-	List(type: List(type: List(type: bool, size=64), size=16), size=6) TotalCoeffValid = 
+	bool TotalCoeffValid[6][16][64] = 
 		[
 			[
 				// 0 <= nC < 2 ; nbBitRead = 1
@@ -937,7 +937,7 @@ unit Imp_CavlcLookUpTables :
 
 
 	//The first byte is TrailingOnes(coeff_token), the second byte isTotalCoeff(coeff_token)
-	List(type: List(type: List(type: uint(size=16), size=64), size=16), size=6) TotalCoeffValue =
+	uint(size=16) TotalCoeffValue[6][16][64] =
 		[
 			[
 				// 0 <= nC < 2 ; nbBitRead = 1
@@ -1817,7 +1817,7 @@ unit Imp_CavlcLookUpTables :
 			]
 		];
 
-	List(type: List(type: List(type: List(type: bool        , size=8), size=16), size=16), size=3) TotalZerosValid =
+	bool TotalZerosValid[3][16][16][8] =
 		[
 			[
 				[
@@ -3459,7 +3459,7 @@ unit Imp_CavlcLookUpTables :
 			]
 		];
 
-	List(type: List(type: List(type: List(type: uint(size=4), size=8), size=16), size=16), size=3) TotalZerosValue=
+	uint(size=4) TotalZerosValue[3][16][16][8] =
 		[
 			[
 				[
@@ -5046,7 +5046,7 @@ unit Imp_CavlcLookUpTables :
 		];
 
 
-	List(type: List(type: List(type: bool, size=8), size=16), size=7) RunBeforeValid = 
+	bool RunBeforeValid[7][16][8] =
 		[
 			[	//zerosLeft = 1 ; nbBitRead = 0 .. 15
 				[ false , false , false , false , false , false , false , false ],
@@ -5176,7 +5176,7 @@ unit Imp_CavlcLookUpTables :
 			]
 		];
 
-	List(type: List(type: List(type: uint(size=4), size=8), size=16), size=7) RunBeforeValue = 
+	uint(size=4) RunBeforeValue[7][16][8] =
 		[
 			[	//zerosLeft = 1 ; nbBitRead = 0 .. 15
 				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],

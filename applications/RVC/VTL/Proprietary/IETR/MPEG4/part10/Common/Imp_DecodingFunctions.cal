@@ -71,7 +71,7 @@ unit Imp_DecodingFunctions :
 	uint(size=5) CAVLC_TOTAL_ZEROS     =  9;
 	uint(size=5) CAVLC_RUN_BEFORE      = 10;
 
-	List(type: uint(size=8), size=11) TabNbParamForFunction =
+	uint(size=8) TabNbParamForFunction[11] =
 		[ 0, 1, 0, 0, 1, 0, 0, 1, 0, 2
 		, 1];
 
