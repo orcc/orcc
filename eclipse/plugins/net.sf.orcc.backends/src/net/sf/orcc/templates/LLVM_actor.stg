@@ -17,7 +17,6 @@ fifoVarName(port) ::= <<
 >>
 
 fifo(port) ::= <<
-@<port.name> = global i8* null
 <fifoVarName(port)> = global <fifoType(port)>* null
 
 >>
