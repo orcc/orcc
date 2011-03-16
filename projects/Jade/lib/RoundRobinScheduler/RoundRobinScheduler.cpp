@@ -57,6 +57,7 @@
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Variable.h"
 #include "Jade/Core/Network/Instance.h"
+#include "Jade/RoundRobinScheduler/ActionSchedulerAdder.h"
 #include "Jade/RoundRobinScheduler/RoundRobinScheduler.h"
 
 #include "Jade/Actor/display.h"
@@ -76,21 +77,35 @@ static int Filesize(){
 
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool verbose): Context(C) {
 	this->decoder = decoder;
+	this->configuration = decoder->getConfiguration();
 	this->scheduler = NULL;
 	this->initBrInst = NULL;
 	this->schedBrInst = NULL;
 	this->verbose = verbose;
 
-	//Create the scheduler function
-	createSchedulerFn();
-	
+	createScheduler();	
 }
+
+void RoundRobinScheduler::createScheduler(){
+	//Add action schedulers in instances
+	map<string, Instance*>::iterator it;
+	map<string, Instance*>* instances = configuration->getInstances();
+	ActionSchedulerAdder actionSchedulerAdder(Context, decoder);
+	
+	for (it = instances->begin(); it != instances->end(); it++){
+		actionSchedulerAdder.transform(it->second);
+	}
+
+	//Create the scheduler function
+	createNetworkScheduler();
+}
+
 
 RoundRobinScheduler::~RoundRobinScheduler (){
 	scheduler->eraseFromParent();
 }
 
-void RoundRobinScheduler::createSchedulerFn(){
+void RoundRobinScheduler::createNetworkScheduler(){
 	map<string, Instance*>::iterator it;
 	
 	Module* module = decoder->getModule();

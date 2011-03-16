@@ -93,11 +93,15 @@ public:
 	void removeInstance(Instance* instance);
 
 private:
-
 	/**
-     *  @brief Create the scheduler function
+     *  @brief Insert a scheduler into the decoder
      */
-	void createSchedulerFn();
+	void createScheduler();
+	
+	/**
+     *  @brief Create the network scheduler
+     */
+	void createNetworkScheduler();
 
 	/**
      *  @brief Remove a call
@@ -106,6 +110,9 @@ private:
 
 	/** Decoder bound to the round robin scheduler */
 	Decoder* decoder;
+
+	/** Configuration of the decoder */
+	Configuration* configuration;
 
 	/** Main scheduling function */
 	llvm::Function* scheduler;
