@@ -33,14 +33,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 import java.util.Map.Entry;
 
-import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
+import org.jgrapht.DirectedGraph;
+
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -52,6 +56,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -59,12 +64,11 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.UniqueEdge;
 
 /**
  * This class defines a visitor that transforms multi-token to mono-token data
@@ -73,7 +77,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Khaled Jerbi
  * 
  */
-public class Multi2MonoToken extends ActionSplitter {
+public class Multi2MonoToken extends AbstractActorVisitor {
 	/**
 	 * This class defines a visitor that substitutes process variable names with
 	 * those of the newly defined actions for Store
@@ -99,11 +103,6 @@ public class Multi2MonoToken extends ActionSplitter {
 				load.setSource(useArray);
 			}
 		}
-
-		@Override
-		public void visit(Read read) {
-			itInstruction.remove();
-		}
 	}
 
 	/**
@@ -127,19 +126,15 @@ public class Multi2MonoToken extends ActionSplitter {
 				store.setTarget(tab);
 			}
 		}
-
-		@Override
-		public void visit(Write write) {
-			itInstruction.remove();
-		}
-
 	}
 
 	private Action done;
 
 	private Type entryType;
 
+	private FSM fsm;
 	private int inputIndex = 0;
+
 	private int numTokens;
 
 	private int outputIndex = 0;
@@ -157,6 +152,20 @@ public class Multi2MonoToken extends ActionSplitter {
 	private Action store;
 
 	private Action write;
+
+	private void addFsm() {
+		ActionScheduler scheduler = actor.getActionScheduler();
+
+		fsm = new FSM();
+		fsm.setInitialState("init");
+		fsm.addState("init");
+		for (Action action : scheduler.getActions()) {
+			fsm.addTransition("init", action, "init");
+		}
+
+		scheduler.getActions().clear();
+		scheduler.setFsm(fsm);
+	}
 
 	/**
 	 * This method creates an action with the given name.
@@ -207,7 +216,7 @@ public class Multi2MonoToken extends ActionSplitter {
 	 * @param action
 	 *            the action getting transformed
 	 */
-	public void createActionsSet(Action action, String sourceName,
+	private void createActionsSet(Action action, String sourceName,
 			String targetName) {
 		scanInputs(action, sourceName, targetName);
 		scanOutputs(action, sourceName, targetName);
@@ -226,7 +235,9 @@ public class Multi2MonoToken extends ActionSplitter {
 				IrFactory.eINSTANCE.createTypeInt(16), name, true);
 		Expression expression = new IntExpr(0);
 		newCounter.setInitialValue(expression);
-		actor.getStateVars().put(newCounter.getName(), newCounter);
+		if (!actor.getStateVars().contains(newCounter.getName())) {
+			actor.getStateVars().put(newCounter.getName(), newCounter);
+		}
 		return newCounter;
 	}
 
@@ -313,9 +324,7 @@ public class Multi2MonoToken extends ActionSplitter {
 		moveNodes(listIt, body);
 		Iterator<LocalVariable> it = action.getBody().getLocals().iterator();
 		moveLocals(it, body);
-
 		return newProcessAction;
-
 	}
 
 	/**
@@ -371,7 +380,9 @@ public class Multi2MonoToken extends ActionSplitter {
 		Type type = IrFactory.eINSTANCE.createTypeList(numTokens, entryType);
 		GlobalVariable newList = new GlobalVariable(new Location(), type, name,
 				true);
-		actor.getStateVars().put(newList.getName(), newList);
+		if (!actor.getStateVars().contains(newList.getName())) {
+			actor.getStateVars().put(newList.getName(), newList);
+		}
 		return newList;
 	}
 
@@ -430,11 +441,6 @@ public class Multi2MonoToken extends ActionSplitter {
 		Use readCounterUse = new Use(readCounter);
 		Instruction load1 = new Load(counter, readCounterUse);
 		bodyNode.add(load1);
-
-		// locals.put(localINPUT.getName(), localINPUT);
-		Instruction read = new Read(port, 1, localINPUT);
-		localINPUT.setInstruction(read);
-		bodyNode.add(read);
 
 		LocalVariable input = new LocalVariable(true, 1, new Location(),
 				port.getName() + "_Input", port.getType());
@@ -521,9 +527,6 @@ public class Multi2MonoToken extends ActionSplitter {
 		store1Index.add(new IntExpr(0));
 		Instruction store1 = new Store(OUTPUT, store1Index, store1Expression);
 		bodyNode.add(store1);
-
-		Instruction write = new Write(port, 1, OUTPUT);
-		OUTPUT.setInstruction(write);
 
 		Expression store2Expression = new VarExpr(new Use(counter2));
 		Instruction store2 = new Store(writeCounter, store2Expression);
@@ -647,7 +650,8 @@ public class Multi2MonoToken extends ActionSplitter {
 				repeatInput = true;
 				process = createProcessAction(action);
 				String processName = "newStateProcess" + action.getName();
-				addTransition(processName, targetName, process);
+				fsm.addState(processName);
+				fsm.addTransition(processName, process, targetName);
 				// move action's Output pattern to new process action
 				moveOutputPattern(action, process);
 
@@ -668,14 +672,14 @@ public class Multi2MonoToken extends ActionSplitter {
 					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
 							tab);
 					modifyProcessAction.visit(process.getBody());
-
-					addTransition(sourceName, sourceName, store);
+					fsm.addState(sourceName);
+					fsm.addTransition(sourceName, store, sourceName);
 
 					// create a new store done action once
 					if (inputIndex == 1) {
 						done = createDoneAction(action.getName()
 								+ "newStoreDone", counter, numTokens);
-						addTransition(sourceName, processName, done);
+						fsm.addTransition(sourceName, done, processName);
 					} else {
 						// the new done action already exists --> modify
 						// schedulability
@@ -690,6 +694,17 @@ public class Multi2MonoToken extends ActionSplitter {
 		inputIndex = 0;
 	}
 
+	/**
+	 * For every output of the action this method creates the new required
+	 * actions
+	 * 
+	 * @param action
+	 *            action to transform
+	 * @param sourceName
+	 *            name of the source state of the action in the actor fsm
+	 * @param targetName
+	 *            name of the target state of the action in the actor fsm
+	 */
 	private void scanOutputs(Action action, String sourceName, String targetName) {
 		for (Entry<Port, Integer> verifEntry : action.getOutputPattern()
 				.getNumTokensMap().entrySet()) {
@@ -703,7 +718,8 @@ public class Multi2MonoToken extends ActionSplitter {
 				// inputs
 				if (!repeatInput) {
 					process = createProcessAction(action);
-					addTransition(processName, writeName, process);
+					fsm.addState(processName);
+					fsm.addTransition(processName, process, writeName);
 					this.actor.getActions().remove(action);
 				} else {
 					fsm.replaceTarget(processName, process, writeName);
@@ -727,14 +743,14 @@ public class Multi2MonoToken extends ActionSplitter {
 					ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
 							tab);
 					modifyProcessActionWrite.visit(process.getBody());
-
-					addTransition(writeName, writeName, write);
+					fsm.addState(writeName);
+					fsm.addTransition(writeName, write, writeName);
 
 					// create a new write done action once
 					if (outputIndex == 1) {
 						done = createDoneAction(action.getName()
 								+ "newWriteDone", counter, numTokens);
-						addTransition(writeName, targetName, done);
+						fsm.addTransition(writeName, done, targetName);
 					} else {
 						modifyDoneAction(counter, outputIndex);
 					}
@@ -747,22 +763,59 @@ public class Multi2MonoToken extends ActionSplitter {
 
 	@Override
 	public void visit(Actor actor) {
-		super.visit(actor);
-		visitAllActions();
+		this.actor = actor;
+		fsm = actor.getActionScheduler().getFsm();
+		if (fsm == null) {
+			// no FSM: simply visit all the actions
+			List<Action> actions = new ArrayList<Action>(actor
+					.getActionScheduler().getActions());
+			addFsm();
+			for (Action action : actions) {
+				String sourceName = "init";
+				String targetName = "init";
+				visitTransition(sourceName, targetName, action);
+			}
+		} else {
+			// with an FSM: visits all transitions
+			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
+			Set<UniqueEdge> edges = graph.edgeSet();
+			for (UniqueEdge edge : edges) {
+				State source = graph.getEdgeSource(edge);
+				String sourceName = source.getName();
+
+				State target = graph.getEdgeTarget(edge);
+				String targetName = target.getName();
+
+				Action action = (Action) edge.getObject();
+				visitTransition(sourceName, targetName, action);
+			}
+		}
 	}
 
-	@Override
-	protected void visit(String sourceName, String targetName, Action action) {
+	/**
+	 * visits a transition characterized by its source name, target name and
+	 * action
+	 * 
+	 * @param sourceName
+	 *            source state
+	 * @param targetName
+	 *            target state
+	 * @param action
+	 *            action of the transition
+	 */
+	private void visitTransition(String sourceName, String targetName,
+			Action action) {
 		createActionsSet(action, sourceName, targetName);
 		if (repeatInput) {
-			removeTransition(sourceName, action);
+			fsm.removeTransition(sourceName, action);
 			repeatInput = false;
 		} else {
 			if (repeatOutput) {
-				removeTransition(sourceName, action);
+				fsm.removeTransition(sourceName, action);
 				repeatOutput = false;
 			}
 		}
+
 	}
 
 }
