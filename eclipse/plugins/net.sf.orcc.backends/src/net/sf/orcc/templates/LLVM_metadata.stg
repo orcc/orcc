@@ -1,4 +1,128 @@
 ///////////////////////////////////////////////////////////////////////////////
+// FIFO declaration
+///////////////////////////////////////////////////////////////////////////////
+
+fifoType(port) ::= <<
+i<port.type.size>
+>>
+
+fifoVar(port, var) ::= <<
+%<var> = bitcast <fifoType(port)>** <fifoVarName(port)> to <VarType(var)>*
+>>
+
+fifoVarName(port) ::= <<
+@<port.name>_ptr
+>>
+
+fifo(port) ::= <<
+<fifoVarName(port)> = global <fifoType(port)>* null
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Constants
+///////////////////////////////////////////////////////////////////////////////
+
+ConstantValue(type, const) ::= <<
+<if(type.list)> <Constant(constant = const, type = type, iterator = type.sizeIterator)> <else> <Constant(constant = const, type="", iterator="")> <endif>
+>>
+
+Constant(constant, type, iterator) ::= <<
+<if(constant.listExpr)
+> <ListExpr(constant = constant, type = type, iterator = iterator)> <
+else
+> <(constant.class.simpleName)(constant)> <
+endif>
+>>
+
+BoolExpr(constant) ::= <<
+<if (constant.value)>1<else>0<endif>
+>>
+
+IntExpr(constant) ::= <<
+<constant>
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+ListExpr(constant, type, iterator) ::= <<
+[<iterator, constant.value: {iterator, value | <type.type> <if(value)> <Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)> <else> zeroinitializer <endif> }; wrap, separator=", ">]
+>>
+
+StringExpr(constant) ::= <<
+c"<constant>"
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// argument type declaration
+///////////////////////////////////////////////////////////////////////////////
+
+argumentTypeDeclaration(variable) ::= <<
+<if(variable.type.list)
+><variable.type>*<
+else
+><variable.type><
+endif>
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Types and variables
+///////////////////////////////////////////////////////////////////////////////
+Var(var) ::= <<
+<if(var.global)>@<else>%<endif><var>
+>>
+
+Expr(expr, type) ::= <<
+<if(expr.varExpr)><Var(expr.var.variable)><else><ConstantValue(const=expr, type=type)><endif>
+>>
+
+ExprType(expr) ::= <<
+<expr.type>
+>>
+
+VarType(var) ::= <<
+<var.type>
+>>
+
+ListType(list) ::= <<
+<list.type.elementType>
+>>
+
+indexes(indexes) ::= <<
+<indexes: { index | <if(index.type)><index.type><else>i32<endif> <Expr(expr=index, type=index.type)> }; separator=", ">
+>>
+
+indexesName(indexes) ::= <<
+<indexes: {index |<index>}; separator="_">
+>>
+
+parametersDeclaration(arguments, parameters, casts, location) ::= <<
+<arguments, parameters, casts: { arg, param, cast | <parameters(type = arg.type, variable= param, cast =cast, location=location)>}; separator=", ">
+>>
+
+parameters(type, variable, cast, location) ::= <<
+<if(variable.intExpr)><type> <elseif(type.list)><type>* <elseif(variable.booleanExpr)>i1 <else><variable.type> <endif><if(cast)>%<variable><location>_cast<else><Expr(expr=variable, type=variable.type)><endif>
+>>
+
+argumentDeclaration(variable) ::= <<
+<if(variable.type.list)
+><variable.type>* %<variable><
+else
+><variable.type> %<variable><
+endif>
+>>
+
+Location(location) ::= <<
+<location.startLine><location.startColumn><location.endColumn>
+>>
+
+// phi definition
+phiPair(value, label) ::= <<
+[<value>, %<label>]
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
 // metadata
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -199,7 +323,7 @@ patterns_MD(actor, patterns) ::= <<
 >>
 
 patterns_vars_MD(actor, vars) ::= <<
-<patterns_vars_decl_MD(actor=actor, vars=vars)> = metadata !{<vars.keys: {key | metadata <port_decl_MD(actor=actor, port=key)>, <fifoType(key)>** <fifoVarName(key)>}; separator=", ">} 
+<patterns_vars_decl_MD(actor=actor, vars=vars)> = metadata !{<vars.keys: {key | metadata <port_decl_MD(actor=actor, port=key)>}; separator=", ">} 
 
 >>
 
@@ -238,7 +362,7 @@ action_MD(actor, action) ::= <<
 
 
 port_MD(actor, port) ::= <<
-<port_decl_MD(actor=actor, port=port)> = metadata !{metadata <Type_decl_MD(actor=actor, var=port)>, <varName_MD(port)>}
+<port_decl_MD(actor=actor, port=port)> = metadata !{metadata <Type_decl_MD(actor=actor, var=port)>, <varName_MD(port)>, <fifoType(port)>** <fifoVarName(port)>}
 <Type_MD(actor=actor, var=port)>
 
 >>

@@ -1,94 +1,8 @@
 import "net/sf/orcc/templates/LLVM_metadata.stg"
 
 ///////////////////////////////////////////////////////////////////////////////
-// FIFO declaration
+// Local variables
 ///////////////////////////////////////////////////////////////////////////////
-
-fifoType(port) ::= <<
-i<port.type.size>
->>
-
-fifoVar(port, var) ::= <<
-%<var> = bitcast <fifoType(port)>** <fifoVarName(port)> to <VarType(var)>*
->>
-
-fifoVarName(port) ::= <<
-@<port.name>_ptr
->>
-
-fifo(port) ::= <<
-<fifoVarName(port)> = global <fifoType(port)>* null
-
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Constants
-///////////////////////////////////////////////////////////////////////////////
-
-ConstantValue(type, const) ::= <<
-<if(type.list)> <Constant(constant = const, type = type, iterator = type.sizeIterator)> <else> <Constant(constant = const, type="", iterator="")> <endif>
->>
-
-Constant(constant, type, iterator) ::= <<
-<if(constant.listExpr)
-> <ListExpr(constant = constant, type = type, iterator = iterator)> <
-else
-> <(constant.class.simpleName)(constant)> <
-endif>
->>
-
-BoolExpr(constant) ::= <<
-<if (constant.value)>1<else>0<endif>
->>
-
-IntExpr(constant) ::= <<
-<constant>
->>
-
-// the values of a list: {val1, val2, ..., valn}
-ListExpr(constant, type, iterator) ::= <<
-[<iterator, constant.value: {iterator, value | <type.type> <if(value)> <Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)> <else> zeroinitializer <endif> }; wrap, separator=", ">]
->>
-
-StringExpr(constant) ::= <<
-c"<constant>"
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// argument type declaration
-///////////////////////////////////////////////////////////////////////////////
-
-argumentTypeDeclaration(variable) ::= <<
-<if(variable.type.list)
-><variable.type>*<
-else
-><variable.type><
-endif>
->>
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Types and variables
-///////////////////////////////////////////////////////////////////////////////
-Var(var) ::= <<
-<if(var.global)>@<else>%<endif><var>
->>
-
-Expr(expr, type) ::= <<
-<if(expr.varExpr)><Var(expr.var.variable)><else><ConstantValue(const=expr, type=type)><endif>
->>
-
-ExprType(expr) ::= <<
-<expr.type>
->>
-
-VarType(var) ::= <<
-<var.type>
->>
-
-ListType(list) ::= <<
-<list.type.elementType>
->>
 
 variableDeclaration(variable) ::= <<
 <if(!variable.port)
@@ -98,39 +12,6 @@ variableDeclaration(variable) ::= <<
 <endif>
 <endif><
 endif>
->>
-
-indexes(indexes) ::= <<
-<indexes: { index | <if(index.type)><index.type><else>i32<endif> <Expr(expr=index, type=index.type)> }; separator=", ">
->>
-
-indexesName(indexes) ::= <<
-<indexes: {index |<index>}; separator="_">
->>
-
-parametersDeclaration(arguments, parameters, casts, location) ::= <<
-<arguments, parameters, casts: { arg, param, cast | <parameters(type = arg.type, variable= param, cast =cast, location=location)>}; separator=", ">
->>
-
-parameters(type, variable, cast, location) ::= <<
-<if(variable.intExpr)><type> <elseif(type.list)><type>* <elseif(variable.booleanExpr)>i1 <else><variable.type> <endif><if(cast)>%<variable><location>_cast<else><Expr(expr=variable, type=variable.type)><endif>
->>
-
-argumentDeclaration(variable) ::= <<
-<if(variable.type.list)
-><variable.type>* %<variable><
-else
-><variable.type> %<variable><
-endif>
->>
-
-Location(location) ::= <<
-<location.startLine><location.startColumn><location.endColumn>
->>
-
-// phi definition
-phiPair(value, label) ::= <<
-[<value>, %<label>]
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -255,10 +136,6 @@ b<label(ifNode.joinNode)>:
 
 >>
 
-LoadLocalPort(instr) ::= <<
-%local_<instr.port><instr.block.label> = <LoadOp(ty=fifoName(instr.port), pointer={@<instr.port>})>
->>
-
 label(nodes) ::= "b<first(nodes):{ x | <x.label>}>"
 
 phiPairs(phi) ::= <<
@@ -313,31 +190,6 @@ Assign(assign) ::= <<
 PhiAssignment(phi) ::= <<
 
 %<phi.target> = phi <phi.target.type> <phiPairs(phi)>
->>
-
-Read(read) ::= <<
-
-<LoadLocalPort(read)>
-%<read.port>_ptr = <CallOp(ty ={<read.port.type>*}, fnptrval={fifo_<fifoType(read.port)>_read}, function_args={<fifoName(read.port)> %local_<read.target><read.block.label>, i32 <read.numTokens>})>
-<BitcastOp(result=Var(read.target) , ty={<read.port.type>*}, value={%<read.port>_ptr}, ty2={<VarType(read.target)>*})>
-
->>
-
-
-Peek(peek) ::= <<
-
-<LoadLocalPort(peek)>
-%<peek.port>_ptr = <CallOp(ty ={<peek.port.type>*}, fnptrval={fifo_<fifoType(peek.port)>_peek}, function_args={<fifoName(peek.port)> %local_<peek.target><peek.block.label>, i32 <peek.numTokens>})>
-<BitcastOp(result=Var(peek.target) , ty={<peek.port.type>*}, value={%<peek.port>_ptr}, ty2={<VarType(peek.target)>*})>
-
->>
-
-Write(write) ::= <<
-
-<LoadLocalPort(write)>
-%<write.port>_ptr = <CallOp(ty ={<write.port.type>*}, fnptrval={fifo_<fifoType(write.port)>_write}, function_args={<fifoName(write.port)> %local_<write.target><write.block.label>, i32 <write.numTokens>})>
-<BitcastOp(result=Var(write.target) , ty={<write.port.type>*}, value={%<write.port>_ptr}, ty2={<VarType(write.target)>*})>
-
 >>
 
 Return(return) ::= <<
