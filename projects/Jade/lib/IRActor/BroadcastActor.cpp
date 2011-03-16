@@ -77,18 +77,13 @@ BroadcastActor::~BroadcastActor(){
 }
 
 void BroadcastActor::createActor(){
-	// Getting type of fifo
-	StructType* structType = FifoMng::getFifoType(cast<IntegerType>(type));
-	PointerType* fifoType = (PointerType*)structType->getPointerTo();
-	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(fifoType));
-
 	// Creating input variable of name input
-	string inputName = "input";
-	GlobalVariable* inputGlobalVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, name+"_"+inputName);
+	string inputPortName = "input";
+	GlobalVariable* inputGlobalVar = new GlobalVariable(*module, type, true, GlobalValue::ExternalLinkage, NULL, name+"_"+inputPortName+"_ptr");
 	
 	//Create a new port
-	Port* inputPort = new Port(inputName, type);
-	Variable* inputVar = new Variable(type, inputName, true, true, inputGlobalVar);
+	Port* inputPort = new Port(inputPortName, type);
+	Variable* inputVar = new Variable(type, inputPortName, true, true, inputGlobalVar);
 	inputPort->setPtrVar(inputVar);
 	
 	
@@ -96,15 +91,15 @@ void BroadcastActor::createActor(){
 
 	// Creating output port of name input
 	for (int i = 0; i < numOutputs; i++) {
-		stringstream outputName;
+		stringstream outputPortName;
 		
 		// Creating output variable of name output
-		outputName <<name<<"_output_" << i;
-		GlobalVariable* outputGlobalVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, outputName.str());
+		outputPortName <<name<<"_output_" << i;
+		GlobalVariable* outputGlobalVar = new GlobalVariable(*module, type, true, GlobalValue::ExternalLinkage, NULL, outputPortName.str()+"_ptr");
 
 		//Create a new port
-		Port* outputPort = new Port(outputName.str(), type);
-		Variable* outputVar = new Variable(type, outputName.str(), true, true, outputGlobalVar);
+		Port* outputPort = new Port(outputPortName.str(), type);
+		Variable* outputVar = new Variable(type, outputPortName.str(), true, true, outputGlobalVar);
 		
 		outputPort->setPtrVar(outputVar);
 		outputs->insert(pair<string, Port*>(outputPort->getName(), outputPort));
@@ -141,11 +136,9 @@ Procedure* BroadcastActor::createScheduler(){
 	// Add the first basic block entry into the function.
 	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", NewF);
 
-	//Create a test for input port
-	Value* hasTokenValue = createHasTokenTest(getInput(), BBEntry);
-
 	//Return resut
-	ReturnInst* returnInst = ReturnInst::Create(Context, hasTokenValue, BBEntry);
+	ConstantInt* one = ConstantInt::get(Type::getInt1Ty(Context), 1);
+	ReturnInst* returnInst = ReturnInst::Create(Context, one, BBEntry);
 
 	return new Procedure(isSchedulableName, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);
 }
@@ -160,7 +153,7 @@ Procedure* BroadcastActor::createBody(){
 
 	//Read fifo from output
 	Value* token = createReadFifo(getInput(), BBEntry);
-
+/*
 	//Write token to output
 	map<string, Port*>::iterator it;
 	
@@ -169,7 +162,7 @@ Procedure* BroadcastActor::createBody(){
 	}
 
 	//Create setReadEnd on input
-	createSetReadEnd(getInput(), BBEntry);
+	createSetReadEnd(getInput(), BBEntry);*/
 
 	//Return value
 	ConstantInt* one = ConstantInt::get(Type::getInt32Ty(Context), 1);
@@ -213,7 +206,20 @@ Value* BroadcastActor::createHasTokenTest(Port* port, BasicBlock* current){
 }
 
 Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
-	//Load port structure
+	GlobalVariable* var = port->getPtrVar()->getGlobalVariable();
+	
+	//Create first bitcast
+	Type* arrayType = ArrayType::get(var->getType()->getElementType(), 1);
+	BitCastInst* bitcastInst = new BitCastInst(var, arrayType->getPointerTo(), "", current);
+
+	//Get first element
+	Value *Idxs[2];
+	Value *Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
+	Idxs[0] = Zero;
+    Idxs[1] = Zero;
+	
+	GetElementPtrInst* getInstr = GetElementPtrInst::Create(bitcastInst, Idxs, Idxs+2, "", current);
+	/*//Load port structure
 	LoadInst* inputStruct = new LoadInst(port->getPtrVar()->getGlobalVariable(), "l"+ port->getName(), current);
 	
 	// Call readPtr
@@ -222,10 +228,10 @@ Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 	
 	Function* readFn = FifoMng::getReadFunction(port->getType(), decoder);
-	CallInst* retVal = CallInst::Create(readFn, vector.begin(), vector.end(), "tokenPtr", current);
+	CallInst* retVal = CallInst::Create(readFn, vector.begin(), vector.end(), "tokenPtr", current);*/
 	
 	//Return token value
-	return new LoadInst(retVal,"token", current);
+	return new LoadInst(getInstr,"token", current);
 }
 
 void BroadcastActor::createWriteFifo(Port* port, Value* token ,BasicBlock* current){

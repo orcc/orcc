@@ -120,7 +120,7 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				string name = "broadcast_"+ instance->getId()+"_"+ srcPort->getName();
 				BroadcastActor* actorBCast = new BroadcastActor(Context, decoder, name, numOuputs, srcPort->getType()/*, fifo*/);
 				
-				//Create an instance for the broadcast
+				//Create an instance for the broadcast with the specified inputs and outputs
 				Instance* newInstance = new Instance(name, actorBCast);
 				addedBroads.push_back(newInstance);
 
