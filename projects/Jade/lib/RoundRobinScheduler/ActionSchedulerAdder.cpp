@@ -232,7 +232,7 @@ void ActionSchedulerAdder::createSchedulerNoFSM(Instance* instance, BasicBlock* 
 }
 
 BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* function, BasicBlock* skipBB, BasicBlock* BB){
-	Pattern* pattern = action->getInputPattern();
+/*	Pattern* pattern = action->getInputPattern();
 	
 	//Pattern is empty, return current basic block
 	if (pattern->isEmpty()){
@@ -243,7 +243,7 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* fu
 	map<Port*, ConstantInt*>::iterator it;
 	list<Value*>::iterator itValue;
 	list<Value*> values;
-/*
+
 	for ( it=pattern->begin() ; it != pattern->end(); it++ ){
 		Value* hasTokenValue = createInputTest(it->first, it->second, BB);
 		TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);

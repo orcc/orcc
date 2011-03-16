@@ -168,7 +168,9 @@ cl::opt<int> StopAt("stop-at-frame",
          cl::desc("Stop decoder after a given number of frame decoded."),
          cl::init(0));
 
-static cl::opt<bool> Verbose("v", cl::desc("Print information about actions taken"), cl::init(false));
+static cl::opt<bool> Verbose("verbose", cl::desc("Print information about actions taken"), cl::init(false));
+
+static cl::opt<bool> Verify("v", cl::desc("Verify every generated decoders"), cl::init(false));
 
 static cl::opt<bool> Console("console", cl::desc("Enter in console mode"), cl::init(false));
 
@@ -235,9 +237,18 @@ void startCmdLine(){
 	//Load network
 	engine->load(network, 3);
 
+	// Verify the given decoder if needed
+	if (Verify){
+		engine->verify(network, "error.txt");
+	}
+
+	// Print the given decoder if needed
 	if (OutputDir != ""){
 		engine->print(network, "module.txt");
 	}
+
+
+
 	//Run network
 	//engine->run(network, VidFile);
 
@@ -286,7 +297,7 @@ int main(int argc, char **argv) {
 		if (Verbose){
 			cout << "> Starting scenario mode :\n";
 		}
-		Manager manager(engine, Verbose);
+		Manager manager(engine, Verify, Verbose);
 		manager.start(ScFile);
 
 		if (Verbose){

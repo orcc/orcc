@@ -70,8 +70,12 @@ public:
 	 * Creates a new manager for the DecoderEngine.
 	 *
 	 * @param engine : the DecoderEngine to manage
+	 *
+	 * @param verify : decoder has to be verify or not 
+	 *
+	 * @param verbose : display actions taken
      */
-	Manager(DecoderEngine* engine, bool verbose = false);
+	Manager(DecoderEngine* engine, bool verify = false, bool verbose = false);
 
 	/*!
      *  @brief Start the manager
@@ -202,6 +206,9 @@ private:
 	/** Network pointer */
 	std::map<int, Network*>::iterator netPtr;
 
+	/** Verify generated decoder */
+	bool verify;
+	
 	/** Verbose events */
 	bool verbose;
 };

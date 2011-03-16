@@ -54,9 +54,10 @@
 using namespace std;
 using namespace llvm;
 
-Manager::Manager(DecoderEngine* engine, bool verbose){
+Manager::Manager(DecoderEngine* engine, bool verify, bool verbose){
 	this->engine = engine;
 	this->verbose = verbose;
+	this->verify = verify;
 }
 
 bool Manager::start(std::string scFile){
@@ -155,6 +156,10 @@ bool Manager::runLoadEvent(LoadEvent* loadEvent){
 	//Store resulting network
 	networks.insert(pair<int, Network*>(id, network));
 
+	if (verify){
+		engine->verify(network, "error.txt");
+	}
+	
 	if (verbose){
 		cout << "--> Load decoder finished in : "<< (clock () - timer1) * 1000 / CLOCKS_PER_SEC << "ms.\n";
 		cout << "-> Load event executed in :" << (clock () - timer2) * 1000 / CLOCKS_PER_SEC <<"\n";

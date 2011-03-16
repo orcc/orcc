@@ -78,13 +78,7 @@ bool IRWriter::write(Instance* instance){
 
 void IRWriter::writeInstance(Instance* instance){
 	
-	//Get ports from the instance
-	//inputs = instance->getInputs();
-	//outputs = instance->getOutputs();
-	
-	//Write instance elements
-	//writePorts(IRConstant::KEY_INPUTS, actor->getInputs());
-	//writePorts(IRConstant::KEY_OUTPUTS, actor->getOutputs());
+	//Write all instance property
 	stateVars = writeStateVariables(actor->getStateVars());
 	parameters = writeVariables(actor->getParameters());
 	procs = writeProcedures(actor->getProcs());
