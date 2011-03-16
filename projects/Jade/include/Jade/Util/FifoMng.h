@@ -270,11 +270,6 @@ private:
 	static FifoAccess* parseFifo(llvm::MDNode* node);
 
 	/**
-    * @brief Parse extern functions
-    */
-	static void parseExternFunctions();
-
-	/**
     * @brief Defines the name of a fifo according to the bitwidth
     */
 	static FifoMng::FifoAccess* getFifoAccess(llvm::IntegerType* type);
@@ -293,12 +288,6 @@ private:
 
 	/** Module that contains the fifo */
 	static llvm::Module* headerMd;
-
-	/** Module that contains the extern functions */
-	static llvm::Module* externFnMd;
-
-	/** Extern functions */
-	static std::map<std::string,llvm::Function*> externFunct;
 
 	/** Extern structs */
 	static std::list<llvm::Function*> externStruct;

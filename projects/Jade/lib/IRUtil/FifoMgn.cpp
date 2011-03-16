@@ -62,8 +62,6 @@ FifoTy FifoMng::fifoTy;
 string FifoMng::externFnFile;
 string FifoMng::packageFolder;
 Module* FifoMng::headerMd;
-Module* FifoMng::externFnMd;
-map<string, Function*> FifoMng::externFunct;
 map<int, FifoMng::FifoAccess*> FifoMng::fifoAccesses;
 map<string, const StructType*> FifoMng::fifoStructs;
 
@@ -74,7 +72,6 @@ void FifoMng::setFifoTy(FifoTy fifoTy, std::string packageFld){
 
 		parseModules();
 		parseFifos();
-		parseExternFunctions();
 }
 
 void FifoMng::parseModules(){
@@ -89,14 +86,6 @@ void FifoMng::parseModules(){
 
 	if (headerMd == NULL){
 		cout << "Unable to parse fifo header file";
-		exit(0);
-	}
-
-	//parse extern functions
-	externFnMd = parser.loadModule(packageSystem, "Extern");
-
-	if (externFnMd == NULL){
-		cout << "Unable to parse extern functions file";
 		exit(0);
 	}
 }
@@ -147,14 +136,6 @@ pair<string, StructType*> FifoMng::parseFifoStruct(llvm::MDNode* structMD){
 	return pair<string, StructType*>(name->getString(), structType);
 }
 
-void FifoMng::parseExternFunctions(){
-	
-	// Iterate though functions of extern module 
-	for (Module::iterator I = externFnMd->begin(), E = externFnMd->end(); I != E; ++I) {
-		externFunct.insert(pair<std::string,llvm::Function*>(I->getName(), I));
-	}
-}
-
 AbstractFifo* FifoMng::getFifo(LLVMContext& C, Decoder* decoder, Type* type, int size){
 	//Todo : implement static class in fifo for creation
 	return new FifoCircular(C, decoder->getModule(), type, size);
@@ -186,14 +167,16 @@ map<string, Function*>* FifoMng::addFifoFunctions(Decoder* decoder){
 	
 	map<string, Function*>* functions = new map<string, Function*>();
 
-	map<string, Function*>::iterator itMap;
-	
-	for(itMap = externFunct.begin(); itMap != externFunct.end(); ++itMap){
-		Function* function = writer.addFunctionProtosExternal((*itMap).second);
-		functions->insert(pair<string, Function*>(itMap->first, function));
+	// Add external functions
+	for (Module::iterator FI = headerMd->begin(), FE = headerMd->end(); FI != FE; ++FI) {
+		if (FI->isDeclaration()){
+			Function* function = writer.addFunctionProtosExternal(FI);
+			functions->insert(pair<string, Function*>(FI->getName(), function));
+		}
 	}
 
 	map<int, FifoAccess*>::iterator itAcc;
+	map<string, Function*>::iterator itMap;
 	for (itAcc = fifoAccesses.begin(); itAcc != fifoAccesses.end(); itAcc++){
 		FifoAccess* fifoAccess  = itAcc->second;
 
