@@ -461,7 +461,7 @@ network(network, options) ::= <<
 #define __USE_GNU
 #endif
 
-#include "orcc.h"
+#include "orcc_types.h"
 #include "orcc_fifo.h"
 <printMediumInclude(network.templateData.allMediumsAllInstances)>
 #include "orcc_scheduler.h"
