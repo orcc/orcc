@@ -202,6 +202,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 
 		composite.setVisible(show);
 		((GridData) composite.getLayoutData()).exclude = !show;
+		launchConfigurationTab.updateSize();
 	}
 
 	/**

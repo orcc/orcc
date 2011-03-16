@@ -107,6 +107,7 @@ public class TextBoxOptionWidget implements ModifyListener, OptionWidget {
 	public void hide() {
 		composite.setVisible(false);
 		((GridData) composite.getLayoutData()).exclude = true;
+		launchConfigurationTab.updateSize();
 	}
 
 	@Override
@@ -136,6 +137,7 @@ public class TextBoxOptionWidget implements ModifyListener, OptionWidget {
 	public void show() {
 		composite.setVisible(true);
 		((GridData) composite.getLayoutData()).exclude = false;
+		launchConfigurationTab.updateSize();
 	}
 
 	@Override

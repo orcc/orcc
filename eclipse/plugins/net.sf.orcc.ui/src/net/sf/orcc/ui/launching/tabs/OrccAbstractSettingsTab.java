@@ -421,7 +421,7 @@ public abstract class OrccAbstractSettingsTab extends
 	 * Updates the size of the composite. Will make scrollbars appear if
 	 * necessary.
 	 */
-	private void updateSize() {
+	public void updateSize() {
 		groupOptions.setSize(groupOptions.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		composite.setSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}

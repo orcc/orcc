@@ -178,6 +178,7 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 
 		composite.setVisible(show);
 		((GridData) composite.getLayoutData()).exclude = !show;
+		launchConfigurationTab.updateSize();
 	}
 
 	@Override
