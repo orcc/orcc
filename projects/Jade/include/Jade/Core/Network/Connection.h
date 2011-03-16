@@ -154,14 +154,6 @@ public:
      */
 	AbstractFifo* getFifo(){return fifo;};
 
-	/*!
-     *  @brief set the fifo bound to the connection
-     *
-	 *  @param fifo: a llvm::GlobalVariable representing the fifo of the connection
-     *
-     */
-	 void setFifo(AbstractFifo* fifo);
-
 	 /*!
 	 *  @brief unset the fifo bound to the connection
      *

@@ -47,6 +47,7 @@ class Connection;
 class Configuration;
 class Decoder;
 class LLVMExecution;
+class Port;
 
 #include "llvm/LLVMContext.h"
 
@@ -119,9 +120,21 @@ private:
 	 * LLVMExecution* executionEngine
 	 */
 	void setConnection(Connection* connection, LLVMExecution* executionEngine);
+
+	/**
+	 * @brief Create a new global variable for the given port
+	 * 
+	 * @param port : the initial port
+	 *
+	 * @return the corresponding GlobalVariable
+	 */
+	llvm::GlobalVariable* createPortVar(Port* port);
 	
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** LLVM Module of the decoder */
+	llvm::Module* module;
 
 	/** Decoder to print connection */
 	Decoder* decoder;

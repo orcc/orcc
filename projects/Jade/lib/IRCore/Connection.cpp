@@ -88,20 +88,6 @@ IRAttribute* Connection::getAttribute(std::string name){
 	return it->second;
 }
 
-void Connection::setFifo(AbstractFifo* fifo){
-	//Set fifo bound to the connection
-	this->fifo = fifo;
-
-	//Get GV of the port
-	GlobalVariable* srcVar = source->getGlobalVariable();
-	GlobalVariable* dstVar = target->getGlobalVariable();
-
-	//Set initialize to the fifo global variable
-	GlobalVariable* fifoGV = fifo->getGV();
-	srcVar->setInitializer(fifoGV);
-	dstVar->setInitializer(fifoGV);
-}
-
 void Connection::unsetFifo(){
 	//Get GV of the port
 	GlobalVariable* srcVar = source->getGlobalVariable();

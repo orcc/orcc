@@ -395,9 +395,8 @@ Procedure* IRParser::parseProc(MDNode* node){
 Port* IRParser::parsePort(MDNode* node){
 	Type* type = (Type*)parseType(cast<MDNode>(node->getOperand(0)));
 	MDString* name = cast<MDString>(node->getOperand(1));
-	GlobalVariable* variable = cast<GlobalVariable>(node->getOperand(2));
 	
-	return new Port(name->getString(), (IntegerType*)type, variable);
+	return new Port(name->getString(), (IntegerType*)type);
 }
 
 Type* IRParser::parseType(MDNode* node){

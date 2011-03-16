@@ -68,15 +68,15 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose): Co
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
 
-	//Set elements of the decoder
-	this->scheduler = new RoundRobinScheduler(Context, this);
-
 	// Add Fifo function and fifo type into the decoder
 	this->fifoFn = FifoMng::addFifoHeader(this);
 
 	//Configure the decoder
 	ConfigurationEngine engine(Context);
 	engine.configure(this);
+
+	//Set elements of the decoder
+	scheduler = new RoundRobinScheduler(Context, this);
 
 	//Create execution engine
 	executionEngine = new LLVMExecution(Context, this);

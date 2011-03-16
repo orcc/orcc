@@ -81,10 +81,41 @@ public:
 	 *
      */
 	llvm::GlobalVariable* createVariable(llvm::GlobalVariable* variable);
+	
+	/**
+     *  @brief Create a new Function in the decoder
+	 *
+	 * @param function : the llvm::Function to add
+	 *
+	 * @return the created llvm::Function.
+     */
 	llvm::Function* createFunction(llvm::Function* function);
 
+	/**
+     *  @brief Add a new external Function prototype in the decoder
+	 *
+	 * @param function : the llvm::Function to add
+	 *
+	 * @return the created prototype.
+     */
 	llvm::Function* addFunctionProtosExternal(const llvm::Function* function);
+	
+	/**
+     *  @brief Add a new internal Function prototype in the decoder
+	 *
+	 * @param function : the llvm::Function to add
+	 *
+	 * @return the created prototype.
+     */
 	llvm::Function* addFunctionProtosInternal(const llvm::Function* function);
+	
+	/**
+     *  @brief Link the body of a Function in the decoder
+	 *
+	 * @param function : the llvm::Function to link
+	 *
+	 * @return true if the function is linked otherwise false
+     */
 	bool linkProcedureBody(llvm::Function* function);
 
 	/**
@@ -128,8 +159,41 @@ private:
      */
 	llvm::GlobalVariable* addVariable(llvm::GlobalVariable* variable);
 
+	/**
+     *  @brief Copy global variable attribute.
+     *
+	 * @param SrcGV : the source llvm::GlobalVariable to get attributes from
+	 *
+	 * @param DestGV : the destination llvm::GlobalVariable to write attributes to
+     */
 	void CopyGVAttributes(llvm::GlobalValue *DestGV, const llvm::GlobalValue *SrcGV);
+	
+	/**
+     *  @brief Links llvm::GlobalVariable initializer.
+     *
+	 * @param variable : the llvm::GlobalVariable to link
+	 *
+	 * @return True if successfull, otherwise false
+     */
 	bool LinkGlobalInits(llvm::GlobalVariable* variable);
+	
+	/**
+     *  @brief Link the body of a Function in the decoder
+	 *
+	 * @param NewFunc : the new llvm::Function
+	 *
+	 * @param OldFunc : the old llvm::Function
+	 *
+	 * @param VMap : the Value Map
+	 *
+	 * @param ModuleLevelChanges : Whether or not the Module Level has Changed
+	 *
+	 * @param Returns : Return instructions
+	 *
+	 * @param NameSuffix : the suffix name
+	 *
+	 * @param CodeInfo : the llvm::ClonedCodeInfo
+     */
 	void linkFunctionBody(llvm::Function *NewFunc, const llvm::Function *OldFunc,
 		llvm::ValueToValueMapTy &VMap,
                        bool ModuleLevelChanges,

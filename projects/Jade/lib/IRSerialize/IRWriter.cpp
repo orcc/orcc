@@ -79,12 +79,12 @@ bool IRWriter::write(Instance* instance){
 void IRWriter::writeInstance(Instance* instance){
 	
 	//Get ports from the instance
-	inputs = instance->getInputs();
-	outputs = instance->getOutputs();
+	//inputs = instance->getInputs();
+	//outputs = instance->getOutputs();
 	
 	//Write instance elements
-	writePorts(IRConstant::KEY_INPUTS, actor->getInputs());
-	writePorts(IRConstant::KEY_OUTPUTS, actor->getOutputs());
+	//writePorts(IRConstant::KEY_INPUTS, actor->getInputs());
+	//writePorts(IRConstant::KEY_OUTPUTS, actor->getOutputs());
 	stateVars = writeStateVariables(actor->getStateVars());
 	parameters = writeVariables(actor->getParameters());
 	procs = writeProcedures(actor->getProcs());
@@ -103,7 +103,7 @@ void IRWriter::writeInstance(Instance* instance){
 	//Resolve paramaters of this instance
 	instance->solveParameters();
 }
-
+/*
 std::map<std::string, Port*>* IRWriter::writePorts(string key, map<string, Port*>* ports){
 	map<string, Port*>::iterator it;
 	map<string, Port*>* newPorts = new map<string, Port*>();
@@ -140,7 +140,7 @@ void IRWriter::writePort(string key, Port* port){
 
 	//Set global variable to the instance port
 	instPort->setGlobalVariable(globalVariable);
-}
+}*/
 
 map<string, Variable*>* IRWriter::writeVariables(map<string, Variable*>* vars){
 	map<string, Variable*>::iterator it;

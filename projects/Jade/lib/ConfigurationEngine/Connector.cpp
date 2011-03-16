@@ -39,6 +39,7 @@
 #include <iostream>
 
 #include "Connector.h"
+#include "Jade/Decoder.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMExecution.h"
@@ -46,15 +47,16 @@
 //------------------------------
 
 using namespace std;
+using namespace llvm;
 
 Connector::Connector(llvm::LLVMContext& C, Decoder* decoder) : Context(C){
 	this->decoder = decoder;
+	this->module = decoder->getModule();
 }
 
 Connector::~Connector(){
 
 }
-
 
 void Connector::setConnections(Configuration* configuration){
 	Network* network = configuration->getNetwork();
@@ -79,13 +81,27 @@ void Connector::unsetConnections(Configuration* configuration){
 	}
 }
 
+GlobalVariable* Connector::createPortVar(Port* port){
+	//Get fifo structure type
+	const PointerType* portStruct = FifoMng::getFifoType(port->getType())->getPointerTo();
+
+	//Return new variable
+	return new GlobalVariable(*module, portStruct, true,  GlobalValue::InternalLinkage, /*init*/0, port->getName(), 0, false);;
+}
+
 void Connector::setConnection(Connection* connection){
 	//Source port is choosen as the reference type
 	Port* src = connection->getSourcePort();
+	Port* dst = connection->getDestinationPort();
 	
+	//Create port variables
+	GlobalVariable* srcVar = createPortVar(src);
+	GlobalVariable* dstVar = createPortVar(dst);
+
 	//Create a fifo and set it to the connection
 	AbstractFifo* fifo = FifoMng::getFifo(Context, decoder, src->getType(), connection->getSize());
-	connection->setFifo(fifo);
+	srcVar->setInitializer(fifo->getGV());
+	dstVar->setInitializer(fifo->getGV());
 }
 
 void Connector::setConnections(Configuration* configuration, LLVMExecution* executionEngine){
