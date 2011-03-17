@@ -267,8 +267,8 @@ void Display::display_init() {
 }
 
 void Display::setSize(int width, int height){
-	this->width = width;
-	this->height = height;
+	this->width = width * 16;
+	this->height = height * 16;
 
 	display_set_video(this);
 }

@@ -8,7 +8,8 @@ define i1 @isSchedulable_send_data() nounwind {
 define i32 @send_data() nounwind {
 entry:
   %source = load i8** @source
-  %O = bitcast i8** @O_ptr to [1 x i8]*
+  %O_ptr = load i8** @O_ptr
+  %O = bitcast i8* %O_ptr to [1 x i8]*
   %O_elt = getelementptr [1 x i8]* %O, i32 0, i32 0
   call void @get_src(i8* %source, i8* %O_elt) nounwind ;
   br label %return

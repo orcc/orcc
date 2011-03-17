@@ -7,7 +7,8 @@ i<port.type.size>
 >>
 
 fifoVar(port, var) ::= <<
-%<var> = bitcast <fifoType(port)>** <fifoVarName(port)> to <VarType(var)>*
+%<var>_ptr = load <fifoType(port)>** <fifoVarName(port)>
+%<var> = bitcast <fifoType(port)>* %<var>_ptr to <VarType(var)>*
 >>
 
 fifoVarName(port) ::= <<

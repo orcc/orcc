@@ -10,8 +10,10 @@ entry:
 
 define void @get_size() nounwind {
 entry:
-	%WIDTH = bitcast i16** @WIDTH_ptr to [1 x i16]*
-	%HEIGHT = bitcast i16** @HEIGHT_ptr to [1 x i16]*
+	%WIDTH_ptr = load i16** @WIDTH_ptr
+	%WIDTH = bitcast i16* %WIDTH_ptr to [1 x i16]*
+	%HEIGHT_ptr = load i16** @HEIGHT_ptr
+	%HEIGHT = bitcast i16* %HEIGHT_ptr to [1 x i16]*
 	%display = load i8** @display
 	%WIDTH_elt = getelementptr [1 x i16]* %WIDTH, i32 0, i32 0
 	%HEIGHT_elt = getelementptr [1 x i16]* %HEIGHT, i32 0, i32 0

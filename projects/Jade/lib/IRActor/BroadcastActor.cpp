@@ -224,8 +224,9 @@ Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
 	GlobalVariable* var = port->getPtrVar()->getGlobalVariable();
 	
 	//Create first bitcast
-	Type* arrayType = ArrayType::get(var->getType()->getElementType(), 1);
-	BitCastInst* bitcastInst = new BitCastInst(var, arrayType->getPointerTo(), "", current);
+	Type* arrayType = ArrayType::get(port->getType(), 1);
+	LoadInst* loadInst = new LoadInst(var,"", current);
+	BitCastInst* bitcastInst = new BitCastInst(loadInst, arrayType->getPointerTo(), "", current);
 
 	//Get first element
 	Value *Idxs[2];
@@ -243,8 +244,9 @@ void BroadcastActor::createWriteFifo(Port* port, Value* token ,BasicBlock* curre
 	GlobalVariable* var = port->getPtrVar()->getGlobalVariable();
 	
 	//Create first bitcast
-	Type* arrayType = ArrayType::get(var->getType()->getElementType(), 1);
-	BitCastInst* bitcastInst = new BitCastInst(var, arrayType->getPointerTo(), "", current);
+	Type* arrayType = ArrayType::get(port->getType(), 1);
+	LoadInst* loadInst = new LoadInst(var,"", current);
+	BitCastInst* bitcastInst = new BitCastInst(loadInst, arrayType->getPointerTo(), "", current);
 
 	//Get first element
 	Value *Idxs[2];
