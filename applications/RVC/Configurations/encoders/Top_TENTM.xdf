@@ -25,7 +25,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="System.Display"/>
+        <Class name="std.video.DisplayYUV"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -64,9 +64,9 @@
     <Connection dst="Merger" dst-port="Y" src="Extract_yuv" src-port="Y"/>
     <Connection dst="Merger" dst-port="U" src="Extract_yuv" src-port="U"/>
     <Connection dst="Merger" dst-port="V" src="Extract_yuv" src-port="V"/>
-    <Connection dst="display" dst-port="B" src="Merger" src-port="YUV"/>
     <Connection dst="Extract_yuv" dst-port="Width" src="SPS" src-port="Width"/>
     <Connection dst="Extract_yuv" dst-port="Height" src="SPS" src-port="Height"/>
-    <Connection dst="display" dst-port="WIDTH" src="SPS" src-port="Width"/>
-    <Connection dst="display" dst-port="HEIGHT" src="SPS" src-port="Height"/>
+    <Connection dst="display" dst-port="Byte" src="Merger" src-port="YUV"/>
+    <Connection dst="display" dst-port="Height" src="SPS" src-port="Height"/>
+    <Connection dst="display" dst-port="Width" src="SPS" src-port="Width"/>
 </XDF>

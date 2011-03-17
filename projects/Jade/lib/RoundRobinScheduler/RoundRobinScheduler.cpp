@@ -97,7 +97,11 @@ void RoundRobinScheduler::createScheduler(){
 	}
 
 	//Create the scheduler function
-	//createNetworkScheduler();
+	createNetworkScheduler();
+
+	for (it = instances->begin(); it != instances->end(); it++){
+		addInstance(it->second);
+	}
 }
 
 

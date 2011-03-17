@@ -250,7 +250,7 @@ void startCmdLine(){
 
 
 	//Run network
-	//engine->run(network, VidFile);
+	engine->run(network, VidFile);
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
 }
