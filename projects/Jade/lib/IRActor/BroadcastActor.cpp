@@ -49,6 +49,7 @@
 #include "Jade/Actor/BroadcastActor.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
+#include "Jade/Core/MoC/SDFMoC.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/Util/FifoMng.h"
 //------------------------------
@@ -68,6 +69,7 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 	
 	module = new Module(name, Context);
 	this->decoder = decoder;
+	
 	//Create the broadcast actor
 	createActor();
 }
@@ -108,8 +110,22 @@ void BroadcastActor::createActor(){
 	//Create action of the broadcast actor
 	createAction();
 	
+	// Create a MoC
+	createMoC();
+
 	//Create action scheduler
 	actionScheduler = new ActionScheduler(actions, NULL);
+}
+
+void BroadcastActor::createMoC(){
+	// Set broadcast actor as SDF
+	SDFMoC* sdfMoC = new SDFMoC();
+
+	//Set properties of the MoC
+	Action* action = actions->front();
+	sdfMoC->addAction(action);
+	sdfMoC->setInputPattern(action->getInputPattern());
+	sdfMoC->setOutputPattern(action->getOutputPattern());
 }
 
 void BroadcastActor::createAction(){
@@ -122,6 +138,7 @@ void BroadcastActor::createAction(){
 	
 	//Add action to the actor
 	Action* action = new Action(actionTag, inputPattern, outputPattern, scheduler, body);
+
 	actions->push_back(action);
 }
 

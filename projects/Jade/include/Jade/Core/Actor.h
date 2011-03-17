@@ -47,7 +47,7 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/Procedure.h"
-#include "Jade/Core/MoC/MoC.h"
+#include "Jade/Core/MoC.h"
 
 namespace llvm{
 	class Module;

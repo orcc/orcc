@@ -39,7 +39,7 @@
 #ifndef SDFMOC_H
 #define SDFMOC_H
 
-#include "Jade/Core/CSDFMoC.h"
+#include "Jade/Core/MoC/CSDFMoC.h"
 //------------------------------
 
 /**

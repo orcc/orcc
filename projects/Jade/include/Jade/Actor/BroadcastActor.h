@@ -128,6 +128,11 @@ private:
 	void createAction();
 
 	/**
+     *  @brief Create the MoC of broadcast actor
+     */
+	void createMoC();
+
+	/**
      *  @brief Create the scheduler of the broadcast action
      */
 	Procedure* createScheduler();

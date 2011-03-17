@@ -70,6 +70,72 @@ public:
 	 */
 	bool isCSDF(){return true;};
 
+	/**
+	 * @brief Add action to the MoC.
+	 *
+	 * Adds the given action to the list of actions that can be scheduled
+	 * statically.
+	 * 
+	 * @param action : an Action
+	 */
+	void addAction(Action* action) {
+		actions.push_back(action);
+	}
+
+	/**
+	 * @brief Returns the input pattern of this CSDF MoC.
+	 * 
+	 * @return the input pattern of this CSDF MoC
+	 */
+	Pattern* getInputPattern() {
+		return inputPattern;
+	}
+
+	/**
+	 * @brief Returns the output pattern of this CSDF MoC.
+	 * 
+	 * @return the output pattern of this CSDF MoC
+	 */
+	Pattern* getOutputPattern() {
+		return outputPattern;
+	}
+
+	/**
+	 * @brief Returns the number of phases of this CSDF MoC.
+	 * 
+	 * @return the number of phases of this CSDF MoC
+	 */
+	int getNumberOfPhases() {
+		return numberOfPhases;
+	}
+
+	/**
+	 * @brief Set the number of phases of this CSDF MoC.
+	 * 
+	 * @param numberOfPhases : the number of phases of this CSDF MoC
+	 */
+	void setNumberOfPhases(int numberOfPhases) {
+		this->numberOfPhases = numberOfPhases;
+	}
+
+	/**
+	 * @brief Set the output pattern of this CSDF MoC.
+	 * 
+	 * @param pattern : the output Pattern
+	 */
+	void setOutputPattern(Pattern* pattern) {
+		this->outputPattern = pattern;
+	}
+
+	/**
+	 * @brief Set the output pattern of this CSDF MoC.
+	 * 
+	 * @param pattern : the input Pattern
+	 */
+	void setInputPattern(Pattern* pattern) {
+		this->inputPattern = pattern;
+	}
+
 protected:
 	/** Sequence of actions */
 	std::list<Action*> actions;
