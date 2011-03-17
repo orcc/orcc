@@ -6,8 +6,8 @@ actor MAATb1() int I ==> int O :
 
 	a0: action I:[i] ==>
 	do
-		my_array[i & 3] := i - 1;
-		my_array[(i & 12) >> 2] := i;
+		my_array[i] := i;
+		my_array[i + 1] := i + 1;
 	end
 	
 	a1: action ==> O:[x]

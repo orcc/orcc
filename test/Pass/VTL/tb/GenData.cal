@@ -15,7 +15,7 @@ actor GenData () ==> int O :
 
 	loop: action ==> O:[ v ]
 	var
-		int(size=4) v = stimulus[count]
+		uint(size=4) v = stimulus[count]
 	do
 		count := count + 1;
 	end
