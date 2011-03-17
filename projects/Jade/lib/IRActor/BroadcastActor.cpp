@@ -79,9 +79,11 @@ BroadcastActor::~BroadcastActor(){
 }
 
 void BroadcastActor::createActor(){
+	const PointerType* fifoType = type->getPointerTo();
+
 	// Creating input variable of name input
 	string inputPortName = "input";
-	GlobalVariable* inputGlobalVar = new GlobalVariable(*module, type, true, GlobalValue::ExternalLinkage, NULL, name+"_"+inputPortName+"_ptr");
+	GlobalVariable* inputGlobalVar = new GlobalVariable(*module, fifoType, false, GlobalValue::InternalLinkage, ConstantPointerNull::get(fifoType), name+"_"+inputPortName+"_ptr");
 	
 	//Create a new port
 	Port* inputPort = new Port(inputPortName, type);
@@ -97,7 +99,7 @@ void BroadcastActor::createActor(){
 		
 		// Creating output variable of name output
 		outputPortName <<name<<"_output_" << i;
-		GlobalVariable* outputGlobalVar = new GlobalVariable(*module, type, true, GlobalValue::ExternalLinkage, NULL, outputPortName.str()+"_ptr");
+		GlobalVariable* outputGlobalVar = new GlobalVariable(*module, fifoType, false, GlobalValue::InternalLinkage, ConstantPointerNull::get(fifoType), outputPortName.str()+"_ptr");
 
 		//Create a new port
 		Port* outputPort = new Port(outputPortName.str(), type);

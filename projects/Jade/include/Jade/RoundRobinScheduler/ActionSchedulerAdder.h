@@ -180,7 +180,7 @@ private:
 
 
 	/**
-	 * @brief Creates a output pattern test for an Action
+	 * @brief check a output pattern for an Action
 	 * 
 	 * @param action : the Action to test
 	 *
@@ -190,9 +190,127 @@ private:
 	 *
 	 * @param BB : llvm::BasicBlock where add instructions
 	 *
-	 * @param llvm::BasicBlock : the next basic block to add instruction
+	 * @return the next basic block to add instruction
 	 */
-	llvm::BasicBlock* createOutputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
+	llvm::BasicBlock* checkOutputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Check peek pattern of an Action
+	 * 
+	 * @param action : the Action to test peek
+	 *
+	 * @param function : function where test is added
+	 *
+	 * @param BB : llvm::BasicBlock where add instructions
+	 */
+	void checkPeekPattern(Action* action, llvm::Function* function, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create a peek for an Action
+	 * 
+	 * @param port : the port to peek
+	 *
+	 * @param variable : the Variable where peek is stored
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens to peek
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createPeek(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create a read for an Action
+	 * 
+	 * @param port : the port to read
+	 *
+	 * @param variable : the Variable where read is stored
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens to read
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createRead(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create reads for an Action
+	 * 
+	 * @param action : the action to create read for
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createReads(Action* action, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create a ReadEnd for an Action
+	 * 
+	 * @param port : the port to set to ReadEnd
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens that has been read
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createReadEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create readends for an Action
+	 * 
+	 * @param action : the action to create readends for
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createReadEnds(Action* action, llvm::BasicBlock* BB );
+	
+	/**
+	 * @brief Create a WriteEnd for an Action
+	 * 
+	 * @param port : the port to set to WriteEnd
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens that has been read
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createWriteEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create writeends for an Action
+	 * 
+	 * @param action : the action to create writeends for
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createWriteEnds(Action* action, llvm::BasicBlock* BB );
+
+
+	/**
+	 * @brief Create a write for an Action
+	 * 
+	 * @param port : the port to write
+	 *
+	 * @param variable : the Variable where write is stored
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens to write
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createWrite(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create writes for an Action
+	 * 
+	 * @param action : the action to create writes for
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createWrites(Action* action, llvm::BasicBlock* BB );
+
+	/**
+	 * @brief Create a Action execution
+	 * 
+	 * @param action : the action to execute
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createActionCall(Action* action, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Creates a hasRoom test for a Port

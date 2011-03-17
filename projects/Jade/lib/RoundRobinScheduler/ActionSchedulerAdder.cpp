@@ -232,7 +232,7 @@ void ActionSchedulerAdder::createSchedulerNoFSM(Instance* instance, BasicBlock* 
 }
 
 BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* function, BasicBlock* skipBB, BasicBlock* BB){
-/*	Pattern* pattern = action->getInputPattern();
+	Pattern* pattern = action->getInputPattern();
 	
 	//Pattern is empty, return current basic block
 	if (pattern->isEmpty()){
@@ -240,11 +240,12 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* fu
 	}
 
 	//Check inputs
-	map<Port*, ConstantInt*>::iterator it;
 	list<Value*>::iterator itValue;
 	list<Value*> values;
+	map<Port*, ConstantInt*>::iterator it;
+	map<Port*, ConstantInt*>* numTokens = pattern->getNumTokensMap();
 
-	for ( it=pattern->begin() ; it != pattern->end(); it++ ){
+	for ( it=numTokens->begin() ; it != numTokens->end(); it++ ){
 		Value* hasTokenValue = createInputTest(it->first, it->second, BB);
 		TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);
 		values.push_back(truncTokenInst);
@@ -264,24 +265,25 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* fu
 
 	//Finally branch fire to hasToken block if all inputs have tokens
 	BranchInst* brInst = BranchInst::Create(tokenBB, skipBB, value1, BB);
-	return tokenBB;*/
-	return NULL;
+	return tokenBB;
 }
 
-BasicBlock* ActionSchedulerAdder::createOutputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB){
-	/*map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
+BasicBlock* ActionSchedulerAdder::checkOutputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB){
+	Pattern* outputPattern = action->getOutputPattern();
 
 	//No output pattern return basic block
-	if (outputPattern->empty()){
+	if (outputPattern->isEmpty()){
 		return BB;
 	}
 	
 	//Test if rooms are available on output
-	map<Port*, ConstantInt*>::iterator it;
 	list<Value*>::iterator itValue;
 	list<Value*> values;
+	map<Port*, ConstantInt*>::iterator it;
+	map<Port*, ConstantInt*>* numTokens = outputPattern->getNumTokensMap();
+	
 
-	for ( it=outputPattern->begin() ; it != outputPattern->end(); it++ ){
+	for ( it=numTokens->begin() ; it != numTokens->end(); it++ ){
 		Value* hasRoomValue = createOutputTest(it->first, it->second, BB);
 		TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", BB);
 		values.push_back(truncRoomInst);
@@ -302,8 +304,42 @@ BasicBlock* ActionSchedulerAdder::createOutputPattern(Action* action, llvm::Func
 	//Finally branch fire to hasRoom block if all outputs have free room
 	BranchInst* brInst = BranchInst::Create(roomBB, skipBB, value1, BB);
 
-	return roomBB;*/
-	return NULL;
+	return roomBB;
+}
+
+void ActionSchedulerAdder::checkPeekPattern(Action* action, Function* function, BasicBlock* BB){
+	Pattern* inputPattern = action->getInputPattern();
+
+	//Test if rooms are available on output
+	map<Port*, Variable*>::iterator it;
+	map<Port*, Variable*>* peeked = inputPattern->getPeekedMap();
+	map<Port*, ConstantInt*>* numTokensMap = inputPattern->getNumTokensMap();
+
+	for ( it=peeked->begin() ; it != peeked->end(); it++ ){
+		Port* port = it->first;
+
+		// Get number of tokens to peek
+		map<Port*, ConstantInt*>::iterator itToken;
+
+		itToken = numTokensMap->find(port);
+
+		createPeek(it->first, it->second, itToken->second, BB);
+	}
+}
+
+void ActionSchedulerAdder::createPeek(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
+	//Load selected port
+	GlobalVariable* fifoVar = port->getFifoVar();
+	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
+	
+	//Call peek function
+	Function* peekFn = FifoMng::getPeekFunction(port->getType(), decoder);
+	Value* peekArgs[] = { loadPort, numTokens};
+	CallInst* callInst = CallInst::Create(peekFn, peekArgs, peekArgs+2,"",  BB);
+
+	// Store fifo pointer in port pointer
+	GlobalVariable* portPtr = variable->getGlobalVariable();
+	new StoreInst(callInst, portPtr, BB);
 }
 
 BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* BB, BasicBlock* incBB, Function* function){
@@ -328,20 +364,153 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 	BB = checkInputPattern(action, function, skipBB, BB);
 	
 	//Test firing condition of an action
+	checkPeekPattern(action, function, BB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* schedInst = CallInst::Create(scheduler->getFunction(), "",  BB);
 	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, schedInst, BB);
 
 	//Create output pattern
-	fireBB = createOutputPattern(action, function, skipBB, fireBB);
+	fireBB = checkOutputPattern(action, function, skipBB, fireBB);
 	
-	//Launch action body
-	CallInst* bodyInst = CallInst::Create(body->getFunction(), "",  fireBB);
+	//Execute the action
+	createActionCall(action, fireBB);
 
 	//Branch fire basic block to BB basic block
 	BranchInst::Create(incBB, fireBB);
 	
 	return skipBB;
+}
+
+void ActionSchedulerAdder::createActionCall(Action* action, BasicBlock* BB){
+	// Create read/write for the action
+	createReads(action, BB);
+	createWrites(action, BB);
+	
+	//Launch action body
+	Procedure* body = action->getBody();
+	CallInst* bodyInst = CallInst::Create(body->getFunction(), "",  BB);
+
+	//Create ReadEnd/WriteEnd
+	createReadEnds(action, BB);
+	createWriteEnds(action, BB);
+}
+
+void ActionSchedulerAdder::createWriteEnds(Action* action, llvm::BasicBlock* BB){
+	Pattern* outputPattern = action->getOutputPattern();
+
+	//Get tokens and var
+	map<Port*, ConstantInt*>::iterator it;
+	map<Port*, ConstantInt*>* numTokensMap = outputPattern->getNumTokensMap();
+
+	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
+		//Create write end
+		createWriteEnd(it->first, it->second, BB);
+	}
+}
+
+void ActionSchedulerAdder::createReadEnds(Action* action, llvm::BasicBlock* BB){
+	Pattern* inputPattern = action->getInputPattern();
+
+	//Get tokens and var
+	map<Port*, ConstantInt*>::iterator it;
+	map<Port*, ConstantInt*>* numTokensMap = inputPattern->getNumTokensMap();
+
+	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
+		//Create read end
+		createReadEnd(it->first, it->second, BB);
+	}
+}
+
+void ActionSchedulerAdder::createReadEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+	//Load selected port
+	GlobalVariable* fifoVar = port->getFifoVar();
+	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
+	
+	//Call peek function
+	Function* readEndFn = FifoMng::getReadEndFunction(port->getType(), decoder);
+	Value* readEndArgs[] = { loadPort, numTokens};
+	CallInst::Create(readEndFn, readEndArgs, readEndArgs+2,"",  BB);
+}
+
+void ActionSchedulerAdder::createWriteEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+	//Load selected port
+	GlobalVariable* fifoVar = port->getFifoVar();
+	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
+	
+	//Call peek function
+	Function* writeEndFn = FifoMng::getWriteEndFunction(port->getType(), decoder);
+	Value* writeEndArgs[] = { loadPort, numTokens};
+	CallInst::Create(writeEndFn, writeEndArgs, writeEndArgs+2,"",  BB);
+}
+
+
+void ActionSchedulerAdder::createWrites(Action* action, llvm::BasicBlock* BB){
+	Pattern* outputPattern = action->getOutputPattern();
+
+	//Get tokens and var
+	map<Port*, ConstantInt*>::iterator it;
+	map<Port*, Variable*>::iterator itVar;
+	map<Port*, ConstantInt*>* numTokensMap = outputPattern->getNumTokensMap();
+	map<Port*, Variable*>* variableMap = outputPattern->getVariableMap();
+
+	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
+		// Get associated port variable
+		Port* port = it->first;
+		itVar = variableMap->find(port);
+
+		//Create read
+		createWrite(port, itVar->second, it->second, BB);
+	}
+}
+
+void ActionSchedulerAdder::createReads(Action* action, llvm::BasicBlock* BB){
+	Pattern* inputPattern = action->getInputPattern();
+
+	//Get tokens and var
+	map<Port*, ConstantInt*>::iterator it;
+	map<Port*, Variable*>::iterator itVar;
+	map<Port*, ConstantInt*>* numTokensMap = inputPattern->getNumTokensMap();
+	map<Port*, Variable*>* variableMap = inputPattern->getVariableMap();
+
+	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
+		// Get associated port variable
+		Port* port = it->first;
+		itVar = variableMap->find(port);
+
+		//Create read
+		createRead(port, itVar->second, it->second, BB);
+	}
+}
+
+void ActionSchedulerAdder::createWrite(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
+	//Load selected port
+	GlobalVariable* fifoVar = port->getFifoVar();
+	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
+	
+	//Call peek function
+	Function* writeFn = FifoMng::getWriteFunction(port->getType(), decoder);
+	Value* writeArgs[] = { loadPort, numTokens};
+	CallInst* callInst = CallInst::Create(writeFn, writeArgs, writeArgs+2,"",  BB);
+
+	// Store fifo pointer in port pointer
+	GlobalVariable* portPtr = variable->getGlobalVariable();
+	new StoreInst(callInst, portPtr, BB);
+}
+
+
+void ActionSchedulerAdder::createRead(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
+	//Load selected port
+	GlobalVariable* fifoVar = port->getFifoVar();
+	LoadInst* loadPort = new LoadInst(port->getFifoVar(), "", BB);
+	
+	//Call peek function
+	Function* readFn = FifoMng::getReadFunction(port->getType(), decoder);
+	Value* readArgs[] = { loadPort, numTokens};
+	CallInst* callInst = CallInst::Create(readFn, readArgs, readArgs+2,"",  BB);
+
+	// Store fifo pointer in port pointer
+	GlobalVariable* portPtr = variable->getGlobalVariable();
+	new StoreInst(callInst, portPtr, BB);
 }
 
 map<FSM::State*, BasicBlock*>* ActionSchedulerAdder::createStates(map<string, FSM::State*>* states, Function* function){
@@ -460,6 +629,7 @@ BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* next
 	stateBB = checkInputPattern(action, function, skipStateBB, stateBB);
 	
 	//Test firing condition of an action
+	checkPeekPattern(action, function, stateBB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  stateBB);
 	BranchInst* branchInst	= BranchInst::Create(fireStateBB, skipStateBB, callInst, stateBB);
@@ -474,7 +644,7 @@ BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* next
 	BranchInst::Create(returnBB, skipRoomBB);
 
 	//Create output pattern
-	fireStateBB = createOutputPattern(action, function, skipRoomBB, fireStateBB);
+	fireStateBB = checkOutputPattern(action, function, skipRoomBB, fireStateBB);
 	
 	//Create call state
 	createActionCallState(nextStateInfo, fireStateBB, BBTransitions);
@@ -489,9 +659,8 @@ void ActionSchedulerAdder::createActionCallState(FSM::NextStateInfo* nextStateIn
 	Action* action = nextStateInfo->getAction();
 	FSM::State* nextState = nextStateInfo->getTargetState();
 
-	//Call body of the action
-	Procedure* body = action->getBody();
-	CallInst* callInst = CallInst::Create(body->getFunction(), "",  BB);
+	//Execute the action
+	createActionCall(action, BB);
 
 	//Create a branch to the next state
 	it = BBTransitions->find(nextState);

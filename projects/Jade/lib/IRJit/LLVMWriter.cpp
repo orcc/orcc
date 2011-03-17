@@ -66,7 +66,7 @@ GlobalVariable* LLVMWriter::createPortVariable(Port* port){
 	const PointerType* portStruct = FifoMng::getFifoType(port->getType())->getPointerTo();
 
 	GlobalVariable *newPortVar =  new GlobalVariable(*module, portStruct,
-                          true, portVar->getLinkage(), /*init*/0,
+                          true, portVar->getLinkage(), ConstantPointerNull::get(portStruct),
                            prefix + portVar->getName(), 0, false);
 
 	return newPortVar;

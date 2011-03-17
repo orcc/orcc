@@ -91,10 +91,10 @@ void RoundRobinScheduler::createScheduler(){
 	map<string, Instance*>::iterator it;
 	map<string, Instance*>* instances = configuration->getInstances();
 	ActionSchedulerAdder actionSchedulerAdder(Context, decoder);
-	/*
+	
 	for (it = instances->begin(); it != instances->end(); it++){
 		actionSchedulerAdder.transform(it->second);
-	}*/
+	}
 
 	//Create the scheduler function
 	//createNetworkScheduler();
