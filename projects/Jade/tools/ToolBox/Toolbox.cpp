@@ -59,6 +59,7 @@
 
 #include "Jade/Util/OptionMng.h"
 #include "Jade/Util/PackageMng.h"
+#include "Jade/Util/CompressionMng.h"
 //------------------------------
 using namespace llvm;
 using namespace std;
@@ -92,8 +93,14 @@ OutputBitcode("c", cl::desc("Generate LLVM in bytecode representation"));
 static cl::opt<bool> 
 OutputArchive("a", cl::desc("Generate package in archives"));
 
+static cl::opt<bool> 
+OutputCompressedArchive("ca", cl::desc("Generate package in compressed archives"));
+
 static cl::opt<string> 
 LibraryFolder("L", cl::Required, cl::ValueRequired, cl::desc("Input folder of Video Tool Library"));
+
+static cl::opt<string> 
+XDFFile("xdf", cl::Optional, cl::ValueRequired, cl::desc("Compress input XDF"));
 
 //Optimization specific options
 static cl::opt<bool>
@@ -310,7 +317,7 @@ void opt(string file, Module* M){
 
   if (OutputAssembly){
       Passes.add(createPrintModulePass(&Out));
-  }else if(OutputBitcode || OutputArchive){
+  }else if(OutputBitcode || OutputArchive || OutputCompressedArchive){
       Passes.add(createBitcodeWriterPass(Out));
   }
 
@@ -359,8 +366,13 @@ void createArchives(map<sys::Path,string>* filesPath){
 	// Write archives to the disk
 	for (itArchive = archives.begin(); itArchive != archives.end(); itArchive++){
 		itArchive->second->writeToDisk(true, false, true, &errorMsg);
-		if (errorMsg != "")
+		if (errorMsg != ""){
 			cerr <<"Error when creat "<< itArchive->first << ".a\n";
+		}
+		// Compress archives
+		if(OutputCompressedArchive){
+			CompressionMng::compressFile(itArchive->second->getPath().c_str());
+		}
 	}
 
 	// Erase all initial files
@@ -369,8 +381,9 @@ void createArchives(map<sys::Path,string>* filesPath){
 	for (itPack=Packages.begin() ; itPack != Packages.end(); itPack++){
 		sys::Path erasePath(LibraryFolder + *itPack);
 		erasePath.eraseFromDisk(true,&errorMsg);
-		if (errorMsg != "")
+		if (errorMsg != ""){
 			cerr <<"Error when erase the directory"<< erasePath.str() << "\n";
+		}
 	}
 }
 
@@ -467,9 +480,14 @@ int main(int argc, char **argv) {
 	cl::ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
 	
 	InitializeNativeTarget();
-	
+
 	//Verify options
 	OptionMng::setDirectory(&LibraryFolder);
+
+	//Compress XDF
+	if(XDFFile.getNumOccurrences() == 1){
+		CompressionMng::compressFile(XDFFile);
+	}
 
 	//Build files Path
 	map<sys::Path,string> filesPath;
@@ -486,7 +504,7 @@ int main(int argc, char **argv) {
 	}
 
 	//Create archives
-	if(OutputArchive){
+	if(OutputArchive || OutputCompressedArchive){
 		createArchives(&filesPath);
 	}
 }

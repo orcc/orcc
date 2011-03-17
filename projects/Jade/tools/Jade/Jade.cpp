@@ -57,6 +57,7 @@
 #include "Jade/Fifo/FifoSelection.h"
 #include "Jade/Scenario/Manager.h"
 #include "Jade/Util/OptionMng.h"
+#include "Jade/Util/CompressionMng.h"
 //------------------------------
 
 #ifdef __APPLE__

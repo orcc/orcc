@@ -104,6 +104,7 @@ add_subdirectory(lib/RoundRobinScheduler)
 add_subdirectory(lib/Scenario)
 add_subdirectory(lib/TinyXml)
 add_subdirectory(lib/XDFParser)
+add_subdirectory(lib/Compression)
 
 # Include directories
 include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS} ${SDL_INCLUDE_DIR})

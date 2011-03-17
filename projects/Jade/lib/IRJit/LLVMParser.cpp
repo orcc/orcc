@@ -43,6 +43,7 @@
 
 #include "Jade/Jit/LLVMParser.h"
 #include "Jade/Util/PackageMng.h"
+#include "Jade/Util/CompressionMng.h"
 //------------------------------
 
 using namespace llvm;
@@ -120,6 +121,11 @@ void LLVMParser::openArchive(Package* package){
 	//Get archive file
 	string archiveName = PackageMng::getFirstFolder(package->getDirectory()) + ".a";
 	sys::Path archiveFile(directory + archiveName);
+
+	//If useful, uncompress archive 
+	if(CompressionMng::IsGZipFile(archiveFile.c_str())){
+		CompressionMng::uncompressGZip(archiveFile.c_str());
+	}
 
 	//Load archive
 	package->setArchive(Archive::OpenAndLoad(archiveFile, Context, &Error));

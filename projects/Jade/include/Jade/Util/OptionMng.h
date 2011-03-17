@@ -43,7 +43,7 @@
 //------------------------------
 
 /**
- * @class PackageMng
+ * @class OptionMng
  *
  *  This class contains methods for managing options.
  *

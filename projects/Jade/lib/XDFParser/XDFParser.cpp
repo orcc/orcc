@@ -38,6 +38,7 @@
 //------------------------------
 #include "Jade/XDFParser.h"
 #include "NetworkParser.h"
+#include "Jade/Util/CompressionMng.h"
 //------------------------------
 
 using namespace std;
@@ -89,7 +90,12 @@ const char* XDFNetwork::TYPE_UINT = "uint";
 
 XDFParser::XDFParser (string filename, bool verbose){
 	this->verbose = verbose;
-	xdfFile = filename; 
+	xdfFile = filename;
+
+	//Uncompress XDF if it is compressed
+	if(CompressionMng::IsGZipFile(filename)){
+		CompressionMng::uncompressGZip(filename);
+	}
 }
 
 Network* XDFParser::ParseXDF (llvm::LLVMContext& C){
