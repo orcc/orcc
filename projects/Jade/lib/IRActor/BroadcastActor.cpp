@@ -145,7 +145,7 @@ Procedure* BroadcastActor::createScheduler(){
 
 Procedure* BroadcastActor::createBody(){
 	// Creating scheduler function
-	FunctionType *FTy = FunctionType::get(Type::getInt32Ty(Context),false);
+	FunctionType *FTy = FunctionType::get(Type::getVoidTy(Context), false);
 	Function *NewF = Function::Create(FTy, Function::InternalLinkage , name, module);
 
 	// Add the first basic block entry into the function.
@@ -153,7 +153,7 @@ Procedure* BroadcastActor::createBody(){
 
 	//Read fifo from output
 	Value* token = createReadFifo(getInput(), BBEntry);
-/*
+
 	//Write token to output
 	map<string, Port*>::iterator it;
 	
@@ -161,12 +161,8 @@ Procedure* BroadcastActor::createBody(){
 		createWriteFifo(it->second, token , BBEntry);
 	}
 
-	//Create setReadEnd on input
-	createSetReadEnd(getInput(), BBEntry);*/
-
 	//Return value
-	ConstantInt* one = ConstantInt::get(Type::getInt32Ty(Context), 1);
-	ReturnInst::Create(Context, one, BBEntry);
+	ReturnInst::Create(Context, NULL, BBEntry);
 
 	return new Procedure(name, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);;
 }
@@ -219,40 +215,28 @@ Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
     Idxs[1] = Zero;
 	
 	GetElementPtrInst* getInstr = GetElementPtrInst::Create(bitcastInst, Idxs, Idxs+2, "", current);
-	/*//Load port structure
-	LoadInst* inputStruct = new LoadInst(port->getPtrVar()->getGlobalVariable(), "l"+ port->getName(), current);
-	
-	// Call readPtr
-	vector<Value*> vector;
-	vector.push_back(inputStruct);
-	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
-	
-	Function* readFn = FifoMng::getReadFunction(port->getType(), decoder);
-	CallInst* retVal = CallInst::Create(readFn, vector.begin(), vector.end(), "tokenPtr", current);*/
 	
 	//Return token value
 	return new LoadInst(getInstr,"token", current);
 }
 
 void BroadcastActor::createWriteFifo(Port* port, Value* token ,BasicBlock* current){
-
-	//Load port structure
-	LoadInst* portStruct = new LoadInst(port->getPtrVar()->getGlobalVariable(), "l"+ port->getName(), current);
-
-	// Call readPtr
-	vector<Value*> vector;
-	vector.push_back(portStruct);
-	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
-	Function* writeFn = FifoMng::getWriteFunction(port->getType(), decoder);
-	CallInst* retVal = CallInst::Create(writeFn, vector.begin(), vector.end(), "w"+port->getName(), current);
+	GlobalVariable* var = port->getPtrVar()->getGlobalVariable();
 	
-	//Store token value
-	StoreInst* storeInst = new StoreInst (token, retVal, current);
+	//Create first bitcast
+	Type* arrayType = ArrayType::get(var->getType()->getElementType(), 1);
+	BitCastInst* bitcastInst = new BitCastInst(var, arrayType->getPointerTo(), "", current);
 
-	// Call setWriteEnd
-	Function* writeEndFn = FifoMng::getWriteEndFunction(port->getType(), decoder);
-	CallInst::Create(writeEndFn, vector.begin(), vector.end(), "", current);
+	//Get first element
+	Value *Idxs[2];
+	Value *Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
+	Idxs[0] = Zero;
+    Idxs[1] = Zero;
+	
+	GetElementPtrInst* getInstr = GetElementPtrInst::Create(bitcastInst, Idxs, Idxs+2, "", current);
 
+	//Return token value
+	new StoreInst(token,getInstr, current);
 }
 
 void BroadcastActor::createSetReadEnd(Port* port, BasicBlock* current){
