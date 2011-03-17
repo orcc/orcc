@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IRISA
+ * Copyright (c) 2010-2011, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,20 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations;
+package net.sf.orcc.backends.xlim.transformations;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -41,51 +49,48 @@ import net.sf.orcc.ir.instructions.Store;
 
 /**
  * This class defines an actor transformation that replace list of one element
- * used in write/read instructions by a scalar
+ * used to stock input/output value by a scalar
  * 
  * @author Herve Yviquel
  * 
  */
-public class ListOfOneElementToScalarTransformation extends
-		AbstractActorVisitor {
+public class UnaryListToScalarTransformation extends AbstractActorVisitor {
+
+	private List<Instruction> toBeRemoved;
+	private Map<Instruction, Assign> toBeAdded;
 
 	@Override
-	public void visit(Read read) {
-		if (read.getNumTokens() == 1 && itInstruction.hasNext()) {
-			Instruction instruction = itInstruction.next();
-			if (instruction.isLoad()) {
-				Load load = (Load) instruction;
-
-				Variable oldTarget = read.getTarget();
-				read.setTarget(load.getTarget());
-
-				// clean up uses
-				load.setTarget(null);
-				load.setSource(null);
-
-				// remove instruction
-				itInstruction.remove();
-				procedure.getLocals().remove(oldTarget.getName());
-			}
-		}
+	public void visit(Action action) {
+		toBeRemoved = new ArrayList<Instruction>();
+		toBeAdded = new HashMap<Instruction, Assign>();
+		super.visit(action);
 	}
 
 	@Override
-	public void visit(Write write) {
-		if (write.getNumTokens() == 1 && itInstruction.hasPrevious()) {
-			itInstruction.previous();
-			if (itInstruction.hasPrevious()) {
-				Instruction instruction = itInstruction.previous();
-				if (instruction.isStore()) {
+	public void visit(Pattern pattern) {
+		for (Port port : pattern.getNumTokensMap().keySet()) {
+			if (pattern.getNumTokens(port) == 1) {
+				Variable oldTarget = pattern.getVariableMap().get(port);
+				Instruction instruction = oldTarget.getInstruction();
+				if (instruction.isLoad()) {
+					Load load = (Load) instruction;
+					Variable newTarget = load.getTarget();
+
+					pattern.remove(port);
+					pattern.setVariable(port, newTarget);
+
+					// clean up uses
+					load.setTarget(null);
+					load.setSource(null);
+
+					// remove instruction
+					toBeRemoved.add(instruction);
+					procedure.getLocals().remove(oldTarget.getName());
+				} else if (instruction.isStore()) {
 					Store store = (Store) instruction;
 					Expression expr = store.getValue();
 
-					Variable oldTarget = write.getTarget();
 					Variable newTarget;
-
-					// remove instruction
-					itInstruction.remove();
-					procedure.getLocals().remove(oldTarget.getName());
 
 					if (expr.isVarExpr()) {
 						VarExpr var = (VarExpr) expr;
@@ -103,42 +108,39 @@ public class ListOfOneElementToScalarTransformation extends
 
 						newTarget = localNewTarget;
 
-						// instructionIterator.previous();
-						itInstruction.add(assign);
+						toBeAdded.put(instruction, assign);
 					}
-					write.setTarget(newTarget);
-					newTarget.setInstruction(write);
-					itInstruction.next();
+
+					pattern.remove(port);
+					pattern.setVariable(port, newTarget);
+
+					// remove instruction
+					toBeRemoved.add(instruction);
+					procedure.getLocals().remove(oldTarget.getName());
 
 					// clean up uses
 					store.setTarget(null);
 					store.setValue(null);
 				}
-				if (itInstruction.hasNext()) {
-					itInstruction.next();
+				oldTarget = pattern.getPeeked(port);
+				if (oldTarget != null) {
+					instruction = oldTarget.getInstruction();
+					if (instruction.isLoad()) {
+						Load load = (Load) instruction;
+						Variable newTarget = load.getTarget();
+
+						pattern.remove(port);
+						pattern.setVariable(port, newTarget);
+
+						// clean up uses
+						load.setTarget(null);
+						load.setSource(null);
+
+						// remove instruction
+						itInstruction.remove();
+						procedure.getLocals().remove(oldTarget.getName());
+					}
 				}
-			}
-		}
-
-	}
-
-	@Override
-	public void visit(Peek peek) {
-		if (peek.getNumTokens() == 1 && itInstruction.hasNext()) {
-			Instruction instruction = itInstruction.next();
-			if (instruction.isLoad()) {
-				Load load = (Load) instruction;
-
-				Variable oldTarget = peek.getTarget();
-				peek.setTarget(load.getTarget());
-
-				// clean up uses
-				load.setTarget(null);
-				load.setSource(null);
-
-				// remove instruction
-				itInstruction.remove();
-				procedure.getLocals().remove(oldTarget.getName());
 			}
 		}
 	}

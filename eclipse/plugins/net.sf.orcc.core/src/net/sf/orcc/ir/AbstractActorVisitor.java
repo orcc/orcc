@@ -130,8 +130,10 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 */
 	public void visit(Action action) {
 		this.action = action;
-		visit(action.getBody());
+		visit(action.getInputPattern());
+		visit(action.getOutputPattern());
 		visit(action.getScheduler());
+		visit(action.getBody());
 		this.action = null;
 	}
 
@@ -239,6 +241,15 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 				expr.accept(this);
 			}
 		}
+	}
+
+	/**
+	 * Visits the given pattern.
+	 * 
+	 * @param pattern
+	 *            an pattern
+	 */
+	public void visit(Pattern pattern) {
 	}
 
 	@Override

@@ -42,13 +42,13 @@ import net.sf.orcc.network.Vertex;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * This class is giving the necessary information for the XLIM HW Network
+ * This class is giving the necessary information for the XLIM Network
  * generation
  * 
  * @author Endri Bezati
  * 
  */
-public class XlimHwNetworkTemplateData {
+public class XlimNetworkTemplateData {
 
 	/**
 	 * Contains a Map which indicates the number of the broadcasted actor

@@ -40,7 +40,6 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
-import net.sf.orcc.backends.transformations.ListOfOneElementToScalarTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
@@ -49,6 +48,7 @@ import net.sf.orcc.backends.xlim.transformations.ConstantPhiValuesTransformation
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
 import net.sf.orcc.backends.xlim.transformations.TernaryOperationAdder;
+import net.sf.orcc.backends.xlim.transformations.UnaryListToScalarTransformation;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimInlineTransformation;
 import net.sf.orcc.ir.Actor;
@@ -111,7 +111,7 @@ public class XlimBackendImpl extends AbstractBackend {
 						new HashMap<String, Expression>(0), actor, null),
 				new TernaryOperationAdder(),
 				new XlimInlineTransformation(true, true),
-				new ListOfOneElementToScalarTransformation(),
+				new UnaryListToScalarTransformation(),
 				new CustomPeekAdder(), new DeadGlobalElimination(),
 				new DeadCodeElimination(), new XlimDeadVariableRemoval(),
 				new ListFlattenTransformation(false, true, false),
@@ -140,7 +140,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		printInstances(network);
 
 		network.computeTemplateMaps();
-		XlimHwNetworkTemplateData data = new XlimHwNetworkTemplateData();
+		XlimNetworkTemplateData data = new XlimNetworkTemplateData();
 		data.computeTemplateMaps(network);
 		network.setTemplateData(data);
 
