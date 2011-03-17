@@ -47,6 +47,7 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/Procedure.h"
+#include "Jade/Core/MoC/MoC.h"
 
 namespace llvm{
 	class Module;
@@ -361,12 +362,30 @@ public:
 	virtual bool isParseable(){return true;};
 
 	/**
-	 * @brief Returns true if this actor is a system actor.
+	 * @brief Returns the MoC of this actor.
+	 * 
+	 * @return an MoC
+	 */
+	MoC* getMoC() {
+		return moc;
+	}
+
+	/**
+	 * Sets the MoC of this actor.
+	 * 
+	 * @param moc : a MoC
+	 */
+	void setMoC(MoC* moc) {
+		this->moc = moc;
+	}
+
+	/**
+	 * @brief Returns true if this actor is a native actor.
 	 * 
 	 * @return true if this actor is a system actor,
 	 *         false otherwise
 	 */
-	bool isSystem();
+	bool isNative();
 
 protected:
 	/** Name of the actor */
@@ -380,6 +399,9 @@ protected:
 
 	/** A map of the parameters of this actor */
 	std::map<std::string, Variable*>* parameters;
+
+	/** MoC of this Actor */
+	MoC* moc;
 
 	/** A map of the initialize action of this actor */
 	std::list<Action*>* initializes;

@@ -176,7 +176,7 @@ StateVar* Actor::getStateVar(std::string name){
 	return (*it).second;
 }
 
-bool Actor::isSystem(){
+bool Actor::isNative(){
 	string firstPackage = PackageMng::getFirstPackageName(this);
 	return firstPackage.compare("System")== 0;
 }
