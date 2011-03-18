@@ -210,7 +210,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 				buffer, writeIndex);
 		modifyActionScheduler.visit(action.getScheduler());
-		modifyActionSchedulability(writeIndex, readIndex);
+		modifyActionSchedulability(action, writeIndex, readIndex);
 	}
 
 	/**
@@ -222,21 +222,26 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param readIndex
 	 *            read index of the buffer
 	 */
-	private void modifyActionSchedulability(GlobalVariable writeIndex,
+	private void modifyActionSchedulability(Action action, GlobalVariable writeIndex,
 			GlobalVariable readIndex) {
 		BlockNode bodyNode = BlockNode.getFirst(action.getScheduler());
+		OrderedMap<String, LocalVariable> locals = action.getScheduler().getLocals();
+		
 		LocalVariable localRead = new LocalVariable(true, 1, new Location(),
 				"readIndex", IrFactory.eINSTANCE.createTypeInt(16));
+		locals.put(localRead.getName(),localRead);
 		Instruction Load = new Load(localRead, new Use(readIndex));
 		bodyNode.add(Load);
 
 		LocalVariable localWrite = new LocalVariable(true, 1, new Location(),
 				"writeIndex", IrFactory.eINSTANCE.createTypeInt(16));
+		locals.put(localWrite.getName(),localWrite);
 		Instruction Load2 = new Load(localWrite, new Use(writeIndex));
 		bodyNode.add(Load2);
 
 		LocalVariable diff = new LocalVariable(true, 1, new Location(), "diff",
 				IrFactory.eINSTANCE.createTypeInt(16));
+		locals.put(diff.getName(),diff);
 		Expression value = new BinaryExpr(new VarExpr(new Use(readIndex)),
 				BinaryOp.MINUS, new VarExpr(new Use(writeIndex)),
 				IrFactory.eINSTANCE.createTypeInt(16));
@@ -904,10 +909,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param action
 	 *            action of the pattern to remove
 	 */
-	private void removePatternPorts(Action action) {
-		Iterator<Port> it = action.getInputPattern().getPorts().iterator();
-		while (it.hasNext()) {
-			it.remove();
+	private void PatternToNull(Action action) {
+		for (Entry<Port, Integer> entry : action.getInputPattern().getNumTokensMap().entrySet()){
+			entry.setValue(0);
 		}
 	}
 
@@ -1003,7 +1007,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				}
 				// change the transformed action to a transition action to keep
 				// the same fireability order
-				removePatternPorts(action);
+				PatternToNull(action);
 				removeNodes(action.getBody());
 				removeLocals(action.getBody());
 				fsm.replaceTarget(sourceName, action, storeName);
