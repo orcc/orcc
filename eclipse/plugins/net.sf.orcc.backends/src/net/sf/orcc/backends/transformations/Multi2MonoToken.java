@@ -79,6 +79,43 @@ import net.sf.orcc.util.UniqueEdge;
  */
 public class Multi2MonoToken extends AbstractActorVisitor {
 	/**
+	 * This class defines a visitor that substitutes the peek from the port to
+	 * the new buffer and chnages the index from (index) to (index+writeIndex)
+	 * 
+	 * @author Khaled Jerbi
+	 * 
+	 */
+	private class ModifyActionScheduler extends AbstractActorVisitor {
+
+		private GlobalVariable buffer;
+		private GlobalVariable writeIndex;
+
+		// private Variable tempTab;
+
+		public ModifyActionScheduler(GlobalVariable buffer,
+				GlobalVariable writeIndex) {
+			this.buffer = buffer;
+			this.writeIndex = writeIndex;
+		}
+
+		@Override
+		public void visit(Load load) {
+
+			if (load.getSource().getVariable().getName().equals(port.getName())) {
+				// change tab Name
+				Use useArray = new Use(buffer);
+				load.setSource(useArray);
+				// change index --> writeIndex+index
+				Expression expression1 = load.getIndexes().get(0);
+				Expression expression2 = new VarExpr(new Use(writeIndex));
+				Expression newExpression = new BinaryExpr(expression1,
+						BinaryOp.PLUS, expression2, port.getType());
+				load.getIndexes().set(0, newExpression);
+			}
+		}
+	}
+
+	/**
 	 * This class defines a visitor that substitutes process variable names with
 	 * those of the newly defined actions for Store
 	 * 
@@ -133,6 +170,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private Type entryType;
 
 	private FSM fsm;
+
 	private int inputIndex = 0;
 
 	private int numTokens;
@@ -151,7 +189,19 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 	private Action store;
 
+	private Action untagged;
+
 	private Action write;
+
+	private void actionToTransition(Action action, GlobalVariable buffer,
+			GlobalVariable writeIndex) {
+		removePatternPorts(action);
+		removeNodes(action.getBody());
+		removeLocals(action.getBody());
+		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
+				buffer, writeIndex);
+		modifyActionScheduler.visit(action.getScheduler());
+	}
 
 	private void addFsm() {
 		ActionScheduler scheduler = actor.getActionScheduler();
@@ -211,7 +261,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
-	 * This method creates the required Store, done and process actions
+	 * This method creates the required Store, done, untagged and process
+	 * actions
 	 * 
 	 * @param action
 	 *            the action getting transformed
@@ -251,7 +302,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            global variable counter used for reading (writing) tokens
 	 * @param numTokens
 	 *            repeat value
-	 * @return
+	 * @return new done action
 	 */
 	private Action createDoneAction(String name, GlobalVariable counter,
 			int numTokens) {
@@ -324,6 +375,13 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		moveNodes(listIt, body);
 		Iterator<LocalVariable> it = action.getBody().getLocals().iterator();
 		moveLocals(it, body);
+		if (repeatOutput && !repeatInput) {
+			Procedure scheduler = newProcessAction.getScheduler();
+			listIt = action.getScheduler().getNodes().listIterator();
+			moveNodes(listIt, scheduler);
+			it = action.getScheduler().getLocals().iterator();
+			moveLocals(it, scheduler);
+		}
 		return newProcessAction;
 	}
 
@@ -344,24 +402,17 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @return new store action
 	 */
 	private Action createStoreAction(String actionName,
-			GlobalVariable readCounter, GlobalVariable storeList) {
+			GlobalVariable readCounter, GlobalVariable storeList,
+			GlobalVariable buffer, GlobalVariable writeIndex) {
 		String storeName = actionName + port.getName() + "_NewStore";
 		Expression guardValue = new IntExpr(numTokens);
 		Expression counterExpression = new VarExpr(new Use(readCounter));
 		Expression expression = new BinaryExpr(counterExpression, BinaryOp.LT,
 				guardValue, IrFactory.eINSTANCE.createTypeBool());
 
-		LocalVariable localINPUT = new LocalVariable(true, 0, new Location(),
-				port.getName(), IrFactory.eINSTANCE.createTypeList(1,
-						port.getType()));
 		Action newStoreAction = createAction(expression, storeName);
 		defineStoreBody(readCounter, storeList, newStoreAction.getBody(),
-				localINPUT);
-
-		// add input pattern
-		Pattern pattern = newStoreAction.getInputPattern();
-		pattern.setNumTokens(port, 1);
-		pattern.setVariable(port, localINPUT);
+				buffer, writeIndex);
 		return newStoreAction;
 	}
 
@@ -376,14 +427,39 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            type of the list
 	 * @return a global variable list
 	 */
-	private GlobalVariable createTab(String name, Type entryType) {
-		Type type = IrFactory.eINSTANCE.createTypeList(numTokens, entryType);
+	private GlobalVariable createTab(String name, Type entryType, int size) {
+		Type type = IrFactory.eINSTANCE.createTypeList(size, entryType);
 		GlobalVariable newList = new GlobalVariable(new Location(), type, name,
 				true);
 		if (!actor.getStateVars().contains(newList.getName())) {
 			actor.getStateVars().put(newList.getName(), newList);
 		}
 		return newList;
+	}
+
+	/**
+	 * creates an untagged action to store tokens
+	 * 
+	 * @param storeCounter
+	 *            global variable counter
+	 * @param storeList
+	 *            global variable list to store
+	 * @return new untagged action
+	 */
+	private Action createUntaggedAction(GlobalVariable readIndex,
+			GlobalVariable storeList) {
+		Expression expression = new BoolExpr(true);
+		Action newUntaggedAction = createAction(expression,
+				"untagged_" + port.getName());
+		LocalVariable localINPUT = new LocalVariable(true, 0, new Location(),
+				port.getName(), IrFactory.eINSTANCE.createTypeList(1,
+						port.getType()));
+		defineUntaggedBody(readIndex, storeList, newUntaggedAction.getBody(),
+				localINPUT);
+		Pattern pattern = newUntaggedAction.getInputPattern();
+		pattern.setNumTokens(port, 1);
+		pattern.setVariable(port, localINPUT);
+		return newUntaggedAction;
 	}
 
 	/**
@@ -395,7 +471,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            global variable write counter
 	 * @param writeList
 	 *            global variable write list
-	 * @return
+	 * @return new write action
 	 */
 	private Action createWriteAction(String actionName,
 			GlobalVariable writeCounter, GlobalVariable writeList) {
@@ -431,6 +507,79 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            new store action body
 	 */
 	private void defineStoreBody(GlobalVariable readCounter,
+			GlobalVariable storeList, Procedure body, GlobalVariable buffer,
+			GlobalVariable writeIndex) {
+		BlockNode bodyNode = BlockNode.getFirst(body);
+
+		OrderedMap<String, LocalVariable> locals = body.getLocals();
+		LocalVariable counter = new LocalVariable(true, 1, new Location(),
+				port.getName() + "_Local_counter", readCounter.getType());
+		locals.put(counter.getName(), counter);
+		Instruction load1 = new Load(counter, new Use(readCounter));
+		bodyNode.add(load1);
+
+		LocalVariable index = new LocalVariable(true, 1, new Location(),
+				"writeIndex", IrFactory.eINSTANCE.createTypeInt(16));
+		locals.put(index.getName(), index);
+		Instruction loadIndex = new Load(index, new Use(writeIndex));
+		bodyNode.add(loadIndex);
+
+		LocalVariable input = new LocalVariable(true, 1, new Location(),
+				port.getName() + "_Input", port.getType());
+		locals.put(input.getName(), input);
+		List<Expression> load2Index = new ArrayList<Expression>(1);
+		Expression expression1 = new VarExpr(new Use(counter));
+		Expression expression2 = new IntExpr(511);
+		Expression indexMask = new BinaryExpr(expression1, BinaryOp.BITAND,
+				expression2, readCounter.getType());
+		// mask index
+		load2Index.add(indexMask);
+		Instruction load2 = new Load(input, new Use(buffer), load2Index);
+		bodyNode.add(load2);
+
+		List<Expression> store1Index = new ArrayList<Expression>(1);
+		store1Index.add(new VarExpr(new Use(counter)));
+		Instruction store1 = new Store(storeList, store1Index, new VarExpr(
+				new Use(input)));
+		bodyNode.add(store1);
+
+		// globalCounter=GlobalCounter+1
+		LocalVariable counter2 = new LocalVariable(true, 2, new Location(),
+				port.getName() + "_Local_counter", readCounter.getType());
+		locals.put(counter2.getName(), counter2);
+		Expression storeIndexElement = new VarExpr(new Use(counter));
+		Expression e2 = new IntExpr(1);
+		Expression assignValue = new BinaryExpr(storeIndexElement,
+				BinaryOp.PLUS, e2, entryType);
+		Instruction assign = new Assign(counter2, assignValue);
+		bodyNode.add(assign);
+		Instruction store2 = new Store(readCounter, new VarExpr(new Use(
+				counter2)));
+		bodyNode.add(store2);
+
+		// writeIndex = (writeIndex&511) +1
+		LocalVariable index2 = new LocalVariable(true, 2, new Location(),
+				"indexTemp", IrFactory.eINSTANCE.createTypeInt(16));
+		Expression value = new BinaryExpr(indexMask, BinaryOp.PLUS, e2,
+				entryType);
+		Instruction assign2 = new Assign(index2, value);
+		bodyNode.add(assign2);
+	}
+
+	/**
+	 * This method creates the instructions for the body of the new untagged
+	 * action
+	 * 
+	 * @param port
+	 *            repeat port
+	 * @param readCounter
+	 *            global variable counter
+	 * @param storeList
+	 *            global store list
+	 * @param body
+	 *            new untagged action body
+	 */
+	private void defineUntaggedBody(GlobalVariable readCounter,
 			GlobalVariable storeList, Procedure body, LocalVariable localINPUT) {
 		BlockNode bodyNode = BlockNode.getFirst(body);
 
@@ -451,11 +600,16 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(load2);
 
 		List<Expression> store1Index = new ArrayList<Expression>(1);
-		store1Index.add(new VarExpr(new Use(counter)));
+		Expression expression1 = new VarExpr(new Use(counter));
+		// index mask (index & 511)
+		Expression expression2 = new IntExpr(511);
+		Expression indexMask = new BinaryExpr(expression1, BinaryOp.BITAND,
+				expression2, readCounter.getType());
+		store1Index.add(indexMask);
 		Instruction store1 = new Store(storeList, store1Index, new VarExpr(
 				new Use(input)));
 		bodyNode.add(store1);
-
+		// globalCounter = GlobalCounter+1
 		LocalVariable counter2 = new LocalVariable(true, 2, new Location(),
 				port.getName() + "_Local_counter", readCounter.getType());
 		locals.put(counter2.getName(), counter2);
@@ -469,6 +623,14 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Instruction store2 = new Store(readCounter, new VarExpr(new Use(
 				counter2)));
 		bodyNode.add(store2);
+		// readIndex = (readIndex & 511) + 1
+		LocalVariable index2 = new LocalVariable(true, 2, new Location(),
+				"indexTemp", IrFactory.eINSTANCE.createTypeInt(16));
+		Expression value = new BinaryExpr(indexMask, BinaryOp.PLUS, e2,
+				entryType);
+		Instruction assign2 = new Assign(index2, value);
+		bodyNode.add(assign2);
+
 	}
 
 	/**
@@ -587,7 +749,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param newProc
 	 *            target procedure
 	 */
-	public void moveLocals(Iterator<LocalVariable> itVar, Procedure newProc) {
+	private void moveLocals(Iterator<LocalVariable> itVar, Procedure newProc) {
 		while (itVar.hasNext()) {
 			LocalVariable var = itVar.next();
 			itVar.remove();
@@ -604,7 +766,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param newProc
 	 *            target procedure
 	 */
-	public void moveNodes(ListIterator<CFGNode> itNode, Procedure newProc) {
+	private void moveNodes(ListIterator<CFGNode> itNode, Procedure newProc) {
 		while (itNode.hasNext()) {
 			CFGNode node = itNode.next();
 			itNode.remove();
@@ -632,6 +794,70 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
+	 * returns the position of a port in a port list
+	 * 
+	 * @param list
+	 *            list of ports
+	 * @param seekPort
+	 *            researched port
+	 * @return position of a port in a list
+	 */
+	private int portPosition(List<Port> list, Port seekPort) {
+		int position = 0;
+		for (Port inputPort : list) {
+			if (inputPort == seekPort) {
+				break;
+			} else {
+				position++;
+			}
+		}
+		return position;
+	}
+
+	/**
+	 * removes the local variables of a procedure
+	 * 
+	 * @param it
+	 *            local variable iterator
+	 * @param procedure
+	 *            procedure containing the local variables to remove
+	 */
+	private void removeLocals(Procedure procedure) {
+		Iterator<LocalVariable> it = procedure.getLocals().iterator();
+		while (it.hasNext()) {
+			it.remove();
+		}
+	}
+
+	/**
+	 * removes the nodes of a procedure
+	 * 
+	 * @param it
+	 *            node iterator
+	 * @param procedure
+	 *            procedure containing the nodes to remove
+	 */
+	private void removeNodes(Procedure procedure) {
+		Iterator<CFGNode> it = procedure.getNodes().iterator();
+		while (it.hasNext()) {
+			it.remove();
+		}
+	}
+
+	/**
+	 * removes the ports of an action's input pattern
+	 * 
+	 * @param action
+	 *            action of the pattern to remove
+	 */
+	private void removePatternPorts(Action action) {
+		Iterator<Port> it = action.getInputPattern().getPorts().iterator();
+		while (it.hasNext()) {
+			it.remove();
+		}
+	}
+
+	/**
 	 * For every Input of the action this method creates the new required
 	 * actions
 	 * 
@@ -648,13 +874,25 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			int verifNumTokens = verifEntry.getValue();
 			if (verifNumTokens > 1) {
 				repeatInput = true;
+				// create new process action
 				process = createProcessAction(action);
+				String storeName = "newStateStore" + action.getName();
 				String processName = "newStateProcess" + action.getName();
 				fsm.addState(processName);
 				fsm.addTransition(processName, process, targetName);
 				// move action's Output pattern to new process action
 				moveOutputPattern(action, process);
-
+				// create a list to store the treated input ports
+				List<Port> inputPorts = new ArrayList<Port>();
+				List<GlobalVariable> inputBuffers = new ArrayList<GlobalVariable>();
+				List<GlobalVariable> readIndexes = new ArrayList<GlobalVariable>();
+				List<GlobalVariable> writeIndexes = new ArrayList<GlobalVariable>();
+				GlobalVariable untagBuffer = new GlobalVariable(new Location(),
+						entryType, "buffer", true);
+				GlobalVariable untagReadIndex = new GlobalVariable(
+						new Location(), entryType, "index", true);
+				GlobalVariable untagWriteIndex = new GlobalVariable(
+						new Location(), entryType, "index", true);
 				// if input repeat detected --> treat all input ports
 				for (Entry<Port, Integer> entry : action.getInputPattern()
 						.getNumTokensMap().entrySet()) {
@@ -662,32 +900,56 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					inputIndex = inputIndex + 1;
 					port = entry.getKey();
 					entryType = entry.getKey().getType();
+
+					if (inputPorts.contains(port)) {
+						int position = portPosition(inputPorts, port);
+						untagBuffer = inputBuffers.get(position);
+						untagReadIndex = readIndexes.get(position);
+						untagWriteIndex = writeIndexes.get(position);
+					} else {
+						inputPorts.add(port);
+						untagBuffer = createTab(port.getName() + "_buffer",
+								entryType, 512);
+						untagReadIndex = createCounter("readIndex_"
+								+ port.getName());
+						untagWriteIndex = createCounter("writeIndex_"
+								+ port.getName());
+						untagged = createUntaggedAction(untagReadIndex,
+								untagBuffer);
+						actor.getActions().add(untagged);
+						actor.getActionScheduler().getActions().add(untagged);
+					}
 					String counterName = action.getName() + "NewStoreCounter"
 							+ inputIndex;
 					GlobalVariable counter = createCounter(counterName);
 					String listName = action.getName() + "NewStoreList"
 							+ inputIndex;
-					GlobalVariable tab = createTab(listName, entryType);
-					store = createStoreAction(action.getName(), counter, tab);
+					GlobalVariable tab = createTab(listName, entryType,
+							numTokens);
+					store = createStoreAction(action.getName(), counter, tab,
+							untagBuffer, untagWriteIndex);
 					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
 							tab);
 					modifyProcessAction.visit(process.getBody());
-					fsm.addState(sourceName);
-					fsm.addTransition(sourceName, store, sourceName);
+					fsm.addState(storeName);
+					fsm.addTransition(storeName, store, storeName);
 
 					// create a new store done action once
 					if (inputIndex == 1) {
 						done = createDoneAction(action.getName()
 								+ "newStoreDone", counter, numTokens);
-						fsm.addTransition(sourceName, done, processName);
+						fsm.addTransition(storeName, done, processName);
 					} else {
 						// the new done action already exists --> modify
 						// schedulability
 						modifyDoneAction(counter, inputIndex);
 					}
 				}
-				// remove the transformed action
-				this.actor.getActions().remove(action);
+				// change the transformed action to a transition action to keep
+				// the same fireability order
+				actionToTransition(action, untagBuffer, untagWriteIndex);
+				fsm.replaceTarget(sourceName, action, storeName);
+
 				break;
 			}
 		}
@@ -718,8 +980,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				// inputs
 				if (!repeatInput) {
 					process = createProcessAction(action);
-					fsm.addState(processName);
-					fsm.addTransition(processName, process, writeName);
+					fsm.addTransition(sourceName, process, writeName);
 					this.actor.getActions().remove(action);
 				} else {
 					fsm.replaceTarget(processName, process, writeName);
@@ -736,7 +997,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					GlobalVariable counter = createCounter(counterName);
 					String listName = action.getName() + "NewWriteList"
 							+ outputIndex;
-					GlobalVariable tab = createTab(listName, entryType);
+					GlobalVariable tab = createTab(listName, entryType,
+							numTokens);
 					write = createWriteAction(action.getName(), counter, tab);
 					write.getOutputPattern().setNumTokens(port, 1);
 
@@ -765,10 +1027,11 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	public void visit(Actor actor) {
 		this.actor = actor;
 		fsm = actor.getActionScheduler().getFsm();
+		List<Action> actions = new ArrayList<Action>(actor.getActionScheduler()
+				.getActions());
+
 		if (fsm == null) {
 			// no FSM: simply visit all the actions
-			List<Action> actions = new ArrayList<Action>(actor
-					.getActionScheduler().getActions());
 			addFsm();
 			for (Action action : actions) {
 				String sourceName = "init";
