@@ -28,52 +28,50 @@
  */
 
 /**
-@brief Interface of IRConstant
+@brief Description of the KPNMoC class interface
 @author Jerome Gorin
-@file IRConstant.h
+@file SDFMoC.h
 @version 1.0
-@date 15/11/2010
+@date 17/03/2011
 */
 
 //------------------------------
-#ifndef IRCONSTANT_H
-#define IRCONSTANT_H
+#ifndef KPNMOC_H
+#define KPNMOC_H
 
-#include <string>
+#include "Jade/Core/MoC.h"
 //------------------------------
 
 /**
-*
-* @class IRConstant
-* @brief Constants IR fields.
-*
-* @author Jerome Gorin
-*
-*/
-class IRConstant {
+ * @class KPNMoC
+ *
+ * @brief  This class defines a KPN.
+ *
+ * This class defines the Kahn Process Network MoC. A KPN actor has
+ * data-dependent, state-dependent production/consumption rates, but contrary to
+ * DPN it cannot be time-dependent.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+class KPNMoC : public MoC {
 public:
 
-	static const std::string KEY_ACTION_SCHED;
+	/**
+	 * @brief Creates a new DPN MoC.
+	 */
+	KPNMoC(){
+	};
+	
+	~KPNMoC(){};
 
-	static const std::string KEY_ACTIONS;
+	/**
+	 * @brief Returns true if this MoC is KPN.
+	 * 
+	 * @return true if this MoC is KPN
+	 */
+	bool isKPN(){return true;};
 
-	static const std::string KEY_INITIALIZES;
-
-	static const std::string KEY_INPUTS;
-
-	static const std::string KEY_NAME;
-
-	static const std::string KEY_OUTPUTS;
-
-	static const std::string KEY_PARAMETERS;
-
-	static const std::string KEY_PROCEDURES;
-
-	static const std::string KEY_SOURCE_FILE;
-
-	static const std::string KEY_STATE_VARS;
-
-	static const std::string KEY_MOC;
 };
 
 #endif

@@ -57,6 +57,11 @@
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Expr/IntExpr.h"
 #include "Jade/Core/Expr/ListExpr.h"
+#include "Jade/Core/MoC/CSDFMoC.h"
+#include "Jade/Core/MoC/DPNMoC.h"
+#include "Jade/Core/MoC/KPNMoC.h"
+#include "Jade/Core/MoC/QSDFMoC.h"
+#include "Jade/Core/MoC/SDFMoC.h"
 #include "Jade/Jit/LLVMParser.h"
 #include "Jade/Serialize/IRParser.h"
 #include "Jade/Util/FifoMng.h"
@@ -70,16 +75,17 @@ using namespace std;
 using namespace llvm;
 
 // Define MDNode keys
-const std::string IRConstant::KEY_ACTION_SCHED = "action_scheduler";
-const std::string IRConstant::KEY_ACTIONS= "actions";
-const std::string IRConstant::KEY_INITIALIZES= "initializes";
-const std::string IRConstant::KEY_INPUTS= "inputs";
-const std::string IRConstant::KEY_NAME= "name";
-const std::string IRConstant::KEY_OUTPUTS= "outputs";
-const std::string IRConstant::KEY_PARAMETERS= "parameters";
-const std::string IRConstant::KEY_PROCEDURES= "procedures";
-const std::string IRConstant::KEY_SOURCE_FILE= "source_file";
-const std::string IRConstant::KEY_STATE_VARS= "state_variables";
+const string IRConstant::KEY_ACTION_SCHED = "action_scheduler";
+const string IRConstant::KEY_ACTIONS= "actions";
+const string IRConstant::KEY_INITIALIZES= "initializes";
+const string IRConstant::KEY_INPUTS= "inputs";
+const string IRConstant::KEY_NAME= "name";
+const string IRConstant::KEY_OUTPUTS= "outputs";
+const string IRConstant::KEY_PARAMETERS= "parameters";
+const string IRConstant::KEY_PROCEDURES= "procedures";
+const string IRConstant::KEY_SOURCE_FILE= "source_file";
+const string IRConstant::KEY_STATE_VARS= "state_variables";
+const string IRConstant::KEY_MOC= "MoC";
 
 
 IRParser::IRParser(llvm::LLVMContext& C, string VTLDir) : Context(C){
@@ -123,9 +129,74 @@ Actor* IRParser::parseActor(string classz){
 	list<Action*>* initializes = parseActions(IRConstant::KEY_INITIALIZES, module);
 	list<Action*>* actions = parseActions(IRConstant::KEY_ACTIONS, module);
 	ActionScheduler* actionScheduler = parseActionScheduler(module);
+	MoC* moc = parseMoC(module);
 
 	return new Actor(name->getString(), module, classz, inputs, outputs, stateVars, 
 						parameters, procs, initializes, actions, actionScheduler);
+}
+
+MoC* IRParser::parseMoC(Module* module){
+	NamedMDNode* mocKeyMD =  module->getNamedMetadata(IRConstant::KEY_MOC);
+	
+	if (mocKeyMD == NULL) {
+		return new DPNMoC();
+	}
+
+	//Parse MoC type
+	MDNode* node = mocKeyMD->getOperand(0);
+	MDString* name = cast<MDString>(node->getOperand(0));
+	StringRef nameStr = name->getString();
+
+	if (nameStr == "SDF"){
+		return parseCSDF(node);
+	}else if(nameStr == "CSDF"){
+		return parseCSDF(node);
+	}else if(nameStr == "QSDF"){
+		return parseQSDF(node);
+	}else if(nameStr == "KPN"){
+		return new KPNMoC();
+	}else if(nameStr == "DPN"){
+		return new DPNMoC();
+	}
+	
+	cout << "Unsupported type of MoC \n";
+	exit(1);
+}
+
+MoC* IRParser::parseCSDF(MDNode* csdfNode){
+	CSDFMoC* csfMoC;
+
+	//Get number of phases
+	ConstantInt* value = cast<ConstantInt>(csdfNode->getOperand(1));
+	int phasesNb = value->getValue().getLimitedValue();
+
+	if (phasesNb == 1){
+		csfMoC = new SDFMoC();
+	}else{
+		csfMoC = new CSDFMoC();
+	}
+	
+	// Parse patterns
+	Pattern* ip = parsePattern(inputs, csdfNode->getOperand(2));
+	Pattern* op = parsePattern(outputs, csdfNode->getOperand(3));
+	csfMoC->setInputPattern(ip);
+	csfMoC->setOutputPattern(op);
+	
+	// Parse actions
+	parseCSDFActions(cast<MDNode>(csdfNode->getOperand(4)), csfMoC);
+
+	return csfMoC;
+}
+
+void IRParser::parseCSDFActions(MDNode* actionsNode, CSDFMoC* csfMoC){
+	for (unsigned i = 0, e = actionsNode->getNumOperands(); i != e; ++i) {
+		Action* action = getAction(cast<MDNode>(actionsNode->getOperand(i)));
+		csfMoC->addAction(action);
+	}
+}
+
+MoC* IRParser::parseQSDF(MDNode* qsdfNode){
+	return new QSDFMoC();
 }
 
 Pattern* IRParser::parsePattern(map<std::string, Port*>* ports, Value* value){
@@ -392,7 +463,10 @@ Procedure* IRParser::parseProc(MDNode* node){
 	return new Procedure(name->getString(), isExtern, function);
 }
 
-
+Function* IRParser::getBodyFunction(llvm::MDNode* actionNode){
+	MDNode* body = cast<MDNode>(actionNode->getOperand(4));
+	return cast<Function>(body->getOperand(2));
+}
 
 Port* IRParser::parsePort(MDNode* node){
 	//Get port property
@@ -478,11 +552,13 @@ Action* IRParser::getAction(llvm::MDNode* node) {
 	Value* idValue = node->getOperand(0);
 	
 	if (idValue == NULL){
-		// removes the first untagged action found
-		Action* action = untaggedActions.front();
-		untaggedActions.remove(action);
-		
-		return action;
+		map<Function*, Action*>::iterator it;
+
+		// Action has not tag, find it by its function name
+		Function* function = getBodyFunction(node);
+		it = untaggedActions.find(function);	
+
+		return it->second;
 	}
 	
 	//Get identifiers of action tag
@@ -502,7 +578,8 @@ Action* IRParser::getAction(llvm::MDNode* node) {
 
 void IRParser::putAction(ActionTag* tag, Action* action){
 	if (tag->isEmpty()){
-		untaggedActions.push_back(action);
+		Procedure* body = action->getBody();
+		untaggedActions.insert(pair<Function*, Action*>(body->getFunction(), action));
 	} else {
 		actions.insert(pair<std::string, Action*>(tag->getIdentifier(), action));
 	}

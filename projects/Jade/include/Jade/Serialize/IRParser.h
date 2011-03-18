@@ -49,7 +49,7 @@ namespace llvm{
 	class Type;
 }
 
-
+class CSDFMoC;
 class LLVMParser;
 class Expr;
 
@@ -117,6 +117,50 @@ private:
 	std::map<std::string, StateVar*>* parseStateVars(llvm::Module* module);
 
 	/**
+     * @brief parse MoC
+	 *
+	 * Parses the given module as a MoC. 
+	 * 
+	 * @param module : the llvm::Module to parse
+	 *
+	 * @return the corresponding MoC.
+	 */
+	MoC* parseMoC(llvm::Module* module);
+
+	/**
+     * @brief parse a SDF MoC
+	 *
+	 * Parses the given node as a SDF MoC. 
+	 * 
+	 * @param module : the llvm::MDNode to parse
+	 *
+	 * @return the corresponding SDF MoC.
+	 */
+	MoC* parseSDF(llvm::MDNode* sdfNode);
+
+	/**
+     * @brief parse a CSDF MoC
+	 *
+	 * Parses the given node as a CSDF MoC. 
+	 * 
+	 * @param module : the llvm::MDNode to parse
+	 *
+	 * @return the corresponding CSDF MoC.
+	 */
+	MoC* parseCSDF(llvm::MDNode* csdfNode);
+
+	/**
+     * @brief parse a QSDF MoC
+	 *
+	 * Parses the given node as a QSDF MoC. 
+	 * 
+	 * @param module : the llvm::MDNode to parse
+	 *
+	 * @return the corresponding QSDF MoC.
+	 */
+	MoC* parseQSDF(llvm::MDNode* qsdfNode);
+
+	/**
      * @brief parse an action scheduler
 	 *
 	 * Parses the given module as an action scheduler. 
@@ -137,6 +181,28 @@ private:
 	 * @return a list of parameters.
 	 */
 	std::map<std::string, Variable*>* parseParameters(llvm::Module* module);
+
+	/**
+     * @brief Return the llvm::Function body of an action
+	 * 
+	 * Return the llvm::Function that corresponds to the body of an action
+	 *  of the given node. This is usefull to identificate an untagged action.
+	 *
+	 * @param actionNode : the llvm::MDNode that represents an action
+	 *
+	 * @return the llvm::Function representing the action body function.
+	 */
+	llvm::Function* getBodyFunction(llvm::MDNode* actionNode);
+
+	/**
+     * @brief Return a list of actions of the MoC
+	 * 
+	 * @param actionsNode : the llvm::MDNode that represents a list of actions.
+	 *
+	 * @param csdfMoC : the CSDFMoC where actions are added.
+	 */
+	void parseCSDFActions(llvm::MDNode* actionsNode, CSDFMoC* csdfMoC);
+
 
 	/**
      * @brief parse pattern of a module
@@ -337,7 +403,7 @@ private:
 	std::map<std::string, Action*> actions;
 
 	/** list of untagged actions of the current actor */
-	std::list<Action*> untaggedActions;
+	std::map<llvm::Function*, Action*> untaggedActions;
 
 	/** list of ports of the current actor */
 	std::map<std::string, Port*>* inputs;

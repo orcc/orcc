@@ -329,6 +329,7 @@ patterns_MD(actor, patterns) ::= <<
 	if(patterns.peekedMap)
 	> metadata <patterns_vars_decl_MD(actor=actor, vars=patterns.peekedMap)><
 	else > null <endif>}
+
 >>
 
 patterns_vars_MD(actor, vars) ::= <<
@@ -462,8 +463,9 @@ Body_MD(actor, action) ::= <<
 <Body_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.body)>, <procNative_MD(action.body)>, void()* @<action.body>}
 
 >>
+
 MoC_Actions_MD(actor, actions) ::= <<
-<MoC_Actions_decl_MD(actor.MoC.actions)> = metadata !{<actor.MoC.actions: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">} 
+<MoC_Actions_decl_MD(actor=actor, actions=actor.MoC.actions)> = metadata !{<actor.MoC.actions: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">} 
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -473,7 +475,8 @@ MoC_Actions_MD(actor, actions) ::= <<
 MoC_MD(actor)::= <<
 <MoC_decl_MD(actor=actor)> = metadata !{<MoCName_MD(actor.MoC)> <
 	if(actor.MoC.CSDF)
-	> , <if(!actor.MoC.inputPattern.empty)
+	> , i32 <actor.MoC.numberOfPhases> ,<
+		if(!actor.MoC.inputPattern.empty)
 			> metadata <patterns_decl_MD(actor=actor, patterns=actor.MoC.inputPattern)><
 		else
 			> null <
@@ -482,16 +485,17 @@ MoC_MD(actor)::= <<
 			> metadata <patterns_decl_MD(actor=actor, patterns=actor.MoC.outputPattern)><
 		else
 			> null <
-		endif>,<
-			MoC_Actions_decl_MD(actor = actor, actions = actor.MoC.actions)
-	> <elseif(actor.MoC.quasiStatic)
-		>
-	
-	<endif>
+		endif
+			>, metadata <MoC_Actions_decl_MD(actor = actor, actions = actor.MoC.actions)> <
+		elseif(actor.MoC.quasiStatic)
+		>, <MoC_Actions_decl_MD(actor = actor, actions = actor.MoC.actions)
+	><endif>
 }
 
 <if(actor.MoC.CSDF)>
 <MoC_Actions_MD(actor= actor, actions= actor.MoC.actions)>
+<elseif(actor.MoC.quasiStatic)>
+
 <endif>
 
 >>

@@ -110,10 +110,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		if (classify) {
-			new ActorClassifier().visit(actor);
+			if (!actor.getSimpleName().equals("BufferCurrPic")&&
+					!actor.getSimpleName().equals("SplitSpsInfo")){
+				new ActorClassifier().visit(actor);
 
-			if (normalize) {
-				new ActorNormalizer().visit(actor);
+				if (normalize) {
+					new ActorNormalizer().visit(actor);
+				}
 			}
 		}
 

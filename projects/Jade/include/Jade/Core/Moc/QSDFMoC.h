@@ -28,52 +28,51 @@
  */
 
 /**
-@brief Interface of IRConstant
+@brief Description of the QSDFMoC class interface
 @author Jerome Gorin
-@file IRConstant.h
+@file QSDFMoC.h
 @version 1.0
-@date 15/11/2010
+@date 17/03/2011
 */
 
 //------------------------------
-#ifndef IRCONSTANT_H
-#define IRCONSTANT_H
+#ifndef QSDFMOC_H
+#define QSDFMOC_H
 
-#include <string>
+#include "Jade/Core/MoC.h"
 //------------------------------
 
 /**
-*
-* @class IRConstant
-* @brief Constants IR fields.
-*
-* @author Jerome Gorin
-*
-*/
-class IRConstant {
+ * @class QSDFMoC
+ *
+ * @brief  This class defines a QSDF MoC.
+ *
+ * This class defines a quasi-static dataflow (QSDF) MoC. QSDF is a model that
+ * exhibits static behavior for a given configuration. An actor that has the
+ * quasi-static class has one action for each configuration, therefore this
+ * class associates one action with one static class.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+class QSDFMoC : public MoC {
 public:
 
-	static const std::string KEY_ACTION_SCHED;
+	/**
+	 * @brief Creates a new DPN MoC.
+	 */
+	QSDFMoC(){
+	};
+	
+	~QSDFMoC(){};
 
-	static const std::string KEY_ACTIONS;
+	/**
+	 * @brief Returns true if this MoC is QCSDF.
+	 * 
+	 * @return true if this MoC is QCSDF
+	 */
+	bool isQuasiStatic(){return true;};
 
-	static const std::string KEY_INITIALIZES;
-
-	static const std::string KEY_INPUTS;
-
-	static const std::string KEY_NAME;
-
-	static const std::string KEY_OUTPUTS;
-
-	static const std::string KEY_PARAMETERS;
-
-	static const std::string KEY_PROCEDURES;
-
-	static const std::string KEY_SOURCE_FILE;
-
-	static const std::string KEY_STATE_VARS;
-
-	static const std::string KEY_MOC;
 };
 
 #endif

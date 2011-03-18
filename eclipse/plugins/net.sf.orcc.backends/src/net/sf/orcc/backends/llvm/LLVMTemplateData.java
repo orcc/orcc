@@ -240,11 +240,10 @@ public class LLVMTemplateData {
 	
 	private void computeQSDFMoC(QSDFMoC qsdfmoc) {
 		Map<Action, SDFMoC> configurations = qsdfmoc.getConfigurations();
-		mocs.put(configurations, id++);
-/*		
+		
 		for (Entry<Action, SDFMoC> entry : configurations.entrySet()){
 			computeConfiguration(entry.getKey(), entry.getValue());
-		}*/
+		}
 	}
 	
 	private void computeConfiguration(Action action, SDFMoC sdfMoC){

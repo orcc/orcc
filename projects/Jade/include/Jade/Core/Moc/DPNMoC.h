@@ -28,52 +28,50 @@
  */
 
 /**
-@brief Interface of IRConstant
+@brief Description of the DPNMoC class interface
 @author Jerome Gorin
-@file IRConstant.h
+@file SDFMoC.h
 @version 1.0
-@date 15/11/2010
+@date 17/03/2011
 */
 
 //------------------------------
-#ifndef IRCONSTANT_H
-#define IRCONSTANT_H
+#ifndef DPNMOC_H
+#define DPNMOC_H
 
-#include <string>
+#include "Jade/Core/MoC.h"
 //------------------------------
 
 /**
-*
-* @class IRConstant
-* @brief Constants IR fields.
-*
-* @author Jerome Gorin
-*
-*/
-class IRConstant {
+ * @class DPNMoC
+ *
+ * @brief  This class defines a DPN.
+ *
+ * This class defines the Dataflow Process Network MoC. A DPN actor has
+ * data-dependent, state-dependent, and time-dependent production/consumption
+ * rates.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+class DPNMoC : public MoC {
 public:
 
-	static const std::string KEY_ACTION_SCHED;
+	/**
+	 * @brief Creates a new DPN MoC.
+	 */
+	DPNMoC(){
+	};
+	
+	~DPNMoC(){};
 
-	static const std::string KEY_ACTIONS;
+	/**
+	 * @brief Returns true if this MoC is DPN.
+	 * 
+	 * @return true if this MoC is DPN
+	 */
+	bool isDPN(){return true;};
 
-	static const std::string KEY_INITIALIZES;
-
-	static const std::string KEY_INPUTS;
-
-	static const std::string KEY_NAME;
-
-	static const std::string KEY_OUTPUTS;
-
-	static const std::string KEY_PARAMETERS;
-
-	static const std::string KEY_PROCEDURES;
-
-	static const std::string KEY_SOURCE_FILE;
-
-	static const std::string KEY_STATE_VARS;
-
-	static const std::string KEY_MOC;
 };
 
 #endif
