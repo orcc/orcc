@@ -193,16 +193,70 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 	private Action write;
 
+	/**
+	 * transforms the transformed action to a transition action
+	 * 
+	 * @param action
+	 *            modified action
+	 * @param buffer
+	 *            current store buffer
+	 * @param writeIndex
+	 *            write index of the buffer
+	 * @param readIndex
+	 *            read index of the buffer
+	 */
 	private void actionToTransition(Action action, GlobalVariable buffer,
-			GlobalVariable writeIndex) {
-		removePatternPorts(action);
-		removeNodes(action.getBody());
-		removeLocals(action.getBody());
+			GlobalVariable writeIndex, GlobalVariable readIndex) {
 		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 				buffer, writeIndex);
 		modifyActionScheduler.visit(action.getScheduler());
+		modifyActionSchedulability(writeIndex, readIndex);
 	}
 
+	/**
+	 * this method changes the schedulability of the action accordingly to
+	 * tokens disponibility in the buffer
+	 * 
+	 * @param writeIndex
+	 *            write index of the buffer
+	 * @param readIndex
+	 *            read index of the buffer
+	 */
+	private void modifyActionSchedulability(GlobalVariable writeIndex,
+			GlobalVariable readIndex) {
+		BlockNode bodyNode = BlockNode.getFirst(action.getScheduler());
+		LocalVariable localRead = new LocalVariable(true, 1, new Location(),
+				"readIndex", IrFactory.eINSTANCE.createTypeInt(16));
+		Instruction Load = new Load(localRead, new Use(readIndex));
+		bodyNode.add(Load);
+
+		LocalVariable localWrite = new LocalVariable(true, 1, new Location(),
+				"writeIndex", IrFactory.eINSTANCE.createTypeInt(16));
+		Instruction Load2 = new Load(localWrite, new Use(writeIndex));
+		bodyNode.add(Load2);
+
+		LocalVariable diff = new LocalVariable(true, 1, new Location(), "diff",
+				IrFactory.eINSTANCE.createTypeInt(16));
+		Expression value = new BinaryExpr(new VarExpr(new Use(readIndex)),
+				BinaryOp.MINUS, new VarExpr(new Use(writeIndex)),
+				IrFactory.eINSTANCE.createTypeInt(16));
+		Instruction assign = new Assign(diff, value);
+		bodyNode.add(assign);
+
+		Expression condition = new BinaryExpr(new VarExpr(new Use(diff)),
+				BinaryOp.GE, new IntExpr(numTokens),
+				IrFactory.eINSTANCE.createTypeInt(16));
+
+		Expression result = action.getScheduler().getResult();
+		action.getScheduler().setResult(
+				new BinaryExpr(result, BinaryOp.LOGIC_AND, condition,
+						IrFactory.eINSTANCE.createTypeBool()));
+	}
+
+	/**
+	 * Adds an FSM to an actor if it has not already
+	 * 
+	 */
 	private void addFsm() {
 		ActionScheduler scheduler = actor.getActionScheduler();
 
@@ -944,10 +998,14 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						// schedulability
 						modifyDoneAction(counter, inputIndex);
 					}
+					actionToTransition(action, untagBuffer, untagWriteIndex,
+							untagReadIndex);
 				}
 				// change the transformed action to a transition action to keep
 				// the same fireability order
-				actionToTransition(action, untagBuffer, untagWriteIndex);
+				removePatternPorts(action);
+				removeNodes(action.getBody());
+				removeLocals(action.getBody());
 				fsm.replaceTarget(sourceName, action, storeName);
 
 				break;
