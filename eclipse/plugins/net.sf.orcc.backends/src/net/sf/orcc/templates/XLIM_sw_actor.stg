@@ -415,6 +415,8 @@ procedure(procedure) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 typeDef(action) ::= <<
+<action.inputPattern.variableMap.values: typeDefLocal()>
+<action.outputPattern.variableMap.values: typeDefLocal()>
 <action.body.locals.list: typeDefLocal()>
 >>
 
@@ -467,6 +469,7 @@ localInitialize(local) ::= <<
 action(action) ::= <<
 \<!-- Action: "<action.name>" --\>
 \<module autostart="false" kind="action" name="<action.name>"\>
+	<action.outputPattern.variableMap.values: localInitialize()>
 	<action.body.locals.list: localInitialize()>
 	<action.inputPattern.variableMap.keys : { port | <printRead(port, action.inputPattern.variableMap.(port), action.inputPattern.numTokensMap.(port))> }; separator="\n">
 	<procedure(procedure=action.body)>

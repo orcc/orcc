@@ -40,7 +40,6 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
-import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
 import net.sf.orcc.backends.xlim.transformations.ArrayInitializeTransformation;
@@ -51,6 +50,7 @@ import net.sf.orcc.backends.xlim.transformations.TernaryOperationAdder;
 import net.sf.orcc.backends.xlim.transformations.UnaryListToScalarTransformation;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimInlineTransformation;
+import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.Expression;
@@ -107,20 +107,20 @@ public class XlimBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		actor.setTemplateData(new XlimActorTemplateData());
-		
+
 		ActorVisitor[] transformations = {
 				new ArrayInitializeTransformation(
 						new HashMap<String, Expression>(0), actor, null),
 				new TernaryOperationAdder(),
 				new XlimInlineTransformation(true, true),
-				new UnaryListToScalarTransformation(),
-				new CustomPeekAdder(), new DeadGlobalElimination(),
-				new DeadCodeElimination(), new XlimDeadVariableRemoval(),
+				new UnaryListToScalarTransformation(), new CustomPeekAdder(),
+				new DeadGlobalElimination(), new DeadCodeElimination(),
+				new XlimDeadVariableRemoval(),
 				new ListFlattenTransformation(false, true, false),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(true),
 				new ConstantPhiValuesTransformation(),
-				new MoveLiteralIntegers(), new VariableRenamer() };
+				new MoveLiteralIntegers(), new XlimVariableRenamer() };
 
 		for (ActorVisitor transformation : transformations) {
 			transformation.visit(actor);
