@@ -71,6 +71,7 @@ public class TimeDependencyAnalyzer {
 	 */
 	private boolean areGuardsCompatible(Action previous, Action action) {
 		ConstraintBuilder builder = new ConstraintBuilder(actor);
+		builder.initialize();
 		try {
 			builder.visitAction(previous);
 			builder.visitAction(action);

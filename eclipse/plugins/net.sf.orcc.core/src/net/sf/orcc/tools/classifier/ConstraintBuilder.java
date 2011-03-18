@@ -39,14 +39,12 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
@@ -256,6 +254,8 @@ public class ConstraintBuilder extends ActorInterpreter {
 	 */
 	private Map<Variable, Variable> variables;
 
+	private boolean initializeMode;
+
 	public ConstraintBuilder(Actor actor) {
 		super(new HashMap<String, Expression>(0), actor, null);
 		network = new Network();
@@ -357,6 +357,13 @@ public class ConstraintBuilder extends ActorInterpreter {
 		return network;
 	}
 
+	@Override
+	public void initialize() {
+		initializeMode = true;
+		super.initialize();
+		initializeMode = false;
+	}
+
 	/**
 	 * Returns the constraint variable with the given name.
 	 * 
@@ -378,8 +385,12 @@ public class ConstraintBuilder extends ActorInterpreter {
 
 	@Override
 	public void visit(Assign assign) {
-		ConstraintExpressionVisitor visitor = new ConstraintExpressionVisitor();
-		assign.getValue().accept(visitor);
+		if (initializeMode) {
+			super.visit(assign);
+		} else {
+			ConstraintExpressionVisitor visitor = new ConstraintExpressionVisitor();
+			assign.getValue().accept(visitor);
+		}
 	}
 
 	@Override
@@ -387,20 +398,22 @@ public class ConstraintBuilder extends ActorInterpreter {
 		// execute the load
 		super.visit(load);
 
-		Variable source = load.getSource().getVariable();
-		List<Expression> indexes = load.getIndexes();
-		if (!indexes.isEmpty()) {
-			if (indexes.size() != 1) {
-				throw new OrccRuntimeException("loading multi-dimensional "
-						+ "arrays not supported by constraint builder");
+		if (!initializeMode) {
+			Variable source = load.getSource().getVariable();
+			List<Expression> indexes = load.getIndexes();
+			if (!indexes.isEmpty()) {
+				if (indexes.size() != 1) {
+					throw new OrccRuntimeException("loading multi-dimensional "
+							+ "arrays not supported by constraint builder");
+				}
+				if (!indexes.get(0).equals(new IntExpr(0))) {
+					throw new OrccRuntimeException("loading arrays "
+							+ "with index != 0 not supported");
+				}
 			}
-			if (!indexes.get(0).equals(new IntExpr(0))) {
-				throw new OrccRuntimeException("loading arrays "
-						+ "with index != 0 not supported");
-			}
-		}
 
-		associateVariable(load.getTarget(), source);
+			associateVariable(load.getTarget(), source);
+		}
 	}
 
 	/**
@@ -412,10 +425,21 @@ public class ConstraintBuilder extends ActorInterpreter {
 	 *            a node visitor
 	 */
 	public void visitAction(Action action) {
+		// allocate patterns
+		Pattern inputPattern = action.getInputPattern();
+		Pattern outputPattern = action.getOutputPattern();
+		allocatePattern(inputPattern);
+		allocatePattern(outputPattern);
+
 		Pattern pattern = action.getInputPattern();
 		for (Port port : pattern.getPorts()) {
 			Variable peeked = pattern.getPeeked(port);
 			if (peeked != null) {
+				// allocate list for peeked
+				peeked.setValue((Expression) peeked.getType().accept(
+						listAllocator));
+
+				// associate variable
 				Variable source = variables.get(peeked);
 				if (source == null) {
 					source = new LocalVariable(true, 0, new Location(),
@@ -425,10 +449,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 			}
 		}
 
-		Procedure scheduler = action.getScheduler();
-		for (CFGNode node : scheduler.getNodes()) {
-			node.accept(this);
-		}
+		visit(action.getScheduler());
 	}
 
 }
