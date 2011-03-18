@@ -73,6 +73,15 @@ public class QSDFMoC extends AbstractMoC {
 	public void addConfiguration(Action action, SDFMoC moc) {
 		configurations.put(action, moc);
 	}
+	
+	/**
+	 * Return the configurations of this quasi-static MoC.
+	 * 
+	 * @return a map of configurations
+	 */
+	public Map<Action, SDFMoC> getConfigurations() {
+		return configurations;
+	}
 
 	/**
 	 * Returns the set of configuration actions.

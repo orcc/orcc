@@ -32,7 +32,7 @@ actor BufferCurrPic ( int MB_WIDTH )
 	uint(size=2) IS_NEW_MB    = 0;
 	uint(size=2) IS_NEW_PIC   = 2;
 
-	uint(size=8)  picture [1024 * 512][256];
+	uint(size=8)  picture [1920 / 16 * 1080 / 16][256];
 	uint(size=32) nbMacroBlocksWritten := 0;
 	uint(size=32) nbMacroBlocksSent    := 0;
 	uint(size=7)  picWidthInMb;

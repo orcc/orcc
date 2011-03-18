@@ -34,7 +34,7 @@
 @version 1.0
 @date 15/11/2010
 */
-/*
+
 //------------------------------
 #include <sstream>
 #include <string>
@@ -45,167 +45,18 @@
 #include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/Instructions.h"
-#include "llvm/ADT/STLExtras.h"
-#include "llvm/Support/CommandLine.h"
 
-#include "Jade/Configuration/Configuration.h"
-#include "Jade/Core/Port.h"
-#include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Decoder.h"
-#include "Jade/Fifo/TraceConnector.h"
-#include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Core/Network.h"
-#include "Jade/Jit/LLVMParser.h"
-#include "Jade/Jit/LLVMWriter.h"
+#include "Jade/Fifo/FifoTrace.h"
+#include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace llvm;
 using namespace std;
 
-
-extern cl::opt<std::string> OutputDir;
-
-TraceConnector::FifoTrace::~FifoTrace(){
-	//Erase from module
-	fifo->eraseFromParent();
-	fifo_buffer->eraseFromParent();
-	contents->eraseFromParent();
-	file->eraseFromParent();
-	
-	//Delete fifo component
-	delete fifo;
-	delete size;
-	delete read_ind;
-	delete write_ind;
-	delete fill_count;
-	delete contents;
-	delete fifo_buffer;
-	delete file;
-}
-
-TraceConnector::TraceConnector(llvm::LLVMContext& C, string system): Context(C), AbstractConnector()
-{
-	//Initialize map
-	createFifoMap();
-	createStructMap();
-
-	//Declare header
-	declareFifoHeader();
-	
-	// Initialize fifo counter
-	fifoCnt = 0;
-
-	// Set location of system
-	this->system = system;
-}
-
-TraceConnector::~TraceConnector (){
-
-}
-
-void TraceConnector::declareFifoHeader (){
-	parseHeader();
-	parseFifoStructs();
-	parseExternFunctions();
-	parseFifoFunctions();
-}
-
-void TraceConnector::parseHeader (){
-	//Create the parser
-	LLVMParser parser(Context, system);
-	
-	header = parser.loadBitcode("System", "FifoTrace");
-
-	if (header == NULL){
-		cerr << "Unable to parse fifo header file";
-		exit(0);
-	}
-
-	externMod = parser.loadBitcode("System", "Extern");
-
-	if (externMod == NULL){
-		cerr << "Unable to parse extern functions file";
-		exit(0);
-	}
-}
-
-void TraceConnector::parseExternFunctions(){
-	
-	// Iterate though functions of extern module 
-	for (Module::iterator I = externMod->begin(), E = externMod->end(); I != E; ++I) {
-		externFunct.insert(pair<std::string,llvm::Function*>(I->getName(), I));
-	}
-}
-
-void TraceConnector::parseFifoFunctions(){
-	
-	// Iterate though functions of header 
-	for (Module::iterator I = header->begin(), E = header->end(); I != E; ++I) {
-		string name = I->getName();
-		
-		if (isFifoFunction(name)){
-			setFifoFunction(name, I);
-		}
-	}
-}
-
-void TraceConnector::parseFifoStructs(){
-	map<string,string>::iterator it;
-	
-	// Iterate though structure
-	for (it = structName.begin(); it != structName.end(); ++it) {
-		string name = it->second;
-
-		Type* type = (Type*)header->getTypeByName(name);
-
-		if (type == NULL){
-			cerr << "Error when parsing fifo, structure "<< name << " has not beend found";
-			exit(0);
-		}
-
-		setFifoStruct(name, type);
-		
-	}
-}
-
-void TraceConnector::addFunctions(Decoder* decoder){
-	std::map<std::string,llvm::Function*>::iterator itMap;
-	LLVMWriter writer("", decoder);
-
-	for(itMap = externFunct.begin(); itMap != externFunct.end(); ++itMap){
-		Function* function = writer.addFunctionProtosExternal((*itMap).second);
-		(*itMap).second = function;
-	}
-
-	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
-		Function* function =  writer.addFunctionProtosInternal((*itMap).second);
-		writer.linkProcedureBody((*itMap).second);
-		(*itMap).second = function;
-	}
-}
-
-void TraceConnector::setConnection(Connection* connection, Decoder* decoder){
-	Module* module = decoder->getModule();
-	
-	// fifo name 
-	ostringstream arrayName;
-	ostringstream bufName;
-	ostringstream fifoName;
-
-	arrayName << "array_" << fifoCnt;
-	bufName << "buffer_" << fifoCnt;
-	fifoName << "fifo_" << fifoCnt;
-
-	// Get vertex of the connection
-	Port* src = connection->getSourcePort();
-	Port* dst = connection->getDestinationPort();
-	Vertex* dstInstance = (Vertex*)connection->getSource();
-	GlobalVariable* srcVar = src->getGlobalVariable();
-	GlobalVariable* dstVar = dst->getGlobalVariable();
-	IntegerType* connectionType = cast<IntegerType>(src->getType());
-
+void FifoTrace::createConnection(){
 	//Get fifo structure
-	StructType* structType = getFifoType(connectionType);
+	IntegerType* connectionType = cast<IntegerType>(fifoType);
 
 	//Get fifo array structure
 	PATypeHolder EltTy(connectionType);
@@ -215,14 +66,14 @@ void TraceConnector::setConnection(Connection* connection, Decoder* decoder){
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArrayContents =
         new GlobalVariable(*module, arrayType,
-		false, GlobalVariable::InternalLinkage, arrayContent, arrayName.str());
+		false, GlobalVariable::InternalLinkage, arrayContent,  "content");
 	NewArrayContents->setAlignment(32);
 	
 	// Initialize array for fifo buffer
 	Constant* arrayFifoBuffer = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArrayFifoBuffer =
         new GlobalVariable(*module, arrayType,
-		false, GlobalVariable::InternalLinkage, arrayFifoBuffer, bufName.str());
+		false, GlobalVariable::InternalLinkage, arrayFifoBuffer, "buffer");
 	NewArrayFifoBuffer->setAlignment(32);
 
 	
@@ -232,8 +83,10 @@ void TraceConnector::setConnection(Connection* connection, Decoder* decoder){
 	string strFile;
 	string strVar;
 	
-	fileName << OutputDir << dstInstance->getName() <<"_" <<src->getName() << ".txt";
-	fileVar << dstInstance->getName() << "_" << src->getName() << "_file";
+	//fileName << OutputDir << dstInstance->getName() <<"_" <<src->getName() << ".txt";
+	//fileVar << dstInstance->getName() << "_" << src->getName() << "_file";
+	//fileName << OutputDir << dstInstance->getName() <<"_" <<src->getName() << ".txt";
+	/*
 	strFile = fileName.str();
 	strVar = fileVar.str();
 	
@@ -262,43 +115,12 @@ void TraceConnector::setConnection(Connection* connection, Decoder* decoder){
 	Constant* fifoStruct =  ConstantStruct::get(structType, Elts);
 
 	// Create fifo 
-	GlobalVariable *NewFifo =
+	fifoGV =
         new GlobalVariable(*module, structType,
 		false, GlobalVariable::InternalLinkage, fifoStruct, fifoName.str());
 	NewFifo->setAlignment(32);
 	
-	// Set initialize to instance port 
-	srcVar->setInitializer(NewFifo);
-	dstVar->setInitializer(NewFifo);
-
-	//Store fifo variable in connection
-	connection->setFifo(new FifoTrace(NewFifo, size, read_ind, write_ind, fill_count, NewArrayContents, NewArrayFifoBuffer, GV));
-
 	// Increment fifo counter 
-	fifoCnt++;
+	fifoCnt++;*/
 	
 }
-
-void TraceConnector::setConnections(Configuration* configuration, Decoder* decoder){
-	Network* network = configuration->getNetwork();
-	HDAGGraph* graph = network->getGraph();
-	
-	int edges = graph->getNbEdges();
-	
-	//Setting connections
-	for (int i = 0; i < edges; i++){
-		setConnection((Connection*)graph->getEdge(i), decoder);
-	}
-}
-
-StructType* TraceConnector::getFifoType(IntegerType* type){
-	map<string,Type*>::iterator it;
-
-	// Struct name 
-	ostringstream structName;
-	structName << "struct.fifo_i" << type->getBitWidth() << "_s";
-
-	it = structAcces.find(structName.str());
-		
-	return cast<StructType>(it->second);
-}*/

@@ -36,8 +36,8 @@
 */
 
 //------------------------------
-#ifndef TraceConnector_H
-#define TraceConnector_H
+#ifndef FIFOTRACE_H
+#define FIFOTRACE_H
 
 #include "Jade/Fifo/AbstractFifo.h"
 //------------------------------
@@ -48,14 +48,18 @@
  * @author Jerome Gorin
  * 
  */
-/*
+
 class FifoTrace : public AbstractFifo {
 public:
-	FifoTrace(Connection* connection) : AbstractFifo(connection) {};
+	FifoTrace(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size, std::string outputDir) : AbstractFifo(C, module, type, size) {
+		this->OutputDir = outputDir;
+		createConnection();
+	};
+
 
 	~FifoTrace();
 	
-private:
+protected:
 		llvm::GlobalVariable *fifo;
 		llvm::Constant* size;
 		llvm::Constant* read_ind;
@@ -64,6 +68,8 @@ private:
 		llvm::GlobalVariable* contents;
 		llvm::GlobalVariable* fifo_buffer;
 		llvm::GlobalVariable* file;
+		std::string OutputDir;
+		void createConnection();
 	};
-*/
+
 #endif

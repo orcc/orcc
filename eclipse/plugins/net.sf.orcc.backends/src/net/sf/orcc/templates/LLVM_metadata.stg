@@ -278,6 +278,14 @@ MoC_decl_MD(actor) ::= <<
 !<actor.templateData.mocs.(actor.MoC)>
 >>
 
+MoC_Actions_decl_MD(actor, actions) ::= <<
+!<actor.templateData.mocs.(actions)>
+>>
+
+MoC_Configurations_decl_MD(actor, configuration) ::= <<
+!<actor.templateData.mocs.(configuration)>
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Actor MD body
 ///////////////////////////////////////////////////////////////////////////////
@@ -454,13 +462,38 @@ Body_MD(actor, action) ::= <<
 <Body_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.body)>, <procNative_MD(action.body)>, void()* @<action.body>}
 
 >>
+MoC_Actions_MD(actor, actions) ::= <<
+<MoC_Actions_decl_MD(actor.MoC.actions)> = metadata !{<actor.MoC.actions: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">} 
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // MoC MD data
 ///////////////////////////////////////////////////////////////////////////////
 
 MoC_MD(actor)::= <<
-<MoC_decl_MD(actor=actor)> = metadata !{<MoCName_MD(actor.MoC)>}
+<MoC_decl_MD(actor=actor)> = metadata !{<MoCName_MD(actor.MoC)> <
+	if(actor.MoC.CSDF)
+	> , <if(!actor.MoC.inputPattern.empty)
+			> metadata <patterns_decl_MD(actor=actor, patterns=actor.MoC.inputPattern)><
+		else
+			> null <
+		endif>,<
+		if(!actor.MoC.outputPattern.empty)
+			> metadata <patterns_decl_MD(actor=actor, patterns=actor.MoC.outputPattern)><
+		else
+			> null <
+		endif>,<
+			MoC_Actions_decl_MD(actor = actor, actions = actor.MoC.actions)
+	> <elseif(actor.MoC.quasiStatic)
+		>
+	
+	<endif>
+}
+
+<if(actor.MoC.CSDF)>
+<MoC_Actions_MD(actor= actor, actions= actor.MoC.actions)>
+<endif>
+
 >>
 
 MoCName_MD(MoC)::= <<

@@ -30,6 +30,7 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -45,6 +46,7 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.QSDFMoC;
+import net.sf.orcc.moc.SDFMoC;
 
 /**
  * This class computes a map for inserting metadata information into LLVM
@@ -231,22 +233,31 @@ public class LLVMTemplateData {
 	}
 
 	private void computeCSDFMoC(CSDFMoC sdfmoc) {
-		mocs.put(sdfmoc, id++);
+		mocs.put(sdfmoc.getActions(), id++);
 		computePattern(sdfmoc.getInputPattern());
 		computePattern(sdfmoc.getOutputPattern());
 	}
+	
+	private void computeQSDFMoC(QSDFMoC qsdfmoc) {
+		Map<Action, SDFMoC> configurations = qsdfmoc.getConfigurations();
+		mocs.put(configurations, id++);
+/*		
+		for (Entry<Action, SDFMoC> entry : configurations.entrySet()){
+			computeConfiguration(entry.getKey(), entry.getValue());
+		}*/
+	}
+	
+	private void computeConfiguration(Action action, SDFMoC sdfMoC){
+		
+	}
 
 	private void computeMoC(MoC moc) {
+		mocs.put(moc, id++);
 		if (moc.isSDF() || moc.isCSDF()) {
 			computeCSDFMoC((CSDFMoC) moc);
 		} else if (moc.isQuasiStatic()) {
 			mocs.put(moc, id++);
-			QSDFMoC qsdfMoc = (QSDFMoC) moc;
-			for (Action action : qsdfMoc.getActions()) {
-				computeCSDFMoC(qsdfMoc.getStaticClass(action));
-			}
-		} else if (moc.isDPN() || moc.isKPN()) {
-			mocs.put(moc, id++);
+			computeQSDFMoC((QSDFMoC) moc);
 		}
 	}
 

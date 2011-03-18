@@ -279,6 +279,9 @@ private:
 	
 	/** Fifo filename */
 	static std::string fifoFiles[];
+
+	/** Fifo class */
+	static AbstractFifo* fifo;
 	
 	/** Extern functions filename */
 	static std::string externFnFile;
