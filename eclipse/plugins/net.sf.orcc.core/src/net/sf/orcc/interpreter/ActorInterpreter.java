@@ -545,14 +545,6 @@ public class ActorInterpreter extends AbstractActorVisitor {
 						exprInterpreter));
 			}
 
-			// Allocate procedure local List variables
-			for (Variable local : proc.getLocals()) {
-				Type type = local.getType();
-				if (type.isList()) {
-					local.setValue((Expression) type.accept(listAllocator));
-				}
-			}
-
 			// Interpret procedure body
 			visit(proc);
 
@@ -633,6 +625,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				i++;
 			}
 
+			String methodName = procedure.getName();
 			try {
 				Class<?> clasz = Class.forName(actor.getName());
 				Method method = clasz.getMethod(procedure.getName(),
@@ -640,7 +633,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				method.invoke(null, args);
 			} catch (Exception e) {
 				throw new OrccRuntimeException(
-						"exception during native procedure call", e);
+						"exception during native procedure call to " + methodName);
 			}
 		} else {
 			// Allocate local List variables

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
     <jar path="net.sf.orcc.core/lib/net.sf.orcc.runtime.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/net.sf.orcc.runtime/net.sf.orcc.runtime.jardesc" exportErrors="false" exportWarnings="false" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="true"/>
@@ -11,11 +11,6 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf.orcc.runtime.actors"/>
-        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;std.video"/>
-        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf"/>
-        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf.orcc.runtime"/>
-        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net"/>
-        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf.orcc"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src"/>
     </selectedElements>
 </jardesc>

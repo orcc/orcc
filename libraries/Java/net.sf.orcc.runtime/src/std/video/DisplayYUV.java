@@ -30,6 +30,8 @@ package std.video;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
@@ -118,6 +120,18 @@ public class DisplayYUV {
 
 	public static void displayYUV_init() {
 		frame = new JFrame("display");
+		frame.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				buffer.dispose();
+				canvas = null;
+				image = null;
+				lastHeight = 0;
+				lastWidth = 0;
+			}
+
+		});
 
 		canvas = new Canvas();
 		frame.add(canvas);
