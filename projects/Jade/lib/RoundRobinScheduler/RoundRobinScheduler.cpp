@@ -50,6 +50,8 @@
 #include "llvm/ADT/SmallString.h"
 #include "llvm/Support/CommandLine.h"
 
+#include "DPNScheduler.h"
+
 #include "Jade/Decoder.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Actor.h"
@@ -57,7 +59,6 @@
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Variable.h"
 #include "Jade/Core/Network/Instance.h"
-#include "Jade/RoundRobinScheduler/ActionSchedulerAdder.h"
 #include "Jade/RoundRobinScheduler/RoundRobinScheduler.h"
 
 #include "Jade/Actor/display.h"
@@ -90,10 +91,10 @@ void RoundRobinScheduler::createScheduler(){
 	//Add action schedulers in instances
 	map<string, Instance*>::iterator it;
 	map<string, Instance*>* instances = configuration->getInstances();
-	ActionSchedulerAdder actionSchedulerAdder(Context, decoder);
+	DPNScheduler DPNSchedulerAdder(Context, decoder);
 	
 	for (it = instances->begin(); it != instances->end(); it++){
-		actionSchedulerAdder.transform(it->second);
+		DPNSchedulerAdder.transform(it->second);
 	}
 
 	//Create the scheduler function

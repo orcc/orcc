@@ -48,7 +48,7 @@ namespace llvm{
 
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Expression.h"
-
+#include "Jade/Core/MoC.h"
 
 class BroadcastActor;
 class Network;
@@ -128,9 +128,15 @@ public:
      *  @brief Getter of clasz
      *
 	 * @return clasz of the Instance
-     *
      */
 	std::string getClasz(){return clasz;};
+
+	/*!
+     *  @brief Get the MoC of the instance
+     *
+	 * @return MoC of the Instance
+     */
+	MoC* getMoC(){return moc;};
 
 	/*!
      *  @brief Setter of clasz
@@ -436,6 +442,9 @@ private:
 
 	/** Initialize actions of the instance */
 	std::list<Action*>* initializes;
+
+	/** MoC of the instance */
+	MoC* moc;
 };
 
 #endif
