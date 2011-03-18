@@ -161,10 +161,6 @@ endif>
 
 instruction(op) ::= <<
 <if(op.call)><printCall(op)><
-elseif(op.peek)><printPeek(op)><
-elseif(op.customPeek)><printCustomPeek(op)><
-elseif(op.read)><printRead(op)><
-elseif(op.write)><printWrite(op)><
 elseif(op.load)><printLoad(op)><
 elseif(op.store)><printStore(op)><
 elseif(op.assign)><printAssign(op)><
@@ -177,41 +173,6 @@ elseif(op.ternaryOperation)><printTernaryOperation(op)><endif>
 
 printCall(op) ::= <<
 \<!-- No calls in XLIM --\>
->>
-
-printPeek(op) ::= <<
-\<operation kind="$literal_Integer" value="0"\>
-	\<port dir="out" size="32" source="peek_<instance.id>_<procedure>_0_<op.target>" typeName="int"/\>
-\</operation\>
-\<operation kind="pinPeek" portName="<op.port.name>" removable="no"\>
-	\<port dir="in" source="peek_<instance.id>_<procedure>_0_<op.target>"/\>
-	<typedPort(dir="out", type=op.port.type, source=op.target)>
-\</operation\>
->>
-
-printCustomPeek(op) ::= <<
-\<operation kind="$literal_Integer" value="<op.tokenIndex>"\>
-	\<port dir="out" size="32" source="customPeek_<instance.id>_<procedure>_<op.tokenIndex>_<op.target>" typeName="int"/\>
-\</operation\>
-\<operation kind="pinPeek" portName="<op.port.name>" removable="no"\>
-	\<port dir="in" source="customPeek_<instance.id>_<procedure>_<op.tokenIndex>_<op.target>"/\>
-	<typedPort(dir="out", type=op.port.type, source=op.target)>
-\</operation\>
->>
-
-printRead(op) ::= <<
-\<note kind="consumptionRates" name="<op.port.name>" value="<op.numTokens>"/\>
-\<operation kind="pinRead" portName="<op.port.name>" removable="no" style="simple"\>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
-\</operation\>
->>
-
-printWrite(op) ::= <<
-\<!-- Write <op> --\>
-\<operation kind="pinWrite" portName="<op.port.name>" style="simple"\>
-	\<port dir="in" source="<op.target>"/\>
-\</operation\>
-\<note kind="productionRates" name="<op.port.name>" value="<op.numTokens>"/\>
 >>
 
 printLoad(op) ::= <<
@@ -292,6 +253,38 @@ printTernaryOperation(op) ::= <<
 	<untypedPort(dir="in", source=op.falseValue)>
 	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// FIFO Operations
+///////////////////////////////////////////////////////////////////////////////
+
+printPeeks(port, indexToTargetMap) ::= <<
+	<indexToTargetMap.keys : { index | <printPeek(port, indexToTargetMap.(index), index)> }; separator="\n">
+>>
+
+printPeek(port, target, tokenIndex) ::= <<
+\<operation kind="$literal_Integer" value="<tokenIndex>"\>
+	\<port dir="out" size="32" source="peek_<instance.id>_<action.scheduler>_<tokenIndex>_<target>" typeName="int"/\>
+\</operation\>
+\<operation kind="pinPeek" portName="<port.name>" removable="no"\>
+	\<port dir="in" source="peek_<instance.id>_<action.scheduler>_<tokenIndex>_<target>"/\>
+	<typedPort(dir="out", type=port.type, source=target)>
+\</operation\>
+>>
+
+printRead(port, target, numTokens) ::= <<
+\<!-- note kind="consumptionRates" name="<port.name>" value="<numTokens>"/--\>
+\<operation kind="pinRead" portName="<port.name>" removable="no" style="simple"\>
+	<typedPort(dir="out", type=target.type, source=target)>
+\</operation\>
+>>
+
+printWrite(port, source, numTokens) ::= <<
+\<operation kind="pinWrite" portName="<port.name>" style="simple"\>
+	\<port dir="in" source="<source>"/\>
+\</operation\>
+\<!--note kind="productionRates" name="<port.name>" value="<numTokens>"/--\>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -475,7 +468,9 @@ action(action) ::= <<
 \<!-- Action: "<action.name>" --\>
 \<module autostart="false" kind="action" name="<action.name>"\>
 	<action.body.locals.list: localInitialize()>
+	<action.inputPattern.variableMap.keys : { port | <printRead(port, action.inputPattern.variableMap.(port), action.inputPattern.numTokensMap.(port))> }; separator="\n">
 	<procedure(procedure=action.body)>
+	<action.outputPattern.variableMap.keys : { port | <printWrite(port, action.outputPattern.variableMap.(port), action.outputPattern.numTokensMap.(port))> }; separator="\n">
 \</module\>
 >>
 
@@ -684,6 +679,7 @@ closeHwTransition() ::=<<
 >>
 
 isSchedulableTest(action) ::= <<
+<instance.actor.templateData.customPeekedMapPerAction.(action).keys: { port | <printPeeks(port, instance.actor.templateData.customPeekedMapPerAction.(action).(port))> }; separator="\n">
 <procedure(action.scheduler)>
 >>
 

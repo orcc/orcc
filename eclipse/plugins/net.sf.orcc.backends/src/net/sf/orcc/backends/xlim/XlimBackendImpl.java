@@ -106,6 +106,8 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
+		actor.setTemplateData(new XlimActorTemplateData());
+		
 		ActorVisitor[] transformations = {
 				new ArrayInitializeTransformation(
 						new HashMap<String, Expression>(0), actor, null),
@@ -201,7 +203,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	public void setOptions() throws OrccException {
-		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
+		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", false);
 		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
 				"xc2vp30-7-ff1152");
 		mapping = getAttribute(OrccLaunchConstants.MAPPING,

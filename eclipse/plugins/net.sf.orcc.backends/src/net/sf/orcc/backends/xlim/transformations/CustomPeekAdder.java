@@ -29,24 +29,19 @@
 package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.Map;
 
-import net.sf.orcc.backends.xlim.instructions.CustomPeek;
+import net.sf.orcc.backends.xlim.XlimActorTemplateData;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
  * 
@@ -58,113 +53,54 @@ import net.sf.orcc.ir.nodes.WhileNode;
  */
 public class CustomPeekAdder extends AbstractActorVisitor {
 
-	private class NeededPeekFinder extends AbstractActorVisitor {
+	private Map<Port, Map<Integer, Variable>> customPeekedMap;
 
-		private List<CustomPeek> neededPeeks;
-		private Peek originalPeek;
+	private List<Load> toBeRemoved;
 
-		public List<CustomPeek> find(Peek originalPeek) {
-			neededPeeks = new ArrayList<CustomPeek>();
-			this.originalPeek = originalPeek;
-			visit(originalPeek.getBlock().getProcedure());
-			return neededPeeks;
-		}
-
-		@Override
-		public void visit(Load load) {
-			if (load.getSource().getVariable() == originalPeek.getTarget()) {
-				int index = ((IntExpr) load.getIndexes().get(0)).getIntValue();
-				CustomPeek newPeek = new CustomPeek(originalPeek.getLocation(),
-						originalPeek.getPort(), index, load.getTarget());
-				neededPeeks.add(newPeek);
-				unusedLoads.add(load);
-			}
-		}
-	}
-
-	private class VariableReplacer extends AbstractActorVisitor {
-		private Variable addedVariable;
-		private Variable removedVariable;
-
-		public void replace(Variable removedVariable, Variable addedVariable,
-				Procedure procedure) {
-			this.removedVariable = removedVariable;
-			this.addedVariable = addedVariable;
-			visit(procedure);
-		}
-
-		public void visit(List<CFGNode> nodes) {
-			ListIterator<CFGNode> it = nodes.listIterator();
-			while (it.hasNext()) {
-				CFGNode node = it.next();
-				itNode = it;
-				if (node.isBlockNode()) {
-					node.accept(this);
-				}
-			}
-		}
-
-		@Override
-		public void visit(Load load) {
-			if (load.getSource().getVariable() == removedVariable) {
-				load.setSource(new Use(addedVariable));
-			}
-		}
-	}
-
-	private List<Load> unusedLoads;
-
-	@Override
-	public void visit(Actor actor) {
-		this.actor = actor;
-
-		itAction = actor.getActions().listIterator();
-		while (itAction.hasNext()) {
-			Action action = itAction.next();
-			visit(action);
-		}
-
-		itAction = actor.getInitializes().listIterator();
-		while (itAction.hasNext()) {
-			Action action = itAction.next();
-			visit(action);
-		}
+	public CustomPeekAdder() {
+		toBeRemoved = new ArrayList<Load>();
 	}
 
 	@Override
 	public void visit(Action action) {
-		unusedLoads = new ArrayList<Load>();
-		visit(action.getScheduler());
+		customPeekedMap = new HashMap<Port, Map<Integer, Variable>>();
+
+		super.visit(action);
+
+		((XlimActorTemplateData) actor.getTemplateData())
+				.getCustomPeekedMapPerAction().put(action, customPeekedMap);
 	}
 
 	@Override
-	public void visit(Load load) {
-		if (unusedLoads.contains(load)) {
-			itInstruction.remove();
+	public void visit(Pattern pattern) {
+		for (Port port : pattern.getPeekedMap().keySet()) {
+			Map<Integer, Variable> indexToVariableMap = new HashMap<Integer, Variable>();
+			Variable oldTarget = pattern.getPeeked(port);
+
+			List<Use> uses = new ArrayList<Use>(oldTarget.getUses());
+			for (Use use : uses) {
+				Load load = (Load) use.getNode();
+
+				int index = ((IntExpr) load.getIndexes().get(0)).getIntValue();
+				indexToVariableMap.put(index, load.getTarget());
+
+				// clean up uses
+				load.setTarget(null);
+				load.setSource(null);
+
+				// remove instruction
+				toBeRemoved.add(load);
+				action.getScheduler().getLocals().remove(oldTarget.getName());
+			}
+
+			customPeekedMap.put(port, indexToVariableMap);
 		}
 	}
 
 	@Override
-	public void visit(Peek peek) {
-		if (!peek.isUnit()) {
+	public void visit(Load load) {
+		if (toBeRemoved.remove(load)) {
 			itInstruction.remove();
-			Instruction instruction = itInstruction.next();
-			if (instruction.isAssign() && !itInstruction.hasNext()) {
-				itInstruction.remove();
-				WhileNode whileNode = (WhileNode) itNode.next();
-				Store store = (Store) ((BlockNode) whileNode.getNodes().get(0))
-						.getInstructions().get(1);
-				(new VariableReplacer()).replace(store.getTarget(),
-						peek.getTarget(), procedure);
-				itNode.remove();
-			}
-			for (CustomPeek newPeek : (new NeededPeekFinder()).find(peek)) {
-				itInstruction.add(newPeek);
-			}
-
-			while (itInstruction.hasPrevious()) {
-				itInstruction.previous();
-			}
 		}
 	}
 }
