@@ -104,6 +104,36 @@ public:
 		std::map<std::string, Port*>* outputs, std::map<std::string, StateVar*>* stateVars, 
 		std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures, 
 		std::list<Action*>* initializes, std::list<Action*>* actions, ActionScheduler* actionScheduler);
+
+	/**
+     *  @brief Constructor
+     *
+	 *	Creates a new actor with the given moc.
+	 *
+	 * @param name : string on the actor name
+	 *
+	 * @param file : string of the bitcode file this actor was defined in
+	 *
+     * @param inputs : a map of input ports
+	 *
+	 * @param outputs : a map of output ports
+	 *
+	 * @param parameters : a map of parameters
+	 *
+	 * @param procedures : a map of procedures
+	 *
+	 * @param stateVars : a map of state variables
+	 *
+	 * @param actions : a list of actions
+	 *
+	 * @param moc : a MoC
+     */
+	Actor(std::string name, llvm::Module* module, std::string file, std::map<std::string, Port*>* inputs, 
+		std::map<std::string, Port*>* outputs, std::map<std::string, StateVar*>* stateVars, 
+		std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures, 
+		std::list<Action*>* initializes, std::list<Action*>* actions, ActionScheduler* actionScheduler,
+		MoC* moc);
+
 	virtual ~Actor();
 
 	/**

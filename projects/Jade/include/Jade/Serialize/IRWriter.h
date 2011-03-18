@@ -50,6 +50,7 @@ class Decoder;
 class JIT;
 class LLVMWriter;
 class ActionSchedulerAdder;
+class CSDFMoC;
 
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Network/Instance.h"
@@ -264,15 +265,39 @@ private:
 	FSM* writeFSM(FSM* fsm);
 
 	/**
+	 * @brief Write a MoC
+	 *
+	 * Write the given MoC for an Instance.
+	 * 
+	 * @param moc : the MoC to write
+	 *
+	 * @return the corresponding moc in the decoder
+	 */
+	MoC* writeMoC(MoC* moc);
+
+	/**
+	 * @brief Write a CSDF MoC
+	 *
+	 * Write the given CSDFMoC for an Instance.
+	 * 
+	 * @param moc : the CSDFMoC to write
+	 *
+	 * @return the corresponding csdfmoc in the decoder
+	 */
+	MoC* writeCSDFMoC(CSDFMoC* csdfMoC);
+
+	/**
 	 * @brief Store the action for a later use.
 	 *
 	 * Remember this action depending on the given Tag, ie. tagged or not. 
 	 * 
+	 * @param actionSrc : action source
+	 *
 	 * @param tag : tag of the action
 	 *
 	 * @param action : action to remember
 	 */
-	void putAction(ActionTag* tag, Action* action);
+	void putAction(Action* actionSrc, ActionTag* tag, Action* action);
 
 	/**
 	 *
@@ -299,7 +324,7 @@ private:
 	std::map<std::string, Action*> actions;
 
 	/** list of untagged actions of the instance */
-	std::list<Action*> untaggedActions;
+	std::map<Action*, Action*> untaggedActions;
 
 	/** list of initialization actions of the instance */
 	std::list<Action*>* initializes;

@@ -68,6 +68,28 @@ Actor::Actor(string name, Module* module, string file, map<string, Port*>* input
 	}
 }
 
+Actor::Actor(string name, Module* module, string file, map<string, Port*>* inputs, 
+		     map<string, Port*>* outputs, map<string, StateVar*>* stateVars,
+			 std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures,
+			 list<Action*>* initializes, list<Action*>* actions, ActionScheduler* actionScheduler, MoC* moc){
+	this->name = name;
+	this->module = module;
+	this->file = file;
+	this->inputs = inputs;
+	this->outputs = outputs;
+	this->initializes = initializes;
+	this->actions = actions;
+	this->stateVars = stateVars;
+	this->parameters = parameters;
+	this->procedures = procedures;
+	this->actionScheduler = actionScheduler;
+	this->moc = moc;
+	
+	//Only actors with a file name are put in the package manager
+	if(!this->file.empty()){
+		PackageMng::setActor(this);
+	}
+}
 Actor::~Actor (){
 	list<Instance*>::iterator it;
 

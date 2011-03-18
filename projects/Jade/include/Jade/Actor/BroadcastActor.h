@@ -130,7 +130,7 @@ private:
 	/**
      *  @brief Create the MoC of broadcast actor
      */
-	void createMoC();
+	MoC* createMoC();
 
 	/**
      *  @brief Create the scheduler of the broadcast action

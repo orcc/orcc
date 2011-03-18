@@ -135,6 +135,17 @@ public:
 	void setInputPattern(Pattern* pattern) {
 		this->inputPattern = pattern;
 	}
+	
+	/**
+	 * @return Get the actions of the CSDFMoC
+	 *
+	 * Returns the list of actions that can be scheduled statically.
+	 * 
+	 * @return the list of actions that can be scheduled statically
+	 */
+	std::list<Action*>* getActions() {
+		return &actions;
+	}
 
 protected:
 	/** Sequence of actions */

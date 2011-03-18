@@ -139,6 +139,13 @@ public:
 	MoC* getMoC(){return moc;};
 
 	/*!
+     *  @brief Set the MoC of the instance
+     *
+	 * @param moc : the MoC of the Instance
+     */
+	void setMoC(MoC* moc){this->moc = moc;};
+
+	/*!
      *  @brief Setter of clasz
      *
 	 * @param clasz: the new clasz of the Instance

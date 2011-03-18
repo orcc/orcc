@@ -51,6 +51,7 @@
 #include "llvm/Support/CommandLine.h"
 
 #include "DPNScheduler.h"
+#include "CSDFScheduler.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Configuration/Configuration.h"

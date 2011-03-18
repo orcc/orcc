@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class ActionSchedulerAdder
+@brief Implementation of class DPNScheduler
 @author Jerome Gorin
-@file ActionSchedulerAdder.cpp
+@file DPNScheduler.cpp
 @version 1.0
 @date 15/11/2010
 */

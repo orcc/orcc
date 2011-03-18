@@ -113,13 +113,13 @@ void BroadcastActor::createActor(){
 	createAction();
 	
 	// Create a MoC
-	createMoC();
+	moc = createMoC();
 
 	//Create action scheduler
 	actionScheduler = new ActionScheduler(actions, NULL);
 }
 
-void BroadcastActor::createMoC(){
+MoC* BroadcastActor::createMoC(){
 	// Set broadcast actor as SDF
 	SDFMoC* sdfMoC = new SDFMoC();
 
@@ -128,6 +128,8 @@ void BroadcastActor::createMoC(){
 	sdfMoC->addAction(action);
 	sdfMoC->setInputPattern(action->getInputPattern());
 	sdfMoC->setOutputPattern(action->getOutputPattern());
+
+	return sdfMoC;
 }
 
 void BroadcastActor::createAction(){

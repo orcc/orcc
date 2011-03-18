@@ -40,6 +40,11 @@
 
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
+#include "Jade/Core/MoC/CSDFMoC.h"
+#include "Jade/Core/MoC/SDFMoC.h"
+#include "Jade/Core/MoC/QSDFMoC.h"
+#include "Jade/Core/MoC/DPNMoC.h"
+#include "Jade/Core/MoC/KPNMoC.h"
 #include "Jade/Jit/LLVMWriter.h"
 #include "Jade/Serialize/IRWriter.h"
 
@@ -92,6 +97,7 @@ void IRWriter::writeInstance(Instance* instance){
 	initializes = writeInitializes(actor->getInitializes());
 	list<Action*>* actions = writeActions(actor->getActions());
 	actionScheduler = writeActionScheduler(actor->getActionScheduler());
+	MoC* moc = writeMoC(actor->getMoC());
 
 	//Set properties of the instance
 	instance->setActions(actions);
@@ -100,6 +106,7 @@ void IRWriter::writeInstance(Instance* instance){
 	instance->setProcs(procs);
 	instance->setInitializes(initializes);
 	instance->setActionScheduler(actionScheduler);
+	instance->setMoC(moc);
 
 	//Resolve paramaters of this instance
 	instance->solveParameters();
@@ -348,15 +355,58 @@ list<Action*>* IRWriter::writeActions(list<Action*>* actions){
 		newActions->push_back(action);
 
 		//Save it for a later use	
-		putAction(action->getTag(), action);
+		putAction(*it, action->getTag(), action);
 	}
 
 	return newActions;
 }
 
-void IRWriter::putAction(ActionTag* tag, Action* action){
+MoC* IRWriter::writeMoC(MoC* moc){
+	if (moc->isCSDF()){
+		return writeCSDFMoC((CSDFMoC*)moc);
+	}else if (moc->isQuasiStatic()){
+		return new QSDFMoC();
+	}else if (moc->isKPN()){
+		return new KPNMoC();
+	}else if (moc->isDPN()){
+		return new DPNMoC();
+	}
+
+	return NULL;
+}
+
+MoC* IRWriter::writeCSDFMoC(CSDFMoC* csdfMoC){
+	CSDFMoC* newCsdfMoC;
+		
+	// Dupplicat moc
+	if (csdfMoC->isSDF()){
+		newCsdfMoC = new SDFMoC();
+	}else{
+		newCsdfMoC = new CSDFMoC();
+		
+		int nbPhases = csdfMoC->getNumberOfPhases();
+		newCsdfMoC->setNumberOfPhases(nbPhases);
+	}
+		
+	// Dupplicate patterns
+	Pattern* inputPattern = writePattern(csdfMoC->getInputPattern(), inputs);
+	Pattern* outputPattern = writePattern(csdfMoC->getOutputPattern(), outputs);
+
+	// Dupplicate actions
+	list<Action*>::iterator it;
+	list<Action*>* actions = csdfMoC->getActions();
+		
+	for (it = actions->begin(); it != actions->end(); it++){
+		Action* newAction = getAction(*it);
+		newCsdfMoC->addAction(newAction);
+	}
+
+	return newCsdfMoC;
+}
+
+void IRWriter::putAction(Action* actionSrc, ActionTag* tag, Action* action){
 	if (tag->isEmpty()){
-		untaggedActions.push_back(action);
+		untaggedActions.insert(pair<Action*, Action*>(actionSrc, action));
 	} else {
 		actions.insert(pair<std::string, Action*>(tag->getIdentifier(), action));
 	}
@@ -364,16 +414,14 @@ void IRWriter::putAction(ActionTag* tag, Action* action){
 
 Action* IRWriter::getAction(Action* action) {
 	ActionTag* actionTag = action->getTag();
-	map<string, Action*>::iterator it;
 
 	if (actionTag->isEmpty()){
-		// removes the first untagged action found
-		Action* action = untaggedActions.front();
-		untaggedActions.remove(action);
-		
-		return action;
+		map<Action*, Action*>::iterator it;
+		it = untaggedActions.find(action);
+		return it->second;
 	}
-	
+
+	map<string, Action*>::iterator it;
 	it = actions.find(actionTag->getIdentifier());
 	
 	return it->second;

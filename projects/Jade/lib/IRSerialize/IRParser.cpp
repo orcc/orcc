@@ -132,7 +132,7 @@ Actor* IRParser::parseActor(string classz){
 	MoC* moc = parseMoC(module);
 
 	return new Actor(name->getString(), module, classz, inputs, outputs, stateVars, 
-						parameters, procs, initializes, actions, actionScheduler);
+						parameters, procs, initializes, actions, actionScheduler, moc);
 }
 
 MoC* IRParser::parseMoC(Module* module){

@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Description of the ActionSchedulerAdder interface
+@brief Description of the DPNScheduler interface
 @author Jerome Gorin
-@file ActionSchedulerAdder.h
+@file DPNScheduler.h
 @version 1.0
 @date 15/11/2010
 */
