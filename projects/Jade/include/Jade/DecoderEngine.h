@@ -69,7 +69,7 @@ public:
 	 *   
 	 *  @param C : the LLVM Context used by JIT
      */
-	DecoderEngine(llvm::LLVMContext& C, std::string library, FifoTy fifo, std::string system = "", bool verbose = false);
+	DecoderEngine(llvm::LLVMContext& C, std::string library, FifoTy fifo, std::string system = "", bool noMerging = false, bool verbose = false);
 	~DecoderEngine();
 
 	/*!
@@ -196,6 +196,9 @@ private:
 	
 	/** Map of decoder loaded in the decoder engine */
 	std::map<Network*, Decoder*> decoders;
+
+	/** Whether or not merging static actors */
+	bool noMerging;
 
 	/** Print all actions made by decoder engine*/
 	bool verbose;

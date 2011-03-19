@@ -392,6 +392,9 @@ MoC* IRWriter::writeCSDFMoC(CSDFMoC* csdfMoC){
 	Pattern* inputPattern = writePattern(csdfMoC->getInputPattern(), inputs);
 	Pattern* outputPattern = writePattern(csdfMoC->getOutputPattern(), outputs);
 
+	newCsdfMoC->setInputPattern(inputPattern);
+	newCsdfMoC->setOutputPattern(outputPattern);
+
 	// Dupplicate actions
 	list<Action*>::iterator it;
 	list<Action*>* actions = csdfMoC->getActions();

@@ -153,9 +153,7 @@ void ActionSchedulerAdder::createInitialize(Instance* instance){
 	BranchInst::Create(returnBB, BB);
 }
 
-BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* function, BasicBlock* skipBB, BasicBlock* BB){
-	Pattern* pattern = action->getInputPattern();
-	
+BasicBlock* ActionSchedulerAdder::checkInputPattern(Pattern* pattern, Function* function, BasicBlock* skipBB, BasicBlock* BB){	
 	//Pattern is empty, return current basic block
 	if (pattern->isEmpty()){
 		return BB;
@@ -182,7 +180,6 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* fu
 
 	// Add a basic block hasToken that test the isSchedulable of a function
 	string hasTokenBrName = "hasToken";
-	hasTokenBrName.append(action->getName());
 	BasicBlock* tokenBB = BasicBlock::Create(Context, hasTokenBrName, function);
 
 	//Finally branch fire to hasToken block if all inputs have tokens
@@ -190,11 +187,9 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* fu
 	return tokenBB;
 }
 
-BasicBlock* ActionSchedulerAdder::checkOutputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB){
-	Pattern* outputPattern = action->getOutputPattern();
-
+BasicBlock* ActionSchedulerAdder::checkOutputPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB){
 	//No output pattern return basic block
-	if (outputPattern->isEmpty()){
+	if (pattern->isEmpty()){
 		return BB;
 	}
 	
@@ -202,7 +197,7 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Action* action, llvm::Funct
 	list<Value*>::iterator itValue;
 	list<Value*> values;
 	map<Port*, ConstantInt*>::iterator it;
-	map<Port*, ConstantInt*>* numTokens = outputPattern->getNumTokensMap();
+	map<Port*, ConstantInt*>* numTokens = pattern->getNumTokensMap();
 	
 
 	for ( it=numTokens->begin() ; it != numTokens->end(); it++ ){
@@ -219,8 +214,7 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Action* action, llvm::Funct
 	}
 
 	// Add a basic block hasRoom that fires the action
-	string hasRoomBrName = "hasRoom_";
-	hasRoomBrName.append(action->getName());
+	string hasRoomBrName = "hasRoom";
 	BasicBlock* roomBB = BasicBlock::Create(Context, hasRoomBrName, function);
 
 	//Finally branch fire to hasRoom block if all outputs have free room
@@ -229,13 +223,11 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Action* action, llvm::Funct
 	return roomBB;
 }
 
-void ActionSchedulerAdder::checkPeekPattern(Action* action, Function* function, BasicBlock* BB){
-	Pattern* inputPattern = action->getInputPattern();
-
+void ActionSchedulerAdder::checkPeekPattern(Pattern* pattern, Function* function, BasicBlock* BB){
 	//Test if rooms are available on output
 	map<Port*, Variable*>::iterator it;
-	map<Port*, Variable*>* peeked = inputPattern->getPeekedMap();
-	map<Port*, ConstantInt*>* numTokensMap = inputPattern->getNumTokensMap();
+	map<Port*, Variable*>* peeked = pattern->getPeekedMap();
+	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
 
 	for ( it=peeked->begin() ; it != peeked->end(); it++ ){
 		Port* port = it->first;
@@ -264,12 +256,11 @@ void ActionSchedulerAdder::createPeek(Port* port, Variable* variable, ConstantIn
 	new StoreInst(callInst, portPtr, BB);
 }
 
-void ActionSchedulerAdder::createWriteEnds(Action* action, llvm::BasicBlock* BB){
-	Pattern* outputPattern = action->getOutputPattern();
+void ActionSchedulerAdder::createWriteEnds(Pattern* pattern, llvm::BasicBlock* BB){
 
 	//Get tokens and var
 	map<Port*, ConstantInt*>::iterator it;
-	map<Port*, ConstantInt*>* numTokensMap = outputPattern->getNumTokensMap();
+	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
 
 	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
 		//Create write end
@@ -277,12 +268,10 @@ void ActionSchedulerAdder::createWriteEnds(Action* action, llvm::BasicBlock* BB)
 	}
 }
 
-void ActionSchedulerAdder::createReadEnds(Action* action, llvm::BasicBlock* BB){
-	Pattern* inputPattern = action->getInputPattern();
-
+void ActionSchedulerAdder::createReadEnds(Pattern* pattern, llvm::BasicBlock* BB){
 	//Get tokens and var
 	map<Port*, ConstantInt*>::iterator it;
-	map<Port*, ConstantInt*>* numTokensMap = inputPattern->getNumTokensMap();
+	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
 
 	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
 		//Create read end
@@ -313,41 +302,29 @@ void ActionSchedulerAdder::createWriteEnd(Port* port, ConstantInt* numTokens, Ba
 }
 
 
-void ActionSchedulerAdder::createWrites(Action* action, llvm::BasicBlock* BB){
-	Pattern* outputPattern = action->getOutputPattern();
-
+void ActionSchedulerAdder::createWrites(Pattern* pattern, llvm::BasicBlock* BB){
 	//Get tokens and var
 	map<Port*, ConstantInt*>::iterator it;
 	map<Port*, Variable*>::iterator itVar;
-	map<Port*, ConstantInt*>* numTokensMap = outputPattern->getNumTokensMap();
-	map<Port*, Variable*>* variableMap = outputPattern->getVariableMap();
+	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
 
 	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
-		// Get associated port variable
+		//Create write
 		Port* port = it->first;
-		itVar = variableMap->find(port);
-
-		//Create read
-		createWrite(port, itVar->second, it->second, BB);
+		createWrite(port, port->getPtrVar(), it->second, BB);
 	}
 }
 
-void ActionSchedulerAdder::createReads(Action* action, llvm::BasicBlock* BB){
-	Pattern* inputPattern = action->getInputPattern();
-
+void ActionSchedulerAdder::createReads(Pattern* pattern, llvm::BasicBlock* BB){
 	//Get tokens and var
 	map<Port*, ConstantInt*>::iterator it;
 	map<Port*, Variable*>::iterator itVar;
-	map<Port*, ConstantInt*>* numTokensMap = inputPattern->getNumTokensMap();
-	map<Port*, Variable*>* variableMap = inputPattern->getVariableMap();
+	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
 
 	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
 		// Get associated port variable
 		Port* port = it->first;
-		itVar = variableMap->find(port);
-
-		//Create read
-		createRead(port, itVar->second, it->second, BB);
+		createRead(port, port->getPtrVar(), it->second, BB);
 	}
 }
 

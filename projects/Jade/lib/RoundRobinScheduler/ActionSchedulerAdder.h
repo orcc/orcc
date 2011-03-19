@@ -60,6 +60,7 @@ class Decoder;
 class Port;
 class Variable;
 class MoC;
+class Pattern;
 //------------------------------
 
 /**
@@ -138,18 +139,18 @@ protected:
 	 *
 	 * @return the next basic block to add instruction
 	 */
-	llvm::BasicBlock* checkOutputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
+	llvm::BasicBlock* checkOutputPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
 
 	/**
-	 * @brief Check peek pattern of an Action
+	 * @brief Check peek pattern
 	 * 
-	 * @param action : the Action to test peek
+	 * @param pattern : the pattern to test peek
 	 *
 	 * @param function : function where test is added
 	 *
 	 * @param BB : llvm::BasicBlock where add instructions
 	 */
-	void checkPeekPattern(Action* action, llvm::Function* function, llvm::BasicBlock* BB);
+	void checkPeekPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create a peek for an Action
@@ -180,11 +181,11 @@ protected:
 	/**
 	 * @brief Create reads for an Action
 	 * 
-	 * @param action : the action to create read for
+	 * @param pattern : the pattern to read
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createReads(Action* action, llvm::BasicBlock* BB);
+	void createReads(Pattern* pattern, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create a ReadEnd for an Action
@@ -200,11 +201,11 @@ protected:
 	/**
 	 * @brief Create readends for an Action
 	 * 
-	 * @param action : the action to create readends for
+	 * @param pattern : the pattern to create readends
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createReadEnds(Action* action, llvm::BasicBlock* BB );
+	void createReadEnds(Pattern* pattern, llvm::BasicBlock* BB );
 	
 	/**
 	 * @brief Create a WriteEnd for an Action
@@ -220,11 +221,11 @@ protected:
 	/**
 	 * @brief Create writeends for an Action
 	 * 
-	 * @param action : the action to create writeends for
+	 * @param pattern : the pattern to create writeEnds
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createWriteEnds(Action* action, llvm::BasicBlock* BB );
+	void createWriteEnds(Pattern* pattern, llvm::BasicBlock* BB );
 
 
 	/**
@@ -243,11 +244,11 @@ protected:
 	/**
 	 * @brief Create writes for an Action
 	 * 
-	 * @param action : the action to create writes for
+	 * @param pattern : the pattern to write
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createWrites(Action* action, llvm::BasicBlock* BB );
+	void createWrites(Pattern* pattern, llvm::BasicBlock* BB );
 
 	/**
 	 * @brief Creates a hasRoom test for a Port
@@ -267,7 +268,7 @@ protected:
 	/**
 	 * @brief Check input pattern of an action
 	 *
-	 * @param action : Action to check
+	 * @param pattern : the Pattern to check
 	 *
 	 * @param function : llvm::Function to add the check
 	 *
@@ -277,7 +278,7 @@ protected:
 	 *
 	 * @return the last llvm::BasicBlock to add instruction
 	 */
-	llvm::BasicBlock* checkInputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
+	llvm::BasicBlock* checkInputPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
 
 
 	/**

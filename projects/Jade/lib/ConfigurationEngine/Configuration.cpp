@@ -46,8 +46,9 @@
 
 using namespace std;
 
-Configuration::Configuration(Network* network){
+Configuration::Configuration(Network* network, bool noMerging){
 	this->network = network;
+	this->noMerging = noMerging;
 
 	//Set configuration property from network
 	setInstances();

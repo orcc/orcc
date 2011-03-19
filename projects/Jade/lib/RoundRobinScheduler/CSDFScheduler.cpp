@@ -38,6 +38,13 @@
 //------------------------------
 #include "CSDFScheduler.h"
 
+#include "llvm/DerivedTypes.h"
+#include "llvm/Instructions.h"
+#include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
+
+#include "Jade/Core/Network/Instance.h"
+#include "Jade/Core/MoC/CSDFMoC.h"
 //------------------------------
 
 using namespace llvm;
@@ -48,5 +55,49 @@ CSDFScheduler::CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder) : ActionSch
 }
 
 void CSDFScheduler::createScheduler(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* scheduler){
+	BB = createPatternTest((CSDFMoC*)instance->getMoC(), BB, incBB, scheduler);
 
+	//Create branch from skip to return
+	BranchInst::Create(returnBB, BB);
+}
+
+BasicBlock* CSDFScheduler::createPatternTest(CSDFMoC* moc, BasicBlock* BB, BasicBlock* incBB, Function* function){
+	map<Port*, ConstantInt*>::iterator it;
+	string skipBrName = "skip";
+	string hasRoomBrName = "hasroom";
+
+	// Add a basic block to bb for ski instructions
+	BasicBlock* skipBB = BasicBlock::Create(Context, skipBrName, function);
+
+	//Create check input pattern
+	BB = checkInputPattern(moc->getInputPattern(), function, skipBB, BB);
+
+	//Create output pattern
+	BasicBlock* fireBB = checkOutputPattern(moc->getOutputPattern(), function, skipBB, BB);
+
+	createActionsCall(moc, fireBB);
+	
+	//Branch fire basic block to BB basic block
+	BranchInst::Create(incBB, fireBB);
+
+	return skipBB;
+}
+
+void CSDFScheduler::createActionsCall(CSDFMoC* moc, BasicBlock* BB){
+	// Create read/write for the action
+	createReads(moc->getInputPattern(), BB);
+	createWrites(moc->getOutputPattern(), BB);
+	
+	// Call actions successively
+	list<Action*>::iterator it;
+	list<Action*>* actions = moc->getActions();
+
+	for ( it=actions->begin() ; it != actions->end(); it++ ){
+		Procedure* body = (*it)->getBody();
+		CallInst* schedInst = CallInst::Create(body->getFunction(), "",  BB);
+	}
+
+	//Create ReadEnd/WriteEnd
+	createReadEnds(moc->getInputPattern(), BB);
+	createWriteEnds(moc->getOutputPattern(), BB);
 }

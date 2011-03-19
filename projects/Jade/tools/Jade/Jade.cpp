@@ -175,6 +175,8 @@ static cl::opt<bool> Verify("v", cl::desc("Verify every generated decoders"), cl
 
 static cl::opt<bool> Console("console", cl::desc("Enter in console mode"), cl::init(false));
 
+static cl::opt<bool> noMerging("nomerging", cl::desc("Deactivate merging of static actors"), cl::init(false));
+
 cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations available:"));
 
 void clean_exit(int sig){
@@ -275,7 +277,7 @@ int main(int argc, char **argv) {
 	setOptions();
 	
 	//Loading decoderEngine
-	engine = new DecoderEngine(Context, VTLDir, Fifo, SystemDir, Verbose);
+	engine = new DecoderEngine(Context, VTLDir, Fifo, SystemDir, noMerging, Verbose);
 
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

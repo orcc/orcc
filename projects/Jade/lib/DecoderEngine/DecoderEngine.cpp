@@ -65,12 +65,14 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 							 string library, 
 							 FifoTy fifo, 
 							 string system, 
+							 bool noMerging,
 							 bool verbose): Context(C) {	
 	//Set properties	
 	this->library = library;
 	this->systemPackage = system;
 	this->verbose = verbose;
 	this->fifoty = fifoty;
+	this->noMerging = noMerging;
 
 	//Select the fifo used
 	FifoMng::setFifoTy(fifo, library);
@@ -88,7 +90,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	clock_t timer = clock ();
 
 	//Create the Configuration from the network
-	Configuration* configuration = new Configuration(network);
+	Configuration* configuration = new Configuration(network, noMerging);
 
 	// Parsing actor and bound it to the configuration
 	map<string, Actor*>* requieredActors = parseActors(configuration);

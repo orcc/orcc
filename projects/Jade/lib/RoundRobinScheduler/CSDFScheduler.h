@@ -41,6 +41,7 @@
 
 #include "ActionSchedulerAdder.h"
 
+class CSDFMoC;
 //------------------------------
 
 /**
@@ -78,6 +79,31 @@ private:
 	 * @param function : llvm::Function where the scheduler is added
 	 */
 	void createScheduler(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* scheduler);
+
+	/**
+	 * @brief Creates a Pattern test for a MoC
+	 * 
+	 * @param moc : the CSDFMoC to test
+	 *
+	 * @param BB : llvm::BasicBlock where test is add
+	 *
+	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the test is added
+	 */
+	llvm::BasicBlock* createPatternTest(CSDFMoC* moc, llvm::BasicBlock* BB, 
+										llvm::BasicBlock* incBB, llvm::Function* function);
+
+	/**
+	 * @brief Create Actions call
+	 * 
+	 * @param moc : the moc to execute
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void createActionsCall(CSDFMoC* moc, llvm::BasicBlock* BB);
 };
 
 #endif

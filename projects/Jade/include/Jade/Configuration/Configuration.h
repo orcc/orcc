@@ -60,7 +60,7 @@ public:
      *
 	 * Creates a new configuration engine.
      */
-	Configuration(Network* network);
+	Configuration(Network* network, bool noMerging = false);
 
 	/*!
      *  @brief Destructor
@@ -176,6 +176,11 @@ public:
 	void eraseSpecifics();
 
 	/**
+     *  @brief Whether or not merging static actors
+     */
+	bool mergeActors(){return noMerging == false;};
+
+	/**
      *  @brief Insert a specific actor in the configuration,
 	 *		all the instance of this specific actor are added in
 	 *      the instance list
@@ -211,6 +216,8 @@ private:
 	/** List of specific actors contained in the configuration */
 	std::list<Actor*> specificActors;
 
+	/** Whether or not merging static actors */
+	bool noMerging;
 };
 
 #endif

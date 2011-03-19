@@ -169,16 +169,16 @@ BasicBlock* DPNScheduler::createActionTest(Action* action, BasicBlock* BB, Basic
 
 
 	//Create check input pattern
-	BB = checkInputPattern(action, function, skipBB, BB);
+	BB = checkInputPattern(action->getInputPattern(), function, skipBB, BB);
 	
 	//Test firing condition of an action
-	checkPeekPattern(action, function, BB);
+	checkPeekPattern(action->getInputPattern(), function, BB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* schedInst = CallInst::Create(scheduler->getFunction(), "",  BB);
 	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, schedInst, BB);
 
 	//Create output pattern
-	fireBB = checkOutputPattern(action, function, skipBB, fireBB);
+	fireBB = checkOutputPattern(action->getOutputPattern(), function, skipBB, fireBB);
 	
 	//Execute the action
 	createActionCall(action, fireBB);
@@ -191,16 +191,16 @@ BasicBlock* DPNScheduler::createActionTest(Action* action, BasicBlock* BB, Basic
 
 void DPNScheduler::createActionCall(Action* action, BasicBlock* BB){
 	// Create read/write for the action
-	createReads(action, BB);
-	createWrites(action, BB);
+	createReads(action->getInputPattern(), BB);
+	createWrites(action->getOutputPattern(), BB);
 	
 	//Launch action body
 	Procedure* body = action->getBody();
 	CallInst* bodyInst = CallInst::Create(body->getFunction(), "",  BB);
 
 	//Create ReadEnd/WriteEnd
-	createReadEnds(action, BB);
-	createWriteEnds(action, BB);
+	createReadEnds(action->getInputPattern(), BB);
+	createWriteEnds(action->getOutputPattern(), BB);
 }
 
 map<FSM::State*, BasicBlock*>* DPNScheduler::createStates(map<string, FSM::State*>* states, Function* function){
@@ -281,28 +281,28 @@ BasicBlock* DPNScheduler::createActionTestState(FSM::NextStateInfo* nextStateInf
 	FSM::State* targetState = nextStateInfo->getTargetState();
 
 	//Create a branch for firing next state
-	string fireStateBrName = "fire_";
+	string fireStateBrName = "fire";
 	fireStateBrName.append(action->getName());
 	BasicBlock* fireStateBB = BasicBlock::Create(Context, fireStateBrName, function);
 
 	//Create a branch for skip next state
-	string skipStateBrName = "skip_";
+	string skipStateBrName = "skip";
 	skipStateBrName.append(action->getName());
 	BasicBlock* skipStateBB = BasicBlock::Create(Context, skipStateBrName, function);
 
 
 	//Test input firing condition of an action
-	stateBB = checkInputPattern(action, function, skipStateBB, stateBB);
+	stateBB = checkInputPattern(action->getInputPattern(), function, skipStateBB, stateBB);
 	
 	//Test firing condition of an action
-	checkPeekPattern(action, function, stateBB);
+	checkPeekPattern(action->getInputPattern(), function, stateBB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  stateBB);
 	BranchInst* branchInst	= BranchInst::Create(fireStateBB, skipStateBB, callInst, stateBB);
 
 
 	//Create a basic block skip_hasRoom that store state and return from function
-	string skipHasRoomBrName = "skipHasRoom_";
+	string skipHasRoomBrName = "skipHasRoom";
 	skipHasRoomBrName.append(action->getName());
 	BasicBlock* skipRoomBB = BasicBlock::Create(Context, skipHasRoomBrName, function);
 	ConstantInt* index = ConstantInt::get(Type::getInt32Ty(Context), sourceState->getIndex());
@@ -310,7 +310,7 @@ BasicBlock* DPNScheduler::createActionTestState(FSM::NextStateInfo* nextStateInf
 	BranchInst::Create(returnBB, skipRoomBB);
 
 	//Create output pattern
-	fireStateBB = checkOutputPattern(action, function, skipRoomBB, fireStateBB);
+	fireStateBB = checkOutputPattern(action->getOutputPattern(), function, skipRoomBB, fireStateBB);
 	
 	//Create call state
 	createActionCallState(nextStateInfo, fireStateBB, BBTransitions);

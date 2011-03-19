@@ -93,9 +93,17 @@ void RoundRobinScheduler::createScheduler(){
 	map<string, Instance*>::iterator it;
 	map<string, Instance*>* instances = configuration->getInstances();
 	DPNScheduler DPNSchedulerAdder(Context, decoder);
+	CSDFScheduler CSDFSchedulerAdder(Context, decoder);
 	
 	for (it = instances->begin(); it != instances->end(); it++){
-		DPNSchedulerAdder.transform(it->second);
+		Instance* instance = it->second;
+		MoC* moc = instance->getMoC();
+
+		if (moc->isCSDF() && !moc->isSDF() && configuration->mergeActors()){
+			CSDFSchedulerAdder.transform(instance);
+		}else{
+			DPNSchedulerAdder.transform(instance);
+		}
 	}
 
 	//Create the scheduler function
