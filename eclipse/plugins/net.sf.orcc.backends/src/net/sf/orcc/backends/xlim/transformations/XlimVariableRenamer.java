@@ -49,11 +49,6 @@ public class XlimVariableRenamer extends VariableRenamer {
 				variable.setName(actionName + "_" + variable.getName());
 			}
 		}
-		for (Variable variable : pattern.getPeekedMap().values()) {
-			if (!action.getScheduler().getLocals().getList().contains(variable)) {
-				variable.setName(actionName + "_" + variable.getName());
-			}
-		}
 	}
 
 }

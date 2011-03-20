@@ -336,7 +336,10 @@ public class InlineTransformation extends AbstractActorVisitor {
 		for (Variable var : function.getLocals().getList()) {
 			LocalVariable oldVar = (LocalVariable) var;
 			LocalVariable newVar = procedure.newTempLocalVariable("",
-					oldVar.getType(), oldVar.getName());
+					oldVar.getType(),
+					procedure.getName() + "_" + oldVar.getName() + "_"
+							+ call.getLocation().getStartLine() + "_"
+							+ call.getLocation().getStartColumn());
 			newVar.setIndex(oldVar.getIndex());
 			newVar.setLocation(oldVar.getLocation());
 			newVar.setAssignable(oldVar.isAssignable());
@@ -352,7 +355,10 @@ public class InlineTransformation extends AbstractActorVisitor {
 				variableToLocalVariableMap.put(oldVar, newVar);
 			} else {
 				LocalVariable newVar = procedure.newTempLocalVariable("",
-						oldVar.getType(), oldVar.getName());
+						oldVar.getType(),
+						procedure.getName() + "_" + oldVar.getName() + "_"
+								+ call.getLocation().getStartLine() + "_"
+								+ call.getLocation().getStartColumn());
 				newVar.setIndex(oldVar.getIndex());
 				newVar.setLocation(oldVar.getLocation());
 				newVar.setAssignable(oldVar.isAssignable());

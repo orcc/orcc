@@ -604,10 +604,11 @@ scheduler(actions) ::= <<
 			\</operation\>
 		\</module\>
 		\<module kind="body"\>
-			\<!-- Make all pinAvail call --\>
+			\<!-- PinAvail call --\>
 			<instance.actor.inputs.list: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
 			<instance.actor.outputs.list: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
     
+    		\<!-- All Schedulable expressions --\>
 			<instance.actor.actions: isSchedulableTest(); separator="\n">
 			<instance.actor.actions: inputPatternTest()>
 			<instance.actor.actions: outputPatternTest()>
