@@ -99,7 +99,7 @@ void RoundRobinScheduler::createScheduler(){
 		Instance* instance = it->second;
 		MoC* moc = instance->getMoC();
 
-		if (moc->isCSDF() && !moc->isSDF() && configuration->mergeActors()){
+		if (moc->isCSDF() && configuration->mergeActors()&& (instance->getId().compare("ddr") !=0)){
 			CSDFSchedulerAdder.transform(instance);
 		}else{
 			DPNSchedulerAdder.transform(instance);

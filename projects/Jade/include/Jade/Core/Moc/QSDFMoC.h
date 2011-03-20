@@ -39,7 +39,7 @@
 #ifndef QSDFMOC_H
 #define QSDFMOC_H
 
-#include "Jade/Core/MoC.h"
+#include "Jade/Core/MoC/CSDFMoC.h"
 //------------------------------
 
 /**
@@ -72,6 +72,31 @@ public:
 	 * @return true if this MoC is QCSDF
 	 */
 	bool isQuasiStatic(){return true;};
+
+	/**
+	 * @brief Returns true if this MoC is QCSDF.
+	 *
+	 * Adds a configuration to this quasi-static MoC. A configuration is given
+	 * by an action and associated with a SDF MoC.
+	 * 
+	 * @param action : a configuration action
+	 * @param moc : a CSDF MoC
+	 */
+	void addConfiguration(Action* action, CSDFMoC* moc) {
+		configurations.insert(std::pair<Action*, CSDFMoC*>(action, moc));
+	}
+
+
+	/**
+	 * @brief Return the configurations of this quasi-static MoC.
+	 * 
+	 * @return a map of configurations
+	 */
+	std::map<Action*, CSDFMoC*>* getConfigurations() {
+		return &configurations;
+	}
+private:
+	std::map<Action*, CSDFMoC*> configurations;
 
 };
 

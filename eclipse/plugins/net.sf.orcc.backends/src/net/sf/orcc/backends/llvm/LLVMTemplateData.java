@@ -86,6 +86,12 @@ public class LLVMTemplateData {
 	 * Medata container of MoCs
 	 */
 	private Map<Object, Integer> mocs;
+	
+	/**
+	 * Medata container of actions of MoCs
+	 */
+	private Map<Object, Integer> actionMoC;
+	
 
 	/**
 	 * Medata container of names
@@ -101,6 +107,11 @@ public class LLVMTemplateData {
 	 * Medata container of ports
 	 */
 	private Map<Object, Integer> ports;
+	
+	/**
+	 * Medata container of configurations
+	 */
+	private Map<Object, Integer> configurations;
 
 	/**
 	 * Medata container of procedures
@@ -123,6 +134,8 @@ public class LLVMTemplateData {
 		ports = new HashMap<Object, Integer>();
 		actions = new HashMap<Object, Integer>();
 		actionScheduler = new HashMap<Object, Integer>();
+		actionMoC = new HashMap<Object, Integer>();
+		configurations = new HashMap<Object, Integer>();
 		patterns = new HashMap<Object, Integer>();
 		varPattern = new HashMap<Object, Integer>();
 		numTokenPattern = new HashMap<Object, Integer>();
@@ -233,7 +246,8 @@ public class LLVMTemplateData {
 	}
 
 	private void computeCSDFMoC(CSDFMoC sdfmoc) {
-		mocs.put(sdfmoc.getActions(), id++);
+		actionMoC.put(sdfmoc, id++);
+		actionMoC.put(sdfmoc.getActions(), id++);
 		computePattern(sdfmoc.getInputPattern());
 		computePattern(sdfmoc.getOutputPattern());
 	}
@@ -247,7 +261,8 @@ public class LLVMTemplateData {
 	}
 	
 	private void computeConfiguration(Action action, SDFMoC sdfMoC){
-		
+		configurations.put(action, id++);
+		computeCSDFMoC(sdfMoC);
 	}
 
 	private void computeMoC(MoC moc) {
@@ -311,6 +326,16 @@ public class LLVMTemplateData {
 	public Map<Object, Integer> getActions() {
 		return actions;
 	}
+	
+
+	/**
+	 * get configurations map
+	 * 
+	 * @return a map of configuration information.
+	 */
+	public Map<Object, Integer> getConfigurations() {
+		return configurations;
+	}
 
 	/**
 	 * get action scheduler map
@@ -319,6 +344,15 @@ public class LLVMTemplateData {
 	 */
 	public Map<Object, Integer> getActionScheduler() {
 		return actionScheduler;
+	}
+	
+	/**
+	 * get the actions of a MoC
+	 * 
+	 * @return a map of actions of MoC information.
+	 */
+	public Map<Object, Integer> getActionMoC() {
+		return actionMoC;
 	}
 
 	/**

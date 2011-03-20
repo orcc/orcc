@@ -51,6 +51,8 @@ class Configuration;
 class Merger {
 public:
 	Merger();
+	~Merger(){};
+
 	void transform(Configuration* configuration);
 };
 

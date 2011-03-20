@@ -147,7 +147,7 @@ private:
 	 *
 	 * @return the corresponding CSDF MoC.
 	 */
-	MoC* parseCSDF(llvm::MDNode* csdfNode);
+	CSDFMoC* parseCSDF(llvm::MDNode* csdfNode);
 
 	/**
      * @brief parse a QSDF MoC
@@ -159,6 +159,15 @@ private:
 	 * @return the corresponding QSDF MoC.
 	 */
 	MoC* parseQSDF(llvm::MDNode* qsdfNode);
+
+	/**
+     * @brief parse a configuration of a QSDF MoC
+	 * 
+	 * @param node : the llvm::MDNode to parse
+	 *
+	 * @return the corresponding configuration.
+	 */
+	std::pair<Action*, CSDFMoC*> parseConfiguration(llvm::MDNode* node);
 
 	/**
      * @brief parse an action scheduler

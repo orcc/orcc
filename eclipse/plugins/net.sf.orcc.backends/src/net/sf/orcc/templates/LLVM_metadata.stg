@@ -279,11 +279,15 @@ MoC_decl_MD(actor) ::= <<
 >>
 
 MoC_Actions_decl_MD(actor, actions) ::= <<
-!<actor.templateData.mocs.(actions)>
+!<actor.templateData.actionMoC.(actions)>
 >>
 
-MoC_Configurations_decl_MD(actor, configuration) ::= <<
-!<actor.templateData.mocs.(configuration)>
+MoC_CSDF_decl_MD(actor, csdf) ::= <<
+!<actor.templateData.actionMoC.(csdf)>
+>>
+
+MoC_Configuration_decl_MD(actor, configuration) ::= <<
+!<actor.templateData.configurations.(configuration)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -465,7 +469,30 @@ Body_MD(actor, action) ::= <<
 >>
 
 MoC_Actions_MD(actor, actions) ::= <<
-<MoC_Actions_decl_MD(actor=actor, actions=actor.MoC.actions)> = metadata !{<actor.MoC.actions: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">} 
+<MoC_Actions_decl_MD(actor=actor, actions=actions)> = metadata !{<actions: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">} 
+>>
+
+MoC_CSDF_MD(actor, csdf) ::= <<
+<MoC_CSDF_decl_MD(actor = actor, csdf = csdf)> = metadata !{i32 <csdf.numberOfPhases> ,<
+		if(!csdf.inputPattern.empty)
+			> metadata <patterns_decl_MD(actor=actor, patterns=csdf.inputPattern)><
+		else
+			> null <
+		endif>,<
+		if(!csdf.outputPattern.empty)
+			> metadata <patterns_decl_MD(actor=actor, patterns=csdf.outputPattern)><
+		else
+			> null <
+		endif
+			>, metadata <MoC_Actions_decl_MD(actor = actor, actions = csdf.actions)>}
+			
+<MoC_Actions_MD(actor= actor, actions= csdf.actions)>
+>>
+
+MoC_Configuration_MD(actor, configuration) ::= <<
+<MoC_Configuration_decl_MD(actor = actor, configuration = configuration)> = metadata !{metadata <action_decl_MD(actor=actor, action=configuration)>, metadata <MoC_CSDF_decl_MD(actor = actor, csdf = actor.MoC.configurations.(configuration))>}
+	
+<MoC_CSDF_MD(actor=actor, csdf=actor.MoC.configurations.(configuration))>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -475,27 +502,18 @@ MoC_Actions_MD(actor, actions) ::= <<
 MoC_MD(actor)::= <<
 <MoC_decl_MD(actor=actor)> = metadata !{<MoCName_MD(actor.MoC)> <
 	if(actor.MoC.CSDF)
-	> , i32 <actor.MoC.numberOfPhases> ,<
-		if(!actor.MoC.inputPattern.empty)
-			> metadata <patterns_decl_MD(actor=actor, patterns=actor.MoC.inputPattern)><
-		else
-			> null <
-		endif>,<
-		if(!actor.MoC.outputPattern.empty)
-			> metadata <patterns_decl_MD(actor=actor, patterns=actor.MoC.outputPattern)><
-		else
-			> null <
-		endif
-			>, metadata <MoC_Actions_decl_MD(actor = actor, actions = actor.MoC.actions)> <
-		elseif(actor.MoC.quasiStatic)
-		>, <MoC_Actions_decl_MD(actor = actor, actions = actor.MoC.actions)
+		> , metadata <MoC_CSDF_decl_MD(actor= actor, csdf = actor.MoC)> <
+	elseif(actor.MoC.quasiStatic)
+		>, <actor.MoC.configurations.keys: {key | metadata <MoC_Configuration_decl_MD(actor = actor, configuration = key)>}; separator=", "
 	><endif>
 }
 
 <if(actor.MoC.CSDF)>
-<MoC_Actions_MD(actor= actor, actions= actor.MoC.actions)>
+<MoC_CSDF_MD(actor=actor, csdf=actor.MoC)>
 <elseif(actor.MoC.quasiStatic)>
-
+<actor.MoC.configurations.keys: {key | 
+<MoC_Configuration_MD(actor = actor, configuration = key)>
+}>
 <endif>
 
 >>

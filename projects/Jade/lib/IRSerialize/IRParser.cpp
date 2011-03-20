@@ -148,10 +148,10 @@ MoC* IRParser::parseMoC(Module* module){
 	StringRef nameStr = name->getString();
 
 	if (nameStr == "SDF"){
-		return parseCSDF(node);
+		return parseCSDF(cast<MDNode>(node->getOperand(1)));
 	}else if(nameStr == "CSDF"){
-		return parseCSDF(node);
-	}else if(nameStr == "QSDF"){
+		return parseCSDF(cast<MDNode>(node->getOperand(1)));
+	}else if(nameStr == "QuasiStatic"){
 		return parseQSDF(node);
 	}else if(nameStr == "KPN"){
 		return new KPNMoC();
@@ -163,11 +163,11 @@ MoC* IRParser::parseMoC(Module* module){
 	exit(1);
 }
 
-MoC* IRParser::parseCSDF(MDNode* csdfNode){
+CSDFMoC* IRParser::parseCSDF(MDNode* csdfNode){
 	CSDFMoC* csfMoC;
 
 	//Get number of phases
-	ConstantInt* value = cast<ConstantInt>(csdfNode->getOperand(1));
+	ConstantInt* value = cast<ConstantInt>(csdfNode->getOperand(0));
 	int phasesNb = value->getValue().getLimitedValue();
 
 	if (phasesNb == 1){
@@ -177,13 +177,14 @@ MoC* IRParser::parseCSDF(MDNode* csdfNode){
 	}
 	
 	// Parse patterns
-	Pattern* ip = parsePattern(inputs, csdfNode->getOperand(2));
-	Pattern* op = parsePattern(outputs, csdfNode->getOperand(3));
+	Pattern* ip = parsePattern(inputs, csdfNode->getOperand(1));
+	Pattern* op = parsePattern(outputs, csdfNode->getOperand(2));
 	csfMoC->setInputPattern(ip);
 	csfMoC->setOutputPattern(op);
+	csfMoC->setNumberOfPhases(value->getLimitedValue());
 	
 	// Parse actions
-	parseCSDFActions(cast<MDNode>(csdfNode->getOperand(4)), csfMoC);
+	parseCSDFActions(cast<MDNode>(csdfNode->getOperand(3)), csfMoC);
 
 	return csfMoC;
 }
@@ -196,7 +197,22 @@ void IRParser::parseCSDFActions(MDNode* actionsNode, CSDFMoC* csfMoC){
 }
 
 MoC* IRParser::parseQSDF(MDNode* qsdfNode){
-	return new QSDFMoC();
+	QSDFMoC* qsdfMoC = new QSDFMoC();
+	
+	// Parse configurations of the QSDF MoC
+	for (unsigned i = 1, e = qsdfNode->getNumOperands(); i != e; ++i) {
+		pair<Action*, CSDFMoC*> configuration = parseConfiguration(cast<MDNode>(qsdfNode->getOperand(i)));
+		qsdfMoC->addConfiguration(configuration.first, configuration.second);
+	}
+
+	return qsdfMoC;
+}
+
+pair<Action*, CSDFMoC*> IRParser::parseConfiguration(MDNode* node){
+	Action* action = getAction(cast<MDNode>(node->getOperand(0)));
+	CSDFMoC* csdfMoC = parseCSDF(cast<MDNode>(node->getOperand(1)));
+
+	return pair<Action*, CSDFMoC*>(action, csdfMoC);
 }
 
 Pattern* IRParser::parsePattern(map<std::string, Port*>* ports, Value* value){
