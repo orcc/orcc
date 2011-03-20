@@ -104,6 +104,15 @@ private:
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
 	void createActionsCall(CSDFMoC* moc, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Update pattern of an Action
+	 * 
+	 * @param pattern : the pattern to update
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	void updatePattern(Pattern* pattern, llvm::BasicBlock* BB);
 };
 
 #endif
