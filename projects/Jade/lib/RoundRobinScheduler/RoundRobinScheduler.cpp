@@ -52,6 +52,7 @@
 
 #include "DPNScheduler.h"
 #include "CSDFScheduler.h"
+#include "QSDFScheduler.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Configuration/Configuration.h"
@@ -94,12 +95,16 @@ void RoundRobinScheduler::createScheduler(){
 	map<string, Instance*>* instances = configuration->getInstances();
 	DPNScheduler DPNSchedulerAdder(Context, decoder);
 	CSDFScheduler CSDFSchedulerAdder(Context, decoder);
+	QSDFScheduler QSDFSchedulerAdder(Context, decoder);
 	
 	for (it = instances->begin(); it != instances->end(); it++){
 		Instance* instance = it->second;
 		MoC* moc = instance->getMoC();
-
-		if (moc->isCSDF() && configuration->mergeActors()&& (instance->getId().compare("ddr") !=0)){
+		
+/*		if (moc->isQuasiStatic() && configuration->mergeActors()&& (instance->getId().compare("decoder_acdc_dcpred") !=0)
+			&& (instance->getId().compare("decoder_acdc_seq") !=0)){
+			QSDFSchedulerAdder.transform(instance);
+		}else*/ if (moc->isCSDF() && configuration->mergeActors()&& (instance->getId().compare("ddr") !=0)){
 			CSDFSchedulerAdder.transform(instance);
 		}else{
 			DPNSchedulerAdder.transform(instance);

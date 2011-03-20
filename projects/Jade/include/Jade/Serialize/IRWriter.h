@@ -51,6 +51,7 @@ class JIT;
 class LLVMWriter;
 class ActionSchedulerAdder;
 class CSDFMoC;
+class QSDFMoC;
 
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Network/Instance.h"
@@ -284,7 +285,32 @@ private:
 	 *
 	 * @return the corresponding csdfmoc in the decoder
 	 */
-	MoC* writeCSDFMoC(CSDFMoC* csdfMoC);
+	CSDFMoC* writeCSDFMoC(CSDFMoC* csdfMoC);
+
+	/**
+	 * @brief Write a QSDF MoC
+	 *
+	 * Write the given QSDFMoC for an Instance.
+	 * 
+	 * @param moc : the QSDFMoC to write
+	 *
+	 * @return the corresponding qsdfmoc in the decoder
+	 */
+	QSDFMoC* writeQSDFMoC(QSDFMoC* qsdfMoC);
+
+	/**
+	 * @brief Write a configuration
+	 *
+	 * Write the given configuration for an Instance.
+	 * 
+	 * @param action : the action of the configuration
+	 *
+	 * @param csdfMoC : the csdfMoC of the configuration
+	 *
+	 * @return the corresponding configuration in the decoder
+	 */
+	std::pair<Action*, CSDFMoC*> writeConfiguration(Action* action, CSDFMoC* csdfMoC);
+
 
 	/**
 	 * @brief Store the action for a later use.

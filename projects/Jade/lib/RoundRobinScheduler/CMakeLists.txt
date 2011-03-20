@@ -26,5 +26,7 @@ add_library (RoundRobinScheduler
 	CSDFScheduler.h
 	DPNSCheduler.cpp
 	DPNScheduler.h
+	QSDFScheduler.cpp
+	QSDFScheduler.h
 	RoundRobinScheduler.cpp
  )

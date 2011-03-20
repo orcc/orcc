@@ -50,7 +50,7 @@
 using namespace llvm;
 using namespace std;
 
-CSDFScheduler::CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder) : ActionSchedulerAdder(C, decoder) {
+CSDFScheduler::CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder) : DPNScheduler(C, decoder) {
 
 }
 

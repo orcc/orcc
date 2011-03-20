@@ -139,7 +139,7 @@ protected:
 	 *
 	 * @return the next basic block to add instruction
 	 */
-	llvm::BasicBlock* checkOutputPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
+	virtual llvm::BasicBlock* checkOutputPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Check peek pattern
@@ -150,7 +150,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where add instructions
 	 */
-	void checkPeekPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* BB);
+	virtual void checkPeekPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create a peek for an Action
@@ -163,7 +163,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createPeek(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	virtual void createPeek(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create a read for an Action
@@ -176,7 +176,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createRead(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	virtual void createRead(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create reads for an Action
@@ -185,7 +185,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createReads(Pattern* pattern, llvm::BasicBlock* BB);
+	virtual void createReads(Pattern* pattern, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create a ReadEnd for an Action
@@ -196,7 +196,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createReadEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	virtual void createReadEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create readends for an Action
@@ -205,7 +205,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createReadEnds(Pattern* pattern, llvm::BasicBlock* BB );
+	virtual void createReadEnds(Pattern* pattern, llvm::BasicBlock* BB );
 	
 	/**
 	 * @brief Create a WriteEnd for an Action
@@ -216,7 +216,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createWriteEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	virtual void createWriteEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create writeends for an Action
@@ -225,7 +225,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createWriteEnds(Pattern* pattern, llvm::BasicBlock* BB );
+	virtual void createWriteEnds(Pattern* pattern, llvm::BasicBlock* BB );
 
 
 	/**
@@ -239,7 +239,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createWrite(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	virtual void createWrite(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create writes for an Action
@@ -248,7 +248,7 @@ protected:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createWrites(Pattern* pattern, llvm::BasicBlock* BB );
+	virtual void createWrites(Pattern* pattern, llvm::BasicBlock* BB );
 
 	/**
 	 * @brief Creates a hasRoom test for a Port
@@ -263,7 +263,7 @@ protected:
 	 *
 	 * @param function : llvm::Function where the test is added
 	 */
-	llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	virtual llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Check input pattern of an action
@@ -278,7 +278,7 @@ protected:
 	 *
 	 * @return the last llvm::BasicBlock to add instruction
 	 */
-	llvm::BasicBlock* checkInputPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
+	virtual llvm::BasicBlock* checkInputPattern(Pattern* pattern, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
 
 
 	/**
@@ -294,7 +294,7 @@ protected:
 	 *
 	 * @param function : llvm::Function where the test is added
 	 */
-	llvm::CallInst* createInputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	virtual llvm::CallInst* createInputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

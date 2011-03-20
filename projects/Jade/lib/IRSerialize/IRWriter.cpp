@@ -365,7 +365,7 @@ MoC* IRWriter::writeMoC(MoC* moc){
 	if (moc->isCSDF()){
 		return writeCSDFMoC((CSDFMoC*)moc);
 	}else if (moc->isQuasiStatic()){
-		return new QSDFMoC();
+		return writeQSDFMoC((QSDFMoC*)moc);
 	}else if (moc->isKPN()){
 		return new KPNMoC();
 	}else if (moc->isDPN()){
@@ -375,7 +375,29 @@ MoC* IRWriter::writeMoC(MoC* moc){
 	return NULL;
 }
 
-MoC* IRWriter::writeCSDFMoC(CSDFMoC* csdfMoC){
+QSDFMoC* IRWriter::writeQSDFMoC(QSDFMoC* csdfMoC){
+	QSDFMoC* newqsdfMoC = new QSDFMoC();
+	
+	// Copy configurations of the QSDFMoC
+	map<Action*, CSDFMoC*>::iterator it;
+	map<Action*, CSDFMoC*>* configurations = csdfMoC->getConfigurations();
+
+	for( it = configurations->begin(); it != configurations->end(); it++){
+		pair<Action*, CSDFMoC*> newConfiguration = writeConfiguration(it->first, it->second);
+		newqsdfMoC->addConfiguration(newConfiguration.first, newConfiguration.second);
+	}
+	
+	return newqsdfMoC;
+}
+
+pair<Action*, CSDFMoC*> IRWriter::writeConfiguration(Action* action, CSDFMoC* csdfMoC){
+	Action* newAction = getAction(action);
+	CSDFMoC* newcsdf = writeCSDFMoC(csdfMoC);
+
+	return pair<Action*, CSDFMoC*>(newAction, newcsdf);
+}
+
+CSDFMoC* IRWriter::writeCSDFMoC(CSDFMoC* csdfMoC){
 	CSDFMoC* newCsdfMoC;
 		
 	// Dupplicat moc

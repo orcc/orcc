@@ -28,29 +28,27 @@
  */
 
 /**
-@brief Description of the CSDFScheduler interface
+@brief Description of the QSDFScheduler interface
 @author Jerome Gorin
-@file CSDFScheduler.h
+@file QSDFScheduler.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#ifndef CSDFSCHEDULER_H
-#define CSDFSCHEDULER_H
+#ifndef QSDFSCHEDULER_H
+#define QSDFSCHEDULER_H
 
-#include "DPNScheduler.h"
-
-class CSDFMoC;
+#include "CSDFScheduler.h"
 //------------------------------
 
 /**
- * @brief  This class defines an action scheduler for a CSDF actor.
+ * @brief  This class defines an action scheduler for a QSDF actor.
  * 
  * @author Jerome Gorin
  * 
  */
-class CSDFScheduler : public DPNScheduler {
+class QSDFScheduler : public CSDFScheduler {
 public:
 	/**
      *  @brief Constructor
@@ -61,8 +59,8 @@ public:
 	 *
 	 *	@param decoder : the Decoder where dynamic action scheduler is inserted
      */
-	CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder);
-	~CSDFScheduler(){};
+	QSDFScheduler(llvm::LLVMContext& C, Decoder* decoder);
+	~QSDFScheduler(){};
 
 protected:
 	/**
@@ -78,12 +76,14 @@ protected:
 	 *
 	 * @param function : llvm::Function where the scheduler is added
 	 */
-	virtual void createScheduler(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* scheduler);
+	void createScheduler(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* scheduler);
 
 	/**
-	 * @brief Creates a Pattern test for a MoC
+	 * @brief Creates a scheduling test for a qsdf
 	 * 
-	 * @param moc : the CSDFMoC to test
+	 * @param action : the Action to test
+	 *
+ 	 * @param csdfMoC : the csdfMoC to execute
 	 *
 	 * @param BB : llvm::BasicBlock where test is add
 	 *
@@ -93,26 +93,9 @@ protected:
 	 *
 	 * @param function : llvm::Function where the test is added
 	 */
-	virtual llvm::BasicBlock* createPatternTest(CSDFMoC* moc, llvm::BasicBlock* BB, 
+	llvm::BasicBlock* createConfigurationTest(Action* action, CSDFMoC* csdfMoC, llvm::BasicBlock* BB, 
 										llvm::BasicBlock* incBB, llvm::Function* function);
 
-	/**
-	 * @brief Create Actions call
-	 * 
-	 * @param moc : the moc to execute
-	 *
-	 * @param BB : llvm::BasicBlock where instructions are added
-	 */
-	virtual void createActionsCall(CSDFMoC* moc, llvm::BasicBlock* BB);
-
-	/**
-	 * @brief Update pattern of an Action
-	 * 
-	 * @param pattern : the pattern to update
-	 *
-	 * @param BB : llvm::BasicBlock where instructions are added
-	 */
-	virtual void updatePattern(Pattern* pattern, llvm::BasicBlock* BB);
 };
 
 #endif

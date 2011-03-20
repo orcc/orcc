@@ -82,7 +82,7 @@ public:
 	DPNScheduler(llvm::LLVMContext& C, Decoder* decoder);
 	~DPNScheduler(){};
 
-private:
+protected:
 	
 	/**
      *  @brief Create the scheduler of actions
@@ -97,7 +97,7 @@ private:
 	 *
 	 * @param function : llvm::Function where the scheduler is added
 	 */
-	void createScheduler(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* scheduler);
+	virtual void createScheduler(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* scheduler);
 
 	/**
      *  @brief Create scheduler of action outside the FSM
@@ -106,7 +106,7 @@ private:
 	 *
 	 *  @param instance : the Instance to add the action scheduler
      */
-	llvm::Function* createSchedulerOutsideFSM(Instance* instance);
+	virtual llvm::Function* createSchedulerOutsideFSM(Instance* instance);
 
 	/**
 	 * @brief Creates states of the FSM
@@ -119,7 +119,7 @@ private:
 	 *
 	 * @return a map of FSM::State and their corresponding llvm::BasicBlock
 	 */
-	std::map<FSM::State*, llvm::BasicBlock*>* createStates(std::map<std::string, FSM::State*>* states, llvm::Function* function);
+	virtual std::map<FSM::State*, llvm::BasicBlock*>* createStates(std::map<std::string, FSM::State*>* states, llvm::Function* function);
 
 	/**
 	 * @brief Creates a scheduler with no FSM
@@ -134,7 +134,7 @@ private:
 	 *
 	 * @param function : llvm::Function where the scheduler is added
 	 */
-	void createSchedulerNoFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, 
+	virtual void createSchedulerNoFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, 
 											llvm::BasicBlock* returnBB, llvm::Function* function);
 
 
@@ -151,7 +151,7 @@ private:
 	 *
 	 * @param function : llvm::Function where the scheduler is added
 	 */
-	void createSchedulerFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, 
+	virtual void createSchedulerFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, 
 								llvm::BasicBlock* incBB, llvm::Function* function);
 
 	/**
@@ -167,7 +167,7 @@ private:
 	 *
 	 * @param function : llvm::Function where the test is added
 	 */
-	llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, 
+	virtual llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, 
 										llvm::BasicBlock* incBB, llvm::Function* function);
 
 	/**
@@ -177,7 +177,7 @@ private:
 	 *
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
-	void createActionCall(Action* action, llvm::BasicBlock* BB);
+	virtual void createActionCall(Action* action, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Creates switcth instruction for the FSM
@@ -192,7 +192,7 @@ private:
 	 *
 	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
 	 */
-	void createSwitchTransition(llvm::Value* stateVar, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, 
+	virtual void createSwitchTransition(llvm::Value* stateVar, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, 
 		std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
 
 
@@ -213,7 +213,7 @@ private:
 	 *
 	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
 	 */
-	void createTransitions(std::map<std::string, FSM::Transition*>* transitions, llvm::BasicBlock* incBB, 
+	virtual void createTransitions(std::map<std::string, FSM::Transition*>* transitions, llvm::BasicBlock* incBB, 
 							llvm::BasicBlock* returnBB, llvm::GlobalVariable* stateVar, llvm::Function* function, 
 							llvm::Function* outsideSchedulerFn, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
 
@@ -235,7 +235,7 @@ private:
 	 *
 	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
 	 */
-	void createTransition(FSM::Transition* transition, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::GlobalVariable* stateVar, llvm::Function* function, llvm::Function* outsideSchedulerFn, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
+	virtual void createTransition(FSM::Transition* transition, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::GlobalVariable* stateVar, llvm::Function* function, llvm::Function* outsideSchedulerFn, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
 	
 	/**
 	 * @brief Creates a test for FSM to  change state
@@ -254,7 +254,7 @@ private:
 	 *
 	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
 	 */
-	llvm::BasicBlock* createSchedulingTestState(std::list<FSM::NextStateInfo*>* nextStates, FSM::State* sourceState, 
+	virtual llvm::BasicBlock* createSchedulingTestState(std::list<FSM::NextStateInfo*>* nextStates, FSM::State* sourceState, 
 													llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, 
 													llvm::GlobalVariable* stateVar, llvm::Function* function, 
 													llvm::Function* outsideSchedulerFn, std::map<FSM::State*, 
@@ -278,7 +278,7 @@ private:
 	 *
 	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
 	 */
-	llvm::BasicBlock* createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, 
+	virtual llvm::BasicBlock* createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, 
 												llvm::BasicBlock* stateBB, llvm::BasicBlock* incBB, 
 												llvm::BasicBlock* returnBB, llvm::GlobalVariable* stateVar, 
 												llvm::Function* function, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
@@ -293,7 +293,7 @@ private:
 	 *
 	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
 	 */
-	void createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
+	virtual void createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
 };
 
 #endif
