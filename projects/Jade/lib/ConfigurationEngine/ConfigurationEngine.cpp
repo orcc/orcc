@@ -47,6 +47,7 @@
 #include "Jade/Actor/BroadcastAdder.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Core/Actor.h"
+#include "Jade/Merger/Merger.h"
 #include "Jade/Scheduler/Scheduler.h"
 #include "Jade/Serialize/IRLinker.h"
 #include "Jade/Serialize/IRUnwriter.h"
@@ -67,6 +68,12 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context,configuration, decoder);
 	broadAdder.transform();
+
+	//Merge static actors together if needed
+	if (configuration->mergeActors()){
+		Merger merger();
+		merger.transform(configuration);
+	}
 
 	//Write instance
 	IRWriter writer(Context, decoder);

@@ -204,7 +204,7 @@ public class ConfigurationAnalyzer {
 		String initialState = fsm.getInitialState().getName();
 		for (NextStateInfo info : fsm.getTransitions(initialState)) {
 			PeekVisitor visitor = new PeekVisitor();
-			visitAction(info.getAction(), visitor);
+			visitor.visit(info.getAction());
 			ports.add(visitor.getCandidates());
 		}
 
@@ -235,20 +235,4 @@ public class ConfigurationAnalyzer {
 	public Map<Port, Expression> getConfiguration(Action action) {
 		return configurations.get(action);
 	}
-
-	/**
-	 * Visits the given action with the given visitor.
-	 * 
-	 * @param action
-	 *            action associated with the next state
-	 * @param visitor
-	 *            a node visitor
-	 */
-	private void visitAction(Action action, NodeVisitor visitor) {
-		Procedure scheduler = action.getScheduler();
-		for (CFGNode node : scheduler.getNodes()) {
-			node.accept(visitor);
-		}
-	}
-
 }
