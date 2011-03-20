@@ -28,10 +28,12 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.interpreter.ActorInterpreter;
+import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -50,26 +52,34 @@ import net.sf.orcc.ir.instructions.Store;
  * @author Herve Yviquel
  * 
  */
-public class ArrayInitializeTransformation extends ActorInterpreter {
+public class ArrayInitializeTransformation extends AbstractActorVisitor {
 
-	public ArrayInitializeTransformation(Map<String, Expression> parameters,
-			Actor actor, OrccProcess process) {
-		super(parameters, actor, process);
-	}
+	private class SpecialActorInterpreter extends ActorInterpreter {
 
-	@Override
-	public void visit(Store instr) {
-		Variable target = instr.getTarget();
-		Type type = target.getType();
-		// Allocate value field of list if it is initialized
-		if (type.isList() && target.getValue() == null) {
-			target.setValue((Expression) type.accept(listAllocator));
+		public SpecialActorInterpreter(Map<String, Expression> parameters,
+				Actor actor, OrccProcess process) {
+			super(parameters, actor, process);
 		}
-		super.visit(instr);
+
+		@Override
+		public void visit(Store instr) {
+			Variable target = instr.getTarget();
+			Type type = target.getType();
+			// Allocate value field of list if it is initialized
+			if (type.isList() && target.getValue() == null) {
+				target.setValue((Expression) type.accept(listAllocator));
+			}
+			super.visit(instr);
+		}
 	}
+
+	private ActorInterpreter actorInterpreter;
 
 	@Override
 	public void visit(Actor actor) {
+		actorInterpreter = new SpecialActorInterpreter(
+				new HashMap<String, Expression>(0), actor, null);
+		
 		// Initialize value field if there is an initial value
 		for (Variable stateVar : actor.getStateVars()) {
 			Expression initConst = ((GlobalVariable) stateVar)
@@ -81,7 +91,9 @@ public class ArrayInitializeTransformation extends ActorInterpreter {
 
 		for (Action action : actor.getInitializes()) {
 			for (CFGNode node : action.getBody().getNodes()) {
+				node.accept(actorInterpreter);
 				node.accept(this);
+				
 			}
 		}
 

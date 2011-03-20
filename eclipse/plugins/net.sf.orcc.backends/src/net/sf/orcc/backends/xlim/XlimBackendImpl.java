@@ -53,7 +53,6 @@ import net.sf.orcc.backends.xlim.transformations.XlimInlineTransformation;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
@@ -108,9 +107,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		actor.setTemplateData(new XlimActorTemplateData());
 
-		ActorVisitor[] transformations = {
-				new ArrayInitializeTransformation(
-						new HashMap<String, Expression>(0), actor, null),
+		ActorVisitor[] transformations = { new ArrayInitializeTransformation(),
 				new TernaryOperationAdder(),
 				new XlimInlineTransformation(true, true),
 				new UnaryListToScalarTransformation(), new CustomPeekAdder(),
