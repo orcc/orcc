@@ -54,25 +54,35 @@ struct actor_s {
 };
 
 struct scheduler_s {
-	int id;
-	int i;
-	int num_actors;
-	struct actor_s **actors;
-	struct actor_s *schedulable[MAX_ACTORS];
-	unsigned int next_entry;
-	unsigned int next_schedulable;
-	int next_else_schedulable;
-	struct waiting_s *waiting_schedulable;
-	struct waiting_s *sending_schedulable;
+	int id; /** Unique ID of this scheduler */
+
+	/* Round robin */
+	int num_actors; /** number of actors managed by this scheduler */
+	struct actor_s **actors; /** static list of actors managed by this scheduler */
+	int rr_next_schedulable; /** index of the next actor to schedule in last list */
+
+	/* Data demand/driven scheduler */
+	struct actor_s *schedulable[MAX_ACTORS]; /** dynamic list of the next actors to schedule */
+	unsigned int ddd_next_entry; /** index of the next actor to schedule in last list */
+	unsigned int ddd_next_schedulable; /** index of next actor added in the list */
+
+	/* Multicore with data demand/driven scheduler */
+	int round_robin; /** set to 1 when last scheduled actor is a result of round robin scheduling */
+	/* ring topology */
+	struct waiting_s *ring_waiting_schedulable; /** receiving list of some actors to schedule */
+	struct waiting_s *ring_sending_schedulable; /** sending list of some actors to schedule */
+	/* mesh topology */
+	struct waiting_s **mesh_waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
+
+	/* Genetic algorithms */
 	struct sync_s *sync;
 	semaphore_struct sem_thread;
-	int round_robin;
 };
 
 struct waiting_s {
+	struct actor_s *waiting_actors[MAX_ACTORS];
 	volatile unsigned int next_entry;
 	unsigned int next_waiting;
-	struct actor_s *waiting_actors[MAX_ACTORS];
 };
 
 #include "orcc_scheduler.inl"
@@ -81,8 +91,8 @@ struct waiting_s {
  * Initializes the given scheduler.
  */
 void sched_init(struct scheduler_s *sched, int id, int num_actors,
-		struct actor_s **actors, struct waiting_s *waiting_schedulable,
-		struct waiting_s *sending_schedulable, struct sync_s *sync);
+		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
+		struct waiting_s *ring_sending_schedulable, struct sync_s *sync);
 void sched_reinit(struct scheduler_s *sched, int num_actors,
 		struct actor_s **actors);
 

@@ -12,12 +12,12 @@
  * Initializes the given scheduler.
  */
 void sched_init(struct scheduler_s *sched, int id, int num_actors,
-		struct actor_s **actors, struct waiting_s *waiting_schedulable,
-		struct waiting_s *sending_schedulable, struct sync_s *sync) {
+		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
+		struct waiting_s *ring_sending_schedulable, struct sync_s *sync) {
 	int i;
 
 	sched->id = id;
-	sched->i = 0;
+
 	sched->num_actors = num_actors;
 	sched->actors = actors;
 	if (actors != NULL) {
@@ -27,17 +27,19 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 			actors[i]->in_waiting = 0;
 		}
 	}
-	sched->next_entry = 0;
-	sched->next_schedulable = 0;
-	sched->next_else_schedulable = 0;
+
+	sched->rr_next_schedulable = 0;
+	sched->ddd_next_entry = 0;
+	sched->ddd_next_schedulable = 0;
+
 	sched->round_robin = 1;
 
-	sched->waiting_schedulable = waiting_schedulable;
-	sched->waiting_schedulable->next_entry = 0;
-	sched->waiting_schedulable->next_waiting = 0;
-	sched->sending_schedulable = sending_schedulable;
-	sched->sending_schedulable->next_entry = 0;
-	sched->sending_schedulable->next_waiting = 0;
+	sched->ring_waiting_schedulable = ring_waiting_schedulable;
+	sched->ring_waiting_schedulable->next_entry = 0;
+	sched->ring_waiting_schedulable->next_waiting = 0;
+	sched->ring_sending_schedulable = ring_sending_schedulable;
+	sched->ring_sending_schedulable->next_entry = 0;
+	sched->ring_sending_schedulable->next_waiting = 0;
 
 	sched->sync = sync;
 	semaphore_create(sched->sem_thread, 0);
@@ -52,14 +54,15 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 
 	sched->actors = actors;
 	sched->num_actors = num_actors;
-	sched->next_entry = 0;
-	sched->next_schedulable = 0;
-	sched->next_else_schedulable = 0;
+	sched->rr_next_schedulable = 0;
+	sched->ddd_next_entry = 0;
+	sched->ddd_next_schedulable = 0;
 	sched->round_robin = 1;
-	sched->waiting_schedulable->next_entry = 0;
-	sched->waiting_schedulable->next_waiting = 0;
-	sched->sending_schedulable->next_entry = 0;
-	sched->sending_schedulable->next_waiting = 0;
+
+	sched->ring_waiting_schedulable->next_entry = 0;
+	sched->ring_waiting_schedulable->next_waiting = 0;
+	sched->ring_sending_schedulable->next_entry = 0;
+	sched->ring_sending_schedulable->next_waiting = 0;
 
 	for (i = 0; i < num_actors; i++) {
 		actors[i]->sched = sched;

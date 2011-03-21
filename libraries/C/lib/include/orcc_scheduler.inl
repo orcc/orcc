@@ -40,10 +40,10 @@ static struct actor_s *sched_get_next(struct scheduler_s *sched) {
 	if (sched->num_actors == 0) {
 		return NULL;
 	}
-	actor = sched->actors[sched->next_else_schedulable];
-	sched->next_else_schedulable++;
-	if (sched->next_else_schedulable == sched->num_actors) {
-		sched->next_else_schedulable = 0;
+	actor = sched->actors[sched->rr_next_schedulable];
+	sched->rr_next_schedulable++;
+	if (sched->rr_next_schedulable == sched->num_actors) {
+		sched->rr_next_schedulable = 0;
 	}
 	return actor;
 }
@@ -58,12 +58,12 @@ static void sched_add_schedulable(struct scheduler_s *sched,
 	// like a list.contains(actor) but in O(1) instead of O(n)
 	if (!actor->in_list) {
 		if (sched == actor->sched) {
-			sched->schedulable[sched->next_entry % MAX_ACTORS] = actor;
+			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
 			actor->in_list = 1;
-			sched->next_entry++;
+			sched->ddd_next_entry++;
 		} else if (!actor->in_waiting) {
 			// this actor isn't launch by this scheduler so it is sent to the next one
-			struct waiting_s *send = sched->sending_schedulable;
+			struct waiting_s *send = sched->ring_sending_schedulable;
 			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
 			actor->in_waiting = 1;
 			send->next_entry++;
@@ -77,17 +77,17 @@ static void sched_add_schedulable(struct scheduler_s *sched,
  */
 static void sched_add_waiting_list(struct scheduler_s *sched) {
 	struct actor_s *actor;
-	struct waiting_s *wait = sched->waiting_schedulable;
+	struct waiting_s *wait = sched->ring_waiting_schedulable;
 	while (wait->next_entry - wait->next_waiting >= 1) {
 		actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
 		if (sched == actor->sched) {
-			sched->schedulable[sched->next_entry % MAX_ACTORS] = actor;
+			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
 			actor->in_list = 1;
 			actor->in_waiting = 0;
-			sched->next_entry++;
+			sched->ddd_next_entry++;
 		} else {
 			// this actor isn't launch by this scheduler so it is sent to the next one
-			struct waiting_s *send = sched->sending_schedulable;
+			struct waiting_s *send = sched->ring_sending_schedulable;
 			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
 			send->next_entry++;
 		}
@@ -104,15 +104,15 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 	struct actor_s *actor;
 	// check if other schedulers sent some schedulable actors
 	sched_add_waiting_list(sched);
-	if (sched->next_schedulable == sched->next_entry) {
+	if (sched->ddd_next_schedulable == sched->ddd_next_entry) {
 		// static actors list is used when schedulable list is empty
 		actor = sched_get_next(sched);
 		sched->round_robin = 1;
 	} else {
-		actor = sched->schedulable[sched->next_schedulable % MAX_ACTORS];
+		actor = sched->schedulable[sched->ddd_next_schedulable % MAX_ACTORS];
 		// actor is not a member of the list anymore
 		actor->in_list = 0;
-		sched->next_schedulable++;
+		sched->ddd_next_schedulable++;
 		sched->round_robin = 0;
 	}
 
