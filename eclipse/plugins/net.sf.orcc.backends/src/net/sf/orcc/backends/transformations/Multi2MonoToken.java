@@ -770,7 +770,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Return actionReturn = (Return) bodyNode.getInstructions().get(returnIndex);
 		Expression returnExpr = actionReturn.getValue();
 		//LocalVariable currentResult
-		Expression e = new BinaryExpr(returnExpr, BinaryOp.LOGIC_AND, conditionExp, IrFactory.eINSTANCE.createTypeBool());
+		Expression e = new BinaryExpr(returnExpr, BinaryOp.LOGIC_AND, new VarExpr(new Use(conditionVar)), IrFactory.eINSTANCE.createTypeBool());
 		Instruction assign3 = new Assign(myResult, e);
 		bodyNode.add(returnIndex,assign3);
 		actionReturn.setValue(new VarExpr(new Use(myResult)));
@@ -987,7 +987,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				// change the transformed action to a transition action to keep
 				// the same fireability order
 				action.getInputPattern().clear();
-				action.getOutputPattern().clear();
 				action.getBody().getNodes().clear();
 				action.getBody().getLocals().clear();
 				fsm.replaceTarget(sourceName, action, storeName);
@@ -1063,6 +1062,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			}
 		}
 		outputIndex = 0;
+		//remove outputPattern from transition action 
+		action.getOutputPattern().clear();
 	}
 
 	@Override
