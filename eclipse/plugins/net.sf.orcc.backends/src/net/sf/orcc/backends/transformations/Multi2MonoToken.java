@@ -730,14 +730,17 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(localRead.getName(), localRead);
 		Instruction Load = new Load(localRead, new Use(readIndex));
-		bodyNode.add(Load);
+		int index = 0;
+		bodyNode.add(index, Load);
+		index++;
 
 		LocalVariable localWrite = new LocalVariable(true, inputIndex,
 				new Location(), "writeIndex",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(localWrite.getName(), localWrite);
 		Instruction Load2 = new Load(localWrite, new Use(writeIndex));
-		bodyNode.add(Load2);
+		bodyNode.add(index, Load2);
+		index++;
 
 		LocalVariable diff = new LocalVariable(true, inputIndex,
 				new Location(), "diff", IrFactory.eINSTANCE.createTypeInt(32));
@@ -746,7 +749,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				BinaryOp.MINUS, new VarExpr(new Use(writeIndex)),
 				IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign = new Assign(diff, value);
-		bodyNode.add(assign);
+		bodyNode.add(index, assign);
+		index++;
 
 		Expression conditionExp = new BinaryExpr(new VarExpr(new Use(diff)),
 				BinaryOp.GE, new IntExpr(numTokens),
@@ -756,12 +760,20 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				new Location(), "condition",
 				IrFactory.eINSTANCE.createTypeBool());
 		Instruction assign2 = new Assign(conditionVar, conditionExp);
-		bodyNode.add(assign2);
+		bodyNode.add(index, assign2);
+		index++;
 
-		Expression result = action.getScheduler().getResult();
-		action.getScheduler().setResult(
-				new BinaryExpr(result, BinaryOp.LOGIC_AND, conditionExp,
-						IrFactory.eINSTANCE.createTypeBool()));
+		LocalVariable myResult = new LocalVariable(true, inputIndex, new Location(),
+				"myResult", IrFactory.eINSTANCE.createTypeBool());
+		locals.put(myResult.getName(), myResult);
+		int returnIndex = bodyNode.getInstructions().size() - 1;
+		Return actionReturn = (Return) bodyNode.getInstructions().get(returnIndex);
+		Expression returnExpr = actionReturn.getValue();
+		//LocalVariable currentResult
+		Expression e = new BinaryExpr(returnExpr, BinaryOp.LOGIC_AND, conditionExp, IrFactory.eINSTANCE.createTypeBool());
+		Instruction assign3 = new Assign(myResult, e);
+		bodyNode.add(returnIndex,assign3);
+		actionReturn.setValue(new VarExpr(new Use(myResult)));
 	}
 
 	/**
@@ -863,19 +875,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
-	 * removes the ports of an action's input pattern
-	 * 
-	 * @param action
-	 *            action of the pattern to remove
-	 */
-	private void PatternToNull(Action action) {
-		for (Entry<Port, Integer> entry : action.getInputPattern()
-				.getNumTokensMap().entrySet()) {
-			entry.setValue(0);
-		}
-	}
-
-	/**
 	 * returns the position of a port in a port list
 	 * 
 	 * @param list
@@ -894,36 +893,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			}
 		}
 		return position;
-	}
-
-	/**
-	 * removes the local variables of a procedure
-	 * 
-	 * @param it
-	 *            local variable iterator
-	 * @param procedure
-	 *            procedure containing the local variables to remove
-	 */
-	private void removeLocals(Procedure procedure) {
-		Iterator<LocalVariable> it = procedure.getLocals().iterator();
-		while (it.hasNext()) {
-			it.remove();
-		}
-	}
-
-	/**
-	 * removes the nodes of a procedure
-	 * 
-	 * @param it
-	 *            node iterator
-	 * @param procedure
-	 *            procedure containing the nodes to remove
-	 */
-	private void removeNodes(Procedure procedure) {
-		Iterator<CFGNode> it = procedure.getNodes().iterator();
-		while (it.hasNext()) {
-			it.remove();
-		}
 	}
 
 	/**
@@ -1017,9 +986,10 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				}
 				// change the transformed action to a transition action to keep
 				// the same fireability order
-				PatternToNull(action);
-				removeNodes(action.getBody());
-				removeLocals(action.getBody());
+				action.getInputPattern().clear();
+				action.getOutputPattern().clear();
+				action.getBody().getNodes().clear();
+				action.getBody().getLocals().clear();
 				fsm.replaceTarget(sourceName, action, storeName);
 
 				break;
