@@ -4,4 +4,5 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 
 add_library (IRMerger
 	Merger.cpp
+	SuperInstance.cpp
  )

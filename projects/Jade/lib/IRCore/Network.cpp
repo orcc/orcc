@@ -54,3 +54,66 @@ void Network::print(std::string file){
 	
 	writer.write(graph, (char*)file.c_str(), 0);
 }
+
+list<Instance*>* Network::getInstances() {
+	// Clear previously computed instances
+	instances.clear();
+
+	// Iterate though all vertex of the graph and add instances
+	list<Vertex*>::iterator it;
+	list<Vertex*>* vertices = getVertices();
+	
+	for (it = vertices->begin(); it != vertices->end(); it++) {
+		
+		Vertex* vertex = *it;
+
+		// In case of hierarchichal graph
+		if (vertex->isInstance()){
+			instances.push_back(vertex->getInstance());
+		}
+		
+	}
+
+	return &instances;
+}
+
+void Network::computeSuccessorsMaps(){
+	// Determine all new successor
+	graph->precomputeSuccessors();
+}
+
+list<Vertex*>*  Network::getVertices(){
+	// Clear previously computed vertices
+	vertices.clear();
+
+	// Iterate though all vertex of the graph and adding then
+	int nbVertices = graph->getNbVertices();
+	
+	for (int i = 0; i < nbVertices; i++) {
+		Vertex* vertex = (Vertex*)graph->getVertex(i);
+
+		vertices.push_back(vertex);
+	}
+
+	return &vertices;
+}
+
+list<Vertex*>* Network::getSuccessorsOf(Vertex* vertex){
+	successors.clear();
+	int nbSucc = vertex->nbSuccessors;
+	
+	for (int i = 0; i < nbSucc; i++){
+		Vertex* succ = (Vertex*)vertex->successors[i];
+		successors.push_back(succ);
+	}
+
+	return &successors;
+}
+
+bool Network::removeVertex(Vertex* vertex){
+	return graph->removeVertex(vertex);
+}
+
+void Network::addVertex(Vertex* vertex){
+	graph->addVertex(vertex);
+}

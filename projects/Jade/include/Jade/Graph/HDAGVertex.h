@@ -29,7 +29,7 @@ class HDAGEdge;
 
 class HDAGVertex {
 
-	private :
+	public :
 		/**
 		 The base, i.e. the graph in which current vertex is included
 		*/

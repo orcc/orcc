@@ -100,6 +100,11 @@ class HDAGGraph {
 		void addEdge(HDAGVertex* source, HDAGVertex* sink, HDAGEdge* edge);
 
 		/**
+		 Removes the given vertex
+		*/
+		bool removeVertex(HDAGVertex* vertex);
+
+		/**
 		 Removes the last added edge
 		*/
 		void removeLastEdge();

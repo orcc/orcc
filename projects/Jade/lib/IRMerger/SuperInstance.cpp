@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class Merger
+@brief Implementation of class SuperInstance
 @author Jerome Gorin
-@file Merger.cpp
+@file SuperInstance.cpp
 @version 1.0
 @date 24/12/2010
 */
@@ -39,72 +39,31 @@
 #include <map>
 #include <list>
 
-#include "Jade/Core/Network.h"
-#include "Jade/Configuration/Configuration.h"
-#include "Jade/Merger/Merger.h"
 #include "Jade/Merger/SuperInstance.h"
 //------------------------------
 
 using namespace std;
 
-Merger::Merger(Configuration* configuration){
-	network = configuration->getNetwork();
+SuperInstance::SuperInstance(std::string id, Instance* srcInstance, int srcFactor, Instance* dstInstance, int dstFactor) : Instance(id, NULL){
+	this->srcInstance = srcInstance;
+	this->dstInstance = dstInstance;
+	this->srcFactor = srcFactor;
+	this->dstFactor = dstFactor;
+	this->actor = createCompositeActor();
 }
 
-void Merger::transform(){
-	bool hasCondidate = true;
-		
-	// Iterate though all vertices until no candidate left
-	while(hasCondidate){
-		list<Vertex*>::iterator it;
-		list<Vertex*>* vertices = network->getVertices();
-		
-		// First compute all successors in the network
-		network->computeSuccessorsMaps();
-		bool recompute = false;
+Actor* SuperInstance::createCompositeActor(){
+	map<string, StateVar*>* stateVars = new map<string, StateVar*>();
+	map<string, Variable*>* parameters = new map<string, Variable*>();
+	map<string, Procedure*>* procedures = new map<string, Procedure*>();
+	list<Action*>* initializes = new list<Action*>();
+	list<Action*>* actions = new list<Action*>();
+	MoC* moc = NULL;
+	
+	// Add stateVars
+	map<string, StateVar*>::iterator itVar;
 
-		for (it = vertices->begin(); it != vertices->end(); it++){
-			Vertex* src = *it;
-			Instance* srcInst = src->getInstance();
-			Actor* srcActor = srcInst->getActor();
 
-			if (srcActor->getMoC()->isCSDF()){
-				//Iterate though successors, try to find a static actor
-				list<Vertex*>::iterator itDst;
-				list<Vertex*>* dsts = network->getSuccessorsOf(src);
-
-				for (itDst = dsts->begin(); itDst !=  dsts->end(); itDst++){
-					Vertex* dst = *itDst;
-					Instance* dstInst = dst->getInstance();
-					Actor* dstActor = dstInst->getActor();
-
-					if (dstActor->getMoC()->isCSDF()){
-						// These two actors can be merged
-						mergeVertex(src, dst);
-
-						// Recompute graph
-						recompute = true;
-						break;
-					}
-				}
-			}
-			
-			if (recompute){
-				break;
-			}
-		}
-		
-		if (!recompute){
-			// No merging found, end the analysis
-			hasCondidate = false;
-		}
-	}
-}
-
-void Merger::mergeVertex(Vertex* src, Vertex* dst){
-	SuperInstance* superInstance = new SuperInstance("merged", src->getInstance(), 1, dst->getInstance(), 1);
-
-	network->removeVertex(src);
-	network->removeVertex(dst);
-	network->addVertex(new Vertex(superInstance));
+	return new Actor(id, NULL, "", new map<string, Port*>(),  new map<string, Port*>(),
+		stateVars, parameters, procedures,initializes, actions, NULL, moc);
 }

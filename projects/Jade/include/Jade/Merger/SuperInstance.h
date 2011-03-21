@@ -36,31 +36,46 @@
 */
 
 //------------------------------
-#ifndef MERGER_H
-#define MERGER_H
+#ifndef SUPERINSTANCE_H
+#define SUPERINSTANCE_H
 
-class Configuration;
-class Network;
-class Vertex;
+#include "Jade/Core/Network/Instance.h"
 //------------------------------
 
 /**
- * @brief  This transformation merge static actors of a configuration together
+ * @brief  This class defines a SuperInstance. A SuperInstance is an instance 
+ *   that contains two instances.
  * 
  * @author Jerome Gorin
  * 
  */
-class Merger {
+class SuperInstance : public Instance {
 public:
-	Merger(Configuration* configuration);
-	~Merger(){};
+	/*!
+     *  @brief Create a SuperInstance.
+	 * 
+	 * @param name : the SuperInstance name
+	 *
+	 * @param instances : the instances encapsulated by the SuperInstance
+	 */
+	SuperInstance(std::string id, Instance* srcInstance, int srcFactor, Instance* dstInstance, int dstFactor);
 
-	void transform();
+	~SuperInstance(){};
 
+	bool isSuperInstance(){return true;};
 private:
-	Network* network;
 
-	void mergeVertex(Vertex* src, Vertex* dst);
+	/*!
+     *  @brief Create a composite actor of the SuperInstance.
+	 *
+	 * @return the resulting Actor
+	 */
+	Actor* createCompositeActor();
+
+	Instance* srcInstance;
+	int srcFactor;
+	Instance* dstInstance;
+	int dstFactor;
 };
 
 #endif

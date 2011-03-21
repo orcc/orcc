@@ -111,7 +111,10 @@ public:
 		this->initializes = NULL;
 		this->actions = NULL;
 		this->actionScheduler = NULL;
-		actor->addInstance(this);
+		
+		if (actor != NULL){
+			actor->addInstance(this);
+		}
 	}
 
 	~Instance();
@@ -123,6 +126,14 @@ public:
      *
      */
 	std::string getId(){return id;};
+
+	/*!
+     *  @brief Return true of the instance is a SuperInstance
+     *
+	 * @return true of the instance is a SuperInstance
+     *
+     */
+	virtual bool isSuperInstance(){return false;};
 
 	/*!
      *  @brief Getter of clasz
@@ -400,7 +411,7 @@ public:
 	*/
 	void solveParameters();
 	
-private:
+protected:
 
 	/* Parameters of an instance */
 	std::map<std::string, Expr*>* parameterValues;	

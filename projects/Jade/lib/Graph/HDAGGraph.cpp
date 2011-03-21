@@ -104,6 +104,28 @@ void HDAGGraph::removeLastEdge(){
 	}
 }
 
+bool HDAGGraph::removeVertex(HDAGVertex* vertex){
+	int i = 0;
+
+	for(;i<nbVertices; i++){
+		HDAGVertex* currentVertex = vertices[i];
+		
+		if (currentVertex == vertex){
+			break;
+		}
+	}
+
+	if ( i == nbVertices - 1){
+		//Vertex has not been found
+		return false;
+	}
+
+	// Fill the current position with the last edge
+	vertices[i] = vertices[--nbVertices];
+	
+	return true;
+}
+
 /**
  Removes all the edges in this graph that are also contained in the specified edge array.
 */

@@ -115,7 +115,54 @@ public:
 	 */
 	void print(std::string file);
 
+	/**
+	 * @brief Returns the list of instances referenced by the graph of this network.
+	 * 
+	 * @return a list of instances
+	 */
+	std::list<Instance*>* getInstances();
+
+	/**
+	 * @brief Returns the list of vertices referenced by the graph of this network.
+	 * 
+	 * @return a list of vertex
+	 */
+	std::list<Vertex*>* getVertices();
+
+	/**
+	 * @brief Returns a list of vertices that are after the given vertex.
+	 * 
+	 * @return a list of successor vertices
+	 */
+	std::list<Vertex*>* getSuccessorsOf(Vertex* vertex);
+
+	/**
+	 * @brief Remove a vertex from the network.
+	 * 
+	 * @param vertex : the Vertex to remove
+	 *
+	 * @return whether the vertex has been found or not
+	 */
+	bool removeVertex(Vertex* vertex);
+
+	/**
+	 * @brief Remove a vertex in the network.
+	 * 
+	 * @param vertex : the Vertex to add
+	 */
+	void addVertex(Vertex* vertex);
+
+	/**
+	 * @brief Compute a list of successors in the graph.
+	 */
+	void computeSuccessorsMaps();
 private:
+
+	/**
+	 * @brief Compute a successor of a vertex.
+	 */
+	void computeSuccessor(Vertex* vertex,
+		std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs);
 
 	/** name of the network  */
 	std::string name;
@@ -128,6 +175,15 @@ private:
 
 	/** graph of the network  */
 	HDAGGraph* graph;
+
+	/** instances of the network  */
+	std::list<Instance*> instances;
+
+	/** vertices of the network  */
+	std::list<Vertex*> vertices;
+
+	/** Sucessors container */
+	std::list<Vertex*> successors;
 };
 
 #endif
