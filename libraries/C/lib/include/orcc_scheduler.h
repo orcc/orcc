@@ -74,7 +74,7 @@ struct scheduler_s {
 	/* mesh topology */
 	struct waiting_s **mesh_waiting_schedulable; /** receiving lists from other schedulers of some actors to schedule */
 
-	/* Genetic algorithms */
+	/* Genetic algorithm */
 	struct sync_s *sync;
 	semaphore_struct sem_thread;
 };
@@ -94,6 +94,6 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
 		struct waiting_s *ring_sending_schedulable, struct sync_s *sync);
 void sched_reinit(struct scheduler_s *sched, int num_actors,
-		struct actor_s **actors);
+		struct actor_s **actors, int use_ring_topology);
 
 #endif

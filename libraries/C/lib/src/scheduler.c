@@ -49,7 +49,7 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
  * Reinitialize the given scheduler with new actors list.
  */
 void sched_reinit(struct scheduler_s *sched, int num_actors,
-		struct actor_s **actors) {
+		struct actor_s **actors, int use_ring_topology) {
 	int i;
 
 	sched->actors = actors;
@@ -69,7 +69,7 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 		actors[i]->in_list = 0;
 		actors[i]->in_waiting = 0;
 		if (!strcmp(actors[i]->name, "source")) {
-			sched_add_schedulable(sched, actors[i]);
+			sched_add_schedulable(sched, actors[i], use_ring_topology);
 		}
 	}
 

@@ -363,7 +363,7 @@ void *scheduler(void *data) {
 	
 	<endif>
 	while (1) {
-		my_actor = sched_get_next<if(options.newScheduler)>_schedulable<endif>(sched);
+		my_actor = sched_get_next<if(options.newScheduler)>_schedulable(sched, RING_TOPOLOGY, <if(options.needDynamicMapping || options.threads)>THREAD_NB<else>1<endif>)<else>(sched)<endif>;
 		if(my_actor != NULL){
 			si.num_firings = 0;
 			my_actor-\>sched_func(&si);
@@ -372,9 +372,9 @@ void *scheduler(void *data) {
 #endif
 			<if (options.newScheduler)>
 			if (si.reason == full<if(options.needDynamicMapping || options.threads)> && (si.num_firings || !sched-\>round_robin)<endif>) {
-				sched_add_successors(sched, my_actor, si.ports);
+				sched_add_successors(sched, my_actor, si.ports, RING_TOPOLOGY);
 			} else if (si.reason == starved<if(options.needDynamicMapping || options.threads)> && (si.num_firings || !sched-\>round_robin)<endif>) {
-				sched_add_predecessors(sched, my_actor, si.ports);
+				sched_add_predecessors(sched, my_actor, si.ports, RING_TOPOLOGY);
 			}
 			<endif>
 		}
@@ -398,7 +398,7 @@ void *scheduler(void *data) {
 >>
 
 printAddSchedulable(instance) ::= <<
-sched_add_schedulable(<GetInstanceId(instance)>.sched, &<GetInstanceId(instance)>);
+sched_add_schedulable(<GetInstanceId(instance)>.sched, &<GetInstanceId(instance)>, RING_TOPOLOGY);
 >>
 
 printAllAddSchedulable(instances) ::= <<
@@ -475,6 +475,9 @@ network(network, options) ::= <<
 
 <if (options.threads || options.needDynamicMapping)>
 #define THREAD_NB <options.threadsNb>
+<endif>
+<if(options.newScheduler)>
+#define RING_TOPOLOGY 1
 <endif>
 <if(options.needDynamicMapping)>
 #define POPULATION_SIZE 20
@@ -572,7 +575,7 @@ static void launcher() {
 	struct monitor_s monitoring;
 	
 	sync_init(&sched_sync);
-	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB);
+	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB, <if(options.newScheduler)>RING_TOPOLOGY<else>0<endif>);
 	monitor_init(&monitoring, &sched_sync, &genetic_info);
 	
 	<else>

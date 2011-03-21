@@ -286,7 +286,8 @@ static void map_actors_on_threads(individual *individual,
 
 	for (i = 0; i < genetic_info->threads_nb; i++) {
 		sched_reinit(&genetic_info->schedulers[i],
-				mapping->actors_per_threads[i], mapping->actors_mapping[i]);
+				mapping->actors_per_threads[i], mapping->actors_mapping[i],
+				genetic_info->use_ring_topology);
 	}
 }
 
@@ -472,7 +473,7 @@ void *monitor(void *data) {
 void genetic_init(struct genetic_s *genetic_info, int population_size,
 		int generation_nb, double keep_ratio, double crossover_ratio,
 		struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb,
-		int threads_nb) {
+		int threads_nb, int use_ring_topology) {
 	genetic_info->population_size = population_size;
 	genetic_info->generation_nb = generation_nb;
 	genetic_info->keep_ratio = keep_ratio;
@@ -481,6 +482,7 @@ void genetic_init(struct genetic_s *genetic_info, int population_size,
 	genetic_info->schedulers = schedulers;
 	genetic_info->actors_nb = actors_nb;
 	genetic_info->threads_nb = threads_nb;
+	genetic_info->use_ring_topology = use_ring_topology;
 }
 
 void monitor_init(struct monitor_s *monitoring, struct sync_s *sync,

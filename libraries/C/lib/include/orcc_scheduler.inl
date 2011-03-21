@@ -53,7 +53,7 @@ static struct actor_s *sched_get_next(struct scheduler_s *sched) {
  * The list is chosen according to associate scheduler of the actor.
  */
 static void sched_add_schedulable(struct scheduler_s *sched,
-		struct actor_s *actor) {
+		struct actor_s *actor, int use_ring_topology) {
 	// only add the actor in the lists if it is not already there
 	// like a list.contains(actor) but in O(1) instead of O(n)
 	if (!actor->in_list) {
@@ -63,7 +63,9 @@ static void sched_add_schedulable(struct scheduler_s *sched,
 			sched->ddd_next_entry++;
 		} else if (!actor->in_waiting) {
 			// this actor isn't launch by this scheduler so it is sent to the next one
-			struct waiting_s *send = sched->ring_sending_schedulable;
+			struct waiting_s *send =
+					use_ring_topology ? sched->ring_sending_schedulable
+							: sched->mesh_waiting_schedulable[actor->sched->id];
 			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
 			actor->in_waiting = 1;
 			send->next_entry++;
@@ -74,8 +76,9 @@ static void sched_add_schedulable(struct scheduler_s *sched,
 /**
  * Add waited actors to the schedulable or waiting list.
  * The list is chosen according to associate scheduler of the actor.
+ * This function use ring topology of communications.
  */
-static void sched_add_waiting_list(struct scheduler_s *sched) {
+static void sched_add_ring_waiting_list(struct scheduler_s *sched) {
 	struct actor_s *actor;
 	struct waiting_s *wait = sched->ring_waiting_schedulable;
 	while (wait->next_entry - wait->next_waiting >= 1) {
@@ -96,14 +99,37 @@ static void sched_add_waiting_list(struct scheduler_s *sched) {
 }
 
 /**
+ * Add waited actors to the schedulable list.
+ * This function use mesh topology of communications.
+ */
+static void sched_add_mesh_waiting_list(struct scheduler_s *sched,
+		int num_schedulers) {
+	int i;
+	struct actor_s *actor;
+	for (i = 0; i < num_schedulers; i++) {
+		struct waiting_s *wait = sched->mesh_waiting_schedulable[i];
+		while (wait->next_entry - wait->next_waiting >= 1) {
+			actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
+			sched->schedulable[sched->ddd_next_entry % MAX_ACTORS] = actor;
+			actor->in_list = 1;
+			actor->in_waiting = 0;
+			sched->ddd_next_entry++;
+			wait->next_waiting++;
+		}
+	}
+}
+
+/**
  * Returns the next schedulable actor, or NULL if no actor is schedulable.
  * The actor is removed from the schedulable list.
  * This method is used by the data/demand driven scheduler.
  */
-static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
+static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
+		int use_ring_topology, int num_schedulers) {
 	struct actor_s *actor;
 	// check if other schedulers sent some schedulable actors
-	sched_add_waiting_list(sched);
+	use_ring_topology ? sched_add_ring_waiting_list(sched)
+			: sched_add_mesh_waiting_list(sched, num_schedulers);
 	if (sched->ddd_next_schedulable == sched->ddd_next_entry) {
 		// static actors list is used when schedulable list is empty
 		actor = sched_get_next(sched);
@@ -120,26 +146,26 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 }
 
 static void sched_add_predecessors(struct scheduler_s *sched,
-		struct actor_s *actor, int ports) {
+		struct actor_s *actor, int ports, int use_ring_topology) {
 	int i, n;
 	n = actor->num_inputs;
 	for (i = 0; i < n; i++) {
 		if ((ports & (1 << i)) != 0 && actor->predecessors[i] != NULL) {
 			struct actor_s *pred = actor->predecessors[i];
-			sched_add_schedulable(sched, pred);
+			sched_add_schedulable(sched, pred, use_ring_topology);
 		}
 	}
 }
 
 static void sched_add_successors(struct scheduler_s *sched,
-		struct actor_s *actor, int ports) {
+		struct actor_s *actor, int ports, int use_ring_topology) {
 	int i, j, n;
 	n = actor->num_outputs;
 	for (i = 0; i < n; i++) {
 		if ((ports & (1 << i)) != 0 && actor->successors[i] != NULL) {
 			for (j = 0; j < actor->num_successors[i]; j++) {
 				struct actor_s *succ = actor->successors[i][j];
-				sched_add_schedulable(sched, succ);
+				sched_add_schedulable(sched, succ, use_ring_topology);
 			}
 		}
 	}

@@ -43,6 +43,7 @@ struct genetic_s {
 	struct scheduler_s *schedulers;
 	int actors_nb;
 	int threads_nb;
+	int use_ring_topology;
 };
 
 struct mapping_s {
@@ -66,12 +67,15 @@ typedef struct population_s {
 	individual **individuals;
 } population;
 
-
 void *monitor(void *data);
-void genetic_init(struct genetic_s *genetic_info, int population_size, int generation_nb, double keep_ratio, double crossover_ratio, struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb, int threads_nb);
-void monitor_init(struct monitor_s *monitoring, struct sync_s *sync, struct genetic_s *genetic_info);
+void genetic_init(struct genetic_s *genetic_info, int population_size,
+		int generation_nb, double keep_ratio, double crossover_ratio,
+		struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb,
+		int threads_nb, int use_ring_topology);
+void monitor_init(struct monitor_s *monitoring, struct sync_s *sync,
+		struct genetic_s *genetic_info);
 int clean_cache(int size);
-		
+
 extern float compute_partial_fps();
 extern void backup_partial_start_info();
 extern void backup_partial_end_info();
@@ -85,7 +89,5 @@ extern void source_active_genetic();
 extern void initialize_instances();
 extern void clear_fifos();
 extern int is_timeout();
-
-
 
 #endif
