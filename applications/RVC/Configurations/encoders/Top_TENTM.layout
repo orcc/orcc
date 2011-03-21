@@ -2,9 +2,9 @@
 <layout>
    <vertices>
       <vertex id="source" x="57" y="70"/>
-      <vertex id="display" x="432" y="70"/>
-      <vertex id="Extract_yuv" x="173" y="154"/>
-      <vertex id="Merger" x="314" y="154"/>
+      <vertex id="Extract_yuv" x="190" y="218"/>
+      <vertex id="Merger" x="325" y="157"/>
       <vertex id="SPS" x="57" y="181"/>
+      <vertex id="display" x="468" y="32"/>
    </vertices>
 </layout>

@@ -59,7 +59,7 @@ int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 	end
 
 	// Select the Y blocks 
-	write_Y: action ==> Y:[ _buf_y ] repeat MAX_BLOCKSZ_Y * MAX_BLOCKSZ_Y
+	_write_Y: action ==> Y:[ _buf_y ] repeat MAX_BLOCKSZ_Y * MAX_BLOCKSZ_Y
 	var
 		List(type: int(size=PIX_SZ), size=MAX_BLOCKSZ_Y * MAX_BLOCKSZ_Y) _buf_y
 	do
@@ -74,7 +74,7 @@ int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 		end
 	end
 
-	write_done: action ==>
+	_write_done: action ==>
 	guard
 		cnt_y = _width_y * _height
 	do
@@ -85,7 +85,7 @@ int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 	end
 
 	// Select the U blocks 
-	write_U: action ==> U:[ _buf_u ] repeat MAX_BLOCKSZ_UV * MAX_BLOCKSZ_UV
+	_write_U: action ==> U:[ _buf_u ] repeat MAX_BLOCKSZ_UV * MAX_BLOCKSZ_UV
 	var
 		List(type: int(size=PIX_SZ), size=MAX_BLOCKSZ_UV * MAX_BLOCKSZ_UV) _buf_u
 	do
@@ -101,7 +101,7 @@ int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 	end
 
 	// Select the V blocks 
-	write_V: action ==> V:[ _buf_v ] repeat MAX_BLOCKSZ_UV * MAX_BLOCKSZ_UV
+	_write_V: action ==> V:[ _buf_v ] repeat MAX_BLOCKSZ_UV * MAX_BLOCKSZ_UV
 	var
 		List(type: int(size=PIX_SZ), size=MAX_BLOCKSZ_UV * MAX_BLOCKSZ_UV) _buf_v
 	do
@@ -120,15 +120,15 @@ int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 		pic_done ( pic_done ) --> read;
 		read ( read ) --> read;
 		read ( read_done ) --> write_y;
-		write_y ( write_Y ) --> write_u;
-		write_u ( write_U ) --> write_v;
-		write_v ( write_V ) --> write_y;
-		write_y ( write_done ) --> pic_done;
+		write_y ( _write_Y ) --> write_u;
+		write_u ( _write_U ) --> write_v;
+		write_v ( _write_V ) --> write_y;
+		write_y ( _write_done ) --> pic_done;
 	end
 
 	priority
 		read_done > read;
-		write_done > write_Y;
+		_write_done > _write_Y;
 	end
 
 end
