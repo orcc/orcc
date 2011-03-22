@@ -130,29 +130,36 @@ public class TimeDependencyAnalyzer {
 	 */
 	private boolean isTimeDependent(List<Action> actions) {
 		Iterator<Action> it = actions.iterator();
+
+		// Create the reference action that will be compared to the list of
+		// action
+
+		Pattern higherPriorityPattern = new Pattern();
+		List<Action> higherPriorityActions = new ArrayList<Action>();
+
 		if (it.hasNext()) {
 			Action higherPriorityAction = it.next();
-			Pattern higherPriorityPattern = higherPriorityAction
-					.getInputPattern();
+			higherPriorityPattern.updatePattern(higherPriorityAction
+					.getInputPattern());
+			higherPriorityActions.add(higherPriorityAction);
 			while (it.hasNext()) {
 				Action lowerPriorityAction = it.next();
 				Pattern lowerPriorityPattern = lowerPriorityAction
 						.getInputPattern();
-				if (lowerPriorityPattern.isSupersetOf(higherPriorityPattern)) {
-					// ok: the lower-priority action has a pattern which is a
-					// superset of (or equal to) the pattern of the
-					// higher-priority action
-					higherPriorityPattern = lowerPriorityPattern;
-				} else {
-					// otherwise, it may still be ok if guards are mutually
-					// exclusive
-					if (areGuardsCompatible(higherPriorityAction,
-							lowerPriorityAction)) {
-						return true;
+
+				if (!lowerPriorityPattern.isSupersetOf(higherPriorityPattern)) {
+					for (Action action : higherPriorityActions) {
+						// it may still be ok if guards are mutually
+						// exclusive
+						if (areGuardsCompatible(action, lowerPriorityAction)) {
+							return true;
+						}
 					}
 				}
 
-				higherPriorityAction = lowerPriorityAction;
+				// Add the current action to higherPriorityActions
+				higherPriorityActions.add(lowerPriorityAction);
+				higherPriorityPattern.updatePattern(lowerPriorityAction.getInputPattern());
 			}
 		}
 

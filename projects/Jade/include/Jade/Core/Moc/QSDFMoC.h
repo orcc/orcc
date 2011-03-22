@@ -83,7 +83,7 @@ public:
 	 * @param moc : a CSDF MoC
 	 */
 	void addConfiguration(Action* action, CSDFMoC* moc) {
-		configurations.insert(std::pair<Action*, CSDFMoC*>(action, moc));
+		configurations.push_back(std::pair<Action*, CSDFMoC*>(action, moc));
 	}
 
 
@@ -92,11 +92,11 @@ public:
 	 * 
 	 * @return a map of configurations
 	 */
-	std::map<Action*, CSDFMoC*>* getConfigurations() {
+	std::list<std::pair<Action*, CSDFMoC*>>* getConfigurations() {
 		return &configurations;
 	}
 private:
-	std::map<Action*, CSDFMoC*> configurations;
+	std::list<std::pair<Action*, CSDFMoC*>> configurations;
 
 };
 

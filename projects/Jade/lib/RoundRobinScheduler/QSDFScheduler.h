@@ -94,7 +94,7 @@ protected:
 	 * @param function : llvm::Function where the test is added
 	 */
 	llvm::BasicBlock* createConfigurationTest(Action* action, CSDFMoC* csdfMoC, llvm::BasicBlock* BB, 
-										llvm::BasicBlock* incBB, llvm::Function* function);
+										llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
 
 };
 

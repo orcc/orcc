@@ -247,7 +247,7 @@ public class Pattern {
 		Variable peek = peekedMap.remove(port);
 		Variable variable = variableMap.remove(port);
 
-		//Remove peek and variable entry from inverseVariableMap
+		// Remove peek and variable entry from inverseVariableMap
 		inverseVariableMap.remove(peek);
 		inverseVariableMap.remove(variable);
 	}
@@ -298,6 +298,30 @@ public class Pattern {
 	@Override
 	public String toString() {
 		return numTokensMap.toString();
+	}
+
+	/**
+	 * Update production/consumption of the pattern with the given pattern
+	 * 
+	 * @param pattern
+	 *            : the reference pattern
+	 */
+	public void updatePattern(Pattern pattern) {
+		for (Entry<Port, Integer> entry : pattern.getNumTokensMap().entrySet()) {
+			// Get number of tokens comsuption/production
+			Port port = entry.getKey();
+			Integer numTokens = entry.getValue();
+			
+			if (contains(port)){
+				if (numTokens < getNumTokens(port)) {
+					// Don't update pattern
+					continue;
+				}
+			}
+			
+			// Update the pattern
+			setNumTokens(port, numTokens);
+		}
 	}
 
 }

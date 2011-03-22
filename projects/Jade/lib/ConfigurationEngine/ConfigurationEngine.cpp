@@ -68,12 +68,12 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context,configuration, decoder);
 	broadAdder.transform();
-
+/*
 	//Merge static actors together if needed
 	if (configuration->mergeActors()){
 		Merger merger(configuration);
 		merger.transform();
-	}
+	}*/
 
 	//Write instance
 	IRWriter writer(Context, decoder);

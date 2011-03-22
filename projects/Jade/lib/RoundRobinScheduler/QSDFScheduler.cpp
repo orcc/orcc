@@ -55,12 +55,12 @@ QSDFScheduler::QSDFScheduler(llvm::LLVMContext& C, Decoder* decoder) : CSDFSched
 }
 
 void QSDFScheduler::createScheduler(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* scheduler){
-	map<Action*, CSDFMoC*>::iterator it;
+	list<pair<Action*, CSDFMoC*>>::iterator it;
 	QSDFMoC* qsdMoC = (QSDFMoC*)instance->getMoC();
-	map<Action*, CSDFMoC*>* configurations = qsdMoC->getConfigurations();
+	list<pair<Action*, CSDFMoC*>>* configurations = qsdMoC->getConfigurations();
 	
 	for(it = configurations->begin(); it != configurations->end(); it++){
-		BB = createConfigurationTest(it->first, it->second, BB, incBB, scheduler);
+		BB = createConfigurationTest(it->first, it->second, BB, incBB, returnBB, scheduler);
 	}
 
 	//Create branch from skip to return
@@ -68,19 +68,19 @@ void QSDFScheduler::createScheduler(Instance* instance, BasicBlock* BB, BasicBlo
 }
 
 BasicBlock*  QSDFScheduler::createConfigurationTest(Action* action, CSDFMoC* csdfMoC, BasicBlock* BB, 
-													BasicBlock* incBB, Function* function){
+													BasicBlock* incBB, BasicBlock* returnBB, Function* function){
 
 	map<Port*, ConstantInt*>::iterator it;
 	string skipBrName = "skip";
 	string hasRoomBrName = "hasroom";
 	string fireBrName = "fire";
+	string returnBrName = "return";
 
 	// Add a basic block to bb for firing instructions
 	BasicBlock* fireBB = BasicBlock::Create(Context, fireBrName, function);
 
 	// Add a basic block to bb for ski instructions
 	BasicBlock* skipBB = BasicBlock::Create(Context, skipBrName, function);
-
 
 	//Create check input pattern
 	BB = checkInputPattern(action->getInputPattern(), function, skipBB, BB);
@@ -92,13 +92,13 @@ BasicBlock*  QSDFScheduler::createConfigurationTest(Action* action, CSDFMoC* csd
 	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, schedInst, BB);
 
 	//Create output pattern
-	fireBB = checkOutputPattern(action->getOutputPattern(), function, skipBB, fireBB);
+	fireBB = checkOutputPattern(action->getOutputPattern(), function, returnBB, fireBB);
 	
 	//Create check input pattern of the associated CSDF MoC
 	BB = checkInputPattern(csdfMoC->getInputPattern(), function, skipBB, fireBB);
 
 	//Create output pattern of the associated CSDF MoC
-	fireBB = checkOutputPattern(csdfMoC->getOutputPattern(), function, skipBB, BB);
+	fireBB = checkOutputPattern(csdfMoC->getOutputPattern(), function, returnBB, BB);
 
 	createActionsCall(csdfMoC, fireBB);
 
