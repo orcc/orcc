@@ -543,11 +543,20 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Instruction loadIndex = new Load(index, new Use(writeIndex));
 		bodyNode.add(loadIndex);
 
+		LocalVariable mask = new LocalVariable(true, 1, new Location(), "mask",
+				IrFactory.eINSTANCE.createTypeInt(32));
+		locals.put(mask.getName(), mask);
+		Expression expr511 = new IntExpr(511);
+		Expression maskValue = new BinaryExpr(new VarExpr(new Use(index)),
+				BinaryOp.BITAND, expr511, IrFactory.eINSTANCE.createTypeInt(32));
+		Assign assignMask = new Assign(mask, maskValue);
+		bodyNode.add(assignMask);
+
 		LocalVariable input = new LocalVariable(true, 1, new Location(),
 				port.getName() + "_Input", port.getType());
 		locals.put(input.getName(), input);
 		List<Expression> load2Index = new ArrayList<Expression>(1);
-		Expression expression1 = new VarExpr(new Use(index));
+		Expression expression1 = new VarExpr(new Use(mask));
 
 		load2Index.add(expression1);
 		Instruction load2 = new Load(input, new Use(buffer), load2Index);
@@ -566,26 +575,22 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Expression storeIndexElement = new VarExpr(new Use(counter));
 		Expression inc1 = new IntExpr(1);
 		Expression assignValue = new BinaryExpr(storeIndexElement,
-				BinaryOp.PLUS, inc1, entryType);
+				BinaryOp.PLUS, inc1, IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign = new Assign(counter2, assignValue);
 		bodyNode.add(assign);
 		Instruction store2 = new Store(readCounter, new VarExpr(new Use(
 				counter2)));
 		bodyNode.add(store2);
 
-		// index = (index + 1) & 511
-		Expression expression511 = new IntExpr(511);
-		Expression indexInc = new BinaryExpr(expression1, BinaryOp.PLUS, inc1,
-				readCounter.getType());
-		LocalVariable mask = new LocalVariable(true, 1, new Location(),
-				"indexMask", IrFactory.eINSTANCE.createTypeInt(32));
-		locals.put(mask.getName(), mask);
-		Expression value = new BinaryExpr(indexInc, BinaryOp.BITAND,
-				expression511, entryType);
-		Instruction assign2 = new Assign(mask, value);
+		LocalVariable tmp = new LocalVariable(true, 1, new Location(), "tmp",
+				IrFactory.eINSTANCE.createTypeInt(32));
+		locals.put(tmp.getName(), tmp);
+		Expression incValue = new BinaryExpr(new VarExpr(new Use(mask)),
+				BinaryOp.PLUS, inc1, IrFactory.eINSTANCE.createTypeInt(32));
+		Instruction assign2 = new Assign(tmp, incValue);
 		bodyNode.add(assign2);
 
-		Instruction store3 = new Store(writeIndex, new VarExpr(new Use(mask)));
+		Instruction store3 = new Store(writeIndex, new VarExpr(new Use(tmp)));
 		bodyNode.add(store3);
 	}
 
@@ -614,6 +619,15 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Instruction load1 = new Load(counter, readCounterUse);
 		bodyNode.add(load1);
 
+		LocalVariable mask = new LocalVariable(true, 1, new Location(), "mask",
+				IrFactory.eINSTANCE.createTypeInt(32));
+		locals.put(mask.getName(), mask);
+		Expression expr511 = new IntExpr(511);
+		Expression maskValue = new BinaryExpr(new VarExpr(new Use(counter)),
+				BinaryOp.BITAND, expr511, IrFactory.eINSTANCE.createTypeInt(32));
+		Assign assignMask = new Assign(mask, maskValue);
+		bodyNode.add(assignMask);
+
 		LocalVariable input = new LocalVariable(true, 1, new Location(),
 				port.getName() + "_Input", port.getType());
 		locals.put(input.getName(), input);
@@ -623,8 +637,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(load2);
 
 		List<Expression> store1Index = new ArrayList<Expression>(1);
-		Expression e1 = new VarExpr(new Use(counter));
-		// globalCounter = globalCounter + 1
+		Expression e1 = new VarExpr(new Use(mask));
+
 		Expression e2 = new IntExpr(1);
 		Expression indexInc = new BinaryExpr(e1, BinaryOp.PLUS, e2,
 				readCounter.getType());
@@ -633,14 +647,11 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Instruction store1 = new Store(storeList, store1Index, new VarExpr(
 				new Use(input)));
 		bodyNode.add(store1);
-		// mask --> globalCounter = (GlobalCounter+1) & 511
+
 		LocalVariable counter2 = new LocalVariable(true, 2, new Location(),
 				port.getName() + "_Local_counter", readCounter.getType());
 		locals.put(counter2.getName(), counter2);
-		Expression expression2 = new IntExpr(511);
-		Expression value = new BinaryExpr(indexInc, BinaryOp.BITAND,
-				expression2, IrFactory.eINSTANCE.createTypeInt(32));
-		Instruction assign = new Assign(counter2, value);
+		Instruction assign = new Assign(counter2, indexInc);
 		bodyNode.add(assign);
 
 		Instruction store2 = new Store(readCounter, new VarExpr(new Use(
@@ -752,27 +763,50 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(index, assign);
 		index++;
 
+		LocalVariable diff_1 = new LocalVariable(true, inputIndex, new Location(),
+				"diff_1", IrFactory.eINSTANCE.createTypeInt(32));
+		locals.put(diff_1.getName(), diff_1);
+		Expression diffValue = new BinaryExpr(new IntExpr(0), BinaryOp.MINUS,
+				new VarExpr(new Use(diff)),
+				IrFactory.eINSTANCE.createTypeInt(32));
+		Instruction assign_diff = new Assign(diff_1, diffValue);
+		bodyNode.add(index, assign_diff);
+		index++;
+
 		Expression conditionExp = new BinaryExpr(new VarExpr(new Use(diff)),
 				BinaryOp.GE, new IntExpr(numTokens),
+				IrFactory.eINSTANCE.createTypeBool());
+
+		Expression negConditionExp = new BinaryExpr(
+				new VarExpr(new Use(diff_1)), BinaryOp.GE, new IntExpr(
+						numTokens), IrFactory.eINSTANCE.createTypeBool());
+
+		Expression absCondition = new BinaryExpr(conditionExp,
+				BinaryOp.LOGIC_OR, negConditionExp,
 				IrFactory.eINSTANCE.createTypeBool());
 
 		LocalVariable conditionVar = new LocalVariable(true, inputIndex,
 				new Location(), "condition",
 				IrFactory.eINSTANCE.createTypeBool());
-		Instruction assign2 = new Assign(conditionVar, conditionExp);
+		locals.put(conditionVar.getName(), conditionVar);
+		Instruction assign2 = new Assign(conditionVar, absCondition);
 		bodyNode.add(index, assign2);
 		index++;
 
-		LocalVariable myResult = new LocalVariable(true, inputIndex, new Location(),
-				"myResult", IrFactory.eINSTANCE.createTypeBool());
+		LocalVariable myResult = new LocalVariable(true, inputIndex,
+				new Location(), "myResult",
+				IrFactory.eINSTANCE.createTypeBool());
 		locals.put(myResult.getName(), myResult);
 		int returnIndex = bodyNode.getInstructions().size() - 1;
-		Return actionReturn = (Return) bodyNode.getInstructions().get(returnIndex);
+		Return actionReturn = (Return) bodyNode.getInstructions().get(
+				returnIndex);
 		Expression returnExpr = actionReturn.getValue();
-		//LocalVariable currentResult
-		Expression e = new BinaryExpr(returnExpr, BinaryOp.LOGIC_AND, new VarExpr(new Use(conditionVar)), IrFactory.eINSTANCE.createTypeBool());
+		// LocalVariable currentResult
+		Expression e = new BinaryExpr(returnExpr, BinaryOp.LOGIC_AND,
+				new VarExpr(new Use(conditionVar)),
+				IrFactory.eINSTANCE.createTypeBool());
 		Instruction assign3 = new Assign(myResult, e);
-		bodyNode.add(returnIndex,assign3);
+		bodyNode.add(returnIndex, assign3);
 		actionReturn.setValue(new VarExpr(new Use(myResult)));
 	}
 
@@ -818,7 +852,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				IrFactory.eINSTANCE.createTypeBool());
 		Instruction bufferAssign = new Assign(result, expression);
 		blkNode.add(index, bufferAssign);
-
 	}
 
 	/**
@@ -954,7 +987,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						writeIndexes.add(untagWriteIndex);
 						untagged = createUntaggedAction(untagReadIndex,
 								untagBuffer);
-						actor.getActionScheduler().getActions().add(untagged);
+						// actor.getActionScheduler().getActions().add(untagged);
+						fsm.addTransition(sourceName, untagged, sourceName);
 					}
 					String counterName = action.getName() + "NewStoreCounter"
 							+ inputIndex;
@@ -984,11 +1018,13 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					actionToTransition(action, untagBuffer, untagWriteIndex,
 							untagReadIndex);
 				}
-				// change the transformed action to a transition action to keep
-				// the same fireability order
+
 				action.getInputPattern().clear();
 				action.getBody().getNodes().clear();
-				action.getBody().getLocals().clear();
+				BlockNode block = new BlockNode(action.getBody());
+				block = new BlockNode(action.getBody());
+				block.add(new Return(null));
+				action.getBody().getNodes().add(block);
 				fsm.replaceTarget(sourceName, action, storeName);
 
 				break;
@@ -1062,7 +1098,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			}
 		}
 		outputIndex = 0;
-		//remove outputPattern from transition action 
+		// remove outputPattern from transition action
 		action.getOutputPattern().clear();
 	}
 
@@ -1099,6 +1135,20 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
+	 * this method returns the closest power of 2 of x --> optimal buffer size
+	 * 
+	 * @param x
+	 * @return closest power of 2 of x
+	 */
+	private int closestPow_2(int x) {
+		int p = 1;
+		while (p < x) {
+			p = p * 2;
+		}
+		return p;
+	}
+
+	/**
 	 * visits a transition characterized by its source name, target name and
 	 * action
 	 * 
@@ -1113,7 +1163,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			Action action) {
 		createActionsSet(action, sourceName, targetName);
 		if (repeatInput) {
-			fsm.removeTransition(sourceName, action);
 			repeatInput = false;
 		} else {
 			if (repeatOutput) {
