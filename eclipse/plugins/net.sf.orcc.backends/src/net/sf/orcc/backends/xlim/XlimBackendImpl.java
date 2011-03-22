@@ -79,7 +79,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	private String fpgaType;
-	private boolean hardwareGen = true;
+	private boolean hardwareGen;
 	private Map<String, String> mapping;
 
 	private Map<Integer, List<Instance>> computeMapping(Network network,
@@ -205,5 +205,13 @@ public class XlimBackendImpl extends AbstractBackend {
 				"xc2vp30-7-ff1152");
 		mapping = getAttribute(OrccLaunchConstants.MAPPING,
 				new HashMap<String, String>());
+	}
+
+	public void setHardwareGen(Boolean hardwareGen) {
+		this.hardwareGen = hardwareGen;
+	}
+
+	public void setFpgaType(String fpgaType) {
+		this.fpgaType = fpgaType;
 	}
 }
