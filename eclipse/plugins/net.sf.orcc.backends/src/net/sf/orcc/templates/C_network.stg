@@ -477,7 +477,7 @@ network(network, options) ::= <<
 #define THREAD_NB <options.threadsNb>
 <endif>
 <if(options.newScheduler)>
-#define RING_TOPOLOGY 1
+#define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
 <endif>
 <if(options.needDynamicMapping)>
 #define POPULATION_SIZE 20
@@ -585,7 +585,7 @@ static void launcher() {
 	initialize_instances();
 	
 	for(i=0; i \< THREAD_NB; i++){
-		sched_init(&schedulers[i], i, <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, &waiting_schedulables[i], &waiting_schedulables[(i+1) % THREAD_NB], <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
+		sched_init(&schedulers[i], i, <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, &waiting_schedulables[i], &waiting_schedulables[(i+1) % THREAD_NB], THREAD_NB, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
 	}
 	
 	<if(options.newScheduler && !options.needDynamicMapping)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
@@ -617,7 +617,7 @@ static void launcher() {
 	
 	initialize_instances();
 
-	sched_init(&sched, 0, sizeof(actors) / sizeof(actors[0]), actors, &waiting_schedulable, &waiting_schedulable, NULL);
+	sched_init(&sched, 0, sizeof(actors) / sizeof(actors[0]), actors, &waiting_schedulable, &waiting_schedulable, 1, NULL);
 	
 	<if(options.newScheduler)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
 		

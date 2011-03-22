@@ -13,7 +13,8 @@
  */
 void sched_init(struct scheduler_s *sched, int id, int num_actors,
 		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
-		struct waiting_s *ring_sending_schedulable, struct sync_s *sync) {
+		struct waiting_s *ring_sending_schedulable, int schedulers_nb,
+		struct sync_s *sync) {
 	int i;
 
 	sched->id = id;
@@ -41,6 +42,15 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 	sched->ring_sending_schedulable->next_entry = 0;
 	sched->ring_sending_schedulable->next_waiting = 0;
 
+	sched->mesh_waiting_schedulable = (struct waiting_s **) malloc(
+			schedulers_nb * sizeof(struct waiting_s *));
+	for (i = 0; i < schedulers_nb; i++) {
+		sched->mesh_waiting_schedulable[i] = (struct waiting_s *) malloc(
+				sizeof(struct waiting_s));
+		sched->mesh_waiting_schedulable[i]->next_entry = 0;
+		sched->mesh_waiting_schedulable[i]->next_waiting = 0;
+	}
+
 	sched->sync = sync;
 	semaphore_create(sched->sem_thread, 0);
 }
@@ -49,7 +59,7 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
  * Reinitialize the given scheduler with new actors list.
  */
 void sched_reinit(struct scheduler_s *sched, int num_actors,
-		struct actor_s **actors, int use_ring_topology) {
+		struct actor_s **actors, int use_ring_topology, int schedulers_nb) {
 	int i;
 
 	sched->actors = actors;
@@ -63,6 +73,11 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 	sched->ring_waiting_schedulable->next_waiting = 0;
 	sched->ring_sending_schedulable->next_entry = 0;
 	sched->ring_sending_schedulable->next_waiting = 0;
+
+	for (i = 0; i < schedulers_nb; i++) {
+		sched->mesh_waiting_schedulable[i]->next_entry = 0;
+		sched->mesh_waiting_schedulable[i]->next_waiting = 0;
+	}
 
 	for (i = 0; i < num_actors; i++) {
 		actors[i]->sched = sched;

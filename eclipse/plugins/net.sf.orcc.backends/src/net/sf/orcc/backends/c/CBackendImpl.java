@@ -97,6 +97,7 @@ public class CBackendImpl extends AbstractBackend {
 	private boolean newScheduler;
 	private boolean normalize;
 	private int threadsNb;
+	private boolean ringTopology;
 	private Network workingNetwork;
 
 	private void computeMapping(Network network) {
@@ -158,6 +159,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	private void computeOptions(Map<String, Object> options) {
 		options.put("newScheduler", newScheduler);
+		options.put("ringTopology", ringTopology);
 		options.put("fifoSize", fifoSize);
 
 		if (codesign) {
@@ -336,6 +338,9 @@ public class CBackendImpl extends AbstractBackend {
 		threadsNb = Integer.parseInt(getAttribute(
 				"net.sf.orcc.backends.processorsNumber", "1"));
 		enableTrace = getAttribute("net.sf.orcc.backends.enableTrace", false);
+		String topology = getAttribute(
+				"net.sf.orcc.backends.newScheduler.topology", "Ring");
+		ringTopology = topology.equals("Ring");
 	}
 
 }

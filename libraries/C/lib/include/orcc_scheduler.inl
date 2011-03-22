@@ -65,7 +65,7 @@ static void sched_add_schedulable(struct scheduler_s *sched,
 			// this actor isn't launch by this scheduler so it is sent to the next one
 			struct waiting_s *send =
 					use_ring_topology ? sched->ring_sending_schedulable
-							: sched->mesh_waiting_schedulable[actor->sched->id];
+							: actor->sched->mesh_waiting_schedulable[sched->id];
 			send->waiting_actors[send->next_entry % MAX_ACTORS] = actor;
 			actor->in_waiting = 1;
 			send->next_entry++;

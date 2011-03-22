@@ -287,7 +287,7 @@ static void map_actors_on_threads(individual *individual,
 	for (i = 0; i < genetic_info->threads_nb; i++) {
 		sched_reinit(&genetic_info->schedulers[i],
 				mapping->actors_per_threads[i], mapping->actors_mapping[i],
-				genetic_info->use_ring_topology);
+				genetic_info->use_ring_topology, genetic_info->threads_nb);
 	}
 }
 

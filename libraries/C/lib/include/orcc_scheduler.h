@@ -92,8 +92,9 @@ struct waiting_s {
  */
 void sched_init(struct scheduler_s *sched, int id, int num_actors,
 		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
-		struct waiting_s *ring_sending_schedulable, struct sync_s *sync);
+		struct waiting_s *ring_sending_schedulable, int schedulers_nb,
+		struct sync_s *sync);
 void sched_reinit(struct scheduler_s *sched, int num_actors,
-		struct actor_s **actors, int use_ring_topology);
+		struct actor_s **actors, int use_ring_topology, int schedulers_nb);
 
 #endif
