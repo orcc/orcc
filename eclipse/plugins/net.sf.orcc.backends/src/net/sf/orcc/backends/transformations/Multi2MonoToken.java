@@ -237,6 +237,20 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
+	 * this method returns the closest power of 2 of x --> optimal buffer size
+	 * 
+	 * @param x
+	 * @return closest power of 2 of x
+	 */
+	private int closestPow_2(int x) {
+		int p = 1;
+		while (p < x) {
+			p = p * 2;
+		}
+		return p;
+	}
+
+	/**
 	 * This method creates an action with the given name.
 	 * 
 	 * @param name
@@ -763,8 +777,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(index, assign);
 		index++;
 
-		LocalVariable diff_1 = new LocalVariable(true, inputIndex, new Location(),
-				"diff_1", IrFactory.eINSTANCE.createTypeInt(32));
+		LocalVariable diff_1 = new LocalVariable(true, inputIndex,
+				new Location(), "diff_1", IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(diff_1.getName(), diff_1);
 		Expression diffValue = new BinaryExpr(new IntExpr(0), BinaryOp.MINUS,
 				new VarExpr(new Use(diff)),
@@ -1132,20 +1146,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				visitTransition(sourceName, targetName, action);
 			}
 		}
-	}
-
-	/**
-	 * this method returns the closest power of 2 of x --> optimal buffer size
-	 * 
-	 * @param x
-	 * @return closest power of 2 of x
-	 */
-	private int closestPow_2(int x) {
-		int p = 1;
-		while (p < x) {
-			p = p * 2;
-		}
-		return p;
 	}
 
 	/**
