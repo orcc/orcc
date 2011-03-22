@@ -57,7 +57,7 @@ public:
 	 *
 	 * @param actor : the actor to get the folder from
 	 *
-	 * @return the corresponding forlder
+	 * @return the corresponding folder
 	 *
      */
 	static void setDirectory(std::string* dir);

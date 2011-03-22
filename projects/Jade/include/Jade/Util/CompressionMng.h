@@ -39,11 +39,13 @@
 #ifndef COMPRESSIONMNG_H
 #define COMPRESSIONMNG_H
 
-#include "Jade/Compression/zlib.h"
+#include "Jade/ZLib/zlib.h"
 
 #include "llvm/System/Path.h"
+#include "llvm/Support/FileUtilities.h"
 
 #include <string>
+#include <list>
 //------------------------------
 
 /**
@@ -65,8 +67,10 @@ public:
 	 * 
 	 * @param compressLevel : the compress level [1..9], 6 by default.
 	 *
+	 * @return Return output file name
+	 *
      */
-	static void compressFile(std::string file, std::string compressLevel = "6");
+	static std::string compressFile(std::string file, std::string compressLevel = "6");
 
 	/**
      * @brief Uncompress the GZip file given.
@@ -75,20 +79,35 @@ public:
 	 *
 	 * @param file : name of the file
 	 *
+	 * @return Return output file name
+	 *
      */
-	static void uncompressGZip(std::string file);
+	static std::string uncompressGZip(std::string file);
 
 	/**
      * @brief See if the file given is a GZip file.
 	 *
 	 * @param file : name of the file
 	 *
-	 * @return return true if the file given is a GZip file, otherwise false.
+	 * @return Return true if the file given is a GZip file, otherwise false.
 	 *
      */
 	static bool IsGZipFile(std::string file) {
 		llvm::sys::Path GZipFile(file + ".gz");
 		return GZipFile.exists();
+	};
+
+	/**
+     * @brief See if the file name given contain the GZip extension.
+	 *
+	 * @param file : name of the file
+	 *
+	 * @return Return true if the file given is a GZip file name, otherwise false.
+	 *
+     */
+	static bool IsGZipName(std::string file) {
+		size_t found = file.find(".gz");
+		return (found != std::string::npos);
 	};
 
 
@@ -132,6 +151,19 @@ private:
      */
 	static void error(std::string msg);
 
+	/**
+     * @brief Add a file in list of tempory files
+	 *
+	 *	All temporary files are deleted when the tmpFiles destructor is called
+	 *
+	 * @param file : path of file
+	 *
+     */
+	static void addTmpFile(llvm::sys::Path file);
+
+	/** List of temporary files */
+	static std::list<llvm::FileRemover> tmpFiles;
+	
 };
 
 #endif

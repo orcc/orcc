@@ -16,4 +16,4 @@ add_library (XDFParser
   XDFParser.cpp
   )
   
-  target_link_libraries(XDFParser Compression)
+  target_link_libraries(XDFParser ZLib)

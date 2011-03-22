@@ -90,11 +90,12 @@ const char* XDFNetwork::TYPE_UINT = "uint";
 
 XDFParser::XDFParser (string filename, bool verbose){
 	this->verbose = verbose;
-	xdfFile = filename;
-
+	
 	//Uncompress XDF if it is compressed
-	if(CompressionMng::IsGZipFile(filename)){
-		CompressionMng::uncompressGZip(filename);
+	if(CompressionMng::IsGZipName(filename)){
+		xdfFile = CompressionMng::uncompressGZip(filename);
+	}else{
+		xdfFile = filename;
 	}
 }
 

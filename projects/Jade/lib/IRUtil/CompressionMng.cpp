@@ -38,8 +38,8 @@
 //------------------------------
 #include "Jade/Util/CompressionMng.h"
 
+#include "llvm/System/Signals.h"
 
-//#include <stdio.h>
 #include <algorithm>
 #include <iostream>
 //------------------------------
@@ -49,7 +49,11 @@
 using namespace std;
 using namespace llvm;
 
-void CompressionMng::compressFile(string file, string compressLevel){
+//Initializing static element
+list<FileRemover> CompressionMng::tmpFiles;
+
+
+string CompressionMng::compressFile(string file, string compressLevel){
 	FILE* in;
 	gzFile out;
 	
@@ -70,34 +74,33 @@ void CompressionMng::compressFile(string file, string compressLevel){
 
 	//Remove original file
 	unlink(file.c_str());
+
+
+	return outFile;
 }
 
-void CompressionMng::uncompressGZip(string file){
+string CompressionMng::uncompressGZip(string file){
 	FILE* out;
 	gzFile in;
-	string outFile = file;
-
-	//Initializes names of files (input file 
-	// can be give without the .gz extension)
-	if(file.find(".gz") != string::npos){
-		outFile.erase(outFile.end()-3, outFile.end());
-	}else{
-		file += ".gz";
-	}
 
 	//Open file
 	CompressionMng::checkFile(file);
 	in = gzopen(file.c_str(), "rb");
 
 	//Create output file
+	file.erase(file.end()-3, file.end()); //Erase ".gz"
+	sys::Path outFile(file);
+
 	out = fopen(outFile.c_str(), "wb");
-	CompressionMng::checkFile(outFile);
+	CompressionMng::checkFile(outFile.c_str());
+
+	//Insert outFile in the list of temporary files
+	CompressionMng::addTmpFile(outFile);
 
 	//Uncompress and set file in output file
 	CompressionMng::uncompress(in, out);
 
-	//Remove original file
-	unlink(file.c_str());
+	return outFile.c_str();
 }
 
 void CompressionMng::checkFile(string file){
@@ -105,7 +108,7 @@ void CompressionMng::checkFile(string file){
 
 	if(!filePath.exists()){
 		//File doesn't exist
-		cout << "File" << filePath.c_str() << " does not exists or be create.'\n";
+		cout << "File " << filePath.c_str() << " does not exists or be create.'\n";
 		exit(0);
 	}
 }
@@ -159,4 +162,9 @@ void CompressionMng::uncompress(gzFile in, FILE* out){
 void CompressionMng::error(string msg){
 	cerr << msg;
 	exit(1);
+}
+
+void CompressionMng::addTmpFile(sys::Path file){
+	CompressionMng::tmpFiles.push_back(FileRemover());
+	CompressionMng::tmpFiles.back().setFile(file);
 }

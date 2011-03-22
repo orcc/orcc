@@ -48,7 +48,7 @@
 using namespace std;
 using namespace llvm;
 
-//Init membres static
+//Initializing static element
 map<string, Package*>* PackageMng::packages = new map<string, Package*>();
 
 

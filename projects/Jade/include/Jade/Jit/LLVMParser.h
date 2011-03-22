@@ -84,12 +84,25 @@ public:
 private:
 
 	/**
+     *  @brief Parse a file in an archive
+	 *
+	 * @param package : package where is the archive
+	 *
+	 * @param file : file to parse
+	 *
+	 * @return the corresponding llvm::Module
+	 *
+     */
+	llvm::Module* ParseArchive(Package* package, llvm::sys::Path file);
+
+	/**
      *  @brief Load and parse the bitcode file in an archive
 	 *
 	 *  Find and read the specified bitcode file of the current 
 	 *  actor and return the corresponding module. 
 	 *
 	 * @param package : package where is the archive
+	 *
 	 * @param file : file to parse
 	 *
 	 * @return the corresponding llvm::Module

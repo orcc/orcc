@@ -65,15 +65,11 @@ Module* LLVMParser::loadModule(Package* package, string file) {
 	sys::Path Filename(directory + package->getDirectory() + "/" + file);
 
 	//Load the bitcode
-	//Archive case
 	if(!Filename.exists()){
-		if(!package->isArchive()){
-			openArchive(package);
-		}
-		Mod = loadBitcodeInArchive(package, Filename);
-	}
-	//Other case
-	else{
+		//Archive case
+		Mod = ParseArchive(package, Filename);
+	}else{
+		//Bitecode et Assembly case
 		Mod = ParseIRFile(Filename.c_str(), Err, Context);
 	}
 
@@ -86,6 +82,14 @@ Module* LLVMParser::loadModule(Package* package, string file) {
 	}
 
 	return Mod;
+}
+
+Module* LLVMParser::ParseArchive(Package* package, sys::Path file){
+	if(!package->isArchive()){
+			openArchive(package);
+	}
+
+	return loadBitcodeInArchive(package, file);
 }
 
 Module* LLVMParser::loadBitcodeInArchive(Package* package, sys::Path file) {
@@ -124,7 +128,8 @@ void LLVMParser::openArchive(Package* package){
 
 	//If useful, uncompress archive 
 	if(CompressionMng::IsGZipFile(archiveFile.c_str())){
-		CompressionMng::uncompressGZip(archiveFile.c_str());
+		string GZipFile = archiveFile.str() + ".gz";
+		CompressionMng::uncompressGZip(GZipFile);
 	}
 
 	//Load archive
