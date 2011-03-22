@@ -26,7 +26,7 @@
 #  endif /* !DYNAMIC_CRC_TABLE */
 #endif /* MAKECRCH */
 
-#include "Jade/Compression/zutil.h"      /* for STDC and FAR definitions */
+#include "Jade/ZLib/zutil.h"      /* for STDC and FAR definitions */
 
 #define local static
 
@@ -198,7 +198,7 @@ local void write_table(out, table)
 /* ========================================================================
  * Tables of CRC-32s of all single-byte values, made by make_crc_table().
  */
-#include "Jade/Compression/crc32.h"
+#include "Jade/ZLib/crc32.h"
 #endif /* DYNAMIC_CRC_TABLE */
 
 /* =========================================================================

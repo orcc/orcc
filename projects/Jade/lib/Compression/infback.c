@@ -10,10 +10,10 @@
    inflate_fast() can be used with either inflate.c or infback.c.
  */
 
-#include "Jade/Compression/zutil.h"
-#include "Jade/Compression/inftrees.h"
-#include "Jade/Compression/inflate.h"
-#include "Jade/Compression/inffast.h"
+#include "Jade/ZLib/zutil.h"
+#include "Jade/ZLib/inftrees.h"
+#include "Jade/ZLib/inflate.h"
+#include "Jade/ZLib/inffast.h"
 
 /* function prototypes */
 local void fixedtables OF((struct inflate_state FAR *state));
@@ -105,7 +105,7 @@ struct inflate_state FAR *state;
         virgin = 0;
     }
 #else /* !BUILDFIXED */
-#   include "Jade/Compression/inffixed.h"
+#   include "Jade/ZLib/inffixed.h"
 #endif /* BUILDFIXED */
     state->lencode = lenfix;
     state->lenbits = 9;

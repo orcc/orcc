@@ -49,7 +49,7 @@
 
 /* @(#) $Id$ */
 
-#include "Jade/Compression/deflate.h"
+#include "Jade/ZLib/deflate.h"
 
 const char deflate_copyright[] =
    " deflate 1.2.5 Copyright 1995-2010 Jean-loup Gailly and Mark Adler ";

@@ -3,10 +3,10 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-#include "Jade/Compression/zutil.h"
-#include "Jade/Compression/inftrees.h"
-#include "Jade/Compression/inflate.h"
-#include "Jade/Compression/inffast.h"
+#include "Jade/ZLib/zutil.h"
+#include "Jade/ZLib/inftrees.h"
+#include "Jade/ZLib/inflate.h"
+#include "Jade/ZLib/inffast.h"
 
 #ifndef ASMINF
 

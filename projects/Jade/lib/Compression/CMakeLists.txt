@@ -2,7 +2,7 @@ include_directories(${JADE_MAIN_INCLUDE_DIR})
 
 add_definitions(${JADE_CPP_FLAGS})
 
-add_library(Compression
+add_library(ZLib
 	gzread.c
 	gzwrite.c
 	gzclose.c

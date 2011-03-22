@@ -80,10 +80,10 @@
  * The history for versions after 1.2.0 are in ChangeLog in zlib distribution.
  */
 
-#include "Jade/Compression/zutil.h"
-#include "Jade/Compression/inftrees.h"
-#include "Jade/Compression/inflate.h"
-#include "Jade/Compression/inffast.h"
+#include "Jade/ZLib/zutil.h"
+#include "Jade/ZLib/inftrees.h"
+#include "Jade/ZLib/inflate.h"
+#include "Jade/ZLib/inffast.h"
 
 #ifdef MAKEFIXED
 #  ifndef BUILDFIXED
@@ -272,7 +272,7 @@ struct inflate_state FAR *state;
         virgin = 0;
     }
 #else /* !BUILDFIXED */
-#   include "Jade/Compression/inffixed.h"
+#   include "Jade/ZLib/inffixed.h"
 #endif /* BUILDFIXED */
     state->lencode = lenfix;
     state->lenbits = 9;
