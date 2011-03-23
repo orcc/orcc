@@ -111,9 +111,9 @@ DP_genericRam_<variable.name> : entity work.DP_genericRam
 ///////////////////////////////////////////////////////////////////////////////
 VarDeclaration(variable) ::= <<
 <if(variable.type.list)
->-- error !!!!! variable <variable.name> : <variable.type> (0 to <listSize(variable.type.dimensions)> -1)<
+>-- !! error !! variable <variable.name> tabular type size = <listSize(variable.type.dimensions)> of <variable.type>;<
 else
->variable <variable.name> : <variable.type><
+>variable <variable.name> : <variable.type>;<
 endif>
 >>
 
@@ -184,8 +184,7 @@ printAssign(assign) ::= <<
 ><CastStore(target=assign.target, targetSize=assign.target.type.size, value=assign.value, cast=assign.cast)>;<
 else
 ><assign.target> := <assign.value>;<
-endif
->
+endif>
 >>
 
 printAssignIndex(assignIndex) ::= <<
@@ -234,23 +233,28 @@ endif
 // is called
 printReturn(return) ::= <<
 <if(return.value)
-><  if(transformReturn)
-><procedure>_go := <return.value>;<
+ ><if(transformReturn)
+   ><procedure>_go := <return.value>;<
   else
->return <return.value>;<
+   >return <return.value>;<
   endif><
 endif>
 >>
 
 printStore(store) ::= <<
 <if(store.indexes)
-><if(action.inputPattern.inverseVariableMap.(store.target) || action.outputPattern.inverseVariableMap.(store.target))
-><if(store.cast)><CastStore(value=store.value, target={<procedure.name>_<getPort(store.target)>}, targetSize={<getPortSize(store.target)>}, cast=store.cast)>;
-<else><procedure.name>_<getPort(store.target)> := <store.value>;<
-endif><
-else><store.target>(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;<
-endif
-><else><store.target> \<= <store.value>;<endif>
+ ><if(action.inputPattern.inverseVariableMap.(store.target) || action.outputPattern.inverseVariableMap.(store.target))
+  ><if(store.cast)
+    ><CastStore(value=store.value, target={<procedure.name>_<getPort(store.target)>}, targetSize={<getPortSize(store.target)>}, cast=store.cast)>;<
+   else
+    ><procedure.name>_<getPort(store.target)> := <store.value>;<
+   endif><
+  else
+   ><store.target>(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;<
+  endif><
+else
+ ><store.target> \<= <store.value>;<
+endif>
 >>
 
 /////////////////////
@@ -319,7 +323,6 @@ elseif (instr.call)><printCall(call=instr)><
 elseif (instr.load)><printLoad(load=instr)><
 elseif (instr.return)><printReturn(return=instr)><
 elseif (instr.store)><printStore(store=instr)><
-
 elseif (instr.ramRead)><printRamRead(ramRead=instr)><
 elseif (instr.ramWrite)><printRamWrite(ramWrite=instr)><
 elseif (instr.ramSetAddress)><printRamSetAddress(ramSetAddress=instr)><
@@ -434,7 +437,7 @@ printProcedure(procedure, transformReturn) ::= <<
 
 printLocals(procedure) ::= <<
 <if(procedure.locals.list)
-><procedure.locals.list: {variable| <VarDeclaration(variable)>;<\n>}><
+><procedure.locals.list: VarDeclaration(); separator="\n"><
 endif>
 >>
 
@@ -471,10 +474,10 @@ port map (
 Actor_Scheduler(actor) ::= <<
 <actor.simpleName>_scheduler : process(<actor.templateData.signals; wrap, anchor, separator=", ">)
   <actor.actions : { action |<printLocals(action.scheduler)>
-variable <action.scheduler>_go : std_logic;
-<action.inputPattern.ports: { port |<if(action.inputPattern.peekedMap.(port))>variable <action.scheduler.name>_<port.name> : <port.type>;
-<endif>}>
-}>--
+variable <action.scheduler>_go : std_logic; <action.inputPattern.ports: {port | <if(action.inputPattern.peekedMap.(port))>
+variable <action.scheduler.name>_<port.name> : <port.type>;<
+endif>}; separator="\n">
+}>  --
 begin
   <actor.actions: {action|-- test if "<action>" action is schedulable
 <action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.peekedMap.(port))>
@@ -550,20 +553,18 @@ actionFire(nextstate) ::= <<
 Actor_Exec(actor) ::= <<
 <actor.simpleName>_execute : process (reset_n, clock) is
   <actor.actions: {action |<printLocals(action.body)>
-<action.inputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;
-}><action.outputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;
-}>
+<action.inputPattern.ports:  { port |variable <action.body.name>_<port.name> : <port.type>;}>
+<action.outputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;}>
 }>  --
 begin
   if reset_n = '0' then
 <if(actor.stateVars.list)>
     <actor.stateVars.list: stateConst()>    --
 <endif>
-    <actor.outputs.list : port_out_init()>
+    <actor.outputs.list : port_out_init()>    --
 <if(actor.actionScheduler.fsm)>
-    FSM    \<= s_<actor.actionScheduler.fsm.initialState>;
+    FSM    \<= s_<actor.actionScheduler.fsm.initialState>;    --
 <endif>
-    --
   elsif rising_edge(clock) then
     <actor.outputs.list :{port|<port.name>_isend \<= '0';}; separator="\n">
     <actor.stateVars.list: resetReadWriteEnable()>
@@ -573,28 +574,25 @@ begin
 <else>
     <executeCore(actor.actions)>
 <endif>
-
   end if;
 end process <actor.simpleName>_execute;
 
 >>
 
 printActionBody(action) ::= <<
-<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.variableMap.(port))>
-}
+<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.variableMap.(port))>}
 ><printProcedure(procedure=action.body, transformReturn="true")
-><action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.variableMap.(port))>
-}
+><action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.variableMap.(port))>}
 >
 >>
 
 actionTestScheduler(action) ::= <<
 (<action>_go = '1') then
   -- body of "<action>" action
-  <printActionBody(action)>
-  --
-  <action.outputPattern.ports: {port|<port.name>_isend \<= '1';
-}>
+  <printActionBody(action)
+  ><if(action.outputPattern.ports)>
+  <action.outputPattern.ports: {port|<port.name>_isend \<= '1';}><
+  endif>
 >>
 
 port_out_init(port) ::=<<
@@ -611,13 +609,9 @@ port_out_init(port) ::=<<
 // Core of an action - NO FSM
 
 executeCore(actions) ::= <<
-    if <executeIndent(actions)>
->>
-
-// just to have a correct indentation
-executeIndent(actions) ::= <<
-    <actions: actionTestScheduler(); separator="\nelsif ">
-    end if;
+if <actions: actionTestScheduler(); separator="--\nelsif ">
+--
+end if;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -627,14 +621,14 @@ executeCoreFSM(actions, fsm) ::= <<
 <if(actions)
 ><executeCore(actions)>
 else
-  case FSM is
+case FSM is
   <switchTransition()>
-      end case;
+end case;
 end if;<
 else
->    case FSM is
+>  case FSM is
   <fsm.transitions: switchTransition(); separator="\n\n">
-    end case;<
+  end case;<
 endif>
 >>
 
@@ -720,7 +714,6 @@ endif>
   type FSM_type is (<actor.actionScheduler.fsm.states: {state|s_<state>}; separator=", ">);
   signal FSM : FSM_type;<
   endif>
-
 
 begin
 
