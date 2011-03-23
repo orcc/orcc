@@ -481,7 +481,7 @@ endif>}; separator="\n">
 begin
   <actor.actions: {action|-- test if "<action>" action is schedulable
 <action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.peekedMap.(port))>
-}>
+}; separator="\n">
 <printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n\n">
 
   --
@@ -524,12 +524,12 @@ printActionFireFSM(actions, fsm) ::= <<
 <if(actions)
 >if<printActionFire(actions)>
 else
-  case FSM is
-  <TransitionFire()>
-      end case;
+case FSM is
+<TransitionFire()>
+  end case;
 end if;<
 else
->  case FSM is
+>case FSM is
 <fsm.transitions: TransitionFire(); separator="\n\n">
   end case;<
 endif>
@@ -552,9 +552,11 @@ actionFire(nextstate) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 Actor_Exec(actor) ::= <<
 <actor.simpleName>_execute : process (reset_n, clock) is
-  <actor.actions: {action |<printLocals(action.body)>
-<action.inputPattern.ports:  { port |variable <action.body.name>_<port.name> : <port.type>;}>
-<action.outputPattern.ports: { port |variable <action.body.name>_<port.name> : <port.type>;}>
+  <actor.actions: {action |<printLocals(action.body)><
+action.inputPattern.ports : { port | 
+variable <action.body.name>_<port.name> : <port.type>;}><
+action.outputPattern.ports: { port | 
+variable <action.body.name>_<port.name> : <port.type>;}>
 }>  --
 begin
   if reset_n = '0' then
@@ -580,9 +582,9 @@ end process <actor.simpleName>_execute;
 >>
 
 printActionBody(action) ::= <<
-<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.variableMap.(port))>}
+<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.variableMap.(port))>}; separator="\n"
 ><printProcedure(procedure=action.body, transformReturn="true")
-><action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.variableMap.(port))>}
+><action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.variableMap.(port))>}; separator="\n"
 >
 >>
 
@@ -626,21 +628,21 @@ case FSM is
 end case;
 end if;<
 else
->  case FSM is
+>case FSM is
   <fsm.transitions: switchTransition(); separator="\n\n">
-  end case;<
+end case;<
 endif>
 >>
 
 switchTransition(transition) ::= <<
-    when s_<transition.sourceState> =\>
-      if <transition.nextStateInfo: actionTestState(); separator="\n      elsif">
-      end if;
+when s_<transition.sourceState> =\>
+  if <transition.nextStateInfo: actionTestState(); separator="\n      elsif">
+  end if;
 >>
 
 actionTestState(nextState) ::= <<
-      <actionTestScheduler(nextState.action)>
-        FSM \<= s_<nextState.targetState>;
+    <actionTestScheduler(nextState.action)>
+      FSM \<= s_<nextState.targetState>;
 >>
 
 
@@ -707,13 +709,13 @@ architecture rtl_<actor.simpleName> of <actor.simpleName> is
   <actor.procs.list: {proc|<function(procedure=proc)>}; separator="\n\n"><
 endif>
 
-  <if(actor.actionScheduler.fsm)
-  >  ---------------------------------------------------------------------------
+<if(actor.actionScheduler.fsm)
+>  ---------------------------------------------------------------------------
   -- FSM
   ---------------------------------------------------------------------------
   type FSM_type is (<actor.actionScheduler.fsm.states: {state|s_<state>}; separator=", ">);
-  signal FSM : FSM_type;<
-  endif>
+  signal FSM : FSM_type;
+<endif>
 
 begin
 
