@@ -16,4 +16,4 @@ add_library (NetSerialize
   XDFParser.cpp
   )
   
-  target_link_libraries(ZLib)
+  target_link_libraries(NetSerialize ZLib)

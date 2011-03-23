@@ -51,7 +51,7 @@
 #include "llvm/System/Signals.h"
 
 
-#include "Jade/XDFParser.h"
+#include "Jade/NetSerialize/XDFParser.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Actor/Display.h"
 #include "Jade/Fifo/FifoSelection.h"
