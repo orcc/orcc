@@ -164,10 +164,28 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 					System.out.println("in actor " + actor.getName()
 							+ ", state " + source + ", merging actions "
 							+ actions);
-					graph.removeAllEdges(source, target);
-					graph.addEdge(source, target,
-							new UniqueEdge(newActions.get(0)));
+					// TODO : this is a fix that may be bugged in case of
+					// transition
+					// than need a merged action in the list as a unique action
+					// Update graph with the new action
+					List<UniqueEdge> upEdges = new ArrayList<UniqueEdge>();
+					for (UniqueEdge checkEdge : graph.edgeSet()) {
+						if (actions.contains(checkEdge.getObject())) {
+							upEdges.add(checkEdge);
+						}
+					}
 
+					UniqueEdge newEdge = new UniqueEdge(newActions.get(0));
+
+					// Remove all transitions and create a new one
+					for (UniqueEdge upEdge : upEdges) {
+						State sourceState = graph.getEdgeSource(upEdge);
+						State targetState = graph.getEdgeTarget(upEdge);
+						graph.removeEdge(upEdge);
+
+						graph.addEdge(sourceState, targetState, newEdge);
+
+					}
 				}
 			}
 		}
@@ -209,17 +227,16 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 			List<Action> actions) {
 		target = new Procedure("SDF", new Location(),
 				IrFactory.eINSTANCE.createTypeVoid());
-		/*
-		 * BlockNode block = BlockNode.getFirst(target);
-		 * 
-		 * // TODO Add input pattern to the merged action
-		 * 
-		 * for (Entry<Port, Integer> entry : input.entrySet()) { Port port =
-		 * entry.getKey(); int numTokens = entry.getValue(); Type type =
-		 * IrFactory.eINSTANCE.createTypeList(numTokens, port.getType());
-		 * LocalVariable variable = target.newTempLocalVariable(file, type,
-		 * port.getName()); block.add(new Read(port, numTokens, variable)); }
-		 */
+/*
+		for (Entry<Port, Integer> entry : input.entrySet()) {
+			Port port = entry.getKey();
+			int numTokens = entry.getValue();
+			Type type = IrFactory.eINSTANCE.createTypeList(numTokens,
+					port.getType());
+			LocalVariable variable = target.newTempLocalVariable(file, type,
+					port.getName());
+			block.add(new Read(port, numTokens, variable));
+		}*/
 
 		// Launch action
 		List<CFGNode> elseNodes = target.getNodes();
