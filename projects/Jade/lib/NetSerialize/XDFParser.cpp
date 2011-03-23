@@ -36,8 +36,8 @@
 */
 
 //------------------------------
-#include "Jade/XDFParser.h"
 #include "NetworkParser.h"
+#include "Jade/NetSerialize/XDFParser.h"
 #include "Jade/Util/CompressionMng.h"
 //------------------------------
 

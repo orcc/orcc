@@ -41,6 +41,9 @@
 
 //------------------------------
 
+/**
+*  @brief Start the console
+*/
 void startConsole();
 
 #endif

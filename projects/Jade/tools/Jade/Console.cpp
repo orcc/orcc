@@ -40,8 +40,8 @@
 
 #include "llvm/Support/CommandLine.h"
 
-#include "Jade/XDFParser.h"
 #include "Jade/DecoderEngine.h"
+#include "Jade/NetSerialize/XDFParser.h"
 #include "Jade/Scenario/Manager.h"
 #include "Jade/Scenario/Event/LoadEvent.h"
 #include "Jade/Scenario/Event/StartEvent.h"

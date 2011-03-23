@@ -101,9 +101,9 @@ void RoundRobinScheduler::createScheduler(){
 		Instance* instance = it->second;
 		MoC* moc = instance->getMoC();
 		
-		if (moc->isQuasiStatic() && configuration->mergeActors()&& (instance->getId().compare("decoder_acdc_seq") ==0)){
+		/*if (moc->isQuasiStatic() && configuration->mergeActors()&& (instance->getId().compare("decoder_acdc_seq") ==0)){
 			QSDFSchedulerAdder.transform(instance);
-		}else if (moc->isCSDF() && configuration->mergeActors()){
+		}else*/ if (moc->isCSDF() && configuration->mergeActors()){
 			CSDFSchedulerAdder.transform(instance);
 		}else{
 			DPNSchedulerAdder.transform(instance);
