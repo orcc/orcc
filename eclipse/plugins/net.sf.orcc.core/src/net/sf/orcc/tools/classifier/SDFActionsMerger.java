@@ -31,6 +31,7 @@ package net.sf.orcc.tools.classifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
@@ -44,9 +45,11 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
@@ -55,6 +58,7 @@ import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transformations.SSATransformation;
+import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -84,25 +88,31 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	public SDFActionsMerger() {
 	}
 
-	private IfNode createActionCall(Expression expr, Procedure body) {
+	private IfNode createActionCall(Expression expr, Procedure body,
+			Pattern inputPattern, Pattern outputPattern) {
+		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
+				outputPattern);
 		actor.getProcs().put(body.getName(), body);
 		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
 		BlockNode node = new BlockNode(target);
 
-		node.add(new Call(new Location(), null, body,
-				new ArrayList<Expression>()));
+		node.add(new Call(new Location(), null, body, callExprs));
 
 		thenNodes.add(node);
 		return new IfNode(target, expr, thenNodes, new ArrayList<CFGNode>(),
 				new BlockNode(target));
 	}
 
-	private Expression createActionCondition(BlockNode node, Procedure scheduler) {
+	private Expression createActionCondition(BlockNode node,
+			Procedure scheduler, Pattern inputPattern, Pattern outputPattern) {
+
+		List<Expression> callExprs = setProcedureParameters(scheduler,
+				inputPattern, outputPattern);
+
 		actor.getProcs().put(scheduler.getName(), scheduler);
 		LocalVariable returnVar = target.newTempLocalVariable(file,
 				scheduler.getReturnType(), scheduler.getName() + "_ret");
-		node.add(new Call(new Location(), returnVar, scheduler,
-				new ArrayList<Expression>()));
+		node.add(new Call(new Location(), returnVar, scheduler, callExprs));
 
 		Use use = new Use(returnVar);
 		return new VarExpr(use);
@@ -202,13 +212,15 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	 *            output pattern common to all actions
 	 * @return
 	 */
-	private List<Action> mergeActions(List<Action> actions, Pattern input,
-			Pattern output) {
+	private List<Action> mergeActions(List<Action> actions) {	
+		Pattern input = actions.get(0).getInputPattern();
+		Pattern output = actions.get(0).getInputPattern();
+		
 		// creates a isSchedulable function
 		Procedure scheduler = createIsSchedulable(input);
 
 		// merges actions
-		Procedure body = mergeSDFBodies(input, output, actions);
+		Procedure body = mergeSDFBodies(actions);
 
 		Action action = new Action(new Location(), new Tag(), input, output,
 				scheduler, body);
@@ -223,42 +235,56 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		return newActions;
 	}
 
-	private Procedure mergeSDFBodies(Pattern input, Pattern output,
-			List<Action> actions) {
+	private Procedure mergeSDFBodies(List<Action> actions) {
 		target = new Procedure("SDF", new Location(),
 				IrFactory.eINSTANCE.createTypeVoid());
-/*
-		for (Entry<Port, Integer> entry : input.entrySet()) {
-			Port port = entry.getKey();
-			int numTokens = entry.getValue();
-			Type type = IrFactory.eINSTANCE.createTypeList(numTokens,
-					port.getType());
-			LocalVariable variable = target.newTempLocalVariable(file, type,
-					port.getName());
-			block.add(new Read(port, numTokens, variable));
-		}*/
 
 		// Launch action
 		List<CFGNode> elseNodes = target.getNodes();
 
 		for (Action action : actions) {
+			Pattern input = action.getInputPattern();
+			Pattern output = action.getOutputPattern();
+			
 			BlockNode thenBlock = BlockNode.getFirst(target, elseNodes);
 			Expression callExpr = createActionCondition(thenBlock,
-					action.getScheduler());
-			IfNode ifNode = createActionCall(callExpr, action.getBody());
+					action.getScheduler(), input, output);
+			IfNode ifNode = createActionCall(callExpr, action.getBody(), input,
+					output);
 			elseNodes.add(ifNode);
 			elseNodes = ifNode.getElseNodes();
 		}
-		// TODO Add input pattern to the merged action
-		/*
-		 * for (Entry<Port, Integer> entry : output.entrySet()) { Port port =
-		 * entry.getKey(); int numTokens = entry.getValue(); Type type =
-		 * IrFactory.eINSTANCE.createTypeList(numTokens, port.getType());
-		 * LocalVariable variable = target.newTempLocalVariable(file, type,
-		 * port.getName()); block.add(new Write(port, numTokens, variable)); }
-		 */
+		
+		BlockNode lastBlock = BlockNode.getLast(target);
+		lastBlock.add(new Return(null));
 
 		return target;
+	}
+
+	private List<Expression> setProcedureParameters(Procedure procedure,
+			Pattern inputPattern, Pattern outputPattern) {
+		List<Expression> exprs = new ArrayList<Expression>();
+
+		OrderedMap<String, LocalVariable> parameters = procedure
+				.getParameters();
+
+		// Add inputs to procedure parameters
+		for (Entry<Port, Variable> entry : inputPattern.getVariableMap()
+				.entrySet()) {
+			Variable variable = entry.getValue();
+			parameters.put(variable.getName(), (LocalVariable) variable);
+			exprs.add(new VarExpr(new Use(variable)));
+		}
+
+		// Add outputs to procedure parameters
+		for (Entry<Port, Variable> entry : outputPattern.getVariableMap()
+				.entrySet()) {
+			Variable variable = entry.getValue();
+			parameters.put(variable.getName(), (LocalVariable) variable);
+			exprs.add(new VarExpr(new Use(variable)));
+		}
+
+		return exprs;
 	}
 
 	/**
@@ -289,7 +315,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 				}
 			}
 
-			return mergeActions(actions, input, output);
+			return mergeActions(actions);
 		}
 	}
 
