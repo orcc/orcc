@@ -120,6 +120,15 @@ public class Pattern {
 		return inverseVariableMap.containsKey(variable);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Pattern) {			
+			return ((Pattern)obj).getNumTokensMap().equals(numTokensMap);
+		}else{
+			return false;
+		}
+	}
+
 	/**
 	 * Returns the inverse variable map.
 	 * 
@@ -311,14 +320,14 @@ public class Pattern {
 			// Get number of tokens comsuption/production
 			Port port = entry.getKey();
 			Integer numTokens = entry.getValue();
-			
-			if (contains(port)){
+
+			if (contains(port)) {
 				if (numTokens < getNumTokens(port)) {
 					// Don't update pattern
 					continue;
 				}
 			}
-			
+
 			// Update the pattern
 			setNumTokens(port, numTokens);
 		}
