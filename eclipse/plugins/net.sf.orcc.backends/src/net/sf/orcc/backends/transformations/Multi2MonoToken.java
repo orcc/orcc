@@ -67,6 +67,7 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
 
@@ -750,13 +751,15 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		OrderedMap<String, LocalVariable> locals = action.getScheduler()
 				.getLocals();
 
+		BlockNode firstBlock = new BlockNode(action.getScheduler());
+		action.getScheduler().getNodes().add(firstBlock);
 		LocalVariable localRead = new LocalVariable(true, inputIndex,
 				new Location(), "readIndex",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(localRead.getName(), localRead);
 		Instruction Load = new Load(localRead, new Use(readIndex));
 		int index = 0;
-		bodyNode.add(index, Load);
+		firstBlock.add(index, Load);
 		index++;
 
 		LocalVariable localWrite = new LocalVariable(true, inputIndex,
@@ -764,7 +767,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(localWrite.getName(), localWrite);
 		Instruction Load2 = new Load(localWrite, new Use(writeIndex));
-		bodyNode.add(index, Load2);
+		firstBlock.add(index, Load2);
 		index++;
 
 		LocalVariable diff = new LocalVariable(true, inputIndex,
@@ -774,39 +777,17 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				BinaryOp.MINUS, new VarExpr(new Use(writeIndex)),
 				IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign = new Assign(diff, value);
-		bodyNode.add(index, assign);
+		firstBlock.add(index, assign);
 		index++;
-
-		LocalVariable diff_1 = new LocalVariable(true, inputIndex,
-				new Location(), "diff_1", IrFactory.eINSTANCE.createTypeInt(32));
-		locals.put(diff_1.getName(), diff_1);
-		Expression diffValue = new BinaryExpr(new IntExpr(0), BinaryOp.MINUS,
-				new VarExpr(new Use(diff)),
-				IrFactory.eINSTANCE.createTypeInt(32));
-		Instruction assign_diff = new Assign(diff_1, diffValue);
-		bodyNode.add(index, assign_diff);
-		index++;
-
-		Expression conditionExp = new BinaryExpr(new VarExpr(new Use(diff)),
-				BinaryOp.GE, new IntExpr(numTokens),
-				IrFactory.eINSTANCE.createTypeBool());
-
-		Expression negConditionExp = new BinaryExpr(
-				new VarExpr(new Use(diff_1)), BinaryOp.GE, new IntExpr(
-						numTokens), IrFactory.eINSTANCE.createTypeBool());
-
-		Expression absCondition = new BinaryExpr(conditionExp,
-				BinaryOp.LOGIC_OR, negConditionExp,
-				IrFactory.eINSTANCE.createTypeBool());
 
 		LocalVariable conditionVar = new LocalVariable(true, inputIndex,
 				new Location(), "condition",
 				IrFactory.eINSTANCE.createTypeBool());
 		locals.put(conditionVar.getName(), conditionVar);
-		Instruction assign2 = new Assign(conditionVar, absCondition);
-		bodyNode.add(index, assign2);
-		index++;
-
+		IfNode ifNode = insertIfCondition(action.getScheduler(), diff, numTokens, conditionVar,
+				512);
+		action.getScheduler().getNodes().add(ifNode);
+		
 		LocalVariable myResult = new LocalVariable(true, inputIndex,
 				new Location(), "myResult",
 				IrFactory.eINSTANCE.createTypeBool());
@@ -820,8 +801,41 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				new VarExpr(new Use(conditionVar)),
 				IrFactory.eINSTANCE.createTypeBool());
 		Instruction assign3 = new Assign(myResult, e);
+
 		bodyNode.add(returnIndex, assign3);
 		actionReturn.setValue(new VarExpr(new Use(myResult)));
+		action.getScheduler().getNodes().add(bodyNode);
+		//action.getScheduler().getNodes().remove(0);
+		}
+
+	private IfNode insertIfCondition(Procedure scheduler, LocalVariable diff,
+			int numTokens, LocalVariable ConditionVar, int bufferSize) {
+		Expression ifCondition = new BinaryExpr(new VarExpr(new Use(diff)),
+				BinaryOp.GE, new IntExpr(0),
+				IrFactory.eINSTANCE.createTypeBool());
+		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
+		BlockNode blkNode = new BlockNode(scheduler);
+		thenNodes.add(blkNode);
+		Expression value = new BinaryExpr(new VarExpr(new Use(diff)),
+				BinaryOp.GE, new IntExpr(numTokens),
+				IrFactory.eINSTANCE.createTypeBool());
+		Instruction assign1 = new Assign(ConditionVar, value);
+		blkNode.add(assign1);
+
+		List<CFGNode> elseNodes = new ArrayList<CFGNode>();
+		BlockNode blkNodeElse = new BlockNode(scheduler);
+		elseNodes.add(blkNodeElse);
+		Expression sum = new BinaryExpr(new VarExpr(new Use(diff)),
+				BinaryOp.PLUS, new IntExpr(bufferSize),
+				IrFactory.eINSTANCE.createTypeInt(32));
+		Expression value2 = new BinaryExpr(sum, BinaryOp.GE, new IntExpr(
+				numTokens), IrFactory.eINSTANCE.createTypeBool());
+		Instruction assign2 = new Assign(ConditionVar, value2);
+		blkNodeElse.add(assign2);
+
+		IfNode ifNode = new IfNode(scheduler, ifCondition, thenNodes,
+				elseNodes, new BlockNode(scheduler));
+		return ifNode;
 	}
 
 	/**
@@ -1166,11 +1180,10 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			repeatInput = false;
 		} else {
 			if (repeatOutput) {
-				fsm.removeTransition(sourceName, action);
+				// fsm.removeTransition(sourceName, action);
 				repeatOutput = false;
 			}
 		}
-
 	}
 
 }
