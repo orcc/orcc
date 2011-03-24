@@ -1,32 +1,5 @@
-/*
- * Author : Endri Bezati (endri.bezati@epfl.ch)
- * Copyright (c) 2009, EPFL SCI-STI-MM
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
- *     contributors may be used to endorse or promote products derived from this
- *     software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
+// Source file is "/home/endrix/Projects/jpeg/src/jpeg/encoder/hw/Test/writer.cal"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -34,22 +7,93 @@
 #include "orcc_fifo.h"
 #include "orcc_util.h"
 
-// from APR
-/* Ignore Microsoft's interpretation of secure development
- * and the POSIX string handling API
- */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-#ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-#pragma warning(disable: 4996)
-#endif
+#define SIZE 512
+
+////////////////////////////////////////////////////////////////////////////////
+// Input FIFOs
+extern struct fifo_i16_s *writer_Byte;
+extern struct fifo_i32_s *writer_pEOF;
+
+static unsigned int index_Byte;
+static unsigned int numTokens_Byte;
+#define NUM_READERS_Byte 1
+#define SIZE_Byte SIZE
+#define tokens_Byte writer_Byte->contents
+
+static unsigned int index_pEOF;
+static unsigned int numTokens_pEOF;
+#define NUM_READERS_pEOF 1
+#define SIZE_pEOF SIZE
+#define tokens_pEOF writer_pEOF->contents
 
 static FILE *F = NULL;
 static int cnt = 0;
 
-// Called before any *_scheduler function.
-void writer_initialize() {
+
+////////////////////////////////////////////////////////////////////////////////
+// Input FIFOs
+////////////////////////////////////////////////////////////////////////////////
+// Input FIFOs Id
+static unsigned int fifo_writer_Byte_id; 
+static unsigned int fifo_writer_pEOF_id;  
+
+////////////////////////////////////////////////////////////////////////////////
+// Parameter values of the instance
+////////////////////////////////////////////////////////////////////////////////
+// State variables of the actor
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Initial FSM state of the actor
+enum states {
+	my_state_s0 = 0,
+	my_state_s1
+};
+
+static char *stateNames[] = {
+	"s0",
+	"s1"
+};
+
+static enum states _FSM_state;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Token functions
+
+static void read_Byte() {
+	index_Byte = writer_Byte->read_inds[fifo_writer_Byte_id];
+	numTokens_Byte = index_Byte + fifo_i16_get_num_tokens(writer_Byte, fifo_writer_Byte_id);
+}
+
+static void read_end_Byte() {
+	writer_Byte->read_inds[fifo_writer_Byte_id] = index_Byte;
+}
+
+static void read_pEOF() {
+	index_pEOF = writer_pEOF->read_inds[fifo_writer_pEOF_id];
+	numTokens_pEOF = index_pEOF + fifo_i32_get_num_tokens(writer_pEOF, fifo_writer_pEOF_id);
+}
+
+static void read_end_pEOF() {
+	writer_pEOF->read_inds[fifo_writer_pEOF_id] = index_pEOF;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Initializes
+void writer_initialize(unsigned int fifo_Byte_id, unsigned int fifo_pEOF_id) {
+	
+	/* Set initial state to current FSM state */
+	_FSM_state = my_state_s0;
+
+	/* Set initial value to global variable */
+
+	/* Initialize input FIFOs id */
+	fifo_writer_Byte_id = fifo_Byte_id; 
+	fifo_writer_pEOF_id = fifo_pEOF_id;  
+
+
 	if (write_file == NULL) {
 		print_usage();
 		fprintf(stderr, "No write file given!\n");
@@ -71,88 +115,97 @@ void writer_initialize() {
 	}
 }
 
-extern struct fifo_u8_s *writer_In;
-extern struct fifo_i32_s *writer_EOF;
 
-enum states {
-	s_Test = 0,
-	s_Write
-};
-
-static char *stateNames[] = {
-	"s_Test",
-	"s_Write"
-};
-
-static enum states _FSM_state = s_Test;
-
+////////////////////////////////////////////////////////////////////////////////
+// Action scheduler
 void writer_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	i32 EOF_buf[1];
-	i32 *pEOF;
-	i32 eof_1;
-	u8 In_buf[1];
-	u8 *In;
+	si->ports = 0;
+	i32 peof;
 	u8 wr;
-	
+	read_Byte();
+	read_pEOF();
+
 
 	// jump to FSM state 
 	switch (_FSM_state) {
-	case s_Test:
-		goto l_Test;
-	case s_Write:
-		goto l_Write;
+	case my_state_s0:
+		goto l_s0;
+	case my_state_s1:
+		goto l_s1;
 	default:
-		printf("unknown state: %s\n", stateNames[_FSM_state]);
+		printf("unknown state in writer.c : %s\n", stateNames[_FSM_state]);
 		wait_for_key();
 		exit(1);
 	}
 
 	// FSM transitions
 
-l_Test:
-	if ( fifo_i32_has_tokens(writer_EOF, 0, 1) ) {
-		pEOF = fifo_i32_read(writer_EOF, EOF_buf, 0, 1);
-		eof_1 = pEOF[0];
-		if (eof_1 == 0) {				
-			i++;
-			fifo_i32_read_end(writer_EOF, 0, 1);
-			goto l_Write;
-		}else{
-			//Exit the program, EOF is reached
+l_s0:
+	if (index_pEOF + 1 <= numTokens_pEOF) {
+		int ports = 0;
+		if (ports != 0) {
+			_FSM_state = my_state_s0;
+			si->num_firings = i;
+			si->reason = full;
+			si->ports = ports;
+			goto finished;
+		}
+		peof = tokens_pEOF[(index_pEOF + 0) % SIZE_pEOF];
+		if (peof == 0) {
+			i++;		
+			index_pEOF += 1;
+			goto l_s1;
+		} else {
 			fclose(F);
-			fifo_i32_read_end(writer_EOF, 0, 1);
-			exit(666);
+			index_pEOF += 1;
+			exit(666);		
 		}
 	} else {
-		_FSM_state = s_Test;
+		int ports = 0;
+		if (index_pEOF + 1 > numTokens_pEOF) {
+			ports |= 0x02;
+		}
 		si->num_firings = i;
 		si->reason = starved;
-		si->ports = 0x02;
-		return;
+		si->ports |= ports;
+		_FSM_state = my_state_s0;
+		goto finished;
 	}
 
-l_Write:
-	if (fifo_u8_has_tokens(writer_In, 0, 1)) {
-		In = fifo_u8_read(writer_In, In_buf, 0, 1);
-		wr = In[0];
-	
+l_s1:
+	if (index_Byte + 1 <= numTokens_Byte ) {
+		int ports = 0;
+		if (ports != 0) {
+			_FSM_state = my_state_s1;
+			si->num_firings = i;
+			si->reason = full;
+			si->ports = ports;
+			goto finished;
+		}
+		wr = tokens_Byte[(index_Byte + 0) % SIZE_Byte];
 		fseek(F,sizeof(u8)*cnt,SEEK_SET);
 		fwrite(&wr,sizeof(u8),1,F);
 		cnt++;	
-		
-		fifo_u8_read_end(writer_In, 0, 1);
+
+		index_Byte += 1;
 		
 		i++;
-		goto l_Test;
+		goto l_s0;
 	} else {
-		_FSM_state = s_Write;
+		int ports = 0;
+		if (index_Byte + 1 > numTokens_Byte) {
+			ports |= 0x01;
+		}
 		si->num_firings = i;
 		si->reason = starved;
-		si->ports = 0x01;
-		return;
+		si->ports |= ports;
+		_FSM_state = my_state_s1;
+		goto finished;
 	}
 
+finished:
+	read_end_Byte();
+	read_end_pEOF();
 }
-
 
