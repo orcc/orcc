@@ -182,6 +182,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 	private int outputIndex = 0;
 
+	private int bufferSize = 0;
+
 	private Port port;
 
 	private Action process;
@@ -606,9 +608,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		LocalVariable mask = new LocalVariable(true, 1, new Location(), "mask",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(mask.getName(), mask);
-		Expression expr511 = new IntExpr(511);
+		Expression exprMask = new IntExpr(bufferSize-1);
 		Expression maskValue = new BinaryExpr(new VarExpr(new Use(index)),
-				BinaryOp.BITAND, expr511, IrFactory.eINSTANCE.createTypeInt(32));
+				BinaryOp.BITAND, exprMask, IrFactory.eINSTANCE.createTypeInt(32));
 		Assign assignMask = new Assign(mask, maskValue);
 		bodyNode.add(assignMask);
 
@@ -682,9 +684,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		LocalVariable mask = new LocalVariable(true, 1, new Location(), "mask",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(mask.getName(), mask);
-		Expression expr511 = new IntExpr(511);
+		Expression exprmask = new IntExpr(bufferSize-1);
 		Expression maskValue = new BinaryExpr(new VarExpr(new Use(counter)),
-				BinaryOp.BITAND, expr511, IrFactory.eINSTANCE.createTypeInt(32));
+				BinaryOp.BITAND, exprmask, IrFactory.eINSTANCE.createTypeInt(32));
 		Assign assignMask = new Assign(mask, maskValue);
 		bodyNode.add(assignMask);
 
@@ -792,13 +794,13 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private void modifyActionSchedulability(Action action,
 			GlobalVariable writeIndex, GlobalVariable readIndex) {
-		
-		BlockNode bodyNode = (BlockNode) action.getScheduler().getNodes().get(action.getScheduler().getNodes().size()-1);
+		BlockNode bodyNode = (BlockNode) action.getScheduler().getNodes()
+				.get(action.getScheduler().getNodes().size() - 1);
 		OrderedMap<String, LocalVariable> locals = action.getScheduler()
 				.getLocals();
 
 		BlockNode firstBlock = new BlockNode(action.getScheduler());
-		action.getScheduler().getNodes().add(0,firstBlock);
+		action.getScheduler().getNodes().add(0, firstBlock);
 		LocalVariable localRead = new LocalVariable(true, inputIndex,
 				new Location(), "readIndex",
 				IrFactory.eINSTANCE.createTypeInt(32));
@@ -831,8 +833,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				IrFactory.eINSTANCE.createTypeBool());
 		locals.put(conditionVar.getName(), conditionVar);
 		IfNode ifNode = createIfCondition(action.getScheduler(), diff,
-				numTokens, conditionVar, 512);
-		action.getScheduler().getNodes().add(1,ifNode);
+				numTokens, conditionVar, bufferSize);
+		action.getScheduler().getNodes().add(1, ifNode);
 
 		LocalVariable myResult = new LocalVariable(true, inputIndex,
 				new Location(), "myResult",
@@ -971,6 +973,31 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
+	 * This method return the closest power of 2 of the maximum repeat value of
+	 * a port
+	 * 
+	 * @param action
+	 *            action containing the port
+	 * @param port
+	 *            repeat port
+	 * @return optimal buffer size
+	 */
+	private int OptimalBufferSize(Action action, Port port) {
+		int size = 0;
+		int optimalSize = 0;
+		for (Entry<Port, Integer> entry : action.getInputPattern()
+				.getNumTokensMap().entrySet()) {
+			if (entry.getKey() == port) {
+				if (entry.getValue() > size) {
+					size = entry.getValue();
+				}
+			}
+		}
+		optimalSize = closestPow_2(size)*2;
+		return optimalSize;
+	}
+
+	/**
 	 * For every Input of the action this method creates the new required
 	 * actions
 	 * 
@@ -1009,6 +1036,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					numTokens = entry.getValue();
 					inputIndex = inputIndex + 1;
 					port = entry.getKey();
+					bufferSize = OptimalBufferSize(action, port);
 					entryType = entry.getKey().getType();
 
 					if (inputPorts.contains(port)) {
@@ -1019,7 +1047,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					} else {
 						inputPorts.add(port);
 						untagBuffer = createTab(port.getName() + "_buffer",
-								entryType, 512);
+								entryType, bufferSize);
 						inputBuffers.add(untagBuffer);
 						untagReadIndex = createCounter("readIndex_"
 								+ port.getName());
