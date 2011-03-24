@@ -49,13 +49,12 @@
 using namespace std;
 using namespace llvm;
 
-SuperInstance::SuperInstance(LLVMContext& C, std::string id, Instance* srcInstance, list<Port*>* intSrcPorts, int srcFactor, Instance* dstInstance, list<Port*>* intDstPorts, int dstFactor) : Instance(id, NULL), Context(C){
+SuperInstance::SuperInstance(LLVMContext& C, std::string id, Instance* srcInstance, int srcFactor, Instance* dstInstance, int dstFactor, map<Port*, Port*>* internalPorts) : Instance(id, NULL), Context(C){
 	this->srcInstance = srcInstance;
 	this->dstInstance = dstInstance;
 	this->srcFactor = srcFactor;
 	this->dstFactor = dstFactor;
-	this->intSrcPorts = intSrcPorts;
-	this->intDstPorts = intDstPorts;
+	this->internalPorts = internalPorts;
 	this->actor = createCompositeActor();
 }
 
@@ -87,9 +86,15 @@ Actor* SuperInstance::createCompositeActor(){
 	// Create a composite moc
 	CSDFMoC* moc = createMoC(srcActor, srcFactor, dstActor, dstFactor);
 	
+	// Filter patterns
+	Pattern* inputMoc = moc->getInputPattern();
+	Pattern* outputMoc = moc->getOutputPattern();
+
+	filterPattern(inputMoc, outputMoc, internalPorts);
+
 	// Set ports ports of the actor
-	map<string, Port*>* inputs = createPorts(moc->getInputPattern()->getPorts());
-	map<string, Port*>* outputs = createPorts(moc->getOutputPattern()->getPorts());
+	map<string, Port*>* inputs = createPorts(inputMoc->getPorts());
+	map<string, Port*>* outputs = createPorts(outputMoc->getPorts());
 	
 	Actor* actorComposite = new Actor(id, NULL, "", inputs,  outputs,
 		stateVars, parameters, procedures, initializes, actions, NULL, moc);
@@ -150,11 +155,6 @@ CSDFMoC* SuperInstance::createMoC(Actor* srcActor, int srcFactor, Actor* dstActo
 	Pattern* inputPattern = createPattern(srcMoc->getInputPattern(), srcFactor, dstMoc->getInputPattern(), dstFactor);
 	Pattern* outputPattern = createPattern(srcMoc->getOutputPattern(), srcFactor, dstMoc->getOutputPattern(), dstFactor);
 
-
-	// Filter patterns
-	filterPattern(outputPattern, srcActor, intSrcPorts);
-	filterPattern(inputPattern, dstActor, intDstPorts);
-
 	// Add to moc
 	moc->setInputPattern(inputPattern);
 	moc->setOutputPattern(outputPattern);
@@ -171,12 +171,12 @@ CSDFMoC* SuperInstance::createMoC(Actor* srcActor, int srcFactor, Actor* dstActo
 	return moc;
 }
 
-void SuperInstance::filterPattern(Pattern* pattern,  Actor* actor, list<Port*>* intPorts){
-	list<Port*>::iterator it;
+void SuperInstance::filterPattern(Pattern* input, Pattern* output, map<Port*, Port*>* intPorts){
+	map<Port*, Port*>::iterator it;
 
 	for (it = intPorts->begin(); it != intPorts->end(); it++){
-		Port* port = actor->getPort((*it)->getName());
-		pattern->remove(port);
+		output->remove(it->first);
+		input->remove(it->second);
 	}
 }
 

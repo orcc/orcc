@@ -58,7 +58,7 @@ public:
 	 *
 	 * @param instances : the instances encapsulated by the SuperInstance
 	 */
-	SuperInstance(llvm::LLVMContext& C, std::string id, Instance* srcInstance, std::list<Port*>* intSrcPorts, int srcFactor, Instance* dstInstance, std::list<Port*>* intDstPorts, int dstFactor);
+	SuperInstance(llvm::LLVMContext& C, std::string id, Instance* srcInstance, int srcFactor, Instance* dstInstance, int dstFactor, std::map<Port*, Port*>* internalPorts );
 
 	~SuperInstance(){};
 
@@ -106,16 +106,16 @@ private:
 	std::map<std::string, Port*>* createPorts(std::set<Port*>* portSet);
 
 	/**
-     *  @brief Filter the given pattern with internal ports
+     *  @brief Filter the given patterns with internal ports
 	 *
-	 * @param pattern : the Pattern to filter
+	 * @param input : the input Pattern to filter
 	 *
-	 * @param actor : the actor from which pattern as to be filter
+	 * @param output : the output Pattern to filter
 	 *
-	 * @param intPorts : the internal ports
+	 * @param intPorts: the internal ports
 	 *
 	 */
-	void filterPattern(Pattern* pattern,  Actor* actor, std::list<Port*>* intPorts);
+	void filterPattern(Pattern* input, Pattern* output, std::map<Port*, Port*>* intPorts);
 
 	/**
      *  @brief Add a map of state variables to another
@@ -164,11 +164,8 @@ private:
 	/** Repetition of source instance*/
 	int srcFactor;
 	
-	/** Internal port of source instance */
-	std::list<Port*>* intSrcPorts;
-
-	/** Internal port of destination instance */
-	std::list<Port*>* intDstPorts;
+	/** Internal port of instance */
+	std::map<Port*, Port*>* internalPorts;
 
 	/** Destination instance */
 	Instance* dstInstance;

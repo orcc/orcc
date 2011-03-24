@@ -152,8 +152,7 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Conn
 	Pattern* srcPattern = ((CSDFMoC*)srcMoC)->getOutputPattern();
 	Pattern* dstPattern = ((CSDFMoC*)dstMoC)->getInputPattern();
 	
-	list<Port*>* intSrcPorts = new list<Port*>();
-	list<Port*>* intDstPorts = new list<Port*>();
+	map<Port*, Port*>* internPorts = new map<Port*, Port*>();
 
 	// Calculate rate and set internal ports
 	Rational rate;
@@ -180,12 +179,11 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Conn
 		}
 
 		// Set internal ports of each instances
-		intSrcPorts->push_back(src);
-		intDstPorts->push_back(dstActPort);
+		internPorts->insert(pair<Port*, Port*>(srcActPort, dstActPort));
 	}
 
 
-	return new SuperInstance(Context, "merged", src, intSrcPorts, rate.numerator(), dst, intDstPorts, rate.denominator());
+	return new SuperInstance(Context, "merged", src, rate.numerator(), dst, rate.denominator(), internPorts);
 }
 
 Rational Merger::getRational(ConstantInt* srcProd, ConstantInt* dstCons){
