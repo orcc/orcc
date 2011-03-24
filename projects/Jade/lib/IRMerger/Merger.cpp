@@ -39,13 +39,19 @@
 #include <map>
 #include <list>
 
+#include "Rational.h"
+
+#include "llvm/Constants.h"
+
 #include "Jade/Core/Network.h"
+#include "Jade/Core/MoC/CSDFMoC.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Merger/Merger.h"
 #include "Jade/Merger/SuperInstance.h"
 //------------------------------
 
 using namespace std;
+using namespace llvm;
 
 Merger::Merger(Configuration* configuration){
 	network = configuration->getNetwork();
@@ -100,11 +106,54 @@ void Merger::transform(){
 }
 
 void Merger::mergeInstance(Instance* src, Instance* dst){
-	list<Connection*>* connection = network->getAllConnections(src, dst);
-
-	SuperInstance* superInstance = new SuperInstance("merged", src, 1, dst, 1);
+	SuperInstance* superInstance =  getSuperInstance(src, dst);
 
 	network->removeInstance(src);
 	network->removeInstance(dst);
 	network->addInstance(superInstance);
+}
+
+SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst){
+	Actor* srcAct = src->getActor();
+	MoC* srcMoC = srcAct->getMoC();
+	Actor* dstAct = dst->getActor();
+	MoC* dstMoC = dstAct->getMoC();
+	Pattern* srcPattern = ((CSDFMoC*)srcMoC)->getOutputPattern();
+	Pattern* dstPattern = ((CSDFMoC*)dstMoC)->getInputPattern();
+	
+	list<Port*>* intSrcPorts = new list<Port*>();
+	list<Port*>* intDstPorts = new list<Port*>();
+
+	// Calculate rate and set internal ports
+	Rational rate;
+	list<Connection*>::iterator it;
+	list<Connection*>* connections = network->getAllConnections(src, dst);
+
+	for (it = connections->begin(); it != connections->end(); it++){
+		Connection* connection = *it;
+		
+		// Get ports of the connection
+		Port* src = connection->getSourcePort();
+		Port* dst = connection->getDestinationPort();
+
+		// Get corresponding port in actor
+		Port* srcActPort = srcAct->getOutput(src->getName());
+		Port* dstActPort = dstAct->getInput(dst->getName());
+		
+		// Verify that rate of the two instances are consistent
+		Rational compareRate = getRational(srcPattern->getNumTokens(srcActPort), dstPattern->getNumTokens(dstActPort));
+		if ( rate == 0){
+			rate = compareRate;
+		}else if (rate != compareRate){
+			// This two instances can't be merged
+			return NULL;
+		}
+	}
+
+
+	return new SuperInstance("merged", src, rate.numerator(), dst, rate.denominator());
+}
+
+Rational Merger::getRational(ConstantInt* srcProd, ConstantInt* dstCons){
+	return Rational(dstCons->getLimitedValue(), srcProd->getLimitedValue());
 }

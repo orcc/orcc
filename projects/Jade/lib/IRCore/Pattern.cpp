@@ -103,3 +103,16 @@ void Pattern::remove(Port* port) {
 	peekedMap->erase(port);
 	variableMap->erase(port);
 }
+
+ConstantInt* Pattern::getNumTokens(Port* port) {
+	map<Port*, ConstantInt*>::iterator it;
+
+	// Looking for the corresponding port in numTokensMap
+	it = numTokensMap->find(port);
+	
+	if (it == numTokensMap->end()){
+		return NULL;
+	}
+
+	return it->second;
+}

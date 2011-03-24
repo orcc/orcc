@@ -41,7 +41,7 @@
 
 #include <list>
 
-#include "Jade/Core/MoC.h"
+#include "Jade/Core/Moc.h"
 
 class Action;
 class Pattern;

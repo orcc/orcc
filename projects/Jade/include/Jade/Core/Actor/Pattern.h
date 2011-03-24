@@ -158,6 +158,13 @@ public:
 	 *            the given port
 	 */
 	void setVariable(Port* port, Variable* variable);
+
+	/**
+	 * @brief Returns the number of tokens produced (or consumed) by the given port.
+	 * 
+	 * @return the number of tokens produced (or consumed) by the given port
+	 */
+	llvm::ConstantInt* getNumTokens(Port* port);
 private:
 
 	/**

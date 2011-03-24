@@ -126,5 +126,5 @@ void Network::addInstance(Instance* instance){
 }
 
 list<Connection*>* Network::getAllConnections(Instance* source, Instance* target){	
-	return (list<Connection*>*)graph->getAllEdges(&Vertex(source), &Vertex(target));
+	return (list<Connection*>*)graph->getAllEdges(new Vertex(source), new Vertex(target));
 }

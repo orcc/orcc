@@ -39,9 +39,15 @@
 #ifndef MERGER_H
 #define MERGER_H
 
+namespace llvm{
+	class ConstantInt;
+}
+
 class Configuration;
 class Network;
 class Vertex;
+class Rational;
+class SuperInstance;
 //------------------------------
 
 /**
@@ -60,7 +66,26 @@ public:
 private:
 	Network* network;
 
+	/**
+	 * @brief Merge two instance in a network
+	 */
 	void mergeInstance(Instance* src, Instance* dst);
+
+	/**
+	 * @brief Get a SuperInstance of the given instance
+	 *
+	 * @param src : the source Instance
+	 *
+	 * @param dst : the destination Instance
+	 */
+	SuperInstance* getSuperInstance(Instance* src, Instance* dst);
+
+	/**
+	 * @brief Get the Rational of a production/comsuption
+	 * 
+	 * @return Rational of the connection.
+	 */
+	Rational getRational(llvm::ConstantInt* srcProd, llvm::ConstantInt* dstCons);
 };
 
 #endif
