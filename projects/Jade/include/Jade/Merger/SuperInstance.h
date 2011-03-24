@@ -58,7 +58,7 @@ public:
 	 *
 	 * @param instances : the instances encapsulated by the SuperInstance
 	 */
-	SuperInstance(std::string id, Instance* srcInstance, int srcFactor, Instance* dstInstance, int dstFactor);
+	SuperInstance(std::string id, Instance* srcInstance, std::list<Port*>* intSrcPorts, int srcFactor, Instance* dstInstance, std::list<Port*>* intDstPorts, int dstFactor);
 
 	~SuperInstance(){};
 
@@ -72,9 +72,22 @@ private:
 	 */
 	Actor* createCompositeActor();
 
+	/** Instance source */
 	Instance* srcInstance;
+	
+	/** Repetition of source instance*/
 	int srcFactor;
+	
+	/** Internal port of source instance */
+	std::list<Port*>* intSrcPorts;
+
+	/** Internal port of destination instance */
+	std::list<Port*>* intDstPorts;
+
+	/** Destination instance */
 	Instance* dstInstance;
+	
+	/** Repetition of destination instance*/
 	int dstFactor;
 };
 

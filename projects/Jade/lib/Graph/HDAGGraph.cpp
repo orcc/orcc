@@ -167,19 +167,24 @@ void HDAGGraph::refreshEdges(){
  Removes an edge in the graph.
 */
 bool HDAGGraph::removeEdge(HDAGEdge* edge){
-	for(int i=0; i<nbEdges; i++){
+	int i = 0;
+	for(; i<nbEdges; i++){
 		if (edge == edges[i]){
-			// delete edge
-			edges[i] = NULL;
-			delete edge;
-
-			//edge is found
-			return true;
+			// Edge found
+			break;
 		}
 	}
 
+	if ( i == nbEdges - 1){
+		//Edge has not been found
+		return false;
+	}
+
+	// Fill the current position with the last edge
+	edges[i] = edges[--nbEdges];
+
 	// edge not found
-	return false;
+	return true;
 }
 
 /**

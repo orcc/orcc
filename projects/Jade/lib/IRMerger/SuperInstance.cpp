@@ -44,11 +44,13 @@
 
 using namespace std;
 
-SuperInstance::SuperInstance(std::string id, Instance* srcInstance, int srcFactor, Instance* dstInstance, int dstFactor) : Instance(id, NULL){
+SuperInstance::SuperInstance(std::string id, Instance* srcInstance, list<Port*>* intSrcPorts, int srcFactor, Instance* dstInstance, list<Port*>* intDstPorts, int dstFactor) : Instance(id, NULL){
 	this->srcInstance = srcInstance;
 	this->dstInstance = dstInstance;
 	this->srcFactor = srcFactor;
 	this->dstFactor = dstFactor;
+	this->intSrcPorts = intSrcPorts;
+	this->intDstPorts = intDstPorts;
 	this->actor = createCompositeActor();
 }
 

@@ -130,11 +130,11 @@ public:
 	std::list<Instance*> getSuccessorsOf(Instance* instance);
 	
 	/**
-	 * @brief Remove a vertex from the network.
+	 * @brief Remove an instance from the network.
 	 * 
-	 * @param vertex : the Vertex to remove
+	 * @param instance : the Instance to remove
 	 *
-	 * @return whether the vertex has been found or not
+	 * @return whether the instance has been found or not
 	 */
 	bool removeInstance(Instance* instance);
 
@@ -142,8 +142,37 @@ public:
 	 * @brief Remove a vertex in the network.
 	 * 
 	 * @param vertex : the Vertex to add
+	 *
+	 * @return the corresponding vertex in graph
 	 */
-	void addInstance(Instance* instance);
+	Vertex* addInstance(Instance* instance);
+
+	/**
+	 * @brief Remove a connection from the network.
+	 * 
+	 * @param connection : the Connection to remove
+	 *
+	 * @return whether the connection has been found or not
+	 */
+	bool removeConnection(Connection* connection);
+
+	/**
+	 * @brief Return incoming connections of the given instance
+	 * 
+	 * @param instance : the Instance to get incoming connections
+	 *
+	 * @return a list of incoming connections
+	 */
+	std::list<Connection*> getInConnections(Instance* instance);
+
+	/**
+	 * @brief Return outgoing connections of the given instance
+	 * 
+	 * @param instance : the Instance to get outgoing connections
+	 *
+	 * @return a list of incoming connections
+	 */
+	std::list<Connection*> getOutConnections(Instance* instance);
 
 	/**
 	 * @brief Compute a list of successors in the graph.

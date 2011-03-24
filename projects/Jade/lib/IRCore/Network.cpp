@@ -43,6 +43,8 @@
 
 using namespace std;
 
+#define MAX_CONNECTION 100
+
 Network::~Network(){
 	delete graph;
 	delete inputs;
@@ -120,11 +122,47 @@ bool Network::removeInstance(Instance* instance){
 	return graph->removeVertex(vertex);
 }
 
-void Network::addInstance(Instance* instance){
+Vertex* Network::addInstance(Instance* instance){
+	Vertex* vertex = new Vertex(instance);
 	instances.push_back(instance);
-	graph->addVertex(new Vertex(instance));
+	graph->addVertex(vertex);
+
+	return vertex;
+}
+
+bool Network::removeConnection(Connection* connection){
+	return graph->removeEdge(connection);
 }
 
 list<Connection*>* Network::getAllConnections(Instance* source, Instance* target){	
-	return (list<Connection*>*)graph->getAllEdges(new Vertex(source), new Vertex(target));
+	return (list<Connection*>*)graph->getAllEdges(&Vertex(source), &Vertex(target));
+}
+
+list<Connection*> Network::getInConnections(Instance* instance){
+	list<Connection*> ins;
+	HDAGEdge* inEdges[MAX_CONNECTION];
+
+	int nbEdges = graph->getInputEdges(&Vertex(instance), inEdges);
+
+	// Insert edge found in result
+	for (int i = 0; i < nbEdges; i++){
+		ins.push_back((Connection*)inEdges[i]);
+	}
+
+	return ins;
+}
+
+list<Connection*> Network::getOutConnections(Instance* instance){
+	list<Connection*> outs;
+
+	HDAGEdge* outEdges[MAX_CONNECTION];
+
+	int nbEdges = graph->getOutputEdges(&Vertex(instance), outEdges);
+
+	// Insert edge found in result
+	for (int i = 0; i < nbEdges; i++){
+		outs.push_back((Connection*)outEdges[i]);
+	}
+
+	return outs;
 }

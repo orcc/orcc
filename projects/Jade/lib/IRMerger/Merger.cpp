@@ -106,14 +106,45 @@ void Merger::transform(){
 }
 
 void Merger::mergeInstance(Instance* src, Instance* dst){
-	SuperInstance* superInstance =  getSuperInstance(src, dst);
+	// Get all connections between the two instances
+	list<Connection*>* connections = network->getAllConnections(src, dst);
+
+	SuperInstance* superInstance =  getSuperInstance(src, dst, connections);
+	
+	// Add the new instance
+	Vertex* vertex = network->addInstance(superInstance);
+
+	updateConnections(connections, src, dst, vertex);
 
 	network->removeInstance(src);
 	network->removeInstance(dst);
-	network->addInstance(superInstance);
+	
 }
 
-SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst){
+void Merger::updateConnections(list<Connection*>* connections, Instance* src, Instance* dst, Vertex* vertex){
+	list<Connection*>::iterator it;
+
+	// Remove internal connections
+	for (it = connections->begin(); it != connections->end(); it++){
+		network->removeConnection(*it);
+	}
+
+	// Update input connections with new vertex
+	list<Connection*> srcIn = network->getInConnections(src);
+	for (it = srcIn.begin(); it != srcIn.end(); it++){
+		(*it)->setSink(vertex);
+	}
+
+	// Update output connections
+	list<Connection*> dstOut = network->getOutConnections(dst);
+	for (it = dstOut.begin(); it != dstOut.end(); it++){
+		(*it)->setSource(vertex);
+	}
+
+
+}
+
+SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Connection*>* connections ){
 	Actor* srcAct = src->getActor();
 	MoC* srcMoC = srcAct->getMoC();
 	Actor* dstAct = dst->getActor();
@@ -126,9 +157,8 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst){
 
 	// Calculate rate and set internal ports
 	Rational rate;
+	
 	list<Connection*>::iterator it;
-	list<Connection*>* connections = network->getAllConnections(src, dst);
-
 	for (it = connections->begin(); it != connections->end(); it++){
 		Connection* connection = *it;
 		
@@ -148,10 +178,14 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst){
 			// This two instances can't be merged
 			return NULL;
 		}
+
+		// Set internal ports of each instances
+		intSrcPorts->push_back(src);
+		intDstPorts->push_back(dstActPort);
 	}
 
 
-	return new SuperInstance("merged", src, rate.numerator(), dst, rate.denominator());
+	return new SuperInstance("merged", src, intSrcPorts, rate.numerator(), dst, intDstPorts, rate.denominator());
 }
 
 Rational Merger::getRational(ConstantInt* srcProd, ConstantInt* dstCons){

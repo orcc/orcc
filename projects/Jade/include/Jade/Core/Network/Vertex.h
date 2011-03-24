@@ -88,8 +88,7 @@ public:
 		this->contents = (void*)port;
 	}
 
-	~Vertex(){
-		delete contents;	
+	~Vertex(){	
 	};
 
 

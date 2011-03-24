@@ -78,7 +78,7 @@ private:
 	 *
 	 * @param dst : the destination Instance
 	 */
-	SuperInstance* getSuperInstance(Instance* src, Instance* dst);
+	SuperInstance* getSuperInstance(Instance* src, Instance* dst, std::list<Connection*>* connections );
 
 	/**
 	 * @brief Get the Rational of a production/comsuption
@@ -86,6 +86,19 @@ private:
 	 * @return Rational of the connection.
 	 */
 	Rational getRational(llvm::ConstantInt* srcProd, llvm::ConstantInt* dstCons);
+
+	/**
+	 * @brief Update connections of the super instance
+	 * 
+	 * @param connections : internal connections of the SuperInstance.
+	 *
+	 * @param src : the instance source.
+	 *
+	 * @param dst : the destination instance.
+	 *
+	 * @param vertex : the corresponding vertex.
+	 */
+	void updateConnections(std::list<Connection*>* connections, Instance* src, Instance* dst, Vertex* vertex);
 };
 
 #endif
