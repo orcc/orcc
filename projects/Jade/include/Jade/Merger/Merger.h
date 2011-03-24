@@ -58,14 +58,12 @@ class SuperInstance;
  */
 class Merger {
 public:
-	Merger(Configuration* configuration);
+	Merger(llvm::LLVMContext& C, Configuration* configuration);
 	~Merger(){};
 
 	void transform();
 
 private:
-	Network* network;
-
 	/**
 	 * @brief Merge two instance in a network
 	 */
@@ -99,6 +97,12 @@ private:
 	 * @param vertex : the corresponding vertex.
 	 */
 	void updateConnections(std::list<Connection*>* connections, Instance* src, Instance* dst, Vertex* vertex);
+
+	/** Network to merge */
+	Network* network;
+
+	/** LLVM Context */
+	llvm::LLVMContext &Context;
 };
 
 #endif

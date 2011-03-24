@@ -116,3 +116,27 @@ ConstantInt* Pattern::getNumTokens(Port* port) {
 
 	return it->second;
 }
+
+Variable* Pattern::getPeeked(Port* port) {
+	map<Port*, Variable*>::iterator it;
+
+	it = peekedMap->find(port);
+
+	if (it == peekedMap->end()){
+		return NULL;
+	}
+
+	return it->second;
+}
+
+Variable* Pattern::getVariable(Port* port) {
+	map<Port*, Variable*>::iterator it;
+
+	it = variableMap->find(port);
+
+	if (it == variableMap->end()){
+		return NULL;
+	}
+
+	return it->second;
+}

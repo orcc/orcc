@@ -58,7 +58,7 @@ public:
 	 *
 	 * @param instances : the instances encapsulated by the SuperInstance
 	 */
-	SuperInstance(std::string id, Instance* srcInstance, std::list<Port*>* intSrcPorts, int srcFactor, Instance* dstInstance, std::list<Port*>* intDstPorts, int dstFactor);
+	SuperInstance(llvm::LLVMContext& C, std::string id, Instance* srcInstance, std::list<Port*>* intSrcPorts, int srcFactor, Instance* dstInstance, std::list<Port*>* intDstPorts, int dstFactor);
 
 	~SuperInstance(){};
 
@@ -71,6 +71,92 @@ private:
 	 * @return the resulting Actor
 	 */
 	Actor* createCompositeActor();
+
+	/*!
+     *  @brief Create a moc of the composite actor.
+	 *
+	 * @return the resulting moc
+	 */
+	CSDFMoC* createMoC(Actor* srcActor, int srcFactor, Actor* dstActor, int dstFactor);
+
+	/**
+     *  @brief Create a pattern of the composite actor.
+	 *
+	 * Merge two patterns of actors according to the repetition factor
+	 *
+	 * @param srcPattern : the source Pattern
+	 *
+	 * @param srcFactor : the repetition factor of source pattern
+	 *
+	 * @param dstPattern : the destination Pattern
+	 *
+	 * @param dstFactor : the repetition factor of destination pattern
+	 *
+	 * @return the resulting pattern
+	 */
+	Pattern* createPattern(Pattern* srcPattern,  int srcFactor, Pattern* dstPattern, int dstFactor);
+
+	/**
+     *  @brief Create ports of the composite actor.
+	 *
+	 * @param portSet : a set of port
+	 *
+	 * @return the corresponding port map
+	 */
+	std::map<std::string, Port*>* createPorts(std::set<Port*>* portSet);
+
+	/**
+     *  @brief Filter the given pattern with internal ports
+	 *
+	 * @param pattern : the Pattern to filter
+	 *
+	 * @param actor : the actor from which pattern as to be filter
+	 *
+	 * @param intPorts : the internal ports
+	 *
+	 */
+	void filterPattern(Pattern* pattern,  Actor* actor, std::list<Port*>* intPorts);
+
+	/**
+     *  @brief Add a map of state variables to another
+	 *
+	 * @param src : the source map
+	 *
+	 * @param dst : the destination map
+	 *
+	 */
+	void addStateVars(std::map<std::string, StateVar*>* src, std::map<std::string, StateVar*>* dst);
+
+
+	/**
+     *  @brief Add a map of paramters to another
+	 *
+	 * @param src : the source map
+	 *
+	 * @param dst : the destination map
+	 *
+	 */
+	void addParameters(std::map<std::string, Variable*>* src, std::map<std::string, Variable*>* dst);
+
+	/**
+     *  @brief Add a map of procedures to another
+	 *
+	 * @param src : the source map
+	 *
+	 * @param dst : the destination map
+	 *
+	 */
+	void addProcedures(std::map<std::string, Procedure*>* src, std::map<std::string, Procedure*>* dst);
+
+	/**
+     *  @brief Add a list of Action to another
+	 *
+	 * @param src : the source list
+	 *
+	 * @param dst : the destination list
+	 *
+	 */
+	void addActions(std::list<Action*>* src, std::list<Action*>* dst);
 
 	/** Instance source */
 	Instance* srcInstance;
@@ -89,6 +175,9 @@ private:
 	
 	/** Repetition of destination instance*/
 	int dstFactor;
+
+	/** LLVM Context */
+	llvm::LLVMContext &Context;
 };
 
 #endif

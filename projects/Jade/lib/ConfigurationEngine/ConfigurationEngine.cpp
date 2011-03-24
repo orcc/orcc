@@ -71,7 +71,7 @@ void ConfigurationEngine::configure(Decoder* decoder){
 
 	//Merge static actors together if needed
 	if (configuration->mergeActors()){
-		Merger merger(configuration);
+		Merger merger(Context, configuration);
 		merger.transform();
 	}
 

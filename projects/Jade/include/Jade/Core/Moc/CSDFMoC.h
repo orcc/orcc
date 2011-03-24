@@ -83,6 +83,21 @@ public:
 	}
 
 	/**
+	 * @brief Add a list of actions to the MoC.
+	 *
+	 * Adds the given actions to the list of actions that can be scheduled
+	 * statically.
+	 * 
+	 * @param action : a list of Action
+	 */
+	void addActions(std::list<Action*>* actions) {
+		std::list<Action*>::iterator it;
+		for (it = actions->begin(); it != actions->end(); it++){
+			addAction(*it);
+		}
+	}
+
+	/**
 	 * @brief Returns the input pattern of this CSDF MoC.
 	 * 
 	 * @return the input pattern of this CSDF MoC

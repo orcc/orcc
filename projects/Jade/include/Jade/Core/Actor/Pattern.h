@@ -165,6 +165,36 @@ public:
 	 * @return the number of tokens produced (or consumed) by the given port
 	 */
 	llvm::ConstantInt* getNumTokens(Port* port);
+
+	/**
+	 *  @brief Returns the variable that contains the tokens peeked
+	 *
+	 * Returns the variable that contains the tokens peeked by the given port.
+	 * May be NULL if the port is not peeked.
+	 * 
+	 * @return the variable that contains the tokens peeked by the given port
+	 */
+	Variable* getPeeked(Port* port);
+
+	/**
+	 *  @brief Returns the variable that contains tokens produced (or consumed)
+	 *
+	 * Returns the variable that contains tokens produced (or consumed) by the
+	 * given port.
+	 * 
+	 * @return the variable that contains tokens produced (or consumed) by the
+	 *         given port
+	 */
+	Variable* getVariable(Port* port);
+
+	/**
+	 * @brief Returns the ports of this pattern.
+	 * 
+	 * @return the ports of this pattern
+	 */
+	std::set<Port*>* getPorts() {
+		return &ports;
+	}
 private:
 
 	/**

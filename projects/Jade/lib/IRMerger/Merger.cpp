@@ -53,7 +53,7 @@
 using namespace std;
 using namespace llvm;
 
-Merger::Merger(Configuration* configuration){
+Merger::Merger(LLVMContext& C, Configuration* configuration): Context(C){
 	network = configuration->getNetwork();
 }
 
@@ -185,7 +185,7 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Conn
 	}
 
 
-	return new SuperInstance("merged", src, intSrcPorts, rate.numerator(), dst, intDstPorts, rate.denominator());
+	return new SuperInstance(Context, "merged", src, intSrcPorts, rate.numerator(), dst, intDstPorts, rate.denominator());
 }
 
 Rational Merger::getRational(ConstantInt* srcProd, ConstantInt* dstCons){
