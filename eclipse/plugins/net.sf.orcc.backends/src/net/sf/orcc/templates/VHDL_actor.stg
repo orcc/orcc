@@ -348,7 +348,8 @@ if (<ifNode.value>) then
   <printNodes(ifNode.thenNodes)><if(ifNode.elseNodes)>
 else
   <printNodes(ifNode.elseNodes)>
-end if;<endif>
+end if;
+<endif>
 <printBlockNode(ifNode.joinNode)>
 >>
 
@@ -475,13 +476,12 @@ Actor_Scheduler(actor) ::= <<
 <actor.simpleName>_scheduler : process(<actor.templateData.signals; wrap, anchor, separator=", ">)
   <actor.actions : { action |<printLocals(action.scheduler)>
 variable <action.scheduler>_go : std_logic; <action.inputPattern.ports: {port | <if(action.inputPattern.peekedMap.(port))>
-variable <action.scheduler.name>_<port.name> : <port.type>;<
+variable <action.scheduler>_<port.name> : <port.type>;<
 endif>}; separator="\n">
 }>  --
 begin
   <actor.actions: {action|-- test if "<action>" action is schedulable
-<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.peekedMap.(port))>
-}; separator="\n">
+<action.inputPattern.ports: { port |<printRead(procedure=action.scheduler, port=port, variable=action.inputPattern.peekedMap.(port))>}; separator="\n">
 <printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n\n">
 
   --
@@ -582,19 +582,18 @@ end process <actor.simpleName>_execute;
 >>
 
 printActionBody(action) ::= <<
-<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.variableMap.(port))>}; separator="\n"
-><printProcedure(procedure=action.body, transformReturn="true")
-><action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.variableMap.(port))>}; separator="\n"
->
+<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.variableMap.(port))>}; separator="\n">
+<printProcedure(procedure=action.body, transformReturn="true")><
+action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.variableMap.(port))>}; separator="\n">
 >>
 
 actionTestScheduler(action) ::= <<
 (<action>_go = '1') then
   -- body of "<action>" action
-  <printActionBody(action)
-  ><if(action.outputPattern.ports)>
-  <action.outputPattern.ports: {port|<port.name>_isend \<= '1';}><
-  endif>
+  <printActionBody(action)><
+  if(action.outputPattern.ports)>
+  <action.outputPattern.ports: {port|<port.name>_isend \<= '1';}; separator="\n">
+  <endif>
 >>
 
 port_out_init(port) ::=<<
@@ -611,8 +610,7 @@ port_out_init(port) ::=<<
 // Core of an action - NO FSM
 
 executeCore(actions) ::= <<
-if <actions: actionTestScheduler(); separator="--\nelsif ">
---
+if <actions: actionTestScheduler(); separator="--\nelsif ">--
 end if;
 >>
 
@@ -641,8 +639,7 @@ when s_<transition.sourceState> =\>
 >>
 
 actionTestState(nextState) ::= <<
-    <actionTestScheduler(nextState.action)>
-      FSM \<= s_<nextState.targetState>;
+    <actionTestScheduler(nextState.action)>      FSM \<= s_<nextState.targetState>;
 >>
 
 
