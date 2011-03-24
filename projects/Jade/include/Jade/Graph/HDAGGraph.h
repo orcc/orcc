@@ -11,6 +11,7 @@ parallel applications.
  
 #ifndef HDAG_GRAPH
 #define HDAG_GRAPH
+#include <list>
 
 #include "HDAGVertex.h"
 #include "HDAGEdge.h"
@@ -120,6 +121,11 @@ class HDAGGraph {
 		bool removeEdge(HDAGEdge* edge);
 
 		/**
+		 Returns a set of all edges connecting source vertex to target vertex if such vertices exist in this graph.
+		*/
+		std::list<HDAGEdge*>* getAllEdges(HDAGVertex* sourceVertex, HDAGVertex* targetVertex);
+
+		/**
 		Refresh edges of the graph. This method MUST be called when edge are changed in the graph.
 		*/
 		void refreshEdges();
@@ -193,6 +199,11 @@ class HDAGGraph {
 		 @return number of edges
 		*/
 		int getNbEdges();
+
+		/**
+		 Edge container used to returns information on graph
+		*/
+		std::list<HDAGEdge*> edgesContainer;
 
 		/**
 		 Gets the input edges of a given vertex. Careful!! Slow!

@@ -60,7 +60,7 @@ public:
 private:
 	Network* network;
 
-	void mergeVertex(Vertex* src, Vertex* dst);
+	void mergeInstance(Instance* src, Instance* dst);
 };
 
 #endif

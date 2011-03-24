@@ -56,31 +56,29 @@ void Merger::transform(){
 		
 	// Iterate though all vertices until no candidate left
 	while(hasCondidate){
-		list<Vertex*>::iterator it;
-		list<Vertex*>* vertices = network->getVertices();
+		list<Instance*>::iterator it;
+		list<Instance*>* instances = network->getInstances();
 		
 		// First compute all successors in the network
 		network->computeSuccessorsMaps();
 		bool recompute = false;
 
-		for (it = vertices->begin(); it != vertices->end(); it++){
-			Vertex* src = *it;
-			Instance* srcInst = src->getInstance();
-			Actor* srcActor = srcInst->getActor();
+		for (it = instances->begin(); it != instances->end(); it++){
+			Instance* src = *it;
+			Actor* srcActor = src->getActor();
 
 			if (srcActor->getMoC()->isCSDF()){
 				//Iterate though successors, try to find a static actor
-				list<Vertex*>::iterator itDst;
-				list<Vertex*>* dsts = network->getSuccessorsOf(src);
+				list<Instance*>::iterator itDst;
+				list<Instance*> dsts = network->getSuccessorsOf(src);
 
-				for (itDst = dsts->begin(); itDst !=  dsts->end(); itDst++){
-					Vertex* dst = *itDst;
-					Instance* dstInst = dst->getInstance();
-					Actor* dstActor = dstInst->getActor();
+				for (itDst = dsts.begin(); itDst !=  dsts.end(); itDst++){
+					Instance* dst = *itDst;
+					Actor* dstActor = dst->getActor();
 
 					if (dstActor->getMoC()->isCSDF()){
 						// These two actors can be merged
-						mergeVertex(src, dst);
+						mergeInstance(src, dst);
 
 						// Recompute graph
 						recompute = true;
@@ -101,10 +99,12 @@ void Merger::transform(){
 	}
 }
 
-void Merger::mergeVertex(Vertex* src, Vertex* dst){
-	SuperInstance* superInstance = new SuperInstance("merged", src->getInstance(), 1, dst->getInstance(), 1);
+void Merger::mergeInstance(Instance* src, Instance* dst){
+	list<Connection*>* connection = network->getAllConnections(src, dst);
 
-	network->removeVertex(src);
-	network->removeVertex(dst);
-	network->addVertex(new Vertex(superInstance));
+	SuperInstance* superInstance = new SuperInstance("merged", src, 1, dst, 1);
+
+	network->removeInstance(src);
+	network->removeInstance(dst);
+	network->addInstance(superInstance);
 }

@@ -60,12 +60,10 @@ list<Instance*>* Network::getInstances() {
 	instances.clear();
 
 	// Iterate though all vertex of the graph and add instances
-	list<Vertex*>::iterator it;
-	list<Vertex*>* vertices = getVertices();
+	int nbVertices = graph->getNbVertices();
 	
-	for (it = vertices->begin(); it != vertices->end(); it++) {
-		
-		Vertex* vertex = *it;
+	for (int i = 0; i < nbVertices; i++) {
+		Vertex* vertex = (Vertex*)graph->getVertex(i);
 
 		// In case of hierarchichal graph
 		if (vertex->isInstance()){
@@ -82,38 +80,51 @@ void Network::computeSuccessorsMaps(){
 	graph->precomputeSuccessors();
 }
 
-list<Vertex*>*  Network::getVertices(){
-	// Clear previously computed vertices
-	vertices.clear();
-
-	// Iterate though all vertex of the graph and adding then
-	int nbVertices = graph->getNbVertices();
-	
-	for (int i = 0; i < nbVertices; i++) {
-		Vertex* vertex = (Vertex*)graph->getVertex(i);
-
-		vertices.push_back(vertex);
-	}
-
-	return &vertices;
-}
-
-list<Vertex*>* Network::getSuccessorsOf(Vertex* vertex){
-	successors.clear();
+list<Instance*> Network::getSuccessorsOf(Instance* instance){
+	Vertex* vertex = getVertex(instance);
 	int nbSucc = vertex->nbSuccessors;
 	
+	// Add all successor in list
+	list<Instance*> successors;
+
 	for (int i = 0; i < nbSucc; i++){
 		Vertex* succ = (Vertex*)vertex->successors[i];
-		successors.push_back(succ);
+		if (succ->isInstance()){
+			successors.push_back(succ->getInstance());
+		}
 	}
 
-	return &successors;
+	return successors;
 }
 
-bool Network::removeVertex(Vertex* vertex){
+Vertex* Network::getVertex(Instance* instance){
+	int nbVertex = graph->getNbVertices();
+	
+	for (int i = 0; i < nbVertex; i++){
+		Vertex* vertex = (Vertex*)graph->getVertex(i);
+		if (vertex->isInstance()){
+			if (vertex->getInstance() == instance){
+				// Vertex has been found
+				return vertex;
+			}
+		}
+	}
+	
+	// No vertex found
+	return NULL;
+}
+
+bool Network::removeInstance(Instance* instance){
+	instances.remove(instance);
+	Vertex* vertex = getVertex(instance);
 	return graph->removeVertex(vertex);
 }
 
-void Network::addVertex(Vertex* vertex){
-	graph->addVertex(vertex);
+void Network::addInstance(Instance* instance){
+	instances.push_back(instance);
+	graph->addVertex(new Vertex(instance));
+}
+
+list<Connection*>* Network::getAllConnections(Instance* source, Instance* target){	
+	return (list<Connection*>*)graph->getAllEdges(&Vertex(source), &Vertex(target));
 }

@@ -123,19 +123,12 @@ public:
 	std::list<Instance*>* getInstances();
 
 	/**
-	 * @brief Returns the list of vertices referenced by the graph of this network.
+	 * @brief Returns a list of instance that are connected the given instance.
 	 * 
-	 * @return a list of vertex
+	 * @return a list of successor instances
 	 */
-	std::list<Vertex*>* getVertices();
-
-	/**
-	 * @brief Returns a list of vertices that are after the given vertex.
-	 * 
-	 * @return a list of successor vertices
-	 */
-	std::list<Vertex*>* getSuccessorsOf(Vertex* vertex);
-
+	std::list<Instance*> getSuccessorsOf(Instance* instance);
+	
 	/**
 	 * @brief Remove a vertex from the network.
 	 * 
@@ -143,19 +136,29 @@ public:
 	 *
 	 * @return whether the vertex has been found or not
 	 */
-	bool removeVertex(Vertex* vertex);
+	bool removeInstance(Instance* instance);
 
 	/**
 	 * @brief Remove a vertex in the network.
 	 * 
 	 * @param vertex : the Vertex to add
 	 */
-	void addVertex(Vertex* vertex);
+	void addInstance(Instance* instance);
 
 	/**
 	 * @brief Compute a list of successors in the graph.
 	 */
 	void computeSuccessorsMaps();
+
+	/**
+	 * @brief Returns a set of all edges connecting source vertex to target vertex if such vertices exist in this graph.
+	 *
+	 * @param source : the source Vertex
+	 *
+	 * @param target : the target Vertex
+	 */
+	std::list<Connection*>* getAllConnections(Instance* source, Instance* target);
+
 private:
 
 	/**
@@ -163,6 +166,13 @@ private:
 	 */
 	void computeSuccessor(Vertex* vertex,
 		std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs);
+
+	/**
+	 * @brief Returns the vertex corresponding to the instance.
+	 * 
+	 * @return the corresponding vertex
+	 */
+	Vertex* getVertex(Instance* instance);
 
 	/** name of the network  */
 	std::string name;
@@ -178,12 +188,6 @@ private:
 
 	/** instances of the network  */
 	std::list<Instance*> instances;
-
-	/** vertices of the network  */
-	std::list<Vertex*> vertices;
-
-	/** Sucessors container */
-	std::list<Vertex*> successors;
 };
 
 #endif

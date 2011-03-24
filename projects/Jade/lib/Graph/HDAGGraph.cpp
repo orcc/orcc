@@ -110,7 +110,8 @@ bool HDAGGraph::removeVertex(HDAGVertex* vertex){
 	for(;i<nbVertices; i++){
 		HDAGVertex* currentVertex = vertices[i];
 		
-		if (currentVertex == vertex){
+		if (currentVertex->equals(vertex)){
+			delete vertices[i];
 			break;
 		}
 	}
@@ -179,6 +180,27 @@ bool HDAGGraph::removeEdge(HDAGEdge* edge){
 
 	// edge not found
 	return false;
+}
+
+/**
+ Returns a set of all edges connecting source vertex to target vertex if such vertices exist in this graph.
+*/
+list<HDAGEdge*>* HDAGGraph::getAllEdges(HDAGVertex* sourceVertex, HDAGVertex* targetVertex){
+	edgesContainer.clear();
+
+	for(int i=0; i<nbEdges; i++){
+		HDAGEdge* curEgde = edges[i];
+
+		if (getEdgeSource(curEgde)->equals(sourceVertex)){
+			if (getEdgeTarget(curEgde)->equals(targetVertex)){
+				// Store current edge
+				edgesContainer.push_back(curEgde);
+			}
+		}
+	}
+
+	// return edge founds
+	return &edgesContainer;
 }
 
 HDAGVertex* HDAGGraph::getEdgeTarget(HDAGEdge* edge){
