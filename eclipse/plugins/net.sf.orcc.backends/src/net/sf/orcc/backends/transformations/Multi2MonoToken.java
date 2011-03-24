@@ -33,10 +33,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import org.jgrapht.DirectedGraph;
+import java.util.Set;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
@@ -45,6 +43,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -56,7 +55,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -70,6 +68,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
+
+import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a visitor that transforms multi-token to mono-token data
@@ -388,6 +388,51 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		this.actor.getActions().add(action);
 
 		return action;
+	}
+
+	/**
+	 * This method creates an IfNode
+	 * 
+	 * @param scheduler
+	 *            target procedure
+	 * @param diff
+	 *            (readIndex - writeIndex)
+	 * @param numTokens
+	 *            number of repeats
+	 * @param ConditionVar
+	 *            result of the if statement
+	 * @param bufferSize
+	 *            size of the buffer
+	 * @return IfNode
+	 */
+	private IfNode createIfCondition(Procedure scheduler, LocalVariable diff,
+			int numTokens, LocalVariable ConditionVar, int bufferSize) {
+		Expression ifCondition = new BinaryExpr(new VarExpr(new Use(diff)),
+				BinaryOp.GE, new IntExpr(0),
+				IrFactory.eINSTANCE.createTypeBool());
+		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
+		BlockNode blkNode = new BlockNode(scheduler);
+		thenNodes.add(blkNode);
+		Expression value = new BinaryExpr(new VarExpr(new Use(diff)),
+				BinaryOp.GE, new IntExpr(numTokens),
+				IrFactory.eINSTANCE.createTypeBool());
+		Instruction assign1 = new Assign(ConditionVar, value);
+		blkNode.add(assign1);
+
+		List<CFGNode> elseNodes = new ArrayList<CFGNode>();
+		BlockNode blkNodeElse = new BlockNode(scheduler);
+		elseNodes.add(blkNodeElse);
+		Expression sum = new BinaryExpr(new VarExpr(new Use(diff)),
+				BinaryOp.PLUS, new IntExpr(bufferSize),
+				IrFactory.eINSTANCE.createTypeInt(32));
+		Expression value2 = new BinaryExpr(sum, BinaryOp.GE, new IntExpr(
+				numTokens), IrFactory.eINSTANCE.createTypeBool());
+		Instruction assign2 = new Assign(ConditionVar, value2);
+		blkNodeElse.add(assign2);
+
+		IfNode ifNode = new IfNode(scheduler, ifCondition, thenNodes,
+				elseNodes, new BlockNode(scheduler));
+		return ifNode;
 	}
 
 	/**
@@ -747,12 +792,13 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private void modifyActionSchedulability(Action action,
 			GlobalVariable writeIndex, GlobalVariable readIndex) {
-		BlockNode bodyNode = BlockNode.getFirst(action.getScheduler());
+		
+		BlockNode bodyNode = (BlockNode) action.getScheduler().getNodes().get(action.getScheduler().getNodes().size()-1);
 		OrderedMap<String, LocalVariable> locals = action.getScheduler()
 				.getLocals();
 
 		BlockNode firstBlock = new BlockNode(action.getScheduler());
-		action.getScheduler().getNodes().add(firstBlock);
+		action.getScheduler().getNodes().add(0,firstBlock);
 		LocalVariable localRead = new LocalVariable(true, inputIndex,
 				new Location(), "readIndex",
 				IrFactory.eINSTANCE.createTypeInt(32));
@@ -784,10 +830,10 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				new Location(), "condition",
 				IrFactory.eINSTANCE.createTypeBool());
 		locals.put(conditionVar.getName(), conditionVar);
-		IfNode ifNode = insertIfCondition(action.getScheduler(), diff, numTokens, conditionVar,
-				512);
-		action.getScheduler().getNodes().add(ifNode);
-		
+		IfNode ifNode = createIfCondition(action.getScheduler(), diff,
+				numTokens, conditionVar, 512);
+		action.getScheduler().getNodes().add(1,ifNode);
+
 		LocalVariable myResult = new LocalVariable(true, inputIndex,
 				new Location(), "myResult",
 				IrFactory.eINSTANCE.createTypeBool());
@@ -804,38 +850,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		bodyNode.add(returnIndex, assign3);
 		actionReturn.setValue(new VarExpr(new Use(myResult)));
-		action.getScheduler().getNodes().add(bodyNode);
-		//action.getScheduler().getNodes().remove(0);
-		}
-
-	private IfNode insertIfCondition(Procedure scheduler, LocalVariable diff,
-			int numTokens, LocalVariable ConditionVar, int bufferSize) {
-		Expression ifCondition = new BinaryExpr(new VarExpr(new Use(diff)),
-				BinaryOp.GE, new IntExpr(0),
-				IrFactory.eINSTANCE.createTypeBool());
-		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
-		BlockNode blkNode = new BlockNode(scheduler);
-		thenNodes.add(blkNode);
-		Expression value = new BinaryExpr(new VarExpr(new Use(diff)),
-				BinaryOp.GE, new IntExpr(numTokens),
-				IrFactory.eINSTANCE.createTypeBool());
-		Instruction assign1 = new Assign(ConditionVar, value);
-		blkNode.add(assign1);
-
-		List<CFGNode> elseNodes = new ArrayList<CFGNode>();
-		BlockNode blkNodeElse = new BlockNode(scheduler);
-		elseNodes.add(blkNodeElse);
-		Expression sum = new BinaryExpr(new VarExpr(new Use(diff)),
-				BinaryOp.PLUS, new IntExpr(bufferSize),
-				IrFactory.eINSTANCE.createTypeInt(32));
-		Expression value2 = new BinaryExpr(sum, BinaryOp.GE, new IntExpr(
-				numTokens), IrFactory.eINSTANCE.createTypeBool());
-		Instruction assign2 = new Assign(ConditionVar, value2);
-		blkNodeElse.add(assign2);
-
-		IfNode ifNode = new IfNode(scheduler, ifCondition, thenNodes,
-				elseNodes, new BlockNode(scheduler));
-		return ifNode;
 	}
 
 	/**
