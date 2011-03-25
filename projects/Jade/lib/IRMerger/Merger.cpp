@@ -214,7 +214,7 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Conn
 		}
 
 		// Set internal ports of each instances
-		internPorts->insert(pair<Port*, Port*>(srcActPort, dstActPort));
+		internPorts->insert(pair<Port*, Port*>(src, dst));
 	}
 
 	

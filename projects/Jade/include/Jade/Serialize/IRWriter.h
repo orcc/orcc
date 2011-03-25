@@ -54,7 +54,7 @@ class CSDFMoC;
 class QSDFMoC;
 
 #include "Jade/Core/Actor.h"
-#include "Jade/Core/Network/Instance.h"
+#include "Jade/Merger/SuperInstance.h"
 //------------------------------
 
 
@@ -86,6 +86,15 @@ public:
 	 * @return true if the actor is written, otherwise false
 	 */
 	bool write(Instance* instance);
+
+	/**
+	 * @brief Write the given super instance
+	 * 
+	 * @param superInstance: the super instance to write
+     *
+	 * @return true if the actor is written, otherwise false
+	 */
+	bool write(SuperInstance* superInstance);
 
 	~IRWriter();
 

@@ -48,6 +48,7 @@
 #include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Merger/Merger.h"
+#include "Jade/Merger/SuperInstance.h"
 #include "Jade/Scheduler/Scheduler.h"
 #include "Jade/Serialize/IRLinker.h"
 #include "Jade/Serialize/IRUnwriter.h"
@@ -80,7 +81,14 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	map<string, Instance*>* instances = configuration->getInstances();
 
 	for (it = instances->begin(); it != instances->end(); it++){
-		writer.write(it->second);
+		Instance* instance = it->second;
+		
+		// In case of super instance, write all subInstances
+		if (instance->isSuperInstance()){
+			writer.write((SuperInstance*)instance);
+		}else{
+			writer.write(instance);
+		}
 	}
 
 	// Setting connections of the decoder

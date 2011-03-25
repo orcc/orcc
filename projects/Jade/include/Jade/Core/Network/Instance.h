@@ -156,14 +156,14 @@ public:
 	 *
 	 * @return the corresponding state variables
      */
-	virtual Port* getInternalPort(Port* port){return NULL;};
+	virtual StateVar* getInternalVar(Port* port){return NULL;};
 
 	/**
      * @brief Get the internal state variables of the instance
 	 *
 	 * @return a list of state variable
      */
-	virtual std::map<Port*, Port*>* getInternalPorts(){return NULL;};
+	virtual std::map<Port*, StateVar*>* getInternalPorts(){return NULL;};
 
 	/**
      * @brief Return true if this instance has internal port

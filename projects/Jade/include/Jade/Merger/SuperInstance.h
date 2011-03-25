@@ -40,6 +40,7 @@
 #define SUPERINSTANCE_H
 
 #include "Jade/Core/Network/Instance.h"
+class CSDFMoC;
 //------------------------------
 
 /**
@@ -78,14 +79,21 @@ public:
 	 *
 	 * @return the corresponding state variables
      */
-	Port* getInternalPort(Port* port);
+	StateVar* getInternalPort(Port* port);
 
 	/**
      * @brief Get the internal state variables of the instance
 	 *
 	 * @return a list of state variable
      */
-	virtual std::map<Port*, Port*>* getInternalPorts(){return &internalPorts;};
+	virtual std::map<Port*, StateVar*>* getInternalPorts(){return &internalVars;};
+
+	/**
+     * @brief Get instances of the superinstance with their repition factor
+	 *
+	 * @return a map of instance with their repetition factor
+     */
+	std::map<Instance*, int>* getInstances(){return &instances;};
 
 private:
 
@@ -143,53 +151,7 @@ private:
 	 */
 	void filterPattern(Pattern* input, Pattern* output, std::map<Port*, Port*>* intPorts);
 
-	/**
-     *  @brief Add a map of state variables to another
-	 *
-	 * @param src : the source map
-	 *
-	 * @param dst : the destination map
-	 *
-	 */
-	void addStateVars(std::map<std::string, StateVar*>* src, std::map<std::string, StateVar*>* dst);
-
-	/**
-     *  @brief Add internal ports in superinstance
-	 *
-	 * @param internalPorts : the internal ports to add
-	 *
-	 */
-	void addInternalPorts(std::map<Port*, Port*>* internalPorts);
-	
-	/**
-     *  @brief Add a map of paramters to another
-	 *
-	 * @param src : the source map
-	 *
-	 * @param dst : the destination map
-	 *
-	 */
-	void addParameters(std::map<std::string, Variable*>* src, std::map<std::string, Variable*>* dst);
-
-	/**
-     *  @brief Add a map of procedures to another
-	 *
-	 * @param src : the source map
-	 *
-	 * @param dst : the destination map
-	 *
-	 */
-	void addProcedures(std::map<std::string, Procedure*>* src, std::map<std::string, Procedure*>* dst);
-
-	/**
-     *  @brief Add a list of Action to another
-	 *
-	 * @param src : the source list
-	 *
-	 * @param dst : the destination list
-	 *
-	 */
-	void addActions(std::list<Action*>* src, std::list<Action*>* dst);
+	void analyzeInstance(Instance* instance, int factor);
 
 	/** Instance source */
 	Instance* srcInstance;
@@ -198,11 +160,14 @@ private:
 	int srcFactor;
 	
 	/** Internal port of instance */
-	std::map<Port*, Port*> internalPorts;
+	std::map<Port*, StateVar*> internalVars;
 
 	/** Destination instance */
 	Instance* dstInstance;
 	
+	/** Instance of the Superinstance */
+	std::map<Instance*, int> instances;
+
 	/** Repetition of destination instance*/
 	int dstFactor;
 

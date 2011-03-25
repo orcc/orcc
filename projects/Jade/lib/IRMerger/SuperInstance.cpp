@@ -56,6 +56,26 @@ SuperInstance::SuperInstance(LLVMContext& C, std::string id, Instance* srcInstan
 	this->srcFactor = srcFactor;
 	this->dstFactor = dstFactor;
 	this->actor = createCompositeActor(internalPorts);
+	
+	analyzeInstance(srcInstance, srcFactor);
+	analyzeInstance(dstInstance, dstFactor);
+
+}
+
+void SuperInstance::analyzeInstance(Instance* instance, int factor){
+	// Set instances of the super instance
+	if (instance->isSuperInstance()){
+		map<Instance*, int>::iterator it;
+		SuperInstance* superInstance = (SuperInstance*) instance;
+		map<Instance*, int>* subInstances = superInstance->getInstances();
+
+		for (it = subInstances->begin(); it != subInstances->end(); it++){
+			instances.insert(pair<Instance*, int>(it->first, it->second * factor));
+		}
+
+	}else{
+		instances.insert(pair<Instance*, int>(instance, factor));
+	}
 }
 
 Actor* SuperInstance::createCompositeActor(map<Port*, Port*>* internalPorts){
@@ -71,34 +91,11 @@ Actor* SuperInstance::createCompositeActor(map<Port*, Port*>* internalPorts){
 	list<Action*>* initializes = new list<Action*>();
 	list<Action*>* actions = new list<Action*>();
 
-	// Add actor properties
-	addStateVars(srcActor->getStateVars(), stateVars);
-	addStateVars(dstActor->getStateVars(), stateVars);
-	addParameters(srcActor->getParameters(), parameters);
-	addParameters(dstActor->getParameters(), parameters);
-	addProcedures(srcActor->getProcs(), procedures);
-	addProcedures(dstActor->getProcs(), procedures);
-	addActions(srcActor->getInitializes(), initializes);
-	addActions(dstActor->getInitializes(), initializes);
-	addActions(srcActor->getActions(), actions);
-	addActions(dstActor->getActions(), actions);
-
-	//Write internal ports if present
-	if (srcInstance->hasInternalPort()){
-		addInternalPorts(srcInstance->getInternalPorts());
-	}
-	if (srcInstance->hasInternalPort()){
-		addInternalPorts(srcInstance->getInternalPorts());
-	}
-
 	// Create a composite moc
 	CSDFMoC* moc = createMoC(srcActor, srcFactor, dstActor, dstFactor);
-	ActionScheduler* scheduler = new ActionScheduler(moc->getActions(), NULL);
-	
-	// Filter patterns
+
 	Pattern* inputMoc = moc->getInputPattern();
 	Pattern* outputMoc = moc->getOutputPattern();
-
 	filterPattern(inputMoc, outputMoc, internalPorts);
 
 	// Set ports ports of the actor
@@ -106,18 +103,10 @@ Actor* SuperInstance::createCompositeActor(map<Port*, Port*>* internalPorts){
 	map<string, Port*>* outputs = createPorts(outputMoc->getPorts());
 	
 	Actor* actorComposite = new Actor(id, NULL, "", inputs,  outputs,
-		stateVars, parameters, procedures, initializes, actions, scheduler, moc);
+		stateVars, parameters, procedures, initializes, actions, NULL, moc);
 
 
 	return actorComposite;
-}
-
-void SuperInstance::addInternalPorts(map<Port*, Port*>* internalPorts){
-	map<Port*, Port*>::iterator it;
-
-	for (it = internalPorts->begin(); it != internalPorts->end(); it++){
-		this->internalPorts.insert(pair<Port*, Port*>(it->first, it->second));
-	}
 }
 
 map<string, Port*>* SuperInstance::createPorts(set<Port*>* portSet){
@@ -131,44 +120,12 @@ map<string, Port*>* SuperInstance::createPorts(set<Port*>* portSet){
 	return ports;
 }
 
-void SuperInstance::addStateVars(map<string, StateVar*>* src, map<string, StateVar*>* dst){
-	map<string, StateVar*>::iterator it;
-	
-	for (it = src->begin(); it != src->end(); it++){
-		dst->insert(pair<string, StateVar*>(it->first, it->second));
-	}
-}
+StateVar* SuperInstance::getInternalPort(Port* port){
+	map<Port*, StateVar*>::iterator it;
 
-void SuperInstance::addParameters(map<string, Variable*>* src, map<string, Variable*>* dst){
-	map<string, Variable*>::iterator it;
-	
-	for (it = src->begin(); it != src->end(); it++){
-		dst->insert(pair<string, Variable*>(it->first, it->second));
-	}
-}
+	it = internalVars.find(port);
 
-void SuperInstance::addProcedures(map<string, Procedure*>* src, map<string, Procedure*>* dst){
-	map<string, Procedure*>::iterator it;
-	
-	for (it = src->begin(); it != src->end(); it++){
-		dst->insert(pair<string, Procedure*>(it->first, it->second));
-	}
-}
-
-void SuperInstance::addActions(list<Action*>* src, list<Action*>* dst){
-	list<Action*>::iterator it;
-	
-	for (it = src->begin(); it != src->end(); it++){
-		dst->push_back(*it);
-	}
-}
-
-Port* SuperInstance::getInternalPort(Port* port){
-	map<Port*, Port*>::iterator it;
-
-	it = internalPorts.find(port);
-
-	if (it == internalPorts.end()){
+	if (it == internalVars.end()){
 		return NULL;
 	}
 
@@ -207,12 +164,10 @@ void SuperInstance::filterPattern(Pattern* input, Pattern* output, map<Port*, Po
 	for (it = intPorts->begin(); it != intPorts->end(); it++){
 		Port* out = it->first;
 		Port* in = it->second;
-		
-		Port* port = new Port(out->getName()+"_"+in->getName(), cast<IntegerType>(out->getType()));
 
 		// Associate stateVar to port
-		internalPorts.insert(pair<Port*, Port*>(in, port));
-		internalPorts.insert(pair<Port*, Port*>(out, port));
+		internalVars.insert(pair<Port*, StateVar*>(in, NULL));
+		internalVars.insert(pair<Port*, StateVar*>(out, NULL));
 
 		// Remove port 
 		output->remove(out);
