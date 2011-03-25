@@ -306,16 +306,20 @@ static void <action.body.name>() {
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-printOutputPatternPort(port) ::= <<
-if (index_<port.name> + <pattern.numTokensMap.(port)> \> numFree_<port.name>) {
+printOutputPatternPort(port, successor, readerId) ::= <<
+if (<pattern.numTokensMap.(port)> \> SIZE_<port.name> - index_<port.name> + <getPortName(port)>-\>read_inds[<readerId>] ) {
 	stop = 1;
-	<options.network.successorsMap.(instance).(port): { successor | sched_add_schedulable(<instance.id>.sched, &<successor.id>, RING_TOPOLOGY);}; separator="\n">
+	sched_add_schedulable(<instance.id>.sched, &<successor.id>, RING_TOPOLOGY);
 }
+>>
+
+printOutputPatternsPort(port) ::= <<
+<options.network.successorsMap.(instance).(port): { successor | <printOutputPatternPort(port, successor, i0)> }; separator="\n">
 >>
 
 printOutputPattern(pattern) ::= <<
 int stop = 0;
-<pattern.ports: printOutputPatternPort(); separator="\n">
+<pattern.ports: printOutputPatternsPort(); separator="\n">
 if (stop != 0) {
 >>
 
