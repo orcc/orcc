@@ -150,6 +150,20 @@ public:
 	Variable* getPtrVar(){return ptrVar;};
 
 	/**
+	 * @brief Set the port as internal
+	 *
+	 * @param the corresponding Variable
+	 */
+	void setInternal(bool intern){this->intern = intern;};
+
+	/**
+	 * @brief Set the port as internal
+	 *
+	 * @return whether or not this port is internal
+	 */
+	bool isInternal(){return intern;};
+
+	/**
 	 * @brief Getter fifo variable
 	 * 
 	 * Get the llvm::GlobalVariable that corresponds to the Port fifo
@@ -197,6 +211,9 @@ protected:
 	
 	/** Corresponding global variable pointer */
 	Variable* ptrVar;
+
+	/** Internal port */
+	bool intern;
 
 	/** Corresponding global variable fifo*/
 	llvm::GlobalVariable* fifoVar;

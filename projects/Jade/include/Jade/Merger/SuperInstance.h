@@ -79,14 +79,28 @@ public:
 	 *
 	 * @return the corresponding state variables
      */
-	StateVar* getInternalPort(Port* port);
+	StateVar* getInternalVar(Port* port);
 
 	/**
      * @brief Get the internal state variables of the instance
 	 *
 	 * @return a list of state variable
      */
-	virtual std::map<Port*, StateVar*>* getInternalPorts(){return &internalVars;};
+	virtual std::map<Port*, StateVar*>* getInternalVars(){return internalVars;};
+
+	/**
+     * @brief Get the internal connections of the instance
+	 *
+	 * @return a map of internal connection
+     */
+	virtual std::map<Port*, Port*>* getInternalConnections();
+
+	/**
+     * @brief Get the internal state variables of the instance
+	 *
+	 * @return a list of state variable
+     */
+	virtual void setInternalVars(std::map<Port*, StateVar*>* internalVars){this->internalVars = internalVars;};
 
 	/**
      * @brief Get instances of the superinstance with their repition factor
@@ -94,6 +108,13 @@ public:
 	 * @return a map of instance with their repetition factor
      */
 	std::map<Instance*, int>* getInstances(){return &instances;};
+
+	/**
+     *  @brief Get the MoC of the super instance
+     *
+	 * @return MoC of the super Instance
+     */
+	MoC* getMoC();
 
 private:
 
@@ -111,7 +132,7 @@ private:
 	 *
 	 * @return the resulting moc
 	 */
-	CSDFMoC* createMoC(Actor* srcActor, int srcFactor, Actor* dstActor, int dstFactor);
+	CSDFMoC* createMoC(CSDFMoC* srcMoc, int srcFactor, CSDFMoC* dstMoc, int dstFactor);
 
 	/**
      *  @brief Create a pattern of the composite actor.
@@ -144,12 +165,16 @@ private:
 	 *
 	 * @param input : the input Pattern to filter
 	 *
+	 * @param dstActor : the destination actor
+	 *
 	 * @param output : the output Pattern to filter
+	 *
+	 * @param srcActor : the source actor
 	 *
 	 * @param intPorts: the internal ports
 	 *
 	 */
-	void filterPattern(Pattern* input, Pattern* output, std::map<Port*, Port*>* intPorts);
+	void filterPattern(Pattern* input, Actor* dstActor, Pattern* output, Actor* srcActor, std::map<Port*, Port*>* intPorts);
 
 	void analyzeInstance(Instance* instance, int factor);
 
@@ -160,7 +185,7 @@ private:
 	int srcFactor;
 	
 	/** Internal port of instance */
-	std::map<Port*, StateVar*> internalVars;
+	std::map<Port*, StateVar*>* internalVars;
 
 	/** Destination instance */
 	Instance* dstInstance;
@@ -173,6 +198,9 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** Internal ports of the Super interface */
+	std::map<Port*, Port*>* internalPorts;
 };
 
 #endif

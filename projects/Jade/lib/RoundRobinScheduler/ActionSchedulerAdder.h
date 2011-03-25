@@ -199,6 +199,17 @@ protected:
 	virtual void createReadEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/**
+	 * @brief Create an internal ReadEnd for an Action
+	 * 
+	 * @param port : the port to set to ReadEnd
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens that has been read
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	virtual void createInternalReadEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
 	 * @brief Create readends for an Action
 	 * 
 	 * @param pattern : the pattern to create readends
@@ -207,6 +218,17 @@ protected:
 	 */
 	virtual void createReadEnds(Pattern* pattern, llvm::BasicBlock* BB );
 	
+	/**
+	 * @brief Create an internal WriteEnd for an Action
+	 * 
+	 * @param port : the port to set to WriteEnd
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens that has been read
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	virtual void createInternalWriteEnd(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
 	/**
 	 * @brief Create a WriteEnd for an Action
 	 * 
@@ -227,6 +249,31 @@ protected:
 	 */
 	virtual void createWriteEnds(Pattern* pattern, llvm::BasicBlock* BB );
 
+	/**
+	 * @brief Create an internal write for an Action
+	 * 
+	 * @param port : the port to write
+	 *
+	 * @param variable : the Variable where write is stored
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens to write
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	virtual void createInternalWrite(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create an internal read for an Action
+	 * 
+	 * @param port : the port to read
+	 *
+	 * @param variable : the Variable where read is stored
+	 *
+	 * @param numToken : ConstantInt representing the number of tokens to read
+	 *
+	 * @param BB : llvm::BasicBlock where instructions are added
+	 */
+	virtual void createInternalRead(Port* port, Variable* variable, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Create a write for an Action

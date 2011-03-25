@@ -42,6 +42,7 @@
 #include "DPNScheduler.h"
 
 class CSDFMoC;
+class SuperInstance;
 //------------------------------
 
 /**
@@ -113,6 +114,13 @@ protected:
 	 * @param BB : llvm::BasicBlock where instructions are added
 	 */
 	virtual void updatePattern(Pattern* pattern, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Create internal communication in instance
+	 * 
+	 * @param superInstance : the superInstance to create communication interface
+	 */
+	virtual void createStateVars(SuperInstance* superInstance);
 };
 
 #endif

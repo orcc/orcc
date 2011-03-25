@@ -56,7 +56,10 @@ SuperInstance::SuperInstance(LLVMContext& C, std::string id, Instance* srcInstan
 	this->srcFactor = srcFactor;
 	this->dstFactor = dstFactor;
 	this->actor = createCompositeActor(internalPorts);
-	
+	this->internalPorts = internalPorts;
+	this->moc = NULL;
+	this->actionScheduler = new ActionScheduler(new list<Action*>(), NULL);
+
 	analyzeInstance(srcInstance, srcFactor);
 	analyzeInstance(dstInstance, dstFactor);
 
@@ -78,6 +81,44 @@ void SuperInstance::analyzeInstance(Instance* instance, int factor){
 	}
 }
 
+map<Port*, Port*>* SuperInstance::getInternalConnections(){
+	map<Port*, Port*>::iterator it;
+	
+	//Get internal connection of source Instance
+	if (srcInstance->isSuperInstance()){
+		SuperInstance* src = (SuperInstance*)srcInstance;
+		map<Port*, Port*>* srcConns = src->getInternalConnections();
+
+		for (it = srcConns->begin(); it != srcConns->end(); it++){
+			internalPorts->insert(pair<Port*, Port*>(it->first, it->second));
+		}
+	}
+
+	//Get internal connection of destination Instance
+	if (dstInstance->isSuperInstance()){
+		SuperInstance* dst = (SuperInstance*)dstInstance;
+		//Get internal connection of subInstance
+		map<Port*, Port*>* dstConns = dst->getInternalConnections();
+
+		for (it = dstConns->begin(); it != dstConns->end(); it++){
+			internalPorts->insert(pair<Port*, Port*>(it->first, it->second));
+		}
+	}
+
+	return internalPorts;
+}
+
+MoC* SuperInstance::getMoC(){
+	if (moc == NULL){
+		CSDFMoC* srcMoC = (CSDFMoC*)srcInstance->getMoC();
+		CSDFMoC* dstMoC = (CSDFMoC*)dstInstance->getMoC();
+		moc = createMoC(srcMoC, srcFactor, dstMoC, dstFactor);
+	}
+
+	return moc;
+}
+
+
 Actor* SuperInstance::createCompositeActor(map<Port*, Port*>* internalPorts){
 	// Get actors of the two instances
 	Actor* srcActor = srcInstance->getActor();
@@ -92,11 +133,13 @@ Actor* SuperInstance::createCompositeActor(map<Port*, Port*>* internalPorts){
 	list<Action*>* actions = new list<Action*>();
 
 	// Create a composite moc
-	CSDFMoC* moc = createMoC(srcActor, srcFactor, dstActor, dstFactor);
+	CSDFMoC* srcMoc = (CSDFMoC*)srcActor->getMoC();
+	CSDFMoC* dstMoc = (CSDFMoC*)dstActor->getMoC();
+	CSDFMoC* moc = createMoC(srcMoc, srcFactor, dstMoc, dstFactor);
 
 	Pattern* inputMoc = moc->getInputPattern();
 	Pattern* outputMoc = moc->getOutputPattern();
-	filterPattern(inputMoc, outputMoc, internalPorts);
+	filterPattern(inputMoc, dstActor, outputMoc, srcActor, internalPorts);
 
 	// Set ports ports of the actor
 	map<string, Port*>* inputs = createPorts(inputMoc->getPorts());
@@ -120,22 +163,20 @@ map<string, Port*>* SuperInstance::createPorts(set<Port*>* portSet){
 	return ports;
 }
 
-StateVar* SuperInstance::getInternalPort(Port* port){
+StateVar* SuperInstance::getInternalVar(Port* port){
 	map<Port*, StateVar*>::iterator it;
 
-	it = internalVars.find(port);
+	it = internalVars->find(port);
 
-	if (it == internalVars.end()){
+	if (it == internalVars->end()){
 		return NULL;
 	}
 
 	return it->second;
 };
 
-CSDFMoC* SuperInstance::createMoC(Actor* srcActor, int srcFactor, Actor* dstActor, int dstFactor){
+CSDFMoC* SuperInstance::createMoC(CSDFMoC* srcMoc, int srcFactor, CSDFMoC* dstMoc, int dstFactor){
 	CSDFMoC* moc = new CSDFMoC();
-	CSDFMoC* srcMoc = (CSDFMoC*)srcActor->getMoC();
-	CSDFMoC* dstMoc = (CSDFMoC*)dstActor->getMoC();
 
 	// Merges patterns of actors
 	Pattern* inputPattern = createPattern(srcMoc->getInputPattern(), srcFactor, dstMoc->getInputPattern(), dstFactor);
@@ -157,21 +198,20 @@ CSDFMoC* SuperInstance::createMoC(Actor* srcActor, int srcFactor, Actor* dstActo
 	return moc;
 }
 
-void SuperInstance::filterPattern(Pattern* input, Pattern* output, map<Port*, Port*>* intPorts){
+void SuperInstance::filterPattern(Pattern* input, Actor* dstActor, Pattern* output, Actor* srcActor, map<Port*, Port*>* intPorts){
 	map<Port*, Port*>::iterator it;
 
 	// Remove internal ports from patterns
 	for (it = intPorts->begin(); it != intPorts->end(); it++){
+		// Get actor port
 		Port* out = it->first;
 		Port* in = it->second;
-
-		// Associate stateVar to port
-		internalVars.insert(pair<Port*, StateVar*>(in, NULL));
-		internalVars.insert(pair<Port*, StateVar*>(out, NULL));
+		Port* actIn = dstActor->getInput(in->getName());
+		Port* actOut = dstActor->getOutput(out->getName());
 
 		// Remove port 
-		output->remove(out);
-		input->remove(in);
+		output->remove(actOut);
+		input->remove(actIn);
 	}
 }
 

@@ -81,14 +81,7 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	map<string, Instance*>* instances = configuration->getInstances();
 
 	for (it = instances->begin(); it != instances->end(); it++){
-		Instance* instance = it->second;
-		
-		// In case of super instance, write all subInstances
-		if (instance->isSuperInstance()){
-			writer.write((SuperInstance*)instance);
-		}else{
-			writer.write(instance);
-		}
+		writer.write(it->second);
 	}
 
 	// Setting connections of the decoder

@@ -149,7 +149,7 @@ public:
      *
 	 * @return MoC of the Instance
      */
-	MoC* getMoC(){return moc;};
+	virtual MoC* getMoC(){return moc;};
 
 	/**
      * @brief Get the internal state variable corresponding to a port

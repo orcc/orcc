@@ -94,7 +94,7 @@ public:
      *
 	 * @return true if the actor is written, otherwise false
 	 */
-	bool write(SuperInstance* superInstance);
+	bool writeSuperInterface(SuperInstance* superInstance);
 
 	~IRWriter();
 

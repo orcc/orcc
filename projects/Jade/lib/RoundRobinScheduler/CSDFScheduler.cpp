@@ -36,6 +36,7 @@
 */
 
 //------------------------------
+#include <iostream>
 #include "CSDFScheduler.h"
 
 #include "llvm/DerivedTypes.h"
@@ -43,8 +44,10 @@
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
 
-#include "Jade/Core/Network/Instance.h"
+#include "Jade/Decoder.h"
 #include "Jade/Core/MoC/CSDFMoC.h"
+#include "Jade/Core/Network/Instance.h"
+#include "Jade/Merger/SuperInstance.h"
 //------------------------------
 
 using namespace llvm;
@@ -55,10 +58,54 @@ CSDFScheduler::CSDFScheduler(llvm::LLVMContext& C, Decoder* decoder) : DPNSchedu
 }
 
 void CSDFScheduler::createScheduler(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* scheduler){
+	if (instance->isSuperInstance()){
+		// Create internal communication of superinstance
+		createStateVars((SuperInstance*)instance);
+	}
+	
 	BB = createPatternTest((CSDFMoC*)instance->getMoC(), BB, incBB, scheduler);
 
 	//Create branch from skip to return
 	BranchInst::Create(returnBB, BB);
+}
+
+void CSDFScheduler::createStateVars(SuperInstance* instance){
+	Module* module = decoder->getModule();
+	map<Port*, Port*>::iterator it;
+	map<Port*, Port*>* conns = instance->getInternalConnections();
+	CSDFMoC* moc = (CSDFMoC*)instance->getMoC();
+	Pattern* input = moc->getInputPattern();
+	Pattern* output = moc->getOutputPattern();
+	map<Port*, StateVar*>* internalVars = new map<Port*, StateVar*>();
+
+	for (it = conns->begin(); it != conns->end(); it++){
+		Port* src = it->first;
+		Port* dst = it->second;
+
+		ConstantInt* srcPat = input->getNumTokens(dst);
+		ConstantInt* dstPat = output->getNumTokens(src);
+
+		if (srcPat->getLimitedValue() != dstPat->getLimitedValue()){
+			cout << "Found a consumption/production error between port " << src->getName() << " and port " << dst->getName();
+			exit(1);
+		}
+		
+
+		//Create the corresponding state variable
+		string name = src->getName() +"_"+ dst->getName();
+		Type* type = ArrayType::get(src->getType(), srcPat->getLimitedValue());
+		GlobalVariable* gv = new GlobalVariable(*module, type, false, GlobalVariable::InternalLinkage, ConstantAggregateZero::get(type), name);
+		StateVar* stateVar = new StateVar(type, name, true, gv);
+		
+		// Set state var to port
+		src->setFifoVar(gv);
+		dst->setFifoVar(gv);
+		internalVars->insert(pair<Port*, StateVar*>(src, stateVar));
+		internalVars->insert(pair<Port*, StateVar*>(dst, stateVar));
+	}
+
+	// Set internal vars of the super instance
+	instance->setInternalVars(internalVars);
 }
 
 BasicBlock* CSDFScheduler::createPatternTest(CSDFMoC* moc, BasicBlock* BB, BasicBlock* incBB, Function* function){

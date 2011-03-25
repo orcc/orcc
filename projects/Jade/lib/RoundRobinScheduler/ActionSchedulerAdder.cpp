@@ -166,11 +166,24 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Pattern* pattern, Function* 
 	map<Port*, ConstantInt*>* numTokens = pattern->getNumTokensMap();
 
 	for ( it=numTokens->begin() ; it != numTokens->end(); it++ ){
-		Value* hasTokenValue = createInputTest(it->first, it->second, BB);
+		Port* port = it->first;
+
+		if (port->isInternal()){
+			// Don't test internal ports
+			continue;
+		}
+		
+		Value* hasTokenValue = createInputTest(port, it->second, BB);
 		TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);
 		values.push_back(truncTokenInst);
 	}
 	
+	// No test to do, return basic block
+	if (values.empty()){
+		return BB;
+	}
+
+	// Create resulting hastoken test
 	itValue=values.begin();
 	Value* value1 = *itValue;
 	for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
@@ -201,11 +214,23 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Pattern* pattern, llvm::Fun
 	
 
 	for ( it=numTokens->begin() ; it != numTokens->end(); it++ ){
-		Value* hasRoomValue = createOutputTest(it->first, it->second, BB);
+		Port* port = it->first;
+
+		if (port->isInternal()){
+			// Don't test internal ports
+			continue;
+		}
+		Value* hasRoomValue = createOutputTest(port, it->second, BB);
 		TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", BB);
 		values.push_back(truncRoomInst);
 	}
 
+	// No test to do, return basic block
+	if (values.empty()){
+		return BB;
+	}
+
+	// Create resulting hasroom test
 	itValue=values.begin();
 	Value* value1 = *itValue;
 	for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
@@ -263,8 +288,14 @@ void ActionSchedulerAdder::createWriteEnds(Pattern* pattern, llvm::BasicBlock* B
 	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
 
 	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
+		Port* port = it->first;
+		
 		//Create write end
-		createWriteEnd(it->first, it->second, BB);
+		if (port->isInternal()){
+			createInternalWriteEnd(port, it->second, BB);
+		}else{
+			createWriteEnd(port, it->second, BB);
+		}
 	}
 }
 
@@ -274,9 +305,23 @@ void ActionSchedulerAdder::createReadEnds(Pattern* pattern, llvm::BasicBlock* BB
 	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
 
 	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
+		Port* port = it->first;
+		
 		//Create read end
-		createReadEnd(it->first, it->second, BB);
+		if (port->isInternal()){
+			createInternalReadEnd(port, it->second, BB);
+		}else{
+			createReadEnd(port, it->second, BB);
+		}
 	}
+}
+
+void ActionSchedulerAdder::createInternalReadEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+
+}
+
+void ActionSchedulerAdder::createInternalWriteEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+
 }
 
 void ActionSchedulerAdder::createReadEnd(Port* port, ConstantInt* numTokens, BasicBlock* BB){
@@ -311,7 +356,11 @@ void ActionSchedulerAdder::createWrites(Pattern* pattern, llvm::BasicBlock* BB){
 	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
 		//Create write
 		Port* port = it->first;
-		createWrite(port, port->getPtrVar(), it->second, BB);
+		if (port->isInternal()){
+			createInternalWrite(port, port->getPtrVar(), it->second, BB);
+		}else{
+			createWrite(port, port->getPtrVar(), it->second, BB);
+		}
 	}
 }
 
@@ -324,8 +373,20 @@ void ActionSchedulerAdder::createReads(Pattern* pattern, llvm::BasicBlock* BB){
 	for (it = numTokensMap->begin(); it != numTokensMap->end(); it++){
 		// Get associated port variable
 		Port* port = it->first;
-		createRead(port, port->getPtrVar(), it->second, BB);
+		if (port->isInternal()){
+			createInternalRead(port, port->getPtrVar(), it->second, BB);
+		}else{
+			createRead(port, port->getPtrVar(), it->second, BB);
+		}
 	}
+}
+
+void ActionSchedulerAdder::createInternalWrite(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
+
+}
+
+void ActionSchedulerAdder::createInternalRead(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){
+
 }
 
 void ActionSchedulerAdder::createWrite(Port* port, Variable* variable, ConstantInt* numTokens, BasicBlock* BB){

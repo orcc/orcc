@@ -67,6 +67,28 @@ IRWriter::~IRWriter(){
 }
 
 bool IRWriter::write(Instance* instance){
+	// Define instance kind
+	if (instance->isSuperInstance()){
+		writeSuperInterface((SuperInstance*)instance);
+	}else{
+		writeInstance(instance);
+	}
+
+	return true;
+}
+
+bool IRWriter::writeSuperInterface(SuperInstance* superInstance){
+	map<Instance*, int>::iterator it;
+	map<Instance*, int>* subInstances = superInstance->getInstances();
+
+	for (it = subInstances->begin(); it != subInstances->end(); it++){
+		write(it->first);
+	}
+	
+	return true;
+}
+
+void IRWriter::writeInstance(Instance* instance){
 	this->instance = instance;
 	this->actor = instance->getActor();
 
@@ -74,34 +96,9 @@ bool IRWriter::write(Instance* instance){
 	actions.clear();
 	untaggedActions.clear();
 	
-	//Write instance
+	//LLVM writer
 	writer = new LLVMWriter(instance->getId()+"_", decoder);	
-	writeInstance(instance);
 
-	return true;
-}
-
-bool IRWriter::write(SuperInstance* superInstance){
-	map<Instance*, int>::iterator it;
-	map<Instance*, int>* subInstances = superInstance->getInstances();
-
-	for (it = subInstances->begin(); it != subInstances->end(); it++){
-		write(it->first);
-	}
-
-	// Write moc of the superinstance
-	actions.clear();
-	untaggedActions.clear();
-
-	this->instance = superInstance;
-	this->actor = instance->getActor();
-	MoC* moc = writeMoC(actor->getMoC());
-	superInstance->setMoC(moc);
-	return true;
-}
-
-void IRWriter::writeInstance(Instance* instance){
-	
 	// Get instance ports
 	inputs = instance->getInputs();
 	outputs = instance->getOutputs();
