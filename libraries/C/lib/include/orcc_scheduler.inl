@@ -144,29 +144,3 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
 
 	return actor;
 }
-
-static void sched_add_predecessors(struct scheduler_s *sched,
-		struct actor_s *actor, int ports, int use_ring_topology) {
-	int i, n;
-	n = actor->num_inputs;
-	for (i = 0; i < n; i++) {
-		if ((ports & (1 << i)) != 0 && actor->predecessors[i] != NULL) {
-			struct actor_s *pred = actor->predecessors[i];
-			sched_add_schedulable(sched, pred, use_ring_topology);
-		}
-	}
-}
-
-static void sched_add_successors(struct scheduler_s *sched,
-		struct actor_s *actor, int ports, int use_ring_topology) {
-	int i, j, n;
-	n = actor->num_outputs;
-	for (i = 0; i < n; i++) {
-		if ((ports & (1 << i)) != 0 && actor->successors[i] != NULL) {
-			for (j = 0; j < actor->num_successors[i]; j++) {
-				struct actor_s *succ = actor->successors[i][j];
-				sched_add_schedulable(sched, succ, use_ring_topology);
-			}
-		}
-	}
-}

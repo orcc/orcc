@@ -98,7 +98,7 @@ goDeclareSuccs(map,outputs) ::= <<
 int <GetInstanceId(instance)>_num_successors[] = {<goDeclareNumSuccessors(map,outputs)>};
 >>
 
-goDeclarePredSucc(inputs, outputs) ::= <<
+goDeclarePredSucc(network, inputs, outputs) ::= <<
 <if(!inputs.empty)
 >struct actor_s *<GetInstanceId(instance)>_predecessors[] = {<predecessors(map=network.predecessorsMap.(instance), ports=inputs)>};
 <endif><
@@ -289,10 +289,7 @@ elseif (instance.broadcast)><instance.broadcast.numOutputs><else>0<endif>
 fillActorStruct(instance) ::= <<
 <if(instance.actor || instance.broadcast)>
 struct actor_s <GetInstanceId(instance)> = {"<GetInstanceId(instance)>", <GetInstanceId(instance)>_scheduler, <
-NumInputs(instance)>, <NumOutputs(instance)>, <
-if(instance.actor.inputs.list.empty || !options.newScheduler)>NULL<else><GetInstanceId(instance)>_predecessors<endif>, <
-if(instance.actor.outputs.list.empty || !options.newScheduler)>NULL<else><GetInstanceId(instance)>_num_successors<endif>, <
-if(instance.actor.outputs.list.empty || !options.newScheduler)>NULL<else><GetInstanceId(instance)>_successors<endif>};
+NumInputs(instance)>, <NumOutputs(instance)>, NULL, NULL, NULL};
 <endif>
 >>
 
@@ -512,13 +509,6 @@ network(network, options) ::= <<
 // Declaration of a struct actor for each actor
 
 <declareActors(network.instances)>
-
-<if(options.newScheduler)>
-////////////////////////////////////////////////////////////////////////////////
-// Declaration of the predecessors and successors of each actor
-
-<declarePredsSuccs(network.instances)>
-<endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of the actors array
