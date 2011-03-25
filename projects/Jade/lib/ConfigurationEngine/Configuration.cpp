@@ -96,6 +96,12 @@ void Configuration::setInstances(){
 				clasz = "System.Display";
 				instance->setClasz(clasz);
 			}
+
+			if (clasz.compare("std.io.Source") == 0){
+				clasz = "System.Source";
+				instance->setClasz(clasz);
+			}
+
 			actorFiles.push_back(clasz);
 		}
 	}
