@@ -195,10 +195,10 @@ protected:
 	/** Fifos bound to the port */
 	std::list<AbstractConnector*> fifos;
 	
-	/** Corresponding global variable*/
+	/** Corresponding global variable pointer */
 	Variable* ptrVar;
 
-	/** Corresponding global variable*/
+	/** Corresponding global variable fifo*/
 	llvm::GlobalVariable* fifoVar;
 };
 #endif

@@ -94,9 +94,9 @@ private:
 	 *
 	 * @param dst : the destination instance.
 	 *
-	 * @param vertex : the corresponding vertex.
+	 * @param superInstance : the corresponding SuperInstance.
 	 */
-	void updateConnections(std::list<Connection*>* connections, Instance* src, Instance* dst, Vertex* vertex);
+	void updateConnections(std::list<Connection*>* connections, Instance* src, Instance* dst, SuperInstance* superInstance);
 
 	/** Index of merger */
 	int index;

@@ -145,6 +145,15 @@ private:
 	std::map<std::string, StateVar*>* writeStateVariables(std::map<std::string, StateVar*>* vars);
 
 	/**
+	 * @brief Write a list of internal state variable
+	 *
+	 * Write a list of internal state variable for an Instance.
+	 * 
+	 * @param internalPorts : a map of state variables to write
+	 */
+	void writeInternalPorts(std::map<Port*, Port*>* internalPorts);
+
+	/**
 	 * @brief Write a state variable
 	 *
 	 * Write the given state variable for an Instance.

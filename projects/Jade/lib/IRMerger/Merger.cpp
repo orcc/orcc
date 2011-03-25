@@ -38,6 +38,7 @@
 //------------------------------
 #include <map>
 #include <list>
+#include <sstream>
 
 #include "Rational.h"
 
@@ -117,19 +118,18 @@ void Merger::mergeInstance(Instance* src, Instance* dst){
 
 	SuperInstance* superInstance =  getSuperInstance(src, dst, connections);
 	
-	// Add the new instance
-	Vertex* vertex = network->addInstance(superInstance);
-
-	updateConnections(connections, src, dst, vertex);
+	updateConnections(connections, src, dst, superInstance);
 
 	network->removeInstance(src);
 	network->removeInstance(dst);
 }
 
-void Merger::updateConnections(list<Connection*>* connections, Instance* src, Instance* dst, Vertex* vertex){
-	list<Connection*>::iterator it;
+void Merger::updateConnections(list<Connection*>* connections, Instance* src, Instance* dst, SuperInstance* superInstance){
+	// Add the new instance
+	Vertex* vertex = network->addInstance(superInstance);
 
 	// Remove internal connections
+	list<Connection*>::iterator it;
 	for (it = connections->begin(); it != connections->end(); it++){
 		network->removeConnection(*it);
 	}
@@ -138,30 +138,48 @@ void Merger::updateConnections(list<Connection*>* connections, Instance* src, In
 	list<Connection*> srcIn = network->getInConnections(src);
 	for (it = srcIn.begin(); it != srcIn.end(); it++){
 		(*it)->setSink(vertex);
+		
+		// Add input port to superinstance
+		superInstance->setAsInput((*it)->getDestinationPort());
 	}
 
 	// Update outputs connections of source
 	list<Connection*> srcOut = network->getOutConnections(src);
 	for (it = srcOut.begin(); it != srcOut.end(); it++){
 		(*it)->setSource(vertex);
+
+		// Add output port to superinstance
+		superInstance->setAsOutput((*it)->getSourcePort());
 	}
 
 	// Update input connections of destination
 	list<Connection*> dstIn = network->getInConnections(dst);
 	for (it = dstIn.begin(); it != dstIn.end(); it++){
 		(*it)->setSink(vertex);
+
+		// Add input port to superinstance
+		superInstance->setAsInput((*it)->getDestinationPort());
 	}
 
 	// Update output connections of destination
 	list<Connection*> dstOut = network->getOutConnections(dst);
 	for (it = dstOut.begin(); it != dstOut.end(); it++){
 		(*it)->setSource(vertex);
+
+		// Add output port to superinstance
+		superInstance->setAsOutput((*it)->getSourcePort());
 	}
 
 
 }
 
 SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Connection*>* connections ){
+	// Superinstance name
+	stringstream id;
+	id << "merger";
+	id << index++;
+
+	//Get property of instances
 	Actor* srcAct = src->getActor();
 	MoC* srcMoC = srcAct->getMoC();
 	Actor* dstAct = dst->getActor();
@@ -199,8 +217,8 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Conn
 		internPorts->insert(pair<Port*, Port*>(srcActPort, dstActPort));
 	}
 
-
-	return new SuperInstance(Context, "merged"+(index++), src, rate.numerator(), dst, rate.denominator(), internPorts);
+	
+	return new SuperInstance(Context, id.str() , src, rate.numerator(), dst, rate.denominator(), internPorts);
 }
 
 Rational Merger::getRational(ConstantInt* srcProd, ConstantInt* dstCons){

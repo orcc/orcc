@@ -142,12 +142,35 @@ public:
      */
 	std::string getClasz(){return clasz;};
 
-	/*!
+	/**
      *  @brief Get the MoC of the instance
      *
 	 * @return MoC of the Instance
      */
 	MoC* getMoC(){return moc;};
+
+	/**
+     * @brief Get the internal state variable corresponding to a port
+     *
+	 * @param port : the internal Port 
+	 *
+	 * @return the corresponding state variables
+     */
+	virtual Port* getInternalPort(Port* port){return NULL;};
+
+	/**
+     * @brief Get the internal state variables of the instance
+	 *
+	 * @return a list of state variable
+     */
+	virtual std::map<Port*, Port*>* getInternalPorts(){return NULL;};
+
+	/**
+     * @brief Return true if this instance has internal port
+	 *
+	 * @return true if this instance has internal port, otherwise false
+     */
+	virtual bool hasInternalPort(){return false;};
 
 	/*!
      *  @brief Set the MoC of the instance

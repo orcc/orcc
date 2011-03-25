@@ -91,6 +91,12 @@ void IRWriter::writeInstance(Instance* instance){
 	writePortPtrs(actor->getInputs(), inputs);
 	writePortPtrs(actor->getOutputs(), outputs);
 
+	// Write eventual internal ports
+	if (instance->hasInternalPort()){
+		writeInternalPorts(instance->getInternalPorts());
+	}
+
+
 	stateVars = writeStateVariables(actor->getStateVars());
 	parameters = writeVariables(actor->getParameters());
 	procs = writeProcedures(actor->getProcs());
@@ -127,6 +133,24 @@ void IRWriter::writePortPtrs(map<string, Port*>* srcPorts, map<string, Port*>* d
 		dst->setPtrVar(newVar);
 	}
 
+}
+
+void IRWriter::writeInternalPorts(map<Port*, Port*>* internalPorts){
+	map<Port*, Port*>::iterator it;
+
+	for (it = internalPorts->begin(); it != internalPorts->end(); it++){
+		Port* port = it->second;
+
+		if (port->getPtrVar() == NULL){
+			Type* type = port->getType();
+			string name = port->getName()+"_ptr";
+			
+			// Create a variable corresponding to this internal port pointer
+			GlobalVariable* gvPtr = new GlobalVariable(*decoder->getModule(), type->getPointerTo(), false, GlobalValue::InternalLinkage, NULL, name);
+			Variable* varPtr = new Variable(type, name, true, true, gvPtr);
+			port->setPtrVar(varPtr);
+		}
+	}
 }
 
 map<string, Variable*>* IRWriter::writeVariables(map<string, Variable*>* vars){
@@ -213,10 +237,18 @@ Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
 	map<Port*, ConstantInt*>* numTokens = pattern->getNumTokensMap();
 
 	for (itTokens = numTokens->begin(); itTokens != numTokens->end(); itTokens++) {
-		Port* port = itTokens->first;
-		itPort = ports->find(port->getName());
-		
-		newPattern->setNumTokens(itPort->second, itTokens->second);
+		Port* src = itTokens->first;
+		itPort = ports->find(src->getName());
+
+		Port* dst;
+		if (itPort == ports->end()){
+			// Port not found, search in internal port
+			dst = instance->getInternalPort(src);
+		}else{
+			dst = itPort->second;
+		}
+
+		newPattern->setNumTokens(dst, itTokens->second);
 	}
 
 	//Add variable map for each ports
@@ -229,7 +261,14 @@ Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
 		//Get corresponding port in instance
 		Port* src = itVar->first;
 		itPort = ports->find(src->getName());
-		Port* dst = itPort->second;
+		
+		Port* dst;
+		if (itPort == ports->end()){
+			// Port not found, search in internal port
+			dst = instance->getInternalPort(src);
+		}else{
+			dst = itPort->second;
+		}
 
 		// Add variable to pattern
 		newPattern->setVariable(dst, dst->getPtrVar());
@@ -244,7 +283,15 @@ Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
 		//Get corresponding port in instance
 		Port* src = itVar->first;
 		itPort = ports->find(src->getName());
-		Port* dst = itPort->second;
+		
+		Port* dst;
+		if (itPort == ports->end()){
+			// Port not found, search in internal port
+			dst = instance->getInternalPort(src);
+		}else{
+			dst = itPort->second;
+		}
+
 
 		// Add variable to pattern
 		newPattern->setPeeked(dst, dst->getPtrVar());

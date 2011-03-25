@@ -103,7 +103,7 @@ public:
 	}
 
 	/**
-	 * @brief Getter of variable
+	 * @brief Getter of global variable
 	 *
 	 * Returns the llvm::GlobalVariable bounds to this variable.
 	 * 
@@ -111,6 +111,17 @@ public:
 	 */
 	llvm::GlobalVariable* getGlobalVariable() {
 		return variable;
+	}
+
+	/**
+	 * @brief Setter of global variable
+	 *
+	 * Set the llvm::GlobalVariable bounds to this variable.
+	 * 
+	 * @param  llvm::GlobalVariable bounds to this variable
+	 */
+	void setGlobalVariable(llvm::GlobalVariable* variable) {
+		this->variable = variable;
 	}
 
 

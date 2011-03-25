@@ -51,7 +51,7 @@
  */
 class SuperInstance : public Instance {
 public:
-	/*!
+	/**
      *  @brief Create a SuperInstance.
 	 * 
 	 * @param name : the SuperInstance name
@@ -63,14 +63,40 @@ public:
 	~SuperInstance(){};
 
 	bool isSuperInstance(){return true;};
+
+	/**
+     * @brief Return true if this instance has internal port
+	 *
+	 * @return true if this instance has internal port, otherwise false
+     */
+	bool hasInternalPort(){return true;};
+
+	/**
+     * @brief Get the internal state variable corresponding to a port
+     *
+	 * @param port : the internal Port 
+	 *
+	 * @return the corresponding state variables
+     */
+	Port* getInternalPort(Port* port);
+
+	/**
+     * @brief Get the internal state variables of the instance
+	 *
+	 * @return a list of state variable
+     */
+	virtual std::map<Port*, Port*>* getInternalPorts(){return &internalPorts;};
+
 private:
 
 	/*!
      *  @brief Create a composite actor of the SuperInstance.
 	 *
-	 * @return the resulting Actor
+	 *  @param internalPorts : a map of internal ports
+	 *
+	 *  @return the resulting Actor
 	 */
-	Actor* createCompositeActor();
+	Actor* createCompositeActor(std::map<Port*, Port*>* internalPorts);
 
 	/*!
      *  @brief Create a moc of the composite actor.
@@ -127,7 +153,14 @@ private:
 	 */
 	void addStateVars(std::map<std::string, StateVar*>* src, std::map<std::string, StateVar*>* dst);
 
-
+	/**
+     *  @brief Add internal ports in superinstance
+	 *
+	 * @param internalPorts : the internal ports to add
+	 *
+	 */
+	void addInternalPorts(std::map<Port*, Port*>* internalPorts);
+	
 	/**
      *  @brief Add a map of paramters to another
 	 *
@@ -165,7 +198,7 @@ private:
 	int srcFactor;
 	
 	/** Internal port of instance */
-	std::map<Port*, Port*>* internalPorts;
+	std::map<Port*, Port*> internalPorts;
 
 	/** Destination instance */
 	Instance* dstInstance;
