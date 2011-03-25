@@ -436,16 +436,14 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 
 printInputPatternPort(port) ::= <<
 if (index_<port.name> + <pattern.numTokensMap.(port)> \> numTokens_<port.name>) {
-	ports |= 0x0<maskInputs.(port)>;
+	sched_add_schedulable(<instance.id>.sched, &<options.network.predecessorsMap.(instance).(port).id>, RING_TOPOLOGY);
 }
 >>
 
 printTransitionPattern(pattern, maskInputs) ::= <<
-int ports = 0;
 <pattern.ports: printInputPatternPort(); separator="\n">
 si-\>num_firings = i;
 si-\>reason = starved;
-si-\>ports |= ports;
 >>
 
 schedulingStates(states) ::= <<
@@ -600,27 +598,35 @@ instance(instance, options) ::= <<
 #include "orcc_types.h"
 #include "orcc_fifo.h"
 #include "orcc_util.h"
+#include "orcc_scheduler.h"
 <printMediumInclude(options.network.templateData.listAllMedium.(instance))>
 
 #define SIZE <options.("fifoSize")>
 
+#define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
+
+////////////////////////////////////////////////////////////////////////////////
+// Instance
+extern struct actor_s <instance.id>;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-<instance.actor.inputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
-}>
+<instance.actor.inputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;}; separator="\n">
 <instance.actor.inputs.list: printInputPort()>
 <if(options.enableTrace)>
-<instance.actor.inputs.list: { port | FILE *file_<port.name>;
-}>
+<instance.actor.inputs.list: { port | FILE *file_<port.name>;}; separator="\n">
 <endif>
+
+////////////////////////////////////////////////////////////////////////////////
+// Predecessors
+<instance.actor.inputs.list: { port | extern struct actor_s <options.network.predecessorsMap.(instance).(port).id>;}; separator="\n">
+
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-<instance.actor.outputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
-}>
+<instance.actor.outputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;}; separator="\n">
 <instance.actor.outputs.list: printOutputPort()>
 <if(options.enableTrace)>
-<instance.actor.outputs.list: { port | FILE *file_<port.name>;
-}>
+<instance.actor.outputs.list: { port | FILE *file_<port.name>;}; separator="\n">
 <endif>
 
 ////////////////////////////////////////////////////////////////////////////////
