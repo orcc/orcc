@@ -120,9 +120,9 @@ void writer_initialize(unsigned int fifo_Byte_id, unsigned int fifo_pEOF_id) {
 // Action scheduler
 void writer_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	si->ports = 0;
 	i32 peof;
 	u8 wr;
+	si->ports = 0;
 	read_Byte();
 	read_pEOF();
 
