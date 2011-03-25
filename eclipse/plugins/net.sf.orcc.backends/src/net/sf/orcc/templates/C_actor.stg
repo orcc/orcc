@@ -308,14 +308,15 @@ static void <action.body.name>() {
 
 printOutputPatternPort(port) ::= <<
 if (index_<port.name> + <pattern.numTokensMap.(port)> \> numFree_<port.name>) {
-	ports |= 0x0<instance.actor.templateData.maskOutputs.(port)>;
+	stop = 1;
+	<options.network.successorsMap.(instance).(port): { successor | sched_add_schedulable(<instance.id>.sched, &<successor.id>, RING_TOPOLOGY);}; separator="\n">
 }
 >>
 
 printOutputPattern(pattern) ::= <<
-int ports = 0;
+int stop = 0;
 <pattern.ports: printOutputPatternPort(); separator="\n">
-if (ports != 0) {
+if (stop != 0) {
 >>
 
 checkInputPattern(pattern) ::= <<
@@ -385,7 +386,6 @@ if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
 	<printOutputPattern(pattern=action.outputPattern)>
 		si-\>num_firings = i;
 		si-\>reason = full;
-		si-\>ports = ports;
 		goto finished;
 	}
 	<endif>
@@ -422,7 +422,6 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 		_FSM_state = my_state_<transition.sourceState>;
 		si-\>num_firings = i;
 		si-\>reason = full;
-		si-\>ports = ports;
 		goto finished;
 	}
 	<endif>
@@ -505,7 +504,6 @@ finished:
 
 void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	si-\>ports = 0;
 
 	<printCallTokenFunctions()>
 <if(options.enableTrace)>
@@ -628,6 +626,10 @@ extern struct actor_s <instance.id>;
 <if(options.enableTrace)>
 <instance.actor.outputs.list: { port | FILE *file_<port.name>;}; separator="\n">
 <endif>
+
+////////////////////////////////////////////////////////////////////////////////
+// Successors
+<instance.actor.outputs.list: { port | <options.network.successorsMap.(instance).(port): { successor | extern struct actor_s <successor.id>;}; separator="\n">}; separator="\n">
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs Id

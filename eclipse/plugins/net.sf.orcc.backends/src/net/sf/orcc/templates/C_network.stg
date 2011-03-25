@@ -370,11 +370,6 @@ void *scheduler(void *data) {
 #ifdef PRINT_FIRINGS
 			printf("%2i  %5i\t<if (options.newScheduler)>%5i\t<endif>%s\t%s\n", sched-\>id, si.num_firings, <if (options.newScheduler)>si.ports, <endif>si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
-			<if (options.newScheduler)>
-			if (si.reason == full<if(options.needDynamicMapping || options.threads)> && (si.num_firings || !sched-\>round_robin)<endif>) {
-				sched_add_successors(sched, my_actor, si.ports, RING_TOPOLOGY);
-			}
-			<endif>
 		}
 		<if(options.needDynamicMapping)>
 		i++;
