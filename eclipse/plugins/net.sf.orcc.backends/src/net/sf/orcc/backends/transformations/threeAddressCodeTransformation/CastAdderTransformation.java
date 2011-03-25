@@ -285,11 +285,16 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 		if ((returnType != null) && (!returnType.isVoid())) {
 			itInstruction.previous();
 			Expression value = returnInstr.getValue();
-			Expression newValue = (Expression) value.accept(
-					new CastExprInterpreter(), returnType);
-			returnInstr.setValue(newValue);
+			
+			// Check if value is not void
+			if (value != null){
+				Expression newValue = (Expression) value.accept(
+						new CastExprInterpreter(), returnType);
+				returnInstr.setValue(newValue);
+				Use.addUses(returnInstr, returnInstr.getValue());
+			}
+			
 			itInstruction.next();
-			Use.addUses(returnInstr, returnInstr.getValue());
 		}
 	}
 
