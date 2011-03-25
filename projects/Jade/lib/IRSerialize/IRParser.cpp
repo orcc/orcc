@@ -119,6 +119,9 @@ Actor* IRParser::parseActor(string classz){
 	NamedMDNode* nameNMD =  module->getNamedMetadata(IRConstant::KEY_NAME);
 	MDNode* nameMD = cast<MDNode>(nameNMD->getOperand(0));
 	MDString* name = cast<MDString>(nameMD->getOperand(0));
+	
+	// Create the new actor
+	actor = new Actor(name->getString(), module, classz);
 
 	// Parse actor elements
 	inputs = parsePorts(IRConstant::KEY_INPUTS, module);
@@ -131,8 +134,19 @@ Actor* IRParser::parseActor(string classz){
 	ActionScheduler* actionScheduler = parseActionScheduler(module);
 	MoC* moc = parseMoC(module);
 
-	return new Actor(name->getString(), module, classz, inputs, outputs, stateVars, 
-						parameters, procs, initializes, actions, actionScheduler, moc);
+	//Set parameters of the actor
+	actor->setInputs(inputs);
+	actor->setOutputs(outputs);
+	actor->setParameters(parameters);
+	actor->setActions(actions);
+	actor->setStateVars(stateVars);
+	actor->setProcs(procs);
+	actor->setActions(actions);
+	actor->setInitializes(initializes);
+	actor->setActionScheduler(actionScheduler);
+	actor->setMoC(moc);
+	
+	return actor;
 }
 
 MoC* IRParser::parseMoC(Module* module){
@@ -463,7 +477,7 @@ Action* IRParser::parseAction(MDNode* node){
 
 	Procedure* scheduler = parseProc(cast<MDNode>(node->getOperand(3)));
 	Procedure* body = parseProc(cast<MDNode>(node->getOperand(4)));
-	Action* action = new Action(tag, ip, op, scheduler, body);
+	Action* action = new Action(tag, ip, op, scheduler, body, actor);
 
 	putAction(tag, action);
 

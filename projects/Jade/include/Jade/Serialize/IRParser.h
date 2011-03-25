@@ -408,6 +408,9 @@ private:
 
 
 private:
+	/** Current actor */
+	Actor* actor;
+
 	/** list of actions of the current actor */
 	std::map<std::string, Action*> actions;
 

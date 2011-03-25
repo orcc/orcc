@@ -66,7 +66,7 @@ class Configuration;
  * @author Jerome Gorin
  * 
  */
-class Instance {
+class Instance  : public Parent {
 public:
 	/*!
      *  @brief Constructor
@@ -134,6 +134,8 @@ public:
      *
      */
 	virtual bool isSuperInstance(){return false;};
+
+	bool isInstance(){return true;}
 
 	/*!
      *  @brief Getter of clasz

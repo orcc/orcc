@@ -81,7 +81,7 @@ public:
 	 */
 	Pattern();
 
-	~Pattern();
+	~Pattern(){};
 
 	/**
 	 * @brief Returns true if this pattern is empty.

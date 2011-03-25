@@ -46,6 +46,19 @@
 using namespace std;
 using namespace llvm;
 
+
+Actor::Actor(std::string name, llvm::Module* module, std::string file){
+	this->name = name;
+	this->module = module;
+	this->file = file;
+
+	//Only actors with a file name are put in the package manager
+	if(!this->file.empty()){
+		PackageMng::setActor(this);
+	}
+}
+
+
 Actor::Actor(string name, Module* module, string file, map<string, Port*>* inputs, 
 		     map<string, Port*>* outputs, map<string, StateVar*>* stateVars,
 			 std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures,

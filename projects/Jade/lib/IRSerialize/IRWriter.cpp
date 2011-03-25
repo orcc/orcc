@@ -233,7 +233,7 @@ Action* IRWriter::writeAction(Action* action){
 		Pattern* outputPattern = writePattern(action->getOutputPattern(), outputs);
 
 		//Create the action
-		return new Action(action->getTag(), inputPattern, outputPattern, newScheduler, newBody);
+		return new Action(action->getTag(), inputPattern, outputPattern, newScheduler, newBody, instance);
 }
 
 Procedure* IRWriter::writeProcedure(Procedure* procedure){

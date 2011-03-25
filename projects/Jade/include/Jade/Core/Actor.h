@@ -48,6 +48,7 @@
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/MoC.h"
+#include "Jade/Core/Parent.h"
 
 namespace llvm{
 	class Module;
@@ -76,14 +77,32 @@ class Variable;
  * @author Jerome Gorin
  * 
  */
-class Actor {
+class Actor : public Parent {
 public:
+	
+	/**
+     *  @brief Constructor
+     *
+	 *	Creates a new empty actor.
+
+	 * @param name : string on the actor name
+	 *
+	 * @param module : the llvm::Module of the actor
+	 *
+	 * @param file : string of the bitcode file this actor was defined in
+	 *
+     */
+	Actor(std::string name, llvm::Module* module, std::string file);
+	
+	
 	/**
      *  @brief Constructor
      *
 	 *	Creates a new actor.
 	 *
 	 * @param name : string on the actor name
+	 *
+	 * @param module : the llvm::Module of the actor
 	 *
 	 * @param file : string of the bitcode file this actor was defined in
 	 *
@@ -113,6 +132,8 @@ public:
 	 * @param name : string on the actor name
 	 *
 	 * @param file : string of the bitcode file this actor was defined in
+	 *
+	 * @param module : the llvm::Module of the actor
 	 *
      * @param inputs : a map of input ports
 	 *
@@ -160,6 +181,13 @@ public:
 	std::map<std::string, Variable*>* getParameters(){return parameters;};
 
 	/**
+     *  @brief Set parameters of actor
+	 *
+	 *  @param parameters : a map of Variable that contains actor parameters
+     */
+	 void setParameters(std::map<std::string, Variable*>* parameters){this->parameters = parameters;};
+
+	/**
      *  @brief Return the package of this actor
 	 *
 	 *  @return the package of this actor
@@ -182,6 +210,8 @@ public:
 	 *
      */
 	std::string getPackage();
+
+	bool isActor(){return true;};
 
 	/**
      *  @brief Returns the simple name of this actor
@@ -228,12 +258,26 @@ public:
 	std::map<std::string, Port*>* getInputs() {return inputs;};
 
 	/**
-     *  @brief getter of input ports
+     *  @brief setter of input ports
+	 *
+	 *  @param inputs : a map of Port representing inputs of the actor
+     */
+	void setInputs(std::map<std::string, Port*>* inputs) {this->inputs = inputs;};
+
+	/**
+     *  @brief getter of output ports
 	 *
 	 *  @return a map of Port representing inputs of the actor
 	 *
      */
 	std::map<std::string, Port*>* getOutputs() {return outputs;};
+
+	/**
+     *  @brief setter of output ports
+	 *
+	 *  @param outputs : a map of Port representing output of the actor
+     */
+	void setOutputs(std::map<std::string, Port*>* outputs) {this->outputs = outputs;};
 
 
 	/**
@@ -244,6 +288,13 @@ public:
      */
 	std::list<Action*>* getActions() {return actions;};
 
+	/***
+     *  @brief setter of actions
+	 *
+	 *  @param actions : a list of actions
+     */
+	void setActions(std::list<Action*>* actions) {this->actions = actions;};
+
 	/**
      *  @brief getter of initialize actions
 	 *
@@ -253,12 +304,26 @@ public:
 	std::list<Action*>* getInitializes() {return initializes;};
 
 	/**
+     *  @brief Setter of initialize actions
+	 *
+	 *  @param initializes : a list of initialize actions
+	 *
+     */
+	 void setInitializes(std::list<Action*>* initializes) {this->initializes = initializes;};
+
+	/**
      *  @brief return true if actior has initialize actions
 	 *
 	 *  @return true if actor has initializes actions
 	 *
      */
-	bool hasInitializes() {return !initializes->empty();};
+	bool hasInitializes() {
+		if (initializes != NULL){
+			return !initializes->empty();
+		}
+		
+		return false;
+	};
 
 	/**
      *  @brief Create an input port
@@ -307,6 +372,15 @@ public:
 	}
 
 	/**
+	 * @brief Setter of stateVars
+	 * 
+	 * @param  a map of state variables
+	 */
+	void setStateVars(std::map<std::string, StateVar*>* stateVars) {
+		this->stateVars = stateVars;
+	}
+
+	/**
 	 * @brief Getter of a state variable
 	 *
 	 *  @param name : name of string of the port identifier
@@ -328,14 +402,32 @@ public:
 	}
 
 	/**
+	 * @brief Setter of actionScheduler
+	 * 
+	 * @return ActionScheduler of this actor
+	 */
+	 void setActionScheduler(ActionScheduler* actionScheduler) {
+		this->actionScheduler = actionScheduler;
+	}
+
+	/**
 	 * @brief Getter of procedures
 	 *
 	 * Returns a map of procedure of this actor.
 	 * 
-	 * @return a map of ProcedureActionScheduler of this actor
+	 * @return a map of Procedure of this actor
 	 */
 	std::map<std::string, Procedure*>* getProcs() {
 		return procedures;
+	}
+
+	/**
+	 * @brief Setter of procedures
+	 * 
+	 * @param procs  : a map of Procedure of this actor
+	 */
+	void setProcs(std::map<std::string, Procedure*>* procs) {
+		this->procedures = procs;
 	}
 
 	/**

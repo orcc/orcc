@@ -188,6 +188,8 @@ public:
 	 */
 	std::list<Connection*>* getAllConnections(Instance* source, Instance* target);
 
+	bool isNetwork(){return true;}
+
 private:
 
 	/**
