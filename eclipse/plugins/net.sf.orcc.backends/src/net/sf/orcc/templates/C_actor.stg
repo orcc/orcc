@@ -614,7 +614,7 @@ instance(instance, options) ::= <<
 }>
 <endif>
 ////////////////////////////////////////////////////////////////////////////////
-// Input FIFOs
+// Output FIFOs
 <instance.actor.outputs.list: { port | extern struct fifo<printMedium(port)>_<port.type>_s *<getPortName(port)>;
 }>
 <instance.actor.outputs.list: printOutputPort()>
