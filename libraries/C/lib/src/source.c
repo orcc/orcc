@@ -48,13 +48,12 @@
 #define LOOP_NUMBER 5
 
 static FILE *F = NULL;
-static int cnt = 0;
 static int nb;
 static int stop;
 static int genetic = 0;
 
 // Called before any *_scheduler function.
-void source_initialize() {
+void source_init() {
 	stop = 0;
 	nb = 0;
 
@@ -77,8 +76,6 @@ void source_initialize() {
 	}
 }
 
-extern struct fifo_i8_s *source_O;
-
 int source_is_stopped() {
 	return stop;
 }
@@ -87,40 +84,21 @@ void source_active_genetic() {
 	genetic = 1;
 }
 
-void source_scheduler(struct schedinfo_s *si) {
-	int i = 0;
-	int n;
-
-	if (!(stop && genetic)) {
-		while (fifo_i8_has_room(source_O, source_O->readers_nb, 1) && !(stop && genetic)) {
-			unsigned char buf[1];
-			n = fread(&buf, 1, 1, F);
-			if (n < 1) {
-				if (feof(F)) {
-					rewind(F);
-					cnt = 0;
-					if (!genetic || (genetic && nb < LOOP_NUMBER)) {
-						n = fread(&buf, 1, 1, F);
-						nb++;
-					}
-					else{
-						n = fclose(F);
-						stop = 1;
-					}
-				}
+unsigned int source_read_file(){
+	unsigned char buf[1];
+	int n = fread(&buf, 1, 1, F);
+	if (n < 1) {
+		if (feof(F)) {
+			rewind(F);
+			if (!genetic || (genetic && nb < LOOP_NUMBER)) {
+				n = fread(&buf, 1, 1, F);
+				nb++;
 			}
-			i++;
-			cnt++;
-
-			fifo_i8_write_1(source_O, buf[0]);
+			else{
+				n = fclose(F);
+				stop = 1;
+			}
 		}
 	}
-
-	si->num_firings = i;
-	if (stop && genetic) {
-		si->reason = starved;
-	} else {
-		si->reason = full;
-	}
-	si->ports = 0x01; // FIFO connected to first output port is empty
+	return buf[0];
 }
