@@ -67,7 +67,14 @@ Configuration::~Configuration(){
 	}
 }
 
+void Configuration::update(){
+	//Set configuration property from network
+	setInstances();
+}
+
 void Configuration::setInstances(){
+	instances.clear();
+	
 	// Create list of instance and actor
 	HDAGGraph* graph = network->getGraph();
 	int vertices = graph->getNbVertices();

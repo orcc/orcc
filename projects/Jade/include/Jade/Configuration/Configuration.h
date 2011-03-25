@@ -116,6 +116,13 @@ public:
 	Network* getNetwork(){return network;};
 
 	/**
+     *  @brief Update the configuration with the given network
+	 * 
+	 *  @param network : the used Network to update the configuration
+     */
+	void update();
+
+	/**
      *  @brief return the actor corresponding to the given name
 	 * 
 	 *	Return an actor corresponding to the given name if the current actor is contained in the configuration,

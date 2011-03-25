@@ -54,7 +54,10 @@ using namespace std;
 using namespace llvm;
 
 Merger::Merger(LLVMContext& C, Configuration* configuration): Context(C){
-	network = configuration->getNetwork();
+	// Set merger property
+	this->configuration = configuration;
+	this->index = 0;
+	this->network = configuration->getNetwork();
 }
 
 void Merger::transform(){
@@ -103,6 +106,9 @@ void Merger::transform(){
 			hasCondidate = false;
 		}
 	}
+
+	// Update configuration
+	configuration->update();
 }
 
 void Merger::mergeInstance(Instance* src, Instance* dst){
@@ -118,7 +124,6 @@ void Merger::mergeInstance(Instance* src, Instance* dst){
 
 	network->removeInstance(src);
 	network->removeInstance(dst);
-	
 }
 
 void Merger::updateConnections(list<Connection*>* connections, Instance* src, Instance* dst, Vertex* vertex){
@@ -129,13 +134,25 @@ void Merger::updateConnections(list<Connection*>* connections, Instance* src, In
 		network->removeConnection(*it);
 	}
 
-	// Update input connections with new vertex
+	// Update input connections of source
 	list<Connection*> srcIn = network->getInConnections(src);
 	for (it = srcIn.begin(); it != srcIn.end(); it++){
 		(*it)->setSink(vertex);
 	}
 
-	// Update output connections
+	// Update outputs connections of source
+	list<Connection*> srcOut = network->getOutConnections(src);
+	for (it = srcOut.begin(); it != srcOut.end(); it++){
+		(*it)->setSource(vertex);
+	}
+
+	// Update input connections of destination
+	list<Connection*> dstIn = network->getInConnections(dst);
+	for (it = dstIn.begin(); it != dstIn.end(); it++){
+		(*it)->setSink(vertex);
+	}
+
+	// Update output connections of destination
 	list<Connection*> dstOut = network->getOutConnections(dst);
 	for (it = dstOut.begin(); it != dstOut.end(); it++){
 		(*it)->setSource(vertex);
@@ -183,7 +200,7 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Conn
 	}
 
 
-	return new SuperInstance(Context, "merged", src, rate.numerator(), dst, rate.denominator(), internPorts);
+	return new SuperInstance(Context, "merged"+(index++), src, rate.numerator(), dst, rate.denominator(), internPorts);
 }
 
 Rational Merger::getRational(ConstantInt* srcProd, ConstantInt* dstCons){

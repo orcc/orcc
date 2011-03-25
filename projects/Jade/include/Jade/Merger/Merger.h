@@ -98,6 +98,12 @@ private:
 	 */
 	void updateConnections(std::list<Connection*>* connections, Instance* src, Instance* dst, Vertex* vertex);
 
+	/** Index of merger */
+	int index;
+
+	/** Configuration to update */
+	Configuration* configuration;
+
 	/** Network to merge */
 	Network* network;
 
