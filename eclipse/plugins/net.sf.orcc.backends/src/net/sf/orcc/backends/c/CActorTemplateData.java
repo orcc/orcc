@@ -56,16 +56,6 @@ public class CActorTemplateData {
 	private Pattern inputPattern;
 
 	/**
-	 * Map that associates an input port to a mask
-	 */
-	private Map<Port, String> maskInputs;
-
-	/**
-	 * Map that associates an output port to a mask
-	 */
-	private Map<Port, String> maskOutputs;
-
-	/**
 	 * Map that associates a transition with the minimum input pattern that
 	 * allows all actions in the transition to fire
 	 */
@@ -92,30 +82,6 @@ public class CActorTemplateData {
 					inputPattern.setNumTokens(port, numTokens);
 				}
 			}
-		}
-	}
-
-	/**
-	 * Builds the mask inputs map.
-	 */
-	private void buildMaskInputs(Actor actor) {
-		int i = 0;
-		for (Port port : actor.getInputs()) {
-			int mask = (1 << i);
-			i++;
-			maskInputs.put(port, Integer.toHexString(mask));
-		}
-	}
-
-	/**
-	 * Builds the mask outputs map.
-	 */
-	private void buildMaskOutputs(Actor actor) {
-		int i = 0;
-		for (Port port : actor.getOutputs()) {
-			int mask = (1 << i);
-			i++;
-			maskOutputs.put(port, Integer.toHexString(mask));
 		}
 	}
 
@@ -159,13 +125,9 @@ public class CActorTemplateData {
 	 */
 	public void computeTemplateMaps(Actor actor) {
 		inputPattern = new Pattern();
-		maskInputs = new HashMap<Port, String>();
-		maskOutputs = new HashMap<Port, String>();
 		transitionPattern = new HashMap<FSM.Transition, Pattern>();
 
 		buildInputPattern(actor);
-		buildMaskInputs(actor);
-		buildMaskOutputs(actor);
 		buildTransitionPattern(actor);
 	}
 
@@ -178,24 +140,6 @@ public class CActorTemplateData {
 	 */
 	public Pattern getInputPattern() {
 		return inputPattern;
-	}
-
-	/**
-	 * Returns a map that associates an input port to a mask.
-	 * 
-	 * @return a map that associates an input port to a mask
-	 */
-	public Map<Port, String> getMaskInputs() {
-		return maskInputs;
-	}
-
-	/**
-	 * Returns a map that associates an output port to a mask.
-	 * 
-	 * @return a map that associates an output port to a mask
-	 */
-	public Map<Port, String> getMaskOutputs() {
-		return maskOutputs;
 	}
 
 	/**

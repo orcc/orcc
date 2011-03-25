@@ -404,8 +404,7 @@ printActions(actions) ::= <<
 <if (first(actions))
 ><actionTest(action=first(actions), restActions=rest(actions))><
 else
-><printTransitionPattern(pattern=instance.actor.templateData.inputPattern,
-	maskInputs=instance.actor.templateData.maskInputs)>
+><printTransitionPattern(instance.actor.templateData.inputPattern)>
 goto finished;<
 endif>
 >>
@@ -443,7 +442,7 @@ if (index_<port.name> + <pattern.numTokensMap.(port)> \> numTokens_<port.name>) 
 }
 >>
 
-printTransitionPattern(pattern, maskInputs) ::= <<
+printTransitionPattern(pattern) ::= <<
 <pattern.ports: printInputPatternPort(); separator="\n">
 si-\>num_firings = i;
 si-\>reason = starved;
@@ -453,8 +452,7 @@ schedulingStates(states) ::= <<
 <if (first(states))
 ><actionTestState(state=first(states), restStates=rest(states))><
 else
-><printTransitionPattern(pattern=instance.actor.templateData.transitionPattern.(transition),
-	maskInputs=instance.actor.templateData.maskInputs)>
+><printTransitionPattern(pattern=instance.actor.templateData.transitionPattern.(transition))>
 _FSM_state = my_state_<transition.sourceState>;
 goto finished;<
 endif>
