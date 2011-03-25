@@ -602,7 +602,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		LocalVariable tmp = new LocalVariable(true, 1, new Location(), "tmp",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(tmp.getName(), tmp);
-		Expression incValue = new BinaryExpr(new VarExpr(new Use(mask)),
+		Expression incValue = new BinaryExpr(new VarExpr(new Use(index)),
 				BinaryOp.PLUS, inc1, IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign2 = new Assign(tmp, incValue);
 		bodyNode.add(assign2);
@@ -655,12 +655,12 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(load2);
 
 		List<Expression> store1Index = new ArrayList<Expression>(1);
-		Expression e1 = new VarExpr(new Use(mask));
+		Expression e1 = new VarExpr(new Use(counter));
 
 		Expression e2 = new IntExpr(1);
 		Expression indexInc = new BinaryExpr(e1, BinaryOp.PLUS, e2,
 				readCounter.getType());
-		store1Index.add(e1);
+		store1Index.add(new VarExpr(new Use(mask)));
 
 		Instruction store1 = new Store(storeList, store1Index, new VarExpr(
 				new Use(input)));
@@ -772,7 +772,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		index++;
 
 		LocalVariable diff = new LocalVariable(true, inputIndex,
-				new Location(), "diff", IrFactory.eINSTANCE.createTypeUint(32));
+				new Location(), "diff", IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(diff.getName(), diff);
 		Expression value = new BinaryExpr(new VarExpr(new Use(readIndex)),
 				BinaryOp.MINUS, new VarExpr(new Use(writeIndex)),
@@ -781,15 +781,11 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(index, assign);
 		index++;
 
-		Expression mask = new BinaryExpr(new VarExpr(new Use(diff)),
-				BinaryOp.BITAND, new IntExpr(bufferSize - 1),
-				IrFactory.eINSTANCE.createTypeUint(32));
-
 		LocalVariable conditionVar = new LocalVariable(true, inputIndex,
 				new Location(), "condition",
 				IrFactory.eINSTANCE.createTypeBool());
 		locals.put(conditionVar.getName(), conditionVar);
-		Expression value2 = new BinaryExpr(mask, BinaryOp.GE, new IntExpr(
+		Expression value2 = new BinaryExpr(new VarExpr(new Use(diff)), BinaryOp.GE, new IntExpr(
 				numTokens), IrFactory.eINSTANCE.createTypeBool());
 		Instruction assign2 = new Assign(conditionVar, value2);
 		bodyNode.add(index, assign2);
@@ -931,7 +927,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				}
 			}
 		}
-		optimalSize = closestPow_2(size) * 2;
+		optimalSize = closestPow_2(size);
 		return optimalSize;
 	}
 
