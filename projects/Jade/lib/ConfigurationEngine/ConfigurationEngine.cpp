@@ -71,10 +71,10 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	broadAdder.transform();
 
 	//Merge static actors together if needed
-	if (configuration->mergeActors()){
+/*	if (configuration->mergeActors()){
 		Merger merger(Context, configuration);
 		merger.transform();
-	}
+	}*/
 
 	//Write instance
 	IRWriter writer(Context, decoder);

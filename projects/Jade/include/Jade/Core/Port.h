@@ -82,6 +82,7 @@ public:
 		this->type = type; 
 		this->ptrVar = NULL;
 		this->fifoVar = NULL;
+		this->intern = false;
 	};
 
 	/**
