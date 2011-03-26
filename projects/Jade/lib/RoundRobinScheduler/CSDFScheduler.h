@@ -43,6 +43,7 @@
 
 class CSDFMoC;
 class SuperInstance;
+class StateVar;
 //------------------------------
 
 /**
@@ -121,6 +122,15 @@ protected:
 	 * @param superInstance : the superInstance to create communication interface
 	 */
 	virtual void createStateVars(SuperInstance* superInstance);
+
+	/**
+	 * @brief Internal internal communication of the isntance
+	 * 
+	 * @param stateVars : map of internal stateVars
+	 *
+	 * @param BB : the llvm::BasicBlock where instructions are added
+	 */
+	virtual void initializeStateVars(std::map<Port*, StateVar*>* stateVars, llvm::BasicBlock* BB);
 };
 
 #endif

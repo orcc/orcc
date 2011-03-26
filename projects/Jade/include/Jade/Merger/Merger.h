@@ -58,7 +58,7 @@ class SuperInstance;
  */
 class Merger {
 public:
-	Merger(llvm::LLVMContext& C, Configuration* configuration);
+	Merger(llvm::LLVMContext& C, Configuration* configuration, bool verbose = false);
 	~Merger(){};
 
 	void transform();
@@ -97,6 +97,9 @@ private:
 	 * @param superInstance : the corresponding SuperInstance.
 	 */
 	void updateConnections(std::list<Connection*>* connections, Instance* src, Instance* dst, SuperInstance* superInstance);
+
+	/** Verbose message */
+	bool verbose;
 
 	/** Index of merger */
 	int index;

@@ -254,7 +254,15 @@ public:
      */
 	Port* getOutput(std::string portName);
 
-	/*!
+
+	/**
+     * @brief Get the internal state variables of the instance
+	 *
+	 * @return a list of state variable
+     */
+	virtual std::map<Port*, StateVar*>* getInternalVars(){return NULL;};
+
+	/**
      *  @brief Getter of paramters
      *
 	 * @return a map on the Instance paramter

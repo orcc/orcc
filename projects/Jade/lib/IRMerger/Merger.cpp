@@ -54,16 +54,17 @@
 using namespace std;
 using namespace llvm;
 
-Merger::Merger(LLVMContext& C, Configuration* configuration): Context(C){
+Merger::Merger(LLVMContext& C, Configuration* configuration, bool verbose): Context(C){
 	// Set merger property
 	this->configuration = configuration;
 	this->index = 0;
 	this->network = configuration->getNetwork();
+	this->verbose = verbose;
 }
 
 void Merger::transform(){
 	bool hasCondidate = true;
-		
+
 	// Iterate though all vertices until no candidate left
 	while(hasCondidate){
 		list<Instance*>::iterator it;
@@ -110,6 +111,10 @@ void Merger::transform(){
 
 	// Update configuration
 	configuration->update();
+
+	if (verbose){
+		cout << "--> " << index + 1 << " instances are merged.\n";
+	}
 }
 
 void Merger::mergeInstance(Instance* src, Instance* dst){
@@ -214,6 +219,8 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Conn
 		}
 
 		// Set internal ports of each instances
+		src->setInternal(true);
+		dst->setInternal(true);
 		internPorts->insert(pair<Port*, Port*>(src, dst));
 	}
 

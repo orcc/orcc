@@ -64,6 +64,8 @@ ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decode
 }
 
 void ActionSchedulerAdder::transform(Instance* instance) {
+	this->instance = instance;
+	
 	//Create action scheduler
 	createActionScheduler(instance);
 

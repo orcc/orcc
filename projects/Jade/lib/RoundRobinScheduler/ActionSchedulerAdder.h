@@ -354,6 +354,9 @@ protected:
 
 	/** MoC of the Instance */
 	MoC* moc;
+
+	/** Current instance */
+	Instance* instance;
 };
 
 #endif

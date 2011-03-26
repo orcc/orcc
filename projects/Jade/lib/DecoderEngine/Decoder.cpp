@@ -72,7 +72,7 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose): Co
 	this->fifoFn = FifoMng::addFifoHeader(this);
 
 	//Configure the decoder
-	ConfigurationEngine engine(Context);
+	ConfigurationEngine engine(Context, verbose);
 	engine.configure(this);
 
 	//Set elements of the decoder

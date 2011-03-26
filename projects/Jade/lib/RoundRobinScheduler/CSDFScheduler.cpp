@@ -122,12 +122,35 @@ BasicBlock* CSDFScheduler::createPatternTest(CSDFMoC* moc, BasicBlock* BB, Basic
 	//Create output pattern
 	BasicBlock* fireBB = checkOutputPattern(moc->getOutputPattern(), function, skipBB, BB);
 
+	// Initialize internal vars
+	if (instance->hasInternalPort()){
+		initializeStateVars(instance->getInternalVars(), fireBB);
+	}
+
 	createActionsCall(moc, fireBB);
 	
 	//Branch fire basic block to BB basic block
 	BranchInst::Create(incBB, fireBB);
 
 	return skipBB;
+}
+
+void CSDFScheduler::initializeStateVars(map<Port*, StateVar*>* stateVars, BasicBlock* BB){
+	map<Port*, StateVar*>::iterator it;
+
+	for (it = stateVars->begin(); it != stateVars->end(); it++){
+		Port* port = it->first;
+		StateVar* stateVar = it->second;
+
+		// Get zero element of the state var
+		ConstantInt* zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
+		Value* values[] = {zero, zero};
+		GetElementPtrInst* gepInst = GetElementPtrInst::Create(stateVar->getGlobalVariable(), values, values + 2, "", BB);
+
+		//Store to port pointer
+		new StoreInst(gepInst, port->getPtrVar()->getGlobalVariable(), BB);
+	}
+
 }
 
 void CSDFScheduler::createActionsCall(CSDFMoC* moc, BasicBlock* BB){
