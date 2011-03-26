@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -48,6 +49,7 @@ import net.sf.orcc.moc.KPNMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
+import net.sf.orcc.network.Network;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.core.resources.IFile;
@@ -56,7 +58,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -117,7 +121,7 @@ public class ActorClassifier implements ActorVisitor {
 			showMarker();
 		} else {
 			// merges actions with the same input/output pattern together
-			new SDFActionsMerger().visit(actor);
+			//new SDFActionsMerger().visit(actor);
 
 			// first tries SDF with *all* the actions of the actor
 			moc = classifySDF(actions);
@@ -406,9 +410,15 @@ public class ActorClassifier implements ActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		this.actor = actor;
-		classify();
-		actor = null;
+		try {
+			this.actor = actor;
+			classify();
+			actor = null;
+		}catch (Exception e) {
+			System.out.println("Error of classification for actor " + actor + ":"+e);
+			System.out.println("Set actor moc of "+actor +" to default");
+			actor.setMoC(new DPNMoC());
+		}
 	}
 
 }
