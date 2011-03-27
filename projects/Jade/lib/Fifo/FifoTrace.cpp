@@ -58,6 +58,9 @@ void FifoTrace::createConnection(){
 	//Get fifo structure
 	IntegerType* connectionType = cast<IntegerType>(fifoType);
 
+	//Get fifo structure
+	StructType* structType = FifoMng::getFifoType(connectionType);
+
 	//Get fifo array structure
 	PATypeHolder EltTy(connectionType);
 	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getSize());
@@ -82,11 +85,11 @@ void FifoTrace::createConnection(){
 	ostringstream fileVar;
 	string strFile;
 	string strVar;
-	
-	//fileName << OutputDir << dstInstance->getName() <<"_" <<src->getName() << ".txt";
-	//fileVar << dstInstance->getName() << "_" << src->getName() << "_file";
-	//fileName << OutputDir << dstInstance->getName() <<"_" <<src->getName() << ".txt";
-	/*
+	Vertex* srcVer = (Vertex*)connection->getSource();
+	Instance* instance = srcVer->getInstance();
+	Port* port = connection->getSourcePort();
+	fileName << outputDir << instance->getId() <<"_" <<port->getName() << ".txt";
+	fileVar << instance->getId() << "_" << port->getName() << "_file";
 	strFile = fileName.str();
 	strVar = fileVar.str();
 	
@@ -117,10 +120,6 @@ void FifoTrace::createConnection(){
 	// Create fifo 
 	fifoGV =
         new GlobalVariable(*module, structType,
-		false, GlobalVariable::InternalLinkage, fifoStruct, fifoName.str());
-	NewFifo->setAlignment(32);
-	
-	// Increment fifo counter 
-	fifoCnt++;*/
-	
+		false, GlobalVariable::InternalLinkage, fifoStruct,"fifo");
+	fifoGV->setAlignment(32);	
 }

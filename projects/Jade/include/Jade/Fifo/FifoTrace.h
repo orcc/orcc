@@ -40,6 +40,7 @@
 #define FIFOTRACE_H
 
 #include "Jade/Fifo/AbstractFifo.h"
+class Network;
 //------------------------------
 
 /**
@@ -51,13 +52,16 @@
 
 class FifoTrace : public AbstractFifo {
 public:
-	FifoTrace(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size, std::string outputDir) : AbstractFifo(C, module, type, size) {
+	FifoTrace(llvm::LLVMContext& C, Connection* connection, llvm::Module* module, Network* network, llvm::Type* type, int size, std::string outputDir) : AbstractFifo(C, module, type, size) {
 		this->OutputDir = outputDir;
+		this->network = network;
+		this->connection = connection;
+		this->outputDir = outputDir;
 		createConnection();
 	};
 
 
-	~FifoTrace();
+	~FifoTrace(){};
 	
 protected:
 		llvm::GlobalVariable *fifo;
@@ -70,6 +74,8 @@ protected:
 		llvm::GlobalVariable* file;
 		std::string OutputDir;
 		void createConnection();
+		Network* network;
+		std::string outputDir;
 	};
 
 #endif

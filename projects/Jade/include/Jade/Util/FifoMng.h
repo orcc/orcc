@@ -111,7 +111,7 @@ public:
 	 *
 	 *	@param packageFld : the VTL folder
      */
-	static void setFifoTy(FifoTy fifoTy, std::string packageFld);
+	static void setFifoTy(FifoTy fifoTy, std::string packageFld, std::string outputDir = "");
 
 	/**
      *  @brief Filename of the fifo to parse
@@ -203,13 +203,13 @@ public:
 	 *
 	 *  @param decoder : the Decoder used
 	 *
-	 *  @param type : the llvm::Type of the fifo
+	 *  @param type : the fifo type
 	 *
-	 *  @param size : the number of token the fifo can contain
+	 *  @param connection : the Connection where fifo is created
 	 *
 	 *	@Return the new Fifo
      */
-	static AbstractFifo* getFifo(llvm::LLVMContext& C, Decoder* decoder, llvm::Type* type, int size);
+	static AbstractFifo* getFifo(llvm::LLVMContext& C, Decoder* decoder, llvm::Type* type, Connection* connection);
 	
 	/**
 	 *  @brief Add fifo header
@@ -288,6 +288,9 @@ private:
 
 	/** Path to package folder */
 	static std::string packageFolder;
+
+	/** Path to writing directoru */
+	static std::string outputDir;
 
 	/** Module that contains the fifo */
 	static llvm::Module* headerMd;

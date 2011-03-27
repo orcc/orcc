@@ -65,6 +65,7 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 							 string library, 
 							 FifoTy fifo, 
 							 string system, 
+							 string outputDir, 
 							 bool noMerging,
 							 bool verbose): Context(C) {	
 	//Set properties	
@@ -73,9 +74,10 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 	this->verbose = verbose;
 	this->fifoty = fifoty;
 	this->noMerging = noMerging;
+	this->outputDir = outputDir;
 
 	//Select the fifo used
-	FifoMng::setFifoTy(fifo, library);
+	FifoMng::setFifoTy(fifo, library, outputDir);
 
 	//Load IR Parser
 	irParser = new IRParser(C, library);

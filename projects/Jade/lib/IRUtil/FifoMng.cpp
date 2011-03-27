@@ -61,14 +61,16 @@ std::string FifoMng::fifoFiles[] = { "FifoCircular", "FifoTrace", "FifoUnprotect
 FifoTy FifoMng::fifoTy;
 string FifoMng::externFnFile;
 string FifoMng::packageFolder;
+string FifoMng::outputDir;
 Module* FifoMng::headerMd;
 map<int, FifoMng::FifoAccess*> FifoMng::fifoAccesses;
 map<string, const StructType*> FifoMng::fifoStructs;
 
 
-void FifoMng::setFifoTy(FifoTy fifoTy, std::string packageFld){
+void FifoMng::setFifoTy(FifoTy fifoTy, std::string packageFld, std::string outputDir){
 		FifoMng::fifoTy =  fifoTy;
 		FifoMng::packageFolder = packageFld;
+		FifoMng::outputDir = outputDir;
 
 		parseModules();
 		parseFifos();
@@ -136,9 +138,20 @@ pair<string, StructType*> FifoMng::parseFifoStruct(llvm::MDNode* structMD){
 	return pair<string, StructType*>(name->getString(), structType);
 }
 
-AbstractFifo* FifoMng::getFifo(LLVMContext& C, Decoder* decoder, Type* type, int size){
+AbstractFifo* FifoMng::getFifo(LLVMContext& C, Decoder* decoder, Type* type, Connection* connection){
+	int size = connection->getSize();
+
 	//Todo : implement static class in fifo for creation
-	return new FifoCircular(C, decoder->getModule(), type, size);
+	if (fifoTy == trace){
+		return new FifoTrace(C, connection, decoder->getModule(), decoder->getConfiguration()->getNetwork(), type, size, outputDir);
+	}else if (fifoTy == circular){
+		return new FifoCircular(C, decoder->getModule(), type, size);
+	}else if (fifoTy == unprotected){
+		//return new FifoUnprotected(C, decoder->getModule(), type, size);
+		return NULL;
+	}else{
+		return NULL;
+	}
 }
 
 StructType* FifoMng::getFifoType(IntegerType* type){

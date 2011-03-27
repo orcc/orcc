@@ -277,7 +277,7 @@ int main(int argc, char **argv) {
 	setOptions();
 	
 	//Loading decoderEngine
-	engine = new DecoderEngine(Context, VTLDir, Fifo, SystemDir, noMerging, Verbose);
+	engine = new DecoderEngine(Context, VTLDir, Fifo, SystemDir, OutputDir, noMerging, Verbose);
 
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

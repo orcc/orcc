@@ -414,9 +414,10 @@ public class ActorClassifier implements ActorVisitor {
 			this.actor = actor;
 			classify();
 			actor = null;
-		}catch (Exception e) {
-			System.out.println("Error of classification for actor " + actor + ":"+e);
-			System.out.println("Set actor moc of "+actor +" to default");
+		} catch (Exception e) {
+			System.out.println("Error of classification for actor " + actor
+					+ ":" + e);
+			System.out.println("Set actor moc of " + actor + " to default");
 			actor.setMoC(new DPNMoC());
 		}
 	}

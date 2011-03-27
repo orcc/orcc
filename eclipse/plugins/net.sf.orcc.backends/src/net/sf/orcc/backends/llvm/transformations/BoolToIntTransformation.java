@@ -81,20 +81,7 @@ public class BoolToIntTransformation extends AbstractActorVisitor {
 		visitPort(actor.getInputs());
 		visitPort(actor.getOutputs());
 
-		// Set corresponding in procedure
-		for (Procedure proc : actor.getProcs()) {
-			visit(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visit(action.getBody());
-			visit(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visit(action.getBody());
-			visit(action.getScheduler());
-		}
+		super.visit(actor);
 	}
 
 	public void visitPort(OrderedMap<String, Port> ports) {
