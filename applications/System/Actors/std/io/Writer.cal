@@ -3,6 +3,56 @@ package std.io;
 /**
  * Standard I/O writer actor.
  */
-native actor Writer() ==> :
+actor Writer()
+ 	uint(size=8) Byte,
+ 	bool pEOF
+ 		==> 
+ 			:
 
+	/**
+	 * Initializing the file to be written
+	 */
+	native procedure Writer_init() end
+
+	/**
+	 * Wite a byte to a file
+	 */
+	native procedure Writer_write(uint(size=8) byte) end
+	
+	/**
+	 * Close tthe file
+	 */
+	native procedure Writer_close() end
+
+	initialize ==>
+	do
+		Writer_init();
+	end
+	
+	bool peof := false;
+	
+	GetEOF: action pEOF:[p] ==>
+	do
+		peof := p;
+	end
+	
+	Write: action Byte:[b] ==>
+	guard
+		not peof
+	do
+		Writer_write(b);
+	end
+	
+	Close: action ==>
+	guard
+		peof
+	do
+		Writer_close();
+	end
+	
+	schedule fsm s0:
+		s0		(GetEOF)		--> s1;
+		s1		(Write)			--> s0;
+		s1		(Close)			--> s0;
+	end
 end
