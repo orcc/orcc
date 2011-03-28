@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="Any2Bits" x="352" y="147"/>
-      <vertex id="Source" x="177" y="122"/>
-      <vertex id="Display_Bit" x="514" y="159"/>
-   </vertices>
-</layout>
