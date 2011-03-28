@@ -1,7 +1,0 @@
-package System;
-
-native actor ReadFile (String filename) ==> uint(size=8) O:
-	// so the actor scheduler will call an initialize function
-	initialize ==>
-	end
-end

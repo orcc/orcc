@@ -1,8 +1,0 @@
-package std.io;
-
-/**
- * Standard I/O reader actor.
- */
-native actor Reader() ==> :
-
-end
