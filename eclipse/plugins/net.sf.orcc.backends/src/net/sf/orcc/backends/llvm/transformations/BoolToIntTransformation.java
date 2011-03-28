@@ -34,7 +34,6 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.util.OrderedMap;
