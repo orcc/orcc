@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="AVCDecoder" x="180" y="118"/>
-      <vertex id="Merger" x="394" y="76"/>
-      <vertex id="art_Source_bin" x="17" y="144"/>
-      <vertex id="art_Display_yuv_width_height" x="542" y="102"/>
-   </vertices>
-</layout>
