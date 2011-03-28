@@ -309,7 +309,9 @@ static void <action.body.name>() {
 printOutputPatternPort(port, successor, readerId) ::= <<
 if (<pattern.numTokensMap.(port)> \> SIZE_<port.name> - index_<port.name> + <getPortName(port)>-\>read_inds[<readerId>] ) {
 	stop = 1;
-	sched_add_schedulable(<instance.id>.sched, &<successor.id>, RING_TOPOLOGY);
+	if(!<instance.id>.sched-\>round_robin) {
+		sched_add_schedulable(<instance.id>.sched, &<successor.id>, RING_TOPOLOGY);
+	}
 }
 >>
 
@@ -438,7 +440,9 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 
 printInputPatternPort(port) ::= <<
 if (index_<port.name> + <pattern.numTokensMap.(port)> \> numTokens_<port.name>) {
-	sched_add_schedulable(<instance.id>.sched, &<options.network.predecessorsMap.(instance).(port).id>, RING_TOPOLOGY);
+	if(!<instance.id>.sched-\>round_robin) {
+		sched_add_schedulable(<instance.id>.sched, &<options.network.predecessorsMap.(instance).(port).id>, RING_TOPOLOGY);
+	}
 }
 >>
 
