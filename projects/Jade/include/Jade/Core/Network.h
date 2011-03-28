@@ -98,6 +98,13 @@ public:
 	HDAGGraph* getGraph() {	return graph;};
 
 	/**
+	 * @brief Return connections of this network
+	 * 
+	 * @return a list of connections contained in this network
+	 */
+	std::list<Connection*>* getConnections();
+	
+	/**
 	 * @brief Getter of name
 	 *
 	 * Returns the name of the network
@@ -219,6 +226,9 @@ private:
 
 	/** instances of the network  */
 	std::list<Instance*> instances;
+
+	/** connections of the network  */
+	std::list<Connection*> connections;
 };
 
 #endif

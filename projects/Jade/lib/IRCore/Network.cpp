@@ -71,7 +71,6 @@ list<Instance*>* Network::getInstances() {
 		if (vertex->isInstance()){
 			instances.push_back(vertex->getInstance());
 		}
-		
 	}
 
 	return &instances;
@@ -132,6 +131,18 @@ Vertex* Network::addInstance(Instance* instance){
 
 bool Network::removeConnection(Connection* connection){
 	return graph->removeEdge(connection);
+}
+
+list<Connection*>* Network::getConnections(){	
+	connections.clear();
+	
+	int nbEdge = graph->getNbEdges();
+	
+	for (int i = 0 ; i < nbEdge; i++){
+		connections.push_back((Connection*)graph->getEdge(i));
+	}
+
+	return &connections;
 }
 
 list<Connection*>* Network::getAllConnections(Instance* source, Instance* target){	
