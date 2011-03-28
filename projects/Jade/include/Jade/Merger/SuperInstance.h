@@ -132,7 +132,7 @@ private:
 	 *
 	 * @return the resulting moc
 	 */
-	CSDFMoC* createMoC(CSDFMoC* srcMoc, int srcFactor, CSDFMoC* dstMoc, int dstFactor);
+	CSDFMoC* createMoC(CSDFMoC* srcMoc, int srcFactor, CSDFMoC* dstMoc, int dstFactor, std::set<Port*>* in = NULL, std::set<Port*>* out = NULL);
 
 	/**
      *  @brief Create a pattern of the composite actor.
@@ -149,7 +149,7 @@ private:
 	 *
 	 * @return the resulting pattern
 	 */
-	Pattern* createPattern(Pattern* srcPattern,  int srcFactor, Pattern* dstPattern, int dstFactor);
+	Pattern* createPattern(Pattern* srcPattern,  int srcFactor, Pattern* dstPattern, int dstFactor, std::set<Port*>* ports);
 
 	/**
      *  @brief Create ports of the composite actor.
@@ -159,22 +159,6 @@ private:
 	 * @return the corresponding port map
 	 */
 	std::map<std::string, Port*>* createPorts(std::set<Port*>* portSet);
-
-	/**
-     *  @brief Filter the given patterns with internal ports
-	 *
-	 * @param input : the input Pattern to filter
-	 *
-	 * @param dstActor : the destination actor
-	 *
-	 * @param output : the output Pattern to filter
-	 *
-	 * @param srcActor : the source actor
-	 *
-	 * @param intPorts: the internal ports
-	 *
-	 */
-	void filterPattern(Pattern* input, Actor* dstActor, Pattern* output, Actor* srcActor, std::map<Port*, Port*>* intPorts);
 
 	void analyzeInstance(Instance* instance, int factor);
 

@@ -131,17 +131,29 @@ Actor* SuperInstance::createCompositeActor(map<Port*, Port*>* internalPorts){
 	map<string, Procedure*>* procedures = new map<string, Procedure*>();
 	list<Action*>* initializes = new list<Action*>();
 	list<Action*>* actions = new list<Action*>();
+	
+
+	// Set of input and output of actors
+	map<Port*, Port*>::iterator it;
+	set<Port*> in;
+	set<Port*> out;
+	for (it = internalPorts->begin(); it != internalPorts->end(); it++){
+		Port* output = it->first;
+		Port* input = it->second;
+
+		// Set input and output of actor as internal
+		out.insert(srcActor->getOutput(output->getName()));
+		in.insert(dstActor->getInput(input->getName()));
+	}
 
 	// Create a composite moc
 	CSDFMoC* srcMoc = (CSDFMoC*)srcActor->getMoC();
 	CSDFMoC* dstMoc = (CSDFMoC*)dstActor->getMoC();
-	CSDFMoC* moc = createMoC(srcMoc, srcFactor, dstMoc, dstFactor);
-
-	Pattern* inputMoc = moc->getInputPattern();
-	Pattern* outputMoc = moc->getOutputPattern();
-	filterPattern(inputMoc, dstActor, outputMoc, srcActor, internalPorts);
+	CSDFMoC* moc = createMoC(srcMoc, srcFactor, dstMoc, dstFactor, &in, &out);
 
 	// Set ports ports of the actor
+	Pattern* inputMoc = moc->getInputPattern();
+	Pattern* outputMoc = moc->getOutputPattern();
 	map<string, Port*>* inputs = createPorts(inputMoc->getPorts());
 	map<string, Port*>* outputs = createPorts(outputMoc->getPorts());
 	
@@ -175,12 +187,12 @@ StateVar* SuperInstance::getInternalVar(Port* port){
 	return it->second;
 };
 
-CSDFMoC* SuperInstance::createMoC(CSDFMoC* srcMoc, int srcFactor, CSDFMoC* dstMoc, int dstFactor){
+CSDFMoC* SuperInstance::createMoC(CSDFMoC* srcMoc, int srcFactor, CSDFMoC* dstMoc, int dstFactor, set<Port*>* in, set<Port*>* out){
 	CSDFMoC* moc = new CSDFMoC();
 
 	// Merges patterns of actors
-	Pattern* inputPattern = createPattern(srcMoc->getInputPattern(), srcFactor, dstMoc->getInputPattern(), dstFactor);
-	Pattern* outputPattern = createPattern(srcMoc->getOutputPattern(), srcFactor, dstMoc->getOutputPattern(), dstFactor);
+	Pattern* inputPattern = createPattern(srcMoc->getInputPattern(), srcFactor, dstMoc->getInputPattern(), dstFactor, in);
+	Pattern* outputPattern = createPattern(srcMoc->getOutputPattern(), srcFactor, dstMoc->getOutputPattern(), dstFactor, out);
 
 	// Add to moc
 	moc->setInputPattern(inputPattern);
@@ -198,33 +210,24 @@ CSDFMoC* SuperInstance::createMoC(CSDFMoC* srcMoc, int srcFactor, CSDFMoC* dstMo
 	return moc;
 }
 
-void SuperInstance::filterPattern(Pattern* input, Actor* dstActor, Pattern* output, Actor* srcActor, map<Port*, Port*>* intPorts){
-	map<Port*, Port*>::iterator it;
-
-	// Remove internal ports from patterns
-	for (it = intPorts->begin(); it != intPorts->end(); it++){
-		// Get actor port
-		Port* out = it->first;
-		Port* in = it->second;
-		Port* actIn = dstActor->getInput(in->getName());
-		Port* actOut = dstActor->getOutput(out->getName());
-
-		// Remove port 
-		output->remove(actOut);
-		input->remove(actIn);
-	}
-}
-
-Pattern* SuperInstance::createPattern(Pattern* srcPattern,  int srcFactor, Pattern* dstPattern, int dstFactor){
+Pattern* SuperInstance::createPattern(Pattern* srcPattern,  int srcFactor, Pattern* dstPattern, int dstFactor, set<Port*>* ports){
 	Pattern* newPattern = new Pattern();
 	
 	// Add source pattern
+	map<Port*, Port*>::iterator itPort;
 	map<Port*, ConstantInt*>::iterator it;
 	map<Port*,ConstantInt*>* srcProds = srcPattern->getNumTokensMap();
 	
 	for(it = srcProds->begin(); it != srcProds->end(); it++){
 		Port* port = it->first;
-		
+
+		if (ports != NULL){
+			if (ports->find(port) != ports->end()){
+				// This port is internal
+				continue;
+			}
+		}
+
 		// Update token production
 		int val = it->second->getLimitedValue();
 		
@@ -242,6 +245,13 @@ Pattern* SuperInstance::createPattern(Pattern* srcPattern,  int srcFactor, Patte
 	for(it = dstProds->begin(); it != dstProds->end(); it++){
 		Port* port = it->first;
 		
+		if (ports != NULL){
+			if (ports->find(port) != ports->end()){
+				// This port is internal
+				continue;
+			}
+		}
+
 		// Update token production
 		int val = it->second->getLimitedValue();
 		
