@@ -28,10 +28,12 @@
  */
 package net.sf.orcc.backends.vhdl.instructions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.expr.IntExpr;
 
 /**
  * This class defines a specific instruction that sets the address of a RAM.
@@ -49,7 +51,7 @@ public class RamSetAddress extends RamInstruction {
 	public RamSetAddress(List<Expression> indexes) {
 		setIndexes(indexes);
 	}
-
+	
 	/**
 	 * Returns the expressions that are used by this RamSetAddress.
 	 * 
@@ -57,6 +59,23 @@ public class RamSetAddress extends RamInstruction {
 	 */
 	public List<Expression> getIndexes() {
 		return indexes;
+	}
+
+	/**
+	 * Returns a list containing the sizes of the indexes.
+	 * 
+	 * @return a list containing the sizes of the indexes
+	 */
+	public List<Integer> getIndexesSizes() {
+		List<Integer> dimensions = getVariable().getType().getDimensions();
+		List<Integer> indexSizes = new ArrayList<Integer>(dimensions.size());
+		for (int size : dimensions) {
+			// index goes from 0 to size - 1, and we remove the sign bit
+			int indexSize = IntExpr.getSize(size - 1) - 1;
+			indexSizes.add(indexSize);
+		}
+		
+		return indexSizes;
 	}
 
 	/**

@@ -47,11 +47,11 @@ import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.Printer;
 import net.sf.orcc.backends.transformations.InlineTransformation;
-import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
-import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.ArrayToRamTransformation;
+import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
+import net.sf.orcc.backends.vhdl.transformations.ListDeclarationTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
@@ -146,7 +146,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// must be done before MAAT because MAAT does not handle
 				// multiple array accesses in loops
 
-				// transform multiple array accesses
+				// array to RAM transformation
 				new ArrayToRamTransformation(),
 				new ActionSplitter(),
 
@@ -156,8 +156,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// transforms "if (b)" to "if (b = true)"
 				new TransformConditionals(),
 
-				// flattens multi-dimensional arrays
-				new ListFlattenTransformation(true, false, true),
+				// flattens declarations of multi-dimensional arrays
+				new ListDeclarationTransformation(),
 
 				// renames variables so we can inline them in the template
 				// should remain after other transformations

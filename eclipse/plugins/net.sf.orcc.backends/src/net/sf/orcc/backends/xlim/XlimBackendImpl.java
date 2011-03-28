@@ -39,12 +39,12 @@ import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
 import net.sf.orcc.backends.xlim.transformations.ArrayInitializeTransformation;
 import net.sf.orcc.backends.xlim.transformations.ConstantPhiValuesTransformation;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
+import net.sf.orcc.backends.xlim.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
 import net.sf.orcc.backends.xlim.transformations.TernaryOperationAdder;
 import net.sf.orcc.backends.xlim.transformations.UnaryListToScalarTransformation;
@@ -113,7 +113,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new UnaryListToScalarTransformation(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(),
-				new ListFlattenTransformation(false, true, false),
+				new ListFlattenTransformation(),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(true),
 				new ConstantPhiValuesTransformation(),

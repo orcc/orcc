@@ -309,7 +309,7 @@ if(ramWrite.variable.type.type.bool)
 >>
 
 printRamSetAddress(ramSetAddress) ::= <<
-<ramSetAddress.variable.name>_address_p<ramSetAddress.port> \<= <ramSetAddress.indexes: {index | std_logic_vector(to_unsigned(<index>, <index.type.size>))}; separator=" & ">;
+<ramSetAddress.variable.name>_address_p<ramSetAddress.port> \<= <ramSetAddress.indexes, ramSetAddress.indexesSizes: {index, size | std_logic_vector(to_unsigned(<index>, <size>))}; separator=" & ">;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

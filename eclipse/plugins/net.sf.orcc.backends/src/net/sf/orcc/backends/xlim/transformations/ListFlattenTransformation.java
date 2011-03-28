@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations;
+package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,9 +34,7 @@ import java.util.List;
 
 import net.sf.orcc.backends.instructions.AssignIndex;
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
@@ -44,7 +42,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
@@ -61,39 +58,6 @@ import net.sf.orcc.ir.instructions.Store;
  * 
  */
 public class ListFlattenTransformation extends AbstractActorVisitor {
-
-	private boolean applyToDeclarations;
-
-	private boolean applyToLocalLists;
-
-	private boolean useUint;
-
-	public ListFlattenTransformation(boolean applyToDeclarations,
-			boolean applyToLocalLists, boolean useUint) {
-		this.applyToDeclarations = applyToDeclarations;
-		this.applyToLocalLists = applyToLocalLists;
-		this.useUint = useUint;
-	}
-
-	/**
-	 * Flattens a multi-dimensional list expression to a list with a single
-	 * dimension.
-	 * 
-	 * @param expression
-	 *            an expression
-	 * @param values
-	 *            a list of values
-	 */
-	private void flattenList(Expression expression, List<Expression> values) {
-		if (expression.isListExpr()) {
-			List<Expression> expressions = ((ListExpr) expression).getValue();
-			for (Expression subExpr : expressions) {
-				flattenList(subExpr, values);
-			}
-		} else {
-			values.add(expression);
-		}
-	}
 
 	/**
 	 * Prints the indexes of an NDim array, each index is print separately and
@@ -128,16 +92,9 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 			// new index variable
 			LocalVariable indexVar;
 
-			if (useUint) {
-				// index goes from 0 to size - 1, and we remove the sign bit
-				indexSize = IntExpr.getSize(size - 1) - 1;
-				indexVar = procedure.newTempLocalVariable("",
-						IrFactory.eINSTANCE.createTypeUint(indexSize), "index");
-			} else {
-				indexSize = IntExpr.getSize(size - 1);
-				indexVar = procedure.newTempLocalVariable("",
-						IrFactory.eINSTANCE.createTypeInt(indexSize), "index");
-			}
+			indexSize = IntExpr.getSize(size - 1);
+			indexVar = procedure.newTempLocalVariable("",
+					IrFactory.eINSTANCE.createTypeInt(indexSize), "index");
 			listIndex.add(new VarExpr(new Use(indexVar)));
 
 			// add the assign instruction for each index
@@ -149,16 +106,10 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 		}
 
 		// creates the variable that will hold the concatenation of indexes
-		LocalVariable indexVar;
-		if (useUint) {
-			indexVar = procedure.newTempLocalVariable("",
-					IrFactory.eINSTANCE.createTypeUint(concatenatedSize),
-					"concat_index");
-		} else {
-			indexVar = procedure.newTempLocalVariable("",
-					IrFactory.eINSTANCE.createTypeInt(concatenatedSize),
-					"concat_index");
-		}
+		LocalVariable indexVar = procedure.newTempLocalVariable("",
+				IrFactory.eINSTANCE.createTypeInt(concatenatedSize),
+				"concat_index");
+
 		// sets indexVar as memory index
 		Use.removeUses(instruction, indexes);
 		indexes.clear();
@@ -174,28 +125,10 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
-		if (applyToDeclarations) {
-			// VHDL synthesizers don't support multi-dimensional memory yet
-			for (GlobalVariable variable : actor.getStateVars()) {
-				if (variable.getType().isList()) {
-					List<Expression> newValues = new ArrayList<Expression>();
-					flattenList(variable.getValue(), newValues);
-					variable.setInitialValue(new ListExpr(newValues));
-				}
-			}
-		}
-
-		super.visit(actor);
-	}
-
-	@Override
 	public void visit(Load load) {
 		List<Expression> indexes = load.getIndexes();
 
-		if (!indexes.isEmpty()
-				&& (applyToLocalLists || load.getSource().getVariable()
-						.isGlobal())) {
+		if (!indexes.isEmpty()) {
 			Type type = load.getSource().getVariable().getType();
 			printAssignment(indexes, type);
 		}
@@ -205,8 +138,7 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 	public void visit(Store store) {
 		List<Expression> indexes = store.getIndexes();
 
-		if (!indexes.isEmpty()
-				&& (applyToLocalLists || store.getTarget().isGlobal())) {
+		if (!indexes.isEmpty()) {
 			Type type = store.getTarget().getType();
 			printAssignment(indexes, type);
 		}
