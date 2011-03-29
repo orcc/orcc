@@ -77,6 +77,10 @@ public abstract class RamInstruction extends SpecificInstruction {
 	 *            the port on which operations should be performed
 	 */
 	public void setPort(int port) {
+		if (port != 1 && port != 2) {
+			throw new IllegalArgumentException();
+		}
+
 		this.port = port;
 	}
 
