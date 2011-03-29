@@ -55,6 +55,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -199,6 +200,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private Action untagged;
 	private Action write;
 	private List<GlobalVariable> writeIndexes = new ArrayList<GlobalVariable>();
+	private List<Action> NoRepeatActions = new ArrayList<Action>();
 
 	/**
 	 * transforms the transformed action to a transition action
@@ -785,8 +787,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				new Location(), "condition",
 				IrFactory.eINSTANCE.createTypeBool());
 		locals.put(conditionVar.getName(), conditionVar);
-		Expression value2 = new BinaryExpr(new VarExpr(new Use(diff)), BinaryOp.GE, new IntExpr(
-				numTokens), IrFactory.eINSTANCE.createTypeBool());
+		Expression value2 = new BinaryExpr(new VarExpr(new Use(diff)),
+				BinaryOp.GE, new IntExpr(numTokens),
+				IrFactory.eINSTANCE.createTypeBool());
 		Instruction assign2 = new Assign(conditionVar, value2);
 		bodyNode.add(index, assign2);
 		index++;
@@ -1115,16 +1118,17 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						done = createDoneAction(action.getName()
 								+ "newWriteDone", counter, numTokens);
 						fsm.addTransition(writeName, done, targetName);
+
 					} else {
 						modifyDoneAction(counter, outputIndex);
 					}
 				}
+				// remove outputPattern from transition action
+				action.getOutputPattern().clear();
 				break;
 			}
 		}
 		outputIndex = 0;
-		// remove outputPattern from transition action
-		action.getOutputPattern().clear();
 	}
 
 	@Override
@@ -1157,6 +1161,102 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				visitTransition(sourceName, targetName, action);
 			}
 		}
+		modifyNoRepeatActions();
+	}
+
+	/**
+	 * This method changes the data source of an action from a port to a
+	 * specified buffer if the port is a repeat one in another action
+	 * 
+	 */
+	private void modifyNoRepeatActions() {
+		LocalVariable tmp = new LocalVariable(true, 0, new Location(), "tmp",
+				entryType);
+		LocalVariable inputTmp = new LocalVariable(true, 0, new Location(),
+				"inputTmp", entryType);
+		for (Action action : NoRepeatActions) {
+			for (Entry<Port, Variable> entry : action.getInputPattern()
+					.getVariableMap().entrySet()) {
+				Port port = entry.getKey();
+				if (inputPorts.contains(port)) {
+					Load load = (Load) BlockNode.getFirst(action.getBody())
+							.getInstructions().get(0);
+					tmp = load.getTarget();
+					load.setSource(new Use(tmp));
+					inputTmp = (LocalVariable) entry.getValue();
+					BlockNode.getFirst(action.getBody()).getInstructions()
+							.remove(0);
+					int position = portPosition(inputPorts, port);
+					addStoreFromBuffer(action.getBody(), position, tmp);
+					removePortFromPattern(action.getInputPattern(), port,
+							inputTmp);
+				}
+			}
+		}
+	}
+
+	/**
+	 * This method removes a port from a pattern
+	 * 
+	 * @param pattern
+	 *            pattern containing the port
+	 * @param port
+	 *            port to remove
+	 */
+	private void removePortFromPattern(Pattern pattern, Port port,
+			LocalVariable tmp) {
+		pattern.getVariableMap().remove(port);
+		pattern.getPeekedMap().remove(port);
+		pattern.getInverseVariableMap().remove(tmp);
+		pattern.getNumTokensMap().remove(port);
+		pattern.getPorts().remove(port);
+	}
+
+	/**
+	 * This method adds instructions for an action to read from a specific
+	 * buffer at a specific index
+	 * 
+	 * @param body
+	 *            body of the action
+	 * @param position
+	 *            position of the buffer in inputBuffers list
+	 * @param tmp
+	 *            the Local variable used to read from the port
+	 */
+	private void addStoreFromBuffer(Procedure body, int position,
+			LocalVariable tmp) {
+		BlockNode bodyNode = BlockNode.getFirst(body);
+		OrderedMap<String, LocalVariable> locals = body.getLocals();
+		LocalVariable index = new LocalVariable(true, 1, new Location(),
+				"index", tmp.getType());
+		locals.put(index.getName(), index);
+		GlobalVariable writeIndex = writeIndexes.get(position);
+		Instruction loadInd = new Load(index, new Use(writeIndex));
+		int addIndex = 0;
+		bodyNode.add(addIndex, loadInd);
+		addIndex++;
+
+		List<Expression> loadIndex = new ArrayList<Expression>(1);
+		Expression expression = new VarExpr(new Use(index));
+		loadIndex.add(expression);
+		Instruction load = new Load(tmp, new Use(inputBuffers.get(position)),
+				loadIndex);
+		bodyNode.add(addIndex, load);
+		addIndex++;
+
+		LocalVariable indexInc = new LocalVariable(true, 2, new Location(),
+				"index", tmp.getType());
+		locals.put(indexInc.getName(), indexInc);
+		Expression value = new BinaryExpr(new VarExpr(new Use(index)),
+				BinaryOp.PLUS, new IntExpr(1),
+				IrFactory.eINSTANCE.createTypeInt(32));
+		Instruction assign = new Assign(indexInc, value);
+		bodyNode.add(addIndex, assign);
+		addIndex++;
+
+		Instruction store = new Store(writeIndex,
+				new VarExpr(new Use(indexInc)));
+		bodyNode.add(addIndex, store);
 	}
 
 	/**
@@ -1173,14 +1273,10 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private void visitTransition(String sourceName, String targetName,
 			Action action) {
 		createActionsSet(action, sourceName, targetName);
-		if (repeatInput) {
-			repeatInput = false;
-		} else {
-			if (repeatOutput) {
-				// fsm.removeTransition(sourceName, action);
-				repeatOutput = false;
-			}
+		if (!repeatInput && !repeatOutput) {
+			NoRepeatActions.add(action);
 		}
+		repeatInput = false;
+		repeatOutput = false;
 	}
-
 }
