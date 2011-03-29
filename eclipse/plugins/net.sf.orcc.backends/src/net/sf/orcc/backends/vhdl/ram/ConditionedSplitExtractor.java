@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,23 +28,24 @@
  */
 package net.sf.orcc.backends.vhdl.ram;
 
-import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorVisitor;
+import net.sf.orcc.backends.instructions.SplitInstruction;
+import net.sf.orcc.ir.AbstractActorVisitor;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 
 /**
- * This class defines the transformation of IR to use RAMs.
+ * This class defines a transformation that extracts the SplitInstructions from
+ * conditionals.
  * 
  * @author Matthieu Wipliez
- *
+ * 
  */
-public class RAMTransformation implements ActorVisitor {
+public class ConditionedSplitExtractor extends AbstractActorVisitor {
 
 	@Override
-	public void visit(Actor actor) {
-		new RAMInstructionScheduler().visit(actor);
-		new ConditionedSplitExtractor().visit(actor);
-		new ActionSplitter().visit(actor);
+	public void visit(SpecificInstruction instruction) {
+		if (instruction instanceof SplitInstruction) {
+			// do something here
+		}
 	}
-	
+
 }
