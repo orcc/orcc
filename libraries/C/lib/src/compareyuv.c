@@ -47,82 +47,13 @@
 #pragma warning(disable: 4996)
 #endif
 
+static FILE        *ptrFile ;
+static unsigned int fileSize;
+static char         useCompare;
 
-extern struct fifo_i8_s *Compare_B;
-extern struct fifo_i16_s *Compare_WIDTH;
-extern struct fifo_i16_s *Compare_HEIGHT;
-
-static unsigned int fifo_Compare_B_id;
-static unsigned int fifo_Compare_WIDTH_id;
-static unsigned int fifo_Compare_HEIGHT_id;
-
-#define MAX_WIDTH 704
-#define MAX_HEIGHT 576
-
-
-static int m_x;
-static int m_y;
-static int m_width;
-static int m_height;
-static int FrameCounter;
-static int NumberOfFrames; 
-static unsigned char img_buf_y[MAX_WIDTH * MAX_HEIGHT];
-static unsigned char img_buf_u[MAX_WIDTH * MAX_HEIGHT / 4];
-static unsigned char img_buf_v[MAX_WIDTH * MAX_HEIGHT / 4];
-static unsigned char Y[MAX_WIDTH * MAX_HEIGHT];
-static unsigned char U[MAX_WIDTH * MAX_HEIGHT / 4];
-static unsigned char V[MAX_WIDTH * MAX_HEIGHT / 4];
-static FILE *ptfile ;
-static int  xsize_int;
-static int  ysize_int;
-static int  images;
-
-static int genetic = 0;
-
-static int Filesize(FILE *f) {
-	struct stat st;
-	fstat(fileno(f), &st);
-	return st.st_size;
-}
-
-static void Read_YUV_init(int xsize, int ysize, char * filename) {
-	if (filename == NULL) {
-		print_usage();
-		fprintf(stderr, "No yuv file given! (used by compareyuv actor).\n");
-		wait_for_key();
-		exit(1);
-	}
-	ptfile = fopen(filename, "rb");
-	if (ptfile == NULL) {
-		printf("Cannot open yuv_file concatenated input file '%s' for reading\n", filename);
-		exit(-1);
-	}
-
-	if ((xsize_int = xsize) == 0) {
-		printf("xsize %d invalid\n", xsize);
-		exit(-2);
-	}
-	if ((ysize_int = ysize) == 0) {
-		printf("ysize %d invalid\n", ysize);
-		exit(-3);
-	}
-
-	NumberOfFrames = Filesize(ptfile) / (xsize * ysize + xsize * ysize / 2);
-}
-
-static void Read_YUV(unsigned char *Y, unsigned char *U, unsigned char *V) {
-	fread(Y, sizeof(unsigned char), xsize_int * ysize_int, ptfile);
-	fread(U, sizeof(unsigned char), xsize_int * ysize_int / 4, ptfile);
-	fread(V, sizeof(unsigned char), xsize_int * ysize_int / 4, ptfile);
-	images++;
-
-	if (images == NumberOfFrames) {
-		fseek(ptfile, 0, SEEK_SET);
-		images = 0 ;
-	}
-}
-
-static void DiffUcharImage(const int x_size, const int y_size, const unsigned char *true_img_uchar, const unsigned char *test_img_uchar, unsigned char SizeMbSide, char Component_Type) {
+static void compareYUV_compareComponent(const int x_size, const int y_size, 
+               const unsigned char *true_img_uchar, const unsigned char *test_img_uchar,
+               unsigned char SizeMbSide, char Component_Type) {
 	int pix_x, pix_y,blk_x,blk_y;
 	int error = 0;
 	int WidthSzInBlk  = x_size / SizeMbSide;
@@ -141,8 +72,7 @@ static void DiffUcharImage(const int x_size, const int y_size, const unsigned ch
 					if (true_img_uchar[Idx_pix] - test_img_uchar[Idx_pix] != 0)
 					{
 						error++;
-
-						if (error < 100 && !genetic)
+						if (error < 100)
 						{
 							printf("error %3d instead of %3d at position : mb = (%d ; %d) , loc_in_mb = (%d ; %d)\n",
 								test_img_uchar[Idx_pix] , true_img_uchar[Idx_pix], blk_x, blk_y, pix_x, pix_y);
@@ -155,130 +85,84 @@ static void DiffUcharImage(const int x_size, const int y_size, const unsigned ch
 
 	if (error != 0) {
 		printf("%d error(s) in %c Component !!!!!!!!!!!!!\n", error, Component_Type);
-		//system("pause");
 	}
-	//  else
-	//   printf("OK\n");
 }
 
-void Compare_write_mb() {
-	int i, j, cnt, base, idx;
-
-	//printf("display_write_mb (%i, %i)\n", m_x, m_y);
-
-	cnt = 0;
-	base = m_y * m_width + m_x;
-
-	for (i = 0; i < 16; i++) {
-		for (j = 0; j < 16; j++) {
-			int tok = fifo_i8_read_1(Compare_B, fifo_Compare_B_id);
-			cnt++;
-
-			idx = base + i * m_width + j;
-			img_buf_y[idx] = tok;
-		}
+void compareYUV_init()
+{
+	//Fix me!! Dirty but it's the only way for the moment.
+	if (yuv_file == NULL) {
+		useCompare = 0;
+		return;
+	}
+	useCompare = 1;
+	ptrFile = fopen(yuv_file, "rb");
+	if (ptrFile == NULL) {
+		printf("Cannot open yuv_file concatenated input file '%s' for reading\n", yuv_file);
+		exit(-1);
 	}
 
-	base = m_y / 2 * m_width / 2 + m_x / 2;
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = fifo_i8_read_1(Compare_B, fifo_Compare_B_id);
-			cnt++;
+	fseek(ptrFile, 0, SEEK_END);
+	fileSize = ftell(ptrFile);
+	rewind(ptrFile);
+}
 
-			idx = base + i * m_width / 2 + j;
-			img_buf_u[idx] = tok;
+static void compareYUV_readComponent(unsigned char **Component, unsigned short width, unsigned short height, char sizeChanged) {
+	size_t numByteRead;
+
+	if(*Component == NULL) {
+		*Component = malloc(width*height * sizeof(unsigned char));
+	}
+	else {
+		if(sizeChanged) {
+			printf("bouh\n");
+			while(1);
+			*Component = realloc(*Component, width*height * sizeof(unsigned char));
 		}
 	}
-
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = fifo_i8_read_1(Compare_B, fifo_Compare_B_id);
-			cnt++;
-			idx = base + i * m_width / 2 + j;
-			img_buf_v[idx] = tok;
-		}
+	if(*Component == NULL) {
+		fprintf(stderr,"Problem when allocating memory.\n");
+		exit(-5);
 	}
-
-	m_x += 16;
-	if (m_x == m_width) {
-		m_x = 0;
-		m_y += 16;
+	numByteRead = fread(*Component, sizeof(unsigned char),  width*height, ptrFile);
+	if(numByteRead != (width*height)) {
+		fprintf(stderr, "Error when using fread\n");
+		exit(-6);
 	}
+}
 
-	if (m_y == m_height) {
-		m_x = 0;
-		m_y = 0;
-		if(!genetic){
-			printf("Frame number %d \n", FrameCounter);
-		}
-		Read_YUV(Y, U, V);
-		DiffUcharImage(m_width, m_height, Y, img_buf_y,16, 'Y');
-		DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u,8,'U');
-		DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v,8, 'V');
-		if ((NumberOfFrames == FrameCounter) && !genetic){
-			printf("\nThat's all folks\n");
+void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU,
+                               unsigned char *pictureBufferV, unsigned short pictureWidth,
+                               unsigned short pictureHeight) {
+	static unsigned int frameNumber = 0;
+	static int prevXSize = 0;
+	static int prevYSize = 0;
+
+	static unsigned char *Y = NULL;
+	static unsigned char *U = NULL;
+	static unsigned char *V = NULL;
+	int i;
+	char sizeChanged;
+
+	if(useCompare) {
+		printf("Frame number %d \n", frameNumber);
+		frameNumber++;
+
+		sizeChanged = ((prevXSize*prevYSize) != (pictureWidth*pictureHeight)) ? 1 : 0;
+		compareYUV_readComponent(&Y, pictureWidth,   pictureHeight,   sizeChanged);
+		compareYUV_readComponent(&U, pictureWidth/2, pictureHeight/2, sizeChanged);
+		compareYUV_readComponent(&V, pictureWidth/2, pictureHeight/2, sizeChanged);
+
+		compareYUV_compareComponent(pictureWidth, pictureHeight, Y, pictureBufferY,16, 'Y');
+		compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, U, pictureBufferU,8,'U');
+		compareYUV_compareComponent(pictureWidth >> 1, pictureHeight >> 1, V, pictureBufferV,8, 'V');
+
+		if(ftell(ptrFile) == fileSize) {
+			rewind(ptrFile);
+			frameNumber = 0;
 			exit(0);
 		}
-		FrameCounter ++;
+		prevXSize = pictureWidth;
+		prevYSize = pictureHeight;
 	}
-}
-
-static void Compare_init(int width, int height) {
-	m_width = width;
-	m_height = height;
-	Read_YUV_init (width, height, yuv_file);
-}
-
-void Compare_active_genetic() {
-	genetic = 1;
-}
-
-static int init;
-
-void Compare_initialize(unsigned int fifo_B_id, unsigned int fifo_WIDTH_id, unsigned int fifo_HEIGHT_id){
-	m_x = 0;
-	m_y = 0;
-	init = 1;
-	FrameCounter = 0;
-	images = 0;
-	fifo_Compare_B_id = fifo_B_id; 
-	fifo_Compare_WIDTH_id = fifo_WIDTH_id; 
-	fifo_Compare_HEIGHT_id = fifo_HEIGHT_id;
-}
-
-void Compare_close(){
-	if(ptfile != NULL){
-		fclose(ptfile);
-	}
-}
-
-void Compare_scheduler(struct schedinfo_s *si) {
-	int i = 0;
-
-	while (1) {
-		if (fifo_i16_has_tokens(Compare_WIDTH, fifo_Compare_WIDTH_id, 1) && fifo_i16_has_tokens(Compare_HEIGHT, fifo_Compare_HEIGHT_id, 1)) {
-			short width, height;
-			width = fifo_i16_read_1(Compare_WIDTH, fifo_Compare_WIDTH_id) * 16;
-			height = fifo_i16_read_1(Compare_HEIGHT, fifo_Compare_HEIGHT_id) * 16;
-
-			if (init == 1) {
-				Compare_init(width, height);
-				init = 0;
-			}
-
-			i++;
-		}
-
-		if (fifo_i8_has_tokens(Compare_B, fifo_Compare_B_id, 384) && init == 0) {
-			i8 Compare_B_buf[384];
-			Compare_write_mb();
-			i+=384;
-		} else {
-			break;
-		}
-	}
-
-	si->num_firings = i;
-	si->reason = starved;
-	si->ports = 0x07; // FIFOs connected to first three input ports are empty
 }
