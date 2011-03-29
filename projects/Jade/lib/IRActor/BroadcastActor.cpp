@@ -50,6 +50,7 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/MoC/SDFMoC.h"
+#include "Jade/Core/MoC/DPNMoC.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/Util/FifoMng.h"
 //------------------------------
@@ -120,15 +121,15 @@ void BroadcastActor::createActor(){
 }
 
 MoC* BroadcastActor::createMoC(){
-	// Set broadcast actor as SDF
+	/*// Set broadcast actor as SDF
 	SDFMoC* sdfMoC = new SDFMoC();
 
 	//Set properties of the MoC
 	Action* action = actions->front();
 	sdfMoC->addAction(action);
 	sdfMoC->setInputPattern(action->getInputPattern());
-	sdfMoC->setOutputPattern(action->getOutputPattern());
-
+	sdfMoC->setOutputPattern(action->getOutputPattern());*/
+	DPNMoC* sdfMoC = new DPNMoC();
 	return sdfMoC;
 }
 

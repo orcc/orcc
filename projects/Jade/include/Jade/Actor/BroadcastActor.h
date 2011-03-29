@@ -97,6 +97,8 @@ public:
 		return inputs->begin()->second;
 	};
 
+	bool isBroadcast(){return true;};
+
 private:
 
 	/** The current decoder  */

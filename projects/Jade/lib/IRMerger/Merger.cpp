@@ -41,6 +41,7 @@
 #include <sstream>
 
 #include "Rational.h"
+#include "CheckPinoRules.h"
 
 #include "llvm/Constants.h"
 
@@ -65,6 +66,9 @@ Merger::Merger(LLVMContext& C, Configuration* configuration, bool verbose): Cont
 void Merger::transform(){
 	bool hasCondidate = true;
 
+	//Initialize pino rule checker
+	CheckPinoRules pinoChecker(network);
+
 	// Iterate though all vertices until no candidate left
 	while(hasCondidate){
 		list<Instance*>::iterator it;
@@ -88,12 +92,14 @@ void Merger::transform(){
 					Actor* dstActor = dst->getActor();
 
 					if (dstActor->getMoC()->isCSDF()){
-						// These two actors can be merged
-						mergeInstance(src, dst);
+						if (pinoChecker.isValide(src, dst)){
+							// These two actors can be merged
+							mergeInstance(src, dst);
 
-						// Recompute graph
-						recompute = true;
-						break;
+							// Recompute graph
+							recompute = true;
+							break;
+						}
 					}
 				}
 			}
@@ -102,7 +108,7 @@ void Merger::transform(){
 				break;
 			}
 		}
-		
+
 		if (!recompute){
 			// No merging found, end the analysis
 			hasCondidate = false;

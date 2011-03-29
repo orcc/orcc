@@ -212,6 +212,7 @@ public:
 	std::string getPackage();
 
 	bool isActor(){return true;};
+	virtual bool isBroadcast(){return false;};
 
 	/**
      *  @brief Returns the simple name of this actor

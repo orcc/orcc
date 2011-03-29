@@ -94,6 +94,8 @@ list<Instance*> Network::getSuccessorsOf(Instance* instance){
 			successors.push_back(succ->getInstance());
 		}
 	}
+	
+	successors.unique();
 
 	return successors;
 }
