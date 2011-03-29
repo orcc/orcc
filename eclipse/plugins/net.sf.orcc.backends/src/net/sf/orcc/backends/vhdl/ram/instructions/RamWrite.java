@@ -26,68 +26,50 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.instructions;
+package net.sf.orcc.backends.vhdl.ram.instructions;
 
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines a specific instruction that manipulates a RAM associated
- * to a variable.
+ * This class defines a specific instruction that writes data to a RAM.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class RamInstruction extends SpecificInstruction {
+public class RamWrite extends RamInstruction implements ValueContainer {
 
-	private int port;
+	private Expression value;
 
-	private Variable variable;
+	@Override
+	public Expression getValue() {
+		return value;
+	}
 
-	/**
-	 * Creates a new RamRead
-	 */
-	public RamInstruction() {
-		super(new Location());
+	@Override
+	public void internalSetValue(Expression value) {
+		this.value = value;
 	}
 
 	/**
-	 * Returns the port on which operations should be performed.
+	 * Returns <code>true</code>. Intended for use in template.
 	 * 
-	 * @return the port on which operations should be performed
+	 * @return <code>true</code>
 	 */
-	public int getPort() {
-		return port;
+	public boolean isRamWrite() {
+		return true;
 	}
 
-	/**
-	 * Returns the variable to which the RAM is associated.
-	 * 
-	 * @return the variable to which the RAM is associated
-	 */
-	public Variable getVariable() {
-		return variable;
+	@Override
+	public void setValue(Expression value) {
+		CommonNodeOperations.setValue(this, value);
 	}
 
-	/**
-	 * Sets the port on which operations should be performed.
-	 * 
-	 * @param port
-	 *            the port on which operations should be performed
-	 */
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	/**
-	 * Sets the variable to which the RAM is associated.
-	 * 
-	 * @param variable
-	 *            the variable to which the RAM is associated
-	 */
-	public void setVariable(Variable variable) {
-		this.variable = variable;
+	@Override
+	public String toString() {
+		return getVariable().getName() + "_p" + getPort() + " <= "
+				+ getValue().toString();
 	}
 
 }

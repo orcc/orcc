@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.instructions;
+package net.sf.orcc.backends.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.instructions.SpecificInstruction;

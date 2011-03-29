@@ -48,8 +48,7 @@ import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.Printer;
 import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
-import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
-import net.sf.orcc.backends.vhdl.transformations.ArrayToRamTransformation;
+import net.sf.orcc.backends.vhdl.ram.RAMTransformation;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.ListDeclarationTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
@@ -138,17 +137,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new DeadVariableRemoval(),
 
 				// out-of-SSA transformation
-				// must be done before WTF and MAAT passes because having phis
-				// span multiple procedures does not make sense
 				new PhiRemoval(),
 
-				// TODO: While To FSM transformation
-				// must be done before MAAT because MAAT does not handle
-				// multiple array accesses in loops
-
 				// array to RAM transformation
-				new ArrayToRamTransformation(),
-				new ActionSplitter(),
+				new RAMTransformation(),
 
 				// transform "b := a > b;" statements to if conditionals
 				new BoolExprTransformation(),

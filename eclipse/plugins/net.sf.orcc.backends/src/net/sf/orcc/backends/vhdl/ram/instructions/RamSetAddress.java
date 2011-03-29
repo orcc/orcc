@@ -26,30 +26,56 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.instructions;
+package net.sf.orcc.backends.vhdl.ram.instructions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.ValueContainer;
-import net.sf.orcc.ir.util.CommonNodeOperations;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.expr.IntExpr;
 
 /**
- * This class defines a specific instruction that writes data to a RAM.
+ * This class defines a specific instruction that sets the address of a RAM.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class RamWrite extends RamInstruction implements ValueContainer {
+public class RamSetAddress extends RamInstruction {
 
-	private Expression value;
+	private List<Expression> indexes;
 
-	@Override
-	public Expression getValue() {
-		return value;
+	/**
+	 * Creates a new RamSetAddress
+	 */
+	public RamSetAddress(List<Expression> indexes) {
+		setIndexes(indexes);
+	}
+	
+	/**
+	 * Returns the expressions that are used by this RamSetAddress.
+	 * 
+	 * @return the expressions that are used by this RamSetAddress
+	 */
+	public List<Expression> getIndexes() {
+		return indexes;
 	}
 
-	@Override
-	public void internalSetValue(Expression value) {
-		this.value = value;
+	/**
+	 * Returns a list containing the sizes of the indexes.
+	 * 
+	 * @return a list containing the sizes of the indexes
+	 */
+	public List<Integer> getIndexesSizes() {
+		List<Integer> dimensions = getVariable().getType().getDimensions();
+		List<Integer> indexSizes = new ArrayList<Integer>(dimensions.size());
+		for (int size : dimensions) {
+			// index goes from 0 to size - 1, and we remove the sign bit
+			int indexSize = IntExpr.getSize(size - 1) - 1;
+			indexSizes.add(indexSize);
+		}
+		
+		return indexSizes;
 	}
 
 	/**
@@ -57,19 +83,30 @@ public class RamWrite extends RamInstruction implements ValueContainer {
 	 * 
 	 * @return <code>true</code>
 	 */
-	public boolean isRamWrite() {
+	public boolean isRamSetAddress() {
 		return true;
 	}
 
-	@Override
-	public void setValue(Expression value) {
-		CommonNodeOperations.setValue(this, value);
+	/**
+	 * Sets the indexes of this instruction. Uses are updated to point to this
+	 * instruction. This method is internal. Indexes should be modified solely
+	 * using the {@link #getIndexes()} method.
+	 * 
+	 * @param indexes
+	 *            a list of expressions
+	 */
+	private void setIndexes(List<Expression> indexes) {
+		if (this.indexes != null) {
+			Use.removeUses(this, this.indexes);
+		}
+		this.indexes = indexes;
+		Use.addUses(this, indexes);
 	}
 
 	@Override
 	public String toString() {
-		return getVariable().getName() + "_p" + getPort() + " <= "
-				+ getValue().toString();
+		return getVariable().getName() + "_address_p" + getPort() + " <= "
+				+ indexes.toString();
 	}
 
 }

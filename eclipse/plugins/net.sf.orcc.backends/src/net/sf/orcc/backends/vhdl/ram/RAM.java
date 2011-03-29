@@ -26,50 +26,66 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.instructions;
-
-import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.util.CommonNodeOperations;
+package net.sf.orcc.backends.vhdl.ram;
 
 /**
- * This class defines a specific instruction that reads data from a RAM.
+ * This class defines a RAM.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class RamRead extends RamInstruction implements LocalTargetContainer {
+public class RAM {
 
-	private LocalVariable target;
+	private boolean firstAccess;
 
-	@Override
-	public LocalVariable getTarget() {
-		return target;
-	}
+	private boolean lastAccessRead;
 
-	@Override
-	public void internalSetTarget(LocalVariable target) {
-		this.target = target;
-	}
+	private int lastPortUsed;
+
+	private boolean waitCycleNeeded;
 
 	/**
-	 * Returns <code>true</code>. Intended for use in template.
-	 * 
-	 * @return <code>true</code>
+	 * Creates a new RAM.
 	 */
-	public boolean isRamRead() {
-		return true;
+	public RAM() {
+		reset();
 	}
 
-	@Override
-	public void setTarget(LocalVariable target) {
-		CommonNodeOperations.setTarget(this, target);
+	public int getLastPortUsed() {
+		return lastPortUsed;
 	}
 
-	@Override
-	public String toString() {
-		return getTarget().getName() + " := " + getVariable().getName()
-				+ "_q_p" + getPort();
+	public boolean isLastAccessRead() {
+		return !firstAccess && lastAccessRead;
+	}
+
+	public boolean isLastAccessWrite() {
+		return !firstAccess && !lastAccessRead;
+	}
+
+	public boolean isWaitCycleNeeded() {
+		return waitCycleNeeded;
+	}
+
+	public void reset() {
+		firstAccess = true;
+	}
+
+	public void setLastAccessRead(boolean lastAccessRead) {
+		firstAccess = false;
+		this.lastAccessRead = lastAccessRead;
+	}
+
+	public void setLastPortUsed(int lastPortUsed) {
+		if (lastPortUsed != 1 && lastPortUsed != 2) {
+			throw new IllegalArgumentException();
+		}
+
+		this.lastPortUsed = lastPortUsed;
+	}
+
+	public void setWaitCycleNeeded(boolean waitCycleNeeded) {
+		this.waitCycleNeeded = waitCycleNeeded;
 	}
 
 }

@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.transformations;
+package net.sf.orcc.backends.vhdl.ram;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,10 +34,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.backends.vhdl.instructions.RamRead;
-import net.sf.orcc.backends.vhdl.instructions.RamSetAddress;
-import net.sf.orcc.backends.vhdl.instructions.RamWrite;
-import net.sf.orcc.backends.vhdl.instructions.SplitInstruction;
+import net.sf.orcc.backends.instructions.SplitInstruction;
+import net.sf.orcc.backends.vhdl.ram.instructions.RamRead;
+import net.sf.orcc.backends.vhdl.ram.instructions.RamSetAddress;
+import net.sf.orcc.backends.vhdl.ram.instructions.RamWrite;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -57,7 +57,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Matthieu Wipliez
  * 
  */
-public class ArrayToRamTransformation extends AbstractActorVisitor {
+public class RAMInstructionScheduler extends AbstractActorVisitor {
 
 	private Map<RAM, List<RamRead>> pendingReads;
 
@@ -84,7 +84,7 @@ public class ArrayToRamTransformation extends AbstractActorVisitor {
 
 		// save index
 		int index = itInstruction.nextIndex() + 1;
-		
+
 		// insert the RSA before the previous split instruction
 		while (itInstruction.hasPrevious()) {
 			Instruction instruction = itInstruction.previous();
@@ -206,13 +206,11 @@ public class ArrayToRamTransformation extends AbstractActorVisitor {
 				// two ports have been used
 				if (ram.isWaitCycleNeeded()) {
 					addSplitInstruction(block);
-					addSplitInstruction(block);
-					executeTwoPendingReads(block, ram);
 					ram.setWaitCycleNeeded(false);
-				} else {
-					addSplitInstruction(block);
-					executeTwoPendingReads(block, ram);
 				}
+
+				addSplitInstruction(block);
+				executeTwoPendingReads(block, ram);
 			}
 		} else {
 			port = 1;
@@ -280,6 +278,7 @@ public class ArrayToRamTransformation extends AbstractActorVisitor {
 		}
 
 		for (Action action : actor.getActions()) {
+			this.action = action;
 			visit(action.getBody());
 		}
 	}
@@ -314,10 +313,8 @@ public class ArrayToRamTransformation extends AbstractActorVisitor {
 	@Override
 	public void visit(Store store) {
 		Variable variable = store.getTarget();
-		if (!store.getIndexes().isEmpty() && variable.isAssignable()
-				&& variable.isGlobal()) {
+		if (!store.getIndexes().isEmpty() && variable.isGlobal()) {
 			itInstruction.remove();
-
 			convertStore(store);
 		}
 	}

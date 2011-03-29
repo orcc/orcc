@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,66 +26,24 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.transformations;
+package net.sf.orcc.backends.vhdl.ram;
+
+import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorVisitor;
 
 /**
- * This class defines a RAM.
+ * This class defines the transformation of IR to use RAMs.
  * 
  * @author Matthieu Wipliez
- * 
+ *
  */
-public class RAM {
+public class RAMTransformation implements ActorVisitor {
 
-	private boolean firstAccess;
-
-	private boolean lastAccessRead;
-
-	private int lastPortUsed;
-
-	private boolean waitCycleNeeded;
-
-	/**
-	 * Creates a new RAM.
-	 */
-	public RAM() {
-		reset();
+	@Override
+	public void visit(Actor actor) {
+		new RAMInstructionScheduler().visit(actor);
+		new ActionSplitter().visit(actor);
 	}
-
-	public int getLastPortUsed() {
-		return lastPortUsed;
-	}
-
-	public boolean isLastAccessRead() {
-		return !firstAccess && lastAccessRead;
-	}
-
-	public boolean isLastAccessWrite() {
-		return !firstAccess && !lastAccessRead;
-	}
-
-	public boolean isWaitCycleNeeded() {
-		return waitCycleNeeded;
-	}
-
-	public void reset() {
-		firstAccess = true;
-	}
-
-	public void setLastAccessRead(boolean lastAccessRead) {
-		firstAccess = false;
-		this.lastAccessRead = lastAccessRead;
-	}
-
-	public void setLastPortUsed(int lastPortUsed) {
-		if (lastPortUsed != 1 && lastPortUsed != 2) {
-			throw new IllegalArgumentException();
-		}
-
-		this.lastPortUsed = lastPortUsed;
-	}
-
-	public void setWaitCycleNeeded(boolean waitCycleNeeded) {
-		this.waitCycleNeeded = waitCycleNeeded;
-	}
-
+	
 }

@@ -31,7 +31,7 @@ package net.sf.orcc.backends.vhdl.transformations;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.backends.vhdl.instructions.RamRead;
+import net.sf.orcc.backends.vhdl.ram.instructions.RamRead;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
@@ -183,4 +183,5 @@ public class DataMover extends AbstractActorVisitor {
 			}
 		}
 	}
+
 }
