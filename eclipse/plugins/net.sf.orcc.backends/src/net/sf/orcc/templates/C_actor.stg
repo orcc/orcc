@@ -309,9 +309,11 @@ static void <action.body.name>() {
 printOutputPatternPort(port, successor, readerId) ::= <<
 if (<pattern.numTokensMap.(port)> \> SIZE_<port.name> - index_<port.name> + <getPortName(port)>-\>read_inds[<readerId>] ) {
 	stop = 1;
-	if(!<instance.id>.sched-\>round_robin) {
+	<if(options.newScheduler)>
+	if(!<instance.id>.sched-\>round_robin || i \> 0) {
 		sched_add_schedulable(<instance.id>.sched, &<successor.id>, RING_TOPOLOGY);
 	}
+	<endif>
 }
 >>
 
@@ -440,14 +442,16 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 
 printInputPatternPort(port) ::= <<
 if (index_<port.name> + <pattern.numTokensMap.(port)> \> numTokens_<port.name>) {
-	if(!<instance.id>.sched-\>round_robin) {
+	if(!<instance.id>.sched-\>round_robin || i \> 0) {
 		sched_add_schedulable(<instance.id>.sched, &<options.network.predecessorsMap.(instance).(port).id>, RING_TOPOLOGY);
 	}
 }
 >>
 
 printTransitionPattern(pattern) ::= <<
+<if(options.newScheduler)>
 <pattern.ports: printInputPatternPort(); separator="\n">
+<endif>
 si-\>num_firings = i;
 si-\>reason = starved;
 >>
@@ -607,7 +611,9 @@ instance(instance, options) ::= <<
 
 #define SIZE <options.("fifoSize")>
 
+<if(options.newScheduler)>
 #define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
+<endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Instance

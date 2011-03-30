@@ -320,6 +320,7 @@ public class CBackendImpl extends AbstractBackend {
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.getOptions().put("enableTrace", enableTrace);
 		printer.getOptions().put("ringTopology", ringTopology);
+		printer.getOptions().put("newScheduler", newScheduler);
 		return printer.print(instance.getId() + ".c", path, instance,
 				"instance");
 	}
