@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #include "orcc_types.h"
 #include "orcc_fifo.h"
@@ -47,7 +48,7 @@
 
 #define LOOP_NUMBER 5
 
-static FILE *F = NULL;
+static FILE *file = NULL;
 static int nb;
 static int stop;
 static int genetic = 0;
@@ -64,8 +65,8 @@ void source_init() {
 		exit(1);
 	}
 
-	F = fopen(input_file, "rb");
-	if (F == NULL) {
+	file = fopen(input_file, "rb");
+	if (file == NULL) {
 		if (input_file == NULL) {
 			input_file = "<null>";
 		}
@@ -76,6 +77,12 @@ void source_init() {
 	}
 }
 
+int source_sizeOfFile() { 
+	struct stat st; 
+	fstat(fileno(file), &st); 
+	return st.st_size; 
+}
+
 int source_is_stopped() {
 	return stop;
 }
@@ -84,21 +91,42 @@ void source_active_genetic() {
 	genetic = 1;
 }
 
-unsigned int source_read_file(){
+void source_rewind() {
+	if(file != NULL) {
+		rewind(file);
+	}
+}
+
+unsigned int source_readByte(){
 	unsigned char buf[1];
-	int n = fread(&buf, 1, 1, F);
+	int n = fread(&buf, 1, 1, file);
+
 	if (n < 1) {
-		if (feof(F)) {
-			rewind(F);
+		if (feof(file)) {
+			printf("warning\n");
+			rewind(file);
 			if (!genetic || (genetic && nb < LOOP_NUMBER)) {
-				n = fread(&buf, 1, 1, F);
+				n = fread(&buf, 1, 1, file);
 				nb++;
 			}
 			else{
-				n = fclose(F);
+				n = fclose(file);
 				stop = 1;
 			}
 		}
+		else {
+			fprintf(stderr,"Problem when reading input file.\n");
+		}
 	}
 	return buf[0];
+}
+
+
+void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
+	int n = fread(outTable, 1, nbTokenToRead, file);
+
+	if(n < nbTokenToRead) {
+		fprintf(stderr,"Problem when reading input file.\n");
+		exit(-4);
+	}
 }

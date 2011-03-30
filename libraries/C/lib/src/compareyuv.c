@@ -90,6 +90,8 @@ static void compareYUV_compareComponent(const int x_size, const int y_size,
 
 void compareYUV_init()
 {
+	struct stat st;
+
 	//Fix me!! Dirty but it's the only way for the moment.
 	if (yuv_file == NULL) {
 		useCompare = 0;
@@ -102,9 +104,7 @@ void compareYUV_init()
 		exit(-1);
 	}
 
-	fseek(ptrFile, 0, SEEK_END);
-	fileSize = ftell(ptrFile);
-	rewind(ptrFile);
+	fileSize = fstat(fileno(ptrFile), &st);
 }
 
 static void compareYUV_readComponent(unsigned char **Component, unsigned short width, unsigned short height, char sizeChanged) {
@@ -115,8 +115,6 @@ static void compareYUV_readComponent(unsigned char **Component, unsigned short w
 	}
 	else {
 		if(sizeChanged) {
-			printf("bouh\n");
-			while(1);
 			*Component = realloc(*Component, width*height * sizeof(unsigned char));
 		}
 	}
