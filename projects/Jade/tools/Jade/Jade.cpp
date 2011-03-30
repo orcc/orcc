@@ -51,7 +51,7 @@
 #include "llvm/System/Signals.h"
 
 
-#include "Jade/NetSerialize/XDFParser.h"
+#include "Jade/XDFSerialize/XDFParser.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Actor/Display.h"
 #include "Jade/Fifo/FifoSelection.h"
@@ -277,7 +277,7 @@ int main(int argc, char **argv) {
 	setOptions();
 	
 	//Loading decoderEngine
-	engine = new DecoderEngine(Context, VTLDir, Fifo, SystemDir, OutputDir, noMerging, Verbose);
+	engine = new DecoderEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, Verbose);
 
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

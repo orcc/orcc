@@ -138,9 +138,13 @@ Instance* NetworkParser::parseInstance(TiXmlElement* instance){
 		exit(0);
 	}
 	
+	// Get parameters
 	map<string, Expr*>* parameters = parseParameters(child);
 
-	return new Instance(string(id.c_str()), string(clasz.c_str()), parameters);
+	// Get attributes 
+	map<string, IRAttribute*>* attributes = parseAttributes(child);
+
+	return new Instance(string(id.c_str()), string(clasz.c_str()), parameters, attributes);
 }
 
 

@@ -45,6 +45,7 @@
 #include "Jade/Core/Expr/BinaryExpr.h"
 #include "Jade/Core/Expr/IntExpr.h"
 #include "Jade/Core/Expr/ListExpr.h"
+#include "Jade/Core/Expr/StringExpr.h"
 //------------------------------
 
 using namespace std;
@@ -104,6 +105,11 @@ Constant* ListExpr::getConstant(){
 }
 
 Constant* BinaryExpr::getConstant(){
+
+	return NULL;
+}
+
+Constant* StringExpr::getConstant(){
 
 	return NULL;
 }

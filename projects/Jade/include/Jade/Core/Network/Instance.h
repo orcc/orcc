@@ -49,6 +49,8 @@ namespace llvm{
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Expression.h"
 #include "Jade/Core/MoC.h"
+#include "Jade/Core/Attribute/TypeAttribute.h"
+#include "Jade/Core/Attribute/ValueAttribute.h"
 
 class BroadcastActor;
 class Network;
@@ -78,10 +80,12 @@ public:
 	 * @param parameters : list of Expr representif parameters of this instance
      *
      */
-	Instance(std::string id, std::string clasz, std::map<std::string, Expr*>* parameterValues){
+	Instance(std::string id, std::string clasz, std::map<std::string, Expr*>* parameterValues, 
+			 std::map<std::string, IRAttribute*>* attributes = NULL){
 		this->id = id;
 		this->clasz = clasz;
 		this->parameterValues = parameterValues;
+		this->attributes = attributes;
 		this->actor = NULL;
 		this->configuration = NULL;
 		this->stateVars = NULL;
@@ -436,6 +440,20 @@ public:
 	 */
 	 void setParameters(std::map<std::string, Variable*>* parameters) {this->parameters = parameters;};
 
+	 /**
+	 * @brief Returns a map of attributes.
+	 * 
+	 * @return a map of attributes
+	 */
+	std::map<std::string, IRAttribute*>* getAttributes() {return attributes;};
+
+	/**
+	 * @brief Set the map of attributes of this instance.
+	 * 
+	 * @param attributes: a map of attributes
+	 */
+	 void setAttributes(std::map<std::string, IRAttribute*>* attributes) {this->attributes = attributes;};
+
 	/**
 	*
 	* @brief Solves all parameters.
@@ -443,6 +461,14 @@ public:
 	* Resolves parameters of this instance by using parameter and their values.
 	*/
 	void solveParameters();
+
+	/**
+	*
+	* @brief Setter of Id
+	*
+	* @name : the new Id of instance
+	*/
+	void setId(std::string name){this->id = name;};
 	
 protected:
 
@@ -478,6 +504,9 @@ protected:
 
 	/** A map of the parameters of this actor */
 	std::map<std::string, Variable*>* parameters;
+
+	/** A map of the attributes of this actor */
+	std::map<std::string, IRAttribute*>* attributes;
 
 	/** State variables of this actor */
 	std::map<std::string, StateVar*>* stateVars;

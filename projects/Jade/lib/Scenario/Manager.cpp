@@ -43,7 +43,7 @@
 #include "llvm/System/Alarm.h"
 
 #include "Jade/DecoderEngine.h"
-#include "Jade/NetSerialize/XDFParser.h"
+#include "Jade/XDFSerialize/XDFParser.h"
 #include "Jade/Scenario/Manager.h"
 
 #include "ScenarioParser.h"

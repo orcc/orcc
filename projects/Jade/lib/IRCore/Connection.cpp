@@ -45,12 +45,12 @@
 #include "Jade/Core/Network/Connection.h"
 #include "Jade/Core/Expression.h"
 #include "Jade/Core/Attribute/ValueAttribute.h"
+#include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
-extern cl::opt<int> FifoSize;
 
 Connection::Connection(Port* source, Port* target, std::map<std::string, IRAttribute*>* attributes): HDAGEdge()
 {	this->attributes = attributes; 
@@ -64,7 +64,7 @@ int Connection::getSize(){
 	IRAttribute* attribute = getAttribute("bufferSize");
 	
 	if (attribute == NULL){
-		return FifoSize;
+		return FifoMng::getDefaultFifoSize();
 	}
 	
 	if (attribute->isValue()){

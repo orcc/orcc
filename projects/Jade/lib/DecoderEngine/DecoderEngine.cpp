@@ -63,7 +63,8 @@ using namespace llvm;
 
 DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 							 string library, 
-							 FifoTy fifo, 
+							 FifoTy fifo,
+							 int defaultFifoSize,
 							 string system, 
 							 string outputDir, 
 							 bool noMerging,
@@ -77,7 +78,7 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 	this->outputDir = outputDir;
 
 	//Select the fifo used
-	FifoMng::setFifoTy(fifo, library, outputDir);
+	FifoMng::setFifoTy(fifo, library, defaultFifoSize, outputDir);
 
 	//Load IR Parser
 	irParser = new IRParser(C, library);

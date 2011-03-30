@@ -2,7 +2,7 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 
 include_directories(${LLVM_INCLUDE_DIRS} ${JADE_MAIN_INCLUDE_DIR})
 
-add_library (NetSerialize
+add_library (XDFSerialize
   BinOpSeqParser.cpp
   BinOpSeqParser.h
   ExprParser.cpp
@@ -14,6 +14,7 @@ add_library (NetSerialize
   TypeParser.h
   XDFConstant.h
   XDFParser.cpp
+  XDFWriter.cpp
+  InstanceIdRemoveAll.cpp
   )
   
-  target_link_libraries(NetSerialize ZLib)

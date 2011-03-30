@@ -48,12 +48,31 @@
 #include "llvm/System/Signals.h"
 //------------------------------
 
+/**
+ *  @brief Build a map of files path
+ *   
+ *  @param filesPath : a map of files path
+ */
 void buildFilesPath(std::map<llvm::sys::Path,std::string>* filesPath);
 
-
+/**
+ *  @brief Parse files given to modules
+ *   
+ *  @param filesPath : a map of files path
+ *
+ *  @param modules : a map of module
+ */
 void parseFiles(std::map<llvm::sys::Path,std::string>* filesPath, std::map<std::string,llvm::Module*>* modules);
 
-
+/**
+ *  @brief Make recursively a map of directories
+ *   
+ *  @param path : path of file
+ *
+ *  @param name : file name
+ *
+ *  @param result : a map of directories
+ */
 void recurseMapDirectories(const llvm::sys::Path& path, std::string name, std::map<llvm::sys::Path,std::string>& result);
 
 #endif

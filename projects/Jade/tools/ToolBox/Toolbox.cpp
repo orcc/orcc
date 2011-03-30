@@ -39,9 +39,13 @@
 #include <iostream>
 #include <map>
 
+#include "llvm/LLVMContext.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Target/TargetSelect.h"
+#include "Jade/XDFSerialize/InstanceIdRemoveAll.h"
 
+#include "Jade/XDFSerialize/XDFParser.h"
+#include "Jade/XDFSerialize/XDFWriter.h"
 #include "Jade/Util/OptionMng.h"
 #include "Jade/Util/CompressionMng.h"
 
@@ -149,6 +153,20 @@ int main(int argc, char **argv) {
 
 	//Compress XDF
 	if(XDFFile != ""){
+		//Parse XDF
+		LLVMContext &Context = getGlobalContext();
+		XDFParser xdfParser(XDFFile);
+		Network* network = xdfParser.ParseXDF(Context);
+
+		//Remove all instance id
+		InstanceIdRemoveAll instanceIdRemoveAll(network);
+		instanceIdRemoveAll.Remove();
+
+		//Write new XDF
+		XDFWriter xdfWriter(XDFFile, network);
+		xdfWriter.WriteXDF();
+
+		//Create a XDF GZip file
 		CompressionMng::compressFile(XDFFile);
 	}
 

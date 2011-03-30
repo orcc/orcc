@@ -104,7 +104,7 @@ add_subdirectory(lib/IRUtil)
 add_subdirectory(lib/RoundRobinScheduler)
 add_subdirectory(lib/Scenario)
 add_subdirectory(lib/TinyXml)
-add_subdirectory(lib/NetSerialize)
+add_subdirectory(lib/XDFSerialize)
 add_subdirectory(lib/ZLib)
 
 # Include directories

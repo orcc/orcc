@@ -28,84 +28,43 @@
  */
 
 /**
-@brief Description of the StringExpr class interface
-@author Jerome Gorin
-@file StringExpr.h
+@brief Implementation of class InstanceIdRemoveAll
+@author Olivier Labois
+@file InstanceIdRemoveAll.cpp
 @version 1.0
-@date 15/11/2010
+@date 28/03/2011
 */
 
 //------------------------------
-#ifndef STRINGEXPR_H
-#define STRINGEXPR_H
+#include <iostream>
+#include <sstream>
+#include <list>
 
-#include <string>
-
-#include "Jade/Core/Expression.h"
-#include "Jade/Core/Type/StringType.h"
+#include "Jade/XDFSerialize/InstanceIdRemoveAll.h"
 //------------------------------
 
-/**
- * @class IntExpr
- *
- * @brief  This class defines an integer expression.
- *
- * This class represents an integer Expression in a network.
- * 
- * @author Jerome Gorin
- * 
- */
-class StringExpr : public Expr {
-public:
-	/*!
-     *  @brief Constructor
-     *
-	 * Creates a new string expression.
-	 *
-	 *  @param C : llvm::LLVMContext.
-	 *  @param value : string value of the StringExpr.
-     *
-     */
-	StringExpr(llvm::LLVMContext &C, std::string value): Expr(C){
-		this->value = value;
-	};
+using namespace std;
 
-	~StringExpr();
 
-	/**
-	 * @brief Returns true if the expression is an instance of StringExpr
-	 * 
-	 * @return True if the expression is an instance of StringExpr
-	 */
-	bool isStringExpr(){return true;};
+InstanceIdRemoveAll::InstanceIdRemoveAll(Network* network){
+	this->network = network;
+}
 
-	/*!
-     *  @brief Return ir::Type of the string expression
-     *
-	 *  @return ir::Type of the string expression.
-     *
-     */
-	IRType* getIRType(){return new StringType();};
+void InstanceIdRemoveAll::Remove(){
+	list<Instance*>* instances = network->getInstances();
+	list<Instance*>::iterator itInst;
 
-	/**
-	 * @brief Returns llvm::Constant corresponding to the llvm value of this expression.
-	 * 
-	 * @return llvm::Constant of this expression
-	 */
-	llvm::Constant* getConstant();
+	int i = 0;
 
-	/*!
-     *  @brief Get Value
-     *
-	 *  @return Value
-     *
-     */
-	std::string getValue(){return value;};
+	for(itInst = instances->begin(); itInst != instances->end(); itInst++){
+		if((*itInst)->getId() != "source" && (*itInst)->getId() != "display"){
+			ostringstream id;
+			id << i;
+			(*itInst)->setId(id.str());
+			i++;
+		}
+	}
+}
 
-private:
-	std::string value;
-
-	llvm::Constant* constantVal;
-};
-
-#endif
+InstanceIdRemoveAll::~InstanceIdRemoveAll(){
+}

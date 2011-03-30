@@ -65,15 +65,21 @@ string FifoMng::outputDir;
 Module* FifoMng::headerMd;
 map<int, FifoMng::FifoAccess*> FifoMng::fifoAccesses;
 map<string, const StructType*> FifoMng::fifoStructs;
+int FifoMng::defaultFifoSize = 10000;
 
 
-void FifoMng::setFifoTy(FifoTy fifoTy, std::string packageFld, std::string outputDir){
+void FifoMng::setFifoTy(FifoTy fifoTy, std::string packageFld, int defaultFifoSize, std::string outputDir){
 		FifoMng::fifoTy =  fifoTy;
 		FifoMng::packageFolder = packageFld;
 		FifoMng::outputDir = outputDir;
 
 		parseModules();
 		parseFifos();
+		FifoMng::defaultFifoSize = defaultFifoSize;
+}
+
+int FifoMng::getDefaultFifoSize(){
+		return defaultFifoSize;
 }
 
 void FifoMng::parseModules(){

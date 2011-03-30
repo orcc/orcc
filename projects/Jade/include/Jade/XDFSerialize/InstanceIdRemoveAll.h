@@ -28,84 +28,44 @@
  */
 
 /**
-@brief Description of the StringExpr class interface
-@author Jerome Gorin
-@file StringExpr.h
+@brief Description of the InstanceIdRemoveAll class interface 
+@author Olivier Labois
+@file InstanceIdRemoveAll.h
 @version 1.0
-@date 15/11/2010
+@date 28/03/2011
 */
 
 //------------------------------
-#ifndef STRINGEXPR_H
-#define STRINGEXPR_H
+#ifndef IDMNG_H
+#define IDMNG_H
 
-#include <string>
-
-#include "Jade/Core/Expression.h"
-#include "Jade/Core/Type/StringType.h"
+#include "Jade/Core/Network.h"
 //------------------------------
 
-/**
- * @class IntExpr
- *
- * @brief  This class defines an integer expression.
- *
- * This class represents an integer Expression in a network.
- * 
- * @author Jerome Gorin
- * 
- */
-class StringExpr : public Expr {
+class InstanceIdRemoveAll{
 public:
-	/*!
-     *  @brief Constructor
-     *
-	 * Creates a new string expression.
+
+	/**
+     *  @brief Constructor of the class InstanceidRemoveAll
 	 *
-	 *  @param C : llvm::LLVMContext.
-	 *  @param value : string value of the StringExpr.
-     *
+	 *  @param network : a network
      */
-	StringExpr(llvm::LLVMContext &C, std::string value): Expr(C){
-		this->value = value;
-	};
-
-	~StringExpr();
+	InstanceIdRemoveAll(Network* network);
 
 	/**
-	 * @brief Returns true if the expression is an instance of StringExpr
-	 * 
-	 * @return True if the expression is an instance of StringExpr
-	 */
-	bool isStringExpr(){return true;};
-
-	/*!
-     *  @brief Return ir::Type of the string expression
-     *
-	 *  @return ir::Type of the string expression.
-     *
+     *  @brief Destructor of the class InstanceIdRemoveAll
      */
-	IRType* getIRType(){return new StringType();};
+	~InstanceIdRemoveAll();
 
 	/**
-	 * @brief Returns llvm::Constant corresponding to the llvm value of this expression.
-	 * 
-	 * @return llvm::Constant of this expression
-	 */
-	llvm::Constant* getConstant();
-
-	/*!
-     *  @brief Get Value
-     *
-	 *  @return Value
-     *
+     *  @brief Start remove all instances id
      */
-	std::string getValue(){return value;};
+	void Remove();
 
 private:
-	std::string value;
 
-	llvm::Constant* constantVal;
+	/** network where are instances*/
+	Network* network;
+
 };
-
 #endif

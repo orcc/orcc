@@ -129,8 +129,8 @@ Expr* ExprParser::parseExprLiteral(TiXmlElement* elt){
 		fprintf(stderr,"Reals not supported yet");
 		exit(0);
 	} else if (kind == XDFNetwork::LITERAL_STRING) {
-		fprintf(stderr,"String not supported yet");
-		exit(0);
+		string String = value.c_str();
+		return new StringExpr(Context, String);
 	} else {
 		fprintf(stderr,"Unsupported expression literal kind: \"%s\"", kind.c_str());
 		exit(0);

@@ -111,7 +111,7 @@ public:
 	 *
 	 *	@param packageFld : the VTL folder
      */
-	static void setFifoTy(FifoTy fifoTy, std::string packageFld, std::string outputDir = "");
+	static void setFifoTy(FifoTy fifoTy, std::string packageFld, int defaultFifoSize, std::string outputDir = "");
 
 	/**
      *  @brief Filename of the fifo to parse
@@ -222,6 +222,13 @@ public:
 	 */
 	static std::map<std::string, llvm::Function*>* addFifoHeader(Decoder* decoder);
 
+	/**
+	 *  @brief Return the default fifo size
+	 *
+	 *	@return the default fifo size
+	 */
+	static int getDefaultFifoSize();
+
 private:
 	/**
 	 *  @brief Add fifo functions
@@ -294,6 +301,9 @@ private:
 
 	/** Module that contains the fifo */
 	static llvm::Module* headerMd;
+
+	/** Size of default fifo */
+	static int defaultFifoSize;
 
 	/** Extern structs */
 	static std::list<llvm::Function*> externStruct;

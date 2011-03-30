@@ -48,15 +48,48 @@
 #include "llvm/Target/TargetData.h"
 //------------------------------
 
+/**
+ *  @brief  Add pass in pass manager base
+ *   
+ *  @param PM : a pass manager base
+ *
+ *  @param P : a pass
+ */
 inline void addPass(llvm::PassManagerBase &PM, llvm::Pass *P);
 
+/**
+ *  @brief Add optimization passes
+ *   
+ *  @param MPM : a pass manager
+ *
+ *  @param FPM : a pass manager
+ *
+ *  @param OptLevel : optimization level
+ */
 void AddOptimizationPasses(llvm::PassManagerBase &MPM, llvm::PassManagerBase &FPM,
                            unsigned OptLevel);
 
+/**
+ *  @brief Add standard link passes
+ *   
+ *  @param PM : a pass manager base
+ */
 void AddStandardCompilePasses(llvm::PassManagerBase &PM);
 
+/**
+ *  @brief Add standard link passes
+ *   
+ *  @param PM : a pass manager base
+ */
 void AddStandardLinkPasses(llvm::PassManagerBase &PM);
 
+/**
+ *  @brief Make an optimization
+ *   
+ *  @param file : a file
+ *
+ *  @param M : a module
+ */
 void opt(std::string file, llvm::Module* M);
 
 #endif

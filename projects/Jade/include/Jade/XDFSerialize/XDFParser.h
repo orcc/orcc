@@ -79,7 +79,6 @@ public:
      *  @brief Start Parsing XDF file
      *
      *  @return a network class that describe the network of the dataflow, NULL if parsing failed
-     *  
      */
 	Network* ParseXDF (llvm::LLVMContext& C);
 

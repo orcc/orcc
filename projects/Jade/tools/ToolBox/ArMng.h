@@ -44,6 +44,12 @@
 #include "llvm/Bitcode/Archive.h"
 //------------------------------
 
+
+/**
+ *  @brief Create an archive with given files
+ *   
+ *  @param filesPath : a map of files path
+ */
 void createArchives(std::map<llvm::sys::Path,std::string>* filesPath);
 
 #endif

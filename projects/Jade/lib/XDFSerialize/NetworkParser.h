@@ -80,6 +80,8 @@ public:
      *  @param filename : name of the network file to parse
 	 *
 	 *  @param verbose : verbose actions taken
+	 *
+	 *  @param FifoSize : default size of fifo
      */
 	NetworkParser (llvm::LLVMContext& C, std::string filename, bool verbose = false);
 
@@ -155,7 +157,7 @@ private:
 	 * Parses the given TiXmlElement as a Connection, and adds a matching
 	 * Connection to the graph of the network being parsed.
 	 *
-     *  @param root : TiXmlElement representation of Connection element 
+     *  @param root : TiXmlElement representation of Connection element
      */
 	void parseConnection(TiXmlElement* connection);
 

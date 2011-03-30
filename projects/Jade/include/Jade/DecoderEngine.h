@@ -69,7 +69,7 @@ public:
 	 *   
 	 *  @param C : the LLVM Context used by JIT
      */
-	DecoderEngine(llvm::LLVMContext& C, std::string library, FifoTy fifo, std::string system = "", std::string outputDir="", bool noMerging = false, bool verbose = false);
+	DecoderEngine(llvm::LLVMContext& C, std::string library, FifoTy fifo, int defaultFifoSize, std::string system = "", std::string outputDir="", bool noMerging = false, bool verbose = false);
 	~DecoderEngine();
 
 	/*!
