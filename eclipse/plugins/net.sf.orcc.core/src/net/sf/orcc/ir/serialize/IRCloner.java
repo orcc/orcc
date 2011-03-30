@@ -613,15 +613,32 @@ public class IRCloner {
 	private OrderedMap<String, Port> outputs;
 
 	/**
-	 * Creates an actor writer on the given actor.
+	 * Creates a new full actor cloner.
 	 * 
-	 * @param actor
-	 *            an actor
 	 */
 	public IRCloner() {
 		untaggedActions = new ArrayList<Action>();
 		actions = new OrderedMap<String, Action>();
 		ports = new OrderedMap<String, Port>();
+	}
+	
+	/**
+	 * Creates a new partial actor that clones local elements of an actor.
+	 * 
+	 * @param actor
+	 *            the source actor
+	 */
+	public IRCloner(Actor actor) {
+		untaggedActions = new ArrayList<Action>();
+		actions = new OrderedMap<String, Action>();
+		ports = new OrderedMap<String, Port>();
+		
+		// Get elements of the actor
+		parameters = actor.getParameters();
+		stateVars = actor.getStateVars();
+		inputs = actor.getInputs();
+		outputs =actor.getOutputs();
+		procs = actor.getProcs();
 	}
 
 	public Actor clone(Actor actor) {
