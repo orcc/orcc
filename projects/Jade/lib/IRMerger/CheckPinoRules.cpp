@@ -66,7 +66,7 @@ bool CheckPinoRules::isValide(Instance* src, Instance* dst){
 	}
 
 	// Check precedence violation
-	if(checkPrecedence(src, dst)){
+	if(checkZeroDelay(src, dst)){
 		return false;
 	}
 
@@ -83,7 +83,7 @@ bool CheckPinoRules::checkCycle(Instance* instance){
 	return paths.size() > 0;
 }
 
-bool CheckPinoRules::checkPrecedence(Instance* src, Instance* dst){
+bool CheckPinoRules::checkZeroDelay(Instance* src, Instance* dst){
 	list<Instance*> visited;
 	paths.clear();
 	

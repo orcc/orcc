@@ -93,7 +93,7 @@ private:
 	 * 
 	 * @return true if precedence are found, otherwise false
 	 */
-	bool checkPrecedence(Instance* src, Instance* dst);
+	bool checkZeroDelay(Instance* src, Instance* dst);
 
 	/** Instances to check */
 	Instance* src;

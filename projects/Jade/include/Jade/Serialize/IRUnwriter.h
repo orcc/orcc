@@ -207,6 +207,13 @@ private:
 	 */
 	void unwriteProcedures(std::map<std::string, Procedure*>* procs);
 
+	/**
+	 * @brief Erase the body of a procedure
+	 * 
+	 * @param procs : the procedures to erase body from
+	 */
+	void eraseBodyProcedure(Procedure* procedure);
+
 	/** Decoder where instance is unwrite*/
 	Decoder* decoder;
 

@@ -109,6 +109,10 @@ void Merger::transform(){
 			}
 		}
 
+		if (index == 28){
+			recompute = false;
+		}
+
 		if (!recompute){
 			// No merging found, end the analysis
 			hasCondidate = false;
@@ -208,12 +212,12 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Conn
 		Connection* connection = *it;
 		
 		// Get ports of the connection
-		Port* src = connection->getSourcePort();
-		Port* dst = connection->getDestinationPort();
+		Port* srcPort = connection->getSourcePort();
+		Port* dstPort = connection->getDestinationPort();
 
 		// Get corresponding port in actor
-		Port* srcActPort = srcAct->getOutput(src->getName());
-		Port* dstActPort = dstAct->getInput(dst->getName());
+		Port* srcActPort = srcAct->getOutput(srcPort->getName());
+		Port* dstActPort = dstAct->getInput(dstPort->getName());
 		
 		// Verify that rate of the two instances are consistent
 		Rational compareRate = getRational(srcPattern->getNumTokens(srcActPort), dstPattern->getNumTokens(dstActPort));
@@ -225,9 +229,9 @@ SuperInstance*  Merger::getSuperInstance(Instance* src, Instance* dst, list<Conn
 		}
 
 		// Set internal ports of each instances
-		src->setInternal(true);
-		dst->setInternal(true);
-		internPorts->insert(pair<Port*, Port*>(src, dst));
+		srcPort->setInternal(true);
+		dstPort->setInternal(true);
+		internPorts->insert(pair<Port*, Port*>(srcPort, dstPort));
 	}
 
 	

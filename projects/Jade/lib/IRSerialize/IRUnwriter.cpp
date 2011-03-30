@@ -140,7 +140,7 @@ void IRUnwriter::unwritePorts(string key, map<string, Port*>* ports){
 	map<string, Port*>::iterator it;
 
 	//Iterate though the given ports
-	for (it = ports->begin(); it != ports->end(); ++it){
+	for (it = ports->begin(); it != ports->end(); it++){
 		Port* port = it->second;
 
 		//Remove the port
@@ -151,6 +151,11 @@ void IRUnwriter::unwritePorts(string key, map<string, Port*>* ports){
 void IRUnwriter::unwriteProcedures(map<string, Procedure*>* procs){
 	map<string, Procedure*>::iterator it;
 	
+	// First erase body of procedures, in case of recursive call
+	for (it = procs->begin(); it != procs->end(); ++it){
+		eraseBodyProcedure(it->second);
+	}
+
 	//Creation of procedure must be done in two times because function can call other functions
 	for (it = procs->begin(); it != procs->end(); ++it){
 		unwriteProcedure(it->second);
@@ -169,17 +174,15 @@ void IRUnwriter::unwritePort(string key, Port* port){
 
 void IRUnwriter::unwriteActions(list<Action*>* actions){
 	list<Action*>::iterator it;
-	list<Action*>* newActions = new list<Action*>();
 
-	for (it = actions->begin(); it != actions->end(); ++it){
+	for (it = actions->begin(); it != actions->end(); it++){
 		unwriteAction(*it);
 	}
 }
 void IRUnwriter::unwriteInitializes(list<Action*>* actions){
 	list<Action*>::iterator it;
-	list<Action*>* newActions = new list<Action*>();
 
-	for (it = actions->begin(); it != actions->end(); ++it){
+	for (it = actions->begin(); it != actions->end(); it++){
 		unwriteAction(*it);
 	}
 }
@@ -188,7 +191,11 @@ void IRUnwriter::unwriteAction(Action* action){
 		//Write body and scheduler of the action
 		unwriteProcedure(action->getScheduler());
 		unwriteProcedure(action->getBody());
+}
 
+void IRUnwriter::eraseBodyProcedure(Procedure* procedure){
+	Function* function = procedure->getFunction();
+	function->deleteBody();
 }
 
 void IRUnwriter::unwriteProcedure(Procedure* procedure){
