@@ -608,8 +608,6 @@ public class IRCloner {
 		}
 	}
 
-	private Actor actor;
-
 	private OrderedMap<String, Port> inputs;
 
 	private OrderedMap<String, Port> outputs;
@@ -620,16 +618,14 @@ public class IRCloner {
 	 * @param actor
 	 *            an actor
 	 */
-	public IRCloner(Actor actor) {
-		this.actor = actor;
-
+	public IRCloner() {
 		untaggedActions = new ArrayList<Action>();
 		actions = new OrderedMap<String, Action>();
 		ports = new OrderedMap<String, Port>();
 	}
 
-	@Override
-	public Actor clone() {
+	public Actor clone(Actor actor) {
+		
 		parameters = cloneGlobalVariables(actor.getParameters());
 		stateVars = cloneGlobalVariables(actor.getStateVars());
 		inputs = clonePorts(actor.getInputs());
@@ -662,7 +658,7 @@ public class IRCloner {
 	 *            the action to clone
 	 * @return a clone action
 	 */
-	private Action cloneAction(Action action) {
+	public Action cloneAction(Action action) {
 		patternVars = new OrderedMap<String, Variable>();
 
 		Location location = cloneLocation(action.getLocation());
@@ -687,7 +683,7 @@ public class IRCloner {
 	 *            a list of cloned port;
 	 * @return the cloned pattern
 	 */
-	private Pattern cloneActionPattern(Pattern pattern,
+	public Pattern cloneActionPattern(Pattern pattern,
 			OrderedMap<String, Port> ports) {
 		Pattern clonePattern = new Pattern();
 
@@ -718,7 +714,7 @@ public class IRCloner {
 	 * 
 	 * @return the cloned pattern variable
 	 */
-	private LocalVariable clonePatternVar(Variable patternVar) {
+	public LocalVariable clonePatternVar(Variable patternVar) {
 		// Clone variables associated to ports
 		LocalVariable cloneVar = cloneLocalVariable((LocalVariable) patternVar);
 
@@ -735,7 +731,7 @@ public class IRCloner {
 	 *            a list of actions to clone
 	 * @return the cloned action list
 	 */
-	private List<Action> cloneActions(List<Action> actions) {
+	public List<Action> cloneActions(List<Action> actions) {
 		List<Action> cloneActions = new ArrayList<Action>();
 
 		for (Action action : actions) {
@@ -756,7 +752,7 @@ public class IRCloner {
 	 *            the action scheduler of the actor to clone.
 	 * @return the action scheduler cloned.
 	 */
-	private ActionScheduler cloneActionScheduler(ActionScheduler scheduler) {
+	public ActionScheduler cloneActionScheduler(ActionScheduler scheduler) {
 		List<Action> actions = new ArrayList<Action>();
 		FSM clonedFSM = null;
 
@@ -782,7 +778,7 @@ public class IRCloner {
 	 *            the action tag to clone
 	 * @return the tag cloned
 	 */
-	private Tag cloneActionTag(Tag tag) {
+	public Tag cloneActionTag(Tag tag) {
 		return new Tag(tag.getIdentifiers());
 	}
 
@@ -793,7 +789,7 @@ public class IRCloner {
 	 *            an FSM to be cloned
 	 * @return the cloned FSM
 	 */
-	private FSM cloneFSM(FSM fsm) {
+	public FSM cloneFSM(FSM fsm) {
 		FSM clonedFsm = new FSM();
 
 		for (String state : fsm.getStates()) {
@@ -824,7 +820,7 @@ public class IRCloner {
 	 *            the variable to clone
 	 * @return the cloned variables
 	 */
-	private GlobalVariable cloneGlobalVariable(GlobalVariable variable) {
+	public GlobalVariable cloneGlobalVariable(GlobalVariable variable) {
 		Location location = cloneLocation(variable.getLocation());
 		Type type = cloneType(variable.getType());
 
@@ -847,7 +843,7 @@ public class IRCloner {
 	 *            an OrderedMap of variable to clone
 	 * @return the cloned variables
 	 */
-	private OrderedMap<String, GlobalVariable> cloneGlobalVariables(
+	public OrderedMap<String, GlobalVariable> cloneGlobalVariables(
 			OrderedMap<String, GlobalVariable> variables) {
 		OrderedMap<String, GlobalVariable> cloneMap = new OrderedMap<String, GlobalVariable>();
 
@@ -866,7 +862,7 @@ public class IRCloner {
 	 *            a list of initialize actions to clone
 	 * @return the cloned initialize action list
 	 */
-	private List<Action> cloneInitializes(List<Action> actions) {
+	public List<Action> cloneInitializes(List<Action> actions) {
 		List<Action> cloneActions = new ArrayList<Action>();
 
 		for (Action action : actions) {
@@ -883,7 +879,7 @@ public class IRCloner {
 	 *            the variable to clone
 	 * @return the cloned variables
 	 */
-	private LocalVariable cloneLocalVariable(LocalVariable variable) {
+	public LocalVariable cloneLocalVariable(LocalVariable variable) {
 		Location location = cloneLocation(variable.getLocation());
 		Type type = cloneType(variable.getType());
 
@@ -898,7 +894,7 @@ public class IRCloner {
 	 *            an ordered map of variables
 	 * @return the cloned ordered map
 	 */
-	private OrderedMap<String, LocalVariable> cloneLocalVariables(
+	public OrderedMap<String, LocalVariable> cloneLocalVariables(
 			OrderedMap<String, LocalVariable> variables) {
 		OrderedMap<String, LocalVariable> cloneMap = new OrderedMap<String, LocalVariable>();
 
@@ -917,7 +913,7 @@ public class IRCloner {
 	 *            a port
 	 * @return the cloned port
 	 */
-	private Port clonePort(Port port) {
+	public Port clonePort(Port port) {
 		Location location = cloneLocation(port.getLocation());
 		Type type = cloneType(port.getType());
 		Port clone = new Port(location, type, port.getName());
@@ -947,7 +943,7 @@ public class IRCloner {
 	 *            the ordered map of ports to clone
 	 * @return the cloned ordered map
 	 */
-	private OrderedMap<String, Port> clonePorts(OrderedMap<String, Port> ports) {
+	public OrderedMap<String, Port> clonePorts(OrderedMap<String, Port> ports) {
 		OrderedMap<String, Port> cloneMap = new OrderedMap<String, Port>();
 
 		for (Port port : ports) {
@@ -965,7 +961,7 @@ public class IRCloner {
 	 *            the procedure to clone
 	 * @return a cloned procedure
 	 */
-	private Procedure cloneProcedure(Procedure procedure) {
+	public Procedure cloneProcedure(Procedure procedure) {
 		Type returnType = cloneType(procedure.getReturnType());
 
 		OrderedMap<String, LocalVariable> parameters = cloneLocalVariables(procedure
@@ -991,7 +987,7 @@ public class IRCloner {
 	 *            an ordered map of procedures
 	 * @return the corresponding clones
 	 */
-	private OrderedMap<String, Procedure> cloneProcedures(
+	public OrderedMap<String, Procedure> cloneProcedures(
 			OrderedMap<String, Procedure> procedures) {
 		OrderedMap<String, Procedure> cloneProcedures = new OrderedMap<String, Procedure>();
 		for (Procedure procedure : procedures) {

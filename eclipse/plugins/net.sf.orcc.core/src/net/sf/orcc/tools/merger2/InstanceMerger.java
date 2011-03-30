@@ -91,7 +91,7 @@ public class InstanceMerger {
 			if (network.getInstancesOf(actor).size() > 1){
 				// Clone the actor so as to isolate transformations on other
 				// instance of this actor
-				actor = new IRCloner(actor).clone();
+				actor = new IRCloner().clone(actor);
 			}
 
 			actorMerger.add(actor, entry.getValue());
