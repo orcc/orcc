@@ -121,15 +121,15 @@ void BroadcastActor::createActor(){
 }
 
 MoC* BroadcastActor::createMoC(){
-	/*// Set broadcast actor as SDF
+	// Set broadcast actor as SDF
 	SDFMoC* sdfMoC = new SDFMoC();
 
 	//Set properties of the MoC
 	Action* action = actions->front();
 	sdfMoC->addAction(action);
 	sdfMoC->setInputPattern(action->getInputPattern());
-	sdfMoC->setOutputPattern(action->getOutputPattern());*/
-	DPNMoC* sdfMoC = new DPNMoC();
+	sdfMoC->setOutputPattern(action->getOutputPattern());
+	//DPNMoC* sdfMoC = new DPNMoC();
 	return sdfMoC;
 }
 

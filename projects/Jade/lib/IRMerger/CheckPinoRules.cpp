@@ -56,17 +56,41 @@ bool CheckPinoRules::isValide(Instance* src, Instance* dst){
 	this->src = src;
 
 	//Check cycle violation
-	paths.clear();
-	return !checkCycle(dst);
+	if (checkCycle(src)){
+		return false;
+	}
+	
+	//Check cycle violation
+	if (checkCycle(dst)){
+		return false;
+	}
+
+	// Check precedence violation
+	if(checkPrecedence(src, dst)){
+		return false;
+	}
+
+	return true;
 }
 
 bool CheckPinoRules::checkCycle(Instance* instance){
 	list<Instance*> visited;
+	paths.clear();
 	
 	visited.push_back(instance);
 	findPath(&visited, instance);
 
 	return paths.size() > 0;
+}
+
+bool CheckPinoRules::checkPrecedence(Instance* src, Instance* dst){
+	list<Instance*> visited;
+	paths.clear();
+	
+	visited.push_back(src);
+	findPath(&visited, dst);
+
+	return paths.size() > 1;
 }
 
 
@@ -97,7 +121,7 @@ void CheckPinoRules::findPath(list<Instance*>* visited, Instance* end){
 	for (it = nodes.begin(); it != nodes.end(); it++){
 		Instance* node = *it;
 
-		if (find(visited->begin(), visited->end(), node) != visited->end() || node == end || node == src ){
+		if (find(visited->begin(), visited->end(), node) != visited->end() || node == end || node == src || node == dst){
 			continue;
 		}
 		

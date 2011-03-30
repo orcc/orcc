@@ -87,6 +87,14 @@ private:
 	 */
 	bool checkCycle(Instance* instance);
 
+	
+	/**
+	 * @brief Look for precedence in between the two instance to merge
+	 * 
+	 * @return true if precedence are found, otherwise false
+	 */
+	bool checkPrecedence(Instance* src, Instance* dst);
+
 	/** Instances to check */
 	Instance* src;
 	Instance* dst;
