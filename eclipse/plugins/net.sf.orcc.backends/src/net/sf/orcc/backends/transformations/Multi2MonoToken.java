@@ -43,6 +43,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
@@ -66,6 +67,7 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.serialize.IRCloner;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
 
@@ -170,35 +172,20 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	private int bufferSize = 0;
-
 	private Action done;
-
 	private Type entryType;
-
 	private FSM fsm;
-
 	private List<GlobalVariable> inputBuffers = new ArrayList<GlobalVariable>();
-
 	private int inputIndex = 0;
-
 	private List<Port> inputPorts = new ArrayList<Port>();
-
 	private List<Action> NoRepeatActions = new ArrayList<Action>();
-
 	private int numTokens;
-
 	private int outputIndex = 0;
-
 	private Port port;
-
 	private Action process;
-
 	private List<GlobalVariable> readIndexes = new ArrayList<GlobalVariable>();
-
 	private boolean repeatInput = false;
-
 	private boolean repeatOutput = false;
-
 	private LocalVariable result;
 	private Action store;
 	private Action untagged;
@@ -293,38 +280,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
-	 * This method clones the local variables of a procedure to another using a
-	 * LocalVariable iterator
-	 * 
-	 * @param itVar
-	 *            source LocalVariable iterator
-	 * @param newProc
-	 *            target procedure
-	 */
-	private void cloneLocals(Iterator<LocalVariable> itVar, Procedure newProc) {
-		while (itVar.hasNext()) {
-			LocalVariable var = itVar.next();
-			newProc.getLocals().put(var.getName(), var);
-		}
-	}
-
-	/**
-	 * This method clones the nodes of a procedure to another using a CFGNode
-	 * iterator
-	 * 
-	 * @param itNode
-	 *            source node iterator
-	 * @param newProc
-	 *            target procedure
-	 */
-	private void cloneNodes(ListIterator<CFGNode> itNode, Procedure newProc) {
-		while (itNode.hasNext()) {
-			CFGNode node = itNode.next();
-			newProc.getNodes().add(node);
-		}
-	}
-
-	/**
 	 * this method returns the closest power of 2 of x --> optimal buffer size
 	 * 
 	 * @param x
@@ -402,21 +357,15 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @return new cloned action
 	 */
 	private Action createCloneAction(Action action) {
-		Expression expression = new BoolExpr(true);
-		Action newCloneAction = createAction(expression,
-				"cloneAction" + action.getName());
-		cloneNodes(action.getBody().getNodes().listIterator(),
-				newCloneAction.getBody());
-		cloneNodes(action.getScheduler().getNodes().listIterator(),
-				newCloneAction.getScheduler());
-		cloneLocals(action.getBody().getLocals().iterator(),
-				newCloneAction.getBody());
-		cloneLocals(action.getScheduler().getLocals().iterator(),
-				newCloneAction.getScheduler());
-		BlockNode blkNode = BlockNode.getFirst(newCloneAction.getScheduler());
-		// remove condition and return put by the create action method
-		blkNode.getInstructions().remove(0);
-		blkNode.getInstructions().remove(0);
+		 String name = action.getName()+"_clone";
+		 IRCloner iRCloner = new IRCloner(actor);
+		 Action newCloneAction = iRCloner.cloneAction(action);
+		 newCloneAction.getTag().add("clone");
+		 newCloneAction.getTag().get(0).replaceAll(newCloneAction.getName(), name);
+		 newCloneAction.getBody().setName(name);
+		 newCloneAction.getScheduler().setName("isSchedulable_"+name);
+		 actor.getActions().add(newCloneAction);
+		 
 		return newCloneAction;
 	}
 
@@ -967,43 +916,60 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
-	 * This method changes the data source of an action from a port to a
-	 * specified buffer if the port is a repeat one in another action
+	 * This method creates a clone action that has the same behavior than a
+	 * reference action but stores tokens from a specific buffer in spite of a
+	 * port
 	 * 
 	 */
 	private void modifyNoRepeatActions() {
-		LocalVariable tmp = new LocalVariable(true, 0, new Location(), "tmp",
-				entryType);
-		for (Action action : NoRepeatActions) {
-			for (Entry<Port, Variable> entry : action.getInputPattern()
-					.getVariableMap().entrySet()) {
-				Port port = entry.getKey();
-				if (inputPorts.contains(port)) {
-					Action cloneAction = createCloneAction(action);
-					Procedure body = cloneAction.getBody();
-					LocalVariable inputTmp = new LocalVariable(true, 0,
-							new Location(), port.getName(), entryType);
-					Instruction instruction = BlockNode.getFirst(body)
-							.getInstructions().get(0);
-					if (instruction.isLoad()) {
-						Load load = (Load) instruction;
-						tmp = load.getTarget();
-						load.setSource(new Use(tmp));
-						inputTmp = (LocalVariable) entry.getValue();
-						BlockNode.getFirst(body).getInstructions().remove(0);
+		DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
+		Set<UniqueEdge> edges = graph.edgeSet();
+		for (UniqueEdge edge : edges) {
+			State source = graph.getEdgeSource(edge);
+			String sourceName = source.getName();
+			State target = graph.getEdgeTarget(edge);
+			String targetName = target.getName();
+			Action action = (Action) edge.getObject();
+			int cloneIndex = transitionPosition(fsm.getTransitions(sourceName), action);
+			if (NoRepeatActions.contains(action)) {
+				for (Entry<Port, Variable> entry : action.getInputPattern()
+						.getVariableMap().entrySet()) {
+					Port port = entry.getKey();
+					if (inputPorts.contains(port)) {
+						LocalVariable tmp = new LocalVariable(true, 0,
+								new Location(), "tmp", entryType);
+						Action cloneAction = createCloneAction(action);
+						Procedure body = cloneAction.getBody();
+						LocalVariable inputTmp = new LocalVariable(true, 0,
+								new Location(), port.getName(), entryType);
+						Instruction instruction = BlockNode.getFirst(body)
+								.getInstructions().get(0);
+						if (instruction.isLoad()) {
+							Load load = (Load) instruction;
+							tmp = load.getTarget();
+							load.setSource(new Use(tmp));
+							inputTmp = (LocalVariable) entry.getValue();
+							BlockNode.getFirst(body).getInstructions()
+									.remove(0);
+						}
+						int position = portPosition(inputPorts, port);
+						addStoreFromBuffer(body, position, tmp);
+						removePortFromPattern(cloneAction.getInputPattern(),
+								port, inputTmp);
+						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
+								inputBuffers.get(position),
+								writeIndexes.get(position), port);
+						modifyActionScheduler.visit(cloneAction.getScheduler());
+						modifyActionSchedulability(cloneAction,
+								writeIndexes.get(position),
+								readIndexes.get(position), BinaryOp.NE,
+								new IntExpr(0));
+						fsm.addTransition(sourceName, cloneAction, targetName);
+						int length = fsm.getTransitions(sourceName).size();
+						NextStateInfo info = fsm.getTransitions(sourceName).get(length -1);
+						fsm.getTransitions(sourceName).add(cloneIndex, info);
+						fsm.getTransitions(sourceName).remove(length);
 					}
-					int position = portPosition(inputPorts, port);
-					addStoreFromBuffer(body, position, tmp);
-					removePortFromPattern(cloneAction.getInputPattern(), port,
-							inputTmp);
-					ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-							inputBuffers.get(position),
-							writeIndexes.get(position), port);
-					modifyActionScheduler.visit(cloneAction.getScheduler());
-					modifyActionSchedulability(cloneAction,
-							writeIndexes.get(position),
-							readIndexes.get(position), BinaryOp.NE,
-							new IntExpr(0));
 				}
 			}
 		}
@@ -1108,6 +1074,27 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		return position;
 	}
 
+	/**
+	 * returns the position of an action transition in a transitions list
+	 * 
+	 * @param list
+	 *            transitions list
+	 * @param action
+	 *            researched action
+	 * @return position of the transition
+	 */
+	private int transitionPosition(List<NextStateInfo> list, Action action) {
+		int position = 0;
+		for (NextStateInfo info : list) {
+			if (info.getAction() == action) {
+				break;
+			} else {
+				position++;
+			}
+		}
+		return position;
+	}
+	
 	/**
 	 * This method removes a port from a pattern
 	 * 
