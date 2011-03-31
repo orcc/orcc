@@ -34,7 +34,7 @@ import java.util.ListIterator;
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
@@ -165,9 +165,9 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(List<CFGNode> nodes) {
+	public void visit(List<Node> nodes) {
 		for (int i = 0; i < nodes.size(); i++) {
-			CFGNode node = nodes.get(i);
+			Node node = nodes.get(i);
 			node.accept(this);
 			i = nodes.indexOf(node);
 		}

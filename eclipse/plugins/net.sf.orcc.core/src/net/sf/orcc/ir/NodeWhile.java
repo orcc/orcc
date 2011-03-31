@@ -35,10 +35,10 @@ import org.eclipse.emf.common.util.EList;
  * its condition.
  * 
  * @author Matthieu Wipliez
- * @model extends="net.sf.orcc.ir.CFGNode"
+ * @model extends="net.sf.orcc.ir.Node"
  * 
  */
-public interface NodeWhile extends CFGNode, ValueContainer {
+public interface NodeWhile extends Node, ValueContainer {
 
 	/**
 	 * Returns the join node of this NodeWhile.
@@ -54,7 +54,7 @@ public interface NodeWhile extends CFGNode, ValueContainer {
 	 * @return the nodes of this NodeWhile
 	 * @model containment="true"
 	 */
-	EList<CFGNode> getNodes();
+	EList<Node> getNodes();
 
 	/**
 	 * Sets the join node of this NodeWhile.

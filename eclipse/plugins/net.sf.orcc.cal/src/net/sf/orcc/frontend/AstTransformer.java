@@ -61,7 +61,7 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
@@ -192,8 +192,8 @@ public class AstTransformer {
 			}
 
 			// transforms "then" statements and "else" statements
-			List<CFGNode> thenNodes = getNodes(expression.getThen());
-			List<CFGNode> elseNodes = getNodes(expression.getElse());
+			List<Node> thenNodes = getNodes(expression.getThen());
+			List<Node> elseNodes = getNodes(expression.getElse());
 
 			NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
 			node.setLocation(location);
@@ -379,9 +379,9 @@ public class AstTransformer {
 		 *            an AST expression
 		 * @return a list of CFG nodes
 		 */
-		private List<CFGNode> getNodes(AstExpression astExpression) {
+		private List<Node> getNodes(AstExpression astExpression) {
 			Location location = Util.getLocation(astExpression);
-			List<CFGNode> nodes = context.getProcedure().getNodes();
+			List<Node> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -392,8 +392,8 @@ public class AstTransformer {
 			int last = nodes.size();
 
 			// moves selected CFG nodes from "nodes" list to resultNodes
-			List<CFGNode> subList = nodes.subList(first, last);
-			List<CFGNode> resultNodes = new ArrayList<CFGNode>(subList);
+			List<Node> subList = nodes.subList(first, last);
+			List<Node> resultNodes = new ArrayList<Node>(subList);
 			subList.clear();
 
 			return resultNodes;
@@ -409,8 +409,8 @@ public class AstTransformer {
 		 *            a list of statements
 		 * @return a list of CFG nodes
 		 */
-		private List<CFGNode> getNodes(List<AstExpression> astExpressions) {
-			List<CFGNode> nodes = context.getProcedure().getNodes();
+		private List<Node> getNodes(List<AstExpression> astExpressions) {
+			List<Node> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -424,8 +424,8 @@ public class AstTransformer {
 			int last = nodes.size();
 
 			// moves selected CFG nodes from "nodes" list to resultNodes
-			List<CFGNode> subList = nodes.subList(first, last);
-			List<CFGNode> resultNodes = new ArrayList<CFGNode>(subList);
+			List<Node> subList = nodes.subList(first, last);
+			List<Node> resultNodes = new ArrayList<Node>(subList);
 			subList.clear();
 
 			return resultNodes;
@@ -496,7 +496,7 @@ public class AstTransformer {
 			indexes.add(index);
 
 			// translates the expression (this will form the innermost nodes)
-			List<CFGNode> nodes = getNodes(expressions);
+			List<Node> nodes = getNodes(expressions);
 
 			// build the loops from the inside out
 			ListIterator<AstGenerator> it = generators.listIterator(generators
@@ -538,7 +538,7 @@ public class AstTransformer {
 				block.add(assignInit);
 
 				// nodes
-				nodes = new ArrayList<CFGNode>(2);
+				nodes = new ArrayList<Node>(2);
 				nodes.add(block);
 				nodes.add(nodeWhile);
 			}
@@ -709,7 +709,7 @@ public class AstTransformer {
 					IrFactory.eINSTANCE.createTypeBool());
 
 			// body
-			List<CFGNode> nodes = getNodes(foreach.getStatements());
+			List<Node> nodes = getNodes(foreach.getStatements());
 			NodeBlock block = procedure.getLast(nodes);
 			assign = new Assign(location, loopVar, new BinaryExpr(new VarExpr(
 					new Use(loopVar)), BinaryOp.PLUS, new IntExpr(1),
@@ -735,8 +735,8 @@ public class AstTransformer {
 			Expression condition = transformExpression(stmtIf.getCondition());
 
 			// transforms "then" statements and "else" statements
-			List<CFGNode> thenNodes = getNodes(stmtIf.getThen());
-			List<CFGNode> elseNodes = getNodes(stmtIf.getElse());
+			List<Node> thenNodes = getNodes(stmtIf.getThen());
+			List<Node> elseNodes = getNodes(stmtIf.getElse());
 
 			NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
 			node.setLocation(location);
@@ -756,7 +756,7 @@ public class AstTransformer {
 
 			Expression condition = transformExpression(stmtWhile.getCondition());
 
-			List<CFGNode> nodes = getNodes(stmtWhile.getStatements());
+			List<Node> nodes = getNodes(stmtWhile.getStatements());
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setLocation(location);
@@ -778,8 +778,8 @@ public class AstTransformer {
 		 *            a list of statements
 		 * @return a list of CFG nodes
 		 */
-		private List<CFGNode> getNodes(List<AstStatement> statements) {
-			List<CFGNode> nodes = context.getProcedure().getNodes();
+		private List<Node> getNodes(List<AstStatement> statements) {
+			List<Node> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -787,8 +787,8 @@ public class AstTransformer {
 			int last = nodes.size();
 
 			// moves selected CFG nodes from "nodes" list to resultNodes
-			List<CFGNode> subList = nodes.subList(first, last);
-			List<CFGNode> resultNodes = new ArrayList<CFGNode>(subList);
+			List<Node> subList = nodes.subList(first, last);
+			List<Node> resultNodes = new ArrayList<Node>(subList);
 			subList.clear();
 
 			return resultNodes;

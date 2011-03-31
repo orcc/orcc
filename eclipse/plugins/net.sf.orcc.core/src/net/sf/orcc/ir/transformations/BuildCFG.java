@@ -32,7 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFG;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -65,7 +65,7 @@ public class BuildCFG extends AbstractActorVisitor {
 
 		@Override
 		public Object interpret(NodeBlock node, Object... args) {
-			CFGNode previous = (CFGNode) args[0];
+			Node previous = (Node) args[0];
 			graph.addVertex(node);
 			if (previous != null) {
 				graph.addEdge(previous, node);
@@ -76,27 +76,27 @@ public class BuildCFG extends AbstractActorVisitor {
 
 		@Override
 		public Object interpret(NodeIf node, Object... args) {
-			CFGNode previous = (CFGNode) args[0];
-			CFGNode last;
+			Node previous = (Node) args[0];
+			Node last;
 			graph.addVertex(node);
 			if (previous != null) {
 				graph.addEdge(previous, node);
 			}
 
-			CFGNode join = node.getJoinNode();
+			Node join = node.getJoinNode();
 			graph.addVertex(join);
 
 			if (node.getThenNodes().isEmpty()) {
 				graph.addEdge(previous, join);
 			} else {
-				last = (CFGNode) visit(node.getThenNodes(), node);
+				last = (Node) visit(node.getThenNodes(), node);
 				graph.addEdge(last, join);
 			}
 
 			if (node.getElseNodes().isEmpty()) {
 				graph.addEdge(previous, join);
 			} else {
-				last = (CFGNode) visit(node.getElseNodes(), node);
+				last = (Node) visit(node.getElseNodes(), node);
 				graph.addEdge(last, join);
 			}
 
@@ -105,9 +105,9 @@ public class BuildCFG extends AbstractActorVisitor {
 
 		@Override
 		public Object interpret(NodeWhile node, Object... args) {
-			CFGNode previous = (CFGNode) args[0];
+			Node previous = (Node) args[0];
 
-			CFGNode join = node.getJoinNode();
+			Node join = node.getJoinNode();
 			graph.addVertex(join);
 
 			if (previous != null) {
@@ -117,7 +117,7 @@ public class BuildCFG extends AbstractActorVisitor {
 			graph.addVertex(node);
 			graph.addEdge(join, node);
 
-			CFGNode last = (CFGNode) visit(node.getNodes(), join);
+			Node last = (Node) visit(node.getNodes(), join);
 			graph.addEdge(last, join);
 
 			return node;
@@ -132,9 +132,9 @@ public class BuildCFG extends AbstractActorVisitor {
 		 *            the previous node, or <code>null</code> if there is none
 		 * @return the last node of the node list
 		 */
-		public Object visit(List<CFGNode> nodes, CFGNode previous) {
+		public Object visit(List<Node> nodes, Node previous) {
 			Object last = previous;
-			for (CFGNode node : nodes) {
+			for (Node node : nodes) {
 				last = node.accept(this, last);
 			}
 

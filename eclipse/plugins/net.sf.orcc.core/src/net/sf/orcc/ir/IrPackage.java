@@ -317,24 +317,23 @@ public interface IrPackage extends EPackage {
 
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.CFGNodeImpl <em>CFG Node</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.CFGNodeImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getCFGNode()
+	 * @see net.sf.orcc.ir.impl.NodeImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
 	 * @generated
 	 */
-	int CFG_NODE = 11;
+	int NODE = 15;
 
 	/**
-	 * The number of structural features of the '<em>CFG Node</em>' class.
+	 * The number of structural features of the '<em>Node</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CFG_NODE_FEATURE_COUNT = USER_FEATURE_COUNT + 0;
-
+	int NODE_FEATURE_COUNT = USER_FEATURE_COUNT + 0;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl <em>Node Block</em>}' class.
@@ -344,7 +343,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeBlock()
 	 * @generated
 	 */
-	int NODE_BLOCK = 12;
+	int NODE_BLOCK = 11;
 
 	/**
 	 * The feature id for the '<em><b>Instructions</b></em>' containment reference list.
@@ -353,7 +352,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_BLOCK__INSTRUCTIONS = CFG_NODE_FEATURE_COUNT + 0;
+	int NODE_BLOCK__INSTRUCTIONS = NODE_FEATURE_COUNT + 0;
 
 	/**
 	 * The number of structural features of the '<em>Node Block</em>' class.
@@ -362,7 +361,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_BLOCK_FEATURE_COUNT = CFG_NODE_FEATURE_COUNT + 1;
+	int NODE_BLOCK_FEATURE_COUNT = NODE_FEATURE_COUNT + 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeIfImpl <em>Node If</em>}' class.
@@ -372,7 +371,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeIf()
 	 * @generated
 	 */
-	int NODE_IF = 13;
+	int NODE_IF = 12;
 
 	/**
 	 * The feature id for the '<em><b>Else Nodes</b></em>' containment reference list.
@@ -381,7 +380,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF__ELSE_NODES = CFG_NODE_FEATURE_COUNT + 0;
+	int NODE_IF__ELSE_NODES = NODE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
@@ -390,7 +389,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF__JOIN_NODE = CFG_NODE_FEATURE_COUNT + 1;
+	int NODE_IF__JOIN_NODE = NODE_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Then Nodes</b></em>' containment reference list.
@@ -399,7 +398,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF__THEN_NODES = CFG_NODE_FEATURE_COUNT + 2;
+	int NODE_IF__THEN_NODES = NODE_FEATURE_COUNT + 2;
 
 	/**
 	 * The number of structural features of the '<em>Node If</em>' class.
@@ -408,7 +407,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF_FEATURE_COUNT = CFG_NODE_FEATURE_COUNT + 3;
+	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl <em>Node While</em>}' class.
@@ -418,7 +417,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeWhile()
 	 * @generated
 	 */
-	int NODE_WHILE = 14;
+	int NODE_WHILE = 13;
 
 	/**
 	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
@@ -427,7 +426,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_WHILE__JOIN_NODE = CFG_NODE_FEATURE_COUNT + 0;
+	int NODE_WHILE__JOIN_NODE = NODE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
@@ -436,7 +435,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_WHILE__NODES = CFG_NODE_FEATURE_COUNT + 1;
+	int NODE_WHILE__NODES = NODE_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Node While</em>' class.
@@ -445,7 +444,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_WHILE_FEATURE_COUNT = CFG_NODE_FEATURE_COUNT + 2;
+	int NODE_WHILE_FEATURE_COUNT = NODE_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.ValueContainer <em>Value Container</em>}' class.
@@ -455,7 +454,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getValueContainer()
 	 * @generated
 	 */
-	int VALUE_CONTAINER = 15;
+	int VALUE_CONTAINER = 14;
 
 	/**
 	 * The number of structural features of the '<em>Value Container</em>' class.
@@ -633,16 +632,6 @@ public interface IrPackage extends EPackage {
 	EClass getUser();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.CFGNode <em>CFG Node</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>CFG Node</em>'.
-	 * @see net.sf.orcc.ir.CFGNode
-	 * @generated
-	 */
-	EClass getCFGNode();
-
-	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeBlock <em>Node Block</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -748,6 +737,16 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getValueContainer();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Node <em>Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Node</em>'.
+	 * @see net.sf.orcc.ir.Node
+	 * @generated
+	 */
+	EClass getNode();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -922,16 +921,6 @@ public interface IrPackage extends EPackage {
 		EClass USER = eINSTANCE.getUser();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.CFGNodeImpl <em>CFG Node</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.CFGNodeImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getCFGNode()
-		 * @generated
-		 */
-		EClass CFG_NODE = eINSTANCE.getCFGNode();
-
-		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl <em>Node Block</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -1018,6 +1007,16 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass VALUE_CONTAINER = eINSTANCE.getValueContainer();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.NodeImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
+		 * @generated
+		 */
+		EClass NODE = eINSTANCE.getNode();
 
 
 	}

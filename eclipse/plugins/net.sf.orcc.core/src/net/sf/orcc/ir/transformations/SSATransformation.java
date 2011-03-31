@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalTargetContainer;
@@ -154,22 +154,22 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * @param node
 	 *            a CFG node
 	 */
-	private void findNodes(Set<CFGNode> nodes, CFGNode node) {
+	private void findNodes(Set<Node> nodes, Node node) {
 		nodes.add(node);
 		if (node.isIfNode()) {
 			NodeIf nodeIf = (NodeIf) node;
-			for (CFGNode subNode : nodeIf.getThenNodes()) {
+			for (Node subNode : nodeIf.getThenNodes()) {
 				findNodes(nodes, subNode);
 			}
 
-			for (CFGNode subNode : nodeIf.getElseNodes()) {
+			for (Node subNode : nodeIf.getElseNodes()) {
 				findNodes(nodes, subNode);
 			}
 
 			nodes.add(nodeIf.getJoinNode());
 		} else if (node.isWhileNode()) {
 			NodeWhile nodeWhile = (NodeWhile) node;
-			for (CFGNode subNode : nodeWhile.getNodes()) {
+			for (Node subNode : nodeWhile.getNodes()) {
 				findNodes(nodes, subNode);
 			}
 			nodes.add(nodeWhile.getJoinNode());
@@ -314,14 +314,14 @@ public class SSATransformation extends AbstractActorVisitor {
 	 */
 	private void replaceUsesInLoop(LocalVariable oldVar, LocalVariable newVar) {
 		List<Use> uses = new ArrayList<Use>(oldVar.getUses());
-		Set<CFGNode> nodes = new HashSet<CFGNode>();
+		Set<Node> nodes = new HashSet<Node>();
 		findNodes(nodes, loop);
 
 		for (Use use : uses) {
 			User user = use.getNode();
-			CFGNode node;
+			Node node;
 			if (user.isCFGNode()) {
-				node = (CFGNode) user;
+				node = (Node) user;
 			} else {
 				Instruction instruction = (Instruction) user;
 				node = instruction.getBlock();

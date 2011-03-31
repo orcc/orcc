@@ -40,7 +40,7 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
@@ -468,7 +468,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				+ action.getName());
 		Procedure body = newProcessAction.getBody();
 
-		ListIterator<CFGNode> listIt = action.getBody().getNodes()
+		ListIterator<Node> listIt = action.getBody().getNodes()
 				.listIterator();
 		moveNodes(listIt, body);
 		Iterator<LocalVariable> it = action.getBody().getLocals().iterator();
@@ -996,7 +996,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
-	 * This method moves the nodes of a procedure to another using a CFGNode
+	 * This method moves the nodes of a procedure to another using a Node
 	 * iterator
 	 * 
 	 * @param itNode
@@ -1004,9 +1004,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param newProc
 	 *            target procedure
 	 */
-	private void moveNodes(ListIterator<CFGNode> itNode, Procedure newProc) {
+	private void moveNodes(ListIterator<Node> itNode, Procedure newProc) {
 		while (itNode.hasNext()) {
-			CFGNode node = itNode.next();
+			Node node = itNode.next();
 			itNode.remove();
 			newProc.getNodes().add(node);
 		}

@@ -35,7 +35,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
@@ -349,8 +349,8 @@ public class IRCloner {
 			nodeIf.setLocation(location);
 			Expression value = cloneExpression(node.getValue());
 			nodeIf.setValue(value);
-			List<CFGNode> thenNodes = cloneNodes(node.getThenNodes());
-			List<CFGNode> elseNodes = cloneNodes(node.getElseNodes());
+			List<Node> thenNodes = cloneNodes(node.getThenNodes());
+			List<Node> elseNodes = cloneNodes(node.getElseNodes());
 			NodeBlock joinNode = (NodeBlock) cloneNode(node.getJoinNode());
 
 			node.getThenNodes().addAll(thenNodes);
@@ -364,7 +364,7 @@ public class IRCloner {
 		public Object interpret(NodeWhile node, Object... args) {
 			Location location = cloneLocation(node.getLocation());
 			Expression value = cloneExpression(node.getValue());
-			List<CFGNode> nodes = cloneNodes(node.getNodes());
+			List<Node> nodes = cloneNodes(node.getNodes());
 			NodeBlock joinNode = (NodeBlock) cloneNode(node.getJoinNode());
 			
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
@@ -499,8 +499,8 @@ public class IRCloner {
 		return (MoC) moc.accept(new MoCCloner());
 	}
 
-	private static CFGNode cloneNode(CFGNode node) {
-		return (CFGNode) node.accept(new NodeCloner());
+	private static Node cloneNode(Node node) {
+		return (Node) node.accept(new NodeCloner());
 	}
 
 	/**
@@ -510,9 +510,9 @@ public class IRCloner {
 	 *            a list of nodes to clone
 	 * @return the cloned nodes
 	 */
-	private static List<CFGNode> cloneNodes(List<CFGNode> nodes) {
-		List<CFGNode> cloneNodes = new ArrayList<CFGNode>();
-		for (CFGNode node : nodes) {
+	private static List<Node> cloneNodes(List<Node> nodes) {
+		List<Node> cloneNodes = new ArrayList<Node>();
+		for (Node node : nodes) {
 			cloneNodes.add(cloneNode(node));
 		}
 
@@ -1035,7 +1035,7 @@ public class IRCloner {
 		localVars.putAll(parameters);
 		localVars.putAll(locals);
 
-		List<CFGNode> nodes = cloneNodes(procedure.getNodes());
+		List<Node> nodes = cloneNodes(procedure.getNodes());
 
 		return new Procedure(procedure.getName(), procedure.isNative(),
 				procedure.getLocation(), returnType, parameters, locals, nodes);

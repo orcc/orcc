@@ -12,7 +12,7 @@ import java.util.Set;
 
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.CFGEdge;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
@@ -28,13 +28,13 @@ import org.eclipse.emf.ecore.EClass;
  *
  * @generated
  */
-public abstract class CFGNodeImpl extends UserImpl implements CFGNode {
+public abstract class NodeImpl extends UserImpl implements Node {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected CFGNodeImpl() {
+	protected NodeImpl() {
 		super();
 	}
 
@@ -45,7 +45,7 @@ public abstract class CFGNodeImpl extends UserImpl implements CFGNode {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.CFG_NODE;
+		return IrPackage.Literals.NODE;
 	}
 	
 	private static int labelCount;
@@ -69,7 +69,7 @@ public abstract class CFGNodeImpl extends UserImpl implements CFGNode {
 	 * @see #resetLabelCount()
 	 */
 	public static void setLabelCount(int labelCount) {
-		CFGNodeImpl.labelCount = labelCount;
+		NodeImpl.labelCount = labelCount;
 	}
 
 	private int label;
@@ -78,7 +78,7 @@ public abstract class CFGNodeImpl extends UserImpl implements CFGNode {
 
 	private Procedure procedure;
 
-	protected CFGNodeImpl(Location location, Procedure procedure) {
+	protected NodeImpl(Location location, Procedure procedure) {
 		this.location = location;
 		this.procedure = procedure;
 		labelCount++;
@@ -96,7 +96,7 @@ public abstract class CFGNodeImpl extends UserImpl implements CFGNode {
 	}
 
 	@Override
-	public List<CFGNode> getPredecessors() {
+	public List<Node> getPredecessors() {
 		if (procedure == null) {
 			return null;
 		}
@@ -107,7 +107,7 @@ public abstract class CFGNodeImpl extends UserImpl implements CFGNode {
 		}
 
 		Set<CFGEdge> edges = cfg.incomingEdgesOf(this);
-		List<CFGNode> predecessors = new ArrayList<CFGNode>(edges.size());
+		List<Node> predecessors = new ArrayList<Node>(edges.size());
 		for (CFGEdge edge : edges) {
 			predecessors.add(cfg.getEdgeSource(edge));
 		}
@@ -120,7 +120,7 @@ public abstract class CFGNodeImpl extends UserImpl implements CFGNode {
 	}
 
 	@Override
-	public List<CFGNode> getSuccessors() {
+	public List<Node> getSuccessors() {
 		if (procedure == null) {
 			return null;
 		}
@@ -131,7 +131,7 @@ public abstract class CFGNodeImpl extends UserImpl implements CFGNode {
 		}
 
 		Set<CFGEdge> edges = cfg.outgoingEdgesOf(this);
-		List<CFGNode> successors = new ArrayList<CFGNode>(edges.size());
+		List<Node> successors = new ArrayList<Node>(edges.size());
 		for (CFGEdge edge : edges) {
 			successors.add(cfg.getEdgeTarget(edge));
 		}
@@ -172,4 +172,4 @@ public abstract class CFGNodeImpl extends UserImpl implements CFGNode {
 		this.procedure = procedure;
 	}
 
-} //CFGNodeImpl
+} //NodeImpl

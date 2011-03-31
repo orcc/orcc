@@ -39,7 +39,7 @@ import net.sf.orcc.ir.nodes.NodeVisitor;
  * @author Matthieu Wipliez
  * @model abstract="true"
  */
-public interface CFGNode extends User {
+public interface Node extends User {
 
 	/**
 	 * Accepts the given node interpreter.
@@ -81,7 +81,7 @@ public interface CFGNode extends User {
 	 * 
 	 * @return the predecessors of this node in the CFG
 	 */
-	public List<CFGNode> getPredecessors();
+	public List<Node> getPredecessors();
 
 	/**
 	 * Returns the procedure this node belongs to.
@@ -95,7 +95,7 @@ public interface CFGNode extends User {
 	 * 
 	 * @return the successors of this node in the CFG
 	 */
-	public List<CFGNode> getSuccessors();
+	public List<Node> getSuccessors();
 
 	/**
 	 * Returns <code>true</code> if this node is a NodeBlock.

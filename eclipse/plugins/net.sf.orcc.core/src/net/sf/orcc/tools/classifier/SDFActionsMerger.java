@@ -37,7 +37,7 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
@@ -97,7 +97,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
 				outputPattern);
 		actor.getProcs().put(body.getName(), body);
-		List<CFGNode> thenNodes = nodeIf.getThenNodes();
+		List<Node> thenNodes = nodeIf.getThenNodes();
 		NodeBlock node = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
 		node.add(new Call(new Location(), null, body, callExprs));
@@ -244,7 +244,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		// Launch action
-		List<CFGNode> elseNodes = target.getNodes();
+		List<Node> elseNodes = target.getNodes();
 
 		for (Action action : actions) {
 			Pattern input = action.getInputPattern();

@@ -36,7 +36,7 @@ import java.util.Map;
 
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
@@ -140,13 +140,13 @@ public class InlineTransformation extends AbstractActorVisitor {
 		public Object interpret(NodeIf node, Object... args) {
 			Expression condition = (Expression) node.getValue().accept(this,
 					args);
-			List<CFGNode> thenNodes = new ArrayList<CFGNode>();
-			for (CFGNode n : node.getThenNodes()) {
-				thenNodes.add((CFGNode) n.accept(this, args));
+			List<Node> thenNodes = new ArrayList<Node>();
+			for (Node n : node.getThenNodes()) {
+				thenNodes.add((Node) n.accept(this, args));
 			}
-			List<CFGNode> elseNodes = new ArrayList<CFGNode>();
-			for (CFGNode n : node.getElseNodes()) {
-				elseNodes.add((CFGNode) n.accept(this, args));
+			List<Node> elseNodes = new ArrayList<Node>();
+			for (Node n : node.getElseNodes()) {
+				elseNodes.add((Node) n.accept(this, args));
 			}
 			NodeBlock joinNode = (NodeBlock) node.getJoinNode().accept(this,
 					args);
@@ -299,9 +299,9 @@ public class InlineTransformation extends AbstractActorVisitor {
 		public Object interpret(NodeWhile node, Object... args) {
 			Expression condition = (Expression) node.getValue().accept(this,
 					args);
-			List<CFGNode> nodes = new ArrayList<CFGNode>();
-			for (CFGNode n : node.getNodes()) {
-				nodes.add((CFGNode) n.accept(this, args));
+			List<Node> nodes = new ArrayList<Node>();
+			for (Node n : node.getNodes()) {
+				nodes.add((Node) n.accept(this, args));
 			}
 			NodeBlock joinNode = (NodeBlock) node.getJoinNode().accept(this,
 					args);
@@ -379,7 +379,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 			}
 		}
 
-		List<CFGNode> nodes = new ArrayList<CFGNode>();
+		List<Node> nodes = new ArrayList<Node>();
 
 		// Assign all parameters except for list
 		NodeBlock newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -400,8 +400,8 @@ public class InlineTransformation extends AbstractActorVisitor {
 		}
 
 		// Clone function/procedure body
-		for (CFGNode node : function.getNodes()) {
-			nodes.add((CFGNode) node.accept(inlineCloner, (Object) null));
+		for (Node node : function.getNodes()) {
+			nodes.add((Node) node.accept(inlineCloner, (Object) null));
 		}
 
 		// Remove old block and add the new ones
@@ -416,7 +416,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 
 		nodes.add(secondBlockNodePart);
 
-		for (CFGNode node : nodes) {
+		for (Node node : nodes) {
 			itNode.add(node);
 		}
 
@@ -470,7 +470,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(NodeWhile nodeWhile) {
-		ListIterator<CFGNode> oldNodeIterator = itNode;
+		ListIterator<Node> oldNodeIterator = itNode;
 		visit(nodeWhile.getNodes());
 		itNode = oldNodeIterator;
 		visit(nodeWhile.getJoinNode());
@@ -478,7 +478,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(NodeIf nodeIf) {
-		ListIterator<CFGNode> oldNodeIterator = itNode;
+		ListIterator<Node> oldNodeIterator = itNode;
 		visit(nodeIf.getThenNodes());
 		visit(nodeIf.getElseNodes());
 		itNode = oldNodeIterator;

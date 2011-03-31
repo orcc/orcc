@@ -32,7 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
@@ -259,7 +259,7 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 
 		for (Expression value : values) {
 			int indexValue = values.indexOf(value);
-			CFGNode node = phi.getBlock().getPredecessors().get(indexValue);
+			Node node = phi.getBlock().getPredecessors().get(indexValue);
 
 			if (node.isBlockNode()) {
 				itInstruction = ((NodeBlock) node).lastListIterator();

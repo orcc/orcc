@@ -37,7 +37,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class NodeBlockImpl extends CFGNodeImpl implements NodeBlock {
+public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	/**
 	 * The cached value of the '{@link #getInstructions() <em>Instructions</em>}' containment reference list.
 	 * <!-- begin-user-doc -->

@@ -8,7 +8,7 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.NodeBlock;
@@ -40,7 +40,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class NodeIfImpl extends CFGNodeImpl implements NodeIf {
+public class NodeIfImpl extends NodeImpl implements NodeIf {
 	/**
 	 * The cached value of the '{@link #getElseNodes() <em>Else Nodes</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -48,7 +48,7 @@ public class NodeIfImpl extends CFGNodeImpl implements NodeIf {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<CFGNode> elseNodes;
+	protected EList<Node> elseNodes;
 
 	/**
 	 * The cached value of the '{@link #getJoinNode() <em>Join Node</em>}' containment reference.
@@ -66,7 +66,7 @@ public class NodeIfImpl extends CFGNodeImpl implements NodeIf {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<CFGNode> thenNodes;
+	protected EList<Node> thenNodes;
 
 	private Expression value;
 
@@ -165,14 +165,14 @@ public class NodeIfImpl extends CFGNodeImpl implements NodeIf {
 		switch (featureID) {
 			case IrPackage.NODE_IF__ELSE_NODES:
 				getElseNodes().clear();
-				getElseNodes().addAll((Collection<? extends CFGNode>)newValue);
+				getElseNodes().addAll((Collection<? extends Node>)newValue);
 				return;
 			case IrPackage.NODE_IF__JOIN_NODE:
 				setJoinNode((NodeBlock)newValue);
 				return;
 			case IrPackage.NODE_IF__THEN_NODES:
 				getThenNodes().clear();
-				getThenNodes().addAll((Collection<? extends CFGNode>)newValue);
+				getThenNodes().addAll((Collection<? extends Node>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -211,9 +211,9 @@ public class NodeIfImpl extends CFGNodeImpl implements NodeIf {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<CFGNode> getElseNodes() {
+	public EList<Node> getElseNodes() {
 		if (elseNodes == null) {
-			elseNodes = new EObjectContainmentEList<CFGNode>(CFGNode.class, this, IrPackage.NODE_IF__ELSE_NODES);
+			elseNodes = new EObjectContainmentEList<Node>(Node.class, this, IrPackage.NODE_IF__ELSE_NODES);
 		}
 		return elseNodes;
 	}
@@ -230,9 +230,9 @@ public class NodeIfImpl extends CFGNodeImpl implements NodeIf {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<CFGNode> getThenNodes() {
+	public EList<Node> getThenNodes() {
 		if (thenNodes == null) {
-			thenNodes = new EObjectContainmentEList<CFGNode>(CFGNode.class, this, IrPackage.NODE_IF__THEN_NODES);
+			thenNodes = new EObjectContainmentEList<Node>(Node.class, this, IrPackage.NODE_IF__THEN_NODES);
 		}
 		return thenNodes;
 	}

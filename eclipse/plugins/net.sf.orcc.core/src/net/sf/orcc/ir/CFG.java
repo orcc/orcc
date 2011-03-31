@@ -50,20 +50,20 @@ import org.jgrapht.graph.DefaultDirectedGraph;
  * @author Matthieu Wipliez
  * 
  */
-public class CFG extends DefaultDirectedGraph<CFGNode, CFGEdge> {
+public class CFG extends DefaultDirectedGraph<Node, CFGEdge> {
 
-	private class CFGNodeNameProvider implements VertexNameProvider<CFGNode> {
+	private class CFGNodeNameProvider implements VertexNameProvider<Node> {
 
 		private int nodeCount;
 
-		private Map<CFGNode, Integer> nodeMap;
+		private Map<Node, Integer> nodeMap;
 
 		public CFGNodeNameProvider() {
-			nodeMap = new HashMap<CFGNode, Integer>();
+			nodeMap = new HashMap<Node, Integer>();
 		}
 
 		@Override
-		public String getVertexName(CFGNode node) {
+		public String getVertexName(Node node) {
 			Integer id = nodeMap.get(node);
 			if (id == null) {
 				nodeCount++;
@@ -96,9 +96,9 @@ public class CFG extends DefaultDirectedGraph<CFGNode, CFGEdge> {
 	public void printGraph(File file) throws OrccException {
 		try {
 			OutputStream out = new FileOutputStream(file);
-			DOTExporter<CFGNode, CFGEdge> exporter = new DOTExporter<CFGNode, CFGEdge>(
+			DOTExporter<Node, CFGEdge> exporter = new DOTExporter<Node, CFGEdge>(
 					new CFGNodeNameProvider(),
-					new StringNameProvider<CFGNode>(),
+					new StringNameProvider<Node>(),
 					new StringEdgeNameProvider<CFGEdge>());
 			exporter.export(new OutputStreamWriter(out), this);
 		} catch (IOException e) {

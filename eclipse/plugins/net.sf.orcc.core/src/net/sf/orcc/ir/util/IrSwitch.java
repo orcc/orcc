@@ -161,17 +161,10 @@ public class IrSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.CFG_NODE: {
-				CFGNode cfgNode = (CFGNode)theEObject;
-				T result = caseCFGNode(cfgNode);
-				if (result == null) result = caseUser(cfgNode);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case IrPackage.NODE_BLOCK: {
 				NodeBlock nodeBlock = (NodeBlock)theEObject;
 				T result = caseNodeBlock(nodeBlock);
-				if (result == null) result = caseCFGNode(nodeBlock);
+				if (result == null) result = caseNode(nodeBlock);
 				if (result == null) result = caseUser(nodeBlock);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
@@ -179,7 +172,7 @@ public class IrSwitch<T> {
 			case IrPackage.NODE_IF: {
 				NodeIf nodeIf = (NodeIf)theEObject;
 				T result = caseNodeIf(nodeIf);
-				if (result == null) result = caseCFGNode(nodeIf);
+				if (result == null) result = caseNode(nodeIf);
 				if (result == null) result = caseValueContainer(nodeIf);
 				if (result == null) result = caseUser(nodeIf);
 				if (result == null) result = defaultCase(theEObject);
@@ -188,9 +181,16 @@ public class IrSwitch<T> {
 			case IrPackage.NODE_WHILE: {
 				NodeWhile nodeWhile = (NodeWhile)theEObject;
 				T result = caseNodeWhile(nodeWhile);
-				if (result == null) result = caseCFGNode(nodeWhile);
+				if (result == null) result = caseNode(nodeWhile);
 				if (result == null) result = caseValueContainer(nodeWhile);
 				if (result == null) result = caseUser(nodeWhile);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.NODE: {
+				Node node = (Node)theEObject;
+				T result = caseNode(node);
+				if (result == null) result = caseUser(node);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -364,21 +364,6 @@ public class IrSwitch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>CFG Node</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>CFG Node</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseCFGNode(CFGNode object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Node Block</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -435,6 +420,21 @@ public class IrSwitch<T> {
 	 * @generated
 	 */
 	public T caseValueContainer(ValueContainer object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Node</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Node</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseNode(Node object) {
 		return null;
 	}
 

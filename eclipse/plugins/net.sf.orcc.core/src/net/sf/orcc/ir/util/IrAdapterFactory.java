@@ -116,10 +116,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createUserAdapter();
 			}
 			@Override
-			public Adapter caseCFGNode(CFGNode object) {
-				return createCFGNodeAdapter();
-			}
-			@Override
 			public Adapter caseNodeBlock(NodeBlock object) {
 				return createNodeBlockAdapter();
 			}
@@ -134,6 +130,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseValueContainer(ValueContainer object) {
 				return createValueContainerAdapter();
+			}
+			@Override
+			public Adapter caseNode(Node object) {
+				return createNodeAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -310,20 +310,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.CFGNode <em>CFG Node</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.CFGNode
-	 * @generated
-	 */
-	public Adapter createCFGNodeAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.NodeBlock <em>Node Block</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -376,6 +362,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createValueContainerAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Node <em>Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Node
+	 * @generated
+	 */
+	public Adapter createNodeAdapter() {
 		return null;
 	}
 

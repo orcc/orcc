@@ -35,7 +35,7 @@ import java.util.ListIterator;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
@@ -53,7 +53,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.impl.CFGNodeImpl;
+import net.sf.orcc.ir.impl.NodeImpl;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
@@ -155,7 +155,7 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 	 * @param it
 	 * @return
 	 */
-	private ListIterator<Instruction> getItr(ListIterator<CFGNode> it) {
+	private ListIterator<Instruction> getItr(ListIterator<Node> it) {
 		// Create a new basic block
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
@@ -249,10 +249,10 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 	public void visit(Procedure procedure) {
 		// set the label counter to prevent new nodes from having the same label
 		// as existing nodes
-		List<CFGNode> nodes = procedure.getNodes();
+		List<Node> nodes = procedure.getNodes();
 		if (nodes.size() > 0) {
-			CFGNode lastNode = nodes.get(nodes.size() - 1);
-			CFGNodeImpl.setLabelCount(lastNode.getLabel() + 2);
+			Node lastNode = nodes.get(nodes.size() - 1);
+			NodeImpl.setLabelCount(lastNode.getLabel() + 2);
 		}
 		super.visit(procedure);
 	}

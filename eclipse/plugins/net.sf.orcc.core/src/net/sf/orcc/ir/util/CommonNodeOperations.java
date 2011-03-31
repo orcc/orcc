@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.util;
 
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalTargetContainer;
@@ -93,7 +93,7 @@ public class CommonNodeOperations {
 	 * Sets the value of the given user.
 	 * 
 	 * @param user
-	 *            an {@link CFGNode} or an {@link Instruction} that implements
+	 *            an {@link Node} or an {@link Instruction} that implements
 	 *            {@link ValueContainer}
 	 * @param value
 	 *            an expression

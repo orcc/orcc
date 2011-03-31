@@ -36,7 +36,7 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Type;
@@ -90,7 +90,7 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor {
 		}
 
 		for (Action action : actor.getInitializes()) {
-			for (CFGNode node : action.getBody().getNodes()) {
+			for (Node node : action.getBody().getNodes()) {
 				node.accept(actorInterpreter);
 				node.accept(this);
 				

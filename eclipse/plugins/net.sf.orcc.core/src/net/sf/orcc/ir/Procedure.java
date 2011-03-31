@@ -68,13 +68,13 @@ public class Procedure {
 	 *            a list of nodes of the given procedure
 	 * @return a block
 	 */
-	public NodeBlock getFirst(List<CFGNode> nodes) {
+	public NodeBlock getFirst(List<Node> nodes) {
 		NodeBlock block;
 		if (nodes.isEmpty()) {
 			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			nodes.add(block);
 		} else {
-			CFGNode node = nodes.get(0);
+			Node node = nodes.get(0);
 			if (node.isBlockNode()) {
 				block = (NodeBlock) node;
 			} else {
@@ -109,13 +109,13 @@ public class Procedure {
 	 *            nodes
 	 * @return a block
 	 */
-	public NodeBlock getLast(List<CFGNode> nodes) {
+	public NodeBlock getLast(List<Node> nodes) {
 		NodeBlock block;
 		if (nodes.isEmpty()) {
 			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			nodes.add(block);
 		} else {
-			CFGNode node = nodes.get(nodes.size() - 1);
+			Node node = nodes.get(nodes.size() - 1);
 			if (node.isBlockNode()) {
 				block = (NodeBlock) node;
 			} else {
@@ -192,7 +192,7 @@ public class Procedure {
 	/**
 	 * the list of nodes of this procedure
 	 */
-	private List<CFGNode> nodes;
+	private List<Node> nodes;
 
 	/**
 	 * ordered map of parameters
@@ -223,7 +223,7 @@ public class Procedure {
 	 */
 	public Procedure(String name, boolean nativeFlag, Location location,
 			Type returnType, OrderedMap<String, LocalVariable> parameters,
-			OrderedMap<String, LocalVariable> locals, List<CFGNode> nodes) {
+			OrderedMap<String, LocalVariable> locals, List<Node> nodes) {
 		this.location = location;
 		this.nativeFlag = nativeFlag;
 		this.nodes = nodes;
@@ -249,7 +249,7 @@ public class Procedure {
 	public Procedure(String name, Location location, Type returnType) {
 		this.location = location;
 		this.nativeFlag = false;
-		this.nodes = new ArrayList<CFGNode>();
+		this.nodes = new ArrayList<Node>();
 		this.locals = new OrderedMap<String, LocalVariable>();
 		this.name = name;
 		this.parameters = new OrderedMap<String, LocalVariable>();
@@ -310,7 +310,7 @@ public class Procedure {
 	 * 
 	 * @return the list of nodes of this procedure
 	 */
-	public List<CFGNode> getNodes() {
+	public List<Node> getNodes() {
 		return nodes;
 	}
 
@@ -425,7 +425,7 @@ public class Procedure {
 	 * @param nodes
 	 *            a list of CFG nodes
 	 */
-	public void setNodes(List<CFGNode> nodes) {
+	public void setNodes(List<Node> nodes) {
 		this.nodes = nodes;
 	}
 

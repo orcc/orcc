@@ -31,7 +31,7 @@ package net.sf.orcc.backends.vhdl.transformations;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.NodeBlock;
@@ -99,9 +99,9 @@ public class CodeMover extends AbstractActorVisitor {
 	 * @param itNode
 	 *            a list iterator of nodes
 	 */
-	public void moveNodes(ListIterator<CFGNode> itNode) {
+	public void moveNodes(ListIterator<Node> itNode) {
 		while (itNode.hasNext()) {
-			CFGNode node = itNode.next();
+			Node node = itNode.next();
 			itNode.remove();
 			node.accept(this);
 

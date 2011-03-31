@@ -71,7 +71,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 
 	protected ListIterator<Instruction> itInstruction;
 
-	protected ListIterator<CFGNode> itNode;
+	protected ListIterator<Node> itNode;
 
 	/**
 	 * current procedure being visited
@@ -218,10 +218,10 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(List<CFGNode> nodes) {
-		ListIterator<CFGNode> it = nodes.listIterator();
+	public void visit(List<Node> nodes) {
+		ListIterator<Node> it = nodes.listIterator();
 		while (it.hasNext()) {
-			CFGNode node = it.next();
+			Node node = it.next();
 			itNode = it;
 			node.accept(this);
 		}
@@ -266,7 +266,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 */
 	public void visit(Procedure procedure) {
 		this.procedure = procedure;
-		List<CFGNode> nodes = procedure.getNodes();
+		List<Node> nodes = procedure.getNodes();
 		visit(nodes);
 	}
 

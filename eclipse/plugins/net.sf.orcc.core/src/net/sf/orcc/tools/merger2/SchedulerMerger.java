@@ -34,7 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IrFactory;
@@ -77,7 +77,7 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 	}
 
 	private Procedure createBody() {
-		List<CFGNode> nodes = new ArrayList<CFGNode>();
+		List<Node> nodes = new ArrayList<Node>();
 
 		Procedure procedure = new Procedure("initCounter", false,
 				new Location(), IrFactory.eINSTANCE.createTypeVoid(),
@@ -104,7 +104,7 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 	}
 
 	private Procedure createScheduler() {
-		List<CFGNode> nodes = new ArrayList<CFGNode>();
+		List<Node> nodes = new ArrayList<Node>();
 
 		Procedure procedure = new Procedure("isSchedulable_initCounter",
 				false, new Location(), IrFactory.eINSTANCE.createTypeBool(),

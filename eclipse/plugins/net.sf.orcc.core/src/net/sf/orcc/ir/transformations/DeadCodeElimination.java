@@ -33,7 +33,7 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
@@ -54,11 +54,11 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
  */
 public class DeadCodeElimination extends AbstractActorVisitor {
 
-	private void addNodes(List<CFGNode> nodes, NodeBlock join, int index) {
+	private void addNodes(List<Node> nodes, NodeBlock join, int index) {
 		itNode.previous();
 		itNode.remove();
 
-		for (CFGNode node : nodes) {
+		for (Node node : nodes) {
 			itNode.add(node);
 		}
 

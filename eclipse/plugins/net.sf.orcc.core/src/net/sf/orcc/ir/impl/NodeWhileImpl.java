@@ -8,7 +8,7 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.NodeBlock;
@@ -39,7 +39,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *
  * @generated
  */
-public class NodeWhileImpl extends CFGNodeImpl implements NodeWhile {
+public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	/**
 	 * The cached value of the '{@link #getJoinNode() <em>Join Node</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -56,7 +56,7 @@ public class NodeWhileImpl extends CFGNodeImpl implements NodeWhile {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<CFGNode> nodes;
+	protected EList<Node> nodes;
 
 	private Expression value;
 
@@ -152,7 +152,7 @@ public class NodeWhileImpl extends CFGNodeImpl implements NodeWhile {
 				return;
 			case IrPackage.NODE_WHILE__NODES:
 				getNodes().clear();
-				getNodes().addAll((Collection<? extends CFGNode>)newValue);
+				getNodes().addAll((Collection<? extends Node>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -196,9 +196,9 @@ public class NodeWhileImpl extends CFGNodeImpl implements NodeWhile {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<CFGNode> getNodes() {
+	public EList<Node> getNodes() {
 		if (nodes == null) {
-			nodes = new EObjectContainmentEList<CFGNode>(CFGNode.class, this, IrPackage.NODE_WHILE__NODES);
+			nodes = new EObjectContainmentEList<Node>(Node.class, this, IrPackage.NODE_WHILE__NODES);
 		}
 		return nodes;
 	}

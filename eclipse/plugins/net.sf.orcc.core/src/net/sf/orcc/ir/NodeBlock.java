@@ -38,10 +38,10 @@ import java.util.ListIterator;
  * instructions.
  * 
  * @author Matthieu Wipliez
- * @model extends="net.sf.orcc.ir.CFGNode"
+ * @model extends="net.sf.orcc.ir.Node"
  * 
  */
-public interface NodeBlock extends CFGNode {
+public interface NodeBlock extends Node {
 
 	/**
 	 * Appends the specified instruction to the end of this block.

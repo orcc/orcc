@@ -67,7 +67,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
@@ -458,7 +458,7 @@ public class IRWriter {
 		return array;
 	}
 
-	private static JsonElement writeNode(CFGNode node) {
+	private static JsonElement writeNode(Node node) {
 		return (JsonElement) node.accept(new NodeWriter());
 	}
 
@@ -469,9 +469,9 @@ public class IRWriter {
 	 *            a list of nodes
 	 * @return a JSON array
 	 */
-	private static JsonArray writeNodes(List<CFGNode> nodes) {
+	private static JsonArray writeNodes(List<Node> nodes) {
 		JsonArray array = new JsonArray();
-		for (CFGNode node : nodes) {
+		for (Node node : nodes) {
 			array.add(writeNode(node));
 		}
 

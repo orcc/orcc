@@ -31,7 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
@@ -135,7 +135,7 @@ public class PhiRemoval extends AbstractActorVisitor {
 	public void visit(NodeWhile node) {
 		// the node before the while.
 		if (itNode.hasPrevious()) {
-			CFGNode previousNode = itNode.previous();
+			Node previousNode = itNode.previous();
 			if (previousNode.isBlockNode()) {
 				targetBlock = (NodeBlock) previousNode;
 			} else {

@@ -40,7 +40,7 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.interpreter.ListAllocator;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.NodeBlock;
@@ -77,9 +77,9 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		public NodeBlock joinNode;
 		public int nbSubNodes;
 		public int subNodeIdx;
-		public List<CFGNode> subNodes;
+		public List<Node> subNodes;
 
-		public NodeInfo(int subNodeIdx, int nbSubNodes, List<CFGNode> subNodes,
+		public NodeInfo(int subNodeIdx, int nbSubNodes, List<Node> subNodes,
 				NodeBlock joinNode, Expression condition) {
 			this.subNodeIdx = subNodeIdx;
 			this.nbSubNodes = nbSubNodes;
@@ -272,7 +272,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 					}
 				}
 			} else {
-				CFGNode subNode = node.subNodes.get(node.subNodeIdx++);
+				Node subNode = node.subNodes.get(node.subNodeIdx++);
 				if (subNode instanceof NodeIf) {
 					Object condition = ((NodeIf) subNode).getValue().accept(
 							exprEvaluator);

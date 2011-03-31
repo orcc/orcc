@@ -32,7 +32,7 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * This interface defines an interface common to {@link Instruction} and
- * {@link CFGNode}.
+ * {@link Node}.
  * 
  * @author Matthieu Wipliez
  * @model abstract="true"

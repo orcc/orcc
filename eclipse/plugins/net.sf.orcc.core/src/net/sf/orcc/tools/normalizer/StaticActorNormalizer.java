@@ -35,7 +35,7 @@ import java.util.List;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
@@ -86,7 +86,7 @@ public class StaticActorNormalizer {
 
 		private List<LocalVariable> indexes;
 
-		private List<CFGNode> nodes;
+		private List<Node> nodes;
 
 		private Procedure procedure;
 
@@ -116,8 +116,8 @@ public class StaticActorNormalizer {
 			block.add(assign);
 
 			// create while
-			List<CFGNode> oldNodes = nodes;
-			nodes = new ArrayList<CFGNode>();
+			List<Node> oldNodes = nodes;
+			nodes = new ArrayList<Node>();
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.getNodes().addAll(nodes);
@@ -277,7 +277,7 @@ public class StaticActorNormalizer {
 				it.remove();
 			}
 
-			List<CFGNode> nodes = scheduler.getNodes();
+			List<Node> nodes = scheduler.getNodes();
 			nodes.clear();
 			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			nodes.add(block);
@@ -310,7 +310,7 @@ public class StaticActorNormalizer {
 	private Procedure createBody() {
 		Location location = new Location();
 		variables = new OrderedMap<String, LocalVariable>();
-		List<CFGNode> nodes = new ArrayList<CFGNode>();
+		List<Node> nodes = new ArrayList<Node>();
 
 		Procedure procedure = new Procedure(ACTION_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeVoid(),
@@ -391,7 +391,7 @@ public class StaticActorNormalizer {
 	private Procedure createScheduler() {
 		Location location = new Location();
 		variables = new OrderedMap<String, LocalVariable>();
-		List<CFGNode> nodes = new ArrayList<CFGNode>();
+		List<Node> nodes = new ArrayList<Node>();
 
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),

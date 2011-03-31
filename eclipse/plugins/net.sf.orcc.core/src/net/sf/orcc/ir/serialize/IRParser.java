@@ -69,7 +69,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
@@ -103,7 +103,7 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.impl.CFGNodeImpl;
+import net.sf.orcc.ir.impl.NodeImpl;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
@@ -706,7 +706,7 @@ public class IRParser {
 	 *            a JSON array
 	 * @return a CFG node
 	 */
-	private CFGNode parseNode(JsonArray array) {
+	private Node parseNode(JsonArray array) {
 		String name = array.get(0).getAsString();
 		Location loc = parseLocation(array.get(1).getAsJsonArray());
 
@@ -750,8 +750,8 @@ public class IRParser {
 	 */
 	private NodeIf parseNodeIf(Location loc, JsonArray array) {
 		Expression condition = parseExpr(array.get(2));
-		List<CFGNode> thenNodes = parseNodes(array.get(3).getAsJsonArray());
-		List<CFGNode> elseNodes = parseNodes(array.get(4).getAsJsonArray());
+		List<Node> thenNodes = parseNodes(array.get(3).getAsJsonArray());
+		List<Node> elseNodes = parseNodes(array.get(4).getAsJsonArray());
 		NodeBlock joinNode = (NodeBlock) parseNode(array.get(5)
 				.getAsJsonArray());
 
@@ -772,8 +772,8 @@ public class IRParser {
 	 *            a JSON array
 	 * @return a list of CFG nodes
 	 */
-	private List<CFGNode> parseNodes(JsonArray array) {
-		List<CFGNode> nodes = new ArrayList<CFGNode>(array.size());
+	private List<Node> parseNodes(JsonArray array) {
+		List<Node> nodes = new ArrayList<Node>(array.size());
 		for (JsonElement element : array) {
 			nodes.add(parseNode(element.getAsJsonArray()));
 		}
@@ -791,7 +791,7 @@ public class IRParser {
 	 */
 	private NodeWhile parseNodeWhile(Location loc, JsonArray array) {
 		Expression condition = parseExpr(array.get(2));
-		List<CFGNode> nodes = parseNodes(array.get(3).getAsJsonArray());
+		List<Node> nodes = parseNodes(array.get(3).getAsJsonArray());
 		NodeBlock joinNode = (NodeBlock) parseNode(array.get(4)
 				.getAsJsonArray());
 		
@@ -876,13 +876,13 @@ public class IRParser {
 		Procedure procedure = new Procedure(name, external, location,
 				returnType, parameters, locals, null);
 
-		List<CFGNode> nodes = parseNodes(array.get(6).getAsJsonArray());
+		List<Node> nodes = parseNodes(array.get(6).getAsJsonArray());
 		procedure.setNodes(nodes);
 
 		// go back to previous scope
 		variables = variables.getParent().getParent();
 
-		CFGNodeImpl.resetLabelCount();
+		NodeImpl.resetLabelCount();
 
 		return procedure;
 	}

@@ -41,7 +41,7 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IrFactory;
@@ -329,7 +329,7 @@ public class ActorMerger implements INetworkTransformation {
 	 * @throws OrccException
 	 */
 	private Procedure createBody() throws OrccException {
-		List<CFGNode> nodes = new ArrayList<CFGNode>();
+		List<Node> nodes = new ArrayList<Node>();
 
 		OrderedMap<String, LocalVariable> locals = new OrderedMap<String, LocalVariable>();
 
@@ -463,7 +463,7 @@ public class ActorMerger implements INetworkTransformation {
 	 * 
 	 */
 	private void createLoopedSchedule(Procedure procedure, Schedule schedule,
-			List<CFGNode> nodes) throws OrccException {
+			List<Node> nodes) throws OrccException {
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
 				Instance instance = iterand.getVertex().getInstance();
@@ -532,7 +532,7 @@ public class ActorMerger implements INetworkTransformation {
 	private Procedure createScheduler() {
 		Location location = new Location();
 		variables = new OrderedMap<String, LocalVariable>();
-		List<CFGNode> nodes = new ArrayList<CFGNode>();
+		List<Node> nodes = new ArrayList<Node>();
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),
 				new OrderedMap<String, LocalVariable>(), variables, nodes);

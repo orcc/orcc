@@ -35,10 +35,10 @@ import org.eclipse.emf.common.util.EList;
  * condition.
  * 
  * @author Matthieu Wipliez
- * @model extends="net.sf.orcc.ir.CFGNode"
+ * @model extends="net.sf.orcc.ir.Node"
  * 
  */
-public interface NodeIf extends CFGNode, ValueContainer {
+public interface NodeIf extends Node, ValueContainer {
 
 	/**
 	 * Returns the nodes in the "else" branch of this NodeIf.
@@ -46,7 +46,7 @@ public interface NodeIf extends CFGNode, ValueContainer {
 	 * @return the nodes in the "else" branch of this NodeIf
 	 * @model containment="true"
 	 */
-	EList<CFGNode> getElseNodes();
+	EList<Node> getElseNodes();
 
 	/**
 	 * Returns the join node of this NodeIf.
@@ -62,7 +62,7 @@ public interface NodeIf extends CFGNode, ValueContainer {
 	 * @return the nodes in the "then" branch of this NodeIf
 	 * @model containment="true"
 	 */
-	EList<CFGNode> getThenNodes();
+	EList<Node> getThenNodes();
 
 	/**
 	 * Sets the join node of this NodeIf.

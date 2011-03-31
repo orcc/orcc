@@ -56,7 +56,7 @@ import net.sf.orcc.frontend.schedule.RegExpConverter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
@@ -205,7 +205,7 @@ public class ActorTransformer {
 			Expression condition = new BinaryExpr(
 					new VarExpr(new Use(loopVar)), BinaryOp.LT, new IntExpr(
 							repeat), IrFactory.eINSTANCE.createTypeBool());
-			List<CFGNode> nodes = new ArrayList<CFGNode>(1);
+			List<Node> nodes = new ArrayList<Node>(1);
 			nodes.add(block);
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
@@ -298,7 +298,7 @@ public class ActorTransformer {
 			Expression condition = new BinaryExpr(
 					new VarExpr(new Use(loopVar)), BinaryOp.LT, new IntExpr(
 							repeat), IrFactory.eINSTANCE.createTypeBool());
-			List<CFGNode> nodes = new ArrayList<CFGNode>(1);
+			List<Node> nodes = new ArrayList<Node>(1);
 			nodes.add(block);
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
