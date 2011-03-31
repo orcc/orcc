@@ -80,8 +80,8 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
@@ -162,7 +162,7 @@ public class ActorTransformer {
 			Assign assign = new Assign(loopVar, new IntExpr(0));
 			addInstruction(assign);
 
-			BlockNode block = new BlockNode(procedure);
+			NodeBlock block = new NodeBlock(procedure);
 
 			int i = 0;
 			int numTokens = tokens.size();
@@ -206,9 +206,9 @@ public class ActorTransformer {
 							repeat), IrFactory.eINSTANCE.createTypeBool());
 			List<CFGNode> nodes = new ArrayList<CFGNode>(1);
 			nodes.add(block);
-			WhileNode whileNode = new WhileNode(procedure, condition, nodes,
-					new BlockNode(procedure));
-			procedure.getNodes().add(whileNode);
+			NodeWhile nodeWhile = new NodeWhile(procedure, condition, nodes,
+					new NodeBlock(procedure));
+			procedure.getNodes().add(nodeWhile);
 		}
 	}
 
@@ -250,7 +250,7 @@ public class ActorTransformer {
 			Assign assign = new Assign(loopVar, new IntExpr(0));
 			addInstruction(assign);
 
-			BlockNode block = new BlockNode(procedure);
+			NodeBlock block = new NodeBlock(procedure);
 
 			int i = 0;
 			int numTokens = values.size();
@@ -297,9 +297,9 @@ public class ActorTransformer {
 							repeat), IrFactory.eINSTANCE.createTypeBool());
 			List<CFGNode> nodes = new ArrayList<CFGNode>(1);
 			nodes.add(block);
-			WhileNode whileNode = new WhileNode(procedure, condition, nodes,
-					new BlockNode(procedure));
-			procedure.getNodes().add(whileNode);
+			NodeWhile nodeWhile = new NodeWhile(procedure, condition, nodes,
+					new NodeBlock(procedure));
+			procedure.getNodes().add(nodeWhile);
 		}
 	}
 
@@ -311,7 +311,7 @@ public class ActorTransformer {
 	 */
 	private void addInstruction(Instruction instruction) {
 		Context context = astTransformer.getContext();
-		BlockNode block = BlockNode.getLast(context.getProcedure());
+		NodeBlock block = NodeBlock.getLast(context.getProcedure());
 		block.add(instruction);
 	}
 
@@ -506,7 +506,7 @@ public class ActorTransformer {
 				}
 
 				for (Action action : initializes) {
-					BlockNode block = BlockNode.getFirst(action.getBody());
+					NodeBlock block = NodeBlock.getFirst(action.getBody());
 					List<Expression> params = new ArrayList<Expression>(0);
 					block.add(0, new Call(location, null, initialize, params));
 				}

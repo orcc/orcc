@@ -86,9 +86,9 @@ import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
@@ -194,8 +194,8 @@ public class AstTransformer {
 			List<CFGNode> thenNodes = getNodes(expression.getThen());
 			List<CFGNode> elseNodes = getNodes(expression.getElse());
 
-			IfNode node = new IfNode(location, context.getProcedure(),
-					condition, thenNodes, elseNodes, new BlockNode(
+			NodeIf node = new NodeIf(location, context.getProcedure(),
+					condition, thenNodes, elseNodes, new NodeBlock(
 							context.getProcedure()));
 			context.getProcedure().getNodes().add(node);
 
@@ -381,7 +381,7 @@ public class AstTransformer {
 			List<CFGNode> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
-			nodes.add(new BlockNode(context.getProcedure()));
+			nodes.add(new NodeBlock(context.getProcedure()));
 
 			Expression value = transformExpression(astExpression);
 			createAssignOrStore(location, target, indexes, value);
@@ -410,7 +410,7 @@ public class AstTransformer {
 			List<CFGNode> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
-			nodes.add(new BlockNode(context.getProcedure()));
+			nodes.add(new NodeBlock(context.getProcedure()));
 
 			for (AstExpression astExpression : astExpressions) {
 				Location location = Util.getLocation(astExpression);
@@ -515,18 +515,18 @@ public class AstTransformer {
 						IrFactory.eINSTANCE.createTypeBool());
 
 				// add increment to body
-				BlockNode block = BlockNode.getLast(procedure, nodes);
+				NodeBlock block = NodeBlock.getLast(procedure, nodes);
 				Assign assign = new Assign(location, loopVar, new BinaryExpr(
 						new VarExpr(new Use(loopVar)), BinaryOp.PLUS,
 						new IntExpr(1), loopVar.getType()));
 				block.add(assign);
 
 				// create while
-				WhileNode whileNode = new WhileNode(location, procedure,
-						condition, nodes, new BlockNode(procedure));
+				NodeWhile nodeWhile = new NodeWhile(location, procedure,
+						condition, nodes, new NodeBlock(procedure));
 
 				// create assign
-				block = new BlockNode(procedure);
+				block = new NodeBlock(procedure);
 				AstExpression astLower = generator.getLower();
 				Expression lower = transformExpression(astLower);
 				Assign assignInit = new Assign(location, loopVar, lower);
@@ -535,7 +535,7 @@ public class AstTransformer {
 				// nodes
 				nodes = new ArrayList<CFGNode>(2);
 				nodes.add(block);
-				nodes.add(whileNode);
+				nodes.add(nodeWhile);
 			}
 
 			// add the outer while node
@@ -705,16 +705,16 @@ public class AstTransformer {
 
 			// body
 			List<CFGNode> nodes = getNodes(foreach.getStatements());
-			BlockNode block = BlockNode.getLast(procedure, nodes);
+			NodeBlock block = NodeBlock.getLast(procedure, nodes);
 			assign = new Assign(location, loopVar, new BinaryExpr(new VarExpr(
 					new Use(loopVar)), BinaryOp.PLUS, new IntExpr(1),
 					loopVar.getType()));
 			block.add(assign);
 
 			// create while
-			WhileNode whileNode = new WhileNode(location, procedure, condition,
-					nodes, new BlockNode(procedure));
-			procedure.getNodes().add(whileNode);
+			NodeWhile nodeWhile = new NodeWhile(location, procedure, condition,
+					nodes, new NodeBlock(procedure));
+			procedure.getNodes().add(nodeWhile);
 
 			return object;
 		}
@@ -730,8 +730,8 @@ public class AstTransformer {
 			List<CFGNode> thenNodes = getNodes(stmtIf.getThen());
 			List<CFGNode> elseNodes = getNodes(stmtIf.getElse());
 
-			IfNode node = new IfNode(location, procedure, condition, thenNodes,
-					elseNodes, new BlockNode(procedure));
+			NodeIf node = new NodeIf(location, procedure, condition, thenNodes,
+					elseNodes, new NodeBlock(procedure));
 			procedure.getNodes().add(node);
 
 			return object;
@@ -746,9 +746,9 @@ public class AstTransformer {
 
 			List<CFGNode> nodes = getNodes(stmtWhile.getStatements());
 
-			WhileNode whileNode = new WhileNode(location, procedure, condition,
-					nodes, new BlockNode(procedure));
-			procedure.getNodes().add(whileNode);
+			NodeWhile nodeWhile = new NodeWhile(location, procedure, condition,
+					nodes, new NodeBlock(procedure));
+			procedure.getNodes().add(nodeWhile);
 
 			return object;
 		}
@@ -767,7 +767,7 @@ public class AstTransformer {
 			List<CFGNode> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
-			nodes.add(new BlockNode(context.getProcedure()));
+			nodes.add(new NodeBlock(context.getProcedure()));
 			transformStatements(statements);
 			int last = nodes.size();
 
@@ -882,7 +882,7 @@ public class AstTransformer {
 	 *            an instruction
 	 */
 	private void addInstruction(Instruction instruction) {
-		BlockNode block = BlockNode.getLast(context.getProcedure());
+		NodeBlock block = NodeBlock.getLast(context.getProcedure());
 		block.add(instruction);
 	}
 
@@ -896,7 +896,7 @@ public class AstTransformer {
 	 *            do not have a return value
 	 */
 	public void addReturn(Procedure procedure, Expression value) {
-		BlockNode block = BlockNode.getLast(procedure);
+		NodeBlock block = NodeBlock.getLast(procedure);
 		Return returnInstr = new Return(value);
 		block.add(returnInstr);
 	}
@@ -1121,7 +1121,7 @@ public class AstTransformer {
 			LocalVariable local = context.getMapGlobals().get(global);
 
 			Load load = new Load(local, new Use(global));
-			BlockNode block = BlockNode.getFirst(context.getProcedure());
+			NodeBlock block = NodeBlock.getFirst(context.getProcedure());
 			block.add(i, load);
 			i++;
 		}
