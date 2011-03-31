@@ -50,12 +50,12 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.CFGNodeImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
@@ -252,7 +252,7 @@ public class ExpressionSplitterTransformation extends
 		List<CFGNode> nodes = procedure.getNodes();
 		if (nodes.size() > 0) {
 			CFGNode lastNode = nodes.get(nodes.size() - 1);
-			AbstractNode.setLabelCount(lastNode.getLabel() + 2);
+			CFGNodeImpl.setLabelCount(lastNode.getLabel() + 2);
 		}
 		super.visit(procedure);
 	}
