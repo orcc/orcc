@@ -91,7 +91,12 @@ GlobalVariable* Connector::createPortVar(Port* port){
 	const PointerType* portStruct = FifoMng::getFifoType(port->getType())->getPointerTo();
 
 	//Return new variable
-	return new GlobalVariable(*module, portStruct, true,  GlobalValue::InternalLinkage, /*init*/0, port->getName(), 0, false);;
+	GlobalVariable* var =  new GlobalVariable(*module, portStruct, true,  GlobalValue::InternalLinkage, /*init*/0, port->getName(), 0, false);;
+
+	// Store the generated variable
+	port->setFifoVar(var);
+
+	return var;
 }
 
 void Connector::setConnection(Connection* connection){
@@ -107,10 +112,9 @@ void Connector::setConnection(Connection* connection){
 	AbstractFifo* fifo = FifoMng::getFifo(Context, decoder, src->getType(), connection);
 	srcVar->setInitializer(fifo->getGV());
 	dstVar->setInitializer(fifo->getGV());
-	
-	// Store the generated variable
-	src->setFifoVar(srcVar);
-	dst->setFifoVar(dstVar);
+
+	// Set the new fifo to the connection
+	connection->setFifo(fifo);
 }
 
 void Connector::setConnections(Configuration* configuration, LLVMExecution* executionEngine){
