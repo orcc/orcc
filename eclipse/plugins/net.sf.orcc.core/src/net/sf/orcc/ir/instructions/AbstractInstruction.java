@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.instructions;
 
-import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Location;
@@ -40,13 +39,14 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractInstruction extends AbstractLocalizable implements
-		Instruction {
+public abstract class AbstractInstruction implements Instruction {
 
 	private BlockNode block;
 
+	private Location location;
+
 	protected AbstractInstruction(Location location) {
-		super(location);
+		this.location = location;
 	}
 
 	@Override
@@ -57,6 +57,11 @@ public abstract class AbstractInstruction extends AbstractLocalizable implements
 	@Override
 	public Cast getCast() {
 		return null;
+	}
+
+	@Override
+	public Location getLocation() {
+		return location;
 	}
 
 	@Override
@@ -127,6 +132,10 @@ public abstract class AbstractInstruction extends AbstractLocalizable implements
 	@Override
 	public void setBlock(BlockNode block) {
 		this.block = block;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 }

@@ -38,7 +38,22 @@ package net.sf.orcc.ir;
  * @author Samuel Keller
  * 
  */
-public class Action extends AbstractLocalizable {
+public class Action {
+
+	private Location location;
+
+	/**
+	 * Returns the location of this action.
+	 * 
+	 * @return the location of this action
+	 */
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
 
 	private Procedure body;
 
@@ -68,7 +83,7 @@ public class Action extends AbstractLocalizable {
 	 */
 	public Action(Location location, Tag tag, Pattern inputPattern,
 			Pattern outputPattern, Procedure scheduler, Procedure body) {
-		super(location);
+		this.location = location;
 		this.body = body;
 		this.inputPattern = inputPattern;
 		this.outputPattern = outputPattern;

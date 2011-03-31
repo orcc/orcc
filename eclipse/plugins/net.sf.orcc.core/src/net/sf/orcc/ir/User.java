@@ -35,7 +35,7 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public interface User extends Localizable {
+public interface User {
 
 	/**
 	 * Returns <code>true</code> if the user is a CFG node.

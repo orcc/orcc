@@ -76,6 +76,13 @@ public interface Instruction extends User {
 	Cast getCast();
 
 	/**
+	 * Returns the location of this instruction.
+	 * 
+	 * @return the location of this instruction
+	 */
+	public Location getLocation();
+
+	/**
 	 * Returns <code>true</code> if the instruction is an Assign.
 	 * 
 	 * @return <code>true</code> if the instruction is an Assign

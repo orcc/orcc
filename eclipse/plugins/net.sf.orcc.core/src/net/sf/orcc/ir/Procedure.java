@@ -43,7 +43,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class Procedure extends AbstractLocalizable {
+public class Procedure {
 
 	/**
 	 * This class visits the procedure to find the state variables used.
@@ -95,6 +95,8 @@ public class Procedure extends AbstractLocalizable {
 	 */
 	private OrderedMap<String, LocalVariable> locals;
 
+	private Location location;
+
 	/**
 	 * the name of this procedure
 	 */
@@ -140,7 +142,7 @@ public class Procedure extends AbstractLocalizable {
 	public Procedure(String name, boolean nativeFlag, Location location,
 			Type returnType, OrderedMap<String, LocalVariable> parameters,
 			OrderedMap<String, LocalVariable> locals, List<CFGNode> nodes) {
-		super(location);
+		this.location = location;
 		this.nativeFlag = nativeFlag;
 		this.nodes = nodes;
 		this.locals = locals;
@@ -163,7 +165,7 @@ public class Procedure extends AbstractLocalizable {
 	 *            The procedure return type.
 	 */
 	public Procedure(String name, Location location, Type returnType) {
-		super(location);
+		this.location = location;
 		this.nativeFlag = false;
 		this.nodes = new ArrayList<CFGNode>();
 		this.locals = new OrderedMap<String, LocalVariable>();
@@ -201,6 +203,15 @@ public class Procedure extends AbstractLocalizable {
 	 */
 	public OrderedMap<String, LocalVariable> getLocals() {
 		return locals;
+	}
+
+	/**
+	 * Returns the location of this procedure.
+	 * 
+	 * @return the location of this procedure
+	 */
+	public Location getLocation() {
+		return location;
 	}
 
 	/**
@@ -300,6 +311,10 @@ public class Procedure extends AbstractLocalizable {
 	 */
 	public void setGraph(CFG graph) {
 		this.graph = graph;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	/**

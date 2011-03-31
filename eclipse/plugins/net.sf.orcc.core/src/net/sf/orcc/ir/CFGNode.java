@@ -70,6 +70,13 @@ public interface CFGNode extends User {
 	public int getLabel();
 
 	/**
+	 * Returns the location of this node.
+	 * 
+	 * @return the location of this node
+	 */
+	public Location getLocation();
+
+	/**
 	 * Returns the predecessors of this node in the CFG.
 	 * 
 	 * @return the predecessors of this node in the CFG

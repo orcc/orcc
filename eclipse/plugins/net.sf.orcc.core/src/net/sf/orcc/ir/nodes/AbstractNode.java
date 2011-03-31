@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.CFGEdge;
 import net.sf.orcc.ir.CFGNode;
@@ -45,8 +44,7 @@ import net.sf.orcc.ir.Procedure;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractNode extends AbstractLocalizable implements
-		CFGNode {
+public abstract class AbstractNode implements CFGNode {
 
 	private static int labelCount;
 
@@ -74,10 +72,12 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 
 	private int label;
 
+	private Location location;
+
 	private Procedure procedure;
 
 	protected AbstractNode(Location location, Procedure procedure) {
-		super(location);
+		this.location = location;
 		this.procedure = procedure;
 		labelCount++;
 		this.label = labelCount;
@@ -86,6 +86,11 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 	@Override
 	public int getLabel() {
 		return label;
+	}
+
+	@Override
+	public Location getLocation() {
+		return location;
 	}
 
 	@Override
@@ -154,6 +159,10 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 	@Override
 	public boolean isWhileNode() {
 		return false;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	@Override
