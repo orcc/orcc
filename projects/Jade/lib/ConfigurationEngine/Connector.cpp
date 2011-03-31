@@ -82,6 +82,11 @@ void Connector::unsetConnections(Configuration* configuration){
 }
 
 GlobalVariable* Connector::createPortVar(Port* port){
+	if (port->getFifoVar() != NULL){
+		// Port has already a fifo assigned
+		return port->getFifoVar();
+	}
+	
 	//Get fifo structure type
 	const PointerType* portStruct = FifoMng::getFifoType(port->getType())->getPointerTo();
 
