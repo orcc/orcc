@@ -450,6 +450,10 @@ public class IRWriter {
 	}
 
 	private static JsonArray writeLocation(Location location) {
+		if (location == null) {
+			location = new Location();
+		}
+
 		JsonArray array = new JsonArray();
 		array.add(new JsonPrimitive(location.getStartLine()));
 		array.add(new JsonPrimitive(location.getStartColumn()));

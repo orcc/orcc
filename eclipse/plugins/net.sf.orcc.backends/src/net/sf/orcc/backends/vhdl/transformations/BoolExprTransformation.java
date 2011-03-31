@@ -90,6 +90,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	private void createIfNode(LocalVariable target, Expression expr) {
 		NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
 		node.setValue(expr);
+		node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 
 		// add "then" nodes
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();

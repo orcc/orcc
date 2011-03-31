@@ -492,6 +492,7 @@ public class ActorMerger implements INetworkTransformation {
 						IrFactory.eINSTANCE.createTypeBool());
 
 				NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+				nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 				nodeWhile.setValue(condition);
 				nodes.add(nodeWhile);
 

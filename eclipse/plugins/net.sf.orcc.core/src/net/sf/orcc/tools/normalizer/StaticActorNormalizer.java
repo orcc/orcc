@@ -120,7 +120,9 @@ public class StaticActorNormalizer {
 			nodes = new ArrayList<Node>();
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			nodeWhile.getNodes().addAll(nodes);
+
 			oldNodes.add(nodeWhile);
 
 			// assign condition

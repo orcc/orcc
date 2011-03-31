@@ -196,6 +196,7 @@ public class AstTransformer {
 			List<Node> elseNodes = getNodes(expression.getElse());
 
 			NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
+			node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			node.setLocation(location);
 			node.setValue(condition);
 			node.getThenNodes().addAll(thenNodes);
@@ -526,8 +527,10 @@ public class AstTransformer {
 
 				// create while
 				NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+				nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 				nodeWhile.setValue(condition);
 				nodeWhile.getNodes().addAll(nodes);
+				
 				procedure.getNodes().add(nodeWhile);
 
 				// create assign
@@ -718,6 +721,7 @@ public class AstTransformer {
 
 			// create while
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			nodeWhile.setLocation(location);
 			nodeWhile.setValue(condition);
 			nodeWhile.getNodes().addAll(nodes);
@@ -739,6 +743,7 @@ public class AstTransformer {
 			List<Node> elseNodes = getNodes(stmtIf.getElse());
 
 			NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
+			node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			node.setLocation(location);
 			node.setValue(condition);
 			node.getThenNodes().addAll(thenNodes);
@@ -759,6 +764,7 @@ public class AstTransformer {
 			List<Node> nodes = getNodes(stmtWhile.getStatements());
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			nodeWhile.setLocation(location);
 			nodeWhile.setValue(condition);
 			nodeWhile.getNodes().addAll(nodes);

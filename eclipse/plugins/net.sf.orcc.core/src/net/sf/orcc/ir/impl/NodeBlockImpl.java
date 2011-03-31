@@ -182,7 +182,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	 *            an instruction
 	 */
 	public void add(Instruction instruction) {
-		instructions.add(instruction);
+		getInstructions().add(instruction);
 	}
 
 	/**
@@ -194,7 +194,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	 *            an instruction
 	 */
 	public void add(int index, Instruction instruction) {
-		instructions.add(index, instruction);
+		getInstructions().add(index, instruction);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	 *         this block
 	 */
 	public int indexOf(Instruction instruction) {
-		return instructions.indexOf(instruction);
+		return getInstructions().indexOf(instruction);
 	}
 
 	@Override
@@ -229,7 +229,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 
 	@Override
 	public Iterator<Instruction> iterator() {
-		return instructions.iterator();
+		return getInstructions().iterator();
 	}
 
 	/**
@@ -240,7 +240,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	 *         sequence)
 	 */
 	public ListIterator<Instruction> lastListIterator() {
-		return instructions.listIterator(instructions.size());
+		return getInstructions().listIterator(getInstructions().size());
 	}
 
 	/**
@@ -251,7 +251,7 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	 *         sequence)
 	 */
 	public ListIterator<Instruction> listIterator() {
-		return instructions.listIterator();
+		return getInstructions().listIterator();
 	}
 
 	@Override

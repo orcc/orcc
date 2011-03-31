@@ -209,6 +209,7 @@ public class ActorTransformer {
 			nodes.add(block);
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			nodeWhile.setValue(condition);
 			nodeWhile.getNodes().addAll(nodes);
 			procedure.getNodes().add(nodeWhile);
@@ -302,6 +303,7 @@ public class ActorTransformer {
 			nodes.add(block);
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			nodeWhile.setValue(condition);
 			nodeWhile.getNodes().addAll(nodes);
 			procedure.getNodes().add(nodeWhile);

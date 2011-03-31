@@ -92,6 +92,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	private NodeIf createActionCall(Expression expr, Procedure body,
 			Pattern inputPattern, Pattern outputPattern) {
 		NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
+		nodeIf.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 		nodeIf.setValue(expr);
 
 		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
