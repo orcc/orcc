@@ -124,7 +124,10 @@ public class DisplayYUV {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				buffer.dispose();
+				if (buffer != null) {
+					buffer.dispose();
+				}
+
 				canvas = null;
 				image = null;
 				lastHeight = 0;
