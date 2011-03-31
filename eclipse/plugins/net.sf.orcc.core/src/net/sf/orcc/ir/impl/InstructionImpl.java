@@ -13,7 +13,6 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -52,12 +51,7 @@ public abstract class InstructionImpl extends UserImpl implements Instruction {
 
 	@Override
 	public NodeBlock getBlock() {
-		EObject cter = eContainer();
-		while (cter != null && !(cter instanceof NodeBlock)) {
-			cter = cter.eContainer();
-		}
-
-		return (NodeBlock) cter;
+		return (NodeBlock) eContainer();
 	}
 
 	@Override

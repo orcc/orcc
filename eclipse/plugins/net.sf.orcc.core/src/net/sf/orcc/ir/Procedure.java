@@ -130,7 +130,7 @@ public interface Procedure extends EObject {
 	 * Returns the list of nodes of this procedure.
 	 * 
 	 * @return the list of nodes of this procedure
-	 * @model
+	 * @model containment="true"
 	 */
 	EList<Node> getNodes();
 
@@ -152,7 +152,7 @@ public interface Procedure extends EObject {
 	 * Returns the return type of this procedure.
 	 * 
 	 * @return the return type of this procedure
-	 * @model
+	 * @model containment="true"
 	 */
 	Type getReturnType();
 

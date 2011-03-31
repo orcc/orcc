@@ -496,7 +496,7 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE__NAME = 1;
 
 	/**
-	 * The feature id for the '<em><b>Nodes</b></em>' reference list.
+	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -505,7 +505,7 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE__NODES = 2;
 
 	/**
-	 * The feature id for the '<em><b>Return Type</b></em>' reference.
+	 * The feature id for the '<em><b>Return Type</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -857,10 +857,10 @@ public interface IrPackage extends EPackage {
 	EAttribute getProcedure_Name();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Procedure#getNodes <em>Nodes</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Procedure#getNodes <em>Nodes</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Nodes</em>'.
+	 * @return the meta object for the containment reference list '<em>Nodes</em>'.
 	 * @see net.sf.orcc.ir.Procedure#getNodes()
 	 * @see #getProcedure()
 	 * @generated
@@ -868,10 +868,10 @@ public interface IrPackage extends EPackage {
 	EReference getProcedure_Nodes();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Procedure#getReturnType <em>Return Type</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Procedure#getReturnType <em>Return Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Return Type</em>'.
+	 * @return the meta object for the containment reference '<em>Return Type</em>'.
 	 * @see net.sf.orcc.ir.Procedure#getReturnType()
 	 * @see #getProcedure()
 	 * @generated
@@ -1197,7 +1197,7 @@ public interface IrPackage extends EPackage {
 		EAttribute PROCEDURE__NAME = eINSTANCE.getProcedure_Name();
 
 		/**
-		 * The meta object literal for the '<em><b>Nodes</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Nodes</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -1205,7 +1205,7 @@ public interface IrPackage extends EPackage {
 		EReference PROCEDURE__NODES = eINSTANCE.getProcedure_Nodes();
 
 		/**
-		 * The meta object literal for the '<em><b>Return Type</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Return Type</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

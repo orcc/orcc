@@ -29,12 +29,14 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -42,15 +44,14 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLocation <em>Location</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getName <em>Name</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getNodes <em>Nodes</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getReturnType <em>Return Type
- * </em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#isNative <em>Native</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getLocation <em>Location</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getNodes <em>Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#getReturnType <em>Return Type</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ProcedureImpl#isNative <em>Native</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ProcedureImpl extends EObjectImpl implements Procedure {
@@ -98,34 +99,13 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	/**
-	 * The default value of the '{@link #getLocation() <em>Location</em>}'
-	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The default value of the '{@link #getLocation() <em>Location</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLocation()
 	 * @generated
 	 * @ordered
 	 */
 	protected static final Location LOCATION_EDEFAULT = null;
-
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
 
 	private CFG graph;
 
@@ -135,9 +115,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	private OrderedMap<String, LocalVariable> locals;
 
 	/**
-	 * The cached value of the '{@link #getLocation() <em>Location</em>}'
-	 * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getLocation() <em>Location</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLocation()
 	 * @generated
 	 * @ordered
@@ -145,9 +124,17 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected Location location = LOCATION_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -155,19 +142,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected String name = NAME_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' reference
-	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getNodes()
 	 * @generated
 	 * @ordered
@@ -182,9 +158,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	private Expression result;
 
 	/**
-	 * The cached value of the '{@link #getReturnType() <em>Return Type</em>}'
-	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getReturnType() <em>Return Type</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getReturnType()
 	 * @generated
 	 * @ordered
@@ -192,8 +167,25 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected Type returnType;
 
 	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected ProcedureImpl() {
@@ -202,93 +194,76 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public Type basicGetReturnType() {
-		return returnType;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.PROCEDURE__LOCATION:
-			return getLocation();
-		case IrPackage.PROCEDURE__NAME:
-			return getName();
-		case IrPackage.PROCEDURE__NODES:
-			return getNodes();
-		case IrPackage.PROCEDURE__RETURN_TYPE:
-			if (resolve)
+			case IrPackage.PROCEDURE__LOCATION:
+				return getLocation();
+			case IrPackage.PROCEDURE__NAME:
+				return getName();
+			case IrPackage.PROCEDURE__NODES:
+				return getNodes();
+			case IrPackage.PROCEDURE__RETURN_TYPE:
 				return getReturnType();
-			return basicGetReturnType();
-		case IrPackage.PROCEDURE__NATIVE:
-			return isNative();
+			case IrPackage.PROCEDURE__NATIVE:
+				return isNative();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.PROCEDURE__LOCATION:
-			return LOCATION_EDEFAULT == null ? location != null
-					: !LOCATION_EDEFAULT.equals(location);
-		case IrPackage.PROCEDURE__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
-		case IrPackage.PROCEDURE__NODES:
-			return nodes != null && !nodes.isEmpty();
-		case IrPackage.PROCEDURE__RETURN_TYPE:
-			return returnType != null;
-		case IrPackage.PROCEDURE__NATIVE:
-			return native_ != NATIVE_EDEFAULT;
+			case IrPackage.PROCEDURE__LOCATION:
+				return LOCATION_EDEFAULT == null ? location != null : !LOCATION_EDEFAULT.equals(location);
+			case IrPackage.PROCEDURE__NAME:
+				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case IrPackage.PROCEDURE__NODES:
+				return nodes != null && !nodes.isEmpty();
+			case IrPackage.PROCEDURE__RETURN_TYPE:
+				return returnType != null;
+			case IrPackage.PROCEDURE__NATIVE:
+				return native_ != NATIVE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.PROCEDURE__LOCATION:
-			setLocation((Location) newValue);
-			return;
-		case IrPackage.PROCEDURE__NAME:
-			setName((String) newValue);
-			return;
-		case IrPackage.PROCEDURE__NODES:
-			getNodes().clear();
-			getNodes().addAll((Collection<? extends Node>) newValue);
-			return;
-		case IrPackage.PROCEDURE__RETURN_TYPE:
-			setReturnType((Type) newValue);
-			return;
-		case IrPackage.PROCEDURE__NATIVE:
-			setNative((Boolean) newValue);
-			return;
+			case IrPackage.PROCEDURE__LOCATION:
+				setLocation((Location)newValue);
+				return;
+			case IrPackage.PROCEDURE__NAME:
+				setName((String)newValue);
+				return;
+			case IrPackage.PROCEDURE__NODES:
+				getNodes().clear();
+				getNodes().addAll((Collection<? extends Node>)newValue);
+				return;
+			case IrPackage.PROCEDURE__RETURN_TYPE:
+				setReturnType((Type)newValue);
+				return;
+			case IrPackage.PROCEDURE__NATIVE:
+				setNative((Boolean)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -298,27 +273,26 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.PROCEDURE__LOCATION:
-			setLocation(LOCATION_EDEFAULT);
-			return;
-		case IrPackage.PROCEDURE__NAME:
-			setName(NAME_EDEFAULT);
-			return;
-		case IrPackage.PROCEDURE__NODES:
-			getNodes().clear();
-			return;
-		case IrPackage.PROCEDURE__RETURN_TYPE:
-			setReturnType((Type) null);
-			return;
-		case IrPackage.PROCEDURE__NATIVE:
-			setNative(NATIVE_EDEFAULT);
-			return;
+			case IrPackage.PROCEDURE__LOCATION:
+				setLocation(LOCATION_EDEFAULT);
+				return;
+			case IrPackage.PROCEDURE__NAME:
+				setName(NAME_EDEFAULT);
+				return;
+			case IrPackage.PROCEDURE__NODES:
+				getNodes().clear();
+				return;
+			case IrPackage.PROCEDURE__RETURN_TYPE:
+				setReturnType((Type)null);
+				return;
+			case IrPackage.PROCEDURE__NATIVE:
+				setNative(NATIVE_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -437,7 +411,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Location getLocation() {
@@ -446,7 +419,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String getName() {
@@ -455,13 +427,11 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Node> getNodes() {
 		if (nodes == null) {
-			nodes = new EObjectResolvingEList<Node>(Node.class, this,
-					IrPackage.PROCEDURE__NODES);
+			nodes = new EObjectContainmentEList<Node>(Node.class, this, IrPackage.PROCEDURE__NODES);
 		}
 		return nodes;
 	}
@@ -481,21 +451,25 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Type getReturnType() {
-		if (returnType != null && returnType.eIsProxy()) {
-			InternalEObject oldReturnType = (InternalEObject) returnType;
-			returnType = (Type) eResolveProxy(oldReturnType);
-			if (returnType != oldReturnType) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
-							IrPackage.PROCEDURE__RETURN_TYPE, oldReturnType,
-							returnType));
-			}
-		}
 		return returnType;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetReturnType(Type newReturnType, NotificationChain msgs) {
+		Type oldReturnType = returnType;
+		returnType = newReturnType;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE, oldReturnType, newReturnType);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -512,7 +486,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public boolean isNative() {
@@ -564,41 +537,51 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setLocation(Location newLocation) {
 		Location oldLocation = location;
 		location = newLocation;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__LOCATION, oldLocation, location));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__LOCATION, oldLocation, location));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__NAME, oldName, name));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setNative(boolean newNative) {
 		boolean oldNative = native_;
 		native_ = newNative;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__NATIVE, oldNative, native_));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__NATIVE, oldNative, native_));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.PROCEDURE__NODES:
+				return ((InternalEList<?>)getNodes()).basicRemove(otherEnd, msgs);
+			case IrPackage.PROCEDURE__RETURN_TYPE:
+				return basicSetReturnType(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	@Override
@@ -612,26 +595,29 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setReturnType(Type newReturnType) {
-		Type oldReturnType = returnType;
-		returnType = newReturnType;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.PROCEDURE__RETURN_TYPE, oldReturnType, returnType));
+		if (newReturnType != returnType) {
+			NotificationChain msgs = null;
+			if (returnType != null)
+				msgs = ((InternalEObject)returnType).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
+			if (newReturnType != null)
+				msgs = ((InternalEObject)newReturnType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__RETURN_TYPE, null, msgs);
+			msgs = basicSetReturnType(newReturnType, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__RETURN_TYPE, newReturnType, newReturnType));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy())
-			return super.toString();
+		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (location: ");

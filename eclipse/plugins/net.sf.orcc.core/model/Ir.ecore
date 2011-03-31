@@ -50,8 +50,9 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="location" eType="#//Location"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
-        eType="#//Node"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="returnType" eType="#//Type"/>
+        eType="#//Node" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="returnType" eType="#//Type"
+        containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="native" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EDataType" name="Location" instanceClassName="net.sf.orcc.ir.Location"/>
