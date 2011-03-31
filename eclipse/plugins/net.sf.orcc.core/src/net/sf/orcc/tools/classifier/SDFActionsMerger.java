@@ -44,6 +44,8 @@ import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -52,11 +54,10 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeIf;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
@@ -90,17 +91,20 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 
 	private NodeIf createActionCall(Expression expr, Procedure body,
 			Pattern inputPattern, Pattern outputPattern) {
+		NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
+		nodeIf.setValue(expr);
+
 		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
 				outputPattern);
 		actor.getProcs().put(body.getName(), body);
-		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
-		NodeBlock node = new NodeBlock(target);
+		List<CFGNode> thenNodes = nodeIf.getThenNodes();
+		NodeBlock node = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
 		node.add(new Call(new Location(), null, body, callExprs));
 
 		thenNodes.add(node);
-		return new NodeIf(target, expr, thenNodes, new ArrayList<CFGNode>(),
-				new NodeBlock(target));
+
+		return nodeIf;
 	}
 
 	private Expression createActionCondition(NodeBlock node,
@@ -134,7 +138,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 
 		// create "then" nodes
 		Assign thenAssign = new Assign(result, new BoolExpr(true));
-		NodeBlock nodeBlock = new NodeBlock(procedure);
+		NodeBlock nodeBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		nodeBlock.add(thenAssign);
 		procedure.getNodes().add(nodeBlock);
 

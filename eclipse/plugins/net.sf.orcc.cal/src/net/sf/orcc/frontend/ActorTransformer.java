@@ -64,6 +64,8 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -76,12 +78,11 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
@@ -162,7 +163,7 @@ public class ActorTransformer {
 			Assign assign = new Assign(loopVar, new IntExpr(0));
 			addInstruction(assign);
 
-			NodeBlock block = new NodeBlock(procedure);
+			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
 			int i = 0;
 			int numTokens = tokens.size();
@@ -206,8 +207,10 @@ public class ActorTransformer {
 							repeat), IrFactory.eINSTANCE.createTypeBool());
 			List<CFGNode> nodes = new ArrayList<CFGNode>(1);
 			nodes.add(block);
-			NodeWhile nodeWhile = new NodeWhile(procedure, condition, nodes,
-					new NodeBlock(procedure));
+
+			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.setValue(condition);
+			nodeWhile.getNodes().addAll(nodes);
 			procedure.getNodes().add(nodeWhile);
 		}
 	}
@@ -250,7 +253,7 @@ public class ActorTransformer {
 			Assign assign = new Assign(loopVar, new IntExpr(0));
 			addInstruction(assign);
 
-			NodeBlock block = new NodeBlock(procedure);
+			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
 			int i = 0;
 			int numTokens = values.size();
@@ -297,8 +300,10 @@ public class ActorTransformer {
 							repeat), IrFactory.eINSTANCE.createTypeBool());
 			List<CFGNode> nodes = new ArrayList<CFGNode>(1);
 			nodes.add(block);
-			NodeWhile nodeWhile = new NodeWhile(procedure, condition, nodes,
-					new NodeBlock(procedure));
+
+			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.setValue(condition);
+			nodeWhile.getNodes().addAll(nodes);
 			procedure.getNodes().add(nodeWhile);
 		}
 	}

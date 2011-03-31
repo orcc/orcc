@@ -10,7 +10,7 @@ import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.NodeBlock;
 
 import org.eclipse.emf.ecore.EClass;
 

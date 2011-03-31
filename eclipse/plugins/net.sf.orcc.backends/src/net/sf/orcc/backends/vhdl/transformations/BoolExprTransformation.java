@@ -28,27 +28,25 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeIf;
 
 /**
  * This class defines an actor transformation that transforms assignments whose
@@ -90,20 +88,18 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 *            an expression
 	 */
 	private void createIfNode(LocalVariable target, Expression expr) {
-		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
-		List<CFGNode> elseNodes = new ArrayList<CFGNode>();
-		NodeIf node = new NodeIf(procedure, expr, thenNodes, elseNodes,
-				new NodeBlock(procedure));
+		NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
+		node.setValue(expr);
 
 		// add "then" nodes
-		NodeBlock block = new NodeBlock(procedure);
-		thenNodes.add(block);
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		node.getThenNodes().add(block);
 		Assign assign = new Assign(target, new BoolExpr(true));
 		block.add(assign);
 
 		// add "else" nodes
-		block = new NodeBlock(procedure);
-		elseNodes.add(block);
+		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		node.getElseNodes().add(block);
 		assign = new Assign(target, new BoolExpr(false));
 		block.add(assign);
 
@@ -118,7 +114,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 *            list iterator
 	 */
 	private void createNewBlock(ListIterator<Instruction> iit) {
-		NodeBlock block = new NodeBlock(procedure);
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		while (iit.hasNext()) {
 			Instruction instruction = iit.next();
 			iit.remove();

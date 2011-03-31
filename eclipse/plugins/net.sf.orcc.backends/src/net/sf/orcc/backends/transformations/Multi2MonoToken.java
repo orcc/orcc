@@ -50,6 +50,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -62,11 +63,11 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.ir.serialize.IRCloner;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
@@ -311,7 +312,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		scheduler.getLocals().remove(result.getBaseName());
 		scheduler.getLocals().put(result.getName(), result);
 
-		NodeBlock block = new NodeBlock(scheduler);
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		block.add(new Assign(result, condition));
 		block.add(new Return(new VarExpr(new Use(result))));
 		scheduler.getNodes().add(block);
@@ -319,7 +320,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		// body
 		Procedure body = new Procedure(name, new Location(),
 				IrFactory.eINSTANCE.createTypeVoid());
-		block = new NodeBlock(body);
+		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		block.add(new Return(null));
 		body.getNodes().add(block);
 
@@ -406,7 +407,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		// body
 		Procedure body = new Procedure(name, new Location(),
 				IrFactory.eINSTANCE.createTypeVoid());
-		NodeBlock block = new NodeBlock(body);
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		Store store = new Store(counter, new IntExpr(0));
 		block.add(store);
 		block.add(new Return(null));
@@ -427,7 +428,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		LocalVariable localCounter = new LocalVariable(true, 1, new Location(),
 				"localCounter", counter.getType());
 		scheduler.getLocals().put(localCounter.getName(), localCounter);
-		block = new NodeBlock(scheduler);
+		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		Load schedulerLoad = new Load(localCounter, new Use(counter));
 		block.add(0, schedulerLoad);
 
@@ -1208,8 +1209,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 				action.getInputPattern().clear();
 				action.getBody().getNodes().clear();
-				NodeBlock block = new NodeBlock(action.getBody());
-				block = new NodeBlock(action.getBody());
+				NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				block.add(new Return(null));
 				action.getBody().getNodes().add(block);
 				fsm.replaceTarget(sourceName, action, storeName);

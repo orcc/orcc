@@ -33,9 +33,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -71,14 +71,14 @@ public class Procedure {
 	public NodeBlock getFirst(List<CFGNode> nodes) {
 		NodeBlock block;
 		if (nodes.isEmpty()) {
-			block = new NodeBlock(this);
+			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(0);
 			if (node.isBlockNode()) {
 				block = (NodeBlock) node;
 			} else {
-				block = new NodeBlock(this);
+				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				nodes.add(0, block);
 			}
 		}
@@ -112,14 +112,14 @@ public class Procedure {
 	public NodeBlock getLast(List<CFGNode> nodes) {
 		NodeBlock block;
 		if (nodes.isEmpty()) {
-			block = new NodeBlock(this);
+			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(nodes.size() - 1);
 			if (node.isBlockNode()) {
 				block = (NodeBlock) node;
 			} else {
-				block = new NodeBlock(this);
+				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				nodes.add(block);
 			}
 		}

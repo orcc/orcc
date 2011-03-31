@@ -37,13 +37,14 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeIf;
 
 /**
  * 
@@ -62,7 +63,7 @@ public class TernaryOperationAdder extends AbstractActorVisitor {
 	public void visit(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			if (!proc.getReturnType().isVoid()) {
-				newBlockNode = new NodeBlock(proc);
+				newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				visit(proc);
 				proc.getNodes().clear();
 				proc.getNodes().add(newBlockNode);

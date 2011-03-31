@@ -39,6 +39,9 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -51,14 +54,12 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.CFGNodeImpl;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeIf;
-import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * Split expression and effective node that contains more than one fundamental
@@ -68,8 +69,7 @@ import net.sf.orcc.ir.nodes.NodeWhile;
  * @author Matthieu Wipliez
  * 
  */
-public class ExpressionSplitterTransformation extends
-		AbstractActorVisitor {
+public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 
 	private class ExpressionSplitter extends AbstractExpressionInterpreter {
 
@@ -157,7 +157,7 @@ public class ExpressionSplitterTransformation extends
 	 */
 	private ListIterator<Instruction> getItr(ListIterator<CFGNode> it) {
 		// Create a new basic block
-		NodeBlock block = new NodeBlock(procedure);
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
 		// Add it before the current node
 		it.previous();

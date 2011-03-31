@@ -40,6 +40,9 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -52,6 +55,7 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
@@ -60,10 +64,7 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeIf;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
-import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * This class defines an actor transformation that inline the functions and/or
@@ -98,7 +99,8 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 
 		@Override
 		public Object interpret(NodeBlock node, Object... args) {
-			NodeBlock nodeBlock = new NodeBlock(node.getLocation(), procedure);
+			NodeBlock nodeBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			nodeBlock.setLocation(node.getLocation());
 			for (Instruction instruction : node.getInstructions()) {
 				Instruction i = (Instruction) instruction.accept(this, args);
 				if (i != null) {
@@ -148,8 +150,14 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 			}
 			NodeBlock joinNode = (NodeBlock) node.getJoinNode().accept(this,
 					args);
-			NodeIf nodeIf = new NodeIf(node.getLocation(), procedure,
-					condition, thenNodes, elseNodes, joinNode);
+
+			NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
+			nodeIf.setLocation(node.getLocation());
+			node.setValue(condition);
+			node.getThenNodes().addAll(thenNodes);
+			node.getElseNodes().addAll(elseNodes);
+			node.setJoinNode(joinNode);
+
 			Use.addUses(nodeIf, condition);
 			return nodeIf;
 		}
@@ -308,8 +316,13 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 			}
 			NodeBlock joinNode = (NodeBlock) node.getJoinNode().accept(this,
 					args);
-			NodeWhile nodeWhile = new NodeWhile(node.getLocation(), procedure,
-					condition, nodes, joinNode);
+
+			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.setLocation(node.getLocation());
+			nodeWhile.setValue(condition);
+			nodeWhile.getNodes().addAll(nodes);
+			nodeWhile.setJoinNode(joinNode);
+
 			Use.addUses(nodeWhile, condition);
 			return nodeWhile;
 		}
@@ -426,7 +439,7 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		// Assign all parameters except for list
-		NodeBlock newBlockNode = new NodeBlock(procedure);
+		NodeBlock newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		for (int i = 0; i < function.getParameters().getLength(); i++) {
 			Variable parameter = function.getParameters().getList().get(i);
 			if (!parameter.getType().isList()) {
@@ -449,7 +462,8 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 		}
 
 		// Remove old block and add the new ones
-		NodeBlock secondBlockNodePart = new NodeBlock(procedure);
+		NodeBlock secondBlockNodePart = IrFactoryImpl.eINSTANCE
+				.createNodeBlock();
 
 		itInstruction.remove();
 		while (itInstruction.hasNext()) {

@@ -47,6 +47,8 @@ import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -59,13 +61,12 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -490,8 +491,8 @@ public class ActorMerger implements INetworkTransformation {
 						sched.getIterationCount()),
 						IrFactory.eINSTANCE.createTypeBool());
 
-				NodeWhile nodeWhile = new NodeWhile(procedure, condition,
-						new ArrayList<CFGNode>(), new NodeBlock(procedure));
+				NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+				nodeWhile.setValue(condition);
 				nodes.add(nodeWhile);
 
 				depth++;
@@ -535,7 +536,7 @@ public class ActorMerger implements INetworkTransformation {
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),
 				new OrderedMap<String, LocalVariable>(), variables, nodes);
-		NodeBlock block = new NodeBlock(procedure);
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		nodes.add(block);
 		createInputCondition(block);
 		return procedure;

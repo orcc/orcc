@@ -36,17 +36,18 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.AbstractInstructionVisitor;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeIf;
-import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -138,11 +139,11 @@ public class PhiRemoval extends AbstractActorVisitor {
 			if (previousNode.isBlockNode()) {
 				targetBlock = (NodeBlock) previousNode;
 			} else {
-				targetBlock = new NodeBlock(procedure);
+				targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				itNode.add(targetBlock);
 			}
 		} else {
-			targetBlock = new NodeBlock(procedure);
+			targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			itNode.add(targetBlock);
 		}
 

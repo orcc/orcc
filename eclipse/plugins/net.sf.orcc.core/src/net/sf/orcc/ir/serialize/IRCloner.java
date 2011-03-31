@@ -46,6 +46,9 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -71,6 +74,7 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
@@ -79,10 +83,7 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeIf;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
-import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
@@ -192,11 +193,11 @@ public class IRCloner {
 			Location location = cloneLocation(call.getLocation());
 			Procedure procedure = getProcedure(call.getProcedure());
 			LocalVariable target = null;
-			
-			if (call.getTarget() != null){
+
+			if (call.getTarget() != null) {
 				target = getLocalVar(call.getTarget());
 			}
-			
+
 			List<Expression> parameters = cloneExpressions(call.getParameters());
 
 			return new Call(location, target, procedure, parameters);
@@ -328,12 +329,13 @@ public class IRCloner {
 
 		@Override
 		public Object interpret(NodeBlock node, Object... args) {
-			Procedure procedure = getProcedure(node.getProcedure());
 			Location location = cloneLocation(node.getLocation());
 			List<Instruction> instructions = cloneIntructions(node
 					.getInstructions());
 
-			NodeBlock clonedBlockNode = new NodeBlock(location, procedure);
+			NodeBlock clonedBlockNode = IrFactoryImpl.eINSTANCE
+					.createNodeBlock();
+			clonedBlockNode.setLocation(location);
 			clonedBlockNode.addAll(instructions);
 
 			return clonedBlockNode;
@@ -341,26 +343,37 @@ public class IRCloner {
 
 		@Override
 		public Object interpret(NodeIf node, Object... args) {
+			NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
+
 			Location location = cloneLocation(node.getLocation());
-			Procedure procedure = getProcedure(node.getProcedure());
+			nodeIf.setLocation(location);
 			Expression value = cloneExpression(node.getValue());
+			nodeIf.setValue(value);
 			List<CFGNode> thenNodes = cloneNodes(node.getThenNodes());
 			List<CFGNode> elseNodes = cloneNodes(node.getElseNodes());
 			NodeBlock joinNode = (NodeBlock) cloneNode(node.getJoinNode());
 
-			return new NodeIf(location, procedure, value, thenNodes, elseNodes,
-					joinNode);
+			node.getThenNodes().addAll(thenNodes);
+			node.getElseNodes().addAll(elseNodes);
+			node.setJoinNode(joinNode);
+
+			return nodeIf;
 		}
 
 		@Override
 		public Object interpret(NodeWhile node, Object... args) {
 			Location location = cloneLocation(node.getLocation());
-			Procedure procedure = getProcedure(node.getProcedure());
 			Expression value = cloneExpression(node.getValue());
 			List<CFGNode> nodes = cloneNodes(node.getNodes());
 			NodeBlock joinNode = (NodeBlock) cloneNode(node.getJoinNode());
+			
+			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.setLocation(location);
+			nodeWhile.setValue(value);
+			nodeWhile.getNodes().addAll(nodes);
+			nodeWhile.setJoinNode(joinNode);
 
-			return new NodeWhile(location, procedure, value, nodes, joinNode);
+			return nodeWhile;
 		}
 	}
 
@@ -418,7 +431,7 @@ public class IRCloner {
 	private static OrderedMap<String, LocalVariable> localVars;
 
 	private static OrderedMap<String, Variable> patternVars;
-	
+
 	private static OrderedMap<String, Variable> peekedVars;
 
 	private static OrderedMap<String, GlobalVariable> parameters;
@@ -551,10 +564,10 @@ public class IRCloner {
 		}
 
 		// The local variable corresponds to a pattern
-		if (patternVars.contains(variable.getName())){
+		if (patternVars.contains(variable.getName())) {
 			return (LocalVariable) patternVars.get(variable.getName());
 		}
-		
+
 		// The local variable corresponds to a peeked variable
 		return (LocalVariable) peekedVars.get(variable.getName());
 	}
@@ -633,7 +646,7 @@ public class IRCloner {
 		actions = new OrderedMap<String, Action>();
 		ports = new OrderedMap<String, Port>();
 	}
-	
+
 	/**
 	 * Creates a new partial actor that clones local elements of an actor.
 	 * 
@@ -644,17 +657,17 @@ public class IRCloner {
 		untaggedActions = new ArrayList<Action>();
 		actions = new OrderedMap<String, Action>();
 		ports = new OrderedMap<String, Port>();
-		
+
 		// Get elements of the actor
 		parameters = actor.getParameters();
 		stateVars = actor.getStateVars();
 		inputs = actor.getInputs();
-		outputs =actor.getOutputs();
+		outputs = actor.getOutputs();
 		procs = actor.getProcs();
 	}
 
 	public Actor clone(Actor actor) {
-		
+
 		parameters = cloneGlobalVariables(actor.getParameters());
 		stateVars = cloneGlobalVariables(actor.getStateVars());
 		inputs = clonePorts(actor.getInputs());
@@ -753,7 +766,7 @@ public class IRCloner {
 
 		return cloneVar;
 	}
-	
+
 	/**
 	 * Returns a clone of the given peeked variable.
 	 * 

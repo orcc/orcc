@@ -30,7 +30,6 @@ package net.sf.orcc.ir;
 
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
-import net.sf.orcc.ir.nodes.NodeBlock;
 
 /**
  * This class defines an instruction.
@@ -166,5 +165,13 @@ public interface Instruction extends User {
 	 *            the block that contains this instruction
 	 */
 	void setBlock(NodeBlock block);
+
+	/**
+	 * Sets the location of this instruction.
+	 * 
+	 * @param location
+	 *            the location of this instruction
+	 */
+	void setLocation(Location location);
 
 }

@@ -38,6 +38,9 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -48,13 +51,11 @@ import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeIf;
-import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * 
@@ -145,7 +146,7 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 		if (itInstruction == null) {
 			Procedure procedure = nodeIf.getProcedure();
 			int index = procedure.getNodes().indexOf(nodeIf);
-			NodeBlock newBlock = new NodeBlock(procedure);
+			NodeBlock newBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			procedure.getNodes().add(index, newBlock);
 			itInstruction = newBlock.getInstructions().listIterator();
 		}
@@ -221,7 +222,7 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 		if (itInstruction == null) {
 			Procedure procedure = nodeWhile.getProcedure();
 			int index = procedure.getNodes().indexOf(nodeWhile);
-			NodeBlock newBlock = new NodeBlock(procedure);
+			NodeBlock newBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			procedure.getNodes().add(index, newBlock);
 			itInstruction = newBlock.getInstructions().listIterator();
 		}

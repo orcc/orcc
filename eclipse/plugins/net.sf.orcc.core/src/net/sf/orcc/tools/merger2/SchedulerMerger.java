@@ -40,14 +40,15 @@ import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.moc.AbstractMoCInterpreter;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.util.OrderedMap;
@@ -83,7 +84,7 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 				new OrderedMap<String, LocalVariable>(),
 				new OrderedMap<String, LocalVariable>(), nodes);
 
-		NodeBlock block = new NodeBlock(procedure);
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		nodes.add(block);
 
 		for (GlobalVariable counter : varCounters) {
@@ -110,7 +111,7 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 				new OrderedMap<String, LocalVariable>(),
 				new OrderedMap<String, LocalVariable>(), nodes);
 
-		NodeBlock block = new NodeBlock(procedure);
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		nodes.add(block);
 		Return returnInstr = new Return(new BoolExpr(true));
 		block.add(returnInstr);

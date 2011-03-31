@@ -119,6 +119,14 @@ public interface CFGNode extends User {
 	boolean isWhileNode();
 
 	/**
+	 * Sets the location of this node.
+	 * 
+	 * @param location
+	 *            the location of this node
+	 */
+	void setLocation(Location location);
+
+	/**
 	 * Sets the procedure this node belongs to.
 	 * 
 	 * @param procedure

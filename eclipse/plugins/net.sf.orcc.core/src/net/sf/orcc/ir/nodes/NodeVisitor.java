@@ -28,6 +28,10 @@
  */
 package net.sf.orcc.ir.nodes;
 
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
+
 /**
  * This interface defines a node visitor.
  * 

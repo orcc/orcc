@@ -77,6 +77,9 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -101,15 +104,13 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.CFGNodeImpl;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeIf;
-import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
@@ -141,8 +142,6 @@ public class IRParser {
 	private boolean isInitialize;
 
 	private OrderedMap<String, Port> outputs;
-
-	private Procedure procedure;
 
 	final private OrderedMap<String, Procedure> procs;
 
@@ -732,7 +731,7 @@ public class IRParser {
 	 * @return a NodeBlock
 	 */
 	private NodeBlock parseNodeBlock(Location loc, JsonArray array) {
-		NodeBlock join = new NodeBlock(loc, procedure);
+		NodeBlock join = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		for (JsonElement element : array.get(2).getAsJsonArray()) {
 			join.add(parseInstruction(element.getAsJsonArray()));
 		}
@@ -756,8 +755,14 @@ public class IRParser {
 		NodeBlock joinNode = (NodeBlock) parseNode(array.get(5)
 				.getAsJsonArray());
 
-		return new NodeIf(loc, procedure, condition, thenNodes, elseNodes,
-				joinNode);
+		NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
+		nodeIf.setLocation(loc);
+		nodeIf.setValue(condition);
+		nodeIf.getThenNodes().addAll(thenNodes);
+		nodeIf.getElseNodes().addAll(elseNodes);
+		nodeIf.setJoinNode(joinNode);
+
+		return nodeIf;
 	}
 
 	/**
@@ -789,7 +794,13 @@ public class IRParser {
 		List<CFGNode> nodes = parseNodes(array.get(3).getAsJsonArray());
 		NodeBlock joinNode = (NodeBlock) parseNode(array.get(4)
 				.getAsJsonArray());
-		return new NodeWhile(loc, procedure, condition, nodes, joinNode);
+		
+		NodeWhile node = IrFactoryImpl.eINSTANCE.createNodeWhile();
+		node.setValue(condition);
+		node.getNodes().addAll(nodes);
+		node.setJoinNode(joinNode);
+
+		return node;
 	}
 
 	private Pattern parsePattern(OrderedMap<String, Port> ports, JsonArray array) {
@@ -862,8 +873,8 @@ public class IRParser {
 		OrderedMap<String, LocalVariable> locals = parseLocalVariables(array
 				.get(5).getAsJsonArray());
 
-		procedure = new Procedure(name, external, location, returnType,
-				parameters, locals, null);
+		Procedure procedure = new Procedure(name, external, location,
+				returnType, parameters, locals, null);
 
 		List<CFGNode> nodes = parseNodes(array.get(6).getAsJsonArray());
 		procedure.setNodes(nodes);

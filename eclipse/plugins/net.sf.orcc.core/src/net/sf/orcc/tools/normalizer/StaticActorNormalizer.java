@@ -42,6 +42,8 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -54,12 +56,11 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.NodeBlock;
-import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.util.OrderedMap;
 
@@ -118,8 +119,8 @@ public class StaticActorNormalizer {
 			List<CFGNode> oldNodes = nodes;
 			nodes = new ArrayList<CFGNode>();
 
-			NodeWhile nodeWhile = new NodeWhile(procedure, null, nodes,
-					new NodeBlock(procedure));
+			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			nodeWhile.getNodes().addAll(nodes);
 			oldNodes.add(nodeWhile);
 
 			// assign condition
@@ -278,7 +279,7 @@ public class StaticActorNormalizer {
 
 			List<CFGNode> nodes = scheduler.getNodes();
 			nodes.clear();
-			NodeBlock block = new NodeBlock(scheduler);
+			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			nodes.add(block);
 			block.add(new Return(new Location(), new BoolExpr(true)));
 		}
@@ -396,7 +397,7 @@ public class StaticActorNormalizer {
 				IrFactory.eINSTANCE.createTypeBool(),
 				new OrderedMap<String, LocalVariable>(), variables, nodes);
 
-		NodeBlock block = new NodeBlock(procedure);
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		nodes.add(block);
 
 		createInputCondition(block);

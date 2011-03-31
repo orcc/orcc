@@ -45,16 +45,17 @@ import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -124,7 +125,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 			scheduler.getLocals().remove(result.getBaseName());
 			scheduler.getLocals().put(result.getName(), result);
 
-			NodeBlock block = new NodeBlock(scheduler);
+			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			block.add(new Assign(result, condition));
 			block.add(new Return(new VarExpr(new Use(result))));
 			scheduler.getNodes().add(block);
@@ -132,7 +133,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 			// body
 			Procedure body = new Procedure(name, new Location(),
 					IrFactory.eINSTANCE.createTypeVoid());
-			block = new NodeBlock(body);
+			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			block.add(new Return(null));
 			body.getNodes().add(block);
 
