@@ -48,9 +48,9 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.simulators.SimuActor;
@@ -74,13 +74,13 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 
 	private class NodeInfo {
 		public Expression condition;
-		public BlockNode joinNode;
+		public NodeBlock joinNode;
 		public int nbSubNodes;
 		public int subNodeIdx;
 		public List<CFGNode> subNodes;
 
 		public NodeInfo(int subNodeIdx, int nbSubNodes, List<CFGNode> subNodes,
-				BlockNode joinNode, Expression condition) {
+				NodeBlock joinNode, Expression condition) {
 			this.subNodeIdx = subNodeIdx;
 			this.nbSubNodes = nbSubNodes;
 			this.subNodes = subNodes;
@@ -273,33 +273,33 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 				}
 			} else {
 				CFGNode subNode = node.subNodes.get(node.subNodeIdx++);
-				if (subNode instanceof IfNode) {
-					Object condition = ((IfNode) subNode).getValue().accept(
+				if (subNode instanceof NodeIf) {
+					Object condition = ((NodeIf) subNode).getValue().accept(
 							exprEvaluator);
 					if (((BoolExpr) condition).getValue()) {
-						nodeStack.add(new NodeInfo(0, ((IfNode) subNode)
-								.getThenNodes().size(), ((IfNode) subNode)
-								.getThenNodes(), ((IfNode) subNode)
+						nodeStack.add(new NodeInfo(0, ((NodeIf) subNode)
+								.getThenNodes().size(), ((NodeIf) subNode)
+								.getThenNodes(), ((NodeIf) subNode)
 								.getJoinNode(), null));
 					} else {
-						nodeStack.add(new NodeInfo(0, ((IfNode) subNode)
-								.getElseNodes().size(), ((IfNode) subNode)
-								.getElseNodes(), ((IfNode) subNode)
+						nodeStack.add(new NodeInfo(0, ((NodeIf) subNode)
+								.getElseNodes().size(), ((NodeIf) subNode)
+								.getElseNodes(), ((NodeIf) subNode)
 								.getJoinNode(), null));
 					}
 					nodeStackLevel++;
 					exeStmt = true;
-				} else if (subNode instanceof WhileNode) {
-					Expression condition = ((WhileNode) subNode).getValue();
+				} else if (subNode instanceof NodeWhile) {
+					Expression condition = ((NodeWhile) subNode).getValue();
 					if (((BoolExpr) condition.accept(exprEvaluator)).getValue()) {
-						nodeStack.add(new NodeInfo(0, ((WhileNode) subNode)
-								.getNodes().size(), ((WhileNode) subNode)
+						nodeStack.add(new NodeInfo(0, ((NodeWhile) subNode)
+								.getNodes().size(), ((NodeWhile) subNode)
 								.getNodes(), null, condition));
 						nodeStackLevel++;
 					}
 					exeStmt = true;
-				} else /* BlockNode => add instructions to stack */{
-					Iterator<Instruction> it = ((BlockNode) subNode).iterator();
+				} else /* NodeBlock => add instructions to stack */{
+					Iterator<Instruction> it = ((NodeBlock) subNode).iterator();
 					while (it.hasNext()) {
 						instrStack.add(it.next());
 					}

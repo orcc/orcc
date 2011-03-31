@@ -39,31 +39,35 @@ import net.sf.orcc.ir.impl.CFGNodeImpl;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines a While node. A while node is a node with a value used in
- * its condition.
+ * This class defines an If node. An if node is a node with a value used in its
+ * condition.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class WhileNode extends CFGNodeImpl implements ValueContainer {
+public class NodeIf extends CFGNodeImpl implements ValueContainer {
 
-	private BlockNode joinNode;
+	private List<CFGNode> elseNodes;
 
-	private List<CFGNode> nodes;
+	private NodeBlock joinNode;
+
+	private List<CFGNode> thenNodes;
 
 	private Expression value;
 
-	public WhileNode(Location location, Procedure procedure,
-			Expression condition, List<CFGNode> nodes, BlockNode joinNode) {
+	public NodeIf(Location location, Procedure procedure, Expression condition,
+			List<CFGNode> thenNodes, List<CFGNode> elseNodes, NodeBlock joinNode) {
 		super(location, procedure);
+		this.elseNodes = elseNodes;
 		this.joinNode = joinNode;
-		this.nodes = nodes;
+		this.thenNodes = thenNodes;
 		setValue(condition);
 	}
 
-	public WhileNode(Procedure procedure, Expression condition,
-			List<CFGNode> nodes, BlockNode joinNode) {
-		this(new Location(), procedure, condition, nodes, joinNode);
+	public NodeIf(Procedure procedure, Expression condition,
+			List<CFGNode> thenNodes, List<CFGNode> elseNodes, NodeBlock joinNode) {
+		this(new Location(), procedure, condition, thenNodes, elseNodes,
+				joinNode);
 	}
 
 	@Override
@@ -76,12 +80,16 @@ public class WhileNode extends CFGNodeImpl implements ValueContainer {
 		visitor.visit(this);
 	}
 
-	public BlockNode getJoinNode() {
+	public List<CFGNode> getElseNodes() {
+		return elseNodes;
+	}
+
+	public NodeBlock getJoinNode() {
 		return joinNode;
 	}
 
-	public List<CFGNode> getNodes() {
-		return nodes;
+	public List<CFGNode> getThenNodes() {
+		return thenNodes;
 	}
 
 	@Override
@@ -95,11 +103,11 @@ public class WhileNode extends CFGNodeImpl implements ValueContainer {
 	}
 
 	@Override
-	public boolean isWhileNode() {
+	public boolean isIfNode() {
 		return true;
 	}
 
-	public void setJoinNode(BlockNode joinNode) {
+	public void setJoinNode(NodeBlock joinNode) {
 		this.joinNode = joinNode;
 	}
 
@@ -110,7 +118,7 @@ public class WhileNode extends CFGNodeImpl implements ValueContainer {
 
 	@Override
 	public String toString() {
-		return "while (" + getValue() + ")";
+		return "if (" + getValue() + ")";
 	}
 
 }

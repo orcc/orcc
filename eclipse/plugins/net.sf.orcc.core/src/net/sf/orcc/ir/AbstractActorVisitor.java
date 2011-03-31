@@ -48,10 +48,10 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
 import net.sf.orcc.ir.nodes.NodeVisitor;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * This abstract class implements a no-op visitor on an actor. This class should
@@ -172,8 +172,8 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(BlockNode blockNode) {
-		ListIterator<Instruction> it = blockNode.listIterator();
+	public void visit(NodeBlock nodeBlock) {
+		ListIterator<Instruction> it = nodeBlock.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
 			itInstruction = it;
@@ -199,14 +199,14 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(IfNode ifNode) {
+	public void visit(NodeIf nodeIf) {
 		if (visitFull) {
-			ifNode.getValue().accept(this);
+			nodeIf.getValue().accept(this);
 		}
 
-		visit(ifNode.getThenNodes());
-		visit(ifNode.getElseNodes());
-		visit(ifNode.getJoinNode());
+		visit(nodeIf.getThenNodes());
+		visit(nodeIf.getElseNodes());
+		visit(nodeIf.getJoinNode());
 	}
 
 	@Override
@@ -313,13 +313,13 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(WhileNode whileNode) {
+	public void visit(NodeWhile nodeWhile) {
 		if (visitFull) {
-			whileNode.getValue().accept(this);
+			nodeWhile.getValue().accept(this);
 		}
 
-		visit(whileNode.getNodes());
-		visit(whileNode.getJoinNode());
+		visit(nodeWhile.getNodes());
+		visit(nodeWhile.getJoinNode());
 	}
 
 }

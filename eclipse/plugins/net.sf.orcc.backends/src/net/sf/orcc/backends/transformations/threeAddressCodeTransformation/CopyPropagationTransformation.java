@@ -54,8 +54,8 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -183,14 +183,14 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(IfNode ifNode) {
+	public void visit(NodeIf nodeIf) {
 		// Visit value of store
-		Expression value = ifNode.getValue();
+		Expression value = nodeIf.getValue();
 		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
-		ifNode.setValue(newExpr);
+		nodeIf.setValue(newExpr);
 
-		super.visit(ifNode);
-		Use.addUses(ifNode, newExpr);
+		super.visit(nodeIf);
+		Use.addUses(nodeIf, newExpr);
 	}
 
 	@Override
@@ -278,13 +278,13 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode whileNode) {
-		Expression value = whileNode.getValue();
+	public void visit(NodeWhile nodeWhile) {
+		Expression value = nodeWhile.getValue();
 		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
-		whileNode.setValue(newExpr);
+		nodeWhile.setValue(newExpr);
 
-		super.visit(whileNode);
-		Use.addUses(whileNode, newExpr);
+		super.visit(nodeWhile);
+		Use.addUses(nodeWhile, newExpr);
 	}
 
 	private void visitExpressions(List<Expression> expressions) {

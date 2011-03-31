@@ -66,8 +66,8 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;
@@ -556,7 +556,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(IfNode node) {
+	public void visit(NodeIf node) {
 		// Interpret first expression ("if" condition)
 		Expression condition = (Expression) node.getValue().accept(
 				exprInterpreter);
@@ -693,7 +693,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode node) {
+	public void visit(NodeWhile node) {
 		int oldBranch = branch;
 		branch = 0;
 		visit(node.getJoinNode());

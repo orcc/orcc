@@ -60,10 +60,10 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * This class defines an actor transformation that inline the functions and/or
@@ -97,15 +97,15 @@ public class InlineTransformation extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(BlockNode node, Object... args) {
-			BlockNode blockNode = new BlockNode(node.getLocation(), procedure);
+		public Object interpret(NodeBlock node, Object... args) {
+			NodeBlock nodeBlock = new NodeBlock(node.getLocation(), procedure);
 			for (Instruction instruction : node.getInstructions()) {
 				Instruction i = (Instruction) instruction.accept(this, args);
 				if (i != null) {
-					blockNode.add(i);
+					nodeBlock.add(i);
 				}
 			}
-			return blockNode;
+			return nodeBlock;
 		}
 
 		@Override
@@ -135,7 +135,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(IfNode node, Object... args) {
+		public Object interpret(NodeIf node, Object... args) {
 			Expression condition = (Expression) node.getValue().accept(this,
 					args);
 			List<CFGNode> thenNodes = new ArrayList<CFGNode>();
@@ -146,12 +146,12 @@ public class InlineTransformation extends AbstractActorVisitor {
 			for (CFGNode n : node.getElseNodes()) {
 				elseNodes.add((CFGNode) n.accept(this, args));
 			}
-			BlockNode joinNode = (BlockNode) node.getJoinNode().accept(this,
+			NodeBlock joinNode = (NodeBlock) node.getJoinNode().accept(this,
 					args);
-			IfNode ifNode = new IfNode(node.getLocation(), procedure,
+			NodeIf nodeIf = new NodeIf(node.getLocation(), procedure,
 					condition, thenNodes, elseNodes, joinNode);
-			Use.addUses(ifNode, condition);
-			return ifNode;
+			Use.addUses(nodeIf, condition);
+			return nodeIf;
 		}
 
 		@Override
@@ -288,19 +288,19 @@ public class InlineTransformation extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(WhileNode node, Object... args) {
+		public Object interpret(NodeWhile node, Object... args) {
 			Expression condition = (Expression) node.getValue().accept(this,
 					args);
 			List<CFGNode> nodes = new ArrayList<CFGNode>();
 			for (CFGNode n : node.getNodes()) {
 				nodes.add((CFGNode) n.accept(this, args));
 			}
-			BlockNode joinNode = (BlockNode) node.getJoinNode().accept(this,
+			NodeBlock joinNode = (NodeBlock) node.getJoinNode().accept(this,
 					args);
-			WhileNode whileNode = new WhileNode(node.getLocation(), procedure,
+			NodeWhile nodeWhile = new NodeWhile(node.getLocation(), procedure,
 					condition, nodes, joinNode);
-			Use.addUses(whileNode, condition);
-			return whileNode;
+			Use.addUses(nodeWhile, condition);
+			return nodeWhile;
 		}
 
 	}
@@ -369,7 +369,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		// Assign all parameters except for list
-		BlockNode newBlockNode = new BlockNode(procedure);
+		NodeBlock newBlockNode = new NodeBlock(procedure);
 		for (int i = 0; i < function.getParameters().getLength(); i++) {
 			Variable parameter = function.getParameters().getList().get(i);
 			if (!parameter.getType().isList()) {
@@ -392,7 +392,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 		}
 
 		// Remove old block and add the new ones
-		BlockNode secondBlockNodePart = new BlockNode(procedure);
+		NodeBlock secondBlockNodePart = new NodeBlock(procedure);
 
 		itInstruction.remove();
 		while (itInstruction.hasNext()) {
@@ -426,8 +426,8 @@ public class InlineTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(BlockNode blockNode) {
-		ListIterator<Instruction> it = blockNode.listIterator();
+	public void visit(NodeBlock nodeBlock) {
+		ListIterator<Instruction> it = nodeBlock.listIterator();
 		needToSkipThisNode = false;
 		while (it.hasNext() && !needToSkipThisNode) {
 			Instruction instruction = it.next();
@@ -455,20 +455,20 @@ public class InlineTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode whileNode) {
+	public void visit(NodeWhile nodeWhile) {
 		ListIterator<CFGNode> oldNodeIterator = itNode;
-		visit(whileNode.getNodes());
+		visit(nodeWhile.getNodes());
 		itNode = oldNodeIterator;
-		visit(whileNode.getJoinNode());
+		visit(nodeWhile.getJoinNode());
 	}
 
 	@Override
-	public void visit(IfNode ifNode) {
+	public void visit(NodeIf nodeIf) {
 		ListIterator<CFGNode> oldNodeIterator = itNode;
-		visit(ifNode.getThenNodes());
-		visit(ifNode.getElseNodes());
+		visit(nodeIf.getThenNodes());
+		visit(nodeIf.getElseNodes());
 		itNode = oldNodeIterator;
-		visit(ifNode.getJoinNode());
+		visit(nodeIf.getJoinNode());
 	}
 
 }

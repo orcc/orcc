@@ -64,8 +64,8 @@ import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -92,7 +92,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		private Map<Variable, Integer> loads;
 		private Map<Variable, Integer> stores;
-		private BlockNode currentBlock;
+		private NodeBlock currentBlock;
 
 		public ModifyLoadStoreIndexes(String id) {
 			this.id = id;
@@ -106,7 +106,7 @@ public class ActorMerger implements INetworkTransformation {
 				stores = new HashMap<Variable, Integer>();
 				visit(proc);
 
-				currentBlock = BlockNode.getLast(proc);
+				currentBlock = NodeBlock.getLast(proc);
 
 				updateLoadIndex();
 				updateStoreIndex();
@@ -348,7 +348,7 @@ public class ActorMerger implements INetworkTransformation {
 			Variable read = actor.getStateVars().get(var.getName() + "_r");
 			Variable write = actor.getStateVars().get(var.getName() + "_w");
 
-			BlockNode block = BlockNode.getLast(procedure, nodes);
+			NodeBlock block = NodeBlock.getLast(procedure, nodes);
 			block.add(new Store(read, new IntExpr(0)));
 			block.add(new Store(write, new IntExpr(0)));
 		}
@@ -366,7 +366,7 @@ public class ActorMerger implements INetworkTransformation {
 	 * @param block
 	 *            block to which return is to be added
 	 */
-	private void createInputCondition(BlockNode block) {
+	private void createInputCondition(NodeBlock block) {
 		Expression value;
 		Iterator<LocalVariable> it = variables.iterator();
 		if (it.hasNext()) {
@@ -470,7 +470,7 @@ public class ActorMerger implements INetworkTransformation {
 				Procedure proc = actor.getProcs().get(
 						instance.getId() + "_" + action.getName());
 
-				BlockNode blkNode = BlockNode.getLast(procedure, nodes);
+				NodeBlock blkNode = NodeBlock.getLast(procedure, nodes);
 				blkNode.add(new Call(new Location(), null, proc,
 						new ArrayList<Expression>()));
 			} else {
@@ -482,7 +482,7 @@ public class ActorMerger implements INetworkTransformation {
 						+ depth);
 
 				// Reset loop counter
-				BlockNode blkNode = BlockNode.getLast(procedure, nodes);
+				NodeBlock blkNode = NodeBlock.getLast(procedure, nodes);
 				blkNode.add(new Assign(loopVar, new IntExpr(0)));
 
 				Expression condition = new BinaryExpr(new VarExpr(new Use(
@@ -490,13 +490,13 @@ public class ActorMerger implements INetworkTransformation {
 						sched.getIterationCount()),
 						IrFactory.eINSTANCE.createTypeBool());
 
-				WhileNode whileNode = new WhileNode(procedure, condition,
-						new ArrayList<CFGNode>(), new BlockNode(procedure));
-				nodes.add(whileNode);
+				NodeWhile nodeWhile = new NodeWhile(procedure, condition,
+						new ArrayList<CFGNode>(), new NodeBlock(procedure));
+				nodes.add(nodeWhile);
 
 				depth++;
 
-				createLoopedSchedule(procedure, sched, whileNode.getNodes());
+				createLoopedSchedule(procedure, sched, nodeWhile.getNodes());
 
 				depth--;
 
@@ -504,7 +504,7 @@ public class ActorMerger implements INetworkTransformation {
 				Assign assign = new Assign(loopVar, new BinaryExpr(new VarExpr(
 						new Use(loopVar)), BinaryOp.PLUS, new IntExpr(1),
 						loopVar.getType()));
-				BlockNode.getLast(procedure, whileNode.getNodes()).add(assign);
+				NodeBlock.getLast(procedure, nodeWhile.getNodes()).add(assign);
 
 			}
 		}
@@ -535,7 +535,7 @@ public class ActorMerger implements INetworkTransformation {
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),
 				new OrderedMap<String, LocalVariable>(), variables, nodes);
-		BlockNode block = new BlockNode(procedure);
+		NodeBlock block = new NodeBlock(procedure);
 		nodes.add(block);
 		createInputCondition(block);
 		return procedure;

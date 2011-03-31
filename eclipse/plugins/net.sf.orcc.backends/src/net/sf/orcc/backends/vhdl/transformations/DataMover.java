@@ -42,7 +42,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -61,7 +61,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class DataMover extends AbstractActorVisitor {
 
-	private BlockNode targetBlock;
+	private NodeBlock targetBlock;
 
 	private Map<LocalVariable, GlobalVariable> variableMap;
 
@@ -127,7 +127,7 @@ public class DataMover extends AbstractActorVisitor {
 		Store store = new Store(stateVar, new VarExpr(new Use(variable)));
 
 		Instruction instruction = variable.getInstruction();
-		BlockNode block = instruction.getBlock();
+		NodeBlock block = instruction.getBlock();
 		int index = block.indexOf(instruction);
 		block.add(index + 1, store);
 		variableMap.put(variable, stateVar);
@@ -155,7 +155,7 @@ public class DataMover extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(BlockNode node) {
+	public void visit(NodeBlock node) {
 		this.targetBlock = node;
 		super.visit(node);
 	}

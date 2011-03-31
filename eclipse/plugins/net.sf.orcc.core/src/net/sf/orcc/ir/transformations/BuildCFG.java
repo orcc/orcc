@@ -34,10 +34,10 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * This class defines a transformation to build the CFG of procedures.
@@ -64,7 +64,7 @@ public class BuildCFG extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(BlockNode node, Object... args) {
+		public Object interpret(NodeBlock node, Object... args) {
 			CFGNode previous = (CFGNode) args[0];
 			graph.addVertex(node);
 			if (previous != null) {
@@ -75,7 +75,7 @@ public class BuildCFG extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(IfNode node, Object... args) {
+		public Object interpret(NodeIf node, Object... args) {
 			CFGNode previous = (CFGNode) args[0];
 			CFGNode last;
 			graph.addVertex(node);
@@ -104,7 +104,7 @@ public class BuildCFG extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(WhileNode node, Object... args) {
+		public Object interpret(NodeWhile node, Object... args) {
 			CFGNode previous = (CFGNode) args[0];
 
 			CFGNode join = node.getJoinNode();

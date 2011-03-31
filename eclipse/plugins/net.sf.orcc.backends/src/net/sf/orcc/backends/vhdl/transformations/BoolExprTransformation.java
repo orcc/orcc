@@ -47,8 +47,8 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
 
 /**
  * This class defines an actor transformation that transforms assignments whose
@@ -59,14 +59,14 @@ import net.sf.orcc.ir.nodes.IfNode;
  * <p>
  * The algorithm works as follows: Considering a block with instructions [i1,
  * i2, ..., ii, ..., in] where the instruction <code>ii</code> is an assign or a
- * store whose value is a boolean binary/unary expression, then create an IfNode
+ * store whose value is a boolean binary/unary expression, then create an NodeIf
  * after the current block that assigns <code>true</code> to the target if
  * <code>true</code>, and assigns <code>false</code> otherwise.
  * </p>
  * 
  * <p>
  * The remaining instructions <code>i(i+1)</code> to <code>in</code> are moved
- * to a new block created after the newly-created IfNode. The
+ * to a new block created after the newly-created NodeIf. The
  * <code>previous</code> method is called on the node iterator so that the new
  * block is to be visited next.
  * </p>
@@ -92,17 +92,17 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	private void createIfNode(LocalVariable target, Expression expr) {
 		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
 		List<CFGNode> elseNodes = new ArrayList<CFGNode>();
-		IfNode node = new IfNode(procedure, expr, thenNodes, elseNodes,
-				new BlockNode(procedure));
+		NodeIf node = new NodeIf(procedure, expr, thenNodes, elseNodes,
+				new NodeBlock(procedure));
 
 		// add "then" nodes
-		BlockNode block = new BlockNode(procedure);
+		NodeBlock block = new NodeBlock(procedure);
 		thenNodes.add(block);
 		Assign assign = new Assign(target, new BoolExpr(true));
 		block.add(assign);
 
 		// add "else" nodes
-		block = new BlockNode(procedure);
+		block = new NodeBlock(procedure);
 		elseNodes.add(block);
 		assign = new Assign(target, new BoolExpr(false));
 		block.add(assign);
@@ -112,20 +112,20 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 
 	/**
 	 * Creates a new block node that will contain the remaining instructions of
-	 * the block that is being visited. The new block is added after the IfNode.
+	 * the block that is being visited. The new block is added after the NodeIf.
 	 * 
 	 * @param iit
 	 *            list iterator
 	 */
 	private void createNewBlock(ListIterator<Instruction> iit) {
-		BlockNode block = new BlockNode(procedure);
+		NodeBlock block = new NodeBlock(procedure);
 		while (iit.hasNext()) {
 			Instruction instruction = iit.next();
 			iit.remove();
 			block.add(instruction);
 		}
 
-		// adds this block after the IfNode
+		// adds this block after the NodeIf
 		itNode.add(block);
 
 		// moves the iterator back so the new block will be visited next

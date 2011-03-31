@@ -30,7 +30,7 @@ package net.sf.orcc.ir;
 
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
 
 /**
  * This class defines an instruction.
@@ -66,7 +66,7 @@ public interface Instruction extends User {
 	 * 
 	 * @return the block that contains this instruction
 	 */
-	BlockNode getBlock();
+	NodeBlock getBlock();
 
 	/**
 	 * Returns instruction casting type if needed.
@@ -165,6 +165,6 @@ public interface Instruction extends User {
 	 * @param block
 	 *            the block that contains this instruction
 	 */
-	void setBlock(BlockNode block);
+	void setBlock(NodeBlock block);
 
 }

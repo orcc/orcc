@@ -46,7 +46,7 @@ import net.sf.orcc.ir.impl.CFGNodeImpl;
  * @author Matthieu Wipliez
  * 
  */
-public final class BlockNode extends CFGNodeImpl implements
+public final class NodeBlock extends CFGNodeImpl implements
 		Iterable<Instruction> {
 
 	/**
@@ -57,7 +57,7 @@ public final class BlockNode extends CFGNodeImpl implements
 	 *            a procedure
 	 * @return a block
 	 */
-	public static BlockNode getFirst(Procedure procedure) {
+	public static NodeBlock getFirst(Procedure procedure) {
 		return getFirst(procedure, procedure.getNodes());
 	}
 
@@ -71,17 +71,17 @@ public final class BlockNode extends CFGNodeImpl implements
 	 *            a list of nodes of the given procedure
 	 * @return a block
 	 */
-	public static BlockNode getFirst(Procedure procedure, List<CFGNode> nodes) {
-		BlockNode block;
+	public static NodeBlock getFirst(Procedure procedure, List<CFGNode> nodes) {
+		NodeBlock block;
 		if (nodes.isEmpty()) {
-			block = new BlockNode(procedure);
+			block = new NodeBlock(procedure);
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(0);
 			if (node.isBlockNode()) {
-				block = (BlockNode) node;
+				block = (NodeBlock) node;
 			} else {
-				block = new BlockNode(procedure);
+				block = new NodeBlock(procedure);
 				nodes.add(0, block);
 			}
 		}
@@ -97,7 +97,7 @@ public final class BlockNode extends CFGNodeImpl implements
 	 *            a procedure
 	 * @return a block
 	 */
-	public static BlockNode getLast(Procedure procedure) {
+	public static NodeBlock getLast(Procedure procedure) {
 		return getLast(procedure, procedure.getNodes());
 	}
 
@@ -112,17 +112,17 @@ public final class BlockNode extends CFGNodeImpl implements
 	 *            nodes
 	 * @return a block
 	 */
-	public static BlockNode getLast(Procedure procedure, List<CFGNode> nodes) {
-		BlockNode block;
+	public static NodeBlock getLast(Procedure procedure, List<CFGNode> nodes) {
+		NodeBlock block;
 		if (nodes.isEmpty()) {
-			block = new BlockNode(procedure);
+			block = new NodeBlock(procedure);
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(nodes.size() - 1);
 			if (node.isBlockNode()) {
-				block = (BlockNode) node;
+				block = (NodeBlock) node;
 			} else {
-				block = new BlockNode(procedure);
+				block = new NodeBlock(procedure);
 				nodes.add(block);
 			}
 		}
@@ -138,7 +138,7 @@ public final class BlockNode extends CFGNodeImpl implements
 	/**
 	 * Creates a new empty block node with the given location.
 	 */
-	public BlockNode(Location location, Procedure procedure) {
+	public NodeBlock(Location location, Procedure procedure) {
 		super(location, procedure);
 		instructions = new ArrayList<Instruction>();
 	}
@@ -146,7 +146,7 @@ public final class BlockNode extends CFGNodeImpl implements
 	/**
 	 * Creates a new empty block node.
 	 */
-	public BlockNode(Procedure procedure) {
+	public NodeBlock(Procedure procedure) {
 		this(new Location(), procedure);
 	}
 
@@ -166,7 +166,7 @@ public final class BlockNode extends CFGNodeImpl implements
 	 * @param block
 	 *            a block
 	 */
-	public void add(BlockNode block) {
+	public void add(NodeBlock block) {
 		for (Instruction instruction : block) {
 			add(instruction);
 		}

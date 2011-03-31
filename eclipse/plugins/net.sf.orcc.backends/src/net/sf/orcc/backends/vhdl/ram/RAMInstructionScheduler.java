@@ -48,7 +48,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
 
 /**
  * This class defines a visitor that transforms loads and stores to RAM
@@ -75,7 +75,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param variable
 	 *            variable
 	 */
-	private void addEarlySetAddress(BlockNode block, List<Expression> indexes,
+	private void addEarlySetAddress(NodeBlock block, List<Expression> indexes,
 			int port, Variable variable) {
 		RamSetAddress rsa = new RamSetAddress(indexes);
 		rsa.setBlock(block);
@@ -133,7 +133,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param variable
 	 *            variable
 	 */
-	private void addSetAddress(BlockNode block, List<Expression> indexes,
+	private void addSetAddress(NodeBlock block, List<Expression> indexes,
 			int port, Variable variable) {
 		RamSetAddress rsa = new RamSetAddress(indexes);
 		rsa.setBlock(block);
@@ -148,7 +148,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param block
 	 *            a block
 	 */
-	private void addSplitInstruction(BlockNode block) {
+	private void addSplitInstruction(NodeBlock block) {
 		SplitInstruction instruction = new SplitInstruction();
 		instruction.setBlock(block);
 		itInstruction.add(instruction);
@@ -180,7 +180,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 *            a Load
 	 */
 	private void convertLoad(Load load) {
-		BlockNode block = load.getBlock();
+		NodeBlock block = load.getBlock();
 		List<Expression> indexes = load.getIndexes();
 		Variable variable = load.getSource().getVariable();
 
@@ -224,7 +224,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 *            a Store
 	 */
 	private void convertStore(Store store) {
-		BlockNode block = store.getBlock();
+		NodeBlock block = store.getBlock();
 		List<Expression> indexes = store.getIndexes();
 		Variable variable = store.getTarget();
 
@@ -248,7 +248,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 		ram.setLastAccessRead(false);
 	}
 
-	private boolean executeTwoPendingReads(BlockNode block, RAM ram) {
+	private boolean executeTwoPendingReads(NodeBlock block, RAM ram) {
 		List<RamRead> reads = pendingReads.get(ram);
 		Iterator<RamRead> it = reads.iterator();
 		for (int i = 0; it.hasNext() && i < 2; i++) {
@@ -292,7 +292,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	public void visit(Procedure procedure) {
 		super.visit(procedure);
 
-		BlockNode block = BlockNode.getLast(procedure);
+		NodeBlock block = NodeBlock.getLast(procedure);
 		itInstruction = block.lastListIterator();
 		for (RAM ram : ramMap.values()) {
 			// set the RAM as "never accessed"

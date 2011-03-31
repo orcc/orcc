@@ -44,9 +44,9 @@ import net.sf.orcc.ir.instructions.AbstractInstructionVisitor;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -71,7 +71,7 @@ public class PhiRemoval extends AbstractActorVisitor {
 
 	}
 
-	private void removePhis(BlockNode join) {
+	private void removePhis(NodeBlock join) {
 		ListIterator<Instruction> it = join.listIterator();
 		while (it.hasNext()) {
 			itInstruction = it;
@@ -79,18 +79,18 @@ public class PhiRemoval extends AbstractActorVisitor {
 		}
 	}
 
-	private BlockNode targetBlock;
+	private NodeBlock targetBlock;
 
 	private int phiIndex;
 
 	@Override
-	public void visit(IfNode node) {
-		BlockNode join = node.getJoinNode();
-		targetBlock = BlockNode.getLast(procedure, node.getThenNodes());
+	public void visit(NodeIf node) {
+		NodeBlock join = node.getJoinNode();
+		targetBlock = NodeBlock.getLast(procedure, node.getThenNodes());
 		phiIndex = 0;
 		join.accept(this);
 
-		targetBlock = BlockNode.getLast(procedure, node.getElseNodes());
+		targetBlock = NodeBlock.getLast(procedure, node.getElseNodes());
 		phiIndex = 1;
 		join.accept(this);
 		removePhis(join);
@@ -130,22 +130,22 @@ public class PhiRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode node) {
+	public void visit(NodeWhile node) {
 		// the node before the while.
 		if (itNode.hasPrevious()) {
 			CFGNode previousNode = itNode.previous();
 			if (previousNode.isBlockNode()) {
-				targetBlock = (BlockNode) previousNode;
+				targetBlock = (NodeBlock) previousNode;
 			} else {
-				targetBlock = new BlockNode(procedure);
+				targetBlock = new NodeBlock(procedure);
 				itNode.add(targetBlock);
 			}
 		} else {
-			targetBlock = new BlockNode(procedure);
+			targetBlock = new NodeBlock(procedure);
 			itNode.add(targetBlock);
 		}
 
-		BlockNode join = node.getJoinNode();
+		NodeBlock join = node.getJoinNode();
 		phiIndex = 0;
 		join.accept(this);
 
@@ -153,7 +153,7 @@ public class PhiRemoval extends AbstractActorVisitor {
 		itNode.next();
 
 		// last node of the while
-		targetBlock = BlockNode.getLast(procedure, node.getNodes());
+		targetBlock = NodeBlock.getLast(procedure, node.getNodes());
 		phiIndex = 1;
 		join.accept(this);
 		removePhis(join);

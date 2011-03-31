@@ -47,8 +47,8 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * This class defines an abstract interpreter of an actor. It refines the
@@ -80,7 +80,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	public void visit(IfNode node) {
+	public void visit(NodeIf node) {
 		// Interpret first expression ("if" condition)
 		Expression condition = (Expression) node.getValue().accept(
 				exprInterpreter);
@@ -165,7 +165,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	public void visit(WhileNode node) {
+	public void visit(NodeWhile node) {
 		int oldBranch = branch;
 		branch = 0;
 		visit(node.getJoinNode());

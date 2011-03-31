@@ -107,9 +107,9 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
@@ -723,16 +723,16 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the given JSON array as a BlockNode.
+	 * Parses the given JSON array as a NodeBlock.
 	 * 
 	 * @param loc
 	 *            location information
 	 * @param array
 	 *            a JSON array
-	 * @return a BlockNode
+	 * @return a NodeBlock
 	 */
-	private BlockNode parseNodeBlock(Location loc, JsonArray array) {
-		BlockNode join = new BlockNode(loc, procedure);
+	private NodeBlock parseNodeBlock(Location loc, JsonArray array) {
+		NodeBlock join = new NodeBlock(loc, procedure);
 		for (JsonElement element : array.get(2).getAsJsonArray()) {
 			join.add(parseInstruction(element.getAsJsonArray()));
 		}
@@ -741,22 +741,22 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the given JSON array as an IfNode.
+	 * Parses the given JSON array as an NodeIf.
 	 * 
 	 * @param loc
 	 *            location information
 	 * @param array
 	 *            a JSON array
-	 * @return an IfNode
+	 * @return an NodeIf
 	 */
-	private IfNode parseNodeIf(Location loc, JsonArray array) {
+	private NodeIf parseNodeIf(Location loc, JsonArray array) {
 		Expression condition = parseExpr(array.get(2));
 		List<CFGNode> thenNodes = parseNodes(array.get(3).getAsJsonArray());
 		List<CFGNode> elseNodes = parseNodes(array.get(4).getAsJsonArray());
-		BlockNode joinNode = (BlockNode) parseNode(array.get(5)
+		NodeBlock joinNode = (NodeBlock) parseNode(array.get(5)
 				.getAsJsonArray());
 
-		return new IfNode(loc, procedure, condition, thenNodes, elseNodes,
+		return new NodeIf(loc, procedure, condition, thenNodes, elseNodes,
 				joinNode);
 	}
 
@@ -776,20 +776,20 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the given JSON array as a WhileNode.
+	 * Parses the given JSON array as a NodeWhile.
 	 * 
 	 * @param loc
 	 *            location information
 	 * @param array
 	 *            a JSON array
-	 * @return a WhileNode
+	 * @return a NodeWhile
 	 */
-	private WhileNode parseNodeWhile(Location loc, JsonArray array) {
+	private NodeWhile parseNodeWhile(Location loc, JsonArray array) {
 		Expression condition = parseExpr(array.get(2));
 		List<CFGNode> nodes = parseNodes(array.get(3).getAsJsonArray());
-		BlockNode joinNode = (BlockNode) parseNode(array.get(4)
+		NodeBlock joinNode = (NodeBlock) parseNode(array.get(4)
 				.getAsJsonArray());
-		return new WhileNode(loc, procedure, condition, nodes, joinNode);
+		return new NodeWhile(loc, procedure, condition, nodes, joinNode);
 	}
 
 	private Pattern parsePattern(OrderedMap<String, Port> ports, JsonArray array) {

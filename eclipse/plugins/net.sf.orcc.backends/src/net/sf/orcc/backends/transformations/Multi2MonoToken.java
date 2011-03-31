@@ -66,7 +66,7 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.ir.serialize.IRCloner;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
@@ -244,7 +244,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private void addStoreFromBuffer(Procedure body, int position,
 			LocalVariable tmp) {
-		BlockNode bodyNode = BlockNode.getFirst(body);
+		NodeBlock bodyNode = NodeBlock.getFirst(body);
 		OrderedMap<String, LocalVariable> locals = body.getLocals();
 		locals.put(tmp.getBaseName(), tmp);
 		LocalVariable index = new LocalVariable(true, 1, new Location(),
@@ -311,7 +311,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		scheduler.getLocals().remove(result.getBaseName());
 		scheduler.getLocals().put(result.getName(), result);
 
-		BlockNode block = new BlockNode(scheduler);
+		NodeBlock block = new NodeBlock(scheduler);
 		block.add(new Assign(result, condition));
 		block.add(new Return(new VarExpr(new Use(result))));
 		scheduler.getNodes().add(block);
@@ -319,7 +319,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		// body
 		Procedure body = new Procedure(name, new Location(),
 				IrFactory.eINSTANCE.createTypeVoid());
-		block = new BlockNode(body);
+		block = new NodeBlock(body);
 		block.add(new Return(null));
 		body.getNodes().add(block);
 
@@ -405,7 +405,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		// body
 		Procedure body = new Procedure(name, new Location(),
 				IrFactory.eINSTANCE.createTypeVoid());
-		BlockNode block = new BlockNode(body);
+		NodeBlock block = new NodeBlock(body);
 		Store store = new Store(counter, new IntExpr(0));
 		block.add(store);
 		block.add(new Return(null));
@@ -426,7 +426,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		LocalVariable localCounter = new LocalVariable(true, 1, new Location(),
 				"localCounter", counter.getType());
 		scheduler.getLocals().put(localCounter.getName(), localCounter);
-		block = new BlockNode(scheduler);
+		block = new NodeBlock(scheduler);
 		Load schedulerLoad = new Load(localCounter, new Use(counter));
 		block.add(0, schedulerLoad);
 
@@ -605,7 +605,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private void defineStoreBody(GlobalVariable readCounter,
 			GlobalVariable storeList, Procedure body, GlobalVariable buffer,
 			GlobalVariable writeIndex) {
-		BlockNode bodyNode = BlockNode.getFirst(body);
+		NodeBlock bodyNode = NodeBlock.getFirst(body);
 
 		OrderedMap<String, LocalVariable> locals = body.getLocals();
 		LocalVariable counter = new LocalVariable(true, 1, new Location(),
@@ -687,7 +687,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private void defineUntaggedBody(GlobalVariable readCounter,
 			GlobalVariable storeList, Procedure body, LocalVariable localINPUT) {
-		BlockNode bodyNode = BlockNode.getFirst(body);
+		NodeBlock bodyNode = NodeBlock.getFirst(body);
 
 		OrderedMap<String, LocalVariable> locals = body.getLocals();
 		LocalVariable counter = new LocalVariable(true, 1, new Location(),
@@ -751,7 +751,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 	private void defineWriteBody(GlobalVariable writeCounter,
 			GlobalVariable writeList, Procedure body, LocalVariable OUTPUT) {
-		BlockNode bodyNode = BlockNode.getFirst(body);
+		NodeBlock bodyNode = NodeBlock.getFirst(body);
 		OrderedMap<String, LocalVariable> locals = body.getLocals();
 		LocalVariable counter1 = new LocalVariable(true, outputIndex,
 				new Location(), port.getName() + "_Local_writeCounter",
@@ -813,7 +813,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			GlobalVariable writeIndex, GlobalVariable readIndex, BinaryOp op,
 			Expression reference) {
 		Procedure scheduler = action.getScheduler();
-		BlockNode bodyNode = BlockNode.getLast(scheduler);
+		NodeBlock bodyNode = NodeBlock.getLast(scheduler);
 		OrderedMap<String, LocalVariable> locals = scheduler.getLocals();
 
 		LocalVariable localRead = new LocalVariable(true, inputIndex,
@@ -879,12 +879,12 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private void modifyDoneAction(GlobalVariable counter, int portIndex) {
 
-		BlockNode blkNode = BlockNode.getFirst(done.getBody());
+		NodeBlock blkNode = NodeBlock.getFirst(done.getBody());
 		Expression storeValue = new IntExpr(0);
 		Instruction store = new Store(counter, storeValue);
 		blkNode.add(store);
 
-		blkNode = BlockNode.getFirst(done.getScheduler());
+		blkNode = NodeBlock.getFirst(done.getScheduler());
 		OrderedMap<String, LocalVariable> schedulerLocals = done.getScheduler()
 				.getLocals();
 		LocalVariable localCounter = new LocalVariable(true, portIndex,
@@ -942,14 +942,14 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						Procedure body = cloneAction.getBody();
 						LocalVariable inputTmp = new LocalVariable(true, 0,
 								new Location(), port.getName(), entryType);
-						Instruction instruction = BlockNode.getFirst(body)
+						Instruction instruction = NodeBlock.getFirst(body)
 								.getInstructions().get(0);
 						if (instruction.isLoad()) {
 							Load load = (Load) instruction;
 							tmp = load.getTarget();
 							load.setSource(new Use(tmp));
 							inputTmp = (LocalVariable) entry.getValue();
-							BlockNode.getFirst(body).getInstructions()
+							NodeBlock.getFirst(body).getInstructions()
 									.remove(0);
 						}
 						int position = portPosition(inputPorts, port);
@@ -1206,8 +1206,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 				action.getInputPattern().clear();
 				action.getBody().getNodes().clear();
-				BlockNode block = new BlockNode(action.getBody());
-				block = new BlockNode(action.getBody());
+				NodeBlock block = new NodeBlock(action.getBody());
+				block = new NodeBlock(action.getBody());
 				block.add(new Return(null));
 				action.getBody().getNodes().add(block);
 				fsm.replaceTarget(sourceName, action, storeName);

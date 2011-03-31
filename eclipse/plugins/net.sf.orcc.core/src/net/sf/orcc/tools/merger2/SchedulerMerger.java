@@ -47,7 +47,7 @@ import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.moc.AbstractMoCInterpreter;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.util.OrderedMap;
@@ -83,7 +83,7 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 				new OrderedMap<String, LocalVariable>(),
 				new OrderedMap<String, LocalVariable>(), nodes);
 
-		BlockNode block = new BlockNode(procedure);
+		NodeBlock block = new NodeBlock(procedure);
 		nodes.add(block);
 
 		for (GlobalVariable counter : varCounters) {
@@ -110,7 +110,7 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 				new OrderedMap<String, LocalVariable>(),
 				new OrderedMap<String, LocalVariable>(), nodes);
 
-		BlockNode block = new BlockNode(procedure);
+		NodeBlock block = new NodeBlock(procedure);
 		nodes.add(block);
 		Return returnInstr = new Return(new BoolExpr(true));
 		block.add(returnInstr);

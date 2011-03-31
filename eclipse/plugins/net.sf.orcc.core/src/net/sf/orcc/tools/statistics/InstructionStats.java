@@ -37,8 +37,8 @@ import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.network.Network;
 
 /**
@@ -72,9 +72,9 @@ public class InstructionStats {
 		}
 
 		@Override
-		public void visit(IfNode ifNode) {
+		public void visit(NodeIf nodeIf) {
 			statsElement.ifNb++;
-			super.visit(ifNode);
+			super.visit(nodeIf);
 		}
 
 		@Override
@@ -85,9 +85,9 @@ public class InstructionStats {
 		}
 
 		@Override
-		public void visit(WhileNode whileNode) {
+		public void visit(NodeWhile nodeWhile) {
 			statsElement.whileNb++;
-			super.visit(whileNode);
+			super.visit(nodeWhile);
 		}
 	}
 

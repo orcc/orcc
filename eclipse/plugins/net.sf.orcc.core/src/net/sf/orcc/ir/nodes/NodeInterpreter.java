@@ -45,7 +45,7 @@ public interface NodeInterpreter {
 	 *            arguments
 	 * @return an object
 	 */
-	public Object interpret(BlockNode node, Object... args);
+	public Object interpret(NodeBlock node, Object... args);
 
 	/**
 	 * Interprets an if node.
@@ -56,7 +56,7 @@ public interface NodeInterpreter {
 	 *            arguments
 	 * @return an object
 	 */
-	public Object interpret(IfNode node, Object... args);
+	public Object interpret(NodeIf node, Object... args);
 
 	/**
 	 * Interprets a while node.
@@ -67,6 +67,6 @@ public interface NodeInterpreter {
 	 *            arguments
 	 * @return an object
 	 */
-	public Object interpret(WhileNode node, Object... args);
+	public Object interpret(NodeWhile node, Object... args);
 
 }

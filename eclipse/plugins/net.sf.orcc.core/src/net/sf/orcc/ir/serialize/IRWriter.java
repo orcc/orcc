@@ -106,10 +106,10 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
@@ -312,7 +312,7 @@ public class IRWriter {
 	private static class NodeWriter implements NodeInterpreter {
 
 		@Override
-		public Object interpret(BlockNode node, Object... args) {
+		public Object interpret(NodeBlock node, Object... args) {
 			JsonArray array = new JsonArray();
 
 			array.add(new JsonPrimitive(NODE_BLOCK));
@@ -324,7 +324,7 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(IfNode node, Object... args) {
+		public Object interpret(NodeIf node, Object... args) {
 			JsonArray array = new JsonArray();
 
 			array.add(new JsonPrimitive(NODE_IF));
@@ -340,7 +340,7 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(WhileNode node, Object... args) {
+		public Object interpret(NodeWhile node, Object... args) {
 			JsonArray array = new JsonArray();
 
 			array.add(new JsonPrimitive(NODE_WHILE));

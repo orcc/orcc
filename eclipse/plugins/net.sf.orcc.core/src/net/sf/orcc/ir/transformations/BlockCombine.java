@@ -30,9 +30,9 @@ package net.sf.orcc.ir.transformations;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * This class defines an actor transformation that combines blocks of
@@ -43,10 +43,10 @@ import net.sf.orcc.ir.nodes.WhileNode;
  */
 public class BlockCombine extends AbstractActorVisitor {
 
-	private BlockNode previous;
+	private NodeBlock previous;
 
 	@Override
-	public void visit(BlockNode node) {
+	public void visit(NodeBlock node) {
 		if (previous == null) {
 			previous = node;
 		} else {
@@ -60,7 +60,7 @@ public class BlockCombine extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(IfNode node) {
+	public void visit(NodeIf node) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
 		visit(node.getThenNodes());
@@ -85,7 +85,7 @@ public class BlockCombine extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode node) {
+	public void visit(NodeWhile node) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
 		visit(node.getNodes());

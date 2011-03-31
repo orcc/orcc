@@ -43,8 +43,8 @@ import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
 
 /**
  * This class defines a very simple Dead Code Elimination.
@@ -54,7 +54,7 @@ import net.sf.orcc.ir.nodes.IfNode;
  */
 public class DeadCodeElimination extends AbstractActorVisitor {
 
-	private void addNodes(List<CFGNode> nodes, BlockNode join, int index) {
+	private void addNodes(List<CFGNode> nodes, NodeBlock join, int index) {
 		itNode.previous();
 		itNode.remove();
 
@@ -66,7 +66,7 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 		replacePhis(join, index);
 	}
 
-	private void replacePhis(BlockNode joinNode, int index) {
+	private void replacePhis(NodeBlock joinNode, int index) {
 		ListIterator<Instruction> it = joinNode.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
@@ -104,7 +104,7 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(IfNode node) {
+	public void visit(NodeIf node) {
 		Expression condition = node.getValue();
 		if (condition.isBooleanExpr()) {
 			if (((BoolExpr) condition).getValue()) {

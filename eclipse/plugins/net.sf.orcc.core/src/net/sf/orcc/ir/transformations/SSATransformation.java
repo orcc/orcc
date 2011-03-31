@@ -54,9 +54,9 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * This class converts the given actor to SSA form.
@@ -105,12 +105,12 @@ public class SSATransformation extends AbstractActorVisitor {
 	/**
 	 * join node (if any)
 	 */
-	private BlockNode join;
+	private NodeBlock join;
 
 	/**
 	 * contains the current while node being treated (if any)
 	 */
-	private WhileNode loop;
+	private NodeWhile loop;
 
 	/**
 	 * maps a variable name to a local variable (used when replacing uses)
@@ -129,9 +129,9 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * Commits the phi assignments in the given join node.
 	 * 
 	 * @param innerJoin
-	 *            a BlockNode that contains phi assignments
+	 *            a NodeBlock that contains phi assignments
 	 */
-	private void commitPhi(BlockNode innerJoin) {
+	private void commitPhi(NodeBlock innerJoin) {
 		for (Instruction instruction : innerJoin.getInstructions()) {
 			PhiAssignment phi = (PhiAssignment) instruction;
 			LocalVariable oldVar = phi.getOldVariable();
@@ -157,22 +157,22 @@ public class SSATransformation extends AbstractActorVisitor {
 	private void findNodes(Set<CFGNode> nodes, CFGNode node) {
 		nodes.add(node);
 		if (node.isIfNode()) {
-			IfNode ifNode = (IfNode) node;
-			for (CFGNode subNode : ifNode.getThenNodes()) {
+			NodeIf nodeIf = (NodeIf) node;
+			for (CFGNode subNode : nodeIf.getThenNodes()) {
 				findNodes(nodes, subNode);
 			}
 
-			for (CFGNode subNode : ifNode.getElseNodes()) {
+			for (CFGNode subNode : nodeIf.getElseNodes()) {
 				findNodes(nodes, subNode);
 			}
 
-			nodes.add(ifNode.getJoinNode());
+			nodes.add(nodeIf.getJoinNode());
 		} else if (node.isWhileNode()) {
-			WhileNode whileNode = (WhileNode) node;
-			for (CFGNode subNode : whileNode.getNodes()) {
+			NodeWhile nodeWhile = (NodeWhile) node;
+			for (CFGNode subNode : nodeWhile.getNodes()) {
 				findNodes(nodes, subNode);
 			}
-			nodes.add(whileNode.getJoinNode());
+			nodes.add(nodeWhile.getJoinNode());
 		}
 	}
 
@@ -358,27 +358,27 @@ public class SSATransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(IfNode ifNode) {
+	public void visit(NodeIf nodeIf) {
 		int outerBranch = branch;
-		BlockNode outerJoin = join;
-		WhileNode outerLoop = loop;
+		NodeBlock outerJoin = join;
+		NodeWhile outerLoop = loop;
 
-		replaceUses(ifNode.getValue());
+		replaceUses(nodeIf.getValue());
 
-		join = ifNode.getJoinNode();
+		join = nodeIf.getJoinNode();
 		loop = null;
 
 		branch = 1;
-		visit(ifNode.getThenNodes());
+		visit(nodeIf.getThenNodes());
 
 		// restore variables used in phi assignments
 		restoreVariables();
 
 		branch = 2;
-		visit(ifNode.getElseNodes());
+		visit(nodeIf.getElseNodes());
 
 		// commit phi
-		BlockNode innerJoin = join;
+		NodeBlock innerJoin = join;
 		branch = outerBranch;
 		join = outerJoin;
 		loop = outerLoop;
@@ -410,21 +410,21 @@ public class SSATransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode whileNode) {
+	public void visit(NodeWhile nodeWhile) {
 		int outerBranch = branch;
-		BlockNode outerJoin = join;
-		WhileNode outerLoop = loop;
+		NodeBlock outerJoin = join;
+		NodeWhile outerLoop = loop;
 
-		replaceUses(whileNode.getValue());
+		replaceUses(nodeWhile.getValue());
 
 		branch = 2;
-		join = whileNode.getJoinNode();
-		loop = whileNode;
+		join = nodeWhile.getJoinNode();
+		loop = nodeWhile;
 
-		visit(whileNode.getNodes());
+		visit(nodeWhile.getNodes());
 
 		// commit phi
-		BlockNode innerJoin = join;
+		NodeBlock innerJoin = join;
 		branch = outerBranch;
 		join = outerJoin;
 		loop = outerLoop;

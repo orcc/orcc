@@ -39,35 +39,31 @@ import net.sf.orcc.ir.impl.CFGNodeImpl;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines an If node. An if node is a node with a value used in its
- * condition.
+ * This class defines a While node. A while node is a node with a value used in
+ * its condition.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class IfNode extends CFGNodeImpl implements ValueContainer {
+public class NodeWhile extends CFGNodeImpl implements ValueContainer {
 
-	private List<CFGNode> elseNodes;
+	private NodeBlock joinNode;
 
-	private BlockNode joinNode;
-
-	private List<CFGNode> thenNodes;
+	private List<CFGNode> nodes;
 
 	private Expression value;
 
-	public IfNode(Location location, Procedure procedure, Expression condition,
-			List<CFGNode> thenNodes, List<CFGNode> elseNodes, BlockNode joinNode) {
+	public NodeWhile(Location location, Procedure procedure,
+			Expression condition, List<CFGNode> nodes, NodeBlock joinNode) {
 		super(location, procedure);
-		this.elseNodes = elseNodes;
 		this.joinNode = joinNode;
-		this.thenNodes = thenNodes;
+		this.nodes = nodes;
 		setValue(condition);
 	}
 
-	public IfNode(Procedure procedure, Expression condition,
-			List<CFGNode> thenNodes, List<CFGNode> elseNodes, BlockNode joinNode) {
-		this(new Location(), procedure, condition, thenNodes, elseNodes,
-				joinNode);
+	public NodeWhile(Procedure procedure, Expression condition,
+			List<CFGNode> nodes, NodeBlock joinNode) {
+		this(new Location(), procedure, condition, nodes, joinNode);
 	}
 
 	@Override
@@ -80,16 +76,12 @@ public class IfNode extends CFGNodeImpl implements ValueContainer {
 		visitor.visit(this);
 	}
 
-	public List<CFGNode> getElseNodes() {
-		return elseNodes;
-	}
-
-	public BlockNode getJoinNode() {
+	public NodeBlock getJoinNode() {
 		return joinNode;
 	}
 
-	public List<CFGNode> getThenNodes() {
-		return thenNodes;
+	public List<CFGNode> getNodes() {
+		return nodes;
 	}
 
 	@Override
@@ -103,11 +95,11 @@ public class IfNode extends CFGNodeImpl implements ValueContainer {
 	}
 
 	@Override
-	public boolean isIfNode() {
+	public boolean isWhileNode() {
 		return true;
 	}
 
-	public void setJoinNode(BlockNode joinNode) {
+	public void setJoinNode(NodeBlock joinNode) {
 		this.joinNode = joinNode;
 	}
 
@@ -118,7 +110,7 @@ public class IfNode extends CFGNodeImpl implements ValueContainer {
 
 	@Override
 	public String toString() {
-		return "if (" + getValue() + ")";
+		return "while (" + getValue() + ")";
 	}
 
 }

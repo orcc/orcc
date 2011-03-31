@@ -56,9 +56,9 @@ import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * Split expression and effective node that contains more than one fundamental
@@ -157,7 +157,7 @@ public class ExpressionSplitterTransformation extends
 	 */
 	private ListIterator<Instruction> getItr(ListIterator<CFGNode> it) {
 		// Create a new basic block
-		BlockNode block = new BlockNode(procedure);
+		NodeBlock block = new NodeBlock(procedure);
 
 		// Add it before the current node
 		it.previous();
@@ -226,15 +226,15 @@ public class ExpressionSplitterTransformation extends
 	}
 
 	@Override
-	public void visit(IfNode ifNode) {
-		Expression value = ifNode.getValue();
+	public void visit(NodeIf nodeIf) {
+		Expression value = nodeIf.getValue();
 		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
-			Expression newValue = visitExpression(ifNode.getValue(),
+			Expression newValue = visitExpression(nodeIf.getValue(),
 					getItr(itNode));
-			ifNode.setValue(newValue);
-			Use.addUses(ifNode, newValue);
+			nodeIf.setValue(newValue);
+			Use.addUses(nodeIf, newValue);
 		}
-		super.visit(ifNode);
+		super.visit(nodeIf);
 	}
 
 	@Override
@@ -288,22 +288,22 @@ public class ExpressionSplitterTransformation extends
 	}
 
 	@Override
-	public void visit(WhileNode whileNode) {
-		ListIterator<Instruction> it = whileNode.getJoinNode().listIterator();
+	public void visit(NodeWhile nodeWhile) {
+		ListIterator<Instruction> it = nodeWhile.getJoinNode().listIterator();
 
 		// Go to the end of joinNode
 		while (it.hasNext()) {
 			it.next();
 		}
 
-		Expression value = whileNode.getValue();
+		Expression value = nodeWhile.getValue();
 		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
-			Expression expr = visitExpression(whileNode.getValue(), it);
-			whileNode.setValue(expr);
-			Use.addUses(whileNode, expr);
+			Expression expr = visitExpression(nodeWhile.getValue(), it);
+			nodeWhile.setValue(expr);
+			Use.addUses(nodeWhile, expr);
 		}
 
-		super.visit(whileNode);
+		super.visit(nodeWhile);
 	}
 
 	private Expression visitExpression(Expression value,

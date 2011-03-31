@@ -98,23 +98,23 @@ public interface CFGNode extends User {
 	public List<CFGNode> getSuccessors();
 
 	/**
-	 * Returns <code>true</code> if this node is a BlockNode.
+	 * Returns <code>true</code> if this node is a NodeBlock.
 	 * 
-	 * @return <code>true</code> if this node is a BlockNode
+	 * @return <code>true</code> if this node is a NodeBlock
 	 */
 	boolean isBlockNode();
 
 	/**
-	 * Returns <code>true</code> if this node is an IfNode.
+	 * Returns <code>true</code> if this node is an NodeIf.
 	 * 
-	 * @return <code>true</code> if this node is an IfNode
+	 * @return <code>true</code> if this node is an NodeIf
 	 */
 	boolean isIfNode();
 
 	/**
-	 * Returns <code>true</code> if this node is a WhileNode.
+	 * Returns <code>true</code> if this node is a NodeWhile.
 	 * 
-	 * @return <code>true</code> if this node is a WhileNode
+	 * @return <code>true</code> if this node is a NodeWhile
 	 */
 	boolean isWhileNode();
 

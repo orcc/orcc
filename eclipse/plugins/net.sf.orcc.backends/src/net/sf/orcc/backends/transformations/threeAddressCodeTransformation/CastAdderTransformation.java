@@ -51,9 +51,9 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * Add cast in IR in the form of assign instruction where target's type differs
@@ -262,12 +262,12 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 			CFGNode node = phi.getBlock().getPredecessors().get(indexValue);
 
 			if (node.isBlockNode()) {
-				itInstruction = ((BlockNode) node).lastListIterator();
+				itInstruction = ((NodeBlock) node).lastListIterator();
 			} else if (node.isIfNode()) {
-				itInstruction = ((IfNode) node).getJoinNode()
+				itInstruction = ((NodeIf) node).getJoinNode()
 						.lastListIterator();
 			} else {
-				itInstruction = ((WhileNode) node).getJoinNode()
+				itInstruction = ((NodeWhile) node).getJoinNode()
 						.lastListIterator();
 			}
 

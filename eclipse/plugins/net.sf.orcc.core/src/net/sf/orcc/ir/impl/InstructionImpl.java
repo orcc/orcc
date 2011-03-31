@@ -10,7 +10,7 @@ import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
 
 import org.eclipse.emf.ecore.EClass;
 
@@ -43,7 +43,7 @@ public abstract class InstructionImpl extends UserImpl implements Instruction {
 		return IrPackage.Literals.INSTRUCTION;
 	}
 	
-	private BlockNode block;
+	private NodeBlock block;
 
 	private Location location;
 
@@ -52,7 +52,7 @@ public abstract class InstructionImpl extends UserImpl implements Instruction {
 	}
 
 	@Override
-	public BlockNode getBlock() {
+	public NodeBlock getBlock() {
 		return block;
 	}
 
@@ -132,7 +132,7 @@ public abstract class InstructionImpl extends UserImpl implements Instruction {
 	}
 
 	@Override
-	public void setBlock(BlockNode block) {
+	public void setBlock(NodeBlock block) {
 		this.block = block;
 	}
 

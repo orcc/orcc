@@ -42,7 +42,7 @@ public interface NodeVisitor {
 	 * @param node
 	 *            a block node
 	 */
-	public void visit(BlockNode node);
+	public void visit(NodeBlock node);
 
 	/**
 	 * Visits an if node.
@@ -50,7 +50,7 @@ public interface NodeVisitor {
 	 * @param node
 	 *            an if node
 	 */
-	public void visit(IfNode node);
+	public void visit(NodeIf node);
 
 	/**
 	 * Visits a while node.
@@ -58,6 +58,6 @@ public interface NodeVisitor {
 	 * @param node
 	 *            a while node
 	 */
-	public void visit(WhileNode node);
+	public void visit(NodeWhile node);
 
 }

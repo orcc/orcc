@@ -38,7 +38,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -50,7 +50,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class CodeMover extends AbstractActorVisitor {
 
-	private BlockNode targetBlock;
+	private NodeBlock targetBlock;
 
 	private Procedure targetProcedure;
 
@@ -62,7 +62,7 @@ public class CodeMover extends AbstractActorVisitor {
 	 *            a list iterator of instructions
 	 */
 	public void moveInstructions(ListIterator<Instruction> itInstruction) {
-		targetBlock = BlockNode.getLast(targetProcedure);
+		targetBlock = NodeBlock.getLast(targetProcedure);
 		while (itInstruction.hasNext()) {
 			Instruction instruction = itInstruction.next();
 			this.procedure = instruction.getBlock().getProcedure();
@@ -131,10 +131,10 @@ public class CodeMover extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(BlockNode blockNode) {
-		this.procedure = blockNode.getProcedure();
-		super.visit(blockNode);
-		blockNode.setProcedure(targetProcedure);
+	public void visit(NodeBlock nodeBlock) {
+		this.procedure = nodeBlock.getProcedure();
+		super.visit(nodeBlock);
+		nodeBlock.setProcedure(targetProcedure);
 	}
 
 	@Override

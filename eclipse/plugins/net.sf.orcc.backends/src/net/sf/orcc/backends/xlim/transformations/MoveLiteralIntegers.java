@@ -52,9 +52,9 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * 
@@ -140,27 +140,27 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(IfNode ifNode) {
-		// Check the presence of a BlockNode before and create one if needed
+	public void visit(NodeIf nodeIf) {
+		// Check the presence of a NodeBlock before and create one if needed
 		if (itInstruction == null) {
-			Procedure procedure = ifNode.getProcedure();
-			int index = procedure.getNodes().indexOf(ifNode);
-			BlockNode newBlock = new BlockNode(procedure);
+			Procedure procedure = nodeIf.getProcedure();
+			int index = procedure.getNodes().indexOf(nodeIf);
+			NodeBlock newBlock = new NodeBlock(procedure);
 			procedure.getNodes().add(index, newBlock);
 			itInstruction = newBlock.getInstructions().listIterator();
 		}
 		ListIterator<Instruction> instructionIteratorBackup = itInstruction;
-		ifNode.setValue((Expression) ifNode.getValue().accept(exprInterpreter,
+		nodeIf.setValue((Expression) nodeIf.getValue().accept(exprInterpreter,
 				itInstruction));
-		visit(ifNode.getThenNodes());
+		visit(nodeIf.getThenNodes());
 		itInstruction = instructionIteratorBackup;
-		visit(ifNode.getElseNodes());
+		visit(nodeIf.getElseNodes());
 		itInstruction = instructionIteratorBackup;
 		// Unusually visit method to doesn't add new instructions in join node
-		for (Instruction instr : ifNode.getJoinNode().getInstructions()) {
+		for (Instruction instr : nodeIf.getJoinNode().getInstructions()) {
 			instr.accept(this);
 		}
-		Use.addUses(ifNode, ifNode.getValue());
+		Use.addUses(nodeIf, nodeIf.getValue());
 	}
 
 	@Override
@@ -216,25 +216,25 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode whileNode) {
-		// Check the presence of a BlockNode before and create one if needed
+	public void visit(NodeWhile nodeWhile) {
+		// Check the presence of a NodeBlock before and create one if needed
 		if (itInstruction == null) {
-			Procedure procedure = whileNode.getProcedure();
-			int index = procedure.getNodes().indexOf(whileNode);
-			BlockNode newBlock = new BlockNode(procedure);
+			Procedure procedure = nodeWhile.getProcedure();
+			int index = procedure.getNodes().indexOf(nodeWhile);
+			NodeBlock newBlock = new NodeBlock(procedure);
 			procedure.getNodes().add(index, newBlock);
 			itInstruction = newBlock.getInstructions().listIterator();
 		}
 		ListIterator<Instruction> instructionIteratorBackup = itInstruction;
-		whileNode.setValue((Expression) whileNode.getValue().accept(
+		nodeWhile.setValue((Expression) nodeWhile.getValue().accept(
 				exprInterpreter, itInstruction));
-		visit(whileNode.getNodes());
+		visit(nodeWhile.getNodes());
 		itInstruction = instructionIteratorBackup;
 		// Unusually visit method to doesn't add new instructions in join node
-		for (Instruction instr : whileNode.getJoinNode().getInstructions()) {
+		for (Instruction instr : nodeWhile.getJoinNode().getInstructions()) {
 			instr.accept(this);
 		}
-		Use.addUses(whileNode, whileNode.getValue());
+		Use.addUses(nodeWhile, nodeWhile.getValue());
 	}
 
 }

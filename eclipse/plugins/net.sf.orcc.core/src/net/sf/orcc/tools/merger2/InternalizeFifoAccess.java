@@ -49,7 +49,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
 
 public class InternalizeFifoAccess extends AbstractActorVisitor {
 	private List<Variable> localFifoVars;
@@ -109,7 +109,7 @@ public class InternalizeFifoAccess extends AbstractActorVisitor {
 			return;
 		}
 		
-		BlockNode node = BlockNode.getLast(body);
+		NodeBlock node = NodeBlock.getLast(body);
 		
 		Use use = new Use(counter);
 		

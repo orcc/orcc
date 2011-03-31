@@ -55,8 +55,8 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
@@ -88,22 +88,22 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	public SDFActionsMerger() {
 	}
 
-	private IfNode createActionCall(Expression expr, Procedure body,
+	private NodeIf createActionCall(Expression expr, Procedure body,
 			Pattern inputPattern, Pattern outputPattern) {
 		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
 				outputPattern);
 		actor.getProcs().put(body.getName(), body);
 		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
-		BlockNode node = new BlockNode(target);
+		NodeBlock node = new NodeBlock(target);
 
 		node.add(new Call(new Location(), null, body, callExprs));
 
 		thenNodes.add(node);
-		return new IfNode(target, expr, thenNodes, new ArrayList<CFGNode>(),
-				new BlockNode(target));
+		return new NodeIf(target, expr, thenNodes, new ArrayList<CFGNode>(),
+				new NodeBlock(target));
 	}
 
-	private Expression createActionCondition(BlockNode node,
+	private Expression createActionCondition(NodeBlock node,
 			Procedure scheduler, Pattern inputPattern, Pattern outputPattern) {
 
 		List<Expression> callExprs = setProcedureParameters(scheduler,
@@ -134,12 +134,12 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 
 		// create "then" nodes
 		Assign thenAssign = new Assign(result, new BoolExpr(true));
-		BlockNode blockNode = new BlockNode(procedure);
-		blockNode.add(thenAssign);
-		procedure.getNodes().add(blockNode);
+		NodeBlock nodeBlock = new NodeBlock(procedure);
+		nodeBlock.add(thenAssign);
+		procedure.getNodes().add(nodeBlock);
 
 		// add the return
-		BlockNode block = BlockNode.getLast(procedure);
+		NodeBlock block = NodeBlock.getLast(procedure);
 		block.add(new Return(new VarExpr(new Use(result))));
 
 		// convert to SSA form
@@ -246,16 +246,16 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 			Pattern input = action.getInputPattern();
 			Pattern output = action.getOutputPattern();
 			
-			BlockNode thenBlock = BlockNode.getFirst(target, elseNodes);
+			NodeBlock thenBlock = NodeBlock.getFirst(target, elseNodes);
 			Expression callExpr = createActionCondition(thenBlock,
 					action.getScheduler(), input, output);
-			IfNode ifNode = createActionCall(callExpr, action.getBody(), input,
+			NodeIf nodeIf = createActionCall(callExpr, action.getBody(), input,
 					output);
-			elseNodes.add(ifNode);
-			elseNodes = ifNode.getElseNodes();
+			elseNodes.add(nodeIf);
+			elseNodes = nodeIf.getElseNodes();
 		}
 		
-		BlockNode lastBlock = BlockNode.getLast(target);
+		NodeBlock lastBlock = NodeBlock.getLast(target);
 		lastBlock.add(new Return(null));
 
 		return target;

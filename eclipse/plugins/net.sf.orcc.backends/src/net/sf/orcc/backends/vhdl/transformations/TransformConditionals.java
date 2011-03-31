@@ -43,8 +43,8 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeIf;
+import net.sf.orcc.ir.nodes.NodeWhile;
 
 /**
  * This class defines an actor transformation that transform the simple
@@ -136,13 +136,13 @@ public class TransformConditionals extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(IfNode node) {
+	public void visit(NodeIf node) {
 		node.setValue((Expression) node.getValue().accept(exprInterpreter));
 		super.visit(node);
 	}
 
 	@Override
-	public void visit(WhileNode node) {
+	public void visit(NodeWhile node) {
 		node.setValue((Expression) node.getValue().accept(exprInterpreter));
 		super.visit(node);
 	}

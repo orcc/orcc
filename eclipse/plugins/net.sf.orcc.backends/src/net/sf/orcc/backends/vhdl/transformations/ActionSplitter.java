@@ -54,7 +54,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -124,7 +124,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 			scheduler.getLocals().remove(result.getBaseName());
 			scheduler.getLocals().put(result.getName(), result);
 
-			BlockNode block = new BlockNode(scheduler);
+			NodeBlock block = new NodeBlock(scheduler);
 			block.add(new Assign(result, condition));
 			block.add(new Return(new VarExpr(new Use(result))));
 			scheduler.getNodes().add(block);
@@ -132,7 +132,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 			// body
 			Procedure body = new Procedure(name, new Location(),
 					IrFactory.eINSTANCE.createTypeVoid());
-			block = new BlockNode(body);
+			block = new NodeBlock(body);
 			block.add(new Return(null));
 			body.getNodes().add(block);
 

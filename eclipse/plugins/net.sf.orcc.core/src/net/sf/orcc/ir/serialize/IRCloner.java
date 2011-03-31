@@ -79,10 +79,10 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.NodeWhile;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
@@ -327,40 +327,40 @@ public class IRCloner {
 	private static class NodeCloner implements NodeInterpreter {
 
 		@Override
-		public Object interpret(BlockNode node, Object... args) {
+		public Object interpret(NodeBlock node, Object... args) {
 			Procedure procedure = getProcedure(node.getProcedure());
 			Location location = cloneLocation(node.getLocation());
 			List<Instruction> instructions = cloneIntructions(node
 					.getInstructions());
 
-			BlockNode clonedBlockNode = new BlockNode(location, procedure);
+			NodeBlock clonedBlockNode = new NodeBlock(location, procedure);
 			clonedBlockNode.addAll(instructions);
 
 			return clonedBlockNode;
 		}
 
 		@Override
-		public Object interpret(IfNode node, Object... args) {
+		public Object interpret(NodeIf node, Object... args) {
 			Location location = cloneLocation(node.getLocation());
 			Procedure procedure = getProcedure(node.getProcedure());
 			Expression value = cloneExpression(node.getValue());
 			List<CFGNode> thenNodes = cloneNodes(node.getThenNodes());
 			List<CFGNode> elseNodes = cloneNodes(node.getElseNodes());
-			BlockNode joinNode = (BlockNode) cloneNode(node.getJoinNode());
+			NodeBlock joinNode = (NodeBlock) cloneNode(node.getJoinNode());
 
-			return new IfNode(location, procedure, value, thenNodes, elseNodes,
+			return new NodeIf(location, procedure, value, thenNodes, elseNodes,
 					joinNode);
 		}
 
 		@Override
-		public Object interpret(WhileNode node, Object... args) {
+		public Object interpret(NodeWhile node, Object... args) {
 			Location location = cloneLocation(node.getLocation());
 			Procedure procedure = getProcedure(node.getProcedure());
 			Expression value = cloneExpression(node.getValue());
 			List<CFGNode> nodes = cloneNodes(node.getNodes());
-			BlockNode joinNode = (BlockNode) cloneNode(node.getJoinNode());
+			NodeBlock joinNode = (NodeBlock) cloneNode(node.getJoinNode());
 
-			return new WhileNode(location, procedure, value, nodes, joinNode);
+			return new NodeWhile(location, procedure, value, nodes, joinNode);
 		}
 	}
 

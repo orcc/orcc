@@ -42,8 +42,8 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeBlock;
+import net.sf.orcc.ir.nodes.NodeIf;
 
 /**
  * 
@@ -55,14 +55,14 @@ import net.sf.orcc.ir.nodes.IfNode;
  */
 public class TernaryOperationAdder extends AbstractActorVisitor {
 
-	private BlockNode newBlockNode;
+	private NodeBlock newBlockNode;
 	private LocalVariable condVar;
 
 	@Override
 	public void visit(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			if (!proc.getReturnType().isVoid()) {
-				newBlockNode = new BlockNode(proc);
+				newBlockNode = new NodeBlock(proc);
 				visit(proc);
 				proc.getNodes().clear();
 				proc.getNodes().add(newBlockNode);
@@ -71,8 +71,8 @@ public class TernaryOperationAdder extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(BlockNode blockNode) {
-		ListIterator<Instruction> it = blockNode.listIterator();
+	public void visit(NodeBlock nodeBlock) {
+		ListIterator<Instruction> it = nodeBlock.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
 			itInstruction = it;
@@ -97,28 +97,28 @@ public class TernaryOperationAdder extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(IfNode ifNode) {
+	public void visit(NodeIf nodeIf) {
 		LocalVariable oldCondVar = condVar;
 
-		Expression condExpr = ifNode.getValue();
+		Expression condExpr = nodeIf.getValue();
 		condVar = procedure.newTempLocalVariable(null,
 				IrFactory.eINSTANCE.createTypeBool(), "ifCondition_"
-						+ ifNode.getLocation().getStartLine());
+						+ nodeIf.getLocation().getStartLine());
 		condVar.setIndex(1);
 		Assign assignCond = new Assign(condVar, condExpr);
 		condVar.setInstruction(assignCond);
 		newBlockNode.add(assignCond);
 
 		// clean uses
-		ifNode.setValue(null);
-		Use.removeUses(ifNode, condExpr);
+		nodeIf.setValue(null);
+		Use.removeUses(nodeIf, condExpr);
 
 		// add uses
 		Use.addUses(assignCond, condExpr);
 
-		visit(ifNode.getThenNodes());
-		visit(ifNode.getElseNodes());
-		visit(ifNode.getJoinNode());
+		visit(nodeIf.getThenNodes());
+		visit(nodeIf.getElseNodes());
+		visit(nodeIf.getJoinNode());
 		condVar = oldCondVar;
 	}
 }
