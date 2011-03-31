@@ -59,8 +59,6 @@ namespace llvm{
 *
 */
 class XDFParser {
-private:
-	std::string xdfFile; /**<XDF file to parse*/
 
 public:
 	/**
@@ -80,12 +78,15 @@ public:
      *
      *  @return a network class that describe the network of the dataflow, NULL if parsing failed
      */
-	Network* ParseXDF (llvm::LLVMContext& C);
+	Network* parseXDF (llvm::LLVMContext& C);
 
 private:
 
 	/** Verbose actions taken */
 	bool verbose;
+
+	/** Name of XDF file to parse*/
+	std::string xdfFile;
 };
 
 #endif

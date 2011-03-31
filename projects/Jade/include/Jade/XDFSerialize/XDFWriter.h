@@ -79,7 +79,7 @@ public:
 	/**
      *  @brief Start writing of XDF
      */
-	void WriteXDF();
+	void writeXDF();
 
 
 private:

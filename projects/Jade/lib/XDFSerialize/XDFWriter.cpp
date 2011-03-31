@@ -40,6 +40,7 @@
 
 #include "llvm/LLVMContext.h"
 
+#include "XDFConstant.h"
 #include "Jade/XDFSerialize/XDFWriter.h"
 #include "Jade/Core/Attribute/ValueAttribute.h"
 #include "Jade/Core/Attribute/TypeAttribute.h"
@@ -52,51 +53,6 @@
 //------------------------------
 
 using namespace std;
-
-
-const char* XDF_ROOT = "XDF";
-const char* NAME = "name";
-const char* ATTRIBUTE = "Attribute";
-const char* CONNECTION = "Connection";
-const char* CONNECTION_SRC = "src";
-const char* CONNECTION_SRC_PORT = "src-port";
-const char* CONNECTION_DST = "dst";
-const char* CONNECTION_DST_PORT = "dst-port";
-const char* DECL = "Decl";
-const char* ENTRY = "Entry";
-const char* EXPR = "Expr";
-const char* EXPR_OP = "Op";
-const char* INSTANCE = "Instance";
-const char* INSTANCE_CLASS = "Class";
-const char* INSTANCE_ID = "id";
-const char* INSTANCE_PARAMETER = "Parameter";
-const char* KIND = "kind";
-const char* KIND_BINOPSEQ = "BinOpSeq";
-const char* KIND_CUSTOM = "Custom";
-const char* KIND_FLAG = "Flag";
-const char* KIND_LIST = "List";
-const char* KIND_LITERAL = "Literal";
-const char* KIND_STRING = "String";
-const char* KIND_TYPE = "Type";
-const char* KIND_UNARYOP = "UnaryOp";
-const char* KIND_VALUE = "Value";
-const char* KIND_VAR = "Var";
-const char* LITERAL_BOOL = "Boolean";
-const char* LITERAL_CHAR = "Character";
-const char* LITERAL_INT = "Integer";
-const char* LITERAL_KIND = "literal-kind";
-const char* LITERAL_REAL = "Real";
-const char* LITERAL_STRING = "String";
-const char* LITERAL_VALUE = "value";
-const char* PACKAGE = "Package";
-const char* PORT = "Port";
-const char* TYPE = "Type";
-const char* TYPE_BOOL = "bool";
-const char* TYPE_INT = "int";
-const char* TYPE_LIST = "List";
-const char* TYPE_STRING = "String";
-const char* TYPE_UINT = "uint";
-const char* TYPE_SIZE = "size";
 
 
 XDFWriter::XDFWriter (string filename, Network* network){
@@ -112,14 +68,14 @@ XDFWriter::~XDFWriter (){
 }
 
 
-void XDFWriter::WriteXDF(){
+void XDFWriter::writeXDF(){
 	//Write declaration
 	TiXmlDeclaration* decl = new TiXmlDeclaration("1.0","UTF-8","");
 	xdfDoc->LinkEndChild(decl);
 
 	//Write root element
-	TiXmlElement* root = new TiXmlElement(XDF_ROOT); 
-	root->SetAttribute(NAME, network->getName().c_str());
+	TiXmlElement* root = new TiXmlElement(XDFNetwork::XDF_ROOT); 
+	root->SetAttribute(XDFNetwork::NAME, network->getName().c_str());
 	xdfDoc->LinkEndChild(root);
 
 	//Write inputs
@@ -154,12 +110,12 @@ void XDFWriter::WriteXDF(){
 }
 
 TiXmlElement* XDFWriter::writeInstance(Instance* instance){
-	TiXmlElement* instanceElt = new TiXmlElement(INSTANCE);
-	instanceElt->SetAttribute(INSTANCE_ID, instance->getId().c_str());
+	TiXmlElement* instanceElt = new TiXmlElement(XDFNetwork::INSTANCE);
+	instanceElt->SetAttribute(XDFNetwork::INSTANCE_ID, instance->getId().c_str());
 
 	// Class
-	TiXmlElement* classElt = new TiXmlElement(INSTANCE_CLASS);
-	classElt->SetAttribute(NAME, instance->getClasz().c_str());
+	TiXmlElement* classElt = new TiXmlElement(XDFNetwork::INSTANCE_CLASS);
+	classElt->SetAttribute(XDFNetwork::NAME, instance->getClasz().c_str());
 	instanceElt->LinkEndChild(classElt);
 
 	// Parameters
@@ -167,8 +123,8 @@ TiXmlElement* XDFWriter::writeInstance(Instance* instance){
 	map<string, Expr*>::iterator itPar;
 
 	for(itPar = parameters->begin(); itPar != parameters->end(); itPar++){
-		TiXmlElement* parameterElt = new TiXmlElement(INSTANCE_PARAMETER);
-		parameterElt->SetAttribute(NAME, itPar->first.c_str());
+		TiXmlElement* parameterElt = new TiXmlElement(XDFNetwork::INSTANCE_PARAMETER);
+		parameterElt->SetAttribute(XDFNetwork::NAME, itPar->first.c_str());
 		instanceElt->LinkEndChild(parameterElt);
 
 		// Expr
@@ -182,7 +138,7 @@ TiXmlElement* XDFWriter::writeInstance(Instance* instance){
 }
 
 TiXmlElement* XDFWriter::writeConnection(Connection* connection){
-	TiXmlElement* connectionElt = new TiXmlElement(CONNECTION);
+	TiXmlElement* connectionElt = new TiXmlElement(XDFNetwork::CONNECTION);
 
 	Vertex* srcVertex = (Vertex*) connection->getSource();
 	Vertex* dstVertex = (Vertex*) connection->getSink();
@@ -192,10 +148,10 @@ TiXmlElement* XDFWriter::writeConnection(Connection* connection){
 	string srcPort = connection->getSourcePort()->getName();
 	string dstPort = connection->getDestinationPort()->getName();
 
-	connectionElt->SetAttribute(CONNECTION_SRC, source->getId().c_str());
-	connectionElt->SetAttribute(CONNECTION_SRC_PORT, srcPort.c_str());
-	connectionElt->SetAttribute(CONNECTION_DST, dest->getId().c_str());
-	connectionElt->SetAttribute(CONNECTION_DST_PORT, dstPort.c_str());
+	connectionElt->SetAttribute(XDFNetwork::CONNECTION_SRC, source->getId().c_str());
+	connectionElt->SetAttribute(XDFNetwork::CONNECTION_SRC_PORT, srcPort.c_str());
+	connectionElt->SetAttribute(XDFNetwork::CONNECTION_DST, dest->getId().c_str());
+	connectionElt->SetAttribute(XDFNetwork::CONNECTION_DST_PORT, dstPort.c_str());
 
 	// Attributes
 	writeAttributes(connectionElt, connection->getAttributes());
@@ -208,8 +164,8 @@ void XDFWriter::writeAttributes(TiXmlElement* parent, map<string,IRAttribute*>* 
 
 	for(itAtt = attributes->begin(); itAtt != attributes->end(); itAtt++){
 		//Write attribute
-		TiXmlElement* attElt = new TiXmlElement(ATTRIBUTE);
-		attElt->SetAttribute(NAME, itAtt->first.c_str());
+		TiXmlElement* attElt = new TiXmlElement(XDFNetwork::IRAttribute);
+		attElt->SetAttribute(XDFNetwork::NAME, itAtt->first.c_str());
 		parent->LinkEndChild(attElt);
 
 		//Write kind
@@ -220,48 +176,48 @@ void XDFWriter::writeAttributes(TiXmlElement* parent, map<string,IRAttribute*>* 
 		}else if(attribute->isString()){
 			cerr << "String attribute is not supported yet";
 		}else if(attribute->isType()){
-			kind = KIND_TYPE;
+			kind = XDFNetwork::KIND_TYPE;
 			TypeAttribute* typeAttribute = (TypeAttribute*)attribute;			
 			attElt->LinkEndChild(writeType(typeAttribute->getType()));
 		}else if(attribute->isValue()){
-			kind = KIND_VALUE;	
+			kind = XDFNetwork::KIND_VALUE;	
 			ValueAttribute* valueAttribute = (ValueAttribute*)attribute;		
 			writeExpr(attElt, valueAttribute->getValue());
 		}else{
 			cerr << "unknown attribute type";
 		}
 		
-		attElt->SetAttribute(KIND, kind.c_str());
+		attElt->SetAttribute(XDFNetwork::KIND, kind.c_str());
 	}
 }
 
 void XDFWriter::writeExpr(TiXmlElement* parent, Expr* expr){
-	TiXmlElement* exprElt = new TiXmlElement(EXPR);
+	TiXmlElement* exprElt = new TiXmlElement(XDFNetwork::EXPR);
 	parent->LinkEndChild(exprElt);
 	
 	if(expr->isBinaryExpr()){
-		exprElt->SetAttribute(KIND, KIND_BINOPSEQ);
+		exprElt->SetAttribute(XDFNetwork::KIND, XDFNetwork::KIND_BINOPSEQ);
 		cerr << "Binary expression is not supported yet";
 	}else if(expr->isBooleanExpr()){
-		exprElt->SetAttribute(KIND, KIND_LITERAL);
-		exprElt->SetAttribute(LITERAL_KIND, LITERAL_BOOL);
+		exprElt->SetAttribute(XDFNetwork::KIND, XDFNetwork::KIND_LITERAL);
+		exprElt->SetAttribute(XDFNetwork::LITERAL_KIND, XDFNetwork::LITERAL_BOOL);
 		if (((BoolExpr*)expr)->getValue()){
-			exprElt->SetAttribute(LITERAL_VALUE, "true");
+			exprElt->SetAttribute(XDFNetwork::LITERAL_VALUE, "true");
 		}else{
-			exprElt->SetAttribute(LITERAL_VALUE, "false");
+			exprElt->SetAttribute(XDFNetwork::LITERAL_VALUE, "false");
 		}
 	}else if(expr->isIntExpr()){
-		exprElt->SetAttribute(KIND, KIND_LITERAL);
-		exprElt->SetAttribute(LITERAL_KIND, LITERAL_INT);
+		exprElt->SetAttribute(XDFNetwork::KIND, XDFNetwork::KIND_LITERAL);
+		exprElt->SetAttribute(XDFNetwork::LITERAL_KIND, XDFNetwork::LITERAL_INT);
 		int value = expr->evaluateAsInteger();
-		exprElt->SetAttribute(LITERAL_VALUE, value);	
+		exprElt->SetAttribute(XDFNetwork::LITERAL_VALUE, value);	
 	}else if(expr->isListExpr()){
 		cerr << "List expression is not supported yet";
 	}else if(expr->isStringExpr()){
-		exprElt->SetAttribute(KIND, KIND_LITERAL);
-		exprElt->SetAttribute(LITERAL_KIND, LITERAL_STRING);
+		exprElt->SetAttribute(XDFNetwork::KIND, XDFNetwork::KIND_LITERAL);
+		exprElt->SetAttribute(XDFNetwork::LITERAL_KIND, XDFNetwork::LITERAL_STRING);
 		string value = ((StringExpr*)expr)->getValue();
-		exprElt->SetAttribute(LITERAL_VALUE, value.c_str());
+		exprElt->SetAttribute(XDFNetwork::LITERAL_VALUE, value.c_str());
 	}else if(expr->isUnaryExpr()){
 		cerr << "Unary expression is not supported yet";
 	}else if(expr->isVarExpr()){
@@ -272,43 +228,43 @@ void XDFWriter::writeExpr(TiXmlElement* parent, Expr* expr){
 }
 
 TiXmlElement* XDFWriter::writeType(IRType* type){
-	TiXmlElement* typeElt = new TiXmlElement(TYPE);
+	TiXmlElement* typeElt = new TiXmlElement(XDFNetwork::TYPE);
 
 	string name;
 	int size;
 
 	if(type->isBoolType()){
-		name = TYPE_BOOL;
+		name = XDFNetwork::TYPE_BOOL;
 	}else if(type->isIntType()){
-		name = TYPE_INT;
+		name = XDFNetwork::TYPE_INT;
 		size = ((IntType*)type)->getSize();
 		llvm::LLVMContext &Context = llvm::getGlobalContext();
-		typeElt->LinkEndChild(writeEntry(TYPE_SIZE, new IntExpr(Context, size)));
+		typeElt->LinkEndChild(writeEntry(XDFNetwork::TYPE_SIZE, new IntExpr(Context, size)));
 	}else if(type->isListType()){
-		name = TYPE_LIST;
+		name = XDFNetwork::TYPE_LIST;
 		cerr << "List type is not supported yet";
 	}else if(type->isStringType()){
-		name = TYPE_STRING;
+		name = XDFNetwork::TYPE_STRING;
 	}else if(type->isUintType()){
-		name = TYPE_UINT;
+		name = XDFNetwork::TYPE_UINT;
 		size = ((UIntType*)type)->getSize();
 		llvm::LLVMContext &Context = llvm::getGlobalContext();
-		typeElt->LinkEndChild(writeEntry(TYPE_SIZE, new IntExpr(Context, size)));
+		typeElt->LinkEndChild(writeEntry(XDFNetwork::TYPE_SIZE, new IntExpr(Context, size)));
 	}else if(type->isVoidType()){
 		cerr << "void type is invalid in XDF";
 	}else{
 		cerr << "unknown type";
 	}
 
-	typeElt->SetAttribute(NAME, name.c_str());
+	typeElt->SetAttribute(XDFNetwork::NAME, name.c_str());
 	return typeElt;
 }
 
 TiXmlElement* XDFWriter::writeEntry(string name, Expr *expr){
-	TiXmlElement* entry = new TiXmlElement(ENTRY);
+	TiXmlElement* entry = new TiXmlElement(XDFNetwork::ENTRY);
 	
-	entry->SetAttribute(KIND, KIND_TYPE);
-	entry->SetAttribute(NAME, name.c_str());
+	entry->SetAttribute(XDFNetwork::KIND, XDFNetwork::KIND_TYPE);
+	entry->SetAttribute(XDFNetwork::NAME, name.c_str());
 	writeExpr(entry, expr);
 
 	return entry;

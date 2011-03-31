@@ -7,14 +7,15 @@ add_library (XDFSerialize
   BinOpSeqParser.h
   ExprParser.cpp
   ExprParser.h
+  InstanceIdRemoval.cpp
   NetworkParser.cpp
   NetworkParser.h
   ParseContinuation.h
   TypeParser.cpp
   TypeParser.h
+  XDFConstant.cpp
   XDFConstant.h
   XDFParser.cpp
   XDFWriter.cpp
-  InstanceIdRemoveAll.cpp
   )
   

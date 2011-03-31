@@ -81,7 +81,7 @@ public:
      *
      */
 	Instance(std::string id, std::string clasz, std::map<std::string, Expr*>* parameterValues, 
-			 std::map<std::string, IRAttribute*>* attributes = NULL){
+			 std::map<std::string, IRAttribute*>* attributes){
 		this->id = id;
 		this->clasz = clasz;
 		this->parameterValues = parameterValues;

@@ -94,6 +94,7 @@ public:
 	static const char* TYPE_LIST;
 	static const char* TYPE_STRING;
 	static const char* TYPE_UINT;
+	static const char* TYPE_SIZE;
 };
 
 #endif

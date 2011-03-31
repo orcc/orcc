@@ -233,7 +233,7 @@ void startCmdLine(){
 	std::cout << "Parsing file " << XDFFile.getValue() << ". \n";
 
 	XDFParser xdfParser(XDFFile);
-	Network* network = xdfParser.ParseXDF(Context);
+	Network* network = xdfParser.parseXDF(Context);
 
 	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
 

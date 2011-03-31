@@ -28,43 +28,44 @@
  */
 
 /**
-@brief Implementation of class InstanceIdRemoveAll
+@brief Description of the InstanceIdRemoval class interface 
 @author Olivier Labois
-@file InstanceIdRemoveAll.cpp
+@file InstanceIdRemoval.h
 @version 1.0
 @date 28/03/2011
 */
 
 //------------------------------
-#include <iostream>
-#include <sstream>
-#include <list>
+#ifndef IDMNG_H
+#define IDMNG_H
 
-#include "Jade/XDFSerialize/InstanceIdRemoveAll.h"
+#include "Jade/Core/Network.h"
 //------------------------------
 
-using namespace std;
+class InstanceIdRemoveAll{
+public:
 
+	/**
+     *  @brief Constructor of the class InstanceidRemoval
+	 *
+	 *  @param network : a network
+     */
+	InstanceIdRemoveAll(Network* network);
 
-InstanceIdRemoveAll::InstanceIdRemoveAll(Network* network){
-	this->network = network;
-}
+	/**
+     *  @brief Destructor of the class InstanceIdRemoval
+     */
+	~InstanceIdRemoveAll();
 
-void InstanceIdRemoveAll::Remove(){
-	list<Instance*>* instances = network->getInstances();
-	list<Instance*>::iterator itInst;
+	/**
+     *  @brief Start removal instances id
+     */
+	void removal();
 
-	int i = 0;
+private:
 
-	for(itInst = instances->begin(); itInst != instances->end(); itInst++){
-		if((*itInst)->getId() != "source" && (*itInst)->getId() != "display"){
-			ostringstream id;
-			id << i;
-			(*itInst)->setId(id.str());
-			i++;
-		}
-	}
-}
+	/** network where are instances*/
+	Network* network;
 
-InstanceIdRemoveAll::~InstanceIdRemoveAll(){
-}
+};
+#endif
