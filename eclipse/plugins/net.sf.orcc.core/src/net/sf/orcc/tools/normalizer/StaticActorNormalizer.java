@@ -314,8 +314,8 @@ public class StaticActorNormalizer {
 		variables = new OrderedMap<String, LocalVariable>();
 		List<Node> nodes = new ArrayList<Node>();
 
-		Procedure procedure = new Procedure(ACTION_NAME, false, location,
-				IrFactory.eINSTANCE.createTypeVoid(),
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(ACTION_NAME,
+				false, location, IrFactory.eINSTANCE.createTypeVoid(),
 				new OrderedMap<String, LocalVariable>(), variables, nodes);
 
 		// add state variables
@@ -395,7 +395,8 @@ public class StaticActorNormalizer {
 		variables = new OrderedMap<String, LocalVariable>();
 		List<Node> nodes = new ArrayList<Node>();
 
-		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+				SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),
 				new OrderedMap<String, LocalVariable>(), variables, nodes);
 

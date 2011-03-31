@@ -12,17 +12,17 @@ import java.util.Set;
 
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.CFGEdge;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Procedure;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>CFG Node</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>CFG Node</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
  *
@@ -30,8 +30,7 @@ import org.eclipse.emf.ecore.EClass;
  */
 public abstract class NodeImpl extends UserImpl implements Node {
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected NodeImpl() {
@@ -39,15 +38,14 @@ public abstract class NodeImpl extends UserImpl implements Node {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
 	protected EClass eStaticClass() {
 		return IrPackage.Literals.NODE;
 	}
-	
+
 	private static int labelCount;
 
 	/**
@@ -76,11 +74,8 @@ public abstract class NodeImpl extends UserImpl implements Node {
 
 	private Location location;
 
-	private Procedure procedure;
-
-	protected NodeImpl(Location location, Procedure procedure) {
+	protected NodeImpl(Location location) {
 		this.location = location;
-		this.procedure = procedure;
 		labelCount++;
 		this.label = labelCount;
 	}
@@ -97,6 +92,7 @@ public abstract class NodeImpl extends UserImpl implements Node {
 
 	@Override
 	public List<Node> getPredecessors() {
+		Procedure procedure = getProcedure();
 		if (procedure == null) {
 			return null;
 		}
@@ -116,11 +112,17 @@ public abstract class NodeImpl extends UserImpl implements Node {
 
 	@Override
 	public Procedure getProcedure() {
-		return procedure;
+		EObject cter = eContainer();
+		while (cter != null && !(cter instanceof Procedure)) {
+			cter = cter.eContainer();
+		}
+
+		return (Procedure) cter;
 	}
 
 	@Override
 	public List<Node> getSuccessors() {
+		Procedure procedure = getProcedure();
 		if (procedure == null) {
 			return null;
 		}
@@ -167,9 +169,4 @@ public abstract class NodeImpl extends UserImpl implements Node {
 		this.location = location;
 	}
 
-	@Override
-	public void setProcedure(Procedure procedure) {
-		this.procedure = procedure;
-	}
-
-} //NodeImpl
+} // NodeImpl

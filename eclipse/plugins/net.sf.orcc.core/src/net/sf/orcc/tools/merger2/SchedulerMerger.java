@@ -34,11 +34,9 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
@@ -51,7 +49,6 @@ import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.moc.AbstractMoCInterpreter;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines a transformation that take a MoC as input and returns the
@@ -77,15 +74,12 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 	}
 
 	private Procedure createBody() {
-		List<Node> nodes = new ArrayList<Node>();
-
-		Procedure procedure = new Procedure("initCounter", false,
-				new Location(), IrFactory.eINSTANCE.createTypeVoid(),
-				new OrderedMap<String, LocalVariable>(),
-				new OrderedMap<String, LocalVariable>(), nodes);
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+				"initCounter", new Location(),
+				IrFactory.eINSTANCE.createTypeVoid());
 
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		nodes.add(block);
+		procedure.getNodes().add(block);
 
 		for (GlobalVariable counter : varCounters) {
 			Store store = new Store(counter, new IntExpr(0));
@@ -104,15 +98,12 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 	}
 
 	private Procedure createScheduler() {
-		List<Node> nodes = new ArrayList<Node>();
-
-		Procedure procedure = new Procedure("isSchedulable_initCounter",
-				false, new Location(), IrFactory.eINSTANCE.createTypeBool(),
-				new OrderedMap<String, LocalVariable>(),
-				new OrderedMap<String, LocalVariable>(), nodes);
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+				"isSchedulable_initCounter", new Location(),
+				IrFactory.eINSTANCE.createTypeBool());
 
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		nodes.add(block);
+		procedure.getNodes().add(block);
 		Return returnInstr = new Return(new BoolExpr(true));
 		block.add(returnInstr);
 
@@ -132,8 +123,9 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 			fsm.addTransition("s" + stateId++, action, "s" + stateId);
 		}
 
-		fsm.addTransition("s" + stateId, initializeCounter, fsm.getInitialState().toString());
-		
+		fsm.addTransition("s" + stateId, initializeCounter, fsm
+				.getInitialState().toString());
+
 		return new ActionScheduler(new ArrayList<Action>(), fsm);
 	}
 }

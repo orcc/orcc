@@ -155,7 +155,7 @@ printCall(call) ::= <<
 
 <if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printParameter()>);<
 else
-><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
+><if(call.target)><call.target> = <endif><call.procedure.name>(<call.parameters; separator=", ">);<
 endif>
 >>
 
@@ -397,7 +397,7 @@ if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
 		goto finished;
 	}
 	<endif>
-	<action.body>();
+	<action.body.name>();
 	i++;
 } else {
 	<printActions(restActions)>
@@ -432,7 +432,7 @@ if (<checkInputPattern(state.action.inputPattern)>isSchedulable_<state.action>()
 		goto finished;
 	}
 	<endif>
-	<state.action.body>();
+	<state.action.body.name>();
 	i++;
 	goto l_<state.targetState>;
 } else {

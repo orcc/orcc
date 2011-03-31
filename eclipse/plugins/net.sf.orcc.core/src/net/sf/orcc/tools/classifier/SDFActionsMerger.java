@@ -131,8 +131,9 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	 * @return a procedure
 	 */
 	private Procedure createIsSchedulable(Pattern input) {
-		Procedure procedure = new Procedure("isSchedulable_SDF",
-				new Location(), IrFactory.eINSTANCE.createTypeBool());
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+				"isSchedulable_SDF", new Location(),
+				IrFactory.eINSTANCE.createTypeBool());
 
 		LocalVariable result = procedure.newTempLocalVariable(file,
 				IrFactory.eINSTANCE.createTypeBool(), "result");
@@ -241,7 +242,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	}
 
 	private Procedure mergeSDFBodies(List<Action> actions) {
-		target = new Procedure("SDF", new Location(),
+		target = IrFactory.eINSTANCE.createProcedure("SDF", new Location(),
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		// Launch action

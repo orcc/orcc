@@ -232,9 +232,9 @@ public class ActorMerger implements INetworkTransformation {
 
 			for (Action action : current.getActions()) {
 				Procedure body = action.getBody();
-				Procedure proc = new Procedure(instance.getId() + "_"
-						+ action.getName(), false, new Location(),
-						IrFactory.eINSTANCE.createTypeVoid(),
+				Procedure proc = IrFactory.eINSTANCE.createProcedure(
+						instance.getId() + "_" + action.getName(), false,
+						new Location(), IrFactory.eINSTANCE.createTypeVoid(),
 						new OrderedMap<String, LocalVariable>(),
 						body.getLocals(), body.getNodes());
 				actor.getProcs().put(proc.getName(), proc);
@@ -333,8 +333,8 @@ public class ActorMerger implements INetworkTransformation {
 
 		OrderedMap<String, LocalVariable> locals = new OrderedMap<String, LocalVariable>();
 
-		Procedure procedure = new Procedure(ACTION_NAME, false, new Location(),
-				IrFactory.eINSTANCE.createTypeVoid(),
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(ACTION_NAME,
+				false, new Location(), IrFactory.eINSTANCE.createTypeVoid(),
 				new OrderedMap<String, LocalVariable>(), locals, nodes);
 
 		// Add loop counters
@@ -492,7 +492,8 @@ public class ActorMerger implements INetworkTransformation {
 						IrFactory.eINSTANCE.createTypeBool());
 
 				NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
-				nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+				nodeWhile
+						.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 				nodeWhile.setValue(condition);
 				nodes.add(nodeWhile);
 
@@ -534,7 +535,8 @@ public class ActorMerger implements INetworkTransformation {
 		Location location = new Location();
 		variables = new OrderedMap<String, LocalVariable>();
 		List<Node> nodes = new ArrayList<Node>();
-		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
+				SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),
 				new OrderedMap<String, LocalVariable>(), variables, nodes);
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();

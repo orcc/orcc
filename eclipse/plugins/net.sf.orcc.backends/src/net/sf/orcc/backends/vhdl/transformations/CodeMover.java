@@ -134,7 +134,6 @@ public class CodeMover extends AbstractActorVisitor {
 	public void visit(NodeBlock nodeBlock) {
 		this.procedure = nodeBlock.getProcedure();
 		super.visit(nodeBlock);
-		nodeBlock.setProcedure(targetProcedure);
 	}
 
 	@Override

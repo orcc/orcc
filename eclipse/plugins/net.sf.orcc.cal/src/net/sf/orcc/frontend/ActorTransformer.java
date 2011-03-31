@@ -362,10 +362,11 @@ public class ActorTransformer {
 		Pattern inputPattern = new Pattern(0);
 		Pattern outputPattern = new Pattern(0);
 
-		Procedure scheduler = new Procedure("isSchedulable_init_actor",
-				location, IrFactory.eINSTANCE.createTypeBool());
-		Procedure body = new Procedure("init_actor", location,
-				IrFactory.eINSTANCE.createTypeVoid());
+		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
+				"isSchedulable_init_actor", location,
+				IrFactory.eINSTANCE.createTypeBool());
+		Procedure body = IrFactory.eINSTANCE.createProcedure("init_actor",
+				location, IrFactory.eINSTANCE.createTypeVoid());
 
 		// add return instructions
 		astTransformer.addReturn(scheduler, new BoolExpr(true));
@@ -591,9 +592,10 @@ public class ActorTransformer {
 		Pattern outputPattern = new Pattern();
 
 		// creates scheduler and body
-		Procedure scheduler = new Procedure("isSchedulable_" + name, location,
+		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
+				"isSchedulable_" + name, location,
 				IrFactory.eINSTANCE.createTypeBool());
-		Procedure body = new Procedure(name, location,
+		Procedure body = IrFactory.eINSTANCE.createProcedure(name, location,
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		// fills the patterns and procedures

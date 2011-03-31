@@ -116,8 +116,9 @@ public class ActionSplitter extends AbstractActorVisitor {
 		 */
 		private Action createNewAction(Expression condition, String name) {
 			// scheduler
-			Procedure scheduler = new Procedure("isSchedulable_" + name,
-					new Location(), IrFactory.eINSTANCE.createTypeBool());
+			Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
+					"isSchedulable_" + name, new Location(),
+					IrFactory.eINSTANCE.createTypeBool());
 			LocalVariable result = scheduler.newTempLocalVariable(
 					ActionSplitter.this.actor.getFile(),
 					IrFactory.eINSTANCE.createTypeBool(), "result");
@@ -131,8 +132,8 @@ public class ActionSplitter extends AbstractActorVisitor {
 			scheduler.getNodes().add(block);
 
 			// body
-			Procedure body = new Procedure(name, new Location(),
-					IrFactory.eINSTANCE.createTypeVoid());
+			Procedure body = IrFactory.eINSTANCE.createProcedure(name,
+					new Location(), IrFactory.eINSTANCE.createTypeVoid());
 			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			block.add(new Return(null));
 			body.getNodes().add(block);

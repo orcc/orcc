@@ -108,7 +108,6 @@ public class DataMover extends AbstractActorVisitor {
 
 			// adds a Load
 			Load duplicateLoad = new Load(duplicate, new Use(stateVar));
-			duplicateLoad.setBlock(targetBlock);
 			itInstruction.previous();
 			itInstruction.add(duplicateLoad);
 		}

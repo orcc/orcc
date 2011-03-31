@@ -794,7 +794,7 @@ public class IRParser {
 		List<Node> nodes = parseNodes(array.get(3).getAsJsonArray());
 		NodeBlock joinNode = (NodeBlock) parseNode(array.get(4)
 				.getAsJsonArray());
-		
+
 		NodeWhile node = IrFactoryImpl.eINSTANCE.createNodeWhile();
 		node.setValue(condition);
 		node.getNodes().addAll(nodes);
@@ -872,12 +872,10 @@ public class IRParser {
 		variables = new Scope<String, Variable>(variables, false);
 		OrderedMap<String, LocalVariable> locals = parseLocalVariables(array
 				.get(5).getAsJsonArray());
-
-		Procedure procedure = new Procedure(name, external, location,
-				returnType, parameters, locals, null);
-
 		List<Node> nodes = parseNodes(array.get(6).getAsJsonArray());
-		procedure.setNodes(nodes);
+
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
+				external, location, returnType, parameters, locals, nodes);
 
 		// go back to previous scope
 		variables = variables.getParent().getParent();

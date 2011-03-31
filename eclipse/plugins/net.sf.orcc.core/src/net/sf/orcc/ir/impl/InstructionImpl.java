@@ -13,6 +13,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -42,8 +43,6 @@ public abstract class InstructionImpl extends UserImpl implements Instruction {
 	protected EClass eStaticClass() {
 		return IrPackage.Literals.INSTRUCTION;
 	}
-	
-	private NodeBlock block;
 
 	private Location location;
 
@@ -53,7 +52,12 @@ public abstract class InstructionImpl extends UserImpl implements Instruction {
 
 	@Override
 	public NodeBlock getBlock() {
-		return block;
+		EObject cter = eContainer();
+		while (cter != null && !(cter instanceof NodeBlock)) {
+			cter = cter.eContainer();
+		}
+
+		return (NodeBlock) cter;
 	}
 
 	@Override
@@ -129,11 +133,6 @@ public abstract class InstructionImpl extends UserImpl implements Instruction {
 	@Override
 	public boolean isWriteEnd() {
 		return false;
-	}
-
-	@Override
-	public void setBlock(NodeBlock block) {
-		this.block = block;
 	}
 
 	public void setLocation(Location location) {

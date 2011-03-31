@@ -126,12 +126,4 @@ public interface Node extends User {
 	 */
 	void setLocation(Location location);
 
-	/**
-	 * Sets the procedure this node belongs to.
-	 * 
-	 * @param procedure
-	 *            the procedure this node belongs to
-	 */
-	public void setProcedure(Procedure procedure);
-
 }

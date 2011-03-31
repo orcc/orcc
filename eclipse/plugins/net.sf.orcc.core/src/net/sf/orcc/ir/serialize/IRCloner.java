@@ -1037,8 +1037,9 @@ public class IRCloner {
 
 		List<Node> nodes = cloneNodes(procedure.getNodes());
 
-		return new Procedure(procedure.getName(), procedure.isNative(),
-				procedure.getLocation(), returnType, parameters, locals, nodes);
+		return IrFactory.eINSTANCE.createProcedure(procedure.getName(),
+				procedure.isNative(), procedure.getLocation(), returnType,
+				parameters, locals, nodes);
 	}
 
 	/**

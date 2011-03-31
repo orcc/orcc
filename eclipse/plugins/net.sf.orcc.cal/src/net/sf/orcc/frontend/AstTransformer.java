@@ -527,10 +527,11 @@ public class AstTransformer {
 
 				// create while
 				NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
-				nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+				nodeWhile
+						.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 				nodeWhile.setValue(condition);
 				nodeWhile.getNodes().addAll(nodes);
-				
+
 				procedure.getNodes().add(nodeWhile);
 
 				// create assign
@@ -814,8 +815,8 @@ public class AstTransformer {
 			if ("print".equals(name) || "println".equals(name)) {
 				Procedure procedure = procedures.get("print");
 				if (procedure == null) {
-					procedure = new Procedure("print", location,
-							IrFactory.eINSTANCE.createTypeVoid());
+					procedure = IrFactory.eINSTANCE.createProcedure("print",
+							location, IrFactory.eINSTANCE.createTypeVoid());
 					procedure.setNative(true);
 					procedures.put("print", procedure);
 				}
@@ -1285,7 +1286,8 @@ public class AstTransformer {
 		Location location = Util.getLocation(astFunction);
 		Type type = astFunction.getIrType();
 
-		Procedure procedure = new Procedure(name, location, type);
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
+				location, type);
 		Context oldContext = newContext(procedure);
 
 		transformParameters(astFunction.getParameters());
@@ -1366,8 +1368,8 @@ public class AstTransformer {
 		// translate and add to initialize
 		if (mustInitialize) {
 			if (initialize == null) {
-				initialize = new Procedure("_initialize", location,
-						IrFactory.eINSTANCE.createTypeVoid());
+				initialize = IrFactory.eINSTANCE.createProcedure("_initialize",
+						location, IrFactory.eINSTANCE.createTypeVoid());
 			}
 
 			Context oldContext = newContext(initialize);
@@ -1462,8 +1464,8 @@ public class AstTransformer {
 		String name = astProcedure.getName();
 		Location location = Util.getLocation(astProcedure);
 
-		Procedure procedure = new Procedure(name, location,
-				IrFactory.eINSTANCE.createTypeVoid());
+		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
+				location, IrFactory.eINSTANCE.createTypeVoid());
 		Context oldContext = newContext(procedure);
 
 		transformParameters(astProcedure.getParameters());

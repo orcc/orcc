@@ -68,17 +68,14 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * 
 	 * @param ram
 	 *            RAM
-	 * @param block
-	 *            parent block
 	 * @param indexes
 	 *            list of indexes
 	 * @param variable
 	 *            variable
 	 */
-	private void addEarlySetAddress(NodeBlock block, List<Expression> indexes,
-			int port, Variable variable) {
+	private void addEarlySetAddress(List<Expression> indexes, int port,
+			Variable variable) {
 		RamSetAddress rsa = new RamSetAddress(indexes);
-		rsa.setBlock(block);
 		rsa.setPort(port);
 		rsa.setVariable(variable);
 
@@ -112,7 +109,6 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 */
 	private void addPendingRead(RAM ram, Load load, int port) {
 		RamRead read = new RamRead();
-		read.setBlock(load.getBlock());
 		read.setPort(port);
 		read.setTarget(load.getTarget());
 		read.setVariable(load.getSource().getVariable());
@@ -124,8 +120,6 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	/**
 	 * Adds a RamSetAddress instruction.
 	 * 
-	 * @param block
-	 *            parent block
 	 * @param indexes
 	 *            list of indexes
 	 * @param port
@@ -133,25 +127,20 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param variable
 	 *            variable
 	 */
-	private void addSetAddress(NodeBlock block, List<Expression> indexes,
-			int port, Variable variable) {
+	private void addSetAddress(List<Expression> indexes, int port,
+			Variable variable) {
 		RamSetAddress rsa = new RamSetAddress(indexes);
-		rsa.setBlock(block);
 		rsa.setPort(port);
 		rsa.setVariable(variable);
 		itInstruction.add(rsa);
 	}
 
 	/**
-	 * Adds a SplitInstruction to the given block.
+	 * Adds a SplitInstruction.
 	 * 
-	 * @param block
-	 *            a block
 	 */
-	private void addSplitInstruction(NodeBlock block) {
-		SplitInstruction instruction = new SplitInstruction();
-		instruction.setBlock(block);
-		itInstruction.add(instruction);
+	private void addSplitInstruction() {
+		itInstruction.add(new SplitInstruction());
 	}
 
 	/**
@@ -166,7 +155,6 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 */
 	private void addWrite(RAM ram, Store store, int port) {
 		RamWrite write = new RamWrite();
-		write.setBlock(store.getBlock());
 		write.setPort(port);
 		write.setVariable(store.getTarget());
 		write.setValue(store.getValue());
@@ -180,7 +168,6 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 *            a Load
 	 */
 	private void convertLoad(Load load) {
-		NodeBlock block = load.getBlock();
 		List<Expression> indexes = load.getIndexes();
 		Variable variable = load.getSource().getVariable();
 
@@ -191,24 +178,24 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 
 			int ajustedPort = port % 2 + 1;
 			if (ram.isWaitCycleNeeded()) {
-				addSetAddress(block, indexes, ajustedPort, variable);
+				addSetAddress(indexes, ajustedPort, variable);
 			} else {
-				addEarlySetAddress(block, indexes, ajustedPort, variable);
+				addEarlySetAddress(indexes, ajustedPort, variable);
 			}
 			addPendingRead(ram, load, ajustedPort);
 
 			if (port % 2 == 1) {
 				// two ports have been used
 				if (ram.isWaitCycleNeeded()) {
-					addSplitInstruction(block);
+					addSplitInstruction();
 					ram.setWaitCycleNeeded(false);
 				}
 
-				addSplitInstruction(block);
-				executeTwoPendingReads(block, ram);
+				addSplitInstruction();
+				executeTwoPendingReads(ram);
 			}
 		} else {
-			addSetAddress(block, indexes, 1, variable);
+			addSetAddress(indexes, 1, variable);
 			addPendingRead(ram, load, 1);
 
 			ram.setLastAccessRead(true);
@@ -224,7 +211,6 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 *            a Store
 	 */
 	private void convertStore(Store store) {
-		NodeBlock block = store.getBlock();
 		List<Expression> indexes = store.getIndexes();
 		Variable variable = store.getTarget();
 
@@ -234,21 +220,21 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 			port = ram.getLastPortUsed() + 1;
 			if (port > 0 && port % 2 == 0) {
 				// port == 2, 4, 6, 8...
-				addSplitInstruction(block);
+				addSplitInstruction();
 			}
 		} else {
 			port = 0;
 		}
 
 		int ajustedPort = port % 2 + 1;
-		addSetAddress(block, indexes, ajustedPort, variable);
+		addSetAddress(indexes, ajustedPort, variable);
 		addWrite(ram, store, ajustedPort);
 
 		ram.setLastPortUsed(port);
 		ram.setLastAccessRead(false);
 	}
 
-	private boolean executeTwoPendingReads(NodeBlock block, RAM ram) {
+	private boolean executeTwoPendingReads(RAM ram) {
 		List<RamRead> reads = pendingReads.get(ram);
 		Iterator<RamRead> it = reads.iterator();
 		for (int i = 0; it.hasNext() && i < 2; i++) {
@@ -300,7 +286,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 
 			boolean hasMorePendingReads;
 			do {
-				hasMorePendingReads = executeTwoPendingReads(block, ram);
+				hasMorePendingReads = executeTwoPendingReads(ram);
 			} while (hasMorePendingReads);
 		}
 	}

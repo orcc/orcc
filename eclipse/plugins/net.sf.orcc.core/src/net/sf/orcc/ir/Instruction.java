@@ -159,14 +159,6 @@ public interface Instruction extends User {
 	boolean isWriteEnd();
 
 	/**
-	 * Sets the block that contains this instruction.
-	 * 
-	 * @param block
-	 *            the block that contains this instruction
-	 */
-	void setBlock(NodeBlock block);
-
-	/**
 	 * Sets the location of this instruction.
 	 * 
 	 * @param location

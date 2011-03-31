@@ -7,6 +7,7 @@
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Ir.ecore#/">
+    <genDataTypes ecoreDataType="Ir.ecore#//Location"/>
     <genClasses image="false" ecoreClass="Ir.ecore#//Expression"/>
     <genClasses image="false" ecoreClass="Ir.ecore#//Type"/>
     <genClasses ecoreClass="Ir.ecore#//TypeBool"/>
@@ -41,5 +42,12 @@
     </genClasses>
     <genClasses image="false" ecoreClass="Ir.ecore#//ValueContainer"/>
     <genClasses image="false" ecoreClass="Ir.ecore#//Node"/>
+    <genClasses ecoreClass="Ir.ecore#//Procedure">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Procedure/location"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Procedure/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/nodes"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/returnType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Procedure/native"/>
+    </genClasses>
   </genPackages>
 </genmodel:GenModel>

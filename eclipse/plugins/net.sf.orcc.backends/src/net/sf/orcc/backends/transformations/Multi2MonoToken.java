@@ -303,8 +303,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private Action createAction(Expression condition, String name) {
 		// scheduler
-		Procedure scheduler = new Procedure("isSchedulable_" + name,
-				new Location(), IrFactory.eINSTANCE.createTypeBool());
+		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
+				"isSchedulable_" + name, new Location(),
+				IrFactory.eINSTANCE.createTypeBool());
 		LocalVariable result = scheduler.newTempLocalVariable(
 				this.actor.getFile(), IrFactory.eINSTANCE.createTypeBool(),
 				"myResult");
@@ -318,8 +319,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		scheduler.getNodes().add(block);
 
 		// body
-		Procedure body = new Procedure(name, new Location(),
-				IrFactory.eINSTANCE.createTypeVoid());
+		Procedure body = IrFactory.eINSTANCE.createProcedure(name,
+				new Location(), IrFactory.eINSTANCE.createTypeVoid());
 		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		block.add(new Return(null));
 		body.getNodes().add(block);
@@ -405,8 +406,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private Action createDoneAction(String name, GlobalVariable counter,
 			int numTokens) {
 		// body
-		Procedure body = new Procedure(name, new Location(),
-				IrFactory.eINSTANCE.createTypeVoid());
+		Procedure body = IrFactory.eINSTANCE.createProcedure(name,
+				new Location(), IrFactory.eINSTANCE.createTypeVoid());
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		Store store = new Store(counter, new IntExpr(0));
 		block.add(store);
@@ -414,8 +415,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		body.getNodes().add(block);
 
 		// scheduler
-		Procedure scheduler = new Procedure("isSchedulable_" + name,
-				new Location(), IrFactory.eINSTANCE.createTypeBool());
+		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
+				"isSchedulable_" + name, new Location(),
+				IrFactory.eINSTANCE.createTypeBool());
 		LocalVariable temp = scheduler.newTempLocalVariable(
 				this.actor.getFile(), IrFactory.eINSTANCE.createTypeBool(),
 				"temp");
@@ -468,8 +470,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				+ action.getName());
 		Procedure body = newProcessAction.getBody();
 
-		ListIterator<Node> listIt = action.getBody().getNodes()
-				.listIterator();
+		ListIterator<Node> listIt = action.getBody().getNodes().listIterator();
 		moveNodes(listIt, body);
 		Iterator<LocalVariable> it = action.getBody().getLocals().iterator();
 		moveLocals(it, body);

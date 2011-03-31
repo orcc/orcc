@@ -8,6 +8,7 @@ package net.sf.orcc.ir;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
@@ -467,6 +468,81 @@ public interface IrPackage extends EPackage {
 
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.ProcedureImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getProcedure()
+	 * @generated
+	 */
+	int PROCEDURE = 16;
+
+	/**
+	 * The feature id for the '<em><b>Location</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__LOCATION = 0;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__NAME = 1;
+
+	/**
+	 * The feature id for the '<em><b>Nodes</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__NODES = 2;
+
+	/**
+	 * The feature id for the '<em><b>Return Type</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__RETURN_TYPE = 3;
+
+	/**
+	 * The feature id for the '<em><b>Native</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__NATIVE = 4;
+
+	/**
+	 * The number of structural features of the '<em>Procedure</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE_FEATURE_COUNT = 5;
+
+	/**
+	 * The meta object id for the '<em>Location</em>' data type.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.Location
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getLocation()
+	 * @generated
+	 */
+	int LOCATION = 17;
+
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -749,6 +825,82 @@ public interface IrPackage extends EPackage {
 	EClass getNode();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Procedure <em>Procedure</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Procedure</em>'.
+	 * @see net.sf.orcc.ir.Procedure
+	 * @generated
+	 */
+	EClass getProcedure();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Procedure#getLocation <em>Location</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Location</em>'.
+	 * @see net.sf.orcc.ir.Procedure#getLocation()
+	 * @see #getProcedure()
+	 * @generated
+	 */
+	EAttribute getProcedure_Location();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Procedure#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.ir.Procedure#getName()
+	 * @see #getProcedure()
+	 * @generated
+	 */
+	EAttribute getProcedure_Name();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Procedure#getNodes <em>Nodes</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Nodes</em>'.
+	 * @see net.sf.orcc.ir.Procedure#getNodes()
+	 * @see #getProcedure()
+	 * @generated
+	 */
+	EReference getProcedure_Nodes();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Procedure#getReturnType <em>Return Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Return Type</em>'.
+	 * @see net.sf.orcc.ir.Procedure#getReturnType()
+	 * @see #getProcedure()
+	 * @generated
+	 */
+	EReference getProcedure_ReturnType();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Procedure#isNative <em>Native</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Native</em>'.
+	 * @see net.sf.orcc.ir.Procedure#isNative()
+	 * @see #getProcedure()
+	 * @generated
+	 */
+	EAttribute getProcedure_Native();
+
+	/**
+	 * Returns the meta object for data type '{@link net.sf.orcc.ir.Location <em>Location</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for data type '<em>Location</em>'.
+	 * @see net.sf.orcc.ir.Location
+	 * @model instanceClass="net.sf.orcc.ir.Location"
+	 * @generated
+	 */
+	EDataType getLocation();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1017,6 +1169,66 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass NODE = eINSTANCE.getNode();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ProcedureImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getProcedure()
+		 * @generated
+		 */
+		EClass PROCEDURE = eINSTANCE.getProcedure();
+
+		/**
+		 * The meta object literal for the '<em><b>Location</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PROCEDURE__LOCATION = eINSTANCE.getProcedure_Location();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PROCEDURE__NAME = eINSTANCE.getProcedure_Name();
+
+		/**
+		 * The meta object literal for the '<em><b>Nodes</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PROCEDURE__NODES = eINSTANCE.getProcedure_Nodes();
+
+		/**
+		 * The meta object literal for the '<em><b>Return Type</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PROCEDURE__RETURN_TYPE = eINSTANCE.getProcedure_ReturnType();
+
+		/**
+		 * The meta object literal for the '<em><b>Native</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PROCEDURE__NATIVE = eINSTANCE.getProcedure_Native();
+
+		/**
+		 * The meta object literal for the '<em>Location</em>' data type.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.Location
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getLocation()
+		 * @generated
+		 */
+		EDataType LOCATION = eINSTANCE.getLocation();
 
 
 	}

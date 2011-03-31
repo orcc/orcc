@@ -28,23 +28,27 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import java.util.List;
-import java.util.Set;
 
-import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines a procedure.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class Procedure {
+public interface Procedure extends EObject {
+
+	/**
+	 * Returns the CFG of this procedure. The CFG must be set by calling
+	 * {@link #setGraph(CFG)}.
+	 * 
+	 * @return the CFG of this procedure
+	 */
+	CFG getCFG();
 
 	/**
 	 * Returns the first block in the list of nodes of the given procedure. A
@@ -54,9 +58,7 @@ public class Procedure {
 	 *            a procedure
 	 * @return a block
 	 */
-	public NodeBlock getFirst() {
-		return getFirst(getNodes());
-	}
+	NodeBlock getFirst();
 
 	/**
 	 * Returns the first block in the given list of nodes. A new block is
@@ -68,23 +70,7 @@ public class Procedure {
 	 *            a list of nodes of the given procedure
 	 * @return a block
 	 */
-	public NodeBlock getFirst(List<Node> nodes) {
-		NodeBlock block;
-		if (nodes.isEmpty()) {
-			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			nodes.add(block);
-		} else {
-			Node node = nodes.get(0);
-			if (node.isBlockNode()) {
-				block = (NodeBlock) node;
-			} else {
-				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-				nodes.add(0, block);
-			}
-		}
-
-		return block;
-	}
+	NodeBlock getFirst(List<Node> nodes);
 
 	/**
 	 * Returns the last block in the list of nodes of the given procedure. A new
@@ -94,9 +80,7 @@ public class Procedure {
 	 *            a procedure
 	 * @return a block
 	 */
-	public NodeBlock getLast() {
-		return getLast(getNodes());
-	}
+	NodeBlock getLast();
 
 	/**
 	 * Returns the last block in the given list of nodes. A new block is created
@@ -109,162 +93,7 @@ public class Procedure {
 	 *            nodes
 	 * @return a block
 	 */
-	public NodeBlock getLast(List<Node> nodes) {
-		NodeBlock block;
-		if (nodes.isEmpty()) {
-			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			nodes.add(block);
-		} else {
-			Node node = nodes.get(nodes.size() - 1);
-			if (node.isBlockNode()) {
-				block = (NodeBlock) node;
-			} else {
-				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-				nodes.add(block);
-			}
-		}
-
-		return block;
-	}
-
-	/**
-	 * This class visits the procedure to find the state variables used.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class ProcVisitor extends AbstractActorVisitor {
-
-		private Set<GlobalVariable> loadedVariables;
-
-		private Set<GlobalVariable> storedVariables;
-
-		public ProcVisitor() {
-			storedVariables = new HashSet<GlobalVariable>();
-			loadedVariables = new HashSet<GlobalVariable>();
-		}
-
-		public List<GlobalVariable> getLoadedVariables() {
-			return new ArrayList<GlobalVariable>(loadedVariables);
-		}
-
-		public List<GlobalVariable> getStoredVariables() {
-			return new ArrayList<GlobalVariable>(storedVariables);
-		}
-
-		@Override
-		public void visit(Load node) {
-			Variable var = node.getSource().getVariable();
-			if (!var.getType().isList()) {
-				loadedVariables.add((GlobalVariable) var);
-			}
-		}
-
-		@Override
-		public void visit(Store store) {
-			Variable var = store.getTarget();
-			if (!var.getType().isList()) {
-				storedVariables.add((GlobalVariable) var);
-			}
-		}
-
-	}
-
-	private CFG graph;
-
-	/**
-	 * ordered map of local variables
-	 */
-	private OrderedMap<String, LocalVariable> locals;
-
-	private Location location;
-
-	/**
-	 * the name of this procedure
-	 */
-	private String name;
-
-	/**
-	 * whether this procedure is external.
-	 */
-	private boolean nativeFlag;
-
-	/**
-	 * the list of nodes of this procedure
-	 */
-	private List<Node> nodes;
-
-	/**
-	 * ordered map of parameters
-	 */
-	private OrderedMap<String, LocalVariable> parameters;
-
-	private Expression result;
-
-	/**
-	 * the return type of this procedure
-	 */
-	private Type returnType;
-
-	/**
-	 * Creates a new procedure.
-	 * 
-	 * @param name
-	 *            The procedure name.
-	 * @param native Whether it is native or not.
-	 * @param location
-	 *            The procedure location.
-	 * @param returnType
-	 *            The procedure return type.
-	 * @param parameters
-	 *            The procedure parameters.
-	 * @param locals
-	 *            The procedure local variables.
-	 */
-	public Procedure(String name, boolean nativeFlag, Location location,
-			Type returnType, OrderedMap<String, LocalVariable> parameters,
-			OrderedMap<String, LocalVariable> locals, List<Node> nodes) {
-		this.location = location;
-		this.nativeFlag = nativeFlag;
-		this.nodes = nodes;
-		this.locals = locals;
-		this.name = name;
-		this.parameters = parameters;
-		this.returnType = returnType;
-	}
-
-	/**
-	 * Creates a new procedure, not external, with empty parameters, locals, and
-	 * nodes.
-	 * 
-	 * @param name
-	 *            The procedure name.
-	 * @param external
-	 *            Whether it is external or not.
-	 * @param location
-	 *            The procedure location.
-	 * @param returnType
-	 *            The procedure return type.
-	 */
-	public Procedure(String name, Location location, Type returnType) {
-		this.location = location;
-		this.nativeFlag = false;
-		this.nodes = new ArrayList<Node>();
-		this.locals = new OrderedMap<String, LocalVariable>();
-		this.name = name;
-		this.parameters = new OrderedMap<String, LocalVariable>();
-		this.returnType = returnType;
-	}
-
-	/**
-	 * Returns the CFG of this procedure. The CFG must be set by calling
-	 * {@link #setGraph(CFG)}.
-	 * 
-	 * @return the CFG of this procedure
-	 */
-	public CFG getCFG() {
-		return graph;
-	}
+	NodeBlock getLast(List<Node> nodes);
 
 	/**
 	 * Computes and returns the list of scalar variables loaded by this
@@ -272,69 +101,60 @@ public class Procedure {
 	 * 
 	 * @return the list of scalar variables loaded by this procedure
 	 */
-	public List<GlobalVariable> getLoadedVariables() {
-		ProcVisitor visitor = new ProcVisitor();
-		visitor.visit(nodes);
-		return visitor.getLoadedVariables();
-	}
+	List<GlobalVariable> getLoadedVariables();
 
 	/**
 	 * Returns the local variables of this procedure as an ordered map.
 	 * 
 	 * @return the local variables of this procedure as an ordered map
 	 */
-	public OrderedMap<String, LocalVariable> getLocals() {
-		return locals;
-	}
+	OrderedMap<String, LocalVariable> getLocals();
 
 	/**
 	 * Returns the location of this procedure.
 	 * 
 	 * @return the location of this procedure
+	 * @model
 	 */
-	public Location getLocation() {
-		return location;
-	}
+	Location getLocation();
 
 	/**
 	 * Returns the name of this procedure.
 	 * 
 	 * @return the name of this procedure
+	 * @model
 	 */
-	public String getName() {
-		return name;
-	}
+	String getName();
 
 	/**
 	 * Returns the list of nodes of this procedure.
 	 * 
 	 * @return the list of nodes of this procedure
+	 * @model
 	 */
-	public List<Node> getNodes() {
-		return nodes;
-	}
+	EList<Node> getNodes();
 
 	/**
 	 * Returns the parameters of this procedure as an ordered map.
 	 * 
 	 * @return the parameters of this procedure as an ordered map
 	 */
-	public OrderedMap<String, LocalVariable> getParameters() {
-		return parameters;
-	}
+	OrderedMap<String, LocalVariable> getParameters();
 
-	public Expression getResult() {
-		return result;
-	}
+	/**
+	 * Returns the result of this procedure.
+	 * 
+	 * @return
+	 */
+	Expression getResult();
 
 	/**
 	 * Returns the return type of this procedure.
 	 * 
 	 * @return the return type of this procedure
+	 * @model
 	 */
-	public Type getReturnType() {
-		return returnType;
-	}
+	Type getReturnType();
 
 	/**
 	 * Computes and returns the list of scalar variables stored by this
@@ -342,20 +162,15 @@ public class Procedure {
 	 * 
 	 * @return the list of scalar variables stored by this procedure
 	 */
-	public List<GlobalVariable> getStoredVariables() {
-		ProcVisitor visitor = new ProcVisitor();
-		visitor.visit(nodes);
-		return visitor.getStoredVariables();
-	}
+	List<GlobalVariable> getStoredVariables();
 
 	/**
 	 * Returns <code>true</code> if this procedure is native.
 	 * 
 	 * @return <code>true</code> if this procedure is native
+	 * @model
 	 */
-	public boolean isNative() {
-		return nativeFlag;
-	}
+	boolean isNative();
 
 	/**
 	 * Creates a new local variable that can be used to hold intermediate
@@ -369,21 +184,7 @@ public class Procedure {
 	 *            hint for the variable name
 	 * @return a new local variable
 	 */
-	public LocalVariable newTempLocalVariable(String file, Type type,
-			String hint) {
-		String name = hint;
-		LocalVariable variable = locals.get(name);
-		int i = 0;
-		while (variable != null) {
-			name = hint + i;
-			variable = locals.get(name);
-			i++;
-		}
-
-		variable = new LocalVariable(true, 0, new Location(), name, type);
-		locals.put(file, variable.getLocation(), variable.getName(), variable);
-		return (LocalVariable) variable;
-	}
+	LocalVariable newTempLocalVariable(String file, Type type, String hint);
 
 	/**
 	 * Set the CFG of this procedure.
@@ -391,13 +192,17 @@ public class Procedure {
 	 * @param the
 	 *            CFG of this procedure
 	 */
-	public void setGraph(CFG graph) {
-		this.graph = graph;
-	}
+	void setGraph(CFG graph);
 
-	public void setLocation(Location location) {
-		this.location = location;
-	}
+	/**
+	 * Sets the local variables of this procedure as an ordered map.
+	 * 
+	 * @param locals
+	 *            the local variables of this procedure as an ordered map
+	 */
+	void setLocals(OrderedMap<String, LocalVariable> locals);
+
+	void setLocation(Location location);
 
 	/**
 	 * Sets the name of this procedure.
@@ -405,9 +210,7 @@ public class Procedure {
 	 * @param name
 	 *            the new name
 	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+	void setName(String name);
 
 	/**
 	 * Sets this procedure as "native".
@@ -415,23 +218,17 @@ public class Procedure {
 	 * @param nativeFlag
 	 *            value of native flag
 	 */
-	public void setNative(boolean nativeFlag) {
-		this.nativeFlag = nativeFlag;
-	}
+	void setNative(boolean nativeFlag);
 
 	/**
-	 * Sets the node list of this procedure.
+	 * Sets the parameters of this procedure as an ordered map.
 	 * 
-	 * @param nodes
-	 *            a list of CFG nodes
+	 * @param parameters
+	 *            the parameters of this procedure as an ordered map
 	 */
-	public void setNodes(List<Node> nodes) {
-		this.nodes = nodes;
-	}
+	void setParameters(OrderedMap<String, LocalVariable> parameters);
 
-	public void setResult(Expression result) {
-		this.result = result;
-	}
+	void setResult(Expression result);
 
 	/**
 	 * Sets the return type of this procedure
@@ -439,13 +236,6 @@ public class Procedure {
 	 * @param returnType
 	 *            a type
 	 */
-	public void setReturnType(Type returnType) {
-		this.returnType = returnType;
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
+	void setReturnType(Type returnType);
 
 }
