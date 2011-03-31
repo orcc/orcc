@@ -27,7 +27,7 @@ endif()
 
 # Common packages required
 find_library(CALaka_LIBRARY CALaka HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
-find_library(SystemActor_LIBRARY SystemActor HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
+find_library(System_LIBRARY System HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 find_library(Thread_LIBRARY Thread HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 find_path(CAL_INCLUDE_DIR actoraka.h HINTS $ENV{CALDIR} PATH_SUFFIXES include include/CAL)
 
@@ -46,7 +46,7 @@ ${CAL_INCLUDE_DIR}
 
 set(libraries
 ${CALaka_LIBRARY}
-${SystemActor_LIBRARY}
+${System_LIBRARY}
 ${Thread_LIBRARY}
 )
 
@@ -55,7 +55,7 @@ set(libraries ${libraries} ${Wrapper_LIBRARY} ${AdaptorFactory_LIBRARY})
 <endif>
 
 
-if(SDL_DISPLAY)
+if(NOT NO_DISPLAY)
 find_package(SDL REQUIRED)
 set(includes ${includes} ${SDL_INCLUDE_DIR})	
 set(libraries ${libraries} ${SDL_LIBRARY})

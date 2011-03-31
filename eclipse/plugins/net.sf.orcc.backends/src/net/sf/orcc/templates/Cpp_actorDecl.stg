@@ -34,7 +34,9 @@ nonConstStateVar(variable) ::= <<
 
 procedure(procedure) ::= <<
 
-<procedure.returnType> <procedure>(<procedure.parameters.list: variableDeclaration(); wrap, anchor, separator=", ">);
+<if(!procedure.native)
+><procedure.returnType> <procedure>(<procedure.parameters.list: variableDeclaration(); wrap, anchor, separator=", ">);<
+endif>
 
 >>
 

@@ -166,10 +166,6 @@ m_rooms[<actor.simpleName>_<port.name>] -= <numTokens>;
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// Nodes
-///////////////////////////////////////////////////////////////////////////////
-
 printInstructions(instructions) ::= <<
 <instructions: {instr | <
 if (instr.assign)><printAssign(assign=instr)><
@@ -217,14 +213,17 @@ while (<whileNode.value>) {
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-
-<procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
+<if(!procedure.native)
+><procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
 {
 <if(procedure.locals.list)>
 	<procedure.locals.list: {local | <variableDeclaration(local)>;<\n>}>
 
 <endif>
-	<printNodes(procedure.nodes)>}
+	<printNodes(procedure.nodes)>}<
+else
+	>extern <procedure.returnType> <procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">);
+<endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -232,7 +231,8 @@ procedure(procedure) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printActionBody(procedure) ::= <<
-<procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
+<if(!procedure.native)
+><procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
 {
 	<action.inputPattern.ports : {port | <variableDeclaration(action.inputPattern.variableMap.(port))>;}>
 	<action.outputPattern.ports : {port | <variableDeclaration(action.outputPattern.variableMap.(port))>;}>
@@ -243,7 +243,8 @@ printActionBody(procedure) ::= <<
 <endif>
 	<printNodes(procedure.nodes)>
 	<action.outputPattern.ports : {port | <printWrite(port=port, variable=action.outputPattern.variableMap.(port), numTokens=action.outputPattern.numTokensMap.(port))>}>
-}
+}<
+endif>
 >>
 
 printActionScheduler(procedure) ::= <<
@@ -260,6 +261,7 @@ printActionScheduler(procedure) ::= <<
 >>
 
 action(action) ::= <<
+
 <printActionBody(action.body)>
 
 <printActionScheduler(action.scheduler)>
