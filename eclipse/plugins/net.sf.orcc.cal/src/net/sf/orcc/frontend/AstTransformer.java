@@ -532,8 +532,6 @@ public class AstTransformer {
 				nodeWhile.setValue(condition);
 				nodeWhile.getNodes().addAll(nodes);
 
-				procedure.getNodes().add(nodeWhile);
-
 				// create assign
 				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				AstExpression astLower = generator.getLower();
