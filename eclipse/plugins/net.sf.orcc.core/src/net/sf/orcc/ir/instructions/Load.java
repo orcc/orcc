@@ -39,6 +39,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.SourceContainer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.impl.InstructionImpl;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -48,7 +49,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class Load extends AbstractInstruction implements LocalTargetContainer,
+public class Load extends InstructionImpl implements LocalTargetContainer,
 		SourceContainer {
 
 	private List<Expression> indexes;

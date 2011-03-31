@@ -39,6 +39,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.impl.InstructionImpl;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -48,7 +49,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class Store extends AbstractInstruction implements TargetContainer,
+public class Store extends InstructionImpl implements TargetContainer,
 		ValueContainer {
 
 	private List<Expression> indexes;

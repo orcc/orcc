@@ -28,14 +28,16 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * This interface defines an interface common to {@link Instruction} and
  * {@link CFGNode}.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model abstract="true"
  */
-public interface User {
+public interface User extends EObject {
 
 	/**
 	 * Returns <code>true</code> if the user is a CFG node.

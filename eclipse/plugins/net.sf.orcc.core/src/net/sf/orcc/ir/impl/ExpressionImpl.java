@@ -48,7 +48,6 @@ public abstract class ExpressionImpl extends EObjectImpl implements Expression {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected ExpressionImpl() {
@@ -64,7 +63,6 @@ public abstract class ExpressionImpl extends EObjectImpl implements Expression {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

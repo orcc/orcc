@@ -37,7 +37,7 @@ import net.sf.orcc.ir.nodes.NodeVisitor;
  * This class defines a node in the CFG.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model abstract="true"
  */
 public interface CFGNode extends User {
 

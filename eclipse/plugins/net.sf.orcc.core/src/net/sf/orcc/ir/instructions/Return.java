@@ -31,6 +31,7 @@ package net.sf.orcc.ir.instructions;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.impl.InstructionImpl;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -39,7 +40,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class Return extends AbstractInstruction implements ValueContainer {
+public class Return extends InstructionImpl implements ValueContainer {
 
 	private Expression value;
 

@@ -25,5 +25,8 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//TypeUint/size"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//TypeVoid"/>
+    <genClasses image="false" ecoreClass="Ir.ecore#//Instruction"/>
+    <genClasses image="false" ecoreClass="Ir.ecore#//User"/>
+    <genClasses image="false" ecoreClass="Ir.ecore#//CFGNode"/>
   </genPackages>
 </genmodel:GenModel>

@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.instructions;
 
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.impl.InstructionImpl;
 
 /**
  * This class defines a back-end specific instruction.
@@ -36,7 +37,7 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class SpecificInstruction extends AbstractInstruction {
+public class SpecificInstruction extends InstructionImpl {
 
 	protected SpecificInstruction(Location location) {
 		super(location);

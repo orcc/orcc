@@ -23,4 +23,7 @@
         defaultValueLiteral="32"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TypeVoid" eSuperTypes="#//Type"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true" eSuperTypes="#//User"/>
+  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="CFGNode" abstract="true" eSuperTypes="#//User"/>
 </ecore:EPackage>

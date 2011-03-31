@@ -278,6 +278,65 @@ public interface IrPackage extends EPackage {
 
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.UserImpl <em>User</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.UserImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUser()
+	 * @generated
+	 */
+	int USER = 10;
+
+	/**
+	 * The number of structural features of the '<em>User</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int USER_FEATURE_COUNT = 0;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstructionImpl <em>Instruction</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.InstructionImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstruction()
+	 * @generated
+	 */
+	int INSTRUCTION = 9;
+
+	/**
+	 * The number of structural features of the '<em>Instruction</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTRUCTION_FEATURE_COUNT = USER_FEATURE_COUNT + 0;
+
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.CFGNodeImpl <em>CFG Node</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.CFGNodeImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getCFGNode()
+	 * @generated
+	 */
+	int CFG_NODE = 11;
+
+	/**
+	 * The number of structural features of the '<em>CFG Node</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CFG_NODE_FEATURE_COUNT = USER_FEATURE_COUNT + 0;
+
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -421,6 +480,36 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getTypeVoid();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Instruction <em>Instruction</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Instruction</em>'.
+	 * @see net.sf.orcc.ir.Instruction
+	 * @generated
+	 */
+	EClass getInstruction();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.User <em>User</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>User</em>'.
+	 * @see net.sf.orcc.ir.User
+	 * @generated
+	 */
+	EClass getUser();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.CFGNode <em>CFG Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>CFG Node</em>'.
+	 * @see net.sf.orcc.ir.CFGNode
+	 * @generated
+	 */
+	EClass getCFGNode();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -573,6 +662,36 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass TYPE_VOID = eINSTANCE.getTypeVoid();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstructionImpl <em>Instruction</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.InstructionImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstruction()
+		 * @generated
+		 */
+		EClass INSTRUCTION = eINSTANCE.getInstruction();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.UserImpl <em>User</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.UserImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUser()
+		 * @generated
+		 */
+		EClass USER = eINSTANCE.getUser();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.CFGNodeImpl <em>CFG Node</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.CFGNodeImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getCFGNode()
+		 * @generated
+		 */
+		EClass CFG_NODE = eINSTANCE.getCFGNode();
 
 	}
 

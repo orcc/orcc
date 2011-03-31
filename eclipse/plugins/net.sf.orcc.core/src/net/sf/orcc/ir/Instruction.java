@@ -36,7 +36,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * This class defines an instruction.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model abstract="true"
  */
 public interface Instruction extends User {
 

@@ -34,6 +34,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.impl.InstructionImpl;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -43,7 +44,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class PhiAssignment extends AbstractInstruction implements
+public class PhiAssignment extends InstructionImpl implements
 		LocalTargetContainer {
 
 	/**

@@ -35,6 +35,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.impl.CFGNodeImpl;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -44,7 +45,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class WhileNode extends AbstractNode implements ValueContainer {
+public class WhileNode extends CFGNodeImpl implements ValueContainer {
 
 	private BlockNode joinNode;
 

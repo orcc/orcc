@@ -37,6 +37,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.impl.CFGNodeImpl;
 
 /**
  * This class defines a Block node. A block node is a node that contains
@@ -45,7 +46,7 @@ import net.sf.orcc.ir.Procedure;
  * @author Matthieu Wipliez
  * 
  */
-public final class BlockNode extends AbstractNode implements
+public final class BlockNode extends CFGNodeImpl implements
 		Iterable<Instruction> {
 
 	/**
