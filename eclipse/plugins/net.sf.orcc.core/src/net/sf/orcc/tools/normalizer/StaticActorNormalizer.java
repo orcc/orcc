@@ -110,7 +110,7 @@ public class StaticActorNormalizer {
 			LocalVariable loopVar = indexes.get(depth - 1);
 
 			// init var
-			NodeBlock block = NodeBlock.getLast(procedure, nodes);
+			NodeBlock block = procedure.getLast(nodes);
 			Assign assign = new Assign(loopVar, new IntExpr(0));
 			block.add(assign);
 
@@ -133,7 +133,7 @@ public class StaticActorNormalizer {
 			pattern.getPattern().accept(this);
 
 			// add assign
-			block = NodeBlock.getLast(procedure, nodes);
+			block = procedure.getLast(nodes);
 			assign = new Assign(loopVar, null);
 			assign.setValue(new BinaryExpr(
 					new VarExpr(new Use(loopVar, assign)), BinaryOp.PLUS,
@@ -154,7 +154,7 @@ public class StaticActorNormalizer {
 
 		@Override
 		public void visit(SimplePattern pattern) {
-			NodeBlock block = NodeBlock.getLast(procedure, nodes);
+			NodeBlock block = procedure.getLast(nodes);
 			Action action = pattern.getAction();
 
 			// Call the action corresponding to the pattern
@@ -223,7 +223,7 @@ public class StaticActorNormalizer {
 	 *            input or output pattern
 	 */
 	private void addStateVariables(Procedure procedure, Pattern pattern) {
-		NodeBlock block = NodeBlock.getLast(procedure);
+		NodeBlock block = procedure.getLast();
 		for (Port port : pattern.getPorts()) {
 			int numTokens = pattern.getNumTokens(port);
 

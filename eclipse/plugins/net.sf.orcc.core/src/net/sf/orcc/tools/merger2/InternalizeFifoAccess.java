@@ -109,7 +109,7 @@ public class InternalizeFifoAccess extends AbstractActorVisitor {
 			return;
 		}
 		
-		NodeBlock node = NodeBlock.getLast(body);
+		NodeBlock node = body.getLast();
 		
 		Use use = new Use(counter);
 		

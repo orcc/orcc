@@ -311,7 +311,7 @@ public class ActorTransformer {
 	 */
 	private void addInstruction(Instruction instruction) {
 		Context context = astTransformer.getContext();
-		NodeBlock block = NodeBlock.getLast(context.getProcedure());
+		NodeBlock block = context.getProcedure().getLast();
 		block.add(instruction);
 	}
 
@@ -506,7 +506,7 @@ public class ActorTransformer {
 				}
 
 				for (Action action : initializes) {
-					NodeBlock block = NodeBlock.getFirst(action.getBody());
+					NodeBlock block = action.getBody().getFirst();
 					List<Expression> params = new ArrayList<Expression>(0);
 					block.add(0, new Call(location, null, initialize, params));
 				}

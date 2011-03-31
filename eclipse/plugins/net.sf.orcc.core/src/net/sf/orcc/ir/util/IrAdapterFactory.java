@@ -120,6 +120,22 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createCFGNodeAdapter();
 			}
 			@Override
+			public Adapter caseNodeBlock(NodeBlock object) {
+				return createNodeBlockAdapter();
+			}
+			@Override
+			public Adapter caseNodeIf(NodeIf object) {
+				return createNodeIfAdapter();
+			}
+			@Override
+			public Adapter caseNodeWhile(NodeWhile object) {
+				return createNodeWhileAdapter();
+			}
+			@Override
+			public Adapter caseValueContainer(ValueContainer object) {
+				return createValueContainerAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -304,6 +320,62 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createCFGNodeAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.NodeBlock <em>Node Block</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.NodeBlock
+	 * @generated
+	 */
+	public Adapter createNodeBlockAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.NodeIf <em>Node If</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.NodeIf
+	 * @generated
+	 */
+	public Adapter createNodeIfAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.NodeWhile <em>Node While</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.NodeWhile
+	 * @generated
+	 */
+	public Adapter createNodeWhileAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ValueContainer <em>Value Container</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.ValueContainer
+	 * @generated
+	 */
+	public Adapter createValueContainerAdapter() {
 		return null;
 	}
 

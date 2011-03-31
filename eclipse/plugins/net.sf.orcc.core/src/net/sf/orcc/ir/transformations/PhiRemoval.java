@@ -86,11 +86,11 @@ public class PhiRemoval extends AbstractActorVisitor {
 	@Override
 	public void visit(NodeIf node) {
 		NodeBlock join = node.getJoinNode();
-		targetBlock = NodeBlock.getLast(procedure, node.getThenNodes());
+		targetBlock = procedure.getLast(node.getThenNodes());
 		phiIndex = 0;
 		join.accept(this);
 
-		targetBlock = NodeBlock.getLast(procedure, node.getElseNodes());
+		targetBlock = procedure.getLast(node.getElseNodes());
 		phiIndex = 1;
 		join.accept(this);
 		removePhis(join);
@@ -109,7 +109,8 @@ public class PhiRemoval extends AbstractActorVisitor {
 		// if source is a local variable with index = 0, we remove it from the
 		// procedure and translate the PHI by an assignment of 0 (zero) to
 		// target. Otherwise, we just create an assignment target = source.
-		OrderedMap<String, LocalVariable> parameters = procedure.getParameters();
+		OrderedMap<String, LocalVariable> parameters = procedure
+				.getParameters();
 		Assign assign;
 		if (source.getIndex() == 0 && !parameters.contains(source.getName())) {
 			procedure.getLocals().remove(source.getName());
@@ -153,7 +154,7 @@ public class PhiRemoval extends AbstractActorVisitor {
 		itNode.next();
 
 		// last node of the while
-		targetBlock = NodeBlock.getLast(procedure, node.getNodes());
+		targetBlock = procedure.getLast(node.getNodes());
 		phiIndex = 1;
 		join.accept(this);
 		removePhis(join);

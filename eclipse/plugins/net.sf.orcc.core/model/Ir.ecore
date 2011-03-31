@@ -26,4 +26,24 @@
   <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true" eSuperTypes="#//User"/>
   <eClassifiers xsi:type="ecore:EClass" name="User" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="CFGNode" abstract="true" eSuperTypes="#//User"/>
+  <eClassifiers xsi:type="ecore:EClass" name="NodeBlock" eSuperTypes="#//CFGNode">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="instructions" upperBound="-1"
+        eType="#//Instruction" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NodeIf" eSuperTypes="#//CFGNode #//ValueContainer">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elseNodes" upperBound="-1"
+        eType="#//CFGNode" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//NodeBlock"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="thenNodes" upperBound="-1"
+        eType="#//CFGNode" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NodeWhile" eSuperTypes="#//CFGNode #//ValueContainer">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//NodeBlock"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
+        eType="#//CFGNode" containment="true" resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ValueContainer" instanceClassName="net.sf.orcc.ir.ValueContainer"
+      abstract="true" interface="true"/>
 </ecore:EPackage>

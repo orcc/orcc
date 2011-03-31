@@ -62,7 +62,7 @@ public class CodeMover extends AbstractActorVisitor {
 	 *            a list iterator of instructions
 	 */
 	public void moveInstructions(ListIterator<Instruction> itInstruction) {
-		targetBlock = NodeBlock.getLast(targetProcedure);
+		targetBlock = targetProcedure.getLast();
 		while (itInstruction.hasNext()) {
 			Instruction instruction = itInstruction.next();
 			this.procedure = instruction.getBlock().getProcedure();

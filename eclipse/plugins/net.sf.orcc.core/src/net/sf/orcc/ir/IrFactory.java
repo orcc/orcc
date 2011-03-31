@@ -123,6 +123,33 @@ public interface IrFactory extends EFactory {
 	TypeVoid createTypeVoid();
 
 	/**
+	 * Returns a new object of class '<em>Node Block</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Node Block</em>'.
+	 * @generated
+	 */
+	NodeBlock createNodeBlock();
+
+	/**
+	 * Returns a new object of class '<em>Node If</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Node If</em>'.
+	 * @generated
+	 */
+	NodeIf createNodeIf();
+
+	/**
+	 * Returns a new object of class '<em>Node While</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Node While</em>'.
+	 * @generated
+	 */
+	NodeWhile createNodeWhile();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

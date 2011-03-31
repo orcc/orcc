@@ -35,6 +35,7 @@ import java.util.Set;
 
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.NodeBlock;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -44,6 +45,87 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class Procedure {
+
+	/**
+	 * Returns the first block in the list of nodes of the given procedure. A
+	 * new block is created if there is no block in the given node list.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @return a block
+	 */
+	public NodeBlock getFirst() {
+		return getFirst(getNodes());
+	}
+
+	/**
+	 * Returns the first block in the given list of nodes. A new block is
+	 * created if there is no block in the given node list.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @param nodes
+	 *            a list of nodes of the given procedure
+	 * @return a block
+	 */
+	public NodeBlock getFirst(List<CFGNode> nodes) {
+		NodeBlock block;
+		if (nodes.isEmpty()) {
+			block = new NodeBlock(this);
+			nodes.add(block);
+		} else {
+			CFGNode node = nodes.get(0);
+			if (node.isBlockNode()) {
+				block = (NodeBlock) node;
+			} else {
+				block = new NodeBlock(this);
+				nodes.add(0, block);
+			}
+		}
+
+		return block;
+	}
+
+	/**
+	 * Returns the last block in the list of nodes of the given procedure. A new
+	 * block is created if there is no block in the given node list.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @return a block
+	 */
+	public NodeBlock getLast() {
+		return getLast(getNodes());
+	}
+
+	/**
+	 * Returns the last block in the given list of nodes. A new block is created
+	 * if there is no block in the given node list.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @param nodes
+	 *            a list of nodes that are a subset of the given procedure's
+	 *            nodes
+	 * @return a block
+	 */
+	public NodeBlock getLast(List<CFGNode> nodes) {
+		NodeBlock block;
+		if (nodes.isEmpty()) {
+			block = new NodeBlock(this);
+			nodes.add(block);
+		} else {
+			CFGNode node = nodes.get(nodes.size() - 1);
+			if (node.isBlockNode()) {
+				block = (NodeBlock) node;
+			} else {
+				block = new NodeBlock(this);
+				nodes.add(block);
+			}
+		}
+
+		return block;
+	}
 
 	/**
 	 * This class visits the procedure to find the state variables used.

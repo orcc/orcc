@@ -515,7 +515,7 @@ public class AstTransformer {
 						IrFactory.eINSTANCE.createTypeBool());
 
 				// add increment to body
-				NodeBlock block = NodeBlock.getLast(procedure, nodes);
+				NodeBlock block = procedure.getLast(nodes);
 				Assign assign = new Assign(location, loopVar, new BinaryExpr(
 						new VarExpr(new Use(loopVar)), BinaryOp.PLUS,
 						new IntExpr(1), loopVar.getType()));
@@ -705,7 +705,7 @@ public class AstTransformer {
 
 			// body
 			List<CFGNode> nodes = getNodes(foreach.getStatements());
-			NodeBlock block = NodeBlock.getLast(procedure, nodes);
+			NodeBlock block = procedure.getLast(nodes);
 			assign = new Assign(location, loopVar, new BinaryExpr(new VarExpr(
 					new Use(loopVar)), BinaryOp.PLUS, new IntExpr(1),
 					loopVar.getType()));
@@ -882,7 +882,7 @@ public class AstTransformer {
 	 *            an instruction
 	 */
 	private void addInstruction(Instruction instruction) {
-		NodeBlock block = NodeBlock.getLast(context.getProcedure());
+		NodeBlock block = context.getProcedure().getLast();
 		block.add(instruction);
 	}
 
@@ -896,7 +896,7 @@ public class AstTransformer {
 	 *            do not have a return value
 	 */
 	public void addReturn(Procedure procedure, Expression value) {
-		NodeBlock block = NodeBlock.getLast(procedure);
+		NodeBlock block = procedure.getLast();
 		Return returnInstr = new Return(value);
 		block.add(returnInstr);
 	}
@@ -1121,7 +1121,7 @@ public class AstTransformer {
 			LocalVariable local = context.getMapGlobals().get(global);
 
 			Load load = new Load(local, new Use(global));
-			NodeBlock block = NodeBlock.getFirst(context.getProcedure());
+			NodeBlock block = context.getProcedure().getFirst();
 			block.add(i, load);
 			i++;
 		}

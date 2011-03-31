@@ -139,7 +139,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		procedure.getNodes().add(nodeBlock);
 
 		// add the return
-		NodeBlock block = NodeBlock.getLast(procedure);
+		NodeBlock block = procedure.getLast();
 		block.add(new Return(new VarExpr(new Use(result))));
 
 		// convert to SSA form
@@ -212,10 +212,10 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	 *            output pattern common to all actions
 	 * @return
 	 */
-	private List<Action> mergeActions(List<Action> actions) {	
+	private List<Action> mergeActions(List<Action> actions) {
 		Pattern input = actions.get(0).getInputPattern();
 		Pattern output = actions.get(0).getInputPattern();
-		
+
 		// creates a isSchedulable function
 		Procedure scheduler = createIsSchedulable(input);
 
@@ -245,8 +245,8 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		for (Action action : actions) {
 			Pattern input = action.getInputPattern();
 			Pattern output = action.getOutputPattern();
-			
-			NodeBlock thenBlock = NodeBlock.getFirst(target, elseNodes);
+
+			NodeBlock thenBlock = target.getFirst(elseNodes);
 			Expression callExpr = createActionCondition(thenBlock,
 					action.getScheduler(), input, output);
 			NodeIf nodeIf = createActionCall(callExpr, action.getBody(), input,
@@ -254,8 +254,8 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 			elseNodes.add(nodeIf);
 			elseNodes = nodeIf.getElseNodes();
 		}
-		
-		NodeBlock lastBlock = NodeBlock.getLast(target);
+
+		NodeBlock lastBlock = target.getLast();
 		lastBlock.add(new Return(null));
 
 		return target;

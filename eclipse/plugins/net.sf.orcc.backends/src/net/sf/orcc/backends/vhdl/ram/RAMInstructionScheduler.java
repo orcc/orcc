@@ -292,7 +292,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	public void visit(Procedure procedure) {
 		super.visit(procedure);
 
-		NodeBlock block = NodeBlock.getLast(procedure);
+		NodeBlock block = procedure.getLast();
 		itInstruction = block.lastListIterator();
 		for (RAM ram : ramMap.values()) {
 			// set the RAM as "never accessed"

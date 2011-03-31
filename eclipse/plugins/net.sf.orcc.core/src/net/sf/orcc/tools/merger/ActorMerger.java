@@ -106,7 +106,7 @@ public class ActorMerger implements INetworkTransformation {
 				stores = new HashMap<Variable, Integer>();
 				visit(proc);
 
-				currentBlock = NodeBlock.getLast(proc);
+				currentBlock = proc.getLast();
 
 				updateLoadIndex();
 				updateStoreIndex();
@@ -348,7 +348,7 @@ public class ActorMerger implements INetworkTransformation {
 			Variable read = actor.getStateVars().get(var.getName() + "_r");
 			Variable write = actor.getStateVars().get(var.getName() + "_w");
 
-			NodeBlock block = NodeBlock.getLast(procedure, nodes);
+			NodeBlock block = procedure.getLast(nodes);
 			block.add(new Store(read, new IntExpr(0)));
 			block.add(new Store(write, new IntExpr(0)));
 		}
@@ -470,7 +470,7 @@ public class ActorMerger implements INetworkTransformation {
 				Procedure proc = actor.getProcs().get(
 						instance.getId() + "_" + action.getName());
 
-				NodeBlock blkNode = NodeBlock.getLast(procedure, nodes);
+				NodeBlock blkNode = procedure.getLast(nodes);
 				blkNode.add(new Call(new Location(), null, proc,
 						new ArrayList<Expression>()));
 			} else {
@@ -482,7 +482,7 @@ public class ActorMerger implements INetworkTransformation {
 						+ depth);
 
 				// Reset loop counter
-				NodeBlock blkNode = NodeBlock.getLast(procedure, nodes);
+				NodeBlock blkNode = procedure.getLast(nodes);
 				blkNode.add(new Assign(loopVar, new IntExpr(0)));
 
 				Expression condition = new BinaryExpr(new VarExpr(new Use(
@@ -504,7 +504,7 @@ public class ActorMerger implements INetworkTransformation {
 				Assign assign = new Assign(loopVar, new BinaryExpr(new VarExpr(
 						new Use(loopVar)), BinaryOp.PLUS, new IntExpr(1),
 						loopVar.getType()));
-				NodeBlock.getLast(procedure, nodeWhile.getNodes()).add(assign);
+				procedure.getLast(nodeWhile.getNodes()).add(assign);
 
 			}
 		}

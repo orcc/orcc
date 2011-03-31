@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
@@ -84,6 +85,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.TYPE_STRING: return createTypeString();
 			case IrPackage.TYPE_UINT: return createTypeUint();
 			case IrPackage.TYPE_VOID: return createTypeVoid();
+			case IrPackage.NODE_BLOCK: return createNodeBlock();
+			case IrPackage.NODE_IF: return createNodeIf();
+			case IrPackage.NODE_WHILE: return createNodeWhile();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -180,6 +184,36 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public TypeVoid createTypeVoid() {
 		TypeVoidImpl typeVoid = new TypeVoidImpl();
 		return typeVoid;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NodeBlock createNodeBlock() {
+		NodeBlockImpl nodeBlock = new NodeBlockImpl();
+		return nodeBlock;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NodeIf createNodeIf() {
+		NodeIfImpl nodeIf = new NodeIfImpl();
+		return nodeIf;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NodeWhile createNodeWhile() {
+		NodeWhileImpl nodeWhile = new NodeWhileImpl();
+		return nodeWhile;
 	}
 
 	/**
