@@ -100,7 +100,6 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 
 	//Remove unused instances
 	IRUnwriter unwriter(decoder);
-
 	
 	//Iterate though all instances to remove
 	list<Instance*>* removes = reconfiguration.getToRemove();
@@ -156,6 +155,17 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	// Setting connections of the decoder
 	Connector connector(Context, decoder);
 	connector.setConnections(configuration, decoder->getEE());
+
+	// Add the new instances to the scheduler
+	Scheduler* scheduler = decoder->getScheduler();
+	for (it = broads->begin(); it != broads->end(); it++){
+		scheduler->addInstance(*it);
+	}
+	
+	for (it = adds->begin(); it != adds->end(); it++){
+		scheduler->addInstance(*it);
+	}
+
 }
 
 void ConfigurationEngine::reinit(Decoder* decoder){

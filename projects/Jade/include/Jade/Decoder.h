@@ -131,6 +131,13 @@ public:
      */
 	 Scheduler* getScheduler(){return scheduler;};
 
+	 /**
+     *  @brief Return true if this decoder has already a scheduler defined
+	 * 
+	 *  @return true if the decoder has a scheduler, otherwise false
+     */
+	 bool hasScheduler(){return scheduler != NULL;};
+
 	/**
      *  @brief Setter of a stimulus file
 	 * 

@@ -90,29 +90,12 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder,
 }
 
 void RoundRobinScheduler::createScheduler(){
-	//Add action schedulers in instances
-	map<string, Instance*>::iterator it;
-	map<string, Instance*>* instances = configuration->getInstances();
-	DPNScheduler DPNSchedulerAdder(Context, decoder);
-	CSDFScheduler CSDFSchedulerAdder(Context, decoder);
-	QSDFScheduler QSDFSchedulerAdder(Context, decoder);
-	
-	for (it = instances->begin(); it != instances->end(); it++){
-		Instance* instance = it->second;
-		MoC* moc = instance->getMoC();
-		
-		/*if (moc->isQuasiStatic() && configuration->mergeActors()&& (instance->getId().compare("decoder_acdc_seq") ==0)){
-			QSDFSchedulerAdder.transform(instance);
-		}else*/ if (moc->isCSDF() && configuration->mergeActors()){
-			CSDFSchedulerAdder.transform(instance);
-		}else{
-			DPNSchedulerAdder.transform(instance);
-		}
-	}
-
 	//Create the scheduler function
 	createNetworkScheduler();
 
+	//Add the instance in the scheduler
+	map<string, Instance*>::iterator it;
+	map<string, Instance*>* instances = configuration->getInstances();
 	for (it = instances->begin(); it != instances->end(); it++){
 		addInstance(it->second);
 	}
@@ -157,19 +140,41 @@ void RoundRobinScheduler::createNetworkScheduler(){
 	schedBrInst = BranchInst::Create(BBReturn, schedulerBB, stopVal, schedulerBB);
 }
 
-void RoundRobinScheduler::addInstance(Instance* instance){
+void RoundRobinScheduler::createCall(Instance* instance){
 	ActionScheduler* actionScheduler = instance->getActionScheduler();
 	
+	// Call initialize function if present
 	if (actionScheduler->hasInitializeScheduler()){
 		Function* initialize = actionScheduler->getInitializeFunction();
 		CallInst* CallInit = CallInst::Create(initialize, "", initBrInst);
 		functionCall.insert(pair<Function*, CallInst*>(initialize, CallInit));
 	}
 
+	// Call scheduler function of the instance
 	Function* scheduler = actionScheduler->getSchedulerFunction();
 	CallInst* CallSched = CallInst::Create(scheduler, "", schedBrInst);
 	CallSched->setTailCall();
 	functionCall.insert(pair<Function*, CallInst*>(scheduler, CallSched));
+}
+
+void RoundRobinScheduler::addInstance(Instance* instance){
+	// Create an action scheduler for the instance
+	DPNScheduler DPNSchedulerAdder(Context, decoder);
+	CSDFScheduler CSDFSchedulerAdder(Context, decoder);
+	QSDFScheduler QSDFSchedulerAdder(Context, decoder);
+	
+	MoC* moc = instance->getMoC();
+		
+	/*if (moc->isQuasiStatic() && configuration->mergeActors()&& (instance->getId().compare("decoder_acdc_seq") ==0)){
+		QSDFSchedulerAdder.transform(instance);
+	}else*/ if (moc->isCSDF() && configuration->mergeActors()){
+		CSDFSchedulerAdder.transform(instance);
+	}else{
+		DPNSchedulerAdder.transform(instance);
+	}
+
+	// Call the action scheduler
+	createCall(instance);
 }
 
 void RoundRobinScheduler::removeInstance(Instance* instance){

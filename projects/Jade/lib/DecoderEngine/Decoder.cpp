@@ -64,6 +64,7 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose): Co
 	this->executionEngine = NULL;
 	this->fifoFn = NULL;
 	this->running = false;
+	this->scheduler = NULL;
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);

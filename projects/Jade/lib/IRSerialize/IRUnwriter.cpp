@@ -61,8 +61,10 @@ IRUnwriter::~IRUnwriter(){
 
 int IRUnwriter::remove(Instance* instance){
 	//Remove instance from the scheduler
-	Scheduler* scheduler = decoder->getScheduler();
-	scheduler->removeInstance(instance);
+	if (decoder->hasScheduler()){
+		Scheduler* scheduler = decoder->getScheduler();
+		scheduler->removeInstance(instance);
+	}
 
 	//Remove all elements of the instance
 	unwriteActionScheduler(instance->getActionScheduler());

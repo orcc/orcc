@@ -151,15 +151,15 @@ void Reconfiguration::detectInstances(map<string, Actor*>* actors){
 		//And the new instances
 		list<Instance*>::iterator itCur;
 		list<Instance*> newChilds = curConfiguration->getInstances(actor);
-/*
-		if ((actor->getName() == "System.Source")||
+
+	/*	if ((actor->getName() == "System.Source")||
 			(actor->getName() == "System.Display")){
 				list<Instance*>::iterator itInsert = toRemove.begin();
 				toRemove.insert(itInsert, refChilds.begin(), refChilds.end());
 
 				itInsert = toAdd.begin();
 				toAdd.insert(itInsert, newChilds.begin(), newChilds.end());
-		}else{*/
+		}*/
 
 		//Couple instances
 		for (itRef = refChilds.begin(), itCur = newChilds.begin(); itRef != refChilds.end() && itCur != newChilds.end() ; itRef++, itCur++){

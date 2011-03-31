@@ -104,7 +104,16 @@ private:
 	void createNetworkScheduler();
 
 	/**
+     *  @brief Create a call to the action scheduler of an instance in the instance
+	 *
+	 *  @param instance : the Instance to call
+     */
+	void createCall(Instance* instance);
+	
+	/**
      *  @brief Remove a call
+	 *
+	 *  @param function : the llvm::Function to remove
      */
 	void removeCall(llvm::Function* function);
 
