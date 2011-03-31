@@ -191,7 +191,12 @@ public class IRCloner {
 		public Object interpret(Call call, Object... args) {
 			Location location = cloneLocation(call.getLocation());
 			Procedure procedure = getProcedure(call.getProcedure());
-			LocalVariable target = getLocalVar(call.getTarget());
+			LocalVariable target = null;
+			
+			if (call.getTarget() != null){
+				target = getLocalVar(call.getTarget());
+			}
+			
 			List<Expression> parameters = cloneExpressions(call.getParameters());
 
 			return new Call(location, target, procedure, parameters);
@@ -413,6 +418,8 @@ public class IRCloner {
 	private static OrderedMap<String, LocalVariable> localVars;
 
 	private static OrderedMap<String, Variable> patternVars;
+	
+	private static OrderedMap<String, Variable> peekedVars;
 
 	private static OrderedMap<String, GlobalVariable> parameters;
 
@@ -544,7 +551,12 @@ public class IRCloner {
 		}
 
 		// The local variable corresponds to a pattern
-		return (LocalVariable) patternVars.get(variable.getName());
+		if (patternVars.contains(variable.getName())){
+			return (LocalVariable) patternVars.get(variable.getName());
+		}
+		
+		// The local variable corresponds to a peeked variable
+		return (LocalVariable) peekedVars.get(variable.getName());
 	}
 
 	/**
@@ -677,6 +689,7 @@ public class IRCloner {
 	 */
 	public Action cloneAction(Action action) {
 		patternVars = new OrderedMap<String, Variable>();
+		peekedVars = new OrderedMap<String, Variable>();
 
 		Location location = cloneLocation(action.getLocation());
 		Tag tag = cloneActionTag(action.getTag());
@@ -711,7 +724,7 @@ public class IRCloner {
 			// Clone pattern variables
 			Variable peeked = pattern.getPeeked(port);
 			if (peeked != null) {
-				clonePattern.setPeeked(clonedPort, clonePatternVar(peeked));
+				clonePattern.setPeeked(clonedPort, clonePeekedVar(peeked));
 			}
 
 			Variable var = pattern.getVariable(port);
@@ -737,6 +750,24 @@ public class IRCloner {
 
 		// Store the cloned variable
 		patternVars.put(cloneVar.getName(), cloneVar);
+
+		return cloneVar;
+	}
+	
+	/**
+	 * Returns a clone of the given peeked variable.
+	 * 
+	 * @param peekedVar
+	 *            a peeked variable of a pattern;
+	 * 
+	 * @return the cloned peeked variable
+	 */
+	public LocalVariable clonePeekedVar(Variable peekedVar) {
+		// Clone variables associated to ports
+		LocalVariable cloneVar = cloneLocalVariable((LocalVariable) peekedVar);
+
+		// Store the cloned variable
+		peekedVars.put(cloneVar.getName(), cloneVar);
 
 		return cloneVar;
 	}
