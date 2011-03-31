@@ -336,7 +336,7 @@ public class IRCloner {
 			NodeBlock clonedBlockNode = IrFactoryImpl.eINSTANCE
 					.createNodeBlock();
 			clonedBlockNode.setLocation(location);
-			clonedBlockNode.addAll(instructions);
+			clonedBlockNode.getInstructions().addAll(instructions);
 
 			return clonedBlockNode;
 		}
@@ -366,7 +366,7 @@ public class IRCloner {
 			Expression value = cloneExpression(node.getValue());
 			List<Node> nodes = cloneNodes(node.getNodes());
 			NodeBlock joinNode = (NodeBlock) cloneNode(node.getJoinNode());
-			
+
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setLocation(location);
 			nodeWhile.setValue(value);

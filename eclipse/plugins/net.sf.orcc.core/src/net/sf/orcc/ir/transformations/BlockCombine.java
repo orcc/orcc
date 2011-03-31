@@ -52,7 +52,7 @@ public class BlockCombine extends AbstractActorVisitor {
 		} else {
 			// add instructions of this block after previous block's
 			// instructions
-			previous.add(node);
+			previous.getInstructions().addAll(node.getInstructions());
 
 			// remove this block
 			itNode.remove();

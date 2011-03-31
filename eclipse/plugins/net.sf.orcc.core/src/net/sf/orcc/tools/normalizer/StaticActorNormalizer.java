@@ -170,8 +170,8 @@ public class StaticActorNormalizer {
 
 			// Add all instructions
 			block.add(call);
-			block.addAll(indexIn);
-			block.addAll(indexOut);
+			block.getInstructions().addAll(indexIn);
+			block.getInstructions().addAll(indexOut);
 		}
 
 		private List<Instruction> updateIndex(Pattern pattern) {

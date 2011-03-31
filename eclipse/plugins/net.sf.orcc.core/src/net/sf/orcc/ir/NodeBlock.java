@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.common.util.EList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.ListIterator;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class defines a Block node. A block node is a node that contains
@@ -60,22 +60,6 @@ public interface NodeBlock extends Node {
 	 *            an instruction
 	 */
 	void add(int index, Instruction instruction);
-
-	/**
-	 * Appends the instructions of the specified block at the end of this block.
-	 * 
-	 * @param block
-	 *            a block
-	 */
-	void add(NodeBlock block);
-
-	/**
-	 * Appends a list of instruction to the end of this block.
-	 * 
-	 * @param instructions
-	 *            a list of instruction
-	 */
-	void addAll(List<Instruction> instructions);
 
 	/**
 	 * Returns the instructions of this block node.
