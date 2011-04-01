@@ -94,14 +94,16 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		private GlobalVariable buffer;
 		private Port currentPort;
 		private GlobalVariable writeIndex;
+		private int bufferSize;
 
 		// private Variable tempTab;
 
 		public ModifyActionScheduler(GlobalVariable buffer,
-				GlobalVariable writeIndex, Port currentPort) {
+				GlobalVariable writeIndex, Port currentPort, int bufferSize) {
 			this.buffer = buffer;
 			this.writeIndex = writeIndex;
 			this.currentPort = currentPort;
+			this.bufferSize = bufferSize;
 		}
 
 		@Override
@@ -117,7 +119,11 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				Expression expression2 = new VarExpr(new Use(writeIndex));
 				Expression newExpression = new BinaryExpr(expression1,
 						BinaryOp.PLUS, expression2, port.getType());
-				load.getIndexes().set(0, newExpression);
+				Expression maskValue = new IntExpr(bufferSize - 1);
+				Expression mask = new BinaryExpr(newExpression,
+						BinaryOp.BITAND, maskValue,
+						IrFactory.eINSTANCE.createTypeInt(32));
+				load.getIndexes().set(0, mask);
 			}
 		}
 	}
@@ -208,7 +214,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private void actionToTransition(Action action, GlobalVariable buffer,
 			GlobalVariable writeIndex, GlobalVariable readIndex) {
 		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-				buffer, writeIndex, port);
+				buffer, writeIndex, port, bufferSize);
 		modifyActionScheduler.visit(action.getScheduler());
 		modifyActionSchedulability(action, writeIndex, readIndex, BinaryOp.GE,
 				new IntExpr(numTokens));
@@ -258,7 +264,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		addIndex++;
 
 		List<Expression> loadIndex = new ArrayList<Expression>(1);
-		Expression expression = new VarExpr(new Use(index));
+		Expression expression = new BinaryExpr(new VarExpr(new Use(index)),
+				BinaryOp.BITAND, new IntExpr(bufferSize-1),
+				IrFactory.eINSTANCE.createTypeInt(32));
 		loadIndex.add(expression);
 		Instruction load = new Load(tmp, new Use(inputBuffers.get(position)),
 				loadIndex);
@@ -961,7 +969,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 								port, inputTmp);
 						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 								inputBuffers.get(position),
-								writeIndexes.get(position), port);
+								writeIndexes.get(position), port, bufferSize);
 						modifyActionScheduler.visit(cloneAction.getScheduler());
 						modifyActionSchedulability(cloneAction,
 								writeIndexes.get(position),
@@ -1053,7 +1061,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				}
 			}
 		}
-		optimalSize = closestPow_2(size);
+		optimalSize = closestPow_2(size) * 8;
 		return optimalSize;
 	}
 
@@ -1155,7 +1163,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					numTokens = entry.getValue();
 					inputIndex = inputIndex + 1;
 					port = entry.getKey();
-					bufferSize = OptimalBufferSize(action, port);
+					bufferSize = 512;// OptimalBufferSize(action, port);
 					entryType = entry.getKey().getType();
 
 					if (inputPorts.contains(port)) {
