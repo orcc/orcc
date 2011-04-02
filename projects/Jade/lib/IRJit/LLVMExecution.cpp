@@ -271,7 +271,9 @@ void LLVMExecution::runFunction(Function* function) {
 }
 
 void LLVMExecution::stop(pthread_t* thread) {
-	display->forceStop(thread);
+	if (thread != NULL){
+		display->forceStop(thread);
+	}
 }
 
 void LLVMExecution::recompile(Function* function) {

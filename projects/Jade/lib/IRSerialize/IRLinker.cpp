@@ -38,11 +38,14 @@
 //------------------------------
 #include <iostream>
 
+#include "llvm/Module.h"
+#include "llvm/Constants.h"
+
+
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
+#include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Serialize/IRLinker.h"
-
-#include "llvm/Module.h"
 
 #include "IRConstant.h"
 //------------------------------
@@ -82,6 +85,28 @@ void IRLinker::linkInstance(Instance* refinstance, Instance* instance){
 	instance->setProcs(refinstance->getProcs());
 	instance->setInitializes(refinstance->getInitializes());
 	instance->setActionScheduler(refinstance->getActionScheduler());
+
+	// Solve parameters of the linked instance
+	instance->solveParameters();
+	setParameters(instance->getParameters());
+}
+
+void IRLinker::setParameters(map<string, Variable*>* parameters){
+	LLVMExecution* executionEngine = decoder->getEE();
+
+	// Iterate though all parametes
+	map<string, Variable*>::iterator it;
+	for (it = parameters->begin(); it != parameters->end(); it++){
+		Variable* var = it->second;
+		GlobalVariable* gv = var->getGlobalVariable();
+
+		if (executionEngine->isCompiledGV(gv)){
+			int* gvPtr = (int*)executionEngine->getGVPtr(gv);
+			ConstantInt* constant = cast<ConstantInt>(gv->getInitializer());
+			
+			*gvPtr = constant->getLimitedValue();
+		}
+	}
 }
 
 void IRLinker::linkPorts(map<string, Port*>* refPorts, map<string, Port*>* ports){

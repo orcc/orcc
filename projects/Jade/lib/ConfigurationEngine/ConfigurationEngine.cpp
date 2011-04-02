@@ -53,6 +53,7 @@
 #include "Jade/Serialize/IRLinker.h"
 #include "Jade/Serialize/IRUnwriter.h"
 #include "Jade/Serialize/IRWriter.h"
+#include "Jade/XDFSerialize/XDFWriter.h"
 //------------------------------
 
 using namespace std;
@@ -144,7 +145,7 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 
 	IRLinker linker(decoder);
 	linker.link(keeps);
-	
+
 	Initializer initializer(Context, decoder);
 	for (itKeep = keeps->begin(); itKeep != keeps->end(); itKeep++){
 		initializer.add((*itKeep).second);

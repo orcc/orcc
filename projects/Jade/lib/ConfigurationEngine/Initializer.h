@@ -41,6 +41,7 @@
 #include <map>
 
 #include "Jade/Core/Network/Instance.h"
+#include "Jade/Core/Expr/BoolExpr.h"
 #include "Jade/Core/Expr/IntExpr.h"
 #include "Jade/Core/Expr/ListExpr.h"
 
@@ -138,6 +139,14 @@ private:
 	 */
 	void initializeListExpr(llvm::GlobalVariable* var, ListExpr* expr);
 
+	/**
+	 * @brief Initialize a bool expression
+	 * 
+	 * @param var : the GlobalVariable to initialize
+	 *
+	 * @param expr : the initial values
+	 */
+	void initializeBoolExpr(llvm::GlobalVariable* var, BoolExpr* expr);
 
 	/** Decoder to initialize */
 	Decoder* decoder;

@@ -161,3 +161,21 @@ void Instance::solveParameters(){
 		variable->setInitializer(value);
 	}
 }
+
+Instance::Instance(std::string id, Actor* actor){
+	this->id = id;
+	this->actor = actor;
+	this->configuration = NULL;
+	this->stateVars = NULL;
+	this->parameters = NULL;
+	this->procedures = NULL;
+	this->initializes = NULL;
+	this->actions = NULL;
+	this->actionScheduler = NULL;
+	this->parameterValues = new map<string, Expr*>();
+	this->attributes = new map<string, IRAttribute*>();
+		
+	if (actor != NULL){
+		actor->addInstance(this);
+	}
+}

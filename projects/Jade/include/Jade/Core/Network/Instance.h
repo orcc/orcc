@@ -105,21 +105,7 @@ public:
 	 * @param broadcast : a Broadcast
      *
      */
-	Instance(std::string id, Actor* actor){
-		this->id = id;
-		this->actor = actor;
-		this->configuration = NULL;
-		this->stateVars = NULL;
-		this->parameters = NULL;
-		this->procedures = NULL;
-		this->initializes = NULL;
-		this->actions = NULL;
-		this->actionScheduler = NULL;
-		
-		if (actor != NULL){
-			actor->addInstance(this);
-		}
-	}
+	Instance(std::string id, Actor* actor);
 
 	~Instance();
 	
