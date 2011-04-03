@@ -147,6 +147,7 @@ void Instance::solveParameters(){
 		itValues = parameterValues->find(itParameter->first);
 		Expr* expr = itValues->second;
 		Constant* value = NULL;
+		parameter->setInitialValue(expr);
 
 		if (expr->isIntExpr()){
 			//Get corresponding parameter value with the correct size

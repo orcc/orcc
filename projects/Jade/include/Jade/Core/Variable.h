@@ -133,14 +133,50 @@ public:
 	bool isGlobal() {return global;};
 
 	/**
+	 * Returns true if this variable is a state variable.
+	 * 
+	 * @return true if this variable is global
+	 */
+	virtual bool isStateVar() {return false;};
+
+	/**
 	 * Returns true if this variable is assignable.
 	 * 
 	 * @return true if this variable is assignable
 	 */
 	bool isAssignable() {return assignable;};
 
+	/**
+	 * @brief Returns the initial expression of this variable.
+	 * 
+	 * @return the initial expression of this variable
+	 */
+	Expr* getInitialValue() {
+		return initialValue;
+	}
+
+	/**
+	 * @brief Returns the initial expression of this variable.
+	 * 
+	 * @return the initial expression of this variable
+	 */
+	void setInitialValue(Expr* expr) {
+		this->initialValue = expr;
+	}
+
+	/**
+	 * @brief Returns true if the variable has an initial value.
+	 * 
+	 * @return true if the variable has an initial value otherwise false
+	 */
+	bool hasInitialValue() {
+		return initialValue != NULL;
+	}
 
 protected:
+	/** Initial value */
+	Expr* initialValue;
+
 	/** variable type */
 	llvm::Type* type;
 

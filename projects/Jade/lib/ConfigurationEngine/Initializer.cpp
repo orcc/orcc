@@ -118,13 +118,26 @@ void Initializer::initializeStateVariables(map<string, StateVar*>* vars){
 		if (var->isAssignable() && var->hasInitialValue()){
 			if (executionEngine->isCompiledGV(var->getGlobalVariable())){
 				//Variable has been previously compiled
-				initializeStateVariable(var);
+				initializeVariable(var);
 			}
 		}
 	}
 }
 
-void Initializer::initializeStateVariable(StateVar* var){
+void Initializer::initializeParameters(map<string, Variable*>* parameters){
+	map<string, Variable*>::iterator it;
+
+	for (it = parameters->begin(); it != parameters->end(); ++it){
+		Variable* var = it->second;
+
+		if (executionEngine->isCompiledGV(var->getGlobalVariable())){
+			//Variable has been previously compiled
+			initializeVariable(var);
+		}
+	}
+}
+
+void Initializer::initializeVariable(Variable* var){
 	Expr* initVal = var->getInitialValue();
 	
 	if (initVal->isBooleanExpr()){

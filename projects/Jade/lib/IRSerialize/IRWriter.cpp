@@ -134,9 +134,17 @@ void IRWriter::writePortPtrs(map<string, Port*>* srcPorts, map<string, Port*>* d
 	map<string, Port*>::iterator itDst;
 
 	for (itSrc = srcPorts->begin(); itSrc != srcPorts->end(); itSrc++){
-		itDst = dstPorts->find(itSrc->first);
 		Port* src = itSrc->second;
-		Port* dst = itDst->second;
+		
+		// Find destination port
+		itDst = dstPorts->find(itSrc->first);
+		Port* dst;
+		if (itDst == dstPorts->end()){
+			dst = new Port(src->getName(), src->getType());
+			dstPorts->insert(pair<string, Port*>(itSrc->first, dst));
+		}else{
+			dst = itDst->second;
+		}
 
 		Variable* srcVar = src->getPtrVar();
 		GlobalVariable* globalVar = writer->createVariable(srcVar->getGlobalVariable());
@@ -251,7 +259,15 @@ Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
 		Port* src = itTokens->first;
 		itPort = ports->find(src->getName());
 
-		Port* dst = itPort->second;
+		// Find destination port
+		Port* dst;
+		itPort = ports->find(src->getName());
+		if (itPort == ports->end()){
+			dst = new Port(src->getName(), src->getType());
+			ports->insert(pair<string, Port*>(src->getName(), dst));
+		}else{
+			dst = itPort->second;
+		}
 
 		newPattern->setNumTokens(dst, itTokens->second);
 	}
@@ -267,7 +283,15 @@ Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
 		Port* src = itVar->first;
 		itPort = ports->find(src->getName());
 		
-		Port* dst = itPort->second;
+		// Find destination port
+		Port* dst;
+		itPort = ports->find(src->getName());
+		if (itPort == ports->end()){
+			dst = new Port(src->getName(), src->getType());
+			ports->insert(pair<string, Port*>(src->getName(), dst));
+		}else{
+			dst = itPort->second;
+		}
 
 		// Add variable to pattern
 		newPattern->setVariable(dst, dst->getPtrVar());
@@ -282,8 +306,16 @@ Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
 		//Get corresponding port in instance
 		Port* src = itVar->first;
 		itPort = ports->find(src->getName());
-		
-		Port* dst = itPort->second;
+
+			// Find destination port
+		Port* dst;
+		itPort = ports->find(src->getName());
+		if (itPort == ports->end()){
+			dst = new Port(src->getName(), src->getType());
+			ports->insert(pair<string, Port*>(src->getName(), dst));
+		}else{
+			dst = itPort->second;
+		}
 
 		// Add variable to pattern
 		newPattern->setPeeked(dst, dst->getPtrVar());

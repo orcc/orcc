@@ -88,25 +88,6 @@ void IRLinker::linkInstance(Instance* refinstance, Instance* instance){
 
 	// Solve parameters of the linked instance
 	instance->solveParameters();
-	setParameters(instance->getParameters());
-}
-
-void IRLinker::setParameters(map<string, Variable*>* parameters){
-	LLVMExecution* executionEngine = decoder->getEE();
-
-	// Iterate though all parametes
-	map<string, Variable*>::iterator it;
-	for (it = parameters->begin(); it != parameters->end(); it++){
-		Variable* var = it->second;
-		GlobalVariable* gv = var->getGlobalVariable();
-
-		if (executionEngine->isCompiledGV(gv)){
-			int* gvPtr = (int*)executionEngine->getGVPtr(gv);
-			ConstantInt* constant = cast<ConstantInt>(gv->getInitializer());
-			
-			*gvPtr = constant->getLimitedValue();
-		}
-	}
 }
 
 void IRLinker::linkPorts(map<string, Port*>* refPorts, map<string, Port*>* ports){

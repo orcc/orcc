@@ -102,30 +102,14 @@ public:
 		this->initialValue = initialValue;
 	};
 
+	/**
+	 * Returns true if this variable is a state variable.
+	 * 
+	 * @return true if this variable is global
+	 */
+	bool isStateVar() {return true;};
 
 	~StateVar();
-
-	/**
-	 * @brief Returns the initial expression of this variable.
-	 * 
-	 * @return the initial expression of this variable
-	 */
-	Expr* getInitialValue() {
-		return initialValue;
-	}
-
-	/**
-	 * @brief Returns true if the variable has an initial value.
-	 * 
-	 * @return true if the variable has an initial value otherwise false
-	 */
-	bool hasInitialValue() {
-		return initialValue != NULL;
-	}
-
-protected:
-	/** Initial value */
-	Expr* initialValue;
 };
 
 #endif

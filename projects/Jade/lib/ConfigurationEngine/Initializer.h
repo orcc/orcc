@@ -115,11 +115,19 @@ private:
 	void initializeStateVariables(std::map<std::string, StateVar*>* vars);
 
 	/**
-	 * @brief Initialize a state variable
+	 * @brief Initialize a list of parameter
 	 * 
-	 * @param var : the state variable to initialize
+	 * @param vars : the state variables to initialize
 	 */
-	void initializeStateVariable(StateVar* var);
+	void initializeParameters(std::map<std::string, Variable*>* parameters);
+
+	/**
+	 * @brief Initialize a variable
+	 * 
+	 * @param var : the variable to initialize
+	 */
+	void initializeVariable(Variable* var);
+
 
 	/**
 	 * @brief Initialize an integer expression

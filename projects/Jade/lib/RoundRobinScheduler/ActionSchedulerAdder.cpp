@@ -170,7 +170,7 @@ BasicBlock* ActionSchedulerAdder::checkInputPattern(Pattern* pattern, Function* 
 	for ( it=numTokens->begin() ; it != numTokens->end(); it++ ){
 		Port* port = it->first;
 
-		if (port->isInternal()){
+		if (port->isInternal() || port->getFifoVar() == NULL){
 			// Don't test internal ports
 			continue;
 		}
@@ -218,7 +218,7 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Pattern* pattern, llvm::Fun
 	for ( it=numTokens->begin() ; it != numTokens->end(); it++ ){
 		Port* port = it->first;
 
-		if (port->isInternal()){
+		if (port->isInternal() || port->getFifoVar() == NULL){
 			// Don't test internal ports
 			continue;
 		}
@@ -264,6 +264,11 @@ void ActionSchedulerAdder::checkPeekPattern(Pattern* pattern, Function* function
 
 		itToken = numTokensMap->find(port);
 
+		if ( itToken == numTokensMap->end() || port->getFifoVar() == NULL){
+			// No peek
+			continue;
+		}
+
 		createPeek(it->first, it->second, itToken->second, BB);
 	}
 }
@@ -295,7 +300,7 @@ void ActionSchedulerAdder::createWriteEnds(Pattern* pattern, llvm::BasicBlock* B
 		//Create write end
 		if (port->isInternal()){
 			createInternalWriteEnd(port, it->second, BB);
-		}else{
+		}else if (port->getFifoVar() != NULL){
 			createWriteEnd(port, it->second, BB);
 		}
 	}
@@ -312,7 +317,7 @@ void ActionSchedulerAdder::createReadEnds(Pattern* pattern, llvm::BasicBlock* BB
 		//Create read end
 		if (port->isInternal()){
 			createInternalReadEnd(port, it->second, BB);
-		}else{
+		}else if (port->getFifoVar() != NULL){
 			createReadEnd(port, it->second, BB);
 		}
 	}
@@ -360,7 +365,7 @@ void ActionSchedulerAdder::createWrites(Pattern* pattern, llvm::BasicBlock* BB){
 		Port* port = it->first;
 		if (port->isInternal()){
 			createInternalWrite(port, port->getPtrVar(), it->second, BB);
-		}else{
+		}else if (port->getFifoVar() != NULL){
 			createWrite(port, port->getPtrVar(), it->second, BB);
 		}
 	}
@@ -377,7 +382,7 @@ void ActionSchedulerAdder::createReads(Pattern* pattern, llvm::BasicBlock* BB){
 		Port* port = it->first;
 		if (port->isInternal()){
 			createInternalRead(port, port->getPtrVar(), it->second, BB);
-		}else{
+		}else if (port->getFifoVar() != NULL){
 			createRead(port, port->getPtrVar(), it->second, BB);
 		}
 	}

@@ -99,12 +99,6 @@ private:
 	 */
 	void linkPorts(std::map<std::string, Port*>* refPorts, std::map<std::string, Port*>* ports);
 
-	/**
-	 * @brief Set parameters of a compiled instance two list of ports
-	 *
-	 * @param parameters : the parameters to set
-	 */
-	void setParameters(std::map<std::string, Variable*>* parameters);
 
 	/** Decoder where instance are linked */
 	Decoder* decoder;
