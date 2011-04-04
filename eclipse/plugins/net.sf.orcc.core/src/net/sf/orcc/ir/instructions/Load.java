@@ -34,7 +34,7 @@ import java.util.List;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.SourceContainer;
 import net.sf.orcc.ir.Type;
@@ -56,17 +56,17 @@ public class Load extends InstructionImpl implements LocalTargetContainer,
 
 	private Use source;
 
-	private LocalVariable target;
+	private VarLocal target;
 
-	public Load(LocalVariable target, Use source) {
+	public Load(VarLocal target, Use source) {
 		this(target, source, new ArrayList<Expression>(0));
 	}
 
-	public Load(LocalVariable target, Use source, List<Expression> indexes) {
+	public Load(VarLocal target, Use source, List<Expression> indexes) {
 		this(new Location(), target, source, indexes);
 	}
 
-	public Load(Location location, LocalVariable target, Use source,
+	public Load(Location location, VarLocal target, Use source,
 			List<Expression> indexes) {
 		super(location);
 		setIndexes(indexes);
@@ -123,7 +123,7 @@ public class Load extends InstructionImpl implements LocalTargetContainer,
 	}
 
 	@Override
-	public LocalVariable getTarget() {
+	public VarLocal getTarget() {
 		return target;
 	}
 
@@ -133,7 +133,7 @@ public class Load extends InstructionImpl implements LocalTargetContainer,
 	}
 
 	@Override
-	public void internalSetTarget(LocalVariable target) {
+	public void internalSetTarget(VarLocal target) {
 		this.target = target;
 	}
 
@@ -170,7 +170,7 @@ public class Load extends InstructionImpl implements LocalTargetContainer,
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void setTarget(VarLocal target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 

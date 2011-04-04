@@ -35,7 +35,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -43,7 +43,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -116,7 +116,7 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 
 			if (cast.isExtended() || cast.isTrunced()) {
 				// Make a new assignment to the binary expression
-				LocalVariable newVar = procedure.newTempLocalVariable(file,
+				VarLocal newVar = procedure.newTempLocalVariable(file,
 						cast.getTarget(), procedure.getName() + "_" + "expr");
 
 				newVar.setIndex(1);
@@ -146,14 +146,14 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 		this.castType = castType;
 	}
 
-	private LocalVariable castTarget(LocalVariable target, Type type) {
+	private VarLocal castTarget(VarLocal target, Type type) {
 		Cast castTarget = new Cast(target.getType(), type);
 
 		if (castType & castTarget.isDifferent()) {
 			Location location = target.getLocation();
 
 			// Make a new assignment to the binary expression
-			LocalVariable transitionVar = procedure.newTempLocalVariable(file,
+			VarLocal transitionVar = procedure.newTempLocalVariable(file,
 					castTarget.getTarget(), procedure.getName() + "_" + "expr");
 
 			transitionVar.setIndex(1);
@@ -170,7 +170,7 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 			Location location = target.getLocation();
 
 			// Make a new assignment to the binary expression
-			LocalVariable transitionVar = procedure.newTempLocalVariable(file,
+			VarLocal transitionVar = procedure.newTempLocalVariable(file,
 					castTarget.getTarget(), procedure.getName() + "_" + "expr");
 
 			transitionVar.setIndex(1);
@@ -214,7 +214,7 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 			itInstruction.next();
 
 			if (!binExpr.getOp().isComparison()) {
-				LocalVariable newVar = castTarget(assign.getTarget(),
+				VarLocal newVar = castTarget(assign.getTarget(),
 						binExpr.getType());
 				assign.setTarget(newVar);
 			}
@@ -226,15 +226,15 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 		List<Expression> parameters = call.getParameters();
 		Procedure procedure = call.getProcedure();
 		if (!procedure.isNative()) {
-			List<LocalVariable> variables = call.getProcedure().getParameters()
+			List<VarLocal> variables = call.getProcedure().getParameters()
 					.getList();
 
 			for (Expression parameter : parameters) {
-				Variable variable = variables
+				Var var = variables
 						.get(parameters.indexOf(parameter));
 				itInstruction.previous();
 				Expression newParam = (Expression) parameter.accept(
-						new CastExprInterpreter(), variable.getType());
+						new CastExprInterpreter(), var.getType());
 				parameters.set(parameters.indexOf(parameter), newParam);
 				itInstruction.next();
 			}
@@ -244,10 +244,10 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Load load) {
-		LocalVariable target = load.getTarget();
+		VarLocal target = load.getTarget();
 		Use use = load.getSource();
 
-		LocalVariable newVar = castTarget(target, use.getVariable().getType());
+		VarLocal newVar = castTarget(target, use.getVariable().getType());
 
 		load.setTarget(newVar);
 	}
@@ -301,7 +301,7 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 	@Override
 	public void visit(Store store) {
 		Expression value = store.getValue();
-		Variable target = store.getTarget();
+		Var target = store.getTarget();
 
 		itInstruction.previous();
 

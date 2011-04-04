@@ -43,7 +43,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
@@ -119,7 +119,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 			Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
 					"isSchedulable_" + name, new Location(),
 					IrFactory.eINSTANCE.createTypeBool());
-			LocalVariable result = scheduler.newTempLocalVariable(
+			VarLocal result = scheduler.newTempLocalVariable(
 					ActionSplitter.this.actor.getFile(),
 					IrFactory.eINSTANCE.createTypeBool(), "result");
 			result.setIndex(1);

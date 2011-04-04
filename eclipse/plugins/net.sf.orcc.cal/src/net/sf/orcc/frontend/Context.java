@@ -34,9 +34,9 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.Scope;
 
 /**
@@ -50,12 +50,12 @@ public class Context {
 	/**
 	 * A map from global variables to local variables
 	 */
-	private Map<Variable, LocalVariable> mapGlobals;
+	private Map<Var, VarLocal> mapGlobals;
 
 	/**
 	 * A map from AST variables to IR variables.
 	 */
-	private Scope<AstVariable, Variable> mapVariables;
+	private Scope<AstVariable, Var> mapVariables;
 
 	/**
 	 * Contains the current procedures where local variables or nodes should be
@@ -63,9 +63,9 @@ public class Context {
 	 */
 	private Procedure procedure;
 
-	private Set<Variable> setGlobalsToLoad;
+	private Set<Var> setGlobalsToLoad;
 
-	private Set<Variable> setGlobalsToStore;
+	private Set<Var> setGlobalsToStore;
 
 	/**
 	 * Creates a new context with the given parent context and the given
@@ -79,16 +79,16 @@ public class Context {
 	public Context(Context context, Procedure procedure) {
 		this.procedure = procedure;
 
-		mapGlobals = new HashMap<Variable, LocalVariable>();
+		mapGlobals = new HashMap<Var, VarLocal>();
 
 		if (context == null) {
-			mapVariables = new Scope<AstVariable, Variable>();
+			mapVariables = new Scope<AstVariable, Var>();
 		} else {
-			mapVariables = new Scope<AstVariable, Variable>(context
+			mapVariables = new Scope<AstVariable, Var>(context
 					.getMapVariables().getParent(), true);
 		}
-		setGlobalsToLoad = new LinkedHashSet<Variable>();
-		setGlobalsToStore = new LinkedHashSet<Variable>();
+		setGlobalsToLoad = new LinkedHashSet<Var>();
+		setGlobalsToStore = new LinkedHashSet<Var>();
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class Context {
 	 * 
 	 * @return the mapGlobals field
 	 */
-	public Map<Variable, LocalVariable> getMapGlobals() {
+	public Map<Var, VarLocal> getMapGlobals() {
 		return mapGlobals;
 	}
 
@@ -116,7 +116,7 @@ public class Context {
 	 * 
 	 * @return the mapVariables field
 	 */
-	public Scope<AstVariable, Variable> getMapVariables() {
+	public Scope<AstVariable, Var> getMapVariables() {
 		return mapVariables;
 	}
 
@@ -134,7 +134,7 @@ public class Context {
 	 * 
 	 * @return the setGlobalsToLoad field
 	 */
-	public Set<Variable> getSetGlobalsToLoad() {
+	public Set<Var> getSetGlobalsToLoad() {
 		return setGlobalsToLoad;
 	}
 
@@ -143,7 +143,7 @@ public class Context {
 	 * 
 	 * @return the setGlobalsToStore field
 	 */
-	public Set<Variable> getSetGlobalsToStore() {
+	public Set<Var> getSetGlobalsToStore() {
 		return setGlobalsToStore;
 	}
 
@@ -154,7 +154,7 @@ public class Context {
 	 *            an AST variable
 	 * @return the IR variable associated with the given AST variable
 	 */
-	public Variable getVariable(AstVariable variable) {
+	public Var getVariable(AstVariable variable) {
 		return mapVariables.get(variable);
 	}
 
@@ -162,7 +162,7 @@ public class Context {
 	 * Creates a new scope for mapVariables.
 	 */
 	public void newScope() {
-		mapVariables = new Scope<AstVariable, Variable>(mapVariables, true);
+		mapVariables = new Scope<AstVariable, Var>(mapVariables, true);
 	}
 
 	/**
@@ -177,11 +177,11 @@ public class Context {
 	 * 
 	 * @param astVariable
 	 *            an AST variable
-	 * @param variable
+	 * @param var
 	 *            an IR variable associated with the given AST variable
 	 */
-	public void putVariable(AstVariable astVariable, Variable variable) {
-		mapVariables.put(astVariable, variable);
+	public void putVariable(AstVariable astVariable, Var var) {
+		mapVariables.put(astVariable, var);
 	}
 
 }

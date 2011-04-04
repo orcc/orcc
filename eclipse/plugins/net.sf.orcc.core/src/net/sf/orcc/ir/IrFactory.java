@@ -80,8 +80,8 @@ public interface IrFactory extends EFactory {
 	 */
 	Procedure createProcedure(String name, boolean nativeFlag,
 			Location location, Type returnType,
-			OrderedMap<String, LocalVariable> parameters,
-			OrderedMap<String, LocalVariable> locals, List<Node> nodes);
+			OrderedMap<String, VarLocal> parameters,
+			OrderedMap<String, VarLocal> locals, List<Node> nodes);
 
 	/**
 	 * Creates a new procedure, not external, with empty parameters, locals, and

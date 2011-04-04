@@ -38,7 +38,7 @@ import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.ValueContainer;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.InstructionImpl;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
@@ -54,11 +54,11 @@ public class Store extends InstructionImpl implements TargetContainer,
 
 	private List<Expression> indexes;
 
-	private Variable target;
+	private Var target;
 
 	private Expression value;
 
-	public Store(Location location, Variable target, List<Expression> indexes,
+	public Store(Location location, Var target, List<Expression> indexes,
 			Expression value) {
 		super(location);
 		setIndexes(indexes);
@@ -66,11 +66,11 @@ public class Store extends InstructionImpl implements TargetContainer,
 		setValue(value);
 	}
 
-	public Store(Variable target, Expression value) {
+	public Store(Var target, Expression value) {
 		this(target, new ArrayList<Expression>(0), value);
 	}
 
-	public Store(Variable target, List<Expression> indexes, Expression value) {
+	public Store(Var target, List<Expression> indexes, Expression value) {
 		this(new Location(), target, indexes, value);
 	}
 
@@ -116,7 +116,7 @@ public class Store extends InstructionImpl implements TargetContainer,
 	}
 
 	@Override
-	public Variable getTarget() {
+	public Var getTarget() {
 		return target;
 	}
 
@@ -126,7 +126,7 @@ public class Store extends InstructionImpl implements TargetContainer,
 	}
 
 	@Override
-	public void internalSetTarget(Variable target) {
+	public void internalSetTarget(Var target) {
 		this.target = target;
 	}
 
@@ -156,7 +156,7 @@ public class Store extends InstructionImpl implements TargetContainer,
 	}
 
 	@Override
-	public void setTarget(Variable target) {
+	public void setTarget(Var target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 

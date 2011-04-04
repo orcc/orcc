@@ -42,7 +42,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -51,7 +51,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
@@ -115,7 +115,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 				inputPattern, outputPattern);
 
 		actor.getProcs().put(scheduler.getName(), scheduler);
-		LocalVariable returnVar = target.newTempLocalVariable(file,
+		VarLocal returnVar = target.newTempLocalVariable(file,
 				scheduler.getReturnType(), scheduler.getName() + "_ret");
 		node.add(new Call(new Location(), returnVar, scheduler, callExprs));
 
@@ -135,7 +135,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 				"isSchedulable_SDF", new Location(),
 				IrFactory.eINSTANCE.createTypeBool());
 
-		LocalVariable result = procedure.newTempLocalVariable(file,
+		VarLocal result = procedure.newTempLocalVariable(file,
 				IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		// create "then" nodes
@@ -271,23 +271,23 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 			Pattern inputPattern, Pattern outputPattern) {
 		List<Expression> exprs = new ArrayList<Expression>();
 
-		OrderedMap<String, LocalVariable> parameters = procedure
+		OrderedMap<String, VarLocal> parameters = procedure
 				.getParameters();
 
 		// Add inputs to procedure parameters
-		for (Entry<Port, Variable> entry : inputPattern.getVariableMap()
+		for (Entry<Port, Var> entry : inputPattern.getVariableMap()
 				.entrySet()) {
-			Variable variable = entry.getValue();
-			parameters.put(variable.getName(), (LocalVariable) variable);
-			exprs.add(new VarExpr(new Use(variable)));
+			Var var = entry.getValue();
+			parameters.put(var.getName(), (VarLocal) var);
+			exprs.add(new VarExpr(new Use(var)));
 		}
 
 		// Add outputs to procedure parameters
-		for (Entry<Port, Variable> entry : outputPattern.getVariableMap()
+		for (Entry<Port, Var> entry : outputPattern.getVariableMap()
 				.entrySet()) {
-			Variable variable = entry.getValue();
-			parameters.put(variable.getName(), (LocalVariable) variable);
-			exprs.add(new VarExpr(new Use(variable)));
+			Var var = entry.getValue();
+			parameters.put(var.getName(), (VarLocal) var);
+			exprs.add(new VarExpr(new Use(var)));
 		}
 
 		return exprs;

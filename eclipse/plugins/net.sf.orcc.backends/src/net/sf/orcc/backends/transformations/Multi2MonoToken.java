@@ -45,10 +45,10 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
@@ -57,7 +57,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -92,15 +92,15 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private class ModifyActionScheduler extends AbstractActorVisitor {
 
-		private GlobalVariable buffer;
+		private VarGlobal buffer;
 		private Port currentPort;
-		private GlobalVariable writeIndex;
+		private VarGlobal writeIndex;
 		private int bufferSize;
 
-		// private Variable tempTab;
+		// private Var tempTab;
 
-		public ModifyActionScheduler(GlobalVariable buffer,
-				GlobalVariable writeIndex, Port currentPort, int bufferSize) {
+		public ModifyActionScheduler(VarGlobal buffer,
+				VarGlobal writeIndex, Port currentPort, int bufferSize) {
 			this.buffer = buffer;
 			this.writeIndex = writeIndex;
 			this.currentPort = currentPort;
@@ -138,18 +138,18 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private class ModifyCloneBody extends AbstractActorVisitor {
 
-		private GlobalVariable buffer;
+		private VarGlobal buffer;
 		private Port currentPort;
-		private GlobalVariable writeIndex;
-		private GlobalVariable readIndex;
+		private VarGlobal writeIndex;
+		private VarGlobal readIndex;
 		private Procedure body;
 		private int bufferSize;
 		private Action cloneAction;
 
-		// private Variable tempTab;
+		// private Var tempTab;
 
-		public ModifyCloneBody(GlobalVariable buffer,
-				GlobalVariable writeIndex, GlobalVariable readIndex,
+		public ModifyCloneBody(VarGlobal buffer,
+				VarGlobal writeIndex, VarGlobal readIndex,
 				Port currentPort, Procedure body, int bufferSize, Action cloneAction) {
 			this.buffer = buffer;
 			this.writeIndex = writeIndex;
@@ -165,9 +165,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			
 			if (load.getSource().getVariable().getName()
 					.equals(currentPort.getName())) {
-				LocalVariable inputTmp = new LocalVariable(true, 0, new Location(),
+				VarLocal inputTmp = new VarLocal(true, 0, new Location(),
 						currentPort.getName(), entryType);
-				LocalVariable tmp = new LocalVariable(true, 0, new Location(),
+				VarLocal tmp = new VarLocal(true, 0, new Location(),
 						"tmp", entryType);
 				tmp = load.getTarget();
 				// change tab Name
@@ -200,11 +200,11 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private class ModifyProcessActionStore extends AbstractActorVisitor {
 
-		private GlobalVariable tab;
+		private VarGlobal tab;
 
-		// private Variable tempTab;
+		// private Var tempTab;
 
-		public ModifyProcessActionStore(GlobalVariable tab) {
+		public ModifyProcessActionStore(VarGlobal tab) {
 			this.tab = tab;
 		}
 
@@ -227,9 +227,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private class ModifyProcessActionWrite extends AbstractActorVisitor {
 
-		private GlobalVariable tab;
+		private VarGlobal tab;
 
-		public ModifyProcessActionWrite(GlobalVariable tab) {
+		public ModifyProcessActionWrite(VarGlobal tab) {
 			this.tab = tab;
 		}
 
@@ -245,7 +245,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private Action done;
 	private Type entryType;
 	private FSM fsm;
-	private List<GlobalVariable> inputBuffers = new ArrayList<GlobalVariable>();
+	private List<VarGlobal> inputBuffers = new ArrayList<VarGlobal>();
 	private int inputIndex = 0;
 	private List<Port> inputPorts = new ArrayList<Port>();
 	private List<Action> NoRepeatActions = new ArrayList<Action>();
@@ -255,14 +255,14 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private int outputIndex = 0;
 	private Port port;
 	private Action process;
-	private List<GlobalVariable> readIndexes = new ArrayList<GlobalVariable>();
+	private List<VarGlobal> readIndexes = new ArrayList<VarGlobal>();
 	private boolean repeatInput = false;
 	private boolean repeatOutput = false;
-	private LocalVariable result;
+	private VarLocal result;
 	private Action store;
 	private Action untagged;
 	private Action write;
-	private List<GlobalVariable> writeIndexes = new ArrayList<GlobalVariable>();
+	private List<VarGlobal> writeIndexes = new ArrayList<VarGlobal>();
 
 	/**
 	 * transforms the transformed action to a transition action
@@ -276,8 +276,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param readIndex
 	 *            read index of the buffer
 	 */
-	private void actionToTransition(Action action, GlobalVariable buffer,
-			GlobalVariable writeIndex, GlobalVariable readIndex) {
+	private void actionToTransition(Action action, VarGlobal buffer,
+			VarGlobal writeIndex, VarGlobal readIndex) {
 		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 				buffer, writeIndex, port, bufferSize);
 		modifyActionScheduler.visit(action.getScheduler());
@@ -315,14 +315,14 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            the Local variable used to read from the port
 	 */
 	private void addStoreFromBuffer(Procedure body, int position,
-			LocalVariable tmp) {
+			VarLocal tmp) {
 		NodeBlock bodyNode = body.getFirst();
-		OrderedMap<String, LocalVariable> locals = body.getLocals();
+		OrderedMap<String, VarLocal> locals = body.getLocals();
 		locals.put(tmp.getBaseName(), tmp);
-		LocalVariable index = new LocalVariable(true, 1, new Location(),
+		VarLocal index = new VarLocal(true, 1, new Location(),
 				"index", tmp.getType());
 		locals.put(index.getName(), index);
-		GlobalVariable writeIndex = writeIndexes.get(position);
+		VarGlobal writeIndex = writeIndexes.get(position);
 		Instruction loadInd = new Load(index, new Use(writeIndex));
 		int addIndex = 0;
 		bodyNode.add(addIndex, loadInd);
@@ -338,7 +338,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(addIndex, load);
 		addIndex++;
 
-		LocalVariable indexInc = new LocalVariable(true, 2, new Location(),
+		VarLocal indexInc = new VarLocal(true, 2, new Location(),
 				"index", tmp.getType());
 		locals.put(indexInc.getName(), indexInc);
 		Expression value = new BinaryExpr(new VarExpr(new Use(index)),
@@ -379,7 +379,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
 				"isSchedulable_" + name, new Location(),
 				IrFactory.eINSTANCE.createTypeBool());
-		LocalVariable result = scheduler.newTempLocalVariable(
+		VarLocal result = scheduler.newTempLocalVariable(
 				this.actor.getFile(), IrFactory.eINSTANCE.createTypeBool(),
 				"myResult");
 		result.setIndex(1);
@@ -453,8 +453,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            name of the counter
 	 * @return new counter with the given name
 	 */
-	private GlobalVariable createCounter(String name) {
-		GlobalVariable newCounter = new GlobalVariable(new Location(),
+	private VarGlobal createCounter(String name) {
+		VarGlobal newCounter = new VarGlobal(new Location(),
 				IrFactory.eINSTANCE.createTypeInt(32), name, true);
 		Expression expression = new IntExpr(0);
 		newCounter.setInitialValue(expression);
@@ -476,7 +476,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            repeat value
 	 * @return new done action
 	 */
-	private Action createDoneAction(String name, GlobalVariable counter,
+	private Action createDoneAction(String name, VarGlobal counter,
 			int numTokens) {
 		// body
 		Procedure body = IrFactory.eINSTANCE.createProcedure(name,
@@ -491,16 +491,16 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
 				"isSchedulable_" + name, new Location(),
 				IrFactory.eINSTANCE.createTypeBool());
-		LocalVariable temp = scheduler.newTempLocalVariable(
+		VarLocal temp = scheduler.newTempLocalVariable(
 				this.actor.getFile(), IrFactory.eINSTANCE.createTypeBool(),
 				"temp");
 		temp.setIndex(1);
 		scheduler.getLocals().remove(temp.getBaseName());
 		scheduler.getLocals().put(temp.getName(), temp);
-		result = new LocalVariable(true, 0, new Location(), "result",
+		result = new VarLocal(true, 0, new Location(), "result",
 				IrFactory.eINSTANCE.createTypeBool());
 		scheduler.getLocals().put(result.getName(), result);
-		LocalVariable localCounter = new LocalVariable(true, 1, new Location(),
+		VarLocal localCounter = new VarLocal(true, 1, new Location(),
 				"localCounter", counter.getType());
 		scheduler.getLocals().put(localCounter.getName(), localCounter);
 		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -545,7 +545,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		ListIterator<Node> listIt = action.getBody().getNodes().listIterator();
 		moveNodes(listIt, body);
-		Iterator<LocalVariable> it = action.getBody().getLocals().iterator();
+		Iterator<VarLocal> it = action.getBody().getLocals().iterator();
 		moveLocals(it, body);
 		if (repeatOutput && !repeatInput) {
 			Procedure scheduler = newProcessAction.getScheduler();
@@ -574,8 +574,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @return new store action
 	 */
 	private Action createStoreAction(String actionName,
-			GlobalVariable readCounter, GlobalVariable storeList,
-			GlobalVariable buffer, GlobalVariable writeIndex) {
+			VarGlobal readCounter, VarGlobal storeList,
+			VarGlobal buffer, VarGlobal writeIndex) {
 		String storeName = actionName + port.getName() + "_NewStore";
 		Expression guardValue = new IntExpr(numTokens);
 		Expression counterExpression = new VarExpr(new Use(readCounter));
@@ -599,9 +599,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            type of the list
 	 * @return a global variable list
 	 */
-	private GlobalVariable createTab(String name, Type entryType, int size) {
+	private VarGlobal createTab(String name, Type entryType, int size) {
 		Type type = IrFactory.eINSTANCE.createTypeList(size, entryType);
-		GlobalVariable newList = new GlobalVariable(new Location(), type, name,
+		VarGlobal newList = new VarGlobal(new Location(), type, name,
 				true);
 		if (!actor.getStateVars().contains(newList.getName())) {
 			actor.getStateVars().put(newList.getName(), newList);
@@ -618,12 +618,12 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            global variable list to store
 	 * @return new untagged action
 	 */
-	private Action createUntaggedAction(GlobalVariable readIndex,
-			GlobalVariable storeList) {
+	private Action createUntaggedAction(VarGlobal readIndex,
+			VarGlobal storeList) {
 		Expression expression = new BoolExpr(true);
 		Action newUntaggedAction = createAction(expression,
 				"untagged_" + port.getName());
-		LocalVariable localINPUT = new LocalVariable(true, 0, new Location(),
+		VarLocal localINPUT = new VarLocal(true, 0, new Location(),
 				port.getName(), IrFactory.eINSTANCE.createTypeList(1,
 						port.getType()));
 		defineUntaggedBody(readIndex, storeList, newUntaggedAction.getBody(),
@@ -646,7 +646,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @return new write action
 	 */
 	private Action createWriteAction(String actionName,
-			GlobalVariable writeCounter, GlobalVariable writeList) {
+			VarGlobal writeCounter, VarGlobal writeList) {
 		String writeName = actionName + port.getName() + "_NewWrite";
 		Expression guardValue = new IntExpr(numTokens);
 		Expression counterExpression = new VarExpr(new Use(writeCounter));
@@ -654,7 +654,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				guardValue, IrFactory.eINSTANCE.createTypeBool());
 		Action newWriteAction = createAction(expression, writeName);
 
-		LocalVariable OUTPUT = new LocalVariable(true, 0, new Location(),
+		VarLocal OUTPUT = new VarLocal(true, 0, new Location(),
 				port.getName() + "OUTPUT", IrFactory.eINSTANCE.createTypeList(
 						1, port.getType()));
 		defineWriteBody(writeCounter, writeList, newWriteAction.getBody(),
@@ -678,25 +678,25 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param body
 	 *            new store action body
 	 */
-	private void defineStoreBody(GlobalVariable readCounter,
-			GlobalVariable storeList, Procedure body, GlobalVariable buffer,
-			GlobalVariable writeIndex) {
+	private void defineStoreBody(VarGlobal readCounter,
+			VarGlobal storeList, Procedure body, VarGlobal buffer,
+			VarGlobal writeIndex) {
 		NodeBlock bodyNode = body.getFirst();
 
-		OrderedMap<String, LocalVariable> locals = body.getLocals();
-		LocalVariable counter = new LocalVariable(true, 1, new Location(),
+		OrderedMap<String, VarLocal> locals = body.getLocals();
+		VarLocal counter = new VarLocal(true, 1, new Location(),
 				port.getName() + "_Local_counter", readCounter.getType());
 		locals.put(counter.getName(), counter);
 		Instruction load1 = new Load(counter, new Use(readCounter));
 		bodyNode.add(load1);
 
-		LocalVariable index = new LocalVariable(true, 1, new Location(),
+		VarLocal index = new VarLocal(true, 1, new Location(),
 				"writeIndex", IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(index.getName(), index);
 		Instruction loadIndex = new Load(index, new Use(writeIndex));
 		bodyNode.add(loadIndex);
 
-		LocalVariable mask = new LocalVariable(true, 1, new Location(), "mask",
+		VarLocal mask = new VarLocal(true, 1, new Location(), "mask",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(mask.getName(), mask);
 		Expression exprMask = new IntExpr(bufferSize - 1);
@@ -706,7 +706,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Assign assignMask = new Assign(mask, maskValue);
 		bodyNode.add(assignMask);
 
-		LocalVariable input = new LocalVariable(true, 1, new Location(),
+		VarLocal input = new VarLocal(true, 1, new Location(),
 				port.getName() + "_Input", port.getType());
 		locals.put(input.getName(), input);
 		List<Expression> load2Index = new ArrayList<Expression>(1);
@@ -723,7 +723,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(store1);
 
 		// globalCounter= globalCounter + 1
-		LocalVariable counter2 = new LocalVariable(true, 2, new Location(),
+		VarLocal counter2 = new VarLocal(true, 2, new Location(),
 				port.getName() + "_Local_counter", readCounter.getType());
 		locals.put(counter2.getName(), counter2);
 		Expression storeIndexElement = new VarExpr(new Use(counter));
@@ -736,7 +736,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				counter2)));
 		bodyNode.add(store2);
 
-		LocalVariable tmp = new LocalVariable(true, 1, new Location(), "tmp",
+		VarLocal tmp = new VarLocal(true, 1, new Location(), "tmp",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(tmp.getName(), tmp);
 		Expression incValue = new BinaryExpr(new VarExpr(new Use(index)),
@@ -761,19 +761,19 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param body
 	 *            new untagged action body
 	 */
-	private void defineUntaggedBody(GlobalVariable readCounter,
-			GlobalVariable storeList, Procedure body, LocalVariable localINPUT) {
+	private void defineUntaggedBody(VarGlobal readCounter,
+			VarGlobal storeList, Procedure body, VarLocal localINPUT) {
 		NodeBlock bodyNode = body.getFirst();
 
-		OrderedMap<String, LocalVariable> locals = body.getLocals();
-		LocalVariable counter = new LocalVariable(true, 1, new Location(),
+		OrderedMap<String, VarLocal> locals = body.getLocals();
+		VarLocal counter = new VarLocal(true, 1, new Location(),
 				port.getName() + "_Local_counter", readCounter.getType());
 		locals.put(counter.getName(), counter);
 		Use readCounterUse = new Use(readCounter);
 		Instruction load1 = new Load(counter, readCounterUse);
 		bodyNode.add(load1);
 
-		LocalVariable mask = new LocalVariable(true, 1, new Location(), "mask",
+		VarLocal mask = new VarLocal(true, 1, new Location(), "mask",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(mask.getName(), mask);
 		Expression exprmask = new IntExpr(bufferSize - 1);
@@ -783,7 +783,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Assign assignMask = new Assign(mask, maskValue);
 		bodyNode.add(assignMask);
 
-		LocalVariable input = new LocalVariable(true, 1, new Location(),
+		VarLocal input = new VarLocal(true, 1, new Location(),
 				port.getName() + "_Input", port.getType());
 		locals.put(input.getName(), input);
 		List<Expression> load2Index = new ArrayList<Expression>(1);
@@ -803,7 +803,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				new Use(input)));
 		bodyNode.add(store1);
 
-		LocalVariable counter2 = new LocalVariable(true, 2, new Location(),
+		VarLocal counter2 = new VarLocal(true, 2, new Location(),
 				port.getName() + "_Local_counter", readCounter.getType());
 		locals.put(counter2.getName(), counter2);
 		Instruction assign = new Assign(counter2, indexInc);
@@ -825,11 +825,11 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            body of the new write action
 	 */
 
-	private void defineWriteBody(GlobalVariable writeCounter,
-			GlobalVariable writeList, Procedure body, LocalVariable OUTPUT) {
+	private void defineWriteBody(VarGlobal writeCounter,
+			VarGlobal writeList, Procedure body, VarLocal OUTPUT) {
 		NodeBlock bodyNode = body.getFirst();
-		OrderedMap<String, LocalVariable> locals = body.getLocals();
-		LocalVariable counter1 = new LocalVariable(true, outputIndex,
+		OrderedMap<String, VarLocal> locals = body.getLocals();
+		VarLocal counter1 = new VarLocal(true, outputIndex,
 				new Location(), port.getName() + "_Local_writeCounter",
 				writeCounter.getType());
 		locals.put(counter1.getName(), counter1);
@@ -837,7 +837,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Instruction load1 = new Load(counter1, writeCounterUse);
 		bodyNode.add(load1);
 
-		LocalVariable output = new LocalVariable(true, outputIndex,
+		VarLocal output = new VarLocal(true, outputIndex,
 				new Location(), port.getName() + "_LocalOutput", port.getType());
 		locals.put(output.getName(), output);
 		List<Expression> load2Index = new ArrayList<Expression>(1);
@@ -845,7 +845,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Instruction load2 = new Load(output, new Use(writeList), load2Index);
 		bodyNode.add(load2);
 
-		LocalVariable out = new LocalVariable(true, outputIndex,
+		VarLocal out = new VarLocal(true, outputIndex,
 				new Location(), "_LocalTemp", port.getType());
 		locals.put(out.getName(), out);
 		Use assign1Expr = new Use(output);
@@ -853,7 +853,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Instruction assign1 = new Assign(out, assign1Value);
 		bodyNode.add(assign1);
 
-		LocalVariable counter2 = new LocalVariable(true, outputIndex,
+		VarLocal counter2 = new VarLocal(true, outputIndex,
 				new Location(), port.getName() + "_Local_writeCounter_2",
 				writeCounter.getType());
 		locals.put(counter2.getName(), counter2);
@@ -886,13 +886,13 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 *            read index of the buffer
 	 */
 	private void modifyActionSchedulability(Action action,
-			GlobalVariable writeIndex, GlobalVariable readIndex, BinaryOp op,
+			VarGlobal writeIndex, VarGlobal readIndex, BinaryOp op,
 			Expression reference) {
 		Procedure scheduler = action.getScheduler();
 		NodeBlock bodyNode = scheduler.getLast();
-		OrderedMap<String, LocalVariable> locals = scheduler.getLocals();
+		OrderedMap<String, VarLocal> locals = scheduler.getLocals();
 
-		LocalVariable localRead = new LocalVariable(true, inputIndex,
+		VarLocal localRead = new VarLocal(true, inputIndex,
 				new Location(), "readIndex",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(localRead.getName(), localRead);
@@ -901,7 +901,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(index, Load);
 		index++;
 
-		LocalVariable localWrite = new LocalVariable(true, inputIndex,
+		VarLocal localWrite = new VarLocal(true, inputIndex,
 				new Location(), "writeIndex",
 				IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(localWrite.getName(), localWrite);
@@ -909,7 +909,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(index, Load2);
 		index++;
 
-		LocalVariable diff = new LocalVariable(true, inputIndex,
+		VarLocal diff = new VarLocal(true, inputIndex,
 				new Location(), "diff", IrFactory.eINSTANCE.createTypeInt(32));
 		locals.put(diff.getName(), diff);
 		Expression value = new BinaryExpr(new VarExpr(new Use(readIndex)),
@@ -919,7 +919,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(index, assign);
 		index++;
 
-		LocalVariable conditionVar = new LocalVariable(true, inputIndex,
+		VarLocal conditionVar = new VarLocal(true, inputIndex,
 				new Location(), "condition",
 				IrFactory.eINSTANCE.createTypeBool());
 		locals.put(conditionVar.getName(), conditionVar);
@@ -929,7 +929,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(index, assign2);
 		index++;
 
-		LocalVariable myResult = new LocalVariable(true, inputIndex,
+		VarLocal myResult = new VarLocal(true, inputIndex,
 				new Location(), "myResult",
 				IrFactory.eINSTANCE.createTypeBool());
 		locals.put(myResult.getName(), myResult);
@@ -937,7 +937,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Return actionReturn = (Return) bodyNode.getInstructions().get(
 				returnIndex);
 		Expression returnExpr = actionReturn.getValue();
-		// LocalVariable currentResult
+		// VarLocal currentResult
 		Expression e = new BinaryExpr(returnExpr, BinaryOp.LOGIC_AND,
 				new VarExpr(new Use(conditionVar)),
 				IrFactory.eINSTANCE.createTypeBool());
@@ -951,9 +951,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * This method changes the schedulability of the done action
 	 * 
 	 * @param counter
-	 *            Global Variable counter
+	 *            Global Var counter
 	 */
-	private void modifyDoneAction(GlobalVariable counter, int portIndex) {
+	private void modifyDoneAction(VarGlobal counter, int portIndex) {
 
 		NodeBlock blkNode = done.getBody().getFirst();
 		Expression storeValue = new IntExpr(0);
@@ -961,16 +961,16 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		blkNode.add(store);
 
 		blkNode = done.getScheduler().getFirst();
-		OrderedMap<String, LocalVariable> schedulerLocals = done.getScheduler()
+		OrderedMap<String, VarLocal> schedulerLocals = done.getScheduler()
 				.getLocals();
-		LocalVariable localCounter = new LocalVariable(true, portIndex,
+		VarLocal localCounter = new VarLocal(true, portIndex,
 				new Location(), "localCounterModif", counter.getType());
 		schedulerLocals.put(localCounter.getName(), localCounter);
 
 		Instruction load = new Load(localCounter, new Use(counter));
 		blkNode.add(1, load);
 
-		LocalVariable temp = new LocalVariable(true, portIndex, new Location(),
+		VarLocal temp = new VarLocal(true, portIndex, new Location(),
 				"temp", IrFactory.eINSTANCE.createTypeBool());
 		schedulerLocals.put(temp.getName(), temp);
 		Expression guardValue = new IntExpr(numTokens);
@@ -1009,7 +1009,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			int cloneIndex = transitionPosition(fsm.getTransitions(sourceName),
 					action);
 			if (NoRepeatActions.contains(action)) {
-				for (Entry<Port, Variable> entry : action.getInputPattern()
+				for (Entry<Port, Var> entry : action.getInputPattern()
 						.getVariableMap().entrySet()) {
 					Port port = entry.getKey();
 					if (inputPorts.contains(port)) {
@@ -1018,10 +1018,10 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 							cloneActions.add(cloneAction);
 							Procedure body = cloneAction.getBody();
 							int position = portPosition(inputPorts, port);
-							GlobalVariable buffer = inputBuffers.get(position);
-							GlobalVariable writeIndex = writeIndexes
+							VarGlobal buffer = inputBuffers.get(position);
+							VarGlobal writeIndex = writeIndexes
 									.get(position);
-							GlobalVariable readIndex = readIndexes
+							VarGlobal readIndex = readIndexes
 									.get(position);
 
 							//
@@ -1059,16 +1059,16 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 	/**
 	 * This method moves the local variables of a procedure to another using a
-	 * LocalVariable iterator
+	 * VarLocal iterator
 	 * 
 	 * @param itVar
-	 *            source LocalVariable iterator
+	 *            source VarLocal iterator
 	 * @param newProc
 	 *            target procedure
 	 */
-	private void moveLocals(Iterator<LocalVariable> itVar, Procedure newProc) {
+	private void moveLocals(Iterator<VarLocal> itVar, Procedure newProc) {
 		while (itVar.hasNext()) {
-			LocalVariable var = itVar.next();
+			VarLocal var = itVar.next();
 			itVar.remove();
 			newProc.getLocals().put(var.getName(), var);
 		}
@@ -1206,7 +1206,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param port
 	 *            port to remove
 	 */
-	private void removePortFromPattern(Pattern pattern, Port port, LocalVariable tmp) {
+	private void removePortFromPattern(Pattern pattern, Port port, VarLocal tmp) {
 		pattern.getVariableMap().remove(port);
 		pattern.getPeekedMap().remove(port);
 		pattern.getInverseVariableMap().remove(tmp);
@@ -1241,11 +1241,11 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				moveOutputPattern(action, process);
 				// create a list to store the treated input ports
 
-				GlobalVariable untagBuffer = new GlobalVariable(new Location(),
+				VarGlobal untagBuffer = new VarGlobal(new Location(),
 						entryType, "buffer", true);
-				GlobalVariable untagReadIndex = new GlobalVariable(
+				VarGlobal untagReadIndex = new VarGlobal(
 						new Location(), entryType, "index", true);
-				GlobalVariable untagWriteIndex = new GlobalVariable(
+				VarGlobal untagWriteIndex = new VarGlobal(
 						new Location(), entryType, "index", true);
 				// if input repeat detected --> treat all input ports
 				for (Entry<Port, Integer> entry : action.getInputPattern()
@@ -1279,10 +1279,10 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					}
 					String counterName = action.getName() + "NewStoreCounter"
 							+ inputIndex;
-					GlobalVariable counter = createCounter(counterName);
+					VarGlobal counter = createCounter(counterName);
 					String listName = action.getName() + "NewStoreList"
 							+ inputIndex;
-					GlobalVariable tab = createTab(listName, entryType,
+					VarGlobal tab = createTab(listName, entryType,
 							numTokens);
 					store = createStoreAction(action.getName(), counter, tab,
 							untagBuffer, untagWriteIndex);
@@ -1358,10 +1358,10 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					entryType = entry.getKey().getType();
 					String counterName = action.getName() + "NewWriteCounter"
 							+ outputIndex;
-					GlobalVariable counter = createCounter(counterName);
+					VarGlobal counter = createCounter(counterName);
 					String listName = action.getName() + "NewWriteList"
 							+ outputIndex;
-					GlobalVariable tab = createTab(listName, entryType,
+					VarGlobal tab = createTab(listName, entryType,
 							numTokens);
 					write = createWriteAction(action.getName(), counter, tab);
 					write.getOutputPattern().setNumTokens(port, 1);

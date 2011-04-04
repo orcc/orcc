@@ -35,7 +35,7 @@ import java.util.List;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
@@ -43,7 +43,7 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -52,24 +52,24 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
 
 public class InternalizeFifoAccess extends AbstractActorVisitor {
-	private List<Variable> localFifoVars;
+	private List<Var> localFifoVars;
 	private Port port;
 
 	private Procedure body;
-	private GlobalVariable readCount;
-	private GlobalVariable writeCount;
-	private GlobalVariable variable;
+	private VarGlobal readCount;
+	private VarGlobal writeCount;
+	private VarGlobal variable;
 
-	public InternalizeFifoAccess(Port port, GlobalVariable variable,
-			GlobalVariable readCount, GlobalVariable writeCount) {
+	public InternalizeFifoAccess(Port port, VarGlobal variable,
+			VarGlobal readCount, VarGlobal writeCount) {
 		this.port = port;
 		this.variable = variable;
 		this.readCount = readCount;
 		this.writeCount = writeCount;
-		this.localFifoVars = new ArrayList<Variable>();
+		this.localFifoVars = new ArrayList<Var>();
 	}
 
-	private void setIndex(GlobalVariable count, Instruction instr, List<Expression> indexes) {
+	private void setIndex(VarGlobal count, Instruction instr, List<Expression> indexes) {
 
 		if (indexes.size() < 2) {
 			Use use = new Use(count, instr);
@@ -103,7 +103,7 @@ public class InternalizeFifoAccess extends AbstractActorVisitor {
 		updateCounter(writeCount, produced);
 	}
 
-	private void updateCounter(GlobalVariable counter, int nbTokens){
+	private void updateCounter(VarGlobal counter, int nbTokens){
 		if (nbTokens == 0 ){
 			// Update is useless
 			return;
@@ -140,7 +140,7 @@ public class InternalizeFifoAccess extends AbstractActorVisitor {
 	@Override
 	public void visit(Load load) {
 		Use use = load.getSource();
-		Variable var = use.getVariable();
+		Var var = use.getVariable();
 		if (localFifoVars.contains(var)) {
 			load.setSource(new Use(variable, load));
 			setIndex(readCount, load, load.getIndexes());
@@ -149,7 +149,7 @@ public class InternalizeFifoAccess extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Store store) {
-		Variable var = store.getTarget();
+		Var var = store.getTarget();
 		if (localFifoVars.contains(var)) {
 			store.setTarget(variable);
 			setIndex(writeCount, store, store.getIndexes());

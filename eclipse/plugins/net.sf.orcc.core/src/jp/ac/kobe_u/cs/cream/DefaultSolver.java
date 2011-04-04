@@ -331,7 +331,7 @@ public class DefaultSolver extends Solver {
 	// protected void solve(int level) {
 	// if (isAborted())
 	// return;
-	// Variable objective = network.getObjective();
+	// Var objective = network.getObjective();
 	// if (isOption(MINIMIZE)) {
 	// if (bestValue < IntDomain.MAX_VALUE) {
 	// IntDomain d = (IntDomain)objective.getDomain();
@@ -352,7 +352,7 @@ public class DefaultSolver extends Solver {
 	// boolean sat = satisfy();
 	// if (isAborted() || ! sat)
 	// return;
-	// Variable v0 = selectVariable();
+	// Var v0 = selectVariable();
 	// if (v0 == null) {
 	// solution = new Solution(network);
 	// success();

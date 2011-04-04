@@ -33,12 +33,12 @@ import java.util.List;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -56,7 +56,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 
-	private OrderedMap<String, GlobalVariable> stateVars;
+	private OrderedMap<String, VarGlobal> stateVars;
 
 	@Override
 	public void visit(Actor actor) {
@@ -64,11 +64,11 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 		super.visit(actor);
 	}
 
-	private void updateIndex(Variable var, Instruction instr,
+	private void updateIndex(Var var, Instruction instr,
 			List<Expression> indexes) {
 
 		if (indexes.size() < 2) {
-			Variable varCount = stateVars.get(var.getName() + "_count");
+			Var varCount = stateVars.get(var.getName() + "_count");
 
 			Use use = new Use(varCount, instr);
 			BinaryExpr expr = new BinaryExpr(new VarExpr(use), BinaryOp.PLUS,
@@ -84,8 +84,8 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 	@Override
 	public void visit(Load load) {
 		Use use = load.getSource();
-		Variable var = use.getVariable();
-		if (!var.isGlobal() && isPort((LocalVariable) var)) {
+		Var var = use.getVariable();
+		if (!var.isGlobal() && isPort((VarLocal) var)) {
 			load.setSource(new Use(stateVars.get(var.getName()), load));
 			updateIndex(var, load, load.getIndexes());
 		}
@@ -93,8 +93,8 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Store store) {
-		Variable var = store.getTarget();
-		if (!var.isGlobal() && isPort((LocalVariable) var)) {
+		Var var = store.getTarget();
+		if (!var.isGlobal() && isPort((VarLocal) var)) {
 			store.setTarget(stateVars.get(var.getName()));
 			updateIndex(var, store, store.getIndexes());
 		}

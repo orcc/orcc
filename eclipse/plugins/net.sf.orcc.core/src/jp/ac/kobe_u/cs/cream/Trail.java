@@ -29,7 +29,7 @@ public class Trail {
 	 * Pushes a pair of the variable <tt>v</tt> and its domain
 	 * to the trail stack.
 	 * This is invoked for each assignment to the variable 
-	 * by {@link Variable#updateDomain(Domain, Trail)}.
+	 * by {@link Var#updateDomain(Domain, Trail)}.
 	 * @param v the variable
 	 */
 	public void push(Variable v) {

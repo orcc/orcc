@@ -34,7 +34,7 @@ import java.util.List;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.expr.ListExpr;
 
 /**
@@ -71,7 +71,7 @@ public class ListDeclarationTransformation extends AbstractActorVisitor {
 	@Override
 	public void visit(Actor actor) {
 		// VHDL synthesizers don't support multi-dimensional memory yet
-		for (GlobalVariable variable : actor.getStateVars()) {
+		for (VarGlobal variable : actor.getStateVars()) {
 			if (variable.getType().isList()) {
 				List<Expression> newValues = new ArrayList<Expression>();
 				flattenList(variable.getValue(), newValues);

@@ -101,14 +101,14 @@ public interface Procedure extends EObject {
 	 * 
 	 * @return the list of scalar variables loaded by this procedure
 	 */
-	List<GlobalVariable> getLoadedVariables();
+	List<VarGlobal> getLoadedVariables();
 
 	/**
 	 * Returns the local variables of this procedure as an ordered map.
 	 * 
 	 * @return the local variables of this procedure as an ordered map
 	 */
-	OrderedMap<String, LocalVariable> getLocals();
+	OrderedMap<String, VarLocal> getLocals();
 
 	/**
 	 * Returns the location of this procedure.
@@ -139,7 +139,7 @@ public interface Procedure extends EObject {
 	 * 
 	 * @return the parameters of this procedure as an ordered map
 	 */
-	OrderedMap<String, LocalVariable> getParameters();
+	OrderedMap<String, VarLocal> getParameters();
 
 	/**
 	 * Returns the result of this procedure.
@@ -162,7 +162,7 @@ public interface Procedure extends EObject {
 	 * 
 	 * @return the list of scalar variables stored by this procedure
 	 */
-	List<GlobalVariable> getStoredVariables();
+	List<VarGlobal> getStoredVariables();
 
 	/**
 	 * Returns <code>true</code> if this procedure is native.
@@ -184,7 +184,7 @@ public interface Procedure extends EObject {
 	 *            hint for the variable name
 	 * @return a new local variable
 	 */
-	LocalVariable newTempLocalVariable(String file, Type type, String hint);
+	VarLocal newTempLocalVariable(String file, Type type, String hint);
 
 	/**
 	 * Set the CFG of this procedure.
@@ -200,7 +200,7 @@ public interface Procedure extends EObject {
 	 * @param locals
 	 *            the local variables of this procedure as an ordered map
 	 */
-	void setLocals(OrderedMap<String, LocalVariable> locals);
+	void setLocals(OrderedMap<String, VarLocal> locals);
 
 	void setLocation(Location location);
 
@@ -226,7 +226,7 @@ public interface Procedure extends EObject {
 	 * @param parameters
 	 *            the parameters of this procedure as an ordered map
 	 */
-	void setParameters(OrderedMap<String, LocalVariable> parameters);
+	void setParameters(OrderedMap<String, VarLocal> parameters);
 
 	void setResult(Expression result);
 

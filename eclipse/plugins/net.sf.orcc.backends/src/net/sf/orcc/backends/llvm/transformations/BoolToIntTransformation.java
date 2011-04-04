@@ -35,7 +35,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -45,8 +45,8 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class BoolToIntTransformation extends AbstractActorVisitor {
 
-	private void changeType(Variable variable) {
-		TypeList listType = (TypeList) variable.getType();
+	private void changeType(Var var) {
+		TypeList listType = (TypeList) var.getType();
 		if (listType.getElementType().isBool()) {
 			listType.setType(IrFactory.eINSTANCE.createTypeInt(32));
 		}
@@ -57,20 +57,20 @@ public class BoolToIntTransformation extends AbstractActorVisitor {
 		// input pattern
 		Pattern pattern = action.getInputPattern();
 		for (Port port : pattern.getPorts()) {
-			Variable variable = pattern.getVariable(port);
-			changeType(variable);
+			Var var = pattern.getVariable(port);
+			changeType(var);
 
-			variable = pattern.getPeeked(port);
-			if (variable != null) {
-				changeType(variable);
+			var = pattern.getPeeked(port);
+			if (var != null) {
+				changeType(var);
 			}
 		}
 
 		// output pattern
 		pattern = action.getOutputPattern();
 		for (Port port : pattern.getPorts()) {
-			Variable variable = pattern.getVariable(port);
-			changeType(variable);
+			Var var = pattern.getVariable(port);
+			changeType(var);
 		}
 	}
 
@@ -84,7 +84,7 @@ public class BoolToIntTransformation extends AbstractActorVisitor {
 	}
 
 	public void visitPort(OrderedMap<String, Port> ports) {
-		// Transform Port into int Variable
+		// Transform Port into int Var
 		for (Port port : ports) {
 			if (port.getType().isBool()) {
 				port.setType(IrFactory.eINSTANCE.createTypeInt(32));

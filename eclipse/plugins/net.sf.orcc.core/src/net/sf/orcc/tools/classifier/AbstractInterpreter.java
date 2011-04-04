@@ -37,12 +37,12 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -110,8 +110,8 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	@Override
 	public void visit(Load instr) {
-		LocalVariable target = instr.getTarget();
-		Variable source = instr.getSource().getVariable();
+		VarLocal target = instr.getTarget();
+		Var source = instr.getSource().getVariable();
 		if (instr.getIndexes().isEmpty()) {
 			target.setValue(source.getValue());
 		} else {
@@ -140,12 +140,12 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	@Override
 	public void visit(Store instr) {
-		Variable variable = instr.getTarget();
+		Var var = instr.getTarget();
 		if (instr.getIndexes().isEmpty()) {
-			variable.setValue((Expression) instr.getValue().accept(
+			var.setValue((Expression) instr.getValue().accept(
 					exprInterpreter));
 		} else {
-			Expression target = variable.getValue();
+			Expression target = var.getValue();
 			Iterator<Expression> it = instr.getIndexes().iterator();
 			IntExpr index = (IntExpr) it.next().accept(exprInterpreter);
 
@@ -269,7 +269,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 		// allocates peeked variables
 		Pattern pattern = action.getInputPattern();
 		for (Port port : pattern.getPorts()) {
-			Variable peeked = pattern.getPeeked(port);
+			Var peeked = pattern.getPeeked(port);
 			if (peeked != null) {
 				peeked.setValue((Expression) peeked.getType().accept(
 						listAllocator));

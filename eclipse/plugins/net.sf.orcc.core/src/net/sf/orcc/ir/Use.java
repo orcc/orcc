@@ -35,7 +35,7 @@ import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.expr.VarExpr;
 
 /**
- * This class defines a use of a variable.
+ * This class defines a use of a var.
  * 
  * @author Matthieu Wipliez
  * 
@@ -172,11 +172,11 @@ public class Use {
 	 * Replaces uses of oldVar by uses of newVar.
 	 * 
 	 * @param oldVar
-	 *            old variable
+	 *            old var
 	 * @param newVar
-	 *            new variable
+	 *            new var
 	 */
-	public static void replaceUses(LocalVariable oldVar, LocalVariable newVar) {
+	public static void replaceUses(VarLocal oldVar, VarLocal newVar) {
 		// copy uses because #setVariable will change oldVar's uses
 		List<Use> existingUses = new ArrayList<Use>(oldVar.getUses());
 		for (Use use : existingUses) {
@@ -187,45 +187,45 @@ public class Use {
 	}
 
 	/**
-	 * the node where the variable referenced is used. May be <code>null</code>
+	 * the node where the var referenced is used. May be <code>null</code>
 	 * if the information is not available or has no meaning.
 	 */
 	private User node;
 
 	/**
-	 * the variable referenced
+	 * the var referenced
 	 */
-	private Variable variable;
+	private Var var;
 
 	/**
-	 * Creates a new use of the given variable. This use is added to the use
-	 * list of the newly referenced variable.
+	 * Creates a new use of the given var. This use is added to the use
+	 * list of the newly referenced var.
 	 * 
-	 * @param variable
-	 *            a variable
+	 * @param var
+	 *            a var
 	 */
-	public Use(Variable variable) {
-		setVariable(variable);
+	public Use(Var var) {
+		setVariable(var);
 	}
 
 	/**
-	 * Creates a new use of the given variable. This use is added to the use
-	 * list of the newly referenced variable. The node parameter must not be
+	 * Creates a new use of the given var. This use is added to the use
+	 * list of the newly referenced var. The node parameter must not be
 	 * <code>null</code>, if you want to create a use with no node, use the
 	 * other constructor.
 	 * 
-	 * @param variable
-	 *            a variable
+	 * @param var
+	 *            a var
 	 * @param user
 	 *            a node
 	 * @throws NullPointerException
 	 *             if node is null.
 	 */
-	public Use(Variable variable, User user) {
+	public Use(Var var, User user) {
 		if (user == null) {
 			throw new NullPointerException();
 		}
-		setVariable(variable);
+		setVariable(var);
 		this.node = user;
 	}
 
@@ -240,16 +240,16 @@ public class Use {
 	}
 
 	/**
-	 * Returns the variable referenced by this use.
+	 * Returns the var referenced by this use.
 	 * 
-	 * @return the variable referenced by this use
+	 * @return the var referenced by this use
 	 */
-	public Variable getVariable() {
-		return variable;
+	public Var getVariable() {
+		return var;
 	}
 
 	/**
-	 * Removes this variable use from the variable referenced.
+	 * Removes this var use from the var referenced.
 	 */
 	public void remove() {
 		getVariable().removeUse(this);
@@ -266,24 +266,24 @@ public class Use {
 	}
 
 	/**
-	 * Sets the variable referenced by this use to the given variable. This use
-	 * is removed from the use list of the previously referenced variable, and
-	 * added to the use list of the newly referenced variable.
+	 * Sets the var referenced by this use to the given var. This use
+	 * is removed from the use list of the previously referenced var, and
+	 * added to the use list of the newly referenced var.
 	 * 
-	 * @param variable
-	 *            a variable that this use will reference
+	 * @param var
+	 *            a var that this use will reference
 	 */
-	public void setVariable(Variable variable) {
-		if (this.variable != null) {
-			this.variable.removeUse(this);
+	public void setVariable(Var var) {
+		if (this.var != null) {
+			this.var.removeUse(this);
 		}
-		this.variable = variable;
-		variable.addUse(this);
+		this.var = var;
+		var.addUse(this);
 	}
 
 	@Override
 	public String toString() {
-		return String.valueOf(variable);
+		return String.valueOf(var);
 	}
 
 }

@@ -72,9 +72,9 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -91,7 +91,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
@@ -496,17 +496,17 @@ public class IRWriter {
 	/**
 	 * Serializes the given variable to JSON.
 	 * 
-	 * @param variable
+	 * @param var
 	 *            a variable
 	 * @return
 	 */
-	private static JsonArray writeVariable(Variable variable) {
+	private static JsonArray writeVariable(Var var) {
 		JsonArray array = new JsonArray();
-		if (variable.isGlobal()) {
-			array.add(new JsonPrimitive(variable.getName()));
+		if (var.isGlobal()) {
+			array.add(new JsonPrimitive(var.getName()));
 			array.add(new JsonPrimitive(0));
 		} else {
-			LocalVariable local = (LocalVariable) variable;
+			VarLocal local = (VarLocal) var;
 			array.add(new JsonPrimitive(local.getBaseName()));
 			array.add(new JsonPrimitive(local.getIndex()));
 		}
@@ -594,13 +594,13 @@ public class IRWriter {
 
 			patternArray.add(new JsonPrimitive(port.getName()));
 			patternArray.add(new JsonPrimitive(pattern.getNumTokens(port)));
-			Variable peeked = pattern.getPeeked(port);
+			Var peeked = pattern.getPeeked(port);
 			if (peeked == null) {
 				patternArray.add(new JsonNull());
 			} else {
-				patternArray.add(writeLocalVariable((LocalVariable) peeked));
+				patternArray.add(writeLocalVariable((VarLocal) peeked));
 			}
-			patternArray.add(writeLocalVariable((LocalVariable) pattern
+			patternArray.add(writeLocalVariable((VarLocal) pattern
 					.getVariable(port)));
 		}
 
@@ -737,7 +737,7 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JsonArray writeGlobalVariable(GlobalVariable variable) {
+	private JsonArray writeGlobalVariable(VarGlobal variable) {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(variable.getName()));
@@ -764,9 +764,9 @@ public class IRWriter {
 	 * @return a JSON array
 	 */
 	private JsonArray writeGlobalVariables(
-			OrderedMap<String, GlobalVariable> variables) {
+			OrderedMap<String, VarGlobal> variables) {
 		JsonArray array = new JsonArray();
-		for (GlobalVariable variable : variables) {
+		for (VarGlobal variable : variables) {
 			array.add(writeGlobalVariable(variable));
 		}
 		return array;
@@ -779,7 +779,7 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JsonArray writeLocalVariable(LocalVariable variable) {
+	private JsonArray writeLocalVariable(VarLocal variable) {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(variable.getBaseName()));
@@ -799,9 +799,9 @@ public class IRWriter {
 	 * @return a JSON array
 	 */
 	private JsonArray writeLocalVariables(
-			OrderedMap<String, LocalVariable> variables) {
+			OrderedMap<String, VarLocal> variables) {
 		JsonArray array = new JsonArray();
-		for (LocalVariable variable : variables) {
+		for (VarLocal variable : variables) {
 			array.add(writeLocalVariable(variable));
 		}
 		return array;

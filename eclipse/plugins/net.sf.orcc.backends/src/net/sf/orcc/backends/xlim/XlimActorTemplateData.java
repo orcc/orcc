@@ -34,7 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 
 /**
  * This class is giving the necessary information for the XLIM Actor generation
@@ -44,14 +44,14 @@ import net.sf.orcc.ir.Variable;
  */
 public class XlimActorTemplateData {
 
-	private Map<Action, Map<Port, Map<Integer, Variable>>> customPeekedMapPerAction;
+	private Map<Action, Map<Port, Map<Integer, Var>>> customPeekedMapPerAction;
 
-	public Map<Action, Map<Port, Map<Integer, Variable>>> getCustomPeekedMapPerAction() {
+	public Map<Action, Map<Port, Map<Integer, Var>>> getCustomPeekedMapPerAction() {
 		return customPeekedMapPerAction;
 	}
 
 	public XlimActorTemplateData() {
-		customPeekedMapPerAction = new HashMap<Action, Map<Port, Map<Integer, Variable>>>();
+		customPeekedMapPerAction = new HashMap<Action, Map<Port, Map<Integer, Var>>>();
 	}
 
 }

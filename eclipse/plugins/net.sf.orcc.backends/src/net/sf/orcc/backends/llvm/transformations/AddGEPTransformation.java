@@ -37,11 +37,11 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
 
@@ -56,12 +56,12 @@ public class AddGEPTransformation extends AbstractActorVisitor {
 
 	private String file;
 
-	private Variable addGEP(Variable array, Type type,
+	private Var addGEP(Var array, Type type,
 			List<Expression> indexes, ListIterator<Instruction> it) {
 		List<Expression> GepIndexes = new ArrayList<Expression>(indexes);
 
 		// Make a new localVariable that will contains the elt to access
-		LocalVariable eltVar = procedure.newTempLocalVariable(file, type,
+		VarLocal eltVar = procedure.newTempLocalVariable(file, type,
 				array.getName() + "_" + "elt");
 
 		GEP gepInstr = new GEP(eltVar, new Use(array), GepIndexes);
@@ -85,13 +85,13 @@ public class AddGEPTransformation extends AbstractActorVisitor {
 	@Override
 	public void visit(Load load) {
 		Use source = load.getSource();
-		LocalVariable target = load.getTarget();
+		VarLocal target = load.getTarget();
 		List<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
 			itInstruction.previous();
 
-			Variable newSource = addGEP(source.getVariable(), target.getType(),
+			Var newSource = addGEP(source.getVariable(), target.getType(),
 					indexes, itInstruction);
 
 			load.setSource(new Use(newSource));
@@ -104,14 +104,14 @@ public class AddGEPTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Store store) {
-		Variable target = store.getTarget();
+		Var target = store.getTarget();
 		List<Expression> indexes = store.getIndexes();
 
 		if (!indexes.isEmpty()) {
 			itInstruction.previous();
 			TypeList typeList = (TypeList) target.getType();
 
-			Variable newTarget = addGEP(target, typeList.getElementType(),
+			Var newTarget = addGEP(target, typeList.getElementType(),
 					indexes, itInstruction);
 
 			store.setTarget(newTarget);

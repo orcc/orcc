@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -80,13 +80,13 @@ public class RenameTransformation extends AbstractActorVisitor {
 		this.replacement = replacement;
 	}
 
-	private void checkVariables(OrderedMap<String, ? extends Variable> variables) {
-		for (Variable variable : variables) {
-			String name = variable.getName();
+	private void checkVariables(OrderedMap<String, ? extends Var> vars) {
+		for (Var var : vars) {
+			String name = var.getName();
 			if (transformations != null && transformations.containsKey(name)) {
-				variable.setName(transformations.get(name));
+				var.setName(transformations.get(name));
 			} else if (pattern != null) {
-				variable.setName(pattern.matcher(name).replaceAll(replacement));
+				var.setName(pattern.matcher(name).replaceAll(replacement));
 			}
 		}
 	}

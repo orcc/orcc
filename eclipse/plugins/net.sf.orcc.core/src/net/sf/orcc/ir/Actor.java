@@ -69,11 +69,11 @@ public class Actor implements Comparable<Actor> {
 
 	private OrderedMap<String, Port> outputs;
 
-	private OrderedMap<String, GlobalVariable> parameters;
+	private OrderedMap<String, VarGlobal> parameters;
 
 	private OrderedMap<String, Procedure> procs;
 
-	private OrderedMap<String, GlobalVariable> stateVars;
+	private OrderedMap<String, VarGlobal> stateVars;
 
 	/**
 	 * holds template-specific data.
@@ -105,9 +105,9 @@ public class Actor implements Comparable<Actor> {
 	 *            an action scheduler
 	 */
 	public Actor(String name, String file,
-			OrderedMap<String, GlobalVariable> parameters,
+			OrderedMap<String, VarGlobal> parameters,
 			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
-			boolean nativeFlag, OrderedMap<String, GlobalVariable> stateVars,
+			boolean nativeFlag, OrderedMap<String, VarGlobal> stateVars,
 			OrderedMap<String, Procedure> procs, List<Action> actions,
 			List<Action> initializes, ActionScheduler scheduler) {
 		this.actions = actions;
@@ -151,9 +151,9 @@ public class Actor implements Comparable<Actor> {
 	 *            a MoC
 	 */
 	public Actor(String name, String file,
-			OrderedMap<String, GlobalVariable> parameters,
+			OrderedMap<String, VarGlobal> parameters,
 			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
-			boolean nativeFlag, OrderedMap<String, GlobalVariable> stateVars,
+			boolean nativeFlag, OrderedMap<String, VarGlobal> stateVars,
 			OrderedMap<String, Procedure> procs, List<Action> actions,
 			List<Action> initializes, ActionScheduler scheduler, MoC moc) {
 		this.actions = actions;
@@ -302,7 +302,7 @@ public class Actor implements Comparable<Actor> {
 	 * 
 	 * @return the ordered map of parameters
 	 */
-	public OrderedMap<String, GlobalVariable> getParameters() {
+	public OrderedMap<String, VarGlobal> getParameters() {
 		return parameters;
 	}
 
@@ -349,7 +349,7 @@ public class Actor implements Comparable<Actor> {
 	 * 
 	 * @return the ordered map of state variables
 	 */
-	public OrderedMap<String, GlobalVariable> getStateVars() {
+	public OrderedMap<String, VarGlobal> getStateVars() {
 		return stateVars;
 	}
 

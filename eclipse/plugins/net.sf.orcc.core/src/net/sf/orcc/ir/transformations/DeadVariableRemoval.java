@@ -33,10 +33,10 @@ import java.util.List;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
@@ -46,7 +46,7 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * This class defines a very simple Dead Variable Elimination.
+ * This class defines a very simple Dead Var Elimination.
  * 
  * @author Matthieu Wipliez
  * 
@@ -57,7 +57,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Assign assign) {
-		LocalVariable variable = assign.getTarget();
+		VarLocal variable = assign.getTarget();
 		if (!variable.isUsed()) {
 			// do not remove assign to variables that are used by writes
 			if (isPort(variable)) {
@@ -79,7 +79,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	@Override
 	public void visit(Call call) {
 		if (call.hasResult()) {
-			LocalVariable variable = call.getTarget();
+			VarLocal variable = call.getTarget();
 			if (!variable.isUsed()) {
 				// do not remove call to variables that are used by writes
 				if (isPort(variable)) {
@@ -101,7 +101,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Load load) {
-		LocalVariable target = load.getTarget();
+		VarLocal target = load.getTarget();
 		if (!target.isUsed()) {
 			// do not remove loads to variables that are used by writes
 			if (isPort(target)) {
@@ -123,7 +123,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(PhiAssignment phi) {
-		LocalVariable variable = phi.getTarget();
+		VarLocal variable = phi.getTarget();
 		if (!variable.isUsed()) {
 			// do not remove phi to variables that are used by writes
 			if (isPort(variable)) {
@@ -155,10 +155,10 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			changed = false;
 
 			// first shot: removes locals not used by any instruction
-			OrderedMap<String, LocalVariable> locals = procedure.getLocals();
-			Iterator<LocalVariable> it = locals.iterator();
+			OrderedMap<String, VarLocal> locals = procedure.getLocals();
+			Iterator<VarLocal> it = locals.iterator();
 			while (it.hasNext()) {
-				LocalVariable local = it.next();
+				VarLocal local = it.next();
 				if (!local.isUsed() && local.getInstruction() == null
 						&& local.getInstructions() == null) {
 					changed = true;
@@ -172,12 +172,12 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Store store) {
-		Variable target = store.getTarget();
+		Var target = store.getTarget();
 		if (!target.isUsed()) {
 			// do not remove stores to variables that are used by writes, or
 			// variables that are parameters
 			if (!target.isGlobal()
-					&& (isPort((LocalVariable) target) || procedure
+					&& (isPort((VarLocal) target) || procedure
 							.getParameters().contains(target.getName()))) {
 				return;
 			}

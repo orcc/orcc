@@ -39,10 +39,10 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.instructions.Load;
 
@@ -91,7 +91,7 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 
 		@Override
 		public void visit(Load node) {
-			Variable var = node.getSource().getVariable();
+			Var var = node.getSource().getVariable();
 			if (!var.getType().isList() && var.isAssignable()) {
 				signals.add(var.getName());
 			}
@@ -99,11 +99,11 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 
 	}
 
-	private Map<GlobalVariable, Boolean> customInitMap;
+	private Map<VarGlobal, Boolean> customInitMap;
 
 	private Expression initValue;
 
-	private Map<GlobalVariable, Expression> initValueMap;
+	private Map<VarGlobal, Expression> initValueMap;
 
 	/**
 	 * the set of signals that appear in the sensitivity list of the scheduler
@@ -122,7 +122,7 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 	 * @return <code>true</code> if the given variable has an initial value that
 	 *         is not a list of a unique value
 	 */
-	private boolean getCustomInitFlag(GlobalVariable variable, Expression value) {
+	private boolean getCustomInitFlag(VarGlobal variable, Expression value) {
 		if (value.isListExpr()) {
 			ListExpr exprList = (ListExpr) value;
 			for (Expression subExpr : exprList.getValue()) {
@@ -149,7 +149,7 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 	 * 
 	 * @return the map of global variables to custom init flag
 	 */
-	public Map<GlobalVariable, Boolean> getCustomInitMap() {
+	public Map<VarGlobal, Boolean> getCustomInitMap() {
 		return customInitMap;
 	}
 
@@ -158,7 +158,7 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 	 * 
 	 * @return the initValue map
 	 */
-	public Map<GlobalVariable, Expression> getInitValueMap() {
+	public Map<VarGlobal, Expression> getInitValueMap() {
 		return initValueMap;
 	}
 
@@ -181,9 +181,9 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 		signals = new LinkedHashSet<String>();
 		new SensitivityComputer().visit(actor);
 
-		customInitMap = new HashMap<GlobalVariable, Boolean>();
-		initValueMap = new HashMap<GlobalVariable, Expression>();
-		for (GlobalVariable variable : actor.getStateVars()) {
+		customInitMap = new HashMap<VarGlobal, Boolean>();
+		initValueMap = new HashMap<VarGlobal, Expression>();
+		for (VarGlobal variable : actor.getStateVars()) {
 			Expression initialValue = variable.getInitialValue();
 			if (variable.getType().isList() && variable.isAssignable()
 					&& initialValue != null) {

@@ -36,12 +36,12 @@ import java.util.Map;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
@@ -77,14 +77,14 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 				.keySet());
 		for (Port port : ports) {
 			if (pattern.getNumTokens(port) == 1) {
-				Variable oldTarget = pattern.getVariableMap().get(port);
+				Var oldTarget = pattern.getVariableMap().get(port);
 				if (!oldTarget.getUses().isEmpty()) {
 					Instruction instruction = (Instruction) oldTarget.getUses()
 							.get(0).getNode();
 
 					if (instruction.isLoad()) {
 						Load load = (Load) instruction;
-						Variable newTarget = load.getTarget();
+						Var newTarget = load.getTarget();
 
 						pattern.setVariable(port, newTarget);
 
@@ -105,14 +105,14 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 							Store store = (Store) instruction;
 							Expression expr = store.getValue();
 
-							Variable newTarget;
+							Var newTarget;
 
 							if (expr.isVarExpr()) {
 								VarExpr var = (VarExpr) expr;
 								newTarget = var.getVar().getVariable();
 
 							} else {
-								LocalVariable localNewTarget = action
+								VarLocal localNewTarget = action
 										.getBody()
 										.newTempLocalVariable(null,
 												expr.getType(),
@@ -140,7 +140,7 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 							store.setValue(null);
 						}
 					} else {
-						LocalVariable localNewTarget = action.getBody()
+						VarLocal localNewTarget = action.getBody()
 								.newTempLocalVariable(
 										null,
 										((TypeList) oldTarget.getType())

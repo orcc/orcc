@@ -72,10 +72,10 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -92,7 +92,7 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -147,7 +147,7 @@ public class IRParser {
 
 	final private List<Action> untaggedActions;
 
-	private Scope<String, Variable> variables;
+	private Scope<String, Var> vars;
 
 	/**
 	 * Creates a new IR parser.
@@ -156,7 +156,7 @@ public class IRParser {
 		actions = new HashMap<Tag, Action>();
 		procs = new OrderedMap<String, Procedure>();
 		untaggedActions = new ArrayList<Action>();
-		variables = new Scope<String, Variable>();
+		vars = new Scope<String, Var>();
 	}
 
 	/**
@@ -189,9 +189,9 @@ public class IRParser {
 	 *            an array that contains a variable name and SSA index
 	 * @return the variable associated with the name
 	 */
-	private Variable getVariable(JsonArray array) {
+	private Var getVariable(JsonArray array) {
 		String varName = getVariableName(array);
-		Variable varDef = variables.get(varName);
+		Var varDef = vars.get(varName);
 		if (varDef == null) {
 			throw new OrccRuntimeException("unknown variable: " + varName);
 		}
@@ -228,24 +228,24 @@ public class IRParser {
 			tag.add(tagArray.get(i).getAsString());
 		}
 
-		variables = new Scope<String, Variable>(variables, true);
+		vars = new Scope<String, Var>(vars, true);
 		Pattern ip = parsePattern(inputs, array.get(1).getAsJsonArray());
 		Pattern op = parsePattern(outputs, array.get(2).getAsJsonArray());
 
 		Procedure body = parseProc(array.get(4).getAsJsonArray());
 
-		// add peeked variables
-		variables = new Scope<String, Variable>(variables, true);
+		// add peeked vars
+		vars = new Scope<String, Var>(vars, true);
 		for (Port port : ip.getPorts()) {
-			Variable peeked = ip.getPeeked(port);
+			Var peeked = ip.getPeeked(port);
 			if (peeked != null) {
-				variables.put(file, peeked.getLocation(), peeked.getName(),
+				vars.put(file, peeked.getLocation(), peeked.getName(),
 						peeked);
 			}
 		}
 		Procedure scheduler = parseProc(array.get(3).getAsJsonArray());
 
-		variables = variables.getParent().getParent();
+		vars = vars.getParent().getParent();
 
 		Action action = new Action(body.getLocation(), tag, ip, op, scheduler,
 				body);
@@ -314,8 +314,8 @@ public class IRParser {
 			String name = obj.get(KEY_NAME).getAsString();
 
 			JsonArray array = obj.get(KEY_PARAMETERS).getAsJsonArray();
-			OrderedMap<String, GlobalVariable> parameters = parseGlobalVariables(array);
-			variables = new Scope<String, Variable>(variables, true);
+			OrderedMap<String, VarGlobal> parameters = parseGlobalVariables(array);
+			vars = new Scope<String, Var>(vars, true);
 
 			boolean nativeFlag = obj.get(KEY_NATIVE).getAsBoolean();
 
@@ -323,7 +323,7 @@ public class IRParser {
 			outputs = parsePorts(obj.get(KEY_OUTPUTS).getAsJsonArray());
 
 			array = obj.get(KEY_STATE_VARS).getAsJsonArray();
-			OrderedMap<String, GlobalVariable> stateVars = parseGlobalVariables(array);
+			OrderedMap<String, VarGlobal> stateVars = parseGlobalVariables(array);
 
 			array = obj.get(KEY_PROCEDURES).getAsJsonArray();
 			for (JsonElement element : array) {
@@ -460,17 +460,17 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the given list as a list of global variables. A
-	 * {@link GlobalVariable} is a {@link Variable} with an optional reference
+	 * Parses the given list as a list of global vars. A
+	 * {@link VarGlobal} is a {@link Var} with an optional reference
 	 * to a constant that contain the variable's initial value.
 	 * 
 	 * @param array
-	 *            A list of JSON-encoded {@link GlobalVariable}.
-	 * @return A {@link List}&lt;{@link GlobalVariable}&gt;.
+	 *            A list of JSON-encoded {@link VarGlobal}.
+	 * @return A {@link List}&lt;{@link VarGlobal}&gt;.
 	 */
-	private OrderedMap<String, GlobalVariable> parseGlobalVariables(
+	private OrderedMap<String, VarGlobal> parseGlobalVariables(
 			JsonArray arrayGlobals) {
-		OrderedMap<String, GlobalVariable> stateVars = new OrderedMap<String, GlobalVariable>();
+		OrderedMap<String, VarGlobal> stateVars = new OrderedMap<String, VarGlobal>();
 		for (JsonElement element : arrayGlobals) {
 			JsonArray array = element.getAsJsonArray();
 
@@ -485,12 +485,12 @@ public class IRParser {
 				init = parseExpr(array.get(4));
 			}
 
-			GlobalVariable stateVar = new GlobalVariable(location, type, name,
+			VarGlobal stateVar = new VarGlobal(location, type, name,
 					assignable, init);
 			stateVars.put(file, location, name, stateVar);
 
 			// register the state variable
-			variables.put(file, location, name, stateVar);
+			vars.put(file, location, name, stateVar);
 		}
 
 		return stateVars;
@@ -506,9 +506,9 @@ public class IRParser {
 	 * @return an Assign instruction
 	 */
 	private Assign parseInstrAssign(Location loc, JsonArray array) {
-		Variable var = getVariable(array.get(2).getAsJsonArray());
+		Var var = getVariable(array.get(2).getAsJsonArray());
 		Expression value = parseExpr(array.get(3));
-		LocalVariable local = (LocalVariable) var;
+		VarLocal local = (VarLocal) var;
 		Assign assign = new Assign(loc, local, value);
 		local.setInstruction(assign);
 		return assign;
@@ -533,9 +533,9 @@ public class IRParser {
 
 		List<Expression> parameters = parseExprs(array.get(3).getAsJsonArray());
 
-		LocalVariable res = null;
+		VarLocal res = null;
 		if (array.get(4).isJsonArray()) {
-			res = (LocalVariable) getVariable(array.get(4).getAsJsonArray());
+			res = (VarLocal) getVariable(array.get(4).getAsJsonArray());
 		}
 
 		Call call = new Call(loc, res, proc, parameters);
@@ -555,7 +555,7 @@ public class IRParser {
 	 * @return a Load instruction
 	 */
 	private Load parseInstrLoad(Location loc, JsonArray array) {
-		LocalVariable target = (LocalVariable) getVariable(array.get(2)
+		VarLocal target = (VarLocal) getVariable(array.get(2)
 				.getAsJsonArray());
 		Use source = parseVarUse(array.get(3).getAsJsonArray());
 		List<Expression> indexes = parseExprs(array.get(4).getAsJsonArray());
@@ -575,7 +575,7 @@ public class IRParser {
 	 * @return a Phi instruction
 	 */
 	private PhiAssignment parseInstrPhi(Location loc, JsonArray array) {
-		LocalVariable target = (LocalVariable) getVariable(array.get(2)
+		VarLocal target = (VarLocal) getVariable(array.get(2)
 				.getAsJsonArray());
 		List<Expression> values = parseExprs(array.get(3).getAsJsonArray());
 
@@ -611,7 +611,7 @@ public class IRParser {
 	 * @return a Store instruction
 	 */
 	private Store parseInstrStore(Location loc, JsonArray array) {
-		Variable target = getVariable(array.get(2).getAsJsonArray());
+		Var target = getVariable(array.get(2).getAsJsonArray());
 		List<Expression> indexes = parseExprs(array.get(3).getAsJsonArray());
 		Expression value = parseExpr(array.get(4));
 
@@ -646,35 +646,35 @@ public class IRParser {
 		throw new OrccRuntimeException("unknown instruction type: " + name);
 	}
 
-	private LocalVariable parseLocalVariable(JsonArray array) {
+	private VarLocal parseLocalVariable(JsonArray array) {
 		String name = array.get(0).getAsString();
 		boolean assignable = array.get(1).getAsBoolean();
 		int index = array.get(2).getAsInt();
 		Location loc = parseLocation(array.get(3).getAsJsonArray());
 		Type type = parseType(array.get(4));
 
-		return new LocalVariable(assignable, index, loc, name, type);
+		return new VarLocal(assignable, index, loc, name, type);
 	}
 
 	/**
-	 * Parses the given list as a list of local variables. A
-	 * {@link LocalVariable} is a {@link Variable} with an SSA index.
+	 * Parses the given list as a list of local vars. A
+	 * {@link VarLocal} is a {@link Var} with an SSA index.
 	 * 
 	 * @param array
-	 *            A list of JSON-encoded {@link LocalVariable}.
-	 * @return A {@link List}&lt;{@link LocalVariable}&gt;.
+	 *            A list of JSON-encoded {@link VarLocal}.
+	 * @return A {@link List}&lt;{@link VarLocal}&gt;.
 	 */
-	private OrderedMap<String, LocalVariable> parseLocalVariables(
+	private OrderedMap<String, VarLocal> parseLocalVariables(
 			JsonArray arrayVars) {
-		OrderedMap<String, LocalVariable> localVars = new OrderedMap<String, LocalVariable>();
+		OrderedMap<String, VarLocal> localVars = new OrderedMap<String, VarLocal>();
 		for (JsonElement element : arrayVars) {
 			JsonArray array = element.getAsJsonArray();
 
-			LocalVariable varDef = parseLocalVariable(array);
+			VarLocal varDef = parseLocalVariable(array);
 			localVars.put(file, varDef.getLocation(), varDef.getName(), varDef);
 
 			// register the variable definition
-			variables.put(file, varDef.getLocation(), varDef.getName(), varDef);
+			vars.put(file, varDef.getLocation(), varDef.getName(), varDef);
 		}
 
 		return localVars;
@@ -813,17 +813,17 @@ public class IRParser {
 			pattern.setNumTokens(port, numTokens);
 
 			if (!patternArray.get(2).isJsonNull()) {
-				LocalVariable peeked = parseLocalVariable(patternArray.get(2)
+				VarLocal peeked = parseLocalVariable(patternArray.get(2)
 						.getAsJsonArray());
 				pattern.setPeeked(port, peeked);
 			}
 
-			LocalVariable variable = parseLocalVariable(patternArray.get(3)
+			VarLocal variable = parseLocalVariable(patternArray.get(3)
 					.getAsJsonArray());
 			pattern.setVariable(port, variable);
 
 			// register the variable definition
-			variables.put(file, variable.getLocation(), variable.getName(),
+			vars.put(file, variable.getLocation(), variable.getName(),
 					variable);
 		}
 
@@ -866,11 +866,11 @@ public class IRParser {
 
 		Location location = parseLocation(array.get(2).getAsJsonArray());
 		Type returnType = parseType(array.get(3));
-		variables = new Scope<String, Variable>(variables, true);
-		OrderedMap<String, LocalVariable> parameters = parseLocalVariables(array
+		vars = new Scope<String, Var>(vars, true);
+		OrderedMap<String, VarLocal> parameters = parseLocalVariables(array
 				.get(4).getAsJsonArray());
-		variables = new Scope<String, Variable>(variables, false);
-		OrderedMap<String, LocalVariable> locals = parseLocalVariables(array
+		vars = new Scope<String, Var>(vars, false);
+		OrderedMap<String, VarLocal> locals = parseLocalVariables(array
 				.get(5).getAsJsonArray());
 		List<Node> nodes = parseNodes(array.get(6).getAsJsonArray());
 
@@ -878,7 +878,7 @@ public class IRParser {
 				external, location, returnType, parameters, locals, nodes);
 
 		// go back to previous scope
-		variables = variables.getParent().getParent();
+		vars = vars.getParent().getParent();
 
 		NodeImpl.resetLabelCount();
 
@@ -929,7 +929,7 @@ public class IRParser {
 	}
 
 	private Use parseVarUse(JsonArray array) {
-		Variable varDef = getVariable(array);
+		Var varDef = getVariable(array);
 		return new Use(varDef);
 	}
 

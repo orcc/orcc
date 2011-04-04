@@ -38,9 +38,9 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Store;
 
@@ -63,7 +63,7 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor {
 
 		@Override
 		public void visit(Store instr) {
-			Variable target = instr.getTarget();
+			Var target = instr.getTarget();
 			Type type = target.getType();
 			// Allocate value field of list if it is initialized
 			if (type.isList() && target.getValue() == null) {
@@ -81,8 +81,8 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor {
 				new HashMap<String, Expression>(0), actor, null);
 		
 		// Initialize value field if there is an initial value
-		for (Variable stateVar : actor.getStateVars()) {
-			Expression initConst = ((GlobalVariable) stateVar)
+		for (Var stateVar : actor.getStateVars()) {
+			Expression initConst = ((VarGlobal) stateVar)
 					.getInitialValue();
 			if (initConst != null) {
 				stateVar.setValue(initConst);
@@ -98,9 +98,9 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor {
 		}
 
 		// Copy computed value to initialValue field and clean value field
-		for (Variable stateVar : actor.getStateVars()) {
+		for (Var stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
-			GlobalVariable s = (GlobalVariable) stateVar;
+			VarGlobal s = (VarGlobal) stateVar;
 			if (type.isList() && s.getInitialValue() == null
 					&& s.getValue() != null) {
 				s.setInitialValue(s.getValue());

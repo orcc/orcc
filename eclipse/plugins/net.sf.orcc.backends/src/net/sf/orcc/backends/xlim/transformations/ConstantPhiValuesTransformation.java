@@ -33,7 +33,7 @@ import java.util.List;
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -54,15 +54,15 @@ public class ConstantPhiValuesTransformation extends AbstractActorVisitor {
 	@Override
 	public void visit(PhiAssignment phi) {
 		List<Expression> values = phi.getValues();
-		LocalVariable target = phi.getTarget();
-		OrderedMap<String, LocalVariable> parameters = procedure
+		VarLocal target = phi.getTarget();
+		OrderedMap<String, VarLocal> parameters = procedure
 				.getParameters();
 
 		// Remove local variable with index = 0 from value
 		for (Expression value : values) {
 			if (value.isVarExpr()) {
 				VarExpr sourceExpr = (VarExpr) value;
-				LocalVariable source = (LocalVariable) sourceExpr.getVar()
+				VarLocal source = (VarLocal) sourceExpr.getVar()
 						.getVariable();
 
 				// Local variable must not be a parameter of the procedure
@@ -95,7 +95,7 @@ public class ConstantPhiValuesTransformation extends AbstractActorVisitor {
 
 	public Expression clean(Expression oldExpr) {
 		if (oldExpr.isVarExpr()) {
-			LocalVariable var = (LocalVariable) ((VarExpr) oldExpr).getVar()
+			VarLocal var = (VarLocal) ((VarExpr) oldExpr).getVar()
 					.getVariable();
 
 			// Local variable must not be a parameter of the procedure

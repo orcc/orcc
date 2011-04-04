@@ -37,10 +37,10 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
@@ -50,7 +50,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -84,7 +84,7 @@ public class StaticActorNormalizer {
 
 		private int depth;
 
-		private List<LocalVariable> indexes;
+		private List<VarLocal> indexes;
 
 		private List<Node> nodes;
 
@@ -93,14 +93,14 @@ public class StaticActorNormalizer {
 		public MyPatternVisitor(Procedure procedure) {
 			this.procedure = procedure;
 			nodes = procedure.getNodes();
-			indexes = new ArrayList<LocalVariable>();
+			indexes = new ArrayList<VarLocal>();
 		}
 
 		@Override
 		public void visit(LoopPattern pattern) {
 			depth++;
 			if (indexes.size() < depth) {
-				LocalVariable varDef = new LocalVariable(true, depth - 1,
+				VarLocal varDef = new VarLocal(true, depth - 1,
 						new Location(), "loop",
 						IrFactory.eINSTANCE.createTypeBool());
 				variables.put(actor.getFile(), varDef.getLocation(),
@@ -108,7 +108,7 @@ public class StaticActorNormalizer {
 				indexes.add(varDef);
 			}
 
-			LocalVariable loopVar = indexes.get(depth - 1);
+			VarLocal loopVar = indexes.get(depth - 1);
 
 			// init var
 			NodeBlock block = procedure.getLast(nodes);
@@ -180,7 +180,7 @@ public class StaticActorNormalizer {
 			for (Port port : pattern.getPorts()) {
 				Integer tokens = pattern.getNumTokens(port);
 
-				Variable varCount = stateVars.get(port.getName() + "_count");
+				Var varCount = stateVars.get(port.getName() + "_count");
 				Use use = new Use(varCount);
 
 				Store store = new Store(varCount, new BinaryExpr(new VarExpr(
@@ -201,11 +201,11 @@ public class StaticActorNormalizer {
 
 	private Actor actor;
 
-	private OrderedMap<String, GlobalVariable> stateVars;
+	private OrderedMap<String, VarGlobal> stateVars;
 
 	private CSDFMoC staticCls;
 
-	private OrderedMap<String, LocalVariable> variables;
+	private OrderedMap<String, VarLocal> variables;
 
 	/**
 	 * Creates a new normalizer
@@ -232,12 +232,12 @@ public class StaticActorNormalizer {
 
 			Type type = IrFactory.eINSTANCE.createTypeList(numTokens,
 					port.getType());
-			GlobalVariable var = new GlobalVariable(new Location(), type,
+			VarGlobal var = new VarGlobal(new Location(), type,
 					port.getName(), false);
 			stateVars.put(actor.getFile(), var.getLocation(), var.getName(),
 					var);
 
-			GlobalVariable varCount = new GlobalVariable(new Location(),
+			VarGlobal varCount = new VarGlobal(new Location(),
 					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
 							+ "_count", true, new IntExpr(0));
 			stateVars.put(actor.getFile(), varCount.getLocation(),
@@ -273,7 +273,7 @@ public class StaticActorNormalizer {
 		// all action scheduler now just return true
 		for (Action action : actor.getActions()) {
 			Procedure scheduler = action.getScheduler();
-			Iterator<LocalVariable> it = scheduler.getLocals().iterator();
+			Iterator<VarLocal> it = scheduler.getLocals().iterator();
 			while (it.hasNext()) {
 				it.next();
 				it.remove();
@@ -311,12 +311,12 @@ public class StaticActorNormalizer {
 	 */
 	private Procedure createBody() {
 		Location location = new Location();
-		variables = new OrderedMap<String, LocalVariable>();
+		variables = new OrderedMap<String, VarLocal>();
 		List<Node> nodes = new ArrayList<Node>();
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(ACTION_NAME,
 				false, location, IrFactory.eINSTANCE.createTypeVoid(),
-				new OrderedMap<String, LocalVariable>(), variables, nodes);
+				new OrderedMap<String, VarLocal>(), variables, nodes);
 
 		// add state variables
 		addStateVariables(procedure, staticCls.getInputPattern());
@@ -349,13 +349,13 @@ public class StaticActorNormalizer {
 	 */
 	private void createInputCondition(NodeBlock block) {
 		Expression value;
-		Iterator<LocalVariable> it = variables.iterator();
+		Iterator<VarLocal> it = variables.iterator();
 		if (it.hasNext()) {
-			LocalVariable previous = it.next();
+			VarLocal previous = it.next();
 			value = new VarExpr(new Use(previous, block));
 
 			while (it.hasNext()) {
-				LocalVariable thisOne = (LocalVariable) it.next();
+				VarLocal thisOne = (VarLocal) it.next();
 				value = new BinaryExpr(value, BinaryOp.LOGIC_AND, new VarExpr(
 						new Use(thisOne, block)),
 						IrFactory.eINSTANCE.createTypeBool());
@@ -379,7 +379,7 @@ public class StaticActorNormalizer {
 		Pattern inputPattern = staticCls.getInputPattern();
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
-			Variable var = stateVars.get(port.getName());
+			Var var = stateVars.get(port.getName());
 			System.out.println("must read " + numTokens + " tokens from "
 					+ var.getName());
 		}
@@ -392,13 +392,13 @@ public class StaticActorNormalizer {
 	 */
 	private Procedure createScheduler() {
 		Location location = new Location();
-		variables = new OrderedMap<String, LocalVariable>();
+		variables = new OrderedMap<String, VarLocal>();
 		List<Node> nodes = new ArrayList<Node>();
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
 				SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),
-				new OrderedMap<String, LocalVariable>(), variables, nodes);
+				new OrderedMap<String, VarLocal>(), variables, nodes);
 
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		nodes.add(block);
@@ -418,7 +418,7 @@ public class StaticActorNormalizer {
 		Pattern outputPattern = staticCls.getOutputPattern();
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
-			Variable var = stateVars.get(port.getName());
+			Var var = stateVars.get(port.getName());
 			System.out.println("must write " + numTokens + " tokens from "
 					+ var.getName());
 		}

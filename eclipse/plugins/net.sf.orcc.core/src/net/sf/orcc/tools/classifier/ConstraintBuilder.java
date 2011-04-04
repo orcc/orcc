@@ -40,8 +40,8 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
@@ -49,7 +49,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -214,25 +214,25 @@ public class ConstraintBuilder extends ActorInterpreter {
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
-			Variable variable = expr.getVar().getVariable();
-			if (variable == null) {
+			Var var = expr.getVar().getVariable();
+			if (var == null) {
 				throw new OrccRuntimeException("unknown variable");
 			}
 
-			Variable source = variables.get(variable);
+			Var source = vars.get(var);
 			if (source == null) {
-				source = variable;
+				source = var;
 			}
 
 			// if the source is a constant retrieve its value
 			if (source.isGlobal() && !source.isAssignable()) {
-				Expression value = ((GlobalVariable) source).getInitialValue();
+				Expression value = ((VarGlobal) source).getInitialValue();
 				if (value != null && value.isIntExpr()) {
 					return value;
 				}
 			}
 
-			return getIntVariable(variable);
+			return getIntVariable(var);
 		}
 
 	}
@@ -245,14 +245,14 @@ public class ConstraintBuilder extends ActorInterpreter {
 	private Network network;
 
 	/**
-	 * a map of name to constraint variables
+	 * a map of name to constraint vars
 	 */
 	private Map<String, IntVariable> variableConstraints;
 
 	/**
-	 * a map of IR variables to constraint variables
+	 * a map of IR vars to constraint vars
 	 */
-	private Map<Variable, Variable> variables;
+	private Map<Var, Var> vars;
 
 	private boolean initializeMode;
 
@@ -260,7 +260,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 		super(new HashMap<String, Expression>(0), actor, null);
 		network = new Network();
 		variableConstraints = new HashMap<String, IntVariable>();
-		variables = new HashMap<Variable, Variable>();
+		vars = new HashMap<Var, Var>();
 	}
 
 	/**
@@ -268,29 +268,29 @@ public class ConstraintBuilder extends ActorInterpreter {
 	 * 
 	 * @param target
 	 *            a target local variable
-	 * @param variable
+	 * @param var
 	 *            a state variable or a port
 	 */
-	private void associateVariable(Variable target, Variable variable) {
-		Variable source = variables.get(target);
+	private void associateVariable(Var target, Var var) {
+		Var source = vars.get(target);
 		if (source == null) {
-			variables.put(target, variable);
+			vars.put(target, var);
 		}
 	}
 
 	/**
 	 * Returns the domain of the given variable, or throws an exception.
 	 * 
-	 * @param variable
+	 * @param var
 	 *            a variable
 	 * @return the domain of the given variable
 	 */
-	private IntDomain getDomain(Variable variable) {
+	private IntDomain getDomain(Var var) {
 		int lo;
 		int hi;
 
-		Expression value = variable.getValue();
-		Type type = variable.getType();
+		Expression value = var.getValue();
+		Type type = var.getType();
 		if (type.isList()) {
 			type = ((TypeList) type).getElementType();
 		}
@@ -328,10 +328,10 @@ public class ConstraintBuilder extends ActorInterpreter {
 		return new IntDomain(lo, hi);
 	}
 
-	private IntVariable getIntVariable(Variable variable) {
-		Variable source = variables.get(variable);
+	private IntVariable getIntVariable(Var var) {
+		Var source = vars.get(var);
 		if (source == null) {
-			source = variable;
+			source = var;
 		}
 
 		IntVariable intVar = variableConstraints.get(source.getName());
@@ -399,7 +399,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 		super.visit(load);
 
 		if (!initializeMode) {
-			Variable source = load.getSource().getVariable();
+			Var source = load.getSource().getVariable();
 			List<Expression> indexes = load.getIndexes();
 			if (!indexes.isEmpty()) {
 				if (indexes.size() != 1) {
@@ -433,18 +433,18 @@ public class ConstraintBuilder extends ActorInterpreter {
 
 		Pattern pattern = action.getInputPattern();
 		for (Port port : pattern.getPorts()) {
-			Variable peeked = pattern.getPeeked(port);
+			Var peeked = pattern.getPeeked(port);
 			if (peeked != null) {
 				// allocate list for peeked
 				peeked.setValue((Expression) peeked.getType().accept(
 						listAllocator));
 
 				// associate variable
-				Variable source = variables.get(peeked);
+				Var source = vars.get(peeked);
 				if (source == null) {
-					source = new LocalVariable(true, 0, new Location(),
+					source = new VarLocal(true, 0, new Location(),
 							port.getName(), port.getType());
-					variables.put(peeked, source);
+					vars.put(peeked, source);
 				}
 			}
 		}

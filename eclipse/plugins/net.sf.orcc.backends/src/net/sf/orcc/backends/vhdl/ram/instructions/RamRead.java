@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.vhdl.ram.instructions;
 
 import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -40,15 +40,15 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  */
 public class RamRead extends RamInstruction implements LocalTargetContainer {
 
-	private LocalVariable target;
+	private VarLocal target;
 
 	@Override
-	public LocalVariable getTarget() {
+	public VarLocal getTarget() {
 		return target;
 	}
 
 	@Override
-	public void internalSetTarget(LocalVariable target) {
+	public void internalSetTarget(VarLocal target) {
 		this.target = target;
 	}
 
@@ -62,7 +62,7 @@ public class RamRead extends RamInstruction implements LocalTargetContainer {
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void setTarget(VarLocal target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 

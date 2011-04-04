@@ -41,7 +41,7 @@ public interface LocalTargetContainer extends User {
 	 * 
 	 * @return the target of this node
 	 */
-	public LocalVariable getTarget();
+	public VarLocal getTarget();
 
 	/**
 	 * Warning: this method is for internal uses only!
@@ -53,7 +53,7 @@ public interface LocalTargetContainer extends User {
 	 * @param target
 	 *            a local variable
 	 */
-	public void internalSetTarget(LocalVariable target);
+	public void internalSetTarget(VarLocal target);
 
 	/**
 	 * Sets the target of this node.
@@ -61,6 +61,6 @@ public interface LocalTargetContainer extends User {
 	 * @param target
 	 *            a local variable
 	 */
-	public void setTarget(LocalVariable target);
+	public void setTarget(VarLocal target);
 
 }

@@ -38,7 +38,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -87,7 +87,7 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 			Expression binExpr = new BinaryExpr(e1, op, e2, type);
 
 			// Make a new assignment to the binary expression
-			LocalVariable target = procedure.newTempLocalVariable(file, type,
+			VarLocal target = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "expr");
 			Assign assign = new Assign(target, binExpr);
 
@@ -107,7 +107,7 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 			BinaryExpr binaryExpr = transformUnaryExpr(expr.getOp(), varExpr);
 
 			// Make a new assignment to the binary expression
-			LocalVariable target = procedure.newTempLocalVariable(file, type,
+			VarLocal target = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "expr");
 			Assign assign = new Assign(target, binaryExpr);
 

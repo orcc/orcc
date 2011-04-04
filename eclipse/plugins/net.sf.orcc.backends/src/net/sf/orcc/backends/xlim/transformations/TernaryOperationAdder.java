@@ -36,7 +36,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Procedure;
@@ -57,7 +57,7 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 public class TernaryOperationAdder extends AbstractActorVisitor {
 
 	private NodeBlock newBlockNode;
-	private LocalVariable condVar;
+	private VarLocal condVar;
 
 	@Override
 	public void visit(Actor actor) {
@@ -99,7 +99,7 @@ public class TernaryOperationAdder extends AbstractActorVisitor {
 
 	@Override
 	public void visit(NodeIf nodeIf) {
-		LocalVariable oldCondVar = condVar;
+		VarLocal oldCondVar = condVar;
 
 		Expression condExpr = nodeIf.getValue();
 		condVar = procedure.newTempLocalVariable(null,

@@ -42,15 +42,15 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM.NextStateInfo;
-import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
@@ -211,8 +211,8 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	 */
 	protected void allocatePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
-			Variable variable = pattern.getVariable(port);
-			variable.setValue((Expression) variable.getType().accept(
+			Var var = pattern.getVariable(port);
+			var.setValue((Expression) var.getType().accept(
 					listAllocator));
 		}
 	}
@@ -334,14 +334,14 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	public void initialize() {
 		try {
 			// Initialize actors parameters with instance map
-			for (Variable param : actor.getParameters()) {
+			for (Var param : actor.getParameters()) {
 				Expression value = parameters.get(param.getName());
 				param.setValue(value);
 			}
 
 			// Check for List state variables which need to be allocated or
 			// initialized
-			for (GlobalVariable stateVar : actor.getStateVars()) {
+			for (VarGlobal stateVar : actor.getStateVars()) {
 				Type type = stateVar.getType();
 				// Initialize variables with constant values
 				Expression initConst = stateVar.getInitialValue();
@@ -390,7 +390,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 		// allocates peeked variables
 		for (Port port : pattern.getPorts()) {
-			Variable peeked = pattern.getPeeked(port);
+			Var peeked = pattern.getPeeked(port);
 			if (peeked != null) {
 				peeked.setValue((Expression) peeked.getType().accept(
 						listAllocator));
@@ -496,7 +496,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	@Override
 	public void visit(Assign instr) {
 		try {
-			LocalVariable target = instr.getTarget();
+			VarLocal target = instr.getTarget();
 			target.setValue((Expression) instr.getValue().accept(
 					exprInterpreter));
 		} catch (OrccRuntimeException e) {
@@ -538,9 +538,9 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				}
 			}
 		} else {
-			List<LocalVariable> procParams = proc.getParameters().getList();
+			List<VarLocal> procParams = proc.getParameters().getList();
 			for (int i = 0; i < callParams.size(); i++) {
-				Variable procVar = procParams.get(i);
+				Var procVar = procParams.get(i);
 				procVar.setValue((Expression) callParams.get(i).accept(
 						exprInterpreter));
 			}
@@ -582,8 +582,8 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Load instr) {
-		LocalVariable target = instr.getTarget();
-		Variable source = instr.getSource().getVariable();
+		VarLocal target = instr.getTarget();
+		Var source = instr.getSource().getVariable();
 		if (instr.getIndexes().isEmpty()) {
 			target.setValue(source.getValue());
 		} else {
@@ -617,7 +617,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 			Class<?>[] parameterTypes = new Class<?>[numParams];
 			Object[] args = new Object[numParams];
 			int i = 0;
-			for (LocalVariable parameter : procedure.getParameters()) {
+			for (VarLocal parameter : procedure.getParameters()) {
 				args[i] = parameter.getValue().accept(
 						new JavaExpressionConverter());
 				parameterTypes[i] = args[i].getClass();
@@ -637,7 +637,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 			}
 		} else {
 			// Allocate local List variables
-			for (Variable local : procedure.getLocals()) {
+			for (Var local : procedure.getLocals()) {
 				Type type = local.getType();
 				if (type.isList()) {
 					local.setValue((Expression) type.accept(listAllocator));
@@ -663,13 +663,13 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Store instr) {
-		Variable variable = instr.getTarget();
+		Var var = instr.getTarget();
 		if (instr.getIndexes().isEmpty()) {
-			variable.setValue((Expression) instr.getValue().accept(
+			var.setValue((Expression) instr.getValue().accept(
 					exprInterpreter));
 		} else {
 			try {
-				Expression target = variable.getValue();
+				Expression target = var.getValue();
 				Iterator<Expression> it = instr.getIndexes().iterator();
 				IntExpr index = (IntExpr) it.next().accept(exprInterpreter);
 				while (it.hasNext()) {

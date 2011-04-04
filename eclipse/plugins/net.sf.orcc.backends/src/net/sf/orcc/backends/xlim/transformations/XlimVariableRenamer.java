@@ -30,7 +30,7 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 
 /**
  * This class defines an extension of VariableRenamer to do specified treatment
@@ -44,9 +44,9 @@ public class XlimVariableRenamer extends VariableRenamer {
 	@Override
 	public void visit(Pattern pattern) {
 		String actionName = action.getName();
-		for (Variable variable : pattern.getVariableMap().values()) {
-			if (!action.getBody().getLocals().getList().contains(variable)) {
-				variable.setName(actionName + "_" + variable.getName());
+		for (Var var : pattern.getVariableMap().values()) {
+			if (!action.getBody().getLocals().getList().contains(var)) {
+				var.setName(actionName + "_" + var.getName());
 			}
 		}
 	}

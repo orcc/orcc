@@ -42,11 +42,11 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
 
@@ -61,7 +61,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 
 	private Map<RAM, List<RamRead>> pendingReads;
 
-	private Map<Variable, RAM> ramMap;
+	private Map<Var, RAM> ramMap;
 
 	/**
 	 * Adds a RamSetAddress instruction before the previous SplitInstruction.
@@ -70,14 +70,14 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 *            RAM
 	 * @param indexes
 	 *            list of indexes
-	 * @param variable
+	 * @param var
 	 *            variable
 	 */
 	private void addEarlySetAddress(List<Expression> indexes, int port,
-			Variable variable) {
+			Var var) {
 		RamSetAddress rsa = new RamSetAddress(indexes);
 		rsa.setPort(port);
-		rsa.setVariable(variable);
+		rsa.setVariable(var);
 
 		// save index
 		int index = itInstruction.nextIndex() + 1;
@@ -124,14 +124,14 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 *            list of indexes
 	 * @param port
 	 *            port used
-	 * @param variable
+	 * @param var
 	 *            variable
 	 */
 	private void addSetAddress(List<Expression> indexes, int port,
-			Variable variable) {
+			Var var) {
 		RamSetAddress rsa = new RamSetAddress(indexes);
 		rsa.setPort(port);
-		rsa.setVariable(variable);
+		rsa.setVariable(var);
 		itInstruction.add(rsa);
 	}
 
@@ -169,18 +169,18 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 */
 	private void convertLoad(Load load) {
 		List<Expression> indexes = load.getIndexes();
-		Variable variable = load.getSource().getVariable();
+		Var var = load.getSource().getVariable();
 
-		RAM ram = ramMap.get(variable);
+		RAM ram = ramMap.get(var);
 		if (ram.isLastAccessRead()) {
 			int port = ram.getLastPortUsed() + 1;
 			ram.setLastPortUsed(port);
 
 			int ajustedPort = port % 2 + 1;
 			if (ram.isWaitCycleNeeded()) {
-				addSetAddress(indexes, ajustedPort, variable);
+				addSetAddress(indexes, ajustedPort, var);
 			} else {
-				addEarlySetAddress(indexes, ajustedPort, variable);
+				addEarlySetAddress(indexes, ajustedPort, var);
 			}
 			addPendingRead(ram, load, ajustedPort);
 
@@ -195,7 +195,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 				executeTwoPendingReads(ram);
 			}
 		} else {
-			addSetAddress(indexes, 1, variable);
+			addSetAddress(indexes, 1, var);
 			addPendingRead(ram, load, 1);
 
 			ram.setLastAccessRead(true);
@@ -212,9 +212,9 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 */
 	private void convertStore(Store store) {
 		List<Expression> indexes = store.getIndexes();
-		Variable variable = store.getTarget();
+		Var var = store.getTarget();
 
-		RAM ram = ramMap.get(variable);
+		RAM ram = ramMap.get(var);
 		int port;
 		if (ram.isLastAccessWrite()) {
 			port = ram.getLastPortUsed() + 1;
@@ -227,7 +227,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 		}
 
 		int ajustedPort = port % 2 + 1;
-		addSetAddress(indexes, ajustedPort, variable);
+		addSetAddress(indexes, ajustedPort, var);
 		addWrite(ram, store, ajustedPort);
 
 		ram.setLastPortUsed(port);
@@ -248,8 +248,8 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	@Override
 	public void visit(Actor actor) {
 		pendingReads = new HashMap<RAM, List<RamRead>>();
-		ramMap = new HashMap<Variable, RAM>();
-		for (GlobalVariable variable : actor.getStateVars()) {
+		ramMap = new HashMap<Var, RAM>();
+		for (VarGlobal variable : actor.getStateVars()) {
 			if (variable.isAssignable() && variable.getType().isList()) {
 				RAM ram = new RAM();
 				ramMap.put(variable, ram);
@@ -265,9 +265,9 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Load load) {
-		Variable variable = load.getSource().getVariable();
-		if (!load.getIndexes().isEmpty() && variable.isAssignable()
-				&& variable.isGlobal()) {
+		Var var = load.getSource().getVariable();
+		if (!load.getIndexes().isEmpty() && var.isAssignable()
+				&& var.isGlobal()) {
 			itInstruction.remove();
 
 			convertLoad(load);
@@ -293,8 +293,8 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Store store) {
-		Variable variable = store.getTarget();
-		if (!store.getIndexes().isEmpty() && variable.isGlobal()) {
+		Var var = store.getTarget();
+		if (!store.getIndexes().isEmpty() && var.isGlobal()) {
 			itInstruction.remove();
 			convertStore(store);
 		}

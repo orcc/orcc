@@ -38,7 +38,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -80,7 +80,7 @@ public class Instantiator implements INetworkTransformation {
 	 */
 	private void checkParameters(Network network) {
 		for (Instance instance : network.getInstances()) {
-			OrderedMap<String, ? extends Variable> parameters;
+			OrderedMap<String, ? extends Var> parameters;
 			if (instance.isActor()) {
 				parameters = instance.getActor().getParameters();
 			} else {
@@ -89,7 +89,7 @@ public class Instantiator implements INetworkTransformation {
 
 			// check all parameters declared have a value
 			Map<String, Expression> values = instance.getParameters();
-			for (Variable parameter : parameters) {
+			for (Var parameter : parameters) {
 				String name = parameter.getName();
 				Expression value = values.get(name);
 				if (value == null) {
@@ -102,7 +102,7 @@ public class Instantiator implements INetworkTransformation {
 
 			// check that the values all reference a parameter
 			for (String name : values.keySet()) {
-				Variable parameter = parameters.get(name);
+				Var parameter = parameters.get(name);
 				if (parameter == null) {
 					throw new OrccRuntimeException("In network \""
 							+ network.getName() + "\": Instance "

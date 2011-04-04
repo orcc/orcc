@@ -38,13 +38,13 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.moc.CSDFMoC;
@@ -85,10 +85,10 @@ public class ActorMerger {
 		}
 
 		private void compareVariables(
-				OrderedMap<String, GlobalVariable> refVariables,
-				OrderedMap<String, GlobalVariable> variables) {
-			for (Variable variable : variables) {
-				String name = variable.getName();
+				OrderedMap<String, VarGlobal> refVariables,
+				OrderedMap<String, VarGlobal> variables) {
+			for (Var var : variables) {
+				String name = var.getName();
 
 				// Check if Global variable name is already used in the
 				// reference actor
@@ -157,18 +157,18 @@ public class ActorMerger {
 	private List<Action> initializes;
 	private OrderedMap<String, Port> inputs;
 	private MultiMap<Port, Port> IntPorts;
-	private Map<Port, GlobalVariable> intVars;
+	private Map<Port, VarGlobal> intVars;
 	private MoC moc;
 	private String name;
 	private OrderedMap<String, Port> outputs;
-	private OrderedMap<String, GlobalVariable> parameters;
+	private OrderedMap<String, VarGlobal> parameters;
 	private OrderedMap<String, Procedure> procs;
 	private int rate;
-	private Map<GlobalVariable, GlobalVariable> readCounts;
+	private Map<VarGlobal, VarGlobal> readCounts;
 	private ActionScheduler scheduler;
-	private OrderedMap<String, GlobalVariable> stateVars;
+	private OrderedMap<String, VarGlobal> stateVars;
 	private OrderedMap<String, Port> toKeep;
-	private Map<GlobalVariable, GlobalVariable> writeCounts;
+	private Map<VarGlobal, VarGlobal> writeCounts;
 
 	/**
 	 * Creates a new actor merger with the given name, inputs and outputs,
@@ -192,11 +192,11 @@ public class ActorMerger {
 		this.extOutputs = outputs;
 		this.IntPorts = internalPorts;
 		this.name = name;
-		this.intVars = new HashMap<Port, GlobalVariable>();
-		this.readCounts = new HashMap<GlobalVariable, GlobalVariable>();
-		this.writeCounts = new HashMap<GlobalVariable, GlobalVariable>();
-		this.parameters = new OrderedMap<String, GlobalVariable>();
-		this.stateVars = new OrderedMap<String, GlobalVariable>();
+		this.intVars = new HashMap<Port, VarGlobal>();
+		this.readCounts = new HashMap<VarGlobal, VarGlobal>();
+		this.writeCounts = new HashMap<VarGlobal, VarGlobal>();
+		this.parameters = new OrderedMap<String, VarGlobal>();
+		this.stateVars = new OrderedMap<String, VarGlobal>();
 		this.inputs = new OrderedMap<String, Port>();
 		this.outputs = new OrderedMap<String, Port>();
 		this.procs = new OrderedMap<String, Procedure>();
@@ -254,7 +254,7 @@ public class ActorMerger {
 				stateVars, procs, actions, initializes, scheduler, moc);
 	}
 
-	private GlobalVariable getInternalStateVar(Port port) {
+	private VarGlobal getInternalStateVar(Port port) {
 		// Check if a state variable has been assigned to the connection
 		for (Port target : IntPorts.get(port)) {
 			if (intVars.containsKey(target)) {
@@ -267,10 +267,10 @@ public class ActorMerger {
 		return null;
 	}
 
-	private GlobalVariable internalizePort(Port port, GlobalVariable portVar,
+	private VarGlobal internalizePort(Port port, VarGlobal portVar,
 			Actor actor) {
-		GlobalVariable readCount;
-		GlobalVariable writeCount;
+		VarGlobal readCount;
+		VarGlobal writeCount;
 
 		// Port has never been internalize, create a new one
 		if (portVar == null) {
@@ -283,19 +283,19 @@ public class ActorMerger {
 			// Set new port var of size tokenSize
 			TypeList typeList = IrFactory.eINSTANCE.createTypeList(size,
 					port.getType());
-			portVar = new GlobalVariable(new Location(), typeList,
+			portVar = new VarGlobal(new Location(), typeList,
 					port.getName(), true);
 
 			// Create an associated read counter access
-			readCount = new GlobalVariable(new Location(),
+			readCount = new VarGlobal(new Location(),
 					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
 							+ "_read", true, new IntExpr(0));
 
 			// Create an associated write counter access
-			readCount = new GlobalVariable(new Location(),
+			readCount = new VarGlobal(new Location(),
 					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
 							+ "_read", true, new IntExpr(0));
-			writeCount = new GlobalVariable(new Location(),
+			writeCount = new VarGlobal(new Location(),
 					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
 							+ "_write", true, new IntExpr(0));
 
@@ -344,8 +344,8 @@ public class ActorMerger {
 				toKeep.put(port.getName(), port);
 			} else {
 				// Port is internal, merge to state variable
-				GlobalVariable portVar = getInternalStateVar(candidatePort);
-				GlobalVariable internalVar = internalizePort(port, portVar,
+				VarGlobal portVar = getInternalStateVar(candidatePort);
+				VarGlobal internalVar = internalizePort(port, portVar,
 						actor);
 				intVars.put(candidatePort, internalVar);
 			}
@@ -367,8 +367,8 @@ public class ActorMerger {
 				toKeep.put(port.getName(), port);
 			} else {
 				// Port is internal, merge to state variable
-				GlobalVariable portVar = getInternalStateVar(candidatePort);
-				GlobalVariable internalVar = internalizePort(port, portVar,
+				VarGlobal portVar = getInternalStateVar(candidatePort);
+				VarGlobal internalVar = internalizePort(port, portVar,
 						actor);
 				intVars.put(candidatePort, internalVar);
 			}

@@ -41,10 +41,10 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.FSM.Transition;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -62,7 +62,7 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -182,7 +182,7 @@ public class IRCloner {
 		@Override
 		public Object interpret(Assign assign, Object... args) {
 			Location location = cloneLocation(assign.getLocation());
-			LocalVariable target = getLocalVar(assign.getTarget());
+			VarLocal target = getLocalVar(assign.getTarget());
 			Expression value = cloneExpression(assign.getValue());
 
 			return new Assign(location, target, value);
@@ -192,7 +192,7 @@ public class IRCloner {
 		public Object interpret(Call call, Object... args) {
 			Location location = cloneLocation(call.getLocation());
 			Procedure procedure = getProcedure(call.getProcedure());
-			LocalVariable target = null;
+			VarLocal target = null;
 
 			if (call.getTarget() != null) {
 				target = getLocalVar(call.getTarget());
@@ -206,7 +206,7 @@ public class IRCloner {
 		@Override
 		public Object interpret(Load load, Object... args) {
 			Location location = cloneLocation(load.getLocation());
-			LocalVariable target = getLocalVar(load.getTarget());
+			VarLocal target = getLocalVar(load.getTarget());
 			Use source = new Use(getVar(load.getSource().getVariable()));
 			List<Expression> indexes = cloneExpressions(load.getIndexes());
 
@@ -216,7 +216,7 @@ public class IRCloner {
 		@Override
 		public Object interpret(PhiAssignment phi, Object... args) {
 			Location location = cloneLocation(phi.getLocation());
-			LocalVariable target = getLocalVar(phi.getTarget());
+			VarLocal target = getLocalVar(phi.getTarget());
 			List<Expression> values = cloneExpressions(phi.getValues());
 
 			return new PhiAssignment(location, target, values);
@@ -245,7 +245,7 @@ public class IRCloner {
 		@Override
 		public Object interpret(Store store, Object... args) {
 			Location location = cloneLocation(store.getLocation());
-			Variable target = getVar(store.getTarget());
+			Var target = getVar(store.getTarget());
 			List<Expression> indexes = cloneExpressions(store.getIndexes());
 			Expression value = cloneExpression(store.getValue());
 
@@ -428,19 +428,19 @@ public class IRCloner {
 
 	private static Actor clone;
 
-	private static OrderedMap<String, LocalVariable> localVars;
+	private static OrderedMap<String, VarLocal> localVars;
 
-	private static OrderedMap<String, Variable> patternVars;
+	private static OrderedMap<String, Var> patternVars;
 
-	private static OrderedMap<String, Variable> peekedVars;
+	private static OrderedMap<String, Var> peekedVars;
 
-	private static OrderedMap<String, GlobalVariable> parameters;
+	private static OrderedMap<String, VarGlobal> parameters;
 
 	private static OrderedMap<String, Port> ports;
 
 	private static OrderedMap<String, Procedure> procs;
 
-	private static OrderedMap<String, GlobalVariable> stateVars;
+	private static OrderedMap<String, VarGlobal> stateVars;
 
 	private static List<Action> untaggedActions;
 
@@ -558,18 +558,18 @@ public class IRCloner {
 	 *            a local variable
 	 * @return the corresponding cloned local variable
 	 */
-	private static LocalVariable getLocalVar(LocalVariable variable) {
+	private static VarLocal getLocalVar(VarLocal variable) {
 		if (localVars.contains(variable.getName())) {
 			return localVars.get(variable.getName());
 		}
 
 		// The local variable corresponds to a pattern
 		if (patternVars.contains(variable.getName())) {
-			return (LocalVariable) patternVars.get(variable.getName());
+			return (VarLocal) patternVars.get(variable.getName());
 		}
 
 		// The local variable corresponds to a peeked variable
-		return (LocalVariable) peekedVars.get(variable.getName());
+		return (VarLocal) peekedVars.get(variable.getName());
 	}
 
 	/**
@@ -597,21 +597,21 @@ public class IRCloner {
 	/**
 	 * Returns the cloned variable that corresponds to the variable.
 	 * 
-	 * @param variable
+	 * @param var
 	 *            a variable
 	 * @return the corresponding cloned variable
 	 */
-	private static Variable getVar(Variable variable) {
-		if (!variable.isGlobal()) {
-			return getLocalVar((LocalVariable) variable);
+	private static Var getVar(Var var) {
+		if (!var.isGlobal()) {
+			return getLocalVar((VarLocal) var);
 		}
 
-		if (stateVars.contains(variable.getName())) {
-			return stateVars.get(variable.getName());
+		if (stateVars.contains(var.getName())) {
+			return stateVars.get(var.getName());
 		}
 
-		if (parameters.contains(variable.getName())) {
-			return parameters.get(variable.getName());
+		if (parameters.contains(var.getName())) {
+			return parameters.get(var.getName());
 		}
 
 		return null;
@@ -701,8 +701,8 @@ public class IRCloner {
 	 * @return a clone action
 	 */
 	public Action cloneAction(Action action) {
-		patternVars = new OrderedMap<String, Variable>();
-		peekedVars = new OrderedMap<String, Variable>();
+		patternVars = new OrderedMap<String, Var>();
+		peekedVars = new OrderedMap<String, Var>();
 
 		Location location = cloneLocation(action.getLocation());
 		Tag tag = cloneActionTag(action.getTag());
@@ -735,12 +735,12 @@ public class IRCloner {
 			clonePattern.setNumTokens(clonedPort, pattern.getNumTokens(port));
 
 			// Clone pattern variables
-			Variable peeked = pattern.getPeeked(port);
+			Var peeked = pattern.getPeeked(port);
 			if (peeked != null) {
 				clonePattern.setPeeked(clonedPort, clonePeekedVar(peeked));
 			}
 
-			Variable var = pattern.getVariable(port);
+			Var var = pattern.getVariable(port);
 			if (var != null) {
 				clonePattern.setVariable(clonedPort, clonePatternVar(var));
 			}
@@ -757,9 +757,9 @@ public class IRCloner {
 	 * 
 	 * @return the cloned pattern variable
 	 */
-	public LocalVariable clonePatternVar(Variable patternVar) {
+	public VarLocal clonePatternVar(Var patternVar) {
 		// Clone variables associated to ports
-		LocalVariable cloneVar = cloneLocalVariable((LocalVariable) patternVar);
+		VarLocal cloneVar = cloneLocalVariable((VarLocal) patternVar);
 
 		// Store the cloned variable
 		patternVars.put(cloneVar.getName(), cloneVar);
@@ -775,9 +775,9 @@ public class IRCloner {
 	 * 
 	 * @return the cloned peeked variable
 	 */
-	public LocalVariable clonePeekedVar(Variable peekedVar) {
+	public VarLocal clonePeekedVar(Var peekedVar) {
 		// Clone variables associated to ports
-		LocalVariable cloneVar = cloneLocalVariable((LocalVariable) peekedVar);
+		VarLocal cloneVar = cloneLocalVariable((VarLocal) peekedVar);
 
 		// Store the cloned variable
 		peekedVars.put(cloneVar.getName(), cloneVar);
@@ -881,7 +881,7 @@ public class IRCloner {
 	 *            the variable to clone
 	 * @return the cloned variables
 	 */
-	public GlobalVariable cloneGlobalVariable(GlobalVariable variable) {
+	public VarGlobal cloneGlobalVariable(VarGlobal variable) {
 		Location location = cloneLocation(variable.getLocation());
 		Type type = cloneType(variable.getType());
 
@@ -893,7 +893,7 @@ public class IRCloner {
 			constant = cloneExpression(variable.getInitialValue());
 		}
 
-		return new GlobalVariable(location, type, variable.getName(),
+		return new VarGlobal(location, type, variable.getName(),
 				variable.isAssignable(), constant);
 	}
 
@@ -904,12 +904,12 @@ public class IRCloner {
 	 *            an OrderedMap of variable to clone
 	 * @return the cloned variables
 	 */
-	public OrderedMap<String, GlobalVariable> cloneGlobalVariables(
-			OrderedMap<String, GlobalVariable> variables) {
-		OrderedMap<String, GlobalVariable> cloneMap = new OrderedMap<String, GlobalVariable>();
+	public OrderedMap<String, VarGlobal> cloneGlobalVariables(
+			OrderedMap<String, VarGlobal> variables) {
+		OrderedMap<String, VarGlobal> cloneMap = new OrderedMap<String, VarGlobal>();
 
-		for (GlobalVariable variable : variables) {
-			GlobalVariable duplicateVar = cloneGlobalVariable(variable);
+		for (VarGlobal variable : variables) {
+			VarGlobal duplicateVar = cloneGlobalVariable(variable);
 			cloneMap.put(duplicateVar.getName(), duplicateVar);
 		}
 
@@ -940,11 +940,11 @@ public class IRCloner {
 	 *            the variable to clone
 	 * @return the cloned variables
 	 */
-	public LocalVariable cloneLocalVariable(LocalVariable variable) {
+	public VarLocal cloneLocalVariable(VarLocal variable) {
 		Location location = cloneLocation(variable.getLocation());
 		Type type = cloneType(variable.getType());
 
-		return new LocalVariable(variable.isAssignable(), variable.getIndex(),
+		return new VarLocal(variable.isAssignable(), variable.getIndex(),
 				location, variable.getBaseName(), type);
 	}
 
@@ -955,12 +955,12 @@ public class IRCloner {
 	 *            an ordered map of variables
 	 * @return the cloned ordered map
 	 */
-	public OrderedMap<String, LocalVariable> cloneLocalVariables(
-			OrderedMap<String, LocalVariable> variables) {
-		OrderedMap<String, LocalVariable> cloneMap = new OrderedMap<String, LocalVariable>();
+	public OrderedMap<String, VarLocal> cloneLocalVariables(
+			OrderedMap<String, VarLocal> variables) {
+		OrderedMap<String, VarLocal> cloneMap = new OrderedMap<String, VarLocal>();
 
-		for (LocalVariable variable : variables) {
-			LocalVariable cloneVar = cloneLocalVariable(variable);
+		for (VarLocal variable : variables) {
+			VarLocal cloneVar = cloneLocalVariable(variable);
 			cloneMap.put(cloneVar.getName(), cloneVar);
 		}
 
@@ -1025,13 +1025,13 @@ public class IRCloner {
 	public Procedure cloneProcedure(Procedure procedure) {
 		Type returnType = cloneType(procedure.getReturnType());
 
-		OrderedMap<String, LocalVariable> parameters = cloneLocalVariables(procedure
+		OrderedMap<String, VarLocal> parameters = cloneLocalVariables(procedure
 				.getParameters());
-		OrderedMap<String, LocalVariable> locals = cloneLocalVariables(procedure
+		OrderedMap<String, VarLocal> locals = cloneLocalVariables(procedure
 				.getLocals());
 
 		// Store all local variable for a later link
-		localVars = new OrderedMap<String, LocalVariable>();
+		localVars = new OrderedMap<String, VarLocal>();
 		localVars.putAll(parameters);
 		localVars.putAll(locals);
 

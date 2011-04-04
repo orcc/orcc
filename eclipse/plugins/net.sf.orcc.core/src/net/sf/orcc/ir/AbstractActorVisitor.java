@@ -110,7 +110,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 * @return <code>true</code> if the variable is not in the locals nor
 	 *         parameters of the current procedure
 	 */
-	final public boolean isPort(LocalVariable variable) {
+	final public boolean isPort(VarLocal variable) {
 		if (action != null) {
 			return action.getInputPattern().contains(variable)
 					|| action.getOutputPattern().contains(variable);

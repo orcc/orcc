@@ -39,7 +39,7 @@ import java.util.TreeMap;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
@@ -404,8 +404,8 @@ public class XDFWriter {
 	 * @throws OrccException
 	 */
 	private void writeDecls(Element parent, String kind,
-			OrderedMap<String, GlobalVariable> variables) throws OrccException {
-		for (GlobalVariable variable : variables) {
+			OrderedMap<String, VarGlobal> variables) throws OrccException {
+		for (VarGlobal variable : variables) {
 			Element decl = document.createElement("Decl");
 			parent.appendChild(decl);
 
@@ -584,7 +584,7 @@ public class XDFWriter {
 		writePorts(xdf, "Input", network.getInputs());
 		writePorts(xdf, "Output", network.getOutputs());
 		writeDecls(xdf, "Param", network.getParameters());
-		writeDecls(xdf, "Variable", network.getVariables());
+		writeDecls(xdf, "Var", network.getVariables());
 
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {

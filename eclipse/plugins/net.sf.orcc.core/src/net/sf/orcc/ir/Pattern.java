@@ -48,30 +48,30 @@ public class Pattern {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Map<Variable, Port> inverseVariableMap;
+	private Map<Var, Port> inverseVariableMap;
 
 	private Map<Port, Integer> numTokensMap;
 
-	private Map<Port, Variable> peekedMap;
+	private Map<Port, Var> peekedMap;
 
 	private List<Port> ports;
 
-	private Map<Port, Variable> variableMap;
+	private Map<Port, Var> variableMap;
 
 	public Pattern() {
 		ports = new ArrayList<Port>();
 		numTokensMap = new LinkedHashMap<Port, Integer>();
-		peekedMap = new LinkedHashMap<Port, Variable>();
-		variableMap = new LinkedHashMap<Port, Variable>();
-		inverseVariableMap = new LinkedHashMap<Variable, Port>();
+		peekedMap = new LinkedHashMap<Port, Var>();
+		variableMap = new LinkedHashMap<Port, Var>();
+		inverseVariableMap = new LinkedHashMap<Var, Port>();
 	}
 
 	public Pattern(int initialCapacity) {
 		ports = new ArrayList<Port>(initialCapacity);
 		numTokensMap = new LinkedHashMap<Port, Integer>(initialCapacity);
-		peekedMap = new LinkedHashMap<Port, Variable>(initialCapacity);
-		variableMap = new LinkedHashMap<Port, Variable>(initialCapacity);
-		inverseVariableMap = new LinkedHashMap<Variable, Port>(initialCapacity);
+		peekedMap = new LinkedHashMap<Port, Var>(initialCapacity);
+		variableMap = new LinkedHashMap<Port, Var>(initialCapacity);
+		inverseVariableMap = new LinkedHashMap<Var, Port>(initialCapacity);
 	}
 
 	/**
@@ -112,12 +112,12 @@ public class Pattern {
 	/**
 	 * Returns <code>true</code> if this pattern contains the given variable.
 	 * 
-	 * @param variable
+	 * @param var
 	 *            a variable
 	 * @return <code>true</code> if this pattern contains the given variable
 	 */
-	public boolean contains(Variable variable) {
-		return inverseVariableMap.containsKey(variable);
+	public boolean contains(Var var) {
+		return inverseVariableMap.containsKey(var);
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class Pattern {
 	 * 
 	 * @return the inverse variable map
 	 */
-	public Map<Variable, Port> getInverseVariableMap() {
+	public Map<Var, Port> getInverseVariableMap() {
 		return inverseVariableMap;
 	}
 
@@ -162,7 +162,7 @@ public class Pattern {
 	 * 
 	 * @return the variable that contains the tokens peeked by the given port
 	 */
-	public Variable getPeeked(Port port) {
+	public Var getPeeked(Port port) {
 		return peekedMap.get(port);
 	}
 
@@ -171,7 +171,7 @@ public class Pattern {
 	 * 
 	 * @return the peeked map
 	 */
-	public Map<Port, Variable> getPeekedMap() {
+	public Map<Port, Var> getPeekedMap() {
 		return peekedMap;
 	}
 
@@ -191,7 +191,7 @@ public class Pattern {
 	 * @return the variable that contains tokens produced (or consumed) by the
 	 *         given port
 	 */
-	public Variable getVariable(Port port) {
+	public Var getVariable(Port port) {
 		return variableMap.get(port);
 	}
 
@@ -200,7 +200,7 @@ public class Pattern {
 	 * 
 	 * @return the variable map
 	 */
-	public Map<Port, Variable> getVariableMap() {
+	public Map<Port, Var> getVariableMap() {
 		return variableMap;
 	}
 
@@ -253,12 +253,12 @@ public class Pattern {
 	public void remove(Port port) {
 		ports.remove(port);
 		numTokensMap.remove(port);
-		Variable peek = peekedMap.remove(port);
-		Variable variable = variableMap.remove(port);
+		Var peek = peekedMap.remove(port);
+		Var var = variableMap.remove(port);
 
 		// Remove peek and variable entry from inverseVariableMap
 		inverseVariableMap.remove(peek);
-		inverseVariableMap.remove(variable);
+		inverseVariableMap.remove(var);
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class Pattern {
 	 * @param peeked
 	 *            a variable that contains tokens peeked by the given port
 	 */
-	public void setPeeked(Port port, Variable peeked) {
+	public void setPeeked(Port port, Var peeked) {
 		checkPortPresence(port);
 		peekedMap.put(port, peeked);
 		inverseVariableMap.put(peeked, port);
@@ -294,14 +294,14 @@ public class Pattern {
 	 * 
 	 * @param port
 	 *            a port
-	 * @param variable
+	 * @param var
 	 *            the variable that contains tokens produced (or consumed) by
 	 *            the given port
 	 */
-	public void setVariable(Port port, Variable variable) {
+	public void setVariable(Port port, Var var) {
 		checkPortPresence(port);
-		variableMap.put(port, variable);
-		inverseVariableMap.put(variable, port);
+		variableMap.put(port, var);
+		inverseVariableMap.put(var, port);
 	}
 
 	@Override

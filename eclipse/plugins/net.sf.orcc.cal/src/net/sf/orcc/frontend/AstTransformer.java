@@ -63,10 +63,10 @@ import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -75,7 +75,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -113,7 +113,7 @@ public class AstTransformer {
 
 		private List<Expression> indexes;
 
-		private Variable target;
+		private Var target;
 
 		public ExpressionTransformer() {
 			indexes = new ArrayList<Expression>();
@@ -148,7 +148,7 @@ public class AstTransformer {
 			Procedure calledProcedure = mapFunctions.get(astFunction);
 
 			// generates a new target
-			LocalVariable target = procedure.newTempLocalVariable(file,
+			VarLocal target = procedure.newTempLocalVariable(file,
 					calledProcedure.getReturnType(),
 					"call_" + calledProcedure.getName());
 
@@ -169,7 +169,7 @@ public class AstTransformer {
 			Expression condition = transformExpression(expression
 					.getCondition());
 
-			Variable currentTarget = target;
+			Var currentTarget = target;
 			List<Expression> currentIndexes = indexes;
 
 			Type type = expression.getIrType();
@@ -220,19 +220,19 @@ public class AstTransformer {
 
 			Location location = Util.getLocation(expression);
 			AstVariable astVariable = expression.getSource().getVariable();
-			Variable variable = context.getVariable(astVariable);
-			if (variable == null) {
-				variable = transformGlobalVariable(astVariable);
+			Var var = context.getVariable(astVariable);
+			if (var == null) {
+				var = transformGlobalVariable(astVariable);
 			}
 
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
 
-			LocalVariable target = context.getProcedure()
+			VarLocal target = context.getProcedure()
 					.newTempLocalVariable(file, expression.getIrType(),
-							"local_" + variable.getName());
+							"local_" + var.getName());
 
-			Load load = new Load(location, target, new Use(variable), indexes);
+			Load load = new Load(location, target, new Use(var), indexes);
 			addInstruction(load);
 
 			Use use = new Use(target);
@@ -249,7 +249,7 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionList(AstExpressionList astExpression) {
-			Variable currentTarget = target;
+			Var currentTarget = target;
 			List<Expression> currentIndexes = indexes;
 
 			List<AstExpression> expressions = astExpression.getExpressions();
@@ -297,24 +297,24 @@ public class AstTransformer {
 				AstExpressionVariable expression) {
 			AstVariable astVariable = expression.getValue().getVariable();
 
-			Variable variable = context.getVariable(astVariable);
-			if (variable == null) {
-				variable = globals.get(astVariable.getName());
-				if (variable == null) {
-					variable = transformGlobalVariable(astVariable);
+			Var var = context.getVariable(astVariable);
+			if (var == null) {
+				var = globals.get(astVariable.getName());
+				if (var == null) {
+					var = transformGlobalVariable(astVariable);
 				}
 			}
 
-			if (variable.getType().isList()) {
-				Use use = new Use(variable);
+			if (var.getType().isList()) {
+				Use use = new Use(var);
 				Expression varExpr = new VarExpr(use);
 				return varExpr;
 			} else {
-				Variable v = null;
+				Var v = null;
 				if (context.getProcedure() != null) {
-					v = getLocalVariable(variable, false);
+					v = getLocalVariable(var, false);
 				} else {
-					v = variable;
+					v = var;
 				}
 				Use use = new Use(v);
 				Expression varExpr = new VarExpr(use);
@@ -441,7 +441,7 @@ public class AstTransformer {
 		 * @param indexes
 		 *            a list of indexes
 		 */
-		public void setTarget(Variable target, List<Expression> indexes) {
+		public void setTarget(Var target, List<Expression> indexes) {
 			this.target = target;
 			this.indexes = indexes;
 		}
@@ -456,7 +456,7 @@ public class AstTransformer {
 		 */
 		private void transformListGenerators(List<AstExpression> expressions,
 				List<AstGenerator> generators) {
-			Variable currentTarget = target;
+			Var currentTarget = target;
 			List<Expression> currentIndexes = indexes;
 
 			indexes = new ArrayList<Expression>(currentIndexes);
@@ -467,7 +467,7 @@ public class AstTransformer {
 			Expression index = null;
 			for (AstGenerator generator : generators) {
 				AstVariable astVariable = generator.getVariable();
-				LocalVariable loopVar = transformLocalVariable(astVariable);
+				VarLocal loopVar = transformLocalVariable(astVariable);
 				procedure.getLocals().put(file, loopVar.getLocation(),
 						loopVar.getName(), loopVar);
 
@@ -508,7 +508,7 @@ public class AstTransformer {
 
 				// assigns the loop variable its initial value
 				AstVariable astVariable = generator.getVariable();
-				LocalVariable loopVar = (LocalVariable) context
+				VarLocal loopVar = (VarLocal) context
 						.getVariable(astVariable);
 
 				// condition
@@ -561,7 +561,7 @@ public class AstTransformer {
 		 *            a list of AST expressions
 		 */
 		private void transformListSimple(List<AstExpression> expressions) {
-			Variable currentTarget = target;
+			Var currentTarget = target;
 			List<Expression> currentIndexes = indexes;
 
 			int i = 0;
@@ -647,7 +647,7 @@ public class AstTransformer {
 
 			// get target
 			AstVariable astTarget = astAssign.getTarget().getVariable();
-			Variable target = context.getVariable(astTarget);
+			Var target = context.getVariable(astTarget);
 			if (target == null) {
 				target = transformGlobalVariable(astTarget);
 			}
@@ -694,7 +694,7 @@ public class AstTransformer {
 
 			// creates loop variable and assigns it
 			AstVariable astVariable = foreach.getVariable();
-			LocalVariable loopVar = transformLocalVariable(astVariable);
+			VarLocal loopVar = transformLocalVariable(astVariable);
 			procedure.getLocals().put(file, loopVar.getLocation(),
 					loopVar.getName(), loopVar);
 
@@ -856,7 +856,7 @@ public class AstTransformer {
 	/**
 	 * a map of global variables (parameters and state variables)
 	 */
-	private OrderedMap<String, GlobalVariable> globals;
+	private OrderedMap<String, VarGlobal> globals;
 
 	private Procedure initialize;
 
@@ -940,7 +940,7 @@ public class AstTransformer {
 		initialize = null;
 	}
 
-	private void createAssignOrStore(Location location, Variable target,
+	private void createAssignOrStore(Location location, Var target,
 			List<Expression> indexes, Expression value) {
 		// special case for list expressions
 		if (value.isVarExpr()) {
@@ -953,7 +953,7 @@ public class AstTransformer {
 
 		Instruction instruction;
 		if (indexes == null || indexes.isEmpty()) {
-			LocalVariable local = getLocalVariable(target, true);
+			VarLocal local = getLocalVariable(target, true);
 			instruction = new Assign(location, local, value);
 		} else {
 			instruction = new Store(location, target, indexes, value);
@@ -973,15 +973,15 @@ public class AstTransformer {
 	 * @param expressions
 	 *            arguments
 	 */
-	private void createCall(Location location, LocalVariable target,
+	private void createCall(Location location, VarLocal target,
 			Procedure procedure, List<AstExpression> expressions) {
 		// transform parameters
 		List<Expression> parameters = transformExpressions(expressions);
 
 		// stores variables that have been loaded and modified, and are loaded
 		// by the procedure
-		for (Variable global : procedure.getLoadedVariables()) {
-			LocalVariable local = context.getMapGlobals().get(global);
+		for (Var global : procedure.getLoadedVariables()) {
+			VarLocal local = context.getMapGlobals().get(global);
 			if (local != null
 					&& context.getSetGlobalsToStore().contains(global)) {
 				// variable already loaded somewhere and modified
@@ -998,8 +998,8 @@ public class AstTransformer {
 		addInstruction(call);
 
 		// loads variables that are stored by the procedure
-		for (Variable global : procedure.getStoredVariables()) {
-			LocalVariable local = context.getMapGlobals().get(global);
+		for (Var global : procedure.getStoredVariables()) {
+			VarLocal local = context.getMapGlobals().get(global);
 			if (local == null) {
 				// creates a new local variable
 				local = context.getProcedure().newTempLocalVariable(file,
@@ -1045,31 +1045,31 @@ public class AstTransformer {
 	 * set of globals to load, and if <code>isStored</code> is <code>true</code>
 	 * , the variable is added to the set of variables to store, too.
 	 * 
-	 * @param variable
+	 * @param var
 	 *            an IR variable, possibly global
 	 * @param isStored
 	 *            <code>true</code> if the variable is stored,
 	 *            <code>false</code> otherwise
 	 * @return a local IR variable
 	 */
-	private LocalVariable getLocalVariable(Variable variable, boolean isStored) {
-		if (variable.isGlobal()) {
-			LocalVariable local = context.getMapGlobals().get(variable);
+	private VarLocal getLocalVariable(Var var, boolean isStored) {
+		if (var.isGlobal()) {
+			VarLocal local = context.getMapGlobals().get(var);
 			if (local == null) {
 				local = context.getProcedure().newTempLocalVariable(file,
-						variable.getType(), "local_" + variable.getName());
-				context.getMapGlobals().put(variable, local);
+						var.getType(), "local_" + var.getName());
+				context.getMapGlobals().put(var, local);
 			}
 
-			context.getSetGlobalsToLoad().add(variable);
+			context.getSetGlobalsToLoad().add(var);
 			if (isStored) {
-				context.getSetGlobalsToStore().add(variable);
+				context.getSetGlobalsToStore().add(var);
 			}
 
 			return local;
 		}
 
-		return (LocalVariable) variable;
+		return (VarLocal) var;
 	}
 
 	/**
@@ -1137,8 +1137,8 @@ public class AstTransformer {
 	 */
 	private void loadGlobals() {
 		int i = 0;
-		for (Variable global : context.getSetGlobalsToLoad()) {
-			LocalVariable local = context.getMapGlobals().get(global);
+		for (Var global : context.getSetGlobalsToLoad()) {
+			VarLocal local = context.getMapGlobals().get(global);
 
 			Load load = new Load(local, new Use(global));
 			NodeBlock block = context.getProcedure().getFirst();
@@ -1214,7 +1214,7 @@ public class AstTransformer {
 	 * @param globals
 	 *            a map
 	 */
-	public void setGlobalsMap(OrderedMap<String, GlobalVariable> globals) {
+	public void setGlobalsMap(OrderedMap<String, VarGlobal> globals) {
 		this.globals = globals;
 	}
 
@@ -1222,8 +1222,8 @@ public class AstTransformer {
 	 * Writes back the globals that need to be stored.
 	 */
 	private void storeGlobals() {
-		for (Variable global : context.getSetGlobalsToStore()) {
-			LocalVariable local = context.getMapGlobals().get(global);
+		for (Var global : context.getSetGlobalsToStore()) {
+			VarLocal local = context.getMapGlobals().get(global);
 			VarExpr value = new VarExpr(new Use(local));
 			Location location = global.getLocation();
 
@@ -1245,7 +1245,7 @@ public class AstTransformer {
 	 * @return an IR expression
 	 */
 	public Expression transformExpression(AstExpression expression) {
-		Variable target = exprTransformer.target;
+		Var target = exprTransformer.target;
 		List<Expression> indexes = exprTransformer.indexes;
 		Expression result = exprTransformer.doSwitch(expression);
 		exprTransformer.target = target;
@@ -1295,7 +1295,7 @@ public class AstTransformer {
 		if (astFunction.isNative()) {
 			value = null;
 		} else {
-			Variable target = exprTransformer.target;
+			Var target = exprTransformer.target;
 			List<Expression> indexes = exprTransformer.indexes;
 			exprTransformer.clearTarget();
 			value = transformExpression(astFunction.getExpression());
@@ -1322,7 +1322,7 @@ public class AstTransformer {
 	 *            a list of AST state variables
 	 * @return an ordered map of IR state variables
 	 */
-	public GlobalVariable transformGlobalVariable(AstVariable astVariable) {
+	public VarGlobal transformGlobalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
 		AstType astType = astVariable.getType();
 		Type type = astVariable.getIrType();
@@ -1353,11 +1353,11 @@ public class AstTransformer {
 		}
 
 		// create state variable
-		GlobalVariable variable = new GlobalVariable(location, type, name,
+		VarGlobal variable = new VarGlobal(location, type, name,
 				assignable, initialValue);
 
 		// registers the global variable in the outermost scope
-		Scope<AstVariable, Variable> top = context.getMapVariables();
+		Scope<AstVariable, Var> top = context.getMapVariables();
 		while (top.getParent() != null) {
 			top = top.getParent();
 		}
@@ -1396,7 +1396,7 @@ public class AstTransformer {
 	 *            an AST variable
 	 * @return the IR local variable created
 	 */
-	public LocalVariable transformLocalVariable(AstVariable astVariable) {
+	public VarLocal transformLocalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
 
 		String name = getQualifiedName(astVariable);
@@ -1405,7 +1405,7 @@ public class AstTransformer {
 		Type type = astVariable.getIrType();
 
 		// create local variable with the given name
-		LocalVariable local = new LocalVariable(assignable, 0, location, name,
+		VarLocal local = new VarLocal(assignable, 0, location, name,
 				type);
 
 		AstExpression value = astVariable.getValue();
@@ -1429,7 +1429,7 @@ public class AstTransformer {
 	 */
 	public void transformLocalVariables(List<AstVariable> variables) {
 		for (AstVariable astVariable : variables) {
-			LocalVariable local = transformLocalVariable(astVariable);
+			VarLocal local = transformLocalVariable(astVariable);
 			context.getProcedure().getLocals()
 					.put(file, local.getLocation(), local.getName(), local);
 		}
@@ -1444,7 +1444,7 @@ public class AstTransformer {
 	 */
 	private void transformParameters(List<AstVariable> parameters) {
 		for (AstVariable astParameter : parameters) {
-			LocalVariable local = transformLocalVariable(astParameter);
+			VarLocal local = transformLocalVariable(astParameter);
 			context.getProcedure().getParameters()
 					.put(file, local.getLocation(), local.getName(), local);
 		}

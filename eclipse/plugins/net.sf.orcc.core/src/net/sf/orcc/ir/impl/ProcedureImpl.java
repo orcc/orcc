@@ -15,15 +15,15 @@ import java.util.Set;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
@@ -63,36 +63,36 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	private class ProcVisitor extends AbstractActorVisitor {
 
-		private Set<GlobalVariable> loadedVariables;
+		private Set<VarGlobal> loadedVariables;
 
-		private Set<GlobalVariable> storedVariables;
+		private Set<VarGlobal> storedVariables;
 
 		public ProcVisitor() {
-			storedVariables = new HashSet<GlobalVariable>();
-			loadedVariables = new HashSet<GlobalVariable>();
+			storedVariables = new HashSet<VarGlobal>();
+			loadedVariables = new HashSet<VarGlobal>();
 		}
 
-		public List<GlobalVariable> getLoadedVariables() {
-			return new ArrayList<GlobalVariable>(loadedVariables);
+		public List<VarGlobal> getLoadedVariables() {
+			return new ArrayList<VarGlobal>(loadedVariables);
 		}
 
-		public List<GlobalVariable> getStoredVariables() {
-			return new ArrayList<GlobalVariable>(storedVariables);
+		public List<VarGlobal> getStoredVariables() {
+			return new ArrayList<VarGlobal>(storedVariables);
 		}
 
 		@Override
 		public void visit(Load node) {
-			Variable var = node.getSource().getVariable();
+			Var var = node.getSource().getVariable();
 			if (!var.getType().isList()) {
-				loadedVariables.add((GlobalVariable) var);
+				loadedVariables.add((VarGlobal) var);
 			}
 		}
 
 		@Override
 		public void visit(Store store) {
-			Variable var = store.getTarget();
+			Var var = store.getTarget();
 			if (!var.getType().isList()) {
-				storedVariables.add((GlobalVariable) var);
+				storedVariables.add((VarGlobal) var);
 			}
 		}
 
@@ -112,7 +112,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	/**
 	 * ordered map of local variables
 	 */
-	private OrderedMap<String, LocalVariable> locals;
+	private OrderedMap<String, VarLocal> locals;
 
 	/**
 	 * The cached value of the '{@link #getLocation() <em>Location</em>}' attribute.
@@ -153,7 +153,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	/**
 	 * ordered map of parameters
 	 */
-	private OrderedMap<String, LocalVariable> parameters;
+	private OrderedMap<String, VarLocal> parameters;
 
 	private Expression result;
 
@@ -394,7 +394,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * 
 	 * @return the list of scalar variables loaded by this procedure
 	 */
-	public List<GlobalVariable> getLoadedVariables() {
+	public List<VarGlobal> getLoadedVariables() {
 		ProcVisitor visitor = new ProcVisitor();
 		visitor.visit(nodes);
 		return visitor.getLoadedVariables();
@@ -405,7 +405,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * 
 	 * @return the local variables of this procedure as an ordered map
 	 */
-	public OrderedMap<String, LocalVariable> getLocals() {
+	public OrderedMap<String, VarLocal> getLocals() {
 		return locals;
 	}
 
@@ -441,7 +441,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * 
 	 * @return the parameters of this procedure as an ordered map
 	 */
-	public OrderedMap<String, LocalVariable> getParameters() {
+	public OrderedMap<String, VarLocal> getParameters() {
 		return parameters;
 	}
 
@@ -478,7 +478,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * 
 	 * @return the list of scalar variables stored by this procedure
 	 */
-	public List<GlobalVariable> getStoredVariables() {
+	public List<VarGlobal> getStoredVariables() {
 		ProcVisitor visitor = new ProcVisitor();
 		visitor.visit(nodes);
 		return visitor.getStoredVariables();
@@ -504,10 +504,10 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 *            hint for the variable name
 	 * @return a new local variable
 	 */
-	public LocalVariable newTempLocalVariable(String file, Type type,
+	public VarLocal newTempLocalVariable(String file, Type type,
 			String hint) {
 		String name = hint;
-		LocalVariable variable = locals.get(name);
+		VarLocal variable = locals.get(name);
 		int i = 0;
 		while (variable != null) {
 			name = hint + i;
@@ -515,9 +515,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			i++;
 		}
 
-		variable = new LocalVariable(true, 0, new Location(), name, type);
+		variable = new VarLocal(true, 0, new Location(), name, type);
 		locals.put(file, variable.getLocation(), variable.getName(), variable);
-		return (LocalVariable) variable;
+		return (VarLocal) variable;
 	}
 
 	/**
@@ -531,7 +531,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	@Override
-	public void setLocals(OrderedMap<String, LocalVariable> locals) {
+	public void setLocals(OrderedMap<String, VarLocal> locals) {
 		this.locals = locals;
 	}
 
@@ -585,7 +585,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	@Override
-	public void setParameters(OrderedMap<String, LocalVariable> parameters) {
+	public void setParameters(OrderedMap<String, VarLocal> parameters) {
 		this.parameters = parameters;
 	}
 

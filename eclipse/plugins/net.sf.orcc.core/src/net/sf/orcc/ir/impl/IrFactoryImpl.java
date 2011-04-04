@@ -172,8 +172,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public Procedure createProcedure(String name, boolean nativeFlag,
 			Location location, Type returnType,
-			OrderedMap<String, LocalVariable> parameters,
-			OrderedMap<String, LocalVariable> locals, List<Node> nodes) {
+			OrderedMap<String, VarLocal> parameters,
+			OrderedMap<String, VarLocal> locals, List<Node> nodes) {
 		ProcedureImpl procedure = new ProcedureImpl();
 
 		procedure.setLocation(location);
@@ -197,8 +197,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		procedure.setName(name);
 		procedure.setReturnType(returnType);
 
-		procedure.setLocals(new OrderedMap<String, LocalVariable>());
-		procedure.setParameters(new OrderedMap<String, LocalVariable>());
+		procedure.setLocals(new OrderedMap<String, VarLocal>());
+		procedure.setParameters(new OrderedMap<String, VarLocal>());
 
 		return procedure;
 	}

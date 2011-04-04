@@ -35,7 +35,7 @@ import java.util.Map;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
@@ -60,13 +60,13 @@ import net.sf.orcc.moc.CSDFMoC;
 public class SchedulerMerger extends AbstractMoCInterpreter {
 	private List<Action> actions;
 	private Action initializeCounter;
-	private List<GlobalVariable> varCounters;
+	private List<VarGlobal> varCounters;
 
 	public SchedulerMerger(List<Action> actions,
-			Map<GlobalVariable, GlobalVariable> readCounts,
-			Map<GlobalVariable, GlobalVariable> writeCounts) {
+			Map<VarGlobal, VarGlobal> readCounts,
+			Map<VarGlobal, VarGlobal> writeCounts) {
 		this.actions = actions;
-		varCounters = new ArrayList<GlobalVariable>();
+		varCounters = new ArrayList<VarGlobal>();
 		varCounters.addAll(readCounts.values());
 		varCounters.addAll(writeCounts.values());
 
@@ -81,7 +81,7 @@ public class SchedulerMerger extends AbstractMoCInterpreter {
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		procedure.getNodes().add(block);
 
-		for (GlobalVariable counter : varCounters) {
+		for (VarGlobal counter : varCounters) {
 			Store store = new Store(counter, new IntExpr(0));
 			block.add(store);
 		}

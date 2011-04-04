@@ -46,7 +46,7 @@ public interface InstPhi extends Instruction {
 	 * @return the "old" variable of this phi
 	 * @model
 	 */
-	LocalVariable getOldVariable();
+	VarLocal getOldVariable();
 
 	/**
 	 * Returns the target of this call (may be <code>null</code>).
@@ -54,7 +54,7 @@ public interface InstPhi extends Instruction {
 	 * @return the target of this node (may be <code>null</code>)
 	 * @model
 	 */
-	LocalVariable getTarget();
+	VarLocal getTarget();
 
 	/**
 	 * Returns the values of this phi instruction.
@@ -71,7 +71,7 @@ public interface InstPhi extends Instruction {
 	 * @param old
 	 *            an "old" variable
 	 */
-	void setOldVariable(LocalVariable old);
+	void setOldVariable(VarLocal old);
 
 	/**
 	 * Sets the target of this node.
@@ -79,6 +79,6 @@ public interface InstPhi extends Instruction {
 	 * @param target
 	 *            a local variable
 	 */
-	void setTarget(LocalVariable target);
+	void setTarget(VarLocal target);
 
 }

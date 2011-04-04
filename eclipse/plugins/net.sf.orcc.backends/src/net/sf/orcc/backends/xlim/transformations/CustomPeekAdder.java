@@ -39,7 +39,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.instructions.Load;
 
@@ -53,7 +53,7 @@ import net.sf.orcc.ir.instructions.Load;
  */
 public class CustomPeekAdder extends AbstractActorVisitor {
 
-	private Map<Port, Map<Integer, Variable>> customPeekedMap;
+	private Map<Port, Map<Integer, Var>> customPeekedMap;
 
 	private List<Load> toBeRemoved;
 
@@ -63,7 +63,7 @@ public class CustomPeekAdder extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Action action) {
-		customPeekedMap = new HashMap<Port, Map<Integer, Variable>>();
+		customPeekedMap = new HashMap<Port, Map<Integer, Var>>();
 
 		super.visit(action);
 
@@ -74,8 +74,8 @@ public class CustomPeekAdder extends AbstractActorVisitor {
 	@Override
 	public void visit(Pattern pattern) {
 		for (Port port : pattern.getPeekedMap().keySet()) {
-			Map<Integer, Variable> indexToVariableMap = new HashMap<Integer, Variable>();
-			Variable oldTarget = pattern.getPeeked(port);
+			Map<Integer, Var> indexToVariableMap = new HashMap<Integer, Var>();
+			Var oldTarget = pattern.getPeeked(port);
 
 			List<Use> uses = new ArrayList<Use>(oldTarget.getUses());
 			for (Use use : uses) {

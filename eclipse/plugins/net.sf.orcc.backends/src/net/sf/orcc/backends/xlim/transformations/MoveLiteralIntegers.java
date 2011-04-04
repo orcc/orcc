@@ -37,7 +37,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -83,7 +83,7 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 		public Object interpret(BoolExpr expr, Object... args) {
 			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			LocalVariable var = procedure.newTempLocalVariable(file, type,
+			VarLocal var = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "litteral_integer");
 			Assign assign = new Assign(var, expr);
 
@@ -103,7 +103,7 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 		public Object interpret(IntExpr expr, Object... args) {
 			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			LocalVariable var = procedure.newTempLocalVariable(file, type,
+			VarLocal var = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "litteral_integer");
 			Assign assign = new Assign(var, expr);
 

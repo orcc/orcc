@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
@@ -71,7 +71,7 @@ public class MemoryStats {
 	private Map<Actor, MemoryStatsElement> memoryStatsMap;
 
 	private void computeMemorySize(Actor actor, MemoryStatsElement statsElement) {
-		for (GlobalVariable var : actor.getStateVars()) {
+		for (VarGlobal var : actor.getStateVars()) {
 			statsElement.globalMemorySize += getSize(var.getType());
 		}
 	}

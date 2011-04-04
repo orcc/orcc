@@ -35,14 +35,14 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public class LocalVariable extends Variable {
+public class VarLocal extends Var {
 
 	/**
 	 * SSA index.
 	 */
 	private int index;
 
-	public LocalVariable(boolean assignable, int index, Location loc,
+	public VarLocal(boolean assignable, int index, Location loc,
 			String name, Type type) {
 		super(loc, type, name, false, assignable);
 		this.index = index;

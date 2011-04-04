@@ -34,7 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
@@ -58,7 +58,7 @@ public class AssignIndex extends SpecificInstruction implements
 
 	private Type listType;
 	
-	private LocalVariable target;
+	private VarLocal target;
 
 	/**
 	 * Creates a new AssignIndex from the given indexes and target.
@@ -68,7 +68,7 @@ public class AssignIndex extends SpecificInstruction implements
 	 * @param indexes
 	 *            a list of indexes
 	 */
-	public AssignIndex(LocalVariable target, List<Expression> indexes,
+	public AssignIndex(VarLocal target, List<Expression> indexes,
 			Type listType) {
 		super(target.getLocation());
 		expressionToIndexMap = new HashMap<Expression, Integer>();
@@ -105,12 +105,12 @@ public class AssignIndex extends SpecificInstruction implements
 	}
 
 	@Override
-	public LocalVariable getTarget() {
+	public VarLocal getTarget() {
 		return target;
 	}
 	
 	@Override
-	public void internalSetTarget(LocalVariable target) {
+	public void internalSetTarget(VarLocal target) {
 		this.target = target;
 	}
 
@@ -149,7 +149,7 @@ public class AssignIndex extends SpecificInstruction implements
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void setTarget(VarLocal target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 	

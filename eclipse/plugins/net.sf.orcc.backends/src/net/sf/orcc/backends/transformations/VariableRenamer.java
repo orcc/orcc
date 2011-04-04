@@ -29,9 +29,9 @@
 package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 
 /**
  * This class defines an actor transformation that renames all variables inside
@@ -51,9 +51,9 @@ public class VariableRenamer extends AbstractActorVisitor {
 	@Override
 	public void visit(Procedure procedure) {
 		String procName = procedure.getName();
-		for (Variable variable : procedure.getLocals()) {
-			LocalVariable local = (LocalVariable) variable;
-			variable.setName(procName + "_" + local.getBaseName());
+		for (Var var : procedure.getLocals()) {
+			VarLocal local = (VarLocal) var;
+			var.setName(procName + "_" + local.getBaseName());
 		}
 	}
 

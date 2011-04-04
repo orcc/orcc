@@ -29,12 +29,12 @@
 package net.sf.orcc.backends.vhdl.ram.instructions;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 
 /**
  * This class defines a specific instruction that manipulates a RAM associated
- * to a variable.
+ * to a var.
  * 
  * @author Matthieu Wipliez
  * 
@@ -43,7 +43,7 @@ public abstract class RamInstruction extends SpecificInstruction {
 
 	private int port;
 
-	private Variable variable;
+	private Var var;
 
 	/**
 	 * Creates a new RamRead
@@ -62,12 +62,12 @@ public abstract class RamInstruction extends SpecificInstruction {
 	}
 
 	/**
-	 * Returns the variable to which the RAM is associated.
+	 * Returns the var to which the RAM is associated.
 	 * 
-	 * @return the variable to which the RAM is associated
+	 * @return the var to which the RAM is associated
 	 */
-	public Variable getVariable() {
-		return variable;
+	public Var getVariable() {
+		return var;
 	}
 
 	/**
@@ -85,13 +85,13 @@ public abstract class RamInstruction extends SpecificInstruction {
 	}
 
 	/**
-	 * Sets the variable to which the RAM is associated.
+	 * Sets the var to which the RAM is associated.
 	 * 
-	 * @param variable
-	 *            the variable to which the RAM is associated
+	 * @param var
+	 *            the var to which the RAM is associated
 	 */
-	public void setVariable(Variable variable) {
-		this.variable = variable;
+	public void setVariable(Var var) {
+		this.var = var;
 	}
 
 }

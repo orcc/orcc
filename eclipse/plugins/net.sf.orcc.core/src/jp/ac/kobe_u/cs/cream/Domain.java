@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 /**
  * Domains.
  * This is an abstract class for domains.
- * @see	Variable
+ * @see	Var
  * @since 1.0
  * @version 1.4
  * @author Naoyuki Tamura (tamura@kobe-u.ac.jp)

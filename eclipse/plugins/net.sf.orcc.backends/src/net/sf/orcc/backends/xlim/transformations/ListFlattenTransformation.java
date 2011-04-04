@@ -37,7 +37,7 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Use;
@@ -90,7 +90,7 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 
 			int indexSize;
 			// new index variable
-			LocalVariable indexVar;
+			VarLocal indexVar;
 
 			indexSize = IntExpr.getSize(size - 1);
 			indexVar = procedure.newTempLocalVariable("",
@@ -106,7 +106,7 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 		}
 
 		// creates the variable that will hold the concatenation of indexes
-		LocalVariable indexVar = procedure.newTempLocalVariable("",
+		VarLocal indexVar = procedure.newTempLocalVariable("",
 				IrFactory.eINSTANCE.createTypeInt(concatenatedSize),
 				"concat_index");
 

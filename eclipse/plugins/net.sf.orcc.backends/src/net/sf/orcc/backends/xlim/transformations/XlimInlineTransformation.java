@@ -31,7 +31,7 @@ package net.sf.orcc.backends.xlim.transformations;
 import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 
@@ -55,7 +55,7 @@ public class XlimInlineTransformation extends InlineTransformation {
 		public Object interpret(SpecificInstruction specific, Object... args) {
 			if (specific instanceof TernaryOperation) {
 				TernaryOperation ternaryOperation = (TernaryOperation) specific;
-				LocalVariable target = (LocalVariable) variableToLocalVariableMap
+				VarLocal target = (VarLocal) variableToLocalVariableMap
 						.get(ternaryOperation.getTarget());
 
 				Expression conditionValue = (Expression) ternaryOperation

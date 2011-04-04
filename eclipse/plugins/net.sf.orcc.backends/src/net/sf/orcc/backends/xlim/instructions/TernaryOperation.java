@@ -30,7 +30,7 @@ package net.sf.orcc.backends.xlim.instructions;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
@@ -51,11 +51,11 @@ public class TernaryOperation extends SpecificInstruction implements
 
 	private Expression falseValue;
 
-	private LocalVariable target;
+	private VarLocal target;
 
 	private Expression trueValue;
 
-	public TernaryOperation(Location location, LocalVariable target,
+	public TernaryOperation(Location location, VarLocal target,
 			Expression conditionValue, Expression trueValue,
 			Expression falseValue) {
 		super(location);
@@ -65,7 +65,7 @@ public class TernaryOperation extends SpecificInstruction implements
 		setFalseValue(falseValue);
 	}
 
-	public TernaryOperation(LocalVariable target, Expression conditionValue,
+	public TernaryOperation(VarLocal target, Expression conditionValue,
 			Expression trueValue, Expression falseValue) {
 		this(new Location(), target, conditionValue, trueValue, falseValue);
 	}
@@ -89,7 +89,7 @@ public class TernaryOperation extends SpecificInstruction implements
 	}
 
 	@Override
-	public LocalVariable getTarget() {
+	public VarLocal getTarget() {
 		return target;
 	}
 
@@ -98,7 +98,7 @@ public class TernaryOperation extends SpecificInstruction implements
 	}
 
 	@Override
-	public void internalSetTarget(LocalVariable target) {
+	public void internalSetTarget(VarLocal target) {
 		this.target = target;
 	}
 
@@ -115,7 +115,7 @@ public class TernaryOperation extends SpecificInstruction implements
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void setTarget(VarLocal target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 

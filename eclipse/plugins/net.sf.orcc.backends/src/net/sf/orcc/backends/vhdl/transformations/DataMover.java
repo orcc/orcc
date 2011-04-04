@@ -34,10 +34,10 @@ import java.util.Map;
 import net.sf.orcc.backends.vhdl.ram.instructions.RamRead;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -63,7 +63,7 @@ public class DataMover extends AbstractActorVisitor {
 
 	private NodeBlock targetBlock;
 
-	private Map<LocalVariable, GlobalVariable> variableMap;
+	private Map<VarLocal, VarGlobal> variableMap;
 
 	/**
 	 * Creates a new code mover
@@ -73,7 +73,7 @@ public class DataMover extends AbstractActorVisitor {
 		super(true);
 
 		this.actor = actor;
-		variableMap = new HashMap<LocalVariable, GlobalVariable>();
+		variableMap = new HashMap<VarLocal, VarGlobal>();
 	}
 
 	/**
@@ -85,22 +85,22 @@ public class DataMover extends AbstractActorVisitor {
 	 * @param expr
 	 * @param instruction
 	 */
-	private void addSpillCode(LocalVariable variable, VarExpr expr) {
+	private void addSpillCode(VarLocal variable, VarExpr expr) {
 		if (!procedure.getLocals().contains(variable.getName())) {
-			GlobalVariable stateVar = variableMap.get(variable);
+			VarGlobal stateVar = variableMap.get(variable);
 			if (stateVar == null) {
 				stateVar = getOrAddGlobal(variable);
 				addStoreToGlobal(variable, stateVar);
 			}
 
 			// duplicates the local variable
-			LocalVariable duplicate = new LocalVariable(
+			VarLocal duplicate = new VarLocal(
 					variable.isAssignable(), variable.getIndex(),
 					variable.getLocation(), variable.getBaseName(),
 					variable.getType());
 
 			// add it to the locals
-			OrderedMap<String, LocalVariable> variables = procedure.getLocals();
+			OrderedMap<String, VarLocal> variables = procedure.getLocals();
 			variables.put(duplicate.getName(), duplicate);
 
 			// updates the expression
@@ -121,8 +121,8 @@ public class DataMover extends AbstractActorVisitor {
 	 * @param stateVar
 	 *            a global variable
 	 */
-	private void addStoreToGlobal(LocalVariable variable,
-			GlobalVariable stateVar) {
+	private void addStoreToGlobal(VarLocal variable,
+			VarGlobal stateVar) {
 		Store store = new Store(stateVar, new VarExpr(new Use(variable)));
 
 		Instruction instruction = variable.getInstruction();
@@ -140,11 +140,11 @@ public class DataMover extends AbstractActorVisitor {
 	 *            a local variable
 	 * @return the corresponding global variable
 	 */
-	private GlobalVariable getOrAddGlobal(LocalVariable variable) {
-		GlobalVariable stateVar = actor.getStateVars().get(
+	private VarGlobal getOrAddGlobal(VarLocal variable) {
+		VarGlobal stateVar = actor.getStateVars().get(
 				"g_" + variable.getBaseName());
 		if (stateVar == null) {
-			stateVar = new GlobalVariable(variable.getLocation(),
+			stateVar = new VarGlobal(variable.getLocation(),
 					variable.getType(), "g_" + variable.getBaseName(), true);
 
 			actor.getStateVars().put(stateVar.getName(), stateVar);
@@ -161,14 +161,14 @@ public class DataMover extends AbstractActorVisitor {
 
 	@Override
 	public void visit(VarExpr expr, Object... args) {
-		LocalVariable variable = (LocalVariable) expr.getVar().getVariable();
+		VarLocal variable = (VarLocal) expr.getVar().getVariable();
 		Instruction instruction = variable.getInstruction();
 		if (instruction != null) {
 			if (instruction.isLoad()) {
 				Load load = (Load) instruction;
 				if (load.getIndexes().isEmpty()) {
 					// registers loaded variables into the variableMap
-					variableMap.put(variable, (GlobalVariable) load.getSource()
+					variableMap.put(variable, (VarGlobal) load.getSource()
 							.getVariable());
 				}
 			} else if (instruction instanceof RamRead) {

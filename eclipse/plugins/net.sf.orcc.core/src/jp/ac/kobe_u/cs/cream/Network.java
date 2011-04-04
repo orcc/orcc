@@ -8,15 +8,15 @@ import java.util.List;
 
 /**
  * Constraint networks. A constraint network consists of
- * {@linkplain Variable variables}, {@linkplain Constraint constraints}, and
+ * {@linkplain Var variables}, {@linkplain Constraint constraints}, and
  * an objective variable (optional). Variables and constraints are added by
  * <tt>add</tt> methods:
  * 
  * <pre>
  * Network net = new Network();
  * Domain d = new IntDomain(0, IntDomain.MAX_VALUE);
- * Variable x = new Variable(net, d);
- * Variable y = new Variable(net, d);
+ * Var x = new Var(net, d);
+ * Var y = new Var(net, d);
  * new NotEquals(net, x, y);
  * </pre>
  * 
@@ -25,7 +25,7 @@ import java.util.List;
  * different networks. In other words, a network can not share a variable or a
  * constraint with another network.
  * 
- * @see Variable
+ * @see Var
  * @see Constraint
  * @since 1.0
  * @version 1.4

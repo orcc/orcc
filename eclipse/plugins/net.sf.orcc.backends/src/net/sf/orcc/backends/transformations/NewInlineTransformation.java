@@ -39,13 +39,13 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
@@ -80,7 +80,7 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 
 		@Override
 		public Object interpret(Assign assign, Object... args) {
-			LocalVariable target = (LocalVariable) variableToLocalVariableMap
+			VarLocal target = (VarLocal) variableToLocalVariableMap
 					.get(assign.getTarget());
 			Expression value = (Expression) assign.getValue()
 					.accept(this, args);
@@ -118,7 +118,7 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 
 		@Override
 		public Object interpret(Call call, Object... args) {
-			LocalVariable target = (LocalVariable) variableToLocalVariableMap
+			VarLocal target = (VarLocal) variableToLocalVariableMap
 					.get(call.getTarget());
 			List<Expression> parameters = new ArrayList<Expression>();
 			for (Expression parameter : call.getParameters()) {
@@ -183,14 +183,14 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 			if (unusedVariable.contains(load.getTarget())) {
 				return null;
 			} else {
-				LocalVariable target = (LocalVariable) variableToLocalVariableMap
+				VarLocal target = (VarLocal) variableToLocalVariableMap
 						.get(load.getTarget());
 				List<Expression> indexes = new ArrayList<Expression>();
 				for (Expression index : load.getIndexes()) {
 					indexes.add((Expression) index.accept(this, args));
 				}
 				Load l;
-				Variable sourceVariable = load.getSource().getVariable();
+				Var sourceVariable = load.getSource().getVariable();
 				if (sourceVariable.isGlobal()) {
 					l = new Load(load.getLocation(), target, load.getSource(),
 							indexes);
@@ -206,7 +206,7 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 
 		@Override
 		public Object interpret(PhiAssignment phi, Object... args) {
-			LocalVariable target = (LocalVariable) variableToLocalVariableMap
+			VarLocal target = (VarLocal) variableToLocalVariableMap
 					.get(phi.getTarget());
 			List<Expression> values = new ArrayList<Expression>();
 			for (Expression value : phi.getValues()) {
@@ -244,7 +244,7 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 							.getVar().getVariable())) {
 				return null;
 			} else {
-				Variable target;
+				Var target;
 				if (store.getTarget().isGlobal()) {
 					target = store.getTarget();
 				} else {
@@ -271,7 +271,7 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 
 		public Object interpret(TernaryOperation ternaryOperation,
 				Object... args) {
-			LocalVariable target = (LocalVariable) variableToLocalVariableMap
+			VarLocal target = (VarLocal) variableToLocalVariableMap
 					.get(ternaryOperation.getTarget());
 
 			Expression conditionValue = (Expression) ternaryOperation
@@ -300,7 +300,7 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
-			Variable newVar = variableToLocalVariableMap.get(expr.getVar()
+			Var newVar = variableToLocalVariableMap.get(expr.getVar()
 					.getVariable());
 			VarExpr varExpr = new VarExpr(new Use(newVar));
 			return varExpr;
@@ -329,7 +329,7 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 
 	}
 
-	private List<LocalVariable> unusedVariable;
+	private List<VarLocal> unusedVariable;
 
 	protected InlineCloner inlineCloner;
 
@@ -339,9 +339,9 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 
 	private boolean needToSkipThisNode;
 
-	private LocalVariable returnVariableOfCurrentFunction;
+	private VarLocal returnVariableOfCurrentFunction;
 
-	protected Map<Variable, Variable> variableToLocalVariableMap;
+	protected Map<Var, Var> variableToLocalVariableMap;
 
 	public NewInlineTransformation(boolean inlineProcedure,
 			boolean inlineFunction) {
@@ -399,11 +399,11 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 
 		// Create a new local variable to all function/procedure's variable
 		// except for list (reference is using)
-		variableToLocalVariableMap = new HashMap<Variable, Variable>();
-		unusedVariable = new ArrayList<LocalVariable>();
-		for (Variable var : function.getLocals().getList()) {
-			LocalVariable oldVar = (LocalVariable) var;
-			LocalVariable newVar = checkAlreadyLoadedVariable(oldVar,
+		variableToLocalVariableMap = new HashMap<Var, Var>();
+		unusedVariable = new ArrayList<VarLocal>();
+		for (Var var : function.getLocals().getList()) {
+			VarLocal oldVar = (VarLocal) var;
+			VarLocal newVar = checkAlreadyLoadedVariable(oldVar,
 					finderInFunction.getLocalVariableToStateVarMap(),
 					finderInCurrentAction.getStateVarToLocalVariableMap());
 
@@ -418,16 +418,16 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 			}
 			variableToLocalVariableMap.put(oldVar, newVar);
 		}
-		for (Variable var : function.getParameters().getList()) {
-			LocalVariable oldVar = (LocalVariable) var;
+		for (Var var : function.getParameters().getList()) {
+			VarLocal oldVar = (VarLocal) var;
 			if (var.getType().isList()) {
 				// In case of list, the parameter could be a global variable
-				Variable newVar = ((VarExpr) call.getParameters().get(
+				Var newVar = ((VarExpr) call.getParameters().get(
 						function.getParameters().getList().indexOf(var)))
 						.getVar().getVariable();
 				variableToLocalVariableMap.put(oldVar, newVar);
 			} else {
-				LocalVariable newVar = procedure.newTempLocalVariable("",
+				VarLocal newVar = procedure.newTempLocalVariable("",
 						oldVar.getType(), oldVar.getName());
 				newVar.setIndex(oldVar.getIndex());
 				newVar.setLocation(oldVar.getLocation());
@@ -441,11 +441,11 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 		// Assign all parameters except for list
 		NodeBlock newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		for (int i = 0; i < function.getParameters().getLength(); i++) {
-			Variable parameter = function.getParameters().getList().get(i);
+			Var parameter = function.getParameters().getList().get(i);
 			if (!parameter.getType().isList()) {
 				Expression expr = call.getParameters().get(i);
 				Assign assign = new Assign(
-						(LocalVariable) variableToLocalVariableMap
+						(VarLocal) variableToLocalVariableMap
 								.get(parameter),
 						expr);
 				newBlockNode.add(assign);
@@ -541,11 +541,11 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 		visit(nodeIf.getJoinNode());
 	}
 
-	private LocalVariable checkAlreadyLoadedVariable(LocalVariable oldVar,
-			Map<LocalVariable, Variable> functionMap,
-			Map<Variable, LocalVariable> currentActionMap) {
-		LocalVariable newVar = null;
-		Variable stateVar = functionMap.get(oldVar);
+	private VarLocal checkAlreadyLoadedVariable(VarLocal oldVar,
+			Map<VarLocal, Var> functionMap,
+			Map<Var, VarLocal> currentActionMap) {
+		VarLocal newVar = null;
+		Var stateVar = functionMap.get(oldVar);
 		if (stateVar != null) {
 			newVar = currentActionMap.get(stateVar);
 		}
@@ -553,14 +553,14 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 	}
 
 	private class LoadedVariableFinder extends AbstractActorVisitor {
-		private Map<Variable, LocalVariable> stateVarToLocalVariableMap;
-		private Map<LocalVariable, Variable> localVariableToStateVarMap;
+		private Map<Var, VarLocal> stateVarToLocalVariableMap;
+		private Map<VarLocal, Var> localVariableToStateVarMap;
 		private Call exitCall;
 		private boolean stop;
 
 		public LoadedVariableFinder() {
-			stateVarToLocalVariableMap = new HashMap<Variable, LocalVariable>();
-			localVariableToStateVarMap = new HashMap<LocalVariable, Variable>();
+			stateVarToLocalVariableMap = new HashMap<Var, VarLocal>();
+			localVariableToStateVarMap = new HashMap<VarLocal, Var>();
 			stop = false;
 		}
 
@@ -569,19 +569,19 @@ public class NewInlineTransformation extends AbstractActorVisitor {
 			this.exitCall = exitCall;
 		}
 
-		public Map<LocalVariable, Variable> getLocalVariableToStateVarMap() {
+		public Map<VarLocal, Var> getLocalVariableToStateVarMap() {
 			return localVariableToStateVarMap;
 		}
 
-		public Map<Variable, LocalVariable> getStateVarToLocalVariableMap() {
+		public Map<Var, VarLocal> getStateVarToLocalVariableMap() {
 			return stateVarToLocalVariableMap;
 		}
 
 		@Override
 		public void visit(Load load) {
 			if (!stop) {
-				Variable source = load.getSource().getVariable();
-				LocalVariable target = load.getTarget();
+				Var source = load.getSource().getVariable();
+				VarLocal target = load.getTarget();
 				if (source.isGlobal() && load.getIndexes().isEmpty()) {
 					stateVarToLocalVariableMap.put(source, target);
 					localVariableToStateVarMap.put(target, source);

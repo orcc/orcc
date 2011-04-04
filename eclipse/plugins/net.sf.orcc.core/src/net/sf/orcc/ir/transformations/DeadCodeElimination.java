@@ -36,7 +36,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -73,9 +73,9 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 			if (instruction.isPhi()) {
 				PhiAssignment phi = (PhiAssignment) instruction;
 
-				LocalVariable target = phi.getTarget();
+				VarLocal target = phi.getTarget();
 				VarExpr sourceExpr = (VarExpr) phi.getValues().get(index);
-				LocalVariable source = (LocalVariable) sourceExpr.getVar()
+				VarLocal source = (VarLocal) sourceExpr.getVar()
 						.getVariable();
 
 				// translate the phi to an assign
@@ -87,7 +87,7 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 
 				// remove the other variable
 				VarExpr localExpr = (VarExpr) phi.getValues().get(1 - index);
-				LocalVariable local = (LocalVariable) localExpr.getVar()
+				VarLocal local = (VarLocal) localExpr.getVar()
 						.getVariable();
 				procedure.getLocals().remove(local.getName());
 			}

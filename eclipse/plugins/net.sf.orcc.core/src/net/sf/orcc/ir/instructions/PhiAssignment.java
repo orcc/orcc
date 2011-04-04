@@ -32,7 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.impl.InstructionImpl;
 import net.sf.orcc.ir.util.CommonNodeOperations;
@@ -50,9 +50,9 @@ public class PhiAssignment extends InstructionImpl implements
 	/**
 	 * Only used when translating to SSA form.
 	 */
-	private LocalVariable oldVariable;
+	private VarLocal oldVariable;
 
-	private LocalVariable target;
+	private VarLocal target;
 
 	private List<Expression> values;
 
@@ -65,7 +65,7 @@ public class PhiAssignment extends InstructionImpl implements
 	 * @param vars
 	 *            a list of uses
 	 */
-	public PhiAssignment(Location location, LocalVariable target,
+	public PhiAssignment(Location location, VarLocal target,
 			List<Expression> values) {
 		super(location);
 		setTarget(target);
@@ -88,12 +88,12 @@ public class PhiAssignment extends InstructionImpl implements
 	 * 
 	 * @return the "old" variable of this phi
 	 */
-	public LocalVariable getOldVariable() {
+	public VarLocal getOldVariable() {
 		return oldVariable;
 	}
 
 	@Override
-	public LocalVariable getTarget() {
+	public VarLocal getTarget() {
 		return target;
 	}
 
@@ -102,7 +102,7 @@ public class PhiAssignment extends InstructionImpl implements
 	}
 
 	@Override
-	public void internalSetTarget(LocalVariable target) {
+	public void internalSetTarget(VarLocal target) {
 		this.target = target;
 	}
 
@@ -118,12 +118,12 @@ public class PhiAssignment extends InstructionImpl implements
 	 * @param old
 	 *            an "old" variable
 	 */
-	public void setOldVariable(LocalVariable old) {
+	public void setOldVariable(VarLocal old) {
 		this.oldVariable = old;
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void setTarget(VarLocal target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 

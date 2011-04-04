@@ -33,7 +33,7 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Assign;
@@ -83,10 +83,10 @@ public class CodeMover extends AbstractActorVisitor {
 	 *            a variable
 	 */
 	private void moveLocalVariable(Instruction instruction,
-			LocalVariable variable) {
+			VarLocal variable) {
 		procedure.getLocals().remove(variable.getName());
 
-		OrderedMap<String, LocalVariable> locals = targetProcedure.getLocals();
+		OrderedMap<String, VarLocal> locals = targetProcedure.getLocals();
 		if (!locals.contains(variable.getName())) {
 			// this test handles the case of assignments created by PhiRemoval
 			locals.put(variable.getName(), variable);

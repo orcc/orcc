@@ -33,7 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.instructions.Store;
@@ -68,10 +68,10 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		OrderedMap<String, GlobalVariable> stateVariables = actor.getStateVars();
-		Iterator<GlobalVariable> it = stateVariables.iterator();
+		OrderedMap<String, VarGlobal> stateVariables = actor.getStateVars();
+		Iterator<VarGlobal> it = stateVariables.iterator();
 		while (it.hasNext()) {
-			GlobalVariable variable = it.next();
+			VarGlobal variable = it.next();
 			if (!variable.isUsed()) {
 				it.remove();
 				remove(variable.getInstructions());

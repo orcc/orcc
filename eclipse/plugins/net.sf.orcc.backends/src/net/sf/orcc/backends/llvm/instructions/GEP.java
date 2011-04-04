@@ -33,7 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.SourceContainer;
 import net.sf.orcc.ir.Type;
@@ -55,7 +55,7 @@ public class GEP extends SpecificInstruction implements LocalTargetContainer,
 
 	private Use source;
 
-	private LocalVariable target;
+	private VarLocal target;
 
 	/**
 	 * Creates a new GEP instruction from the given value, its indexes, a target
@@ -68,7 +68,7 @@ public class GEP extends SpecificInstruction implements LocalTargetContainer,
 	 * @param indexes
 	 *            a list of indexes
 	 */
-	public GEP(LocalVariable target, Use source, List<Expression> indexes) {
+	public GEP(VarLocal target, Use source, List<Expression> indexes) {
 		this(new Location(), target, source, indexes);
 	}
 
@@ -83,7 +83,7 @@ public class GEP extends SpecificInstruction implements LocalTargetContainer,
 	 * @param indexes
 	 *            a list of indexes
 	 */
-	public GEP(Location location, LocalVariable target, Use source,
+	public GEP(Location location, VarLocal target, Use source,
 			List<Expression> indexes) {
 		super(location);
 		setIndexes(indexes);
@@ -130,7 +130,7 @@ public class GEP extends SpecificInstruction implements LocalTargetContainer,
 	}
 
 	@Override
-	public LocalVariable getTarget() {
+	public VarLocal getTarget() {
 		return target;
 	}
 
@@ -140,7 +140,7 @@ public class GEP extends SpecificInstruction implements LocalTargetContainer,
 	}
 
 	@Override
-	public void internalSetTarget(LocalVariable target) {
+	public void internalSetTarget(VarLocal target) {
 		this.target = target;
 	}
 
@@ -188,7 +188,7 @@ public class GEP extends SpecificInstruction implements LocalTargetContainer,
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void setTarget(VarLocal target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 

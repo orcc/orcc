@@ -53,7 +53,7 @@ public interface InstStore extends Instruction {
 	 * @return the target of this store
 	 * @model
 	 */
-	Variable getTarget();
+	Var getTarget();
 
 	/**
 	 * Returns the value of this store.
@@ -69,7 +69,7 @@ public interface InstStore extends Instruction {
 	 * @param target
 	 *            a local variable
 	 */
-	void setTarget(Variable target);
+	void setTarget(Var target);
 
 	/**
 	 * Sets the value of this store.

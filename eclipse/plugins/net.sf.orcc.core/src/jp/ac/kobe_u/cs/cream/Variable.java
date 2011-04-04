@@ -1,5 +1,5 @@
 /*
- * @(#)Variable.java
+ * @(#)Var.java
  */
 package jp.ac.kobe_u.cs.cream;
 
@@ -34,7 +34,7 @@ public class Variable implements Cloneable {
 	/**
 	 * Constructs a variable of the network with an initial domain <tt>d</tt>
 	 * and a default name. This constructor is equivalent to
-	 * <tt>Variable(network, d, null)</tt>.
+	 * <tt>Var(network, d, null)</tt>.
 	 * 
 	 * @param net
 	 *            the network

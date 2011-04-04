@@ -40,7 +40,7 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -48,7 +48,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
@@ -77,9 +77,9 @@ public class SSATransformation extends AbstractActorVisitor {
 		@Override
 		public void visit(VarExpr expr, Object... args) {
 			Use use = expr.getVar();
-			Variable oldVar = use.getVariable();
+			Var oldVar = use.getVariable();
 			if (!oldVar.isGlobal()) {
-				LocalVariable newVar = uses.get(((LocalVariable) oldVar)
+				VarLocal newVar = uses.get(((VarLocal) oldVar)
 						.getBaseName());
 				if (newVar != null) {
 					// newVar may be null if oldVar is a function parameter for
@@ -100,7 +100,7 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * maps a variable name to a local variable (used when creating new
 	 * definitions)
 	 */
-	private Map<String, LocalVariable> definitions;
+	private Map<String, VarLocal> definitions;
 
 	/**
 	 * join node (if any)
@@ -115,14 +115,14 @@ public class SSATransformation extends AbstractActorVisitor {
 	/**
 	 * maps a variable name to a local variable (used when replacing uses)
 	 */
-	private Map<String, LocalVariable> uses;
+	private Map<String, VarLocal> uses;
 
 	/**
 	 * Creates a new SSA transformation.
 	 */
 	public SSATransformation() {
-		definitions = new HashMap<String, LocalVariable>();
-		uses = new HashMap<String, LocalVariable>();
+		definitions = new HashMap<String, VarLocal>();
+		uses = new HashMap<String, VarLocal>();
 	}
 
 	/**
@@ -134,8 +134,8 @@ public class SSATransformation extends AbstractActorVisitor {
 	private void commitPhi(NodeBlock innerJoin) {
 		for (Instruction instruction : innerJoin.getInstructions()) {
 			PhiAssignment phi = (PhiAssignment) instruction;
-			LocalVariable oldVar = phi.getOldVariable();
-			LocalVariable newVar = phi.getTarget();
+			VarLocal oldVar = phi.getOldVariable();
+			VarLocal newVar = phi.getTarget();
 
 			// updates the current value of "var"
 			uses.put(oldVar.getBaseName(), newVar);
@@ -184,7 +184,7 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * @param newVar
 	 *            new variable
 	 */
-	private void insertPhi(LocalVariable oldVar, LocalVariable newVar) {
+	private void insertPhi(VarLocal oldVar, VarLocal newVar) {
 		String name = oldVar.getBaseName();
 		PhiAssignment phi = null;
 		for (Instruction instruction : join.getInstructions()) {
@@ -198,7 +198,7 @@ public class SSATransformation extends AbstractActorVisitor {
 		}
 
 		if (phi == null) {
-			LocalVariable target = newDefinition(oldVar);
+			VarLocal target = newDefinition(oldVar);
 			List<Expression> values = new ArrayList<Expression>(2);
 			phi = new PhiAssignment(new Location(), target, values);
 			phi.setOldVariable(oldVar);
@@ -228,7 +228,7 @@ public class SSATransformation extends AbstractActorVisitor {
 	 *            a variable
 	 * @return a new definition based on the given old variable
 	 */
-	private LocalVariable newDefinition(LocalVariable oldVar) {
+	private VarLocal newDefinition(VarLocal oldVar) {
 		String name = oldVar.getBaseName();
 
 		// get index
@@ -240,7 +240,7 @@ public class SSATransformation extends AbstractActorVisitor {
 		}
 
 		// create new variable
-		LocalVariable newVar = new LocalVariable(oldVar.isAssignable(), index,
+		VarLocal newVar = new VarLocal(oldVar.isAssignable(), index,
 				oldVar.getLocation(), name, oldVar.getType());
 		procedure.getLocals().put(newVar.getName(), newVar);
 		definitions.put(name, newVar);
@@ -255,12 +255,12 @@ public class SSATransformation extends AbstractActorVisitor {
 	 *            a local target container
 	 */
 	private void replaceDef(LocalTargetContainer cter) {
-		LocalVariable target = cter.getTarget();
+		VarLocal target = cter.getTarget();
 		if (target != null) {
 			String name = target.getBaseName();
 
 			// v_old is the value of the variable before the assignment
-			LocalVariable oldVar = uses.get(name);
+			VarLocal oldVar = uses.get(name);
 			if (oldVar == null) {
 				// may be null if the variable is used without having been
 				// assigned first
@@ -268,7 +268,7 @@ public class SSATransformation extends AbstractActorVisitor {
 				oldVar = target;
 			}
 
-			LocalVariable newTarget = newDefinition(target);
+			VarLocal newTarget = newDefinition(target);
 			cter.setTarget(newTarget);
 
 			uses.put(name, newTarget);
@@ -312,7 +312,7 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * @param newVar
 	 *            new variable
 	 */
-	private void replaceUsesInLoop(LocalVariable oldVar, LocalVariable newVar) {
+	private void replaceUsesInLoop(VarLocal oldVar, VarLocal newVar) {
 		List<Use> uses = new ArrayList<Use>(oldVar.getUses());
 		Set<Node> nodes = new HashSet<Node>();
 		findNodes(nodes, loop);
@@ -340,7 +340,7 @@ public class SSATransformation extends AbstractActorVisitor {
 	private void restoreVariables() {
 		for (Instruction instruction : join.getInstructions()) {
 			PhiAssignment phi = (PhiAssignment) instruction;
-			LocalVariable oldVar = phi.getOldVariable();
+			VarLocal oldVar = phi.getOldVariable();
 			uses.put(oldVar.getBaseName(), oldVar);
 		}
 	}

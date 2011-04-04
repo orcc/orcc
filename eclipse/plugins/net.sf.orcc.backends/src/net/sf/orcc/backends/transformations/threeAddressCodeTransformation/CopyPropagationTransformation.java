@@ -36,14 +36,14 @@ import java.util.Map;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -97,7 +97,7 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
-			Variable var = expr.getVar().getVariable();
+			Var var = expr.getVar().getVariable();
 
 			if (copyVars.containsKey(var)) {
 				return copyVars.get(var).accept(this, args);
@@ -107,12 +107,12 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 		}
 	}
 
-	private Map<Variable, Expression> copyVars;
+	private Map<Var, Expression> copyVars;
 
 	private List<Instruction> removedInstrs;
 
 	public CopyPropagationTransformation() {
-		copyVars = new HashMap<Variable, Expression>();
+		copyVars = new HashMap<Var, Expression>();
 		removedInstrs = new ArrayList<Instruction>();
 
 	}
@@ -135,14 +135,14 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 	/**
 	 * Removes the given list of variables from the procedure
 	 * 
-	 * @param variables
+	 * @param vars
 	 *            a map of variable
 	 */
-	private void removeVariables(Map<Variable, Expression> variables) {
-		OrderedMap<String, LocalVariable> lovalVars = procedure.getLocals();
+	private void removeVariables(Map<Var, Expression> vars) {
+		OrderedMap<String, VarLocal> lovalVars = procedure.getLocals();
 
-		for (Map.Entry<Variable, Expression> entry : copyVars.entrySet()) {
-			Variable var = entry.getKey();
+		for (Map.Entry<Var, Expression> entry : copyVars.entrySet()) {
+			Var var = entry.getKey();
 			lovalVars.remove(var.getName());
 		}
 
@@ -160,7 +160,7 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 
 		if ((!value.isBinaryExpr()) && (!value.isUnaryExpr())) {
 			// Assign instruction can be remove
-			LocalVariable target = assign.getTarget();
+			VarLocal target = assign.getTarget();
 			Expression expr = assign.getValue();
 
 			// Set instruction and variable as to be remove
@@ -204,8 +204,8 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 	@Override
 	public void visit(PhiAssignment phi) {
 		List<Expression> values = phi.getValues();
-		LocalVariable target = phi.getTarget();
-		OrderedMap<String, LocalVariable> parameters = procedure
+		VarLocal target = phi.getTarget();
+		OrderedMap<String, VarLocal> parameters = procedure
 				.getParameters();
 
 		// Visit expressions of value of phi
@@ -215,7 +215,7 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 		for (Expression value : values) {
 			if (value.isVarExpr()) {
 				VarExpr sourceExpr = (VarExpr) value;
-				LocalVariable source = (LocalVariable) sourceExpr.getVar()
+				VarLocal source = (VarLocal) sourceExpr.getVar()
 						.getVariable();
 
 				// Local variable must not be a parameter of the procedure

@@ -48,7 +48,7 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
@@ -208,7 +208,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		stackFrame.codeLine = lastVisitedLocation.getStartLine();
 		stackFrame.nbOfFirings = nbOfFirings;
 		stackFrame.stateVars.clear();
-		for (Variable stateVar : actorIR.getStateVars()) {
+		for (Var stateVar : actorIR.getStateVars()) {
 			stackFrame.stateVars.put(stateVar.getName(), stateVar.getValue());
 		}
 		stackFrame.currentAction = lastVisitedAction;
@@ -426,7 +426,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 					nbOfFirings++;
 					lastVisitedAction = currentAction.getName();
 					// Allocate local List variables
-					for (Variable local : currentAction.getBody().getLocals()) {
+					for (Var local : currentAction.getBody().getLocals()) {
 						Type type = local.getType();
 						if (type.isList()) {
 							local.setValue((Expression) type

@@ -41,7 +41,7 @@ public interface TargetContainer extends User {
 	 * 
 	 * @return the target of this instruction
 	 */
-	public Variable getTarget();
+	public Var getTarget();
 
 	/**
 	 * Warning: this method is for internal uses only!
@@ -53,7 +53,7 @@ public interface TargetContainer extends User {
 	 * @param target
 	 *            a variable
 	 */
-	public void internalSetTarget(Variable target);
+	public void internalSetTarget(Var target);
 
 	/**
 	 * Sets the target of this instruction.
@@ -61,6 +61,6 @@ public interface TargetContainer extends User {
 	 * @param target
 	 *            a variable
 	 */
-	public void setTarget(Variable target);
+	public void setTarget(Var target);
 
 }

@@ -34,7 +34,7 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -102,15 +102,15 @@ public class PhiRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(PhiAssignment phi) {
-		LocalVariable target = phi.getTarget();
+		VarLocal target = phi.getTarget();
 		VarExpr sourceExpr = (VarExpr) phi.getValues().get(phiIndex);
-		LocalVariable source = (LocalVariable) sourceExpr.getVar()
+		VarLocal source = (VarLocal) sourceExpr.getVar()
 				.getVariable();
 
 		// if source is a local variable with index = 0, we remove it from the
 		// procedure and translate the PHI by an assignment of 0 (zero) to
 		// target. Otherwise, we just create an assignment target = source.
-		OrderedMap<String, LocalVariable> parameters = procedure
+		OrderedMap<String, VarLocal> parameters = procedure
 				.getParameters();
 		Assign assign;
 		if (source.getIndex() == 0 && !parameters.contains(source.getName())) {

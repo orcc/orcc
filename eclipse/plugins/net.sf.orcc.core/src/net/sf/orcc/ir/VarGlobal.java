@@ -35,7 +35,7 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public class GlobalVariable extends Variable {
+public class VarGlobal extends Var {
 
 	/**
 	 * initial value, if present, <code>null</code> otherwise
@@ -55,7 +55,7 @@ public class GlobalVariable extends Variable {
 	 * @param value
 	 *            initial value
 	 */
-	public GlobalVariable(Location location, Type type, String name,
+	public VarGlobal(Location location, Type type, String name,
 			boolean assignable) {
 		this(location, type, name, assignable, null);
 	}
@@ -73,7 +73,7 @@ public class GlobalVariable extends Variable {
 	 * @param value
 	 *            initial value
 	 */
-	public GlobalVariable(Location location, Type type, String name,
+	public VarGlobal(Location location, Type type, String name,
 			boolean assignable, Expression initialValue) {
 		super(location, type, name, true, assignable);
 		this.initialValue = initialValue;

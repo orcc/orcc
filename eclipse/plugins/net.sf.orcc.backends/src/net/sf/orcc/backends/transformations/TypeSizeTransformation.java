@@ -36,7 +36,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -71,9 +71,9 @@ public class TypeSizeTransformation extends AbstractActorVisitor {
 		}
 	}
 
-	private void checkVariables(OrderedMap<String, ? extends Variable> variables) {
-		for (Variable variable : variables) {
-			checkType(variable.getType());
+	private void checkVariables(OrderedMap<String, ? extends Var> vars) {
+		for (Var var : vars) {
+			checkType(var.getType());
 		}
 	}
 

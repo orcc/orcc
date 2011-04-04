@@ -32,11 +32,11 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.ValueContainer;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 
 /**
  * This class defines operations common to nodes.
@@ -54,8 +54,8 @@ public class CommonNodeOperations {
 	 * @param target
 	 *            a variable
 	 */
-	public static void setTarget(TargetContainer instruction, Variable target) {
-		Variable thisTarget = instruction.getTarget();
+	public static void setTarget(TargetContainer instruction, Var target) {
+		Var thisTarget = instruction.getTarget();
 		if (thisTarget != null) {
 			thisTarget.removeInstruction((Instruction) instruction);
 		}
@@ -76,8 +76,8 @@ public class CommonNodeOperations {
 	 *            a variable
 	 */
 	public static void setTarget(LocalTargetContainer instruction,
-			LocalVariable target) {
-		Variable thisTarget = instruction.getTarget();
+			VarLocal target) {
+		Var thisTarget = instruction.getTarget();
 		if (thisTarget != null) {
 			thisTarget.setInstruction(null);
 		}

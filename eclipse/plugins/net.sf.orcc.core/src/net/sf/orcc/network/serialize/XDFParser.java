@@ -39,7 +39,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
@@ -50,7 +50,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
@@ -231,14 +231,14 @@ public class XDFParser {
 						String name = elt.getAttribute("name");
 						// look up variable, in variables scope, and if not
 						// found in parameters scope
-						Variable variable = network.getVariables().get(name);
-						if (variable == null) {
+						Var var = network.getVariables().get(name);
+						if (var == null) {
 							throw new OrccException("In network \""
 									+ network.getName() + "\" defined in \""
 									+ file + "\": unknown variable: \"" + name
 									+ "\"");
 						}
-						Use use = new Use(variable);
+						Use use = new Use(var);
 						expr = new VarExpr(use);
 						break;
 					} else {
@@ -710,15 +710,15 @@ public class XDFParser {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
-			GlobalVariable var = new GlobalVariable(location, type, name, false);
+			VarGlobal var = new VarGlobal(location, type, name, false);
 			network.getParameters().put(file.getAbsolutePath(), location, name,
 					var);
-		} else if (kind.equals("Variable")) {
+		} else if (kind.equals("Var")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
 			Expression expr = exprParser.parseExpr(cont.getNode());
-			GlobalVariable var = new GlobalVariable(location, type, name,
+			VarGlobal var = new VarGlobal(location, type, name,
 					false, expr);
 			network.getVariables().put(file.getAbsolutePath(), location, name,
 					var);

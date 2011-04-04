@@ -34,13 +34,13 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
@@ -87,7 +87,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 * @param expr
 	 *            an expression
 	 */
-	private void createIfNode(LocalVariable target, Expression expr) {
+	private void createIfNode(VarLocal target, Expression expr) {
 		NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
 		node.setValue(expr);
 		node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
@@ -134,14 +134,14 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 * 
 	 * @return a new boolean local variable
 	 */
-	private LocalVariable newVariable() {
-		return new LocalVariable(true, tempVarCount++, new Location(),
+	private VarLocal newVariable() {
+		return new VarLocal(true, tempVarCount++, new Location(),
 				"bool_expr", IrFactory.eINSTANCE.createTypeBool());
 	}
 
 	@Override
 	public void visit(Assign assign) {
-		LocalVariable target = assign.getTarget();
+		VarLocal target = assign.getTarget();
 		if (target.getType().isBool()) {
 			Expression expr = assign.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
@@ -167,7 +167,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 		if (procedure.getReturnType().isBool()) {
 			Expression expr = returnInstr.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
-				LocalVariable local = newVariable();
+				VarLocal local = newVariable();
 				procedure.getLocals().put(local.getName(), local);
 				returnInstr.setValue(new VarExpr(new Use(local)));
 				createIfNode(local, expr);
@@ -181,11 +181,11 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Store store) {
-		Variable target = store.getTarget();
+		Var target = store.getTarget();
 		if (target.getType().isBool()) {
 			Expression expr = store.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
-				LocalVariable local = newVariable();
+				VarLocal local = newVariable();
 				procedure.getLocals().put(local.getName(), local);
 				store.setValue(new VarExpr(new Use(local)));
 				createIfNode(local, expr);

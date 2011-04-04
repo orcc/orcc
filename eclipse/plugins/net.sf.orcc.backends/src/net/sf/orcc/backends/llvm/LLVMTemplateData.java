@@ -38,11 +38,11 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
-import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.QSDFMoC;
@@ -216,12 +216,12 @@ public class LLVMTemplateData {
 		}
 
 		// Insert statevars
-		for (GlobalVariable var : actor.getStateVars()) {
+		for (VarGlobal var : actor.getStateVars()) {
 			computeStateVar(var);
 		}
 
 		// Insert parameters
-		for (Variable parameter : actor.getParameters()) {
+		for (Var parameter : actor.getParameters()) {
 			computeVar(parameter);
 		}
 
@@ -299,22 +299,22 @@ public class LLVMTemplateData {
 		procs.put(proc, id++);
 	}
 
-	private void computeStateVar(GlobalVariable var) {
+	private void computeStateVar(VarGlobal var) {
 		computeVar(var);
 		if (var.isInitialized()) {
 			exprs.put(var.getName(), id++);
 		}
 	}
 
-	private void computeVar(Variable var) {
+	private void computeVar(Var var) {
 		vars.put(var, id++);
 		names.put(var.getName(), id++);
 		types.put(var.getType(), id++);
 	}
 
-	private void computeVars(Map<Port, Variable> variables) {
-		if (!variables.isEmpty()) {
-			varPattern.put(variables, id++);
+	private void computeVars(Map<Port, Var> vars) {
+		if (!vars.isEmpty()) {
+			varPattern.put(vars, id++);
 		}
 	}
 

@@ -41,7 +41,7 @@ import java.util.ListIterator;
  * @author Matthieu Wipliez
  * 
  */
-public class Variable {
+public class Var {
 
 	/**
 	 * whether the variable is assignable.
@@ -102,7 +102,7 @@ public class Variable {
 	 * @param global
 	 *            whether this variable is global
 	 */
-	public Variable(Location location, Type type, String name, boolean global) {
+	public Var(Location location, Type type, String name, boolean global) {
 		this(location, type, name, global, false);
 	}
 
@@ -121,7 +121,7 @@ public class Variable {
 	 * @param assignable
 	 *            <code>true</code> if this variable can be assigned
 	 */
-	public Variable(Location location, Type type, String name, boolean global,
+	public Var(Location location, Type type, String name, boolean global,
 			boolean assignable) {
 		this.location = location;
 		this.type = type;
