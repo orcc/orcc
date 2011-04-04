@@ -32,11 +32,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypeVisitor;
 
@@ -222,11 +222,11 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetSizeExpr(Expression newSizeExpr, NotificationChain msgs) {
+	public NotificationChain basicSetSizeExpr(Expression newSizeExpr,
+			NotificationChain msgs) {
 		Expression oldSizeExpr = sizeExpr;
 		sizeExpr = newSizeExpr;
 		if (eNotificationRequired()) {
@@ -262,8 +262,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public NotificationChain basicSetType(Type newType, NotificationChain msgs) {
@@ -288,7 +287,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	 *            the number of elements of this list type
 	 */
 	public void setSize(int newSize) {
-		setSizeExpr(new IntExpr(newSize));
+		setSizeExpr(IrFactory.eINSTANCE.createExprInt(newSize));
 	}
 
 	/**
@@ -334,12 +333,12 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case IrPackage.TYPE_LIST__SIZE_EXPR:
 				return basicSetSizeExpr(null, msgs);

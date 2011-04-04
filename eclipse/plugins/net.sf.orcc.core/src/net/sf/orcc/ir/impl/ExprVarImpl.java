@@ -27,18 +27,17 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.ir.impl.ExprVarImpl#getUse <em>Use</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ExprVarImpl#getUse <em>Use</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 
 	/**
-	 * The cached value of the '{@link #getUse() <em>Use</em>}' containment
-	 * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getUse() <em>Use</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getUse()
 	 * @generated
 	 * @ordered
@@ -47,7 +46,6 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected ExprVarImpl() {
@@ -66,84 +64,74 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetUse(Use newUse, NotificationChain msgs) {
 		Use oldUse = use;
 		use = newUse;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.EXPR_VAR__USE, oldUse, newUse);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_VAR__USE, oldUse, newUse);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.EXPR_VAR__USE:
-			return getUse();
+			case IrPackage.EXPR_VAR__USE:
+				return getUse();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case IrPackage.EXPR_VAR__USE:
-			return basicSetUse(null, msgs);
+			case IrPackage.EXPR_VAR__USE:
+				return basicSetUse(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.EXPR_VAR__USE:
-			return use != null;
+			case IrPackage.EXPR_VAR__USE:
+				return use != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.EXPR_VAR__USE:
-			setUse((Use) newValue);
-			return;
+			case IrPackage.EXPR_VAR__USE:
+				setUse((Use)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -153,15 +141,14 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.EXPR_VAR__USE:
-			setUse((Use) null);
-			return;
+			case IrPackage.EXPR_VAR__USE:
+				setUse((Use)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -173,7 +160,6 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Use getUse() {
@@ -187,26 +173,20 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setUse(Use newUse) {
 		if (newUse != use) {
 			NotificationChain msgs = null;
 			if (use != null)
-				msgs = ((InternalEObject) use).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_VAR__USE, null,
-						msgs);
+				msgs = ((InternalEObject)use).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_VAR__USE, null, msgs);
 			if (newUse != null)
-				msgs = ((InternalEObject) newUse).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_VAR__USE, null,
-						msgs);
+				msgs = ((InternalEObject)newUse).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.EXPR_VAR__USE, null, msgs);
 			msgs = basicSetUse(newUse, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_VAR__USE, newUse, newUse));
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_VAR__USE, newUse, newUse));
 	}
 
 } // ExprVarImpl

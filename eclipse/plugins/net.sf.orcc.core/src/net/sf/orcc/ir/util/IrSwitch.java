@@ -8,9 +8,6 @@ package net.sf.orcc.ir.util;
 
 import java.util.List;
 
-import net.sf.orcc.ir.BinaryOp;
-import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -43,7 +40,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.UnaryOp;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.Var;

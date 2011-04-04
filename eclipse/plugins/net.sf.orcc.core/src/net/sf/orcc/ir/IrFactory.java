@@ -28,6 +28,84 @@ public interface IrFactory extends EFactory {
 	IrFactory eINSTANCE = net.sf.orcc.ir.impl.IrFactoryImpl.init();
 
 	/**
+	 * Returns a new object of class '<em>Expr Binary</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Binary</em>'.
+	 * @generated
+	 */
+	ExprBinary createExprBinary();
+
+	/**
+	 * Returns a new object of class '<em>Expr Bool</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Bool</em>'.
+	 * @generated
+	 */
+	ExprBool createExprBool();
+
+	Expression createExprBool(boolean value);
+
+	/**
+	 * Returns a new object of class '<em>Expr Float</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Float</em>'.
+	 * @generated
+	 */
+	ExprFloat createExprFloat();
+
+	/**
+	 * Returns a new object of class '<em>Expr Int</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Int</em>'.
+	 * @generated
+	 */
+	ExprInt createExprInt();
+
+	Expression createExprInt(int value);
+
+	/**
+	 * Returns a new object of class '<em>Expr List</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr List</em>'.
+	 * @generated
+	 */
+	ExprList createExprList();
+
+	Expression createExprList(ExprList l1, ExprList l2);
+
+	/**
+	 * Returns a new object of class '<em>Expr String</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr String</em>'.
+	 * @generated
+	 */
+	ExprString createExprString();
+
+	/**
+	 * Returns a new object of class '<em>Expr Unary</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Unary</em>'.
+	 * @generated
+	 */
+	ExprUnary createExprUnary();
+
+	/**
+	 * Returns a new object of class '<em>Expr Var</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Var</em>'.
+	 * @generated
+	 */
+	ExprVar createExprVar();
+
+	/**
 	 * Returns a new object of class '<em>Inst Assign</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -406,78 +484,6 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Use createUse();
-
-	/**
-	 * Returns a new object of class '<em>Expr Binary</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr Binary</em>'.
-	 * @generated
-	 */
-	ExprBinary createExprBinary();
-
-	/**
-	 * Returns a new object of class '<em>Expr Bool</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr Bool</em>'.
-	 * @generated
-	 */
-	ExprBool createExprBool();
-
-	/**
-	 * Returns a new object of class '<em>Expr Float</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr Float</em>'.
-	 * @generated
-	 */
-	ExprFloat createExprFloat();
-
-	/**
-	 * Returns a new object of class '<em>Expr Int</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr Int</em>'.
-	 * @generated
-	 */
-	ExprInt createExprInt();
-
-	/**
-	 * Returns a new object of class '<em>Expr List</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr List</em>'.
-	 * @generated
-	 */
-	ExprList createExprList();
-
-	/**
-	 * Returns a new object of class '<em>Expr String</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr String</em>'.
-	 * @generated
-	 */
-	ExprString createExprString();
-
-	/**
-	 * Returns a new object of class '<em>Expr Unary</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr Unary</em>'.
-	 * @generated
-	 */
-	ExprUnary createExprUnary();
-
-	/**
-	 * Returns a new object of class '<em>Expr Var</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr Var</em>'.
-	 * @generated
-	 */
-	ExprVar createExprVar();
 
 	/**
 	 * Creates a new use of the given variable.

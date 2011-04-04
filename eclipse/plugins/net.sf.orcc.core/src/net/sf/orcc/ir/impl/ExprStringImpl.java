@@ -23,17 +23,16 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.ir.impl.ExprStringImpl#getValue <em>Value</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ExprStringImpl#getValue <em>Value</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ExprStringImpl extends ExpressionImpl implements ExprString {
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
@@ -42,7 +41,6 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected ExprStringImpl() {
@@ -61,7 +59,6 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String basicGetValue() {
@@ -70,52 +67,47 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.EXPR_STRING__VALUE:
-			if (resolve)
-				return getValue();
-			return basicGetValue();
+			case IrPackage.EXPR_STRING__VALUE:
+				if (resolve) return getValue();
+				return basicGetValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.EXPR_STRING__VALUE:
-			return value != null;
+			case IrPackage.EXPR_STRING__VALUE:
+				return value != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.EXPR_STRING__VALUE:
-			setValue((String) newValue);
-			return;
+			case IrPackage.EXPR_STRING__VALUE:
+				setValue((String)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -125,15 +117,14 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.EXPR_STRING__VALUE:
-			setValue((String) null);
-			return;
+			case IrPackage.EXPR_STRING__VALUE:
+				setValue((String)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -155,15 +146,13 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setValue(String newValue) {
 		String oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.EXPR_STRING__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_STRING__VALUE, oldValue, value));
 	}
 
 } // ExprStringImpl

@@ -32,9 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
 import net.sf.orcc.network.attributes.IValueAttribute;
@@ -69,7 +69,7 @@ public class Connection implements IAttributeContainer, Comparable<Connection> {
 	 * source port
 	 */
 	private Port source;
-	
+
 	/**
 	 * target port
 	 */
@@ -89,7 +89,8 @@ public class Connection implements IAttributeContainer, Comparable<Connection> {
 	 */
 	public Connection(Port source, Port target, int size) {
 		this.attributes = new HashMap<String, IAttribute>();
-		attributes.put(BUFFER_SIZE, new ValueAttribute(new IntExpr(size)));
+		attributes.put(BUFFER_SIZE,
+				new ValueAttribute(IrFactory.eINSTANCE.createExprInt(size)));
 		this.source = source;
 		this.target = target;
 	}

@@ -28,15 +28,17 @@
  */
 package net.sf.orcc.ir.expr;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Var;
@@ -63,7 +65,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	public int evaluateAsInteger(Expression expr) {
 		Expression value = (Expression) expr.accept(this);
 		if (value != null && value.isIntExpr()) {
-			return ((IntExpr) value).getIntValue();
+			return ((ExprInt) value).getIntValue();
 		}
 
 		// evaluated ok, but not as an integer
@@ -96,13 +98,14 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 
 	@Override
 	public Object interpret(ExprList expr, Object... args) {
+		ExprList list = IrFactory.eINSTANCE.createExprList();
 		List<Expression> expressions = expr.getValue();
-		List<Expression> values = new ArrayList<Expression>(expressions.size());
+		List<Expression> values = list.getValue();
 		for (Expression expression : expressions) {
 			values.add((Expression) expression.accept(this));
 		}
 
-		return new ListExpr(values);
+		return list;
 	}
 
 	@Override
@@ -127,7 +130,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 
 	@Override
 	public Object interpret(ExprVar expr, Object... args) {
-		Var var = expr.getVar().getVariable();
+		Var var = expr.getUse().getVariable();
 		Expression value = var.getValue();
 		if (value == null && throwException) {
 			throwException = false;
@@ -156,54 +159,54 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 		case BITAND:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.and(i2);
 			}
 			break;
 		case BITOR:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.or(i2);
 			}
 			break;
 		case BITXOR:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.xor(i2);
 			}
 			break;
 		case DIV:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.divide(i2);
 			}
 			break;
 		case DIV_INT:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.divide(i2);
 			}
 			break;
 		case EQ:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
-				return new BoolExpr(i1.equals(i2));
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
+				return IrFactory.eINSTANCE.createExprBool(i1.equals(i2));
 			} else if (val1 != null && val1.isBooleanExpr() && val2 != null
 					&& val2.isBooleanExpr()) {
-				BoolExpr b1 = (BoolExpr) val1;
-				BoolExpr b2 = (BoolExpr) val2;
-				return new BoolExpr(b1.equals(b2));
+				ExprInt b1 = (ExprInt) val1;
+				ExprInt b2 = (ExprInt) val2;
+				return IrFactory.eINSTANCE.createExprBool(b1.equals(b2));
 			}
 			break;
 		case EXP:
@@ -211,116 +214,118 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 		case GE:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.ge(i2);
 			}
 			break;
 		case GT:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.gt(i2);
 			}
 			break;
 		case LOGIC_AND:
 			if (val1 != null && val1.isBooleanExpr() && val2 != null
 					&& val2.isBooleanExpr()) {
-				BoolExpr b1 = (BoolExpr) val1;
-				BoolExpr b2 = (BoolExpr) val2;
-				return new BoolExpr(b1.getValue() && b2.getValue());
+				ExprBool b1 = (ExprBool) val1;
+				ExprBool b2 = (ExprBool) val2;
+				return IrFactory.eINSTANCE.createExprBool(b1.isValue()
+						&& b2.isValue());
 			}
 			break;
 		case LE:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.le(i2);
 			}
 			break;
 		case LOGIC_OR:
 			if (val1 != null && val1.isBooleanExpr() && val2 != null
 					&& val2.isBooleanExpr()) {
-				BoolExpr b1 = (BoolExpr) val1;
-				BoolExpr b2 = (BoolExpr) val2;
-				return new BoolExpr(b1.getValue() || b2.getValue());
+				ExprBool b1 = (ExprBool) val1;
+				ExprBool b2 = (ExprBool) val2;
+				return IrFactory.eINSTANCE.createExprBool(b1.isValue()
+						|| b2.isValue());
 			}
 			break;
 		case LT:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.lt(i2);
 			}
 			break;
 		case MINUS:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.subtract(i2);
 			}
 			break;
 		case MOD:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.mod(i2);
 			}
 			break;
 		case NE:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
-				return new BoolExpr(!i1.equals(i2));
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
+				return IrFactory.eINSTANCE.createExprBool(!i1.equals(i2));
 			} else if (val1 != null && val1.isBooleanExpr() && val2 != null
 					&& val2.isBooleanExpr()) {
-				BoolExpr b1 = (BoolExpr) val1;
-				BoolExpr b2 = (BoolExpr) val2;
-				return new BoolExpr(!b1.equals(b2));
+				ExprBool b1 = (ExprBool) val1;
+				ExprBool b2 = (ExprBool) val2;
+				return IrFactory.eINSTANCE.createExprBool(!b1.equals(b2));
 			}
 			break;
 		case PLUS:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.add(i2);
 			}
 
 			if (val1 != null && val1.isListExpr() && val2 != null
 					&& val2.isListExpr()) {
-				ListExpr l1 = (ListExpr) val1;
-				ListExpr l2 = (ListExpr) val2;
-				return new ListExpr(l1, l2);
+				ExprList l1 = (ExprList) val1;
+				ExprList l2 = (ExprList) val2;
+				return IrFactory.eINSTANCE.createExprList(l1, l2);
 			}
 			break;
 		case SHIFT_LEFT:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.shiftLeft(i2);
 			}
 			break;
 		case SHIFT_RIGHT:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.shiftRight(i2);
 			}
 			break;
 		case TIMES:
 			if (val1 != null && val1.isIntExpr() && val2 != null
 					&& val2.isIntExpr()) {
-				IntExpr i1 = (IntExpr) val1;
-				IntExpr i2 = (IntExpr) val2;
+				ExprInt i1 = (ExprInt) val1;
+				ExprInt i2 = (ExprInt) val2;
 				return i1.multiply(i2);
 			}
 			break;
@@ -343,17 +348,17 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 		switch (op) {
 		case BITNOT:
 			if (value != null && value.isIntExpr()) {
-				return ((IntExpr) value).not();
+				return ((ExprInt) value).not();
 			}
 			break;
 		case LOGIC_NOT:
 			if (value != null && value.isBooleanExpr()) {
-				return ((BoolExpr) value).not();
+				return ((ExprBool) value).not();
 			}
 			break;
 		case MINUS:
 			if (value != null && value.isIntExpr()) {
-				return ((IntExpr) value).negate();
+				return ((ExprInt) value).negate();
 			}
 			break;
 		case NUM_ELTS:

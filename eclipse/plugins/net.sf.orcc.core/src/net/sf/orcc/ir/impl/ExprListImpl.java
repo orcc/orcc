@@ -16,7 +16,6 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
-import net.sf.orcc.ir.expr.ListExpr;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
@@ -28,18 +27,17 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.ir.impl.ExprListImpl#getValue <em>Value</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ExprListImpl#getValue <em>Value</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ExprListImpl extends ExpressionImpl implements ExprList {
 
 	/**
-	 * The cached value of the '{@link #getValue() <em>Value</em>}' reference
-	 * list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getValue() <em>Value</em>}' reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
@@ -48,17 +46,10 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected ExprListImpl() {
 		super();
-	}
-
-	protected ExprListImpl(ListExpr l1, ListExpr l2) {
-		super();
-		getValue().addAll(l1.getValue());
-		getValue().addAll(l2.getValue());
 	}
 
 	@Override
@@ -73,52 +64,48 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.EXPR_LIST__VALUE:
-			return getValue();
+			case IrPackage.EXPR_LIST__VALUE:
+				return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.EXPR_LIST__VALUE:
-			return value != null && !value.isEmpty();
+			case IrPackage.EXPR_LIST__VALUE:
+				return value != null && !value.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.EXPR_LIST__VALUE:
-			getValue().clear();
-			getValue().addAll((Collection<? extends Expression>) newValue);
-			return;
+			case IrPackage.EXPR_LIST__VALUE:
+				getValue().clear();
+				getValue().addAll((Collection<? extends Expression>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -128,15 +115,14 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.EXPR_LIST__VALUE:
-			getValue().clear();
-			return;
+			case IrPackage.EXPR_LIST__VALUE:
+				getValue().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -174,13 +160,11 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Expression> getValue() {
 		if (value == null) {
-			value = new EObjectResolvingEList<Expression>(Expression.class,
-					this, IrPackage.EXPR_LIST__VALUE);
+			value = new EObjectResolvingEList<Expression>(Expression.class, this, IrPackage.EXPR_LIST__VALUE);
 		}
 		return value;
 	}

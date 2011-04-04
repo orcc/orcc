@@ -16,6 +16,8 @@ import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
+
+import java.math.BigInteger;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
@@ -100,6 +102,41 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertOpBinaryToString(EDataType eDataType, Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertOpUnaryToString(EDataType eDataType, Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String convertToString(EDataType eDataType, Object instanceValue) {
+		switch (eDataType.getClassifierID()) {
+			case IrPackage.OP_BINARY:
+				return convertOpBinaryToString(eDataType, instanceValue);
+			case IrPackage.OP_UNARY:
+				return convertOpUnaryToString(eDataType, instanceValue);
+			default:
+				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		}
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -145,16 +182,101 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public ExprBinary createExprBinary() {
+		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
+		return exprBinary;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprBool createExprBool() {
+		ExprBoolImpl exprBool = new ExprBoolImpl();
+		return exprBool;
+	}
+
 	@Override
-	public Object createFromString(EDataType eDataType, String initialValue) {
-		switch (eDataType.getClassifierID()) {
-			case IrPackage.OP_BINARY:
-				return createOpBinaryFromString(eDataType, initialValue);
-			case IrPackage.OP_UNARY:
-				return createOpUnaryFromString(eDataType, initialValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
-		}
+	public Expression createExprBool(boolean value) {
+		ExprBoolImpl exprBool = new ExprBoolImpl();
+		exprBool.setValue(value);
+		return exprBool;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprFloat createExprFloat() {
+		ExprFloatImpl exprFloat = new ExprFloatImpl();
+		return exprFloat;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprInt createExprInt() {
+		ExprIntImpl exprInt = new ExprIntImpl();
+		return exprInt;
+	}
+
+	@Override
+	public Expression createExprInt(int value) {
+		ExprIntImpl exprInt = new ExprIntImpl();
+		exprInt.setValue(BigInteger.valueOf(value));
+		return exprInt;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprList createExprList() {
+		ExprListImpl exprList = new ExprListImpl();
+		return exprList;
+	}
+
+	@Override
+	public Expression createExprList(ExprList l1, ExprList l2) {
+		ExprListImpl exprList = new ExprListImpl();
+		exprList.getValue().addAll(l1.getValue());
+		exprList.getValue().addAll(l2.getValue());
+		return exprList;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprString createExprString() {
+		ExprStringImpl exprString = new ExprStringImpl();
+		return exprString;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprUnary createExprUnary() {
+		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
+		return exprUnary;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprVar createExprVar() {
+		ExprVarImpl exprVar = new ExprVarImpl();
+		return exprVar;
 	}
 
 	/**
@@ -163,12 +285,12 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * @generated
 	 */
 	@Override
-	public String convertToString(EDataType eDataType, Object instanceValue) {
+	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
 			case IrPackage.OP_BINARY:
-				return convertOpBinaryToString(eDataType, instanceValue);
+				return createOpBinaryFromString(eDataType, initialValue);
 			case IrPackage.OP_UNARY:
-				return convertOpUnaryToString(eDataType, instanceValue);
+				return createOpUnaryFromString(eDataType, initialValue);
 			default:
 				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
@@ -390,6 +512,28 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public OpBinary createOpBinaryFromString(EDataType eDataType, String initialValue) {
+		OpBinary result = OpBinary.get(initialValue);
+		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public OpUnary createOpUnaryFromString(EDataType eDataType, String initialValue) {
+		OpUnary result = OpUnary.get(initialValue);
+		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		return result;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -532,126 +676,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Use createUse() {
 		UseImpl use = new UseImpl();
 		return use;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ExprBinary createExprBinary() {
-		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
-		return exprBinary;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ExprBool createExprBool() {
-		ExprBoolImpl exprBool = new ExprBoolImpl();
-		return exprBool;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ExprFloat createExprFloat() {
-		ExprFloatImpl exprFloat = new ExprFloatImpl();
-		return exprFloat;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ExprInt createExprInt() {
-		ExprIntImpl exprInt = new ExprIntImpl();
-		return exprInt;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ExprList createExprList() {
-		ExprListImpl exprList = new ExprListImpl();
-		return exprList;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ExprString createExprString() {
-		ExprStringImpl exprString = new ExprStringImpl();
-		return exprString;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ExprUnary createExprUnary() {
-		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
-		return exprUnary;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ExprVar createExprVar() {
-		ExprVarImpl exprVar = new ExprVarImpl();
-		return exprVar;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public OpBinary createOpBinaryFromString(EDataType eDataType, String initialValue) {
-		OpBinary result = OpBinary.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
-		return result;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String convertOpBinaryToString(EDataType eDataType, Object instanceValue) {
-		return instanceValue == null ? null : instanceValue.toString();
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public OpUnary createOpUnaryFromString(EDataType eDataType, String initialValue) {
-		OpUnary result = OpUnary.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
-		return result;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String convertOpUnaryToString(EDataType eDataType, Object instanceValue) {
-		return instanceValue == null ? null : instanceValue.toString();
 	}
 
 	@Override

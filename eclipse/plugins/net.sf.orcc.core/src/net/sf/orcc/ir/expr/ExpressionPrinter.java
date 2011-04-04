@@ -42,6 +42,7 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
+import net.sf.orcc.ir.impl.ExprBinaryImpl;
 
 /**
  * This class defines the default expression printer.
@@ -92,11 +93,11 @@ public class ExpressionPrinter implements ExpressionVisitor {
 	 */
 	protected void toString(int nextPrec, Expression e1, OpBinary op,
 			Expression e2) {
-		e1.accept(this, nextPrec, BinaryExpr.LEFT);
+		e1.accept(this, nextPrec, ExprBinaryImpl.LEFT);
 		builder.append(" ");
 		builder.append(toString(op));
 		builder.append(" ");
-		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
+		e2.accept(this, nextPrec, ExprBinaryImpl.RIGHT);
 	}
 
 	/**
@@ -125,7 +126,7 @@ public class ExpressionPrinter implements ExpressionVisitor {
 
 	@Override
 	public void visit(ExprBool expr, Object... args) {
-		builder.append(expr.getValue());
+		builder.append(expr.isValue());
 	}
 
 	@Override
@@ -168,7 +169,7 @@ public class ExpressionPrinter implements ExpressionVisitor {
 
 	@Override
 	public void visit(ExprVar expr, Object... args) {
-		builder.append(expr.getVar());
+		builder.append(expr.getUse());
 	}
 
 }
