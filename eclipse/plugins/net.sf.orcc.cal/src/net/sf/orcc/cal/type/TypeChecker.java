@@ -58,15 +58,15 @@ import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
+import net.sf.orcc.ir.impl.ExprIntImpl;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -110,7 +110,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionBinary(AstExpressionBinary expression) {
-		BinaryOp op = BinaryOp.getOperator(expression.getOperator());
+		OpBinary op = OpBinary.getOperator(expression.getOperator());
 		Type t1 = getType(expression.getLeft());
 		Type t2 = getType(expression.getRight());
 		return getTypeBinary(op, t1, t2, expression, CalPackage.AST_EXPRESSION);
@@ -227,7 +227,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionInteger(AstExpressionInteger expression) {
-		return IrFactory.eINSTANCE.createTypeInt(IntExpr.getSize(expression
+		return IrFactory.eINSTANCE.createTypeInt(ExprIntImpl.getSize(expression
 				.getValue()));
 	}
 
@@ -268,7 +268,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionUnary(AstExpressionUnary expression) {
-		UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
+		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
 		Type type = getType(expression.getExpression());
 		if (type == null) {
 			return null;
@@ -307,8 +307,8 @@ public class TypeChecker extends CalSwitch<Type> {
 				return null;
 			}
 			TypeList listType = (TypeList) type;
-			return IrFactory.eINSTANCE.createTypeInt(IntExpr.getSize(listType
-					.getSize()));
+			return IrFactory.eINSTANCE.createTypeInt(ExprIntImpl
+					.getSize(listType.getSize()));
 		default:
 			error("Unknown unary operator", expression,
 					CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
@@ -387,13 +387,13 @@ public class TypeChecker extends CalSwitch<Type> {
 			Expression dim = itD.next();
 			if (dim == null) {
 				// no index size: assume 32 bits
-				dim = new IntExpr(32);
+				dim = IrFactory.eINSTANCE.createExprInt(32);
 			}
 
 			AstExpression index = itI.next();
 			if (EcoreUtil.isAncestor(index, expression)) {
 				// index goes from 0 to dim - 1
-				int indexSize = IntExpr.getSize(new ExpressionEvaluator()
+				int indexSize = ExprIntImpl.getSize(new ExpressionEvaluator()
 						.evaluateAsInteger(dim) - 1);
 				return IrFactory.eINSTANCE.createTypeInt(indexSize);
 			}
@@ -655,7 +655,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	 *            feature
 	 * @return the type of the binary expression, or <code>null</code>
 	 */
-	private Type getTypeBinary(BinaryOp op, Type t1, Type t2, EObject source,
+	private Type getTypeBinary(OpBinary op, Type t1, Type t2, EObject source,
 			int feature) {
 		if (t1 == null || t2 == null) {
 			return null;

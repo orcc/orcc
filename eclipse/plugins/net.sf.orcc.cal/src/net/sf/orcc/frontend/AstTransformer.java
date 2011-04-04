@@ -61,6 +61,7 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -74,19 +75,13 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
@@ -120,18 +115,19 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
-			BinaryOp op = BinaryOp.getOperator(expression.getOperator());
+			OpBinary op = OpBinary.getOperator(expression.getOperator());
 			Expression e1 = doSwitch(expression.getLeft());
 			Expression e2 = doSwitch(expression.getRight());
 
-			return new BinaryExpr(e1, op, e2, expression.getIrType());
+			return IrFactory.eINSTANCE.createExprBinary(e1, op, e2,
+					expression.getIrType());
 		}
 
 		@Override
 		public Expression caseAstExpressionBoolean(
 				AstExpressionBoolean expression) {
 			boolean value = expression.isValue();
-			return new BoolExpr(value);
+			return IrFactory.eINSTANCE.createExprBool(value);
 		}
 
 		@Override
@@ -156,8 +152,7 @@ public class AstTransformer {
 					astCall.getParameters());
 
 			// return local variable
-			Use use = IrFactory.eINSTANCE.createUse(target);
-			Expression varExpr = new VarExpr(use);
+			Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
 			return varExpr;
 		}
 
@@ -202,8 +197,7 @@ public class AstTransformer {
 			node.getElseNodes().addAll(elseNodes);
 			context.getProcedure().getNodes().add(node);
 
-			Use use = IrFactory.eINSTANCE.createUse(target);
-			Expression varExpr = new VarExpr(use);
+			Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
 
 			// restores target and indexes
 			target = currentTarget;
@@ -234,8 +228,7 @@ public class AstTransformer {
 					target, IrFactory.eINSTANCE.createUse(var), indexes);
 			addInstruction(load);
 
-			Use use = IrFactory.eINSTANCE.createUse(target);
-			Expression varExpr = new VarExpr(use);
+			Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
 			return varExpr;
 		}
 
@@ -243,7 +236,7 @@ public class AstTransformer {
 		public Expression caseAstExpressionInteger(
 				AstExpressionInteger expression) {
 			long value = expression.getValue();
-			return new IntExpr(value);
+			return IrFactory.eINSTANCE.createExprInt(value);
 		}
 
 		@Override
@@ -262,8 +255,7 @@ public class AstTransformer {
 				transformListGenerators(expressions, generators);
 			}
 
-			Expression expression = new VarExpr(
-					IrFactory.eINSTANCE.createUse(target));
+			Expression expression = IrFactory.eINSTANCE.createExprVar(target);
 
 			// restores target and indexes
 			target = currentTarget;
@@ -275,21 +267,22 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionString(AstExpressionString expression) {
-			return new StringExpr(OrccUtil.getEscapedString(expression
-					.getValue()));
+			return IrFactory.eINSTANCE.createExprString(OrccUtil
+					.getEscapedString(expression.getValue()));
 		}
 
 		@Override
 		public Expression caseAstExpressionUnary(AstExpressionUnary expression) {
-			UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
+			OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
 			Expression expr = doSwitch(expression.getExpression());
 
-			if (UnaryOp.NUM_ELTS == op) {
+			if (OpUnary.NUM_ELTS == op) {
 				TypeList typeList = (TypeList) expr.getType();
-				return new IntExpr(typeList.getSize());
+				return IrFactory.eINSTANCE.createExprInt(typeList.getSize());
 			}
 
-			return new UnaryExpr(op, expr, expression.getIrType());
+			return IrFactory.eINSTANCE.createExprUnary(op, expr,
+					expression.getIrType());
 		}
 
 		@Override
@@ -306,8 +299,7 @@ public class AstTransformer {
 			}
 
 			if (var.getType().isList()) {
-				Use use = IrFactory.eINSTANCE.createUse(var);
-				Expression varExpr = new VarExpr(use);
+				Expression varExpr = IrFactory.eINSTANCE.createExprVar(var);
 				return varExpr;
 			} else {
 				Var v = null;
@@ -316,8 +308,8 @@ public class AstTransformer {
 				} else {
 					v = var;
 				}
-				Use use = IrFactory.eINSTANCE.createUse(v);
-				Expression varExpr = new VarExpr(use);
+
+				Expression varExpr = IrFactory.eINSTANCE.createExprVar(v);
 				return varExpr;
 			}
 		}
@@ -474,11 +466,13 @@ public class AstTransformer {
 				AstExpression astLower = generator.getLower();
 				int lower = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astLower);
-				Expression thisIndex = new VarExpr(
-						IrFactory.eINSTANCE.createUse(loopVar));
+				Expression thisIndex = IrFactory.eINSTANCE
+						.createExprVar(loopVar);
 				if (lower != 0) {
-					thisIndex = new BinaryExpr(thisIndex, BinaryOp.MINUS,
-							new IntExpr(lower), thisIndex.getType());
+					thisIndex = IrFactory.eINSTANCE.createExprBinary(thisIndex,
+							OpBinary.MINUS,
+							IrFactory.eINSTANCE.createExprInt(lower),
+							EcoreUtil.copy(thisIndex.getType()));
 				}
 
 				AstExpression astHigher = generator.getHigher();
@@ -488,10 +482,15 @@ public class AstTransformer {
 				if (index == null) {
 					index = thisIndex;
 				} else {
-					index = new BinaryExpr(new BinaryExpr(index,
-							BinaryOp.TIMES, new IntExpr(higher - lower + 1),
-							index.getType()), BinaryOp.PLUS, thisIndex,
-							index.getType());
+					index = IrFactory.eINSTANCE.createExprBinary(
+							IrFactory.eINSTANCE.createExprBinary(
+									index,
+									OpBinary.TIMES,
+									IrFactory.eINSTANCE.createExprInt(higher
+											- lower + 1),
+									EcoreUtil.copy(index.getType())),
+							OpBinary.PLUS, thisIndex, EcoreUtil.copy(index
+									.getType()));
 				}
 			}
 
@@ -514,18 +513,19 @@ public class AstTransformer {
 				// condition
 				AstExpression astHigher = generator.getHigher();
 				Expression higher = transformExpression(astHigher);
-				Expression condition = new BinaryExpr(new VarExpr(
-						IrFactory.eINSTANCE.createUse(loopVar)), BinaryOp.LE,
-						higher, IrFactory.eINSTANCE.createTypeBool());
+				Expression condition = IrFactory.eINSTANCE.createExprBinary(
+						IrFactory.eINSTANCE.createExprVar(loopVar),
+						OpBinary.LE, higher,
+						IrFactory.eINSTANCE.createTypeBool());
 
 				// add increment to body
 				NodeBlock block = procedure.getLast(nodes);
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						location,
-						loopVar,
-						new BinaryExpr(new VarExpr(IrFactory.eINSTANCE
-								.createUse(loopVar)), BinaryOp.PLUS,
-								new IntExpr(1), loopVar.getType()));
+						location, loopVar, IrFactory.eINSTANCE
+								.createExprBinary(IrFactory.eINSTANCE
+										.createExprVar(loopVar), OpBinary.PLUS,
+										IrFactory.eINSTANCE.createExprInt(1),
+										EcoreUtil.copy(loopVar.getType())));
 				block.add(assign);
 
 				// create while
@@ -573,7 +573,7 @@ public class AstTransformer {
 				Location location = Util.getLocation(expression);
 
 				indexes = new ArrayList<Expression>(currentIndexes);
-				indexes.add(new IntExpr(i));
+				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 				i++;
 
 				Expression value = transformExpression(expression);
@@ -615,8 +615,8 @@ public class AstTransformer {
 
 		@Override
 		public Object caseAstExpressionBinary(AstExpressionBinary astExpression) {
-			BinaryOp op = BinaryOp.getOperator(astExpression.getOperator());
-			if (op == BinaryOp.PLUS) {
+			OpBinary op = OpBinary.getOperator(astExpression.getOperator());
+			if (op == OpBinary.PLUS) {
 				doSwitch(astExpression.getLeft());
 				Expression expression = transformExpression(astExpression
 						.getRight());
@@ -711,19 +711,19 @@ public class AstTransformer {
 			// condition
 			AstExpression astHigher = foreach.getHigher();
 			Expression higher = transformExpression(astHigher);
-			Expression condition = new BinaryExpr(new VarExpr(
-					IrFactory.eINSTANCE.createUse(loopVar)), BinaryOp.LE,
+			Expression condition = IrFactory.eINSTANCE.createExprBinary(
+					IrFactory.eINSTANCE.createExprVar(loopVar), OpBinary.LE,
 					higher, IrFactory.eINSTANCE.createTypeBool());
 
 			// body
 			List<Node> nodes = getNodes(foreach.getStatements());
 			NodeBlock block = procedure.getLast(nodes);
-			assign = IrFactory.eINSTANCE.createInstAssign(
-					location,
-					loopVar,
-					new BinaryExpr(new VarExpr(IrFactory.eINSTANCE
-							.createUse(loopVar)), BinaryOp.PLUS,
-							new IntExpr(1), loopVar.getType()));
+			assign = IrFactory.eINSTANCE.createInstAssign(location, loopVar,
+					IrFactory.eINSTANCE.createExprBinary(
+							IrFactory.eINSTANCE.createExprVar(loopVar),
+							OpBinary.PLUS,
+							IrFactory.eINSTANCE.createExprInt(1),
+							EcoreUtil.copy(loopVar.getType())));
 			block.add(assign);
 
 			// create while
@@ -835,7 +835,7 @@ public class AstTransformer {
 				}
 
 				if ("println".equals(name)) {
-					parameters.add(new StringExpr("\\n"));
+					parameters.add(IrFactory.eINSTANCE.createExprString("\\n"));
 				}
 
 				addInstruction(IrFactory.eINSTANCE.createInstCall(location,
@@ -953,7 +953,7 @@ public class AstTransformer {
 			List<Expression> indexes, Expression value) {
 		// special case for list expressions
 		if (value.isVarExpr()) {
-			Use use = ((VarExpr) value).getVar();
+			Use use = ((ExprVar) value).getUse();
 			if (use.getVariable().getType().isList()) {
 				return;
 			}
@@ -995,8 +995,7 @@ public class AstTransformer {
 			if (local != null
 					&& context.getSetGlobalsToStore().contains(global)) {
 				// variable already loaded somewhere and modified
-				VarExpr value = new VarExpr(
-						IrFactory.eINSTANCE.createUse(local));
+				ExprVar value = IrFactory.eINSTANCE.createExprVar(local);
 
 				List<Expression> indexes = new ArrayList<Expression>(0);
 				InstStore store = IrFactory.eINSTANCE.createInstStore(location,
@@ -1239,7 +1238,7 @@ public class AstTransformer {
 	private void storeGlobals() {
 		for (Var global : context.getSetGlobalsToStore()) {
 			Var local = context.getMapGlobals().get(global);
-			VarExpr value = new VarExpr(IrFactory.eINSTANCE.createUse(local));
+			ExprVar value = IrFactory.eINSTANCE.createExprVar(local);
 			Location location = global.getLocation();
 
 			List<Expression> indexes = new ArrayList<Expression>(0);

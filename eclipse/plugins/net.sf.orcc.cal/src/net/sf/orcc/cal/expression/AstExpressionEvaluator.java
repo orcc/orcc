@@ -51,17 +51,16 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.frontend.Util;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.FloatExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -85,7 +84,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 	@Override
 	public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
-		BinaryOp op = BinaryOp.getOperator(expression.getOperator());
+		OpBinary op = OpBinary.getOperator(expression.getOperator());
 		Expression val1 = evaluate(expression.getLeft());
 		Expression val2 = evaluate(expression.getRight());
 		return new ExpressionEvaluator().interpretBinaryExpr(val1, op, val2);
@@ -93,7 +92,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 	@Override
 	public Expression caseAstExpressionBoolean(AstExpressionBoolean expression) {
-		return new BoolExpr(expression.isValue());
+		return IrFactory.eINSTANCE.createExprBool(expression.isValue());
 	}
 
 	@Override
@@ -113,7 +112,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 	@Override
 	public Expression caseAstExpressionFloat(AstExpressionFloat expression) {
-		return new FloatExpr(expression.getValue());
+		return IrFactory.eINSTANCE.createExprFloat(expression.getValue());
 	}
 
 	@Override
@@ -125,7 +124,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		Expression oElse = evaluate(expression.getElse());
 
 		if (condition != null && condition.isBooleanExpr()) {
-			if (((BoolExpr) condition).getValue()) {
+			if (((ExprBool) condition).isValue()) {
 				return oThen;
 			} else {
 				return oElse;
@@ -154,9 +153,9 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		for (AstExpression index : indexes) {
 			Expression indexValue = evaluate(index);
 			if (value != null && value.isListExpr()) {
-				ListExpr list = (ListExpr) value;
+				ExprList list = (ExprList) value;
 				if (indexValue != null && indexValue.isIntExpr()) {
-					IntExpr intExpr = (IntExpr) indexValue;
+					ExprInt intExpr = (ExprInt) indexValue;
 					if (intExpr.isLong()) {
 						error("index must be a int(size=32) integer",
 								expression,
@@ -185,7 +184,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 	@Override
 	public Expression caseAstExpressionInteger(AstExpressionInteger expression) {
-		return new IntExpr(expression.getValue());
+		return IrFactory.eINSTANCE.createExprInt(expression.getValue());
 	}
 
 	@Override
@@ -193,39 +192,37 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		List<AstExpression> expressions = expression.getExpressions();
 		List<AstGenerator> generators = expression.getGenerators();
 
-		List<Expression> list;
+		ExprList list = IrFactory.eINSTANCE.createExprList();
 		if (generators.isEmpty()) {
-			int size = expressions.size();
-			list = new ArrayList<Expression>(size);
 			for (AstExpression subExpression : expressions) {
-				list.add(evaluate(subExpression));
+				list.getValue().add(evaluate(subExpression));
 			}
 		} else {
 			// generators will be translated to statements in initialize
-			list = new ArrayList<Expression>(0);
 
 			// for some weird reason the evaluation of generators slows down *a
 			// lot* everything (even code generation, although I have no idea
 			// why), so we will not use it
 		}
 
-		return new ListExpr(list);
+		return list;
 	}
 
 	@Override
 	public Expression caseAstExpressionString(AstExpressionString expression) {
-		return new StringExpr(OrccUtil.getEscapedString(expression.getValue()));
+		return IrFactory.eINSTANCE.createExprString(OrccUtil
+				.getEscapedString(expression.getValue()));
 	}
 
 	@Override
 	public Expression caseAstExpressionUnary(AstExpressionUnary expression) {
-		UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
+		OpUnary op = OpUnary.getOperator(expression.getUnaryOperator());
 
 		switch (op) {
 		case BITNOT: {
 			Expression value = evaluate(expression.getExpression());
 			if (value != null && value.isIntExpr()) {
-				IntExpr i = (IntExpr) value;
+				ExprInt i = (ExprInt) value;
 				return i.not();
 			}
 
@@ -236,7 +233,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		case LOGIC_NOT: {
 			Expression value = evaluate(expression.getExpression());
 			if (value != null && value.isBooleanExpr()) {
-				return ((BoolExpr) value).not();
+				return ((ExprBool) value).not();
 			}
 
 			error("not expects a boolean expression", expression,
@@ -246,7 +243,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		case MINUS: {
 			Expression value = evaluate(expression.getExpression());
 			if (value != null && value.isIntExpr()) {
-				IntExpr i = (IntExpr) value;
+				ExprInt i = (ExprInt) value;
 				return i.negate();
 			}
 
@@ -258,7 +255,8 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			TypeChecker typeChecker = new TypeChecker(validator);
 			Type type = typeChecker.getType(expression.getExpression());
 			if (type != null && type.isList()) {
-				return new IntExpr(((TypeList) type).getSize());
+				return IrFactory.eINSTANCE.createExprInt(((TypeList) type)
+						.getSize());
 			}
 
 			error("operator # expects a list expression", expression,
@@ -319,7 +317,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 	public int evaluateAsInteger(AstExpression expression) {
 		Expression value = evaluate(expression);
 		if (value != null && value.isIntExpr()) {
-			IntExpr intExpr = (IntExpr) value;
+			ExprInt intExpr = (ExprInt) value;
 			if (intExpr.isLong()) {
 				error("integer expression too large", expression,
 						CalPackage.AST_EXPRESSION);
