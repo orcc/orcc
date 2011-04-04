@@ -38,23 +38,24 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
-import net.sf.orcc.ir.expr.FloatExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -92,7 +93,7 @@ public class XDFWriter {
 	private class BinOpSeqWriter implements ExpressionVisitor {
 
 		@Override
-		public void visit(BinaryExpr expr, Object... args) {
+		public void visit(ExprBinary expr, Object... args) {
 			Element parent = ((Element) args[0]);
 
 			int parentPrec = (Integer) args[1];
@@ -116,7 +117,7 @@ public class XDFWriter {
 		}
 
 		@Override
-		public void visit(BoolExpr expr, Object... args) {
+		public void visit(ExprBool expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Boolean");
@@ -125,7 +126,7 @@ public class XDFWriter {
 		}
 
 		@Override
-		public void visit(FloatExpr expr, Object... args) {
+		public void visit(ExprFloat expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Real");
@@ -134,7 +135,7 @@ public class XDFWriter {
 		}
 
 		@Override
-		public void visit(IntExpr expr, Object... args) {
+		public void visit(ExprInt expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Integer");
@@ -143,7 +144,7 @@ public class XDFWriter {
 		}
 
 		@Override
-		public void visit(ListExpr expr, Object... args) {
+		public void visit(ExprList expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "List");
 			for (Expression childExpr : expr.getValue()) {
@@ -152,7 +153,7 @@ public class XDFWriter {
 		}
 
 		@Override
-		public void visit(StringExpr expr, Object... args) {
+		public void visit(ExprString expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "String");
@@ -161,7 +162,7 @@ public class XDFWriter {
 		}
 
 		@Override
-		public void visit(UnaryExpr expr, Object... args) {
+		public void visit(ExprUnary expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "UnaryOp");
 
@@ -176,15 +177,15 @@ public class XDFWriter {
 		}
 
 		@Override
-		public void visit(VarExpr expr, Object... args) {
+		public void visit(ExprVar expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
-			String value = expr.getVar().getVariable().getName();
+			String value = expr.getUse().getVariable().getName();
 			exprElt.setAttribute("kind", "Var");
 			exprElt.setAttribute("name", value);
 			((Element) args[0]).appendChild(exprElt);
 		}
 
-		private void writeOperator(BinaryOp op, Element parent) {
+		private void writeOperator(OpBinary op, Element parent) {
 			Element opElt = document.createElement("Op");
 			opElt.setAttribute("name", op.getText());
 			parent.appendChild(opElt);
@@ -547,19 +548,22 @@ public class XDFWriter {
 		} else if (type.isInt()) {
 			name = "int";
 			size = ((TypeInt) type).getSize();
-			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
+			typeElt.appendChild(writeEntry("size",
+					IrFactory.eINSTANCE.createExprInt(size)));
 		} else if (type.isList()) {
 			name = "List";
 			size = ((TypeList) type).getSize();
 			type = ((TypeList) type).getType();
 			typeElt.appendChild(writeEntry("type", type));
-			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
+			typeElt.appendChild(writeEntry("size",
+					IrFactory.eINSTANCE.createExprInt(size)));
 		} else if (type.isString()) {
 			name = "String";
 		} else if (type.isUint()) {
 			name = "uint";
 			size = ((TypeUint) type).getSize();
-			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
+			typeElt.appendChild(writeEntry("size",
+					IrFactory.eINSTANCE.createExprInt(size)));
 		} else if (type.isVoid()) {
 			throw new OrccException("void type is invalid in XDF");
 		} else {

@@ -32,9 +32,9 @@ import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.actors.Actor_WriteFile;
@@ -58,7 +58,7 @@ public class InterpreterSimuWriteFile extends AbstractInterpreterSimuActor
 			OrccProcess process) {
 		Expression expr = actorParameters.get("filename");
 		if (expr.isStringExpr()) {
-			StringExpr s = (StringExpr) expr;
+			ExprString s = (ExprString) expr;
 			this.writeFile = new Actor_WriteFile(s.getValue());
 			this.instanceId = instanceId;
 		}

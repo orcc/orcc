@@ -40,6 +40,14 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.InstAssign;
@@ -49,6 +57,7 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
@@ -56,16 +65,8 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.FloatExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;
@@ -85,27 +86,27 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	private class JavaExpressionConverter implements ExpressionInterpreter {
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
+		public Object interpret(ExprBinary expr, Object... args) {
 			return null;
 		}
 
 		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
+		public Object interpret(ExprBool expr, Object... args) {
+			return expr.isValue();
+		}
+
+		@Override
+		public Object interpret(ExprFloat expr, Object... args) {
 			return expr.getValue();
 		}
 
 		@Override
-		public Object interpret(FloatExpr expr, Object... args) {
-			return expr.getValue();
-		}
-
-		@Override
-		public Object interpret(IntExpr expr, Object... args) {
+		public Object interpret(ExprInt expr, Object... args) {
 			return expr.getIntValue();
 		}
 
 		@Override
-		public Object interpret(ListExpr expr, Object... args) {
+		public Object interpret(ExprList expr, Object... args) {
 			Object[] values = new Object[expr.getValue().size()];
 			int i = 0;
 			for (Expression subExpr : expr.getValue()) {
@@ -118,18 +119,18 @@ public class ActorInterpreter extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(StringExpr expr, Object... args) {
+		public Object interpret(ExprString expr, Object... args) {
 			return expr.getValue();
 		}
 
 		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
+		public Object interpret(ExprUnary expr, Object... args) {
 			return null;
 		}
 
 		@Override
-		public Object interpret(VarExpr expr, Object... args) {
-			return expr.getVar().getVariable().getValue().accept(this);
+		public Object interpret(ExprVar expr, Object... args) {
+			return expr.getUse().getVariable().getValue().accept(this);
 		}
 
 	}
@@ -399,7 +400,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 		visit(action.getScheduler());
 		if (returnValue != null && returnValue.isBooleanExpr()) {
-			return ((BoolExpr) returnValue).getValue();
+			return ((ExprBool) returnValue).isValue();
 		} else {
 			return false;
 		}
@@ -407,28 +408,29 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 	private void peekFifo(Expression value, Fifo fifo, int numTokens) {
 		if (fifo instanceof Fifo_int) {
-			ListExpr target = (ListExpr) value;
+			ExprList target = (ExprList) value;
 			int[] intTarget = new int[target.getSize()];
 			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
 					fifo.getReadIndex(numTokens), intTarget, 0, numTokens);
 			for (int i = 0; i < intTarget.length; i++) {
-				target.set(i, new IntExpr(intTarget[i]));
+				target.set(i, IrFactory.eINSTANCE.createExprInt(intTarget[i]));
 			}
 		} else if (fifo instanceof Fifo_boolean) {
-			ListExpr target = (ListExpr) value;
+			ExprList target = (ExprList) value;
 			boolean[] boolTarget = new boolean[target.getSize()];
 			System.arraycopy(((Fifo_boolean) fifo).getReadArray(numTokens),
 					fifo.getReadIndex(numTokens), boolTarget, 0, numTokens);
 			for (int i = 0; i < boolTarget.length; i++) {
-				target.set(i, new BoolExpr(boolTarget[i]));
+				target.set(i, IrFactory.eINSTANCE.createExprBool(boolTarget[i]));
 			}
 		} else if (fifo instanceof Fifo_String) {
-			ListExpr target = (ListExpr) value;
+			ExprList target = (ExprList) value;
 			String[] stringTarget = new String[target.getSize()];
 			System.arraycopy(((Fifo_String) fifo).getReadArray(numTokens),
 					fifo.getReadIndex(numTokens), stringTarget, 0, numTokens);
 			for (int i = 0; i < stringTarget.length; i++) {
-				target.set(i, new StringExpr(stringTarget[i]));
+				target.set(i,
+						IrFactory.eINSTANCE.createExprString(stringTarget[i]));
 			}
 		}
 	}
@@ -523,7 +525,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 					if (callParams.get(i).isStringExpr()) {
 						// String characters rework for escaped control
 						// management
-						String str = ((StringExpr) callParams.get(i))
+						String str = ((ExprString) callParams.get(i))
 								.getValue();
 						String unescaped = OrccUtil.getUnescapedString(str);
 						process.write(unescaped);
@@ -561,7 +563,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 		// if (condition is true)
 		if (condition != null && condition.isBooleanExpr()) {
 			int oldBranch = branch;
-			if (((BoolExpr) condition).getValue()) {
+			if (((ExprBool) condition).isValue()) {
 				visit(node.getThenNodes());
 				branch = 0;
 			} else {
@@ -588,7 +590,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				Expression value = source.getValue();
 				for (Expression index : instr.getIndexes()) {
 					if (value.isListExpr()) {
-						value = ((ListExpr) value).get((IntExpr) index
+						value = ((ExprList) value).get((ExprInt) index
 								.accept(exprInterpreter));
 					}
 				}
@@ -668,18 +670,18 @@ public class ActorInterpreter extends AbstractActorVisitor {
 			try {
 				Expression target = var.getValue();
 				Iterator<Expression> it = instr.getIndexes().iterator();
-				IntExpr index = (IntExpr) it.next().accept(exprInterpreter);
+				ExprInt index = (ExprInt) it.next().accept(exprInterpreter);
 				while (it.hasNext()) {
 					if (target.isListExpr()) {
-						target = ((ListExpr) target).get(index);
+						target = ((ExprList) target).get(index);
 					}
-					index = (IntExpr) it.next().accept(exprInterpreter);
+					index = (ExprInt) it.next().accept(exprInterpreter);
 				}
 
 				if (target.isListExpr()) {
 					Expression value = (Expression) instr.getValue().accept(
 							exprInterpreter);
-					((ListExpr) target).set(index, value);
+					((ExprList) target).set(index, value);
 				}
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
@@ -702,7 +704,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 		// while (condition is true) do
 		if (condition != null && condition.isBooleanExpr()) {
 			branch = 1;
-			while (((BoolExpr) condition).getValue()) {
+			while (((ExprBool) condition).isValue()) {
 				visit(node.getNodes());
 				visit(node.getJoinNode());
 
@@ -724,12 +726,12 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	private void writeFifo(Expression value, Fifo fifo, int numTokens) {
-		ListExpr target = (ListExpr) value;
+		ExprList target = (ExprList) value;
 		if (fifo instanceof Fifo_int) {
 			int[] fifoArray = ((Fifo_int) fifo).getWriteArray(numTokens);
 			int index = fifo.getWriteIndex(numTokens);
 			for (Expression obj_elem : target.getValue()) {
-				fifoArray[index++] = ((IntExpr) obj_elem).getIntValue();
+				fifoArray[index++] = ((ExprInt) obj_elem).getIntValue();
 			}
 			((Fifo_int) fifo).writeEnd(numTokens, fifoArray);
 		} else if (fifo instanceof Fifo_boolean) {
@@ -737,14 +739,14 @@ public class ActorInterpreter extends AbstractActorVisitor {
 					.getWriteArray(numTokens);
 			int index = fifo.getWriteIndex(numTokens);
 			for (Expression obj_elem : target.getValue()) {
-				fifoArray[index++] = ((BoolExpr) obj_elem).getValue();
+				fifoArray[index++] = ((ExprBool) obj_elem).isValue();
 			}
 			((Fifo_boolean) fifo).writeEnd(numTokens, fifoArray);
 		} else if (fifo instanceof Fifo_String) {
 			String[] fifoArray = ((Fifo_String) fifo).getWriteArray(numTokens);
 			int index = fifo.getWriteIndex(numTokens);
 			for (Expression obj_elem : target.getValue()) {
-				fifoArray[index++] = ((StringExpr) obj_elem).getValue();
+				fifoArray[index++] = ((ExprString) obj_elem).getValue();
 			}
 			((Fifo_String) fifo).writeEnd(numTokens, fifoArray);
 		}

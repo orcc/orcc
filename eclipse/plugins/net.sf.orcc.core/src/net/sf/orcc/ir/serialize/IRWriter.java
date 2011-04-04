@@ -67,6 +67,14 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
@@ -98,15 +106,7 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.FloatExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.InstructionInterpreter;
 import net.sf.orcc.ir.impl.NodeInterpreter;
 import net.sf.orcc.ir.type.TypeInterpreter;
@@ -139,7 +139,7 @@ public class IRWriter {
 	private static class ExpressionWriter implements ExpressionInterpreter {
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
+		public Object interpret(ExprBinary expr, Object... args) {
 			JsonArray array = new JsonArray();
 			array.add(new JsonPrimitive(EXPR_BINARY));
 			array.add(new JsonPrimitive(expr.getOp().getText()));
@@ -150,22 +150,22 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
+		public Object interpret(ExprBool expr, Object... args) {
+			return new JsonPrimitive(expr.isValue());
+		}
+
+		@Override
+		public Object interpret(ExprFloat expr, Object... args) {
 			return new JsonPrimitive(expr.getValue());
 		}
 
 		@Override
-		public Object interpret(FloatExpr expr, Object... args) {
+		public Object interpret(ExprInt expr, Object... args) {
 			return new JsonPrimitive(expr.getValue());
 		}
 
 		@Override
-		public Object interpret(IntExpr expr, Object... args) {
-			return new JsonPrimitive(expr.getValue());
-		}
-
-		@Override
-		public Object interpret(ListExpr expr, Object... args) {
+		public Object interpret(ExprList expr, Object... args) {
 			JsonArray array = new JsonArray();
 			array.add(new JsonPrimitive(EXPR_LIST));
 			for (Expression expression : expr.getValue()) {
@@ -175,12 +175,12 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(StringExpr expr, Object... args) {
+		public Object interpret(ExprString expr, Object... args) {
 			return new JsonPrimitive(expr.getValue());
 		}
 
 		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
+		public Object interpret(ExprUnary expr, Object... args) {
 			JsonArray array = new JsonArray();
 			array.add(new JsonPrimitive(EXPR_UNARY));
 			array.add(new JsonPrimitive(expr.getOp().getText()));
@@ -190,10 +190,10 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(VarExpr expr, Object... args) {
+		public Object interpret(ExprVar expr, Object... args) {
 			JsonArray array = new JsonArray();
 			array.add(new JsonPrimitive(EXPR_VAR));
-			array.add(writeVariable(expr.getVar().getVariable()));
+			array.add(writeVariable(expr.getUse().getVariable()));
 			return array;
 		}
 

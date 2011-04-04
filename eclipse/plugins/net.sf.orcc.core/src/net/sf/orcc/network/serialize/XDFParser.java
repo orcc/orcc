@@ -41,6 +41,8 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
@@ -48,18 +50,8 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.FloatExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.type.Entry;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -133,20 +125,20 @@ public class XDFParser {
 		 * @throws OrccException
 		 *             if the binary operator could not be parsed
 		 */
-		private ParseContinuation<BinaryOp> parseExprBinaryOp(Node node)
+		private ParseContinuation<OpBinary> parseExprBinaryOp(Node node)
 				throws OrccException {
 			while (node != null) {
 				if (node.getNodeName().equals("Op")) {
 					Element op = (Element) node;
 					String name = op.getAttribute("name");
-					return new ParseContinuation<BinaryOp>(node,
-							BinaryOp.getOperator(name));
+					return new ParseContinuation<OpBinary>(node,
+							OpBinary.getOperator(name));
 				}
 
 				node = node.getNextSibling();
 			}
 
-			return new ParseContinuation<BinaryOp>(node, null);
+			return new ParseContinuation<OpBinary>(node, null);
 		}
 
 		/**
@@ -163,14 +155,14 @@ public class XDFParser {
 		private ParseContinuation<Expression> parseExprBinOpSeq(Node node)
 				throws OrccException {
 			List<Expression> expressions = new ArrayList<Expression>();
-			List<BinaryOp> operators = new ArrayList<BinaryOp>();
+			List<OpBinary> operators = new ArrayList<OpBinary>();
 
 			ParseContinuation<Expression> contE = parseExprCont(node);
 			expressions.add(contE.getResult());
 			node = contE.getNode();
 			while (node != null) {
-				ParseContinuation<BinaryOp> contO = parseExprBinaryOp(node);
-				BinaryOp op = contO.getResult();
+				ParseContinuation<OpBinary> contO = parseExprBinaryOp(node);
+				OpBinary op = contO.getResult();
 				node = contO.getNode();
 				if (op != null) {
 					operators.add(op);
@@ -217,14 +209,15 @@ public class XDFParser {
 					} else if (kind.equals("List")) {
 						List<Expression> exprs = parseExprs(node
 								.getFirstChild());
-						expr = new ListExpr(exprs);
+						expr = IrFactory.eINSTANCE.createExprList(exprs);
 						break;
 					} else if (kind.equals("UnaryOp")) {
-						ParseContinuation<UnaryOp> cont = parseExprUnaryOp(node
+						ParseContinuation<OpUnary> cont = parseExprUnaryOp(node
 								.getFirstChild());
-						UnaryOp op = cont.getResult();
+						OpUnary op = cont.getResult();
 						Expression unaryExpr = parseExpr(cont.getNode());
-						expr = new UnaryExpr(op, unaryExpr, null);
+						expr = IrFactory.eINSTANCE.createExprUnary(op,
+								unaryExpr, null);
 						break;
 					} else if (kind.equals("Var")) {
 						String name = elt.getAttribute("name");
@@ -237,8 +230,7 @@ public class XDFParser {
 									+ file + "\": unknown variable: \"" + name
 									+ "\"");
 						}
-						Use use = IrFactory.eINSTANCE.createUse(var);
-						expr = new VarExpr(use);
+						expr = IrFactory.eINSTANCE.createExprVar(var);
 						break;
 					} else {
 						throw new OrccException("In network \""
@@ -267,15 +259,17 @@ public class XDFParser {
 			String kind = elt.getAttribute("literal-kind");
 			String value = elt.getAttribute("value");
 			if (kind.equals("Boolean")) {
-				return new BoolExpr(Boolean.parseBoolean(value));
+				return IrFactory.eINSTANCE.createExprBool(Boolean
+						.parseBoolean(value));
 			} else if (kind.equals("Character")) {
 				throw new OrccException("Characters not supported yet");
 			} else if (kind.equals("Integer")) {
-				return new IntExpr(Long.parseLong(value));
+				return IrFactory.eINSTANCE.createExprInt(Long.parseLong(value));
 			} else if (kind.equals("Real")) {
-				return new FloatExpr(Float.parseFloat(value));
+				return IrFactory.eINSTANCE.createExprFloat(Float
+						.parseFloat(value));
 			} else if (kind.equals("String")) {
-				return new StringExpr(value);
+				return IrFactory.eINSTANCE.createExprString(value);
 			} else {
 				throw new OrccException("Unsupported Expr "
 						+ "literal kind: \"" + kind + "\"");
@@ -306,14 +300,14 @@ public class XDFParser {
 		 * @throws OrccException
 		 *             if the unary operator could not be parsed
 		 */
-		private ParseContinuation<UnaryOp> parseExprUnaryOp(Node node)
+		private ParseContinuation<OpUnary> parseExprUnaryOp(Node node)
 				throws OrccException {
 			while (node != null) {
 				if (node.getNodeName().equals("Op")) {
 					Element op = (Element) node;
 					String name = op.getAttribute("name");
-					return new ParseContinuation<UnaryOp>(node,
-							UnaryOp.getOperator(name));
+					return new ParseContinuation<OpUnary>(node,
+							OpUnary.getOperator(name));
 				}
 
 				node = node.getNextSibling();
@@ -474,7 +468,7 @@ public class XDFParser {
 				throws OrccException {
 			Entry entry = entries.get("size");
 			if (entry == null) {
-				return new IntExpr(defaultSize);
+				return IrFactory.eINSTANCE.createExprInt(defaultSize);
 			} else {
 				return entry.getEntryAsExpr();
 			}

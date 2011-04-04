@@ -69,6 +69,9 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstAssign;
@@ -84,6 +87,8 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -97,16 +102,6 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.FloatExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.impl.NodeImpl;
 import net.sf.orcc.util.OrderedMap;
@@ -360,23 +355,27 @@ public class IRParser {
 		if (element.isJsonPrimitive()) {
 			JsonPrimitive primitive = element.getAsJsonPrimitive();
 			if (primitive.isBoolean()) {
-				return new BoolExpr(primitive.getAsBoolean());
+				return IrFactory.eINSTANCE.createExprBool(primitive
+						.getAsBoolean());
 			} else if (primitive.isNumber()) {
 				Number number = primitive.getAsNumber();
 				if (number instanceof BigInteger) {
-					return new IntExpr(primitive.getAsBigInteger());
+					return IrFactory.eINSTANCE.createExprInt(primitive
+							.getAsBigInteger());
 				} else if (number instanceof BigDecimal) {
-					return new FloatExpr(primitive.getAsFloat());
+					return IrFactory.eINSTANCE.createExprFloat(primitive
+							.getAsFloat());
 				}
 			} else if (primitive.isString()) {
-				return new StringExpr(element.getAsString());
+				return IrFactory.eINSTANCE.createExprString(element
+						.getAsString());
 			}
 		} else if (element.isJsonArray()) {
 			JsonArray array = element.getAsJsonArray();
 			String name = array.get(0).getAsString();
 			if (name.equals(EXPR_VAR)) {
 				Use var = parseVarUse(array.get(1).getAsJsonArray());
-				return new VarExpr(var);
+				return IrFactory.eINSTANCE.createExprVar(var);
 			} else if (name.equals(EXPR_UNARY)) {
 				return parseExprUnary(array);
 			} else if (name.equals(EXPR_BINARY)) {
@@ -392,22 +391,22 @@ public class IRParser {
 		throw new OrccRuntimeException("Invalid expression: " + element);
 	}
 
-	private BinaryExpr parseExprBinary(JsonArray array) {
+	private ExprBinary parseExprBinary(JsonArray array) {
 		String name = array.get(1).getAsString();
 		Expression e1 = parseExpr(array.get(2));
 		Expression e2 = parseExpr(array.get(3));
 		Type type = parseType(array.get(4));
-		BinaryOp op = BinaryOp.getOperator(name);
-		return new BinaryExpr(e1, op, e2, type);
+		OpBinary op = OpBinary.getOperator(name);
+		return IrFactory.eINSTANCE.createExprBinary(e1, op, e2, type);
 	}
 
-	private ListExpr parseExprList(JsonArray array) {
+	private ExprList parseExprList(JsonArray array) {
 		int size = array.size();
 		List<Expression> exprs = new ArrayList<Expression>(size - 1);
 		for (int i = 1; i < size; i++) {
 			exprs.add(parseExpr(array.get(i)));
 		}
-		return new ListExpr(exprs);
+		return IrFactory.eINSTANCE.createExprList(exprs);
 	}
 
 	private List<Expression> parseExprs(JsonArray array) {
@@ -420,12 +419,12 @@ public class IRParser {
 		return exprs;
 	}
 
-	private UnaryExpr parseExprUnary(JsonArray array) {
+	private ExprUnary parseExprUnary(JsonArray array) {
 		String name = array.get(1).getAsString();
 		Expression expr = parseExpr(array.get(2));
 		Type type = parseType(array.get(3));
-		UnaryOp op = UnaryOp.getOperator(name);
-		return new UnaryExpr(op, expr, type);
+		OpUnary op = OpUnary.getOperator(name);
+		return IrFactory.eINSTANCE.createExprUnary(op, expr, type);
 	}
 
 	private FSM parseFSM(JsonArray array) {

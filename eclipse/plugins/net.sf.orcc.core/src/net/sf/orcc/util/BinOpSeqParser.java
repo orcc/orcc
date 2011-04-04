@@ -33,8 +33,7 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.OpBinary;
 
 /**
  * This class defines a parser of binary operation sequences. This parser
@@ -66,20 +65,21 @@ public class BinOpSeqParser {
 	 * @throws OrccException
 	 */
 	private static Expression createPrecedenceTree(
-			List<Expression> expressions, List<BinaryOp> operators,
+			List<Expression> expressions, List<OpBinary> operators,
 			int startIndex, int stopIndex) throws OrccException {
 		if (stopIndex == startIndex) {
 			return expressions.get(startIndex);
 		}
 
 		int pivot = findPivot(operators, startIndex, stopIndex - 1);
-		BinaryOp op = operators.get(pivot);
+		OpBinary op = operators.get(pivot);
 		Expression e1 = createPrecedenceTree(expressions, operators,
 				startIndex, pivot);
 		Expression e2 = createPrecedenceTree(expressions, operators, pivot + 1,
 				stopIndex);
 
-		return new BinaryExpr(e1, op, e2, IrFactory.eINSTANCE.createTypeVoid());
+		return IrFactory.eINSTANCE.createExprBinary(e1, op, e2,
+				IrFactory.eINSTANCE.createTypeVoid());
 	}
 
 	/**
@@ -96,10 +96,10 @@ public class BinOpSeqParser {
 	 * @return the index of the pivot operator
 	 * @throws OrccException
 	 */
-	private static int findPivot(List<BinaryOp> operators, int startIndex,
+	private static int findPivot(List<OpBinary> operators, int startIndex,
 			int stopIndex) throws OrccException {
 		int pivot = startIndex;
-		BinaryOp bop = operators.get(pivot);
+		OpBinary bop = operators.get(pivot);
 		int pivotRank = bop.getPrecedence();
 		for (int i = startIndex + 1; i <= stopIndex; i++) {
 			bop = operators.get(i);
@@ -126,7 +126,7 @@ public class BinOpSeqParser {
 	 * @throws OrccException
 	 */
 	public static Expression parse(List<Expression> expressions,
-			List<BinaryOp> operators) throws OrccException {
+			List<OpBinary> operators) throws OrccException {
 		return createPrecedenceTree(expressions, operators, 0,
 				expressions.size() - 1);
 	}

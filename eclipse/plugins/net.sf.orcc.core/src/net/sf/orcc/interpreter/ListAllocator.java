@@ -28,12 +28,10 @@
  */
 package net.sf.orcc.interpreter;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.type.AbstractTypeInterpreter;
 
 /**
@@ -48,12 +46,12 @@ public class ListAllocator extends AbstractTypeInterpreter {
 	@Override
 	public Object interpret(TypeList type) {
 		int size = type.getSize();
-		List<Expression> values = new ArrayList<Expression>(size);
+		ExprList list = IrFactory.eINSTANCE.createExprList();
 		for (int i = 0; i < size; i++) {
-			values.add((Expression) type.getType().accept(this));
+			list.getValue().add((Expression) type.getType().accept(this));
 		}
 
-		return new ListExpr(values);
+		return list;
 	}
 
 }

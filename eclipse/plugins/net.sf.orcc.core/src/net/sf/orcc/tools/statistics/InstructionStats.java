@@ -33,12 +33,12 @@ import java.util.Map;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.network.Network;
 
 /**
@@ -53,7 +53,7 @@ public class InstructionStats {
 	private class InstructionStatsBuilder extends AbstractActorVisitor {
 
 		private InstructionStatsElement statsElement;
-		
+
 		public InstructionStatsBuilder() {
 			super(true);
 		}
@@ -65,7 +65,7 @@ public class InstructionStats {
 		}
 
 		@Override
-		public void visit(BinaryExpr expr, Object... args) {
+		public void visit(ExprBinary expr, Object... args) {
 			int count = statsElement.binaryOpNbMap.get(expr.getOp()) + 1;
 			statsElement.binaryOpNbMap.put(expr.getOp(), count);
 			super.visit(expr, args);
@@ -78,7 +78,7 @@ public class InstructionStats {
 		}
 
 		@Override
-		public void visit(UnaryExpr expr, Object... args) {
+		public void visit(ExprUnary expr, Object... args) {
 			int count = statsElement.unaryOpNbMap.get(expr.getOp()) + 1;
 			statsElement.unaryOpNbMap.put(expr.getOp(), count);
 			super.visit(expr, args);
@@ -92,9 +92,9 @@ public class InstructionStats {
 	}
 
 	public class InstructionStatsElement {
-		private Map<BinaryOp, Integer> binaryOpNbMap;
+		private Map<OpBinary, Integer> binaryOpNbMap;
 		private int ifNb;
-		private Map<UnaryOp, Integer> unaryOpNbMap;
+		private Map<OpUnary, Integer> unaryOpNbMap;
 		private int whileNb;
 
 		public InstructionStatsElement() {
@@ -103,7 +103,7 @@ public class InstructionStats {
 			initializeMaps();
 		}
 
-		public Map<BinaryOp, Integer> getBinaryOpNbMap() {
+		public Map<OpBinary, Integer> getBinaryOpNbMap() {
 			return binaryOpNbMap;
 		}
 
@@ -111,7 +111,7 @@ public class InstructionStats {
 			return ifNb;
 		}
 
-		public Map<UnaryOp, Integer> getUnaryOpNbMap() {
+		public Map<OpUnary, Integer> getUnaryOpNbMap() {
 			return unaryOpNbMap;
 		}
 
@@ -121,34 +121,34 @@ public class InstructionStats {
 
 		private void initializeMaps() {
 			// UnaryOp map
-			unaryOpNbMap = new HashMap<UnaryOp, Integer>();
-			unaryOpNbMap.put(UnaryOp.BITNOT, 0);
-			unaryOpNbMap.put(UnaryOp.LOGIC_NOT, 0);
-			unaryOpNbMap.put(UnaryOp.MINUS, 0);
-			unaryOpNbMap.put(UnaryOp.NUM_ELTS, 0);
+			unaryOpNbMap = new HashMap<OpUnary, Integer>();
+			unaryOpNbMap.put(OpUnary.BITNOT, 0);
+			unaryOpNbMap.put(OpUnary.LOGIC_NOT, 0);
+			unaryOpNbMap.put(OpUnary.MINUS, 0);
+			unaryOpNbMap.put(OpUnary.NUM_ELTS, 0);
 
 			// BinaryOp map
-			binaryOpNbMap = new HashMap<BinaryOp, Integer>();
-			binaryOpNbMap.put(BinaryOp.BITAND, 0);
-			binaryOpNbMap.put(BinaryOp.BITOR, 0);
-			binaryOpNbMap.put(BinaryOp.BITXOR, 0);
-			binaryOpNbMap.put(BinaryOp.DIV, 0);
-			binaryOpNbMap.put(BinaryOp.DIV_INT, 0);
-			binaryOpNbMap.put(BinaryOp.EQ, 0);
-			binaryOpNbMap.put(BinaryOp.EXP, 0);
-			binaryOpNbMap.put(BinaryOp.GE, 0);
-			binaryOpNbMap.put(BinaryOp.GT, 0);
-			binaryOpNbMap.put(BinaryOp.LE, 0);
-			binaryOpNbMap.put(BinaryOp.LOGIC_AND, 0);
-			binaryOpNbMap.put(BinaryOp.LOGIC_OR, 0);
-			binaryOpNbMap.put(BinaryOp.LT, 0);
-			binaryOpNbMap.put(BinaryOp.MINUS, 0);
-			binaryOpNbMap.put(BinaryOp.MOD, 0);
-			binaryOpNbMap.put(BinaryOp.NE, 0);
-			binaryOpNbMap.put(BinaryOp.PLUS, 0);
-			binaryOpNbMap.put(BinaryOp.SHIFT_LEFT, 0);
-			binaryOpNbMap.put(BinaryOp.SHIFT_RIGHT, 0);
-			binaryOpNbMap.put(BinaryOp.TIMES, 0);
+			binaryOpNbMap = new HashMap<OpBinary, Integer>();
+			binaryOpNbMap.put(OpBinary.BITAND, 0);
+			binaryOpNbMap.put(OpBinary.BITOR, 0);
+			binaryOpNbMap.put(OpBinary.BITXOR, 0);
+			binaryOpNbMap.put(OpBinary.DIV, 0);
+			binaryOpNbMap.put(OpBinary.DIV_INT, 0);
+			binaryOpNbMap.put(OpBinary.EQ, 0);
+			binaryOpNbMap.put(OpBinary.EXP, 0);
+			binaryOpNbMap.put(OpBinary.GE, 0);
+			binaryOpNbMap.put(OpBinary.GT, 0);
+			binaryOpNbMap.put(OpBinary.LE, 0);
+			binaryOpNbMap.put(OpBinary.LOGIC_AND, 0);
+			binaryOpNbMap.put(OpBinary.LOGIC_OR, 0);
+			binaryOpNbMap.put(OpBinary.LT, 0);
+			binaryOpNbMap.put(OpBinary.MINUS, 0);
+			binaryOpNbMap.put(OpBinary.MOD, 0);
+			binaryOpNbMap.put(OpBinary.NE, 0);
+			binaryOpNbMap.put(OpBinary.PLUS, 0);
+			binaryOpNbMap.put(OpBinary.SHIFT_LEFT, 0);
+			binaryOpNbMap.put(OpBinary.SHIFT_RIGHT, 0);
+			binaryOpNbMap.put(OpBinary.TIMES, 0);
 		}
 	}
 

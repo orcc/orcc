@@ -40,16 +40,16 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.interpreter.ListAllocator;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
 import net.sf.orcc.runtime.Fifo;
@@ -255,8 +255,8 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		if (node.nbSubNodes > 0) {
 			if (node.subNodeIdx == node.nbSubNodes) {
 				if ((node.condition != null)
-						&& ((BoolExpr) node.condition.accept(exprEvaluator))
-								.getValue()) {
+						&& ((ExprBool) node.condition.accept(exprEvaluator))
+								.isValue()) {
 					node.subNodeIdx = 0;
 					exeStmt = true;
 				} else {
@@ -276,7 +276,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 				if (subNode instanceof NodeIf) {
 					Object condition = ((NodeIf) subNode).getCondition()
 							.accept(exprEvaluator);
-					if (((BoolExpr) condition).getValue()) {
+					if (((ExprBool) condition).isValue()) {
 						nodeStack.add(new NodeInfo(0, ((NodeIf) subNode)
 								.getThenNodes().size(), ((NodeIf) subNode)
 								.getThenNodes(), ((NodeIf) subNode)
@@ -291,7 +291,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 					exeStmt = true;
 				} else if (subNode instanceof NodeWhile) {
 					Expression condition = ((NodeWhile) subNode).getCondition();
-					if (((BoolExpr) condition.accept(exprEvaluator)).getValue()) {
+					if (((ExprBool) condition.accept(exprEvaluator)).isValue()) {
 						nodeStack.add(new NodeInfo(0, ((NodeWhile) subNode)
 								.getNodes().size(), ((NodeWhile) subNode)
 								.getNodes(), null, condition));

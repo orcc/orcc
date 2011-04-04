@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -53,7 +54,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
-import net.sf.orcc.ir.expr.VarExpr;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -74,8 +74,8 @@ public class SSATransformation extends AbstractActorVisitor {
 	private class UseUpdater extends AbstractExpressionVisitor {
 
 		@Override
-		public void visit(VarExpr expr, Object... args) {
-			Use use = expr.getVar();
+		public void visit(ExprVar expr, Object... args) {
+			Use use = expr.getUse();
 			Var oldVar = use.getVariable();
 			if (!oldVar.isGlobal()) {
 				Var newVar = uses.get(oldVar.getBaseName());
@@ -198,11 +198,8 @@ public class SSATransformation extends AbstractActorVisitor {
 		if (phi == null) {
 			Var target = newDefinition(oldVar);
 			List<Expression> values = new ArrayList<Expression>(2);
-
-			Use use = IrFactory.eINSTANCE.createUse(oldVar);
-			values.add(new VarExpr(use));
-			use = IrFactory.eINSTANCE.createUse(oldVar);
-			values.add(new VarExpr(use));
+			values.add(IrFactory.eINSTANCE.createExprVar(oldVar));
+			values.add(IrFactory.eINSTANCE.createExprVar(oldVar));
 
 			phi = IrFactory.eINSTANCE.createInstPhi(target, values);
 			phi.setOldVariable(oldVar);
@@ -214,8 +211,8 @@ public class SSATransformation extends AbstractActorVisitor {
 		}
 
 		// replace use
-		Use use = IrFactory.eINSTANCE.createUse(newVar);
-		phi.getValues().set(branch - 1, new VarExpr(use));
+		phi.getValues().set(branch - 1,
+				IrFactory.eINSTANCE.createExprVar(newVar));
 	}
 
 	/**

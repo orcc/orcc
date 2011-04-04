@@ -33,6 +33,8 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstPhi;
@@ -41,10 +43,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 
 /**
  * This class defines a very simple Dead Code Elimination.
@@ -74,20 +73,19 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 				InstPhi phi = (InstPhi) instruction;
 
 				Var target = phi.getTarget();
-				VarExpr sourceExpr = (VarExpr) phi.getValues().get(index);
-				Var source = (Var) sourceExpr.getVar().getVariable();
+				ExprVar sourceExpr = (ExprVar) phi.getValues().get(index);
+				Var source = (Var) sourceExpr.getUse().getVariable();
 
 				// translate the phi to an assign
-				Use localUse = IrFactory.eINSTANCE.createUse(source);
-				VarExpr expr = new VarExpr(localUse);
+				ExprVar expr = IrFactory.eINSTANCE.createExprVar(source);
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 						target, expr);
 
 				it.set(assign);
 
 				// remove the other variable
-				VarExpr localExpr = (VarExpr) phi.getValues().get(1 - index);
-				Var local = localExpr.getVar().getVariable();
+				ExprVar localExpr = (ExprVar) phi.getValues().get(1 - index);
+				Var local = localExpr.getUse().getVariable();
 				procedure.getLocals().remove(local.getName());
 			}
 		}
@@ -106,7 +104,7 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 	public void visit(NodeIf node) {
 		Expression condition = node.getCondition();
 		if (condition.isBooleanExpr()) {
-			if (((BoolExpr) condition).getValue()) {
+			if (((ExprBool) condition).isValue()) {
 				addNodes(node.getThenNodes(), node.getJoinNode(), 0);
 			} else {
 				addNodes(node.getElseNodes(), node.getJoinNode(), 1);

@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transformations;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstPhi;
@@ -41,11 +42,7 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.AbstractInstructionVisitor;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.util.OrderedMap;
@@ -103,8 +100,8 @@ public class PhiRemoval extends AbstractActorVisitor {
 	@Override
 	public void visit(InstPhi phi) {
 		Var target = phi.getTarget();
-		VarExpr sourceExpr = (VarExpr) phi.getValues().get(phiIndex);
-		Var source = sourceExpr.getVar().getVariable();
+		ExprVar sourceExpr = (ExprVar) phi.getValues().get(phiIndex);
+		Var source = sourceExpr.getUse().getVariable();
 
 		// if source is a local variable with index = 0, we remove it from the
 		// procedure and translate the PHI by an assignment of 0 (zero) to
@@ -114,13 +111,12 @@ public class PhiRemoval extends AbstractActorVisitor {
 		if (source.getIndex() == 0 && !parameters.contains(source.getName())) {
 			procedure.getLocals().remove(source.getName());
 			if (target.getType().isBool()) {
-				expr = new BoolExpr(false);
+				expr = IrFactory.eINSTANCE.createExprBool(false);
 			} else {
-				expr = new IntExpr(0);
+				expr = IrFactory.eINSTANCE.createExprInt(0);
 			}
 		} else {
-			Use localUse = IrFactory.eINSTANCE.createUse(source);
-			expr = new VarExpr(localUse);
+			expr = IrFactory.eINSTANCE.createExprVar(source);
 		}
 
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, expr);
