@@ -13,8 +13,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.nodes.NodeInterpreter;
-import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 import org.eclipse.emf.common.notify.Notification;

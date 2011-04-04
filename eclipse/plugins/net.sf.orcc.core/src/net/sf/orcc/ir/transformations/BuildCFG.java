@@ -37,7 +37,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.nodes.NodeInterpreter;
+import net.sf.orcc.ir.impl.NodeInterpreter;
 
 /**
  * This class defines a transformation to build the CFG of procedures.

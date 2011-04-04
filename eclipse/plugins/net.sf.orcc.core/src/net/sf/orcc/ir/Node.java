@@ -30,8 +30,8 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
-import net.sf.orcc.ir.nodes.NodeInterpreter;
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.impl.NodeInterpreter;
+import net.sf.orcc.ir.impl.NodeVisitor;
 
 /**
  * This class defines a node in the CFG.
