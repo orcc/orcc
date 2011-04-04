@@ -84,7 +84,8 @@ import org.jgrapht.DirectedGraph;
 public class Multi2MonoToken extends AbstractActorVisitor {
 	/**
 	 * This class defines a visitor that substitutes the peek from the port to
-	 * the new buffer and chnages the index from (index) to (index+writeIndex)
+	 * the new buffer and changes the index from (index) to
+	 * (index+writeIndex&maskValue)
 	 * 
 	 * @author Khaled Jerbi
 	 * 
@@ -124,6 +125,68 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						BinaryOp.BITAND, maskValue,
 						IrFactory.eINSTANCE.createTypeInt(32));
 				load.getIndexes().set(0, mask);
+			}
+		}
+	}
+
+	/**
+	 * This class replaces the load sources names from ports to specific buffers
+	 * and adds required instructions in the clone action body
+	 * 
+	 * @author kjerbi-adm
+	 * 
+	 */
+	private class ModifyCloneBody extends AbstractActorVisitor {
+
+		private GlobalVariable buffer;
+		private Port currentPort;
+		private GlobalVariable writeIndex;
+		private GlobalVariable readIndex;
+		private Procedure body;
+		private int bufferSize;
+		private Action cloneAction;
+
+		// private Variable tempTab;
+
+		public ModifyCloneBody(GlobalVariable buffer,
+				GlobalVariable writeIndex, GlobalVariable readIndex,
+				Port currentPort, Procedure body, int bufferSize, Action cloneAction) {
+			this.buffer = buffer;
+			this.writeIndex = writeIndex;
+			this.readIndex = readIndex;
+			this.currentPort = currentPort;
+			this.body = body;
+			this.bufferSize = bufferSize;
+			this.cloneAction = cloneAction;
+		}
+
+		@Override
+		public void visit(Load load) {
+			
+			if (load.getSource().getVariable().getName()
+					.equals(currentPort.getName())) {
+				LocalVariable inputTmp = new LocalVariable(true, 0, new Location(),
+						currentPort.getName(), entryType);
+				LocalVariable tmp = new LocalVariable(true, 0, new Location(),
+						"tmp", entryType);
+				tmp = load.getTarget();
+				// change tab Name
+				Use useArray = new Use(buffer);
+				load.setSource(useArray);
+				// change index --> writeIndex+index
+				Expression expression1 = load.getIndexes().get(0);
+				Expression expression2 = new VarExpr(new Use(writeIndex));
+				Expression newExpression = new BinaryExpr(expression1,
+						BinaryOp.PLUS, expression2, currentPort.getType());
+				Expression maskValue = new IntExpr(bufferSize - 1);
+				Expression mask = new BinaryExpr(newExpression,
+						BinaryOp.BITAND, maskValue,
+						IrFactory.eINSTANCE.createTypeInt(32));
+				load.getIndexes().set(0, mask);
+
+				// addStoreFromBuffer(body, position, tmp);
+				//removePortFromPattern(cloneAction.getInputPattern(), currentPort,
+					//	inputTmp);
 			}
 		}
 	}
@@ -186,6 +249,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private int inputIndex = 0;
 	private List<Port> inputPorts = new ArrayList<Port>();
 	private List<Action> NoRepeatActions = new ArrayList<Action>();
+	private List<Action> NoRepeatActionsDone = new ArrayList<Action>();
+	private List<Action> cloneActions = new ArrayList<Action>();
 	private int numTokens;
 	private int outputIndex = 0;
 	private Port port;
@@ -265,7 +330,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		List<Expression> loadIndex = new ArrayList<Expression>(1);
 		Expression expression = new BinaryExpr(new VarExpr(new Use(index)),
-				BinaryOp.BITAND, new IntExpr(bufferSize-1),
+				BinaryOp.BITAND, new IntExpr(bufferSize - 1),
 				IrFactory.eINSTANCE.createTypeInt(32));
 		loadIndex.add(expression);
 		Instruction load = new Load(tmp, new Use(inputBuffers.get(position)),
@@ -948,34 +1013,38 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						.getVariableMap().entrySet()) {
 					Port port = entry.getKey();
 					if (inputPorts.contains(port)) {
-						LocalVariable tmp = new LocalVariable(true, 0,
-								new Location(), "tmp", entryType);
-						Action cloneAction = createCloneAction(action);
-						Procedure body = cloneAction.getBody();
-						LocalVariable inputTmp = new LocalVariable(true, 0,
-								new Location(), port.getName(), entryType);
-						Instruction instruction = body.getFirst()
-								.getInstructions().get(0);
-						if (instruction.isLoad()) {
-							Load load = (Load) instruction;
-							tmp = load.getTarget();
-							load.setSource(new Use(tmp));
-							inputTmp = (LocalVariable) entry.getValue();
-							body.getFirst().getInstructions().remove(0);
+						if (!NoRepeatActionsDone.contains(action)) {
+							Action cloneAction = createCloneAction(action);
+							cloneActions.add(cloneAction);
+							Procedure body = cloneAction.getBody();
+							int position = portPosition(inputPorts, port);
+							GlobalVariable buffer = inputBuffers.get(position);
+							GlobalVariable writeIndex = writeIndexes
+									.get(position);
+							GlobalVariable readIndex = readIndexes
+									.get(position);
+
+							//
+							//ModifyCloneBody modifyCloneBody = new ModifyCloneBody(
+									//buffer, writeIndex, readIndex, port, body , bufferSize, cloneAction);
+							//modifyCloneBody.visit(cloneAction.getBody());
+							//removePortFromPattern(
+									//cloneAction.getInputPattern(), port);
+							ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
+									buffer, writeIndex, port, bufferSize);
+							modifyActionScheduler.visit(cloneAction
+									.getScheduler());
+							modifyActionSchedulability(cloneAction, writeIndex,
+									readIndex, BinaryOp.NE, new IntExpr(0));
+							fsm.addTransition(sourceName, cloneAction,
+									targetName);
+
+						} else {
+							int actionIndex = actionPosition(
+									NoRepeatActionsDone, action);
+							Action clone = cloneActions.get(actionIndex);
+							fsm.addTransition(sourceName, clone, targetName);
 						}
-						int position = portPosition(inputPorts, port);
-						addStoreFromBuffer(body, position, tmp);
-						removePortFromPattern(cloneAction.getInputPattern(),
-								port, inputTmp);
-						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-								inputBuffers.get(position),
-								writeIndexes.get(position), port, bufferSize);
-						modifyActionScheduler.visit(cloneAction.getScheduler());
-						modifyActionSchedulability(cloneAction,
-								writeIndexes.get(position),
-								readIndexes.get(position), BinaryOp.NE,
-								new IntExpr(0));
-						fsm.addTransition(sourceName, cloneAction, targetName);
 						int length = fsm.getTransitions(sourceName).size();
 						NextStateInfo info = fsm.getTransitions(sourceName)
 								.get(length - 1);
@@ -983,6 +1052,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						fsm.getTransitions(sourceName).remove(length);
 					}
 				}
+				NoRepeatActionsDone.add(action);
 			}
 		}
 	}
@@ -1087,6 +1157,27 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
+	 * returns the position of an action in an actions list
+	 * 
+	 * @param list
+	 *            list of actions
+	 * @param seekAction
+	 *            researched action
+	 * @return position of a the action in a list
+	 */
+	private int actionPosition(List<Action> list, Action seekAction) {
+		int position = 0;
+		for (Action action : list) {
+			if (action == seekAction) {
+				break;
+			} else {
+				position++;
+			}
+		}
+		return position;
+	}
+
+	/**
 	 * returns the position of an action transition in a transitions list
 	 * 
 	 * @param list
@@ -1115,8 +1206,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @param port
 	 *            port to remove
 	 */
-	private void removePortFromPattern(Pattern pattern, Port port,
-			LocalVariable tmp) {
+	private void removePortFromPattern(Pattern pattern, Port port, LocalVariable tmp) {
 		pattern.getVariableMap().remove(port);
 		pattern.getPeekedMap().remove(port);
 		pattern.getInverseVariableMap().remove(tmp);
