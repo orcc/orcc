@@ -41,14 +41,16 @@
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="thenNodes" upperBound="-1"
         eType="#//Node" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"
+        containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="NodeWhile" eSuperTypes="#//Node">
     <eStructuralFeatures xsi:type="ecore:EReference" name="joinNode" eType="#//NodeBlock"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
         eType="#//Node" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"
+        containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Node" abstract="true" eSuperTypes="#//User">
     <eStructuralFeatures xsi:type="ecore:EReference" name="location" eType="#//Location"
@@ -125,5 +127,67 @@
   <eClassifiers xsi:type="ecore:EClass" name="Use">
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"
         transient="true" eOpposite="#//Var/uses"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprBinary" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="e1" eType="#//Expression"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="e2" eType="#//Expression"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" eType="#//OpBinary"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type" containment="true"
+        resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprBool" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprFloat" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBigDecimal"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprInt" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBigInteger"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprList" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" upperBound="-1"
+        eType="#//Expression"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprString" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//String"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprUnary" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="expr" eType="#//Expression"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" eType="#//OpUnary"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprVar" eSuperTypes="#//Expression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="use" eType="#//Use" containment="true"
+        resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">
+    <eLiterals name="BITAND"/>
+    <eLiterals name="BITOR" value="1"/>
+    <eLiterals name="BITXOR" value="2"/>
+    <eLiterals name="DIV" value="3"/>
+    <eLiterals name="DIV_INT" value="4"/>
+    <eLiterals name="EQ" value="5"/>
+    <eLiterals name="EXP" value="6"/>
+    <eLiterals name="GE" value="7"/>
+    <eLiterals name="GT" value="8"/>
+    <eLiterals name="LE" value="9"/>
+    <eLiterals name="LOGIC_AND" value="10"/>
+    <eLiterals name="LOGIC_OR" value="11"/>
+    <eLiterals name="LT" value="12"/>
+    <eLiterals name="MINUS" value="13"/>
+    <eLiterals name="MOD" value="14"/>
+    <eLiterals name="NE" value="15"/>
+    <eLiterals name="PLUS" value="16"/>
+    <eLiterals name="SHIFT_LEFT" value="17"/>
+    <eLiterals name="SHIFT_RIGHT" value="18"/>
+    <eLiterals name="TIMES" value="19"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="OpUnary">
+    <eLiterals name="BITNOT"/>
+    <eLiterals name="LOGIC_NOT" value="1"/>
+    <eLiterals name="MINUS" value="2"/>
+    <eLiterals name="NUM_ELTS" value="3"/>
   </eClassifiers>
 </ecore:EPackage>

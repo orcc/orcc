@@ -7,6 +7,34 @@
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Ir.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="Ir.ecore#//OpBinary">
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/BITAND"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/BITOR"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/BITXOR"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/DIV"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/DIV_INT"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/EQ"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/EXP"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/GE"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/GT"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/LE"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/LOGIC_AND"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/LOGIC_OR"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/LT"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/MINUS"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/MOD"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/NE"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/PLUS"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/SHIFT_LEFT"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/SHIFT_RIGHT"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpBinary/TIMES"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="Ir.ecore#//OpUnary">
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpUnary/BITNOT"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpUnary/LOGIC_NOT"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpUnary/MINUS"/>
+      <genEnumLiterals ecoreEnumLiteral="Ir.ecore#//OpUnary/NUM_ELTS"/>
+    </genEnums>
     <genClasses image="false" ecoreClass="Ir.ecore#//Expression"/>
     <genClasses image="false" ecoreClass="Ir.ecore#//Type"/>
     <genClasses ecoreClass="Ir.ecore#//TypeBool"/>
@@ -100,6 +128,34 @@
     <genClasses image="false" ecoreClass="Ir.ecore#//String"/>
     <genClasses ecoreClass="Ir.ecore#//Use">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Use/variable"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//ExprBinary">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprBinary/e1"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprBinary/e2"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute Ir.ecore#//ExprBinary/op"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprBinary/type"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//ExprBool">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//ExprBool/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//ExprFloat">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//ExprFloat/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//ExprInt">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//ExprInt/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//ExprList">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprList/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//ExprString">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprString/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//ExprUnary">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprUnary/expr"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute Ir.ecore#//ExprUnary/op"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//ExprVar">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprVar/use"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

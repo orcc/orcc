@@ -9,18 +9,18 @@ package net.sf.orcc.ir;
 import java.lang.String;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
 /**
- * <!-- begin-user-doc -->
- * The <b>Package</b> for the model.
- * It contains accessors for the meta objects to represent
+ * <!-- begin-user-doc --> The <b>Package</b> for the model. It contains
+ * accessors for the meta objects to represent
  * <ul>
- *   <li>each class,</li>
- *   <li>each feature of each class,</li>
- *   <li>each enum,</li>
- *   <li>and each data type</li>
+ * <li>each class,</li>
+ * <li>each feature of each class,</li>
+ * <li>each enum,</li>
+ * <li>and each data type</li>
  * </ul>
  * <!-- end-user-doc -->
  * @see net.sf.orcc.ir.IrFactory
@@ -30,40 +30,38 @@ import org.eclipse.emf.ecore.EReference;
 public interface IrPackage extends EPackage {
 	/**
 	 * The package name.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	String eNAME = "ir";
 
 	/**
 	 * The package namespace URI.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	String eNS_URI = "http:///net/sf/orcc/ir.ecore";
 
 	/**
 	 * The package namespace name.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	String eNS_PREFIX = "net.sf.orcc.ir";
 
 	/**
 	 * The singleton instance of the package.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @generated
 	 */
 	IrPackage eINSTANCE = net.sf.orcc.ir.impl.IrPackageImpl.init();
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExpressionImpl <em>Expression</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExpressionImpl
+	 * <em>Expression</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.ExpressionImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExpression()
 	 * @generated
@@ -72,8 +70,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Expression</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -81,8 +78,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeImpl <em>Type</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.TypeImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getType()
 	 * @generated
@@ -90,19 +86,17 @@ public interface IrPackage extends EPackage {
 	int TYPE = 1;
 
 	/**
-	 * The number of structural features of the '<em>Type</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Type</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TYPE_FEATURE_COUNT = 0;
 
-
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeBoolImpl <em>Type Bool</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.TypeBoolImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeBool()
 	 * @generated
@@ -110,18 +104,19 @@ public interface IrPackage extends EPackage {
 	int TYPE_BOOL = 2;
 
 	/**
-	 * The number of structural features of the '<em>Type Bool</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Type Bool</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TYPE_BOOL_FEATURE_COUNT = TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeFloatImpl <em>Type Float</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeFloatImpl
+	 * <em>Type Float</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.TypeFloatImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeFloat()
 	 * @generated
@@ -130,8 +125,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Type Float</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -139,8 +133,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeIntImpl <em>Type Int</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.TypeIntImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeInt()
 	 * @generated
@@ -148,18 +141,18 @@ public interface IrPackage extends EPackage {
 	int TYPE_INT = 4;
 
 	/**
-	 * The feature id for the '<em><b>Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TYPE_INT__SIZE = TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The number of structural features of the '<em>Type Int</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Type Int</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -167,8 +160,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeListImpl <em>Type List</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.TypeListImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeList()
 	 * @generated
@@ -177,35 +169,35 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Size Expr</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int TYPE_LIST__SIZE_EXPR = TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Type</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TYPE_LIST__TYPE = TYPE_FEATURE_COUNT + 1;
 
 	/**
-	 * The number of structural features of the '<em>Type List</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Type List</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TYPE_LIST_FEATURE_COUNT = TYPE_FEATURE_COUNT + 2;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeStringImpl <em>Type String</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeStringImpl
+	 * <em>Type String</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.TypeStringImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeString()
 	 * @generated
@@ -213,9 +205,9 @@ public interface IrPackage extends EPackage {
 	int TYPE_STRING = 6;
 
 	/**
-	 * The feature id for the '<em><b>Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -223,8 +215,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Type String</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -232,8 +223,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeUintImpl <em>Type Uint</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.TypeUintImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeUint()
 	 * @generated
@@ -241,18 +231,18 @@ public interface IrPackage extends EPackage {
 	int TYPE_UINT = 7;
 
 	/**
-	 * The feature id for the '<em><b>Size</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TYPE_UINT__SIZE = TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The number of structural features of the '<em>Type Uint</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Type Uint</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -260,8 +250,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeVoidImpl <em>Type Void</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.TypeVoidImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeVoid()
 	 * @generated
@@ -269,19 +258,17 @@ public interface IrPackage extends EPackage {
 	int TYPE_VOID = 8;
 
 	/**
-	 * The number of structural features of the '<em>Type Void</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Type Void</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int TYPE_VOID_FEATURE_COUNT = TYPE_FEATURE_COUNT + 0;
 
-
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.UserImpl <em>User</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.UserImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUser()
 	 * @generated
@@ -289,18 +276,19 @@ public interface IrPackage extends EPackage {
 	int USER = 10;
 
 	/**
-	 * The number of structural features of the '<em>User</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>User</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int USER_FEATURE_COUNT = 0;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstructionImpl <em>Instruction</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstructionImpl
+	 * <em>Instruction</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.InstructionImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstruction()
 	 * @generated
@@ -309,8 +297,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -318,18 +305,15 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Instruction</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INSTRUCTION_FEATURE_COUNT = USER_FEATURE_COUNT + 1;
 
-
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.NodeImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
 	 * @generated
@@ -338,26 +322,26 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int NODE__LOCATION = USER_FEATURE_COUNT + 0;
 
 	/**
-	 * The number of structural features of the '<em>Node</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Node</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int NODE_FEATURE_COUNT = USER_FEATURE_COUNT + 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl <em>Node Block</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl
+	 * <em>Node Block</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.NodeBlockImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeBlock()
 	 * @generated
@@ -366,8 +350,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -375,8 +358,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Instructions</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -384,8 +366,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Node Block</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -393,8 +374,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeIfImpl <em>Node If</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.NodeIfImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeIf()
 	 * @generated
@@ -403,8 +383,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -412,8 +391,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Else Nodes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -421,8 +399,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -430,35 +407,34 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Then Nodes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int NODE_IF__THEN_NODES = NODE_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Condition</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int NODE_IF__CONDITION = NODE_FEATURE_COUNT + 3;
 
 	/**
-	 * The number of structural features of the '<em>Node If</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Node If</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 4;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl <em>Node While</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl
+	 * <em>Node While</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.NodeWhileImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeWhile()
 	 * @generated
@@ -467,8 +443,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -476,8 +451,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -485,17 +459,15 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int NODE_WHILE__NODES = NODE_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Condition</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Condition</b></em>' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -503,8 +475,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Node While</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -512,8 +483,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.ProcedureImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getProcedure()
 	 * @generated
@@ -522,17 +492,16 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int PROCEDURE__LOCATION = 0;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -540,8 +509,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -549,35 +517,35 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Return Type</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int PROCEDURE__RETURN_TYPE = 3;
 
 	/**
-	 * The feature id for the '<em><b>Native</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int PROCEDURE__NATIVE = 4;
 
 	/**
-	 * The number of structural features of the '<em>Procedure</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Procedure</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int PROCEDURE_FEATURE_COUNT = 5;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstAssignImpl <em>Inst Assign</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstAssignImpl
+	 * <em>Inst Assign</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.InstAssignImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstAssign()
 	 * @generated
@@ -586,17 +554,16 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_ASSIGN__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Target</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -604,8 +571,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -613,8 +579,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Inst Assign</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -622,8 +587,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstCallImpl <em>Inst Call</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.InstCallImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstCall()
 	 * @generated
@@ -632,8 +596,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -641,35 +604,34 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_CALL__PARAMETERS = INSTRUCTION_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Procedure</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Procedure</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int INST_CALL__PROCEDURE = INSTRUCTION_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Target</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int INST_CALL__TARGET = INSTRUCTION_FEATURE_COUNT + 2;
 
 	/**
-	 * The number of structural features of the '<em>Inst Call</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Inst Call</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -677,8 +639,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstLoadImpl <em>Inst Load</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.InstLoadImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstLoad()
 	 * @generated
@@ -687,8 +648,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -696,35 +656,34 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_LOAD__INDEXES = INSTRUCTION_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Source</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Source</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int INST_LOAD__SOURCE = INSTRUCTION_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Target</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int INST_LOAD__TARGET = INSTRUCTION_FEATURE_COUNT + 2;
 
 	/**
-	 * The number of structural features of the '<em>Inst Load</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Inst Load</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -732,8 +691,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstPhiImpl <em>Inst Phi</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.InstPhiImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstPhi()
 	 * @generated
@@ -742,26 +700,25 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_PHI__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Old Variable</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Old Variable</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int INST_PHI__OLD_VARIABLE = INSTRUCTION_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Target</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -769,26 +726,26 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Values</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_PHI__VALUES = INSTRUCTION_FEATURE_COUNT + 2;
 
 	/**
-	 * The number of structural features of the '<em>Inst Phi</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Inst Phi</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int INST_PHI_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstReturnImpl <em>Inst Return</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstReturnImpl
+	 * <em>Inst Return</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.InstReturnImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstReturn()
 	 * @generated
@@ -797,8 +754,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -806,8 +762,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -815,17 +770,17 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Inst Return</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_RETURN_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstSpecificImpl <em>Inst Specific</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstSpecificImpl
+	 * <em>Inst Specific</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.InstSpecificImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstSpecific()
 	 * @generated
@@ -834,8 +789,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -843,17 +797,17 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Inst Specific</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_SPECIFIC_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstStoreImpl <em>Inst Store</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstStoreImpl
+	 * <em>Inst Store</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
 	 * @see net.sf.orcc.ir.impl.InstStoreImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstStore()
 	 * @generated
@@ -862,8 +816,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -871,17 +824,16 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_STORE__INDEXES = INSTRUCTION_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Target</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -889,8 +841,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -898,8 +849,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The number of structural features of the '<em>Inst Store</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -907,46 +857,44 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.LocationImpl <em>Location</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.LocationImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getLocation()
 	 * @generated
 	 */
 	int LOCATION = 23;
 
-
 	/**
-	 * The feature id for the '<em><b>End Column</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>End Column</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int LOCATION__END_COLUMN = 0;
 
 	/**
-	 * The feature id for the '<em><b>Start Column</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Start Column</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int LOCATION__START_COLUMN = 1;
 
 	/**
-	 * The feature id for the '<em><b>Start Line</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Start Line</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int LOCATION__START_LINE = 2;
 
 	/**
-	 * The number of structural features of the '<em>Location</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Location</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -954,8 +902,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.VarImpl <em>Var</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.VarImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 	 * @generated
@@ -963,9 +910,9 @@ public interface IrPackage extends EPackage {
 	int VAR = 24;
 
 	/**
-	 * The feature id for the '<em><b>Index</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Index</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -973,8 +920,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Initial Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -982,26 +928,25 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int VAR__LOCATION = 2;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int VAR__NAME = 3;
 
 	/**
-	 * The feature id for the '<em><b>Type</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1009,26 +954,25 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int VAR__VALUE = 5;
 
 	/**
-	 * The feature id for the '<em><b>Assignable</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Assignable</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int VAR__ASSIGNABLE = 6;
 
 	/**
-	 * The feature id for the '<em><b>Global</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Global</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1036,17 +980,16 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Uses</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int VAR__USES = 8;
 
 	/**
-	 * The number of structural features of the '<em>Var</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Var</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
@@ -1054,8 +997,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The meta object id for the '{@link java.lang.String <em>String</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see java.lang.String
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getString()
 	 * @generated
@@ -1063,19 +1005,17 @@ public interface IrPackage extends EPackage {
 	int STRING = 25;
 
 	/**
-	 * The number of structural features of the '<em>String</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>String</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int STRING_FEATURE_COUNT = 0;
 
-
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.UseImpl <em>Use</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.UseImpl
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
@@ -1084,27 +1024,300 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * The feature id for the '<em><b>Variable</b></em>' container reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int USE__VARIABLE = 0;
 
 	/**
-	 * The number of structural features of the '<em>Use</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The number of structural features of the '<em>Use</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 * @ordered
 	 */
 	int USE_FEATURE_COUNT = 1;
 
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprBinaryImpl
+	 * <em>Expr Binary</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @see net.sf.orcc.ir.impl.ExprBinaryImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBinary()
+	 * @generated
+	 */
+	int EXPR_BINARY = 27;
+
+	/**
+	 * The feature id for the '<em><b>E1</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY__E1 = EXPRESSION_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>E2</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY__E2 = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Op</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY__OP = EXPRESSION_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY__TYPE = EXPRESSION_FEATURE_COUNT + 3;
+
+	/**
+	 * The number of structural features of the '<em>Expr Binary</em>' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 4;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprBoolImpl <em>Expr Bool</em>}' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.ExprBoolImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBool()
+	 * @generated
+	 */
+	int EXPR_BOOL = 28;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BOOL__VALUE = EXPRESSION_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Expr Bool</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BOOL_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprFloatImpl
+	 * <em>Expr Float</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @see net.sf.orcc.ir.impl.ExprFloatImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprFloat()
+	 * @generated
+	 */
+	int EXPR_FLOAT = 29;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_FLOAT__VALUE = EXPRESSION_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Expr Float</em>' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_FLOAT_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprIntImpl <em>Expr Int</em>}' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.ExprIntImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprInt()
+	 * @generated
+	 */
+	int EXPR_INT = 30;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_INT__VALUE = EXPRESSION_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Expr Int</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_INT_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprListImpl <em>Expr List</em>}' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.ExprListImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprList()
+	 * @generated
+	 */
+	int EXPR_LIST = 31;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_LIST__VALUE = EXPRESSION_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Expr List</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_LIST_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprStringImpl
+	 * <em>Expr String</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @see net.sf.orcc.ir.impl.ExprStringImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprString()
+	 * @generated
+	 */
+	int EXPR_STRING = 32;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_STRING__VALUE = EXPRESSION_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Expr String</em>' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_STRING_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprUnaryImpl
+	 * <em>Expr Unary</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @see net.sf.orcc.ir.impl.ExprUnaryImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprUnary()
+	 * @generated
+	 */
+	int EXPR_UNARY = 33;
+
+	/**
+	 * The feature id for the '<em><b>Expr</b></em>' containment reference. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_UNARY__EXPR = EXPRESSION_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Op</b></em>' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_UNARY__OP = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Expr Unary</em>' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_UNARY_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprVarImpl <em>Expr Var</em>}' class.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.ExprVarImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprVar()
+	 * @generated
+	 */
+	int EXPR_VAR = 34;
+
+	/**
+	 * The feature id for the '<em><b>Use</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_VAR__USE = EXPRESSION_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Expr Var</em>' class. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_VAR_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.OpBinary
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
+	 * @generated
+	 */
+	int OP_BINARY = 35;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.OpUnary
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
+	 * @generated
+	 */
+	int OP_UNARY = 36;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Expression</em>'.
 	 * @see net.sf.orcc.ir.Expression
 	 * @generated
@@ -1113,8 +1326,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Type <em>Type</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Type</em>'.
 	 * @see net.sf.orcc.ir.Type
 	 * @generated
@@ -1123,8 +1335,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeBool <em>Type Bool</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Type Bool</em>'.
 	 * @see net.sf.orcc.ir.TypeBool
 	 * @generated
@@ -1133,8 +1344,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeFloat <em>Type Float</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Type Float</em>'.
 	 * @see net.sf.orcc.ir.TypeFloat
 	 * @generated
@@ -1143,8 +1353,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeInt <em>Type Int</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Type Int</em>'.
 	 * @see net.sf.orcc.ir.TypeInt
 	 * @generated
@@ -1152,9 +1361,10 @@ public interface IrPackage extends EPackage {
 	EClass getTypeInt();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeInt#getSize <em>Size</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link net.sf.orcc.ir.TypeInt#getSize <em>Size</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Size</em>'.
 	 * @see net.sf.orcc.ir.TypeInt#getSize()
 	 * @see #getTypeInt()
@@ -1164,8 +1374,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeList <em>Type List</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Type List</em>'.
 	 * @see net.sf.orcc.ir.TypeList
 	 * @generated
@@ -1173,10 +1382,12 @@ public interface IrPackage extends EPackage {
 	EClass getTypeList();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.TypeList#getSizeExpr <em>Size Expr</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Size Expr</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.TypeList#getSizeExpr <em>Size Expr</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Size Expr</em>
+	 *         '.
 	 * @see net.sf.orcc.ir.TypeList#getSizeExpr()
 	 * @see #getTypeList()
 	 * @generated
@@ -1184,9 +1395,10 @@ public interface IrPackage extends EPackage {
 	EReference getTypeList_SizeExpr();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.TypeList#getType <em>Type</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.TypeList#getType <em>Type</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the containment reference '<em>Type</em>'.
 	 * @see net.sf.orcc.ir.TypeList#getType()
 	 * @see #getTypeList()
@@ -1196,8 +1408,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeString <em>Type String</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Type String</em>'.
 	 * @see net.sf.orcc.ir.TypeString
 	 * @generated
@@ -1205,9 +1416,10 @@ public interface IrPackage extends EPackage {
 	EClass getTypeString();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeString#getSize <em>Size</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link net.sf.orcc.ir.TypeString#getSize <em>Size</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Size</em>'.
 	 * @see net.sf.orcc.ir.TypeString#getSize()
 	 * @see #getTypeString()
@@ -1217,8 +1429,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeUint <em>Type Uint</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Type Uint</em>'.
 	 * @see net.sf.orcc.ir.TypeUint
 	 * @generated
@@ -1226,9 +1437,10 @@ public interface IrPackage extends EPackage {
 	EClass getTypeUint();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeUint#getSize <em>Size</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link net.sf.orcc.ir.TypeUint#getSize <em>Size</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Size</em>'.
 	 * @see net.sf.orcc.ir.TypeUint#getSize()
 	 * @see #getTypeUint()
@@ -1238,8 +1450,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeVoid <em>Type Void</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Type Void</em>'.
 	 * @see net.sf.orcc.ir.TypeVoid
 	 * @generated
@@ -1248,8 +1459,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Instruction <em>Instruction</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Instruction</em>'.
 	 * @see net.sf.orcc.ir.Instruction
 	 * @generated
@@ -1257,10 +1467,12 @@ public interface IrPackage extends EPackage {
 	EClass getInstruction();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Instruction#getLocation <em>Location</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Location</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.Instruction#getLocation <em>Location</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Location</em>
+	 *         '.
 	 * @see net.sf.orcc.ir.Instruction#getLocation()
 	 * @see #getInstruction()
 	 * @generated
@@ -1269,8 +1481,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.User <em>User</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>User</em>'.
 	 * @see net.sf.orcc.ir.User
 	 * @generated
@@ -1279,8 +1490,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeBlock <em>Node Block</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Node Block</em>'.
 	 * @see net.sf.orcc.ir.NodeBlock
 	 * @generated
@@ -1289,8 +1499,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.NodeBlock#getInstructions <em>Instructions</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Instructions</em>'.
 	 * @see net.sf.orcc.ir.NodeBlock#getInstructions()
 	 * @see #getNodeBlock()
@@ -1300,8 +1509,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeIf <em>Node If</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Node If</em>'.
 	 * @see net.sf.orcc.ir.NodeIf
 	 * @generated
@@ -1309,10 +1517,12 @@ public interface IrPackage extends EPackage {
 	EClass getNodeIf();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.NodeIf#getElseNodes <em>Else Nodes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Else Nodes</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link net.sf.orcc.ir.NodeIf#getElseNodes <em>Else Nodes</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Else Nodes</em>'.
 	 * @see net.sf.orcc.ir.NodeIf#getElseNodes()
 	 * @see #getNodeIf()
 	 * @generated
@@ -1320,10 +1530,12 @@ public interface IrPackage extends EPackage {
 	EReference getNodeIf_ElseNodes();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.NodeIf#getJoinNode <em>Join Node</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Join Node</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.NodeIf#getJoinNode <em>Join Node</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Join Node</em>
+	 *         '.
 	 * @see net.sf.orcc.ir.NodeIf#getJoinNode()
 	 * @see #getNodeIf()
 	 * @generated
@@ -1331,10 +1543,12 @@ public interface IrPackage extends EPackage {
 	EReference getNodeIf_JoinNode();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.NodeIf#getThenNodes <em>Then Nodes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Then Nodes</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link net.sf.orcc.ir.NodeIf#getThenNodes <em>Then Nodes</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Then Nodes</em>'.
 	 * @see net.sf.orcc.ir.NodeIf#getThenNodes()
 	 * @see #getNodeIf()
 	 * @generated
@@ -1342,10 +1556,12 @@ public interface IrPackage extends EPackage {
 	EReference getNodeIf_ThenNodes();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.NodeIf#getCondition <em>Condition</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Condition</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.NodeIf#getCondition <em>Condition</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Condition</em>
+	 *         '.
 	 * @see net.sf.orcc.ir.NodeIf#getCondition()
 	 * @see #getNodeIf()
 	 * @generated
@@ -1354,8 +1570,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeWhile <em>Node While</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Node While</em>'.
 	 * @see net.sf.orcc.ir.NodeWhile
 	 * @generated
@@ -1363,10 +1578,12 @@ public interface IrPackage extends EPackage {
 	EClass getNodeWhile();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.NodeWhile#getJoinNode <em>Join Node</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Join Node</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.NodeWhile#getJoinNode <em>Join Node</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Join Node</em>
+	 *         '.
 	 * @see net.sf.orcc.ir.NodeWhile#getJoinNode()
 	 * @see #getNodeWhile()
 	 * @generated
@@ -1374,10 +1591,12 @@ public interface IrPackage extends EPackage {
 	EReference getNodeWhile_JoinNode();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.NodeWhile#getNodes <em>Nodes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Nodes</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link net.sf.orcc.ir.NodeWhile#getNodes <em>Nodes</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Nodes</em>'.
 	 * @see net.sf.orcc.ir.NodeWhile#getNodes()
 	 * @see #getNodeWhile()
 	 * @generated
@@ -1385,10 +1604,12 @@ public interface IrPackage extends EPackage {
 	EReference getNodeWhile_Nodes();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.NodeWhile#getCondition <em>Condition</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Condition</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.NodeWhile#getCondition <em>Condition</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Condition</em>
+	 *         '.
 	 * @see net.sf.orcc.ir.NodeWhile#getCondition()
 	 * @see #getNodeWhile()
 	 * @generated
@@ -1397,8 +1618,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Node <em>Node</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Node</em>'.
 	 * @see net.sf.orcc.ir.Node
 	 * @generated
@@ -1406,10 +1626,12 @@ public interface IrPackage extends EPackage {
 	EClass getNode();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Node#getLocation <em>Location</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Location</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.Node#getLocation <em>Location</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Location</em>
+	 *         '.
 	 * @see net.sf.orcc.ir.Node#getLocation()
 	 * @see #getNode()
 	 * @generated
@@ -1418,8 +1640,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Procedure <em>Procedure</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Procedure</em>'.
 	 * @see net.sf.orcc.ir.Procedure
 	 * @generated
@@ -1427,10 +1648,12 @@ public interface IrPackage extends EPackage {
 	EClass getProcedure();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Procedure#getLocation <em>Location</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Location</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.Procedure#getLocation <em>Location</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Location</em>
+	 *         '.
 	 * @see net.sf.orcc.ir.Procedure#getLocation()
 	 * @see #getProcedure()
 	 * @generated
@@ -1438,9 +1661,10 @@ public interface IrPackage extends EPackage {
 	EReference getProcedure_Location();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Procedure#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the reference '
+	 * {@link net.sf.orcc.ir.Procedure#getName <em>Name</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the reference '<em>Name</em>'.
 	 * @see net.sf.orcc.ir.Procedure#getName()
 	 * @see #getProcedure()
@@ -1449,10 +1673,12 @@ public interface IrPackage extends EPackage {
 	EReference getProcedure_Name();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Procedure#getNodes <em>Nodes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Nodes</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link net.sf.orcc.ir.Procedure#getNodes <em>Nodes</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Nodes</em>'.
 	 * @see net.sf.orcc.ir.Procedure#getNodes()
 	 * @see #getProcedure()
 	 * @generated
@@ -1461,8 +1687,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Procedure#getReturnType <em>Return Type</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Return Type</em>'.
 	 * @see net.sf.orcc.ir.Procedure#getReturnType()
 	 * @see #getProcedure()
@@ -1471,9 +1696,10 @@ public interface IrPackage extends EPackage {
 	EReference getProcedure_ReturnType();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Procedure#isNative <em>Native</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link net.sf.orcc.ir.Procedure#isNative <em>Native</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Native</em>'.
 	 * @see net.sf.orcc.ir.Procedure#isNative()
 	 * @see #getProcedure()
@@ -1483,8 +1709,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstAssign <em>Inst Assign</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Assign</em>'.
 	 * @see net.sf.orcc.ir.InstAssign
 	 * @generated
@@ -1492,9 +1717,10 @@ public interface IrPackage extends EPackage {
 	EClass getInstAssign();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.InstAssign#getTarget <em>Target</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the reference '
+	 * {@link net.sf.orcc.ir.InstAssign#getTarget <em>Target</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the reference '<em>Target</em>'.
 	 * @see net.sf.orcc.ir.InstAssign#getTarget()
 	 * @see #getInstAssign()
@@ -1503,9 +1729,10 @@ public interface IrPackage extends EPackage {
 	EReference getInstAssign_Target();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.InstAssign#getValue <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.InstAssign#getValue <em>Value</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the containment reference '<em>Value</em>'.
 	 * @see net.sf.orcc.ir.InstAssign#getValue()
 	 * @see #getInstAssign()
@@ -1515,8 +1742,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstCall <em>Inst Call</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Call</em>'.
 	 * @see net.sf.orcc.ir.InstCall
 	 * @generated
@@ -1524,10 +1750,12 @@ public interface IrPackage extends EPackage {
 	EClass getInstCall();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.InstCall#getParameters <em>Parameters</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Parameters</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link net.sf.orcc.ir.InstCall#getParameters <em>Parameters</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Parameters</em>'.
 	 * @see net.sf.orcc.ir.InstCall#getParameters()
 	 * @see #getInstCall()
 	 * @generated
@@ -1535,9 +1763,10 @@ public interface IrPackage extends EPackage {
 	EReference getInstCall_Parameters();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.InstCall#getProcedure <em>Procedure</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the reference '
+	 * {@link net.sf.orcc.ir.InstCall#getProcedure <em>Procedure</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the reference '<em>Procedure</em>'.
 	 * @see net.sf.orcc.ir.InstCall#getProcedure()
 	 * @see #getInstCall()
@@ -1546,9 +1775,10 @@ public interface IrPackage extends EPackage {
 	EReference getInstCall_Procedure();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.InstCall#getTarget <em>Target</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the reference '
+	 * {@link net.sf.orcc.ir.InstCall#getTarget <em>Target</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the reference '<em>Target</em>'.
 	 * @see net.sf.orcc.ir.InstCall#getTarget()
 	 * @see #getInstCall()
@@ -1558,8 +1788,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstLoad <em>Inst Load</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Load</em>'.
 	 * @see net.sf.orcc.ir.InstLoad
 	 * @generated
@@ -1567,10 +1796,12 @@ public interface IrPackage extends EPackage {
 	EClass getInstLoad();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.InstLoad#getIndexes <em>Indexes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Indexes</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link net.sf.orcc.ir.InstLoad#getIndexes <em>Indexes</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Indexes</em>'.
 	 * @see net.sf.orcc.ir.InstLoad#getIndexes()
 	 * @see #getInstLoad()
 	 * @generated
@@ -1578,9 +1809,10 @@ public interface IrPackage extends EPackage {
 	EReference getInstLoad_Indexes();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.InstLoad#getSource <em>Source</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the reference '
+	 * {@link net.sf.orcc.ir.InstLoad#getSource <em>Source</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the reference '<em>Source</em>'.
 	 * @see net.sf.orcc.ir.InstLoad#getSource()
 	 * @see #getInstLoad()
@@ -1589,9 +1821,10 @@ public interface IrPackage extends EPackage {
 	EReference getInstLoad_Source();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.InstLoad#getTarget <em>Target</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the reference '
+	 * {@link net.sf.orcc.ir.InstLoad#getTarget <em>Target</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the reference '<em>Target</em>'.
 	 * @see net.sf.orcc.ir.InstLoad#getTarget()
 	 * @see #getInstLoad()
@@ -1601,8 +1834,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstPhi <em>Inst Phi</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Phi</em>'.
 	 * @see net.sf.orcc.ir.InstPhi
 	 * @generated
@@ -1611,8 +1843,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.InstPhi#getOldVariable <em>Old Variable</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Old Variable</em>'.
 	 * @see net.sf.orcc.ir.InstPhi#getOldVariable()
 	 * @see #getInstPhi()
@@ -1621,9 +1852,10 @@ public interface IrPackage extends EPackage {
 	EReference getInstPhi_OldVariable();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.InstPhi#getTarget <em>Target</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the reference '
+	 * {@link net.sf.orcc.ir.InstPhi#getTarget <em>Target</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the reference '<em>Target</em>'.
 	 * @see net.sf.orcc.ir.InstPhi#getTarget()
 	 * @see #getInstPhi()
@@ -1632,10 +1864,12 @@ public interface IrPackage extends EPackage {
 	EReference getInstPhi_Target();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.InstPhi#getValues <em>Values</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Values</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link net.sf.orcc.ir.InstPhi#getValues <em>Values</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Values</em>'.
 	 * @see net.sf.orcc.ir.InstPhi#getValues()
 	 * @see #getInstPhi()
 	 * @generated
@@ -1644,8 +1878,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstReturn <em>Inst Return</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Return</em>'.
 	 * @see net.sf.orcc.ir.InstReturn
 	 * @generated
@@ -1653,9 +1886,10 @@ public interface IrPackage extends EPackage {
 	EClass getInstReturn();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.InstReturn#getValue <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.InstReturn#getValue <em>Value</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the containment reference '<em>Value</em>'.
 	 * @see net.sf.orcc.ir.InstReturn#getValue()
 	 * @see #getInstReturn()
@@ -1665,8 +1899,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstSpecific <em>Inst Specific</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Specific</em>'.
 	 * @see net.sf.orcc.ir.InstSpecific
 	 * @generated
@@ -1675,8 +1908,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstStore <em>Inst Store</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Store</em>'.
 	 * @see net.sf.orcc.ir.InstStore
 	 * @generated
@@ -1684,10 +1916,12 @@ public interface IrPackage extends EPackage {
 	EClass getInstStore();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.InstStore#getIndexes <em>Indexes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Indexes</em>'.
+	 * Returns the meta object for the containment reference list '
+	 * {@link net.sf.orcc.ir.InstStore#getIndexes <em>Indexes</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference list '
+	 *         <em>Indexes</em>'.
 	 * @see net.sf.orcc.ir.InstStore#getIndexes()
 	 * @see #getInstStore()
 	 * @generated
@@ -1695,9 +1929,10 @@ public interface IrPackage extends EPackage {
 	EReference getInstStore_Indexes();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.InstStore#getTarget <em>Target</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the reference '
+	 * {@link net.sf.orcc.ir.InstStore#getTarget <em>Target</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the reference '<em>Target</em>'.
 	 * @see net.sf.orcc.ir.InstStore#getTarget()
 	 * @see #getInstStore()
@@ -1706,9 +1941,10 @@ public interface IrPackage extends EPackage {
 	EReference getInstStore_Target();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.InstStore#getValue <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.InstStore#getValue <em>Value</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the containment reference '<em>Value</em>'.
 	 * @see net.sf.orcc.ir.InstStore#getValue()
 	 * @see #getInstStore()
@@ -1718,8 +1954,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Location <em>Location</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Location</em>'.
 	 * @see net.sf.orcc.ir.Location
 	 * @generated
@@ -1727,9 +1962,10 @@ public interface IrPackage extends EPackage {
 	EClass getLocation();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Location#getEndColumn <em>End Column</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link net.sf.orcc.ir.Location#getEndColumn <em>End Column</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>End Column</em>'.
 	 * @see net.sf.orcc.ir.Location#getEndColumn()
 	 * @see #getLocation()
@@ -1739,8 +1975,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Location#getStartColumn <em>Start Column</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Start Column</em>'.
 	 * @see net.sf.orcc.ir.Location#getStartColumn()
 	 * @see #getLocation()
@@ -1749,9 +1984,10 @@ public interface IrPackage extends EPackage {
 	EAttribute getLocation_StartColumn();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Location#getStartLine <em>Start Line</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link net.sf.orcc.ir.Location#getStartLine <em>Start Line</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Start Line</em>'.
 	 * @see net.sf.orcc.ir.Location#getStartLine()
 	 * @see #getLocation()
@@ -1761,8 +1997,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Var <em>Var</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Var</em>'.
 	 * @see net.sf.orcc.ir.Var
 	 * @generated
@@ -1771,8 +2006,8 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#getIndex <em>Index</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Index</em>'.
 	 * @see net.sf.orcc.ir.Var#getIndex()
 	 * @see #getVar()
@@ -1781,10 +2016,12 @@ public interface IrPackage extends EPackage {
 	EAttribute getVar_Index();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Var#getInitialValue <em>Initial Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Initial Value</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.Var#getInitialValue <em>Initial Value</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '
+	 *         <em>Initial Value</em>'.
 	 * @see net.sf.orcc.ir.Var#getInitialValue()
 	 * @see #getVar()
 	 * @generated
@@ -1792,10 +2029,12 @@ public interface IrPackage extends EPackage {
 	EReference getVar_InitialValue();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Var#getLocation <em>Location</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Location</em>'.
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.Var#getLocation <em>Location</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Location</em>
+	 *         '.
 	 * @see net.sf.orcc.ir.Var#getLocation()
 	 * @see #getVar()
 	 * @generated
@@ -1804,8 +2043,8 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Var#getName <em>Name</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Name</em>'.
 	 * @see net.sf.orcc.ir.Var#getName()
 	 * @see #getVar()
@@ -1815,8 +2054,8 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Var#getType <em>Type</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Type</em>'.
 	 * @see net.sf.orcc.ir.Var#getType()
 	 * @see #getVar()
@@ -1826,8 +2065,8 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Var#getValue <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Value</em>'.
 	 * @see net.sf.orcc.ir.Var#getValue()
 	 * @see #getVar()
@@ -1836,9 +2075,10 @@ public interface IrPackage extends EPackage {
 	EReference getVar_Value();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#isAssignable <em>Assignable</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the attribute '
+	 * {@link net.sf.orcc.ir.Var#isAssignable <em>Assignable</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the attribute '<em>Assignable</em>'.
 	 * @see net.sf.orcc.ir.Var#isAssignable()
 	 * @see #getVar()
@@ -1848,8 +2088,8 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#isGlobal <em>Global</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Global</em>'.
 	 * @see net.sf.orcc.ir.Var#isGlobal()
 	 * @see #getVar()
@@ -1859,8 +2099,8 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Var#getUses <em>Uses</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Uses</em>'.
 	 * @see net.sf.orcc.ir.Var#getUses()
 	 * @see #getVar()
@@ -1870,8 +2110,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link java.lang.String <em>String</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>String</em>'.
 	 * @see java.lang.String
 	 * @model instanceClass="java.lang.String"
@@ -1881,8 +2120,7 @@ public interface IrPackage extends EPackage {
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Use <em>Use</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Use</em>'.
 	 * @see net.sf.orcc.ir.Use
 	 * @generated
@@ -1890,9 +2128,10 @@ public interface IrPackage extends EPackage {
 	EClass getUse();
 
 	/**
-	 * Returns the meta object for the container reference '{@link net.sf.orcc.ir.Use#getVariable <em>Variable</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns the meta object for the container reference '
+	 * {@link net.sf.orcc.ir.Use#getVariable <em>Variable</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the meta object for the container reference '<em>Variable</em>'.
 	 * @see net.sf.orcc.ir.Use#getVariable()
 	 * @see #getUse()
@@ -1901,22 +2140,251 @@ public interface IrPackage extends EPackage {
 	EReference getUse_Variable();
 
 	/**
-	 * Returns the factory that creates the instances of the model.
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprBinary <em>Expr Binary</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr Binary</em>'.
+	 * @see net.sf.orcc.ir.ExprBinary
+	 * @generated
+	 */
+	EClass getExprBinary();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.ExprBinary#getE1 <em>E1</em>}'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>E1</em>'.
+	 * @see net.sf.orcc.ir.ExprBinary#getE1()
+	 * @see #getExprBinary()
+	 * @generated
+	 */
+	EReference getExprBinary_E1();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.ExprBinary#getE2 <em>E2</em>}'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>E2</em>'.
+	 * @see net.sf.orcc.ir.ExprBinary#getE2()
+	 * @see #getExprBinary()
+	 * @generated
+	 */
+	EReference getExprBinary_E2();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.ExprBinary#getOp <em>Op</em>}'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Op</em>'.
+	 * @see net.sf.orcc.ir.ExprBinary#getOp()
+	 * @see #getExprBinary()
+	 * @generated
+	 */
+	EAttribute getExprBinary_Op();
+
+	/**
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.ExprBinary#getType <em>Type</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Type</em>'.
+	 * @see net.sf.orcc.ir.ExprBinary#getType()
+	 * @see #getExprBinary()
+	 * @generated
+	 */
+	EReference getExprBinary_Type();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprBool <em>Expr Bool</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr Bool</em>'.
+	 * @see net.sf.orcc.ir.ExprBool
+	 * @generated
+	 */
+	EClass getExprBool();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.ExprBool#isValue <em>Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * @see net.sf.orcc.ir.ExprBool#isValue()
+	 * @see #getExprBool()
+	 * @generated
+	 */
+	EAttribute getExprBool_Value();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprFloat <em>Expr Float</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr Float</em>'.
+	 * @see net.sf.orcc.ir.ExprFloat
+	 * @generated
+	 */
+	EClass getExprFloat();
+
+	/**
+	 * Returns the meta object for the attribute '
+	 * {@link net.sf.orcc.ir.ExprFloat#getValue <em>Value</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * @see net.sf.orcc.ir.ExprFloat#getValue()
+	 * @see #getExprFloat()
+	 * @generated
+	 */
+	EAttribute getExprFloat_Value();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprInt <em>Expr Int</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr Int</em>'.
+	 * @see net.sf.orcc.ir.ExprInt
+	 * @generated
+	 */
+	EClass getExprInt();
+
+	/**
+	 * Returns the meta object for the attribute '
+	 * {@link net.sf.orcc.ir.ExprInt#getValue <em>Value</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * @see net.sf.orcc.ir.ExprInt#getValue()
+	 * @see #getExprInt()
+	 * @generated
+	 */
+	EAttribute getExprInt_Value();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprList <em>Expr List</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr List</em>'.
+	 * @see net.sf.orcc.ir.ExprList
+	 * @generated
+	 */
+	EClass getExprList();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.ExprList#getValue <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Value</em>'.
+	 * @see net.sf.orcc.ir.ExprList#getValue()
+	 * @see #getExprList()
+	 * @generated
+	 */
+	EReference getExprList_Value();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprString <em>Expr String</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr String</em>'.
+	 * @see net.sf.orcc.ir.ExprString
+	 * @generated
+	 */
+	EClass getExprString();
+
+	/**
+	 * Returns the meta object for the reference '
+	 * {@link net.sf.orcc.ir.ExprString#getValue <em>Value</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see net.sf.orcc.ir.ExprString#getValue()
+	 * @see #getExprString()
+	 * @generated
+	 */
+	EReference getExprString_Value();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprUnary <em>Expr Unary</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr Unary</em>'.
+	 * @see net.sf.orcc.ir.ExprUnary
+	 * @generated
+	 */
+	EClass getExprUnary();
+
+	/**
+	 * Returns the meta object for the containment reference '
+	 * {@link net.sf.orcc.ir.ExprUnary#getExpr <em>Expr</em>}'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return the meta object for the containment reference '<em>Expr</em>'.
+	 * @see net.sf.orcc.ir.ExprUnary#getExpr()
+	 * @see #getExprUnary()
+	 * @generated
+	 */
+	EReference getExprUnary_Expr();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.ExprUnary#getOp <em>Op</em>}'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Op</em>'.
+	 * @see net.sf.orcc.ir.ExprUnary#getOp()
+	 * @see #getExprUnary()
+	 * @generated
+	 */
+	EAttribute getExprUnary_Op();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprVar <em>Expr Var</em>}'.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr Var</em>'.
+	 * @see net.sf.orcc.ir.ExprVar
+	 * @generated
+	 */
+	EClass getExprVar();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.ExprVar#getUse <em>Use</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Use</em>'.
+	 * @see net.sf.orcc.ir.ExprVar#getUse()
+	 * @see #getExprVar()
+	 * @generated
+	 */
+	EReference getExprVar_Use();
+
+	/**
+	 * Returns the meta object for enum '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for enum '<em>Op Binary</em>'.
+	 * @see net.sf.orcc.ir.OpBinary
+	 * @generated
+	 */
+	EEnum getOpBinary();
+
+	/**
+	 * Returns the meta object for enum '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for enum '<em>Op Unary</em>'.
+	 * @see net.sf.orcc.ir.OpUnary
+	 * @generated
+	 */
+	EEnum getOpUnary();
+
+	/**
+	 * Returns the factory that creates the instances of the model. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return the factory that creates the instances of the model.
 	 * @generated
 	 */
 	IrFactory getIrFactory();
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * Defines literals for the meta objects that represent
+	 * <!-- begin-user-doc --> Defines literals for the meta objects that
+	 * represent
 	 * <ul>
-	 *   <li>each class,</li>
-	 *   <li>each feature of each class,</li>
-	 *   <li>each enum,</li>
-	 *   <li>and each data type</li>
+	 * <li>each class,</li>
+	 * <li>each feature of each class,</li>
+	 * <li>each enum,</li>
+	 * <li>and each data type</li>
 	 * </ul>
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1924,8 +2392,7 @@ public interface IrPackage extends EPackage {
 	interface Literals {
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExpressionImpl <em>Expression</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.ExpressionImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExpression()
 		 * @generated
@@ -1934,8 +2401,7 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeImpl <em>Type</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getType()
 		 * @generated
@@ -1944,8 +2410,7 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeBoolImpl <em>Type Bool</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeBoolImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeBool()
 		 * @generated
@@ -1954,8 +2419,7 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeFloatImpl <em>Type Float</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeFloatImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeFloat()
 		 * @generated
@@ -1964,8 +2428,7 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeIntImpl <em>Type Int</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeIntImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeInt()
 		 * @generated
@@ -1974,16 +2437,14 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute TYPE_INT__SIZE = eINSTANCE.getTypeInt_Size();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeListImpl <em>Type List</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeListImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeList()
 		 * @generated
@@ -1992,24 +2453,22 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Size Expr</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference TYPE_LIST__SIZE_EXPR = eINSTANCE.getTypeList_SizeExpr();
 
 		/**
 		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference TYPE_LIST__TYPE = eINSTANCE.getTypeList_Type();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeStringImpl <em>Type String</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeStringImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeString()
 		 * @generated
@@ -2018,16 +2477,14 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute TYPE_STRING__SIZE = eINSTANCE.getTypeString_Size();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeUintImpl <em>Type Uint</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeUintImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeUint()
 		 * @generated
@@ -2036,16 +2493,14 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute TYPE_UINT__SIZE = eINSTANCE.getTypeUint_Size();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeVoidImpl <em>Type Void</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.TypeVoidImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeVoid()
 		 * @generated
@@ -2054,8 +2509,7 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstructionImpl <em>Instruction</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.InstructionImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstruction()
 		 * @generated
@@ -2064,16 +2518,15 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference INSTRUCTION__LOCATION = eINSTANCE.getInstruction_Location();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.UserImpl <em>User</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.UserImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUser()
 		 * @generated
@@ -2082,8 +2535,7 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl <em>Node Block</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.NodeBlockImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeBlock()
 		 * @generated
@@ -2092,16 +2544,17 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Instructions</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference NODE_BLOCK__INSTRUCTIONS = eINSTANCE.getNodeBlock_Instructions();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeIfImpl <em>Node If</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '
+		 * {@link net.sf.orcc.ir.impl.NodeIfImpl <em>Node If</em>}' class. <!--
+		 * begin-user-doc --> <!-- end-user-doc -->
+		 * 
 		 * @see net.sf.orcc.ir.impl.NodeIfImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeIf()
 		 * @generated
@@ -2110,40 +2563,39 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Else Nodes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference NODE_IF__ELSE_NODES = eINSTANCE.getNodeIf_ElseNodes();
 
 		/**
 		 * The meta object literal for the '<em><b>Join Node</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference NODE_IF__JOIN_NODE = eINSTANCE.getNodeIf_JoinNode();
 
 		/**
 		 * The meta object literal for the '<em><b>Then Nodes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference NODE_IF__THEN_NODES = eINSTANCE.getNodeIf_ThenNodes();
 
 		/**
-		 * The meta object literal for the '<em><b>Condition</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Condition</b></em>' containment reference feature.
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference NODE_IF__CONDITION = eINSTANCE.getNodeIf_Condition();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl <em>Node While</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.NodeWhileImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeWhile()
 		 * @generated
@@ -2152,32 +2604,30 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Join Node</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference NODE_WHILE__JOIN_NODE = eINSTANCE.getNodeWhile_JoinNode();
 
 		/**
 		 * The meta object literal for the '<em><b>Nodes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference NODE_WHILE__NODES = eINSTANCE.getNodeWhile_Nodes();
 
 		/**
-		 * The meta object literal for the '<em><b>Condition</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Condition</b></em>' containment reference feature.
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference NODE_WHILE__CONDITION = eINSTANCE.getNodeWhile_Condition();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.NodeImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
 		 * @generated
@@ -2186,16 +2636,15 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference NODE__LOCATION = eINSTANCE.getNode_Location();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.ProcedureImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getProcedure()
 		 * @generated
@@ -2204,48 +2653,44 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference PROCEDURE__LOCATION = eINSTANCE.getProcedure_Location();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference PROCEDURE__NAME = eINSTANCE.getProcedure_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Nodes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference PROCEDURE__NODES = eINSTANCE.getProcedure_Nodes();
 
 		/**
 		 * The meta object literal for the '<em><b>Return Type</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference PROCEDURE__RETURN_TYPE = eINSTANCE.getProcedure_ReturnType();
 
 		/**
 		 * The meta object literal for the '<em><b>Native</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute PROCEDURE__NATIVE = eINSTANCE.getProcedure_Native();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstAssignImpl <em>Inst Assign</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.InstAssignImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstAssign()
 		 * @generated
@@ -2254,24 +2699,21 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_ASSIGN__TARGET = eINSTANCE.getInstAssign_Target();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_ASSIGN__VALUE = eINSTANCE.getInstAssign_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstCallImpl <em>Inst Call</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.InstCallImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstCall()
 		 * @generated
@@ -2280,32 +2722,29 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_CALL__PARAMETERS = eINSTANCE.getInstCall_Parameters();
 
 		/**
 		 * The meta object literal for the '<em><b>Procedure</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_CALL__PROCEDURE = eINSTANCE.getInstCall_Procedure();
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_CALL__TARGET = eINSTANCE.getInstCall_Target();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstLoadImpl <em>Inst Load</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.InstLoadImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstLoad()
 		 * @generated
@@ -2314,32 +2753,28 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Indexes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_LOAD__INDEXES = eINSTANCE.getInstLoad_Indexes();
 
 		/**
 		 * The meta object literal for the '<em><b>Source</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_LOAD__SOURCE = eINSTANCE.getInstLoad_Source();
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_LOAD__TARGET = eINSTANCE.getInstLoad_Target();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstPhiImpl <em>Inst Phi</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.InstPhiImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstPhi()
 		 * @generated
@@ -2348,32 +2783,28 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Old Variable</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_PHI__OLD_VARIABLE = eINSTANCE.getInstPhi_OldVariable();
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_PHI__TARGET = eINSTANCE.getInstPhi_Target();
 
 		/**
 		 * The meta object literal for the '<em><b>Values</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_PHI__VALUES = eINSTANCE.getInstPhi_Values();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstReturnImpl <em>Inst Return</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.InstReturnImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstReturn()
 		 * @generated
@@ -2382,16 +2813,14 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_RETURN__VALUE = eINSTANCE.getInstReturn_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstSpecificImpl <em>Inst Specific</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.InstSpecificImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstSpecific()
 		 * @generated
@@ -2400,8 +2829,7 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstStoreImpl <em>Inst Store</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.InstStoreImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstStore()
 		 * @generated
@@ -2410,32 +2838,28 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Indexes</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_STORE__INDEXES = eINSTANCE.getInstStore_Indexes();
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_STORE__TARGET = eINSTANCE.getInstStore_Target();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INST_STORE__VALUE = eINSTANCE.getInstStore_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.LocationImpl <em>Location</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.LocationImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getLocation()
 		 * @generated
@@ -2444,32 +2868,28 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>End Column</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute LOCATION__END_COLUMN = eINSTANCE.getLocation_EndColumn();
 
 		/**
 		 * The meta object literal for the '<em><b>Start Column</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute LOCATION__START_COLUMN = eINSTANCE.getLocation_StartColumn();
 
 		/**
 		 * The meta object literal for the '<em><b>Start Line</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute LOCATION__START_LINE = eINSTANCE.getLocation_StartLine();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.VarImpl <em>Var</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.VarImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 		 * @generated
@@ -2478,80 +2898,74 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Index</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute VAR__INDEX = eINSTANCE.getVar_Index();
 
 		/**
 		 * The meta object literal for the '<em><b>Initial Value</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference VAR__INITIAL_VALUE = eINSTANCE.getVar_InitialValue();
 
 		/**
 		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!--
+		 * end-user-doc -->
 		 * @generated
 		 */
 		EReference VAR__LOCATION = eINSTANCE.getVar_Location();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference VAR__NAME = eINSTANCE.getVar_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference VAR__TYPE = eINSTANCE.getVar_Type();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference VAR__VALUE = eINSTANCE.getVar_Value();
 
 		/**
 		 * The meta object literal for the '<em><b>Assignable</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute VAR__ASSIGNABLE = eINSTANCE.getVar_Assignable();
 
 		/**
 		 * The meta object literal for the '<em><b>Global</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EAttribute VAR__GLOBAL = eINSTANCE.getVar_Global();
 
 		/**
 		 * The meta object literal for the '<em><b>Uses</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference VAR__USES = eINSTANCE.getVar_Uses();
 
 		/**
-		 * The meta object literal for the '{@link java.lang.String <em>String</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * The meta object literal for the '{@link java.lang.String
+		 * <em>String</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
+		 * -->
+		 * 
 		 * @see java.lang.String
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getString()
 		 * @generated
@@ -2560,8 +2974,7 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.UseImpl <em>Use</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.UseImpl
 		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 		 * @generated
@@ -2570,13 +2983,190 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Variable</b></em>' container reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference USE__VARIABLE = eINSTANCE.getUse_Variable();
 
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprBinaryImpl <em>Expr Binary</em>}' class.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ExprBinaryImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBinary()
+		 * @generated
+		 */
+		EClass EXPR_BINARY = eINSTANCE.getExprBinary();
+
+		/**
+		 * The meta object literal for the '<em><b>E1</b></em>' containment reference feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_BINARY__E1 = eINSTANCE.getExprBinary_E1();
+
+		/**
+		 * The meta object literal for the '<em><b>E2</b></em>' containment reference feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_BINARY__E2 = eINSTANCE.getExprBinary_E2();
+
+		/**
+		 * The meta object literal for the '<em><b>Op</b></em>' attribute feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EXPR_BINARY__OP = eINSTANCE.getExprBinary_Op();
+
+		/**
+		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_BINARY__TYPE = eINSTANCE.getExprBinary_Type();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprBoolImpl <em>Expr Bool</em>}' class.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ExprBoolImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBool()
+		 * @generated
+		 */
+		EClass EXPR_BOOL = eINSTANCE.getExprBool();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EXPR_BOOL__VALUE = eINSTANCE.getExprBool_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprFloatImpl <em>Expr Float</em>}' class.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ExprFloatImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprFloat()
+		 * @generated
+		 */
+		EClass EXPR_FLOAT = eINSTANCE.getExprFloat();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EXPR_FLOAT__VALUE = eINSTANCE.getExprFloat_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprIntImpl <em>Expr Int</em>}' class.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ExprIntImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprInt()
+		 * @generated
+		 */
+		EClass EXPR_INT = eINSTANCE.getExprInt();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EXPR_INT__VALUE = eINSTANCE.getExprInt_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprListImpl <em>Expr List</em>}' class.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ExprListImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprList()
+		 * @generated
+		 */
+		EClass EXPR_LIST = eINSTANCE.getExprList();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_LIST__VALUE = eINSTANCE.getExprList_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprStringImpl <em>Expr String</em>}' class.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ExprStringImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprString()
+		 * @generated
+		 */
+		EClass EXPR_STRING = eINSTANCE.getExprString();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_STRING__VALUE = eINSTANCE.getExprString_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprUnaryImpl <em>Expr Unary</em>}' class.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ExprUnaryImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprUnary()
+		 * @generated
+		 */
+		EClass EXPR_UNARY = eINSTANCE.getExprUnary();
+
+		/**
+		 * The meta object literal for the '<em><b>Expr</b></em>' containment reference feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_UNARY__EXPR = eINSTANCE.getExprUnary_Expr();
+
+		/**
+		 * The meta object literal for the '<em><b>Op</b></em>' attribute feature.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EXPR_UNARY__OP = eINSTANCE.getExprUnary_Op();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprVarImpl <em>Expr Var</em>}' class.
+		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ExprVarImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprVar()
+		 * @generated
+		 */
+		EClass EXPR_VAR = eINSTANCE.getExprVar();
+
+		/**
+		 * The meta object literal for the '<em><b>Use</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_VAR__USE = eINSTANCE.getExprVar_Use();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.OpBinary
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
+		 * @generated
+		 */
+		EEnum OP_BINARY = eINSTANCE.getOpBinary();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.OpUnary
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
+		 * @generated
+		 */
+		EEnum OP_UNARY = eINSTANCE.getOpUnary();
 
 	}
 
-} //IrPackage
+} // IrPackage

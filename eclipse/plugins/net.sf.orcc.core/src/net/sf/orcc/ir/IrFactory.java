@@ -408,6 +408,78 @@ public interface IrFactory extends EFactory {
 	Use createUse();
 
 	/**
+	 * Returns a new object of class '<em>Expr Binary</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Binary</em>'.
+	 * @generated
+	 */
+	ExprBinary createExprBinary();
+
+	/**
+	 * Returns a new object of class '<em>Expr Bool</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Bool</em>'.
+	 * @generated
+	 */
+	ExprBool createExprBool();
+
+	/**
+	 * Returns a new object of class '<em>Expr Float</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Float</em>'.
+	 * @generated
+	 */
+	ExprFloat createExprFloat();
+
+	/**
+	 * Returns a new object of class '<em>Expr Int</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Int</em>'.
+	 * @generated
+	 */
+	ExprInt createExprInt();
+
+	/**
+	 * Returns a new object of class '<em>Expr List</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr List</em>'.
+	 * @generated
+	 */
+	ExprList createExprList();
+
+	/**
+	 * Returns a new object of class '<em>Expr String</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr String</em>'.
+	 * @generated
+	 */
+	ExprString createExprString();
+
+	/**
+	 * Returns a new object of class '<em>Expr Unary</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Unary</em>'.
+	 * @generated
+	 */
+	ExprUnary createExprUnary();
+
+	/**
+	 * Returns a new object of class '<em>Expr Var</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Var</em>'.
+	 * @generated
+	 */
+	ExprVar createExprVar();
+
+	/**
 	 * Creates a new use of the given variable.
 	 * 
 	 * @param variable

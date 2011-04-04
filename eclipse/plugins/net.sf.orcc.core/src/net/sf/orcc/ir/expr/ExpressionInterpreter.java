@@ -28,6 +28,15 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
+
 /**
  * This class defines an expression interpreter.
  * 
@@ -36,20 +45,20 @@ package net.sf.orcc.ir.expr;
  */
 public interface ExpressionInterpreter {
 
-	public Object interpret(BinaryExpr expr, Object... args);
+	public Object interpret(ExprBinary expr, Object... args);
 
-	public Object interpret(BoolExpr expr, Object... args);
+	public Object interpret(ExprBool expr, Object... args);
 
-	public Object interpret(FloatExpr expr, Object... args);
+	public Object interpret(ExprFloat expr, Object... args);
 
-	public Object interpret(IntExpr expr, Object... args);
+	public Object interpret(ExprInt expr, Object... args);
 
-	public Object interpret(ListExpr expr, Object... args);
+	public Object interpret(ExprList expr, Object... args);
 
-	public Object interpret(StringExpr expr, Object... args);
+	public Object interpret(ExprString expr, Object... args);
 
-	public Object interpret(UnaryExpr expr, Object... args);
+	public Object interpret(ExprUnary expr, Object... args);
 
-	public Object interpret(VarExpr expr, Object... args);
+	public Object interpret(ExprVar expr, Object... args);
 
 }

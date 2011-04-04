@@ -29,14 +29,76 @@
 package net.sf.orcc.ir;
 
 /**
- * This class defines a boolean type.
+ * This class defines a binary expression.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
- * @model extends="net.sf.orcc.ir.Type"
+ * @model extends="net.sf.orcc.ir.Expression"
  */
-public interface TypeBool extends Type {
+public interface ExprBinary extends Expression {
 
-	public static final String NAME = "bool";
+	/**
+	 * Returns the first operand of this binary expression as an expression.
+	 * 
+	 * @return the first operand of this binary expression
+	 * @model containment="true"
+	 */
+	Expression getE1();
+
+	/**
+	 * Returns the second operand of this binary expression as an expression.
+	 * 
+	 * @return the second operand of this binary expression
+	 * @model containment="true"
+	 */
+	Expression getE2();
+
+	/**
+	 * Returns the operator of this binary expression.
+	 * 
+	 * @return the operator of this binary expression
+	 * @model
+	 */
+	OpBinary getOp();
+
+	/**
+	 * Returns the type of this expression.
+	 * 
+	 * @return the type of this expression
+	 * @model containment="true"
+	 */
+	Type getType();
+
+	/**
+	 * Sets the first operand of this binary expression as an expression.
+	 * 
+	 * @param e1
+	 *            the first operand of this binary expression
+	 */
+	void setE1(Expression e1);
+
+	/**
+	 * Sets the second operand of this binary expression as an expression.
+	 * 
+	 * @param e2
+	 *            the second operand of this binary expression
+	 */
+	void setE2(Expression e2);
+
+	/**
+	 * Sets the operator of this binary expression.
+	 * 
+	 * @param op
+	 *            the operator of this binary expression
+	 */
+	void setOp(OpBinary op);
+
+	/**
+	 * Sets the type of this expression.
+	 * 
+	 * @param type
+	 *            the type of this expression
+	 */
+	void setType(Type type);
 
 }

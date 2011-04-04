@@ -29,14 +29,23 @@
 package net.sf.orcc.ir;
 
 /**
- * This class defines a boolean type.
+ * This class defines an expression that references a variable. The variable is
+ * referenced by an instance of the {@link Use} class.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
- * @model extends="net.sf.orcc.ir.Type"
+ * @model extends="net.sf.orcc.ir.Expression"
  */
-public interface TypeBool extends Type {
+public interface ExprVar extends Expression {
 
-	public static final String NAME = "bool";
+	/**
+	 * Returns the use associated with this variable expression.
+	 * 
+	 * @return the use associated with this variable expression
+	 * @model containment="true"
+	 */
+	Use getUse();
+
+	void setUse(Use use);
 
 }

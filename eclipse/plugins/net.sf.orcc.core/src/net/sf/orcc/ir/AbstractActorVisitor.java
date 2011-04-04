@@ -31,15 +31,7 @@ package net.sf.orcc.ir;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
-import net.sf.orcc.ir.expr.FloatExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.InstructionVisitor;
 import net.sf.orcc.ir.impl.NodeVisitor;
 
@@ -149,30 +141,45 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(InstAssign assign) {
-		if (visitFull) {
-			assign.getValue().accept(this);
-		}
-	}
-
-	@Override
-	public void visit(BinaryExpr expr, Object... args) {
+	public void visit(ExprBinary expr, Object... args) {
 		expr.getE1().accept(this, args);
 		expr.getE2().accept(this, args);
 	}
 
 	@Override
-	public void visit(NodeBlock nodeBlock) {
-		ListIterator<Instruction> it = nodeBlock.listIterator();
-		while (it.hasNext()) {
-			Instruction instruction = it.next();
-			itInstruction = it;
-			instruction.accept(this);
-		}
+	public void visit(ExprBool expr, Object... args) {
 	}
 
 	@Override
-	public void visit(BoolExpr expr, Object... args) {
+	public void visit(ExprFloat expr, Object... args) {
+	}
+
+	@Override
+	public void visit(ExprInt expr, Object... args) {
+	}
+
+	@Override
+	public void visit(ExprList expr, Object... args) {
+	}
+
+	@Override
+	public void visit(ExprString expr, Object... args) {
+	}
+
+	@Override
+	public void visit(ExprUnary expr, Object... args) {
+		expr.getExpr().accept(this, args);
+	}
+
+	@Override
+	public void visit(ExprVar expr, Object... args) {
+	}
+
+	@Override
+	public void visit(InstAssign assign) {
+		if (visitFull) {
+			assign.getValue().accept(this);
+		}
 	}
 
 	@Override
@@ -185,61 +192,12 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(FloatExpr expr, Object... args) {
-	}
-
-	@Override
-	public void visit(NodeIf nodeIf) {
-		if (visitFull) {
-			nodeIf.getCondition().accept(this);
-		}
-
-		visit(nodeIf.getThenNodes());
-		visit(nodeIf.getElseNodes());
-		visit(nodeIf.getJoinNode());
-	}
-
-	@Override
-	public void visit(IntExpr expr, Object... args) {
-	}
-
-	/**
-	 * Visits the nodes of the given node list.
-	 * 
-	 * @param nodes
-	 *            a list of nodes that belong to a procedure
-	 * @param args
-	 *            arguments
-	 */
-	public void visit(List<Node> nodes) {
-		ListIterator<Node> it = nodes.listIterator();
-		while (it.hasNext()) {
-			Node node = it.next();
-			itNode = it;
-			node.accept(this);
-		}
-	}
-
-	@Override
-	public void visit(ListExpr expr, Object... args) {
-	}
-
-	@Override
 	public void visit(InstLoad load) {
 		if (visitFull) {
 			for (Expression expr : load.getIndexes()) {
 				expr.accept(this);
 			}
 		}
-	}
-
-	/**
-	 * Visits the given pattern.
-	 * 
-	 * @param pattern
-	 *            an pattern
-	 */
-	public void visit(Pattern pattern) {
 	}
 
 	@Override
@@ -249,18 +207,6 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 				expr.accept(this);
 			}
 		}
-	}
-
-	/**
-	 * Visits the given procedure.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 */
-	public void visit(Procedure procedure) {
-		this.procedure = procedure;
-		List<Node> nodes = procedure.getNodes();
-		visit(nodes);
 	}
 
 	@Override
@@ -289,17 +235,42 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 		}
 	}
 
-	@Override
-	public void visit(StringExpr expr, Object... args) {
+	/**
+	 * Visits the nodes of the given node list.
+	 * 
+	 * @param nodes
+	 *            a list of nodes that belong to a procedure
+	 * @param args
+	 *            arguments
+	 */
+	public void visit(List<Node> nodes) {
+		ListIterator<Node> it = nodes.listIterator();
+		while (it.hasNext()) {
+			Node node = it.next();
+			itNode = it;
+			node.accept(this);
+		}
 	}
 
 	@Override
-	public void visit(UnaryExpr expr, Object... args) {
-		expr.getExpr().accept(this, args);
+	public void visit(NodeBlock nodeBlock) {
+		ListIterator<Instruction> it = nodeBlock.listIterator();
+		while (it.hasNext()) {
+			Instruction instruction = it.next();
+			itInstruction = it;
+			instruction.accept(this);
+		}
 	}
 
 	@Override
-	public void visit(VarExpr expr, Object... args) {
+	public void visit(NodeIf nodeIf) {
+		if (visitFull) {
+			nodeIf.getCondition().accept(this);
+		}
+
+		visit(nodeIf.getThenNodes());
+		visit(nodeIf.getElseNodes());
+		visit(nodeIf.getJoinNode());
 	}
 
 	@Override
@@ -310,6 +281,27 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 
 		visit(nodeWhile.getNodes());
 		visit(nodeWhile.getJoinNode());
+	}
+
+	/**
+	 * Visits the given pattern.
+	 * 
+	 * @param pattern
+	 *            an pattern
+	 */
+	public void visit(Pattern pattern) {
+	}
+
+	/**
+	 * Visits the given procedure.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 */
+	public void visit(Procedure procedure) {
+		this.procedure = procedure;
+		List<Node> nodes = procedure.getNodes();
+		visit(nodes);
 	}
 
 }

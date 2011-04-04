@@ -31,7 +31,17 @@ package net.sf.orcc.ir.expr;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 
 /**
  * This class defines the default expression printer.
@@ -62,7 +72,7 @@ public class ExpressionPrinter implements ExpressionVisitor {
 	 *            a binary operator
 	 * @return the string representation of the given binary operator
 	 */
-	protected String toString(BinaryOp op) {
+	protected String toString(OpBinary op) {
 		return op.getText();
 	}
 
@@ -80,7 +90,7 @@ public class ExpressionPrinter implements ExpressionVisitor {
 	 *            right expression
 	 * @return the string representation of the binary expression
 	 */
-	protected void toString(int nextPrec, Expression e1, BinaryOp op,
+	protected void toString(int nextPrec, Expression e1, OpBinary op,
 			Expression e2) {
 		e1.accept(this, nextPrec, BinaryExpr.LEFT);
 		builder.append(" ");
@@ -96,13 +106,13 @@ public class ExpressionPrinter implements ExpressionVisitor {
 	 *            a unary operator
 	 * @return the string representation of the given unary operator
 	 */
-	protected String toString(UnaryOp op) {
+	protected String toString(OpUnary op) {
 		return op.getText();
 	}
 
 	@Override
-	public void visit(BinaryExpr expr, Object... args) {
-		BinaryOp op = expr.getOp();
+	public void visit(ExprBinary expr, Object... args) {
+		OpBinary op = expr.getOp();
 
 		if (op.needsParentheses(args)) {
 			builder.append("(");
@@ -114,22 +124,22 @@ public class ExpressionPrinter implements ExpressionVisitor {
 	}
 
 	@Override
-	public void visit(BoolExpr expr, Object... args) {
+	public void visit(ExprBool expr, Object... args) {
 		builder.append(expr.getValue());
 	}
 
 	@Override
-	public void visit(IntExpr expr, Object... args) {
+	public void visit(ExprInt expr, Object... args) {
 		builder.append(expr.toString());
 	}
 
 	@Override
-	public void visit(FloatExpr expr, Object... args) {
+	public void visit(ExprFloat expr, Object... args) {
 		builder.append(expr.toString());
 	}
 
 	@Override
-	public void visit(ListExpr expr, Object... args) {
+	public void visit(ExprList expr, Object... args) {
 		List<Expression> list = expr.getValue();
 		if (list.isEmpty()) {
 			builder.append("[]");
@@ -146,18 +156,18 @@ public class ExpressionPrinter implements ExpressionVisitor {
 	}
 
 	@Override
-	public void visit(StringExpr expr, Object... args) {
+	public void visit(ExprString expr, Object... args) {
 		builder.append(expr.getValue());
 	}
 
 	@Override
-	public void visit(UnaryExpr expr, Object... args) {
+	public void visit(ExprUnary expr, Object... args) {
 		builder.append(toString(expr.getOp()));
 		expr.getExpr().accept(this, Integer.MIN_VALUE);
 	}
 
 	@Override
-	public void visit(VarExpr expr, Object... args) {
+	public void visit(ExprVar expr, Object... args) {
 		builder.append(expr.getVar());
 	}
 

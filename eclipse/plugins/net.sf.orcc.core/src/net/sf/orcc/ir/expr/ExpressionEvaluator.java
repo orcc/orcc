@@ -32,7 +32,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Var;
 
 /**
@@ -65,7 +71,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(BinaryExpr expr, Object... args) {
+	public Object interpret(ExprBinary expr, Object... args) {
 		Expression val1 = (Expression) expr.getE1().accept(this);
 		Expression val2 = (Expression) expr.getE2().accept(this);
 		Expression result = interpretBinaryExpr(val1, expr.getOp(), val2);
@@ -89,7 +95,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(ListExpr expr, Object... args) {
+	public Object interpret(ExprList expr, Object... args) {
 		List<Expression> expressions = expr.getValue();
 		List<Expression> values = new ArrayList<Expression>(expressions.size());
 		for (Expression expression : expressions) {
@@ -100,7 +106,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(UnaryExpr expr, Object... args) {
+	public Object interpret(ExprUnary expr, Object... args) {
 		Expression value = (Expression) expr.getExpr().accept(this);
 		Expression result = interpretUnaryExpr(expr.getOp(), value);
 
@@ -120,7 +126,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(VarExpr expr, Object... args) {
+	public Object interpret(ExprVar expr, Object... args) {
 		Var var = expr.getVar().getVariable();
 		Expression value = var.getValue();
 		if (value == null && throwException) {
@@ -144,7 +150,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	 *            another expression
 	 * @return the value of <code>val1</code> <code>op</code> <code>val2</code>
 	 */
-	public Expression interpretBinaryExpr(Expression val1, BinaryOp op,
+	public Expression interpretBinaryExpr(Expression val1, OpBinary op,
 			Expression val2) {
 		switch (op) {
 		case BITAND:
@@ -333,7 +339,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	 *            an expression
 	 * @return the value of <code>op</code> <code>value</code>
 	 */
-	public Expression interpretUnaryExpr(UnaryOp op, Expression value) {
+	public Expression interpretUnaryExpr(OpUnary op, Expression value) {
 		switch (op) {
 		case BITNOT:
 			if (value != null && value.isIntExpr()) {

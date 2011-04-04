@@ -57,7 +57,7 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	protected EList<Node> nodes;
 
 	/**
-	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' reference.
+	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getCondition()
@@ -111,8 +111,7 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 			case IrPackage.NODE_WHILE__NODES:
 				return getNodes();
 			case IrPackage.NODE_WHILE__CONDITION:
-				if (resolve) return getCondition();
-				return basicGetCondition();
+				return getCondition();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -129,6 +128,8 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 				return basicSetJoinNode(null, msgs);
 			case IrPackage.NODE_WHILE__NODES:
 				return ((InternalEList<?>)getNodes()).basicRemove(otherEnd, msgs);
+			case IrPackage.NODE_WHILE__CONDITION:
+				return basicSetCondition(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -226,14 +227,6 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 * @generated
 	 */
 	public Expression getCondition() {
-		if (condition != null && condition.eIsProxy()) {
-			InternalEObject oldCondition = (InternalEObject)condition;
-			condition = (Expression)eResolveProxy(oldCondition);
-			if (condition != oldCondition) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.NODE_WHILE__CONDITION, oldCondition, condition));
-			}
-		}
 		return condition;
 	}
 
@@ -242,8 +235,14 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Expression basicGetCondition() {
-		return condition;
+	public NotificationChain basicSetCondition(Expression newCondition, NotificationChain msgs) {
+		Expression oldCondition = condition;
+		condition = newCondition;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, oldCondition, newCondition);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -252,10 +251,17 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 * @generated
 	 */
 	public void setCondition(Expression newCondition) {
-		Expression oldCondition = condition;
-		condition = newCondition;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, oldCondition, condition));
+		if (newCondition != condition) {
+			NotificationChain msgs = null;
+			if (condition != null)
+				msgs = ((InternalEObject)condition).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_WHILE__CONDITION, null, msgs);
+			if (newCondition != null)
+				msgs = ((InternalEObject)newCondition).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.NODE_WHILE__CONDITION, null, msgs);
+			msgs = basicSetCondition(newCondition, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, newCondition, newCondition));
 	}
 
 	@Override

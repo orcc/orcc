@@ -28,15 +28,25 @@
  */
 package net.sf.orcc.ir;
 
+import java.lang.String;
+
 /**
- * This class defines a boolean type.
+ * This class defines a String expression.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
- * @model extends="net.sf.orcc.ir.Type"
+ * @model extends="net.sf.orcc.ir.Expression"
  */
-public interface TypeBool extends Type {
+public interface ExprString extends Expression {
 
-	public static final String NAME = "bool";
+	/**
+	 * Returns the value of this string expression.
+	 * 
+	 * @return the value of this string expression
+	 * @model
+	 */
+	String getValue();
+
+	void setValue(String value);
 
 }

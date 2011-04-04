@@ -29,14 +29,35 @@
 package net.sf.orcc.ir;
 
 /**
- * This class defines a boolean type.
+ * This class defines a boolean expression.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
- * @model extends="net.sf.orcc.ir.Type"
+ * @model extends="net.sf.orcc.ir.Expression"
  */
-public interface TypeBool extends Type {
+public interface ExprBool extends Expression {
 
-	public static final String NAME = "bool";
+	/**
+	 * Returns the value of this boolean expression.
+	 * 
+	 * @return the value of this boolean expression
+	 * @model
+	 */
+	boolean isValue();
+
+	/**
+	 * Returns the inverse of this boolean expression.
+	 * 
+	 * @return the inverse of this boolean expression
+	 */
+	ExprBool not();
+
+	/**
+	 * Sets the value of this boolean expression.
+	 * 
+	 * @param value
+	 *            the value of this boolean expression
+	 */
+	void setValue(boolean value);
 
 }

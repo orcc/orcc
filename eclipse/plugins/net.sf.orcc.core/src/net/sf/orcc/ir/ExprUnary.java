@@ -29,14 +29,34 @@
 package net.sf.orcc.ir;
 
 /**
- * This class defines a boolean type.
+ * This class defines a unary expression.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
- * @model extends="net.sf.orcc.ir.Type"
+ * @model extends="net.sf.orcc.ir.Expression"
  */
-public interface TypeBool extends Type {
+public interface ExprUnary extends Expression {
 
-	public static final String NAME = "bool";
+	/**
+	 * Returns the operand of this unary expression as an expression.
+	 * 
+	 * @return the operand of this unary expression
+	 * @model containment="true"
+	 */
+	Expression getExpr();
+
+	/**
+	 * Returns the operator of this unary expression.
+	 * 
+	 * @return the operator of this unary expression
+	 * @model
+	 */
+	OpUnary getOp();
+
+	void setExpr(Expression expr);
+
+	void setOp(OpUnary op);
+
+	void setType(Type type);
 
 }

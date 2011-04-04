@@ -28,6 +28,15 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
+
 /**
  * This class defines an expression visitor.
  * 
@@ -36,20 +45,20 @@ package net.sf.orcc.ir.expr;
  */
 public interface ExpressionVisitor {
 
-	public void visit(BinaryExpr expr, Object... args);
+	public void visit(ExprBinary expr, Object... args);
 
-	public void visit(BoolExpr expr, Object... args);
+	public void visit(ExprBool expr, Object... args);
 
-	public void visit(FloatExpr expr, Object... args);
+	public void visit(ExprFloat expr, Object... args);
 
-	public void visit(IntExpr expr, Object... args);
+	public void visit(ExprInt expr, Object... args);
 
-	public void visit(ListExpr expr, Object... args);
+	public void visit(ExprList expr, Object... args);
 
-	public void visit(StringExpr expr, Object... args);
+	public void visit(ExprString expr, Object... args);
 
-	public void visit(UnaryExpr expr, Object... args);
+	public void visit(ExprUnary expr, Object... args);
 
-	public void visit(VarExpr expr, Object... args);
+	public void visit(ExprVar expr, Object... args);
 
 }

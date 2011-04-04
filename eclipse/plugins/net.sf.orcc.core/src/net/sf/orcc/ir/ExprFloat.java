@@ -28,15 +28,72 @@
  */
 package net.sf.orcc.ir;
 
+import java.math.BigDecimal;
+
 /**
- * This class defines a boolean type.
+ * This class defines an integer expression.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
- * @model extends="net.sf.orcc.ir.Type"
+ * @model extends="net.sf.orcc.ir.Expression"
  */
-public interface TypeBool extends Type {
+public interface ExprFloat extends Expression {
 
-	public static final String NAME = "bool";
+	/**
+	 * Adds the given float expression to this float expression.
+	 * 
+	 * @param expr
+	 *            a float expression
+	 * @return the sum of this float expression and the given float expression
+	 */
+	ExprFloat add(ExprFloat expr);
+
+	int compareTo(ExprFloat expr);
+
+	/**
+	 * Divides the given float expression to this float expression.
+	 * 
+	 * @param expr
+	 *            a float expression
+	 * @return the dividend of this float expression and the given float
+	 *         expression
+	 */
+	ExprFloat divide(ExprFloat expr);
+
+	/**
+	 * Returns the value of this integer expression.
+	 * 
+	 * @return the value of this integer expression
+	 * @model
+	 */
+	BigDecimal getValue();
+
+	/**
+	 * Multiplies this float expression by the given float expression.
+	 * 
+	 * @param expr
+	 *            a float expression
+	 * @return the product of this float expression and the given float
+	 *         expression
+	 */
+	ExprFloat multiply(ExprFloat expr);
+
+	/**
+	 * Sets the value of this float expression.
+	 * 
+	 * @param value
+	 *            the value of this float expression
+	 */
+	void setValue(BigDecimal value);
+
+	/**
+	 * Subtracts the given float expression to this float expression.
+	 * 
+	 * @param expr
+	 *            a float expression
+	 * @return the difference of this float expression and the given float
+	 *         expression
+	 */
+	ExprFloat subtract(ExprFloat expr);
 
 }

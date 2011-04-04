@@ -28,15 +28,33 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.common.util.EList;
+
 /**
- * This class defines a boolean type.
+ * This class defines a list expression. This kind of expression is only present
+ * at the network level.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
- * @model extends="net.sf.orcc.ir.Type"
+ * @model extends="net.sf.orcc.ir.Expression"
  */
-public interface TypeBool extends Type {
+public interface ExprList extends Expression {
 
-	public static final String NAME = "bool";
+	public Expression get(int index);
+
+	public Expression get(ExprInt index);
+
+	public int getSize();
+
+	/**
+	 * 
+	 * @return
+	 * @model
+	 */
+	public EList<Expression> getValue();
+
+	public void set(int index, Expression value);
+
+	public void set(ExprInt index, Expression value);
 
 }
