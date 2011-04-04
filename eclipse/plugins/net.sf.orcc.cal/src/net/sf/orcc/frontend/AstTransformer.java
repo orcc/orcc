@@ -61,13 +61,16 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -85,11 +88,6 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
@@ -148,7 +146,7 @@ public class AstTransformer {
 			Procedure calledProcedure = mapFunctions.get(astFunction);
 
 			// generates a new target
-			VarLocal target = procedure.newTempLocalVariable(file,
+			Var target = procedure.newTempLocalVariable(file,
 					calledProcedure.getReturnType(),
 					"call_" + calledProcedure.getName());
 
@@ -157,7 +155,7 @@ public class AstTransformer {
 					astCall.getParameters());
 
 			// return local variable
-			Use use = new Use(target);
+			Use use = IrFactory.eINSTANCE.createUse(target);
 			Expression varExpr = new VarExpr(use);
 			return varExpr;
 		}
@@ -198,12 +196,12 @@ public class AstTransformer {
 			NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
 			node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			node.setLocation(location);
-			node.setValue(condition);
+			node.setCondition(condition);
 			node.getThenNodes().addAll(thenNodes);
 			node.getElseNodes().addAll(elseNodes);
 			context.getProcedure().getNodes().add(node);
 
-			Use use = new Use(target);
+			Use use = IrFactory.eINSTANCE.createUse(target);
 			Expression varExpr = new VarExpr(use);
 
 			// restores target and indexes
@@ -228,14 +226,14 @@ public class AstTransformer {
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
 
-			VarLocal target = context.getProcedure()
-					.newTempLocalVariable(file, expression.getIrType(),
-							"local_" + var.getName());
+			Var target = context.getProcedure().newTempLocalVariable(file,
+					expression.getIrType(), "local_" + var.getName());
 
-			Load load = new Load(location, target, new Use(var), indexes);
+			InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
+					target, IrFactory.eINSTANCE.createUse(var), indexes);
 			addInstruction(load);
 
-			Use use = new Use(target);
+			Use use = IrFactory.eINSTANCE.createUse(target);
 			Expression varExpr = new VarExpr(use);
 			return varExpr;
 		}
@@ -263,7 +261,8 @@ public class AstTransformer {
 				transformListGenerators(expressions, generators);
 			}
 
-			Expression expression = new VarExpr(new Use(target));
+			Expression expression = new VarExpr(
+					IrFactory.eINSTANCE.createUse(target));
 
 			// restores target and indexes
 			target = currentTarget;
@@ -306,7 +305,7 @@ public class AstTransformer {
 			}
 
 			if (var.getType().isList()) {
-				Use use = new Use(var);
+				Use use = IrFactory.eINSTANCE.createUse(var);
 				Expression varExpr = new VarExpr(use);
 				return varExpr;
 			} else {
@@ -316,7 +315,7 @@ public class AstTransformer {
 				} else {
 					v = var;
 				}
-				Use use = new Use(v);
+				Use use = IrFactory.eINSTANCE.createUse(v);
 				Expression varExpr = new VarExpr(use);
 				return varExpr;
 			}
@@ -467,14 +466,15 @@ public class AstTransformer {
 			Expression index = null;
 			for (AstGenerator generator : generators) {
 				AstVariable astVariable = generator.getVariable();
-				VarLocal loopVar = transformLocalVariable(astVariable);
+				Var loopVar = transformLocalVariable(astVariable);
 				procedure.getLocals().put(file, loopVar.getLocation(),
 						loopVar.getName(), loopVar);
 
 				AstExpression astLower = generator.getLower();
 				int lower = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astLower);
-				Expression thisIndex = new VarExpr(new Use(loopVar));
+				Expression thisIndex = new VarExpr(
+						IrFactory.eINSTANCE.createUse(loopVar));
 				if (lower != 0) {
 					thisIndex = new BinaryExpr(thisIndex, BinaryOp.MINUS,
 							new IntExpr(lower), thisIndex.getType());
@@ -508,35 +508,38 @@ public class AstTransformer {
 
 				// assigns the loop variable its initial value
 				AstVariable astVariable = generator.getVariable();
-				VarLocal loopVar = (VarLocal) context
-						.getVariable(astVariable);
+				Var loopVar = context.getVariable(astVariable);
 
 				// condition
 				AstExpression astHigher = generator.getHigher();
 				Expression higher = transformExpression(astHigher);
-				Expression condition = new BinaryExpr(new VarExpr(new Use(
-						loopVar)), BinaryOp.LE, higher,
-						IrFactory.eINSTANCE.createTypeBool());
+				Expression condition = new BinaryExpr(new VarExpr(
+						IrFactory.eINSTANCE.createUse(loopVar)), BinaryOp.LE,
+						higher, IrFactory.eINSTANCE.createTypeBool());
 
 				// add increment to body
 				NodeBlock block = procedure.getLast(nodes);
-				Assign assign = new Assign(location, loopVar, new BinaryExpr(
-						new VarExpr(new Use(loopVar)), BinaryOp.PLUS,
-						new IntExpr(1), loopVar.getType()));
+				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
+						location,
+						loopVar,
+						new BinaryExpr(new VarExpr(IrFactory.eINSTANCE
+								.createUse(loopVar)), BinaryOp.PLUS,
+								new IntExpr(1), loopVar.getType()));
 				block.add(assign);
 
 				// create while
 				NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 				nodeWhile
 						.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-				nodeWhile.setValue(condition);
+				nodeWhile.setCondition(condition);
 				nodeWhile.getNodes().addAll(nodes);
 
 				// create assign
 				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				AstExpression astLower = generator.getLower();
 				Expression lower = transformExpression(astLower);
-				Assign assignInit = new Assign(location, loopVar, lower);
+				InstAssign assignInit = IrFactory.eINSTANCE.createInstAssign(
+						location, loopVar, lower);
 				block.add(assignInit);
 
 				// nodes
@@ -694,35 +697,39 @@ public class AstTransformer {
 
 			// creates loop variable and assigns it
 			AstVariable astVariable = foreach.getVariable();
-			VarLocal loopVar = transformLocalVariable(astVariable);
+			Var loopVar = transformLocalVariable(astVariable);
 			procedure.getLocals().put(file, loopVar.getLocation(),
 					loopVar.getName(), loopVar);
 
 			AstExpression astLower = foreach.getLower();
 			Expression lower = transformExpression(astLower);
-			Assign assign = new Assign(location, loopVar, lower);
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(location,
+					loopVar, lower);
 			addInstruction(assign);
 
 			// condition
 			AstExpression astHigher = foreach.getHigher();
 			Expression higher = transformExpression(astHigher);
-			Expression condition = new BinaryExpr(
-					new VarExpr(new Use(loopVar)), BinaryOp.LE, higher,
-					IrFactory.eINSTANCE.createTypeBool());
+			Expression condition = new BinaryExpr(new VarExpr(
+					IrFactory.eINSTANCE.createUse(loopVar)), BinaryOp.LE,
+					higher, IrFactory.eINSTANCE.createTypeBool());
 
 			// body
 			List<Node> nodes = getNodes(foreach.getStatements());
 			NodeBlock block = procedure.getLast(nodes);
-			assign = new Assign(location, loopVar, new BinaryExpr(new VarExpr(
-					new Use(loopVar)), BinaryOp.PLUS, new IntExpr(1),
-					loopVar.getType()));
+			assign = IrFactory.eINSTANCE.createInstAssign(
+					location,
+					loopVar,
+					new BinaryExpr(new VarExpr(IrFactory.eINSTANCE
+							.createUse(loopVar)), BinaryOp.PLUS,
+							new IntExpr(1), loopVar.getType()));
 			block.add(assign);
 
 			// create while
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			nodeWhile.setLocation(location);
-			nodeWhile.setValue(condition);
+			nodeWhile.setCondition(condition);
 			nodeWhile.getNodes().addAll(nodes);
 
 			procedure.getNodes().add(nodeWhile);
@@ -744,7 +751,7 @@ public class AstTransformer {
 			NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
 			node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			node.setLocation(location);
-			node.setValue(condition);
+			node.setCondition(condition);
 			node.getThenNodes().addAll(thenNodes);
 			node.getElseNodes().addAll(elseNodes);
 
@@ -765,7 +772,7 @@ public class AstTransformer {
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 			nodeWhile.setLocation(location);
-			nodeWhile.setValue(condition);
+			nodeWhile.setCondition(condition);
 			nodeWhile.getNodes().addAll(nodes);
 
 			procedure.getNodes().add(nodeWhile);
@@ -830,7 +837,8 @@ public class AstTransformer {
 					parameters.add(new StringExpr("\\n"));
 				}
 
-				addInstruction(new Call(location, null, procedure, parameters));
+				addInstruction(IrFactory.eINSTANCE.createInstCall(location,
+						null, procedure, parameters));
 			}
 		}
 
@@ -856,7 +864,7 @@ public class AstTransformer {
 	/**
 	 * a map of global variables (parameters and state variables)
 	 */
-	private OrderedMap<String, VarGlobal> globals;
+	private OrderedMap<String, Var> globals;
 
 	private Procedure initialize;
 
@@ -917,7 +925,7 @@ public class AstTransformer {
 	 */
 	public void addReturn(Procedure procedure, Expression value) {
 		NodeBlock block = procedure.getLast();
-		Return returnInstr = new Return(value);
+		InstReturn returnInstr = IrFactory.eINSTANCE.createInstReturn(value);
 		block.add(returnInstr);
 	}
 
@@ -946,17 +954,18 @@ public class AstTransformer {
 		if (value.isVarExpr()) {
 			Use use = ((VarExpr) value).getVar();
 			if (use.getVariable().getType().isList()) {
-				use.remove();
 				return;
 			}
 		}
 
 		Instruction instruction;
 		if (indexes == null || indexes.isEmpty()) {
-			VarLocal local = getLocalVariable(target, true);
-			instruction = new Assign(location, local, value);
+			Var local = getLocalVariable(target, true);
+			instruction = IrFactory.eINSTANCE.createInstAssign(location, local,
+					value);
 		} else {
-			instruction = new Store(location, target, indexes, value);
+			instruction = IrFactory.eINSTANCE.createInstStore(location, target,
+					indexes, value);
 		}
 		addInstruction(instruction);
 	}
@@ -973,33 +982,36 @@ public class AstTransformer {
 	 * @param expressions
 	 *            arguments
 	 */
-	private void createCall(Location location, VarLocal target,
-			Procedure procedure, List<AstExpression> expressions) {
+	private void createCall(Location location, Var target, Procedure procedure,
+			List<AstExpression> expressions) {
 		// transform parameters
 		List<Expression> parameters = transformExpressions(expressions);
 
 		// stores variables that have been loaded and modified, and are loaded
 		// by the procedure
 		for (Var global : procedure.getLoadedVariables()) {
-			VarLocal local = context.getMapGlobals().get(global);
+			Var local = context.getMapGlobals().get(global);
 			if (local != null
 					&& context.getSetGlobalsToStore().contains(global)) {
 				// variable already loaded somewhere and modified
-				VarExpr value = new VarExpr(new Use(local));
+				VarExpr value = new VarExpr(
+						IrFactory.eINSTANCE.createUse(local));
 
 				List<Expression> indexes = new ArrayList<Expression>(0);
-				Store store = new Store(location, global, indexes, value);
+				InstStore store = IrFactory.eINSTANCE.createInstStore(location,
+						global, indexes, value);
 				addInstruction(store);
 			}
 		}
 
 		// add call
-		Call call = new Call(location, target, procedure, parameters);
+		InstCall call = IrFactory.eINSTANCE.createInstCall(location, target,
+				procedure, parameters);
 		addInstruction(call);
 
 		// loads variables that are stored by the procedure
 		for (Var global : procedure.getStoredVariables()) {
-			VarLocal local = context.getMapGlobals().get(global);
+			Var local = context.getMapGlobals().get(global);
 			if (local == null) {
 				// creates a new local variable
 				local = context.getProcedure().newTempLocalVariable(file,
@@ -1007,7 +1019,8 @@ public class AstTransformer {
 				context.getMapGlobals().put(global, local);
 			}
 
-			Load load = new Load(local, new Use(global));
+			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local,
+					IrFactory.eINSTANCE.createUse(global));
 			addInstruction(load);
 		}
 	}
@@ -1052,9 +1065,9 @@ public class AstTransformer {
 	 *            <code>false</code> otherwise
 	 * @return a local IR variable
 	 */
-	private VarLocal getLocalVariable(Var var, boolean isStored) {
+	private Var getLocalVariable(Var var, boolean isStored) {
 		if (var.isGlobal()) {
-			VarLocal local = context.getMapGlobals().get(var);
+			Var local = context.getMapGlobals().get(var);
 			if (local == null) {
 				local = context.getProcedure().newTempLocalVariable(file,
 						var.getType(), "local_" + var.getName());
@@ -1069,7 +1082,7 @@ public class AstTransformer {
 			return local;
 		}
 
-		return (VarLocal) var;
+		return var;
 	}
 
 	/**
@@ -1138,9 +1151,10 @@ public class AstTransformer {
 	private void loadGlobals() {
 		int i = 0;
 		for (Var global : context.getSetGlobalsToLoad()) {
-			VarLocal local = context.getMapGlobals().get(global);
+			Var local = context.getMapGlobals().get(global);
 
-			Load load = new Load(local, new Use(global));
+			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local,
+					IrFactory.eINSTANCE.createUse(global));
 			NodeBlock block = context.getProcedure().getFirst();
 			block.add(i, load);
 			i++;
@@ -1214,7 +1228,7 @@ public class AstTransformer {
 	 * @param globals
 	 *            a map
 	 */
-	public void setGlobalsMap(OrderedMap<String, VarGlobal> globals) {
+	public void setGlobalsMap(OrderedMap<String, Var> globals) {
 		this.globals = globals;
 	}
 
@@ -1223,12 +1237,13 @@ public class AstTransformer {
 	 */
 	private void storeGlobals() {
 		for (Var global : context.getSetGlobalsToStore()) {
-			VarLocal local = context.getMapGlobals().get(global);
-			VarExpr value = new VarExpr(new Use(local));
+			Var local = context.getMapGlobals().get(global);
+			VarExpr value = new VarExpr(IrFactory.eINSTANCE.createUse(local));
 			Location location = global.getLocation();
 
 			List<Expression> indexes = new ArrayList<Expression>(0);
-			Store store = new Store(location, global, indexes, value);
+			InstStore store = IrFactory.eINSTANCE.createInstStore(location,
+					global, indexes, value);
 			addInstruction(store);
 		}
 
@@ -1322,7 +1337,7 @@ public class AstTransformer {
 	 *            a list of AST state variables
 	 * @return an ordered map of IR state variables
 	 */
-	public VarGlobal transformGlobalVariable(AstVariable astVariable) {
+	public Var transformGlobalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
 		AstType astType = astVariable.getType();
 		Type type = astVariable.getIrType();
@@ -1353,7 +1368,7 @@ public class AstTransformer {
 		}
 
 		// create state variable
-		VarGlobal variable = new VarGlobal(location, type, name,
+		Var variable = IrFactory.eINSTANCE.createVar(location, type, name,
 				assignable, initialValue);
 
 		// registers the global variable in the outermost scope
@@ -1396,7 +1411,7 @@ public class AstTransformer {
 	 *            an AST variable
 	 * @return the IR local variable created
 	 */
-	public VarLocal transformLocalVariable(AstVariable astVariable) {
+	public Var transformLocalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
 
 		String name = getQualifiedName(astVariable);
@@ -1405,8 +1420,8 @@ public class AstTransformer {
 		Type type = astVariable.getIrType();
 
 		// create local variable with the given name
-		VarLocal local = new VarLocal(assignable, 0, location, name,
-				type);
+		Var local = IrFactory.eINSTANCE.createVar(location, type, name,
+				assignable, 0);
 
 		AstExpression value = astVariable.getValue();
 		if (value != null) {
@@ -1429,7 +1444,7 @@ public class AstTransformer {
 	 */
 	public void transformLocalVariables(List<AstVariable> variables) {
 		for (AstVariable astVariable : variables) {
-			VarLocal local = transformLocalVariable(astVariable);
+			Var local = transformLocalVariable(astVariable);
 			context.getProcedure().getLocals()
 					.put(file, local.getLocation(), local.getName(), local);
 		}
@@ -1444,7 +1459,7 @@ public class AstTransformer {
 	 */
 	private void transformParameters(List<AstVariable> parameters) {
 		for (AstVariable astParameter : parameters) {
-			VarLocal local = transformLocalVariable(astParameter);
+			Var local = transformLocalVariable(astParameter);
 			context.getProcedure().getParameters()
 					.put(file, local.getLocation(), local.getName(), local);
 		}

@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.frontend;
 
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 
 import org.eclipse.emf.ecore.EObject;
@@ -52,9 +53,10 @@ public class Util {
 	public static Location getLocation(EObject object) {
 		CompositeNode node = NodeUtil.getNode(object);
 		if (node == null) {
-			return new Location();
+			return IrFactory.eINSTANCE.createLocation();
 		} else {
-			return new Location(node.getLine(), 0, node.getLength());
+			return IrFactory.eINSTANCE.createLocation(node.getLine(), 0,
+					node.getLength());
 		}
 	}
 

@@ -56,14 +56,15 @@ import net.sf.orcc.frontend.schedule.RegExpConverter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
@@ -73,16 +74,13 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
@@ -135,8 +133,8 @@ public class ActorTransformer {
 	 *            an integer number of repeat (equals to one if there is no
 	 *            repeat)
 	 */
-	private void actionLoadTokens(VarLocal portVariable,
-			List<AstVariable> tokens, int repeat) {
+	private void actionLoadTokens(Var portVariable, List<AstVariable> tokens,
+			int repeat) {
 		Context context = astTransformer.getContext();
 		if (repeat == 1) {
 			int i = 0;
@@ -146,9 +144,9 @@ public class ActorTransformer {
 				indexes.add(new IntExpr(i));
 				Location location = portVariable.getLocation();
 
-				VarLocal irToken = (VarLocal) context
-						.getVariable(token);
-				Load load = new Load(location, irToken, new Use(portVariable),
+				Var irToken = context.getVariable(token);
+				InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
+						irToken, IrFactory.eINSTANCE.createUse(portVariable),
 						indexes);
 				addInstruction(load);
 
@@ -158,9 +156,10 @@ public class ActorTransformer {
 			Procedure procedure = context.getProcedure();
 
 			// creates loop variable and initializes it
-			VarLocal loopVar = procedure.newTempLocalVariable(file,
+			Var loopVar = procedure.newTempLocalVariable(file,
 					IrFactory.eINSTANCE.createTypeInt(32), "num_repeats");
-			Assign assign = new Assign(loopVar, new IntExpr(0));
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(loopVar,
+					new IntExpr(0));
 			addInstruction(assign);
 
 			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -173,45 +172,49 @@ public class ActorTransformer {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(new BinaryExpr(new BinaryExpr(
 						new IntExpr(numTokens), BinaryOp.TIMES, new VarExpr(
-								new Use(loopVar)), IrFactory.eINSTANCE
-								.createTypeInt(32)), BinaryOp.PLUS,
+								IrFactory.eINSTANCE.createUse(loopVar)),
+						IrFactory.eINSTANCE.createTypeInt(32)), BinaryOp.PLUS,
 						new IntExpr(i), IrFactory.eINSTANCE.createTypeInt(32)));
 
-				VarLocal tmpVar = procedure.newTempLocalVariable(file,
-						type, "token");
-				Load load = new Load(location, tmpVar, new Use(portVariable),
+				Var tmpVar = procedure
+						.newTempLocalVariable(file, type, "token");
+				InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
+						tmpVar, IrFactory.eINSTANCE.createUse(portVariable),
 						indexes);
 				block.add(load);
 
-				VarLocal irToken = (VarLocal) context
-						.getVariable(token);
+				Var irToken = context.getVariable(token);
 
 				indexes = new ArrayList<Expression>(1);
-				indexes.add(new VarExpr(new Use(loopVar)));
-				Store store = new Store(location, irToken, indexes,
-						new VarExpr(new Use(tmpVar)));
+				indexes.add(new VarExpr(IrFactory.eINSTANCE.createUse(loopVar)));
+				InstStore store = IrFactory.eINSTANCE.createInstStore(location,
+						irToken, indexes,
+						new VarExpr(IrFactory.eINSTANCE.createUse(tmpVar)));
 				block.add(store);
 
 				i++;
 			}
 
 			// add increment
-			assign = new Assign(loopVar,
-					new BinaryExpr(new VarExpr(new Use(loopVar)),
-							BinaryOp.PLUS, new IntExpr(1), loopVar.getType()));
+			assign = IrFactory.eINSTANCE.createInstAssign(
+					loopVar,
+					new BinaryExpr(new VarExpr(IrFactory.eINSTANCE
+							.createUse(loopVar)), BinaryOp.PLUS,
+							new IntExpr(1), loopVar.getType()));
 			block.add(assign);
 
 			// create while node
-			Expression condition = new BinaryExpr(
-					new VarExpr(new Use(loopVar)), BinaryOp.LT, new IntExpr(
-							repeat), IrFactory.eINSTANCE.createTypeBool());
+			Expression condition = new BinaryExpr(new VarExpr(
+					IrFactory.eINSTANCE.createUse(loopVar)), BinaryOp.LT,
+					new IntExpr(repeat), IrFactory.eINSTANCE.createTypeBool());
 			List<Node> nodes = new ArrayList<Node>(1);
 			nodes.add(block);
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-			nodeWhile.setValue(condition);
+			nodeWhile.setCondition(condition);
 			nodeWhile.getNodes().addAll(nodes);
+
 			procedure.getNodes().add(nodeWhile);
 		}
 	}
@@ -227,7 +230,7 @@ public class ActorTransformer {
 	 *            an integer number of repeat (equals to one if there is no
 	 *            repeat)
 	 */
-	private void actionStoreTokens(VarLocal portVariable,
+	private void actionStoreTokens(Var portVariable,
 			List<AstExpression> values, int repeat) {
 		if (repeat == 1) {
 			int i = 0;
@@ -239,7 +242,8 @@ public class ActorTransformer {
 
 				Expression value = astTransformer
 						.transformExpression(expression);
-				Store store = new Store(location, portVariable, indexes, value);
+				InstStore store = IrFactory.eINSTANCE.createInstStore(location,
+						portVariable, indexes, value);
 				addInstruction(store);
 
 				i++;
@@ -249,9 +253,10 @@ public class ActorTransformer {
 			Procedure procedure = context.getProcedure();
 
 			// creates loop variable and initializes it
-			VarLocal loopVar = procedure.newTempLocalVariable(file,
+			Var loopVar = procedure.newTempLocalVariable(file,
 					IrFactory.eINSTANCE.createTypeInt(32), "num_repeats");
-			Assign assign = new Assign(loopVar, new IntExpr(0));
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(loopVar,
+					new IntExpr(0));
 			addInstruction(assign);
 
 			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -262,50 +267,55 @@ public class ActorTransformer {
 			for (AstExpression value : values) {
 				Location location = portVariable.getLocation();
 				List<Expression> indexes = new ArrayList<Expression>(1);
-				indexes.add(new VarExpr(new Use(loopVar)));
+				indexes.add(new VarExpr(IrFactory.eINSTANCE.createUse(loopVar)));
 
 				// each expression of an output pattern must be of type list
 				// so they are necessarily variables
-				VarLocal tmpVar = procedure.newTempLocalVariable(file,
-						type, "token");
+				Var tmpVar = procedure
+						.newTempLocalVariable(file, type, "token");
 				Expression expression = astTransformer
 						.transformExpression(value);
 				Use use = ((VarExpr) expression).getVar();
-				use.remove();
-				use = new Use(use.getVariable());
-				Load load = new Load(tmpVar, use, indexes);
+
+				use = IrFactory.eINSTANCE.createUse(use.getVariable());
+				InstLoad load = IrFactory.eINSTANCE.createInstLoad(tmpVar, use,
+						indexes);
 				block.add(load);
 
 				indexes = new ArrayList<Expression>(1);
 				indexes.add(new BinaryExpr(new BinaryExpr(
 						new IntExpr(numTokens), BinaryOp.TIMES, new VarExpr(
-								new Use(loopVar)), IrFactory.eINSTANCE
-								.createTypeInt(32)), BinaryOp.PLUS,
+								IrFactory.eINSTANCE.createUse(loopVar)),
+						IrFactory.eINSTANCE.createTypeInt(32)), BinaryOp.PLUS,
 						new IntExpr(i), IrFactory.eINSTANCE.createTypeInt(32)));
-				Store store = new Store(location, portVariable, indexes,
-						new VarExpr(new Use(tmpVar)));
+				InstStore store = IrFactory.eINSTANCE.createInstStore(location,
+						portVariable, indexes,
+						new VarExpr(IrFactory.eINSTANCE.createUse(tmpVar)));
 				block.add(store);
 
 				i++;
 			}
 
 			// add increment
-			assign = new Assign(loopVar,
-					new BinaryExpr(new VarExpr(new Use(loopVar)),
-							BinaryOp.PLUS, new IntExpr(1), loopVar.getType()));
+			assign = IrFactory.eINSTANCE.createInstAssign(
+					loopVar,
+					new BinaryExpr(new VarExpr(IrFactory.eINSTANCE
+							.createUse(loopVar)), BinaryOp.PLUS,
+							new IntExpr(1), loopVar.getType()));
 			block.add(assign);
 
 			// create while node
-			Expression condition = new BinaryExpr(
-					new VarExpr(new Use(loopVar)), BinaryOp.LT, new IntExpr(
-							repeat), IrFactory.eINSTANCE.createTypeBool());
+			Expression condition = new BinaryExpr(new VarExpr(
+					IrFactory.eINSTANCE.createUse(loopVar)), BinaryOp.LT,
+					new IntExpr(repeat), IrFactory.eINSTANCE.createTypeBool());
 			List<Node> nodes = new ArrayList<Node>(1);
 			nodes.add(block);
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-			nodeWhile.setValue(condition);
+			nodeWhile.setCondition(condition);
 			nodeWhile.getNodes().addAll(nodes);
+
 			procedure.getNodes().add(nodeWhile);
 		}
 	}
@@ -333,10 +343,11 @@ public class ActorTransformer {
 	 *            target local variable
 	 */
 	private void createActionTest(AstAction astAction, Pattern inputPattern,
-			VarLocal result) {
+			Var result) {
 		List<AstExpression> guards = astAction.getGuards();
 		if (guards.isEmpty()) {
-			Assign assign = new Assign(result, new BoolExpr(true));
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result,
+					new BoolExpr(true));
 			addInstruction(assign);
 		} else {
 			transformInputPatternPeek(astAction, inputPattern);
@@ -354,7 +365,7 @@ public class ActorTransformer {
 	 * @return an initialize action
 	 */
 	private Action createInitialize() {
-		Location location = new Location();
+		Location location = IrFactory.eINSTANCE.createLocation();
 
 		// transform tag
 		Tag tag = new Tag();
@@ -387,12 +398,13 @@ public class ActorTransformer {
 	 *            number of tokens
 	 * @return the local array created
 	 */
-	private VarLocal createPortVariable(Port port, int numTokens) {
+	private Var createPortVariable(Port port, int numTokens) {
 		// create the variable to hold the tokens
 		Location location = astTransformer.getContext().getProcedure()
 				.getLocation();
-		return new VarLocal(true, 0, location, port.getName(),
-				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()));
+		return IrFactory.eINSTANCE.createVar(location,
+				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()),
+				port.getName(), true, 0);
 	}
 
 	/**
@@ -468,7 +480,7 @@ public class ActorTransformer {
 			Location location = Util.getLocation(astActor);
 
 			// parameters
-			OrderedMap<String, VarGlobal> parameters = new OrderedMap<String, VarGlobal>();
+			OrderedMap<String, Var> parameters = new OrderedMap<String, Var>();
 			astTransformer.setGlobalsMap(parameters);
 			for (AstVariable astVariable : astActor.getParameters()) {
 				astTransformer.transformGlobalVariable(astVariable);
@@ -478,7 +490,7 @@ public class ActorTransformer {
 			// state variables are transformed on demand when referenced by
 			// expressions or statements
 			// this allows imported variables to be transparently handled
-			OrderedMap<String, VarGlobal> stateVars = new OrderedMap<String, VarGlobal>();
+			OrderedMap<String, Var> stateVars = new OrderedMap<String, Var>();
 			astTransformer.setGlobalsMap(stateVars);
 
 			// transform ports
@@ -516,7 +528,8 @@ public class ActorTransformer {
 				for (Action action : initializes) {
 					NodeBlock block = action.getBody().getFirst();
 					List<Expression> params = new ArrayList<Expression>(0);
-					block.add(0, new Call(location, null, initialize, params));
+					block.add(0, IrFactory.eINSTANCE.createInstCall(location,
+							null, initialize, params));
 				}
 			}
 
@@ -669,20 +682,22 @@ public class ActorTransformer {
 		Context oldContext = astTransformer.newContext(scheduler);
 		Context context = astTransformer.getContext();
 
-		VarLocal result = context.getProcedure().newTempLocalVariable(
-				file, IrFactory.eINSTANCE.createTypeBool(), "result");
+		Var result = context.getProcedure().newTempLocalVariable(file,
+				IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		List<AstExpression> guards = astAction.getGuards();
 		if (inputPattern.isEmpty() && guards.isEmpty()) {
 			// the action is always fireable
-			Assign assign = new Assign(result, new BoolExpr(true));
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result,
+					new BoolExpr(true));
 			addInstruction(assign);
 		} else {
 			createActionTest(astAction, inputPattern, result);
 		}
 
 		astTransformer.restoreContext(oldContext);
-		astTransformer.addReturn(scheduler, new VarExpr(new Use(result)));
+		astTransformer.addReturn(scheduler,
+				new VarExpr(IrFactory.eINSTANCE.createUse(result)));
 	}
 
 	/**
@@ -694,8 +709,7 @@ public class ActorTransformer {
 	 * @param result
 	 *            target local variable
 	 */
-	private void transformGuards(List<AstExpression> guards,
-			VarLocal result) {
+	private void transformGuards(List<AstExpression> guards, Var result) {
 		List<Expression> expressions = astTransformer
 				.transformExpressions(guards);
 		Iterator<Expression> it = expressions.iterator();
@@ -705,7 +719,7 @@ public class ActorTransformer {
 					IrFactory.eINSTANCE.createTypeBool());
 		}
 
-		Assign assign = new Assign(result, value);
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result, value);
 		addInstruction(assign);
 	}
 
@@ -733,7 +747,7 @@ public class ActorTransformer {
 		}
 
 		// create port variable
-		VarLocal variable = createPortVariable(port, totalConsumption);
+		Var variable = createPortVariable(port, totalConsumption);
 		if (peek) {
 			irInputPattern.setPeeked(port, variable);
 		} else {
@@ -742,7 +756,7 @@ public class ActorTransformer {
 
 		// declare tokens
 		for (AstVariable token : tokens) {
-			VarLocal local = astTransformer.transformLocalVariable(token);
+			Var local = astTransformer.transformLocalVariable(token);
 			context.getProcedure().getLocals()
 					.put(file, local.getLocation(), local.getName(), local);
 		}
@@ -812,7 +826,7 @@ public class ActorTransformer {
 			}
 
 			// create port variable
-			VarLocal variable = createPortVariable(port, totalConsumption);
+			Var variable = createPortVariable(port, totalConsumption);
 			irOutputPattern.setVariable(port, variable);
 
 			// store tokens

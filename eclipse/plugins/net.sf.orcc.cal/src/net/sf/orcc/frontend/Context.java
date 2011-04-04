@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.Scope;
@@ -50,7 +49,7 @@ public class Context {
 	/**
 	 * A map from global variables to local variables
 	 */
-	private Map<Var, VarLocal> mapGlobals;
+	private Map<Var, Var> mapGlobals;
 
 	/**
 	 * A map from AST variables to IR variables.
@@ -79,7 +78,7 @@ public class Context {
 	public Context(Context context, Procedure procedure) {
 		this.procedure = procedure;
 
-		mapGlobals = new HashMap<Var, VarLocal>();
+		mapGlobals = new HashMap<Var, Var>();
 
 		if (context == null) {
 			mapVariables = new Scope<AstVariable, Var>();
@@ -107,7 +106,7 @@ public class Context {
 	 * 
 	 * @return the mapGlobals field
 	 */
-	public Map<Var, VarLocal> getMapGlobals() {
+	public Map<Var, Var> getMapGlobals() {
 		return mapGlobals;
 	}
 
