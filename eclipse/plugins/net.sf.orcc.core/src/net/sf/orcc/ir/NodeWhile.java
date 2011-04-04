@@ -44,7 +44,7 @@ public interface NodeWhile extends Node {
 	 * Returns the condition of this node While.
 	 * 
 	 * @return the condition of this node While
-	 * @model
+	 * @model containment="true"
 	 */
 	Expression getCondition();
 

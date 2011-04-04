@@ -12,8 +12,10 @@
         defaultValueLiteral="32"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TypeList" eSuperTypes="#//Type">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="sizeExpr" eType="#//Expression"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sizeExpr" eType="#//Expression"
+        containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type" containment="true"
+        resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TypeString" eSuperTypes="#//Type">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>

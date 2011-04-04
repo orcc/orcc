@@ -190,7 +190,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	public String getActorName() {
 		return actorIR.getName();
 	}
-	
+
 	@Override
 	public String getFileName() {
 		return actorIR.getFile();
@@ -274,8 +274,8 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 			} else {
 				Node subNode = node.subNodes.get(node.subNodeIdx++);
 				if (subNode instanceof NodeIf) {
-					Object condition = ((NodeIf) subNode).getValue().accept(
-							exprEvaluator);
+					Object condition = ((NodeIf) subNode).getCondition()
+							.accept(exprEvaluator);
 					if (((BoolExpr) condition).getValue()) {
 						nodeStack.add(new NodeInfo(0, ((NodeIf) subNode)
 								.getThenNodes().size(), ((NodeIf) subNode)
@@ -290,7 +290,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 					nodeStackLevel++;
 					exeStmt = true;
 				} else if (subNode instanceof NodeWhile) {
-					Expression condition = ((NodeWhile) subNode).getValue();
+					Expression condition = ((NodeWhile) subNode).getCondition();
 					if (((BoolExpr) condition.accept(exprEvaluator)).getValue()) {
 						nodeStack.add(new NodeInfo(0, ((NodeWhile) subNode)
 								.getNodes().size(), ((NodeWhile) subNode)

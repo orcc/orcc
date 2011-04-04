@@ -43,7 +43,7 @@ public abstract class AbstractInterpreterSimuActor {
 
 	protected String lastVisitedAction = "NA";
 
-	protected Location lastVisitedLocation = new Location(0, 0, 0);
+	protected Location lastVisitedLocation;
 	
 	protected int nbOfFirings;
 

@@ -93,6 +93,7 @@ import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -1368,8 +1369,8 @@ public class AstTransformer {
 		}
 
 		// create state variable
-		Var variable = IrFactory.eINSTANCE.createVar(location, type, name,
-				assignable, initialValue);
+		Var variable = IrFactory.eINSTANCE.createVar(location,
+				EcoreUtil.copy(type), name, assignable, initialValue);
 
 		// registers the global variable in the outermost scope
 		Scope<AstVariable, Var> top = context.getMapVariables();
@@ -1420,8 +1421,8 @@ public class AstTransformer {
 		Type type = astVariable.getIrType();
 
 		// create local variable with the given name
-		Var local = IrFactory.eINSTANCE.createVar(location, type, name,
-				assignable, 0);
+		Var local = IrFactory.eINSTANCE.createVar(location,
+				EcoreUtil.copy(type), name, assignable, 0);
 
 		AstExpression value = astVariable.getValue();
 		if (value != null) {

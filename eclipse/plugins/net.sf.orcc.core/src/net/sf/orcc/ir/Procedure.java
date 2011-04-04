@@ -145,7 +145,7 @@ public interface Procedure extends EObject {
 	/**
 	 * Returns the result of this procedure.
 	 * 
-	 * @return
+	 * @return the result of this procedure
 	 */
 	Expression getResult();
 

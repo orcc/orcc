@@ -73,7 +73,7 @@ public interface TypeList extends Type {
 	 * Returns the number of elements of this list type as an expression.
 	 * 
 	 * @return the number of elements of this list type as an expression
-	 * @model
+	 * @model containment="true"
 	 */
 	Expression getSizeExpr();
 
@@ -88,7 +88,7 @@ public interface TypeList extends Type {
 	 * Returns the type of the list
 	 * 
 	 * @return the type of the list
-	 * @model
+	 * @model containment="true"
 	 */
 	Type getType();
 

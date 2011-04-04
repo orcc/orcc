@@ -176,7 +176,7 @@ public interface IrPackage extends EPackage {
 	int TYPE_LIST = 5;
 
 	/**
-	 * The feature id for the '<em><b>Size Expr</b></em>' reference.
+	 * The feature id for the '<em><b>Size Expr</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -185,7 +185,7 @@ public interface IrPackage extends EPackage {
 	int TYPE_LIST__SIZE_EXPR = TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Type</b></em>' reference.
+	 * The feature id for the '<em><b>Type</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1173,10 +1173,10 @@ public interface IrPackage extends EPackage {
 	EClass getTypeList();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.TypeList#getSizeExpr <em>Size Expr</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.TypeList#getSizeExpr <em>Size Expr</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Size Expr</em>'.
+	 * @return the meta object for the containment reference '<em>Size Expr</em>'.
 	 * @see net.sf.orcc.ir.TypeList#getSizeExpr()
 	 * @see #getTypeList()
 	 * @generated
@@ -1184,10 +1184,10 @@ public interface IrPackage extends EPackage {
 	EReference getTypeList_SizeExpr();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.TypeList#getType <em>Type</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.TypeList#getType <em>Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Type</em>'.
+	 * @return the meta object for the containment reference '<em>Type</em>'.
 	 * @see net.sf.orcc.ir.TypeList#getType()
 	 * @see #getTypeList()
 	 * @generated
@@ -1991,7 +1991,7 @@ public interface IrPackage extends EPackage {
 		EClass TYPE_LIST = eINSTANCE.getTypeList();
 
 		/**
-		 * The meta object literal for the '<em><b>Size Expr</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Size Expr</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -1999,7 +1999,7 @@ public interface IrPackage extends EPackage {
 		EReference TYPE_LIST__SIZE_EXPR = eINSTANCE.getTypeList_SizeExpr();
 
 		/**
-		 * The meta object literal for the '<em><b>Type</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

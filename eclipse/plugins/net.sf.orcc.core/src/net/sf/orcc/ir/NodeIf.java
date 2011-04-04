@@ -44,7 +44,7 @@ public interface NodeIf extends Node {
 	 * Returns the condition of this node If.
 	 * 
 	 * @return the condition of this node If
-	 * @model
+	 * @model containment="true"
 	 */
 	Expression getCondition();
 
