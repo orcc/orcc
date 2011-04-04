@@ -46,7 +46,6 @@ import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.Printer;
-import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.ram.RAMTransformation;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
@@ -129,8 +128,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 		evaluateInitializeActions(actor);
 
 		ActorVisitor[] transformationsCodegen = {
-				new InlineTransformation(true, false),
-
 				// cleanup code
 				new DeadGlobalElimination(),
 				new DeadCodeElimination(),

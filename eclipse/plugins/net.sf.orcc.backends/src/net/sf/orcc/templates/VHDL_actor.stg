@@ -193,11 +193,11 @@ printAssignIndex(assignIndex) ::= <<
 
 printCall(call) ::= <<
 <if(call.target)
-><call.target> := <call.procedure>(<call.procedure.loadedVariables: {var | <var>, }><call.parameters: {param | <param>, }>'1');<
+><call.target> := <call.procedure.name>(<call.procedure.loadedVariables: {var | <var>, }><call.parameters: {param | <param>, }>'1');<
 elseif(call.parameters)
-><call.procedure>(<call.parameters; separator=", ">, '1');<
+><call.procedure.name>(<call.parameters; separator=", ">, '1');<
 else
-><call.procedure>('1');<
+><call.procedure.name>('1');<
 endif>
 >>
 
@@ -234,7 +234,7 @@ endif
 printReturn(return) ::= <<
 <if(return.value)
  ><if(transformReturn)
-   ><procedure>_go := <return.value>;<
+   ><procedure.name>_go := <return.value>;<
   else
    >return <return.value>;<
   endif><
@@ -475,8 +475,8 @@ port map (
 Actor_Scheduler(actor) ::= <<
 <actor.simpleName>_scheduler : process(<actor.templateData.signals; wrap, anchor, separator=", ">)
   <actor.actions : { action |<printLocals(action.scheduler)>
-variable <action.scheduler>_go : std_logic; <action.inputPattern.ports: {port | <if(action.inputPattern.peekedMap.(port))>
-variable <action.scheduler>_<port.name> : <port.type>;<
+variable <action.scheduler.name>_go : std_logic; <action.inputPattern.ports: {port | <if(action.inputPattern.peekedMap.(port))>
+variable <action.scheduler.name>_<port.name> : <port.type>;<
 endif>}; separator="\n">
 }>  --
 begin
