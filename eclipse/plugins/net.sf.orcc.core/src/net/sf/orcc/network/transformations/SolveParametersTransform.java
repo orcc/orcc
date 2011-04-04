@@ -34,7 +34,6 @@ import java.util.Map.Entry;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -75,8 +74,8 @@ public class SolveParametersTransform extends AbstractExpressionInterpreter
 	@Override
 	public Object interpret(VarExpr expr, Object... args) {
 		Var var = expr.getVar().getVariable();
-		OrderedMap<String, VarGlobal> variables = network.getVariables();
-		VarGlobal variable = variables.get(var.getName());
+		OrderedMap<String, Var> variables = network.getVariables();
+		Var variable = variables.get(var.getName());
 		Expression value = variable.getInitialValue();
 		return value;
 	}
@@ -131,7 +130,7 @@ public class SolveParametersTransform extends AbstractExpressionInterpreter
 	 */
 	private void updateNetworkParameters(Network network,
 			Map<String, Expression> values) {
-		for (VarGlobal parameter : network.getParameters()) {
+		for (Var parameter : network.getParameters()) {
 			String name = parameter.getName();
 			Expression value = values.get(name);
 			if (value == null) {

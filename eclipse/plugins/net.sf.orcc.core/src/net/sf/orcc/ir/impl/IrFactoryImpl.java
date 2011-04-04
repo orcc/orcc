@@ -130,12 +130,42 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return instAssign;
 	}
 
+	@Override
+	public InstAssign createInstAssign(Location loc, Var target,
+			Expression value) {
+		InstAssignImpl instAssign = new InstAssignImpl();
+		instAssign.setLocation(loc);
+		instAssign.setTarget(target);
+		instAssign.setValue(value);
+		return instAssign;
+	}
+
+	@Override
+	public InstAssign createInstAssign(Var target, Expression value) {
+		InstAssignImpl instAssign = new InstAssignImpl();
+		instAssign.setLocation(IrFactory.eINSTANCE.createLocation());
+		instAssign.setTarget(target);
+		instAssign.setValue(value);
+		return instAssign;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public InstCall createInstCall() {
 		InstCallImpl instCall = new InstCallImpl();
+		return instCall;
+	}
+
+	@Override
+	public InstCall createInstCall(Location location, Var target,
+			Procedure procedure, List<Expression> parameters) {
+		InstCallImpl instCall = new InstCallImpl();
+		instCall.setLocation(location);
+		instCall.setTarget(target);
+		instCall.setProcedure(procedure);
+		instCall.getParameters().addAll(parameters);
 		return instCall;
 	}
 
@@ -148,6 +178,17 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return instLoad;
 	}
 
+	@Override
+	public InstLoad createInstLoad(Location location, Var target, Use source,
+			List<Expression> indexes) {
+		InstLoadImpl instLoad = new InstLoadImpl();
+		instLoad.setLocation(location);
+		instLoad.setTarget(target);
+		instLoad.setSource(source);
+		instLoad.getIndexes().addAll(indexes);
+		return instLoad;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -157,12 +198,39 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return instPhi;
 	}
 
+	@Override
+	public InstPhi createInstPhi(Location location, Var target,
+			List<Expression> values) {
+		InstPhiImpl instPhi = new InstPhiImpl();
+		instPhi.setLocation(location);
+		instPhi.setTarget(target);
+		instPhi.getValues().addAll(values);
+		return instPhi;
+	}
+
+	@Override
+	public InstPhi createInstPhi(Var target, List<Expression> values) {
+		InstPhiImpl instPhi = new InstPhiImpl();
+		instPhi.setLocation(IrFactory.eINSTANCE.createLocation());
+		instPhi.setTarget(target);
+		instPhi.getValues().addAll(values);
+		return instPhi;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public InstReturn createInstReturn() {
 		InstReturnImpl instReturn = new InstReturnImpl();
+		return instReturn;
+	}
+
+	@Override
+	public InstReturn createInstReturn(Location location, Expression value) {
+		InstReturnImpl instReturn = new InstReturnImpl();
+		instReturn.setLocation(location);
+		instReturn.setValue(value);
 		return instReturn;
 	}
 
@@ -181,6 +249,17 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public InstStore createInstStore() {
 		InstStoreImpl instStore = new InstStoreImpl();
+		return instStore;
+	}
+
+	@Override
+	public InstStore createInstStore(Location location, Var target,
+			List<Expression> indexes, Expression value) {
+		InstStoreImpl instStore = new InstStoreImpl();
+		instStore.setLocation(location);
+		instStore.setTarget(target);
+		instStore.setValue(value);
+		instStore.getIndexes().addAll(indexes);
 		return instStore;
 	}
 
@@ -374,6 +453,13 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return use;
 	}
 
+	@Override
+	public Use createUse(Var variable) {
+		UseImpl use = new UseImpl();
+		use.setVariable(variable);
+		return use;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -389,6 +475,19 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
 		var.setGlobal(global);
+		var.setLocation(location);
+		var.setName(name);
+		var.setType(type);
+		return var;
+	}
+
+	@Override
+	public Var createVar(Location location, Type type, String name,
+			boolean assignable, Expression initialValue) {
+		VarImpl var = new VarImpl();
+		var.setAssignable(assignable);
+		var.setGlobal(true);
+		var.setInitialValue(initialValue);
 		var.setLocation(location);
 		var.setName(name);
 		var.setType(type);

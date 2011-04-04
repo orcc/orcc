@@ -38,7 +38,15 @@ import org.eclipse.emf.common.util.EList;
  * @model extends="net.sf.orcc.ir.Node"
  * 
  */
-public interface NodeWhile extends Node, ValueContainer {
+public interface NodeWhile extends Node {
+
+	/**
+	 * Returns the condition of this node While.
+	 * 
+	 * @return the condition of this node While
+	 * @model
+	 */
+	Expression getCondition();
 
 	/**
 	 * Returns the join node of this NodeWhile.
@@ -55,6 +63,14 @@ public interface NodeWhile extends Node, ValueContainer {
 	 * @model containment="true"
 	 */
 	EList<Node> getNodes();
+
+	/**
+	 * Sets the condition of this node While.
+	 * 
+	 * @param condition
+	 *            the condition of this node While
+	 */
+	void setCondition(Expression condition);
 
 	/**
 	 * Sets the join node of this NodeWhile.

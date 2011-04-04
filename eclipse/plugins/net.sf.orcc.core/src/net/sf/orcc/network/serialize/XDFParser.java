@@ -39,7 +39,6 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
@@ -238,7 +237,7 @@ public class XDFParser {
 									+ file + "\": unknown variable: \"" + name
 									+ "\"");
 						}
-						Use use = new Use(var);
+						Use use = IrFactory.eINSTANCE.createUse(var);
 						expr = new VarExpr(use);
 						break;
 					} else {
@@ -546,7 +545,8 @@ public class XDFParser {
 		if (vertexName.isEmpty()) {
 			return null;
 		} else {
-			return new Port(new Location(), null, portName);
+			return new Port(IrFactory.eINSTANCE.createLocation(), null,
+					portName);
 		}
 	}
 
@@ -705,12 +705,13 @@ public class XDFParser {
 			throw new OrccException("Decl has an empty name");
 		}
 
-		Location location = new Location();
+		Location location = IrFactory.eINSTANCE.createLocation();
 		if (kind.equals("Param")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
-			Var var = new VarGlobal(location, type, name, false);
+			Var var = IrFactory.eINSTANCE.createVar(location, type, name, true,
+					false);
 			network.getParameters().put(file.getAbsolutePath(), location, name,
 					var);
 		} else if (kind.equals("Var")) {
@@ -718,7 +719,8 @@ public class XDFParser {
 					.getFirstChild());
 			Type type = cont.getResult();
 			Expression expr = exprParser.parseExpr(cont.getNode());
-			Var var = new VarGlobal(location, type, name, false, expr);
+			Var var = IrFactory.eINSTANCE.createVar(location, type, name,
+					false, expr);
 			network.getVariables().put(file.getAbsolutePath(), location, name,
 					var);
 		} else {
@@ -850,7 +852,7 @@ public class XDFParser {
 	 * @throws OrccException
 	 */
 	private void parsePort(Element eltPort) throws OrccException {
-		Location location = new Location();
+		Location location = IrFactory.eINSTANCE.createLocation();
 		Type type = typeParser.parseType(eltPort.getFirstChild()).getResult();
 		String name = eltPort.getAttribute("name");
 		if (name.isEmpty()) {

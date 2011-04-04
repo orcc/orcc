@@ -67,15 +67,21 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
-import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -103,13 +109,6 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.InstructionInterpreter;
 import net.sf.orcc.ir.impl.NodeInterpreter;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
@@ -210,7 +209,7 @@ public class IRWriter {
 	private static class InstructionWriter implements InstructionInterpreter {
 
 		@Override
-		public Object interpret(Assign assign, Object... args) {
+		public Object interpret(InstAssign assign, Object... args) {
 			JsonArray array = new JsonArray();
 
 			array.add(new JsonPrimitive(INSTR_ASSIGN));
@@ -223,7 +222,7 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(Call call, Object... args) {
+		public Object interpret(InstCall call, Object... args) {
 			JsonArray array = new JsonArray();
 
 			array.add(new JsonPrimitive(INSTR_CALL));
@@ -238,7 +237,7 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(Load load, Object... args) {
+		public Object interpret(InstLoad load, Object... args) {
 			JsonArray array = new JsonArray();
 
 			array.add(new JsonPrimitive(INSTR_LOAD));
@@ -252,7 +251,7 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(PhiAssignment phi, Object... args) {
+		public Object interpret(InstPhi phi, Object... args) {
 			JsonArray array = new JsonArray();
 
 			array.add(new JsonPrimitive(INSTR_PHI));
@@ -265,7 +264,7 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(Return returnInst, Object... args) {
+		public Object interpret(InstReturn returnInst, Object... args) {
 			JsonArray array = new JsonArray();
 
 			array.add(new JsonPrimitive(INSTR_RETURN));
@@ -282,13 +281,13 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(SpecificInstruction specific, Object... args) {
+		public Object interpret(InstSpecific specific, Object... args) {
 			throw new OrccRuntimeException(
 					"IR writer cannot write specific instructions");
 		}
 
 		@Override
-		public Object interpret(Store store, Object... args) {
+		public Object interpret(InstStore store, Object... args) {
 			JsonArray array = new JsonArray();
 
 			array.add(new JsonPrimitive(INSTR_STORE));
@@ -330,7 +329,7 @@ public class IRWriter {
 			array.add(new JsonPrimitive(NODE_IF));
 			array.add(writeLocation(node.getLocation()));
 
-			array.add(writeExpression(node.getValue()));
+			array.add(writeExpression(node.getCondition()));
 			array.add(writeNodes(node.getThenNodes()));
 			array.add(writeNodes(node.getElseNodes()));
 
@@ -346,7 +345,7 @@ public class IRWriter {
 			array.add(new JsonPrimitive(NODE_WHILE));
 			array.add(writeLocation(node.getLocation()));
 
-			array.add(writeExpression(node.getValue()));
+			array.add(writeExpression(node.getCondition()));
 			array.add(writeNodes(node.getNodes()));
 			array.add(writeNode(node.getJoinNode()));
 
@@ -451,7 +450,7 @@ public class IRWriter {
 
 	private static JsonArray writeLocation(Location location) {
 		if (location == null) {
-			location = new Location();
+			location = IrFactory.eINSTANCE.createLocation();
 		}
 
 		JsonArray array = new JsonArray();
@@ -506,9 +505,8 @@ public class IRWriter {
 			array.add(new JsonPrimitive(var.getName()));
 			array.add(new JsonPrimitive(0));
 		} else {
-			VarLocal local = (VarLocal) var;
-			array.add(new JsonPrimitive(local.getBaseName()));
-			array.add(new JsonPrimitive(local.getIndex()));
+			array.add(new JsonPrimitive(var.getBaseName()));
+			array.add(new JsonPrimitive(var.getIndex()));
 		}
 
 		return array;
@@ -598,10 +596,9 @@ public class IRWriter {
 			if (peeked == null) {
 				patternArray.add(new JsonNull());
 			} else {
-				patternArray.add(writeLocalVariable((VarLocal) peeked));
+				patternArray.add(writeLocalVariable(peeked));
 			}
-			patternArray.add(writeLocalVariable((VarLocal) pattern
-					.getVariable(port)));
+			patternArray.add(writeLocalVariable(pattern.getVariable(port)));
 		}
 
 		return array;
@@ -737,7 +734,7 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JsonArray writeGlobalVariable(VarGlobal variable) {
+	private JsonArray writeGlobalVariable(Var variable) {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(variable.getName()));
@@ -763,10 +760,9 @@ public class IRWriter {
 	 *            an ordered map of global variables
 	 * @return a JSON array
 	 */
-	private JsonArray writeGlobalVariables(
-			OrderedMap<String, VarGlobal> variables) {
+	private JsonArray writeGlobalVariables(OrderedMap<String, Var> variables) {
 		JsonArray array = new JsonArray();
-		for (VarGlobal variable : variables) {
+		for (Var variable : variables) {
 			array.add(writeGlobalVariable(variable));
 		}
 		return array;
@@ -779,7 +775,7 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JsonArray writeLocalVariable(VarLocal variable) {
+	private JsonArray writeLocalVariable(Var variable) {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(variable.getBaseName()));
@@ -798,10 +794,9 @@ public class IRWriter {
 	 *            an ordered map of variables
 	 * @return a JSON array
 	 */
-	private JsonArray writeLocalVariables(
-			OrderedMap<String, VarLocal> variables) {
+	private JsonArray writeLocalVariables(OrderedMap<String, Var> variables) {
 		JsonArray array = new JsonArray();
-		for (VarLocal variable : variables) {
+		for (Var variable : variables) {
 			array.add(writeLocalVariable(variable));
 		}
 		return array;

@@ -31,6 +31,7 @@ package net.sf.orcc.network;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
@@ -74,7 +75,7 @@ public class Broadcast {
 		this.numOutputs = numOutputs;
 		this.type = type;
 
-		Location location = new Location();
+		Location location = IrFactory.eINSTANCE.createLocation();
 
 		inputs = new OrderedMap<String, Port>();
 		String name = "input";
@@ -82,7 +83,7 @@ public class Broadcast {
 
 		outputs = new OrderedMap<String, Port>();
 		for (int i = 0; i < numOutputs; i++) {
-			location = new Location();
+			location = IrFactory.eINSTANCE.createLocation();
 			name = "output_" + i;
 			outputs.put(name, new Port(location, type, name));
 		}

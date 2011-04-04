@@ -31,23 +31,23 @@ package net.sf.orcc.ir.transformations;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.AbstractInstructionVisitor;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -61,12 +61,12 @@ public class PhiRemoval extends AbstractActorVisitor {
 	private class PhiRemover extends AbstractInstructionVisitor {
 
 		@Override
-		public void visit(PhiAssignment instruction) {
+		public void visit(InstPhi instruction) {
 			itInstruction.remove();
 		}
 
 		@Override
-		public void visit(SpecificInstruction node) {
+		public void visit(InstSpecific node) {
 			// nothing to do here
 		}
 
@@ -101,33 +101,29 @@ public class PhiRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(PhiAssignment phi) {
-		VarLocal target = phi.getTarget();
+	public void visit(InstPhi phi) {
+		Var target = phi.getTarget();
 		VarExpr sourceExpr = (VarExpr) phi.getValues().get(phiIndex);
-		VarLocal source = (VarLocal) sourceExpr.getVar()
-				.getVariable();
+		Var source = sourceExpr.getVar().getVariable();
 
 		// if source is a local variable with index = 0, we remove it from the
 		// procedure and translate the PHI by an assignment of 0 (zero) to
 		// target. Otherwise, we just create an assignment target = source.
-		OrderedMap<String, VarLocal> parameters = procedure
-				.getParameters();
-		Assign assign;
+		OrderedMap<String, Var> parameters = procedure.getParameters();
+		Expression expr;
 		if (source.getIndex() == 0 && !parameters.contains(source.getName())) {
 			procedure.getLocals().remove(source.getName());
-			Expression expr;
 			if (target.getType().isBool()) {
 				expr = new BoolExpr(false);
 			} else {
 				expr = new IntExpr(0);
 			}
-			assign = new Assign(new Location(), target, expr);
 		} else {
-			Use localUse = new Use(source);
-			VarExpr expr = new VarExpr(localUse);
-			assign = new Assign(new Location(), target, expr);
+			Use localUse = IrFactory.eINSTANCE.createUse(source);
+			expr = new VarExpr(localUse);
 		}
 
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, expr);
 		targetBlock.add(assign);
 	}
 

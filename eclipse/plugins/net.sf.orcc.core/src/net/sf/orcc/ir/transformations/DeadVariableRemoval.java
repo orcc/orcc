@@ -29,20 +29,15 @@
 package net.sf.orcc.ir.transformations;
 
 import java.util.Iterator;
-import java.util.List;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -56,8 +51,8 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	protected boolean changed;
 
 	@Override
-	public void visit(Assign assign) {
-		VarLocal variable = assign.getTarget();
+	public void visit(InstAssign assign) {
+		Var variable = assign.getTarget();
 		if (!variable.isUsed()) {
 			// do not remove assign to variables that are used by writes
 			if (isPort(variable)) {
@@ -77,9 +72,9 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Call call) {
+	public void visit(InstCall call) {
 		if (call.hasResult()) {
-			VarLocal variable = call.getTarget();
+			Var variable = call.getTarget();
 			if (!variable.isUsed()) {
 				// do not remove call to variables that are used by writes
 				if (isPort(variable)) {
@@ -100,18 +95,13 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Load load) {
-		VarLocal target = load.getTarget();
+	public void visit(InstLoad load) {
+		Var target = load.getTarget();
 		if (!target.isUsed()) {
 			// do not remove loads to variables that are used by writes
 			if (isPort(target)) {
 				return;
 			}
-
-			// clean up uses
-			load.setTarget(null);
-			load.setSource(null);
-			Use.removeUses(load, load.getIndexes());
 
 			// remove instruction
 			itInstruction.remove();
@@ -122,21 +112,12 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(PhiAssignment phi) {
-		VarLocal variable = phi.getTarget();
+	public void visit(InstPhi phi) {
+		Var variable = phi.getTarget();
 		if (!variable.isUsed()) {
 			// do not remove phi to variables that are used by writes
 			if (isPort(variable)) {
 				return;
-			}
-
-			// clean up uses
-			phi.setTarget(null);
-			List<Expression> values = phi.getValues();
-
-			for (Expression value : values) {
-				VarExpr varExpr = (VarExpr) value;
-				varExpr.getVar().remove();
 			}
 
 			// remove instruction
@@ -155,10 +136,10 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			changed = false;
 
 			// first shot: removes locals not used by any instruction
-			OrderedMap<String, VarLocal> locals = procedure.getLocals();
-			Iterator<VarLocal> it = locals.iterator();
+			OrderedMap<String, Var> locals = procedure.getLocals();
+			Iterator<Var> it = locals.iterator();
 			while (it.hasNext()) {
-				VarLocal local = it.next();
+				Var local = it.next();
 				if (!local.isUsed() && local.getInstruction() == null
 						&& local.getInstructions() == null) {
 					changed = true;
@@ -171,21 +152,16 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Store store) {
+	public void visit(InstStore store) {
 		Var target = store.getTarget();
 		if (!target.isUsed()) {
 			// do not remove stores to variables that are used by writes, or
 			// variables that are parameters
 			if (!target.isGlobal()
-					&& (isPort((VarLocal) target) || procedure
-							.getParameters().contains(target.getName()))) {
+					&& (isPort(target) || procedure.getParameters().contains(
+							target.getName()))) {
 				return;
 			}
-
-			// clean up uses
-			store.setTarget(null);
-			Use.removeUses(store, store.getIndexes());
-			store.setValue(null);
 
 			// remove instruction
 			itInstruction.remove();

@@ -8,12 +8,11 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.util.CommonNodeOperations;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -33,6 +32,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getElseNodes <em>Else Nodes</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getJoinNode <em>Join Node</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getThenNodes <em>Then Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getCondition <em>Condition</em>}</li>
  * </ul>
  * </p>
  *
@@ -66,7 +66,15 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 */
 	protected EList<Node> thenNodes;
 
-	private Expression value;
+	/**
+	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected Expression condition;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -114,6 +122,9 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 				return getJoinNode();
 			case IrPackage.NODE_IF__THEN_NODES:
 				return getThenNodes();
+			case IrPackage.NODE_IF__CONDITION:
+				if (resolve) return getCondition();
+				return basicGetCondition();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -149,6 +160,8 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 				return joinNode != null;
 			case IrPackage.NODE_IF__THEN_NODES:
 				return thenNodes != null && !thenNodes.isEmpty();
+			case IrPackage.NODE_IF__CONDITION:
+				return condition != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -171,6 +184,9 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 			case IrPackage.NODE_IF__THEN_NODES:
 				getThenNodes().clear();
 				getThenNodes().addAll((Collection<? extends Node>)newValue);
+				return;
+			case IrPackage.NODE_IF__CONDITION:
+				setCondition((Expression)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -200,6 +216,9 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 				return;
 			case IrPackage.NODE_IF__THEN_NODES:
 				getThenNodes().clear();
+				return;
+			case IrPackage.NODE_IF__CONDITION:
+				setCondition((Expression)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -235,14 +254,42 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		return thenNodes;
 	}
 
-	@Override
-	public Expression getValue() {
-		return value;
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Expression getCondition() {
+		if (condition != null && condition.eIsProxy()) {
+			InternalEObject oldCondition = (InternalEObject)condition;
+			condition = (Expression)eResolveProxy(oldCondition);
+			if (condition != oldCondition) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.NODE_IF__CONDITION, oldCondition, condition));
+			}
+		}
+		return condition;
 	}
 
-	@Override
-	public void internalSetValue(Expression value) {
-		this.value = value;
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Expression basicGetCondition() {
+		return condition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setCondition(Expression newCondition) {
+		Expression oldCondition = condition;
+		condition = newCondition;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__CONDITION, oldCondition, condition));
 	}
 
 	@Override
@@ -266,16 +313,6 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__JOIN_NODE, newJoinNode, newJoinNode));
-	}
-
-	@Override
-	public void setValue(Expression value) {
-		CommonNodeOperations.setValue(this, value);
-	}
-
-	@Override
-	public String toString() {
-		return "if (" + getValue() + ")";
 	}
 
 } // NodeIfImpl

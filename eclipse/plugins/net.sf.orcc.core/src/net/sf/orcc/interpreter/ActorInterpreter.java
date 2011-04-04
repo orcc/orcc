@@ -42,8 +42,13 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM.NextStateInfo;
-import net.sf.orcc.ir.VarGlobal;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
@@ -61,13 +66,6 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;
@@ -212,8 +210,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	protected void allocatePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Var var = pattern.getVariable(port);
-			var.setValue((Expression) var.getType().accept(
-					listAllocator));
+			var.setValue((Expression) var.getType().accept(listAllocator));
 		}
 	}
 
@@ -341,7 +338,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 			// Check for List state variables which need to be allocated or
 			// initialized
-			for (VarGlobal stateVar : actor.getStateVars()) {
+			for (Var stateVar : actor.getStateVars()) {
 				Type type = stateVar.getType();
 				// Initialize variables with constant values
 				Expression initConst = stateVar.getInitialValue();
@@ -494,9 +491,9 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Assign instr) {
+	public void visit(InstAssign instr) {
 		try {
-			VarLocal target = instr.getTarget();
+			Var target = instr.getTarget();
 			target.setValue((Expression) instr.getValue().accept(
 					exprInterpreter));
 		} catch (OrccRuntimeException e) {
@@ -512,7 +509,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Call call) {
+	public void visit(InstCall call) {
 		// Get called procedure
 		Procedure proc = call.getProcedure();
 
@@ -538,7 +535,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				}
 			}
 		} else {
-			List<VarLocal> procParams = proc.getParameters().getList();
+			List<Var> procParams = proc.getParameters().getList();
 			for (int i = 0; i < callParams.size(); i++) {
 				Var procVar = procParams.get(i);
 				procVar.setValue((Expression) callParams.get(i).accept(
@@ -558,7 +555,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	@Override
 	public void visit(NodeIf node) {
 		// Interpret first expression ("if" condition)
-		Expression condition = (Expression) node.getValue().accept(
+		Expression condition = (Expression) node.getCondition().accept(
 				exprInterpreter);
 
 		// if (condition is true)
@@ -581,8 +578,8 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Load instr) {
-		VarLocal target = instr.getTarget();
+	public void visit(InstLoad instr) {
+		Var target = instr.getTarget();
 		Var source = instr.getSource().getVariable();
 		if (instr.getIndexes().isEmpty()) {
 			target.setValue(source.getValue());
@@ -605,7 +602,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(PhiAssignment phi) {
+	public void visit(InstPhi phi) {
 		Expression value = phi.getValues().get(branch);
 		phi.getTarget().setValue((Expression) value.accept(exprInterpreter));
 	}
@@ -617,7 +614,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 			Class<?>[] parameterTypes = new Class<?>[numParams];
 			Object[] args = new Object[numParams];
 			int i = 0;
-			for (VarLocal parameter : procedure.getParameters()) {
+			for (Var parameter : procedure.getParameters()) {
 				args[i] = parameter.getValue().accept(
 						new JavaExpressionConverter());
 				parameterTypes[i] = args[i].getClass();
@@ -633,7 +630,8 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				method.invoke(null, args);
 			} catch (Exception e) {
 				throw new OrccRuntimeException(
-						"exception during native procedure call to " + methodName);
+						"exception during native procedure call to "
+								+ methodName);
 			}
 		} else {
 			// Allocate local List variables
@@ -649,24 +647,23 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Return instr) {
+	public void visit(InstReturn instr) {
 		if (instr.getValue() != null) {
 			returnValue = (Expression) instr.getValue().accept(exprInterpreter);
 		}
 	}
 
 	@Override
-	public void visit(SpecificInstruction instr) {
+	public void visit(InstSpecific instr) {
 		throw new OrccRuntimeException("does not know how to interpret a "
 				+ "specific instruction");
 	}
 
 	@Override
-	public void visit(Store instr) {
+	public void visit(InstStore instr) {
 		Var var = instr.getTarget();
 		if (instr.getIndexes().isEmpty()) {
-			var.setValue((Expression) instr.getValue().accept(
-					exprInterpreter));
+			var.setValue((Expression) instr.getValue().accept(exprInterpreter));
 		} else {
 			try {
 				Expression target = var.getValue();
@@ -699,7 +696,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 		visit(node.getJoinNode());
 
 		// Interpret first expression ("while" condition)
-		Expression condition = (Expression) node.getValue().accept(
+		Expression condition = (Expression) node.getCondition().accept(
 				exprInterpreter);
 
 		// while (condition is true) do
@@ -710,8 +707,8 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				visit(node.getJoinNode());
 
 				// Interpret next value of "while" condition
-				condition = (Expression) node.getValue()
-						.accept(exprInterpreter);
+				condition = (Expression) node.getCondition().accept(
+						exprInterpreter);
 				if (condition == null || !condition.isBooleanExpr()) {
 					throw new OrccRuntimeException(
 							"Condition not boolean at line "

@@ -8,12 +8,11 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.util.CommonNodeOperations;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -32,6 +31,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getJoinNode <em>Join Node</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getNodes <em>Nodes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getCondition <em>Condition</em>}</li>
  * </ul>
  * </p>
  *
@@ -56,7 +56,15 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 */
 	protected EList<Node> nodes;
 
-	private Expression value;
+	/**
+	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected Expression condition;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -102,6 +110,9 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 				return getJoinNode();
 			case IrPackage.NODE_WHILE__NODES:
 				return getNodes();
+			case IrPackage.NODE_WHILE__CONDITION:
+				if (resolve) return getCondition();
+				return basicGetCondition();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -133,6 +144,8 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 				return joinNode != null;
 			case IrPackage.NODE_WHILE__NODES:
 				return nodes != null && !nodes.isEmpty();
+			case IrPackage.NODE_WHILE__CONDITION:
+				return condition != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -151,6 +164,9 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 			case IrPackage.NODE_WHILE__NODES:
 				getNodes().clear();
 				getNodes().addAll((Collection<? extends Node>)newValue);
+				return;
+			case IrPackage.NODE_WHILE__CONDITION:
+				setCondition((Expression)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -178,6 +194,9 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 			case IrPackage.NODE_WHILE__NODES:
 				getNodes().clear();
 				return;
+			case IrPackage.NODE_WHILE__CONDITION:
+				setCondition((Expression)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -201,14 +220,42 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 		return nodes;
 	}
 
-	@Override
-	public Expression getValue() {
-		return value;
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Expression getCondition() {
+		if (condition != null && condition.eIsProxy()) {
+			InternalEObject oldCondition = (InternalEObject)condition;
+			condition = (Expression)eResolveProxy(oldCondition);
+			if (condition != oldCondition) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.NODE_WHILE__CONDITION, oldCondition, condition));
+			}
+		}
+		return condition;
 	}
 
-	@Override
-	public void internalSetValue(Expression value) {
-		this.value = value;
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Expression basicGetCondition() {
+		return condition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setCondition(Expression newCondition) {
+		Expression oldCondition = condition;
+		condition = newCondition;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, oldCondition, condition));
 	}
 
 	@Override
@@ -232,16 +279,6 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__JOIN_NODE, newJoinNode, newJoinNode));
-	}
-
-	@Override
-	public void setValue(Expression value) {
-		CommonNodeOperations.setValue(this, value);
-	}
-
-	@Override
-	public String toString() {
-		return "while (" + getValue() + ")";
 	}
 
 } // NodeWhileImpl

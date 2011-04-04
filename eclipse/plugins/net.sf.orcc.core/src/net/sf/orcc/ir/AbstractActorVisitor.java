@@ -191,7 +191,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	@Override
 	public void visit(NodeIf nodeIf) {
 		if (visitFull) {
-			nodeIf.getValue().accept(this);
+			nodeIf.getCondition().accept(this);
 		}
 
 		visit(nodeIf.getThenNodes());
@@ -305,7 +305,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	@Override
 	public void visit(NodeWhile nodeWhile) {
 		if (visitFull) {
-			nodeWhile.getValue().accept(this);
+			nodeWhile.getCondition().accept(this);
 		}
 
 		visit(nodeWhile.getNodes());

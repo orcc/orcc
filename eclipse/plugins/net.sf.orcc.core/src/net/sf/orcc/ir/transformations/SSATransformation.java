@@ -36,27 +36,26 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.Store;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class converts the given actor to SSA form.
@@ -79,8 +78,7 @@ public class SSATransformation extends AbstractActorVisitor {
 			Use use = expr.getVar();
 			Var oldVar = use.getVariable();
 			if (!oldVar.isGlobal()) {
-				VarLocal newVar = uses.get(((VarLocal) oldVar)
-						.getBaseName());
+				Var newVar = uses.get(oldVar.getBaseName());
 				if (newVar != null) {
 					// newVar may be null if oldVar is a function parameter for
 					// instance
@@ -100,7 +98,7 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * maps a variable name to a local variable (used when creating new
 	 * definitions)
 	 */
-	private Map<String, VarLocal> definitions;
+	private Map<String, Var> definitions;
 
 	/**
 	 * join node (if any)
@@ -115,14 +113,14 @@ public class SSATransformation extends AbstractActorVisitor {
 	/**
 	 * maps a variable name to a local variable (used when replacing uses)
 	 */
-	private Map<String, VarLocal> uses;
+	private Map<String, Var> uses;
 
 	/**
 	 * Creates a new SSA transformation.
 	 */
 	public SSATransformation() {
-		definitions = new HashMap<String, VarLocal>();
-		uses = new HashMap<String, VarLocal>();
+		definitions = new HashMap<String, Var>();
+		uses = new HashMap<String, Var>();
 	}
 
 	/**
@@ -133,9 +131,9 @@ public class SSATransformation extends AbstractActorVisitor {
 	 */
 	private void commitPhi(NodeBlock innerJoin) {
 		for (Instruction instruction : innerJoin.getInstructions()) {
-			PhiAssignment phi = (PhiAssignment) instruction;
-			VarLocal oldVar = phi.getOldVariable();
-			VarLocal newVar = phi.getTarget();
+			InstPhi phi = (InstPhi) instruction;
+			Var oldVar = phi.getOldVariable();
+			Var newVar = phi.getTarget();
 
 			// updates the current value of "var"
 			uses.put(oldVar.getBaseName(), newVar);
@@ -184,12 +182,12 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * @param newVar
 	 *            new variable
 	 */
-	private void insertPhi(VarLocal oldVar, VarLocal newVar) {
+	private void insertPhi(Var oldVar, Var newVar) {
 		String name = oldVar.getBaseName();
-		PhiAssignment phi = null;
+		InstPhi phi = null;
 		for (Instruction instruction : join.getInstructions()) {
 			if (instruction.isPhi()) {
-				PhiAssignment tempPhi = (PhiAssignment) instruction;
+				InstPhi tempPhi = (InstPhi) instruction;
 				if (tempPhi.getTarget().getBaseName().equals(name)) {
 					phi = tempPhi;
 					break;
@@ -198,16 +196,17 @@ public class SSATransformation extends AbstractActorVisitor {
 		}
 
 		if (phi == null) {
-			VarLocal target = newDefinition(oldVar);
+			Var target = newDefinition(oldVar);
 			List<Expression> values = new ArrayList<Expression>(2);
-			phi = new PhiAssignment(new Location(), target, values);
+
+			Use use = IrFactory.eINSTANCE.createUse(oldVar);
+			values.add(new VarExpr(use));
+			use = IrFactory.eINSTANCE.createUse(oldVar);
+			values.add(new VarExpr(use));
+
+			phi = IrFactory.eINSTANCE.createInstPhi(target, values);
 			phi.setOldVariable(oldVar);
 			join.add(phi);
-
-			Use use = new Use(oldVar, phi);
-			values.add(new VarExpr(use));
-			use = new Use(oldVar, phi);
-			values.add(new VarExpr(use));
 
 			if (loop != null) {
 				replaceUsesInLoop(oldVar, target);
@@ -215,9 +214,7 @@ public class SSATransformation extends AbstractActorVisitor {
 		}
 
 		// replace use
-		VarExpr varExpr = (VarExpr) phi.getValues().get(branch - 1);
-		varExpr.getVar().remove();
-		Use use = new Use(newVar, phi);
+		Use use = IrFactory.eINSTANCE.createUse(newVar);
 		phi.getValues().set(branch - 1, new VarExpr(use));
 	}
 
@@ -228,7 +225,7 @@ public class SSATransformation extends AbstractActorVisitor {
 	 *            a variable
 	 * @return a new definition based on the given old variable
 	 */
-	private VarLocal newDefinition(VarLocal oldVar) {
+	private Var newDefinition(Var oldVar) {
 		String name = oldVar.getBaseName();
 
 		// get index
@@ -240,8 +237,8 @@ public class SSATransformation extends AbstractActorVisitor {
 		}
 
 		// create new variable
-		VarLocal newVar = new VarLocal(oldVar.isAssignable(), index,
-				oldVar.getLocation(), name, oldVar.getType());
+		Var newVar = IrFactory.eINSTANCE.createVar(oldVar.getLocation(),
+				oldVar.getType(), name, oldVar.isAssignable(), index);
 		procedure.getLocals().put(newVar.getName(), newVar);
 		definitions.put(name, newVar);
 
@@ -254,13 +251,14 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * @param cter
 	 *            a local target container
 	 */
-	private void replaceDef(LocalTargetContainer cter) {
-		VarLocal target = cter.getTarget();
-		if (target != null) {
+	private Var replaceDef(Var target) {
+		if (target == null) {
+			return target;
+		} else {
 			String name = target.getBaseName();
 
 			// v_old is the value of the variable before the assignment
-			VarLocal oldVar = uses.get(name);
+			Var oldVar = uses.get(name);
 			if (oldVar == null) {
 				// may be null if the variable is used without having been
 				// assigned first
@@ -268,14 +266,14 @@ public class SSATransformation extends AbstractActorVisitor {
 				oldVar = target;
 			}
 
-			VarLocal newTarget = newDefinition(target);
-			cter.setTarget(newTarget);
-
+			Var newTarget = newDefinition(target);
 			uses.put(name, newTarget);
 
 			if (branch != 0) {
 				insertPhi(oldVar, newTarget);
 			}
+
+			return newTarget;
 		}
 	}
 
@@ -312,15 +310,15 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * @param newVar
 	 *            new variable
 	 */
-	private void replaceUsesInLoop(VarLocal oldVar, VarLocal newVar) {
+	private void replaceUsesInLoop(Var oldVar, Var newVar) {
 		List<Use> uses = new ArrayList<Use>(oldVar.getUses());
 		Set<Node> nodes = new HashSet<Node>();
 		findNodes(nodes, loop);
 
 		for (Use use : uses) {
-			User user = use.getNode();
+			EObject user = use.eContainer();
 			Node node;
-			if (user.isCFGNode()) {
+			if (user instanceof Node) {
 				node = (Node) user;
 			} else {
 				Instruction instruction = (Instruction) user;
@@ -339,22 +337,22 @@ public class SSATransformation extends AbstractActorVisitor {
 	 */
 	private void restoreVariables() {
 		for (Instruction instruction : join.getInstructions()) {
-			PhiAssignment phi = (PhiAssignment) instruction;
-			VarLocal oldVar = phi.getOldVariable();
+			InstPhi phi = (InstPhi) instruction;
+			Var oldVar = phi.getOldVariable();
 			uses.put(oldVar.getBaseName(), oldVar);
 		}
 	}
 
 	@Override
-	public void visit(Assign assign) {
+	public void visit(InstAssign assign) {
 		replaceUses(assign.getValue());
-		replaceDef(assign);
+		assign.setTarget(replaceDef(assign.getTarget()));
 	}
 
 	@Override
-	public void visit(Call call) {
+	public void visit(InstCall call) {
 		replaceUses(call.getParameters());
-		replaceDef(call);
+		call.setTarget(replaceDef(call.getTarget()));
 	}
 
 	@Override
@@ -363,7 +361,7 @@ public class SSATransformation extends AbstractActorVisitor {
 		NodeBlock outerJoin = join;
 		NodeWhile outerLoop = loop;
 
-		replaceUses(nodeIf.getValue());
+		replaceUses(nodeIf.getCondition());
 
 		join = nodeIf.getJoinNode();
 		loop = null;
@@ -386,9 +384,9 @@ public class SSATransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Load load) {
+	public void visit(InstLoad load) {
 		replaceUses(load.getIndexes());
-		replaceDef(load);
+		load.setTarget(replaceDef(load.getTarget()));
 	}
 
 	@Override
@@ -399,12 +397,12 @@ public class SSATransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Return returnInstr) {
+	public void visit(InstReturn returnInstr) {
 		replaceUses(returnInstr.getValue());
 	}
 
 	@Override
-	public void visit(Store store) {
+	public void visit(InstStore store) {
 		replaceUses(store.getIndexes());
 		replaceUses(store.getValue());
 	}
@@ -415,7 +413,7 @@ public class SSATransformation extends AbstractActorVisitor {
 		NodeBlock outerJoin = join;
 		NodeWhile outerLoop = loop;
 
-		replaceUses(nodeWhile.getValue());
+		replaceUses(nodeWhile.getCondition());
 
 		branch = 2;
 		join = nodeWhile.getJoinNode();

@@ -38,7 +38,15 @@ import org.eclipse.emf.common.util.EList;
  * @model extends="net.sf.orcc.ir.Node"
  * 
  */
-public interface NodeIf extends Node, ValueContainer {
+public interface NodeIf extends Node {
+
+	/**
+	 * Returns the condition of this node If.
+	 * 
+	 * @return the condition of this node If
+	 * @model
+	 */
+	Expression getCondition();
 
 	/**
 	 * Returns the nodes in the "else" branch of this NodeIf.
@@ -63,6 +71,14 @@ public interface NodeIf extends Node, ValueContainer {
 	 * @model containment="true"
 	 */
 	EList<Node> getThenNodes();
+
+	/**
+	 * Sets the condition of this node If.
+	 * 
+	 * @param condition
+	 *            the condition of this node If
+	 */
+	void setCondition(Expression condition);
 
 	/**
 	 * Sets the join node of this NodeIf.

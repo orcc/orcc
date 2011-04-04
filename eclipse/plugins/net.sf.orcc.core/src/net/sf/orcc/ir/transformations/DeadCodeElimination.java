@@ -33,18 +33,18 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.PhiAssignment;
 
 /**
  * This class defines a very simple Dead Code Elimination.
@@ -71,24 +71,23 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
 			if (instruction.isPhi()) {
-				PhiAssignment phi = (PhiAssignment) instruction;
+				InstPhi phi = (InstPhi) instruction;
 
-				VarLocal target = phi.getTarget();
+				Var target = phi.getTarget();
 				VarExpr sourceExpr = (VarExpr) phi.getValues().get(index);
-				VarLocal source = (VarLocal) sourceExpr.getVar()
-						.getVariable();
+				Var source = (Var) sourceExpr.getVar().getVariable();
 
 				// translate the phi to an assign
-				Use localUse = new Use(source);
+				Use localUse = IrFactory.eINSTANCE.createUse(source);
 				VarExpr expr = new VarExpr(localUse);
-				Assign assign = new Assign(new Location(), target, expr);
+				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
+						target, expr);
 
 				it.set(assign);
 
 				// remove the other variable
 				VarExpr localExpr = (VarExpr) phi.getValues().get(1 - index);
-				VarLocal local = (VarLocal) localExpr.getVar()
-						.getVariable();
+				Var local = localExpr.getVar().getVariable();
 				procedure.getLocals().remove(local.getName());
 			}
 		}
@@ -105,7 +104,7 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 
 	@Override
 	public void visit(NodeIf node) {
-		Expression condition = node.getValue();
+		Expression condition = node.getCondition();
 		if (condition.isBooleanExpr()) {
 			if (((BoolExpr) condition).getValue()) {
 				addNodes(node.getThenNodes(), node.getJoinNode(), 0);

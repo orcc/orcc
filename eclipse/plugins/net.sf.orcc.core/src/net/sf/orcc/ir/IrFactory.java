@@ -37,6 +37,30 @@ public interface IrFactory extends EFactory {
 	InstAssign createInstAssign();
 
 	/**
+	 * Creates an InstAssign with the given location, target and value.
+	 * 
+	 * @param location
+	 *            location
+	 * @param target
+	 *            target variable
+	 * @param value
+	 *            value
+	 * @return an InstAssign with the given location, target and value.
+	 */
+	InstAssign createInstAssign(Location location, Var target, Expression value);
+
+	/**
+	 * Creates an InstAssign with the given target and value.
+	 * 
+	 * @param target
+	 *            target variable
+	 * @param value
+	 *            value
+	 * @return an InstAssign with the given location, target and value.
+	 */
+	InstAssign createInstAssign(Var target, Expression value);
+
+	/**
 	 * Returns a new object of class '<em>Inst Call</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -44,6 +68,19 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	InstCall createInstCall();
+
+	/**
+	 * Creates an InstCall with the given location, target, procedure,
+	 * parameters.
+	 * 
+	 * @param location
+	 * @param target
+	 * @param procedure
+	 * @param parameters
+	 * @return a call
+	 */
+	InstCall createInstCall(Location location, Var target, Procedure procedure,
+			List<Expression> parameters);
 
 	/**
 	 * Returns a new object of class '<em>Inst Load</em>'.
@@ -55,6 +92,18 @@ public interface IrFactory extends EFactory {
 	InstLoad createInstLoad();
 
 	/**
+	 * Creates an InstLoad with the given location, target, source, indexes.
+	 * 
+	 * @param location
+	 * @param target
+	 * @param source
+	 * @param indexes
+	 * @return a load
+	 */
+	InstLoad createInstLoad(Location location, Var target, Use source,
+			List<Expression> indexes);
+
+	/**
 	 * Returns a new object of class '<em>Inst Phi</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -64,6 +113,25 @@ public interface IrFactory extends EFactory {
 	InstPhi createInstPhi();
 
 	/**
+	 * Creates an InstPhi with the given location, target, and values.
+	 * 
+	 * @param location
+	 * @param target
+	 * @param values
+	 * @return a phi
+	 */
+	InstPhi createInstPhi(Location location, Var target, List<Expression> values);
+
+	/**
+	 * Creates an InstPhi with the given target and values.
+	 * 
+	 * @param target
+	 * @param values
+	 * @return a phi
+	 */
+	InstPhi createInstPhi(Var target, List<Expression> values);
+
+	/**
 	 * Returns a new object of class '<em>Inst Return</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -71,6 +139,15 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	InstReturn createInstReturn();
+
+	/**
+	 * Creates an InstReturn with the given location and value.
+	 * 
+	 * @param location
+	 * @param value
+	 * @return a return
+	 */
+	InstReturn createInstReturn(Location location, Expression value);
 
 	/**
 	 * Returns a new object of class '<em>Inst Specific</em>'. <!--
@@ -89,6 +166,18 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	InstStore createInstStore();
+
+	/**
+	 * Creates an InstStore with the given location, target, source, indexes.
+	 * 
+	 * @param location
+	 * @param target
+	 * @param source
+	 * @param indexes
+	 * @return a load
+	 */
+	InstStore createInstStore(Location location, Var target,
+			List<Expression> indexes, Expression value);
 
 	/**
 	 * Returns a new object of class '<em>Location</em>'.
@@ -292,6 +381,15 @@ public interface IrFactory extends EFactory {
 	Use createUse();
 
 	/**
+	 * Creates a new use of the given variable.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return a new use of the given variable
+	 */
+	Use createUse(Var variable);
+
+	/**
 	 * Returns a new object of class '<em>Var</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -317,6 +415,24 @@ public interface IrFactory extends EFactory {
 	 */
 	Var createVar(Location location, Type type, String name, boolean global,
 			boolean assignable);
+
+	/**
+	 * Creates a new global variable with the given location, type, name,
+	 * initial value. The variable may be assignable or not.
+	 * 
+	 * @param location
+	 *            the variable location
+	 * @param type
+	 *            the variable type
+	 * @param name
+	 *            the variable name
+	 * @param assignable
+	 *            whether this variable is assignable
+	 * @param initialValue
+	 *            initial value of this variable
+	 */
+	Var createVar(Location location, Type type, String name,
+			boolean assignable, Expression initialValue);
 
 	/**
 	 * Creates a new local variable with the given location, type, name, index.

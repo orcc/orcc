@@ -34,7 +34,6 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
-import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -141,13 +140,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass nodeWhileEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass valueContainerEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -513,6 +505,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getNodeIf_Condition() {
+		return (EReference)nodeIfEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getNodeWhile() {
 		return nodeWhileEClass;
 	}
@@ -540,8 +541,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getValueContainer() {
-		return valueContainerEClass;
+	public EReference getNodeWhile_Condition() {
+		return (EReference)nodeWhileEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1030,12 +1031,12 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(nodeIfEClass, NODE_IF__ELSE_NODES);
 		createEReference(nodeIfEClass, NODE_IF__JOIN_NODE);
 		createEReference(nodeIfEClass, NODE_IF__THEN_NODES);
+		createEReference(nodeIfEClass, NODE_IF__CONDITION);
 
 		nodeWhileEClass = createEClass(NODE_WHILE);
 		createEReference(nodeWhileEClass, NODE_WHILE__JOIN_NODE);
 		createEReference(nodeWhileEClass, NODE_WHILE__NODES);
-
-		valueContainerEClass = createEClass(VALUE_CONTAINER);
+		createEReference(nodeWhileEClass, NODE_WHILE__CONDITION);
 
 		nodeEClass = createEClass(NODE);
 		createEReference(nodeEClass, NODE__LOCATION);
@@ -1136,9 +1137,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		instructionEClass.getESuperTypes().add(this.getUser());
 		nodeBlockEClass.getESuperTypes().add(this.getNode());
 		nodeIfEClass.getESuperTypes().add(this.getNode());
-		nodeIfEClass.getESuperTypes().add(this.getValueContainer());
 		nodeWhileEClass.getESuperTypes().add(this.getNode());
-		nodeWhileEClass.getESuperTypes().add(this.getValueContainer());
 		nodeEClass.getESuperTypes().add(this.getUser());
 		instAssignEClass.getESuperTypes().add(this.getInstruction());
 		instCallEClass.getESuperTypes().add(this.getInstruction());
@@ -1184,12 +1183,12 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getNodeIf_ElseNodes(), this.getNode(), null, "elseNodes", null, 0, -1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeIf_JoinNode(), this.getNodeBlock(), null, "joinNode", null, 0, 1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeIf_ThenNodes(), this.getNode(), null, "thenNodes", null, 0, -1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNodeIf_Condition(), this.getExpression(), null, "condition", null, 0, 1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeWhileEClass, NodeWhile.class, "NodeWhile", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getNodeWhile_JoinNode(), this.getNodeBlock(), null, "joinNode", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeWhile_Nodes(), this.getNode(), null, "nodes", null, 0, -1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(valueContainerEClass, ValueContainer.class, "ValueContainer", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getNodeWhile_Condition(), this.getExpression(), null, "condition", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeEClass, Node.class, "Node", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getNode_Location(), this.getLocation(), null, "location", null, 0, 1, Node.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

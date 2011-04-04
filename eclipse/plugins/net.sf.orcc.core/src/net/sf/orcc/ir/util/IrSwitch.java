@@ -34,7 +34,6 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
-import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EClass;
@@ -200,7 +199,6 @@ public class IrSwitch<T> {
 				NodeIf nodeIf = (NodeIf)theEObject;
 				T result = caseNodeIf(nodeIf);
 				if (result == null) result = caseNode(nodeIf);
-				if (result == null) result = caseValueContainer(nodeIf);
 				if (result == null) result = caseUser(nodeIf);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
@@ -209,7 +207,6 @@ public class IrSwitch<T> {
 				NodeWhile nodeWhile = (NodeWhile)theEObject;
 				T result = caseNodeWhile(nodeWhile);
 				if (result == null) result = caseNode(nodeWhile);
-				if (result == null) result = caseValueContainer(nodeWhile);
 				if (result == null) result = caseUser(nodeWhile);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
@@ -512,21 +509,6 @@ public class IrSwitch<T> {
 	 * @generated
 	 */
 	public T caseNodeWhile(NodeWhile object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Value Container</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Value Container</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseValueContainer(ValueContainer object) {
 		return null;
 	}
 

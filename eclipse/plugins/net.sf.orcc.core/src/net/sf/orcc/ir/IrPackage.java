@@ -334,7 +334,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
 	 * @generated
 	 */
-	int NODE = 15;
+	int NODE = 14;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -438,13 +438,22 @@ public interface IrPackage extends EPackage {
 	int NODE_IF__THEN_NODES = NODE_FEATURE_COUNT + 2;
 
 	/**
+	 * The feature id for the '<em><b>Condition</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_IF__CONDITION = NODE_FEATURE_COUNT + 3;
+
+	/**
 	 * The number of structural features of the '<em>Node If</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 3;
+	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 4;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl <em>Node While</em>}' class.
@@ -484,33 +493,22 @@ public interface IrPackage extends EPackage {
 	int NODE_WHILE__NODES = NODE_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Condition</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_WHILE__CONDITION = NODE_FEATURE_COUNT + 2;
+
+	/**
 	 * The number of structural features of the '<em>Node While</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_WHILE_FEATURE_COUNT = NODE_FEATURE_COUNT + 2;
-
-	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.ValueContainer <em>Value Container</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.ValueContainer
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getValueContainer()
-	 * @generated
-	 */
-	int VALUE_CONTAINER = 14;
-
-	/**
-	 * The number of structural features of the '<em>Value Container</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VALUE_CONTAINER_FEATURE_COUNT = 0;
-
+	int NODE_WHILE_FEATURE_COUNT = NODE_FEATURE_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
@@ -520,7 +518,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getProcedure()
 	 * @generated
 	 */
-	int PROCEDURE = 16;
+	int PROCEDURE = 15;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -584,7 +582,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstAssign()
 	 * @generated
 	 */
-	int INST_ASSIGN = 17;
+	int INST_ASSIGN = 16;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -630,7 +628,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstCall()
 	 * @generated
 	 */
-	int INST_CALL = 18;
+	int INST_CALL = 17;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -685,7 +683,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstLoad()
 	 * @generated
 	 */
-	int INST_LOAD = 19;
+	int INST_LOAD = 18;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -740,7 +738,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstPhi()
 	 * @generated
 	 */
-	int INST_PHI = 20;
+	int INST_PHI = 19;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -795,7 +793,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstReturn()
 	 * @generated
 	 */
-	int INST_RETURN = 21;
+	int INST_RETURN = 20;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -832,7 +830,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstSpecific()
 	 * @generated
 	 */
-	int INST_SPECIFIC = 22;
+	int INST_SPECIFIC = 21;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -860,7 +858,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstStore()
 	 * @generated
 	 */
-	int INST_STORE = 23;
+	int INST_STORE = 22;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -915,7 +913,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getLocation()
 	 * @generated
 	 */
-	int LOCATION = 24;
+	int LOCATION = 23;
 
 
 	/**
@@ -962,7 +960,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 	 * @generated
 	 */
-	int VAR = 25;
+	int VAR = 24;
 
 	/**
 	 * The feature id for the '<em><b>Index</b></em>' attribute.
@@ -1062,7 +1060,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getString()
 	 * @generated
 	 */
-	int STRING = 26;
+	int STRING = 25;
 
 	/**
 	 * The number of structural features of the '<em>String</em>' class.
@@ -1082,7 +1080,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
 	 */
-	int USE = 27;
+	int USE = 26;
 
 	/**
 	 * The feature id for the '<em><b>Variable</b></em>' container reference.
@@ -1344,6 +1342,17 @@ public interface IrPackage extends EPackage {
 	EReference getNodeIf_ThenNodes();
 
 	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.NodeIf#getCondition <em>Condition</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Condition</em>'.
+	 * @see net.sf.orcc.ir.NodeIf#getCondition()
+	 * @see #getNodeIf()
+	 * @generated
+	 */
+	EReference getNodeIf_Condition();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeWhile <em>Node While</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1376,15 +1385,15 @@ public interface IrPackage extends EPackage {
 	EReference getNodeWhile_Nodes();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.ValueContainer <em>Value Container</em>}'.
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.NodeWhile#getCondition <em>Condition</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Value Container</em>'.
-	 * @see net.sf.orcc.ir.ValueContainer
-	 * @model instanceClass="net.sf.orcc.ir.ValueContainer"
+	 * @return the meta object for the reference '<em>Condition</em>'.
+	 * @see net.sf.orcc.ir.NodeWhile#getCondition()
+	 * @see #getNodeWhile()
 	 * @generated
 	 */
-	EClass getValueContainer();
+	EReference getNodeWhile_Condition();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Node <em>Node</em>}'.
@@ -2124,6 +2133,14 @@ public interface IrPackage extends EPackage {
 		EReference NODE_IF__THEN_NODES = eINSTANCE.getNodeIf_ThenNodes();
 
 		/**
+		 * The meta object literal for the '<em><b>Condition</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NODE_IF__CONDITION = eINSTANCE.getNodeIf_Condition();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl <em>Node While</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2150,14 +2167,12 @@ public interface IrPackage extends EPackage {
 		EReference NODE_WHILE__NODES = eINSTANCE.getNodeWhile_Nodes();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.ValueContainer <em>Value Container</em>}' class.
+		 * The meta object literal for the '<em><b>Condition</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.ValueContainer
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getValueContainer()
 		 * @generated
 		 */
-		EClass VALUE_CONTAINER = eINSTANCE.getValueContainer();
+		EReference NODE_WHILE__CONDITION = eINSTANCE.getNodeWhile_Condition();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.

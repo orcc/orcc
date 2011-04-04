@@ -32,7 +32,6 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
-import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -151,10 +150,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseNodeWhile(NodeWhile object) {
 				return createNodeWhileAdapter();
-			}
-			@Override
-			public Adapter caseValueContainer(ValueContainer object) {
-				return createValueContainerAdapter();
 			}
 			@Override
 			public Adapter caseNode(Node object) {
@@ -421,20 +416,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createNodeWhileAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.ValueContainer <em>Value Container</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.ValueContainer
-	 * @generated
-	 */
-	public Adapter createValueContainerAdapter() {
 		return null;
 	}
 
