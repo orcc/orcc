@@ -28,6 +28,91 @@ public interface IrFactory extends EFactory {
 	IrFactory eINSTANCE = net.sf.orcc.ir.impl.IrFactoryImpl.init();
 
 	/**
+	 * Returns a new object of class '<em>Inst Assign</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Assign</em>'.
+	 * @generated
+	 */
+	InstAssign createInstAssign();
+
+	/**
+	 * Returns a new object of class '<em>Inst Call</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Call</em>'.
+	 * @generated
+	 */
+	InstCall createInstCall();
+
+	/**
+	 * Returns a new object of class '<em>Inst Load</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Load</em>'.
+	 * @generated
+	 */
+	InstLoad createInstLoad();
+
+	/**
+	 * Returns a new object of class '<em>Inst Phi</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Phi</em>'.
+	 * @generated
+	 */
+	InstPhi createInstPhi();
+
+	/**
+	 * Returns a new object of class '<em>Inst Return</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Return</em>'.
+	 * @generated
+	 */
+	InstReturn createInstReturn();
+
+	/**
+	 * Returns a new object of class '<em>Inst Specific</em>'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return a new object of class '<em>Inst Specific</em>'.
+	 * @generated
+	 */
+	InstSpecific createInstSpecific();
+
+	/**
+	 * Returns a new object of class '<em>Inst Store</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Store</em>'.
+	 * @generated
+	 */
+	InstStore createInstStore();
+
+	/**
+	 * Returns a new object of class '<em>Location</em>'.
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * @return a new object of class '<em>Location</em>'.
+	 * @generated
+	 */
+	Location createLocation();
+
+	/**
+	 * Constructs a location from the specified start line, start column, end
+	 * column.
+	 * 
+	 * @param startLine
+	 *            The line where the location starts.
+	 * @param startColumn
+	 *            The column where the location starts.
+	 * @param endColumn
+	 *            The column where the location ends.
+	 */
+	Location createLocation(int startLine, int startColumn, int endColumn);
+
+	/**
 	 * Returns a new object of class '<em>Node Block</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -62,100 +147,6 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Procedure createProcedure();
-
-	/**
-	 * Returns a new object of class '<em>Inst Assign</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Assign</em>'.
-	 * @generated
-	 */
-	InstAssign createInstAssign();
-
-	/**
-	 * Returns a new object of class '<em>Inst Call</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Call</em>'.
-	 * @generated
-	 */
-	InstCall createInstCall();
-
-	/**
-	 * Returns a new object of class '<em>Inst Load</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Load</em>'.
-	 * @generated
-	 */
-	InstLoad createInstLoad();
-
-	/**
-	 * Returns a new object of class '<em>Inst Phi</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Phi</em>'.
-	 * @generated
-	 */
-	InstPhi createInstPhi();
-
-	/**
-	 * Returns a new object of class '<em>Inst Return</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Return</em>'.
-	 * @generated
-	 */
-	InstReturn createInstReturn();
-
-	/**
-	 * Returns a new object of class '<em>Inst Specific</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Specific</em>'.
-	 * @generated
-	 */
-	InstSpecific createInstSpecific();
-
-	/**
-	 * Returns a new object of class '<em>Inst Store</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Store</em>'.
-	 * @generated
-	 */
-	InstStore createInstStore();
-
-	/**
-	 * Returns a new object of class '<em>Location</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Location</em>'.
-	 * @generated
-	 */
-	Location createLocation();
-	
-	/**
-	 * Constructs a location from the specified start line, start column, end
-	 * column.
-	 * 
-	 * @param startLine
-	 *            The line where the location starts.
-	 * @param startColumn
-	 *            The column where the location starts.
-	 * @param endColumn
-	 *            The column where the location ends.
-	 */
-	Location createLocation(int startLine, int startColumn, int endColumn);
-
-	/**
-	 * Returns a new object of class '<em>Var</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Var</em>'.
-	 * @generated
-	 */
-	Var createVar();
 
 	/**
 	 * Creates a new procedure.
@@ -290,6 +281,60 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	TypeVoid createTypeVoid();
+
+	/**
+	 * Returns a new object of class '<em>Use</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Use</em>'.
+	 * @generated
+	 */
+	Use createUse();
+
+	/**
+	 * Returns a new object of class '<em>Var</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Var</em>'.
+	 * @generated
+	 */
+	Var createVar();
+
+	/**
+	 * Creates a new variable with the given location, type, and name. The
+	 * variable may be global or local, and assignable or not.
+	 * 
+	 * @param location
+	 *            the variable location
+	 * @param type
+	 *            the variable type
+	 * @param name
+	 *            the variable name
+	 * @param global
+	 *            whether this variable is global
+	 * @param assignable
+	 *            whether this variable is assignable
+	 */
+	Var createVar(Location location, Type type, String name, boolean global,
+			boolean assignable);
+
+	/**
+	 * Creates a new local variable with the given location, type, name, index.
+	 * The variable may be assignable or not.
+	 * 
+	 * @param location
+	 *            the variable location
+	 * @param type
+	 *            the variable type
+	 * @param name
+	 *            the variable name
+	 * @param assignable
+	 *            whether this variable is assignable
+	 * @param index
+	 *            index of this variable
+	 */
+	Var createVar(Location location, Type type, String name,
+			boolean assignable, int index);
 
 	/**
 	 * Returns the package supported by this factory.

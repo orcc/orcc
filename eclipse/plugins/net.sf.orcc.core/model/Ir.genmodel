@@ -94,7 +94,11 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/value"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/assignable"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/global"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/uses"/>
     </genClasses>
     <genClasses image="false" ecoreClass="Ir.ecore#//String"/>
+    <genClasses ecoreClass="Ir.ecore#//Use">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Use/variable"/>
+    </genClasses>
   </genPackages>
 </genmodel:GenModel>

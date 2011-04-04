@@ -8,9 +8,11 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -27,9 +29,8 @@ import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Inst Store</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Inst Store</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -44,15 +45,38 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class InstStoreImpl extends InstructionImpl implements InstStore {
 	/**
 	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getIndexes()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Expression> indexes;@Override
+	protected EList<Expression> indexes;
+
+	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);
+	}
+
+	@Override
+	public Cast getCast() {
+		Type expr = value.getType();
+		Type val = target.getType();
+
+		if (expr == null) {
+			return null;
+		}
+
+		if (value.isIntExpr() || value.isBooleanExpr()) {
+			return null;
+		}
+
+		Cast cast = new Cast(expr, val);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
 	}
 
 	@Override
@@ -62,8 +86,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * The cached value of the '{@link #getTarget() <em>Target</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTarget()
 	 * @generated
 	 * @ordered
@@ -72,8 +95,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
@@ -81,8 +103,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	protected Expression value;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected InstStoreImpl() {
@@ -90,8 +111,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -100,8 +120,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Expression> getIndexes() {
@@ -112,8 +131,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Var getTarget() {
@@ -129,8 +147,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Var basicGetTarget() {
@@ -138,8 +155,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setTarget(Var newTarget) {
@@ -150,8 +166,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Expression getValue() {
@@ -159,11 +174,11 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetValue(Expression newValue, NotificationChain msgs) {
+	public NotificationChain basicSetValue(Expression newValue,
+			NotificationChain msgs) {
 		Expression oldValue = value;
 		value = newValue;
 		if (eNotificationRequired()) {
@@ -174,8 +189,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setValue(Expression newValue) {
@@ -193,12 +207,12 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case IrPackage.INST_STORE__INDEXES:
 				return ((InternalEList<?>)getIndexes()).basicRemove(otherEnd, msgs);
@@ -209,8 +223,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -228,8 +241,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -251,8 +263,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -272,8 +283,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -289,4 +299,4 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 		return super.eIsSet(featureID);
 	}
 
-} //InstStoreImpl
+} // InstStoreImpl

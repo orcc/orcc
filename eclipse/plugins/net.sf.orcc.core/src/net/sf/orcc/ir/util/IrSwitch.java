@@ -32,6 +32,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.Var;
@@ -291,6 +292,12 @@ public class IrSwitch<T> {
 			case IrPackage.VAR: {
 				Var var = (Var)theEObject;
 				T result = caseVar(var);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.USE: {
+				Use use = (Use)theEObject;
+				T result = caseUse(use);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -700,6 +707,21 @@ public class IrSwitch<T> {
 	 * @generated
 	 */
 	public T caseString(String object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Use</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Use</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseUse(Use object) {
 		return null;
 	}
 

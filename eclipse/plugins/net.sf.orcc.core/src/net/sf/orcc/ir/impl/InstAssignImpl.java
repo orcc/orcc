@@ -6,9 +6,11 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -41,6 +43,28 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 * @ordered
 	 */
 	protected Var target;
+
+	@Override
+	public Cast getCast() {
+		Type expr = value.getType();
+		Type val = target.getType();
+
+		if (expr == null) {
+			return null;
+		}
+
+		if (value.isIntExpr() || value.isBooleanExpr()) {
+			return null;
+		}
+
+		Cast cast = new Cast(expr, val);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
+	}
 
 	@Override
 	public boolean isAssign() {

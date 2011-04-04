@@ -1037,13 +1037,22 @@ public interface IrPackage extends EPackage {
 	int VAR__GLOBAL = 7;
 
 	/**
+	 * The feature id for the '<em><b>Uses</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__USES = 8;
+
+	/**
 	 * The number of structural features of the '<em>Var</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int VAR_FEATURE_COUNT = 8;
+	int VAR_FEATURE_COUNT = 9;
 
 	/**
 	 * The meta object id for the '{@link java.lang.String <em>String</em>}' class.
@@ -1063,6 +1072,35 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int STRING_FEATURE_COUNT = 0;
+
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.UseImpl <em>Use</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.UseImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
+	 * @generated
+	 */
+	int USE = 27;
+
+	/**
+	 * The feature id for the '<em><b>Variable</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int USE__VARIABLE = 0;
+
+	/**
+	 * The number of structural features of the '<em>Use</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int USE_FEATURE_COUNT = 1;
 
 
 	/**
@@ -1811,6 +1849,17 @@ public interface IrPackage extends EPackage {
 	EAttribute getVar_Global();
 
 	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Var#getUses <em>Uses</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Uses</em>'.
+	 * @see net.sf.orcc.ir.Var#getUses()
+	 * @see #getVar()
+	 * @generated
+	 */
+	EReference getVar_Uses();
+
+	/**
 	 * Returns the meta object for class '{@link java.lang.String <em>String</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1820,6 +1869,27 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getString();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Use <em>Use</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Use</em>'.
+	 * @see net.sf.orcc.ir.Use
+	 * @generated
+	 */
+	EClass getUse();
+
+	/**
+	 * Returns the meta object for the container reference '{@link net.sf.orcc.ir.Use#getVariable <em>Variable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the container reference '<em>Variable</em>'.
+	 * @see net.sf.orcc.ir.Use#getVariable()
+	 * @see #getUse()
+	 * @generated
+	 */
+	EReference getUse_Variable();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -2456,6 +2526,14 @@ public interface IrPackage extends EPackage {
 		EAttribute VAR__GLOBAL = eINSTANCE.getVar_Global();
 
 		/**
+		 * The meta object literal for the '<em><b>Uses</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VAR__USES = eINSTANCE.getVar_Uses();
+
+		/**
 		 * The meta object literal for the '{@link java.lang.String <em>String</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2464,6 +2542,24 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass STRING = eINSTANCE.getString();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.UseImpl <em>Use</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.UseImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
+		 * @generated
+		 */
+		EClass USE = eINSTANCE.getUse();
+
+		/**
+		 * The meta object literal for the '<em><b>Variable</b></em>' container reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference USE__VARIABLE = eINSTANCE.getUse_Variable();
 
 
 	}

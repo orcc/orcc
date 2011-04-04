@@ -53,7 +53,7 @@ public interface InstLoad extends Instruction {
 	 * @return the variable loaded by this load instruction
 	 * @model
 	 */
-	Var getSource();
+	Use getSource();
 
 	/**
 	 * Returns the target of this load instruction.
@@ -69,7 +69,7 @@ public interface InstLoad extends Instruction {
 	 * @param source
 	 *            the variable loaded by this load instruction
 	 */
-	void setSource(Var source);
+	void setSource(Use source);
 
 	/**
 	 * Sets the target of this load.

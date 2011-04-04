@@ -32,6 +32,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrderedMap;
 
@@ -114,45 +115,10 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.INST_STORE: return createInstStore();
 			case IrPackage.LOCATION: return createLocation();
 			case IrPackage.VAR: return createVar();
+			case IrPackage.USE: return createUse();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NodeBlock createNodeBlock() {
-		NodeBlockImpl nodeBlock = new NodeBlockImpl();
-		return nodeBlock;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NodeIf createNodeIf() {
-		NodeIfImpl nodeIf = new NodeIfImpl();
-		return nodeIf;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NodeWhile createNodeWhile() {
-		NodeWhileImpl nodeWhile = new NodeWhileImpl();
-		return nodeWhile;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Procedure createProcedure() {
-		ProcedureImpl procedure = new ProcedureImpl();
-		return procedure;
 	}
 
 	/**
@@ -227,13 +193,49 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return location;
 	}
 
+	@Override
+	public Location createLocation(int startLine, int startColumn, int endColumn) {
+		LocationImpl location = new LocationImpl();
+		location.setStartLine(startLine);
+		location.setStartColumn(startColumn);
+		location.setEndColumn(endColumn);
+		return location;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var createVar() {
-		VarImpl var = new VarImpl();
-		return var;
+	public NodeBlock createNodeBlock() {
+		NodeBlockImpl nodeBlock = new NodeBlockImpl();
+		return nodeBlock;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NodeIf createNodeIf() {
+		NodeIfImpl nodeIf = new NodeIfImpl();
+		return nodeIf;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NodeWhile createNodeWhile() {
+		NodeWhileImpl nodeWhile = new NodeWhileImpl();
+		return nodeWhile;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Procedure createProcedure() {
+		ProcedureImpl procedure = new ProcedureImpl();
+		return procedure;
 	}
 
 	@Override
@@ -367,17 +369,51 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public IrPackage getIrPackage() {
-		return (IrPackage)getEPackage();
+	public Use createUse() {
+		UseImpl use = new UseImpl();
+		return use;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Var createVar() {
+		VarImpl var = new VarImpl();
+		return var;
 	}
 
 	@Override
-	public Location createLocation(int startLine, int startColumn, int endColumn) {
-		LocationImpl location = new LocationImpl();
-		location.setStartLine(startLine);
-		location.setStartColumn(startColumn);
-		location.setEndColumn(endColumn);
-		return location;
+	public Var createVar(Location location, Type type, String name,
+			boolean global, boolean assignable) {
+		VarImpl var = new VarImpl();
+		var.setAssignable(assignable);
+		var.setGlobal(global);
+		var.setLocation(location);
+		var.setName(name);
+		var.setType(type);
+		return var;
+	}
+
+	@Override
+	public Var createVar(Location location, Type type, String name,
+			boolean assignable, int index) {
+		VarImpl var = new VarImpl();
+		var.setAssignable(assignable);
+		var.setGlobal(false);
+		var.setIndex(index);
+		var.setLocation(location);
+		var.setName(name);
+		var.setType(type);
+		return var;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public IrPackage getIrPackage() {
+		return (IrPackage)getEPackage();
 	}
 
 } // IrFactoryImpl

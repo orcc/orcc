@@ -29,6 +29,7 @@
 package net.sf.orcc.ir;
 
 import java.lang.String;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import java.util.List;
 
@@ -51,22 +52,6 @@ public interface Var extends EObject {
 	 *            an instruction
 	 */
 	void addInstruction(Instruction instruction);
-
-	/**
-	 * Adds a new use of this variable in the given instruction.
-	 * 
-	 * @param instruction
-	 *            an instruction that uses this variable
-	 */
-	void addUse(Instruction instruction);
-
-	/**
-	 * Adds the given use of this variable to this variable's use list.
-	 * 
-	 * @param use
-	 *            a use of this variable
-	 */
-	void addUse(Use use);
 
 	/**
 	 * Returns the base name of this variable, which is the original name of the
@@ -141,8 +126,9 @@ public interface Var extends EObject {
 	 * Returns the list of uses of this variable. The list is a reference.
 	 * 
 	 * @return the list of uses of this variable.
+	 * @model containment="true"
 	 */
-	List<Use> getUses();
+	EList<Use> getUses();
 
 	/**
 	 * Returns the current value of this variable.
@@ -169,14 +155,12 @@ public interface Var extends EObject {
 	boolean isGlobal();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Var#isGlobal <em>Global</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Global</em>' attribute.
-	 * @see #isGlobal()
-	 * @generated
+	 * Sets this variable as global or not.
+	 * 
+	 * @param global
+	 *            <code>true</code> if this variable should be global
 	 */
-	void setGlobal(boolean value);
+	void setGlobal(boolean global);
 
 	/**
 	 * Returns true if this variable has been assigned to an SSA index of this
@@ -208,22 +192,6 @@ public interface Var extends EObject {
 	 *            an instruction
 	 */
 	void removeInstruction(Instruction instruction);
-
-	/**
-	 * Removes the uses of this variable that reference the given instruction.
-	 * 
-	 * @param instruction
-	 *            an instruction
-	 */
-	void removeUse(Instruction instruction);
-
-	/**
-	 * Removes the given use of this variable from this variable's use list.
-	 * 
-	 * @param use
-	 *            a use of this variable
-	 */
-	void removeUse(Use use);
 
 	/**
 	 * Sets this variable as assignable or not.

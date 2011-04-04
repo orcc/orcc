@@ -8,9 +8,12 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -27,9 +30,8 @@ import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Inst Load</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Inst Load</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -44,13 +46,14 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	/**
 	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getIndexes()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Expression> indexes;@Override
+	protected EList<Expression> indexes;
+
+	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);
 	}
@@ -60,20 +63,36 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 		visitor.visit(this);
 	}
 
+	@Override
+	public Cast getCast() {
+		Type tgt = target.getType();
+		Type src = source.getVariable().getType();
+
+		if (src == null) {
+			return null;
+		}
+
+		Cast cast = new Cast(src, tgt);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
+	}
+
 	/**
 	 * The cached value of the '{@link #getSource() <em>Source</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getSource()
 	 * @generated
 	 * @ordered
 	 */
-	protected Var source;
+	protected Use source;
 
 	/**
 	 * The cached value of the '{@link #getTarget() <em>Target</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTarget()
 	 * @generated
 	 * @ordered
@@ -81,8 +100,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	protected Var target;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected InstLoadImpl() {
@@ -90,8 +108,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -100,8 +117,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Expression> getIndexes() {
@@ -112,14 +128,13 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var getSource() {
+	public Use getSource() {
 		if (source != null && source.eIsProxy()) {
 			InternalEObject oldSource = (InternalEObject)source;
-			source = (Var)eResolveProxy(oldSource);
+			source = (Use)eResolveProxy(oldSource);
 			if (source != oldSource) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_LOAD__SOURCE, oldSource, source));
@@ -129,29 +144,26 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var basicGetSource() {
+	public Use basicGetSource() {
 		return source;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setSource(Var newSource) {
-		Var oldSource = source;
+	public void setSource(Use newSource) {
+		Use oldSource = source;
 		source = newSource;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__SOURCE, oldSource, source));
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Var getTarget() {
@@ -167,8 +179,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Var basicGetTarget() {
@@ -176,8 +187,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setTarget(Var newTarget) {
@@ -188,12 +198,12 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case IrPackage.INST_LOAD__INDEXES:
 				return ((InternalEList<?>)getIndexes()).basicRemove(otherEnd, msgs);
@@ -202,8 +212,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -222,8 +231,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -235,7 +243,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 				getIndexes().addAll((Collection<? extends Expression>)newValue);
 				return;
 			case IrPackage.INST_LOAD__SOURCE:
-				setSource((Var)newValue);
+				setSource((Use)newValue);
 				return;
 			case IrPackage.INST_LOAD__TARGET:
 				setTarget((Var)newValue);
@@ -245,8 +253,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -256,7 +263,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 				getIndexes().clear();
 				return;
 			case IrPackage.INST_LOAD__SOURCE:
-				setSource((Var)null);
+				setSource((Use)null);
 				return;
 			case IrPackage.INST_LOAD__TARGET:
 				setTarget((Var)null);
@@ -266,8 +273,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -283,4 +289,4 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 		return super.eIsSet(featureID);
 	}
 
-} //InstLoadImpl
+} // InstLoadImpl

@@ -6,12 +6,16 @@
  */
 package net.sf.orcc.ir.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -52,10 +56,61 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	protected EList<Expression> parameters;
 
 	@Override
+	public Cast getCast() {
+		Type var = target.getType();
+		Type retProc = procedure.getReturnType();
+
+		Cast cast = new Cast(retProc, var);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns a list of parameter cast when needed.
+	 * 
+	 * @return List of cast for each parameter
+	 */
+	public List<Cast> getParamCast() {
+		List<Cast> casts = new ArrayList<Cast>();
+		List<Var> varParams = this.getProcedure().getParameters().getList();
+
+		for (int i = 0; i < parameters.size(); i++) {
+			Expression parameter = parameters.get(i);
+
+			if (!parameter.isBooleanExpr() && !parameter.isIntExpr()) {
+				Type var = varParams.get(i).getType();
+				Type expr = parameter.getType();
+
+				Cast cast = new Cast(expr, var);
+
+				if (cast.isExtended() || cast.isTrunced()) {
+					casts.add(cast);
+				} else if (var.isList()) {
+					// Test size of the two list
+					if (!var.equals(expr)) {
+						casts.add(cast);
+					} else {
+						casts.add(null);
+					}
+				} else {
+					casts.add(null);
+				}
+			}
+
+		}
+
+		return casts;
+	}
+
+	@Override
 	public boolean hasResult() {
 		return (getTarget() != null);
 	}
-	
+
 	@Override
 	public boolean isPrint() {
 		return "print".equals(procedure.getName());

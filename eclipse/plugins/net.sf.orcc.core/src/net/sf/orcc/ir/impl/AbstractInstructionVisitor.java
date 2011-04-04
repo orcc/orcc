@@ -34,7 +34,6 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
 
 /**
  * This abstract class defines a no-op instruction visitor. It does not

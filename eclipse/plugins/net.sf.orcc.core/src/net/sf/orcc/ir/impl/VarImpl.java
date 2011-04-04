@@ -7,8 +7,8 @@
 package net.sf.orcc.ir.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -20,10 +20,13 @@ import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
+import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
@@ -40,6 +43,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getValue <em>Value</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isAssignable <em>Assignable</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isGlobal <em>Global</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getUses <em>Uses</em>}</li>
  * </ul>
  * </p>
  *
@@ -118,11 +122,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	protected Type type;
 
 	/**
-	 * uses of this variable.
-	 */
-	private List<Use> uses;
-
-	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -172,6 +171,18 @@ public class VarImpl extends EObjectImpl implements Var {
 	 */
 	protected boolean global = GLOBAL_EDEFAULT;
 
+
+	/**
+	 * The cached value of the '{@link #getUses() <em>Uses</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getUses()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Use> uses;
+
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -181,65 +192,12 @@ public class VarImpl extends EObjectImpl implements Var {
 		super();
 	}
 
-	/**
-	 * Creates a new variable with the given location, type, and name. The
-	 * variable may be global or local, and is created as non-assignable.
-	 * 
-	 * @param location
-	 *            the variable location
-	 * @param type
-	 *            the variable type
-	 * @param name
-	 *            the variable name
-	 * @param global
-	 *            whether this variable is global
-	 */
-	public VarImpl(Location location, Type type, String name, boolean global) {
-		this(location, type, name, global, false);
-	}
-
-	/**
-	 * Creates a new variable with the given location, type, and name, and
-	 * whether it is assignable or not.
-	 * 
-	 * @param location
-	 *            the variable location
-	 * @param type
-	 *            the variable type
-	 * @param name
-	 *            the variable name
-	 * @param global
-	 *            whether this variable is global
-	 * @param assignable
-	 *            <code>true</code> if this variable can be assigned
-	 */
-	public VarImpl(Location location, Type type, String name, boolean global,
-			boolean assignable) {
-		this.location = location;
-		this.type = type;
-		this.name = name;
-		this.global = global;
-		this.assignable = assignable;
-
-		this.uses = new ArrayList<Use>();
-	}
-
 	@Override
 	public void addInstruction(Instruction instruction) {
 		if (instructions == null) {
 			instructions = new ArrayList<Instruction>(1);
 		}
 		instructions.add(instruction);
-	}
-
-	@Override
-	public void addUse(Instruction instruction) {
-		new Use(this, instruction);
-	}
-
-	@Override
-	public void addUse(Use use) {
-		uses.add(use);
 	}
 
 	/**
@@ -336,6 +294,8 @@ public class VarImpl extends EObjectImpl implements Var {
 				return isAssignable();
 			case IrPackage.VAR__GLOBAL:
 				return isGlobal();
+			case IrPackage.VAR__USES:
+				return getUses();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -356,6 +316,8 @@ public class VarImpl extends EObjectImpl implements Var {
 				return basicSetType(null, msgs);
 			case IrPackage.VAR__VALUE:
 				return basicSetValue(null, msgs);
+			case IrPackage.VAR__USES:
+				return ((InternalEList<?>)getUses()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -384,6 +346,8 @@ public class VarImpl extends EObjectImpl implements Var {
 				return assignable != ASSIGNABLE_EDEFAULT;
 			case IrPackage.VAR__GLOBAL:
 				return global != GLOBAL_EDEFAULT;
+			case IrPackage.VAR__USES:
+				return uses != null && !uses.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -393,6 +357,7 @@ public class VarImpl extends EObjectImpl implements Var {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
@@ -419,6 +384,10 @@ public class VarImpl extends EObjectImpl implements Var {
 				return;
 			case IrPackage.VAR__GLOBAL:
 				setGlobal((Boolean)newValue);
+				return;
+			case IrPackage.VAR__USES:
+				getUses().clear();
+				getUses().addAll((Collection<? extends Use>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -465,6 +434,9 @@ public class VarImpl extends EObjectImpl implements Var {
 				return;
 			case IrPackage.VAR__GLOBAL:
 				setGlobal(GLOBAL_EDEFAULT);
+				return;
+			case IrPackage.VAR__USES:
+				getUses().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -526,11 +498,6 @@ public class VarImpl extends EObjectImpl implements Var {
 		return type;
 	}
 
-	@Override
-	public List<Use> getUses() {
-		return uses;
-	}
-
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -580,22 +547,6 @@ public class VarImpl extends EObjectImpl implements Var {
 		}
 	}
 
-	@Override
-	public void removeUse(Instruction instruction) {
-		ListIterator<Use> it = uses.listIterator();
-		while (it.hasNext()) {
-			Use use = it.next();
-			if (use.getNode().equals(instruction)) {
-				it.remove();
-			}
-		}
-	}
-
-	@Override
-	public void removeUse(Use use) {
-		uses.remove(use);
-	}
-
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -618,6 +569,33 @@ public class VarImpl extends EObjectImpl implements Var {
 		global = newGlobal;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__GLOBAL, oldGlobal, global));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Use> getUses() {
+		if (uses == null) {
+			uses = new EObjectContainmentWithInverseEList<Use>(Use.class, this, IrPackage.VAR__USES, IrPackage.USE__VARIABLE);
+		}
+		return uses;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.VAR__USES:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getUses()).basicAdd(otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
 
 	/**

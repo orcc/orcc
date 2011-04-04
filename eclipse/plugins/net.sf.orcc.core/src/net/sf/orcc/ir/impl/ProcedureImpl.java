@@ -17,6 +17,7 @@ import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
@@ -399,11 +400,11 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetLocation(Location newLocation, NotificationChain msgs) {
+	public NotificationChain basicSetLocation(Location newLocation,
+			NotificationChain msgs) {
 		Location oldLocation = location;
 		location = newLocation;
 		if (eNotificationRequired()) {
@@ -419,8 +420,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String basicGetName() {
@@ -460,11 +460,11 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetReturnType(Type newReturnType, NotificationChain msgs) {
+	public NotificationChain basicSetReturnType(Type newReturnType,
+			NotificationChain msgs) {
 		Type oldReturnType = returnType;
 		returnType = newReturnType;
 		if (eNotificationRequired()) {
@@ -506,8 +506,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 *            hint for the variable name
 	 * @return a new local variable
 	 */
-	public Var newTempLocalVariable(String file, Type type,
-			String hint) {
+	public Var newTempLocalVariable(String file, Type type, String hint) {
 		String name = hint;
 		Var variable = locals.get(name);
 		int i = 0;
@@ -517,7 +516,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			i++;
 		}
 
-		variable = new Var(true, 0, new Location(), name, type);
+		variable = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), type, name, true, 0);
 		locals.put(file, variable.getLocation(), variable.getName(), variable);
 		return variable;
 	}
@@ -578,12 +578,12 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case IrPackage.PROCEDURE__LOCATION:
 				return basicSetLocation(null, msgs);

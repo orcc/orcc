@@ -30,6 +30,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.Var;
@@ -202,6 +203,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseString(String object) {
 				return createStringAdapter();
+			}
+			@Override
+			public Adapter caseUse(Use object) {
+				return createUseAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -598,6 +603,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createStringAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Use <em>Use</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Use
+	 * @generated
+	 */
+	public Adapter createUseAdapter() {
 		return null;
 	}
 
