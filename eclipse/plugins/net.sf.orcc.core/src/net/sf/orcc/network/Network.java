@@ -40,8 +40,8 @@ import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.transformations.Instantiator;
 import net.sf.orcc.network.transformations.NetworkClassifier;
@@ -123,7 +123,7 @@ public class Network {
 
 	private OrderedMap<String, Port> outputs;
 
-	private Scope<String, VarGlobal> parameters;
+	private Scope<String, Var> parameters;
 
 	private Map<Instance, Map<Port, Instance>> predecessorsMap;
 
@@ -138,7 +138,7 @@ public class Network {
 	 */
 	private Object templateData;
 
-	private OrderedMap<String, VarGlobal> variables;
+	private OrderedMap<String, Var> variables;
 
 	/**
 	 * Creates a new network.
@@ -148,8 +148,8 @@ public class Network {
 		graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
 		inputs = new OrderedMap<String, Port>();
 		outputs = new OrderedMap<String, Port>();
-		parameters = new Scope<String, VarGlobal>();
-		variables = new Scope<String, VarGlobal>(parameters, false);
+		parameters = new Scope<String, Var>();
+		variables = new Scope<String, Var>(parameters, false);
 	}
 
 	/**
@@ -537,7 +537,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's parameters
 	 */
-	public OrderedMap<String, VarGlobal> getParameters() {
+	public OrderedMap<String, Var> getParameters() {
 		return parameters;
 	}
 
@@ -591,7 +591,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's variables
 	 */
-	public OrderedMap<String, VarGlobal> getVariables() {
+	public OrderedMap<String, Var> getVariables() {
 		return variables;
 	}
 

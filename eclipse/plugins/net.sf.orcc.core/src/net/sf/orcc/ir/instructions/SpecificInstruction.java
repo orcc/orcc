@@ -30,6 +30,8 @@ package net.sf.orcc.ir.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.impl.InstructionImpl;
+import net.sf.orcc.ir.impl.InstructionInterpreter;
+import net.sf.orcc.ir.impl.InstructionVisitor;
 
 /**
  * This class defines a back-end specific instruction.

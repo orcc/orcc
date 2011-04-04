@@ -26,70 +26,99 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.instructions;
+package net.sf.orcc.ir.impl;
+
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
 
 /**
- * This interface defines an instruction visitor.
+ * This interface defines an instruction interpreter.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface InstructionVisitor {
+public interface InstructionInterpreter {
 
 	/**
-	 * Visits an assign instruction.
+	 * Interprets an assign instruction.
 	 * 
 	 * @param assign
 	 *            an assign instruction
+	 * @param args
+	 *            arguments
+	 * @return an object
 	 */
-	public void visit(Assign assign);
+	public Object interpret(InstAssign assign, Object... args);
 
 	/**
-	 * Visits a call instruction.
+	 * Interprets a call instruction.
 	 * 
 	 * @param call
 	 *            a call instruction
+	 * @param args
+	 *            arguments
+	 * @return an object
 	 */
-	public void visit(Call call);
+	public Object interpret(InstCall call, Object... args);
 
 	/**
-	 * Visits a load instruction.
+	 * Interprets a load instruction.
 	 * 
 	 * @param load
 	 *            a load instruction
+	 * @param args
+	 *            arguments
+	 * @return an object
 	 */
-	public void visit(Load load);
+	public Object interpret(InstLoad load, Object... args);
 
 	/**
-	 * Visits a phi assignment instruction.
+	 * Interprets a phi assignment instruction.
 	 * 
 	 * @param phi
 	 *            a phi assignment instruction
+	 * @param args
+	 *            arguments
+	 * @return an object
 	 */
-	public void visit(PhiAssignment phi);
+	public Object interpret(InstPhi phi, Object... args);
 
 	/**
-	 * Visits a return instruction.
+	 * Interprets a return instruction.
 	 * 
 	 * @param returnInst
 	 *            a return instruction
+	 * @param args
+	 *            arguments
+	 * @return an object
 	 */
-	public void visit(Return returnInst);
+	public Object interpret(InstReturn returnInst, Object... args);
 
 	/**
-	 * Visits a specific instruction.
+	 * Interprets a specific instruction.
 	 * 
 	 * @param specific
 	 *            a specific instruction
+	 * @param args
+	 *            arguments
+	 * @return an object
 	 */
-	public void visit(SpecificInstruction specific);
+	public Object interpret(InstSpecific specific, Object... args);
 
 	/**
-	 * Visits a store instruction.
+	 * Interprets a store instruction.
 	 * 
 	 * @param store
 	 *            a store instruction
+	 * @param args
+	 *            arguments
+	 * @return an object
 	 */
-	public void visit(Store store);
+	public Object interpret(InstStore store, Object... args);
 
 }

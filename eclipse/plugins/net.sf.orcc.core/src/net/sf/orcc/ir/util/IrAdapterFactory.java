@@ -6,13 +6,37 @@
  */
 package net.sf.orcc.ir.util;
 
-import net.sf.orcc.ir.*;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.User;
+import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
-
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -138,6 +162,46 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseProcedure(Procedure object) {
 				return createProcedureAdapter();
+			}
+			@Override
+			public Adapter caseInstAssign(InstAssign object) {
+				return createInstAssignAdapter();
+			}
+			@Override
+			public Adapter caseInstCall(InstCall object) {
+				return createInstCallAdapter();
+			}
+			@Override
+			public Adapter caseInstLoad(InstLoad object) {
+				return createInstLoadAdapter();
+			}
+			@Override
+			public Adapter caseInstPhi(InstPhi object) {
+				return createInstPhiAdapter();
+			}
+			@Override
+			public Adapter caseInstReturn(InstReturn object) {
+				return createInstReturnAdapter();
+			}
+			@Override
+			public Adapter caseInstSpecific(InstSpecific object) {
+				return createInstSpecificAdapter();
+			}
+			@Override
+			public Adapter caseInstStore(InstStore object) {
+				return createInstStoreAdapter();
+			}
+			@Override
+			public Adapter caseLocation(Location object) {
+				return createLocationAdapter();
+			}
+			@Override
+			public Adapter caseVar(Var object) {
+				return createVarAdapter();
+			}
+			@Override
+			public Adapter caseString(String object) {
+				return createStringAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -394,6 +458,146 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createProcedureAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstAssign <em>Inst Assign</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.InstAssign
+	 * @generated
+	 */
+	public Adapter createInstAssignAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstCall <em>Inst Call</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.InstCall
+	 * @generated
+	 */
+	public Adapter createInstCallAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstLoad <em>Inst Load</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.InstLoad
+	 * @generated
+	 */
+	public Adapter createInstLoadAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstPhi <em>Inst Phi</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.InstPhi
+	 * @generated
+	 */
+	public Adapter createInstPhiAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstReturn <em>Inst Return</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.InstReturn
+	 * @generated
+	 */
+	public Adapter createInstReturnAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstSpecific <em>Inst Specific</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.InstSpecific
+	 * @generated
+	 */
+	public Adapter createInstSpecificAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.InstStore <em>Inst Store</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.InstStore
+	 * @generated
+	 */
+	public Adapter createInstStoreAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Location <em>Location</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Location
+	 * @generated
+	 */
+	public Adapter createLocationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Var <em>Var</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Var
+	 * @generated
+	 */
+	public Adapter createVarAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.lang.String <em>String</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.lang.String
+	 * @generated
+	 */
+	public Adapter createStringAdapter() {
 		return null;
 	}
 

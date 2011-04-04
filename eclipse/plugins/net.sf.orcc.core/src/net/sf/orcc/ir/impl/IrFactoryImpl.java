@@ -8,11 +8,34 @@ package net.sf.orcc.ir.impl;
 
 import java.util.List;
 
-import net.sf.orcc.ir.*;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
@@ -68,29 +91,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String convertLocationToString(EDataType eDataType,
-			Object instanceValue) {
-		return super.convertToString(eDataType, instanceValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String convertToString(EDataType eDataType, Object instanceValue) {
-		switch (eDataType.getClassifierID()) {
-			case IrPackage.LOCATION:
-				return convertLocationToString(eDataType, instanceValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
-		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
@@ -105,32 +105,18 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.NODE_IF: return createNodeIf();
 			case IrPackage.NODE_WHILE: return createNodeWhile();
 			case IrPackage.PROCEDURE: return createProcedure();
+			case IrPackage.INST_ASSIGN: return createInstAssign();
+			case IrPackage.INST_CALL: return createInstCall();
+			case IrPackage.INST_LOAD: return createInstLoad();
+			case IrPackage.INST_PHI: return createInstPhi();
+			case IrPackage.INST_RETURN: return createInstReturn();
+			case IrPackage.INST_SPECIFIC: return createInstSpecific();
+			case IrPackage.INST_STORE: return createInstStore();
+			case IrPackage.LOCATION: return createLocation();
+			case IrPackage.VAR: return createVar();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object createFromString(EDataType eDataType, String initialValue) {
-		switch (eDataType.getClassifierID()) {
-			case IrPackage.LOCATION:
-				return createLocationFromString(eDataType, initialValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
-		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Location createLocationFromString(EDataType eDataType,
-			String initialValue) {
-		return (Location)super.createFromString(eDataType, initialValue);
 	}
 
 	/**
@@ -169,11 +155,92 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return procedure;
 	}
 
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstAssign createInstAssign() {
+		InstAssignImpl instAssign = new InstAssignImpl();
+		return instAssign;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstCall createInstCall() {
+		InstCallImpl instCall = new InstCallImpl();
+		return instCall;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstLoad createInstLoad() {
+		InstLoadImpl instLoad = new InstLoadImpl();
+		return instLoad;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstPhi createInstPhi() {
+		InstPhiImpl instPhi = new InstPhiImpl();
+		return instPhi;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstReturn createInstReturn() {
+		InstReturnImpl instReturn = new InstReturnImpl();
+		return instReturn;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstSpecific createInstSpecific() {
+		InstSpecificImpl instSpecific = new InstSpecificImpl();
+		return instSpecific;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstStore createInstStore() {
+		InstStoreImpl instStore = new InstStoreImpl();
+		return instStore;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Location createLocation() {
+		LocationImpl location = new LocationImpl();
+		return location;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Var createVar() {
+		VarImpl var = new VarImpl();
+		return var;
+	}
+
 	@Override
 	public Procedure createProcedure(String name, boolean nativeFlag,
 			Location location, Type returnType,
-			OrderedMap<String, VarLocal> parameters,
-			OrderedMap<String, VarLocal> locals, List<Node> nodes) {
+			OrderedMap<String, Var> parameters, OrderedMap<String, Var> locals,
+			List<Node> nodes) {
 		ProcedureImpl procedure = new ProcedureImpl();
 
 		procedure.setLocation(location);
@@ -197,8 +264,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		procedure.setName(name);
 		procedure.setReturnType(returnType);
 
-		procedure.setLocals(new OrderedMap<String, VarLocal>());
-		procedure.setParameters(new OrderedMap<String, VarLocal>());
+		procedure.setLocals(new OrderedMap<String, Var>());
+		procedure.setParameters(new OrderedMap<String, Var>());
 
 		return procedure;
 	}
@@ -302,6 +369,15 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public IrPackage getIrPackage() {
 		return (IrPackage)getEPackage();
+	}
+
+	@Override
+	public Location createLocation(int startLine, int startColumn, int endColumn) {
+		LocationImpl location = new LocationImpl();
+		location.setStartLine(startLine);
+		location.setStartColumn(startColumn);
+		location.setEndColumn(endColumn);
+		return location;
 	}
 
 } // IrFactoryImpl

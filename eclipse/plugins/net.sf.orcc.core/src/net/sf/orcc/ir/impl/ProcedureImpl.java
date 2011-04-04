@@ -15,17 +15,15 @@ import java.util.Set;
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -63,83 +61,65 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	private class ProcVisitor extends AbstractActorVisitor {
 
-		private Set<VarGlobal> loadedVariables;
+		private Set<Var> loadedVariables;
 
-		private Set<VarGlobal> storedVariables;
+		private Set<Var> storedVariables;
 
 		public ProcVisitor() {
-			storedVariables = new HashSet<VarGlobal>();
-			loadedVariables = new HashSet<VarGlobal>();
+			storedVariables = new HashSet<Var>();
+			loadedVariables = new HashSet<Var>();
 		}
 
-		public List<VarGlobal> getLoadedVariables() {
-			return new ArrayList<VarGlobal>(loadedVariables);
+		public List<Var> getLoadedVariables() {
+			return new ArrayList<Var>(loadedVariables);
 		}
 
-		public List<VarGlobal> getStoredVariables() {
-			return new ArrayList<VarGlobal>(storedVariables);
+		public List<Var> getStoredVariables() {
+			return new ArrayList<Var>(storedVariables);
 		}
 
 		@Override
-		public void visit(Load node) {
+		public void visit(InstLoad node) {
 			Var var = node.getSource().getVariable();
 			if (!var.getType().isList()) {
-				loadedVariables.add((VarGlobal) var);
+				loadedVariables.add((Var) var);
 			}
 		}
 
 		@Override
-		public void visit(Store store) {
+		public void visit(InstStore store) {
 			Var var = store.getTarget();
 			if (!var.getType().isList()) {
-				storedVariables.add((VarGlobal) var);
+				storedVariables.add((Var) var);
 			}
 		}
 
 	}
-
-	/**
-	 * The default value of the '{@link #getLocation() <em>Location</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLocation()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final Location LOCATION_EDEFAULT = null;
 
 	private CFG graph;
 
 	/**
 	 * ordered map of local variables
 	 */
-	private OrderedMap<String, VarLocal> locals;
+	private OrderedMap<String, Var> locals;
 
 	/**
-	 * The cached value of the '{@link #getLocation() <em>Location</em>}' attribute.
+	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLocation()
 	 * @generated
 	 * @ordered
 	 */
-	protected Location location = LOCATION_EDEFAULT;
+	protected Location location;
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * The cached value of the '{@link #getName() <em>Name</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String name = NAME_EDEFAULT;
+	protected String name;
 
 	/**
 	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment reference list.
@@ -153,7 +133,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	/**
 	 * ordered map of parameters
 	 */
-	private OrderedMap<String, VarLocal> parameters;
+	private OrderedMap<String, Var> parameters;
 
 	private Expression result;
 
@@ -202,7 +182,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			case IrPackage.PROCEDURE__LOCATION:
 				return getLocation();
 			case IrPackage.PROCEDURE__NAME:
-				return getName();
+				if (resolve) return getName();
+				return basicGetName();
 			case IrPackage.PROCEDURE__NODES:
 				return getNodes();
 			case IrPackage.PROCEDURE__RETURN_TYPE:
@@ -221,9 +202,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case IrPackage.PROCEDURE__LOCATION:
-				return LOCATION_EDEFAULT == null ? location != null : !LOCATION_EDEFAULT.equals(location);
+				return location != null;
 			case IrPackage.PROCEDURE__NAME:
-				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+				return name != null;
 			case IrPackage.PROCEDURE__NODES:
 				return nodes != null && !nodes.isEmpty();
 			case IrPackage.PROCEDURE__RETURN_TYPE:
@@ -279,10 +260,10 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case IrPackage.PROCEDURE__LOCATION:
-				setLocation(LOCATION_EDEFAULT);
+				setLocation((Location)null);
 				return;
 			case IrPackage.PROCEDURE__NAME:
-				setName(NAME_EDEFAULT);
+				setName((String)null);
 				return;
 			case IrPackage.PROCEDURE__NODES:
 				getNodes().clear();
@@ -394,7 +375,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * 
 	 * @return the list of scalar variables loaded by this procedure
 	 */
-	public List<VarGlobal> getLoadedVariables() {
+	public List<Var> getLoadedVariables() {
 		ProcVisitor visitor = new ProcVisitor();
 		visitor.visit(nodes);
 		return visitor.getLoadedVariables();
@@ -405,7 +386,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * 
 	 * @return the local variables of this procedure as an ordered map
 	 */
-	public OrderedMap<String, VarLocal> getLocals() {
+	public OrderedMap<String, Var> getLocals() {
 		return locals;
 	}
 
@@ -418,10 +399,31 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public NotificationChain basicSetLocation(Location newLocation, NotificationChain msgs) {
+		Location oldLocation = location;
+		location = newLocation;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__LOCATION, oldLocation, newLocation);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	@Override
 	public String getName() {
+		return name;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String basicGetName() {
 		return name;
 	}
 
@@ -441,7 +443,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * 
 	 * @return the parameters of this procedure as an ordered map
 	 */
-	public OrderedMap<String, VarLocal> getParameters() {
+	public OrderedMap<String, Var> getParameters() {
 		return parameters;
 	}
 
@@ -478,7 +480,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * 
 	 * @return the list of scalar variables stored by this procedure
 	 */
-	public List<VarGlobal> getStoredVariables() {
+	public List<Var> getStoredVariables() {
 		ProcVisitor visitor = new ProcVisitor();
 		visitor.visit(nodes);
 		return visitor.getStoredVariables();
@@ -504,10 +506,10 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 *            hint for the variable name
 	 * @return a new local variable
 	 */
-	public VarLocal newTempLocalVariable(String file, Type type,
+	public Var newTempLocalVariable(String file, Type type,
 			String hint) {
 		String name = hint;
-		VarLocal variable = locals.get(name);
+		Var variable = locals.get(name);
 		int i = 0;
 		while (variable != null) {
 			name = hint + i;
@@ -515,9 +517,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			i++;
 		}
 
-		variable = new VarLocal(true, 0, new Location(), name, type);
+		variable = new Var(true, 0, new Location(), name, type);
 		locals.put(file, variable.getLocation(), variable.getName(), variable);
-		return (VarLocal) variable;
+		return variable;
 	}
 
 	/**
@@ -531,7 +533,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	@Override
-	public void setLocals(OrderedMap<String, VarLocal> locals) {
+	public void setLocals(OrderedMap<String, Var> locals) {
 		this.locals = locals;
 	}
 
@@ -540,10 +542,17 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * @generated
 	 */
 	public void setLocation(Location newLocation) {
-		Location oldLocation = location;
-		location = newLocation;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__LOCATION, oldLocation, location));
+		if (newLocation != location) {
+			NotificationChain msgs = null;
+			if (location != null)
+				msgs = ((InternalEObject)location).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__LOCATION, null, msgs);
+			if (newLocation != null)
+				msgs = ((InternalEObject)newLocation).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.PROCEDURE__LOCATION, null, msgs);
+			msgs = basicSetLocation(newLocation, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PROCEDURE__LOCATION, newLocation, newLocation));
 	}
 
 	/**
@@ -576,6 +585,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
+			case IrPackage.PROCEDURE__LOCATION:
+				return basicSetLocation(null, msgs);
 			case IrPackage.PROCEDURE__NODES:
 				return ((InternalEList<?>)getNodes()).basicRemove(otherEnd, msgs);
 			case IrPackage.PROCEDURE__RETURN_TYPE:
@@ -585,7 +596,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	}
 
 	@Override
-	public void setParameters(OrderedMap<String, VarLocal> parameters) {
+	public void setParameters(OrderedMap<String, Var> parameters) {
 		this.parameters = parameters;
 	}
 
@@ -620,11 +631,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (location: ");
-		result.append(location);
-		result.append(", name: ");
-		result.append(name);
-		result.append(", native: ");
+		result.append(" (native: ");
 		result.append(native_);
 		result.append(')');
 		return result.toString();

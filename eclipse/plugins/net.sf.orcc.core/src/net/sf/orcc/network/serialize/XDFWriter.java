@@ -39,12 +39,12 @@ import java.util.TreeMap;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -404,8 +404,8 @@ public class XDFWriter {
 	 * @throws OrccException
 	 */
 	private void writeDecls(Element parent, String kind,
-			OrderedMap<String, VarGlobal> variables) throws OrccException {
-		for (VarGlobal variable : variables) {
+			OrderedMap<String, Var> variables) throws OrccException {
+		for (Var variable : variables) {
 			Element decl = document.createElement("Decl");
 			parent.appendChild(decl);
 

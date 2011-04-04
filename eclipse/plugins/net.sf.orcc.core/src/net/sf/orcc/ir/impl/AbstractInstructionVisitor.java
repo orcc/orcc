@@ -26,7 +26,15 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.instructions;
+package net.sf.orcc.ir.impl;
+
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 
 /**
  * This abstract class defines a no-op instruction visitor. It does not
@@ -39,27 +47,27 @@ package net.sf.orcc.ir.instructions;
 public abstract class AbstractInstructionVisitor implements InstructionVisitor {
 
 	@Override
-	public void visit(Assign node) {
+	public void visit(InstAssign node) {
 	}
 
 	@Override
-	public void visit(Call node) {
+	public void visit(InstCall node) {
 	}
 
 	@Override
-	public void visit(Load node) {
+	public void visit(InstLoad node) {
 	}
 
 	@Override
-	public void visit(PhiAssignment node) {
+	public void visit(InstPhi node) {
 	}
 
 	@Override
-	public void visit(Return node) {
+	public void visit(InstReturn node) {
 	}
 
 	@Override
-	public void visit(Store node) {
+	public void visit(InstStore node) {
 	}
 
 }

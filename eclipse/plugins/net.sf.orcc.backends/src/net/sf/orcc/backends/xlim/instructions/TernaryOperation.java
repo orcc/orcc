@@ -32,8 +32,8 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.instructions.InstructionInterpreter;
-import net.sf.orcc.ir.instructions.InstructionVisitor;
+import net.sf.orcc.ir.impl.InstructionInterpreter;
+import net.sf.orcc.ir.impl.InstructionVisitor;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 

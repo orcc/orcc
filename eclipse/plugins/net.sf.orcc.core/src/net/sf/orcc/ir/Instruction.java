@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.instructions.InstructionInterpreter;
-import net.sf.orcc.ir.instructions.InstructionVisitor;
+import net.sf.orcc.ir.impl.InstructionInterpreter;
+import net.sf.orcc.ir.impl.InstructionVisitor;
 
 /**
  * This class defines an instruction.
@@ -78,6 +78,7 @@ public interface Instruction extends User {
 	 * Returns the location of this instruction.
 	 * 
 	 * @return the location of this instruction
+	 * @model containment="true"
 	 */
 	public Location getLocation();
 

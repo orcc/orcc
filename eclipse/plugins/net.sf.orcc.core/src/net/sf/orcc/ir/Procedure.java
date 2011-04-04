@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import java.lang.String;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import java.util.List;
@@ -101,20 +102,20 @@ public interface Procedure extends EObject {
 	 * 
 	 * @return the list of scalar variables loaded by this procedure
 	 */
-	List<VarGlobal> getLoadedVariables();
+	List<Var> getLoadedVariables();
 
 	/**
 	 * Returns the local variables of this procedure as an ordered map.
 	 * 
 	 * @return the local variables of this procedure as an ordered map
 	 */
-	OrderedMap<String, VarLocal> getLocals();
+	OrderedMap<String, Var> getLocals();
 
 	/**
 	 * Returns the location of this procedure.
 	 * 
 	 * @return the location of this procedure
-	 * @model
+	 * @model containment="true"
 	 */
 	Location getLocation();
 
@@ -139,7 +140,7 @@ public interface Procedure extends EObject {
 	 * 
 	 * @return the parameters of this procedure as an ordered map
 	 */
-	OrderedMap<String, VarLocal> getParameters();
+	OrderedMap<String, Var> getParameters();
 
 	/**
 	 * Returns the result of this procedure.
@@ -162,7 +163,7 @@ public interface Procedure extends EObject {
 	 * 
 	 * @return the list of scalar variables stored by this procedure
 	 */
-	List<VarGlobal> getStoredVariables();
+	List<Var> getStoredVariables();
 
 	/**
 	 * Returns <code>true</code> if this procedure is native.
@@ -184,7 +185,7 @@ public interface Procedure extends EObject {
 	 *            hint for the variable name
 	 * @return a new local variable
 	 */
-	VarLocal newTempLocalVariable(String file, Type type, String hint);
+	Var newTempLocalVariable(String file, Type type, String hint);
 
 	/**
 	 * Set the CFG of this procedure.
@@ -200,7 +201,7 @@ public interface Procedure extends EObject {
 	 * @param locals
 	 *            the local variables of this procedure as an ordered map
 	 */
-	void setLocals(OrderedMap<String, VarLocal> locals);
+	void setLocals(OrderedMap<String, Var> locals);
 
 	void setLocation(Location location);
 
@@ -226,7 +227,7 @@ public interface Procedure extends EObject {
 	 * @param parameters
 	 *            the parameters of this procedure as an ordered map
 	 */
-	void setParameters(OrderedMap<String, VarLocal> parameters);
+	void setParameters(OrderedMap<String, Var> parameters);
 
 	void setResult(Expression result);
 

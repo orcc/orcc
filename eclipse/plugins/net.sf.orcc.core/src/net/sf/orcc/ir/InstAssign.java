@@ -43,7 +43,7 @@ public interface InstAssign extends Instruction {
 	 * @return the target of this node
 	 * @model
 	 */
-	VarLocal getTarget();
+	Var getTarget();
 
 	/**
 	 * Returns the value of this node.
@@ -59,7 +59,7 @@ public interface InstAssign extends Instruction {
 	 * @param target
 	 *            a local variable
 	 */
-	void setTarget(VarLocal target);
+	void setTarget(Var target);
 
 	/**
 	 * Sets the value of this node. Uses are updated to point to this node.

@@ -31,11 +31,14 @@ package net.sf.orcc.ir.instructions;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.impl.InstructionImpl;
+import net.sf.orcc.ir.impl.InstructionInterpreter;
+import net.sf.orcc.ir.impl.InstructionVisitor;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -48,15 +51,15 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
 public class Assign extends InstructionImpl implements
 		LocalTargetContainer, ValueContainer {
 
-	private VarLocal target;
+	private Var target;
 
 	private Expression value;
 
-	public Assign(VarLocal target, Expression value) {
+	public Assign(Var target, Expression value) {
 		this(new Location(), target, value);
 	}
 
-	public Assign(Location location, VarLocal target, Expression value) {
+	public Assign(Location location, Var target, Expression value) {
 		super(location);
 		setTarget(target);
 		setValue(value);
@@ -95,7 +98,7 @@ public class Assign extends InstructionImpl implements
 	}
 
 	@Override
-	public VarLocal getTarget() {
+	public Var getTarget() {
 		return target;
 	}
 
@@ -105,7 +108,7 @@ public class Assign extends InstructionImpl implements
 	}
 
 	@Override
-	public void internalSetTarget(VarLocal target) {
+	public void internalSetTarget(Var target) {
 		this.target = target;
 	}
 
@@ -120,7 +123,7 @@ public class Assign extends InstructionImpl implements
 	}
 
 	@Override
-	public void setTarget(VarLocal target) {
+	public void setTarget(Var target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 

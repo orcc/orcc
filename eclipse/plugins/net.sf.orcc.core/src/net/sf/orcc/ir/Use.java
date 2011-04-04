@@ -176,7 +176,7 @@ public class Use {
 	 * @param newVar
 	 *            new var
 	 */
-	public static void replaceUses(VarLocal oldVar, VarLocal newVar) {
+	public static void replaceUses(Var oldVar, Var newVar) {
 		// copy uses because #setVariable will change oldVar's uses
 		List<Use> existingUses = new ArrayList<Use>(oldVar.getUses());
 		for (Use use : existingUses) {

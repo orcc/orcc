@@ -40,6 +40,8 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.InstructionImpl;
+import net.sf.orcc.ir.impl.InstructionInterpreter;
+import net.sf.orcc.ir.impl.InstructionVisitor;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**

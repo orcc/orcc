@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.List;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This interface defines a instruction that Stores data to memory from an
@@ -45,7 +45,7 @@ public interface InstStore extends Instruction {
 	 * @return the (possibly empty) list of indexes of this store
 	 * @model containment="true"
 	 */
-	List<Expression> getIndexes();
+	EList<Expression> getIndexes();
 
 	/**
 	 * Returns the target of this store.

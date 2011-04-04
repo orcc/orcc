@@ -40,15 +40,8 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.impl.InstructionVisitor;
 import net.sf.orcc.ir.impl.NodeVisitor;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.InstructionVisitor;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.instructions.Store;
 
 /**
  * This abstract class implements a no-op visitor on an actor. This class should
@@ -110,7 +103,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 * @return <code>true</code> if the variable is not in the locals nor
 	 *         parameters of the current procedure
 	 */
-	final public boolean isPort(VarLocal variable) {
+	final public boolean isPort(Var variable) {
 		if (action != null) {
 			return action.getInputPattern().contains(variable)
 					|| action.getOutputPattern().contains(variable);
@@ -156,7 +149,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(Assign assign) {
+	public void visit(InstAssign assign) {
 		if (visitFull) {
 			assign.getValue().accept(this);
 		}
@@ -183,7 +176,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(Call call) {
+	public void visit(InstCall call) {
 		if (visitFull) {
 			for (Expression expr : call.getParameters()) {
 				expr.accept(this);
@@ -232,7 +225,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(Load load) {
+	public void visit(InstLoad load) {
 		if (visitFull) {
 			for (Expression expr : load.getIndexes()) {
 				expr.accept(this);
@@ -250,7 +243,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(PhiAssignment phi) {
+	public void visit(InstPhi phi) {
 		if (visitFull) {
 			for (Expression expr : phi.getValues()) {
 				expr.accept(this);
@@ -271,7 +264,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(Return returnInstr) {
+	public void visit(InstReturn returnInstr) {
 		if (visitFull) {
 			Expression expr = returnInstr.getValue();
 			if (expr != null) {
@@ -281,12 +274,12 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(SpecificInstruction node) {
+	public void visit(InstSpecific node) {
 		// default implementation does nothing
 	}
 
 	@Override
-	public void visit(Store store) {
+	public void visit(InstStore store) {
 		if (visitFull) {
 			for (Expression expr : store.getIndexes()) {
 				expr.accept(this);

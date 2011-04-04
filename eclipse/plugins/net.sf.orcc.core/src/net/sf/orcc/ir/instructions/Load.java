@@ -40,6 +40,8 @@ import net.sf.orcc.ir.SourceContainer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.impl.InstructionImpl;
+import net.sf.orcc.ir.impl.InstructionInterpreter;
+import net.sf.orcc.ir.impl.InstructionVisitor;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**

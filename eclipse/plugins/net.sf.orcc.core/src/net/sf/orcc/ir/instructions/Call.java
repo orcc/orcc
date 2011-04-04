@@ -34,12 +34,15 @@ import java.util.List;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.impl.InstructionImpl;
+import net.sf.orcc.ir.impl.InstructionInterpreter;
+import net.sf.orcc.ir.impl.InstructionVisitor;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -55,9 +58,9 @@ public class Call extends InstructionImpl implements LocalTargetContainer {
 
 	private Procedure procedure;
 
-	private VarLocal target;
+	private Var target;
 
-	public Call(Location location, VarLocal target, Procedure procedure,
+	public Call(Location location, Var target, Procedure procedure,
 			List<Expression> parameters) {
 		super(location);
 		setParameters(parameters);
@@ -96,7 +99,7 @@ public class Call extends InstructionImpl implements LocalTargetContainer {
 	 */
 	public List<Cast> getParamCast() {
 		List<Cast> casts = new ArrayList<Cast>();
-		List<VarLocal> varParams = this.getProcedure().getParameters()
+		List<Var> varParams = this.getProcedure().getParameters()
 				.getList();
 
 		for (int i = 0; i < parameters.size(); i++) {
@@ -136,7 +139,7 @@ public class Call extends InstructionImpl implements LocalTargetContainer {
 	}
 
 	@Override
-	public VarLocal getTarget() {
+	public Var getTarget() {
 		return target;
 	}
 
@@ -145,7 +148,7 @@ public class Call extends InstructionImpl implements LocalTargetContainer {
 	}
 
 	@Override
-	public void internalSetTarget(VarLocal target) {
+	public void internalSetTarget(Var target) {
 		this.target = target;
 	}
 
@@ -195,7 +198,7 @@ public class Call extends InstructionImpl implements LocalTargetContainer {
 	}
 
 	@Override
-	public void setTarget(VarLocal target) {
+	public void setTarget(Var target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 

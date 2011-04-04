@@ -64,6 +64,100 @@ public interface IrFactory extends EFactory {
 	Procedure createProcedure();
 
 	/**
+	 * Returns a new object of class '<em>Inst Assign</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Assign</em>'.
+	 * @generated
+	 */
+	InstAssign createInstAssign();
+
+	/**
+	 * Returns a new object of class '<em>Inst Call</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Call</em>'.
+	 * @generated
+	 */
+	InstCall createInstCall();
+
+	/**
+	 * Returns a new object of class '<em>Inst Load</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Load</em>'.
+	 * @generated
+	 */
+	InstLoad createInstLoad();
+
+	/**
+	 * Returns a new object of class '<em>Inst Phi</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Phi</em>'.
+	 * @generated
+	 */
+	InstPhi createInstPhi();
+
+	/**
+	 * Returns a new object of class '<em>Inst Return</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Return</em>'.
+	 * @generated
+	 */
+	InstReturn createInstReturn();
+
+	/**
+	 * Returns a new object of class '<em>Inst Specific</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Specific</em>'.
+	 * @generated
+	 */
+	InstSpecific createInstSpecific();
+
+	/**
+	 * Returns a new object of class '<em>Inst Store</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Store</em>'.
+	 * @generated
+	 */
+	InstStore createInstStore();
+
+	/**
+	 * Returns a new object of class '<em>Location</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Location</em>'.
+	 * @generated
+	 */
+	Location createLocation();
+	
+	/**
+	 * Constructs a location from the specified start line, start column, end
+	 * column.
+	 * 
+	 * @param startLine
+	 *            The line where the location starts.
+	 * @param startColumn
+	 *            The column where the location starts.
+	 * @param endColumn
+	 *            The column where the location ends.
+	 */
+	Location createLocation(int startLine, int startColumn, int endColumn);
+
+	/**
+	 * Returns a new object of class '<em>Var</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Var</em>'.
+	 * @generated
+	 */
+	Var createVar();
+
+	/**
 	 * Creates a new procedure.
 	 * 
 	 * @param name
@@ -80,8 +174,8 @@ public interface IrFactory extends EFactory {
 	 */
 	Procedure createProcedure(String name, boolean nativeFlag,
 			Location location, Type returnType,
-			OrderedMap<String, VarLocal> parameters,
-			OrderedMap<String, VarLocal> locals, List<Node> nodes);
+			OrderedMap<String, Var> parameters, OrderedMap<String, Var> locals,
+			List<Node> nodes);
 
 	/**
 	 * Creates a new procedure, not external, with empty parameters, locals, and

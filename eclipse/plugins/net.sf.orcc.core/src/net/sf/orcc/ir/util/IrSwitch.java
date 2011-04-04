@@ -8,7 +8,33 @@ package net.sf.orcc.ir.util;
 
 import java.util.List;
 
-import net.sf.orcc.ir.*;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.User;
+import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -197,6 +223,74 @@ public class IrSwitch<T> {
 			case IrPackage.PROCEDURE: {
 				Procedure procedure = (Procedure)theEObject;
 				T result = caseProcedure(procedure);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.INST_ASSIGN: {
+				InstAssign instAssign = (InstAssign)theEObject;
+				T result = caseInstAssign(instAssign);
+				if (result == null) result = caseInstruction(instAssign);
+				if (result == null) result = caseUser(instAssign);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.INST_CALL: {
+				InstCall instCall = (InstCall)theEObject;
+				T result = caseInstCall(instCall);
+				if (result == null) result = caseInstruction(instCall);
+				if (result == null) result = caseUser(instCall);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.INST_LOAD: {
+				InstLoad instLoad = (InstLoad)theEObject;
+				T result = caseInstLoad(instLoad);
+				if (result == null) result = caseInstruction(instLoad);
+				if (result == null) result = caseUser(instLoad);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.INST_PHI: {
+				InstPhi instPhi = (InstPhi)theEObject;
+				T result = caseInstPhi(instPhi);
+				if (result == null) result = caseInstruction(instPhi);
+				if (result == null) result = caseUser(instPhi);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.INST_RETURN: {
+				InstReturn instReturn = (InstReturn)theEObject;
+				T result = caseInstReturn(instReturn);
+				if (result == null) result = caseInstruction(instReturn);
+				if (result == null) result = caseUser(instReturn);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.INST_SPECIFIC: {
+				InstSpecific instSpecific = (InstSpecific)theEObject;
+				T result = caseInstSpecific(instSpecific);
+				if (result == null) result = caseInstruction(instSpecific);
+				if (result == null) result = caseUser(instSpecific);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.INST_STORE: {
+				InstStore instStore = (InstStore)theEObject;
+				T result = caseInstStore(instStore);
+				if (result == null) result = caseInstruction(instStore);
+				if (result == null) result = caseUser(instStore);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.LOCATION: {
+				Location location = (Location)theEObject;
+				T result = caseLocation(location);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.VAR: {
+				Var var = (Var)theEObject;
+				T result = caseVar(var);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -456,6 +550,156 @@ public class IrSwitch<T> {
 	 * @generated
 	 */
 	public T caseProcedure(Procedure object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Inst Assign</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Inst Assign</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseInstAssign(InstAssign object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Inst Call</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Inst Call</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseInstCall(InstCall object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Inst Load</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Inst Load</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseInstLoad(InstLoad object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Inst Phi</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Inst Phi</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseInstPhi(InstPhi object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Inst Return</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Inst Return</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseInstReturn(InstReturn object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Inst Specific</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Inst Specific</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseInstSpecific(InstSpecific object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Inst Store</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Inst Store</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseInstStore(InstStore object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Location</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Location</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseLocation(Location object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Var</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Var</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseVar(Var object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>String</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>String</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseString(String object) {
 		return null;
 	}
 

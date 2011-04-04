@@ -28,109 +28,20 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.ArrayList;
+import java.lang.String;
+import org.eclipse.emf.ecore.EObject;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
- * This class represents a variable. A variable has a location, a type, a name
- * and a list of uses. It may be global or not, assignable or not. It has a list
- * of instructions where it is assigned (for local variables this list has one
- * entry). Finally, it has a value that is only used by the interpreter.
+ * This interface represents a variable. A variable has a location, a type, a
+ * name and a list of uses. It may be global or not, assignable or not. It has a
+ * list of instructions where it is assigned (for local variables this list has
+ * one entry). Finally, it has a value that is only used by the interpreter.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class Var {
-
-	/**
-	 * whether the variable is assignable.
-	 */
-	private boolean assignable;
-
-	/**
-	 * true if this variable is global
-	 */
-	private boolean global;
-
-	/**
-	 * the instruction where the variable is assigned.
-	 */
-	private Instruction instruction;
-
-	/**
-	 * Contains a list of instructions that have this variable on their
-	 * left-hand side. Only valid for non-local variables.
-	 */
-	private List<Instruction> instructions;
-
-	/**
-	 * variable location
-	 */
-	private Location location;
-
-	/**
-	 * variable name
-	 */
-	private String name;
-
-	/**
-	 * variable type
-	 */
-	private Type type;
-
-	/**
-	 * uses of this variable.
-	 */
-	private List<Use> uses;
-
-	/**
-	 * variable value
-	 */
-	private Expression value;
-
-	/**
-	 * Creates a new variable with the given location, type, and name. The
-	 * variable may be global or local, and is created as non-assignable.
-	 * 
-	 * @param location
-	 *            the variable location
-	 * @param type
-	 *            the variable type
-	 * @param name
-	 *            the variable name
-	 * @param global
-	 *            whether this variable is global
-	 */
-	public Var(Location location, Type type, String name, boolean global) {
-		this(location, type, name, global, false);
-	}
-
-	/**
-	 * Creates a new variable with the given location, type, and name, and
-	 * whether it is assignable or not.
-	 * 
-	 * @param location
-	 *            the variable location
-	 * @param type
-	 *            the variable type
-	 * @param name
-	 *            the variable name
-	 * @param global
-	 *            whether this variable is global
-	 * @param assignable
-	 *            <code>true</code> if this variable can be assigned
-	 */
-	public Var(Location location, Type type, String name, boolean global,
-			boolean assignable) {
-		this.location = location;
-		this.type = type;
-		this.name = name;
-		this.global = global;
-		this.assignable = assignable;
-
-		this.uses = new ArrayList<Use>();
-	}
+public interface Var extends EObject {
 
 	/**
 	 * Adds the given instruction from the list of instructions that have this
@@ -139,12 +50,7 @@ public class Var {
 	 * @param instruction
 	 *            an instruction
 	 */
-	public void addInstruction(Instruction instruction) {
-		if (instructions == null) {
-			instructions = new ArrayList<Instruction>(1);
-		}
-		instructions.add(instruction);
-	}
+	void addInstruction(Instruction instruction);
 
 	/**
 	 * Adds a new use of this variable in the given instruction.
@@ -152,9 +58,7 @@ public class Var {
 	 * @param instruction
 	 *            an instruction that uses this variable
 	 */
-	public void addUse(Instruction instruction) {
-		new Use(this, instruction);
-	}
+	void addUse(Instruction instruction);
 
 	/**
 	 * Adds the given use of this variable to this variable's use list.
@@ -162,9 +66,32 @@ public class Var {
 	 * @param use
 	 *            a use of this variable
 	 */
-	public void addUse(Use use) {
-		uses.add(use);
-	}
+	void addUse(Use use);
+
+	/**
+	 * Returns the base name of this variable, which is the original name of the
+	 * variable, without index.
+	 * 
+	 * @return the base name of this variable
+	 */
+	String getBaseName();
+
+	/**
+	 * Returns the SSA index of this variable. Valid only for local scalar
+	 * variables.
+	 * 
+	 * @return the SSA index of this variable
+	 * @model
+	 */
+	int getIndex();
+
+	/**
+	 * Returns the initial expression of this variable.
+	 * 
+	 * @return the initial expression of this variable
+	 * @model containment="true"
+	 */
+	Expression getInitialValue();
 
 	/**
 	 * Returns the instruction where this variable is defined, or
@@ -174,9 +101,7 @@ public class Var {
 	 * @return the instruction where this variable is defined, or
 	 *         <code>null</code>
 	 */
-	public Instruction getInstruction() {
-		return instruction;
-	}
+	Instruction getInstruction();
 
 	/**
 	 * Returns the instructions where this variable appears on the left-hand
@@ -186,81 +111,94 @@ public class Var {
 	 * @return the list of instructions that have this variable on their
 	 *         left-hand side, or <code>null</code>
 	 */
-	public List<Instruction> getInstructions() {
-		return instructions;
-	}
+	List<Instruction> getInstructions();
 
 	/**
 	 * Returns the location of this variable.
 	 * 
 	 * @return the location of this variable
+	 * @model containment="true"
 	 */
-	public Location getLocation() {
-		return location;
-	}
+	Location getLocation();
 
 	/**
 	 * Returns the name of this variable.
 	 * 
 	 * @return the name of this variable
+	 * @model
 	 */
-	public String getName() {
-		return name;
-	}
+	String getName();
 
 	/**
 	 * Returns the type of this variable.
 	 * 
 	 * @return the type of this variable
+	 * @model containment="true"
 	 */
-	public Type getType() {
-		return type;
-	}
+	Type getType();
 
 	/**
 	 * Returns the list of uses of this variable. The list is a reference.
 	 * 
 	 * @return the list of uses of this variable.
 	 */
-	public List<Use> getUses() {
-		return uses;
-	}
+	List<Use> getUses();
 
 	/**
 	 * Returns the current value of this variable.
 	 * 
 	 * @return the current value of this variable
+	 * @model containment="true"
 	 */
-	public Expression getValue() {
-		return value;
-	}
+	Expression getValue();
 
 	/**
 	 * Returns <code>true</code> if this variable can be assigned to.
 	 * 
 	 * @return <code>true</code> if this variable can be assigned to
+	 * @model
 	 */
-	public boolean isAssignable() {
-		return assignable;
-	}
+	boolean isAssignable();
 
 	/**
 	 * Returns <code>true</code> if this variable is global.
 	 * 
 	 * @return <code>true</code> if this variable is global
+	 * @model
 	 */
-	public boolean isGlobal() {
-		return global;
-	}
+	boolean isGlobal();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Var#isGlobal <em>Global</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Global</em>' attribute.
+	 * @see #isGlobal()
+	 * @generated
+	 */
+	void setGlobal(boolean value);
+
+	/**
+	 * Returns true if this variable has been assigned to an SSA index of this
+	 * variable.
+	 * 
+	 * @return true if the variable has an index otherwise false.
+	 */
+	boolean isIndexed();
+
+	/**
+	 * Returns <code>true</code> if this state variable has an initial value.
+	 * 
+	 * @return <code>true</code> if this state variable has an initial value
+	 */
+	boolean isInitialized();
 
 	/**
 	 * Returns true if this variable is used at least once.
 	 * 
 	 * @return true if this variable is used at least once.
 	 */
-	public boolean isUsed() {
-		return !uses.isEmpty();
-	}
+	boolean isUsed();
 
 	/**
 	 * Removes the given instruction from the list of instructions that have
@@ -269,11 +207,7 @@ public class Var {
 	 * @param instruction
 	 *            an instruction
 	 */
-	public void removeInstruction(Instruction instruction) {
-		if (instructions != null) {
-			instructions.remove(instruction);
-		}
-	}
+	void removeInstruction(Instruction instruction);
 
 	/**
 	 * Removes the uses of this variable that reference the given instruction.
@@ -281,15 +215,7 @@ public class Var {
 	 * @param instruction
 	 *            an instruction
 	 */
-	public void removeUse(Instruction instruction) {
-		ListIterator<Use> it = uses.listIterator();
-		while (it.hasNext()) {
-			Use use = it.next();
-			if (use.getNode().equals(instruction)) {
-				it.remove();
-			}
-		}
-	}
+	void removeUse(Instruction instruction);
 
 	/**
 	 * Removes the given use of this variable from this variable's use list.
@@ -297,9 +223,7 @@ public class Var {
 	 * @param use
 	 *            a use of this variable
 	 */
-	public void removeUse(Use use) {
-		uses.remove(use);
-	}
+	void removeUse(Use use);
 
 	/**
 	 * Sets this variable as assignable or not.
@@ -307,9 +231,24 @@ public class Var {
 	 * @param assignable
 	 *            <code>true</code> if the variable is assignable
 	 */
-	public void setAssignable(boolean assignable) {
-		this.assignable = assignable;
-	}
+	void setAssignable(boolean assignable);
+
+	/**
+	 * Sets the SSA index of this variable. Valid only for local scalar
+	 * variables.
+	 * 
+	 * @param index
+	 *            the SSA index of this variable
+	 */
+	void setIndex(int index);
+
+	/**
+	 * Sets the initial expression of this variable.
+	 * 
+	 * @param expression
+	 *            the initial expression of this variable
+	 */
+	void setInitialValue(Expression expression);
 
 	/**
 	 * Sets the instruction where this variable is defined. This is valid if and
@@ -318,9 +257,7 @@ public class Var {
 	 * @param instruction
 	 *            the instruction where this local variable is defined
 	 */
-	public void setInstruction(Instruction instruction) {
-		this.instruction = instruction;
-	}
+	void setInstruction(Instruction instruction);
 
 	/**
 	 * Sets the location of this variable.
@@ -328,9 +265,7 @@ public class Var {
 	 * @param location
 	 *            the new location of this variable
 	 */
-	public void setLocation(Location location) {
-		this.location = location;
-	}
+	void setLocation(Location location);
 
 	/**
 	 * Sets the name of this variable.
@@ -338,9 +273,7 @@ public class Var {
 	 * @param name
 	 *            the new name of this variable
 	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+	void setName(String name);
 
 	/**
 	 * Sets the type of this variable.
@@ -348,9 +281,7 @@ public class Var {
 	 * @param type
 	 *            the new type of this variable
 	 */
-	public void setType(Type type) {
-		this.type = type;
-	}
+	void setType(Type type);
 
 	/**
 	 * Sets the value of this variable.
@@ -358,13 +289,6 @@ public class Var {
 	 * @param value
 	 *            the typed value of this variable
 	 */
-	public void setValue(Expression value) {
-		this.value = value;
-	}
-
-	@Override
-	public String toString() {
-		return getName();
-	}
+	void setValue(Expression value);
 
 }

@@ -73,6 +73,7 @@ public interface Node extends User {
 	 * Returns the location of this node.
 	 * 
 	 * @return the location of this node
+	 * @model containment="true"
 	 */
 	public Location getLocation();
 

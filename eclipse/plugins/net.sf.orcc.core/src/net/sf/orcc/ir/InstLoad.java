@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.List;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This interface defines an instruction that Loads data from memory to a local
@@ -45,7 +45,7 @@ public interface InstLoad extends Instruction {
 	 * @return the (possibly empty) list of indexes of this load
 	 * @model containment="true"
 	 */
-	List<Expression> getIndexes();
+	EList<Expression> getIndexes();
 
 	/**
 	 * Returns the variable loaded by this load instruction.
@@ -61,7 +61,7 @@ public interface InstLoad extends Instruction {
 	 * @return the target of this load instruction
 	 * @model
 	 */
-	VarLocal getTarget();
+	Var getTarget();
 
 	/**
 	 * Sets the variable loaded by this load instruction.
@@ -77,6 +77,6 @@ public interface InstLoad extends Instruction {
 	 * @param target
 	 *            a local variable
 	 */
-	void setTarget(VarLocal target);
+	void setTarget(Var target);
 
 }

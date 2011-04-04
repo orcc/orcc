@@ -80,7 +80,7 @@ public class Instantiator implements INetworkTransformation {
 	 */
 	private void checkParameters(Network network) {
 		for (Instance instance : network.getInstances()) {
-			OrderedMap<String, ? extends Var> parameters;
+			OrderedMap<String, Var> parameters;
 			if (instance.isActor()) {
 				parameters = instance.getActor().getParameters();
 			} else {

@@ -26,73 +26,78 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.ir.impl;
+
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
 
 /**
- * This class represents a local variable. A local variable is a variable that
- * may have a suffix and an SSA index.
+ * This interface defines an instruction visitor.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class VarLocal extends Var {
+public interface InstructionVisitor {
 
 	/**
-	 * SSA index.
-	 */
-	private int index;
-
-	public VarLocal(boolean assignable, int index, Location loc,
-			String name, Type type) {
-		super(loc, type, name, false, assignable);
-		this.index = index;
-	}
-
-	/**
-	 * Returns the base name of this variable, which is the original name of the
-	 * variable, without suffix nor index.
+	 * Visits an assign instruction.
 	 * 
-	 * @return the base name of this variable
+	 * @param assign
+	 *            an assign instruction
 	 */
-	public String getBaseName() {
-		return super.getName();
-	}
+	public void visit(InstAssign assign);
 
 	/**
-	 * Returns the SSA index of this variable. This information is added when
-	 * translating CAL to SSA form.
+	 * Visits a call instruction.
 	 * 
-	 * @return the SSA index of this variable
+	 * @param call
+	 *            a call instruction
 	 */
-	public int getIndex() {
-		return index;
-	}
+	public void visit(InstCall call);
 
 	/**
-	 * Returns true if this variable has been assigned to an SSA index of this
-	 * variable.
+	 * Visits a load instruction.
 	 * 
-	 * @return true if the variable has an index otherwise false.
+	 * @param load
+	 *            a load instruction
 	 */
-	public boolean isIndexed() {
-		return index != 0;
-	}
-
-	@Override
-	public String getName() {
-		String indexStr = (index == 0) ? "" : "_" + index;
-		return getBaseName() + indexStr;
-	}
+	public void visit(InstLoad load);
 
 	/**
-	 * Sets the SSA index of this variable. This information is added when
-	 * translating CAL to SSA form.
+	 * Visits a phi assignment instruction.
 	 * 
-	 * @param index
-	 *            the SSA index of this variable
+	 * @param phi
+	 *            a phi assignment instruction
 	 */
-	public void setIndex(int index) {
-		this.index = index;
-	}
+	public void visit(InstPhi phi);
+
+	/**
+	 * Visits a return instruction.
+	 * 
+	 * @param returnInst
+	 *            a return instruction
+	 */
+	public void visit(InstReturn returnInst);
+
+	/**
+	 * Visits a specific instruction.
+	 * 
+	 * @param specific
+	 *            a specific instruction
+	 */
+	public void visit(InstSpecific specific);
+
+	/**
+	 * Visits a store instruction.
+	 * 
+	 * @param store
+	 *            a store instruction
+	 */
+	public void visit(InstStore store);
 
 }

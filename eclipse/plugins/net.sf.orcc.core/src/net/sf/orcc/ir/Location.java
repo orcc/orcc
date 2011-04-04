@@ -28,89 +28,70 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * This class represents a location. A location keeps track of where a
  * particular element was in the original file. It contains the line, and
  * starting and ending columns.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class Location {
-
-	private int endColumn;
-
-	private int startColumn;
-
-	private int startLine;
-
-	/**
-	 * Constructs a dummy location.
-	 */
-	public Location() {
-	}
-
-	/**
-	 * Constructs a location from the specified start line, start column, end
-	 * column.
-	 * 
-	 * @param startLine
-	 *            The line where the location starts.
-	 * @param startColumn
-	 *            The column where the location starts.
-	 * @param endColumn
-	 *            The column where the location ends.
-	 */
-	public Location(int startLine, int startColumn, int endColumn) {
-		this.startLine = startLine;
-		this.startColumn = startColumn;
-		this.endColumn = endColumn;
-	}
-
-	/**
-	 * Constructs a location from two given locations.
-	 * 
-	 * @param start
-	 *            starting location
-	 * @param end
-	 *            ending location
-	 */
-	public Location(Location start, Location end) {
-		this.startLine = start.startLine;
-	}
+public interface Location extends EObject {
 
 	/**
 	 * Returns the ending column of this location.
 	 * 
 	 * @return the ending column of this location
+	 * @model
 	 */
-	public int getEndColumn() {
-		return endColumn;
-	}
+	int getEndColumn();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Location#getEndColumn <em>End Column</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>End Column</em>' attribute.
+	 * @see #getEndColumn()
+	 * @generated
+	 */
+	void setEndColumn(int value);
 
 	/**
 	 * Returns the starting column of this location.
 	 * 
 	 * @return the starting column of this location
+	 * @model
 	 */
-	public int getStartColumn() {
-		return startColumn;
-	}
+	int getStartColumn();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Location#getStartColumn <em>Start Column</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Start Column</em>' attribute.
+	 * @see #getStartColumn()
+	 * @generated
+	 */
+	void setStartColumn(int value);
 
 	/**
 	 * Returns the starting line of this location.
 	 * 
 	 * @return the starting line of this location
+	 * @model
 	 */
-	public int getStartLine() {
-		return startLine;
-	}
+	int getStartLine();
 
-	@Override
-	public String toString() {
-		String res = "line " + startLine + ", characters " + startColumn + "-"
-				+ endColumn;
-		return res;
-	}
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Location#getStartLine <em>Start Line</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Start Line</em>' attribute.
+	 * @see #getStartLine()
+	 * @generated
+	 */
+	void setStartLine(int value);
 
 }

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.List;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This interface defines an assignment of the result of a <code>phi</code>
@@ -46,7 +46,7 @@ public interface InstPhi extends Instruction {
 	 * @return the "old" variable of this phi
 	 * @model
 	 */
-	VarLocal getOldVariable();
+	Var getOldVariable();
 
 	/**
 	 * Returns the target of this call (may be <code>null</code>).
@@ -54,7 +54,7 @@ public interface InstPhi extends Instruction {
 	 * @return the target of this node (may be <code>null</code>)
 	 * @model
 	 */
-	VarLocal getTarget();
+	Var getTarget();
 
 	/**
 	 * Returns the values of this phi instruction.
@@ -62,7 +62,7 @@ public interface InstPhi extends Instruction {
 	 * @return the values of this phi instruction
 	 * @model containment="true"
 	 */
-	List<Expression> getValues();
+	EList<Expression> getValues();
 
 	/**
 	 * Sets the "old" variable to be remembered when examining the "else" branch
@@ -71,7 +71,7 @@ public interface InstPhi extends Instruction {
 	 * @param old
 	 *            an "old" variable
 	 */
-	void setOldVariable(VarLocal old);
+	void setOldVariable(Var old);
 
 	/**
 	 * Sets the target of this node.
@@ -79,6 +79,6 @@ public interface InstPhi extends Instruction {
 	 * @param target
 	 *            a local variable
 	 */
-	void setTarget(VarLocal target);
+	void setTarget(Var target);
 
 }

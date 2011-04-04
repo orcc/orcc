@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.List;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This interface defines a Call instruction, which possibly stores the result
@@ -45,7 +45,7 @@ public interface InstCall extends Instruction {
 	 * @return the parameters of this call instruction
 	 * @model containment="true"
 	 */
-	List<Expression> getParameters();
+	EList<Expression> getParameters();
 
 	/**
 	 * Returns the procedure referenced by this call instruction.
@@ -61,7 +61,7 @@ public interface InstCall extends Instruction {
 	 * @return the target of this node (may be <code>null</code>)
 	 * @model
 	 */
-	VarLocal getTarget();
+	Var getTarget();
 
 	/**
 	 * Returns <code>true</code> if this call has a result.
@@ -93,6 +93,6 @@ public interface InstCall extends Instruction {
 	 * @param target
 	 *            a local variable (may be <code>null</code>)
 	 */
-	void setTarget(VarLocal target);
+	void setTarget(Var target);
 
 }
