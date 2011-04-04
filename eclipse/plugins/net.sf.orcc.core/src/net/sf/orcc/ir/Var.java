@@ -126,7 +126,7 @@ public interface Var extends EObject {
 	 * Returns the list of uses of this variable. The list is a reference.
 	 * 
 	 * @return the list of uses of this variable.
-	 * @model containment="true"
+	 * @model
 	 */
 	EList<Use> getUses();
 

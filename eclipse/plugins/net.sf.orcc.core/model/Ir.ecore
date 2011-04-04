@@ -120,13 +120,13 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="assignable" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="global" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="uses" upperBound="-1" eType="#//Use"
-        containment="true" resolveProxies="false" eOpposite="#//Use/variable"/>
+        eOpposite="#//Use/variable"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="String" instanceClassName="java.lang.String"
       abstract="true" interface="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="Use">
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"
-        transient="true" eOpposite="#//Var/uses"/>
+        eOpposite="#//Var/uses"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ExprBinary" eSuperTypes="#//Expression">
     <eStructuralFeatures xsi:type="ecore:EReference" name="e1" eType="#//Expression"

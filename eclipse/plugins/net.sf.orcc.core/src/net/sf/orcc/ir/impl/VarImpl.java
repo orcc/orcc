@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
+import org.eclipse.emf.ecore.util.EObjectWithInverseResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -173,7 +173,7 @@ public class VarImpl extends EObjectImpl implements Var {
 
 
 	/**
-	 * The cached value of the '{@link #getUses() <em>Uses</em>}' containment reference list.
+	 * The cached value of the '{@link #getUses() <em>Uses</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getUses()
@@ -578,7 +578,7 @@ public class VarImpl extends EObjectImpl implements Var {
 	 */
 	public EList<Use> getUses() {
 		if (uses == null) {
-			uses = new EObjectContainmentWithInverseEList<Use>(Use.class, this, IrPackage.VAR__USES, IrPackage.USE__VARIABLE);
+			uses = new EObjectWithInverseResolvingEList<Use>(Use.class, this, IrPackage.VAR__USES, IrPackage.USE__VARIABLE);
 		}
 		return uses;
 	}

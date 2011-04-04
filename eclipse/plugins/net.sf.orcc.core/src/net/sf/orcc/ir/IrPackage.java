@@ -979,7 +979,7 @@ public interface IrPackage extends EPackage {
 	int VAR__GLOBAL = 7;
 
 	/**
-	 * The feature id for the '<em><b>Uses</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Uses</b></em>' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -1023,7 +1023,7 @@ public interface IrPackage extends EPackage {
 	int USE = 26;
 
 	/**
-	 * The feature id for the '<em><b>Variable</b></em>' container reference.
+	 * The feature id for the '<em><b>Variable</b></em>' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -2098,10 +2098,10 @@ public interface IrPackage extends EPackage {
 	EAttribute getVar_Global();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Var#getUses <em>Uses</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Var#getUses <em>Uses</em>}'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Uses</em>'.
+	 * @return the meta object for the reference list '<em>Uses</em>'.
 	 * @see net.sf.orcc.ir.Var#getUses()
 	 * @see #getVar()
 	 * @generated
@@ -2955,7 +2955,7 @@ public interface IrPackage extends EPackage {
 		EAttribute VAR__GLOBAL = eINSTANCE.getVar_Global();
 
 		/**
-		 * The meta object literal for the '<em><b>Uses</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Uses</b></em>' reference list feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
@@ -2982,7 +2982,7 @@ public interface IrPackage extends EPackage {
 		EClass USE = eINSTANCE.getUse();
 
 		/**
-		 * The meta object literal for the '<em><b>Variable</b></em>' container reference feature.
+		 * The meta object literal for the '<em><b>Variable</b></em>' reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
