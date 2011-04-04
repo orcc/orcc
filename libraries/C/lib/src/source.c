@@ -94,6 +94,15 @@ void source_active_genetic() {
 void source_rewind() {
 	if(file != NULL) {
 		rewind(file);
+		if (genetic){
+			if(nb < LOOP_NUMBER) {
+				nb++;
+			}
+			else{
+				int n = fclose(file);
+				stop = 1;
+			}
+		}
 	}
 }
 
