@@ -45,6 +45,7 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a List type.
@@ -182,14 +183,14 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	@Override
 	public List<Integer> getDimensions() {
 		List<Integer> dimensions = new ArrayList<Integer>();
-		dimensions.add(this.getSize());
+		dimensions.add(getSize());
 		dimensions.addAll(getType().getDimensions());
 		return dimensions;
 	}
 
 	public List<Expression> getDimensionsExpr() {
 		List<Expression> dimensions = new ArrayList<Expression>();
-		dimensions.add(this.getSizeExpr());
+		dimensions.add(EcoreUtil.copy(getSizeExpr()));
 		dimensions.addAll(getType().getDimensionsExpr());
 		return dimensions;
 	}

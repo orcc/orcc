@@ -54,8 +54,9 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class converts the given actor to SSA form.
@@ -235,7 +236,8 @@ public class SSATransformation extends AbstractActorVisitor {
 
 		// create new variable
 		Var newVar = IrFactory.eINSTANCE.createVar(oldVar.getLocation(),
-				oldVar.getType(), name, oldVar.isAssignable(), index);
+				EcoreUtil.copy(oldVar.getType()), name, oldVar.isAssignable(),
+				index);
 		procedure.getLocals().put(newVar.getName(), newVar);
 		definitions.put(name, newVar);
 
@@ -313,14 +315,7 @@ public class SSATransformation extends AbstractActorVisitor {
 		findNodes(nodes, loop);
 
 		for (Use use : uses) {
-			EObject user = use.eContainer();
-			Node node;
-			if (user instanceof Node) {
-				node = (Node) user;
-			} else {
-				Instruction instruction = (Instruction) user;
-				node = instruction.getBlock();
-			}
+			Node node = EcoreHelper.getContainerOfType(use, Node.class);
 
 			// only changes uses that are in the loop
 			if (node != join && nodes.contains(node)) {
