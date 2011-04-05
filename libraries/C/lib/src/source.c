@@ -31,8 +31,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include "orcc_types.h"
-#include "orcc_fifo.h"
+
 #include "orcc_util.h"
 
 // from APR
@@ -46,7 +45,7 @@
 #pragma warning(disable: 4996)
 #endif
 
-#define LOOP_NUMBER 5
+#define LOOP_NUMBER 1
 
 static FILE *file = NULL;
 static int nb;
@@ -99,10 +98,15 @@ void source_rewind() {
 				nb++;
 			}
 			else{
-				int n = fclose(file);
 				stop = 1;
 			}
 		}
+	}
+}
+
+void source_close() {
+	if(file != NULL) {
+		int n = fclose(file);
 	}
 }
 

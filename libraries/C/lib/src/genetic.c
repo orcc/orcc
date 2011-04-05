@@ -460,6 +460,7 @@ void *monitor(void *data) {
 				monitoring->genetic_info);
 
 		//Compare_close();
+		source_close();
 		clear_fifos();
 		initialize_instances();
 	}

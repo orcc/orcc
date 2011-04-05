@@ -83,6 +83,7 @@ extern void active_fps_printing();
 extern void remove_fps_printing();
 
 extern void source_active_genetic();
+extern void source_close();
 //extern void Compare_active_genetic();
 //extern void Compare_close();
 
