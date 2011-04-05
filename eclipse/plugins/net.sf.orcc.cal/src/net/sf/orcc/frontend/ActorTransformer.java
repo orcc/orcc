@@ -766,8 +766,7 @@ public class ActorTransformer {
 		// declare tokens
 		for (AstVariable token : tokens) {
 			Var local = astTransformer.transformLocalVariable(token);
-			context.getProcedure().getLocals()
-					.put(file, local.getLocation(), local.getName(), local);
+			context.getProcedure().getLocals().add(local);
 		}
 
 		// loads tokens

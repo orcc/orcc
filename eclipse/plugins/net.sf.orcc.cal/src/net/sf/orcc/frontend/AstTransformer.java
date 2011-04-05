@@ -460,8 +460,7 @@ public class AstTransformer {
 			for (AstGenerator generator : generators) {
 				AstVariable astVariable = generator.getVariable();
 				Var loopVar = transformLocalVariable(astVariable);
-				procedure.getLocals().put(file, loopVar.getLocation(),
-						loopVar.getName(), loopVar);
+				procedure.getLocals().add(loopVar);
 
 				AstExpression astLower = generator.getLower();
 				int lower = new AstExpressionEvaluator(null)
@@ -697,8 +696,7 @@ public class AstTransformer {
 			// creates loop variable and assigns it
 			AstVariable astVariable = foreach.getVariable();
 			Var loopVar = transformLocalVariable(astVariable);
-			procedure.getLocals().put(file, loopVar.getLocation(),
-					loopVar.getName(), loopVar);
+			procedure.getLocals().add(loopVar);
 
 			AstExpression astLower = foreach.getLower();
 			Expression lower = transformExpression(astLower);
@@ -1443,8 +1441,7 @@ public class AstTransformer {
 	public void transformLocalVariables(List<AstVariable> variables) {
 		for (AstVariable astVariable : variables) {
 			Var local = transformLocalVariable(astVariable);
-			context.getProcedure().getLocals()
-					.put(file, local.getLocation(), local.getName(), local);
+			context.getProcedure().getLocals().add(local);
 		}
 	}
 
@@ -1458,8 +1455,7 @@ public class AstTransformer {
 	private void transformParameters(List<AstVariable> parameters) {
 		for (AstVariable astParameter : parameters) {
 			Var local = transformLocalVariable(astParameter);
-			context.getProcedure().getParameters()
-					.put(file, local.getLocation(), local.getName(), local);
+			context.getProcedure().getParameters().add(local);
 		}
 	}
 
