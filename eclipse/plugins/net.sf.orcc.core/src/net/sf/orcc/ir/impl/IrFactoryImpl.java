@@ -6,8 +6,10 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.OpUnary;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
+
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -16,11 +18,6 @@ import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
-
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -36,6 +33,8 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
@@ -55,6 +54,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
@@ -81,7 +81,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public static IrFactory init() {
 		try {
-			IrFactory theIrFactory = (IrFactory)EPackage.Registry.INSTANCE.getEFactory("http:///net/sf/orcc/ir.ecore"); 
+			IrFactory theIrFactory = (IrFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/ir/Ir"); 
 			if (theIrFactory != null) {
 				return theIrFactory;
 			}
@@ -193,7 +193,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		exprBinary.setE1(e1);
 		exprBinary.setE2(e2);
 		exprBinary.setOp(op);
-		exprBinary.setType(type);
+		exprBinary.setType(EcoreUtil.copy(type));
 		return exprBinary;
 	}
 
@@ -314,7 +314,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
 		exprUnary.setExpr(expression);
 		exprUnary.setOp(op);
-		exprUnary.setType(type);
+		exprUnary.setType(EcoreUtil.copy(type));
 		return exprUnary;
 	}
 
@@ -614,7 +614,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		procedure.setNative(nativeFlag);
 		procedure.getNodes().addAll(nodes);
 		procedure.setName(name);
-		procedure.setReturnType(returnType);
+		procedure.setReturnType(EcoreUtil.copy(returnType));
 
 		procedure.setLocals(locals);
 		procedure.setParameters(parameters);
@@ -629,7 +629,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 		procedure.setLocation(location);
 		procedure.setName(name);
-		procedure.setReturnType(returnType);
+		procedure.setReturnType(EcoreUtil.copy(returnType));
 
 		procedure.setLocals(new OrderedMap<String, Var>());
 		procedure.setParameters(new OrderedMap<String, Var>());
@@ -684,7 +684,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public TypeList createTypeList(Expression size, Type type) {
 		TypeListImpl listType = new TypeListImpl();
 		listType.setSizeExpr(size);
-		listType.setType(type);
+		listType.setType(EcoreUtil.copy(type));
 		return listType;
 	}
 
@@ -692,7 +692,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public TypeList createTypeList(int size, Type type) {
 		TypeListImpl listType = new TypeListImpl();
 		listType.setSize(size);
-		listType.setType(type);
+		listType.setType(EcoreUtil.copy(type));
 		return listType;
 	}
 
@@ -763,7 +763,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		var.setGlobal(global);
 		var.setLocation(location);
 		var.setName(name);
-		var.setType(type);
+		var.setType(EcoreUtil.copy(type));
 		return var;
 	}
 
@@ -776,7 +776,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		var.setInitialValue(initialValue);
 		var.setLocation(location);
 		var.setName(name);
-		var.setType(type);
+		var.setType(EcoreUtil.copy(type));
 		return var;
 	}
 
@@ -789,7 +789,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		var.setIndex(index);
 		var.setLocation(location);
 		var.setName(name);
-		var.setType(type);
+		var.setType(EcoreUtil.copy(type));
 		return var;
 	}
 

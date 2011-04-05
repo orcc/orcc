@@ -43,7 +43,7 @@ public interface ExprString extends Expression {
 	 * Returns the value of this string expression.
 	 * 
 	 * @return the value of this string expression
-	 * @model
+	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
 	String getValue();
 

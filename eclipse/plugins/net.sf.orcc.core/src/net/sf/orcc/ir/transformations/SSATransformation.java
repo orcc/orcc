@@ -56,8 +56,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 /**
  * This class converts the given actor to SSA form.
  * 
@@ -236,8 +234,7 @@ public class SSATransformation extends AbstractActorVisitor {
 
 		// create new variable
 		Var newVar = IrFactory.eINSTANCE.createVar(oldVar.getLocation(),
-				EcoreUtil.copy(oldVar.getType()), name, oldVar.isAssignable(),
-				index);
+				oldVar.getType(), name, oldVar.isAssignable(), index);
 		procedure.getLocals().put(newVar.getName(), newVar);
 		definitions.put(name, newVar);
 

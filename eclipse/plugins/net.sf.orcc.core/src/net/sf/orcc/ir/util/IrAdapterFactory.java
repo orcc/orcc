@@ -204,10 +204,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createVarAdapter();
 			}
 			@Override
-			public Adapter caseString(String object) {
-				return createStringAdapter();
-			}
-			@Override
 			public Adapter caseUse(Use object) {
 				return createUseAdapter();
 			}
@@ -610,20 +606,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createVarAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.lang.String <em>String</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.lang.String
-	 * @generated
-	 */
-	public Adapter createStringAdapter() {
 		return null;
 	}
 

@@ -110,7 +110,7 @@ public interface Var extends EObject {
 	 * Returns the name of this variable.
 	 * 
 	 * @return the name of this variable
-	 * @model
+	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
 	String getName();
 

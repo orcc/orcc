@@ -53,7 +53,7 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int SIZE_EDEFAULT = 32;
+	protected static final int SIZE_EDEFAULT = 0;
 
 	private int size;
 

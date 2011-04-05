@@ -31,13 +31,22 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  */
 public class ExprStringImpl extends ExpressionImpl implements ExprString {
 	/**
-	 * The cached value of the '{@link #getValue() <em>Value</em>}' reference.
+	 * The default value of the '{@link #getValue() <em>Value</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getValue()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String VALUE_EDEFAULT = null;
+	/**
+	 * The cached value of the '{@link #getValue() <em>Value</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected String value;
+	protected String value = VALUE_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -61,20 +70,11 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String basicGetValue() {
-		return value;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case IrPackage.EXPR_STRING__VALUE:
-				if (resolve) return getValue();
-				return basicGetValue();
+				return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -87,9 +87,25 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case IrPackage.EXPR_STRING__VALUE:
-				return value != null;
+				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (value: ");
+		result.append(value);
+		result.append(')');
+		return result.toString();
 	}
 
 	/**
@@ -123,7 +139,7 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case IrPackage.EXPR_STRING__VALUE:
-				setValue((String)null);
+				setValue(VALUE_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -134,7 +150,9 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 		return IrFactory.eINSTANCE.createTypeString();
 	}
 
-	@Override
+	/**
+	 * @generated
+	 */
 	public String getValue() {
 		return value;
 	}

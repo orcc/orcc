@@ -83,7 +83,6 @@ import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import com.google.inject.Inject;
 
@@ -177,8 +176,8 @@ public class ActorTransformer {
 						OpBinary.PLUS, IrFactory.eINSTANCE.createExprInt(i),
 						IrFactory.eINSTANCE.createTypeInt(32)));
 
-				Var tmpVar = procedure.newTempLocalVariable(file,
-						EcoreUtil.copy(type), "token");
+				Var tmpVar = procedure
+						.newTempLocalVariable(file, type, "token");
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
 						tmpVar, IrFactory.eINSTANCE.createUse(portVariable),
 						indexes);
@@ -202,7 +201,7 @@ public class ActorTransformer {
 							IrFactory.eINSTANCE.createExprVar(loopVar),
 							OpBinary.PLUS,
 							IrFactory.eINSTANCE.createExprInt(1),
-							EcoreUtil.copy(loopVar.getType())));
+							loopVar.getType()));
 			block.add(assign);
 
 			// create while node
@@ -274,8 +273,8 @@ public class ActorTransformer {
 
 				// each expression of an output pattern must be of type list
 				// so they are necessarily variables
-				Var tmpVar = procedure.newTempLocalVariable(file,
-						EcoreUtil.copy(type), "token");
+				Var tmpVar = procedure
+						.newTempLocalVariable(file, type, "token");
 				Expression expression = astTransformer
 						.transformExpression(value);
 				Use use = ((ExprVar) expression).getUse();
@@ -308,7 +307,7 @@ public class ActorTransformer {
 							IrFactory.eINSTANCE.createExprVar(loopVar),
 							OpBinary.PLUS,
 							IrFactory.eINSTANCE.createExprInt(1),
-							EcoreUtil.copy(loopVar.getType())));
+							loopVar.getType()));
 			block.add(assign);
 
 			// create while node
@@ -411,11 +410,9 @@ public class ActorTransformer {
 		// create the variable to hold the tokens
 		Location location = astTransformer.getContext().getProcedure()
 				.getLocation();
-		return IrFactory.eINSTANCE.createVar(
-				location,
-				IrFactory.eINSTANCE.createTypeList(numTokens,
-						EcoreUtil.copy(port.getType())), port.getName(), true,
-				0);
+		return IrFactory.eINSTANCE.createVar(location,
+				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()),
+				port.getName(), true, 0);
 	}
 
 	/**
@@ -727,7 +724,7 @@ public class ActorTransformer {
 		Expression value = it.next();
 		while (it.hasNext()) {
 			value = IrFactory.eINSTANCE.createExprBinary(value,
-					OpBinary.LOGIC_AND, EcoreUtil.copy(it.next()),
+					OpBinary.LOGIC_AND, it.next(),
 					IrFactory.eINSTANCE.createTypeBool());
 		}
 

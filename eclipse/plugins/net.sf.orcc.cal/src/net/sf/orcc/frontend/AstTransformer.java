@@ -120,7 +120,7 @@ public class AstTransformer {
 			Expression e2 = doSwitch(expression.getRight());
 
 			return IrFactory.eINSTANCE.createExprBinary(e1, op, e2,
-					EcoreUtil.copy(expression.getIrType()));
+					expression.getIrType());
 		}
 
 		@Override
@@ -144,8 +144,8 @@ public class AstTransformer {
 
 			// generates a new target
 			Var target = procedure.newTempLocalVariable(file,
-					EcoreUtil.copy(calledProcedure.getReturnType()), "call_"
-							+ calledProcedure.getName());
+					calledProcedure.getReturnType(),
+					"call_" + calledProcedure.getName());
 
 			// creates call with spilling code around it
 			createCall(location, target, calledProcedure,
@@ -181,7 +181,7 @@ public class AstTransformer {
 				}
 
 				target = context.getProcedure().newTempLocalVariable(file,
-						EcoreUtil.copy(type), "_tmp_if");
+						type, "_tmp_if");
 				indexes = new ArrayList<Expression>(0);
 			}
 
@@ -222,8 +222,7 @@ public class AstTransformer {
 					.getIndexes());
 
 			Var target = context.getProcedure().newTempLocalVariable(file,
-					EcoreUtil.copy(expression.getIrType()),
-					"local_" + var.getName());
+					expression.getIrType(), "local_" + var.getName());
 
 			InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
 					target, IrFactory.eINSTANCE.createUse(var), indexes);
@@ -283,7 +282,7 @@ public class AstTransformer {
 			}
 
 			return IrFactory.eINSTANCE.createExprUnary(op, expr,
-					EcoreUtil.copy(expression.getIrType()));
+					expression.getIrType());
 		}
 
 		@Override
@@ -351,8 +350,7 @@ public class AstTransformer {
 			size *= expressions.size();
 
 			Procedure procedure = context.getProcedure();
-			Type listType = IrFactory.eINSTANCE.createTypeList(size,
-					EcoreUtil.copy(type));
+			Type listType = IrFactory.eINSTANCE.createTypeList(size, type);
 			target = procedure.newTempLocalVariable(file, listType, "_list");
 		}
 
@@ -474,7 +472,7 @@ public class AstTransformer {
 					thisIndex = IrFactory.eINSTANCE.createExprBinary(thisIndex,
 							OpBinary.MINUS,
 							IrFactory.eINSTANCE.createExprInt(lower),
-							EcoreUtil.copy(thisIndex.getType()));
+							thisIndex.getType());
 				}
 
 				AstExpression astHigher = generator.getHigher();
@@ -489,10 +487,8 @@ public class AstTransformer {
 									index,
 									OpBinary.TIMES,
 									IrFactory.eINSTANCE.createExprInt(higher
-											- lower + 1),
-									EcoreUtil.copy(index.getType())),
-							OpBinary.PLUS, thisIndex, EcoreUtil.copy(index
-									.getType()));
+											- lower + 1), index.getType()),
+							OpBinary.PLUS, thisIndex, index.getType());
 				}
 			}
 
@@ -527,7 +523,7 @@ public class AstTransformer {
 								.createExprBinary(IrFactory.eINSTANCE
 										.createExprVar(loopVar), OpBinary.PLUS,
 										IrFactory.eINSTANCE.createExprInt(1),
-										EcoreUtil.copy(loopVar.getType())));
+										loopVar.getType()));
 				block.add(assign);
 
 				// create while
@@ -725,7 +721,7 @@ public class AstTransformer {
 							IrFactory.eINSTANCE.createExprVar(loopVar),
 							OpBinary.PLUS,
 							IrFactory.eINSTANCE.createExprInt(1),
-							EcoreUtil.copy(loopVar.getType())));
+							loopVar.getType()));
 			block.add(assign);
 
 			// create while
@@ -1017,8 +1013,7 @@ public class AstTransformer {
 			if (local == null) {
 				// creates a new local variable
 				local = context.getProcedure().newTempLocalVariable(file,
-						EcoreUtil.copy(global.getType()),
-						"local_" + global.getName());
+						global.getType(), "local_" + global.getName());
 				context.getMapGlobals().put(global, local);
 			}
 
@@ -1072,10 +1067,8 @@ public class AstTransformer {
 		if (var.isGlobal()) {
 			Var local = context.getMapGlobals().get(var);
 			if (local == null) {
-				local = context.getProcedure()
-						.newTempLocalVariable(file,
-								EcoreUtil.copy(var.getType()),
-								"local_" + var.getName());
+				local = context.getProcedure().newTempLocalVariable(file,
+						var.getType(), "local_" + var.getName());
 				context.getMapGlobals().put(var, local);
 			}
 
@@ -1305,7 +1298,7 @@ public class AstTransformer {
 		Type type = astFunction.getIrType();
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
-				location, EcoreUtil.copy(type));
+				location, type);
 		Context oldContext = newContext(procedure);
 
 		transformParameters(astFunction.getParameters());
@@ -1425,8 +1418,8 @@ public class AstTransformer {
 		Type type = astVariable.getIrType();
 
 		// create local variable with the given name
-		Var local = IrFactory.eINSTANCE.createVar(location,
-				EcoreUtil.copy(type), name, assignable, 0);
+		Var local = IrFactory.eINSTANCE.createVar(location, type, name,
+				assignable, 0);
 
 		AstExpression value = astVariable.getValue();
 		if (value != null) {

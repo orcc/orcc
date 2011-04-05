@@ -28,12 +28,12 @@
  */
 package net.sf.orcc.ir;
 
-import java.lang.String;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 import java.util.List;
 
 import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a procedure.
@@ -123,7 +123,7 @@ public interface Procedure extends EObject {
 	 * Returns the name of this procedure.
 	 * 
 	 * @return the name of this procedure
-	 * @model
+	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
 	String getName();
 

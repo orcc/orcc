@@ -37,6 +37,15 @@ public interface IrFactory extends EFactory {
 	 */
 	ExprBinary createExprBinary();
 
+	/**
+	 * Creates a new ExprBinary. Type is copied.
+	 * 
+	 * @param e1
+	 * @param op
+	 * @param e2
+	 * @param type
+	 * @return
+	 */
 	ExprBinary createExprBinary(Expression e1, OpBinary op, Expression e2,
 			Type type);
 
@@ -110,6 +119,14 @@ public interface IrFactory extends EFactory {
 	 */
 	ExprUnary createExprUnary();
 
+	/**
+	 * Creates a new ExprUnary. Type is copied.
+	 * 
+	 * @param op
+	 * @param expression
+	 * @param type
+	 * @return
+	 */
 	ExprUnary createExprUnary(OpUnary op, Expression expression, Type type);
 
 	/**
@@ -363,7 +380,7 @@ public interface IrFactory extends EFactory {
 	Procedure createProcedure();
 
 	/**
-	 * Creates a new procedure.
+	 * Creates a new procedure. Return type is copied.
 	 * 
 	 * @param name
 	 *            The procedure name.
@@ -384,7 +401,7 @@ public interface IrFactory extends EFactory {
 
 	/**
 	 * Creates a new procedure, not external, with empty parameters, locals, and
-	 * nodes.
+	 * nodes. Return type is copied.
 	 * 
 	 * @param name
 	 *            The procedure name.
@@ -442,7 +459,8 @@ public interface IrFactory extends EFactory {
 	TypeList createTypeList();
 
 	/**
-	 * Creates a new list type with the given size and element type.
+	 * Creates a new list type with the given size and element type. Type is
+	 * copied.
 	 * 
 	 * @param size
 	 *            the size of this list type
@@ -452,7 +470,8 @@ public interface IrFactory extends EFactory {
 	TypeList createTypeList(Expression size, Type type);
 
 	/**
-	 * Creates a new list type with the given size and element type.
+	 * Creates a new list type with the given size and element type. Type is
+	 * copied.
 	 * 
 	 * @param size
 	 *            the size of this list type
@@ -525,7 +544,7 @@ public interface IrFactory extends EFactory {
 
 	/**
 	 * Creates a new variable with the given location, type, and name. The
-	 * variable may be global or local, and assignable or not.
+	 * variable may be global or local, and assignable or not. Type is copied.
 	 * 
 	 * @param location
 	 *            the variable location
@@ -543,7 +562,7 @@ public interface IrFactory extends EFactory {
 
 	/**
 	 * Creates a new global variable with the given location, type, name,
-	 * initial value. The variable may be assignable or not.
+	 * initial value. The variable may be assignable or not. Type is copied.
 	 * 
 	 * @param location
 	 *            the variable location
@@ -561,7 +580,7 @@ public interface IrFactory extends EFactory {
 
 	/**
 	 * Creates a new local variable with the given location, type, name, index.
-	 * The variable may be assignable or not.
+	 * The variable may be assignable or not. Type is copied.
 	 * 
 	 * @param location
 	 *            the variable location

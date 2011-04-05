@@ -6,7 +6,6 @@
  */
 package net.sf.orcc.ir;
 
-import java.lang.String;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
@@ -40,7 +39,7 @@ public interface IrPackage extends EPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	String eNS_URI = "http:///net/sf/orcc/ir.ecore";
+	String eNS_URI = "http://orcc.sf.net/ir/Ir";
 
 	/**
 	 * The package namespace name.
@@ -995,23 +994,6 @@ public interface IrPackage extends EPackage {
 	 */
 	int VAR_FEATURE_COUNT = 9;
 
-	/**
-	 * The meta object id for the '{@link java.lang.String <em>String</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see java.lang.String
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getString()
-	 * @generated
-	 */
-	int STRING = 25;
-
-	/**
-	 * The number of structural features of the '<em>String</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int STRING_FEATURE_COUNT = 0;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.UseImpl <em>Use</em>}' class.
@@ -1020,7 +1002,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
 	 */
-	int USE = 26;
+	int USE = 25;
 
 	/**
 	 * The feature id for the '<em><b>Variable</b></em>' reference.
@@ -1048,7 +1030,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 27;
+	int EXPR_BINARY = 26;
 
 	/**
 	 * The feature id for the '<em><b>E1</b></em>' containment reference. <!--
@@ -1101,7 +1083,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBool()
 	 * @generated
 	 */
-	int EXPR_BOOL = 28;
+	int EXPR_BOOL = 27;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute.
@@ -1130,7 +1112,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprFloat()
 	 * @generated
 	 */
-	int EXPR_FLOAT = 29;
+	int EXPR_FLOAT = 28;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
@@ -1156,7 +1138,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprInt()
 	 * @generated
 	 */
-	int EXPR_INT = 30;
+	int EXPR_INT = 29;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
@@ -1183,7 +1165,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprList()
 	 * @generated
 	 */
-	int EXPR_LIST = 31;
+	int EXPR_LIST = 30;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' reference list.
@@ -1212,7 +1194,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprString()
 	 * @generated
 	 */
-	int EXPR_STRING = 32;
+	int EXPR_STRING = 31;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' reference. <!--
@@ -1240,7 +1222,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 33;
+	int EXPR_UNARY = 32;
 
 	/**
 	 * The feature id for the '<em><b>Expr</b></em>' containment reference. <!--
@@ -1275,7 +1257,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprVar()
 	 * @generated
 	 */
-	int EXPR_VAR = 34;
+	int EXPR_VAR = 33;
 
 	/**
 	 * The feature id for the '<em><b>Use</b></em>' containment reference.
@@ -1303,7 +1285,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 35;
+	int OP_BINARY = 34;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1313,7 +1295,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 36;
+	int OP_UNARY = 35;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
@@ -1670,7 +1652,7 @@ public interface IrPackage extends EPackage {
 	 * @see #getProcedure()
 	 * @generated
 	 */
-	EReference getProcedure_Name();
+	EAttribute getProcedure_Name();
 
 	/**
 	 * Returns the meta object for the containment reference list '
@@ -2042,15 +2024,15 @@ public interface IrPackage extends EPackage {
 	EReference getVar_Location();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Var#getName <em>Name</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#getName <em>Name</em>}'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Name</em>'.
+	 * @return the meta object for the attribute '<em>Name</em>'.
 	 * @see net.sf.orcc.ir.Var#getName()
 	 * @see #getVar()
 	 * @generated
 	 */
-	EReference getVar_Name();
+	EAttribute getVar_Name();
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Var#getType <em>Type</em>}'.
@@ -2107,16 +2089,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getVar_Uses();
-
-	/**
-	 * Returns the meta object for class '{@link java.lang.String <em>String</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>String</em>'.
-	 * @see java.lang.String
-	 * @model instanceClass="java.lang.String"
-	 * @generated
-	 */
-	EClass getString();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Use <em>Use</em>}'.
@@ -2294,7 +2266,7 @@ public interface IrPackage extends EPackage {
 	 * @see #getExprString()
 	 * @generated
 	 */
-	EReference getExprString_Value();
+	EAttribute getExprString_Value();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprUnary <em>Expr Unary</em>}'.
@@ -2660,11 +2632,11 @@ public interface IrPackage extends EPackage {
 		EReference PROCEDURE__LOCATION = eINSTANCE.getProcedure_Location();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PROCEDURE__NAME = eINSTANCE.getProcedure_Name();
+		EAttribute PROCEDURE__NAME = eINSTANCE.getProcedure_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Nodes</b></em>' containment reference list feature.
@@ -2920,11 +2892,11 @@ public interface IrPackage extends EPackage {
 		EReference VAR__LOCATION = eINSTANCE.getVar_Location();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference VAR__NAME = eINSTANCE.getVar_Name();
+		EAttribute VAR__NAME = eINSTANCE.getVar_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
@@ -2960,17 +2932,6 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference VAR__USES = eINSTANCE.getVar_Uses();
-
-		/**
-		 * The meta object literal for the '{@link java.lang.String
-		 * <em>String</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
-		 * -->
-		 * 
-		 * @see java.lang.String
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getString()
-		 * @generated
-		 */
-		EClass STRING = eINSTANCE.getString();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.UseImpl <em>Use</em>}' class.
@@ -3101,11 +3062,11 @@ public interface IrPackage extends EPackage {
 		EClass EXPR_STRING = eINSTANCE.getExprString();
 
 		/**
-		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference EXPR_STRING__VALUE = eINSTANCE.getExprString_Value();
+		EAttribute EXPR_STRING__VALUE = eINSTANCE.getExprString_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprUnaryImpl <em>Expr Unary</em>}' class.
@@ -3166,6 +3127,8 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EEnum OP_UNARY = eINSTANCE.getOpUnary();
+
+
 
 	}
 

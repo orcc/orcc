@@ -44,7 +44,7 @@ public interface TypeInt extends Type {
 	 * Returns the size of this integer type.
 	 * 
 	 * @return the size of this integer type
-	 * @model default="32"
+	 * @model
 	 */
 	public int getSize();
 

@@ -115,13 +115,23 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected Location location;
 
 	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' reference.
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected String name;
+	protected String name = NAME_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment reference list.
@@ -184,8 +194,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			case IrPackage.PROCEDURE__LOCATION:
 				return getLocation();
 			case IrPackage.PROCEDURE__NAME:
-				if (resolve) return getName();
-				return basicGetName();
+				return getName();
 			case IrPackage.PROCEDURE__NODES:
 				return getNodes();
 			case IrPackage.PROCEDURE__RETURN_TYPE:
@@ -206,7 +215,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			case IrPackage.PROCEDURE__LOCATION:
 				return location != null;
 			case IrPackage.PROCEDURE__NAME:
-				return name != null;
+				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case IrPackage.PROCEDURE__NODES:
 				return nodes != null && !nodes.isEmpty();
 			case IrPackage.PROCEDURE__RETURN_TYPE:
@@ -265,7 +274,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 				setLocation((Location)null);
 				return;
 			case IrPackage.PROCEDURE__NAME:
-				setName((String)null);
+				setName(NAME_EDEFAULT);
 				return;
 			case IrPackage.PROCEDURE__NODES:
 				getNodes().clear();
@@ -415,16 +424,11 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		return msgs;
 	}
 
-	@Override
-	public String getName() {
-		return name;
-	}
-
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String basicGetName() {
+	@Override
+	public String getName() {
 		return name;
 	}
 
@@ -632,7 +636,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (native: ");
+		result.append(" (name: ");
+		result.append(name);
+		result.append(", native: ");
 		result.append(native_);
 		result.append(')');
 		return result.toString();

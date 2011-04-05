@@ -44,7 +44,7 @@ public interface TypeUint extends Type {
 	 * Returns the size of this unsigned integer type.
 	 * 
 	 * @return the size of this unsigned integer type
-	 * @model default="32"
+	 * @model
 	 */
 	public int getSize();
 
