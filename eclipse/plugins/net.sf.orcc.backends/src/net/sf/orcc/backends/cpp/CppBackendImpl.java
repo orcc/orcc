@@ -41,8 +41,8 @@ import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorVisitor;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -184,7 +184,7 @@ public class CppBackendImpl extends AbstractBackend {
 		IAttribute attr = instance.getAttribute("partName");
 		if (attr != null) {
 			Expression expr = ((IValueAttribute) attr).getValue();
-			partName = ((StringExpr) expr).getValue();
+			partName = ((ExprString) expr).getValue();
 		}
 		return partName;
 	}

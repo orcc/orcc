@@ -30,20 +30,21 @@
 package net.sf.orcc.backends.vhdl;
 
 import net.sf.orcc.ir.Cast;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionPrinter;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
+import net.sf.orcc.ir.impl.ExprBinaryImpl;
 import net.sf.orcc.util.OrccUtil;
 
 /**
@@ -75,9 +76,9 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 
 		builder.append(function);
 		builder.append("(");
-		e1.accept(this, nextPrec, BinaryExpr.LEFT);
+		e1.accept(this, nextPrec, ExprBinaryImpl.LEFT);
 		builder.append(", ");
-		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
+		e2.accept(this, nextPrec, ExprBinaryImpl.RIGHT);
 		builder.append(", ");
 		if (function == "bitand") {
 			Type sizee = getLub(e1.getType(), e2.getType());
@@ -145,7 +146,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	}
 
 	@Override
-	protected String toString(BinaryOp op) {
+	protected String toString(OpBinary op) {
 		switch (op) {
 		case EQ:
 			return "=";
@@ -161,7 +162,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	}
 
 	@Override
-	protected String toString(UnaryOp op) {
+	protected String toString(OpUnary op) {
 		switch (op) {
 		case LOGIC_NOT:
 			return "not ";
@@ -171,8 +172,8 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	}
 
 	@Override
-	public void visit(BinaryExpr expr, Object... args) {
-		BinaryOp op = expr.getOp();
+	public void visit(ExprBinary expr, Object... args) {
+		OpBinary op = expr.getOp();
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
 		Type size = expr.getType();
@@ -203,7 +204,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		default: {
 			int currentPrec = op.getPrecedence();
 			int nextPrec;
-			if (op == BinaryOp.LOGIC_OR) {
+			if (op == OpBinary.LOGIC_OR) {
 				// special case, for "or" always put parentheses because
 				// VHDL does not get it if we don't
 				nextPrec = Integer.MIN_VALUE;
@@ -223,27 +224,27 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	}
 
 	@Override
-	public void visit(BoolExpr expr, Object... args) {
-		builder.append(expr.getValue() ? "'1'" : "'0'");
+	public void visit(ExprBool expr, Object... args) {
+		builder.append(expr.isValue() ? "'1'" : "'0'");
 	}
 
 	@Override
-	public void visit(ListExpr expr, Object... args) {
+	public void visit(ExprList expr, Object... args) {
 		builder.append('(');
 		builder.append(OrccUtil.toString(expr.getValue(), ", "));
 		builder.append(')');
 	}
 
 	@Override
-	public void visit(StringExpr expr, Object... args) {
+	public void visit(ExprString expr, Object... args) {
 		builder.append('"');
 		builder.append(expr.getValue());
 		builder.append('"');
 	}
 
 	@Override
-	public void visit(UnaryExpr expr, Object... args) {
-		UnaryOp op = expr.getOp();
+	public void visit(ExprUnary expr, Object... args) {
+		OpUnary op = expr.getOp();
 		switch (op) {
 		case BITNOT:
 			builder.append("bitnot");

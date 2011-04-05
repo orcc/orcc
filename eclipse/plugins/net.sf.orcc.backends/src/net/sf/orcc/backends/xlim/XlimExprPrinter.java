@@ -29,11 +29,11 @@
 package net.sf.orcc.backends.xlim;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.expr.ExpressionPrinter;
-import net.sf.orcc.ir.expr.ListExpr;
 
 /**
  * This class defines a XLIM expression printer.
@@ -44,12 +44,12 @@ import net.sf.orcc.ir.expr.ListExpr;
 public class XlimExprPrinter extends ExpressionPrinter {
 
 	@Override
-	public void visit(BinaryExpr expr, Object... args) {
-		BinaryOp op = expr.getOp();
+	public void visit(ExprBinary expr, Object... args) {
+		OpBinary op = expr.getOp();
 		int currentPrec = op.getPrecedence();
 
 		int nextPrec;
-		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
+		if (op == OpBinary.SHIFT_LEFT || op == OpBinary.SHIFT_RIGHT) {
 			// special case, for shifts always put parentheses because compilers
 			// often issue warnings
 			nextPrec = Integer.MIN_VALUE;
@@ -67,12 +67,12 @@ public class XlimExprPrinter extends ExpressionPrinter {
 	}
 
 	@Override
-	public void visit(BoolExpr expr, Object... args) {
-		builder.append(expr.getValue() ? "1" : "0");
+	public void visit(ExprBool expr, Object... args) {
+		builder.append(expr.isValue() ? "1" : "0");
 	}
 
 	@Override
-	public void visit(ListExpr expr, Object... args) {
+	public void visit(ExprList expr, Object... args) {
 		throw new OrccRuntimeException("List expression not supported");
 	}
 

@@ -37,8 +37,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -186,7 +186,7 @@ public class SerDesAdder implements INetworkTransformation {
 				if (graph.getEdgeSource(conn).isPort()) {
 					IAttribute attr = conn.getAttribute("busRef");
 					IValueAttribute valAttr = (IValueAttribute) attr;
-					String attrName = ((StringExpr) valAttr.getValue())
+					String attrName = ((ExprString) valAttr.getValue())
 							.getValue();
 
 					if (serdesMap.containsKey(attrName)) {
@@ -206,7 +206,7 @@ public class SerDesAdder implements INetworkTransformation {
 				if (graph.getEdgeTarget(conn).isPort()) {
 					IAttribute attr = conn.getAttribute("busRef");
 					IValueAttribute valAttr = (IValueAttribute) attr;
-					String attrName = ((StringExpr) valAttr.getValue())
+					String attrName = ((ExprString) valAttr.getValue())
 							.getValue();
 
 					if (serdesMap.containsKey(attrName)) {
@@ -247,7 +247,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 							IAttribute attr = connection.getAttribute("busRef");
 							IValueAttribute valAttr = (IValueAttribute) attr;
-							String attrName = ((StringExpr) valAttr.getValue())
+							String attrName = ((ExprString) valAttr.getValue())
 									.getValue();
 
 							graph.addEdge(vSrc, serdesMap.get(attrName),
@@ -270,7 +270,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 						IAttribute attr = connection.getAttribute("busRef");
 						IValueAttribute valAttr = (IValueAttribute) attr;
-						String attrName = ((StringExpr) valAttr.getValue())
+						String attrName = ((ExprString) valAttr.getValue())
 								.getValue();
 
 						graph.addEdge(serdesMap.get(attrName), vTgt, outgoing);
@@ -287,7 +287,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 							attr = connection.getAttribute("busRef");
 							valAttr = (IValueAttribute) attr;
-							attrName = ((StringExpr) valAttr.getValue())
+							attrName = ((ExprString) valAttr.getValue())
 									.getValue();
 
 							graph.addEdge(serdesMap.get(attrName), vTgt,

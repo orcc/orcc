@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.AbstractActorVisitor;
-import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
@@ -52,7 +51,7 @@ public class VariableRenamer extends AbstractActorVisitor {
 	public void visit(Procedure procedure) {
 		String procName = procedure.getName();
 		for (Var var : procedure.getLocals()) {
-			VarLocal local = (VarLocal) var;
+			Var local = (Var) var;
 			var.setName(procName + "_" + local.getBaseName());
 		}
 	}

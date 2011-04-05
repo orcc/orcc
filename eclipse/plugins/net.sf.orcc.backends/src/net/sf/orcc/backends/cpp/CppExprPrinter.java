@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.cpp;
 
 import net.sf.orcc.backends.c.CExpressionPrinter;
-import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.ExprBool;
 
 /**
  * This class defines a C++ expression printer. It refines the C expression
@@ -42,8 +42,8 @@ import net.sf.orcc.ir.expr.BoolExpr;
 public class CppExprPrinter extends CExpressionPrinter {
 
 	@Override
-	public void visit(BoolExpr expr, Object... args) {
-		builder.append(expr.getValue() ? "true" : "false");
+	public void visit(ExprBool expr, Object... args) {
+		builder.append(expr.isValue() ? "true" : "false");
 	}
 
 }

@@ -21,23 +21,27 @@ getPortName(port) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-<(constant.class.simpleName)(constant)>
+<if (constant.booleanExpr)><printBool(constant)><
+elseif (constant.intExpr)><printInt(constant)><
+elseif (constant.listExpr)><printList(constant)><
+elseif (constant.stringExpr)><printString(constant)><
+endif>
 >>
 
-BoolExpr(constant) ::= <<
+printBool(constant) ::= <<
 <if (constant.value)>1<else>0<endif>
 >>
 
-IntExpr(number) ::= <<
+printInt(number) ::= <<
 <number><if (number.long)>L<endif>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
-ListExpr(constant) ::= <<
+printList(constant) ::= <<
 {<constant.value: Constant(); wrap, separator=", ">}
 >>
 
-StringExpr(constant) ::= <<
+printString(constant) ::= <<
 "<constant>"
 >>
 
@@ -48,7 +52,7 @@ stateVar(variable) ::= <<
 <if(variable.initialized)>
 <if(!variable.assignable)>
 <if(!variable.type.list)>
-#define <variable> <Constant(variable.initialValue)>
+#define <variable.name> <Constant(variable.initialValue)>
 <else>
 static const <varDecl(variable)> = <Constant(variable.initialValue)>;
 <endif>
@@ -118,7 +122,7 @@ void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int
 
 printAssign(assign) ::= <<
 
-<assign.target> = <assign.value>;
+<assign.target.name> = <assign.value>;
 >>
 
 printFormatType(type) ::= <<
@@ -248,7 +252,7 @@ printBlockNode(blockNode) ::= <<
 // if node
 printIfNode(ifNode) ::= <<
 
-if (<ifNode.value>) {
+if (<ifNode.condition>) {
 	<printNodes(ifNode.thenNodes)>
 }<if(ifNode.elseNodes)> else {
 	<printNodes(ifNode.elseNodes)>
@@ -259,7 +263,7 @@ if (<ifNode.value>) {
 // while node
 printWhileNode(whileNode) ::= <<
 
-while (<whileNode.value>) {
+while (<whileNode.condition>) {
 	<printNodes(whileNode.nodes)>
 }
 <printBlockNode(whileNode.joinNode)>

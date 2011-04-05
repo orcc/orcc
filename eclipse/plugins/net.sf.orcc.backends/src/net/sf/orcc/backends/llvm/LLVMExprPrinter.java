@@ -29,17 +29,17 @@
 package net.sf.orcc.backends.llvm;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionPrinter;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 
 /**
  * This class defines an LLVM expression printer.
@@ -52,7 +52,7 @@ public class LLVMExprPrinter extends ExpressionPrinter {
 	private boolean signed;
 
 	@Override
-	protected String toString(BinaryOp op) {
+	protected String toString(OpBinary op) {
 		switch (op) {
 		case BITAND:
 			return "and";
@@ -125,18 +125,18 @@ public class LLVMExprPrinter extends ExpressionPrinter {
 	}
 
 	@Override
-	public void visit(BinaryExpr expr, Object... args) {
-		BinaryOp op = expr.getOp();
+	public void visit(ExprBinary expr, Object... args) {
+		OpBinary op = expr.getOp();
 		Type type;
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
 		LLVMTypePrinter typePrinter = new LLVMTypePrinter();
 
-		if (e1 instanceof VarExpr) {
-			Use use = ((VarExpr) e1).getVar();
+		if (e1 instanceof ExprVar) {
+			Use use = ((ExprVar) e1).getUse();
 			type = use.getVariable().getType();
-		} else if (e2 instanceof VarExpr) {
-			Use use = ((VarExpr) e2).getVar();
+		} else if (e2 instanceof ExprVar) {
+			Use use = ((ExprVar) e2).getUse();
 			type = use.getVariable().getType();
 		} else {
 			type = expr.getType();
@@ -149,46 +149,46 @@ public class LLVMExprPrinter extends ExpressionPrinter {
 		}
 
 		builder.append(toString(op));
-		
+
 		type.accept(typePrinter);
-		
+
 		builder.append(" " + typePrinter.toString() + " ");
-		
-		if (e1 instanceof VarExpr) {
+
+		if (e1 instanceof ExprVar) {
 			builder.append("%");
 		}
 		expr.getE1().accept(this);
 		builder.append(", ");
-		if (e2 instanceof VarExpr) {
+		if (e2 instanceof ExprVar) {
 			builder.append("%");
 		}
 		expr.getE2().accept(this);
 	}
 
 	@Override
-	public void visit(BoolExpr expr, Object... args) {
-		builder.append(expr.getValue() ? '1' : '0');
+	public void visit(ExprBool expr, Object... args) {
+		builder.append(expr.isValue() ? '1' : '0');
 	}
 
 	@Override
-	public void visit(IntExpr expr, Object... args) {
+	public void visit(ExprInt expr, Object... args) {
 		builder.append(expr.getValue());
 	}
 
 	@Override
-	public void visit(ListExpr expr, Object... args) {
+	public void visit(ExprList expr, Object... args) {
 		throw new OrccRuntimeException("List expression not supported");
 	}
 
 	@Override
-	public void visit(UnaryExpr expr, Object... args) {
+	public void visit(ExprUnary expr, Object... args) {
 		System.err.println("oops: unary expr");
 		// throw new OrccRuntimeException("no unary expressions in LLVM");
 	}
 
 	@Override
-	public void visit(VarExpr expr, Object... args) {
-		builder.append(expr.getVar().getVariable());
+	public void visit(ExprVar expr, Object... args) {
+		builder.append(expr.getUse().getVariable());
 	}
 
 }
