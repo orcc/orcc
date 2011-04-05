@@ -235,7 +235,7 @@ public class SSATransformation extends AbstractActorVisitor {
 		// create new variable
 		Var newVar = IrFactory.eINSTANCE.createVar(oldVar.getLocation(),
 				oldVar.getType(), name, oldVar.isAssignable(), index);
-		procedure.getLocals().put(newVar.getName(), newVar);
+		procedure.getLocals().add(newVar);
 		definitions.put(name, newVar);
 
 		return newVar;

@@ -38,6 +38,7 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -45,7 +46,6 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.AbstractInstructionVisitor;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class removes phi assignments and transforms them to copies.
@@ -106,9 +106,10 @@ public class PhiRemoval extends AbstractActorVisitor {
 		// if source is a local variable with index = 0, we remove it from the
 		// procedure and translate the PHI by an assignment of 0 (zero) to
 		// target. Otherwise, we just create an assignment target = source.
-		OrderedMap<String, Var> parameters = procedure.getParameters();
 		Expression expr;
-		if (source.getIndex() == 0 && !parameters.contains(source.getName())) {
+		if (source.getIndex() == 0
+				&& source.eContainmentFeature() != IrPackage.eINSTANCE
+						.getProcedure_Parameters()) {
 			procedure.getLocals().remove(source.getName());
 			if (target.getType().isBool()) {
 				expr = IrFactory.eINSTANCE.createExprBool(false);

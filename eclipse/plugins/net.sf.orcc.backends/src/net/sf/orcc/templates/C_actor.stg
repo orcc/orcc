@@ -276,12 +276,12 @@ while (<whileNode.condition>) {
 printProcedure(procedure,action="") ::= <<
 <if(procedure.native)>
 extern <procedure.returnType> <procedure.name>(<
-  procedure.parameters.list: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">);
+  procedure.parameters: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">);
 <else>
 static <procedure.returnType> <procedure.name>(<
-  procedure.parameters.list: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">) {
-<if(procedure.locals.list)>
-	<procedure.locals.list: {local | <varDecl(variable=local,sep=";\n")>}>
+  procedure.parameters: {param | <varDecl(variable=param)>}; wrap, anchor, separator=", ">) {
+<if(procedure.locals)>
+	<procedure.locals: {local | <varDecl(variable=local,sep=";\n")>}>
 <endif>
 	<printNodes(procedure.nodes)>
 }
@@ -295,8 +295,8 @@ static <procedure.returnType> <procedure.name>(<
 
 printAction(action) ::= <<
 static void <action.body.name>() {
-<if(action.body.locals.list)>
-	<action.body.locals.list: {local | <varDecl(variable=local,sep=";\n")>}>
+<if(action.body.locals)>
+	<action.body.locals: {local | <varDecl(variable=local,sep=";\n")>}>
 <endif>
 	<printNodes(action.body.nodes)>
 	<action.inputPattern.ports: { port |<printReadEnd(port=port, numTokens=action.inputPattern.numTokensMap.(port))>}>

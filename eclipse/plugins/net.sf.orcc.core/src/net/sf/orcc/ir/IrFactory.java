@@ -9,8 +9,6 @@ package net.sf.orcc.ir;
 import java.math.BigInteger;
 import java.util.List;
 
-import net.sf.orcc.util.OrderedMap;
-
 import org.eclipse.emf.ecore.EFactory;
 
 /**
@@ -378,26 +376,6 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Procedure createProcedure();
-
-	/**
-	 * Creates a new procedure. Return type is copied.
-	 * 
-	 * @param name
-	 *            The procedure name.
-	 * @param native Whether it is native or not.
-	 * @param location
-	 *            The procedure location.
-	 * @param returnType
-	 *            The procedure return type.
-	 * @param parameters
-	 *            The procedure parameters.
-	 * @param locals
-	 *            The procedure local variables.
-	 */
-	Procedure createProcedure(String name, boolean nativeFlag,
-			Location location, Type returnType,
-			OrderedMap<String, Var> parameters, OrderedMap<String, Var> locals,
-			List<Node> nodes);
 
 	/**
 	 * Creates a new procedure, not external, with empty parameters, locals, and

@@ -29,7 +29,6 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -46,7 +45,6 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
@@ -604,25 +602,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Procedure createProcedure(String name, boolean nativeFlag,
-			Location location, Type returnType,
-			OrderedMap<String, Var> parameters, OrderedMap<String, Var> locals,
-			List<Node> nodes) {
-		ProcedureImpl procedure = new ProcedureImpl();
-
-		procedure.setLocation(location);
-		procedure.setNative(nativeFlag);
-		procedure.getNodes().addAll(nodes);
-		procedure.setName(name);
-		procedure.setReturnType(EcoreUtil.copy(returnType));
-
-		procedure.setLocals(locals);
-		procedure.setParameters(parameters);
-
-		return procedure;
-	}
-
-	@Override
 	public Procedure createProcedure(String name, Location location,
 			Type returnType) {
 		ProcedureImpl procedure = new ProcedureImpl();
@@ -630,9 +609,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		procedure.setLocation(location);
 		procedure.setName(name);
 		procedure.setReturnType(EcoreUtil.copy(returnType));
-
-		procedure.setLocals(new OrderedMap<String, Var>());
-		procedure.setParameters(new OrderedMap<String, Var>());
 
 		return procedure;
 	}

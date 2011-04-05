@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.transformations;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -35,7 +36,6 @@ import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines a transformation that transforms variable and procedure
@@ -80,8 +80,8 @@ public class RenameTransformation extends AbstractActorVisitor {
 		this.replacement = replacement;
 	}
 
-	private void checkVariables(OrderedMap<String, ? extends Var> vars) {
-		for (Var var : vars) {
+	private void checkVariables(List<Var> variables) {
+		for (Var var : variables) {
 			String name = var.getName();
 			if (transformations != null && transformations.containsKey(name)) {
 				var.setName(transformations.get(name));
@@ -93,8 +93,8 @@ public class RenameTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		checkVariables(actor.getParameters());
-		checkVariables(actor.getStateVars());
+		checkVariables(actor.getParameters().getList());
+		checkVariables(actor.getStateVars().getList());
 
 		super.visit(actor);
 	}

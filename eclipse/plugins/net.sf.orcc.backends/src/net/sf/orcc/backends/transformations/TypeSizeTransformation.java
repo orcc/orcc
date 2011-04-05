@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.transformations;
 
+import java.util.List;
+
 import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
@@ -71,7 +73,7 @@ public class TypeSizeTransformation extends AbstractActorVisitor {
 		}
 	}
 
-	private void checkVariables(OrderedMap<String, ? extends Var> vars) {
+	private void checkVariables(List<Var> vars) {
 		for (Var var : vars) {
 			checkType(var.getType());
 		}
@@ -91,8 +93,8 @@ public class TypeSizeTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		checkVariables(actor.getParameters());
-		checkVariables(actor.getStateVars());
+		checkVariables(actor.getParameters().getList());
+		checkVariables(actor.getStateVars().getList());
 		checkPorts(actor.getInputs());
 		checkPorts(actor.getOutputs());
 

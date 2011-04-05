@@ -532,13 +532,31 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE__NATIVE = 4;
 
 	/**
+	 * The feature id for the '<em><b>Locals</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__LOCALS = 5;
+
+	/**
+	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__PARAMETERS = 6;
+
+	/**
 	 * The number of structural features of the '<em>Procedure</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE_FEATURE_COUNT = 5;
+	int PROCEDURE_FEATURE_COUNT = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstAssignImpl
@@ -1690,6 +1708,28 @@ public interface IrPackage extends EPackage {
 	EAttribute getProcedure_Native();
 
 	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Procedure#getLocals <em>Locals</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Locals</em>'.
+	 * @see net.sf.orcc.ir.Procedure#getLocals()
+	 * @see #getProcedure()
+	 * @generated
+	 */
+	EReference getProcedure_Locals();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Procedure#getParameters <em>Parameters</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Parameters</em>'.
+	 * @see net.sf.orcc.ir.Procedure#getParameters()
+	 * @see #getProcedure()
+	 * @generated
+	 */
+	EReference getProcedure_Parameters();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstAssign <em>Inst Assign</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Inst Assign</em>'.
@@ -2659,6 +2699,22 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute PROCEDURE__NATIVE = eINSTANCE.getProcedure_Native();
+
+		/**
+		 * The meta object literal for the '<em><b>Locals</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PROCEDURE__LOCALS = eINSTANCE.getProcedure_Locals();
+
+		/**
+		 * The meta object literal for the '<em><b>Parameters</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PROCEDURE__PARAMETERS = eINSTANCE.getProcedure_Parameters();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstAssignImpl <em>Inst Assign</em>}' class.

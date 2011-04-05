@@ -699,6 +699,24 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getProcedure_Locals() {
+		return (EReference)procedureEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getProcedure_Parameters() {
+		return (EReference)procedureEClass.getEStructuralFeatures().get(6);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getInstAssign() {
 		return instAssignEClass;
 	}
@@ -1314,6 +1332,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(procedureEClass, PROCEDURE__NODES);
 		createEReference(procedureEClass, PROCEDURE__RETURN_TYPE);
 		createEAttribute(procedureEClass, PROCEDURE__NATIVE);
+		createEReference(procedureEClass, PROCEDURE__LOCALS);
+		createEReference(procedureEClass, PROCEDURE__PARAMETERS);
 
 		instAssignEClass = createEClass(INST_ASSIGN);
 		createEReference(instAssignEClass, INST_ASSIGN__TARGET);
@@ -1507,6 +1527,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getProcedure_Nodes(), this.getNode(), null, "nodes", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcedure_ReturnType(), this.getType(), null, "returnType", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getProcedure_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcedure_Locals(), this.getVar(), null, "locals", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProcedure_Parameters(), this.getVar(), null, "parameters", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(instAssignEClass, InstAssign.class, "InstAssign", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getInstAssign_Target(), this.getVar(), null, "target", null, 0, 1, InstAssign.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

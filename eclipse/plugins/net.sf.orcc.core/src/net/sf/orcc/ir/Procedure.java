@@ -30,8 +30,6 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
-import net.sf.orcc.util.OrderedMap;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
@@ -105,11 +103,22 @@ public interface Procedure extends EObject {
 	List<Var> getLoadedVariables();
 
 	/**
+	 * Returns the local variable of this procedure that has the given name.
+	 * 
+	 * @param name
+	 *            name of the local variable
+	 * 
+	 * @return the local variable of this procedure that has the given name.
+	 */
+	Var getLocal(String name);
+
+	/**
 	 * Returns the local variables of this procedure as an ordered map.
 	 * 
 	 * @return the local variables of this procedure as an ordered map
+	 * @model containment="true"
 	 */
-	OrderedMap<String, Var> getLocals();
+	EList<Var> getLocals();
 
 	/**
 	 * Returns the location of this procedure.
@@ -136,11 +145,22 @@ public interface Procedure extends EObject {
 	EList<Node> getNodes();
 
 	/**
+	 * Returns the parameter of this procedure that has the given name.
+	 * 
+	 * @param name
+	 *            name of the parameter
+	 * 
+	 * @return the parameter of this procedure that has the given name.
+	 */
+	Var getParameter(String name);
+
+	/**
 	 * Returns the parameters of this procedure as an ordered map.
 	 * 
 	 * @return the parameters of this procedure as an ordered map
+	 * @model containment="true"
 	 */
-	OrderedMap<String, Var> getParameters();
+	EList<Var> getParameters();
 
 	/**
 	 * Returns the result of this procedure.
@@ -195,14 +215,6 @@ public interface Procedure extends EObject {
 	 */
 	void setGraph(CFG graph);
 
-	/**
-	 * Sets the local variables of this procedure as an ordered map.
-	 * 
-	 * @param locals
-	 *            the local variables of this procedure as an ordered map
-	 */
-	void setLocals(OrderedMap<String, Var> locals);
-
 	void setLocation(Location location);
 
 	/**
@@ -220,14 +232,6 @@ public interface Procedure extends EObject {
 	 *            value of native flag
 	 */
 	void setNative(boolean nativeFlag);
-
-	/**
-	 * Sets the parameters of this procedure as an ordered map.
-	 * 
-	 * @param parameters
-	 *            the parameters of this procedure as an ordered map
-	 */
-	void setParameters(OrderedMap<String, Var> parameters);
 
 	void setResult(Expression result);
 

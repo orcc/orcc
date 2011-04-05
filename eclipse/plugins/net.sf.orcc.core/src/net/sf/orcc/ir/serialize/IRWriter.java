@@ -794,7 +794,7 @@ public class IRWriter {
 	 *            an ordered map of variables
 	 * @return a JSON array
 	 */
-	private JsonArray writeLocalVariables(OrderedMap<String, Var> variables) {
+	private JsonArray writeLocalVariables(List<Var> variables) {
 		JsonArray array = new JsonArray();
 		for (Var variable : variables) {
 			array.add(writeLocalVariable(variable));

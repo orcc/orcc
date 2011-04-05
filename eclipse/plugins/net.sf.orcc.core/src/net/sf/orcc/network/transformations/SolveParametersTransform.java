@@ -31,6 +31,8 @@ package net.sf.orcc.network.transformations;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
@@ -80,7 +82,7 @@ public class SolveParametersTransform extends AbstractExpressionInterpreter
 		OrderedMap<String, Var> variables = network.getVariables();
 		Var variable = variables.get(var.getName());
 		Expression value = variable.getInitialValue();
-		return value;
+		return EcoreUtil.copy(value);
 	}
 
 	/**

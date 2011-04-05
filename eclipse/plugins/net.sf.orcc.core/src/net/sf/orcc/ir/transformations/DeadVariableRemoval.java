@@ -38,7 +38,8 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a very simple Dead Var Elimination.
@@ -60,13 +61,13 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			}
 
 			// clean up uses
-			assign.setTarget(null);
-			assign.setValue(null);
+			EcoreUtil.delete(assign.getTarget(), true);
+			EcoreUtil.delete(assign.getValue(), true);
 
 			// remove instruction
 			itInstruction.remove();
 
-			procedure.getLocals().remove(variable.getName());
+			procedure.getLocals().remove(variable);
 			changed = true;
 		}
 	}
@@ -81,14 +82,17 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 					return;
 				}
 
-				// clean up target
+				// remove uses
+				while (!call.getParameters().isEmpty()) {
+					EcoreUtil.delete(call.getParameters().get(0), true);
+				}
 				call.setTarget(null);
 
 				// remove instruction
 				itInstruction.remove();
 
 				// remove result
-				procedure.getLocals().remove(variable.getName());
+				procedure.getLocals().remove(variable);
 				changed = true;
 			}
 		}
@@ -102,11 +106,18 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			if (isPort(target)) {
 				return;
 			}
+			
+			// remove use
+			load.getSource().setVariable(null);
+			while (!load.getIndexes().isEmpty()) {
+				EcoreUtil.delete(load.getIndexes().get(0), true);
+			}
+			load.setTarget(null);
 
 			// remove instruction
 			itInstruction.remove();
 
-			procedure.getLocals().remove(target.getName());
+			procedure.getLocals().remove(target);
 			changed = true;
 		}
 	}
@@ -120,10 +131,16 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 				return;
 			}
 
+			// remove uses
+			while (!phi.getValues().isEmpty()) {
+				EcoreUtil.delete(phi.getValues().get(0), true);
+			}
+			phi.setTarget(null);
+
 			// remove instruction
 			itInstruction.remove();
 
-			procedure.getLocals().remove(variable.getName());
+			procedure.getLocals().remove(variable);
 			changed = true;
 		}
 	}
@@ -136,8 +153,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			changed = false;
 
 			// first shot: removes locals not used by any instruction
-			OrderedMap<String, Var> locals = procedure.getLocals();
-			Iterator<Var> it = locals.iterator();
+			Iterator<Var> it = procedure.getLocals().iterator();
 			while (it.hasNext()) {
 				Var local = it.next();
 				if (!local.isUsed() && local.getInstruction() == null
@@ -162,11 +178,18 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 							target.getName()))) {
 				return;
 			}
+			
+			// remove uses
+			while (!store.getIndexes().isEmpty()) {
+				EcoreUtil.delete(store.getIndexes().get(0), true);
+			}
+			EcoreUtil.delete(store.getValue(), true);
+			store.setTarget(null);
 
 			// remove instruction
 			itInstruction.remove();
 
-			procedure.getLocals().remove(target.getName());
+			procedure.getLocals().remove(target);
 			changed = true;
 		}
 	}

@@ -537,7 +537,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				}
 			}
 		} else {
-			List<Var> procParams = proc.getParameters().getList();
+			List<Var> procParams = proc.getParameters();
 			for (int i = 0; i < callParams.size(); i++) {
 				Var procVar = procParams.get(i);
 				procVar.setValue((Expression) callParams.get(i).accept(
@@ -612,7 +612,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	@Override
 	public void visit(Procedure procedure) {
 		if (procedure.isNative()) {
-			int numParams = procedure.getParameters().getLength();
+			int numParams = procedure.getParameters().size();
 			Class<?>[] parameterTypes = new Class<?>[numParams];
 			Object[] args = new Object[numParams];
 			int i = 0;

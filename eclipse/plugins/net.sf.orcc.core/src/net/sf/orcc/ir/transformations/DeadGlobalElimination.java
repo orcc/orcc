@@ -58,8 +58,6 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 				Instruction instruction = it.next();
 				instruction.accept(this);
 				it.remove();
-
-				instruction.getBlock().getInstructions().remove(instruction);
 			}
 		}
 	}

@@ -660,19 +660,16 @@ public class IRParser {
 	 *            A list of JSON-encoded {@link VarLocal}.
 	 * @return A {@link List}&lt;{@link VarLocal}&gt;.
 	 */
-	private OrderedMap<String, Var> parseLocalVariables(JsonArray arrayVars) {
-		OrderedMap<String, Var> localVars = new OrderedMap<String, Var>();
+	private void parseLocalVariables(List<Var> variables, JsonArray arrayVars) {
 		for (JsonElement element : arrayVars) {
 			JsonArray array = element.getAsJsonArray();
 
 			Var varDef = parseLocalVariable(array);
-			localVars.put(file, varDef.getLocation(), varDef.getName(), varDef);
+			variables.add(varDef);
 
 			// register the variable definition
 			vars.put(file, varDef.getLocation(), varDef.getName(), varDef);
 		}
-
-		return localVars;
 	}
 
 	/**
@@ -861,16 +858,20 @@ public class IRParser {
 
 		Location location = parseLocation(array.get(2).getAsJsonArray());
 		Type returnType = parseType(array.get(3));
-		vars = new Scope<String, Var>(vars, true);
-		OrderedMap<String, Var> parameters = parseLocalVariables(array.get(4)
-				.getAsJsonArray());
-		vars = new Scope<String, Var>(vars, false);
-		OrderedMap<String, Var> locals = parseLocalVariables(array.get(5)
-				.getAsJsonArray());
-		List<Node> nodes = parseNodes(array.get(6).getAsJsonArray());
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
-				external, location, returnType, parameters, locals, nodes);
+				location, returnType);
+		procedure.setNative(external);
+
+		vars = new Scope<String, Var>(vars, true);
+		parseLocalVariables(procedure.getParameters(), array.get(4)
+				.getAsJsonArray());
+		vars = new Scope<String, Var>(vars, false);
+		parseLocalVariables(procedure.getLocals(), array.get(5)
+				.getAsJsonArray());
+
+		List<Node> nodes = parseNodes(array.get(6).getAsJsonArray());
+		procedure.getNodes().addAll(nodes);
 
 		// go back to previous scope
 		vars = vars.getParent().getParent();

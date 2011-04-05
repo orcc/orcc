@@ -229,7 +229,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 */
 	public List<Cast> getParamCast() {
 		List<Cast> casts = new ArrayList<Cast>();
-		List<Var> varParams = this.getProcedure().getParameters().getList();
+		List<Var> varParams = this.getProcedure().getParameters();
 
 		for (int i = 0; i < parameters.size(); i++) {
 			Expression parameter = parameters.get(i);
