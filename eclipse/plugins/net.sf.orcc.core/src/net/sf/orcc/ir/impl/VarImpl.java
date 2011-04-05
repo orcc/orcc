@@ -539,7 +539,7 @@ public class VarImpl extends EObjectImpl implements Var {
 
 	@Override
 	public boolean isUsed() {
-		return !uses.isEmpty();
+		return !getUses().isEmpty();
 	}
 
 	@Override

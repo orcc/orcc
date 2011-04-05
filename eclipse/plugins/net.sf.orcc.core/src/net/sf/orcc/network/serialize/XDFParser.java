@@ -708,7 +708,7 @@ public class XDFParser {
 					false);
 			network.getParameters().put(file.getAbsolutePath(), location, name,
 					var);
-		} else if (kind.equals("Var")) {
+		} else if (kind.equals("Variable")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();

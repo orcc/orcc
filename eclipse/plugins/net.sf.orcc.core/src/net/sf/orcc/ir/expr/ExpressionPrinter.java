@@ -131,12 +131,12 @@ public class ExpressionPrinter implements ExpressionVisitor {
 
 	@Override
 	public void visit(ExprInt expr, Object... args) {
-		builder.append(expr.toString());
+		builder.append(expr.getValue());
 	}
 
 	@Override
 	public void visit(ExprFloat expr, Object... args) {
-		builder.append(expr.toString());
+		builder.append(expr.getValue());
 	}
 
 	@Override
@@ -169,7 +169,7 @@ public class ExpressionPrinter implements ExpressionVisitor {
 
 	@Override
 	public void visit(ExprVar expr, Object... args) {
-		builder.append(expr.getUse());
+		builder.append(expr.getUse().getVariable().getName());
 	}
 
 }
