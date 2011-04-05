@@ -52,38 +52,6 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 */
 	protected EList<Expression> indexes;
 
-	@Override
-	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public Cast getCast() {
-		Type expr = value.getType();
-		Type val = target.getType();
-
-		if (expr == null) {
-			return null;
-		}
-
-		if (value.isIntExpr() || value.isBooleanExpr()) {
-			return null;
-		}
-
-		Cast cast = new Cast(expr, val);
-
-		if (cast.isExtended() || cast.isTrunced()) {
-			return cast;
-		}
-
-		return null;
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		visitor.visit(this);
-	}
-
 	/**
 	 * The cached value of the '{@link #getTarget() <em>Target</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -110,6 +78,112 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 		super();
 	}
 
+	@Override
+	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+
+	@Override
+	public void accept(InstructionVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Var basicGetTarget() {
+		return target;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetValue(Expression newValue,
+			NotificationChain msgs) {
+		Expression oldValue = value;
+		value = newValue;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__VALUE, oldValue, newValue);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case IrPackage.INST_STORE__INDEXES:
+				return getIndexes();
+			case IrPackage.INST_STORE__TARGET:
+				if (resolve) return getTarget();
+				return basicGetTarget();
+			case IrPackage.INST_STORE__VALUE:
+				return getValue();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.INST_STORE__INDEXES:
+				return ((InternalEList<?>)getIndexes()).basicRemove(otherEnd, msgs);
+			case IrPackage.INST_STORE__VALUE:
+				return basicSetValue(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+			case IrPackage.INST_STORE__INDEXES:
+				return indexes != null && !indexes.isEmpty();
+			case IrPackage.INST_STORE__TARGET:
+				return target != null;
+			case IrPackage.INST_STORE__VALUE:
+				return value != null;
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+			case IrPackage.INST_STORE__INDEXES:
+				getIndexes().clear();
+				getIndexes().addAll((Collection<? extends Expression>)newValue);
+				return;
+			case IrPackage.INST_STORE__TARGET:
+				setTarget((Var)newValue);
+				return;
+			case IrPackage.INST_STORE__VALUE:
+				setValue((Expression)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -117,6 +191,48 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	@Override
 	protected EClass eStaticClass() {
 		return IrPackage.Literals.INST_STORE;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+			case IrPackage.INST_STORE__INDEXES:
+				getIndexes().clear();
+				return;
+			case IrPackage.INST_STORE__TARGET:
+				setTarget((Var)null);
+				return;
+			case IrPackage.INST_STORE__VALUE:
+				setValue((Expression)null);
+				return;
+		}
+		super.eUnset(featureID);
+	}
+
+	@Override
+	public Cast getCast() {
+		Type expr = value.getType();
+		Type val = target.getType();
+
+		if (expr == null) {
+			return null;
+		}
+
+		if (value.isIntExpr() || value.isBooleanExpr()) {
+			return null;
+		}
+
+		Cast cast = new Cast(expr, val);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
 	}
 
 	/**
@@ -150,8 +266,13 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var basicGetTarget() {
-		return target;
+	public Expression getValue() {
+		return value;
+	}
+
+	@Override
+	public boolean isStore() {
+		return true;
 	}
 
 	/**
@@ -163,29 +284,6 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 		target = newTarget;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__TARGET, oldTarget, target));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Expression getValue() {
-		return value;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetValue(Expression newValue,
-			NotificationChain msgs) {
-		Expression oldValue = value;
-		value = newValue;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__VALUE, oldValue, newValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
 	}
 
 	/**
@@ -204,99 +302,6 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__VALUE, newValue, newValue));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case IrPackage.INST_STORE__INDEXES:
-				return ((InternalEList<?>)getIndexes()).basicRemove(otherEnd, msgs);
-			case IrPackage.INST_STORE__VALUE:
-				return basicSetValue(null, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case IrPackage.INST_STORE__INDEXES:
-				return getIndexes();
-			case IrPackage.INST_STORE__TARGET:
-				if (resolve) return getTarget();
-				return basicGetTarget();
-			case IrPackage.INST_STORE__VALUE:
-				return getValue();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case IrPackage.INST_STORE__INDEXES:
-				getIndexes().clear();
-				getIndexes().addAll((Collection<? extends Expression>)newValue);
-				return;
-			case IrPackage.INST_STORE__TARGET:
-				setTarget((Var)newValue);
-				return;
-			case IrPackage.INST_STORE__VALUE:
-				setValue((Expression)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-			case IrPackage.INST_STORE__INDEXES:
-				getIndexes().clear();
-				return;
-			case IrPackage.INST_STORE__TARGET:
-				setTarget((Var)null);
-				return;
-			case IrPackage.INST_STORE__VALUE:
-				setValue((Expression)null);
-				return;
-		}
-		super.eUnset(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.INST_STORE__INDEXES:
-				return indexes != null && !indexes.isEmpty();
-			case IrPackage.INST_STORE__TARGET:
-				return target != null;
-			case IrPackage.INST_STORE__VALUE:
-				return value != null;
-		}
-		return super.eIsSet(featureID);
 	}
 
 } // InstStoreImpl

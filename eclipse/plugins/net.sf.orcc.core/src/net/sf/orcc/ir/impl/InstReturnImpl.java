@@ -40,17 +40,7 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	 * @generated
 	 * @ordered
 	 */
-	protected Expression value;@Override
-	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	/**
+	protected Expression value;/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -59,23 +49,14 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 		super();
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.INST_RETURN;
+	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Expression getValue() {
-		return value;
+	@Override
+	public void accept(InstructionVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	/**
@@ -98,18 +79,13 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setValue(Expression newValue) {
-		if (newValue != value) {
-			NotificationChain msgs = null;
-			if (value != null)
-				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_RETURN__VALUE, null, msgs);
-			if (newValue != null)
-				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_RETURN__VALUE, null, msgs);
-			msgs = basicSetValue(newValue, msgs);
-			if (msgs != null) msgs.dispatch();
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case IrPackage.INST_RETURN__VALUE:
+				return getValue();
 		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_RETURN__VALUE, newValue, newValue));
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -132,12 +108,12 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case IrPackage.INST_RETURN__VALUE:
-				return getValue();
+				return value != null;
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -161,6 +137,16 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	 * @generated
 	 */
 	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.INST_RETURN;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case IrPackage.INST_RETURN__VALUE:
@@ -175,13 +161,32 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Expression getValue() {
+		return value;
+	}
+
 	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.INST_RETURN__VALUE:
-				return value != null;
+	public boolean isReturn() {
+		return true;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setValue(Expression newValue) {
+		if (newValue != value) {
+			NotificationChain msgs = null;
+			if (value != null)
+				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_RETURN__VALUE, null, msgs);
+			if (newValue != null)
+				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_RETURN__VALUE, null, msgs);
+			msgs = basicSetValue(newValue, msgs);
+			if (msgs != null) msgs.dispatch();
 		}
-		return super.eIsSet(featureID);
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_RETURN__VALUE, newValue, newValue));
 	}
 
 } //InstReturnImpl

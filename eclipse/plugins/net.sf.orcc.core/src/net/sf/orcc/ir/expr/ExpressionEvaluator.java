@@ -132,6 +132,9 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	public Object interpret(ExprVar expr, Object... args) {
 		Var var = expr.getUse().getVariable();
 		Expression value = var.getValue();
+		if (value == null) {
+			value = var.getInitialValue();
+		}
 		if (value == null && throwException) {
 			throwException = false;
 			throw new OrccRuntimeException("Uninitialized variable: "

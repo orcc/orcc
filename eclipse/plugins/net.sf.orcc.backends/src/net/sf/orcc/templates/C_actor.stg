@@ -159,7 +159,7 @@ printCall(call) ::= <<
 
 <if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printParameter()>);<
 else
-><if(call.target)><call.target> = <endif><call.procedure.name>(<call.parameters; separator=", ">);<
+><if(call.target)><call.target.name> = <endif><call.procedure.name>(<call.parameters; separator=", ">);<
 endif>
 >>
 
@@ -174,9 +174,9 @@ endif>
 printLoad(load) ::= <<
 
 <if (action.inputPattern.inverseVariableMap.(load.source.variable) || action.outputPattern.inverseVariableMap.(load.source.variable))
-><load.target> = tokens_<getPort(load.source.variable)>[(index_<getPort(load.source.variable)> + <first(load.indexes)>) % SIZE_<getPort(load.source.variable)>];<
+><load.target.name> = tokens_<getPort(load.source.variable)>[(index_<getPort(load.source.variable)> + <first(load.indexes)>) % SIZE_<getPort(load.source.variable)>];<
 else
-><load.target> = <load.source><load.indexes : {index | [<index>]}>;<
+><load.target.name> = <load.source.variable.name><load.indexes : {index | [<index>]}>;<
 endif>
 >>
 
@@ -205,7 +205,7 @@ printStore(store) ::= <<
 <if (action.inputPattern.inverseVariableMap.(store.target) || action.outputPattern.inverseVariableMap.(store.target))
 >tokens_<getPort(store.target)>[(index_<getPort(store.target)> + <first(store.indexes)>) % SIZE_<getPort(store.target)>] = <store.value>;<
 else
-><store.target><store.indexes : {index | [<index>]}> = <store.value>;<
+><store.target.name><store.indexes : {index | [<index>]}> = <store.value>;<
 endif>
 >>
 

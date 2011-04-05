@@ -55,6 +55,159 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 */
 	protected EList<Expression> parameters;
 
+	/**
+	 * The cached value of the '{@link #getProcedure() <em>Procedure</em>}' reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getProcedure()
+	 * @generated
+	 * @ordered
+	 */
+	protected Procedure procedure;
+
+	/**
+	 * The cached value of the '{@link #getTarget() <em>Target</em>}' reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getTarget()
+	 * @generated
+	 * @ordered
+	 */
+	protected Var target;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected InstCallImpl() {
+		super();
+	}
+
+	@Override
+	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+
+	@Override
+	public void accept(InstructionVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Procedure basicGetProcedure() {
+		return procedure;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Var basicGetTarget() {
+		return target;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case IrPackage.INST_CALL__PARAMETERS:
+				return getParameters();
+			case IrPackage.INST_CALL__PROCEDURE:
+				if (resolve) return getProcedure();
+				return basicGetProcedure();
+			case IrPackage.INST_CALL__TARGET:
+				if (resolve) return getTarget();
+				return basicGetTarget();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.INST_CALL__PARAMETERS:
+				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+			case IrPackage.INST_CALL__PARAMETERS:
+				return parameters != null && !parameters.isEmpty();
+			case IrPackage.INST_CALL__PROCEDURE:
+				return procedure != null;
+			case IrPackage.INST_CALL__TARGET:
+				return target != null;
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+			case IrPackage.INST_CALL__PARAMETERS:
+				getParameters().clear();
+				getParameters().addAll((Collection<? extends Expression>)newValue);
+				return;
+			case IrPackage.INST_CALL__PROCEDURE:
+				setProcedure((Procedure)newValue);
+				return;
+			case IrPackage.INST_CALL__TARGET:
+				setTarget((Var)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.INST_CALL;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+			case IrPackage.INST_CALL__PARAMETERS:
+				getParameters().clear();
+				return;
+			case IrPackage.INST_CALL__PROCEDURE:
+				setProcedure((Procedure)null);
+				return;
+			case IrPackage.INST_CALL__TARGET:
+				setTarget((Var)null);
+				return;
+		}
+		super.eUnset(featureID);
+	}
+
 	@Override
 	public Cast getCast() {
 		Type var = target.getType();
@@ -106,61 +259,6 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 		return casts;
 	}
 
-	@Override
-	public boolean hasResult() {
-		return (getTarget() != null);
-	}
-
-	@Override
-	public boolean isPrint() {
-		return "print".equals(procedure.getName());
-	}
-
-	@Override
-	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	/**
-	 * The cached value of the '{@link #getProcedure() <em>Procedure</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getProcedure()
-	 * @generated
-	 * @ordered
-	 */
-	protected Procedure procedure;
-
-	/**
-	 * The cached value of the '{@link #getTarget() <em>Target</em>}' reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getTarget()
-	 * @generated
-	 * @ordered
-	 */
-	protected Var target;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected InstCallImpl() {
-		super();
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.INST_CALL;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -192,8 +290,31 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Procedure basicGetProcedure() {
-		return procedure;
+	public Var getTarget() {
+		if (target != null && target.eIsProxy()) {
+			InternalEObject oldTarget = (InternalEObject)target;
+			target = (Var)eResolveProxy(oldTarget);
+			if (target != oldTarget) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_CALL__TARGET, oldTarget, target));
+			}
+		}
+		return target;
+	}
+
+	@Override
+	public boolean hasResult() {
+		return (getTarget() != null);
+	}
+
+	@Override
+	public boolean isCall() {
+		return true;
+	}
+
+	@Override
+	public boolean isPrint() {
+		return "print".equals(procedure.getName());
 	}
 
 	/**
@@ -211,127 +332,11 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var getTarget() {
-		if (target != null && target.eIsProxy()) {
-			InternalEObject oldTarget = (InternalEObject)target;
-			target = (Var)eResolveProxy(oldTarget);
-			if (target != oldTarget) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_CALL__TARGET, oldTarget, target));
-			}
-		}
-		return target;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Var basicGetTarget() {
-		return target;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public void setTarget(Var newTarget) {
 		Var oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_CALL__TARGET, oldTarget, target));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case IrPackage.INST_CALL__PARAMETERS:
-				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case IrPackage.INST_CALL__PARAMETERS:
-				return getParameters();
-			case IrPackage.INST_CALL__PROCEDURE:
-				if (resolve) return getProcedure();
-				return basicGetProcedure();
-			case IrPackage.INST_CALL__TARGET:
-				if (resolve) return getTarget();
-				return basicGetTarget();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case IrPackage.INST_CALL__PARAMETERS:
-				getParameters().clear();
-				getParameters().addAll((Collection<? extends Expression>)newValue);
-				return;
-			case IrPackage.INST_CALL__PROCEDURE:
-				setProcedure((Procedure)newValue);
-				return;
-			case IrPackage.INST_CALL__TARGET:
-				setTarget((Var)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-			case IrPackage.INST_CALL__PARAMETERS:
-				getParameters().clear();
-				return;
-			case IrPackage.INST_CALL__PROCEDURE:
-				setProcedure((Procedure)null);
-				return;
-			case IrPackage.INST_CALL__TARGET:
-				setTarget((Var)null);
-				return;
-		}
-		super.eUnset(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.INST_CALL__PARAMETERS:
-				return parameters != null && !parameters.isEmpty();
-			case IrPackage.INST_CALL__PROCEDURE:
-				return procedure != null;
-			case IrPackage.INST_CALL__TARGET:
-				return target != null;
-		}
-		return super.eIsSet(featureID);
 	}
 
 } // InstCallImpl

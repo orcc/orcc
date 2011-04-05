@@ -44,43 +44,6 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 */
 	protected Var target;
 
-	@Override
-	public Cast getCast() {
-		Type expr = value.getType();
-		Type val = target.getType();
-
-		if (expr == null) {
-			return null;
-		}
-
-		if (value.isIntExpr() || value.isBooleanExpr()) {
-			return null;
-		}
-
-		Cast cast = new Cast(expr, val);
-
-		if (cast.isExtended() || cast.isTrunced()) {
-			return cast;
-		}
-
-		return null;
-	}
-
-	@Override
-	public boolean isAssign() {
-		return true;
-	}
-
-	@Override
-	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		visitor.visit(this);
-	}
-
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -98,29 +61,14 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 		super();
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.INST_ASSIGN;
+	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Var getTarget() {
-		if (target != null && target.eIsProxy()) {
-			InternalEObject oldTarget = (InternalEObject)target;
-			target = (Var)eResolveProxy(oldTarget);
-			if (target != oldTarget) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_ASSIGN__TARGET, oldTarget, target));
-			}
-		}
-		return target;
+	@Override
+	public void accept(InstructionVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	/**
@@ -129,25 +77,6 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 */
 	public Var basicGetTarget() {
 		return target;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setTarget(Var newTarget) {
-		Var oldTarget = target;
-		target = newTarget;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__TARGET, oldTarget, target));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Expression getValue() {
-		return value;
 	}
 
 	/**
@@ -169,18 +98,16 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setValue(Expression newValue) {
-		if (newValue != value) {
-			NotificationChain msgs = null;
-			if (value != null)
-				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__VALUE, null, msgs);
-			if (newValue != null)
-				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__VALUE, null, msgs);
-			msgs = basicSetValue(newValue, msgs);
-			if (msgs != null) msgs.dispatch();
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case IrPackage.INST_ASSIGN__TARGET:
+				if (resolve) return getTarget();
+				return basicGetTarget();
+			case IrPackage.INST_ASSIGN__VALUE:
+				return getValue();
 		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__VALUE, newValue, newValue));
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -202,15 +129,14 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case IrPackage.INST_ASSIGN__TARGET:
-				if (resolve) return getTarget();
-				return basicGetTarget();
+				return target != null;
 			case IrPackage.INST_ASSIGN__VALUE:
-				return getValue();
+				return value != null;
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -235,6 +161,15 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 * @generated
 	 */
 	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.INST_ASSIGN;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case IrPackage.INST_ASSIGN__TARGET:
@@ -247,19 +182,84 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 		super.eUnset(featureID);
 	}
 
+	@Override
+	public Cast getCast() {
+		Type expr = value.getType();
+		Type val = target.getType();
+
+		if (expr == null) {
+			return null;
+		}
+
+		if (value.isIntExpr() || value.isBooleanExpr()) {
+			return null;
+		}
+
+		Cast cast = new Cast(expr, val);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.INST_ASSIGN__TARGET:
-				return target != null;
-			case IrPackage.INST_ASSIGN__VALUE:
-				return value != null;
+	public Var getTarget() {
+		if (target != null && target.eIsProxy()) {
+			InternalEObject oldTarget = (InternalEObject)target;
+			target = (Var)eResolveProxy(oldTarget);
+			if (target != oldTarget) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_ASSIGN__TARGET, oldTarget, target));
+			}
 		}
-		return super.eIsSet(featureID);
+		return target;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Expression getValue() {
+		return value;
+	}
+
+	@Override
+	public boolean isAssign() {
+		return true;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setTarget(Var newTarget) {
+		Var oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__TARGET, oldTarget, target));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setValue(Expression newValue) {
+		if (newValue != value) {
+			NotificationChain msgs = null;
+			if (value != null)
+				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__VALUE, null, msgs);
+			if (newValue != null)
+				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__VALUE, null, msgs);
+			msgs = basicSetValue(newValue, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__VALUE, newValue, newValue));
 	}
 
 } // InstAssignImpl

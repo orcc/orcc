@@ -50,17 +50,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * @generated
 	 * @ordered
 	 */
-	protected Var oldVariable;@Override
-	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	/**
+	protected Var oldVariable;/**
 	 * The cached value of the '{@link #getTarget() <em>Target</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -89,31 +79,14 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 		super();
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.INST_PHI;
+	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Var getOldVariable() {
-		if (oldVariable != null && oldVariable.eIsProxy()) {
-			InternalEObject oldOldVariable = (InternalEObject)oldVariable;
-			oldVariable = (Var)eResolveProxy(oldOldVariable);
-			if (oldVariable != oldOldVariable) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable, oldVariable));
-			}
-		}
-		return oldVariable;
+	@Override
+	public void accept(InstructionVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	/**
@@ -130,35 +103,6 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setOldVariable(Var newOldVariable) {
-		Var oldOldVariable = oldVariable;
-		oldVariable = newOldVariable;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable, oldVariable));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Var getTarget() {
-		if (target != null && target.eIsProxy()) {
-			InternalEObject oldTarget = (InternalEObject)target;
-			target = (Var)eResolveProxy(oldTarget);
-			if (target != oldTarget) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_PHI__TARGET, oldTarget, target));
-			}
-		}
-		return target;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Var basicGetTarget() {
 		return target;
 	}
@@ -168,23 +112,19 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTarget(Var newTarget) {
-		Var oldTarget = target;
-		target = newTarget;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__TARGET, oldTarget, target));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Expression> getValues() {
-		if (values == null) {
-			values = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.INST_PHI__VALUES);
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case IrPackage.INST_PHI__OLD_VARIABLE:
+				if (resolve) return getOldVariable();
+				return basicGetOldVariable();
+			case IrPackage.INST_PHI__TARGET:
+				if (resolve) return getTarget();
+				return basicGetTarget();
+			case IrPackage.INST_PHI__VALUES:
+				return getValues();
 		}
-		return values;
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -207,18 +147,16 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case IrPackage.INST_PHI__OLD_VARIABLE:
-				if (resolve) return getOldVariable();
-				return basicGetOldVariable();
+				return oldVariable != null;
 			case IrPackage.INST_PHI__TARGET:
-				if (resolve) return getTarget();
-				return basicGetTarget();
+				return target != null;
 			case IrPackage.INST_PHI__VALUES:
-				return getValues();
+				return values != null && !values.isEmpty();
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -250,6 +188,16 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * @generated
 	 */
 	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.INST_PHI;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case IrPackage.INST_PHI__OLD_VARIABLE:
@@ -270,17 +218,74 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.INST_PHI__OLD_VARIABLE:
-				return oldVariable != null;
-			case IrPackage.INST_PHI__TARGET:
-				return target != null;
-			case IrPackage.INST_PHI__VALUES:
-				return values != null && !values.isEmpty();
+	public Var getOldVariable() {
+		if (oldVariable != null && oldVariable.eIsProxy()) {
+			InternalEObject oldOldVariable = (InternalEObject)oldVariable;
+			oldVariable = (Var)eResolveProxy(oldOldVariable);
+			if (oldVariable != oldOldVariable) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable, oldVariable));
+			}
 		}
-		return super.eIsSet(featureID);
+		return oldVariable;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Var getTarget() {
+		if (target != null && target.eIsProxy()) {
+			InternalEObject oldTarget = (InternalEObject)target;
+			target = (Var)eResolveProxy(oldTarget);
+			if (target != oldTarget) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_PHI__TARGET, oldTarget, target));
+			}
+		}
+		return target;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Expression> getValues() {
+		if (values == null) {
+			values = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.INST_PHI__VALUES);
+		}
+		return values;
+	}
+
+	@Override
+	public boolean isPhi() {
+		return true;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setOldVariable(Var newOldVariable) {
+		Var oldOldVariable = oldVariable;
+		oldVariable = newOldVariable;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__OLD_VARIABLE, oldOldVariable, oldVariable));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setTarget(Var newTarget) {
+		Var oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__TARGET, oldTarget, target));
 	}
 
 } //InstPhiImpl
