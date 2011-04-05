@@ -562,7 +562,7 @@ public interface IrFactory extends EFactory {
 
 	/**
 	 * Creates a new global variable with the given location, type, name,
-	 * initial value. The variable may be assignable or not. Type is copied.
+	 * initial value. The variable may be assignable or not.
 	 * 
 	 * @param location
 	 *            the variable location

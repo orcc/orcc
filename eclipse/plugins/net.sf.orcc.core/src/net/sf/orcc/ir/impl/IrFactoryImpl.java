@@ -776,7 +776,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		var.setInitialValue(initialValue);
 		var.setLocation(location);
 		var.setName(name);
-		var.setType(EcoreUtil.copy(type));
+		var.setType(type);
 		return var;
 	}
 

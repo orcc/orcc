@@ -28,7 +28,12 @@
  */
 package net.sf.orcc.ir.util;
 
+import net.sf.orcc.ir.Use;
+
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
 /**
  * This class contains several methods to help the manipulation of EMF models.
@@ -37,6 +42,33 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public class EcoreHelper {
+
+	/**
+	 * Returns a deep copy of the given object, and updates uses.
+	 * 
+	 * @param <T>
+	 * @param eObject
+	 * @return a deep copy of the given object with uses correctly updated
+	 */
+	public static <T extends EObject> T copyUpdateUses(T eObject) {
+		Copier copier = new Copier();
+		@SuppressWarnings("unchecked")
+		T result = (T) copier.copy(eObject);
+		copier.copyReferences();
+
+		TreeIterator<EObject> it = EcoreUtil.getAllContents(eObject, true);
+		while (it.hasNext()) {
+			EObject obj = it.next();
+
+			if (obj instanceof Use) {
+				Use use = (Use) obj;
+				Use copyUse = (Use) copier.get(use);
+				copyUse.setVariable(use.getVariable());
+			}
+		}
+
+		return result;
+	}
 
 	/**
 	 * Returns the container of <code>ele</code> with the given type, or

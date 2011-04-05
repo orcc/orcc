@@ -928,8 +928,12 @@ public class TypeChecker extends CalSwitch<Type> {
 			TypeList typeSrc = (TypeList) src;
 			TypeList typeDst = (TypeList) dst;
 			// Recursively check type convertibility
-			return (isConvertibleTo(typeSrc.getType(), typeDst.getType()) && typeSrc
-					.getSize() <= typeDst.getSize());
+			if (isConvertibleTo(typeSrc.getType(), typeDst.getType())) {
+				if (typeSrc.getSizeExpr() != null && typeDst.getSizeExpr() != null) {
+					return typeSrc.getSize() <= typeDst.getSize();
+				}
+				return true;
+			}
 		}
 
 		return false;
