@@ -8,6 +8,7 @@ package net.sf.orcc.ir.util;
 
 import java.util.List;
 
+import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -340,6 +341,12 @@ public class IrSwitch<T> {
 				ExprVar exprVar = (ExprVar)theEObject;
 				T result = caseExprVar(exprVar);
 				if (result == null) result = caseExpression(exprVar);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.DEF: {
+				Def def = (Def)theEObject;
+				T result = caseDef(def);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -839,6 +846,21 @@ public class IrSwitch<T> {
 	 * @generated
 	 */
 	public T caseExprVar(ExprVar object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Def</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Def</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseDef(Def object) {
 		return null;
 	}
 

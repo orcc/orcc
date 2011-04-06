@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -31,67 +31,27 @@ package net.sf.orcc.ir;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * This class represents a location. A location keeps track of where a
- * particular element was in the original file. It contains the line, and
- * starting and ending columns.
+ * This interface defines a definition of a variable.
  * 
  * @author Matthieu Wipliez
  * @model
  */
-public interface Location extends EObject {
+public interface Def extends EObject {
 
 	/**
-	 * Returns the ending column of this location.
+	 * Returns the var defined by this definition.
 	 * 
-	 * @return the ending column of this location
-	 * @model
+	 * @return the var defined by this definition
+	 * @model type="Var" opposite="defs"
 	 */
-	int getEndColumn();
+	Var getVariable();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Location#getEndColumn <em>End Column</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>End Column</em>' attribute.
-	 * @see #getEndColumn()
-	 * @generated
-	 */
-	void setEndColumn(int value);
-
-	/**
-	 * Returns the starting column of this location.
+	 * Sets the variable defined by this definition.
 	 * 
-	 * @return the starting column of this location
-	 * @model
+	 * @param variable
+	 *            the variable defined by this definition
 	 */
-	int getStartColumn();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Location#getStartColumn <em>Start Column</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Start Column</em>' attribute.
-	 * @see #getStartColumn()
-	 * @generated
-	 */
-	void setStartColumn(int value);
-
-	/**
-	 * Returns the starting line of this location.
-	 * 
-	 * @return the starting line of this location
-	 * @model
-	 */
-	int getStartLine();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Location#getStartLine <em>Start Line</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Start Line</em>' attribute.
-	 * @see #getStartLine()
-	 * @generated
-	 */
-	void setStartLine(int value);
+	void setVariable(Var variable);
 
 }

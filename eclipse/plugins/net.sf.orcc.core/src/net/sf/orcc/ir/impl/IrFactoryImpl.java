@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -170,6 +171,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.EXPR_STRING: return createExprString();
 			case IrPackage.EXPR_UNARY: return createExprUnary();
 			case IrPackage.EXPR_VAR: return createExprVar();
+			case IrPackage.DEF: return createDef();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -323,6 +325,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public ExprVar createExprVar() {
 		ExprVarImpl exprVar = new ExprVarImpl();
 		return exprVar;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Def createDef() {
+		DefImpl def = new DefImpl();
+		return def;
 	}
 
 	@Override

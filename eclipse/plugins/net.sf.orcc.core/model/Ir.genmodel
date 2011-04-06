@@ -125,6 +125,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/assignable"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/global"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/uses"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/defs"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Use">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Use/variable"/>
@@ -156,6 +157,9 @@
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//ExprVar">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprVar/use"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//Def">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Ir.ecore#//Def/variable"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

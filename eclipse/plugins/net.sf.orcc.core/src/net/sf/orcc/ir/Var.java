@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,8 @@
  */
 package net.sf.orcc.ir;
 
-import java.lang.String;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import java.util.List;
 
 /**
  * This interface represents a variable. A variable has a location, a type, a
@@ -45,21 +43,14 @@ import java.util.List;
 public interface Var extends EObject {
 
 	/**
-	 * Adds the given instruction from the list of instructions that have this
-	 * variable on their left-hand side.
+	 * Returns the definitions of this variable. A definition is an instruction
+	 * whose target is this variable. If this variable is a local scalar, at
+	 * most one definition is expected.
 	 * 
-	 * @param instruction
-	 *            an instruction
+	 * @return the definitions of this variable
+	 * @model
 	 */
-	void addInstruction(Instruction instruction);
-
-	/**
-	 * Returns the base name of this variable, which is the original name of the
-	 * variable, without index.
-	 * 
-	 * @return the base name of this variable
-	 */
-	String getBaseName();
+	EList<Def> getDefs();
 
 	/**
 	 * Returns the SSA index of this variable. Valid only for local scalar
@@ -71,32 +62,22 @@ public interface Var extends EObject {
 	int getIndex();
 
 	/**
-	 * Returns the initial expression of this variable.
+	 * Returns the indexed name of this variable, which is the name of the
+	 * variable concatenated with "_" and its index, or if index is 0 is the
+	 * name of variable.
 	 * 
-	 * @return the initial expression of this variable
+	 * @return the indexed name of this variable
+	 */
+	String getIndexedName();
+
+	/**
+	 * Returns the initial value of this variable as an expression. Only valid
+	 * for global variables.
+	 * 
+	 * @return the initial value of this variable as an expression
 	 * @model containment="true"
 	 */
 	Expression getInitialValue();
-
-	/**
-	 * Returns the instruction where this variable is defined, or
-	 * <code>null</code> if zero or several instructions use this variable as a
-	 * target. Only valid is this variable is local.
-	 * 
-	 * @return the instruction where this variable is defined, or
-	 *         <code>null</code>
-	 */
-	Instruction getInstruction();
-
-	/**
-	 * Returns the instructions where this variable appears on the left-hand
-	 * side, or <code>null</code> if there are no such instructions, or if this
-	 * variable is local (in which case, see {@link #getInstruction()}).
-	 * 
-	 * @return the list of instructions that have this variable on their
-	 *         left-hand side, or <code>null</code>
-	 */
-	List<Instruction> getInstructions();
 
 	/**
 	 * Returns the location of this variable.
@@ -131,7 +112,7 @@ public interface Var extends EObject {
 	EList<Use> getUses();
 
 	/**
-	 * Returns the current value of this variable.
+	 * Returns the current value of this variable. Used by the interpreter.
 	 * 
 	 * @return the current value of this variable
 	 * @model containment="true"
@@ -153,14 +134,6 @@ public interface Var extends EObject {
 	 * @model
 	 */
 	boolean isGlobal();
-
-	/**
-	 * Sets this variable as global or not.
-	 * 
-	 * @param global
-	 *            <code>true</code> if this variable should be global
-	 */
-	void setGlobal(boolean global);
 
 	/**
 	 * Returns true if this variable has been assigned to an SSA index of this
@@ -185,21 +158,20 @@ public interface Var extends EObject {
 	boolean isUsed();
 
 	/**
-	 * Removes the given instruction from the list of instructions that have
-	 * this variable on their left-hand side.
-	 * 
-	 * @param instruction
-	 *            an instruction
-	 */
-	void removeInstruction(Instruction instruction);
-
-	/**
 	 * Sets this variable as assignable or not.
 	 * 
 	 * @param assignable
 	 *            <code>true</code> if the variable is assignable
 	 */
 	void setAssignable(boolean assignable);
+
+	/**
+	 * Sets this variable as global or not.
+	 * 
+	 * @param global
+	 *            <code>true</code> if this variable should be global
+	 */
+	void setGlobal(boolean global);
 
 	/**
 	 * Sets the SSA index of this variable. Valid only for local scalar
@@ -211,21 +183,12 @@ public interface Var extends EObject {
 	void setIndex(int index);
 
 	/**
-	 * Sets the initial expression of this variable.
+	 * Sets the initial value of this variable as an expression.
 	 * 
 	 * @param expression
-	 *            the initial expression of this variable
+	 *            the initial value of this variable as an expression
 	 */
 	void setInitialValue(Expression expression);
-
-	/**
-	 * Sets the instruction where this variable is defined. This is valid if and
-	 * only if this variable is only assigned to once.
-	 * 
-	 * @param instruction
-	 *            the instruction where this local variable is defined
-	 */
-	void setInstruction(Instruction instruction);
 
 	/**
 	 * Sets the location of this variable.
@@ -252,10 +215,10 @@ public interface Var extends EObject {
 	void setType(Type type);
 
 	/**
-	 * Sets the value of this variable.
+	 * Sets the value of this variable. Used by the interpreter.
 	 * 
 	 * @param value
-	 *            the typed value of this variable
+	 *            the value of this variable
 	 */
 	void setValue(Expression value);
 

@@ -986,13 +986,22 @@ public interface IrPackage extends EPackage {
 	int VAR__USES = 8;
 
 	/**
+	 * The feature id for the '<em><b>Defs</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__DEFS = 9;
+
+	/**
 	 * The number of structural features of the '<em>Var</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int VAR_FEATURE_COUNT = 9;
+	int VAR_FEATURE_COUNT = 10;
 
 
 	/**
@@ -1278,6 +1287,34 @@ public interface IrPackage extends EPackage {
 	int EXPR_VAR_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 1;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.DefImpl <em>Def</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.DefImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getDef()
+	 * @generated
+	 */
+	int DEF = 33;
+
+	/**
+	 * The feature id for the '<em><b>Variable</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DEF__VARIABLE = 0;
+
+	/**
+	 * The number of structural features of the '<em>Def</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int DEF_FEATURE_COUNT = 1;
+
+	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1285,7 +1322,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 33;
+	int OP_BINARY = 34;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1295,7 +1332,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 34;
+	int OP_UNARY = 35;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
@@ -2104,6 +2141,17 @@ public interface IrPackage extends EPackage {
 	EReference getVar_Uses();
 
 	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Var#getDefs <em>Defs</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Defs</em>'.
+	 * @see net.sf.orcc.ir.Var#getDefs()
+	 * @see #getVar()
+	 * @generated
+	 */
+	EReference getVar_Defs();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Use <em>Use</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Use</em>'.
@@ -2332,6 +2380,27 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getExprVar_Use();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Def <em>Def</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Def</em>'.
+	 * @see net.sf.orcc.ir.Def
+	 * @generated
+	 */
+	EClass getDef();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Def#getVariable <em>Variable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Variable</em>'.
+	 * @see net.sf.orcc.ir.Def#getVariable()
+	 * @see #getDef()
+	 * @generated
+	 */
+	EReference getDef_Variable();
 
 	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}'.
@@ -2954,6 +3023,14 @@ public interface IrPackage extends EPackage {
 		EReference VAR__USES = eINSTANCE.getVar_Uses();
 
 		/**
+		 * The meta object literal for the '<em><b>Defs</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VAR__DEFS = eINSTANCE.getVar_Defs();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.UseImpl <em>Use</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.UseImpl
@@ -3127,6 +3204,24 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference EXPR_VAR__USE = eINSTANCE.getExprVar_Use();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.DefImpl <em>Def</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.DefImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getDef()
+		 * @generated
+		 */
+		EClass DEF = eINSTANCE.getDef();
+
+		/**
+		 * The meta object literal for the '<em><b>Variable</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference DEF__VARIABLE = eINSTANCE.getDef_Variable();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.

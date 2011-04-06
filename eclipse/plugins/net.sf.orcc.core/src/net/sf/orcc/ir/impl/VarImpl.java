@@ -6,12 +6,10 @@
  */
 package net.sf.orcc.ir.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
@@ -43,6 +41,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isAssignable <em>Assignable</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isGlobal <em>Global</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getUses <em>Uses</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getDefs <em>Defs</em>}</li>
  * </ul>
  * </p>
  *
@@ -76,17 +75,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	 * @ordered
 	 */
 	protected Expression initialValue;
-
-	/**
-	 * the instruction where the variable is assigned.
-	 */
-	private Instruction instruction;
-
-	/**
-	 * Contains a list of instructions that have this variable on their
-	 * left-hand side. Only valid for non-local variables.
-	 */
-	private List<Instruction> instructions;
 
 	/**
 	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
@@ -180,19 +168,21 @@ public class VarImpl extends EObjectImpl implements Var {
 	protected EList<Use> uses;
 
 	/**
+	 * The cached value of the '{@link #getDefs() <em>Defs</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getDefs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Def> defs;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected VarImpl() {
 		super();
-	}
-
-	@Override
-	public void addInstruction(Instruction instruction) {
-		if (instructions == null) {
-			instructions = new ArrayList<Instruction>(1);
-		}
-		instructions.add(instruction);
 	}
 
 	/**
@@ -279,6 +269,8 @@ public class VarImpl extends EObjectImpl implements Var {
 				return isGlobal();
 			case IrPackage.VAR__USES:
 				return getUses();
+			case IrPackage.VAR__DEFS:
+				return getDefs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -294,6 +286,8 @@ public class VarImpl extends EObjectImpl implements Var {
 		switch (featureID) {
 			case IrPackage.VAR__USES:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getUses()).basicAdd(otherEnd, msgs);
+			case IrPackage.VAR__DEFS:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getDefs()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -316,6 +310,8 @@ public class VarImpl extends EObjectImpl implements Var {
 				return basicSetValue(null, msgs);
 			case IrPackage.VAR__USES:
 				return ((InternalEList<?>)getUses()).basicRemove(otherEnd, msgs);
+			case IrPackage.VAR__DEFS:
+				return ((InternalEList<?>)getDefs()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -345,6 +341,8 @@ public class VarImpl extends EObjectImpl implements Var {
 				return global != GLOBAL_EDEFAULT;
 			case IrPackage.VAR__USES:
 				return uses != null && !uses.isEmpty();
+			case IrPackage.VAR__DEFS:
+				return defs != null && !defs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -384,6 +382,10 @@ public class VarImpl extends EObjectImpl implements Var {
 			case IrPackage.VAR__USES:
 				getUses().clear();
 				getUses().addAll((Collection<? extends Use>)newValue);
+				return;
+			case IrPackage.VAR__DEFS:
+				getDefs().clear();
+				getDefs().addAll((Collection<? extends Def>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -432,13 +434,23 @@ public class VarImpl extends EObjectImpl implements Var {
 			case IrPackage.VAR__USES:
 				getUses().clear();
 				return;
+			case IrPackage.VAR__DEFS:
+				getDefs().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
 
-	@Override
-	public String getBaseName() {
-		return name;
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Def> getDefs() {
+		if (defs == null) {
+			defs = new EObjectWithInverseResolvingEList<Def>(Def.class, this, IrPackage.VAR__DEFS, IrPackage.DEF__VARIABLE);
+		}
+		return defs;
 	}
 
 	/**
@@ -449,22 +461,21 @@ public class VarImpl extends EObjectImpl implements Var {
 		return index;
 	}
 
+	@Override
+	public String getIndexedName() {
+		if (index == 0) {
+			return name;
+		} else {
+			return name + "_" + index;
+		}
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Expression getInitialValue() {
 		return initialValue;
-	}
-
-	@Override
-	public Instruction getInstruction() {
-		return instruction;
-	}
-
-	@Override
-	public List<Instruction> getInstructions() {
-		return instructions;
 	}
 
 	/**
@@ -475,13 +486,12 @@ public class VarImpl extends EObjectImpl implements Var {
 		return location;
 	}
 
-	@Override
+	/**
+	 * 
+	 * @generated
+	 */
 	public String getName() {
-		if (index == 0) {
-			return name;
-		} else {
-			return name + "_" + index;
-		}
+		return name;
 	}
 
 	/**
@@ -542,13 +552,6 @@ public class VarImpl extends EObjectImpl implements Var {
 		return !getUses().isEmpty();
 	}
 
-	@Override
-	public void removeInstruction(Instruction instruction) {
-		if (instructions != null) {
-			instructions.remove(instruction);
-		}
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -598,11 +601,6 @@ public class VarImpl extends EObjectImpl implements Var {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__INITIAL_VALUE, newInitialValue, newInitialValue));
-	}
-
-	@Override
-	public void setInstruction(Instruction instruction) {
-		this.instruction = instruction;
 	}
 
 	/**

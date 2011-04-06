@@ -122,6 +122,8 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="global" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="uses" upperBound="-1" eType="#//Use"
         eOpposite="#//Use/variable"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="defs" upperBound="-1" eType="#//Def"
+        eOpposite="#//Def/variable"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Use">
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"
@@ -160,6 +162,10 @@
   <eClassifiers xsi:type="ecore:EClass" name="ExprVar" eSuperTypes="#//Expression">
     <eStructuralFeatures xsi:type="ecore:EReference" name="use" eType="#//Use" containment="true"
         resolveProxies="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Def">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"
+        eOpposite="#//Var/defs"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">
     <eLiterals name="BITAND"/>

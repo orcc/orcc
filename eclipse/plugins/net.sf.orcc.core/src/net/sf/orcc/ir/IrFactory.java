@@ -136,6 +136,15 @@ public interface IrFactory extends EFactory {
 	 */
 	ExprVar createExprVar();
 
+	/**
+	 * Returns a new object of class '<em>Def</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Def</em>'.
+	 * @generated
+	 */
+	Def createDef();
+
 	ExprVar createExprVar(Use use);
 
 	ExprVar createExprVar(Var variable);

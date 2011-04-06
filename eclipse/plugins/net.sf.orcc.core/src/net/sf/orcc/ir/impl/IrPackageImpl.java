@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -283,6 +284,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass exprVarEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass defEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1024,6 +1032,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getVar_Defs() {
+		return (EReference)varEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getUse() {
 		return useEClass;
 	}
@@ -1222,6 +1239,24 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getDef() {
+		return defEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getDef_Variable() {
+		return (EReference)defEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EEnum getOpBinary() {
 		return opBinaryEEnum;
 	}
@@ -1360,6 +1395,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEAttribute(varEClass, VAR__ASSIGNABLE);
 		createEAttribute(varEClass, VAR__GLOBAL);
 		createEReference(varEClass, VAR__USES);
+		createEReference(varEClass, VAR__DEFS);
 
 		useEClass = createEClass(USE);
 		createEReference(useEClass, USE__VARIABLE);
@@ -1391,6 +1427,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		exprVarEClass = createEClass(EXPR_VAR);
 		createEReference(exprVarEClass, EXPR_VAR__USE);
+
+		defEClass = createEClass(DEF);
+		createEReference(defEClass, DEF__VARIABLE);
 
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
@@ -1551,6 +1590,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEAttribute(getVar_Assignable(), ecorePackage.getEBoolean(), "assignable", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Global(), ecorePackage.getEBoolean(), "global", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Uses(), this.getUse(), this.getUse_Variable(), "uses", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getVar_Defs(), this.getDef(), this.getDef_Variable(), "defs", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(useEClass, Use.class, "Use", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getUse_Variable(), this.getVar(), this.getVar_Uses(), "variable", null, 0, 1, Use.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1582,6 +1622,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(exprVarEClass, ExprVar.class, "ExprVar", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getExprVar_Use(), this.getUse(), null, "use", null, 0, 1, ExprVar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(defEClass, Def.class, "Def", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getDef_Variable(), this.getVar(), this.getVar_Defs(), "variable", null, 0, 1, Def.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");

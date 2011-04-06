@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.util;
 
+import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -233,6 +234,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseExprVar(ExprVar object) {
 				return createExprVarAdapter();
+			}
+			@Override
+			public Adapter caseDef(Def object) {
+				return createDefAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -713,6 +718,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createExprVarAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Def <em>Def</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Def
+	 * @generated
+	 */
+	public Adapter createDefAdapter() {
 		return null;
 	}
 
