@@ -41,7 +41,7 @@ public interface InstAssign extends Instruction {
 	 * Returns the target of this node.
 	 * 
 	 * @return the target of this node
-	 * @model
+	 * @model containment="true"
 	 */
 	Def getTarget();
 

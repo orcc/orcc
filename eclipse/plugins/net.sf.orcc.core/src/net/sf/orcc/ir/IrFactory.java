@@ -14,23 +14,22 @@ import org.eclipse.emf.ecore.EFactory;
 /**
  * <!-- begin-user-doc --> The <b>Factory</b> for the model. It provides a
  * create method for each non-abstract class of the model. <!-- end-user-doc -->
- * 
  * @see net.sf.orcc.ir.IrPackage
  * @generated
  */
 public interface IrFactory extends EFactory {
 	/**
-	 * The singleton instance of the factory. <!-- begin-user-doc --> <!--
+	 * The singleton instance of the factory.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	IrFactory eINSTANCE = net.sf.orcc.ir.impl.IrFactoryImpl.init();
 
 	/**
-	 * Returns a new object of class '<em>Def</em>'. <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Def</em>'.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Def</em>'.
 	 * @generated
 	 */
@@ -46,9 +45,9 @@ public interface IrFactory extends EFactory {
 	Def createDef(Var variable);
 
 	/**
-	 * Returns a new object of class '<em>Expr Binary</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr Binary</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Expr Binary</em>'.
 	 * @generated
 	 */
@@ -67,9 +66,9 @@ public interface IrFactory extends EFactory {
 			Type type);
 
 	/**
-	 * Returns a new object of class '<em>Expr Bool</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr Bool</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Expr Bool</em>'.
 	 * @generated
 	 */
@@ -78,9 +77,9 @@ public interface IrFactory extends EFactory {
 	ExprBool createExprBool(boolean value);
 
 	/**
-	 * Returns a new object of class '<em>Expr Float</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr Float</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Expr Float</em>'.
 	 * @generated
 	 */
@@ -89,9 +88,9 @@ public interface IrFactory extends EFactory {
 	ExprFloat createExprFloat(float value);
 
 	/**
-	 * Returns a new object of class '<em>Expr Int</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr Int</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Expr Int</em>'.
 	 * @generated
 	 */
@@ -104,9 +103,9 @@ public interface IrFactory extends EFactory {
 	ExprInt createExprInt(long value);
 
 	/**
-	 * Returns a new object of class '<em>Expr List</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr List</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Expr List</em>'.
 	 * @generated
 	 */
@@ -117,9 +116,9 @@ public interface IrFactory extends EFactory {
 	ExprList createExprList(List<Expression> exprs);
 
 	/**
-	 * Returns a new object of class '<em>Expr String</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr String</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Expr String</em>'.
 	 * @generated
 	 */
@@ -128,9 +127,9 @@ public interface IrFactory extends EFactory {
 	ExprString createExprString(String value);
 
 	/**
-	 * Returns a new object of class '<em>Expr Unary</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr Unary</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Expr Unary</em>'.
 	 * @generated
 	 */
@@ -147,9 +146,9 @@ public interface IrFactory extends EFactory {
 	ExprUnary createExprUnary(OpUnary op, Expression expression, Type type);
 
 	/**
-	 * Returns a new object of class '<em>Expr Var</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Expr Var</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Expr Var</em>'.
 	 * @generated
 	 */
@@ -160,9 +159,9 @@ public interface IrFactory extends EFactory {
 	ExprVar createExprVar(Var variable);
 
 	/**
-	 * Returns a new object of class '<em>Inst Assign</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Inst Assign</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Inst Assign</em>'.
 	 * @generated
 	 */
@@ -193,9 +192,9 @@ public interface IrFactory extends EFactory {
 	InstAssign createInstAssign(Var target, Expression value);
 
 	/**
-	 * Returns a new object of class '<em>Inst Call</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Inst Call</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Inst Call</em>'.
 	 * @generated
 	 */
@@ -215,9 +214,9 @@ public interface IrFactory extends EFactory {
 			List<Expression> parameters);
 
 	/**
-	 * Returns a new object of class '<em>Inst Load</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Inst Load</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Inst Load</em>'.
 	 * @generated
 	 */
@@ -267,9 +266,9 @@ public interface IrFactory extends EFactory {
 	InstLoad createInstLoad(Var target, Var source, List<Expression> indexes);
 
 	/**
-	 * Returns a new object of class '<em>Inst Phi</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Inst Phi</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Inst Phi</em>'.
 	 * @generated
 	 */
@@ -305,9 +304,9 @@ public interface IrFactory extends EFactory {
 	InstPhi createInstPhi(Var target, List<Expression> values);
 
 	/**
-	 * Returns a new object of class '<em>Inst Return</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Inst Return</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Inst Return</em>'.
 	 * @generated
 	 */
@@ -340,9 +339,9 @@ public interface IrFactory extends EFactory {
 	InstSpecific createInstSpecific();
 
 	/**
-	 * Returns a new object of class '<em>Inst Store</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Inst Store</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Inst Store</em>'.
 	 * @generated
 	 */
@@ -373,9 +372,9 @@ public interface IrFactory extends EFactory {
 			List<Expression> indexes, Expression value);
 
 	/**
-	 * Returns a new object of class '<em>Location</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Location</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Location</em>'.
 	 * @generated
 	 */
@@ -395,36 +394,36 @@ public interface IrFactory extends EFactory {
 	Location createLocation(int startLine, int startColumn, int endColumn);
 
 	/**
-	 * Returns a new object of class '<em>Node Block</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Node Block</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Node Block</em>'.
 	 * @generated
 	 */
 	NodeBlock createNodeBlock();
 
 	/**
-	 * Returns a new object of class '<em>Node If</em>'. <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Node If</em>'.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Node If</em>'.
 	 * @generated
 	 */
 	NodeIf createNodeIf();
 
 	/**
-	 * Returns a new object of class '<em>Node While</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Node While</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Node While</em>'.
 	 * @generated
 	 */
 	NodeWhile createNodeWhile();
 
 	/**
-	 * Returns a new object of class '<em>Procedure</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Procedure</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Procedure</em>'.
 	 * @generated
 	 */
@@ -446,27 +445,27 @@ public interface IrFactory extends EFactory {
 	Procedure createProcedure(String name, Location location, Type returnType);
 
 	/**
-	 * Returns a new object of class '<em>Type Bool</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Type Bool</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Type Bool</em>'.
 	 * @generated
 	 */
 	TypeBool createTypeBool();
 
 	/**
-	 * Returns a new object of class '<em>Type Float</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Type Float</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Type Float</em>'.
 	 * @generated
 	 */
 	TypeFloat createTypeFloat();
 
 	/**
-	 * Returns a new object of class '<em>Type Int</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Type Int</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Type Int</em>'.
 	 * @generated
 	 */
@@ -481,9 +480,9 @@ public interface IrFactory extends EFactory {
 	TypeInt createTypeInt(int size);
 
 	/**
-	 * Returns a new object of class '<em>Type List</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Type List</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Type List</em>'.
 	 * @generated
 	 */
@@ -512,18 +511,18 @@ public interface IrFactory extends EFactory {
 	TypeList createTypeList(int size, Type type);
 
 	/**
-	 * Returns a new object of class '<em>Type String</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Type String</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Type String</em>'.
 	 * @generated
 	 */
 	TypeString createTypeString();
 
 	/**
-	 * Returns a new object of class '<em>Type Uint</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Type Uint</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Type Uint</em>'.
 	 * @generated
 	 */
@@ -538,18 +537,18 @@ public interface IrFactory extends EFactory {
 	TypeUint createTypeUint(int size);
 
 	/**
-	 * Returns a new object of class '<em>Type Void</em>'. <!-- begin-user-doc
+	 * Returns a new object of class '<em>Type Void</em>'.
+	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Type Void</em>'.
 	 * @generated
 	 */
 	TypeVoid createTypeVoid();
 
 	/**
-	 * Returns a new object of class '<em>Use</em>'. <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Use</em>'.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Use</em>'.
 	 * @generated
 	 */
@@ -565,9 +564,9 @@ public interface IrFactory extends EFactory {
 	Use createUse(Var variable);
 
 	/**
-	 * Returns a new object of class '<em>Var</em>'. <!-- begin-user-doc -->
+	 * Returns a new object of class '<em>Var</em>'.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return a new object of class '<em>Var</em>'.
 	 * @generated
 	 */
@@ -628,9 +627,9 @@ public interface IrFactory extends EFactory {
 			boolean assignable, int index);
 
 	/**
-	 * Returns the package supported by this factory. <!-- begin-user-doc -->
+	 * Returns the package supported by this factory.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the package supported by this factory.
 	 * @generated
 	 */

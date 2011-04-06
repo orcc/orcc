@@ -40,16 +40,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NodeIfImpl extends NodeImpl implements NodeIf {
 	/**
-	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getCondition()
-	 * @generated
-	 * @ordered
-	 */
-	protected Expression condition;
-
-	/**
 	 * The cached value of the '{@link #getElseNodes() <em>Else Nodes</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getElseNodes()
@@ -75,6 +65,16 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 * @ordered
 	 */
 	protected EList<Node> thenNodes;
+
+	/**
+	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected Expression condition;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

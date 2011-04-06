@@ -39,16 +39,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	/**
-	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getCondition()
-	 * @generated
-	 * @ordered
-	 */
-	protected Expression condition;
-
-	/**
 	 * The cached value of the '{@link #getJoinNode() <em>Join Node</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getJoinNode()
@@ -65,6 +55,16 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 * @ordered
 	 */
 	protected EList<Node> nodes;
+
+	/**
+	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected Expression condition;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

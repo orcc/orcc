@@ -59,7 +59,7 @@ public interface InstLoad extends Instruction {
 	 * Returns the target of this load instruction.
 	 * 
 	 * @return the target of this load instruction
-	 * @model
+	 * @model containment="true"
 	 */
 	Def getTarget();
 

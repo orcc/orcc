@@ -2759,7 +2759,7 @@ public interface IrPackage extends EPackage {
 		EClass INST_ASSIGN = eINSTANCE.getInstAssign();
 
 		/**
-		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
@@ -2797,7 +2797,7 @@ public interface IrPackage extends EPackage {
 		EReference INST_CALL__PROCEDURE = eINSTANCE.getInstCall_Procedure();
 
 		/**
-		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
@@ -2827,7 +2827,7 @@ public interface IrPackage extends EPackage {
 		EReference INST_LOAD__SOURCE = eINSTANCE.getInstLoad_Source();
 
 		/**
-		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
@@ -2850,7 +2850,7 @@ public interface IrPackage extends EPackage {
 		EReference INST_PHI__OLD_VARIABLE = eINSTANCE.getInstPhi_OldVariable();
 
 		/**
-		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
@@ -2905,7 +2905,7 @@ public interface IrPackage extends EPackage {
 		EReference INST_STORE__INDEXES = eINSTANCE.getInstStore_Indexes();
 
 		/**
-		 * The meta object literal for the '<em><b>Target</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */

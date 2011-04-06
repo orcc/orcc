@@ -43,26 +43,6 @@ public class LocationImpl extends EObjectImpl implements Location {
 	protected static final int END_COLUMN_EDEFAULT = 0;
 
 	/**
-	 * The default value of the '{@link #getStartColumn() <em>Start Column</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getStartColumn()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int START_COLUMN_EDEFAULT = 0;
-
-	/**
-	 * The default value of the '{@link #getStartLine() <em>Start Line</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getStartLine()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int START_LINE_EDEFAULT = 0;
-
-	/**
 	 * The cached value of the '{@link #getEndColumn() <em>End Column</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -73,6 +53,16 @@ public class LocationImpl extends EObjectImpl implements Location {
 	protected int endColumn = END_COLUMN_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getStartColumn() <em>Start Column</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getStartColumn()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int START_COLUMN_EDEFAULT = 0;
+
+	/**
 	 * The cached value of the '{@link #getStartColumn() <em>Start Column</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -81,6 +71,16 @@ public class LocationImpl extends EObjectImpl implements Location {
 	 * @ordered
 	 */
 	protected int startColumn = START_COLUMN_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getStartLine() <em>Start Line</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getStartLine()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int START_LINE_EDEFAULT = 0;
 
 	/**
 	 * The cached value of the '{@link #getStartLine() <em>Start Line</em>}' attribute.

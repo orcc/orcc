@@ -64,6 +64,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 				store.getTarget().setVariable(null);
 				EcoreHelper.deleteObjects(store.getIndexes());
 				EcoreUtil.delete(store.getValue(), true);
+				EcoreUtil.delete(store, true);
 			}
 		}
 	}
@@ -75,8 +76,8 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 		while (it.hasNext()) {
 			Var variable = it.next();
 			if (!variable.isUsed()) {
-				it.remove();
 				remove(variable.getDefs());
+				it.remove();
 			}
 		}
 	}

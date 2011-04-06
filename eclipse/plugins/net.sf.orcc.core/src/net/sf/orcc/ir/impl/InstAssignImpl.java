@@ -34,7 +34,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  */
 public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	/**
-	 * The cached value of the '{@link #getTarget() <em>Target</em>}' reference.
+	 * The cached value of the '{@link #getTarget() <em>Target</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTarget()
 	 * @generated
@@ -73,14 +73,6 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Def basicGetTarget() {
-		return target;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public NotificationChain basicSetValue(Expression newValue,
 			NotificationChain msgs) {
 		Expression oldValue = value;
@@ -100,8 +92,7 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case IrPackage.INST_ASSIGN__TARGET:
-				if (resolve) return getTarget();
-				return basicGetTarget();
+				return getTarget();
 			case IrPackage.INST_ASSIGN__VALUE:
 				return getValue();
 		}
@@ -116,6 +107,8 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
+			case IrPackage.INST_ASSIGN__TARGET:
+				return basicSetTarget(null, msgs);
 			case IrPackage.INST_ASSIGN__VALUE:
 				return basicSetValue(null, msgs);
 		}
@@ -207,15 +200,22 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 * @generated
 	 */
 	public Def getTarget() {
-		if (target != null && target.eIsProxy()) {
-			InternalEObject oldTarget = (InternalEObject)target;
-			target = (Def)eResolveProxy(oldTarget);
-			if (target != oldTarget) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_ASSIGN__TARGET, oldTarget, target));
-			}
-		}
 		return target;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
+		Def oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__TARGET, oldTarget, newTarget);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -237,10 +237,17 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 * @generated
 	 */
 	public void setTarget(Def newTarget) {
-		Def oldTarget = target;
-		target = newTarget;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__TARGET, oldTarget, target));
+		if (newTarget != target) {
+			NotificationChain msgs = null;
+			if (target != null)
+				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__TARGET, null, msgs);
+			if (newTarget != null)
+				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_ASSIGN__TARGET, null, msgs);
+			msgs = basicSetTarget(newTarget, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__TARGET, newTarget, newTarget));
 	}
 
 	/**

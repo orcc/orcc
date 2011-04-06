@@ -51,7 +51,7 @@ public interface InstStore extends Instruction {
 	 * Returns the target of this store.
 	 * 
 	 * @return the target of this store
-	 * @model
+	 * @model containment="true"
 	 */
 	Def getTarget();
 
