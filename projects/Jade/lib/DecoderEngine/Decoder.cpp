@@ -80,7 +80,7 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose): Co
 	scheduler = new RoundRobinScheduler(Context, this);
 
 	//Create execution engine
-	executionEngine = new LLVMExecution(Context, this);
+	executionEngine = new LLVMExecution(Context, this, verbose);
 }
 
 Decoder::~Decoder (){

@@ -154,6 +154,8 @@ void RoundRobinScheduler::createCall(Instance* instance){
 	Function* scheduler = actionScheduler->getSchedulerFunction();
 	CallInst* CallSched = CallInst::Create(scheduler, "", schedBrInst);
 	CallSched->setTailCall();
+	
+
 	functionCall.insert(pair<Function*, CallInst*>(scheduler, CallSched));
 }
 

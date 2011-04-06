@@ -74,7 +74,7 @@ Display::Display(int id, bool printFps){
 	y = 0;
 	init = false;
 	boundedDisplays++;
-
+	bench = fopen("bench.txt", "w");
 	if (!init){
 		display_init();
 	}
@@ -82,7 +82,7 @@ Display::Display(int id, bool printFps){
 
 Display::~Display(){
 	boundedDisplays--;
-
+	fclose(bench);
 	if (boundedDisplays == 0){
 		SDL_Quit();
 	}
@@ -171,7 +171,7 @@ void Display::display_write_mb(unsigned char tokens[384]) {
 		}else if (outputFps){
 			printFps();
 		}
-
+printFps();
 		//Write resulting image
 		display_show_image(this);
 	}
@@ -189,6 +189,8 @@ void Display::printFps(){
 	int t2 = SDL_GetTicks();
 
 	if (t2 - t > 3000) {
+		fprintf(bench, "%f images/sec\n",
+			1000.0f * (float)(frameDecoded - frameStart) / (float)(t2 - t));
 		printf("%f images/sec\n",
 			1000.0f * (float)(frameDecoded - frameStart) / (float)(t2 - t));
 

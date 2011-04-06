@@ -121,6 +121,7 @@ public:
 	static void waitForFirstFrame();
 private:
 	void printFps();
+	FILE* bench;
 	
 	/** Buffers of display */
 	unsigned char img_buf_y[MAX_WIDTH * MAX_HEIGHT];

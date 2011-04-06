@@ -71,8 +71,14 @@ public:
      *
 	 *	Initialize the execution engine
 	 *
+	 *  @param C : the llvm::Context
+	 *
+	 *  @param decoder: the decoder to execute
+	 *
+	 *  @param verbose: verbose actions taken
+	 *
      */
-	LLVMExecution(llvm::LLVMContext& C, Decoder* decoder);
+	LLVMExecution(llvm::LLVMContext& C, Decoder* decoder, bool verbose = false);
 
 	/**
      *  @brief Destructor
@@ -188,6 +194,9 @@ private:
 
 	/** Input stimulus */
 	std::string stimulus;
+
+	/** verbose */
+	bool verbose;
 };
 
 #endif

@@ -79,11 +79,12 @@ extern cl::opt<std::string> TargetTriple;
 //===----------------------------------------------------------------------===//
 // main Driver function
 //
-LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder): Context(C)  {
+LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder, bool verbose): Context(C)  {
   std::string ErrorMsg;
 
   this->decoder = decoder;
   this->source = new Source(1);
+  this->verbose = verbose;
 
   Module* module = decoder->getModule();
 
@@ -239,7 +240,7 @@ void LLVMExecution::setIn(Instance* instance){
 }
 
 void  LLVMExecution::setOut(Instance* instance){
-	 display = new Display(1);
+	 display = new Display(1, verbose);
 
 	//Set var display
 	StateVar* stateVar = instance->getStateVar("display");

@@ -95,7 +95,7 @@ void FifoTrace::createConnection(){
 	
 	//Insert trace file string
 	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context), strFile.size()+1); 
-	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, strFile), strVar.c_str(), 0, false, 0);
+	GlobalVariable *GV = new GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, strFile), strVar.c_str(), 0, false, 0);
 
 	// Initialize fifo elements
 	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getSize());
