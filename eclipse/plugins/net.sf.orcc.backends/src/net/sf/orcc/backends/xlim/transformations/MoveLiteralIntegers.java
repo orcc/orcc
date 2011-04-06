@@ -31,30 +31,29 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
+import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -72,20 +71,21 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 	private ExpressionInterpreter exprInterpreter = new AbstractExpressionInterpreter() {
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
+		public Object interpret(ExprBinary expr, Object... args) {
 			Expression e1 = (Expression) expr.getE1().accept(this, args);
 			Expression e2 = (Expression) expr.getE2().accept(this, args);
-			return new BinaryExpr(e1, expr.getOp(), e2, expr.getType());
+			return IrFactory.eINSTANCE.createExprBinary(e1, expr.getOp(), e2,
+					expr.getType());
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
+		public Object interpret(ExprBool expr, Object... args) {
 			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			VarLocal var = procedure.newTempLocalVariable(file, type,
+			Var var = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "litteral_integer");
-			Assign assign = new Assign(var, expr);
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(var, expr);
 
 			// Add assignment to instruction's list
 			if (it.hasPrevious()) {
@@ -95,17 +95,17 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 			if (it.hasNext()) {
 				it.next();
 			}
-			return new VarExpr(new Use(var));
+			return IrFactory.eINSTANCE.createExprVar(var);
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public Object interpret(IntExpr expr, Object... args) {
+		public Object interpret(ExprInt expr, Object... args) {
 			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			VarLocal var = procedure.newTempLocalVariable(file, type,
+			Var var = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "litteral_integer");
-			Assign assign = new Assign(var, expr);
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(var, expr);
 
 			// Add assignment to instruction's list
 			if (it.hasPrevious()) {
@@ -115,13 +115,14 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 			if (it.hasNext()) {
 				it.next();
 			}
-			return new VarExpr(new Use(var));
+			return IrFactory.eINSTANCE.createExprVar(var);
 		}
 
 		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
+		public Object interpret(ExprUnary expr, Object... args) {
 			Expression e = (Expression) expr.getExpr().accept(this, args);
-			return new UnaryExpr(expr.getOp(), e, expr.getType());
+			return IrFactory.eINSTANCE.createExprUnary(expr.getOp(), e,
+					expr.getType());
 		}
 	};
 
@@ -134,10 +135,9 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Assign assign) {
+	public void visit(InstAssign assign) {
 		assign.setValue((Expression) assign.getValue().accept(exprInterpreter,
 				itInstruction));
-		Use.addUses(assign, assign.getValue());
 	}
 
 	@Override
@@ -151,8 +151,8 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 			itInstruction = newBlock.getInstructions().listIterator();
 		}
 		ListIterator<Instruction> instructionIteratorBackup = itInstruction;
-		nodeIf.setValue((Expression) nodeIf.getValue().accept(exprInterpreter,
-				itInstruction));
+		nodeIf.setCondition((Expression) nodeIf.getCondition().accept(
+				exprInterpreter, itInstruction));
 		visit(nodeIf.getThenNodes());
 		itInstruction = instructionIteratorBackup;
 		visit(nodeIf.getElseNodes());
@@ -161,7 +161,6 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 		for (Instruction instr : nodeIf.getJoinNode().getInstructions()) {
 			instr.accept(this);
 		}
-		Use.addUses(nodeIf, nodeIf.getValue());
 	}
 
 	@Override
@@ -174,13 +173,12 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(PhiAssignment phi) {
+	public void visit(InstPhi phi) {
 		ListIterator<Expression> it = phi.getValues().listIterator();
 		while (it.hasNext()) {
 			it.set((Expression) it.next()
 					.accept(exprInterpreter, itInstruction));
 		}
-		Use.addUses(phi, phi.getValues());
 	}
 
 	@Override
@@ -189,30 +187,24 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Store store) {
+	public void visit(InstStore store) {
 		store.setValue((Expression) store.getValue().accept(exprInterpreter,
 				itInstruction));
-		Use.addUses(store, store.getValue());
 	}
 
 	@Override
-	public void visit(SpecificInstruction node) {
-		if (node instanceof TernaryOperation) {
-			TernaryOperation ternaryOperation = (TernaryOperation) node;
+	public void visit(InstSpecific node) {
+		if (node instanceof InstTernary) {
+			InstTernary ternaryOperation = (InstTernary) node;
 
 			ternaryOperation
 					.setConditionValue((Expression) ternaryOperation
 							.getConditionValue().accept(exprInterpreter,
 									itInstruction));
-			Use.addUses(ternaryOperation, ternaryOperation.getConditionValue());
-
 			ternaryOperation.setTrueValue((Expression) ternaryOperation
 					.getTrueValue().accept(exprInterpreter, itInstruction));
-			Use.addUses(ternaryOperation, ternaryOperation.getTrueValue());
-
 			ternaryOperation.setFalseValue((Expression) ternaryOperation
 					.getFalseValue().accept(exprInterpreter, itInstruction));
-			Use.addUses(ternaryOperation, ternaryOperation.getFalseValue());
 		}
 	}
 
@@ -227,7 +219,7 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 			itInstruction = newBlock.getInstructions().listIterator();
 		}
 		ListIterator<Instruction> instructionIteratorBackup = itInstruction;
-		nodeWhile.setValue((Expression) nodeWhile.getValue().accept(
+		nodeWhile.setCondition((Expression) nodeWhile.getCondition().accept(
 				exprInterpreter, itInstruction));
 		visit(nodeWhile.getNodes());
 		itInstruction = instructionIteratorBackup;
@@ -235,7 +227,6 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 		for (Instruction instr : nodeWhile.getJoinNode().getInstructions()) {
 			instr.accept(this);
 		}
-		Use.addUses(nodeWhile, nodeWhile.getValue());
 	}
 
 }

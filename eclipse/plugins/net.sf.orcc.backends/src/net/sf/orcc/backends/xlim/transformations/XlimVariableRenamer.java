@@ -45,7 +45,7 @@ public class XlimVariableRenamer extends VariableRenamer {
 	public void visit(Pattern pattern) {
 		String actionName = action.getName();
 		for (Var var : pattern.getVariableMap().values()) {
-			if (!action.getBody().getLocals().getList().contains(var)) {
+			if (!action.getBody().getLocals().contains(var)) {
 				var.setName(actionName + "_" + var.getName());
 			}
 		}

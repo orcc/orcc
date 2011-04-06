@@ -21,17 +21,17 @@ import org.eclipse.emf.common.util.EList;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.instructions.AssignIndex#getIndexes <em>Indexes</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.AssignIndex#getTarget <em>Target</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.AssignIndex#getListType <em>List Type</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.InstAssignIndex#getIndexes <em>Indexes</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.InstAssignIndex#getTarget <em>Target</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.InstAssignIndex#getListType <em>List Type</em>}</li>
  * </ul>
  * </p>
  *
- * @see net.sf.orcc.backends.instructions.InstructionsPackage#getAssignIndex()
+ * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstAssignIndex()
  * @model
  * @generated
  */
-public interface AssignIndex extends InstSpecific {
+public interface InstAssignIndex extends InstSpecific {
 	/**
 	 * Returns the value of the '<em><b>Indexes</b></em>' containment reference list.
 	 * The list contents are of type {@link net.sf.orcc.ir.Expression}.
@@ -42,7 +42,7 @@ public interface AssignIndex extends InstSpecific {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Indexes</em>' containment reference list.
-	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getAssignIndex_Indexes()
+	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstAssignIndex_Indexes()
 	 * @model containment="true"
 	 * @generated
 	 */
@@ -58,14 +58,14 @@ public interface AssignIndex extends InstSpecific {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Target</em>' containment reference.
 	 * @see #setTarget(Def)
-	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getAssignIndex_Target()
+	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstAssignIndex_Target()
 	 * @model containment="true"
 	 * @generated
 	 */
 	Def getTarget();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.AssignIndex#getTarget <em>Target</em>}' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstAssignIndex#getTarget <em>Target</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Target</em>' containment reference.
@@ -84,14 +84,14 @@ public interface AssignIndex extends InstSpecific {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>List Type</em>' containment reference.
 	 * @see #setListType(Type)
-	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getAssignIndex_ListType()
+	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstAssignIndex_ListType()
 	 * @model containment="true"
 	 * @generated
 	 */
 	Type getListType();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.AssignIndex#getListType <em>List Type</em>}' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstAssignIndex#getListType <em>List Type</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>List Type</em>' containment reference.

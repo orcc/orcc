@@ -35,12 +35,12 @@ import java.util.Map;
 
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -55,10 +55,10 @@ public class CustomPeekAdder extends AbstractActorVisitor {
 
 	private Map<Port, Map<Integer, Var>> customPeekedMap;
 
-	private List<Load> toBeRemoved;
+	private List<InstLoad> toBeRemoved;
 
 	public CustomPeekAdder() {
-		toBeRemoved = new ArrayList<Load>();
+		toBeRemoved = new ArrayList<InstLoad>();
 	}
 
 	@Override
@@ -79,10 +79,10 @@ public class CustomPeekAdder extends AbstractActorVisitor {
 
 			List<Use> uses = new ArrayList<Use>(oldTarget.getUses());
 			for (Use use : uses) {
-				Load load = (Load) use.getNode();
+				InstLoad load = (InstLoad) use.getNode();
 
-				int index = ((IntExpr) load.getIndexes().get(0)).getIntValue();
-				indexToVariableMap.put(index, load.getTarget());
+				int index = ((ExprInt) load.getIndexes().get(0)).getIntValue();
+				indexToVariableMap.put(index, load.getTarget().getVariable());
 
 				// clean up uses
 				load.setTarget(null);
@@ -98,7 +98,7 @@ public class CustomPeekAdder extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Load load) {
+	public void visit(InstLoad load) {
 		if (toBeRemoved.remove(load)) {
 			itInstruction.remove();
 		}

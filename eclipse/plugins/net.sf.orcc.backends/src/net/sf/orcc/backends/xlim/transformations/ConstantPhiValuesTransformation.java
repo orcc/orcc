@@ -30,16 +30,16 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.List;
 
-import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
+import net.sf.orcc.backends.instructions.InstTernary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * 
@@ -52,27 +52,24 @@ import net.sf.orcc.util.OrderedMap;
 public class ConstantPhiValuesTransformation extends AbstractActorVisitor {
 
 	@Override
-	public void visit(PhiAssignment phi) {
+	public void visit(InstPhi phi) {
 		List<Expression> values = phi.getValues();
-		VarLocal target = phi.getTarget();
-		OrderedMap<String, VarLocal> parameters = procedure
-				.getParameters();
+		Var target = phi.getTarget().getVariable();
+		EList<Var> parameters = procedure.getParameters();
 
 		// Remove local variable with index = 0 from value
 		for (Expression value : values) {
 			if (value.isVarExpr()) {
-				VarExpr sourceExpr = (VarExpr) value;
-				VarLocal source = (VarLocal) sourceExpr.getVar()
-						.getVariable();
+				Var source = ((ExprVar) value).getUse().getVariable();
 
 				// Local variable must not be a parameter of the procedure
 				if (source.getIndex() == 0
 						&& !parameters.contains(source.getName())) {
 					Expression expr;
 					if (target.getType().isBool()) {
-						expr = new BoolExpr(false);
+						expr = IrFactory.eINSTANCE.createExprBool(false);
 					} else {
-						expr = new IntExpr(0);
+						expr = IrFactory.eINSTANCE.createExprInt(0);
 					}
 					values.set(values.indexOf(value), expr);
 				}
@@ -81,9 +78,9 @@ public class ConstantPhiValuesTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(SpecificInstruction node) {
-		if (node instanceof TernaryOperation) {
-			TernaryOperation ternaryOperation = (TernaryOperation) node;
+	public void visit(InstSpecific node) {
+		if (node instanceof InstTernary) {
+			InstTernary ternaryOperation = (InstTernary) node;
 			ternaryOperation.setConditionValue(clean(ternaryOperation
 					.getConditionValue()));
 			ternaryOperation
@@ -95,17 +92,16 @@ public class ConstantPhiValuesTransformation extends AbstractActorVisitor {
 
 	public Expression clean(Expression oldExpr) {
 		if (oldExpr.isVarExpr()) {
-			VarLocal var = (VarLocal) ((VarExpr) oldExpr).getVar()
-					.getVariable();
+			Var var = ((ExprVar) oldExpr).getUse().getVariable();
 
 			// Local variable must not be a parameter of the procedure
 			if (var.getIndex() == 0
 					&& !procedure.getParameters().contains(var.getName())) {
 				Expression expr;
 				if (var.getType().isBool()) {
-					expr = new BoolExpr(false);
+					expr = IrFactory.eINSTANCE.createExprBool(false);
 				} else {
-					expr = new IntExpr(0);
+					expr = IrFactory.eINSTANCE.createExprInt(0);
 				}
 				return expr;
 			}

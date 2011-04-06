@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.backends.instructions.SplitInstruction;
+import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -225,7 +225,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 
 		@Override
 		public void visit(SpecificInstruction instruction) {
-			if (instruction instanceof SplitInstruction) {
+			if (instruction instanceof InstSplit) {
 				splitAction();
 			}
 		}

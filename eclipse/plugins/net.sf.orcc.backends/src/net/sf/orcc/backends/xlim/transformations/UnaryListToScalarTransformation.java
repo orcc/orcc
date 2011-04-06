@@ -33,18 +33,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -56,16 +55,16 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 
-	private Map<Instruction, Assign> toBeAdded;
+	private Map<Instruction, InstAssign> toBeAdded;
 	private List<Instruction> toBeRemoved;
 
 	public UnaryListToScalarTransformation() {
 		toBeRemoved = new ArrayList<Instruction>();
-		toBeAdded = new HashMap<Instruction, Assign>();
+		toBeAdded = new HashMap<Instruction, InstAssign>();
 	}
 
 	@Override
-	public void visit(Load load) {
+	public void visit(InstLoad load) {
 		if (toBeRemoved.remove(load)) {
 			itInstruction.remove();
 		}
@@ -83,8 +82,8 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 							.get(0).getNode();
 
 					if (instruction.isLoad()) {
-						Load load = (Load) instruction;
-						Var newTarget = load.getTarget();
+						InstLoad load = (InstLoad) instruction;
+						Var newTarget = load.getTarget().getVariable();
 
 						pattern.setVariable(port, newTarget);
 
@@ -102,17 +101,17 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 						Instruction instruction = oldTarget.getInstructions()
 								.get(0);
 						if (instruction.isStore()) {
-							Store store = (Store) instruction;
+							InstStore store = (InstStore) instruction;
 							Expression expr = store.getValue();
 
 							Var newTarget;
 
 							if (expr.isVarExpr()) {
-								VarExpr var = (VarExpr) expr;
-								newTarget = var.getVar().getVariable();
+								ExprVar var = (ExprVar) expr;
+								newTarget = var.getUse().getVariable();
 
 							} else {
-								VarLocal localNewTarget = action
+								Var localNewTarget = action
 										.getBody()
 										.newTempLocalVariable(null,
 												expr.getType(),
@@ -120,8 +119,8 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 								localNewTarget.setAssignable(true);
 								localNewTarget.setIndex(1);
 
-								Assign assign = new Assign(localNewTarget, expr);
-								Use.addUses(assign, expr);
+								InstAssign assign = IrFactory.eINSTANCE
+										.createInstAssign(localNewTarget, expr);
 
 								newTarget = localNewTarget;
 
@@ -140,7 +139,7 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 							store.setValue(null);
 						}
 					} else {
-						VarLocal localNewTarget = action.getBody()
+						Var localNewTarget = action.getBody()
 								.newTempLocalVariable(
 										null,
 										((TypeList) oldTarget.getType())
@@ -161,7 +160,7 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Store store) {
+	public void visit(InstStore store) {
 		if (toBeRemoved.remove(store)) {
 			itInstruction.remove();
 			if (toBeAdded.containsKey(store)) {

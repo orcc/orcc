@@ -29,23 +29,19 @@
 package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.backends.instructions.AssignIndex;
+import net.sf.orcc.backends.instructions.InstAssignIndex;
+import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines an actor transformation that transforms declarations and
@@ -71,53 +67,34 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 	 */
 	private void printAssignment(List<Expression> indexes, Type type) {
 		List<Expression> listIndex = new ArrayList<Expression>(indexes.size());
-		int concatenatedSize = 0;
-		Iterator<Integer> iit = type.getDimensions().iterator();
 
 		// returns the load or store, and has the effect that instructions will
 		// be inserted before it
-		Instruction instruction = itInstruction.previous();
+		itInstruction.previous();
 
 		for (Expression expr : indexes) {
-			int size;
-
-			// Indexes must have the same size as the lists
-			if (iit.hasNext()) {
-				size = iit.next();
-			} else {
-				size = ((TypeInt) type).getSize();
-			}
-
-			int indexSize;
-			// new index variable
-			VarLocal indexVar;
-
-			indexSize = IntExpr.getSize(size - 1);
-			indexVar = procedure.newTempLocalVariable("",
-					IrFactory.eINSTANCE.createTypeInt(indexSize), "index");
-			listIndex.add(new VarExpr(new Use(indexVar)));
+			Var indexVar = procedure.newTempLocalVariable("",
+					IrFactory.eINSTANCE.createTypeInt(), "index");
+			listIndex.add(IrFactory.eINSTANCE.createExprVar(indexVar));
 
 			// add the assign instruction for each index
-			Assign assign = new Assign(indexVar, expr);
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(indexVar,
+					expr);
 			itInstruction.add(assign);
-
-			// size of the concatenated index
-			concatenatedSize += indexSize;
 		}
 
 		// creates the variable that will hold the concatenation of indexes
-		VarLocal indexVar = procedure.newTempLocalVariable("",
-				IrFactory.eINSTANCE.createTypeInt(concatenatedSize),
-				"concat_index");
+		Var indexVar = procedure.newTempLocalVariable("",
+				IrFactory.eINSTANCE.createTypeInt(), "concat_index");
 
 		// sets indexVar as memory index
-		Use.removeUses(instruction, indexes);
-		indexes.clear();
-		indexes.add(new VarExpr(new Use(indexVar)));
+		EcoreHelper.deleteObjects(indexes);
+		indexes.add(IrFactory.eINSTANCE.createExprVar(indexVar));
 
 		// add a special assign instruction that assigns the index variable the
 		// concatenation of index expressions
-		AssignIndex assignIndex = new AssignIndex(indexVar, listIndex, type);
+		InstAssignIndex assignIndex = InstructionsFactory.eINSTANCE
+				.createInstAssignIndex(indexVar, listIndex, type);
 		itInstruction.add(assignIndex);
 
 		// so the load (or store) is not endlessly revisited
@@ -125,7 +102,7 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Load load) {
+	public void visit(InstLoad load) {
 		List<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
@@ -135,11 +112,11 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Store store) {
+	public void visit(InstStore store) {
 		List<Expression> indexes = store.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			Type type = store.getTarget().getType();
+			Type type = store.getTarget().getVariable().getType();
 			printAssignment(indexes, type);
 		}
 	}

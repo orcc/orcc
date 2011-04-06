@@ -31,15 +31,13 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.ArrayList;
 import java.util.Map;
 
+import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
-import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 
 /**
@@ -52,11 +50,11 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 
 	@Override
-	public void visit(SpecificInstruction specific) {
-		if (specific instanceof TernaryOperation) {
-			TernaryOperation ternaryOperation = (TernaryOperation) specific;
+	public void visit(InstSpecific specific) {
+		if (specific instanceof InstTernary) {
+			InstTernary ternaryOperation = (InstTernary) specific;
 
-			VarLocal variable = ternaryOperation.getTarget();
+			Var variable = ternaryOperation.getTarget().getVariable();
 			if (!variable.isUsed()) {
 				// do not remove ternaryOperation to variables that are used by
 				// writes
@@ -67,10 +65,9 @@ public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 				// clean up uses
 				ternaryOperation.setTarget(null);
 
-				((VarExpr) ternaryOperation.getConditionValue()).getVar()
-						.remove();
-				((VarExpr) ternaryOperation.getTrueValue()).getVar().remove();
-				((VarExpr) ternaryOperation.getFalseValue()).getVar().remove();
+				ternaryOperation.setConditionValue(null);
+				ternaryOperation.setTrueValue(null);
+				ternaryOperation.setFalseValue(null);
 
 				// remove instruction
 				itInstruction.remove();
@@ -93,7 +90,7 @@ public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 			for (Port port : new ArrayList<Port>(peekedMapPerPort.keySet())) {
 				Map<Integer, Var> peekedMap = peekedMapPerPort.get(port);
 				for (Integer num : new ArrayList<Integer>(peekedMap.keySet())) {
-					if (!action.getScheduler().getLocals().getList()
+					if (!action.getScheduler().getLocals()
 							.contains(peekedMap.get(num))) {
 						peekedMap.remove(num);
 					}

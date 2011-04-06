@@ -75,16 +75,16 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 	protected InstructionsSwitch<Adapter> modelSwitch =
 		new InstructionsSwitch<Adapter>() {
 			@Override
-			public Adapter caseTernaryOperation(TernaryOperation object) {
-				return createTernaryOperationAdapter();
+			public Adapter caseInstTernary(InstTernary object) {
+				return createInstTernaryAdapter();
 			}
 			@Override
-			public Adapter caseAssignIndex(AssignIndex object) {
-				return createAssignIndexAdapter();
+			public Adapter caseInstAssignIndex(InstAssignIndex object) {
+				return createInstAssignIndexAdapter();
 			}
 			@Override
-			public Adapter caseSplitInstruction(SplitInstruction object) {
-				return createSplitInstructionAdapter();
+			public Adapter caseInstSplit(InstSplit object) {
+				return createInstSplitAdapter();
 			}
 			@Override
 			public Adapter caseInstruction(Instruction object) {
@@ -115,44 +115,44 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.TernaryOperation <em>Ternary Operation</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstTernary <em>Inst Ternary</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.instructions.TernaryOperation
+	 * @see net.sf.orcc.backends.instructions.InstTernary
 	 * @generated
 	 */
-	public Adapter createTernaryOperationAdapter() {
+	public Adapter createInstTernaryAdapter() {
 		return null;
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.AssignIndex <em>Assign Index</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstAssignIndex <em>Inst Assign Index</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.instructions.AssignIndex
+	 * @see net.sf.orcc.backends.instructions.InstAssignIndex
 	 * @generated
 	 */
-	public Adapter createAssignIndexAdapter() {
+	public Adapter createInstAssignIndexAdapter() {
 		return null;
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.SplitInstruction <em>Split Instruction</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstSplit <em>Inst Split</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.instructions.SplitInstruction
+	 * @see net.sf.orcc.backends.instructions.InstSplit
 	 * @generated
 	 */
-	public Adapter createSplitInstructionAdapter() {
+	public Adapter createInstSplitAdapter() {
 		return null;
 	}
 

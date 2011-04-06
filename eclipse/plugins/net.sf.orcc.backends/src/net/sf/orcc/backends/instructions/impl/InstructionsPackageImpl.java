@@ -6,11 +6,11 @@
  */
 package net.sf.orcc.backends.instructions.impl;
 
-import net.sf.orcc.backends.instructions.AssignIndex;
+import net.sf.orcc.backends.instructions.InstAssignIndex;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
-import net.sf.orcc.backends.instructions.SplitInstruction;
-import net.sf.orcc.backends.instructions.TernaryOperation;
+import net.sf.orcc.backends.instructions.InstSplit;
+import net.sf.orcc.backends.instructions.InstTernary;
 
 import net.sf.orcc.ir.IrPackage;
 
@@ -32,20 +32,21 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass ternaryOperationEClass = null;
+	private EClass instTernaryEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass assignIndexEClass = null;
+	private EClass instAssignIndexEClass = null;
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass splitInstructionEClass = null;
+	private EClass instSplitEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -116,8 +117,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getTernaryOperation() {
-		return ternaryOperationEClass;
+	public EClass getInstTernary() {
+		return instTernaryEClass;
 	}
 
 	/**
@@ -125,8 +126,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTernaryOperation_ConditionValue() {
-		return (EReference)ternaryOperationEClass.getEStructuralFeatures().get(0);
+	public EReference getInstTernary_ConditionValue() {
+		return (EReference)instTernaryEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -134,8 +135,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTernaryOperation_TrueValue() {
-		return (EReference)ternaryOperationEClass.getEStructuralFeatures().get(1);
+	public EReference getInstTernary_TrueValue() {
+		return (EReference)instTernaryEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -143,8 +144,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTernaryOperation_FalseValue() {
-		return (EReference)ternaryOperationEClass.getEStructuralFeatures().get(2);
+	public EReference getInstTernary_FalseValue() {
+		return (EReference)instTernaryEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -152,8 +153,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTernaryOperation_Target() {
-		return (EReference)ternaryOperationEClass.getEStructuralFeatures().get(3);
+	public EReference getInstTernary_Target() {
+		return (EReference)instTernaryEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -161,8 +162,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getAssignIndex() {
-		return assignIndexEClass;
+	public EClass getInstAssignIndex() {
+		return instAssignIndexEClass;
 	}
 
 	/**
@@ -170,8 +171,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAssignIndex_Indexes() {
-		return (EReference)assignIndexEClass.getEStructuralFeatures().get(0);
+	public EReference getInstAssignIndex_Indexes() {
+		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -179,8 +180,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAssignIndex_Target() {
-		return (EReference)assignIndexEClass.getEStructuralFeatures().get(1);
+	public EReference getInstAssignIndex_Target() {
+		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -188,8 +189,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAssignIndex_ListType() {
-		return (EReference)assignIndexEClass.getEStructuralFeatures().get(2);
+	public EReference getInstAssignIndex_ListType() {
+		return (EReference)instAssignIndexEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -197,8 +198,8 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getSplitInstruction() {
-		return splitInstructionEClass;
+	public EClass getInstSplit() {
+		return instSplitEClass;
 	}
 
 	/**
@@ -229,18 +230,18 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		isCreated = true;
 
 		// Create classes and their features
-		ternaryOperationEClass = createEClass(TERNARY_OPERATION);
-		createEReference(ternaryOperationEClass, TERNARY_OPERATION__CONDITION_VALUE);
-		createEReference(ternaryOperationEClass, TERNARY_OPERATION__TRUE_VALUE);
-		createEReference(ternaryOperationEClass, TERNARY_OPERATION__FALSE_VALUE);
-		createEReference(ternaryOperationEClass, TERNARY_OPERATION__TARGET);
+		instTernaryEClass = createEClass(INST_TERNARY);
+		createEReference(instTernaryEClass, INST_TERNARY__CONDITION_VALUE);
+		createEReference(instTernaryEClass, INST_TERNARY__TRUE_VALUE);
+		createEReference(instTernaryEClass, INST_TERNARY__FALSE_VALUE);
+		createEReference(instTernaryEClass, INST_TERNARY__TARGET);
 
-		assignIndexEClass = createEClass(ASSIGN_INDEX);
-		createEReference(assignIndexEClass, ASSIGN_INDEX__INDEXES);
-		createEReference(assignIndexEClass, ASSIGN_INDEX__TARGET);
-		createEReference(assignIndexEClass, ASSIGN_INDEX__LIST_TYPE);
+		instAssignIndexEClass = createEClass(INST_ASSIGN_INDEX);
+		createEReference(instAssignIndexEClass, INST_ASSIGN_INDEX__INDEXES);
+		createEReference(instAssignIndexEClass, INST_ASSIGN_INDEX__TARGET);
+		createEReference(instAssignIndexEClass, INST_ASSIGN_INDEX__LIST_TYPE);
 
-		splitInstructionEClass = createEClass(SPLIT_INSTRUCTION);
+		instSplitEClass = createEClass(INST_SPLIT);
 	}
 
 	/**
@@ -274,23 +275,23 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
-		ternaryOperationEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
-		assignIndexEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
-		splitInstructionEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		instAssignIndexEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		instSplitEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 
 		// Initialize classes and features; add operations and parameters
-		initEClass(ternaryOperationEClass, TernaryOperation.class, "TernaryOperation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getTernaryOperation_ConditionValue(), theIrPackage.getExpression(), null, "conditionValue", null, 0, 1, TernaryOperation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTernaryOperation_TrueValue(), theIrPackage.getExpression(), null, "trueValue", null, 0, 1, TernaryOperation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTernaryOperation_FalseValue(), theIrPackage.getExpression(), null, "falseValue", null, 0, 1, TernaryOperation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTernaryOperation_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, TernaryOperation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(instTernaryEClass, InstTernary.class, "InstTernary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstTernary_ConditionValue(), theIrPackage.getExpression(), null, "conditionValue", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstTernary_TrueValue(), theIrPackage.getExpression(), null, "trueValue", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstTernary_FalseValue(), theIrPackage.getExpression(), null, "falseValue", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstTernary_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstTernary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(assignIndexEClass, AssignIndex.class, "AssignIndex", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getAssignIndex_Indexes(), theIrPackage.getExpression(), null, "indexes", null, 0, -1, AssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getAssignIndex_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, AssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getAssignIndex_ListType(), theIrPackage.getType(), null, "listType", null, 0, 1, AssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(instAssignIndexEClass, InstAssignIndex.class, "InstAssignIndex", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstAssignIndex_Indexes(), theIrPackage.getExpression(), null, "indexes", null, 0, -1, InstAssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstAssignIndex_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstAssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstAssignIndex_ListType(), theIrPackage.getType(), null, "listType", null, 0, 1, InstAssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(splitInstructionEClass, SplitInstruction.class, "SplitInstruction", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEClass(instSplitEClass, InstSplit.class, "InstSplit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
 		createResource(eNS_URI);

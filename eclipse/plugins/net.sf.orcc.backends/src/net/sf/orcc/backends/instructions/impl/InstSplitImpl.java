@@ -6,8 +6,8 @@
  */
 package net.sf.orcc.backends.instructions.impl;
 
+import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
-import net.sf.orcc.backends.instructions.SplitInstruction;
 
 import net.sf.orcc.ir.impl.InstSpecificImpl;
 
@@ -15,20 +15,20 @@ import org.eclipse.emf.ecore.EClass;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Split Instruction</b></em>'.
+ * An implementation of the model object '<em><b>Inst Split</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * </p>
  *
  * @generated
  */
-public class SplitInstructionImpl extends InstSpecificImpl implements SplitInstruction {
+public class InstSplitImpl extends InstSpecificImpl implements InstSplit {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected SplitInstructionImpl() {
+	protected InstSplitImpl() {
 		super();
 	}
 
@@ -39,7 +39,7 @@ public class SplitInstructionImpl extends InstSpecificImpl implements SplitInstr
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return InstructionsPackage.Literals.SPLIT_INSTRUCTION;
+		return InstructionsPackage.Literals.INST_SPLIT;
 	}
 
-} //SplitInstructionImpl
+} //InstSplitImpl

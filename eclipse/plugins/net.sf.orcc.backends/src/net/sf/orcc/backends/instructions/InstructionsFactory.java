@@ -6,51 +6,61 @@
  */
 package net.sf.orcc.backends.instructions;
 
+import java.util.List;
+
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Var;
+
 import org.eclipse.emf.ecore.EFactory;
 
 /**
- * <!-- begin-user-doc -->
- * The <b>Factory</b> for the model.
- * It provides a create method for each non-abstract class of the model.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> The <b>Factory</b> for the model. It provides a
+ * create method for each non-abstract class of the model. <!-- end-user-doc -->
  * @see net.sf.orcc.backends.instructions.InstructionsPackage
  * @generated
  */
 public interface InstructionsFactory extends EFactory {
 	/**
 	 * The singleton instance of the factory.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @generated
 	 */
 	InstructionsFactory eINSTANCE = net.sf.orcc.backends.instructions.impl.InstructionsFactoryImpl.init();
 
 	/**
-	 * Returns a new object of class '<em>Ternary Operation</em>'.
+	 * Returns a new object of class '<em>Inst Ternary</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Ternary Operation</em>'.
+	 * @return a new object of class '<em>Inst Ternary</em>'.
 	 * @generated
 	 */
-	TernaryOperation createTernaryOperation();
+	InstTernary createInstTernary();
 
 	/**
-	 * Returns a new object of class '<em>Assign Index</em>'.
+	 * Returns a new object of class '<em>Inst Assign Index</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Assign Index</em>'.
+	 * @return a new object of class '<em>Inst Assign Index</em>'.
 	 * @generated
 	 */
-	AssignIndex createAssignIndex();
+	InstAssignIndex createInstAssignIndex();
 
 	/**
-	 * Returns a new object of class '<em>Split Instruction</em>'.
+	 * Returns a new object of class '<em>Inst Split</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Split Instruction</em>'.
+	 * @return a new object of class '<em>Inst Split</em>'.
 	 * @generated
 	 */
-	SplitInstruction createSplitInstruction();
+	InstSplit createInstSplit();
+
+	InstTernary createInstTernary(Var target, Expression condition,
+			Expression trueValue, Expression falseValue);
+
+	InstAssignIndex createInstAssignIndex(Var indexVar, List<Expression> listIndex,
+			Type type);
 
 	/**
 	 * Returns the package supported by this factory.
@@ -61,4 +71,4 @@ public interface InstructionsFactory extends EFactory {
 	 */
 	InstructionsPackage getInstructionsPackage();
 
-} //InstructionsFactory
+} // InstructionsFactory

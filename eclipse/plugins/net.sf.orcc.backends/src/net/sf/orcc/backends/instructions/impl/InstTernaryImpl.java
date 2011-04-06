@@ -6,8 +6,8 @@
  */
 package net.sf.orcc.backends.instructions.impl;
 
+import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
-import net.sf.orcc.backends.instructions.TernaryOperation;
 
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
@@ -24,21 +24,21 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Ternary Operation</b></em>'.
+ * An implementation of the model object '<em><b>Inst Ternary</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.instructions.impl.TernaryOperationImpl#getConditionValue <em>Condition Value</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.impl.TernaryOperationImpl#getTrueValue <em>True Value</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.impl.TernaryOperationImpl#getFalseValue <em>False Value</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.impl.TernaryOperationImpl#getTarget <em>Target</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.impl.InstTernaryImpl#getConditionValue <em>Condition Value</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.impl.InstTernaryImpl#getTrueValue <em>True Value</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.impl.InstTernaryImpl#getFalseValue <em>False Value</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.impl.InstTernaryImpl#getTarget <em>Target</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOperation {
+public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 	/**
 	 * The cached value of the '{@link #getConditionValue() <em>Condition Value</em>}' containment reference.
 	 * <!-- begin-user-doc -->
@@ -84,7 +84,7 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected TernaryOperationImpl() {
+	protected InstTernaryImpl() {
 		super();
 	}
 
@@ -95,7 +95,7 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return InstructionsPackage.Literals.TERNARY_OPERATION;
+		return InstructionsPackage.Literals.INST_TERNARY;
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 		Expression oldConditionValue = conditionValue;
 		conditionValue = newConditionValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.TERNARY_OPERATION__CONDITION_VALUE, oldConditionValue, newConditionValue);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_TERNARY__CONDITION_VALUE, oldConditionValue, newConditionValue);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -131,14 +131,14 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 		if (newConditionValue != conditionValue) {
 			NotificationChain msgs = null;
 			if (conditionValue != null)
-				msgs = ((InternalEObject)conditionValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.TERNARY_OPERATION__CONDITION_VALUE, null, msgs);
+				msgs = ((InternalEObject)conditionValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_TERNARY__CONDITION_VALUE, null, msgs);
 			if (newConditionValue != null)
-				msgs = ((InternalEObject)newConditionValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.TERNARY_OPERATION__CONDITION_VALUE, null, msgs);
+				msgs = ((InternalEObject)newConditionValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_TERNARY__CONDITION_VALUE, null, msgs);
 			msgs = basicSetConditionValue(newConditionValue, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.TERNARY_OPERATION__CONDITION_VALUE, newConditionValue, newConditionValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_TERNARY__CONDITION_VALUE, newConditionValue, newConditionValue));
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 		Expression oldTrueValue = trueValue;
 		trueValue = newTrueValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.TERNARY_OPERATION__TRUE_VALUE, oldTrueValue, newTrueValue);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_TERNARY__TRUE_VALUE, oldTrueValue, newTrueValue);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -174,14 +174,14 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 		if (newTrueValue != trueValue) {
 			NotificationChain msgs = null;
 			if (trueValue != null)
-				msgs = ((InternalEObject)trueValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.TERNARY_OPERATION__TRUE_VALUE, null, msgs);
+				msgs = ((InternalEObject)trueValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_TERNARY__TRUE_VALUE, null, msgs);
 			if (newTrueValue != null)
-				msgs = ((InternalEObject)newTrueValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.TERNARY_OPERATION__TRUE_VALUE, null, msgs);
+				msgs = ((InternalEObject)newTrueValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_TERNARY__TRUE_VALUE, null, msgs);
 			msgs = basicSetTrueValue(newTrueValue, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.TERNARY_OPERATION__TRUE_VALUE, newTrueValue, newTrueValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_TERNARY__TRUE_VALUE, newTrueValue, newTrueValue));
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 		Expression oldFalseValue = falseValue;
 		falseValue = newFalseValue;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.TERNARY_OPERATION__FALSE_VALUE, oldFalseValue, newFalseValue);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_TERNARY__FALSE_VALUE, oldFalseValue, newFalseValue);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -217,14 +217,14 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 		if (newFalseValue != falseValue) {
 			NotificationChain msgs = null;
 			if (falseValue != null)
-				msgs = ((InternalEObject)falseValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.TERNARY_OPERATION__FALSE_VALUE, null, msgs);
+				msgs = ((InternalEObject)falseValue).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_TERNARY__FALSE_VALUE, null, msgs);
 			if (newFalseValue != null)
-				msgs = ((InternalEObject)newFalseValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.TERNARY_OPERATION__FALSE_VALUE, null, msgs);
+				msgs = ((InternalEObject)newFalseValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_TERNARY__FALSE_VALUE, null, msgs);
 			msgs = basicSetFalseValue(newFalseValue, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.TERNARY_OPERATION__FALSE_VALUE, newFalseValue, newFalseValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_TERNARY__FALSE_VALUE, newFalseValue, newFalseValue));
 	}
 
 	/**
@@ -245,7 +245,7 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.TERNARY_OPERATION__TARGET, oldTarget, newTarget);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_TERNARY__TARGET, oldTarget, newTarget);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -260,14 +260,14 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 		if (newTarget != target) {
 			NotificationChain msgs = null;
 			if (target != null)
-				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.TERNARY_OPERATION__TARGET, null, msgs);
+				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_TERNARY__TARGET, null, msgs);
 			if (newTarget != null)
-				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.TERNARY_OPERATION__TARGET, null, msgs);
+				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_TERNARY__TARGET, null, msgs);
 			msgs = basicSetTarget(newTarget, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.TERNARY_OPERATION__TARGET, newTarget, newTarget));
+			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_TERNARY__TARGET, newTarget, newTarget));
 	}
 
 	/**
@@ -278,13 +278,13 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case InstructionsPackage.TERNARY_OPERATION__CONDITION_VALUE:
+			case InstructionsPackage.INST_TERNARY__CONDITION_VALUE:
 				return basicSetConditionValue(null, msgs);
-			case InstructionsPackage.TERNARY_OPERATION__TRUE_VALUE:
+			case InstructionsPackage.INST_TERNARY__TRUE_VALUE:
 				return basicSetTrueValue(null, msgs);
-			case InstructionsPackage.TERNARY_OPERATION__FALSE_VALUE:
+			case InstructionsPackage.INST_TERNARY__FALSE_VALUE:
 				return basicSetFalseValue(null, msgs);
-			case InstructionsPackage.TERNARY_OPERATION__TARGET:
+			case InstructionsPackage.INST_TERNARY__TARGET:
 				return basicSetTarget(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -298,13 +298,13 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case InstructionsPackage.TERNARY_OPERATION__CONDITION_VALUE:
+			case InstructionsPackage.INST_TERNARY__CONDITION_VALUE:
 				return getConditionValue();
-			case InstructionsPackage.TERNARY_OPERATION__TRUE_VALUE:
+			case InstructionsPackage.INST_TERNARY__TRUE_VALUE:
 				return getTrueValue();
-			case InstructionsPackage.TERNARY_OPERATION__FALSE_VALUE:
+			case InstructionsPackage.INST_TERNARY__FALSE_VALUE:
 				return getFalseValue();
-			case InstructionsPackage.TERNARY_OPERATION__TARGET:
+			case InstructionsPackage.INST_TERNARY__TARGET:
 				return getTarget();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -318,16 +318,16 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case InstructionsPackage.TERNARY_OPERATION__CONDITION_VALUE:
+			case InstructionsPackage.INST_TERNARY__CONDITION_VALUE:
 				setConditionValue((Expression)newValue);
 				return;
-			case InstructionsPackage.TERNARY_OPERATION__TRUE_VALUE:
+			case InstructionsPackage.INST_TERNARY__TRUE_VALUE:
 				setTrueValue((Expression)newValue);
 				return;
-			case InstructionsPackage.TERNARY_OPERATION__FALSE_VALUE:
+			case InstructionsPackage.INST_TERNARY__FALSE_VALUE:
 				setFalseValue((Expression)newValue);
 				return;
-			case InstructionsPackage.TERNARY_OPERATION__TARGET:
+			case InstructionsPackage.INST_TERNARY__TARGET:
 				setTarget((Def)newValue);
 				return;
 		}
@@ -342,16 +342,16 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case InstructionsPackage.TERNARY_OPERATION__CONDITION_VALUE:
+			case InstructionsPackage.INST_TERNARY__CONDITION_VALUE:
 				setConditionValue((Expression)null);
 				return;
-			case InstructionsPackage.TERNARY_OPERATION__TRUE_VALUE:
+			case InstructionsPackage.INST_TERNARY__TRUE_VALUE:
 				setTrueValue((Expression)null);
 				return;
-			case InstructionsPackage.TERNARY_OPERATION__FALSE_VALUE:
+			case InstructionsPackage.INST_TERNARY__FALSE_VALUE:
 				setFalseValue((Expression)null);
 				return;
-			case InstructionsPackage.TERNARY_OPERATION__TARGET:
+			case InstructionsPackage.INST_TERNARY__TARGET:
 				setTarget((Def)null);
 				return;
 		}
@@ -366,16 +366,16 @@ public class TernaryOperationImpl extends InstSpecificImpl implements TernaryOpe
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case InstructionsPackage.TERNARY_OPERATION__CONDITION_VALUE:
+			case InstructionsPackage.INST_TERNARY__CONDITION_VALUE:
 				return conditionValue != null;
-			case InstructionsPackage.TERNARY_OPERATION__TRUE_VALUE:
+			case InstructionsPackage.INST_TERNARY__TRUE_VALUE:
 				return trueValue != null;
-			case InstructionsPackage.TERNARY_OPERATION__FALSE_VALUE:
+			case InstructionsPackage.INST_TERNARY__FALSE_VALUE:
 				return falseValue != null;
-			case InstructionsPackage.TERNARY_OPERATION__TARGET:
+			case InstructionsPackage.INST_TERNARY__TARGET:
 				return target != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
-} //TernaryOperationImpl
+} //InstTernaryImpl

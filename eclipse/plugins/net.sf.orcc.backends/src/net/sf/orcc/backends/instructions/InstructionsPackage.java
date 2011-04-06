@@ -61,14 +61,14 @@ public interface InstructionsPackage extends EPackage {
 	InstructionsPackage eINSTANCE = net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl.init();
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.TernaryOperationImpl <em>Ternary Operation</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstTernaryImpl <em>Inst Ternary</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.instructions.impl.TernaryOperationImpl
-	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getTernaryOperation()
+	 * @see net.sf.orcc.backends.instructions.impl.InstTernaryImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstTernary()
 	 * @generated
 	 */
-	int TERNARY_OPERATION = 0;
+	int INST_TERNARY = 0;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -77,7 +77,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TERNARY_OPERATION__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
+	int INST_TERNARY__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
 
 	/**
 	 * The feature id for the '<em><b>Condition Value</b></em>' containment reference.
@@ -86,7 +86,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TERNARY_OPERATION__CONDITION_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
+	int INST_TERNARY__CONDITION_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>True Value</b></em>' containment reference.
@@ -95,7 +95,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TERNARY_OPERATION__TRUE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
+	int INST_TERNARY__TRUE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>False Value</b></em>' containment reference.
@@ -104,7 +104,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TERNARY_OPERATION__FALSE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
+	int INST_TERNARY__FALSE_VALUE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' containment reference.
@@ -113,27 +113,26 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TERNARY_OPERATION__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
+	int INST_TERNARY__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
 
 	/**
-	 * The number of structural features of the '<em>Ternary Operation</em>' class.
+	 * The number of structural features of the '<em>Inst Ternary</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TERNARY_OPERATION_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 4;
-
+	int INST_TERNARY_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 4;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.AssignIndexImpl <em>Assign Index</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstAssignIndexImpl <em>Inst Assign Index</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.instructions.impl.AssignIndexImpl
-	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getAssignIndex()
+	 * @see net.sf.orcc.backends.instructions.impl.InstAssignIndexImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstAssignIndex()
 	 * @generated
 	 */
-	int ASSIGN_INDEX = 1;
+	int INST_ASSIGN_INDEX = 1;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -142,7 +141,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ASSIGN_INDEX__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
+	int INST_ASSIGN_INDEX__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -151,7 +150,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ASSIGN_INDEX__INDEXES = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
+	int INST_ASSIGN_INDEX__INDEXES = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' containment reference.
@@ -160,7 +159,7 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ASSIGN_INDEX__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
+	int INST_ASSIGN_INDEX__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>List Type</b></em>' containment reference.
@@ -169,26 +168,26 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ASSIGN_INDEX__LIST_TYPE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
+	int INST_ASSIGN_INDEX__LIST_TYPE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
 
 	/**
-	 * The number of structural features of the '<em>Assign Index</em>' class.
+	 * The number of structural features of the '<em>Inst Assign Index</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ASSIGN_INDEX_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
+	int INST_ASSIGN_INDEX_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 3;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.SplitInstructionImpl <em>Split Instruction</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstSplitImpl <em>Inst Split</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.instructions.impl.SplitInstructionImpl
-	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getSplitInstruction()
+	 * @see net.sf.orcc.backends.instructions.impl.InstSplitImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstSplit()
 	 * @generated
 	 */
-	int SPLIT_INSTRUCTION = 2;
+	int INST_SPLIT = 2;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -197,124 +196,124 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SPLIT_INSTRUCTION__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
+	int INST_SPLIT__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
 
 	/**
-	 * The number of structural features of the '<em>Split Instruction</em>' class.
+	 * The number of structural features of the '<em>Inst Split</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SPLIT_INSTRUCTION_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
+	int INST_SPLIT_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
 
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.TernaryOperation <em>Ternary Operation</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstTernary <em>Inst Ternary</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Ternary Operation</em>'.
-	 * @see net.sf.orcc.backends.instructions.TernaryOperation
+	 * @return the meta object for class '<em>Inst Ternary</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstTernary
 	 * @generated
 	 */
-	EClass getTernaryOperation();
+	EClass getInstTernary();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.TernaryOperation#getConditionValue <em>Condition Value</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstTernary#getConditionValue <em>Condition Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Condition Value</em>'.
-	 * @see net.sf.orcc.backends.instructions.TernaryOperation#getConditionValue()
-	 * @see #getTernaryOperation()
+	 * @see net.sf.orcc.backends.instructions.InstTernary#getConditionValue()
+	 * @see #getInstTernary()
 	 * @generated
 	 */
-	EReference getTernaryOperation_ConditionValue();
+	EReference getInstTernary_ConditionValue();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.TernaryOperation#getTrueValue <em>True Value</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstTernary#getTrueValue <em>True Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>True Value</em>'.
-	 * @see net.sf.orcc.backends.instructions.TernaryOperation#getTrueValue()
-	 * @see #getTernaryOperation()
+	 * @see net.sf.orcc.backends.instructions.InstTernary#getTrueValue()
+	 * @see #getInstTernary()
 	 * @generated
 	 */
-	EReference getTernaryOperation_TrueValue();
+	EReference getInstTernary_TrueValue();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.TernaryOperation#getFalseValue <em>False Value</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstTernary#getFalseValue <em>False Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>False Value</em>'.
-	 * @see net.sf.orcc.backends.instructions.TernaryOperation#getFalseValue()
-	 * @see #getTernaryOperation()
+	 * @see net.sf.orcc.backends.instructions.InstTernary#getFalseValue()
+	 * @see #getInstTernary()
 	 * @generated
 	 */
-	EReference getTernaryOperation_FalseValue();
+	EReference getInstTernary_FalseValue();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.TernaryOperation#getTarget <em>Target</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstTernary#getTarget <em>Target</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Target</em>'.
-	 * @see net.sf.orcc.backends.instructions.TernaryOperation#getTarget()
-	 * @see #getTernaryOperation()
+	 * @see net.sf.orcc.backends.instructions.InstTernary#getTarget()
+	 * @see #getInstTernary()
 	 * @generated
 	 */
-	EReference getTernaryOperation_Target();
+	EReference getInstTernary_Target();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.AssignIndex <em>Assign Index</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstAssignIndex <em>Inst Assign Index</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Assign Index</em>'.
-	 * @see net.sf.orcc.backends.instructions.AssignIndex
+	 * @return the meta object for class '<em>Inst Assign Index</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstAssignIndex
 	 * @generated
 	 */
-	EClass getAssignIndex();
+	EClass getInstAssignIndex();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.instructions.AssignIndex#getIndexes <em>Indexes</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.instructions.InstAssignIndex#getIndexes <em>Indexes</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference list '<em>Indexes</em>'.
-	 * @see net.sf.orcc.backends.instructions.AssignIndex#getIndexes()
-	 * @see #getAssignIndex()
+	 * @see net.sf.orcc.backends.instructions.InstAssignIndex#getIndexes()
+	 * @see #getInstAssignIndex()
 	 * @generated
 	 */
-	EReference getAssignIndex_Indexes();
+	EReference getInstAssignIndex_Indexes();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.AssignIndex#getTarget <em>Target</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstAssignIndex#getTarget <em>Target</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>Target</em>'.
-	 * @see net.sf.orcc.backends.instructions.AssignIndex#getTarget()
-	 * @see #getAssignIndex()
+	 * @see net.sf.orcc.backends.instructions.InstAssignIndex#getTarget()
+	 * @see #getInstAssignIndex()
 	 * @generated
 	 */
-	EReference getAssignIndex_Target();
+	EReference getInstAssignIndex_Target();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.AssignIndex#getListType <em>List Type</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstAssignIndex#getListType <em>List Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the containment reference '<em>List Type</em>'.
-	 * @see net.sf.orcc.backends.instructions.AssignIndex#getListType()
-	 * @see #getAssignIndex()
+	 * @see net.sf.orcc.backends.instructions.InstAssignIndex#getListType()
+	 * @see #getInstAssignIndex()
 	 * @generated
 	 */
-	EReference getAssignIndex_ListType();
+	EReference getInstAssignIndex_ListType();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.SplitInstruction <em>Split Instruction</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstSplit <em>Inst Split</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Split Instruction</em>'.
-	 * @see net.sf.orcc.backends.instructions.SplitInstruction
+	 * @return the meta object for class '<em>Inst Split</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstSplit
 	 * @generated
 	 */
-	EClass getSplitInstruction();
+	EClass getInstSplit();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -339,14 +338,14 @@ public interface InstructionsPackage extends EPackage {
 	 */
 	interface Literals {
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.TernaryOperationImpl <em>Ternary Operation</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.InstTernaryImpl <em>Inst Ternary</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.instructions.impl.TernaryOperationImpl
-		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getTernaryOperation()
+		 * @see net.sf.orcc.backends.instructions.impl.InstTernaryImpl
+		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstTernary()
 		 * @generated
 		 */
-		EClass TERNARY_OPERATION = eINSTANCE.getTernaryOperation();
+		EClass INST_TERNARY = eINSTANCE.getInstTernary();
 
 		/**
 		 * The meta object literal for the '<em><b>Condition Value</b></em>' containment reference feature.
@@ -354,7 +353,7 @@ public interface InstructionsPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TERNARY_OPERATION__CONDITION_VALUE = eINSTANCE.getTernaryOperation_ConditionValue();
+		EReference INST_TERNARY__CONDITION_VALUE = eINSTANCE.getInstTernary_ConditionValue();
 
 		/**
 		 * The meta object literal for the '<em><b>True Value</b></em>' containment reference feature.
@@ -362,7 +361,7 @@ public interface InstructionsPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TERNARY_OPERATION__TRUE_VALUE = eINSTANCE.getTernaryOperation_TrueValue();
+		EReference INST_TERNARY__TRUE_VALUE = eINSTANCE.getInstTernary_TrueValue();
 
 		/**
 		 * The meta object literal for the '<em><b>False Value</b></em>' containment reference feature.
@@ -370,7 +369,7 @@ public interface InstructionsPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TERNARY_OPERATION__FALSE_VALUE = eINSTANCE.getTernaryOperation_FalseValue();
+		EReference INST_TERNARY__FALSE_VALUE = eINSTANCE.getInstTernary_FalseValue();
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
@@ -378,17 +377,17 @@ public interface InstructionsPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TERNARY_OPERATION__TARGET = eINSTANCE.getTernaryOperation_Target();
+		EReference INST_TERNARY__TARGET = eINSTANCE.getInstTernary_Target();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.AssignIndexImpl <em>Assign Index</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.InstAssignIndexImpl <em>Inst Assign Index</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.instructions.impl.AssignIndexImpl
-		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getAssignIndex()
+		 * @see net.sf.orcc.backends.instructions.impl.InstAssignIndexImpl
+		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstAssignIndex()
 		 * @generated
 		 */
-		EClass ASSIGN_INDEX = eINSTANCE.getAssignIndex();
+		EClass INST_ASSIGN_INDEX = eINSTANCE.getInstAssignIndex();
 
 		/**
 		 * The meta object literal for the '<em><b>Indexes</b></em>' containment reference list feature.
@@ -396,7 +395,7 @@ public interface InstructionsPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference ASSIGN_INDEX__INDEXES = eINSTANCE.getAssignIndex_Indexes();
+		EReference INST_ASSIGN_INDEX__INDEXES = eINSTANCE.getInstAssignIndex_Indexes();
 
 		/**
 		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
@@ -404,7 +403,7 @@ public interface InstructionsPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference ASSIGN_INDEX__TARGET = eINSTANCE.getAssignIndex_Target();
+		EReference INST_ASSIGN_INDEX__TARGET = eINSTANCE.getInstAssignIndex_Target();
 
 		/**
 		 * The meta object literal for the '<em><b>List Type</b></em>' containment reference feature.
@@ -412,17 +411,17 @@ public interface InstructionsPackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference ASSIGN_INDEX__LIST_TYPE = eINSTANCE.getAssignIndex_ListType();
+		EReference INST_ASSIGN_INDEX__LIST_TYPE = eINSTANCE.getInstAssignIndex_ListType();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.SplitInstructionImpl <em>Split Instruction</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.InstSplitImpl <em>Inst Split</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.instructions.impl.SplitInstructionImpl
-		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getSplitInstruction()
+		 * @see net.sf.orcc.backends.instructions.impl.InstSplitImpl
+		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstSplit()
 		 * @generated
 		 */
-		EClass SPLIT_INSTRUCTION = eINSTANCE.getSplitInstruction();
+		EClass INST_SPLIT = eINSTANCE.getInstSplit();
 
 	}
 

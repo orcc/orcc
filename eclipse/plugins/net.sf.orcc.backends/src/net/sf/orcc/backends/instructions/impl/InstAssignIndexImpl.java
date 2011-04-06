@@ -8,7 +8,7 @@ package net.sf.orcc.backends.instructions.impl;
 
 import java.util.Collection;
 
-import net.sf.orcc.backends.instructions.AssignIndex;
+import net.sf.orcc.backends.instructions.InstAssignIndex;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
 
 import net.sf.orcc.ir.Def;
@@ -32,20 +32,20 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Assign Index</b></em>'.
+ * An implementation of the model object '<em><b>Inst Assign Index</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.instructions.impl.AssignIndexImpl#getIndexes <em>Indexes</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.impl.AssignIndexImpl#getTarget <em>Target</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.impl.AssignIndexImpl#getListType <em>List Type</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.impl.InstAssignIndexImpl#getIndexes <em>Indexes</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.impl.InstAssignIndexImpl#getTarget <em>Target</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.impl.InstAssignIndexImpl#getListType <em>List Type</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
+public class InstAssignIndexImpl extends InstSpecificImpl implements InstAssignIndex {
 	/**
 	 * The cached value of the '{@link #getIndexes() <em>Indexes</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
@@ -81,7 +81,7 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected AssignIndexImpl() {
+	protected InstAssignIndexImpl() {
 		super();
 	}
 
@@ -92,7 +92,7 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return InstructionsPackage.Literals.ASSIGN_INDEX;
+		return InstructionsPackage.Literals.INST_ASSIGN_INDEX;
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 	 */
 	public EList<Expression> getIndexes() {
 		if (indexes == null) {
-			indexes = new EObjectContainmentEList<Expression>(Expression.class, this, InstructionsPackage.ASSIGN_INDEX__INDEXES);
+			indexes = new EObjectContainmentEList<Expression>(Expression.class, this, InstructionsPackage.INST_ASSIGN_INDEX__INDEXES);
 		}
 		return indexes;
 	}
@@ -125,7 +125,7 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.ASSIGN_INDEX__TARGET, oldTarget, newTarget);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_ASSIGN_INDEX__TARGET, oldTarget, newTarget);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -140,14 +140,14 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 		if (newTarget != target) {
 			NotificationChain msgs = null;
 			if (target != null)
-				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.ASSIGN_INDEX__TARGET, null, msgs);
+				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_ASSIGN_INDEX__TARGET, null, msgs);
 			if (newTarget != null)
-				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.ASSIGN_INDEX__TARGET, null, msgs);
+				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_ASSIGN_INDEX__TARGET, null, msgs);
 			msgs = basicSetTarget(newTarget, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.ASSIGN_INDEX__TARGET, newTarget, newTarget));
+			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_ASSIGN_INDEX__TARGET, newTarget, newTarget));
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 		Type oldListType = listType;
 		listType = newListType;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.ASSIGN_INDEX__LIST_TYPE, oldListType, newListType);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_ASSIGN_INDEX__LIST_TYPE, oldListType, newListType);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -183,14 +183,14 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 		if (newListType != listType) {
 			NotificationChain msgs = null;
 			if (listType != null)
-				msgs = ((InternalEObject)listType).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.ASSIGN_INDEX__LIST_TYPE, null, msgs);
+				msgs = ((InternalEObject)listType).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_ASSIGN_INDEX__LIST_TYPE, null, msgs);
 			if (newListType != null)
-				msgs = ((InternalEObject)newListType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.ASSIGN_INDEX__LIST_TYPE, null, msgs);
+				msgs = ((InternalEObject)newListType).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_ASSIGN_INDEX__LIST_TYPE, null, msgs);
 			msgs = basicSetListType(newListType, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.ASSIGN_INDEX__LIST_TYPE, newListType, newListType));
+			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_ASSIGN_INDEX__LIST_TYPE, newListType, newListType));
 	}
 
 	/**
@@ -201,11 +201,11 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case InstructionsPackage.ASSIGN_INDEX__INDEXES:
+			case InstructionsPackage.INST_ASSIGN_INDEX__INDEXES:
 				return ((InternalEList<?>)getIndexes()).basicRemove(otherEnd, msgs);
-			case InstructionsPackage.ASSIGN_INDEX__TARGET:
+			case InstructionsPackage.INST_ASSIGN_INDEX__TARGET:
 				return basicSetTarget(null, msgs);
-			case InstructionsPackage.ASSIGN_INDEX__LIST_TYPE:
+			case InstructionsPackage.INST_ASSIGN_INDEX__LIST_TYPE:
 				return basicSetListType(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -219,11 +219,11 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case InstructionsPackage.ASSIGN_INDEX__INDEXES:
+			case InstructionsPackage.INST_ASSIGN_INDEX__INDEXES:
 				return getIndexes();
-			case InstructionsPackage.ASSIGN_INDEX__TARGET:
+			case InstructionsPackage.INST_ASSIGN_INDEX__TARGET:
 				return getTarget();
-			case InstructionsPackage.ASSIGN_INDEX__LIST_TYPE:
+			case InstructionsPackage.INST_ASSIGN_INDEX__LIST_TYPE:
 				return getListType();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -238,14 +238,14 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case InstructionsPackage.ASSIGN_INDEX__INDEXES:
+			case InstructionsPackage.INST_ASSIGN_INDEX__INDEXES:
 				getIndexes().clear();
 				getIndexes().addAll((Collection<? extends Expression>)newValue);
 				return;
-			case InstructionsPackage.ASSIGN_INDEX__TARGET:
+			case InstructionsPackage.INST_ASSIGN_INDEX__TARGET:
 				setTarget((Def)newValue);
 				return;
-			case InstructionsPackage.ASSIGN_INDEX__LIST_TYPE:
+			case InstructionsPackage.INST_ASSIGN_INDEX__LIST_TYPE:
 				setListType((Type)newValue);
 				return;
 		}
@@ -260,13 +260,13 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case InstructionsPackage.ASSIGN_INDEX__INDEXES:
+			case InstructionsPackage.INST_ASSIGN_INDEX__INDEXES:
 				getIndexes().clear();
 				return;
-			case InstructionsPackage.ASSIGN_INDEX__TARGET:
+			case InstructionsPackage.INST_ASSIGN_INDEX__TARGET:
 				setTarget((Def)null);
 				return;
-			case InstructionsPackage.ASSIGN_INDEX__LIST_TYPE:
+			case InstructionsPackage.INST_ASSIGN_INDEX__LIST_TYPE:
 				setListType((Type)null);
 				return;
 		}
@@ -281,14 +281,14 @@ public class AssignIndexImpl extends InstSpecificImpl implements AssignIndex {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case InstructionsPackage.ASSIGN_INDEX__INDEXES:
+			case InstructionsPackage.INST_ASSIGN_INDEX__INDEXES:
 				return indexes != null && !indexes.isEmpty();
-			case InstructionsPackage.ASSIGN_INDEX__TARGET:
+			case InstructionsPackage.INST_ASSIGN_INDEX__TARGET:
 				return target != null;
-			case InstructionsPackage.ASSIGN_INDEX__LIST_TYPE:
+			case InstructionsPackage.INST_ASSIGN_INDEX__LIST_TYPE:
 				return listType != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
-} //AssignIndexImpl
+} //InstAssignIndexImpl

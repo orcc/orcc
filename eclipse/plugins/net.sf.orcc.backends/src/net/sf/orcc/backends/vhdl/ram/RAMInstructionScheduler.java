@@ -34,7 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.backends.instructions.SplitInstruction;
+import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.backends.vhdl.ram.instructions.RamRead;
 import net.sf.orcc.backends.vhdl.ram.instructions.RamSetAddress;
 import net.sf.orcc.backends.vhdl.ram.instructions.RamWrite;
@@ -85,7 +85,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 		// insert the RSA before the previous split instruction
 		while (itInstruction.hasPrevious()) {
 			Instruction instruction = itInstruction.previous();
-			if (instruction instanceof SplitInstruction) {
+			if (instruction instanceof InstSplit) {
 				itInstruction.add(rsa);
 				break;
 			}
@@ -140,7 +140,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * 
 	 */
 	private void addSplitInstruction() {
-		itInstruction.add(new SplitInstruction());
+		itInstruction.add(new InstSplit());
 	}
 
 	/**

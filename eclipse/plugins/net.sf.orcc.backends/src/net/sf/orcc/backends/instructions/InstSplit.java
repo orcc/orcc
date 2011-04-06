@@ -14,9 +14,9 @@ import net.sf.orcc.ir.InstSpecific;
  * <!-- end-user-doc -->
  *
  *
- * @see net.sf.orcc.backends.instructions.InstructionsPackage#getSplitInstruction()
+ * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstSplit()
  * @model
  * @generated
  */
-public interface SplitInstruction extends InstSpecific {
+public interface InstSplit extends InstSpecific {
 } // SplitInstruction

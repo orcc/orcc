@@ -28,12 +28,12 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
+import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.transformations.InlineTransformation;
-import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.Var;
 
 /**
  * This class defines an extension of InlineTransformation to do specified
@@ -52,11 +52,11 @@ public class XlimInlineTransformation extends InlineTransformation {
 
 	private class XlimInlineCloner extends InlineCloner {
 		@Override
-		public Object interpret(SpecificInstruction specific, Object... args) {
-			if (specific instanceof TernaryOperation) {
-				TernaryOperation ternaryOperation = (TernaryOperation) specific;
-				VarLocal target = (VarLocal) variableToLocalVariableMap
-						.get(ternaryOperation.getTarget());
+		public Object interpret(InstSpecific specific, Object... args) {
+			if (specific instanceof InstTernary) {
+				InstTernary ternaryOperation = (InstTernary) specific;
+				Var target = variableToLocalVariableMap.get(ternaryOperation
+						.getTarget());
 
 				Expression conditionValue = (Expression) ternaryOperation
 						.getConditionValue().accept(this, args);
@@ -65,12 +65,8 @@ public class XlimInlineTransformation extends InlineTransformation {
 				Expression falseValue = (Expression) ternaryOperation
 						.getFalseValue().accept(this, args);
 
-				TernaryOperation t = new TernaryOperation(target,
-						conditionValue, trueValue, falseValue);
-				Use.addUses(t, conditionValue);
-				Use.addUses(t, trueValue);
-				Use.addUses(t, falseValue);
-				return t;
+				return InstructionsFactory.eINSTANCE.createInstTernary(
+						target, conditionValue, trueValue, falseValue);
 			}
 			super.interpret(specific, args);
 			return specific;

@@ -35,13 +35,12 @@ import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -62,8 +61,8 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor {
 		}
 
 		@Override
-		public void visit(Store instr) {
-			Var target = instr.getTarget();
+		public void visit(InstStore instr) {
+			Var target = instr.getTarget().getVariable();
 			Type type = target.getType();
 			// Allocate value field of list if it is initialized
 			if (type.isList() && target.getValue() == null) {
@@ -79,11 +78,10 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor {
 	public void visit(Actor actor) {
 		actorInterpreter = new SpecialActorInterpreter(
 				new HashMap<String, Expression>(0), actor, null);
-		
+
 		// Initialize value field if there is an initial value
 		for (Var stateVar : actor.getStateVars()) {
-			Expression initConst = ((VarGlobal) stateVar)
-					.getInitialValue();
+			Expression initConst = stateVar.getInitialValue();
 			if (initConst != null) {
 				stateVar.setValue(initConst);
 			}
@@ -93,24 +91,23 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor {
 			for (Node node : action.getBody().getNodes()) {
 				node.accept(actorInterpreter);
 				node.accept(this);
-				
+
 			}
 		}
 
 		// Copy computed value to initialValue field and clean value field
 		for (Var stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
-			VarGlobal s = (VarGlobal) stateVar;
-			if (type.isList() && s.getInitialValue() == null
-					&& s.getValue() != null) {
-				s.setInitialValue(s.getValue());
+			if (type.isList() && stateVar.getInitialValue() == null
+					&& stateVar.getValue() != null) {
+				stateVar.setInitialValue(stateVar.getValue());
 			}
 			stateVar.setValue(null);
 		}
 	}
 
 	@Override
-	public void visit(Call call) {
+	public void visit(InstCall call) {
 		// Set initialize to native so it will not be printed
 		call.getProcedure().setNative(true);
 	}

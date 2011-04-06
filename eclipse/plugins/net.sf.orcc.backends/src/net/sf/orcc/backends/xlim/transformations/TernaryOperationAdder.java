@@ -30,20 +30,19 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.ListIterator;
 
-import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
+import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -57,7 +56,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 public class TernaryOperationAdder extends AbstractActorVisitor {
 
 	private NodeBlock newBlockNode;
-	private VarLocal condVar;
+	private Var condVar;
 
 	@Override
 	public void visit(Actor actor) {
@@ -78,16 +77,13 @@ public class TernaryOperationAdder extends AbstractActorVisitor {
 			Instruction instruction = it.next();
 			itInstruction = it;
 			if (instruction.isPhi()) {
-				PhiAssignment phi = (PhiAssignment) instruction;
+				InstPhi phi = (InstPhi) instruction;
 
-				TernaryOperation ternaryOp = new TernaryOperation(null,
-						phi.getTarget(), new VarExpr(new Use(condVar)), phi
-								.getValues().get(0), phi.getValues().get(1));
-
-				// add uses
-				Use.addUses(ternaryOp, ternaryOp.getConditionValue());
-				Use.addUses(ternaryOp, ternaryOp.getTrueValue());
-				Use.addUses(ternaryOp, ternaryOp.getFalseValue());
+				InstTernary ternaryOp = InstructionsFactory.eINSTANCE
+						.createInstTernary(phi.getTarget().getVariable(),
+								IrFactory.eINSTANCE.createExprVar(condVar), phi
+										.getValues().get(0), phi.getValues()
+										.get(1));
 
 				newBlockNode.add(ternaryOp);
 			} else {
@@ -99,23 +95,23 @@ public class TernaryOperationAdder extends AbstractActorVisitor {
 
 	@Override
 	public void visit(NodeIf nodeIf) {
-		VarLocal oldCondVar = condVar;
+		Var oldCondVar = condVar;
 
-		Expression condExpr = nodeIf.getValue();
+		Expression condExpr = nodeIf.getCondition();
 		condVar = procedure.newTempLocalVariable(null,
 				IrFactory.eINSTANCE.createTypeBool(), "ifCondition_"
 						+ nodeIf.getLocation().getStartLine());
 		condVar.setIndex(1);
-		Assign assignCond = new Assign(condVar, condExpr);
-		condVar.setInstruction(assignCond);
+		InstAssign assignCond = IrFactory.eINSTANCE.createInstAssign(condVar,
+				condExpr);
 		newBlockNode.add(assignCond);
 
 		// clean uses
-		nodeIf.setValue(null);
-		Use.removeUses(nodeIf, condExpr);
+		nodeIf.setCondition(null);
+		// Use.removeUses(nodeIf, condExpr);
 
 		// add uses
-		Use.addUses(assignCond, condExpr);
+		// Use.addUses(assignCond, condExpr);
 
 		visit(nodeIf.getThenNodes());
 		visit(nodeIf.getElseNodes());

@@ -34,36 +34,35 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.backends.instructions.InstTernary;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.FloatExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.InstructionInterpreter;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.impl.NodeInterpreter;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -79,27 +78,27 @@ public class InlineTransformation extends AbstractActorVisitor {
 			InstructionInterpreter, ExpressionInterpreter {
 
 		@Override
-		public Object interpret(Assign assign, Object... args) {
-			VarLocal target = (VarLocal) variableToLocalVariableMap
-					.get(assign.getTarget());
+		public Object interpret(InstAssign assign, Object... args) {
+			Var target = variableToLocalVariableMap.get(assign.getTarget());
 			Expression value = (Expression) assign.getValue()
 					.accept(this, args);
-			Assign a = new Assign(assign.getLocation(), target, value);
-			Use.addUses(a, value);
+			InstAssign a = IrFactory.eINSTANCE.createInstAssign(
+					assign.getLocation(), target, value);
 			return a;
 		}
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
+		public Object interpret(ExprBinary expr, Object... args) {
 			Expression e1 = (Expression) expr.getE1().accept(this, args);
 			Expression e2 = (Expression) expr.getE2().accept(this, args);
-			BinaryExpr e = new BinaryExpr(e1, expr.getOp(), e2, expr.getType());
+			ExprBinary e = IrFactory.eINSTANCE.createExprBinary(e1,
+					expr.getOp(), e2, expr.getType());
 			return e;
 		}
 
 		@Override
 		public Object interpret(NodeBlock node, Object... args) {
-			NodeBlock nodeBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
 			nodeBlock.setLocation(node.getLocation());
 			for (Instruction instruction : node.getInstructions()) {
 				Instruction i = (Instruction) instruction.accept(this, args);
@@ -111,35 +110,34 @@ public class InlineTransformation extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
-			BoolExpr e = new BoolExpr(expr.getValue());
+		public Object interpret(ExprBool expr, Object... args) {
+			ExprBool e = IrFactory.eINSTANCE.createExprBool(expr.isValue());
 			return e;
 		}
 
 		@Override
-		public Object interpret(Call call, Object... args) {
-			VarLocal target = (VarLocal) variableToLocalVariableMap
-					.get(call.getTarget());
+		public Object interpret(InstCall call, Object... args) {
+			Var target = variableToLocalVariableMap.get(call.getTarget());
 			List<Expression> parameters = new ArrayList<Expression>();
 			for (Expression parameter : call.getParameters()) {
 				parameters.add((Expression) parameter.accept(this, args));
 			}
-			Call c = new Call(call.getLocation(), target, call.getProcedure(),
-					parameters);
-			Use.addUses(c, parameters);
+			InstCall c = IrFactory.eINSTANCE.createInstCall(call.getLocation(),
+					target, call.getProcedure(), parameters);
 			return c;
 		}
 
 		@Override
-		public Object interpret(FloatExpr expr, Object... args) {
-			FloatExpr e = new FloatExpr(expr.getValue());
+		public Object interpret(ExprFloat expr, Object... args) {
+			ExprFloat e = IrFactory.eINSTANCE.createExprFloat();
+			e.setValue(expr.getValue());
 			return e;
 		}
 
 		@Override
 		public Object interpret(NodeIf node, Object... args) {
-			Expression condition = (Expression) node.getValue().accept(this,
-					args);
+			Expression condition = (Expression) node.getCondition().accept(
+					this, args);
 			List<Node> thenNodes = new ArrayList<Node>();
 			for (Node n : node.getThenNodes()) {
 				thenNodes.add((Node) n.accept(this, args));
@@ -151,76 +149,70 @@ public class InlineTransformation extends AbstractActorVisitor {
 			NodeBlock joinNode = (NodeBlock) node.getJoinNode().accept(this,
 					args);
 
-			NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
+			NodeIf nodeIf = IrFactory.eINSTANCE.createNodeIf();
 			nodeIf.setLocation(node.getLocation());
-			node.setValue(condition);
+			node.setCondition(condition);
 			node.getThenNodes().addAll(thenNodes);
 			node.getElseNodes().addAll(elseNodes);
 			node.setJoinNode(joinNode);
 
-			Use.addUses(nodeIf, condition);
 			return nodeIf;
 		}
 
 		@Override
-		public Object interpret(IntExpr expr, Object... args) {
-			IntExpr e = new IntExpr(expr.getValue());
+		public Object interpret(ExprInt expr, Object... args) {
+			ExprInt e = IrFactory.eINSTANCE.createExprInt(expr.getValue());
 			return e;
 		}
 
 		@Override
-		public Object interpret(ListExpr expr, Object... args) {
+		public Object interpret(ExprList expr, Object... args) {
 			List<Expression> expressions = new ArrayList<Expression>();
 			for (Expression e : expr.getValue()) {
 				expressions.add((Expression) e.accept(this, args));
 			}
-			ListExpr listExpr = new ListExpr(expressions);
+			ExprList listExpr = IrFactory.eINSTANCE.createExprList(expressions);
 			return listExpr;
 		}
 
 		@Override
-		public Object interpret(Load load, Object... args) {
-			VarLocal target = (VarLocal) variableToLocalVariableMap
-					.get(load.getTarget());
+		public Object interpret(InstLoad load, Object... args) {
+			Var target = variableToLocalVariableMap.get(load.getTarget());
 			List<Expression> indexes = new ArrayList<Expression>();
 			for (Expression index : load.getIndexes()) {
 				indexes.add((Expression) index.accept(this, args));
 			}
-			Load l;
+			InstLoad l;
 			Var sourceVariable = load.getSource().getVariable();
 			if (sourceVariable.isGlobal()) {
-				l = new Load(load.getLocation(), target, load.getSource(),
-						indexes);
+				l = IrFactory.eINSTANCE.createInstLoad(load.getLocation(),
+						target, load.getSource().getVariable(), indexes);
 			} else {
-				l = new Load(load.getLocation(), target, new Use(
-						variableToLocalVariableMap.get(sourceVariable)),
-						indexes);
+				l = IrFactory.eINSTANCE.createInstLoad(load.getLocation(),
+						target, sourceVariable, indexes);
 			}
-			Use.addUses(l, indexes);
 			return l;
 		}
 
 		@Override
-		public Object interpret(PhiAssignment phi, Object... args) {
-			VarLocal target = (VarLocal) variableToLocalVariableMap
-					.get(phi.getTarget());
+		public Object interpret(InstPhi phi, Object... args) {
+			Var target = variableToLocalVariableMap.get(phi.getTarget());
 			List<Expression> values = new ArrayList<Expression>();
 			for (Expression value : phi.getValues()) {
 				values.add((Expression) value.accept(this, args));
 			}
-			PhiAssignment p = new PhiAssignment(phi.getLocation(), target,
-					values);
-			Use.addUses(p, values);
+			InstPhi p = IrFactory.eINSTANCE.createInstPhi(phi.getLocation(),
+					target, values);
 			return p;
 		}
 
 		@Override
-		public Object interpret(Return returnInst, Object... args) {
+		public Object interpret(InstReturn returnInst, Object... args) {
 			if (returnInst.getValue() != null) {
 				Expression value = (Expression) returnInst.getValue().accept(
 						this, args);
-				Assign a = new Assign(returnVariableOfCurrentFunction, value);
-				Use.addUses(a, value);
+				InstAssign a = IrFactory.eINSTANCE.createInstAssign(
+						returnVariableOfCurrentFunction, value);
 				return a;
 			} else {
 				return null;
@@ -229,39 +221,37 @@ public class InlineTransformation extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(SpecificInstruction specific, Object... args) {
+		public Object interpret(InstSpecific specific, Object... args) {
 			return specific;
 		}
 
 		@Override
-		public Object interpret(Store store, Object... args) {
-			Var target;
-			if (store.getTarget().isGlobal()) {
-				target = store.getTarget();
-			} else {
-				target = variableToLocalVariableMap.get(store.getTarget());
+		public Object interpret(InstStore store, Object... args) {
+			Var target = store.getTarget().getVariable();
+			if (!target.isGlobal()) {
+				target = variableToLocalVariableMap.get(target);
 			}
 			List<Expression> indexes = new ArrayList<Expression>();
 			for (Expression index : store.getIndexes()) {
 				indexes.add((Expression) index.accept(this, args));
 			}
 			Expression value = (Expression) store.getValue().accept(this, args);
-			Store s = new Store(store.getLocation(), target, indexes, value);
-			Use.addUses(s, indexes);
-			Use.addUses(s, value);
+			InstStore s = IrFactory.eINSTANCE.createInstStore(
+					store.getLocation(), target, indexes, value);
 			return s;
 		}
 
 		@Override
-		public Object interpret(StringExpr expr, Object... args) {
-			StringExpr stringExpr = new StringExpr(expr.getValue());
+		public Object interpret(ExprString expr, Object... args) {
+			ExprString stringExpr = IrFactory.eINSTANCE.createExprString(expr
+					.getValue());
 			return stringExpr;
 		}
 
-		public Object interpret(TernaryOperation ternaryOperation,
+		public Object interpret(InstTernary ternaryOperation,
 				Object... args) {
-			VarLocal target = (VarLocal) variableToLocalVariableMap
-					.get(ternaryOperation.getTarget());
+			Var target = variableToLocalVariableMap.get(ternaryOperation
+					.getTarget());
 
 			Expression conditionValue = (Expression) ternaryOperation
 					.getConditionValue().accept(this, args);
@@ -270,35 +260,33 @@ public class InlineTransformation extends AbstractActorVisitor {
 			Expression falseValue = (Expression) ternaryOperation
 					.getFalseValue().accept(this, args);
 
-			TernaryOperation t = new TernaryOperation(target, conditionValue,
-					trueValue, falseValue);
-			Use.addUses(t, conditionValue);
-			Use.addUses(t, trueValue);
-			Use.addUses(t, falseValue);
+			InstTernary t = InstructionsFactory.eINSTANCE
+					.createInstTernary(target, conditionValue, trueValue,
+							falseValue);
 			return t;
 		}
 
 		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
+		public Object interpret(ExprUnary expr, Object... args) {
 			Expression expression = (Expression) expr.getExpr().accept(this,
 					args);
-			UnaryExpr unaryExpr = new UnaryExpr(expr.getOp(), expression,
-					expr.getType());
+			ExprUnary unaryExpr = IrFactory.eINSTANCE.createExprUnary(
+					expr.getOp(), expression, expr.getType());
 			return unaryExpr;
 		}
 
 		@Override
-		public Object interpret(VarExpr expr, Object... args) {
-			Var newVar = variableToLocalVariableMap.get(expr.getVar()
+		public Object interpret(ExprVar expr, Object... args) {
+			Var newVar = variableToLocalVariableMap.get(expr.getUse()
 					.getVariable());
-			VarExpr varExpr = new VarExpr(new Use(newVar));
+			ExprVar varExpr = IrFactory.eINSTANCE.createExprVar(newVar);
 			return varExpr;
 		}
 
 		@Override
 		public Object interpret(NodeWhile node, Object... args) {
-			Expression condition = (Expression) node.getValue().accept(this,
-					args);
+			Expression condition = (Expression) node.getCondition().accept(
+					this, args);
 			List<Node> nodes = new ArrayList<Node>();
 			for (Node n : node.getNodes()) {
 				nodes.add((Node) n.accept(this, args));
@@ -306,13 +294,12 @@ public class InlineTransformation extends AbstractActorVisitor {
 			NodeBlock joinNode = (NodeBlock) node.getJoinNode().accept(this,
 					args);
 
-			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
+			NodeWhile nodeWhile = IrFactory.eINSTANCE.createNodeWhile();
 			nodeWhile.setLocation(node.getLocation());
-			nodeWhile.setValue(condition);
+			nodeWhile.setCondition(condition);
 			nodeWhile.getNodes().addAll(nodes);
 			nodeWhile.setJoinNode(joinNode);
 
-			Use.addUses(nodeWhile, condition);
 			return nodeWhile;
 		}
 
@@ -326,7 +313,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 
 	private boolean needToSkipThisNode;
 
-	private VarLocal returnVariableOfCurrentFunction;
+	private Var returnVariableOfCurrentFunction;
 
 	protected Map<Var, Var> variableToLocalVariableMap;
 
@@ -336,7 +323,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 		inlineCloner = new InlineCloner();
 	}
 
-	private void inline(Call call) {
+	private void inline(InstCall call) {
 		// The function or the procedure
 		Procedure function = call.getProcedure();
 
@@ -346,53 +333,46 @@ public class InlineTransformation extends AbstractActorVisitor {
 		// Create a new local variable to all function/procedure's variable
 		// except for list (reference is using)
 		variableToLocalVariableMap = new HashMap<Var, Var>();
-		for (Var var : function.getLocals().getList()) {
-			VarLocal oldVar = (VarLocal) var;
-			VarLocal newVar = procedure.newTempLocalVariable("",
-					oldVar.getType(),
-					procedure.getName() + "_" + oldVar.getName() + "_"
+		for (Var var : function.getLocals()) {
+			Var newVar = procedure.newTempLocalVariable("", var.getType(),
+					procedure.getName() + "_" + var.getName() + "_"
 							+ call.getLocation().getStartLine() + "_"
 							+ call.getLocation().getStartColumn());
-			newVar.setIndex(oldVar.getIndex());
-			newVar.setLocation(oldVar.getLocation());
-			newVar.setAssignable(oldVar.isAssignable());
-			variableToLocalVariableMap.put(oldVar, newVar);
+			newVar.setIndex(var.getIndex());
+			newVar.setLocation(var.getLocation());
+			newVar.setAssignable(var.isAssignable());
+			variableToLocalVariableMap.put(var, newVar);
 		}
-		for (Var var : function.getParameters().getList()) {
-			VarLocal oldVar = (VarLocal) var;
+		for (Var var : function.getParameters()) {
 			if (var.getType().isList()) {
 				// In case of list, the parameter could be a global variable
-				Var newVar = ((VarExpr) call.getParameters().get(
-						function.getParameters().getList().indexOf(var)))
-						.getVar().getVariable();
-				variableToLocalVariableMap.put(oldVar, newVar);
+				Var newVar = ((ExprVar) call.getParameters().get(
+						function.getParameters().indexOf(var))).getUse()
+						.getVariable();
+				variableToLocalVariableMap.put(var, newVar);
 			} else {
-				VarLocal newVar = procedure.newTempLocalVariable("",
-						oldVar.getType(),
-						procedure.getName() + "_" + oldVar.getName() + "_"
+				Var newVar = procedure.newTempLocalVariable("", var.getType(),
+						procedure.getName() + "_" + var.getName() + "_"
 								+ call.getLocation().getStartLine() + "_"
 								+ call.getLocation().getStartColumn());
-				newVar.setIndex(oldVar.getIndex());
-				newVar.setLocation(oldVar.getLocation());
-				newVar.setAssignable(oldVar.isAssignable());
-				variableToLocalVariableMap.put(oldVar, newVar);
+				newVar.setIndex(var.getIndex());
+				newVar.setLocation(var.getLocation());
+				newVar.setAssignable(var.isAssignable());
+				variableToLocalVariableMap.put(var, newVar);
 			}
 		}
 
 		List<Node> nodes = new ArrayList<Node>();
 
 		// Assign all parameters except for list
-		NodeBlock newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		for (int i = 0; i < function.getParameters().getLength(); i++) {
-			Var parameter = function.getParameters().getList().get(i);
+		NodeBlock newBlockNode = IrFactory.eINSTANCE.createNodeBlock();
+		for (int i = 0; i < function.getParameters().size(); i++) {
+			Var parameter = function.getParameters().get(i);
 			if (!parameter.getType().isList()) {
 				Expression expr = call.getParameters().get(i);
-				Assign assign = new Assign(
-						(VarLocal) variableToLocalVariableMap
-								.get(parameter),
-						expr);
+				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
+						variableToLocalVariableMap.get(parameter), expr);
 				newBlockNode.add(assign);
-				Use.addUses(assign, expr);
 			}
 		}
 		if (newBlockNode.getInstructions().size() > 0) {
@@ -405,8 +385,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 		}
 
 		// Remove old block and add the new ones
-		NodeBlock secondBlockNodePart = IrFactoryImpl.eINSTANCE
-				.createNodeBlock();
+		NodeBlock secondBlockNodePart = IrFactory.eINSTANCE.createNodeBlock();
 
 		itInstruction.remove();
 		while (itInstruction.hasNext()) {
@@ -454,10 +433,10 @@ public class InlineTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Call call) {
+	public void visit(InstCall call) {
 		// Function case
 		if (!call.getProcedure().getReturnType().isVoid() && inlineFunction) {
-			returnVariableOfCurrentFunction = call.getTarget();
+			returnVariableOfCurrentFunction = call.getTarget().getVariable();
 			inline(call);
 			returnVariableOfCurrentFunction = null;
 		}
