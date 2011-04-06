@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.sf.orcc.ir.Use;
@@ -45,6 +46,25 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class EcoreHelper {
 
+	public static <T extends EObject> Collection<T> copyWithUses(Collection<? extends T> eObjects) {
+		Copier copier = new Copier();
+		Collection<T> result = copier.copyAll(eObjects);
+		copier.copyReferences();
+
+		TreeIterator<EObject> it = EcoreUtil.getAllContents(eObjects, true);
+		while (it.hasNext()) {
+			EObject obj = it.next();
+
+			if (obj instanceof Use) {
+				Use use = (Use) obj;
+				Use copyUse = (Use) copier.get(use);
+				copyUse.setVariable(use.getVariable());
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * Returns a deep copy of the given object, and updates uses.
 	 * 
@@ -52,7 +72,7 @@ public class EcoreHelper {
 	 * @param eObject
 	 * @return a deep copy of the given object with uses correctly updated
 	 */
-	public static <T extends EObject> T copyUpdateUses(T eObject) {
+	public static <T extends EObject> T copyWithUses(T eObject) {
 		Copier copier = new Copier();
 		@SuppressWarnings("unchecked")
 		T result = (T) copier.copy(eObject);
