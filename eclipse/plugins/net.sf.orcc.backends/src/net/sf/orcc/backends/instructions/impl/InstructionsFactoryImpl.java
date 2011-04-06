@@ -61,6 +61,8 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements Instruction
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case InstructionsPackage.TERNARY_OPERATION: return createTernaryOperation();
+			case InstructionsPackage.ASSIGN_INDEX: return createAssignIndex();
+			case InstructionsPackage.SPLIT_INSTRUCTION: return createSplitInstruction();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -74,6 +76,26 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements Instruction
 	public TernaryOperation createTernaryOperation() {
 		TernaryOperationImpl ternaryOperation = new TernaryOperationImpl();
 		return ternaryOperation;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public AssignIndex createAssignIndex() {
+		AssignIndexImpl assignIndex = new AssignIndexImpl();
+		return assignIndex;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public SplitInstruction createSplitInstruction() {
+		SplitInstructionImpl splitInstruction = new SplitInstructionImpl();
+		return splitInstruction;
 	}
 
 	/**

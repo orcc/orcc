@@ -79,6 +79,14 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 				return createTernaryOperationAdapter();
 			}
 			@Override
+			public Adapter caseAssignIndex(AssignIndex object) {
+				return createAssignIndexAdapter();
+			}
+			@Override
+			public Adapter caseSplitInstruction(SplitInstruction object) {
+				return createSplitInstructionAdapter();
+			}
+			@Override
 			public Adapter caseInstruction(Instruction object) {
 				return createInstructionAdapter();
 			}
@@ -117,6 +125,34 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createTernaryOperationAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.AssignIndex <em>Assign Index</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.instructions.AssignIndex
+	 * @generated
+	 */
+	public Adapter createAssignIndexAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.SplitInstruction <em>Split Instruction</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.instructions.SplitInstruction
+	 * @generated
+	 */
+	public Adapter createSplitInstructionAdapter() {
 		return null;
 	}
 

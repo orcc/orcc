@@ -35,6 +35,24 @@ public interface InstructionsFactory extends EFactory {
 	TernaryOperation createTernaryOperation();
 
 	/**
+	 * Returns a new object of class '<em>Assign Index</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Assign Index</em>'.
+	 * @generated
+	 */
+	AssignIndex createAssignIndex();
+
+	/**
+	 * Returns a new object of class '<em>Split Instruction</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Split Instruction</em>'.
+	 * @generated
+	 */
+	SplitInstruction createSplitInstruction();
+
+	/**
 	 * Returns the package supported by this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

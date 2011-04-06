@@ -98,6 +98,22 @@ public class InstructionsSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case InstructionsPackage.ASSIGN_INDEX: {
+				AssignIndex assignIndex = (AssignIndex)theEObject;
+				T result = caseAssignIndex(assignIndex);
+				if (result == null) result = caseInstSpecific(assignIndex);
+				if (result == null) result = caseInstruction(assignIndex);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case InstructionsPackage.SPLIT_INSTRUCTION: {
+				SplitInstruction splitInstruction = (SplitInstruction)theEObject;
+				T result = caseSplitInstruction(splitInstruction);
+				if (result == null) result = caseInstSpecific(splitInstruction);
+				if (result == null) result = caseInstruction(splitInstruction);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -114,6 +130,36 @@ public class InstructionsSwitch<T> {
 	 * @generated
 	 */
 	public T caseTernaryOperation(TernaryOperation object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Assign Index</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Assign Index</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseAssignIndex(AssignIndex object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Split Instruction</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Split Instruction</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseSplitInstruction(SplitInstruction object) {
 		return null;
 	}
 
