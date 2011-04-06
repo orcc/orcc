@@ -36,7 +36,6 @@ import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -67,6 +66,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;

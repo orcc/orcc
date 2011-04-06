@@ -28,11 +28,11 @@
  */
 package net.sf.orcc.ir.transformations;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines an actor transformation that combines blocks of

@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
@@ -42,6 +41,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * 

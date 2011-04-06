@@ -30,7 +30,6 @@ package net.sf.orcc.tools.normalizer;
 
 import java.util.List;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.VarGlobal;
@@ -44,6 +43,7 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 
 /**

@@ -30,7 +30,6 @@ package net.sf.orcc.ir.transformations;
 
 import java.util.Iterator;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
@@ -38,6 +37,7 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 

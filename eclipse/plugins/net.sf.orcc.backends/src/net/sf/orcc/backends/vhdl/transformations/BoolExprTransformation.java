@@ -30,7 +30,6 @@ package net.sf.orcc.backends.vhdl.transformations;
 
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -47,6 +46,7 @@ import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines an actor transformation that transforms assignments whose

@@ -35,7 +35,6 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -65,6 +64,7 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines an actor transformation that inline the functions and/or

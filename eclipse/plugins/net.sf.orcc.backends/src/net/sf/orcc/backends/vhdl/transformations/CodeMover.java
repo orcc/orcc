@@ -30,7 +30,6 @@ package net.sf.orcc.backends.vhdl.transformations;
 
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.VarLocal;
@@ -39,6 +38,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 
 /**

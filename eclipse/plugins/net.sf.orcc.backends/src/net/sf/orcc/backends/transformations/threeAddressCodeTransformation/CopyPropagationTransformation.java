@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.VarLocal;
@@ -56,6 +55,7 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 
 /**

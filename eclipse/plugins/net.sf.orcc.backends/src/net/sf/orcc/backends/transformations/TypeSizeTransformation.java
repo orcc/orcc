@@ -30,7 +30,6 @@ package net.sf.orcc.backends.transformations;
 
 import java.util.List;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -39,6 +38,7 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 
 /**

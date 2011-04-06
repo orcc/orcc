@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
@@ -60,6 +59,7 @@ import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * Split expression and effective node that contains more than one fundamental

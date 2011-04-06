@@ -29,7 +29,7 @@
 package net.sf.orcc.tools.normalizer;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorVisitor;
+import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 

@@ -30,7 +30,6 @@ package net.sf.orcc.ir.transformations;
 
 import java.util.List;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -38,6 +37,7 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.impl.NodeInterpreter;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines a transformation to build the CFG of procedures.

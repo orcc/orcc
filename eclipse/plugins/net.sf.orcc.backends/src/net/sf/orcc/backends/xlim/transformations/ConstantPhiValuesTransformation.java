@@ -31,7 +31,6 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.List;
 
 import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.VarLocal;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -39,6 +38,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 
 /**

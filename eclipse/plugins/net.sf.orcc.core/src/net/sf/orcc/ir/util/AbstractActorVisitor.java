@@ -26,11 +26,37 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.ir.util;
 
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
 import net.sf.orcc.ir.impl.InstructionVisitor;
 import net.sf.orcc.ir.impl.NodeVisitor;

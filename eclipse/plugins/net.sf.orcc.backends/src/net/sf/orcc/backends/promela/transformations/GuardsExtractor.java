@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -46,6 +45,7 @@ import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 
 /**

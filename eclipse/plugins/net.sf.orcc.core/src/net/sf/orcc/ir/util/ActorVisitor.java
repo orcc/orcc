@@ -26,7 +26,9 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.ir.util;
+
+import net.sf.orcc.ir.Actor;
 
 /**
  * This interface defines a visitor for an actor.

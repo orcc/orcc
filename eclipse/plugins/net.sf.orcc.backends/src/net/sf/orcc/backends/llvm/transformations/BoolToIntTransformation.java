@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.transformations;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.IrFactory;
@@ -36,6 +35,7 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 
 /**

@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.backends.vhdl.ram.instructions.RamRead;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.Instruction;
@@ -43,6 +42,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 
 /**

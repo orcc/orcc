@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.vhdl.ram;
 
 import net.sf.orcc.backends.instructions.SplitInstruction;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines a transformation that extracts the SplitInstructions from

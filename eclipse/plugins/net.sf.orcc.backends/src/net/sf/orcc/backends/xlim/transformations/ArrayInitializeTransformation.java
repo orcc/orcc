@@ -33,7 +33,6 @@ import java.util.Map;
 
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.interpreter.ActorInterpreter;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
@@ -43,6 +42,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * 

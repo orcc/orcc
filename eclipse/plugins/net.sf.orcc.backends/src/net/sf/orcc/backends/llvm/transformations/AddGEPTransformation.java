@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.backends.llvm.instructions.GEP;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -44,6 +43,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * Add GetElementPtr instructions in actor IR.

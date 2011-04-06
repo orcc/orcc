@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprList;
@@ -44,6 +43,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines template data for the VHDL back-end.

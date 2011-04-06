@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.backends.transformations;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines an actor transformation that renames all variables inside

@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.transformations.BuildCFG;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.ActorVisitor;
 
 /**
  * Main transformation for applying three-address code form to actor IR.

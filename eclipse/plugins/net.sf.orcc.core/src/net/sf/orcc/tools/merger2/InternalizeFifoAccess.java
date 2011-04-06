@@ -32,7 +32,6 @@ package net.sf.orcc.tools.merger2;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.VarGlobal;
@@ -50,6 +49,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 public class InternalizeFifoAccess extends AbstractActorVisitor {
 	private List<Var> localFifoVars;

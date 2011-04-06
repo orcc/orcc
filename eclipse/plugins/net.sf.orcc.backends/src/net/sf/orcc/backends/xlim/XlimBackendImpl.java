@@ -52,10 +52,10 @@ import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimInlineTransformation;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorVisitor;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
+import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 

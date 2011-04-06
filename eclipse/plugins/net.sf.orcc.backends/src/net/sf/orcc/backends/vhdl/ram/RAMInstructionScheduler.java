@@ -38,7 +38,6 @@ import net.sf.orcc.backends.instructions.SplitInstruction;
 import net.sf.orcc.backends.vhdl.ram.instructions.RamRead;
 import net.sf.orcc.backends.vhdl.ram.instructions.RamSetAddress;
 import net.sf.orcc.backends.vhdl.ram.instructions.RamWrite;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -49,6 +48,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines a visitor that transforms loads and stores to RAM

@@ -31,7 +31,6 @@ package net.sf.orcc.tools.statistics;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
@@ -39,6 +38,7 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.network.Network;
 
 /**

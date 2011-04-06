@@ -30,7 +30,7 @@ package net.sf.orcc.backends.vhdl.ram;
 
 import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorVisitor;
+import net.sf.orcc.ir.util.ActorVisitor;
 
 /**
  * This class defines the transformation of IR to use RAMs.

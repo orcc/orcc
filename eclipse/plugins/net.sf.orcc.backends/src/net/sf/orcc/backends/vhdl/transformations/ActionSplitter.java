@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.backends.instructions.SplitInstruction;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -56,6 +55,7 @@ import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;

@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -47,6 +46,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.transformations.RenameTransformation;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.util.MultiMap;

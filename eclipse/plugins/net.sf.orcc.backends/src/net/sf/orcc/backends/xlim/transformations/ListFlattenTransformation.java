@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.backends.instructions.AssignIndex;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -46,6 +45,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines an actor transformation that transforms declarations and

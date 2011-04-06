@@ -31,11 +31,11 @@ package net.sf.orcc.backends.vhdl.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.VarGlobal;
 import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines an actor transformation that transforms declarations of

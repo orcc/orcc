@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
@@ -27,6 +26,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;

@@ -30,7 +30,6 @@ package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
 import java.util.List;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Cast;
@@ -54,6 +53,7 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * Add cast in IR in the form of assign instruction where target's type differs

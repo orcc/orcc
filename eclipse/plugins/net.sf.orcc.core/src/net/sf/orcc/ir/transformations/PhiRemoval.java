@@ -30,7 +30,6 @@ package net.sf.orcc.ir.transformations;
 
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -46,6 +45,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.AbstractInstructionVisitor;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class removes phi assignments and transforms them to copies.

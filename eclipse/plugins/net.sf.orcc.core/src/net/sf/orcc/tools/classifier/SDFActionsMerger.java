@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -59,6 +58,7 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.transformations.SSATransformation;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
 

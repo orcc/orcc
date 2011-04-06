@@ -38,7 +38,6 @@ import java.util.Set;
 import jp.ac.kobe_u.cs.cream.DefaultSolver;
 import jp.ac.kobe_u.cs.cream.IntVariable;
 import jp.ac.kobe_u.cs.cream.Solution;
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -48,6 +47,7 @@ import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines a configuration analyzer.

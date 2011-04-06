@@ -31,7 +31,6 @@ package net.sf.orcc.backends.llvm.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.AbstractActorVisitor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -46,6 +45,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 
 /**
