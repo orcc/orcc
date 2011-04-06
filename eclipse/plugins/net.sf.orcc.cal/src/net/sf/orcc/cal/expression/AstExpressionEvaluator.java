@@ -64,6 +64,7 @@ import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines an expression evaluator.
@@ -195,7 +196,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		ExprList list = IrFactory.eINSTANCE.createExprList();
 		if (generators.isEmpty()) {
 			for (AstExpression subExpression : expressions) {
-				list.getValue().add(evaluate(subExpression));
+				list.getValue().add(EcoreUtil.copy(evaluate(subExpression)));
 			}
 		} else {
 			// generators will be translated to statements in initialize
