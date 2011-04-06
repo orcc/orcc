@@ -39,7 +39,6 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -142,10 +141,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseInstruction(Instruction object) {
 				return createInstructionAdapter();
-			}
-			@Override
-			public Adapter caseUser(User object) {
-				return createUserAdapter();
 			}
 			@Override
 			public Adapter caseNodeBlock(NodeBlock object) {
@@ -396,20 +391,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createInstructionAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.User <em>User</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.User
-	 * @generated
-	 */
-	public Adapter createUserAdapter() {
 		return null;
 	}
 

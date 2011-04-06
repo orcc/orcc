@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.ecore.EObject;
 import net.sf.orcc.ir.impl.InstructionInterpreter;
 import net.sf.orcc.ir.impl.InstructionVisitor;
 
@@ -37,7 +38,7 @@ import net.sf.orcc.ir.impl.InstructionVisitor;
  * @author Matthieu Wipliez
  * @model abstract="true"
  */
-public interface Instruction extends User {
+public interface Instruction extends EObject {
 
 	/**
 	 * Accepts the given instruction interpreter.
@@ -104,32 +105,11 @@ public interface Instruction extends User {
 	boolean isLoad();
 
 	/**
-	 * Returns <code>true</code> if the instruction is a Peek.
-	 * 
-	 * @return <code>true</code> if the instruction is a Peek
-	 */
-	boolean isPeek();
-
-	/**
 	 * Returns <code>true</code> if the instruction is a Phi.
 	 * 
 	 * @return <code>true</code> if the instruction is a Phi
 	 */
 	boolean isPhi();
-
-	/**
-	 * Returns <code>true</code> if the instruction is a Read.
-	 * 
-	 * @return <code>true</code> if the instruction is a Read
-	 */
-	boolean isRead();
-
-	/**
-	 * Returns <code>true</code> if the instruction is a ReadEnd.
-	 * 
-	 * @return <code>true</code> if the instruction is a ReadEnd
-	 */
-	boolean isReadEnd();
 
 	/**
 	 * Returns <code>true</code> if the instruction is a Return.
@@ -144,20 +124,6 @@ public interface Instruction extends User {
 	 * @return <code>true</code> if the instruction is a Store
 	 */
 	boolean isStore();
-
-	/**
-	 * Returns <code>true</code> if the instruction is a Write.
-	 * 
-	 * @return <code>true</code> if the instruction is a Write
-	 */
-	boolean isWrite();
-
-	/**
-	 * Returns <code>true</code> if the instruction is a WriteEnd.
-	 * 
-	 * @return <code>true</code> if the instruction is a WriteEnd
-	 */
-	boolean isWriteEnd();
 
 	/**
 	 * Sets the location of this instruction.

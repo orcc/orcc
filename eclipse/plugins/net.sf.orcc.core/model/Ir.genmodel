@@ -56,7 +56,6 @@
     <genClasses image="false" ecoreClass="Ir.ecore#//Instruction">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Instruction/location"/>
     </genClasses>
-    <genClasses image="false" ecoreClass="Ir.ecore#//User"/>
     <genClasses ecoreClass="Ir.ecore#//NodeBlock">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeBlock/instructions"/>
     </genClasses>

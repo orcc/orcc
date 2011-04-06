@@ -10,13 +10,14 @@ import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
-import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.NotificationChain;
 import net.sf.orcc.ir.NodeBlock;
 
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc -->
@@ -31,7 +32,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *
  * @generated
  */
-public abstract class InstructionImpl extends UserImpl implements Instruction {
+public abstract class InstructionImpl extends EObjectImpl implements Instruction {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -98,37 +99,12 @@ public abstract class InstructionImpl extends UserImpl implements Instruction {
 	}
 
 	@Override
-	public boolean isCFGNode() {
-		return false;
-	}
-
-	@Override
-	public boolean isInstruction() {
-		return true;
-	}
-
-	@Override
 	public boolean isLoad() {
 		return false;
 	}
 
 	@Override
-	public boolean isPeek() {
-		return false;
-	}
-
-	@Override
 	public boolean isPhi() {
-		return false;
-	}
-
-	@Override
-	public boolean isRead() {
-		return false;
-	}
-
-	@Override
-	public boolean isReadEnd() {
 		return false;
 	}
 
@@ -139,16 +115,6 @@ public abstract class InstructionImpl extends UserImpl implements Instruction {
 
 	@Override
 	public boolean isStore() {
-		return false;
-	}
-
-	@Override
-	public boolean isWrite() {
-		return false;
-	}
-
-	@Override
-	public boolean isWriteEnd() {
 		return false;
 	}
 

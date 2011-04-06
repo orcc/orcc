@@ -41,7 +41,6 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EClass;
@@ -185,13 +184,6 @@ public class IrSwitch<T> {
 			case IrPackage.INSTRUCTION: {
 				Instruction instruction = (Instruction)theEObject;
 				T result = caseInstruction(instruction);
-				if (result == null) result = caseUser(instruction);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.USER: {
-				User user = (User)theEObject;
-				T result = caseUser(user);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -199,7 +191,6 @@ public class IrSwitch<T> {
 				NodeBlock nodeBlock = (NodeBlock)theEObject;
 				T result = caseNodeBlock(nodeBlock);
 				if (result == null) result = caseNode(nodeBlock);
-				if (result == null) result = caseUser(nodeBlock);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -207,7 +198,6 @@ public class IrSwitch<T> {
 				NodeIf nodeIf = (NodeIf)theEObject;
 				T result = caseNodeIf(nodeIf);
 				if (result == null) result = caseNode(nodeIf);
-				if (result == null) result = caseUser(nodeIf);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -215,14 +205,12 @@ public class IrSwitch<T> {
 				NodeWhile nodeWhile = (NodeWhile)theEObject;
 				T result = caseNodeWhile(nodeWhile);
 				if (result == null) result = caseNode(nodeWhile);
-				if (result == null) result = caseUser(nodeWhile);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.NODE: {
 				Node node = (Node)theEObject;
 				T result = caseNode(node);
-				if (result == null) result = caseUser(node);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -236,7 +224,6 @@ public class IrSwitch<T> {
 				InstAssign instAssign = (InstAssign)theEObject;
 				T result = caseInstAssign(instAssign);
 				if (result == null) result = caseInstruction(instAssign);
-				if (result == null) result = caseUser(instAssign);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -244,7 +231,6 @@ public class IrSwitch<T> {
 				InstCall instCall = (InstCall)theEObject;
 				T result = caseInstCall(instCall);
 				if (result == null) result = caseInstruction(instCall);
-				if (result == null) result = caseUser(instCall);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -252,7 +238,6 @@ public class IrSwitch<T> {
 				InstLoad instLoad = (InstLoad)theEObject;
 				T result = caseInstLoad(instLoad);
 				if (result == null) result = caseInstruction(instLoad);
-				if (result == null) result = caseUser(instLoad);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -260,7 +245,6 @@ public class IrSwitch<T> {
 				InstPhi instPhi = (InstPhi)theEObject;
 				T result = caseInstPhi(instPhi);
 				if (result == null) result = caseInstruction(instPhi);
-				if (result == null) result = caseUser(instPhi);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -268,7 +252,6 @@ public class IrSwitch<T> {
 				InstReturn instReturn = (InstReturn)theEObject;
 				T result = caseInstReturn(instReturn);
 				if (result == null) result = caseInstruction(instReturn);
-				if (result == null) result = caseUser(instReturn);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -276,7 +259,6 @@ public class IrSwitch<T> {
 				InstSpecific instSpecific = (InstSpecific)theEObject;
 				T result = caseInstSpecific(instSpecific);
 				if (result == null) result = caseInstruction(instSpecific);
-				if (result == null) result = caseUser(instSpecific);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -284,7 +266,6 @@ public class IrSwitch<T> {
 				InstStore instStore = (InstStore)theEObject;
 				T result = caseInstStore(instStore);
 				if (result == null) result = caseInstruction(instStore);
-				if (result == null) result = caseUser(instStore);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -513,21 +494,6 @@ public class IrSwitch<T> {
 	 * @generated
 	 */
 	public T caseInstruction(Instruction object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>User</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>User</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseUser(User object) {
 		return null;
 	}
 

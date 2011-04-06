@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.ecore.EObject;
 import java.util.List;
 
 import net.sf.orcc.ir.impl.NodeInterpreter;
@@ -39,7 +40,7 @@ import net.sf.orcc.ir.impl.NodeVisitor;
  * @author Matthieu Wipliez
  * @model abstract="true"
  */
-public interface Node extends User {
+public interface Node extends EObject {
 
 	/**
 	 * Accepts the given node interpreter.

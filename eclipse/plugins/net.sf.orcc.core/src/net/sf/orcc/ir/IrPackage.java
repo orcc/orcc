@@ -266,24 +266,6 @@ public interface IrPackage extends EPackage {
 	int TYPE_VOID_FEATURE_COUNT = TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.UserImpl <em>User</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.UserImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUser()
-	 * @generated
-	 */
-	int USER = 10;
-
-	/**
-	 * The number of structural features of the '<em>User</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int USER_FEATURE_COUNT = 0;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstructionImpl
 	 * <em>Instruction</em>}' class. <!-- begin-user-doc --> <!-- end-user-doc
 	 * -->
@@ -300,7 +282,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTRUCTION__LOCATION = USER_FEATURE_COUNT + 0;
+	int INSTRUCTION__LOCATION = 0;
 
 	/**
 	 * The number of structural features of the '<em>Instruction</em>' class.
@@ -308,7 +290,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTRUCTION_FEATURE_COUNT = USER_FEATURE_COUNT + 1;
+	int INSTRUCTION_FEATURE_COUNT = 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
@@ -317,7 +299,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
 	 * @generated
 	 */
-	int NODE = 14;
+	int NODE = 13;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -325,7 +307,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE__LOCATION = USER_FEATURE_COUNT + 0;
+	int NODE__LOCATION = 0;
 
 	/**
 	 * The number of structural features of the '<em>Node</em>' class. <!--
@@ -334,7 +316,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FEATURE_COUNT = USER_FEATURE_COUNT + 1;
+	int NODE_FEATURE_COUNT = 1;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl
@@ -345,7 +327,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeBlock()
 	 * @generated
 	 */
-	int NODE_BLOCK = 11;
+	int NODE_BLOCK = 10;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -378,7 +360,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeIf()
 	 * @generated
 	 */
-	int NODE_IF = 12;
+	int NODE_IF = 11;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -438,7 +420,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeWhile()
 	 * @generated
 	 */
-	int NODE_WHILE = 13;
+	int NODE_WHILE = 12;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -487,7 +469,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getProcedure()
 	 * @generated
 	 */
-	int PROCEDURE = 15;
+	int PROCEDURE = 14;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -567,7 +549,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstAssign()
 	 * @generated
 	 */
-	int INST_ASSIGN = 16;
+	int INST_ASSIGN = 15;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -609,7 +591,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstCall()
 	 * @generated
 	 */
-	int INST_CALL = 17;
+	int INST_CALL = 16;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -661,7 +643,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstLoad()
 	 * @generated
 	 */
-	int INST_LOAD = 18;
+	int INST_LOAD = 17;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -713,7 +695,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstPhi()
 	 * @generated
 	 */
-	int INST_PHI = 19;
+	int INST_PHI = 18;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -767,7 +749,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstReturn()
 	 * @generated
 	 */
-	int INST_RETURN = 20;
+	int INST_RETURN = 19;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -802,7 +784,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstSpecific()
 	 * @generated
 	 */
-	int INST_SPECIFIC = 21;
+	int INST_SPECIFIC = 20;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -829,7 +811,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstStore()
 	 * @generated
 	 */
-	int INST_STORE = 22;
+	int INST_STORE = 21;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -879,7 +861,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getLocation()
 	 * @generated
 	 */
-	int LOCATION = 23;
+	int LOCATION = 22;
 
 	/**
 	 * The feature id for the '<em><b>End Column</b></em>' attribute. <!--
@@ -924,7 +906,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 	 * @generated
 	 */
-	int VAR = 24;
+	int VAR = 23;
 
 	/**
 	 * The feature id for the '<em><b>Index</b></em>' attribute. <!--
@@ -1020,7 +1002,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
 	 */
-	int USE = 25;
+	int USE = 24;
 
 	/**
 	 * The feature id for the '<em><b>Variable</b></em>' reference.
@@ -1048,7 +1030,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 26;
+	int EXPR_BINARY = 25;
 
 	/**
 	 * The feature id for the '<em><b>E1</b></em>' containment reference. <!--
@@ -1101,7 +1083,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBool()
 	 * @generated
 	 */
-	int EXPR_BOOL = 27;
+	int EXPR_BOOL = 26;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute.
@@ -1130,7 +1112,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprFloat()
 	 * @generated
 	 */
-	int EXPR_FLOAT = 28;
+	int EXPR_FLOAT = 27;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
@@ -1156,7 +1138,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprInt()
 	 * @generated
 	 */
-	int EXPR_INT = 29;
+	int EXPR_INT = 28;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute. <!--
@@ -1183,7 +1165,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprList()
 	 * @generated
 	 */
-	int EXPR_LIST = 30;
+	int EXPR_LIST = 29;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' reference list.
@@ -1212,7 +1194,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprString()
 	 * @generated
 	 */
-	int EXPR_STRING = 31;
+	int EXPR_STRING = 30;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' reference. <!--
@@ -1240,7 +1222,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 32;
+	int EXPR_UNARY = 31;
 
 	/**
 	 * The feature id for the '<em><b>Expr</b></em>' containment reference. <!--
@@ -1275,7 +1257,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprVar()
 	 * @generated
 	 */
-	int EXPR_VAR = 33;
+	int EXPR_VAR = 32;
 
 	/**
 	 * The feature id for the '<em><b>Use</b></em>' containment reference.
@@ -1303,7 +1285,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 34;
+	int OP_BINARY = 33;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1313,7 +1295,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 35;
+	int OP_UNARY = 34;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
@@ -1478,15 +1460,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getInstruction_Location();
-
-	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.User <em>User</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>User</em>'.
-	 * @see net.sf.orcc.ir.User
-	 * @generated
-	 */
-	EClass getUser();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeBlock <em>Node Block</em>}'.
@@ -2535,15 +2508,6 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference INSTRUCTION__LOCATION = eINSTANCE.getInstruction_Location();
-
-		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.UserImpl <em>User</em>}' class.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.UserImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUser()
-		 * @generated
-		 */
-		EClass USER = eINSTANCE.getUser();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl <em>Node Block</em>}' class.

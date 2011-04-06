@@ -42,7 +42,6 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -123,13 +122,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass instructionEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass userEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -512,15 +504,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EReference getInstruction_Location() {
 		return (EReference)instructionEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getUser() {
-		return userEClass;
 	}
 
 	/**
@@ -1307,8 +1290,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		instructionEClass = createEClass(INSTRUCTION);
 		createEReference(instructionEClass, INSTRUCTION__LOCATION);
 
-		userEClass = createEClass(USER);
-
 		nodeBlockEClass = createEClass(NODE_BLOCK);
 		createEReference(nodeBlockEClass, NODE_BLOCK__INSTRUCTIONS);
 
@@ -1454,11 +1435,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		typeStringEClass.getESuperTypes().add(this.getType());
 		typeUintEClass.getESuperTypes().add(this.getType());
 		typeVoidEClass.getESuperTypes().add(this.getType());
-		instructionEClass.getESuperTypes().add(this.getUser());
 		nodeBlockEClass.getESuperTypes().add(this.getNode());
 		nodeIfEClass.getESuperTypes().add(this.getNode());
 		nodeWhileEClass.getESuperTypes().add(this.getNode());
-		nodeEClass.getESuperTypes().add(this.getUser());
 		instAssignEClass.getESuperTypes().add(this.getInstruction());
 		instCallEClass.getESuperTypes().add(this.getInstruction());
 		instLoadEClass.getESuperTypes().add(this.getInstruction());
@@ -1501,8 +1480,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(instructionEClass, Instruction.class, "Instruction", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getInstruction_Location(), this.getLocation(), null, "location", null, 0, 1, Instruction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(userEClass, User.class, "User", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(nodeBlockEClass, NodeBlock.class, "NodeBlock", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getNodeBlock_Instructions(), this.getInstruction(), null, "instructions", null, 0, -1, NodeBlock.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

@@ -23,11 +23,10 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TypeVoid" eSuperTypes="#//Type"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true" eSuperTypes="#//User">
+  <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true">
     <eStructuralFeatures xsi:type="ecore:EReference" name="location" eType="#//Location"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="User" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="NodeBlock" eSuperTypes="#//Node">
     <eStructuralFeatures xsi:type="ecore:EReference" name="instructions" upperBound="-1"
         eType="#//Instruction" containment="true" resolveProxies="false"/>
@@ -50,7 +49,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Node" abstract="true" eSuperTypes="#//User">
+  <eClassifiers xsi:type="ecore:EClass" name="Node" abstract="true">
     <eStructuralFeatures xsi:type="ecore:EReference" name="location" eType="#//Location"
         containment="true" resolveProxies="false"/>
   </eClassifiers>

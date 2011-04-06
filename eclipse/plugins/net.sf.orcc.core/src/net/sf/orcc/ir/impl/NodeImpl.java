@@ -23,6 +23,7 @@ import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -36,7 +37,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *
  * @generated
  */
-public abstract class NodeImpl extends UserImpl implements Node {
+public abstract class NodeImpl extends EObjectImpl implements Node {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -164,17 +165,7 @@ public abstract class NodeImpl extends UserImpl implements Node {
 	}
 
 	@Override
-	public boolean isCFGNode() {
-		return true;
-	}
-
-	@Override
 	public boolean isIfNode() {
-		return false;
-	}
-
-	@Override
-	public boolean isInstruction() {
 		return false;
 	}
 
