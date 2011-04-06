@@ -115,7 +115,7 @@ public class PhiRemoval extends AbstractActorVisitor {
 		if (source.getIndex() == 0
 				&& source.eContainmentFeature() != IrPackage.eINSTANCE
 						.getProcedure_Parameters()) {
-			procedure.getLocals().remove(source.getName());
+			procedure.getLocals().remove(source);
 			if (target.getType().isBool()) {
 				expr = IrFactory.eINSTANCE.createExprBool(false);
 			} else {

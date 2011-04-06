@@ -9,7 +9,7 @@ listSize(values) ::= <<
 >>
 
 varDecl(variable, sep="") ::= <<
-<variable.type> <variable.name><listSize(variable.type.dimensions)><sep>
+<variable.type> <variable.indexedName><listSize(variable.type.dimensions)><sep>
 >>
 
 getPortName(port) ::= <<
@@ -122,7 +122,7 @@ void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int
 
 printAssign(assign) ::= <<
 
-<assign.target.name> = <assign.value>;
+<assign.target.variable.indexedName> = <assign.value>;
 >>
 
 printFormatType(type) ::= <<
@@ -159,7 +159,7 @@ printCall(call) ::= <<
 
 <if(call.print)>printf(<call.parameters: printFormat()><call.parameters: printParameter()>);<
 else
-><if(call.target)><call.target.name> = <endif><call.procedure.name>(<call.parameters; separator=", ">);<
+><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(<call.parameters; separator=", ">);<
 endif>
 >>
 
@@ -174,9 +174,9 @@ endif>
 printLoad(load) ::= <<
 
 <if (action.inputPattern.inverseVariableMap.(load.source.variable) || action.outputPattern.inverseVariableMap.(load.source.variable))
-><load.target.name> = tokens_<getPort(load.source.variable)>[(index_<getPort(load.source.variable)> + <first(load.indexes)>) % SIZE_<getPort(load.source.variable)>];<
+><load.target.variable.indexedName> = tokens_<getPort(load.source.variable)>[(index_<getPort(load.source.variable)> + <first(load.indexes)>) % SIZE_<getPort(load.source.variable)>];<
 else
-><load.target.name> = <load.source.variable.name><load.indexes : {index | [<index>]}>;<
+><load.target.variable.indexedName> = <load.source.variable.name><load.indexes : {index | [<index>]}>;<
 endif>
 >>
 
@@ -202,10 +202,10 @@ endif>
 
 printStore(store) ::= <<
 
-<if (action.inputPattern.inverseVariableMap.(store.target) || action.outputPattern.inverseVariableMap.(store.target))
->tokens_<getPort(store.target)>[(index_<getPort(store.target)> + <first(store.indexes)>) % SIZE_<getPort(store.target)>] = <store.value>;<
+<if (action.inputPattern.inverseVariableMap.(store.target.variable) || action.outputPattern.inverseVariableMap.(store.target.variable))
+>tokens_<getPort(store.target.variable)>[(index_<getPort(store.target.variable)> + <first(store.indexes)>) % SIZE_<getPort(store.target.variable)>] = <store.value>;<
 else
-><store.target.name><store.indexes : {index | [<index>]}> = <store.value>;<
+><store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;<
 endif>
 >>
 

@@ -35,6 +35,7 @@ import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -105,7 +106,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			if (isPort(target)) {
 				return;
 			}
-			
+
 			// remove def/uses
 			load.getTarget().setVariable(null);
 			load.getSource().setVariable(null);
@@ -168,11 +169,11 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			// do not remove stores to variables that are used by writes, or
 			// variables that are parameters
 			if (!target.isGlobal()
-					&& (isPort(target) || procedure.getParameters().contains(
-							target.getName()))) {
+					&& (isPort(target) || target.eContainmentFeature() == IrPackage.eINSTANCE
+							.getProcedure_Parameters())) {
 				return;
 			}
-			
+
 			// remove def/uses
 			store.getTarget().setVariable(null);
 			EcoreHelper.deleteObjects(store.getIndexes());

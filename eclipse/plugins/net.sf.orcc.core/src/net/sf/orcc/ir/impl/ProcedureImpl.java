@@ -77,9 +77,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			if (notification.getFeatureID(Procedure.class) == IrPackage.PROCEDURE__LOCALS) {
 				Var newVar = (Var) notification.getNewValue();
 				if (notification.getEventType() == Notification.ADD) {
-					localsMap.put(newVar.getName(), newVar);
+					localsMap.put(newVar.getIndexedName(), newVar);
 				} else if (notification.getEventType() == Notification.REMOVE) {
-					localsMap.remove(newVar.getName());
+					localsMap.remove(newVar.getIndexedName());
 				}
 			}
 		}
@@ -519,7 +519,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			EList<Var> list = getLocals();
 
 			for (Var var : list) {
-				localsMap.put(var.getName(), var);
+				localsMap.put(var.getIndexedName(), var);
 			}
 			eAdapters().add(new MyAdapter());
 		}
@@ -572,7 +572,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			EList<Var> list = getParameters();
 
 			for (Var var : list) {
-				paramsMap.put(var.getName(), var);
+				paramsMap.put(var.getIndexedName(), var);
 			}
 			eAdapters().add(new MyAdapter());
 		}

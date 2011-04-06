@@ -169,7 +169,7 @@ public class ExpressionPrinter implements ExpressionVisitor {
 
 	@Override
 	public void visit(ExprVar expr, Object... args) {
-		builder.append(expr.getUse().getVariable().getName());
+		builder.append(expr.getUse().getVariable().getIndexedName());
 	}
 
 }

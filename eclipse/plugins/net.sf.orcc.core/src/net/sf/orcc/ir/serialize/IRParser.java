@@ -657,7 +657,8 @@ public class IRParser {
 			variables.add(varDef);
 
 			// register the variable definition
-			vars.put(file, varDef.getLocation(), varDef.getName(), varDef);
+			vars.put(file, varDef.getLocation(), varDef.getIndexedName(),
+					varDef);
 		}
 	}
 
