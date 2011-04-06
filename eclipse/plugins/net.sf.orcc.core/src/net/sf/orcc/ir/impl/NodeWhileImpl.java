@@ -39,6 +39,16 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	/**
+	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected Expression condition;
+
+	/**
 	 * The cached value of the '{@link #getJoinNode() <em>Join Node</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getJoinNode()
@@ -57,16 +67,6 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	protected EList<Node> nodes;
 
 	/**
-	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getCondition()
-	 * @generated
-	 * @ordered
-	 */
-	protected Expression condition;
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -82,6 +82,21 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	@Override
 	public void accept(NodeVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetCondition(Expression newCondition, NotificationChain msgs) {
+		Expression oldCondition = condition;
+		condition = newCondition;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, oldCondition, newCondition);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -203,6 +218,15 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Expression getCondition() {
+		return condition;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -221,28 +245,9 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 		return nodes;
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Expression getCondition() {
-		return condition;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetCondition(Expression newCondition, NotificationChain msgs) {
-		Expression oldCondition = condition;
-		condition = newCondition;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, oldCondition, newCondition);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
+	@Override
+	public boolean isWhileNode() {
+		return true;
 	}
 
 	/**
@@ -262,11 +267,6 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, newCondition, newCondition));
-	}
-
-	@Override
-	public boolean isWhileNode() {
-		return true;
 	}
 
 	/**

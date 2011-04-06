@@ -55,33 +55,6 @@ public class UseImpl extends EObjectImpl implements Use {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.USE;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Var getVariable() {
-		if (variable != null && variable.eIsProxy()) {
-			InternalEObject oldVariable = (InternalEObject)variable;
-			variable = (Var)eResolveProxy(oldVariable);
-			if (variable != oldVariable) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.USE__VARIABLE, oldVariable, variable));
-			}
-		}
-		return variable;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Var basicGetVariable() {
 		return variable;
 	}
@@ -106,18 +79,14 @@ public class UseImpl extends EObjectImpl implements Use {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setVariable(Var newVariable) {
-		if (newVariable != variable) {
-			NotificationChain msgs = null;
-			if (variable != null)
-				msgs = ((InternalEObject)variable).eInverseRemove(this, IrPackage.VAR__USES, Var.class, msgs);
-			if (newVariable != null)
-				msgs = ((InternalEObject)newVariable).eInverseAdd(this, IrPackage.VAR__USES, Var.class, msgs);
-			msgs = basicSetVariable(newVariable, msgs);
-			if (msgs != null) msgs.dispatch();
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case IrPackage.USE__VARIABLE:
+				if (resolve) return getVariable();
+				return basicGetVariable();
 		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.USE__VARIABLE, newVariable, newVariable));
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -156,13 +125,12 @@ public class UseImpl extends EObjectImpl implements Use {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case IrPackage.USE__VARIABLE:
-				if (resolve) return getVariable();
-				return basicGetVariable();
+				return variable != null;
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -186,6 +154,16 @@ public class UseImpl extends EObjectImpl implements Use {
 	 * @generated
 	 */
 	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.USE;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case IrPackage.USE__VARIABLE:
@@ -200,13 +178,35 @@ public class UseImpl extends EObjectImpl implements Use {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.USE__VARIABLE:
-				return variable != null;
+	public Var getVariable() {
+		if (variable != null && variable.eIsProxy()) {
+			InternalEObject oldVariable = (InternalEObject)variable;
+			variable = (Var)eResolveProxy(oldVariable);
+			if (variable != oldVariable) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.USE__VARIABLE, oldVariable, variable));
+			}
 		}
-		return super.eIsSet(featureID);
+		return variable;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setVariable(Var newVariable) {
+		if (newVariable != variable) {
+			NotificationChain msgs = null;
+			if (variable != null)
+				msgs = ((InternalEObject)variable).eInverseRemove(this, IrPackage.VAR__USES, Var.class, msgs);
+			if (newVariable != null)
+				msgs = ((InternalEObject)newVariable).eInverseAdd(this, IrPackage.VAR__USES, Var.class, msgs);
+			msgs = basicSetVariable(newVariable, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.USE__VARIABLE, newVariable, newVariable));
 	}
 
 } //UseImpl

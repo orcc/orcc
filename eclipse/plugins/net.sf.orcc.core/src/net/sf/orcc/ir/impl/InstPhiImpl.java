@@ -8,6 +8,7 @@ package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
 
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.IrPackage;
@@ -58,7 +59,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * @generated
 	 * @ordered
 	 */
-	protected Var target;
+	protected Def target;
 
 	/**
 	 * The cached value of the '{@link #getValues() <em>Values</em>}' containment reference list.
@@ -103,7 +104,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var basicGetTarget() {
+	public Def basicGetTarget() {
 		return target;
 	}
 
@@ -172,7 +173,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 				setOldVariable((Var)newValue);
 				return;
 			case IrPackage.INST_PHI__TARGET:
-				setTarget((Var)newValue);
+				setTarget((Def)newValue);
 				return;
 			case IrPackage.INST_PHI__VALUES:
 				getValues().clear();
@@ -204,7 +205,7 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 				setOldVariable((Var)null);
 				return;
 			case IrPackage.INST_PHI__TARGET:
-				setTarget((Var)null);
+				setTarget((Def)null);
 				return;
 			case IrPackage.INST_PHI__VALUES:
 				getValues().clear();
@@ -235,10 +236,10 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var getTarget() {
+	public Def getTarget() {
 		if (target != null && target.eIsProxy()) {
 			InternalEObject oldTarget = (InternalEObject)target;
-			target = (Var)eResolveProxy(oldTarget);
+			target = (Def)eResolveProxy(oldTarget);
 			if (target != oldTarget) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_PHI__TARGET, oldTarget, target));
@@ -281,8 +282,8 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTarget(Var newTarget) {
-		Var oldTarget = target;
+	public void setTarget(Def newTarget) {
+		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__TARGET, oldTarget, target));

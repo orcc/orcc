@@ -128,6 +128,13 @@ public interface Var extends EObject {
 	boolean isAssignable();
 
 	/**
+	 * Returns true if this variable is defined at least once.
+	 * 
+	 * @return true if this variable is defined at least once.
+	 */
+	boolean isDefined();
+
+	/**
 	 * Returns <code>true</code> if this variable is global.
 	 * 
 	 * @return <code>true</code> if this variable is global

@@ -61,7 +61,7 @@ public interface InstLoad extends Instruction {
 	 * @return the target of this load instruction
 	 * @model
 	 */
-	Var getTarget();
+	Def getTarget();
 
 	/**
 	 * Sets the variable loaded by this load instruction.
@@ -77,6 +77,6 @@ public interface InstLoad extends Instruction {
 	 * @param target
 	 *            a local variable
 	 */
-	void setTarget(Var target);
+	void setTarget(Def target);
 
 }

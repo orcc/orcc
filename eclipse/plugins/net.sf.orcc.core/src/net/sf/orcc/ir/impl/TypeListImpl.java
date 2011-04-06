@@ -96,6 +96,35 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public NotificationChain basicSetSizeExpr(Expression newSizeExpr,
+			NotificationChain msgs) {
+		Expression oldSizeExpr = sizeExpr;
+		sizeExpr = newSizeExpr;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__SIZE_EXPR, oldSizeExpr, newSizeExpr);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetType(Type newType, NotificationChain msgs) {
+		Type oldType = type;
+		type = newType;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__TYPE, oldType, newType);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -105,6 +134,22 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 				return getType();
 		}
 		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.TYPE_LIST__SIZE_EXPR:
+				return basicSetSizeExpr(null, msgs);
+			case IrPackage.TYPE_LIST__TYPE:
+				return basicSetType(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -223,21 +268,6 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetSizeExpr(Expression newSizeExpr,
-			NotificationChain msgs) {
-		Expression oldSizeExpr = sizeExpr;
-		sizeExpr = newSizeExpr;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__SIZE_EXPR, oldSizeExpr, newSizeExpr);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
 	 * Returns a list of indexes that can be used inside a template.
 	 * 
 	 * @return a list of indexes corresponding to the list size
@@ -260,20 +290,6 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	 */
 	public Type getType() {
 		return type;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetType(Type newType, NotificationChain msgs) {
-		Type oldType = type;
-		type = newType;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__TYPE, oldType, newType);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
 	}
 
 	@Override
@@ -331,22 +347,6 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__TYPE, newType, newType));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd,
-			int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case IrPackage.TYPE_LIST__SIZE_EXPR:
-				return basicSetSizeExpr(null, msgs);
-			case IrPackage.TYPE_LIST__TYPE:
-				return basicSetType(null, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	@Override

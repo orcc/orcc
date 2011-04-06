@@ -9,22 +9,18 @@ package net.sf.orcc.ir.impl;
 import java.util.Collection;
 
 import net.sf.orcc.ir.Cast;
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -59,7 +55,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 * @generated
 	 * @ordered
 	 */
-	protected Var target;
+	protected Def target;
 
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
@@ -92,7 +88,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var basicGetTarget() {
+	public Def basicGetTarget() {
 		return target;
 	}
 
@@ -175,7 +171,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 				getIndexes().addAll((Collection<? extends Expression>)newValue);
 				return;
 			case IrPackage.INST_STORE__TARGET:
-				setTarget((Var)newValue);
+				setTarget((Def)newValue);
 				return;
 			case IrPackage.INST_STORE__VALUE:
 				setValue((Expression)newValue);
@@ -204,7 +200,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 				getIndexes().clear();
 				return;
 			case IrPackage.INST_STORE__TARGET:
-				setTarget((Var)null);
+				setTarget((Def)null);
 				return;
 			case IrPackage.INST_STORE__VALUE:
 				setValue((Expression)null);
@@ -216,7 +212,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	@Override
 	public Cast getCast() {
 		Type expr = value.getType();
-		Type val = target.getType();
+		Type val = target.getVariable().getType();
 
 		if (expr == null) {
 			return null;
@@ -250,10 +246,10 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var getTarget() {
+	public Def getTarget() {
 		if (target != null && target.eIsProxy()) {
 			InternalEObject oldTarget = (InternalEObject)target;
-			target = (Var)eResolveProxy(oldTarget);
+			target = (Def)eResolveProxy(oldTarget);
 			if (target != oldTarget) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_STORE__TARGET, oldTarget, target));
@@ -276,11 +272,12 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTarget(Var newTarget) {
-		Var oldTarget = target;
+	public void setTarget(Def newTarget) {
+		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__TARGET, oldTarget, target));

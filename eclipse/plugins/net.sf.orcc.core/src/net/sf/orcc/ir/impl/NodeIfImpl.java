@@ -40,6 +40,16 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class NodeIfImpl extends NodeImpl implements NodeIf {
 	/**
+	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected Expression condition;
+
+	/**
 	 * The cached value of the '{@link #getElseNodes() <em>Else Nodes</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getElseNodes()
@@ -67,16 +77,6 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	protected EList<Node> thenNodes;
 
 	/**
-	 * The cached value of the '{@link #getCondition() <em>Condition</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getCondition()
-	 * @generated
-	 * @ordered
-	 */
-	protected Expression condition;
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -92,6 +92,21 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	@Override
 	public void accept(NodeVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetCondition(Expression newCondition, NotificationChain msgs) {
+		Expression oldCondition = condition;
+		condition = newCondition;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__CONDITION, oldCondition, newCondition);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -226,6 +241,15 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Expression getCondition() {
+		return condition;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -255,28 +279,9 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		return thenNodes;
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Expression getCondition() {
-		return condition;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetCondition(Expression newCondition, NotificationChain msgs) {
-		Expression oldCondition = condition;
-		condition = newCondition;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__CONDITION, oldCondition, newCondition);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
+	@Override
+	public boolean isIfNode() {
+		return true;
 	}
 
 	/**
@@ -296,11 +301,6 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__CONDITION, newCondition, newCondition));
-	}
-
-	@Override
-	public boolean isIfNode() {
-		return true;
 	}
 
 	/**

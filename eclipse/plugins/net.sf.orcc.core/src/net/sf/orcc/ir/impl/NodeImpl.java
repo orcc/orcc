@@ -38,23 +38,6 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * @generated
  */
 public abstract class NodeImpl extends EObjectImpl implements Node {
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected NodeImpl() {
-		super();
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.NODE;
-	}
-
 	private static int labelCount;
 
 	/**
@@ -83,20 +66,18 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 
 	private Location location;
 
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected NodeImpl() {
+		super();
+	}
+
 	protected NodeImpl(Location location) {
 		this.location = location;
 		labelCount++;
 		this.label = labelCount;
-	}
-
-	@Override
-	public int getLabel() {
-		return label;
-	}
-
-	@Override
-	public Location getLocation() {
-		return location;
 	}
 
 	/**
@@ -112,6 +93,97 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case IrPackage.NODE__LOCATION:
+				return getLocation();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.NODE__LOCATION:
+				return basicSetLocation(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+			case IrPackage.NODE__LOCATION:
+				return location != null;
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+			case IrPackage.NODE__LOCATION:
+				setLocation((Location)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.NODE;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+			case IrPackage.NODE__LOCATION:
+				setLocation((Location)null);
+				return;
+		}
+		super.eUnset(featureID);
+	}
+
+	@Override
+	public int getLabel() {
+		return label;
+	}
+
+	@Override
+	public Location getLocation() {
+		return location;
 	}
 
 	@Override
@@ -176,78 +248,6 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 
 	public void setLocation(Location location) {
 		this.location = location;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case IrPackage.NODE__LOCATION:
-				return basicSetLocation(null, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case IrPackage.NODE__LOCATION:
-				return getLocation();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case IrPackage.NODE__LOCATION:
-				setLocation((Location)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-			case IrPackage.NODE__LOCATION:
-				setLocation((Location)null);
-				return;
-		}
-		super.eUnset(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.NODE__LOCATION:
-				return location != null;
-		}
-		return super.eIsSet(featureID);
 	}
 
 } // NodeImpl

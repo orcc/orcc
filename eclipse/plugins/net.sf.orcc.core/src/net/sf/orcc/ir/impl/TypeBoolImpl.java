@@ -31,15 +31,6 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 		super();
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.TYPE_BOOL;
-	}
-
 	@Override
 	public Object accept(TypeInterpreter interpreter) {
 		return interpreter.interpret(this);
@@ -53,6 +44,15 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof TypeBool);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.TYPE_BOOL;
 	}
 
 	@Override

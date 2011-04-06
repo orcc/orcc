@@ -40,24 +40,11 @@ package net.sf.orcc.ir;
  */
 public class Action {
 
-	private Location location;
-
-	/**
-	 * Returns the location of this action.
-	 * 
-	 * @return the location of this action
-	 */
-	public Location getLocation() {
-		return location;
-	}
-
-	public void setLocation(Location location) {
-		this.location = location;
-	}
-
 	private Procedure body;
 
 	private Pattern inputPattern;
+
+	private Location location;
 
 	private Pattern outputPattern;
 
@@ -110,6 +97,15 @@ public class Action {
 	}
 
 	/**
+	 * Returns the location of this action.
+	 * 
+	 * @return the location of this action
+	 */
+	public Location getLocation() {
+		return location;
+	}
+
+	/**
 	 * Returns action name (tag or body name)
 	 * 
 	 * @return action name
@@ -155,6 +151,10 @@ public class Action {
 	 */
 	public Tag getTag() {
 		return tag;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	/**

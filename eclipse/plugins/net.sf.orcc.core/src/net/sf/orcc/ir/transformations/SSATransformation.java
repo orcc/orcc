@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -77,7 +78,7 @@ public class SSATransformation extends AbstractActorVisitor {
 			Use use = expr.getUse();
 			Var oldVar = use.getVariable();
 			if (!oldVar.isGlobal()) {
-				Var newVar = uses.get(oldVar.getBaseName());
+				Var newVar = uses.get(oldVar.getName());
 				if (newVar != null) {
 					// newVar may be null if oldVar is a function parameter for
 					// instance
@@ -132,10 +133,10 @@ public class SSATransformation extends AbstractActorVisitor {
 		for (Instruction instruction : innerJoin.getInstructions()) {
 			InstPhi phi = (InstPhi) instruction;
 			Var oldVar = phi.getOldVariable();
-			Var newVar = phi.getTarget();
+			Var newVar = phi.getTarget().getVariable();
 
 			// updates the current value of "var"
-			uses.put(oldVar.getBaseName(), newVar);
+			uses.put(oldVar.getName(), newVar);
 
 			if (join != null) {
 				insertPhi(oldVar, newVar);
@@ -182,12 +183,12 @@ public class SSATransformation extends AbstractActorVisitor {
 	 *            new variable
 	 */
 	private void insertPhi(Var oldVar, Var newVar) {
-		String name = oldVar.getBaseName();
+		String name = oldVar.getName();
 		InstPhi phi = null;
 		for (Instruction instruction : join.getInstructions()) {
 			if (instruction.isPhi()) {
 				InstPhi tempPhi = (InstPhi) instruction;
-				if (tempPhi.getTarget().getBaseName().equals(name)) {
+				if (tempPhi.getTarget().getVariable().getName().equals(name)) {
 					phi = tempPhi;
 					break;
 				}
@@ -222,7 +223,7 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * @return a new definition based on the given old variable
 	 */
 	private Var newDefinition(Var oldVar) {
-		String name = oldVar.getBaseName();
+		String name = oldVar.getName();
 
 		// get index
 		int index;
@@ -242,16 +243,17 @@ public class SSATransformation extends AbstractActorVisitor {
 	}
 
 	/**
-	 * Replaces the definition created by the given local target container.
+	 * Replaces the definition created.
 	 * 
-	 * @param cter
-	 *            a local target container
+	 * @param definition
+	 *            a definition
 	 */
-	private Var replaceDef(Var target) {
-		if (target == null) {
-			return target;
+	private Def replaceDef(Def definition) {
+		if (definition == null) {
+			return null;
 		} else {
-			String name = target.getBaseName();
+			Var target = definition.getVariable();
+			String name = target.getName();
 
 			// v_old is the value of the variable before the assignment
 			Var oldVar = uses.get(name);
@@ -269,7 +271,7 @@ public class SSATransformation extends AbstractActorVisitor {
 				insertPhi(oldVar, newTarget);
 			}
 
-			return newTarget;
+			return IrFactory.eINSTANCE.createDef(newTarget);
 		}
 	}
 
@@ -328,7 +330,7 @@ public class SSATransformation extends AbstractActorVisitor {
 		for (Instruction instruction : join.getInstructions()) {
 			InstPhi phi = (InstPhi) instruction;
 			Var oldVar = phi.getOldVariable();
-			uses.put(oldVar.getBaseName(), oldVar);
+			uses.put(oldVar.getName(), oldVar);
 		}
 	}
 

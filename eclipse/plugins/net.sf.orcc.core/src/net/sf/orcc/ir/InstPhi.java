@@ -54,7 +54,7 @@ public interface InstPhi extends Instruction {
 	 * @return the target of this node (may be <code>null</code>)
 	 * @model
 	 */
-	Var getTarget();
+	Def getTarget();
 
 	/**
 	 * Returns the values of this phi instruction.
@@ -79,6 +79,6 @@ public interface InstPhi extends Instruction {
 	 * @param target
 	 *            a local variable
 	 */
-	void setTarget(Var target);
+	void setTarget(Def target);
 
 }

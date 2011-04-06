@@ -33,6 +33,8 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * @generated
  */
 public abstract class InstructionImpl extends EObjectImpl implements Instruction {
+	private Location location;
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -42,35 +44,8 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 		super();
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.INSTRUCTION;
-	}
-
-	private Location location;
-
 	protected InstructionImpl(Location location) {
 		this.location = location;
-	}
-
-	@Override
-	public NodeBlock getBlock() {
-		return (NodeBlock) eContainer();
-	}
-
-	@Override
-	public Cast getCast() {
-		return null;
-	}
-
-	@Override
-	public Location getLocation() {
-		return location;
 	}
 
 	/**
@@ -86,6 +61,103 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case IrPackage.INSTRUCTION__LOCATION:
+				return getLocation();
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.INSTRUCTION__LOCATION:
+				return basicSetLocation(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+			case IrPackage.INSTRUCTION__LOCATION:
+				return location != null;
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eSet(int featureID, Object newValue) {
+		switch (featureID) {
+			case IrPackage.INSTRUCTION__LOCATION:
+				setLocation((Location)newValue);
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.INSTRUCTION;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void eUnset(int featureID) {
+		switch (featureID) {
+			case IrPackage.INSTRUCTION__LOCATION:
+				setLocation((Location)null);
+				return;
+		}
+		super.eUnset(featureID);
+	}
+
+	@Override
+	public NodeBlock getBlock() {
+		return (NodeBlock) eContainer();
+	}
+
+	@Override
+	public Cast getCast() {
+		return null;
+	}
+
+	@Override
+	public Location getLocation() {
+		return location;
 	}
 
 	@Override
@@ -120,78 +192,6 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 
 	public void setLocation(Location location) {
 		this.location = location;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case IrPackage.INSTRUCTION__LOCATION:
-				return basicSetLocation(null, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case IrPackage.INSTRUCTION__LOCATION:
-				return getLocation();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-			case IrPackage.INSTRUCTION__LOCATION:
-				setLocation((Location)newValue);
-				return;
-		}
-		super.eSet(featureID, newValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-			case IrPackage.INSTRUCTION__LOCATION:
-				setLocation((Location)null);
-				return;
-		}
-		super.eUnset(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.INSTRUCTION__LOCATION:
-				return location != null;
-		}
-		return super.eIsSet(featureID);
 	}
 
 } //InstructionImpl

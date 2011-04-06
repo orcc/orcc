@@ -215,7 +215,7 @@ public class IRWriter {
 			array.add(new JsonPrimitive(INSTR_ASSIGN));
 			array.add(writeLocation(assign.getLocation()));
 
-			array.add(writeVariable(assign.getTarget()));
+			array.add(writeVariable(assign.getTarget().getVariable()));
 			array.add(writeExpression(assign.getValue()));
 
 			return array;
@@ -231,7 +231,8 @@ public class IRWriter {
 			array.add(new JsonPrimitive(call.getProcedure().getName()));
 			array.add(writeExpressions(call.getParameters()));
 
-			array.add(call.hasResult() ? writeVariable(call.getTarget()) : null);
+			array.add(call.hasResult() ? writeVariable(call.getTarget()
+					.getVariable()) : null);
 
 			return array;
 		}
@@ -243,7 +244,7 @@ public class IRWriter {
 			array.add(new JsonPrimitive(INSTR_LOAD));
 			array.add(writeLocation(load.getLocation()));
 
-			array.add(writeVariable(load.getTarget()));
+			array.add(writeVariable(load.getTarget().getVariable()));
 			array.add(writeVariable(load.getSource().getVariable()));
 			array.add(writeExpressions(load.getIndexes()));
 
@@ -257,7 +258,7 @@ public class IRWriter {
 			array.add(new JsonPrimitive(INSTR_PHI));
 			array.add(writeLocation(phi.getLocation()));
 
-			array.add(writeVariable(phi.getTarget()));
+			array.add(writeVariable(phi.getTarget().getVariable()));
 			array.add(writeExpressions(phi.getValues()));
 
 			return array;
@@ -293,7 +294,7 @@ public class IRWriter {
 			array.add(new JsonPrimitive(INSTR_STORE));
 			array.add(writeLocation(store.getLocation()));
 
-			array.add(writeVariable(store.getTarget()));
+			array.add(writeVariable(store.getTarget().getVariable()));
 			array.add(writeExpressions(store.getIndexes()));
 			array.add(writeExpression(store.getValue()));
 
@@ -501,14 +502,8 @@ public class IRWriter {
 	 */
 	private static JsonArray writeVariable(Var var) {
 		JsonArray array = new JsonArray();
-		if (var.isGlobal()) {
-			array.add(new JsonPrimitive(var.getName()));
-			array.add(new JsonPrimitive(0));
-		} else {
-			array.add(new JsonPrimitive(var.getBaseName()));
-			array.add(new JsonPrimitive(var.getIndex()));
-		}
-
+		array.add(new JsonPrimitive(var.getName()));
+		array.add(new JsonPrimitive(var.getIndex()));
 		return array;
 	}
 
@@ -778,7 +773,7 @@ public class IRWriter {
 	private JsonArray writeLocalVariable(Var variable) {
 		JsonArray array = new JsonArray();
 
-		array.add(new JsonPrimitive(variable.getBaseName()));
+		array.add(new JsonPrimitive(variable.getName()));
 		array.add(new JsonPrimitive(variable.isAssignable()));
 		array.add(new JsonPrimitive(variable.getIndex()));
 		array.add(writeLocation(variable.getLocation()));

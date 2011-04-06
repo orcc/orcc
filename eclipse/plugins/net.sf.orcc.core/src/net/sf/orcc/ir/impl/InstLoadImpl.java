@@ -9,23 +9,19 @@ package net.sf.orcc.ir.impl;
 import java.util.Collection;
 
 import net.sf.orcc.ir.Cast;
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -69,7 +65,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * @generated
 	 * @ordered
 	 */
-	protected Var target;
+	protected Def target;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -101,7 +97,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var basicGetTarget() {
+	public Def basicGetTarget() {
 		return target;
 	}
 
@@ -171,7 +167,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 				setSource((Use)newValue);
 				return;
 			case IrPackage.INST_LOAD__TARGET:
-				setTarget((Var)newValue);
+				setTarget((Def)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -200,7 +196,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 				setSource((Use)null);
 				return;
 			case IrPackage.INST_LOAD__TARGET:
-				setTarget((Var)null);
+				setTarget((Def)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -208,7 +204,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 
 	@Override
 	public Cast getCast() {
-		Type tgt = target.getType();
+		Type tgt = target.getVariable().getType();
 		Type src = source.getVariable().getType();
 
 		if (src == null) {
@@ -255,10 +251,10 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var getTarget() {
+	public Def getTarget() {
 		if (target != null && target.eIsProxy()) {
 			InternalEObject oldTarget = (InternalEObject)target;
-			target = (Var)eResolveProxy(oldTarget);
+			target = (Def)eResolveProxy(oldTarget);
 			if (target != oldTarget) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_LOAD__TARGET, oldTarget, target));
@@ -284,11 +280,12 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTarget(Var newTarget) {
-		Var oldTarget = target;
+	public void setTarget(Def newTarget) {
+		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__TARGET, oldTarget, target));

@@ -32,10 +32,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a very simple Dead Global Elimination.
@@ -46,18 +50,20 @@ import net.sf.orcc.util.OrderedMap;
 public class DeadGlobalElimination extends AbstractActorVisitor {
 
 	/**
-	 * Removes the given instructions that store to an unused state variable.
+	 * Removes the given definitions of an unused state variable.
 	 * 
-	 * @param instructions
-	 *            a list of instructions
+	 * @param definitions
+	 *            a list of definitions
 	 */
-	private void remove(List<Instruction> instructions) {
-		if (instructions != null) {
-			Iterator<Instruction> it = instructions.iterator();
-			while (it.hasNext()) {
-				Instruction instruction = it.next();
-				instruction.accept(this);
-				it.remove();
+	private void remove(List<Def> definitions) {
+		while (!definitions.isEmpty()) {
+			Def def = definitions.get(0);
+			InstStore store = EcoreHelper.getContainerOfType(def,
+					InstStore.class);
+			if (store != null) {
+				store.getTarget().setVariable(null);
+				EcoreHelper.deleteObjects(store.getIndexes());
+				EcoreUtil.delete(store.getValue(), true);
 			}
 		}
 	}
@@ -70,7 +76,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 			Var variable = it.next();
 			if (!variable.isUsed()) {
 				it.remove();
-				remove(variable.getInstructions());
+				remove(variable.getDefs());
 			}
 		}
 	}

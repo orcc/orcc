@@ -40,9 +40,9 @@ import org.eclipse.emf.common.util.EList;
  */
 public interface ExprList extends Expression {
 
-	public Expression get(int index);
-
 	public Expression get(ExprInt index);
+
+	public Expression get(int index);
 
 	public int getSize();
 
@@ -53,8 +53,8 @@ public interface ExprList extends Expression {
 	 */
 	public EList<Expression> getValue();
 
-	public void set(int index, Expression value);
-
 	public void set(ExprInt index, Expression value);
+
+	public void set(int index, Expression value);
 
 }

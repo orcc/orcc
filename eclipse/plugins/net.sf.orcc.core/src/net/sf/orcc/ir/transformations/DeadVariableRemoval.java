@@ -38,6 +38,7 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -53,15 +54,15 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(InstAssign assign) {
-		Var variable = assign.getTarget();
+		Var variable = assign.getTarget().getVariable();
 		if (!variable.isUsed()) {
 			// do not remove assign to variables that are used by writes
 			if (isPort(variable)) {
 				return;
 			}
 
-			// clean up uses
-			EcoreUtil.delete(assign.getTarget(), true);
+			// remove def/uses
+			assign.getTarget().setVariable(null);
 			EcoreUtil.delete(assign.getValue(), true);
 
 			// remove instruction
@@ -75,18 +76,16 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	@Override
 	public void visit(InstCall call) {
 		if (call.hasResult()) {
-			Var variable = call.getTarget();
+			Var variable = call.getTarget().getVariable();
 			if (!variable.isUsed()) {
 				// do not remove call to variables that are used by writes
 				if (isPort(variable)) {
 					return;
 				}
 
-				// remove uses
-				while (!call.getParameters().isEmpty()) {
-					EcoreUtil.delete(call.getParameters().get(0), true);
-				}
-				call.setTarget(null);
+				// remove def/uses
+				call.getTarget().setVariable(null);
+				EcoreHelper.deleteObjects(call.getParameters());
 
 				// remove instruction
 				itInstruction.remove();
@@ -100,19 +99,17 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(InstLoad load) {
-		Var target = load.getTarget();
+		Var target = load.getTarget().getVariable();
 		if (!target.isUsed()) {
 			// do not remove loads to variables that are used by writes
 			if (isPort(target)) {
 				return;
 			}
 			
-			// remove use
+			// remove def/uses
+			load.getTarget().setVariable(null);
 			load.getSource().setVariable(null);
-			while (!load.getIndexes().isEmpty()) {
-				EcoreUtil.delete(load.getIndexes().get(0), true);
-			}
-			load.setTarget(null);
+			EcoreHelper.deleteObjects(load.getIndexes());
 
 			// remove instruction
 			itInstruction.remove();
@@ -124,18 +121,16 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(InstPhi phi) {
-		Var variable = phi.getTarget();
+		Var variable = phi.getTarget().getVariable();
 		if (!variable.isUsed()) {
 			// do not remove phi to variables that are used by writes
 			if (isPort(variable)) {
 				return;
 			}
 
-			// remove uses
-			while (!phi.getValues().isEmpty()) {
-				EcoreUtil.delete(phi.getValues().get(0), true);
-			}
-			phi.setTarget(null);
+			// remove def/uses
+			phi.getTarget().setVariable(null);
+			EcoreHelper.deleteObjects(phi.getValues());
 
 			// remove instruction
 			itInstruction.remove();
@@ -156,8 +151,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			Iterator<Var> it = procedure.getLocals().iterator();
 			while (it.hasNext()) {
 				Var local = it.next();
-				if (!local.isUsed() && local.getInstruction() == null
-						&& local.getInstructions() == null) {
+				if (!local.isUsed() && !local.isDefined()) {
 					changed = true;
 					it.remove();
 				}
@@ -169,7 +163,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	@Override
 	public void visit(InstStore store) {
-		Var target = store.getTarget();
+		Var target = store.getTarget().getVariable();
 		if (!target.isUsed()) {
 			// do not remove stores to variables that are used by writes, or
 			// variables that are parameters
@@ -179,12 +173,10 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 				return;
 			}
 			
-			// remove uses
-			while (!store.getIndexes().isEmpty()) {
-				EcoreUtil.delete(store.getIndexes().get(0), true);
-			}
+			// remove def/uses
+			store.getTarget().setVariable(null);
+			EcoreHelper.deleteObjects(store.getIndexes());
 			EcoreUtil.delete(store.getValue(), true);
-			store.setTarget(null);
 
 			// remove instruction
 			itInstruction.remove();

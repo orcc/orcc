@@ -138,17 +138,17 @@ public class ExprBoolImpl extends ExpressionImpl implements ExprBool {
 		return IrFactory.eINSTANCE.createTypeBool();
 	}
 
+	@Override
+	public boolean isBooleanExpr() {
+		return true;
+	}
+	
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public boolean isValue() {
 		return value;
-	}
-	
-	@Override
-	public boolean isBooleanExpr() {
-		return true;
 	}
 
 	@Override

@@ -225,7 +225,7 @@ public class AstTransformer {
 					expression.getIrType(), "local_" + var.getName());
 
 			InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
-					target, IrFactory.eINSTANCE.createUse(var), indexes);
+					target, var, indexes);
 			addInstruction(load);
 
 			Expression varExpr = IrFactory.eINSTANCE.createExprVar(target);
@@ -835,7 +835,7 @@ public class AstTransformer {
 				}
 
 				addInstruction(IrFactory.eINSTANCE.createInstCall(location,
-						null, procedure, parameters));
+						(Var) null, procedure, parameters));
 			}
 		}
 
@@ -1015,8 +1015,7 @@ public class AstTransformer {
 				context.getMapGlobals().put(global, local);
 			}
 
-			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local,
-					IrFactory.eINSTANCE.createUse(global));
+			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local, global);
 			addInstruction(load);
 		}
 	}
@@ -1149,8 +1148,7 @@ public class AstTransformer {
 		for (Var global : context.getSetGlobalsToLoad()) {
 			Var local = context.getMapGlobals().get(global);
 
-			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local,
-					IrFactory.eINSTANCE.createUse(global));
+			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local, global);
 			NodeBlock block = context.getProcedure().getFirst();
 			block.add(i, load);
 			i++;

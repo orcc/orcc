@@ -49,6 +49,24 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class VarImpl extends EObjectImpl implements Var {
 	/**
+	 * The default value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isAssignable()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean ASSIGNABLE_EDEFAULT = false;
+
+	/**
+	 * The default value of the '{@link #isGlobal() <em>Global</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isGlobal()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean GLOBAL_EDEFAULT = false;
+
+	/**
 	 * The default value of the '{@link #getIndex() <em>Index</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getIndex()
@@ -56,6 +74,44 @@ public class VarImpl extends EObjectImpl implements Var {
 	 * @ordered
 	 */
 	protected static final int INDEX_EDEFAULT = 0;
+
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isAssignable()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean assignable = ASSIGNABLE_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getDefs() <em>Defs</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getDefs()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Def> defs;
+
+	/**
+	 * The cached value of the '{@link #isGlobal() <em>Global</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isGlobal()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean global = GLOBAL_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getIndex() <em>Index</em>}' attribute.
@@ -86,16 +142,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	protected Location location;
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
@@ -114,51 +160,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	protected Type type;
 
 	/**
-	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getValue()
-	 * @generated
-	 * @ordered
-	 */
-	protected Expression value;
-
-	/**
-	 * The default value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isAssignable()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean ASSIGNABLE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isAssignable()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean assignable = ASSIGNABLE_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #isGlobal() <em>Global</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isGlobal()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean GLOBAL_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isGlobal() <em>Global</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isGlobal()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean global = GLOBAL_EDEFAULT;
-
-	/**
 	 * The cached value of the '{@link #getUses() <em>Uses</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getUses()
@@ -168,14 +169,13 @@ public class VarImpl extends EObjectImpl implements Var {
 	protected EList<Use> uses;
 
 	/**
-	 * The cached value of the '{@link #getDefs() <em>Defs</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDefs()
+	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Def> defs;
+	protected Expression value;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -527,6 +527,11 @@ public class VarImpl extends EObjectImpl implements Var {
 	 */
 	public boolean isAssignable() {
 		return assignable;
+	}
+
+	@Override
+	public boolean isDefined() {
+		return !getDefs().isEmpty();
 	}
 
 	/**

@@ -143,8 +143,7 @@ public class ActorTransformer {
 
 				Var irToken = context.getVariable(token);
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
-						irToken, IrFactory.eINSTANCE.createUse(portVariable),
-						indexes);
+						irToken, portVariable, indexes);
 				addInstruction(load);
 
 				i++;
@@ -179,8 +178,7 @@ public class ActorTransformer {
 				Var tmpVar = procedure
 						.newTempLocalVariable(file, type, "token");
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
-						tmpVar, IrFactory.eINSTANCE.createUse(portVariable),
-						indexes);
+						tmpVar, portVariable, indexes);
 				block.add(load);
 
 				Var irToken = context.getVariable(token);
@@ -279,9 +277,8 @@ public class ActorTransformer {
 						.transformExpression(value);
 				Use use = ((ExprVar) expression).getUse();
 
-				use = IrFactory.eINSTANCE.createUse(use.getVariable());
-				InstLoad load = IrFactory.eINSTANCE.createInstLoad(tmpVar, use,
-						indexes);
+				InstLoad load = IrFactory.eINSTANCE.createInstLoad(tmpVar,
+						use.getVariable(), indexes);
 				block.add(load);
 
 				indexes = new ArrayList<Expression>(1);

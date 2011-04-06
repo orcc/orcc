@@ -72,7 +72,7 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 			if (instruction.isPhi()) {
 				InstPhi phi = (InstPhi) instruction;
 
-				Var target = phi.getTarget();
+				Var target = phi.getTarget().getVariable();
 				ExprVar sourceExpr = (ExprVar) phi.getValues().get(index);
 				Var source = (Var) sourceExpr.getUse().getVariable();
 

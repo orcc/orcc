@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.util.List;
+
 import net.sf.orcc.ir.Use;
 
 import org.eclipse.emf.common.util.TreeIterator;
@@ -68,6 +70,19 @@ public class EcoreHelper {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Deletes recursively all objects in the given list and removes them from
+	 * any feature that references them.
+	 * 
+	 * @param objects
+	 *            a list of objects
+	 */
+	public static void deleteObjects(List<? extends EObject> objects) {
+		while (!objects.isEmpty()) {
+			EcoreUtil.delete(objects.get(0), true);
+		}
 	}
 
 	/**

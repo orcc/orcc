@@ -52,16 +52,6 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 		super();
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.TYPE_FLOAT;
-	}
-
 	@Override
 	public Object accept(TypeInterpreter interpreter) {
 		return interpreter.interpret(this);
@@ -75,6 +65,16 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof TypeFloat);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.TYPE_FLOAT;
 	}
 
 	@Override

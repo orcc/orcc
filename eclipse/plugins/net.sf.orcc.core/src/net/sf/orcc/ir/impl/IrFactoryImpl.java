@@ -6,11 +6,11 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -58,12 +58,14 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
+ * 
  * @generated
  */
 public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -73,28 +75,28 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public static IrFactory init() {
 		try {
-			IrFactory theIrFactory = (IrFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/ir/Ir"); 
+			IrFactory theIrFactory = (IrFactory) EPackage.Registry.INSTANCE
+					.getEFactory("http://orcc.sf.net/ir/Ir");
 			if (theIrFactory != null) {
 				return theIrFactory;
 			}
-		}
-		catch (Exception exception) {
+		} catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new IrFactoryImpl();
 	}
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public IrFactoryImpl() {
@@ -103,6 +105,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpBinaryToString(EDataType eDataType,
@@ -112,6 +115,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpUnaryToString(EDataType eDataType,
@@ -121,64 +125,116 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
-			case IrPackage.OP_BINARY:
-				return convertOpBinaryToString(eDataType, instanceValue);
-			case IrPackage.OP_UNARY:
-				return convertOpUnaryToString(eDataType, instanceValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		case IrPackage.OP_BINARY:
+			return convertOpBinaryToString(eDataType, instanceValue);
+		case IrPackage.OP_UNARY:
+			return convertOpUnaryToString(eDataType, instanceValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case IrPackage.TYPE_BOOL: return createTypeBool();
-			case IrPackage.TYPE_FLOAT: return createTypeFloat();
-			case IrPackage.TYPE_INT: return createTypeInt();
-			case IrPackage.TYPE_LIST: return createTypeList();
-			case IrPackage.TYPE_STRING: return createTypeString();
-			case IrPackage.TYPE_UINT: return createTypeUint();
-			case IrPackage.TYPE_VOID: return createTypeVoid();
-			case IrPackage.NODE_BLOCK: return createNodeBlock();
-			case IrPackage.NODE_IF: return createNodeIf();
-			case IrPackage.NODE_WHILE: return createNodeWhile();
-			case IrPackage.PROCEDURE: return createProcedure();
-			case IrPackage.INST_ASSIGN: return createInstAssign();
-			case IrPackage.INST_CALL: return createInstCall();
-			case IrPackage.INST_LOAD: return createInstLoad();
-			case IrPackage.INST_PHI: return createInstPhi();
-			case IrPackage.INST_RETURN: return createInstReturn();
-			case IrPackage.INST_SPECIFIC: return createInstSpecific();
-			case IrPackage.INST_STORE: return createInstStore();
-			case IrPackage.LOCATION: return createLocation();
-			case IrPackage.VAR: return createVar();
-			case IrPackage.USE: return createUse();
-			case IrPackage.EXPR_BINARY: return createExprBinary();
-			case IrPackage.EXPR_BOOL: return createExprBool();
-			case IrPackage.EXPR_FLOAT: return createExprFloat();
-			case IrPackage.EXPR_INT: return createExprInt();
-			case IrPackage.EXPR_LIST: return createExprList();
-			case IrPackage.EXPR_STRING: return createExprString();
-			case IrPackage.EXPR_UNARY: return createExprUnary();
-			case IrPackage.EXPR_VAR: return createExprVar();
-			case IrPackage.DEF: return createDef();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		case IrPackage.TYPE_BOOL:
+			return createTypeBool();
+		case IrPackage.TYPE_FLOAT:
+			return createTypeFloat();
+		case IrPackage.TYPE_INT:
+			return createTypeInt();
+		case IrPackage.TYPE_LIST:
+			return createTypeList();
+		case IrPackage.TYPE_STRING:
+			return createTypeString();
+		case IrPackage.TYPE_UINT:
+			return createTypeUint();
+		case IrPackage.TYPE_VOID:
+			return createTypeVoid();
+		case IrPackage.NODE_BLOCK:
+			return createNodeBlock();
+		case IrPackage.NODE_IF:
+			return createNodeIf();
+		case IrPackage.NODE_WHILE:
+			return createNodeWhile();
+		case IrPackage.PROCEDURE:
+			return createProcedure();
+		case IrPackage.INST_ASSIGN:
+			return createInstAssign();
+		case IrPackage.INST_CALL:
+			return createInstCall();
+		case IrPackage.INST_LOAD:
+			return createInstLoad();
+		case IrPackage.INST_PHI:
+			return createInstPhi();
+		case IrPackage.INST_RETURN:
+			return createInstReturn();
+		case IrPackage.INST_SPECIFIC:
+			return createInstSpecific();
+		case IrPackage.INST_STORE:
+			return createInstStore();
+		case IrPackage.LOCATION:
+			return createLocation();
+		case IrPackage.VAR:
+			return createVar();
+		case IrPackage.USE:
+			return createUse();
+		case IrPackage.EXPR_BINARY:
+			return createExprBinary();
+		case IrPackage.EXPR_BOOL:
+			return createExprBool();
+		case IrPackage.EXPR_FLOAT:
+			return createExprFloat();
+		case IrPackage.EXPR_INT:
+			return createExprInt();
+		case IrPackage.EXPR_LIST:
+			return createExprList();
+		case IrPackage.EXPR_STRING:
+			return createExprString();
+		case IrPackage.EXPR_UNARY:
+			return createExprUnary();
+		case IrPackage.EXPR_VAR:
+			return createExprVar();
+		case IrPackage.DEF:
+			return createDef();
+		default:
+			throw new IllegalArgumentException("The class '" + eClass.getName()
+					+ "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Def createDef() {
+		DefImpl def = new DefImpl();
+		return def;
+	}
+
+	@Override
+	public Def createDef(Var variable) {
+		DefImpl def = new DefImpl();
+		def.setVariable(variable);
+		return def;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprBinary createExprBinary() {
@@ -199,6 +255,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprBool createExprBool() {
@@ -215,6 +272,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprFloat createExprFloat() {
@@ -231,6 +289,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprInt createExprInt() {
@@ -261,6 +320,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprList createExprList() {
@@ -285,6 +345,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprString createExprString() {
@@ -301,6 +362,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprUnary createExprUnary() {
@@ -320,21 +382,12 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprVar createExprVar() {
 		ExprVarImpl exprVar = new ExprVarImpl();
 		return exprVar;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Def createDef() {
-		DefImpl def = new DefImpl();
-		return def;
 	}
 
 	@Override
@@ -353,22 +406,25 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
-			case IrPackage.OP_BINARY:
-				return createOpBinaryFromString(eDataType, initialValue);
-			case IrPackage.OP_UNARY:
-				return createOpUnaryFromString(eDataType, initialValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		case IrPackage.OP_BINARY:
+			return createOpBinaryFromString(eDataType, initialValue);
+		case IrPackage.OP_UNARY:
+			return createOpUnaryFromString(eDataType, initialValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstAssign createInstAssign() {
@@ -377,26 +433,24 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstAssign createInstAssign(Location loc, Var target,
+	public InstAssign createInstAssign(Location location, Var target,
 			Expression value) {
 		InstAssignImpl instAssign = new InstAssignImpl();
-		instAssign.setLocation(loc);
-		instAssign.setTarget(target);
+		instAssign.setLocation(location);
+		instAssign.setTarget(IrFactory.eINSTANCE.createDef(target));
 		instAssign.setValue(value);
 		return instAssign;
 	}
 
 	@Override
 	public InstAssign createInstAssign(Var target, Expression value) {
-		InstAssignImpl instAssign = new InstAssignImpl();
-		instAssign.setLocation(IrFactory.eINSTANCE.createLocation());
-		instAssign.setTarget(target);
-		instAssign.setValue(value);
-		return instAssign;
+		return createInstAssign(IrFactory.eINSTANCE.createLocation(), target,
+				value);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstCall createInstCall() {
@@ -409,7 +463,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			Procedure procedure, List<Expression> parameters) {
 		InstCallImpl instCall = new InstCallImpl();
 		instCall.setLocation(location);
-		instCall.setTarget(target);
+		if (target != null) {
+			instCall.setTarget(IrFactory.eINSTANCE.createDef(target));
+		}
 		instCall.setProcedure(procedure);
 		instCall.getParameters().addAll(parameters);
 		return instCall;
@@ -417,6 +473,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstLoad createInstLoad() {
@@ -425,7 +482,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstLoad createInstLoad(Location location, Var target, Use source,
+	public InstLoad createInstLoad(Location location, Def target, Use source,
 			List<Expression> indexes) {
 		InstLoadImpl instLoad = new InstLoadImpl();
 		instLoad.setLocation(location);
@@ -436,27 +493,32 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstLoad createInstLoad(Var target, Use source) {
+	public InstLoad createInstLoad(Location location, Var target, Var source,
+			List<Expression> indexes) {
+		return createInstLoad(location, IrFactory.eINSTANCE.createDef(target),
+				IrFactory.eINSTANCE.createUse(source), indexes);
+	}
+
+	@Override
+	public InstLoad createInstLoad(Var target, Var source) {
 		InstLoadImpl instLoad = new InstLoadImpl();
 		instLoad.setLocation(IrFactory.eINSTANCE.createLocation());
-		instLoad.setTarget(target);
-		instLoad.setSource(source);
+		instLoad.setTarget(IrFactory.eINSTANCE.createDef(target));
+		instLoad.setSource(IrFactory.eINSTANCE.createUse(source));
 		return instLoad;
 	}
 
 	@Override
-	public InstLoad createInstLoad(Var target, Use source,
+	public InstLoad createInstLoad(Var target, Var source,
 			List<Expression> indexes) {
-		InstLoadImpl instLoad = new InstLoadImpl();
-		instLoad.setLocation(IrFactory.eINSTANCE.createLocation());
-		instLoad.setTarget(target);
-		instLoad.setSource(source);
-		instLoad.getIndexes().addAll(indexes);
-		return instLoad;
+		return createInstLoad(IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createDef(target),
+				IrFactory.eINSTANCE.createUse(source), indexes);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstPhi createInstPhi() {
@@ -465,7 +527,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstPhi createInstPhi(Location location, Var target,
+	public InstPhi createInstPhi(Location location, Def target,
 			List<Expression> values) {
 		InstPhiImpl instPhi = new InstPhiImpl();
 		instPhi.setLocation(location);
@@ -475,16 +537,21 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
+	public InstPhi createInstPhi(Location location, Var target,
+			List<Expression> values) {
+		return createInstPhi(location, IrFactory.eINSTANCE.createDef(target),
+				values);
+	}
+
+	@Override
 	public InstPhi createInstPhi(Var target, List<Expression> values) {
-		InstPhiImpl instPhi = new InstPhiImpl();
-		instPhi.setLocation(IrFactory.eINSTANCE.createLocation());
-		instPhi.setTarget(target);
-		instPhi.getValues().addAll(values);
-		return instPhi;
+		return createInstPhi(IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createDef(target), values);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstReturn createInstReturn() {
@@ -510,6 +577,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstSpecific createInstSpecific() {
@@ -519,6 +587,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public InstStore createInstStore() {
@@ -527,7 +596,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstStore createInstStore(Location location, Var target,
+	public InstStore createInstStore(Location location, Def target,
 			List<Expression> indexes, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();
 		instStore.setLocation(location);
@@ -537,8 +606,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return instStore;
 	}
 
+	@Override
+	public InstStore createInstStore(Location location, Var target,
+			List<Expression> indexes, Expression value) {
+		return createInstStore(location, IrFactory.eINSTANCE.createDef(target),
+				indexes, value);
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Location createLocation() {
@@ -557,6 +634,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NodeBlock createNodeBlock() {
@@ -566,6 +644,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NodeIf createNodeIf() {
@@ -575,6 +654,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public NodeWhile createNodeWhile() {
@@ -584,28 +664,37 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpBinary createOpBinaryFromString(EDataType eDataType,
 			String initialValue) {
 		OpBinary result = OpBinary.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
 		return result;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public OpUnary createOpUnaryFromString(EDataType eDataType,
 			String initialValue) {
 		OpUnary result = OpUnary.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
 		return result;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Procedure createProcedure() {
@@ -627,6 +716,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeBool createTypeBool() {
@@ -636,6 +726,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeFloat createTypeFloat() {
@@ -645,6 +736,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeInt createTypeInt() {
@@ -661,6 +753,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeList createTypeList() {
@@ -686,6 +779,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeString createTypeString() {
@@ -695,6 +789,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeUint createTypeUint() {
@@ -711,6 +806,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public TypeVoid createTypeVoid() {
@@ -720,6 +816,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Use createUse() {
@@ -736,6 +833,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Var createVar() {
@@ -783,10 +881,11 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public IrPackage getIrPackage() {
-		return (IrPackage)getEPackage();
+		return (IrPackage) getEPackage();
 	}
 
 } // IrFactoryImpl

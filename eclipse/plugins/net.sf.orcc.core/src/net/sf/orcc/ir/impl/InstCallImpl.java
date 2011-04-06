@@ -8,6 +8,7 @@ package net.sf.orcc.ir.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import net.sf.orcc.ir.Def;
 import java.util.List;
 
 import net.sf.orcc.ir.Cast;
@@ -71,7 +72,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * @generated
 	 * @ordered
 	 */
-	protected Var target;
+	protected Def target;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -103,7 +104,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var basicGetTarget() {
+	public Def basicGetTarget() {
 		return target;
 	}
 
@@ -173,7 +174,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 				setProcedure((Procedure)newValue);
 				return;
 			case IrPackage.INST_CALL__TARGET:
-				setTarget((Var)newValue);
+				setTarget((Def)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -202,7 +203,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 				setProcedure((Procedure)null);
 				return;
 			case IrPackage.INST_CALL__TARGET:
-				setTarget((Var)null);
+				setTarget((Def)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -210,7 +211,7 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 
 	@Override
 	public Cast getCast() {
-		Type var = target.getType();
+		Type var = target.getVariable().getType();
 		Type retProc = procedure.getReturnType();
 
 		Cast cast = new Cast(retProc, var);
@@ -290,10 +291,10 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Var getTarget() {
+	public Def getTarget() {
 		if (target != null && target.eIsProxy()) {
 			InternalEObject oldTarget = (InternalEObject)target;
-			target = (Var)eResolveProxy(oldTarget);
+			target = (Def)eResolveProxy(oldTarget);
 			if (target != oldTarget) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_CALL__TARGET, oldTarget, target));
@@ -329,11 +330,12 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTarget(Var newTarget) {
-		Var oldTarget = target;
+	public void setTarget(Def newTarget) {
+		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_CALL__TARGET, oldTarget, target));

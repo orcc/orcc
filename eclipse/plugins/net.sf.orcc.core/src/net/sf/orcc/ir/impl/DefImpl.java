@@ -57,33 +57,6 @@ public class DefImpl extends EObjectImpl implements Def {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.DEF;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Var getVariable() {
-		if (variable != null && variable.eIsProxy()) {
-			InternalEObject oldVariable = (InternalEObject)variable;
-			variable = (Var)eResolveProxy(oldVariable);
-			if (variable != oldVariable) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.DEF__VARIABLE, oldVariable, variable));
-			}
-		}
-		return variable;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Var basicGetVariable() {
 		return variable;
 	}
@@ -108,18 +81,14 @@ public class DefImpl extends EObjectImpl implements Def {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setVariable(Var newVariable) {
-		if (newVariable != variable) {
-			NotificationChain msgs = null;
-			if (variable != null)
-				msgs = ((InternalEObject)variable).eInverseRemove(this, IrPackage.VAR__DEFS, Var.class, msgs);
-			if (newVariable != null)
-				msgs = ((InternalEObject)newVariable).eInverseAdd(this, IrPackage.VAR__DEFS, Var.class, msgs);
-			msgs = basicSetVariable(newVariable, msgs);
-			if (msgs != null) msgs.dispatch();
+	@Override
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
+			case IrPackage.DEF__VARIABLE:
+				if (resolve) return getVariable();
+				return basicGetVariable();
 		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.DEF__VARIABLE, newVariable, newVariable));
+		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
@@ -158,13 +127,12 @@ public class DefImpl extends EObjectImpl implements Def {
 	 * @generated
 	 */
 	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case IrPackage.DEF__VARIABLE:
-				if (resolve) return getVariable();
-				return basicGetVariable();
+				return variable != null;
 		}
-		return super.eGet(featureID, resolve, coreType);
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -188,6 +156,16 @@ public class DefImpl extends EObjectImpl implements Def {
 	 * @generated
 	 */
 	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.DEF;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case IrPackage.DEF__VARIABLE:
@@ -202,13 +180,35 @@ public class DefImpl extends EObjectImpl implements Def {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.DEF__VARIABLE:
-				return variable != null;
+	public Var getVariable() {
+		if (variable != null && variable.eIsProxy()) {
+			InternalEObject oldVariable = (InternalEObject)variable;
+			variable = (Var)eResolveProxy(oldVariable);
+			if (variable != oldVariable) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.DEF__VARIABLE, oldVariable, variable));
+			}
 		}
-		return super.eIsSet(featureID);
+		return variable;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setVariable(Var newVariable) {
+		if (newVariable != variable) {
+			NotificationChain msgs = null;
+			if (variable != null)
+				msgs = ((InternalEObject)variable).eInverseRemove(this, IrPackage.VAR__DEFS, Var.class, msgs);
+			if (newVariable != null)
+				msgs = ((InternalEObject)newVariable).eInverseAdd(this, IrPackage.VAR__DEFS, Var.class, msgs);
+			msgs = basicSetVariable(newVariable, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.DEF__VARIABLE, newVariable, newVariable));
 	}
 
 } //DefImpl

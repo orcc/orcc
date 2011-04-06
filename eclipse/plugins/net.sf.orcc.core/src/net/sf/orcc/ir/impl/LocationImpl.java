@@ -43,16 +43,6 @@ public class LocationImpl extends EObjectImpl implements Location {
 	protected static final int END_COLUMN_EDEFAULT = 0;
 
 	/**
-	 * The cached value of the '{@link #getEndColumn() <em>End Column</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getEndColumn()
-	 * @generated
-	 * @ordered
-	 */
-	protected int endColumn = END_COLUMN_EDEFAULT;
-
-	/**
 	 * The default value of the '{@link #getStartColumn() <em>Start Column</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -63,16 +53,6 @@ public class LocationImpl extends EObjectImpl implements Location {
 	protected static final int START_COLUMN_EDEFAULT = 0;
 
 	/**
-	 * The cached value of the '{@link #getStartColumn() <em>Start Column</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getStartColumn()
-	 * @generated
-	 * @ordered
-	 */
-	protected int startColumn = START_COLUMN_EDEFAULT;
-
-	/**
 	 * The default value of the '{@link #getStartLine() <em>Start Line</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -81,6 +61,26 @@ public class LocationImpl extends EObjectImpl implements Location {
 	 * @ordered
 	 */
 	protected static final int START_LINE_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getEndColumn() <em>End Column</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getEndColumn()
+	 * @generated
+	 * @ordered
+	 */
+	protected int endColumn = END_COLUMN_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getStartColumn() <em>Start Column</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getStartColumn()
+	 * @generated
+	 * @ordered
+	 */
+	protected int startColumn = START_COLUMN_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getStartLine() <em>Start Line</em>}' attribute.
@@ -107,79 +107,6 @@ public class LocationImpl extends EObjectImpl implements Location {
 	 * @generated
 	 */
 	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.LOCATION;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getEndColumn() {
-		return endColumn;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setEndColumn(int newEndColumn) {
-		int oldEndColumn = endColumn;
-		endColumn = newEndColumn;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.LOCATION__END_COLUMN, oldEndColumn, endColumn));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getStartColumn() {
-		return startColumn;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setStartColumn(int newStartColumn) {
-		int oldStartColumn = startColumn;
-		startColumn = newStartColumn;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.LOCATION__START_COLUMN, oldStartColumn, startColumn));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getStartLine() {
-		return startLine;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setStartLine(int newStartLine) {
-		int oldStartLine = startLine;
-		startLine = newStartLine;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.LOCATION__START_LINE, oldStartLine, startLine));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case IrPackage.LOCATION__END_COLUMN:
@@ -190,6 +117,24 @@ public class LocationImpl extends EObjectImpl implements Location {
 				return getStartLine();
 		}
 		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+			case IrPackage.LOCATION__END_COLUMN:
+				return endColumn != END_COLUMN_EDEFAULT;
+			case IrPackage.LOCATION__START_COLUMN:
+				return startColumn != START_COLUMN_EDEFAULT;
+			case IrPackage.LOCATION__START_LINE:
+				return startLine != START_LINE_EDEFAULT;
+		}
+		return super.eIsSet(featureID);
 	}
 
 	/**
@@ -219,6 +164,16 @@ public class LocationImpl extends EObjectImpl implements Location {
 	 * @generated
 	 */
 	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.LOCATION;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case IrPackage.LOCATION__END_COLUMN:
@@ -239,17 +194,62 @@ public class LocationImpl extends EObjectImpl implements Location {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.LOCATION__END_COLUMN:
-				return endColumn != END_COLUMN_EDEFAULT;
-			case IrPackage.LOCATION__START_COLUMN:
-				return startColumn != START_COLUMN_EDEFAULT;
-			case IrPackage.LOCATION__START_LINE:
-				return startLine != START_LINE_EDEFAULT;
-		}
-		return super.eIsSet(featureID);
+	public int getEndColumn() {
+		return endColumn;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getStartColumn() {
+		return startColumn;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getStartLine() {
+		return startLine;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setEndColumn(int newEndColumn) {
+		int oldEndColumn = endColumn;
+		endColumn = newEndColumn;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.LOCATION__END_COLUMN, oldEndColumn, endColumn));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setStartColumn(int newStartColumn) {
+		int oldStartColumn = startColumn;
+		startColumn = newStartColumn;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.LOCATION__START_COLUMN, oldStartColumn, startColumn));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setStartLine(int newStartLine) {
+		int oldStartLine = startLine;
+		startLine = newStartLine;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.LOCATION__START_LINE, oldStartLine, startLine));
 	}
 
 	/**

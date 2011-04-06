@@ -49,6 +49,22 @@ public interface Location extends EObject {
 	int getEndColumn();
 
 	/**
+	 * Returns the starting column of this location.
+	 * 
+	 * @return the starting column of this location
+	 * @model
+	 */
+	int getStartColumn();
+
+	/**
+	 * Returns the starting line of this location.
+	 * 
+	 * @return the starting line of this location
+	 * @model
+	 */
+	int getStartLine();
+
+	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Location#getEndColumn <em>End Column</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -59,14 +75,6 @@ public interface Location extends EObject {
 	void setEndColumn(int value);
 
 	/**
-	 * Returns the starting column of this location.
-	 * 
-	 * @return the starting column of this location
-	 * @model
-	 */
-	int getStartColumn();
-
-	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Location#getStartColumn <em>Start Column</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -75,14 +83,6 @@ public interface Location extends EObject {
 	 * @generated
 	 */
 	void setStartColumn(int value);
-
-	/**
-	 * Returns the starting line of this location.
-	 * 
-	 * @return the starting line of this location
-	 * @model
-	 */
-	int getStartLine();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Location#getStartLine <em>Start Line</em>}' attribute.

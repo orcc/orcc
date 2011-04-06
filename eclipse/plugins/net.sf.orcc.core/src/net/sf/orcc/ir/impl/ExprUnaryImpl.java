@@ -36,15 +36,6 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  */
 public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	/**
-	 * The cached value of the '{@link #getExpr() <em>Expr</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getExpr()
-	 * @generated
-	 * @ordered
-	 */
-	protected Expression expr;
-	/**
 	 * The default value of the '{@link #getOp() <em>Op</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -53,6 +44,15 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	 * @ordered
 	 */
 	protected static final OpUnary OP_EDEFAULT = OpUnary.BITNOT;
+	/**
+	 * The cached value of the '{@link #getExpr() <em>Expr</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getExpr()
+	 * @generated
+	 * @ordered
+	 */
+	protected Expression expr;
 
 	/**
 	 * The cached value of the '{@link #getOp() <em>Op</em>}' attribute.

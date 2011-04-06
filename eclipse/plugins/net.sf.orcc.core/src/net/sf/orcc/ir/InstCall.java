@@ -61,7 +61,7 @@ public interface InstCall extends Instruction {
 	 * @return the target of this node (may be <code>null</code>)
 	 * @model
 	 */
-	Var getTarget();
+	Def getTarget();
 
 	/**
 	 * Returns <code>true</code> if this call has a result.
@@ -93,6 +93,6 @@ public interface InstCall extends Instruction {
 	 * @param target
 	 *            a local variable (may be <code>null</code>)
 	 */
-	void setTarget(Var target);
+	void setTarget(Def target);
 
 }

@@ -495,7 +495,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	@Override
 	public void visit(InstAssign instr) {
 		try {
-			Var target = instr.getTarget();
+			Var target = instr.getTarget().getVariable();
 			target.setValue((Expression) instr.getValue().accept(
 					exprInterpreter));
 		} catch (OrccRuntimeException e) {
@@ -549,7 +549,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 			// Get procedure result if any
 			if (call.hasResult()) {
-				call.getTarget().setValue(returnValue);
+				call.getTarget().getVariable().setValue(returnValue);
 			}
 		}
 	}
@@ -581,7 +581,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 	@Override
 	public void visit(InstLoad instr) {
-		Var target = instr.getTarget();
+		Var target = instr.getTarget().getVariable();
 		Var source = instr.getSource().getVariable();
 		if (instr.getIndexes().isEmpty()) {
 			target.setValue(source.getValue());
@@ -606,7 +606,8 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	@Override
 	public void visit(InstPhi phi) {
 		Expression value = phi.getValues().get(branch);
-		phi.getTarget().setValue((Expression) value.accept(exprInterpreter));
+		phi.getTarget().getVariable()
+				.setValue((Expression) value.accept(exprInterpreter));
 	}
 
 	@Override
@@ -663,7 +664,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 	@Override
 	public void visit(InstStore instr) {
-		Var var = instr.getTarget();
+		Var var = instr.getTarget().getVariable();
 		if (instr.getIndexes().isEmpty()) {
 			var.setValue((Expression) instr.getValue().accept(exprInterpreter));
 		} else {

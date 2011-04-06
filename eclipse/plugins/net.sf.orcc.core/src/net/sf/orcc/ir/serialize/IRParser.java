@@ -503,10 +503,7 @@ public class IRParser {
 	private InstAssign parseInstrAssign(Location loc, JsonArray array) {
 		Var var = getVariable(array.get(2).getAsJsonArray());
 		Expression value = parseExpr(array.get(3));
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(loc, var,
-				value);
-		var.setInstruction(assign);
-		return assign;
+		return IrFactory.eINSTANCE.createInstAssign(loc, var, value);
 	}
 
 	/**
@@ -533,12 +530,7 @@ public class IRParser {
 			res = getVariable(array.get(4).getAsJsonArray());
 		}
 
-		InstCall call = IrFactory.eINSTANCE.createInstCall(loc, res, proc,
-				parameters);
-		if (res != null) {
-			res.setInstruction(call);
-		}
-		return call;
+		return IrFactory.eINSTANCE.createInstCall(loc, res, proc, parameters);
 	}
 
 	/**
@@ -555,10 +547,8 @@ public class IRParser {
 		Use source = parseVarUse(array.get(3).getAsJsonArray());
 		List<Expression> indexes = parseExprs(array.get(4).getAsJsonArray());
 
-		InstLoad load = IrFactory.eINSTANCE.createInstLoad(loc, target, source,
-				indexes);
-		target.setInstruction(load);
-		return load;
+		return IrFactory.eINSTANCE.createInstLoad(loc,
+				IrFactory.eINSTANCE.createDef(target), source, indexes);
 	}
 
 	/**
@@ -573,10 +563,8 @@ public class IRParser {
 	private InstPhi parseInstrPhi(Location loc, JsonArray array) {
 		Var target = getVariable(array.get(2).getAsJsonArray());
 		List<Expression> values = parseExprs(array.get(3).getAsJsonArray());
-
-		InstPhi phi = IrFactory.eINSTANCE.createInstPhi(loc, target, values);
-		target.setInstruction(phi);
-		return phi;
+		return IrFactory.eINSTANCE.createInstPhi(loc,
+				IrFactory.eINSTANCE.createDef(target), values);
 	}
 
 	/**
@@ -610,7 +598,8 @@ public class IRParser {
 		List<Expression> indexes = parseExprs(array.get(3).getAsJsonArray());
 		Expression value = parseExpr(array.get(4));
 
-		return IrFactory.eINSTANCE.createInstStore(loc, target, indexes, value);
+		return IrFactory.eINSTANCE.createInstStore(loc,
+				IrFactory.eINSTANCE.createDef(target), indexes, value);
 	}
 
 	/**

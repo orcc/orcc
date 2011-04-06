@@ -68,7 +68,7 @@
         eType="#//Var" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="InstAssign" eSuperTypes="#//Instruction">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Var"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Def"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Expression"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
@@ -76,17 +76,17 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" upperBound="-1"
         eType="#//Expression" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="procedure" eType="#//Procedure"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Var"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Def"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="InstLoad" eSuperTypes="#//Instruction">
     <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
         eType="#//Expression" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="#//Use"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Var"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Def"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="InstPhi" eSuperTypes="#//Instruction">
     <eStructuralFeatures xsi:type="ecore:EReference" name="oldVariable" eType="#//Var"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Var"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Def"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="values" upperBound="-1"
         eType="#//Expression" containment="true" resolveProxies="false"/>
   </eClassifiers>
@@ -98,7 +98,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="InstStore" eSuperTypes="#//Instruction">
     <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
         eType="#//Expression" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Var"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Def"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Expression"
         containment="true" resolveProxies="false"/>
   </eClassifiers>
