@@ -29,10 +29,10 @@
 package net.sf.orcc.tools.classifier;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.UnaryExpr;
 
 /**
  * This class defines a partial expression evaluator.
@@ -45,7 +45,7 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	private boolean schedulableMode;
 
 	@Override
-	public Object interpret(BinaryExpr expr, Object... args) {
+	public Object interpret(ExprBinary expr, Object... args) {
 		Expression val1 = (Expression) expr.getE1().accept(this);
 		Expression val2 = (Expression) expr.getE2().accept(this);
 		Expression result = interpretBinaryExpr(val1, expr.getOp(), val2);
@@ -59,7 +59,7 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	}
 
 	@Override
-	public Object interpret(UnaryExpr expr, Object... args) {
+	public Object interpret(ExprUnary expr, Object... args) {
 		Expression value = (Expression) expr.getExpr().accept(this);
 		Expression result = interpretUnaryExpr(expr.getOp(), value);
 

@@ -44,9 +44,9 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -148,7 +148,8 @@ public class ConfigurationAnalyzer {
 				Solution solution = solver.findFirst();
 				if (solution != null) {
 					int value = solution.getIntValue(variable);
-					configuration.put(port, new IntExpr(value));
+					configuration.put(port,
+							IrFactory.eINSTANCE.createExprInt(value));
 				}
 			}
 		}

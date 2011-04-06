@@ -35,32 +35,24 @@ import java.util.List;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.util.OrderedMap;
 
@@ -68,7 +60,7 @@ import net.sf.orcc.util.OrderedMap;
  * This class defines a normalizer for static actors.
  * 
  * @author Matthieu Wipliez
- * @autho Jerome Gorin
+ * @author Jerome Gorin
  * 
  */
 public class StaticActorNormalizer {
@@ -84,7 +76,7 @@ public class StaticActorNormalizer {
 
 		private int depth;
 
-		private List<VarLocal> indexes;
+		private List<Var> indexes;
 
 		private List<Node> nodes;
 
@@ -93,54 +85,55 @@ public class StaticActorNormalizer {
 		public MyPatternVisitor(Procedure procedure) {
 			this.procedure = procedure;
 			nodes = procedure.getNodes();
-			indexes = new ArrayList<VarLocal>();
+			indexes = new ArrayList<Var>();
 		}
 
 		@Override
 		public void visit(LoopPattern pattern) {
+			final IrFactory factory = IrFactory.eINSTANCE;
+
 			depth++;
 			if (indexes.size() < depth) {
-				VarLocal varDef = new VarLocal(true, depth - 1,
-						new Location(), "loop",
-						IrFactory.eINSTANCE.createTypeBool());
-				variables.put(actor.getFile(), varDef.getLocation(),
-						varDef.getName(), varDef);
+				Var varDef = factory.createVar(factory.createLocation(),
+						factory.createTypeBool(), "loop", true, depth - 1);
+				variables.add(varDef);
 				indexes.add(varDef);
 			}
 
-			VarLocal loopVar = indexes.get(depth - 1);
+			Var loopVar = indexes.get(depth - 1);
 
 			// init var
 			NodeBlock block = procedure.getLast(nodes);
-			Assign assign = new Assign(loopVar, new IntExpr(0));
+			InstAssign assign = factory.createInstAssign(loopVar,
+					factory.createExprInt(0));
 			block.add(assign);
 
 			// create while
 			List<Node> oldNodes = nodes;
 			nodes = new ArrayList<Node>();
 
-			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
-			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+			NodeWhile nodeWhile = factory.createNodeWhile();
+			nodeWhile.setJoinNode(factory.createNodeBlock());
 			nodeWhile.getNodes().addAll(nodes);
 
 			oldNodes.add(nodeWhile);
 
 			// assign condition
-			Expression condition = new BinaryExpr(new VarExpr(new Use(loopVar,
-					nodeWhile)), BinaryOp.LT, new IntExpr(
-					pattern.getNumIterations()),
-					IrFactory.eINSTANCE.createTypeBool());
-			nodeWhile.setValue(condition);
+			Expression condition = factory.createExprBinary(
+					factory.createExprVar(loopVar), OpBinary.LT,
+					factory.createExprInt(pattern.getNumIterations()),
+					factory.createTypeBool());
+			nodeWhile.setCondition(condition);
 
 			// accept sub pattern
 			pattern.getPattern().accept(this);
 
 			// add assign
 			block = procedure.getLast(nodes);
-			assign = new Assign(loopVar, null);
-			assign.setValue(new BinaryExpr(
-					new VarExpr(new Use(loopVar, assign)), BinaryOp.PLUS,
-					new IntExpr(1), IrFactory.eINSTANCE.createTypeInt(32)));
+			assign = factory.createInstAssign(loopVar, factory
+					.createExprBinary(factory.createExprVar(loopVar),
+							OpBinary.PLUS, factory.createExprInt(1),
+							factory.createTypeInt(32)));
 			block.add(assign);
 
 			// restore stuff
@@ -161,8 +154,8 @@ public class StaticActorNormalizer {
 			Action action = pattern.getAction();
 
 			// Call the action corresponding to the pattern
-			Call call = new Call(new Location(), null, pattern.getAction()
-					.getBody(), new ArrayList<Expression>());
+			InstCall call = IrFactory.eINSTANCE.createInstCall(null, pattern
+					.getAction().getBody(), null);
 
 			// Update variable counter index
 			List<Instruction> indexIn = updateIndex(action.getInputPattern());
@@ -176,16 +169,17 @@ public class StaticActorNormalizer {
 
 		private List<Instruction> updateIndex(Pattern pattern) {
 			List<Instruction> instrs = new ArrayList<Instruction>();
+			final IrFactory factory = IrFactory.eINSTANCE;
 
 			for (Port port : pattern.getPorts()) {
 				Integer tokens = pattern.getNumTokens(port);
 
 				Var varCount = stateVars.get(port.getName() + "_count");
-				Use use = new Use(varCount);
 
-				Store store = new Store(varCount, new BinaryExpr(new VarExpr(
-						use), BinaryOp.PLUS, new IntExpr(tokens),
-						IrFactory.eINSTANCE.createTypeInt(32)));
+				InstStore store = factory.createInstStore(varCount, factory
+						.createExprBinary(factory.createExprVar(varCount),
+								OpBinary.PLUS, factory.createExprInt(tokens),
+								factory.createTypeInt(32)));
 				instrs.add(store);
 
 			}
@@ -201,11 +195,11 @@ public class StaticActorNormalizer {
 
 	private Actor actor;
 
-	private OrderedMap<String, VarGlobal> stateVars;
+	private OrderedMap<String, Var> stateVars;
 
 	private CSDFMoC staticCls;
 
-	private OrderedMap<String, VarLocal> variables;
+	private List<Var> variables;
 
 	/**
 	 * Creates a new normalizer
@@ -226,24 +220,26 @@ public class StaticActorNormalizer {
 	 *            input or output pattern
 	 */
 	private void addStateVariables(Procedure procedure, Pattern pattern) {
+		final IrFactory factory = IrFactory.eINSTANCE;
+
 		NodeBlock block = procedure.getLast();
 		for (Port port : pattern.getPorts()) {
 			int numTokens = pattern.getNumTokens(port);
 
-			Type type = IrFactory.eINSTANCE.createTypeList(numTokens,
-					port.getType());
-			VarGlobal var = new VarGlobal(new Location(), type,
-					port.getName(), false);
+			Type type = factory.createTypeList(numTokens, port.getType());
+			Var var = factory.createVar(factory.createLocation(), type,
+					port.getName(), true, true);
 			stateVars.put(actor.getFile(), var.getLocation(), var.getName(),
 					var);
 
-			VarGlobal varCount = new VarGlobal(new Location(),
-					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
-							+ "_count", true, new IntExpr(0));
+			Var varCount = factory.createVar(factory.createLocation(),
+					factory.createTypeInt(32), port.getName() + "_count", true,
+					factory.createExprInt(0));
 			stateVars.put(actor.getFile(), varCount.getLocation(),
 					varCount.getName(), varCount);
 
-			Store store = new Store(varCount, new IntExpr(0));
+			InstStore store = factory.createInstStore(varCount,
+					factory.createExprInt(0));
 			block.add(store);
 		}
 	}
@@ -273,17 +269,15 @@ public class StaticActorNormalizer {
 		// all action scheduler now just return true
 		for (Action action : actor.getActions()) {
 			Procedure scheduler = action.getScheduler();
-			Iterator<VarLocal> it = scheduler.getLocals().iterator();
-			while (it.hasNext()) {
-				it.next();
-				it.remove();
-			}
+			scheduler.getLocals().clear();
 
 			List<Node> nodes = scheduler.getNodes();
 			nodes.clear();
+
 			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			nodes.add(block);
-			block.add(new Return(new Location(), new BoolExpr(true)));
+			block.add(IrFactory.eINSTANCE.createInstReturn(IrFactory.eINSTANCE
+					.createExprBool(true)));
 		}
 	}
 
@@ -301,7 +295,8 @@ public class StaticActorNormalizer {
 		Tag tag = new Tag();
 		tag.add(ACTION_NAME);
 
-		return new Action(new Location(), tag, input, output, scheduler, body);
+		return new Action(IrFactory.eINSTANCE.createLocation(), tag, input,
+				output, scheduler, body);
 	}
 
 	/**
@@ -310,13 +305,11 @@ public class StaticActorNormalizer {
 	 * @return the body of the static action
 	 */
 	private Procedure createBody() {
-		Location location = new Location();
-		variables = new OrderedMap<String, VarLocal>();
-		List<Node> nodes = new ArrayList<Node>();
-
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(ACTION_NAME,
-				false, location, IrFactory.eINSTANCE.createTypeVoid(),
-				new OrderedMap<String, VarLocal>(), variables, nodes);
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeVoid());
+
+		variables = procedure.getLocals();
 
 		// add state variables
 		addStateVariables(procedure, staticCls.getInputPattern());
@@ -348,24 +341,26 @@ public class StaticActorNormalizer {
 	 *            block to which return is to be added
 	 */
 	private void createInputCondition(NodeBlock block) {
+		final IrFactory factory = IrFactory.eINSTANCE;
+
 		Expression value;
-		Iterator<VarLocal> it = variables.iterator();
+		Iterator<Var> it = variables.iterator();
 		if (it.hasNext()) {
-			VarLocal previous = it.next();
-			value = new VarExpr(new Use(previous, block));
+			Var previous = it.next();
+			value = factory.createExprVar(previous);
 
 			while (it.hasNext()) {
-				VarLocal thisOne = (VarLocal) it.next();
-				value = new BinaryExpr(value, BinaryOp.LOGIC_AND, new VarExpr(
-						new Use(thisOne, block)),
-						IrFactory.eINSTANCE.createTypeBool());
+				Var thisOne = it.next();
+				value = factory.createExprBinary(value, OpBinary.LOGIC_AND,
+						factory.createExprVar(thisOne),
+						factory.createTypeBool());
 				previous = thisOne;
 			}
 		} else {
-			value = new BoolExpr(true);
+			value = factory.createExprBool(true);
 		}
 
-		Return returnInstr = new Return(value);
+		InstReturn returnInstr = factory.createInstReturn(value);
 		block.add(returnInstr);
 	}
 
@@ -391,17 +386,14 @@ public class StaticActorNormalizer {
 	 * @return an "isSchedulable" procedure
 	 */
 	private Procedure createScheduler() {
-		Location location = new Location();
-		variables = new OrderedMap<String, VarLocal>();
-		List<Node> nodes = new ArrayList<Node>();
-
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
-				SCHEDULER_NAME, false, location,
-				IrFactory.eINSTANCE.createTypeBool(),
-				new OrderedMap<String, VarLocal>(), variables, nodes);
+				SCHEDULER_NAME, IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeBool());
+
+		variables = procedure.getLocals();
 
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		nodes.add(block);
+		procedure.getNodes().add(block);
 
 		createInputCondition(block);
 

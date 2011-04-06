@@ -36,30 +36,22 @@ import java.util.Map.Entry;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
+import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -93,7 +85,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 			Pattern inputPattern, Pattern outputPattern) {
 		NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
 		nodeIf.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-		nodeIf.setValue(expr);
+		nodeIf.setCondition(expr);
 
 		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
 				outputPattern);
@@ -101,7 +93,8 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		List<Node> thenNodes = nodeIf.getThenNodes();
 		NodeBlock node = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
-		node.add(new Call(new Location(), null, body, callExprs));
+		node.add(IrFactory.eINSTANCE.createInstCall(
+				IrFactory.eINSTANCE.createLocation(), null, body, callExprs));
 
 		thenNodes.add(node);
 
@@ -115,12 +108,13 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 				inputPattern, outputPattern);
 
 		actor.getProcs().put(scheduler.getName(), scheduler);
-		VarLocal returnVar = target.newTempLocalVariable(file,
+		Var returnVar = target.newTempLocalVariable(file,
 				scheduler.getReturnType(), scheduler.getName() + "_ret");
-		node.add(new Call(new Location(), returnVar, scheduler, callExprs));
+		node.add(IrFactory.eINSTANCE.createInstCall(
+				IrFactory.eINSTANCE.createLocation(), returnVar, scheduler,
+				callExprs));
 
-		Use use = new Use(returnVar);
-		return new VarExpr(use);
+		return IrFactory.eINSTANCE.createExprVar(returnVar);
 	}
 
 	/**
@@ -132,21 +126,23 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	 */
 	private Procedure createIsSchedulable(Pattern input) {
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
-				"isSchedulable_SDF", new Location(),
+				"isSchedulable_SDF", IrFactory.eINSTANCE.createLocation(),
 				IrFactory.eINSTANCE.createTypeBool());
 
-		VarLocal result = procedure.newTempLocalVariable(file,
+		Var result = procedure.newTempLocalVariable(file,
 				IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		// create "then" nodes
-		Assign thenAssign = new Assign(result, new BoolExpr(true));
+		InstAssign thenAssign = IrFactory.eINSTANCE.createInstAssign(result,
+				IrFactory.eINSTANCE.createExprBool(true));
 		NodeBlock nodeBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		nodeBlock.add(thenAssign);
 		procedure.getNodes().add(nodeBlock);
 
 		// add the return
 		NodeBlock block = procedure.getLast();
-		block.add(new Return(new VarExpr(new Use(result))));
+		block.add(IrFactory.eINSTANCE.createInstReturn((IrFactory.eINSTANCE
+				.createExprVar(result))));
 
 		// convert to SSA form
 		new SSATransformation().visit(procedure);
@@ -228,8 +224,8 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		// merges actions
 		Procedure body = mergeSDFBodies(actions);
 
-		Action action = new Action(new Location(), new Tag(), input, output,
-				scheduler, body);
+		Action action = new Action(IrFactory.eINSTANCE.createLocation(),
+				new Tag(), input, output, scheduler, body);
 
 		// removes the actions, add the action merged
 		actor.getActions().removeAll(actions);
@@ -242,7 +238,8 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	}
 
 	private Procedure mergeSDFBodies(List<Action> actions) {
-		target = IrFactory.eINSTANCE.createProcedure("SDF", new Location(),
+		target = IrFactory.eINSTANCE.createProcedure("SDF",
+				IrFactory.eINSTANCE.createLocation(),
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		// Launch action
@@ -262,7 +259,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		}
 
 		NodeBlock lastBlock = target.getLast();
-		lastBlock.add(new Return(null));
+		lastBlock.add(IrFactory.eINSTANCE.createInstReturn());
 
 		return target;
 	}
@@ -271,23 +268,20 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 			Pattern inputPattern, Pattern outputPattern) {
 		List<Expression> exprs = new ArrayList<Expression>();
 
-		OrderedMap<String, VarLocal> parameters = procedure
-				.getParameters();
+		List<Var> parameters = procedure.getParameters();
 
 		// Add inputs to procedure parameters
-		for (Entry<Port, Var> entry : inputPattern.getVariableMap()
-				.entrySet()) {
+		for (Entry<Port, Var> entry : inputPattern.getVariableMap().entrySet()) {
 			Var var = entry.getValue();
-			parameters.put(var.getName(), (VarLocal) var);
-			exprs.add(new VarExpr(new Use(var)));
+			parameters.add(var);
+			exprs.add(IrFactory.eINSTANCE.createExprVar(var));
 		}
 
 		// Add outputs to procedure parameters
-		for (Entry<Port, Var> entry : outputPattern.getVariableMap()
-				.entrySet()) {
+		for (Entry<Port, Var> entry : outputPattern.getVariableMap().entrySet()) {
 			Var var = entry.getValue();
-			parameters.put(var.getName(), (VarLocal) var);
-			exprs.add(new VarExpr(new Use(var)));
+			parameters.add(var);
+			exprs.add(IrFactory.eINSTANCE.createExprVar(var));
 		}
 
 		return exprs;

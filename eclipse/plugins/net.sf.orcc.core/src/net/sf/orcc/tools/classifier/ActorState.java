@@ -35,13 +35,11 @@ import java.util.Map.Entry;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.User;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines the state of an actor as a set of scalar state variables
@@ -52,7 +50,7 @@ import net.sf.orcc.ir.User;
  */
 public class ActorState {
 
-	private Map<VarGlobal, Expression> state;
+	private Map<Var, Expression> state;
 
 	/**
 	 * Creates a new actor state initialized to all the state variables of the
@@ -62,22 +60,18 @@ public class ActorState {
 	 *            an actor
 	 */
 	public ActorState(Actor actor) {
-		state = new HashMap<VarGlobal, Expression>();
-		for (VarGlobal variable : actor.getStateVars()) {
+		state = new HashMap<Var, Expression>();
+		for (Var variable : actor.getStateVars()) {
 			Type type = variable.getType();
 			Expression constant = variable.getInitialValue();
 			if (constant != null && !type.isList()) {
 				// we might consider this constant if it is used by guards
 				boolean usedByGuard = false;
 				for (Use use : variable.getUses()) {
-					User user = use.getNode();
-					Procedure proc;
-					if (user instanceof Instruction) {
-						proc = ((Instruction) user).getBlock().getProcedure();
-					} else {
-						proc = ((NodeBlock) user).getProcedure();
-					}
-
+					// TODO remove this hackish thingy when actions are
+					// meta-modeled
+					Procedure proc = EcoreHelper.getContainerOfType(use,
+							Procedure.class);
 					if (proc.getName().startsWith("isSchedulable_")) {
 						usedByGuard = true;
 						break;
@@ -110,8 +104,8 @@ public class ActorState {
 	 * @return <code>true</code> if the condition stated above holds
 	 */
 	public boolean isInitialState() {
-		for (Entry<VarGlobal, Expression> entry : state.entrySet()) {
-			VarGlobal stateVariable = entry.getKey();
+		for (Entry<Var, Expression> entry : state.entrySet()) {
+			Var stateVariable = entry.getKey();
 			Expression value = stateVariable.getValue();
 			if (value == null) {
 				// oops not static!

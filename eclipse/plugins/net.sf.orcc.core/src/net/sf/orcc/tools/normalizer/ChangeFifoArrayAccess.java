@@ -31,18 +31,15 @@ package net.sf.orcc.tools.normalizer;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
-import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.OrderedMap;
 
@@ -56,7 +53,20 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 
-	private OrderedMap<String, VarGlobal> stateVars;
+	private OrderedMap<String, Var> stateVars;
+
+	private void updateIndex(Var var, List<Expression> indexes) {
+		if (indexes.size() < 2) {
+			Var varCount = stateVars.get(var.getName() + "_count");
+			ExprBinary expr = IrFactory.eINSTANCE.createExprBinary(
+					IrFactory.eINSTANCE.createExprVar(varCount), OpBinary.PLUS,
+					indexes.get(0), IrFactory.eINSTANCE.createTypeInt(32));
+
+			indexes.set(0, expr);
+		} else {
+			System.err.println("TODO index");
+		}
+	}
 
 	@Override
 	public void visit(Actor actor) {
@@ -64,39 +74,23 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 		super.visit(actor);
 	}
 
-	private void updateIndex(Var var, Instruction instr,
-			List<Expression> indexes) {
-
-		if (indexes.size() < 2) {
-			Var varCount = stateVars.get(var.getName() + "_count");
-
-			Use use = new Use(varCount, instr);
-			BinaryExpr expr = new BinaryExpr(new VarExpr(use), BinaryOp.PLUS,
-					indexes.get(0), IrFactory.eINSTANCE.createTypeInt(32));
-
-			indexes.set(0, expr);
-
-		} else {
-			System.err.println("TODO index");
-		}
-	}
-
 	@Override
-	public void visit(Load load) {
+	public void visit(InstLoad load) {
 		Use use = load.getSource();
 		Var var = use.getVariable();
-		if (!var.isGlobal() && isPort((VarLocal) var)) {
-			load.setSource(new Use(stateVars.get(var.getName()), load));
-			updateIndex(var, load, load.getIndexes());
+		if (!var.isGlobal() && isPort(var)) {
+			use.setVariable(stateVars.get(var.getName()));
+			updateIndex(var, load.getIndexes());
 		}
 	}
 
 	@Override
-	public void visit(Store store) {
-		Var var = store.getTarget();
-		if (!var.isGlobal() && isPort((VarLocal) var)) {
-			store.setTarget(stateVars.get(var.getName()));
-			updateIndex(var, store, store.getIndexes());
+	public void visit(InstStore store) {
+		Def def = store.getTarget();
+		Var var = def.getVariable();
+		if (!var.isGlobal() && isPort(var)) {
+			def.setVariable(stateVars.get(var.getName()));
+			updateIndex(var, store.getIndexes());
 		}
 	}
 
