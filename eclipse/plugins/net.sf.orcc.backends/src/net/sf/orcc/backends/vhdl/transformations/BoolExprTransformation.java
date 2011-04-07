@@ -108,17 +108,16 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 * @param iit
 	 *            list iterator
 	 */
-	private void createNewBlock(Instruction inst) {
-		NodeBlock blkSource = inst.getBlock();
-		List<Instruction> instructions = blkSource.getInstructions();
+	private void createNewBlock(NodeBlock block) {
+		List<Instruction> instructions = block.getInstructions();
 
-		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		block.getInstructions().addAll(
+		NodeBlock targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		targetBlock.getInstructions().addAll(
 				instructions.subList(itInstruction.nextIndex(),
 						instructions.size()));
 
 		// adds this block after the NodeIf
-		itNode.add(block);
+		itNode.add(targetBlock);
 
 		// moves the iterator back so the new block will be visited next
 		itNode.previous();
@@ -146,11 +145,12 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 				assign.getTarget().setVariable(null);
 
 				// go back to this assign, and deletes it
+				NodeBlock block = assign.getBlock();
 				itInstruction.previous();
 				itInstruction.remove();
 
 				// move the rest of instructions to a new block
-				createNewBlock(assign);
+				createNewBlock(block);
 			}
 		}
 	}
@@ -166,7 +166,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 
 				// moves this return and remaining instructions to a new block
 				itInstruction.previous();
-				createNewBlock(returnInstr);
+				createNewBlock(returnInstr.getBlock());
 			}
 		}
 	}
@@ -183,7 +183,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 
 				// moves this store and remaining instructions to a new block
 				itInstruction.previous();
-				createNewBlock(store);
+				createNewBlock(store.getBlock());
 			}
 		}
 	}

@@ -113,7 +113,7 @@ VarDeclaration(variable) ::= <<
 <if(variable.type.list)
 >-- !! error !! variable <variable.name> tabular type size = <listSize(variable.type.dimensions)> of <variable.type>;<
 else
->variable <variable.name> : <variable.type>;<
+>variable <variable.indexedName> : <variable.type>;<
 endif>
 >>
 
@@ -151,12 +151,12 @@ resetReadWriteEnable(variable) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 CastStore(target, targetSize, value, cast)::= <<
 <if(cast.extended)
-><target> := <value><
+><target.indexedName> := <value><
 else
 ><if(target.type.uint)
-><target> := ucast(<value>, <value.type.size>, <targetSize>)<  
+><target.indexedName> := ucast(<value>, <value.type.size>, <targetSize>)<  
   else
-><target> := cast(<value>, <value.type.size>, <targetSize>)<  
+><target.indexedName> := cast(<value>, <value.type.size>, <targetSize>)<  
   endif><
 endif>
 >>
@@ -181,19 +181,19 @@ endif>
 
 printAssign(assign) ::= <<
 <if (assign.cast)
-><CastStore(target=assign.target, targetSize=assign.target.type.size, value=assign.value, cast=assign.cast)>;<
+><CastStore(target=assign.target.variable, targetSize=assign.target.variable.type.size, value=assign.value, cast=assign.cast)>;<
 else
-><assign.target> := <assign.value>;<
+><assign.target.variable.indexedName> := <assign.value>;<
 endif>
 >>
 
 printAssignIndex(assignIndex) ::= <<
-<assignIndex.target> := to_integer(unsigned(<assignIndex.indexes: {index | std_logic_vector(to_unsigned(<index>, <index.type.size>))}; separator=" & ">));
+<assignIndex.target.variable.indexedName> := to_integer(unsigned(<assignIndex.indexes: {index | std_logic_vector(to_unsigned(<index>, <index.type.size>))}; separator=" & ">));
 >>
 
 printCall(call) ::= <<
 <if(call.target)
-><call.target> := <call.procedure.name>(<call.procedure.loadedVariables: {var | <var>, }><call.parameters: {param | <param>, }>'1');<
+><call.target.variable.indexedName> := <call.procedure.name>(<call.procedure.loadedVariables: {var | <var>, }><call.parameters: {param | <param>, }>'1');<
 elseif(call.parameters)
 ><call.procedure.name>(<call.parameters; separator=", ">, '1');<
 else
@@ -221,11 +221,11 @@ printLoad(load) ::= <<
 <if(load.indexes)
 ><if (action.inputPattern.inverseVariableMap.(load.source.variable) || action.outputPattern.inverseVariableMap.(load.source.variable))
 ><if(load.cast)><CastLoad(target=load.target, source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;<
-else><load.target> := <procedure.name>_<getPort(load.source.variable)>;<
+else><load.target.variable.indexedName> := <procedure.name>_<getPort(load.source.variable.name)>;<
 endif
-><else><load.target> := <load.source>(<load.indexes : {index | <index>}; separator=", ">);<
+><else><load.target.variable.indexedName> := <load.source.name>(<load.indexes : {index | <index>}; separator=", ">);<
 endif
-><else><load.target> := <load.source>;<endif>
+><else><load.target.variable.indexedName> := <load.source.name>;<endif>
 >>
 
 // a "return" must be transformed when the attribute "transformReturn"
@@ -243,17 +243,17 @@ endif>
 
 printStore(store) ::= <<
 <if(store.indexes)
- ><if(action.inputPattern.inverseVariableMap.(store.target) || action.outputPattern.inverseVariableMap.(store.target))
+ ><if(action.inputPattern.inverseVariableMap.(store.target.variable) || action.outputPattern.inverseVariableMap.(store.target.variable))
   ><if(store.cast)
     ><CastStore(value=store.value, target={<procedure.name>_<getPort(store.target)>}, targetSize={<getPortSize(store.target)>}, cast=store.cast)>;<
    else
-    ><procedure.name>_<getPort(store.target)> := <store.value>;<
+    ><procedure.name>_<getPort(store.target.variable)> := <store.value>;<
    endif><
   else
-   ><store.target>(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;<
+   ><store.target.variable.name>(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;<
   endif><
 else
- ><store.target> \<= <store.value>;<
+ ><store.target.variable.name> \<= <store.value>;<
 endif>
 >>
 
@@ -369,12 +369,12 @@ end loop;
 function(procedure) ::= <<
 <if (!procedure.native)
   ><if (procedure.returnType.void)
->procedure <procedure>(<printParameters(procedure.parameters.list)>dummy : std_logic) is
+>procedure <procedure>(<printParameters(procedure.parameters)>dummy : std_logic) is
 <else
 >function <procedure>(<VarUsed(procedure)><printParameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType)> is
 <endif>
-  <if(procedure.locals.list)
-><procedure.locals.list: {variable| <VarInFctDeclaration(variable)>;<\n>}><
+  <if(procedure.locals)
+><procedure.locals: {variable| <VarInFctDeclaration(variable)>;<\n>}><
   endif>
 begin
   <printNodes(procedure.nodes)>
@@ -388,7 +388,7 @@ VarUsed(procedure) ::= <<
 >>
 
 printParameters(procedure) ::= <<
-<procedure.parameters.list: functionParameter()>
+<procedure.parameters: functionParameter()>
 >>
 
 functionParameter(variable) ::= <<
@@ -437,8 +437,8 @@ printProcedure(procedure, transformReturn) ::= <<
 >>
 
 printLocals(procedure) ::= <<
-<if(procedure.locals.list)
-><procedure.locals.list: VarDeclaration(); separator="\n"><
+<if(procedure.locals)
+><procedure.locals: VarDeclaration(); separator="\n"><
 endif>
 >>
 

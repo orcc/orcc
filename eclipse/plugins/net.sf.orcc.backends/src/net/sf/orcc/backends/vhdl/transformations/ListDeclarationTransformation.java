@@ -60,7 +60,8 @@ public class ListDeclarationTransformation extends AbstractActorVisitor {
 	private void flattenList(Expression expression, ExprList list) {
 		if (expression.isListExpr()) {
 			List<Expression> expressions = ((ExprList) expression).getValue();
-			for (Expression subExpr : expressions) {
+			while (!expressions.isEmpty()) {
+				Expression subExpr = expressions.get(0);
 				flattenList(subExpr, list);
 			}
 		} else {
