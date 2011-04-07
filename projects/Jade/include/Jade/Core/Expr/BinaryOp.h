@@ -40,6 +40,7 @@
 #define BINARYOP_H
 
 #include <string>
+#include <cstdio>
 //------------------------------
 
 

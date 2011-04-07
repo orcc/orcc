@@ -43,7 +43,7 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/GlobalVariable.h"
 
-#include "Jade/Core/Moc/SDFMoC.h"
+#include "Jade/Core/MoC/SDFMoC.h"
 #include "Jade/Merger/SuperInstance.h"
 //------------------------------
 

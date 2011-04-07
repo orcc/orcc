@@ -22,9 +22,9 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 add_library (RoundRobinScheduler
 	ActionSchedulerAdder.cpp
 	ActionSchedulerAdder.h
-	CSDFSCheduler.cpp
+	CSDFScheduler.cpp
 	CSDFScheduler.h
-	DPNSCheduler.cpp
+	DPNScheduler.cpp
 	DPNScheduler.h
 	QSDFScheduler.cpp
 	QSDFScheduler.h

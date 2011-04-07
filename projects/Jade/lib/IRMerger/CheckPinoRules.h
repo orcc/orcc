@@ -103,7 +103,7 @@ private:
 	Network* network;
 
 	/** Path found*/
-	std::list<std::list<Instance*>> paths;
+	std::list<std::list<Instance*> > paths;
 };
 
 

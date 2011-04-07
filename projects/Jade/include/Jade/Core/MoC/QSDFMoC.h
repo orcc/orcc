@@ -92,11 +92,11 @@ public:
 	 * 
 	 * @return a map of configurations
 	 */
-	std::list<std::pair<Action*, CSDFMoC*>>* getConfigurations() {
+	std::list<std::pair<Action*, CSDFMoC*> >* getConfigurations() {
 		return &configurations;
 	}
 private:
-	std::list<std::pair<Action*, CSDFMoC*>> configurations;
+	std::list<std::pair<Action*, CSDFMoC*> > configurations;
 
 };
 

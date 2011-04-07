@@ -65,7 +65,7 @@ class FifoCircular : public AbstractFifo {
 		llvm::GlobalVariable* ArrayFifoBuffer;
 		llvm::GlobalVariable* ArrayContent;
 
-		void createConnection();
+		virtual void createConnection();
 };
 
 #endif

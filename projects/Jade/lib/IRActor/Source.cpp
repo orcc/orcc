@@ -37,6 +37,8 @@
 
 //------------------------------
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
 
 #include "Jade/Actor/Source.h"
 //------------------------------

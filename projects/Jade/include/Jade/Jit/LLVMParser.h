@@ -118,7 +118,7 @@ private:
 	 * @param package : package which will be the archive
 	 *
      */
-	void LLVMParser::openArchive(Package* package);
+	void openArchive(Package* package);
 
 	/** default directory of the actor */
 	std::string directory;

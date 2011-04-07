@@ -40,6 +40,7 @@
 #include <list>
 #include <math.h>
 #include <sstream>
+#include <cstdlib>
 
 #include "Rational.h"
 //------------------------------

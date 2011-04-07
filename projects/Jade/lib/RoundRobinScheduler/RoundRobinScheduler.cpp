@@ -40,6 +40,7 @@
 #include <iostream>
 #include <map>
 #include <sys/stat.h> 
+#include <cstdio>
 
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
@@ -63,7 +64,7 @@
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/RoundRobinScheduler/RoundRobinScheduler.h"
 
-#include "Jade/Actor/display.h"
+#include "Jade/Actor/Display.h"
 //------------------------------
 
 using namespace std;

@@ -55,9 +55,9 @@ QSDFScheduler::QSDFScheduler(llvm::LLVMContext& C, Decoder* decoder) : CSDFSched
 }
 
 void QSDFScheduler::createScheduler(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* scheduler){
-	list<pair<Action*, CSDFMoC*>>::iterator it;
+	list<pair<Action*, CSDFMoC*> >::iterator it;
 	QSDFMoC* qsdMoC = (QSDFMoC*)instance->getMoC();
-	list<pair<Action*, CSDFMoC*>>* configurations = qsdMoC->getConfigurations();
+	list<pair<Action*, CSDFMoC*> >* configurations = qsdMoC->getConfigurations();
 	
 	for(it = configurations->begin(); it != configurations->end(); it++){
 		BB = createConfigurationTest(it->first, it->second, BB, incBB, returnBB, scheduler);

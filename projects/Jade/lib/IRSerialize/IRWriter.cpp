@@ -450,8 +450,8 @@ QSDFMoC* IRWriter::writeQSDFMoC(QSDFMoC* csdfMoC){
 	QSDFMoC* newqsdfMoC = new QSDFMoC();
 	
 	// Copy configurations of the QSDFMoC
-	list<pair<Action*, CSDFMoC*>>::iterator it;
-	list<pair<Action*, CSDFMoC*>>* configurations = csdfMoC->getConfigurations();
+	list<pair<Action*, CSDFMoC*> >::iterator it;
+	list<pair<Action*, CSDFMoC*> >* configurations = csdfMoC->getConfigurations();
 
 	for( it = configurations->begin(); it != configurations->end(); it++){
 		pair<Action*, CSDFMoC*> newConfiguration = writeConfiguration(it->first, it->second);

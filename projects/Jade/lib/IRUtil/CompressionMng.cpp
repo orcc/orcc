@@ -42,6 +42,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <cstdio>
 //------------------------------
 
 #define BUFLEN	16384
