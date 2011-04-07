@@ -7,6 +7,10 @@
 package net.sf.orcc.backends.instructions.impl;
 
 import net.sf.orcc.backends.instructions.InstAssignIndex;
+import net.sf.orcc.backends.instructions.InstRam;
+import net.sf.orcc.backends.instructions.InstRamRead;
+import net.sf.orcc.backends.instructions.InstRamSetAddress;
+import net.sf.orcc.backends.instructions.InstRamWrite;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
 import net.sf.orcc.backends.instructions.InstSplit;
@@ -14,6 +18,7 @@ import net.sf.orcc.backends.instructions.InstTernary;
 
 import net.sf.orcc.ir.IrPackage;
 
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
@@ -47,6 +52,34 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * @generated
 	 */
 	private EClass instSplitEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass instRamEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass instRamReadEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass instRamSetAddressEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass instRamWriteEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -207,6 +240,87 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getInstRam() {
+		return instRamEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getInstRam_Port() {
+		return (EAttribute)instRamEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstRam_Variable() {
+		return (EReference)instRamEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getInstRamRead() {
+		return instRamReadEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstRamRead_Target() {
+		return (EReference)instRamReadEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getInstRamSetAddress() {
+		return instRamSetAddressEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstRamSetAddress_Indexes() {
+		return (EReference)instRamSetAddressEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getInstRamWrite() {
+		return instRamWriteEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstRamWrite_Value() {
+		return (EReference)instRamWriteEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public InstructionsFactory getInstructionsFactory() {
 		return (InstructionsFactory)getEFactoryInstance();
 	}
@@ -242,6 +356,19 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		createEReference(instAssignIndexEClass, INST_ASSIGN_INDEX__LIST_TYPE);
 
 		instSplitEClass = createEClass(INST_SPLIT);
+
+		instRamEClass = createEClass(INST_RAM);
+		createEAttribute(instRamEClass, INST_RAM__PORT);
+		createEReference(instRamEClass, INST_RAM__VARIABLE);
+
+		instRamReadEClass = createEClass(INST_RAM_READ);
+		createEReference(instRamReadEClass, INST_RAM_READ__TARGET);
+
+		instRamSetAddressEClass = createEClass(INST_RAM_SET_ADDRESS);
+		createEReference(instRamSetAddressEClass, INST_RAM_SET_ADDRESS__INDEXES);
+
+		instRamWriteEClass = createEClass(INST_RAM_WRITE);
+		createEReference(instRamWriteEClass, INST_RAM_WRITE__VALUE);
 	}
 
 	/**
@@ -278,6 +405,10 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		instTernaryEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		instAssignIndexEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 		instSplitEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		instRamEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		instRamReadEClass.getESuperTypes().add(this.getInstRam());
+		instRamSetAddressEClass.getESuperTypes().add(this.getInstRam());
+		instRamWriteEClass.getESuperTypes().add(this.getInstRam());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(instTernaryEClass, InstTernary.class, "InstTernary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -292,6 +423,19 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		initEReference(getInstAssignIndex_ListType(), theIrPackage.getType(), null, "listType", null, 0, 1, InstAssignIndex.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(instSplitEClass, InstSplit.class, "InstSplit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(instRamEClass, InstRam.class, "InstRam", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getInstRam_Port(), ecorePackage.getEInt(), "port", null, 0, 1, InstRam.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstRam_Variable(), theIrPackage.getVar(), null, "variable", null, 0, 1, InstRam.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(instRamReadEClass, InstRamRead.class, "InstRamRead", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstRamRead_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstRamRead.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(instRamSetAddressEClass, InstRamSetAddress.class, "InstRamSetAddress", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstRamSetAddress_Indexes(), theIrPackage.getExpression(), null, "indexes", null, 0, -1, InstRamSetAddress.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(instRamWriteEClass, InstRamWrite.class, "InstRamWrite", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstRamWrite_Value(), theIrPackage.getExpression(), null, "value", null, 0, 1, InstRamWrite.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

@@ -26,72 +26,32 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.ram.instructions;
+package net.sf.orcc.backends.instructions;
 
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.Expression;
 
 /**
- * This class defines a specific instruction that manipulates a RAM associated
- * to a var.
+ * This interface defines a specific instruction that writes data to a RAM.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model extends="net.sf.orcc.backends.instructions.InstRam"
  */
-public abstract class RamInstruction extends SpecificInstruction {
-
-	private int port;
-
-	private Var var;
+public interface InstRamWrite extends InstRam {
 
 	/**
-	 * Creates a new RamRead
-	 */
-	public RamInstruction() {
-		super(new Location());
-	}
-
-	/**
-	 * Returns the port on which operations should be performed.
+	 * Returns the value of this node.
 	 * 
-	 * @return the port on which operations should be performed
+	 * @return the value of this node
+	 * @model containment="true"
 	 */
-	public int getPort() {
-		return port;
-	}
+	Expression getValue();
 
 	/**
-	 * Returns the var to which the RAM is associated.
+	 * Sets the value of this node. Uses are updated to point to this node.
 	 * 
-	 * @return the var to which the RAM is associated
+	 * @param value
+	 *            an expression
 	 */
-	public Var getVariable() {
-		return var;
-	}
-
-	/**
-	 * Sets the port on which operations should be performed.
-	 * 
-	 * @param port
-	 *            the port on which operations should be performed
-	 */
-	public void setPort(int port) {
-		if (port != 1 && port != 2) {
-			throw new IllegalArgumentException();
-		}
-
-		this.port = port;
-	}
-
-	/**
-	 * Sets the var to which the RAM is associated.
-	 * 
-	 * @param var
-	 *            the var to which the RAM is associated
-	 */
-	public void setVariable(Var var) {
-		this.var = var;
-	}
+	void setValue(Expression value);
 
 }

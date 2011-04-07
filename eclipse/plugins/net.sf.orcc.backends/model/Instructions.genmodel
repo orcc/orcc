@@ -19,5 +19,18 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstAssignIndex/listType"/>
     </genClasses>
     <genClasses ecoreClass="Instructions.ecore#//InstSplit"/>
+    <genClasses ecoreClass="Instructions.ecore#//InstRam">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Instructions.ecore#//InstRam/port"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRam/variable"/>
+    </genClasses>
+    <genClasses ecoreClass="Instructions.ecore#//InstRamRead">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRamRead/target"/>
+    </genClasses>
+    <genClasses ecoreClass="Instructions.ecore#//InstRamSetAddress">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRamSetAddress/indexes"/>
+    </genClasses>
+    <genClasses ecoreClass="Instructions.ecore#//InstRamWrite">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRamWrite/value"/>
+    </genClasses>
   </genPackages>
 </genmodel:GenModel>

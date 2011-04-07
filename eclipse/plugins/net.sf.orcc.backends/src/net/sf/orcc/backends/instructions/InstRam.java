@@ -26,50 +26,50 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.ram.instructions;
+package net.sf.orcc.backends.instructions;
 
-import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.util.CommonNodeOperations;
+import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.Var;
 
 /**
- * This class defines a specific instruction that reads data from a RAM.
+ * This interface defines a specific instruction that manipulates a RAM
+ * associated to a var.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model extends="net.sf.orcc.ir.InstSpecific"
  */
-public class RamRead extends RamInstruction implements LocalTargetContainer {
-
-	private VarLocal target;
-
-	@Override
-	public VarLocal getTarget() {
-		return target;
-	}
-
-	@Override
-	public void internalSetTarget(VarLocal target) {
-		this.target = target;
-	}
+public interface InstRam extends InstSpecific {
 
 	/**
-	 * Returns <code>true</code>. Intended for use in template.
+	 * Returns the port on which operations should be performed.
 	 * 
-	 * @return <code>true</code>
+	 * @return the port on which operations should be performed
+	 * @model
 	 */
-	public boolean isRamRead() {
-		return true;
-	}
+	int getPort();
 
-	@Override
-	public void setTarget(VarLocal target) {
-		CommonNodeOperations.setTarget(this, target);
-	}
+	/**
+	 * Returns the var to which the RAM is associated.
+	 * 
+	 * @return the var to which the RAM is associated
+	 * @model
+	 */
+	Var getVariable();
 
-	@Override
-	public String toString() {
-		return getTarget().getName() + " := " + getVariable().getName()
-				+ "_q_p" + getPort();
-	}
+	/**
+	 * Sets the port on which operations should be performed.
+	 * 
+	 * @param port
+	 *            the port on which operations should be performed
+	 */
+	void setPort(int port);
+
+	/**
+	 * Sets the var to which the RAM is associated.
+	 * 
+	 * @param var
+	 *            the var to which the RAM is associated
+	 */
+	void setVariable(Var var);
 
 }

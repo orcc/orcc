@@ -87,6 +87,22 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 				return createInstSplitAdapter();
 			}
 			@Override
+			public Adapter caseInstRam(InstRam object) {
+				return createInstRamAdapter();
+			}
+			@Override
+			public Adapter caseInstRamRead(InstRamRead object) {
+				return createInstRamReadAdapter();
+			}
+			@Override
+			public Adapter caseInstRamSetAddress(InstRamSetAddress object) {
+				return createInstRamSetAddressAdapter();
+			}
+			@Override
+			public Adapter caseInstRamWrite(InstRamWrite object) {
+				return createInstRamWriteAdapter();
+			}
+			@Override
 			public Adapter caseInstruction(Instruction object) {
 				return createInstructionAdapter();
 			}
@@ -153,6 +169,62 @@ public class InstructionsAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createInstSplitAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstRam <em>Inst Ram</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.instructions.InstRam
+	 * @generated
+	 */
+	public Adapter createInstRamAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstRamRead <em>Inst Ram Read</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.instructions.InstRamRead
+	 * @generated
+	 */
+	public Adapter createInstRamReadAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstRamSetAddress <em>Inst Ram Set Address</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.instructions.InstRamSetAddress
+	 * @generated
+	 */
+	public Adapter createInstRamSetAddressAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.instructions.InstRamWrite <em>Inst Ram Write</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.instructions.InstRamWrite
+	 * @generated
+	 */
+	public Adapter createInstRamWriteAdapter() {
 		return null;
 	}
 

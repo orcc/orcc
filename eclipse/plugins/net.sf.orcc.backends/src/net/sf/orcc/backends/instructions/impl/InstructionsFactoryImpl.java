@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.backends.instructions.impl;
 
+import net.sf.orcc.backends.instructions.*;
 import java.util.List;
 
 import net.sf.orcc.backends.instructions.InstAssignIndex;
@@ -71,6 +72,10 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 			case InstructionsPackage.INST_TERNARY: return createInstTernary();
 			case InstructionsPackage.INST_ASSIGN_INDEX: return createInstAssignIndex();
 			case InstructionsPackage.INST_SPLIT: return createInstSplit();
+			case InstructionsPackage.INST_RAM: return createInstRam();
+			case InstructionsPackage.INST_RAM_READ: return createInstRamRead();
+			case InstructionsPackage.INST_RAM_SET_ADDRESS: return createInstRamSetAddress();
+			case InstructionsPackage.INST_RAM_WRITE: return createInstRamWrite();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -124,6 +129,46 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 	public InstSplit createInstSplit() {
 		InstSplitImpl instSplit = new InstSplitImpl();
 		return instSplit;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstRam createInstRam() {
+		InstRamImpl instRam = new InstRamImpl();
+		return instRam;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstRamRead createInstRamRead() {
+		InstRamReadImpl instRamRead = new InstRamReadImpl();
+		return instRamRead;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstRamSetAddress createInstRamSetAddress() {
+		InstRamSetAddressImpl instRamSetAddress = new InstRamSetAddressImpl();
+		return instRamSetAddress;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstRamWrite createInstRamWrite() {
+		InstRamWriteImpl instRamWrite = new InstRamWriteImpl();
+		return instRamWrite;
 	}
 
 	/**

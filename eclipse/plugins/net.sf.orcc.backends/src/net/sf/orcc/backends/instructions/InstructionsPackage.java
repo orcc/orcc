@@ -8,6 +8,7 @@ package net.sf.orcc.backends.instructions;
 
 import net.sf.orcc.ir.IrPackage;
 
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
@@ -209,6 +210,218 @@ public interface InstructionsPackage extends EPackage {
 
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstRamImpl <em>Inst Ram</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.instructions.impl.InstRamImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstRam()
+	 * @generated
+	 */
+	int INST_RAM = 3;
+
+	/**
+	 * The feature id for the '<em><b>Location</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Port</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM__PORT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Variable</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM__VARIABLE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Inst Ram</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstRamReadImpl <em>Inst Ram Read</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.instructions.impl.InstRamReadImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstRamRead()
+	 * @generated
+	 */
+	int INST_RAM_READ = 4;
+
+	/**
+	 * The feature id for the '<em><b>Location</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__LOCATION = INST_RAM__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Port</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__PORT = INST_RAM__PORT;
+
+	/**
+	 * The feature id for the '<em><b>Variable</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__VARIABLE = INST_RAM__VARIABLE;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__TARGET = INST_RAM_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Inst Ram Read</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ_FEATURE_COUNT = INST_RAM_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstRamSetAddressImpl <em>Inst Ram Set Address</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.instructions.impl.InstRamSetAddressImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstRamSetAddress()
+	 * @generated
+	 */
+	int INST_RAM_SET_ADDRESS = 5;
+
+	/**
+	 * The feature id for the '<em><b>Location</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__LOCATION = INST_RAM__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Port</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__PORT = INST_RAM__PORT;
+
+	/**
+	 * The feature id for the '<em><b>Variable</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__VARIABLE = INST_RAM__VARIABLE;
+
+	/**
+	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__INDEXES = INST_RAM_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Inst Ram Set Address</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS_FEATURE_COUNT = INST_RAM_FEATURE_COUNT + 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstRamWriteImpl <em>Inst Ram Write</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.instructions.impl.InstRamWriteImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstRamWrite()
+	 * @generated
+	 */
+	int INST_RAM_WRITE = 6;
+
+	/**
+	 * The feature id for the '<em><b>Location</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__LOCATION = INST_RAM__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Port</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__PORT = INST_RAM__PORT;
+
+	/**
+	 * The feature id for the '<em><b>Variable</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__VARIABLE = INST_RAM__VARIABLE;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__VALUE = INST_RAM_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Inst Ram Write</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE_FEATURE_COUNT = INST_RAM_FEATURE_COUNT + 1;
+
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstTernary <em>Inst Ternary</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -314,6 +527,101 @@ public interface InstructionsPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getInstSplit();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstRam <em>Inst Ram</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Inst Ram</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRam
+	 * @generated
+	 */
+	EClass getInstRam();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.instructions.InstRam#getPort <em>Port</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Port</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRam#getPort()
+	 * @see #getInstRam()
+	 * @generated
+	 */
+	EAttribute getInstRam_Port();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.instructions.InstRam#getVariable <em>Variable</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Variable</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRam#getVariable()
+	 * @see #getInstRam()
+	 * @generated
+	 */
+	EReference getInstRam_Variable();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstRamRead <em>Inst Ram Read</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Inst Ram Read</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRamRead
+	 * @generated
+	 */
+	EClass getInstRamRead();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstRamRead#getTarget <em>Target</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Target</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRamRead#getTarget()
+	 * @see #getInstRamRead()
+	 * @generated
+	 */
+	EReference getInstRamRead_Target();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstRamSetAddress <em>Inst Ram Set Address</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Inst Ram Set Address</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRamSetAddress
+	 * @generated
+	 */
+	EClass getInstRamSetAddress();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.instructions.InstRamSetAddress#getIndexes <em>Indexes</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Indexes</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRamSetAddress#getIndexes()
+	 * @see #getInstRamSetAddress()
+	 * @generated
+	 */
+	EReference getInstRamSetAddress_Indexes();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstRamWrite <em>Inst Ram Write</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Inst Ram Write</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRamWrite
+	 * @generated
+	 */
+	EClass getInstRamWrite();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstRamWrite#getValue <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Value</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstRamWrite#getValue()
+	 * @see #getInstRamWrite()
+	 * @generated
+	 */
+	EReference getInstRamWrite_Value();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -422,6 +730,86 @@ public interface InstructionsPackage extends EPackage {
 		 * @generated
 		 */
 		EClass INST_SPLIT = eINSTANCE.getInstSplit();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.InstRamImpl <em>Inst Ram</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.instructions.impl.InstRamImpl
+		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstRam()
+		 * @generated
+		 */
+		EClass INST_RAM = eINSTANCE.getInstRam();
+
+		/**
+		 * The meta object literal for the '<em><b>Port</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute INST_RAM__PORT = eINSTANCE.getInstRam_Port();
+
+		/**
+		 * The meta object literal for the '<em><b>Variable</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INST_RAM__VARIABLE = eINSTANCE.getInstRam_Variable();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.InstRamReadImpl <em>Inst Ram Read</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.instructions.impl.InstRamReadImpl
+		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstRamRead()
+		 * @generated
+		 */
+		EClass INST_RAM_READ = eINSTANCE.getInstRamRead();
+
+		/**
+		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INST_RAM_READ__TARGET = eINSTANCE.getInstRamRead_Target();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.InstRamSetAddressImpl <em>Inst Ram Set Address</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.instructions.impl.InstRamSetAddressImpl
+		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstRamSetAddress()
+		 * @generated
+		 */
+		EClass INST_RAM_SET_ADDRESS = eINSTANCE.getInstRamSetAddress();
+
+		/**
+		 * The meta object literal for the '<em><b>Indexes</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INST_RAM_SET_ADDRESS__INDEXES = eINSTANCE.getInstRamSetAddress_Indexes();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.InstRamWriteImpl <em>Inst Ram Write</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.instructions.impl.InstRamWriteImpl
+		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstRamWrite()
+		 * @generated
+		 */
+		EClass INST_RAM_WRITE = eINSTANCE.getInstRamWrite();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INST_RAM_WRITE__VALUE = eINSTANCE.getInstRamWrite_Value();
 
 	}
 

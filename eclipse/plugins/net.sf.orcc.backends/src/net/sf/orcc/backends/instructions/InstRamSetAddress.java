@@ -26,50 +26,26 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.ram.instructions;
+package net.sf.orcc.backends.instructions;
 
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.ValueContainer;
-import net.sf.orcc.ir.util.CommonNodeOperations;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a specific instruction that writes data to a RAM.
+ * This interface defines a specific instruction that sets the address of a RAM.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model extends="net.sf.orcc.backends.instructions.InstRam"
  */
-public class RamWrite extends RamInstruction implements ValueContainer {
-
-	private Expression value;
-
-	@Override
-	public Expression getValue() {
-		return value;
-	}
-
-	@Override
-	public void internalSetValue(Expression value) {
-		this.value = value;
-	}
+public interface InstRamSetAddress extends InstRam {
 
 	/**
-	 * Returns <code>true</code>. Intended for use in template.
+	 * Returns the list of indexes of this instruction.
 	 * 
-	 * @return <code>true</code>
+	 * @return the list of indexes of this instruction
+	 * @model containment="true"
 	 */
-	public boolean isRamWrite() {
-		return true;
-	}
-
-	@Override
-	public void setValue(Expression value) {
-		CommonNodeOperations.setValue(this, value);
-	}
-
-	@Override
-	public String toString() {
-		return getVariable().getName() + "_p" + getPort() + " <= "
-				+ getValue().toString();
-	}
+	EList<Expression> getIndexes();
 
 }

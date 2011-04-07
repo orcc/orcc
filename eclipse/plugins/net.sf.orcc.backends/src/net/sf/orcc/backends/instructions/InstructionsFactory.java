@@ -56,6 +56,42 @@ public interface InstructionsFactory extends EFactory {
 	 */
 	InstSplit createInstSplit();
 
+	/**
+	 * Returns a new object of class '<em>Inst Ram</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Ram</em>'.
+	 * @generated
+	 */
+	InstRam createInstRam();
+
+	/**
+	 * Returns a new object of class '<em>Inst Ram Read</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Ram Read</em>'.
+	 * @generated
+	 */
+	InstRamRead createInstRamRead();
+
+	/**
+	 * Returns a new object of class '<em>Inst Ram Set Address</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Ram Set Address</em>'.
+	 * @generated
+	 */
+	InstRamSetAddress createInstRamSetAddress();
+
+	/**
+	 * Returns a new object of class '<em>Inst Ram Write</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Ram Write</em>'.
+	 * @generated
+	 */
+	InstRamWrite createInstRamWrite();
+
 	InstTernary createInstTernary(Var target, Expression condition,
 			Expression trueValue, Expression falseValue);
 
