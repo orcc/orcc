@@ -270,20 +270,22 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 *            arguments
 	 */
 	public void visit(List<Node> nodes) {
-		ListIterator<Node> it = nodes.listIterator();
-		while (it.hasNext()) {
-			Node node = it.next();
-			itNode = it;
+		ListIterator<Node> oldItNode = itNode;
+		itNode = nodes.listIterator();
+		while (itNode.hasNext()) {
+			Node node = itNode.next();
 			node.accept(this);
 		}
+		
+		// restore old iterator
+		itNode = oldItNode;
 	}
 
 	@Override
 	public void visit(NodeBlock nodeBlock) {
-		ListIterator<Instruction> it = nodeBlock.listIterator();
-		while (it.hasNext()) {
-			Instruction instruction = it.next();
-			itInstruction = it;
+		itInstruction = nodeBlock.listIterator();
+		while (itInstruction.hasNext()) {
+			Instruction instruction = itInstruction.next();
 			instruction.accept(this);
 		}
 	}
