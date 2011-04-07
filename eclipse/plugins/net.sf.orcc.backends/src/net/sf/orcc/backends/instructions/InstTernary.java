@@ -1,8 +1,30 @@
-/**
- * <copyright>
- * </copyright>
- *
- * $Id$
+/*
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
 package net.sf.orcc.backends.instructions;
 
@@ -11,127 +33,75 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstSpecific;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Ternary Operation</b></em>'.
- * <!-- end-user-doc -->
- *
- * <p>
- * The following features are supported:
- * <ul>
- *   <li>{@link net.sf.orcc.backends.instructions.InstTernary#getConditionValue <em>Condition Value</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.InstTernary#getTrueValue <em>True Value</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.InstTernary#getFalseValue <em>False Value</em>}</li>
- *   <li>{@link net.sf.orcc.backends.instructions.InstTernary#getTarget <em>Target</em>}</li>
- * </ul>
- * </p>
- *
- * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstTernary()
- * @model
- * @generated
+ * This interface defines an instruction for a ternary if.
+ * 
+ * @author Herve Yviquel
+ * @model extends="net.sf.orcc.ir.InstSpecific"
  */
 public interface InstTernary extends InstSpecific {
+
 	/**
-	 * Returns the value of the '<em><b>Condition Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Condition Value</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Condition Value</em>' containment reference.
-	 * @see #setConditionValue(Expression)
-	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstTernary_ConditionValue()
+	 * Returns the condition value of this instruction.
+	 * 
+	 * @return the condition value of this instruction
 	 * @model containment="true"
-	 * @generated
 	 */
 	Expression getConditionValue();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstTernary#getConditionValue <em>Condition Value</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Condition Value</em>' containment reference.
-	 * @see #getConditionValue()
-	 * @generated
-	 */
-	void setConditionValue(Expression value);
-
-	/**
-	 * Returns the value of the '<em><b>True Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>True Value</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>True Value</em>' containment reference.
-	 * @see #setTrueValue(Expression)
-	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstTernary_TrueValue()
+	 * Returns the expression of the "false" branch.
+	 * 
+	 * @return the expression of the "false" branch
 	 * @model containment="true"
-	 * @generated
-	 */
-	Expression getTrueValue();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstTernary#getTrueValue <em>True Value</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>True Value</em>' containment reference.
-	 * @see #getTrueValue()
-	 * @generated
-	 */
-	void setTrueValue(Expression value);
-
-	/**
-	 * Returns the value of the '<em><b>False Value</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>False Value</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>False Value</em>' containment reference.
-	 * @see #setFalseValue(Expression)
-	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstTernary_FalseValue()
-	 * @model containment="true"
-	 * @generated
 	 */
 	Expression getFalseValue();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstTernary#getFalseValue <em>False Value</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>False Value</em>' containment reference.
-	 * @see #getFalseValue()
-	 * @generated
-	 */
-	void setFalseValue(Expression value);
-
-	/**
-	 * Returns the value of the '<em><b>Target</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Target</em>' containment reference isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Target</em>' containment reference.
-	 * @see #setTarget(Def)
-	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstTernary_Target()
+	 * Returns the target of this instruction.
+	 * 
+	 * @return the target of this instruction
 	 * @model containment="true"
-	 * @generated
 	 */
 	Def getTarget();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstTernary#getTarget <em>Target</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Target</em>' containment reference.
-	 * @see #getTarget()
-	 * @generated
+	 * Returns the expression of the "true" branch.
+	 * 
+	 * @return the expression of the "true" branch
+	 * @model containment="true"
+	 */
+	Expression getTrueValue();
+
+	/**
+	 * Sets the condition value of this instruction.
+	 * 
+	 * @param value
+	 *            the new condition value of this instruction
+	 */
+	void setConditionValue(Expression value);
+
+	/**
+	 * Sets the expression of the "false" branch.
+	 * 
+	 * @param value
+	 *            the expression of the "false" branch
+	 */
+	void setFalseValue(Expression value);
+
+	/**
+	 * Sets the target of this instruction.
+	 * 
+	 * @param value
+	 *            the new the target of this instruction
 	 */
 	void setTarget(Def value);
 
-} // TernaryOperation
+	/**
+	 * Sets the expression of the "true" branch.
+	 * 
+	 * @param value
+	 *            the expression of the "true" branch
+	 */
+	void setTrueValue(Expression value);
+
+}
