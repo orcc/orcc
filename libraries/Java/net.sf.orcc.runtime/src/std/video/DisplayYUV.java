@@ -67,6 +67,33 @@ public class DisplayYUV {
 		}
 	}
 
+	/**
+	 * Compares the contents in the given buffers with a golden reference.
+	 * 
+	 * @param pictureBufferY
+	 *            Y buffer
+	 * @param pictureBufferU
+	 *            U buffer
+	 * @param pictureBufferV
+	 *            V buffer
+	 * @param pictureWidth
+	 *            width
+	 * @param pictureHeight
+	 *            height
+	 */
+	public static void compareYUV_displayPicture(Object[] pictureBufferY,
+			Object[] pictureBufferU, Object[] pictureBufferV,
+			Integer pictureWidth, Integer pictureHeight) {
+
+	}
+
+	/**
+	 * Init the YUV comparison.
+	 */
+	public static void compareYUV_init() {
+
+	}
+
 	private static int convertYCbCrtoRGB(int y, int cb, int cr) {
 		int C = y - 16;
 		int D = cb - 128;

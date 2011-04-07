@@ -30,11 +30,15 @@ package net.sf.orcc.ir.util;
 
 import java.util.List;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -49,7 +53,7 @@ import net.sf.orcc.ir.Var;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ExpressionEvaluator extends AbstractExpressionInterpreter {
+public class ExpressionEvaluator implements ExpressionInterpreter {
 
 	private boolean throwException;
 
@@ -97,6 +101,21 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	}
 
 	@Override
+	public Object interpret(ExprBool expr, Object... args) {
+		return EcoreUtil.copy(expr);
+	}
+
+	@Override
+	public Object interpret(ExprFloat expr, Object... args) {
+		return EcoreUtil.copy(expr);
+	}
+
+	@Override
+	public Object interpret(ExprInt expr, Object... args) {
+		return EcoreUtil.copy(expr);
+	}
+
+	@Override
 	public Object interpret(ExprList expr, Object... args) {
 		ExprList list = IrFactory.eINSTANCE.createExprList();
 		List<Expression> expressions = expr.getValue();
@@ -106,6 +125,11 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 		}
 
 		return list;
+	}
+
+	@Override
+	public Object interpret(ExprString expr, Object... args) {
+		return EcoreUtil.copy(expr);
 	}
 
 	@Override
@@ -140,7 +164,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 			throw new OrccRuntimeException("Uninitialized variable: "
 					+ var.getName());
 		}
-		return value;
+		return EcoreUtil.copy(value);
 	}
 
 	/**

@@ -18,6 +18,7 @@ import net.sf.orcc.ir.util.ExpressionInterpreter;
 import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.AbstractEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
@@ -192,11 +193,11 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	}
 
 	public void set(ExprInt index, Expression value) {
-		getValue().set(index.getIntValue(), value);
+		((AbstractEList<Expression>) getValue()).setUnique(index.getIntValue(), value);
 	}
 
 	public void set(int index, Expression value) {
-		getValue().set(index, value);
+		((AbstractEList<Expression>) getValue()).set(index, value);
 	}
 
 } // ExprListImpl
