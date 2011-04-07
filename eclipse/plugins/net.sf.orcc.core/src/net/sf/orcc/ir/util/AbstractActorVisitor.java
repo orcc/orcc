@@ -57,7 +57,6 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
 import net.sf.orcc.ir.impl.InstructionVisitor;
 import net.sf.orcc.ir.impl.NodeVisitor;
 

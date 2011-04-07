@@ -14,8 +14,8 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
+import net.sf.orcc.ir.util.ExpressionInterpreter;
+import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;

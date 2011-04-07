@@ -30,8 +30,8 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
-import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypeVisitor;
+import net.sf.orcc.ir.util.TypeInterpreter;
+import net.sf.orcc.ir.util.TypeVisitor;
 
 import org.eclipse.emf.ecore.EObject;
 

@@ -36,9 +36,9 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypeVisitor;
+import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.TypeInterpreter;
+import net.sf.orcc.ir.util.TypeVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

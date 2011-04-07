@@ -26,80 +26,62 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir.util;
 
-import net.sf.orcc.ir.TypeBool;
-import net.sf.orcc.ir.TypeFloat;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.TypeString;
-import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.type.TypeVisitor;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.Expression;
 
 /**
- * This class defines the default type printer.
+ * This class is an abstract implementation of {@link ExpressionVisitor}.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class TypePrinter implements TypeVisitor {
+public abstract class AbstractExpressionVisitor implements ExpressionVisitor {
 
-	protected StringBuilder builder;
-
-	/**
-	 * Creates a new type printer.
-	 */
-	public TypePrinter() {
-		builder = new StringBuilder();
+	@Override
+	public void visit(ExprBinary expr, Object... args) {
+		expr.getE1().accept(this, args);
+		expr.getE2().accept(this, args);
 	}
 
 	@Override
-	public String toString() {
-		return builder.toString();
+	public void visit(ExprBool expr, Object... args) {
 	}
 
 	@Override
-	public void visit(TypeBool type) {
-		builder.append("bool");
+	public void visit(ExprFloat expr, Object... args) {
 	}
 
 	@Override
-	public void visit(TypeFloat type) {
-		builder.append("float");
+	public void visit(ExprInt expr, Object... args) {
 	}
 
 	@Override
-	public void visit(TypeInt type) {
-		builder.append("int(size=");
-		builder.append(type.getSize());
-		builder.append(")");
+	public void visit(ExprList expr, Object... args) {
+		for (Expression subExpr : expr.getValue()) {
+			subExpr.accept(this, args);
+		}
 	}
 
 	@Override
-	public void visit(TypeList type) {
-		builder.append("List(type:");
-		builder.append(String.valueOf(type.getType()));
-		builder.append(", size=");
-		builder.append(type.getSize());
-		builder.append(")");
+	public void visit(ExprString expr, Object... args) {
 	}
 
 	@Override
-	public void visit(TypeString type) {
-		builder.append("String");
+	public void visit(ExprUnary expr, Object... args) {
+		expr.getExpr().accept(this, args);
 	}
 
 	@Override
-	public void visit(TypeUint type) {
-		builder.append("uint(size=");
-		builder.append(type.getSize());
-		builder.append(")");
-	}
-
-	@Override
-	public void visit(TypeVoid type) {
-		builder.append("void");
+	public void visit(ExprVar expr, Object... args) {
 	}
 
 }

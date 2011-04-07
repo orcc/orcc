@@ -33,7 +33,7 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.type.TypePrinter;
+import net.sf.orcc.ir.util.TypePrinter;
 
 /**
  * This class defines a Java type printer.

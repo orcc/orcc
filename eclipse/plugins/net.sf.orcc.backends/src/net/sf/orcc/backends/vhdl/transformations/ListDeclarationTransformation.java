@@ -72,7 +72,7 @@ public class ListDeclarationTransformation extends AbstractActorVisitor {
 	public void visit(Actor actor) {
 		// VHDL synthesizers don't support multi-dimensional memory yet
 		for (Var variable : actor.getStateVars()) {
-			if (variable.getType().isList()) {
+			if (variable.getType().isList() && variable.getInitialValue() != null) {
 				ExprList list = IrFactory.eINSTANCE.createExprList();
 				flattenList(variable.getValue(), list);
 				variable.setInitialValue(list);

@@ -32,7 +32,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.util.ExpressionEvaluator;
 
 /**
  * This class defines a partial expression evaluator.

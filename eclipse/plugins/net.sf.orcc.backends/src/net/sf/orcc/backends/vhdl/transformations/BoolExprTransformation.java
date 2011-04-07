@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
+import java.util.List;
+
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstReturn;
@@ -106,12 +108,14 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 * @param iit
 	 *            list iterator
 	 */
-	private void createNewBlock() {
+	private void createNewBlock(Instruction inst) {
+		NodeBlock blkSource = inst.getBlock();
+		List<Instruction> instructions = blkSource.getInstructions();
+
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		while (itInstruction.hasNext()) {
-			Instruction instruction = itInstruction.next();
-			block.add(instruction);
-		}
+		block.getInstructions().addAll(
+				instructions.subList(itInstruction.nextIndex(),
+						instructions.size()));
 
 		// adds this block after the NodeIf
 		itNode.add(block);
@@ -146,7 +150,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 				itInstruction.remove();
 
 				// move the rest of instructions to a new block
-				createNewBlock();
+				createNewBlock(assign);
 			}
 		}
 	}
@@ -162,7 +166,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 
 				// moves this return and remaining instructions to a new block
 				itInstruction.previous();
-				createNewBlock();
+				createNewBlock(returnInstr);
 			}
 		}
 	}
@@ -179,7 +183,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 
 				// moves this store and remaining instructions to a new block
 				itInstruction.previous();
-				createNewBlock();
+				createNewBlock(store);
 			}
 		}
 	}

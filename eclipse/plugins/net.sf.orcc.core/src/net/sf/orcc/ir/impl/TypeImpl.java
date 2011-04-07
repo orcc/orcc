@@ -34,9 +34,9 @@ import java.util.List;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypePrinter;
-import net.sf.orcc.ir.type.TypeVisitor;
+import net.sf.orcc.ir.util.TypeInterpreter;
+import net.sf.orcc.ir.util.TypePrinter;
+import net.sf.orcc.ir.util.TypeVisitor;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.EObjectImpl;

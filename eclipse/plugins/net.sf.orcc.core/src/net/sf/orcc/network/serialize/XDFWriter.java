@@ -55,7 +55,7 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
+import net.sf.orcc.ir.util.ExpressionVisitor;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;

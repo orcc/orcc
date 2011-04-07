@@ -26,36 +26,39 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir.util;
 
-import net.sf.orcc.ir.TypeBool;
-import net.sf.orcc.ir.TypeFloat;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.TypeString;
-import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 
 /**
- * This class defines a type interpreter.
+ * This class defines an expression visitor.
  * 
- * @author Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
  * 
  */
-public interface TypeInterpreter {
+public interface ExpressionVisitor {
 
-	public Object interpret(TypeBool type);
+	public void visit(ExprBinary expr, Object... args);
 
-	public Object interpret(TypeFloat type);
+	public void visit(ExprBool expr, Object... args);
 
-	public Object interpret(TypeInt type);
+	public void visit(ExprFloat expr, Object... args);
 
-	public Object interpret(TypeList type);
+	public void visit(ExprInt expr, Object... args);
 
-	public Object interpret(TypeString type);
+	public void visit(ExprList expr, Object... args);
 
-	public Object interpret(TypeUint type);
+	public void visit(ExprString expr, Object... args);
 
-	public Object interpret(TypeVoid type);
+	public void visit(ExprUnary expr, Object... args);
+
+	public void visit(ExprVar expr, Object... args);
 
 }

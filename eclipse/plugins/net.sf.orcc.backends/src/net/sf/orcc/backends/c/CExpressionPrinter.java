@@ -34,7 +34,7 @@ import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.expr.ExpressionPrinter;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 
 /**
  * This class defines a C expression printer.

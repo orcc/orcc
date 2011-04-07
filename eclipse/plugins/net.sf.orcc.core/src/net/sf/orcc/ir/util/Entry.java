@@ -26,71 +26,99 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.ir.util;
 
-import net.sf.orcc.ir.ExprBinary;
-import net.sf.orcc.ir.ExprBool;
-import net.sf.orcc.ir.ExprFloat;
-import net.sf.orcc.ir.ExprInt;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.ExprUnary;
-import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 
 /**
- * This class is an abstract implementation of {@link ExpressionInterpreter}.
+ * This class defines a type entry.
  * 
- * @author Ghislain Roquier
+ * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractExpressionInterpreter implements
-		ExpressionInterpreter {
+public class Entry {
 
-	@Override
-	public Object interpret(ExprBinary expr, Object... args) {
-		expr.getE1().accept(this, args);
-		expr.getE2().accept(this, args);
-		return expr;
+	/**
+	 * expression entry
+	 */
+	public static final int EXPR = 1;
+
+	/**
+	 * type entry
+	 */
+	public static final int TYPE = 2;
+
+	/**
+	 * the contents of this entry: expression or type.
+	 */
+	private Object content;
+
+	/**
+	 * the type of this entry
+	 */
+	private int type;
+
+	/**
+	 * Creates a new expression entry
+	 * 
+	 * @param expr
+	 *            an expression
+	 */
+	public Entry(Expression expr) {
+		this.content = expr;
+		this.type = EXPR;
 	}
 
-	@Override
-	public Object interpret(ExprBool expr, Object... args) {
-		return expr;
+	/**
+	 * Creates a new type entry
+	 * 
+	 * @param type
+	 *            a type
+	 */
+	public Entry(Type type) {
+		this.content = type;
+		this.type = TYPE;
 	}
 
-	@Override
-	public Object interpret(ExprFloat expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(ExprInt expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(ExprList expr, Object... args) {
-		for (Expression subExpr : expr.getValue()) {
-			subExpr.accept(this, args);
+	/**
+	 * Returns this entry's content as an expression
+	 * 
+	 * @return this entry's content as an expression
+	 * @throws OrccException
+	 *             if this entry does not contain an expression
+	 */
+	public Expression getEntryAsExpr() throws OrccException {
+		if (getType() == EXPR) {
+			return (Expression) content;
+		} else {
+			throw new OrccException("this entry does not contain an expression");
 		}
-		return expr;
 	}
 
-	@Override
-	public Object interpret(ExprString expr, Object... args) {
-		return expr;
+	/**
+	 * Returns this entry's content as a type
+	 * 
+	 * @return this entry's content as a type
+	 * @throws OrccException
+	 *             if this entry does not contain a type
+	 */
+	public Type getEntryAsType() throws OrccException {
+		if (getType() == TYPE) {
+			return (Type) content;
+		} else {
+			throw new OrccException("this entry does not contain a type");
+		}
 	}
 
-	@Override
-	public Object interpret(ExprUnary expr, Object... args) {
-		expr.getExpr().accept(this, args);
-		return expr;
-	}
-
-	@Override
-	public Object interpret(ExprVar expr, Object... args) {
-		return expr;
+	/**
+	 * Returns the type of this entry.
+	 * 
+	 * @return the type of this entry
+	 */
+	public int getType() {
+		return type;
 	}
 
 }

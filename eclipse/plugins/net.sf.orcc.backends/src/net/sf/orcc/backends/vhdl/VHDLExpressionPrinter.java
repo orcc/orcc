@@ -43,8 +43,8 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.expr.ExpressionPrinter;
 import net.sf.orcc.ir.impl.ExprBinaryImpl;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.util.OrccUtil;
 
 /**

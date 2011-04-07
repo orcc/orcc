@@ -53,8 +53,8 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractExpressionVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
 /**

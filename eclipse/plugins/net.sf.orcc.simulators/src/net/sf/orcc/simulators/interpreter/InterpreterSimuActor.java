@@ -50,7 +50,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.simulators.SimuActor;

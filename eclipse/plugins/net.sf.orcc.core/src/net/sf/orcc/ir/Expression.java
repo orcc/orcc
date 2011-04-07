@@ -29,8 +29,9 @@
 package net.sf.orcc.ir;
 
 import org.eclipse.emf.ecore.EObject;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
+
+import net.sf.orcc.ir.util.ExpressionInterpreter;
+import net.sf.orcc.ir.util.ExpressionVisitor;
 
 /**
  * This interface defines an expression.

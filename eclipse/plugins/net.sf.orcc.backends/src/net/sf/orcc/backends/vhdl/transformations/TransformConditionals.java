@@ -43,8 +43,8 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.ExpressionInterpreter;
 
 /**
  * This class defines an actor transformation that transform the simple

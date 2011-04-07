@@ -34,7 +34,7 @@ import java.util.Map;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
 import net.sf.orcc.network.attributes.IValueAttribute;

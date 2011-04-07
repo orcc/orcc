@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.ir.util;
 
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -36,29 +36,61 @@ import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
+import net.sf.orcc.ir.Expression;
 
 /**
- * This class defines an expression visitor.
+ * This class is an abstract implementation of {@link ExpressionInterpreter}.
  * 
- * @author Matthieu Wipliez
+ * @author Ghislain Roquier
  * 
  */
-public interface ExpressionVisitor {
+public abstract class AbstractExpressionInterpreter implements
+		ExpressionInterpreter {
 
-	public void visit(ExprBinary expr, Object... args);
+	@Override
+	public Object interpret(ExprBinary expr, Object... args) {
+		expr.getE1().accept(this, args);
+		expr.getE2().accept(this, args);
+		return expr;
+	}
 
-	public void visit(ExprBool expr, Object... args);
+	@Override
+	public Object interpret(ExprBool expr, Object... args) {
+		return expr;
+	}
 
-	public void visit(ExprFloat expr, Object... args);
+	@Override
+	public Object interpret(ExprFloat expr, Object... args) {
+		return expr;
+	}
 
-	public void visit(ExprInt expr, Object... args);
+	@Override
+	public Object interpret(ExprInt expr, Object... args) {
+		return expr;
+	}
 
-	public void visit(ExprList expr, Object... args);
+	@Override
+	public Object interpret(ExprList expr, Object... args) {
+		for (Expression subExpr : expr.getValue()) {
+			subExpr.accept(this, args);
+		}
+		return expr;
+	}
 
-	public void visit(ExprString expr, Object... args);
+	@Override
+	public Object interpret(ExprString expr, Object... args) {
+		return expr;
+	}
 
-	public void visit(ExprUnary expr, Object... args);
+	@Override
+	public Object interpret(ExprUnary expr, Object... args) {
+		expr.getExpr().accept(this, args);
+		return expr;
+	}
 
-	public void visit(ExprVar expr, Object... args);
+	@Override
+	public Object interpret(ExprVar expr, Object... args) {
+		return expr;
+	}
 
 }

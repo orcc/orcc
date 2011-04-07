@@ -31,8 +31,14 @@ package net.sf.orcc.interpreter;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.type.AbstractTypeInterpreter;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.util.TypeInterpreter;
 
 /**
  * This class defines an allocator that allocates a List from a type.
@@ -41,7 +47,22 @@ import net.sf.orcc.ir.type.AbstractTypeInterpreter;
  * @author Matthieu Wipliez
  * 
  */
-public class ListAllocator extends AbstractTypeInterpreter {
+public class ListAllocator implements TypeInterpreter {
+
+	@Override
+	public Object interpret(TypeBool type) {
+		return IrFactory.eINSTANCE.createExprBool();
+	}
+
+	@Override
+	public Object interpret(TypeFloat type) {
+		return IrFactory.eINSTANCE.createExprFloat();
+	}
+
+	@Override
+	public Object interpret(TypeInt type) {
+		return IrFactory.eINSTANCE.createExprInt();
+	}
 
 	@Override
 	public Object interpret(TypeList type) {
@@ -52,6 +73,21 @@ public class ListAllocator extends AbstractTypeInterpreter {
 		}
 
 		return list;
+	}
+
+	@Override
+	public Object interpret(TypeString type) {
+		return IrFactory.eINSTANCE.createExprString();
+	}
+
+	@Override
+	public Object interpret(TypeUint type) {
+		return IrFactory.eINSTANCE.createExprInt();
+	}
+
+	@Override
+	public Object interpret(TypeVoid type) {
+		return null;
 	}
 
 }

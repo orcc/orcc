@@ -26,62 +26,36 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.ir.util;
 
-import net.sf.orcc.ir.ExprBinary;
-import net.sf.orcc.ir.ExprBool;
-import net.sf.orcc.ir.ExprFloat;
-import net.sf.orcc.ir.ExprInt;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.ExprUnary;
-import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 
 /**
- * This class is an abstract implementation of {@link ExpressionVisitor}.
+ * This class defines a type visitor.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractExpressionVisitor implements ExpressionVisitor {
+public interface TypeVisitor {
 
-	@Override
-	public void visit(ExprBinary expr, Object... args) {
-		expr.getE1().accept(this, args);
-		expr.getE2().accept(this, args);
-	}
+	public void visit(TypeBool type);
 
-	@Override
-	public void visit(ExprBool expr, Object... args) {
-	}
+	public void visit(TypeFloat type);
 
-	@Override
-	public void visit(ExprFloat expr, Object... args) {
-	}
+	public void visit(TypeInt type);
 
-	@Override
-	public void visit(ExprInt expr, Object... args) {
-	}
+	public void visit(TypeList type);
 
-	@Override
-	public void visit(ExprList expr, Object... args) {
-		for (Expression subExpr : expr.getValue()) {
-			subExpr.accept(this, args);
-		}
-	}
+	public void visit(TypeString type);
 
-	@Override
-	public void visit(ExprString expr, Object... args) {
-	}
+	public void visit(TypeUint type);
 
-	@Override
-	public void visit(ExprUnary expr, Object... args) {
-		expr.getExpr().accept(this, args);
-	}
-
-	@Override
-	public void visit(ExprVar expr, Object... args) {
-	}
+	public void visit(TypeVoid type);
 
 }

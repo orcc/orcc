@@ -26,57 +26,39 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir.util;
 
-import net.sf.orcc.ir.TypeBool;
-import net.sf.orcc.ir.TypeFloat;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.TypeString;
-import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 
 /**
- * This class defines an abstract type interpreter.
+ * This class defines an expression interpreter.
  * 
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public abstract class AbstractTypeInterpreter implements TypeInterpreter {
+public interface ExpressionInterpreter {
 
-	@Override
-	public Object interpret(TypeBool type) {
-		return null;
-	}
+	public Object interpret(ExprBinary expr, Object... args);
 
-	@Override
-	public Object interpret(TypeFloat type) {
-		return null;
-	}
+	public Object interpret(ExprBool expr, Object... args);
 
-	@Override
-	public Object interpret(TypeInt type) {
-		return null;
-	}
+	public Object interpret(ExprFloat expr, Object... args);
 
-	@Override
-	public Object interpret(TypeList type) {
-		return null;
-	}
+	public Object interpret(ExprInt expr, Object... args);
 
-	@Override
-	public Object interpret(TypeString type) {
-		return null;
-	}
+	public Object interpret(ExprList expr, Object... args);
 
-	@Override
-	public Object interpret(TypeUint type) {
-		return null;
-	}
+	public Object interpret(ExprString expr, Object... args);
 
-	@Override
-	public Object interpret(TypeVoid type) {
-		return null;
-	}
+	public Object interpret(ExprUnary expr, Object... args);
+
+	public Object interpret(ExprVar expr, Object... args);
 
 }

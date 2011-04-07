@@ -60,10 +60,10 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.impl.InstructionInterpreter;
 import net.sf.orcc.ir.impl.NodeInterpreter;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.ExpressionInterpreter;
 
 /**
  * This class defines an actor transformation that inline the functions and/or

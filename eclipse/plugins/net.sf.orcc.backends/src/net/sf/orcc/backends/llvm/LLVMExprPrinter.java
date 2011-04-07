@@ -39,7 +39,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.expr.ExpressionPrinter;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 
 /**
  * This class defines an LLVM expression printer.

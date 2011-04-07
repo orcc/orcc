@@ -40,8 +40,8 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.ExpressionPrinter;
-import net.sf.orcc.ir.type.TypePrinter;
+import net.sf.orcc.ir.util.ExpressionPrinter;
+import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.util.OrccUtil;
 
 import org.stringtemplate.v4.AttributeRenderer;

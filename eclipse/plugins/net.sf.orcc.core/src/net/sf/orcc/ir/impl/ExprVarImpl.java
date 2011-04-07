@@ -10,8 +10,8 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
+import net.sf.orcc.ir.util.ExpressionInterpreter;
+import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

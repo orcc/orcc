@@ -51,10 +51,10 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
+import net.sf.orcc.ir.util.ExpressionInterpreter;
 
 /**
  * 

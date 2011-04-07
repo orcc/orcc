@@ -59,8 +59,8 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
+import net.sf.orcc.ir.util.ExpressionEvaluator;
 
 public class ConstraintBuilder extends ActorInterpreter {
 

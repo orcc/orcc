@@ -106,10 +106,10 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.impl.InstructionInterpreter;
 import net.sf.orcc.ir.impl.NodeInterpreter;
-import net.sf.orcc.ir.type.TypeInterpreter;
+import net.sf.orcc.ir.util.ExpressionInterpreter;
+import net.sf.orcc.ir.util.TypeInterpreter;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
 

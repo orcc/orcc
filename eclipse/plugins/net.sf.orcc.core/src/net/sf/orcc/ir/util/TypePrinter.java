@@ -26,99 +26,80 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir.util;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.util.TypeVisitor;
 
 /**
- * This class defines a type entry.
+ * This class defines the default type printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Entry {
+public class TypePrinter implements TypeVisitor {
+
+	protected StringBuilder builder;
 
 	/**
-	 * expression entry
+	 * Creates a new type printer.
 	 */
-	public static final int EXPR = 1;
-
-	/**
-	 * type entry
-	 */
-	public static final int TYPE = 2;
-
-	/**
-	 * the contents of this entry: expression or type.
-	 */
-	private Object content;
-
-	/**
-	 * the type of this entry
-	 */
-	private int type;
-
-	/**
-	 * Creates a new expression entry
-	 * 
-	 * @param expr
-	 *            an expression
-	 */
-	public Entry(Expression expr) {
-		this.content = expr;
-		this.type = EXPR;
+	public TypePrinter() {
+		builder = new StringBuilder();
 	}
 
-	/**
-	 * Creates a new type entry
-	 * 
-	 * @param type
-	 *            a type
-	 */
-	public Entry(Type type) {
-		this.content = type;
-		this.type = TYPE;
+	@Override
+	public String toString() {
+		return builder.toString();
 	}
 
-	/**
-	 * Returns this entry's content as an expression
-	 * 
-	 * @return this entry's content as an expression
-	 * @throws OrccException
-	 *             if this entry does not contain an expression
-	 */
-	public Expression getEntryAsExpr() throws OrccException {
-		if (getType() == EXPR) {
-			return (Expression) content;
-		} else {
-			throw new OrccException("this entry does not contain an expression");
-		}
+	@Override
+	public void visit(TypeBool type) {
+		builder.append("bool");
 	}
 
-	/**
-	 * Returns this entry's content as a type
-	 * 
-	 * @return this entry's content as a type
-	 * @throws OrccException
-	 *             if this entry does not contain a type
-	 */
-	public Type getEntryAsType() throws OrccException {
-		if (getType() == TYPE) {
-			return (Type) content;
-		} else {
-			throw new OrccException("this entry does not contain a type");
-		}
+	@Override
+	public void visit(TypeFloat type) {
+		builder.append("float");
 	}
 
-	/**
-	 * Returns the type of this entry.
-	 * 
-	 * @return the type of this entry
-	 */
-	public int getType() {
-		return type;
+	@Override
+	public void visit(TypeInt type) {
+		builder.append("int(size=");
+		builder.append(type.getSize());
+		builder.append(")");
+	}
+
+	@Override
+	public void visit(TypeList type) {
+		builder.append("List(type:");
+		builder.append(String.valueOf(type.getType()));
+		builder.append(", size=");
+		builder.append(type.getSize());
+		builder.append(")");
+	}
+
+	@Override
+	public void visit(TypeString type) {
+		builder.append("String");
+	}
+
+	@Override
+	public void visit(TypeUint type) {
+		builder.append("uint(size=");
+		builder.append(type.getSize());
+		builder.append(")");
+	}
+
+	@Override
+	public void visit(TypeVoid type) {
+		builder.append("void");
 	}
 
 }
