@@ -10,9 +10,9 @@ listSize(values) ::= <<
 
 variableDeclaration(variable) ::= <<
 <if (variable.type.dimensionsExpr)
-><variable.type> (*<variable>)<listSize(rest(variable.type.dimensionsExpr)) ><
+><variable.type> (*<variable.indexedName>)<listSize(rest(variable.type.dimensionsExpr)) ><
 else
-><variable.type> <variable><
+><variable.type> <variable.indexedName><
 endif>
 >>
 
@@ -35,7 +35,7 @@ nonConstStateVar(variable) ::= <<
 procedure(procedure) ::= <<
 
 <if(!procedure.native)
-><procedure.returnType> <procedure>(<procedure.parameters.list: variableDeclaration(); wrap, anchor, separator=", ">);<
+><procedure.returnType> <procedure.name>(<procedure.parameters: variableDeclaration(); wrap, anchor, separator=", ">);<
 endif>
 
 >>
@@ -97,7 +97,7 @@ constructor(parameters) ::= <<
 >>
 
 parameters(parameters) ::= <<
-<parameters: {input | <input.type> <input>;}; separator="\n">
+<parameters: {parameter | <parameter.type> <parameter.indexedName>;}; separator="\n">
 
 >>
 

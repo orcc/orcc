@@ -16,7 +16,7 @@ listValue(values) ::= <<
 >>
 
 variableDeclaration(variable) ::= <<
-<variable.type> <variable><listSize(variable.type.dimensions)>
+<variable.type> <variable.indexedName><listSize(variable.type.dimensions)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,24 +24,28 @@ variableDeclaration(variable) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-<(constant.class.simpleName)(constant)>
+<if (constant.booleanExpr)><printBool(constant)><
+elseif (constant.intExpr)><printInt(constant)><
+elseif (constant.listExpr)><printList(constant)><
+elseif (constant.stringExpr)><printString(constant)><
+endif>
 >>
 
 
-BoolExpr(constant) ::= <<
+printBool(constant) ::= <<
 <if (constant.value)>true<else>false<endif>
 >>
 
-IntExpr(number) ::= <<
+printInt(number) ::= <<
 <number><if (number.long)>L<endif>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
-ListExpr(constant) ::= <<
+printList(constant) ::= <<
 {<constant.value: Constant(); wrap, separator=", ">}
 >>
 
-StringExpr(constant) ::= <<
+printString(constant) ::= <<
 "<constant>"
 >>
 
@@ -67,10 +71,10 @@ const <variableDeclaration(variable)> = <Constant(variable.initialValue)>;<\n><e
 StateVarAllocation(variable) ::= <<
 <if(variable.assignable)>
 <if (variable.type.dimensionsExpr)>
-<variable>(new <variable.type><listSize(variable.type.dimensionsExpr)>),
+<variable.indexedName>(new <variable.type><listSize(variable.type.dimensionsExpr)>),
 <else>
 <if (variable.initialized)>
-<variable>(<Constant(variable.initialValue)>),
+<variable.indexedName>(<Constant(variable.initialValue)>),
 <endif>
 <endif>
 <endif>
@@ -82,7 +86,7 @@ StateVarAllocation(variable) ::= <<
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 StateVarDestruction(variable) ::= <<
-<if(variable.assignable)><if (variable.type.dimensions)>delete [] <variable>;<endif><endif>
+<if(variable.assignable)><if (variable.type.dimensions)>delete [] <variable.indexedName>;<endif><endif>
 >>
 
 
@@ -106,7 +110,7 @@ memcpy(<variable>, tmp_<variable>, <variable.type.dimensions> * sizeof(<variable
 
 printAssign(assign) ::= <<
 
-<assign.target> = <assign.value>;
+<assign.target.variable.indexedName> = <assign.value>;
 >>
 
 printParameter(parameter)::= <<
@@ -121,13 +125,13 @@ printCall(call) ::= <<
 
 <if(call.print)>std::cout \<\< <call.parameters: printParameter(); separator=" << ">;<
 else
-><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
+><if(call.target)><call.target.variable.indexedName> = <endif><call.procedure.name>(<call.parameters; separator=", ">);<
 endif>
 >>
 
 printLoad(load) ::= <<
 
-<load.target> = <load.source><load.indexes : {index | [<index>]}>;
+<load.target.variable.indexedName> = <load.source.variable.name><load.indexes : {index | [<index>]}>;
 >>
 
 printPeek(port, variable, numTokens) ::= <<
@@ -153,7 +157,7 @@ return <return.value>;
 
 printStore(store) ::= <<
 
-<store.target><store.indexes : {index | [<index>]}> = <store.value>;
+<store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;
 >>
 
 printWrite(port, variable, numTokens) ::= <<
@@ -191,7 +195,7 @@ printBlockNode(blockNode) ::= <<
 // if node
 printIfNode(ifNode) ::= <<
 
-if (<ifNode.value>) {
+if (<ifNode.condition>) {
 	<printNodes(ifNode.thenNodes)>
 }<if(ifNode.elseNodes)> else {
 	<printNodes(ifNode.elseNodes)>
@@ -202,7 +206,7 @@ if (<ifNode.value>) {
 // while node
 printWhileNode(whileNode) ::= <<
 
-while (<whileNode.value>) {
+while (<whileNode.condition>) {
 	<printNodes(whileNode.nodes)>
 }
 <printBlockNode(whileNode.joinNode)>
@@ -214,15 +218,15 @@ while (<whileNode.value>) {
 
 procedure(procedure) ::= <<
 <if(!procedure.native)
-><procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
+><procedure.returnType> <actor.simpleName>::<procedure.name>(<procedure.parameters: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
 {
-<if(procedure.locals.list)>
-	<procedure.locals.list: {local | <variableDeclaration(local)>;<\n>}>
+<if(procedure.locals)>
+	<procedure.locals: {local | <variableDeclaration(local)>;<\n>}>
 
 <endif>
 	<printNodes(procedure.nodes)>}<
 else
-	>extern <procedure.returnType> <procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">);
+	>extern <procedure.returnType> <procedure.name>(<procedure.parameters: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">);
 <endif>
 >>
 
@@ -232,14 +236,14 @@ else
 
 printActionBody(procedure) ::= <<
 <if(!procedure.native)
-><procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
+><procedure.returnType> <actor.simpleName>::<procedure.name>(<procedure.parameters: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
 {
 	<action.inputPattern.ports : {port | <variableDeclaration(action.inputPattern.variableMap.(port))>;}>
 	<action.outputPattern.ports : {port | <variableDeclaration(action.outputPattern.variableMap.(port))>;}>
 	<action.inputPattern.ports : {port | <printRead(port=port, variable=action.inputPattern.variableMap.(port), numTokens=action.inputPattern.numTokensMap.(port))>}>
 
-<if(procedure.locals.list)>
-	<procedure.locals.list: {local | <variableDeclaration(local)>;<\n>}>
+<if(procedure.locals)>
+	<procedure.locals: {local | <variableDeclaration(local)>;<\n>}>
 <endif>
 	<printNodes(procedure.nodes)>
 	<action.outputPattern.ports : {port | <printWrite(port=port, variable=action.outputPattern.variableMap.(port), numTokens=action.outputPattern.numTokensMap.(port))>}>
@@ -248,13 +252,13 @@ endif>
 >>
 
 printActionScheduler(procedure) ::= <<
-<procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
+<procedure.returnType> <actor.simpleName>::<procedure.name>(<procedure.parameters: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
 {
 	<action.inputPattern.ports : {port | <if(action.inputPattern.peekedMap.(port))><variableDeclaration(action.inputPattern.peekedMap.(port))>;<endif>}>
 	<action.inputPattern.ports : {port | <if(action.inputPattern.peekedMap.(port))><printPeek(port=port, variable=action.inputPattern.peekedMap.(port), numTokens=action.inputPattern.numTokensMap.(port))><endif>}>
 
-<if(procedure.locals.list)>
-	<procedure.locals.list: {local | <variableDeclaration(local)>;<\n>}>
+<if(procedure.locals)>
+	<procedure.locals: {local | <variableDeclaration(local)>;<\n>}>
 <endif>
 	<printNodes(procedure.nodes)>
 }
@@ -291,7 +295,7 @@ inputPattern(pattern) ::= <<
 
 actionCall(action) ::= <<
 <actionTrace(action)>
-<action.body>();
+<action.body.name>();
 res = true;
 i++;
 >>
@@ -311,7 +315,13 @@ if(<inputPattern(action.inputPattern)>isSchedulable_<action>())
 >>
 
 schedulingTest(actions) ::= <<
-<actions: actionTest(); separator="\nelse ">
+<actionTest(first(actions))>
+<if(rest(actions))>
+else
+{
+	<schedulingTest(rest(actions))>
+}
+<endif>
 >>
 
 scheduler(actions) ::= <<
@@ -342,7 +352,7 @@ int <actor.simpleName>::schedule()
 
 actionCallState(nextState) ::= <<
 <actionTrace(nextState.action)>
-<nextState.action.body>();
+<nextState.action.body.name>();
 _FSM_state = state_<nextState.targetState>;
 res = true;
 >>
@@ -361,7 +371,14 @@ if(<inputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.action>
 }>>
 
 schedulingTestState(nextStates) ::= <<
-<nextStates: actionTestState(); separator=" else ">
+<actionTestState(first(nextStates))>
+<if(rest(nextStates))>
+else
+{
+	<schedulingTestState(rest(nextStates))>
+}
+<endif>
+
 >>
 
 stateScheduler(transition) ::= <<
@@ -411,7 +428,7 @@ int <actor.simpleName>::schedule()
 	while (res)
 	{
 		res = false;
-		
+			
 		<if(actions)>
 		if(outside_FSM_scheduler())
 		{
@@ -435,13 +452,13 @@ int <actor.simpleName>::schedule()
 >>
 
 constructor(parameters, stateVars) ::= <<
-<if (actor.parameters.list)>
-<actor.simpleName>::<actor.simpleName>(const char* instanceName, <parameters: {param | <param.type> <param>}; separator=", ">, AKA_PROFILING_MODE eProfilingMode)
+<if (actor.parameters)>
+<actor.simpleName>::<actor.simpleName>(const char* instanceName, <if(parameters)><parameters: {param | <param.type> <param.indexedName>}; separator=", ">,<endif> AKA_PROFILING_MODE eProfilingMode)
 <else>
 <actor.simpleName>::<actor.simpleName>(const char* instanceName, AKA_PROFILING_MODE eProfilingMode)
 <endif>
 :
-<parameters: {param | <param>(<param>),}; wrap, separator="\n">
+<parameters: {param | <param.indexedName>(<param.indexedName>),}; wrap, separator="\n">
 <if(actor.actionScheduler.fsm)>
 _FSM_state(state_<actor.actionScheduler.fsm.initialState>),
 <endif>

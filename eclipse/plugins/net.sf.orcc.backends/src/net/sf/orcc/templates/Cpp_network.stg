@@ -11,10 +11,11 @@ includeActors(actors) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // initialize Instances
 argumentList(parameter) ::= <<
+<parameter>
 <if (instance.parameters.(parameter).stringExpr)
->"<instance.parameters.(parameter)>"<
+>"<instance.parameters.(parameter).indexedName>"<
 else
-><instance.parameters.(parameter)><
+><instance.parameters.(parameter).indexedName><
 endif>
 >>
 
