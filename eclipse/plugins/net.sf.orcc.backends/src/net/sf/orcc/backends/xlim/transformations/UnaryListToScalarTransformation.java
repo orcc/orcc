@@ -45,6 +45,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines an actor transformation that replace list of one element
@@ -78,8 +79,8 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 			if (pattern.getNumTokens(port) == 1) {
 				Var oldTarget = pattern.getVariableMap().get(port);
 				if (!oldTarget.getUses().isEmpty()) {
-					Instruction instruction = (Instruction) oldTarget.getUses()
-							.get(0).getNode();
+					Instruction instruction = EcoreHelper.getContainerOfType(
+							oldTarget.getUses().get(0), Instruction.class);
 
 					if (instruction.isLoad()) {
 						InstLoad load = (InstLoad) instruction;
@@ -97,9 +98,10 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 								.remove(oldTarget.getName());
 					}
 				} else {
-					if (!oldTarget.getInstructions().isEmpty()) {
-						Instruction instruction = oldTarget.getInstructions()
-								.get(0);
+					if (!oldTarget.getDefs().isEmpty()) {
+						Instruction instruction = EcoreHelper
+								.getContainerOfType(oldTarget.getDefs().get(0),
+										Instruction.class);
 						if (instruction.isStore()) {
 							InstStore store = (InstStore) instruction;
 							Expression expr = store.getValue();
