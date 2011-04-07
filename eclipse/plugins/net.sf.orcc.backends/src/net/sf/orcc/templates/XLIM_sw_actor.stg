@@ -123,10 +123,10 @@ printBoolExpr(expr) ::= <<
 
 printVarExpr(expr) ::= <<
 <if(op.cast)>
-<printCast(target = op.target, value = op.value, cast = op.cast)>
+<printCast(target=op.target, value=op.value, cast=op.cast)>
 <else>
 \<operation kind="noop"\>
-	\<port dir="in" source="<expr>"/\>
+	<untypedPort(dir="in", source=expr.use.variable)>
 	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 <endif>
@@ -143,15 +143,15 @@ printCast(target,value,cast) ::= <<
 // XLIM Port
 ///////////////////////////////////////////////////////////////////////////////
 
-untypedPort(dir, source) ::= <<
-\<port dir="<dir>" source="<source>"/\>
+untypedPort(dir, source, extension="") ::= <<
+\<port dir="<dir>" source="<source.name><extension>"/\>
 >>
 
-typedPort(dir, type, source) ::= <<
+typedPort(dir, type, source, extension="") ::= <<
 <if(!type.list || source.global)
->\<port dir="<dir>" size="<if (type.bool)>1<else><type.size><endif>" source="<source>" typeName="<type>"/\><
+>\<port dir="<dir>" size="<if(type.bool)>1<else><type.size><endif>" source="<source.name><extension>" typeName="<type>"/\><
 else
->\<port dir="<dir>" source="<source>" typeName="<source>_typedef"/\><
+>\<port dir="<dir>" source="<source.name><extension>" typeName="<source.name><extension>_typedef"/\><
 endif>
 >>
 
@@ -166,7 +166,6 @@ elseif(op.store)><printStore(op)><
 elseif(op.assign)><printAssign(op)><
 elseif(op.phi)><printPhiAssignment(op)><
 elseif(op.return)><printReturn(op)><
-elseif(op.writeEnd)><printWriteEnd(op)><
 elseif(op.assignIndex)><printAssignIndex(op)><
 elseif(op.ternaryOperation)><printTernaryOperation(op)><endif>
 >>
@@ -178,8 +177,8 @@ printCall(op) ::= <<
 printLoad(op) ::= <<
 \<!-- Load <op> --\>
 <if(op.source.variable.type.list)
->\<operation kind="var_ref" name="<op.source>"\>
-	<op.indexes: {index|<untypedPort(dir="in", source=index.var)>}; separator="\n">
+>\<operation kind="var_ref" name="<op.source.name>"\>
+	<op.indexes: { index | <untypedPort(dir="in", source=index.var)> }; separator="\n">
 	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\><
 else
@@ -192,8 +191,8 @@ else
 printStore(op) ::= <<
 \<!-- Store <op> --\>
 <if (op.target.global || op.target.type.list)
->\<operation kind="assign" target="<op.target>"\>
-	<op.indexes: {index|<untypedPort(dir="in", source=index.var)>}; separator="\n">
+>\<operation kind="assign" target="<op.target.name>"\>
+	<op.indexes: { index | <untypedPort(dir="in", source=index.var)> }; separator="\n">
 	<untypedPort(dir="in", source=op.value.var)>
 \</operation\><
 else
@@ -211,8 +210,8 @@ printAssign(op) ::= <<
 
 printPhiAssignment(op) ::= <<
 \<PHI\>
-	\<port dir="in" source="<first(op.values)>"/\>
-	\<port dir="in" source="<rest(op.values)>"/\>
+	<untypedPort(dir="in", source=first(op.values))>
+	<untypedPort(dir="in", source=rest(op.values))>
 	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</PHI\>
 >>
@@ -221,26 +220,22 @@ printReturn(return) ::= <<
 <if(return.value)>
 \<operation kind="noop"\>
 	<untypedPort(dir="in", source=return.value)>
-	\<port dir="out" size="1" source="<procedure>_go" typeName="bool"/\>
+	<typedPort(dir="out", type=return.value.type, source=procedure, extension="_go")>
 \</operation\>
 <endif>
->>
-
-printWriteEnd(writeEnd) ::= <<
-\<!-- TODO writeEnd --\>
 >>
 
 printAssignIndex(op) ::= <<
 <if(rest(op.indexes))>
 <sizeDeclare(target=op.target, type=op.listType)>
 \<operation kind="noop"\>
-	\<port dir="in" source="<first(op.indexes)>"/\>
-	\<port dir="out" size="32" source="<op.target>_tmp_0" typeName="int"/\>
+	<untypedPort(dir="in", source=first(op.indexes))>
+	<typedPort(dir="out", type=op.target.type, source=op.target, extension="_tmp_0")>
 \</operation\>
 <flatIndexes(indexes=rest(op.indexes), target=op.target, lastIndex="0", indexMap=op.expressionToIndexMap)>
 <else>
 \<operation kind="noop"\>
-	\<port dir="in" source="<first(op.indexes)>"/\>
+	<untypedPort(dir="in", source=first(op.indexes))>
 	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 <endif>
@@ -282,7 +277,7 @@ printRead(port, target, numTokens) ::= <<
 
 printWrite(port, source, numTokens) ::= <<
 \<operation kind="pinWrite" portName="<port.name>" style="simple"\>
-	\<port dir="in" source="<source>"/\>
+	<untypedPort(dir="in", source=source)>
 \</operation\>
 \<!--note kind="productionRates" name="<port.name>" value="<numTokens>"/--\>
 >>
@@ -293,20 +288,20 @@ printWrite(port, source, numTokens) ::= <<
 
 flatIndexes(indexes,target,lastIndex,indexMap) ::= <<
 \<operation kind="$mul"\>
-	\<port dir="in" source="<target>_tmp_<lastIndex>"/\>
-	\<port dir="in" source="<target>_size_<indexMap.(first(indexes))>"/\>
-	\<port dir="out" size="32" source="<target>_tmpMul_<indexMap.(first(indexes))>" typeName="int"/\>
+	\<port dir="in" source="<target.name>_tmp_<lastIndex>"/\>
+	\<port dir="in" source="<target.name>_size_<indexMap.(first(indexes))>"/\>
+	\<port dir="out" size="32" source="<target.name>_tmpMul_<indexMap.(first(indexes))>" typeName="int"/\>
 \</operation\>
 \<operation kind="$add"\>
-	\<port dir="in" source="<target>_tmpMul_<indexMap.(first(indexes))>"/\>
-	\<port dir="in" source="<first(indexes)>"/\>
-	\<port dir="out" size="32" source="<target>_tmp_<indexMap.(first(indexes))>" typeName="int"/\>
+	\<port dir="in" source="<target.name>_tmpMul_<indexMap.(first(indexes))>"/\>
+	<untypedPort(dir="in", source=first(indexes))>
+	\<port dir="out" size="32" source="<target.name>_tmp_<indexMap.(first(indexes))>" typeName="int"/\>
 \</operation\>
 <if(rest(indexes))>
 <flatIndexes(indexes=rest(indexes), target=target, lastIndex=indexMap.(first(indexes)), indexMap=indexMap)>
 <else>
 \<operation kind="noop"\>
-	\<port dir="in" source="<target>_tmp_<indexMap.(first(indexes))>"/\>
+	\<port dir="in" source="<target.name>_tmp_<indexMap.(first(indexes))>"/\>
 	<typedPort(dir="out", type=target.type, source=target)>
 \</operation\>
 <endif>
@@ -315,7 +310,7 @@ flatIndexes(indexes,target,lastIndex,indexMap) ::= <<
 sizeDeclare(target,type) ::= <<
 <type.dimensions:{dimension|
 \<operation kind="$literal_Integer" value="<dimension>"\>
-	\<port dir="out" size="32" source="<target>_size_<i0>" typeName="int"/\>
+	\<port dir="out" size="32" source="<target.name>_size_<i0>" typeName="int"/\>
 \</operation\>}>
 >>
 
@@ -422,7 +417,7 @@ typeDef(action) ::= <<
 
 typeDefLocal(local) ::= <<
 <if(local.type.list)>
-\<typeDef name="<local>_typedef"\>
+\<typeDef name="<local.name>_typedef"\>
 	\<type name="List"\>
 		\<valuePar name="size" value="<local.type.size>"/\>
 		\<typePar name="type"\>
@@ -489,9 +484,9 @@ patternPortPinAvail(dir, port)::= <<
 	\<port dir="out" size="32" source="<dir>putPattern_<instance.id>_<action.name>_<port>_tokenCount" typeName="int"/\>
 \</operation\>
 \<operation kind="$ge"\>
-	\<port dir="in" source="<port>_pinAvail"/\>
-	\<port dir="in" source="<dir>putPattern_<instance.id>_<action.name>_<port>_tokenCount"/\>
-	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_<port>" typeName="bool"/\>
+	<untypedPort(dir="in", source=port, extension="_pinAvail")>
+	\<port dir="in" source="<dir>putPattern_<instance.id>_<action.name>_<port.name>_tokenCount"/\>
+	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_<port.name>" typeName="bool"/\>
 \</operation\>
 >>
 
@@ -551,8 +546,8 @@ inputPattern(pattern, action) ::= <<
 // Pin Available declaration
 
 declarePinAvailableVariable(port) ::= <<
-\<operation kind="pinAvail" portName="<port>"\>
-	\<port dir="out" size="32" source="<port>_pinAvail" typeName="int"/\>
+\<operation kind="pinAvail" portName="<port.name>"\>
+	\<port dir="out" size="32" source="<port.name>_pinAvail" typeName="int"/\>
 \</operation\>
 >>
 
@@ -565,10 +560,10 @@ actionCall(action) ::= <<
 
 actionTest(action) ::= <<
 \<module kind="if"\>
-	\<module decision="isSchedulable_<action>" kind="test"\>
+	\<module decision="isSchedulable_<action.name>" kind="test"\>
 		\<operation kind="noop"\>
-			\<port dir="in" source="isSchedulable_<action>_goWithToken"/\>
-			\<port dir="out" size="1" source="isSchedulable_<action>" typeName="bool"/\>
+			\<port dir="in" source="isSchedulable_<action.name>_goWithToken"/\>
+			\<port dir="out" size="1" source="isSchedulable_<action.name>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="then"\>
@@ -635,8 +630,8 @@ actionTestState(nextState) ::= <<
 \<module kind="if"\>
 	\<module decision="isSchedulable_<nextState.action>_<transition.sourceState>" kind="test"\>
 		\<operation kind="noop"\>
-			\<port dir="in" source="isSchedulable_<nextState.action>_goWithToken"/\>
-			\<port dir="out" size="1" source="isSchedulable_<nextState.action>_<transition.sourceState>" typeName="bool"/\>
+			\<port dir="in" source="isSchedulable_<nextState.action.name>_goWithToken"/\>
+			\<port dir="out" size="1" source="isSchedulable_<nextState.action.name>_<transition.sourceState>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="then"\>
@@ -696,14 +691,14 @@ inputPatternTest(action) ::= <<
 <if(action.inputPattern)>
 <inputPattern(pattern=action.inputPattern.numTokensMap,action=action)>
 \<operation kind="$and"\>
-	\<port dir="in" source="inputPattern_<instance.id>_<action>_decision"/\>
-	\<port dir="in" source="isSchedulable_<action>_go"/\>
-	\<port dir="out" size="1" source="isSchedulable_<action>_goWithToken" typeName="bool"/\>
+	\<port dir="in" source="inputPattern_<instance.id>_<action.name>_decision"/\>
+	\<port dir="in" source="isSchedulable_<action.name>_go"/\>
+	\<port dir="out" size="1" source="isSchedulable_<action.name>_goWithToken" typeName="bool"/\>
 \</operation\>
 <else>
 \<operation kind="noop"\>
-	\<port dir="in" source="isSchedulable_<action>_go"/\>
-	\<port dir="out" size="1" source="isSchedulable_<action>_goWithToken" typeName="bool"/\>
+	\<port dir="in" source="isSchedulable_<action.name>_go"/\>
+	\<port dir="out" size="1" source="isSchedulable_<action.name>_goWithToken" typeName="bool"/\>
 \</operation\>
 <endif>
 >>
