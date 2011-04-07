@@ -10,4 +10,4 @@ add_executable( JadeToolbox
 
 
 # Library requiered
-target_link_libraries(JadeToolbox DecoderEngine XDFSerialize HDAGGraph IRJit Fifo IRCore TinyXml IRUtil ZLib ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(JadeToolbox DecoderEngine XDFSerialize IRCore IRUtil IRCore HDAGGraph Fifo IRJit TinyXml ZLib ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
