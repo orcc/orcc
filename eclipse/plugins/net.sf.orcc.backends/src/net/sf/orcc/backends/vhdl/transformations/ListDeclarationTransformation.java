@@ -28,13 +28,13 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
-import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -54,28 +54,28 @@ public class ListDeclarationTransformation extends AbstractActorVisitor {
 	 * 
 	 * @param expression
 	 *            an expression
-	 * @param values
-	 *            a list of values
+	 * @param list
+	 *            a list expression
 	 */
-	private void flattenList(Expression expression, List<Expression> values) {
+	private void flattenList(Expression expression, ExprList list) {
 		if (expression.isListExpr()) {
-			List<Expression> expressions = ((ListExpr) expression).getValue();
+			List<Expression> expressions = ((ExprList) expression).getValue();
 			for (Expression subExpr : expressions) {
-				flattenList(subExpr, values);
+				flattenList(subExpr, list);
 			}
 		} else {
-			values.add(expression);
+			list.getValue().add(expression);
 		}
 	}
 
 	@Override
 	public void visit(Actor actor) {
 		// VHDL synthesizers don't support multi-dimensional memory yet
-		for (VarGlobal variable : actor.getStateVars()) {
+		for (Var variable : actor.getStateVars()) {
 			if (variable.getType().isList()) {
-				List<Expression> newValues = new ArrayList<Expression>();
-				flattenList(variable.getValue(), newValues);
-				variable.setInitialValue(new ListExpr(newValues));
+				ExprList list = IrFactory.eINSTANCE.createExprList();
+				flattenList(variable.getValue(), list);
+				variable.setInitialValue(list);
 			}
 		}
 	}

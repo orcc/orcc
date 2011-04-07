@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.vhdl.ram;
 
 import net.sf.orcc.backends.instructions.InstSplit;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -42,7 +42,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 public class ConditionedSplitExtractor extends AbstractActorVisitor {
 
 	@Override
-	public void visit(SpecificInstruction instruction) {
+	public void visit(InstSpecific instruction) {
 		if (instruction instanceof InstSplit) {
 			// do something here
 		}

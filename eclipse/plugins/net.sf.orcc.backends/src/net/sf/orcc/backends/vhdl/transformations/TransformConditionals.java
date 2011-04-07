@@ -28,22 +28,22 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.FloatExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -61,66 +61,71 @@ public class TransformConditionals extends AbstractActorVisitor {
 			ExpressionInterpreter {
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
+		public Object interpret(ExprBinary expr, Object... args) {
 			Expression e1 = (Expression) expr.getE1().accept(
 					(ExpressionInterpreter) this);
 			Expression e2 = (Expression) expr.getE2().accept(this);
-			BinaryOp op = expr.getOp();
+			OpBinary op = expr.getOp();
 			Type type = expr.getType();
-			return new BinaryExpr(e1, op, e2, type);
+			return IrFactory.eINSTANCE.createExprBinary(e1, op, e2, type);
 		}
 
 		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
+		public Object interpret(ExprBool expr, Object... args) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(FloatExpr expr, Object... args) {
+		public Object interpret(ExprFloat expr, Object... args) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(IntExpr expr, Object... args) {
+		public Object interpret(ExprInt expr, Object... args) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(ListExpr expr, Object... args) {
+		public Object interpret(ExprList expr, Object... args) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(StringExpr expr, Object... args) {
+		public Object interpret(ExprString expr, Object... args) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
-			UnaryOp op = expr.getOp();
+		public Object interpret(ExprUnary expr, Object... args) {
+			OpUnary op = expr.getOp();
 			Expression subExpr = expr.getExpr();
-			if (op == UnaryOp.LOGIC_NOT) {
+			if (op == OpUnary.LOGIC_NOT) {
 				if (subExpr.isVarExpr()) {
 					// "not a" => "a = false"
-					return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(
-							false), IrFactory.eINSTANCE.createTypeBool());
+					return IrFactory.eINSTANCE.createExprBinary(subExpr,
+							OpBinary.EQ,
+							IrFactory.eINSTANCE.createExprBool(false),
+							IrFactory.eINSTANCE.createTypeBool());
 				} else {
 					// "not (expr)" => "(expr) = false"
 					subExpr = (Expression) subExpr.accept(this);
-					return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(
-							false), IrFactory.eINSTANCE.createTypeBool());
+					return IrFactory.eINSTANCE.createExprBinary(subExpr,
+							OpBinary.EQ,
+							IrFactory.eINSTANCE.createExprBool(false),
+							IrFactory.eINSTANCE.createTypeBool());
 				}
 			} else {
 				subExpr = (Expression) subExpr.accept(this);
 				Type type = expr.getType();
-				return new UnaryExpr(op, subExpr, type);
+				return IrFactory.eINSTANCE.createExprUnary(op, subExpr, type);
 			}
 		}
 
 		@Override
-		public Object interpret(VarExpr expr, Object... args) {
+		public Object interpret(ExprVar expr, Object... args) {
 			if (expr.getType().isBool()) {
-				return new BinaryExpr(expr, BinaryOp.EQ, new BoolExpr(true),
+				return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
+						IrFactory.eINSTANCE.createExprBool(true),
 						IrFactory.eINSTANCE.createTypeBool());
 			} else {
 				return expr;
@@ -137,13 +142,15 @@ public class TransformConditionals extends AbstractActorVisitor {
 
 	@Override
 	public void visit(NodeIf node) {
-		node.setValue((Expression) node.getValue().accept(exprInterpreter));
+		node.setCondition((Expression) node.getCondition().accept(
+				exprInterpreter));
 		super.visit(node);
 	}
 
 	@Override
 	public void visit(NodeWhile node) {
-		node.setValue((Expression) node.getValue().accept(exprInterpreter));
+		node.setCondition((Expression) node.getCondition().accept(
+				exprInterpreter));
 		super.visit(node);
 	}
 

@@ -28,18 +28,18 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
+import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines methods to move code (blocks and instructions) from one
@@ -82,14 +82,13 @@ public class CodeMover extends AbstractActorVisitor {
 	 * @param variable
 	 *            a variable
 	 */
-	private void moveLocalVariable(Instruction instruction,
-			VarLocal variable) {
-		procedure.getLocals().remove(variable.getName());
+	private void moveLocalVariable(Instruction instruction, Var variable) {
+		procedure.getLocals().remove(variable);
 
-		OrderedMap<String, VarLocal> locals = targetProcedure.getLocals();
-		if (!locals.contains(variable.getName())) {
+		List<Var> locals = targetProcedure.getLocals();
+		if (!locals.contains(variable)) {
 			// this test handles the case of assignments created by PhiRemoval
-			locals.put(variable.getName(), variable);
+			locals.add(variable);
 		}
 	}
 
@@ -121,24 +120,24 @@ public class CodeMover extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Assign assign) {
-		moveLocalVariable(assign, assign.getTarget());
+	public void visit(InstAssign assign) {
+		moveLocalVariable(assign, assign.getTarget().getVariable());
 	}
 
 	@Override
-	public void visit(Call call) {
-		moveLocalVariable(call, call.getTarget());
+	public void visit(InstCall call) {
+		moveLocalVariable(call, call.getTarget().getVariable());
+	}
+
+	@Override
+	public void visit(InstLoad load) {
+		moveLocalVariable(load, load.getTarget().getVariable());
 	}
 
 	@Override
 	public void visit(NodeBlock nodeBlock) {
 		this.procedure = nodeBlock.getProcedure();
 		super.visit(nodeBlock);
-	}
-
-	@Override
-	public void visit(Load load) {
-		moveLocalVariable(load, load.getTarget());
 	}
 
 }

@@ -28,24 +28,16 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
-import java.util.ListIterator;
-
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -75,8 +67,6 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class BoolExprTransformation extends AbstractActorVisitor {
 
-	private int tempVarCount;
-
 	/**
 	 * Creates an "if" node that assign <code>true</code> or <code>false</code>
 	 * to <code>target</code> if the given expression is <code>true</code>,
@@ -87,21 +77,23 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 * @param expr
 	 *            an expression
 	 */
-	private void createIfNode(VarLocal target, Expression expr) {
+	private void createIfNode(Var target, Expression expr) {
 		NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
-		node.setValue(expr);
+		node.setCondition(expr);
 		node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 
 		// add "then" nodes
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		node.getThenNodes().add(block);
-		Assign assign = new Assign(target, new BoolExpr(true));
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
+				IrFactory.eINSTANCE.createExprBool(true));
 		block.add(assign);
 
 		// add "else" nodes
 		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		node.getElseNodes().add(block);
-		assign = new Assign(target, new BoolExpr(false));
+		assign = IrFactory.eINSTANCE.createInstAssign(target,
+				IrFactory.eINSTANCE.createExprBool(false));
 		block.add(assign);
 
 		itNode.add(node);
@@ -114,11 +106,10 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 * @param iit
 	 *            list iterator
 	 */
-	private void createNewBlock(ListIterator<Instruction> iit) {
+	private void createNewBlock() {
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		while (iit.hasNext()) {
-			Instruction instruction = iit.next();
-			iit.remove();
+		while (itInstruction.hasNext()) {
+			Instruction instruction = itInstruction.next();
 			block.add(instruction);
 		}
 
@@ -134,65 +125,61 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 * 
 	 * @return a new boolean local variable
 	 */
-	private VarLocal newVariable() {
-		return new VarLocal(true, tempVarCount++, new Location(),
-				"bool_expr", IrFactory.eINSTANCE.createTypeBool());
+	private Var newVariable() {
+		return procedure.newTempLocalVariable("",
+				IrFactory.eINSTANCE.createTypeBool(), "bool_expr");
 	}
 
 	@Override
-	public void visit(Assign assign) {
-		VarLocal target = assign.getTarget();
+	public void visit(InstAssign assign) {
+		Var target = assign.getTarget().getVariable();
 		if (target.getType().isBool()) {
 			Expression expr = assign.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				createIfNode(target, expr);
 
-				// removes this assign and moves remaining instructions to a new
-				// block
+				// remove definition
+				assign.getTarget().setVariable(null);
+
+				// go back to this assign, and deletes it
 				itInstruction.previous();
 				itInstruction.remove();
-				createNewBlock(itInstruction);
+
+				// move the rest of instructions to a new block
+				createNewBlock();
 			}
 		}
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
-		tempVarCount = 1;
-		super.visit(procedure);
-	}
-
-	@Override
-	public void visit(Return returnInstr) {
+	public void visit(InstReturn returnInstr) {
 		if (procedure.getReturnType().isBool()) {
 			Expression expr = returnInstr.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
-				VarLocal local = newVariable();
-				procedure.getLocals().put(local.getName(), local);
-				returnInstr.setValue(new VarExpr(new Use(local)));
+				Var local = newVariable();
+				returnInstr.setValue(IrFactory.eINSTANCE.createExprVar(local));
 				createIfNode(local, expr);
 
 				// moves this return and remaining instructions to a new block
 				itInstruction.previous();
-				createNewBlock(itInstruction);
+				createNewBlock();
 			}
 		}
 	}
 
 	@Override
-	public void visit(Store store) {
-		Var target = store.getTarget();
+	public void visit(InstStore store) {
+		Var target = store.getTarget().getVariable();
 		if (target.getType().isBool()) {
 			Expression expr = store.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
-				VarLocal local = newVariable();
-				procedure.getLocals().put(local.getName(), local);
-				store.setValue(new VarExpr(new Use(local)));
+				Var local = newVariable();
+				store.setValue(IrFactory.eINSTANCE.createExprVar(local));
 				createIfNode(local, expr);
 
 				// moves this store and remaining instructions to a new block
 				itInstruction.previous();
-				createNewBlock(itInstruction);
+				createNewBlock();
 			}
 		}
 	}

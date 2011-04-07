@@ -17,91 +17,100 @@ import org.eclipse.emf.ecore.EFactory;
 /**
  * <!-- begin-user-doc --> The <b>Factory</b> for the model. It provides a
  * create method for each non-abstract class of the model. <!-- end-user-doc -->
+ * 
  * @see net.sf.orcc.backends.instructions.InstructionsPackage
  * @generated
  */
 public interface InstructionsFactory extends EFactory {
 	/**
-	 * The singleton instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * The singleton instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
-	InstructionsFactory eINSTANCE = net.sf.orcc.backends.instructions.impl.InstructionsFactoryImpl.init();
+	InstructionsFactory eINSTANCE = net.sf.orcc.backends.instructions.impl.InstructionsFactoryImpl
+			.init();
 
 	/**
-	 * Returns a new object of class '<em>Inst Ternary</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Ternary</em>'.
-	 * @generated
-	 */
-	InstTernary createInstTernary();
-
-	/**
-	 * Returns a new object of class '<em>Inst Assign Index</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns a new object of class '<em>Inst Assign Index</em>'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Inst Assign Index</em>'.
 	 * @generated
 	 */
 	InstAssignIndex createInstAssignIndex();
 
-	/**
-	 * Returns a new object of class '<em>Inst Split</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Inst Split</em>'.
-	 * @generated
-	 */
-	InstSplit createInstSplit();
+	InstAssignIndex createInstAssignIndex(Var indexVar,
+			List<Expression> listIndex, Type type);
 
 	/**
-	 * Returns a new object of class '<em>Inst Ram</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns a new object of class '<em>Inst Ram</em>'. <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Inst Ram</em>'.
 	 * @generated
 	 */
 	InstRam createInstRam();
 
 	/**
-	 * Returns a new object of class '<em>Inst Ram Read</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns a new object of class '<em>Inst Ram Read</em>'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Inst Ram Read</em>'.
 	 * @generated
 	 */
 	InstRamRead createInstRamRead();
 
+	InstRamRead createInstRamRead(int port, Var variable, Var target);
+
 	/**
-	 * Returns a new object of class '<em>Inst Ram Set Address</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns a new object of class '<em>Inst Ram Set Address</em>'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Inst Ram Set Address</em>'.
 	 * @generated
 	 */
 	InstRamSetAddress createInstRamSetAddress();
 
+	InstRamSetAddress createInstRamSetAddress(int port, Var variable,
+			List<Expression> indexes);
+
 	/**
-	 * Returns a new object of class '<em>Inst Ram Write</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * Returns a new object of class '<em>Inst Ram Write</em>'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @return a new object of class '<em>Inst Ram Write</em>'.
 	 * @generated
 	 */
 	InstRamWrite createInstRamWrite();
 
+	InstRamWrite createInstRamWrite(int port, Var variable, Expression value);
+
+	/**
+	 * Returns a new object of class '<em>Inst Split</em>'. <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
+	 * 
+	 * @return a new object of class '<em>Inst Split</em>'.
+	 * @generated
+	 */
+	InstSplit createInstSplit();
+
+	/**
+	 * Returns a new object of class '<em>Inst Ternary</em>'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return a new object of class '<em>Inst Ternary</em>'.
+	 * @generated
+	 */
+	InstTernary createInstTernary();
+
 	InstTernary createInstTernary(Var target, Expression condition,
 			Expression trueValue, Expression falseValue);
 
-	InstAssignIndex createInstAssignIndex(Var indexVar, List<Expression> listIndex,
-			Type type);
-
 	/**
-	 * Returns the package supported by this factory.
-	 * <!-- begin-user-doc -->
+	 * Returns the package supported by this factory. <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the package supported by this factory.
 	 * @generated
 	 */

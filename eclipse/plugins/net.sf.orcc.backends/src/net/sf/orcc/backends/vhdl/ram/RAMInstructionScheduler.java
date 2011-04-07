@@ -34,20 +34,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.backends.instructions.InstRamRead;
+import net.sf.orcc.backends.instructions.InstRamSetAddress;
+import net.sf.orcc.backends.instructions.InstRamWrite;
 import net.sf.orcc.backends.instructions.InstSplit;
-import net.sf.orcc.backends.vhdl.ram.instructions.RamRead;
-import net.sf.orcc.backends.vhdl.ram.instructions.RamSetAddress;
-import net.sf.orcc.backends.vhdl.ram.instructions.RamWrite;
+import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -59,7 +59,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class RAMInstructionScheduler extends AbstractActorVisitor {
 
-	private Map<RAM, List<RamRead>> pendingReads;
+	private Map<RAM, List<InstRamRead>> pendingReads;
 
 	private Map<Var, RAM> ramMap;
 
@@ -73,11 +73,9 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param var
 	 *            variable
 	 */
-	private void addEarlySetAddress(List<Expression> indexes, int port,
-			Var var) {
-		RamSetAddress rsa = new RamSetAddress(indexes);
-		rsa.setPort(port);
-		rsa.setVariable(var);
+	private void addEarlySetAddress(List<Expression> indexes, int port, Var var) {
+		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
+				.createInstRamSetAddress(port, var, indexes);
 
 		// save index
 		int index = itInstruction.nextIndex() + 1;
@@ -107,13 +105,12 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param port
 	 *            a port
 	 */
-	private void addPendingRead(RAM ram, Load load, int port) {
-		RamRead read = new RamRead();
-		read.setPort(port);
-		read.setTarget(load.getTarget());
-		read.setVariable(load.getSource().getVariable());
+	private void addPendingRead(RAM ram, InstLoad load, int port) {
+		InstRamRead read = InstructionsFactory.eINSTANCE.createInstRamRead(
+				port, load.getSource().getVariable(), load.getTarget()
+						.getVariable());
 
-		List<RamRead> reads = pendingReads.get(ram);
+		List<InstRamRead> reads = pendingReads.get(ram);
 		reads.add(read);
 	}
 
@@ -127,11 +124,9 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param var
 	 *            variable
 	 */
-	private void addSetAddress(List<Expression> indexes, int port,
-			Var var) {
-		RamSetAddress rsa = new RamSetAddress(indexes);
-		rsa.setPort(port);
-		rsa.setVariable(var);
+	private void addSetAddress(List<Expression> indexes, int port, Var var) {
+		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
+				.createInstRamSetAddress(port, var, indexes);
 		itInstruction.add(rsa);
 	}
 
@@ -140,7 +135,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * 
 	 */
 	private void addSplitInstruction() {
-		itInstruction.add(new InstSplit());
+		itInstruction.add(InstructionsFactory.eINSTANCE.createInstSplit());
 	}
 
 	/**
@@ -153,11 +148,9 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param port
 	 *            a port
 	 */
-	private void addWrite(RAM ram, Store store, int port) {
-		RamWrite write = new RamWrite();
-		write.setPort(port);
-		write.setVariable(store.getTarget());
-		write.setValue(store.getValue());
+	private void addWrite(RAM ram, InstStore store, int port) {
+		InstRamWrite write = InstructionsFactory.eINSTANCE.createInstRamWrite(
+				port, store.getTarget().getVariable(), store.getValue());
 		itInstruction.add(write);
 	}
 
@@ -167,7 +160,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param load
 	 *            a Load
 	 */
-	private void convertLoad(Load load) {
+	private void convertLoad(InstLoad load) {
 		List<Expression> indexes = load.getIndexes();
 		Var var = load.getSource().getVariable();
 
@@ -210,9 +203,9 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	 * @param store
 	 *            a Store
 	 */
-	private void convertStore(Store store) {
+	private void convertStore(InstStore store) {
 		List<Expression> indexes = store.getIndexes();
-		Var var = store.getTarget();
+		Var var = store.getTarget().getVariable();
 
 		RAM ram = ramMap.get(var);
 		int port;
@@ -235,8 +228,8 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	}
 
 	private boolean executeTwoPendingReads(RAM ram) {
-		List<RamRead> reads = pendingReads.get(ram);
-		Iterator<RamRead> it = reads.iterator();
+		List<InstRamRead> reads = pendingReads.get(ram);
+		Iterator<InstRamRead> it = reads.iterator();
 		for (int i = 0; it.hasNext() && i < 2; i++) {
 			itInstruction.add(it.next());
 			it.remove();
@@ -247,13 +240,13 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		pendingReads = new HashMap<RAM, List<RamRead>>();
+		pendingReads = new HashMap<RAM, List<InstRamRead>>();
 		ramMap = new HashMap<Var, RAM>();
-		for (VarGlobal variable : actor.getStateVars()) {
+		for (Var variable : actor.getStateVars()) {
 			if (variable.isAssignable() && variable.getType().isList()) {
 				RAM ram = new RAM();
 				ramMap.put(variable, ram);
-				pendingReads.put(ram, new ArrayList<RamRead>(2));
+				pendingReads.put(ram, new ArrayList<InstRamRead>(2));
 			}
 		}
 
@@ -264,7 +257,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Load load) {
+	public void visit(InstLoad load) {
 		Var var = load.getSource().getVariable();
 		if (!load.getIndexes().isEmpty() && var.isAssignable()
 				&& var.isGlobal()) {
@@ -292,8 +285,8 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Store store) {
-		Var var = store.getTarget();
+	public void visit(InstStore store) {
+		Var var = store.getTarget().getVariable();
 		if (!store.getIndexes().isEmpty() && var.isGlobal()) {
 			itInstruction.remove();
 			convertStore(store);

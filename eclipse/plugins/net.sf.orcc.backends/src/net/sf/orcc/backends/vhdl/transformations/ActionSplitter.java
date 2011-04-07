@@ -41,20 +41,14 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
+import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.VarLocal;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.UniqueEdge;
 
@@ -117,33 +111,35 @@ public class ActionSplitter extends AbstractActorVisitor {
 		private Action createNewAction(Expression condition, String name) {
 			// scheduler
 			Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
-					"isSchedulable_" + name, new Location(),
+					"isSchedulable_" + name,
+					IrFactory.eINSTANCE.createLocation(),
 					IrFactory.eINSTANCE.createTypeBool());
-			VarLocal result = scheduler.newTempLocalVariable(
+			Var result = scheduler.newTempLocalVariable(
 					ActionSplitter.this.actor.getFile(),
 					IrFactory.eINSTANCE.createTypeBool(), "result");
 			result.setIndex(1);
-			scheduler.getLocals().remove(result.getBaseName());
-			scheduler.getLocals().put(result.getName(), result);
 
 			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			block.add(new Assign(result, condition));
-			block.add(new Return(new VarExpr(new Use(result))));
+			block.add(IrFactory.eINSTANCE.createInstAssign(result, condition));
+			block.add(IrFactory.eINSTANCE.createInstReturn(IrFactory.eINSTANCE
+					.createExprVar(result)));
 			scheduler.getNodes().add(block);
 
 			// body
 			Procedure body = IrFactory.eINSTANCE.createProcedure(name,
-					new Location(), IrFactory.eINSTANCE.createTypeVoid());
+					IrFactory.eINSTANCE.createLocation(),
+					IrFactory.eINSTANCE.createTypeVoid());
 			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			block.add(new Return(null));
+			block.add(IrFactory.eINSTANCE.createInstReturn());
 			body.getNodes().add(block);
 
 			// tag
 			Tag tag = new Tag();
 			tag.add(name);
 
-			Action action = new Action(new Location(), tag, new Pattern(),
-					currentAction.getOutputPattern(), scheduler, body);
+			Action action = new Action(IrFactory.eINSTANCE.createLocation(),
+					tag, new Pattern(), currentAction.getOutputPattern(),
+					scheduler, body);
 			currentAction.setOutputPattern(new Pattern());
 
 			// add action to actor's actions
@@ -197,7 +193,8 @@ public class ActionSplitter extends AbstractActorVisitor {
 			String newActionName = getNewStateName();
 
 			// create new action
-			nextAction = createNewAction(new BoolExpr(true), newActionName);
+			nextAction = createNewAction(
+					IrFactory.eINSTANCE.createExprBool(true), newActionName);
 
 			// remove the SplitInstruction
 			itInstruction.previous();
@@ -224,7 +221,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 		}
 
 		@Override
-		public void visit(SpecificInstruction instruction) {
+		public void visit(InstSpecific instruction) {
 			if (instruction instanceof InstSplit) {
 				splitAction();
 			}
