@@ -54,8 +54,8 @@
          point="org.eclipse.emf.ecore.generated_package">
       <package
             class="net.sf.orcc.ir.IrPackage"
-            genModel="model/IR.genmodel"
-            uri="platform:/resource/net.sf.orcc.core/model/ir.ecore">
+            genModel="model/Ir.genmodel"
+            uri="platform:/resource/net.sf.orcc.core/model/Ir.ecore">
       </package>
    </extension>
 
