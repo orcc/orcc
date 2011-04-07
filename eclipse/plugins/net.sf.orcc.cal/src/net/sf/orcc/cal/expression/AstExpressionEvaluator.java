@@ -180,7 +180,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			}
 		}
 
-		return value;
+		return EcoreUtil.copy(value);
 	}
 
 	@Override

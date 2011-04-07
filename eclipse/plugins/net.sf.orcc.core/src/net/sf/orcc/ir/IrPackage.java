@@ -1177,7 +1177,7 @@ public interface IrPackage extends EPackage {
 	int EXPR_LIST = 29;
 
 	/**
-	 * The feature id for the '<em><b>Value</b></em>' reference list.
+	 * The feature id for the '<em><b>Value</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2298,10 +2298,10 @@ public interface IrPackage extends EPackage {
 	EClass getExprList();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.ExprList#getValue <em>Value</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.ExprList#getValue <em>Value</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Value</em>'.
+	 * @return the meta object for the containment reference list '<em>Value</em>'.
 	 * @see net.sf.orcc.ir.ExprList#getValue()
 	 * @see #getExprList()
 	 * @generated
@@ -3142,7 +3142,7 @@ public interface IrPackage extends EPackage {
 		EClass EXPR_LIST = eINSTANCE.getExprList();
 
 		/**
-		 * The meta object literal for the '<em><b>Value</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Value</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

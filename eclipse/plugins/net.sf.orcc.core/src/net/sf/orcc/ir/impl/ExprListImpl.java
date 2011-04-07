@@ -17,9 +17,12 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.ExpressionInterpreter;
 import net.sf.orcc.ir.util.ExpressionVisitor;
 
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -36,7 +39,7 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 public class ExprListImpl extends ExpressionImpl implements ExprList {
 
 	/**
-	 * The cached value of the '{@link #getValue() <em>Value</em>}' reference list.
+	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getValue()
 	 * @generated
@@ -164,9 +167,23 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	 */
 	public EList<Expression> getValue() {
 		if (value == null) {
-			value = new EObjectResolvingEList<Expression>(Expression.class, this, IrPackage.EXPR_LIST__VALUE);
+			value = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.EXPR_LIST__VALUE);
 		}
 		return value;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.EXPR_LIST__VALUE:
+				return ((InternalEList<?>)getValue()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	@Override

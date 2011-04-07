@@ -47,9 +47,10 @@ public interface ExprList extends Expression {
 	public int getSize();
 
 	/**
+	 * Returns the list of expressions contained in this expression.
 	 * 
-	 * @return
-	 * @model
+	 * @return the list of expressions contained in this expression
+	 * @model containment="true"
 	 */
 	public EList<Expression> getValue();
 
