@@ -54,6 +54,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ui.PlatformUI;
 
+import std.io.Source;
+
 public class InterpreterSimulatorImpl extends AbstractSimulator {
 
 	protected List<Fifo> fifoList;
@@ -166,6 +168,8 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 
 	@Override
 	protected void initializeNetwork() {
+		Source.fileName = stimulusFile;
+
 		for (SimuActor simuActorInstance : simuActorsMap.values()) {
 			AbstractInterpreterSimuActor myInstance = (AbstractInterpreterSimuActor) simuActorInstance;
 			myInstance.initialize();

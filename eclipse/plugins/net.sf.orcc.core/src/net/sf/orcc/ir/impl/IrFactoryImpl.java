@@ -6,7 +6,6 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;

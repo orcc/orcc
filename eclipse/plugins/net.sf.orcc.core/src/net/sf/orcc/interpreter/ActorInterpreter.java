@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Action;
@@ -334,7 +336,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 			// Initialize actors parameters with instance map
 			for (Var param : actor.getParameters()) {
 				Expression value = parameters.get(param.getName());
-				param.setValue(value);
+				param.setValue(EcoreUtil.copy(value));
 			}
 
 			// Check for List state variables which need to be allocated or
@@ -351,7 +353,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 					}
 				} else {
 					// initialize
-					stateVar.setValue(initConst);
+					stateVar.setValue(EcoreUtil.copy(initConst));
 				}
 			}
 
@@ -584,7 +586,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 		Var target = instr.getTarget().getVariable();
 		Var source = instr.getSource().getVariable();
 		if (instr.getIndexes().isEmpty()) {
-			target.setValue(source.getValue());
+			target.setValue(EcoreUtil.copy(source.getValue()));
 		} else {
 			try {
 				Expression value = source.getValue();
@@ -594,7 +596,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 								.accept(exprInterpreter));
 					}
 				}
-				target.setValue(value);
+				target.setValue(EcoreUtil.copy(value));
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
 						"Array index out of bounds at line "
@@ -630,7 +632,16 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				Class<?> clasz = Class.forName(actor.getName());
 				Method method = clasz.getMethod(procedure.getName(),
 						parameterTypes);
-				method.invoke(null, args);
+				Object res = method.invoke(null, args);
+				if (res instanceof Boolean) {
+					returnValue = IrFactory.eINSTANCE
+							.createExprBool((Boolean) res);
+				} else if (res instanceof Integer) {
+					returnValue = IrFactory.eINSTANCE
+							.createExprInt((Integer) res);
+				} else {
+					returnValue = null;
+				}
 			} catch (Exception e) {
 				throw new OrccRuntimeException(
 						"exception during native procedure call to "
@@ -665,8 +676,10 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	@Override
 	public void visit(InstStore instr) {
 		Var var = instr.getTarget().getVariable();
+		Expression value = (Expression) instr.getValue()
+				.accept(exprInterpreter);
 		if (instr.getIndexes().isEmpty()) {
-			var.setValue((Expression) instr.getValue().accept(exprInterpreter));
+			var.setValue(value);
 		} else {
 			try {
 				Expression target = var.getValue();
@@ -680,8 +693,6 @@ public class ActorInterpreter extends AbstractActorVisitor {
 				}
 
 				if (target.isListExpr()) {
-					Expression value = (Expression) instr.getValue().accept(
-							exprInterpreter);
 					((ExprList) target).set(index, value);
 				}
 			} catch (IndexOutOfBoundsException e) {

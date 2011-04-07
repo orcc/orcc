@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, AKATECH SA
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the AKATECH SA nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,25 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.runtime.actors;
+package std.io;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import net.sf.orcc.runtime.Fifo;
-import net.sf.orcc.runtime.Fifo_int;
+/**
+ * This class defines native functions for the Source actor.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
+public class Source {
 
-public class Actor_ReadFile implements IActor {
+	public static String fileName;
 
-	private Fifo_int fifo_O;
-	
-	private String fileName;
+	private static RandomAccessFile in;
 
-	private RandomAccessFile in;
-	
-	public Actor_ReadFile(String s) {
-		fileName = s;
+	public static void source_init() {
 		try {
 			in = new RandomAccessFile(fileName, "r");
 		} catch (FileNotFoundException e) {
@@ -53,66 +53,35 @@ public class Actor_ReadFile implements IActor {
 		}
 	}
 
-	public String getNextSchedulableAction() {
-		if (fifo_O.hasRoom(1)) {
-			return "read";
-		}
-		return null;
-	}
-
-	@Override
-	public void initialize() {
-	}
-
-	@Override
-	public int schedule() {
-		int i = 0;
-
+	public static void source_readNBytes(Object outTable[], int nbTokenToRead) {
 		try {
-			if (in != null) {
-				while (fifo_O.hasRoom(1)) {
-					int byteRead = in.read();
-					if (byteRead == -1) {
-						break;
-					}
-					
-					int[] O = fifo_O.getWriteArray(1);
-					int O_Index = fifo_O.getWriteIndex(1);
-					O[O_Index] = byteRead;
-					fifo_O.writeEnd(1, O);					
-					i++;
-				}
+			for (int i = 0; i < nbTokenToRead; i++) {
+				outTable[i] = new Integer(in.read());
 			}
 		} catch (IOException e) {
-			String msg = "I/O exception while reading file \"" + fileName + "\"";
+			String msg = "I/O error when reading file \"" + fileName + "\"";
 			throw new RuntimeException(msg, e);
 		}
-
-		return i;
 	}
 
-	@Override
-	public void setFifo(String portName, Fifo fifo) {
-		if ("O".equals(portName)) {
-			fifo_O = (Fifo_int) fifo;
-		}
-		else {
-			String msg = "unknown port \"" + portName + "\"";
-			throw new IllegalArgumentException(msg);
-		}
-	}
-
-	/**
-	 * Close the input stream file
-	 */
-	public void close() {
+	public static void source_rewind() {
 		try {
-			if (in != null) {
-				in.close();
-				in = null;
-			}
+			// and for Damien, no there are no rewind on RandomAccessFile :)
+			in.seek(0L);
 		} catch (IOException e) {
-			e.printStackTrace();
+			String msg = "I/O error when rewinding file \"" + fileName + "\"";
+			throw new RuntimeException(msg, e);
 		}
 	}
+
+	public static int source_sizeOfFile() {
+		try {
+			return (int) in.length();
+		} catch (IOException e) {
+			String msg = "I/O error when getting size of file \"" + fileName
+					+ "\"";
+			throw new RuntimeException(msg, e);
+		}
+	}
+
 }

@@ -45,4 +45,6 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.tools.merger2,
  net.sf.orcc.tools.normalizer,
  net.sf.orcc.tools.statistics,
- net.sf.orcc.util
+ net.sf.orcc.util,
+ std.io,
+ std.video
