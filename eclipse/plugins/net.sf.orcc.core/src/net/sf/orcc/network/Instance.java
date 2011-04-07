@@ -329,7 +329,9 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 						+ "\" because: " + e.getLocalizedMessage(), e);
 			} catch (FileNotFoundException e) {
 				throw new OrccException("Actor \"" + className
-						+ "\" not found! Did you compile the VTL?", e);
+						+ "\" not found!\nIf this actor has errors, please "
+						+ "correct them and try again; otherwise, try to "
+						+ "refresh/clean projects.", e);
 			}
 		}
 
