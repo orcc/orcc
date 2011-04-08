@@ -22,17 +22,16 @@ import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.ir.impl.TagImpl#getIdentifiers <em>Identifiers</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.TagImpl#getIdentifiers <em>Identifiers</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class TagImpl extends EObjectImpl implements Tag {
 	/**
-	 * The cached value of the '{@link #getIdentifiers() <em>Identifiers</em>}'
-	 * attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getIdentifiers() <em>Identifiers</em>}' attribute list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getIdentifiers()
 	 * @generated
 	 * @ordered
@@ -41,7 +40,6 @@ public class TagImpl extends EObjectImpl implements Tag {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected TagImpl() {
@@ -50,7 +48,6 @@ public class TagImpl extends EObjectImpl implements Tag {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -60,75 +57,85 @@ public class TagImpl extends EObjectImpl implements Tag {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<String> getIdentifiers() {
 		if (identifiers == null) {
-			identifiers = new EDataTypeUniqueEList<String>(String.class, this,
-					IrPackage.TAG__IDENTIFIERS);
+			identifiers = new EDataTypeUniqueEList<String>(String.class, this, IrPackage.TAG__IDENTIFIERS);
 		}
 		return identifiers;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.TAG__IDENTIFIERS:
-			return getIdentifiers();
+			case IrPackage.TAG__IDENTIFIERS:
+				return getIdentifiers();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.TAG__IDENTIFIERS:
-			getIdentifiers().clear();
-			getIdentifiers().addAll((Collection<? extends String>) newValue);
-			return;
+			case IrPackage.TAG__IDENTIFIERS:
+				getIdentifiers().clear();
+				getIdentifiers().addAll((Collection<? extends String>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.TAG__IDENTIFIERS:
-			getIdentifiers().clear();
-			return;
+			case IrPackage.TAG__IDENTIFIERS:
+				getIdentifiers().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.TAG__IDENTIFIERS:
-			return identifiers != null && !identifiers.isEmpty();
+			case IrPackage.TAG__IDENTIFIERS:
+				return identifiers != null && !identifiers.isEmpty();
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (identifiers: ");
+		result.append(identifiers);
+		result.append(')');
+		return result.toString();
 	}
 
 	/**

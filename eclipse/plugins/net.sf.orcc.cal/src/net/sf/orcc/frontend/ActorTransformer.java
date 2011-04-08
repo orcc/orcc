@@ -470,7 +470,7 @@ public class ActorTransformer {
 	 * @return the actor in IR form
 	 */
 	public Actor transform(String file, AstActor astActor) {
-		Actor actor = IrFactory.eINSTANCE.createActor();
+		actor = IrFactory.eINSTANCE.createActor();
 		actor.setFile(file);
 
 		astTransformer.setIrActor(actor);

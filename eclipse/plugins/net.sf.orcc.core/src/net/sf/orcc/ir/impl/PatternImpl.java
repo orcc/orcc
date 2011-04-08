@@ -19,9 +19,8 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Pattern</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Pattern</b></em>'. <!-- end-user-doc -->
  * <p>
  * </p>
  *
@@ -34,7 +33,7 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	private static final long serialVersionUID = 1L;
 
 	private Map<Var, Port> inverseVariableMap;
-	
+
 	private Map<Port, Integer> numTokensMap;
 
 	private Map<Port, Var> peekedMap;
@@ -44,8 +43,7 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	private Map<Port, Var> variableMap;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected PatternImpl() {
@@ -100,16 +98,15 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof PatternImpl) {			
-			return ((PatternImpl)obj).getNumTokensMap().equals(numTokensMap);
-		}else{
+		if (obj instanceof PatternImpl) {
+			return ((PatternImpl) obj).getNumTokensMap().equals(numTokensMap);
+		} else {
 			return false;
 		}
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -321,4 +318,4 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 		}
 	}
 
-} //PatternImpl
+} // PatternImpl

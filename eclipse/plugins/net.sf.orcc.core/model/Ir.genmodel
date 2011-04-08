@@ -171,7 +171,6 @@
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Actor">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/actions"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/actionScheduler"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/file"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/initializes"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/inputs"/>
@@ -181,6 +180,8 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/procs"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/stateVars"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/native"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/actionsOutsideFsm"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/fsm"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Pattern"/>
     <genClasses ecoreClass="Ir.ecore#//Port">
@@ -193,6 +194,6 @@
     <genClasses ecoreClass="Ir.ecore#//Tag">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute Ir.ecore#//Tag/identifiers"/>
     </genClasses>
-    <genClasses image="false" ecoreClass="Ir.ecore#//ActionScheduler"/>
+    <genClasses ecoreClass="Ir.ecore#//FSM"/>
   </genPackages>
 </genmodel:GenModel>

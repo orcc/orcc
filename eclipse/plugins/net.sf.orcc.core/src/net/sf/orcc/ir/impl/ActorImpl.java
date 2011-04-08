@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -30,6 +30,7 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
@@ -38,59 +39,27 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActions <em>Actions</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActionScheduler <em>Action
- * Scheduler</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFile <em>File</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInitializes <em>Initializes</em>}
- * </li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInputs <em>Inputs</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getName <em>Name</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getOutputs <em>Outputs</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getParameters <em>Parameters</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getProcs <em>Procs</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#getStateVars <em>State Vars</em>}</li>
- * <li>{@link net.sf.orcc.ir.impl.ActorImpl#isNative <em>Native</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActions <em>Actions</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFile <em>File</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInitializes <em>Initializes</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInputs <em>Inputs</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getOutputs <em>Outputs</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getParameters <em>Parameters</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getProcs <em>Procs</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getStateVars <em>State Vars</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#isNative <em>Native</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActionsOutsideFsm <em>Actions Outside Fsm</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFsm <em>Fsm</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ActorImpl extends EObjectImpl implements Actor {
 	/**
-	 * The default value of the '{@link #getFile() <em>File</em>}' attribute.
+	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getFile()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String FILE_EDEFAULT = null;
-
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #getActions() <em>Actions</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getActions()
 	 * @generated
 	 * @ordered
@@ -98,20 +67,17 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected EList<Action> actions;
 
 	/**
-	 * The cached value of the '{@link #getActionScheduler()
-	 * <em>Action Scheduler</em>}' containment reference. <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * 
-	 * @see #getActionScheduler()
+	 * The default value of the '{@link #getFile() <em>File</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFile()
 	 * @generated
 	 * @ordered
 	 */
-	protected ActionScheduler actionScheduler;
+	protected static final String FILE_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getFile() <em>File</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getFile()
 	 * @generated
 	 * @ordered
@@ -119,9 +85,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected String file = FILE_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getInitializes() <em>Initializes</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getInitializes() <em>Initializes</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getInitializes()
 	 * @generated
 	 * @ordered
@@ -129,14 +94,22 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected EList<Action> initializes;
 
 	/**
-	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getInputs() <em>Inputs</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getInputs()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Port> inputs;
+
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
 
 	private Map<String, Port> inputsMap;
 
@@ -148,7 +121,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -156,19 +128,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected String name = NAME_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @see #getOutputs()
 	 * @generated
 	 * @ordered
@@ -178,9 +139,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	private Map<String, Port> outputsMap;
 
 	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getParameters()
 	 * @generated
 	 * @ordered
@@ -192,9 +152,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	private Map<String, Procedure> proceduresMap;
 
 	/**
-	 * The cached value of the '{@link #getProcs() <em>Procs</em>}' containment
-	 * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getProcs() <em>Procs</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getProcs()
 	 * @generated
 	 * @ordered
@@ -202,14 +161,51 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected EList<Procedure> procs;
 
 	/**
-	 * The cached value of the '{@link #getStateVars() <em>State Vars</em>}'
-	 * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getStateVars() <em>State Vars</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getStateVars()
 	 * @generated
 	 * @ordered
 	 */
 	protected EList<Var> stateVars;
+
+	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getActionsOutsideFsm() <em>Actions Outside Fsm</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getActionsOutsideFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Action> actionsOutsideFsm;
+
+	/**
+	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected FSM fsm;
 
 	private Map<String, Var> stateVarsMap;
 
@@ -220,7 +216,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected ActorImpl() {
@@ -228,186 +223,176 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetActionScheduler(
-			ActionScheduler newActionScheduler, NotificationChain msgs) {
-		ActionScheduler oldActionScheduler = actionScheduler;
-		actionScheduler = newActionScheduler;
+	public NotificationChain basicSetFsm(FSM newFsm, NotificationChain msgs) {
+		FSM oldFsm = fsm;
+		fsm = newFsm;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET, IrPackage.ACTOR__ACTION_SCHEDULER,
-					oldActionScheduler, newActionScheduler);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__FSM, oldFsm, newFsm);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case IrPackage.ACTOR__ACTIONS:
-			return getActions();
-		case IrPackage.ACTOR__ACTION_SCHEDULER:
-			return getActionScheduler();
-		case IrPackage.ACTOR__FILE:
-			return getFile();
-		case IrPackage.ACTOR__INITIALIZES:
-			return getInitializes();
-		case IrPackage.ACTOR__INPUTS:
-			return getInputs();
-		case IrPackage.ACTOR__NAME:
-			return getName();
-		case IrPackage.ACTOR__OUTPUTS:
-			return getOutputs();
-		case IrPackage.ACTOR__PARAMETERS:
-			return getParameters();
-		case IrPackage.ACTOR__PROCS:
-			return getProcs();
-		case IrPackage.ACTOR__STATE_VARS:
-			return getStateVars();
-		case IrPackage.ACTOR__NATIVE:
-			return isNative();
+			case IrPackage.ACTOR__ACTIONS:
+				return getActions();
+			case IrPackage.ACTOR__FILE:
+				return getFile();
+			case IrPackage.ACTOR__INITIALIZES:
+				return getInitializes();
+			case IrPackage.ACTOR__INPUTS:
+				return getInputs();
+			case IrPackage.ACTOR__NAME:
+				return getName();
+			case IrPackage.ACTOR__OUTPUTS:
+				return getOutputs();
+			case IrPackage.ACTOR__PARAMETERS:
+				return getParameters();
+			case IrPackage.ACTOR__PROCS:
+				return getProcs();
+			case IrPackage.ACTOR__STATE_VARS:
+				return getStateVars();
+			case IrPackage.ACTOR__NATIVE:
+				return isNative();
+			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+				return getActionsOutsideFsm();
+			case IrPackage.ACTOR__FSM:
+				return getFsm();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case IrPackage.ACTOR__ACTIONS:
-			return ((InternalEList<?>) getActions())
-					.basicRemove(otherEnd, msgs);
-		case IrPackage.ACTOR__ACTION_SCHEDULER:
-			return basicSetActionScheduler(null, msgs);
-		case IrPackage.ACTOR__INITIALIZES:
-			return ((InternalEList<?>) getInitializes()).basicRemove(otherEnd,
-					msgs);
-		case IrPackage.ACTOR__INPUTS:
-			return ((InternalEList<?>) getInputs()).basicRemove(otherEnd, msgs);
-		case IrPackage.ACTOR__OUTPUTS:
-			return ((InternalEList<?>) getOutputs())
-					.basicRemove(otherEnd, msgs);
-		case IrPackage.ACTOR__PARAMETERS:
-			return ((InternalEList<?>) getParameters()).basicRemove(otherEnd,
-					msgs);
-		case IrPackage.ACTOR__PROCS:
-			return ((InternalEList<?>) getProcs()).basicRemove(otherEnd, msgs);
-		case IrPackage.ACTOR__STATE_VARS:
-			return ((InternalEList<?>) getStateVars()).basicRemove(otherEnd,
-					msgs);
+			case IrPackage.ACTOR__ACTIONS:
+				return ((InternalEList<?>)getActions()).basicRemove(otherEnd, msgs);
+			case IrPackage.ACTOR__INITIALIZES:
+				return ((InternalEList<?>)getInitializes()).basicRemove(otherEnd, msgs);
+			case IrPackage.ACTOR__INPUTS:
+				return ((InternalEList<?>)getInputs()).basicRemove(otherEnd, msgs);
+			case IrPackage.ACTOR__OUTPUTS:
+				return ((InternalEList<?>)getOutputs()).basicRemove(otherEnd, msgs);
+			case IrPackage.ACTOR__PARAMETERS:
+				return ((InternalEList<?>)getParameters()).basicRemove(otherEnd, msgs);
+			case IrPackage.ACTOR__PROCS:
+				return ((InternalEList<?>)getProcs()).basicRemove(otherEnd, msgs);
+			case IrPackage.ACTOR__STATE_VARS:
+				return ((InternalEList<?>)getStateVars()).basicRemove(otherEnd, msgs);
+			case IrPackage.ACTOR__FSM:
+				return basicSetFsm(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case IrPackage.ACTOR__ACTIONS:
-			return actions != null && !actions.isEmpty();
-		case IrPackage.ACTOR__ACTION_SCHEDULER:
-			return actionScheduler != null;
-		case IrPackage.ACTOR__FILE:
-			return FILE_EDEFAULT == null ? file != null : !FILE_EDEFAULT
-					.equals(file);
-		case IrPackage.ACTOR__INITIALIZES:
-			return initializes != null && !initializes.isEmpty();
-		case IrPackage.ACTOR__INPUTS:
-			return inputs != null && !inputs.isEmpty();
-		case IrPackage.ACTOR__NAME:
-			return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT
-					.equals(name);
-		case IrPackage.ACTOR__OUTPUTS:
-			return outputs != null && !outputs.isEmpty();
-		case IrPackage.ACTOR__PARAMETERS:
-			return parameters != null && !parameters.isEmpty();
-		case IrPackage.ACTOR__PROCS:
-			return procs != null && !procs.isEmpty();
-		case IrPackage.ACTOR__STATE_VARS:
-			return stateVars != null && !stateVars.isEmpty();
-		case IrPackage.ACTOR__NATIVE:
-			return native_ != NATIVE_EDEFAULT;
+			case IrPackage.ACTOR__ACTIONS:
+				return actions != null && !actions.isEmpty();
+			case IrPackage.ACTOR__FILE:
+				return FILE_EDEFAULT == null ? file != null : !FILE_EDEFAULT.equals(file);
+			case IrPackage.ACTOR__INITIALIZES:
+				return initializes != null && !initializes.isEmpty();
+			case IrPackage.ACTOR__INPUTS:
+				return inputs != null && !inputs.isEmpty();
+			case IrPackage.ACTOR__NAME:
+				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case IrPackage.ACTOR__OUTPUTS:
+				return outputs != null && !outputs.isEmpty();
+			case IrPackage.ACTOR__PARAMETERS:
+				return parameters != null && !parameters.isEmpty();
+			case IrPackage.ACTOR__PROCS:
+				return procs != null && !procs.isEmpty();
+			case IrPackage.ACTOR__STATE_VARS:
+				return stateVars != null && !stateVars.isEmpty();
+			case IrPackage.ACTOR__NATIVE:
+				return native_ != NATIVE_EDEFAULT;
+			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+				return actionsOutsideFsm != null && !actionsOutsideFsm.isEmpty();
+			case IrPackage.ACTOR__FSM:
+				return fsm != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case IrPackage.ACTOR__ACTIONS:
-			getActions().clear();
-			getActions().addAll((Collection<? extends Action>) newValue);
-			return;
-		case IrPackage.ACTOR__ACTION_SCHEDULER:
-			setActionScheduler((ActionScheduler) newValue);
-			return;
-		case IrPackage.ACTOR__FILE:
-			setFile((String) newValue);
-			return;
-		case IrPackage.ACTOR__INITIALIZES:
-			getInitializes().clear();
-			getInitializes().addAll((Collection<? extends Action>) newValue);
-			return;
-		case IrPackage.ACTOR__INPUTS:
-			getInputs().clear();
-			getInputs().addAll((Collection<? extends Port>) newValue);
-			return;
-		case IrPackage.ACTOR__NAME:
-			setName((String) newValue);
-			return;
-		case IrPackage.ACTOR__OUTPUTS:
-			getOutputs().clear();
-			getOutputs().addAll((Collection<? extends Port>) newValue);
-			return;
-		case IrPackage.ACTOR__PARAMETERS:
-			getParameters().clear();
-			getParameters().addAll((Collection<? extends Var>) newValue);
-			return;
-		case IrPackage.ACTOR__PROCS:
-			getProcs().clear();
-			getProcs().addAll((Collection<? extends Procedure>) newValue);
-			return;
-		case IrPackage.ACTOR__STATE_VARS:
-			getStateVars().clear();
-			getStateVars().addAll((Collection<? extends Var>) newValue);
-			return;
-		case IrPackage.ACTOR__NATIVE:
-			setNative((Boolean) newValue);
-			return;
+			case IrPackage.ACTOR__ACTIONS:
+				getActions().clear();
+				getActions().addAll((Collection<? extends Action>)newValue);
+				return;
+			case IrPackage.ACTOR__FILE:
+				setFile((String)newValue);
+				return;
+			case IrPackage.ACTOR__INITIALIZES:
+				getInitializes().clear();
+				getInitializes().addAll((Collection<? extends Action>)newValue);
+				return;
+			case IrPackage.ACTOR__INPUTS:
+				getInputs().clear();
+				getInputs().addAll((Collection<? extends Port>)newValue);
+				return;
+			case IrPackage.ACTOR__NAME:
+				setName((String)newValue);
+				return;
+			case IrPackage.ACTOR__OUTPUTS:
+				getOutputs().clear();
+				getOutputs().addAll((Collection<? extends Port>)newValue);
+				return;
+			case IrPackage.ACTOR__PARAMETERS:
+				getParameters().clear();
+				getParameters().addAll((Collection<? extends Var>)newValue);
+				return;
+			case IrPackage.ACTOR__PROCS:
+				getProcs().clear();
+				getProcs().addAll((Collection<? extends Procedure>)newValue);
+				return;
+			case IrPackage.ACTOR__STATE_VARS:
+				getStateVars().clear();
+				getStateVars().addAll((Collection<? extends Var>)newValue);
+				return;
+			case IrPackage.ACTOR__NATIVE:
+				setNative((Boolean)newValue);
+				return;
+			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+				getActionsOutsideFsm().clear();
+				getActionsOutsideFsm().addAll((Collection<? extends Action>)newValue);
+				return;
+			case IrPackage.ACTOR__FSM:
+				setFsm((FSM)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -417,74 +402,76 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case IrPackage.ACTOR__ACTIONS:
-			getActions().clear();
-			return;
-		case IrPackage.ACTOR__ACTION_SCHEDULER:
-			setActionScheduler((ActionScheduler) null);
-			return;
-		case IrPackage.ACTOR__FILE:
-			setFile(FILE_EDEFAULT);
-			return;
-		case IrPackage.ACTOR__INITIALIZES:
-			getInitializes().clear();
-			return;
-		case IrPackage.ACTOR__INPUTS:
-			getInputs().clear();
-			return;
-		case IrPackage.ACTOR__NAME:
-			setName(NAME_EDEFAULT);
-			return;
-		case IrPackage.ACTOR__OUTPUTS:
-			getOutputs().clear();
-			return;
-		case IrPackage.ACTOR__PARAMETERS:
-			getParameters().clear();
-			return;
-		case IrPackage.ACTOR__PROCS:
-			getProcs().clear();
-			return;
-		case IrPackage.ACTOR__STATE_VARS:
-			getStateVars().clear();
-			return;
-		case IrPackage.ACTOR__NATIVE:
-			setNative(NATIVE_EDEFAULT);
-			return;
+			case IrPackage.ACTOR__ACTIONS:
+				getActions().clear();
+				return;
+			case IrPackage.ACTOR__FILE:
+				setFile(FILE_EDEFAULT);
+				return;
+			case IrPackage.ACTOR__INITIALIZES:
+				getInitializes().clear();
+				return;
+			case IrPackage.ACTOR__INPUTS:
+				getInputs().clear();
+				return;
+			case IrPackage.ACTOR__NAME:
+				setName(NAME_EDEFAULT);
+				return;
+			case IrPackage.ACTOR__OUTPUTS:
+				getOutputs().clear();
+				return;
+			case IrPackage.ACTOR__PARAMETERS:
+				getParameters().clear();
+				return;
+			case IrPackage.ACTOR__PROCS:
+				getProcs().clear();
+				return;
+			case IrPackage.ACTOR__STATE_VARS:
+				getStateVars().clear();
+				return;
+			case IrPackage.ACTOR__NATIVE:
+				setNative(NATIVE_EDEFAULT);
+				return;
+			case IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM:
+				getActionsOutsideFsm().clear();
+				return;
+			case IrPackage.ACTOR__FSM:
+				setFsm((FSM)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Action> getActions() {
 		if (actions == null) {
-			actions = new EObjectContainmentEList<Action>(Action.class, this,
-					IrPackage.ACTOR__ACTIONS);
+			actions = new EObjectContainmentEList<Action>(Action.class, this, IrPackage.ACTOR__ACTIONS);
 		}
 		return actions;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ActionScheduler getActionScheduler() {
-		return actionScheduler;
+	public EList<Action> getActionsOutsideFsm() {
+		if (actionsOutsideFsm == null) {
+			actionsOutsideFsm = new EObjectResolvingEList<Action>(Action.class, this, IrPackage.ACTOR__ACTIONS_OUTSIDE_FSM);
+		}
+		return actionsOutsideFsm;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String getFile() {
@@ -492,14 +479,21 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public FSM getFsm() {
+		return fsm;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Action> getInitializes() {
 		if (initializes == null) {
-			initializes = new EObjectContainmentEList<Action>(Action.class,
-					this, IrPackage.ACTOR__INITIALIZES);
+			initializes = new EObjectContainmentEList<Action>(Action.class, this, IrPackage.ACTOR__INITIALIZES);
 		}
 		return initializes;
 	}
@@ -516,15 +510,17 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Port> getInputs() {
 		if (inputs == null) {
-			inputs = new EObjectContainmentEList<Port>(Port.class, this,
-					IrPackage.ACTOR__INPUTS);
+			inputs = new EObjectContainmentEList<Port>(Port.class, this, IrPackage.ACTOR__INPUTS);
 		}
 		return inputs;
+	}
+
+	public Map<String, Port> getInputsMap() {
+		return inputsMap;
 	}
 
 	@Override
@@ -534,7 +530,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String getName() {
@@ -553,15 +548,17 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Port> getOutputs() {
 		if (outputs == null) {
-			outputs = new EObjectContainmentEList<Port>(Port.class, this,
-					IrPackage.ACTOR__OUTPUTS);
+			outputs = new EObjectContainmentEList<Port>(Port.class, this, IrPackage.ACTOR__OUTPUTS);
 		}
 		return outputs;
+	}
+
+	public Map<String, Port> getOutputsMap() {
+		return outputsMap;
 	}
 
 	@Override
@@ -596,15 +593,17 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Var> getParameters() {
 		if (parameters == null) {
-			parameters = new EObjectContainmentEList<Var>(Var.class, this,
-					IrPackage.ACTOR__PARAMETERS);
+			parameters = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.ACTOR__PARAMETERS);
 		}
 		return parameters;
+	}
+
+	public Map<String, Var> getParametersMap() {
+		return parametersMap;
 	}
 
 	@Override
@@ -627,15 +626,20 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return proceduresMap.get(name);
 	}
 
+	public Map<String, Procedure> getProceduresMap() {
+		if (proceduresMap == null) {
+			proceduresMap = new HashMap<String, Procedure>();
+		}
+		return proceduresMap;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Procedure> getProcs() {
 		if (procs == null) {
-			procs = new EObjectContainmentEList<Procedure>(Procedure.class,
-					this, IrPackage.ACTOR__PROCS);
+			procs = new EObjectContainmentEList<Procedure>(Procedure.class, this, IrPackage.ACTOR__PROCS);
 		}
 		return procs;
 	}
@@ -660,15 +664,17 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return stateVarsMap.get(name);
 	}
 
+	public Map<String, Var> getStateVariablesMap() {
+		return stateVarsMap;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EList<Var> getStateVars() {
 		if (stateVars == null) {
-			stateVars = new EObjectContainmentEList<Var>(Var.class, this,
-					IrPackage.ACTOR__STATE_VARS);
+			stateVars = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.ACTOR__STATE_VARS);
 		}
 		return stateVars;
 	}
@@ -683,13 +689,17 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	@Override
+	public boolean hasFsm() {
+		return fsm != null;
+	}
+
+	@Override
 	public boolean hasMoC() {
 		return moc != null;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public boolean isNative() {
@@ -712,40 +722,32 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public void setActionScheduler(ActionScheduler newActionScheduler) {
-		if (newActionScheduler != actionScheduler) {
-			NotificationChain msgs = null;
-			if (actionScheduler != null)
-				msgs = ((InternalEObject) actionScheduler)
-						.eInverseRemove(this, EOPPOSITE_FEATURE_BASE
-								- IrPackage.ACTOR__ACTION_SCHEDULER, null, msgs);
-			if (newActionScheduler != null)
-				msgs = ((InternalEObject) newActionScheduler)
-						.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
-								- IrPackage.ACTOR__ACTION_SCHEDULER, null, msgs);
-			msgs = basicSetActionScheduler(newActionScheduler, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.ACTOR__ACTION_SCHEDULER, newActionScheduler,
-					newActionScheduler));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setFile(String newFile) {
 		String oldFile = file;
 		file = newFile;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.ACTOR__FILE, oldFile, file));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__FILE, oldFile, file));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setFsm(FSM newFsm) {
+		if (newFsm != fsm) {
+			NotificationChain msgs = null;
+			if (fsm != null)
+				msgs = ((InternalEObject)fsm).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTOR__FSM, null, msgs);
+			if (newFsm != null)
+				msgs = ((InternalEObject)newFsm).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTOR__FSM, null, msgs);
+			msgs = basicSetFsm(newFsm, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__FSM, newFsm, newFsm));
 	}
 
 	@Override
@@ -755,28 +757,24 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.ACTOR__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__NAME, oldName, name));
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setNative(boolean newNative) {
 		boolean oldNative = native_;
 		native_ = newNative;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					IrPackage.ACTOR__NATIVE, oldNative, native_));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__NATIVE, oldNative, native_));
 	}
 
 	@Override
@@ -786,13 +784,11 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public String toString() {
-		if (eIsProxy())
-			return super.toString();
+		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (file: ");

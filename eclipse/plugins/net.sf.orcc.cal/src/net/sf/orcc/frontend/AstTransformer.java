@@ -922,6 +922,7 @@ public class AstTransformer {
 	 * Clears up context and functions/proceudres maps.
 	 */
 	public void clear() {
+		actor = null;
 		blockCount = 0;
 
 		mapFunctions.clear();

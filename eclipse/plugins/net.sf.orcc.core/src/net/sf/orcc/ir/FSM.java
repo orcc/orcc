@@ -28,36 +28,24 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.ecore.EObject;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.ext.DOTExporter;
-import org.jgrapht.ext.StringEdgeNameProvider;
-import org.jgrapht.ext.StringNameProvider;
-import org.jgrapht.graph.DirectedMultigraph;
 
 /**
  * This class defines a Finite State Machine (FSM). A FSM is a directed
  * multi-graph, where a vertex is a state, and an edge is a list of actions.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class FSM {
+public interface FSM extends EObject {
 
 	/**
 	 * Action associated to the next state.
@@ -67,11 +55,11 @@ public class FSM {
 	 */
 	public class NextStateInfo {
 
-		private Action action;
+		public Action action;
 
-		private State targetState;
+		public State targetState;
 
-		private NextStateInfo(Action action, State targetState) {
+		public NextStateInfo(Action action, State targetState) {
 			this.action = action;
 			this.targetState = targetState;
 		}
@@ -99,9 +87,9 @@ public class FSM {
 	 */
 	public class State implements Comparable<State> {
 
-		private int index;
+		public int index;
 
-		private String name;
+		public String name;
 
 		/**
 		 * Creates a new state with the given name and index.
@@ -111,7 +99,7 @@ public class FSM {
 		 * @param index
 		 *            index of this state
 		 */
-		private State(String name, int index) {
+		public State(String name, int index) {
 			this.index = index;
 			this.name = name;
 		}
@@ -174,9 +162,9 @@ public class FSM {
 	 */
 	public class Transition {
 
-		private List<NextStateInfo> nextStateInfo;
+		public List<NextStateInfo> nextStateInfo;
 
-		private State sourceState;
+		public State sourceState;
 
 		/**
 		 * Creates a transition from a source state.
@@ -184,7 +172,7 @@ public class FSM {
 		 * @param sourceState
 		 *            source state
 		 */
-		private Transition(State sourceState) {
+		public Transition(State sourceState) {
 			this.sourceState = sourceState;
 			this.nextStateInfo = new ArrayList<NextStateInfo>();
 		}
@@ -212,35 +200,6 @@ public class FSM {
 	}
 
 	/**
-	 * index of last state added to the state map
-	 */
-	private int index;
-
-	/**
-	 * initial state
-	 */
-	private State initialState;
-
-	/**
-	 * map of state name to state
-	 */
-	private Map<String, State> states;
-
-	/**
-	 * a linked hash map of transitions.
-	 */
-	private LinkedHashMap<String, Transition> transitions;
-
-	/**
-	 * Creates an FSM.
-	 * 
-	 */
-	public FSM() {
-		states = new HashMap<String, State>();
-		transitions = new LinkedHashMap<String, Transition>();
-	}
-
-	/**
 	 * Adds a state with the given name only if the given state is not already
 	 * present.
 	 * 
@@ -248,16 +207,7 @@ public class FSM {
 	 *            name of a state
 	 * @return the state created
 	 */
-	public State addState(String name) {
-		State state = states.get(name);
-		if (state == null) {
-			state = new State(name, index++);
-			states.put(name, state);
-			transitions.put(name, new Transition(state));
-		}
-
-		return state;
-	}
+	State addState(String name);
 
 	/**
 	 * Adds a transition between two state with the given action.
@@ -269,13 +219,7 @@ public class FSM {
 	 * @param target
 	 *            name of the target state
 	 */
-	public void addTransition(String source, Action action, String target) {
-		State tgtState = addState(target);
-
-		Transition transition = transitions.get(source);
-		List<NextStateInfo> nextState = transition.getNextStateInfo();
-		nextState.add(new NextStateInfo(action, tgtState));
-	}
+	void addTransition(String source, Action action, String target);
 
 	/**
 	 * Creates and returns a graph representation of this FSM. Note that the
@@ -283,39 +227,21 @@ public class FSM {
 	 * 
 	 * @return a graph representation of this FSM
 	 */
-	public DirectedGraph<State, UniqueEdge> getGraph() {
-		DirectedGraph<State, UniqueEdge> graph = new DirectedMultigraph<State, UniqueEdge>(
-				UniqueEdge.class);
-		for (State source : states.values()) {
-			graph.addVertex(source);
-			List<NextStateInfo> nextState = getTransitions(source.getName());
-			for (NextStateInfo info : nextState) {
-				State target = info.getTargetState();
-				graph.addVertex(target);
-				graph.addEdge(source, target, new UniqueEdge(info.getAction()));
-			}
-		}
-
-		return graph;
-	}
+	DirectedGraph<State, UniqueEdge> getGraph();
 
 	/**
 	 * Returns the initial state.
 	 * 
 	 * @return the initial state
 	 */
-	public State getInitialState() {
-		return initialState;
-	}
+	State getInitialState();
 
 	/**
 	 * Returns the list of states sorted by alphabetical order.
 	 * 
 	 * @return the list of states sorted by alphabetical order
 	 */
-	public List<String> getStates() {
-		return new ArrayList<String>(new TreeSet<String>(states.keySet()));
-	}
+	List<String> getStates();
 
 	/**
 	 * Returns the list of transitions of this FSM as a list of
@@ -324,9 +250,7 @@ public class FSM {
 	 * @return the list of transitions of this FSM as a list of
 	 *         {@link Transition}
 	 */
-	public List<Transition> getTransitions() {
-		return new ArrayList<Transition>(transitions.values());
-	}
+	List<Transition> getTransitions();
 
 	/**
 	 * Returns the transitions departing from the given state.
@@ -335,9 +259,7 @@ public class FSM {
 	 *            a state name
 	 * @return a list of next state transitions
 	 */
-	public List<NextStateInfo> getTransitions(String state) {
-		return transitions.get(state).getNextStateInfo();
-	}
+	List<NextStateInfo> getTransitions(String state);
 
 	/**
 	 * Prints a graph representation of this FSM.
@@ -347,17 +269,7 @@ public class FSM {
 	 * @throws OrccException
 	 *             if something goes wrong (most probably I/O error)
 	 */
-	public void printGraph(File file) throws OrccException {
-		try {
-			OutputStream out = new FileOutputStream(file);
-			DOTExporter<State, UniqueEdge> exporter = new DOTExporter<State, UniqueEdge>(
-					new StringNameProvider<State>(), null,
-					new StringEdgeNameProvider<UniqueEdge>());
-			exporter.export(new OutputStreamWriter(out), getGraph());
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
-	}
+	void printGraph(File file) throws OrccException;
 
 	/**
 	 * Removes the transition from the state whose name is given by
@@ -368,16 +280,7 @@ public class FSM {
 	 * @param action
 	 *            action associated with the transition
 	 */
-	public void removeTransition(String source, Action action) {
-		Transition transition = transitions.get(source);
-		Iterator<NextStateInfo> it = transition.getNextStateInfo().iterator();
-		while (it.hasNext()) {
-			NextStateInfo info = it.next();
-			if (info.getAction() == action) {
-				it.remove();
-			}
-		}
-	}
+	void removeTransition(String source, Action action);
 
 	/**
 	 * Replaces the target of the transition from the state whose name is given
@@ -391,17 +294,7 @@ public class FSM {
 	 * @param newTargetName
 	 *            name of the new target state
 	 */
-	public void replaceTarget(String source, Action action, String newTargetName) {
-		Transition transition = transitions.get(source);
-		Iterator<NextStateInfo> it = transition.getNextStateInfo().iterator();
-		while (it.hasNext()) {
-			NextStateInfo info = it.next();
-			if (info.getAction() == action) {
-				// updates target state of this transition
-				info.targetState = addState(newTargetName);
-			}
-		}
-	}
+	void replaceTarget(String source, Action action, String newTargetName);
 
 	/**
 	 * Sets the initial state of this FSM to the given state.
@@ -409,22 +302,6 @@ public class FSM {
 	 * @param state
 	 *            a state name
 	 */
-	public void setInitialState(String state) {
-		initialState = addState(state);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("schedule fsm ");
-		builder.append(initialState);
-		builder.append(" : \n");
-		List<Transition> transitions = getTransitions();
-		for (Transition transition : transitions) {
-			builder.append(transition.toString());
-		}
-		builder.append("end");
-		return builder.toString();
-	}
+	void setInitialState(String state);
 
 }

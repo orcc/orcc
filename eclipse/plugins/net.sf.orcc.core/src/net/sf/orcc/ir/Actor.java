@@ -55,12 +55,14 @@ public interface Actor extends EObject {
 	EList<Action> getActions();
 
 	/**
-	 * Returns the action scheduler of this actor.
+	 * Returns the actions that are outside of an FSM. If this actor has no FSM,
+	 * all actions of the actor are returned. The actions are sorted by
+	 * decreasing priority.
 	 * 
-	 * @return the action scheduler of this actor
-	 * @model containment="true"
+	 * @return the actions that are outside of an FSM
+	 * @model
 	 */
-	ActionScheduler getActionScheduler();
+	EList<Action> getActionsOutsideFsm();
 
 	/**
 	 * Returns the RVC-CAL file this actor was declared in.
@@ -69,6 +71,15 @@ public interface Actor extends EObject {
 	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
 	String getFile();
+
+	/**
+	 * Returns the FSM of this actor, or <code>null</code> if it does not have
+	 * one.
+	 * 
+	 * @return the FSM of this actor
+	 * @model containment="true"
+	 */
+	FSM getFsm();
 
 	/**
 	 * Returns the list of initialize actions.
@@ -216,6 +227,13 @@ public interface Actor extends EObject {
 	Object getTemplateData();
 
 	/**
+	 * Returns true if this actor has an FSM.
+	 * 
+	 * @return true if this actor has an FSM
+	 */
+	boolean hasFsm();
+
+	/**
 	 * Returns true if the actor has a Model of Computation.
 	 * 
 	 * @return true if actor has MoC, otherwise false.
@@ -245,28 +263,21 @@ public interface Actor extends EObject {
 	void resetTokenProduction();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getActionScheduler
-	 * <em>Action Scheduler</em>}' containment reference. <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Action Scheduler</em>' containment
-	 *            reference.
-	 * @see #getActionScheduler()
-	 * @generated
-	 */
-	void setActionScheduler(ActionScheduler value);
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getFile <em>File</em>}
-	 * ' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>File</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getFile <em>File</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @param value the new value of the '<em>File</em>' attribute.
 	 * @see #getFile()
 	 * @generated
 	 */
 	void setFile(String value);
+
+	/**
+	 * Sets the FSM of this actor to the given FSM.
+	 * 
+	 * @param fsm
+	 *            an FSM
+	 */
+	void setFsm(FSM fsm);
 
 	/**
 	 * Sets the MoC of this actor.

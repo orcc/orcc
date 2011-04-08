@@ -1408,22 +1408,13 @@ public interface IrPackage extends EPackage {
 	int ACTOR__ACTIONS = 0;
 
 	/**
-	 * The feature id for the '<em><b>Action Scheduler</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__ACTION_SCHEDULER = 1;
-
-	/**
 	 * The feature id for the '<em><b>File</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FILE = 2;
+	int ACTOR__FILE = 1;
 
 	/**
 	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
@@ -1432,7 +1423,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INITIALIZES = 3;
+	int ACTOR__INITIALIZES = 2;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -1441,7 +1432,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INPUTS = 4;
+	int ACTOR__INPUTS = 3;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1450,7 +1441,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NAME = 5;
+	int ACTOR__NAME = 4;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -1459,7 +1450,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__OUTPUTS = 6;
+	int ACTOR__OUTPUTS = 5;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -1468,7 +1459,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PARAMETERS = 7;
+	int ACTOR__PARAMETERS = 6;
 
 	/**
 	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
@@ -1477,7 +1468,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PROCS = 8;
+	int ACTOR__PROCS = 7;
 
 	/**
 	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
@@ -1486,7 +1477,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__STATE_VARS = 9;
+	int ACTOR__STATE_VARS = 8;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute.
@@ -1495,7 +1486,25 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NATIVE = 10;
+	int ACTOR__NATIVE = 9;
+
+	/**
+	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__ACTIONS_OUTSIDE_FSM = 10;
+
+	/**
+	 * The feature id for the '<em><b>Fsm</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__FSM = 11;
 
 	/**
 	 * The number of structural features of the '<em>Actor</em>' class.
@@ -1504,7 +1513,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR_FEATURE_COUNT = 11;
+	int ACTOR_FEATURE_COUNT = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
@@ -1618,23 +1627,23 @@ public interface IrPackage extends EPackage {
 	int TAG_FEATURE_COUNT = 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.ActionScheduler <em>Action Scheduler</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.FSMImpl <em>FSM</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.ActionScheduler
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getActionScheduler()
+	 * @see net.sf.orcc.ir.impl.FSMImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getFSM()
 	 * @generated
 	 */
-	int ACTION_SCHEDULER = 39;
+	int FSM = 39;
 
 	/**
-	 * The number of structural features of the '<em>Action Scheduler</em>' class.
+	 * The number of structural features of the '<em>FSM</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION_SCHEDULER_FEATURE_COUNT = 0;
+	int FSM_FEATURE_COUNT = 0;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
@@ -2822,17 +2831,6 @@ public interface IrPackage extends EPackage {
 	EReference getActor_Actions();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Actor#getActionScheduler <em>Action Scheduler</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Action Scheduler</em>'.
-	 * @see net.sf.orcc.ir.Actor#getActionScheduler()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EReference getActor_ActionScheduler();
-
-	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Actor#getFile <em>File</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2932,6 +2930,28 @@ public interface IrPackage extends EPackage {
 	EAttribute getActor_Native();
 
 	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Actor#getActionsOutsideFsm <em>Actions Outside Fsm</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Actions Outside Fsm</em>'.
+	 * @see net.sf.orcc.ir.Actor#getActionsOutsideFsm()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EReference getActor_ActionsOutsideFsm();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Actor#getFsm <em>Fsm</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Fsm</em>'.
+	 * @see net.sf.orcc.ir.Actor#getFsm()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EReference getActor_Fsm();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Pattern <em>Pattern</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3028,15 +3048,14 @@ public interface IrPackage extends EPackage {
 	EAttribute getTag_Identifiers();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.ActionScheduler <em>Action Scheduler</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.FSM <em>FSM</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Action Scheduler</em>'.
-	 * @see net.sf.orcc.ir.ActionScheduler
-	 * @model instanceClass="net.sf.orcc.ir.ActionScheduler"
+	 * @return the meta object for class '<em>FSM</em>'.
+	 * @see net.sf.orcc.ir.FSM
 	 * @generated
 	 */
-	EClass getActionScheduler();
+	EClass getFSM();
 
 	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}'.
@@ -3936,14 +3955,6 @@ public interface IrPackage extends EPackage {
 		EReference ACTOR__ACTIONS = eINSTANCE.getActor_Actions();
 
 		/**
-		 * The meta object literal for the '<em><b>Action Scheduler</b></em>' containment reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTOR__ACTION_SCHEDULER = eINSTANCE.getActor_ActionScheduler();
-
-		/**
 		 * The meta object literal for the '<em><b>File</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -4014,6 +4025,22 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute ACTOR__NATIVE = eINSTANCE.getActor_Native();
+
+		/**
+		 * The meta object literal for the '<em><b>Actions Outside Fsm</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTOR__ACTIONS_OUTSIDE_FSM = eINSTANCE.getActor_ActionsOutsideFsm();
+
+		/**
+		 * The meta object literal for the '<em><b>Fsm</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTOR__FSM = eINSTANCE.getActor_Fsm();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
@@ -4094,14 +4121,14 @@ public interface IrPackage extends EPackage {
 		EAttribute TAG__IDENTIFIERS = eINSTANCE.getTag_Identifiers();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.ActionScheduler <em>Action Scheduler</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.FSMImpl <em>FSM</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.ActionScheduler
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getActionScheduler()
+		 * @see net.sf.orcc.ir.impl.FSMImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getFSM()
 		 * @generated
 		 */
-		EClass ACTION_SCHEDULER = eINSTANCE.getActionScheduler();
+		EClass FSM = eINSTANCE.getFSM();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.

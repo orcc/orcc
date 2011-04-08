@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -182,6 +183,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.PATTERN: return createPattern();
 			case IrPackage.PORT: return createPort();
 			case IrPackage.TAG: return createTag();
+			case IrPackage.FSM: return createFSM();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -749,6 +751,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Tag createTag() {
 		TagImpl tag = new TagImpl();
 		return tag;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public FSM createFSM() {
+		FSMImpl fsm = new FSMImpl();
+		return fsm;
 	}
 
 	@Override

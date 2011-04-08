@@ -7,7 +7,6 @@
 package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
@@ -338,7 +337,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass actionSchedulerEClass = null;
+	private EClass fsmEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1386,17 +1385,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getActor_ActionScheduler() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getActor_File() {
-		return (EAttribute)actorEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1405,7 +1395,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Initializes() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(3);
+		return (EReference)actorEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1414,7 +1404,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Inputs() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(4);
+		return (EReference)actorEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1423,7 +1413,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getActor_Name() {
-		return (EAttribute)actorEClass.getEStructuralFeatures().get(5);
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -1432,7 +1422,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Outputs() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(6);
+		return (EReference)actorEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -1441,7 +1431,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Parameters() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(7);
+		return (EReference)actorEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -1450,7 +1440,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Procs() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(8);
+		return (EReference)actorEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -1459,7 +1449,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_StateVars() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(9);
+		return (EReference)actorEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -1468,7 +1458,25 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getActor_Native() {
-		return (EAttribute)actorEClass.getEStructuralFeatures().get(10);
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActor_ActionsOutsideFsm() {
+		return (EReference)actorEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActor_Fsm() {
+		return (EReference)actorEClass.getEStructuralFeatures().get(11);
 	}
 
 	/**
@@ -1557,8 +1565,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getActionScheduler() {
-		return actionSchedulerEClass;
+	public EClass getFSM() {
+		return fsmEClass;
 	}
 
 	/**
@@ -1750,7 +1758,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
-		createEReference(actorEClass, ACTOR__ACTION_SCHEDULER);
 		createEAttribute(actorEClass, ACTOR__FILE);
 		createEReference(actorEClass, ACTOR__INITIALIZES);
 		createEReference(actorEClass, ACTOR__INPUTS);
@@ -1760,6 +1767,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(actorEClass, ACTOR__PROCS);
 		createEReference(actorEClass, ACTOR__STATE_VARS);
 		createEAttribute(actorEClass, ACTOR__NATIVE);
+		createEReference(actorEClass, ACTOR__ACTIONS_OUTSIDE_FSM);
+		createEReference(actorEClass, ACTOR__FSM);
 
 		patternEClass = createEClass(PATTERN);
 
@@ -1773,7 +1782,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		tagEClass = createEClass(TAG);
 		createEAttribute(tagEClass, TAG__IDENTIFIERS);
 
-		actionSchedulerEClass = createEClass(ACTION_SCHEDULER);
+		fsmEClass = createEClass(FSM);
 
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
@@ -1980,7 +1989,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getActor_Actions(), this.getAction(), null, "actions", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getActor_ActionScheduler(), this.getActionScheduler(), null, "actionScheduler", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getActor_File(), theEcorePackage.getEString(), "file", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Initializes(), this.getAction(), null, "initializes", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Inputs(), this.getPort(), null, "inputs", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1990,6 +1998,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getActor_Procs(), this.getProcedure(), null, "procs", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_StateVars(), this.getVar(), null, "stateVars", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getActor_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_ActionsOutsideFsm(), this.getAction(), null, "actionsOutsideFsm", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_Fsm(), this.getFSM(), null, "fsm", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(patternEClass, Pattern.class, "Pattern", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -2003,7 +2013,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(tagEClass, Tag.class, "Tag", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTag_Identifiers(), theEcorePackage.getEString(), "identifiers", null, 0, -1, Tag.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(actionSchedulerEClass, ActionScheduler.class, "ActionScheduler", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEClass(fsmEClass, net.sf.orcc.ir.FSM.class, "FSM", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		// Initialize enums and add enum literals
 		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");
