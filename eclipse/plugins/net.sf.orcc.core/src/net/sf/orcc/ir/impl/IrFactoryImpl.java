@@ -6,7 +6,6 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -23,6 +22,7 @@ import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;

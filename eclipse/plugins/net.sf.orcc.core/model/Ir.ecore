@@ -208,6 +208,9 @@
         eType="#//Action"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="fsm" eType="#//FSM" containment="true"
         resolveProxies="false"/>
+    <eGenericSuperTypes eClassifier="#//Comparable">
+      <eTypeArguments eClassifier="#//Actor"/>
+    </eGenericSuperTypes>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Pattern"/>
   <eClassifiers xsi:type="ecore:EClass" name="Port">
@@ -251,5 +254,9 @@
     <eLiterals name="LOGIC_NOT" value="1"/>
     <eLiterals name="MINUS" value="2"/>
     <eLiterals name="NUM_ELTS" value="3"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Comparable" instanceClassName="java.lang.Comparable"
+      abstract="true" interface="true">
+    <eTypeParameters name="T"/>
   </eClassifiers>
 </ecore:EPackage>

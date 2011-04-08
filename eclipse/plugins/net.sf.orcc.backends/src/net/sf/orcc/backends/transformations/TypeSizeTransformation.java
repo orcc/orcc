@@ -39,7 +39,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines a transformation that changes size of variable to fit
@@ -50,7 +49,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class TypeSizeTransformation extends AbstractActorVisitor {
 
-	private void checkPorts(OrderedMap<String, Port> ports) {
+	private void checkPorts(List<Port> ports) {
 		for (Port port : ports) {
 			checkType(port.getType());
 		}
@@ -93,8 +92,8 @@ public class TypeSizeTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		checkVariables(actor.getParameters().getList());
-		checkVariables(actor.getStateVars().getList());
+		checkVariables(actor.getParameters());
+		checkVariables(actor.getStateVars());
 		checkPorts(actor.getInputs());
 		checkPorts(actor.getOutputs());
 

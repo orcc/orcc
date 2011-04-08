@@ -60,9 +60,6 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 			InstStore store = EcoreHelper.getContainerOfType(def,
 					InstStore.class);
 			if (store != null) {
-				store.getTarget().setVariable(null);
-				EcoreHelper.deleteObjects(store.getIndexes());
-				EcoreUtil.delete(store.getValue(), true);
 				EcoreUtil.delete(store, true);
 			}
 		}

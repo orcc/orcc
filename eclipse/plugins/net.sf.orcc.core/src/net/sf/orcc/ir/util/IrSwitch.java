@@ -66,7 +66,7 @@ import org.eclipse.emf.ecore.EObject;
  * @see net.sf.orcc.ir.IrPackage
  * @generated
  */
-public class IrSwitch<T> {
+public class IrSwitch<T1> {
 	/**
 	 * The cached model package
 	 * <!-- begin-user-doc -->
@@ -98,7 +98,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseAction(Action object) {
+	public T1 caseAction(Action object) {
 		return null;
 	}
 
@@ -113,7 +113,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseActor(Actor object) {
+	public T1 caseActor(Actor object) {
 		return null;
 	}
 
@@ -128,7 +128,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseDef(Def object) {
+	public T1 caseDef(Def object) {
 		return null;
 	}
 
@@ -143,7 +143,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExprBinary(ExprBinary object) {
+	public T1 caseExprBinary(ExprBinary object) {
 		return null;
 	}
 
@@ -158,7 +158,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExprBool(ExprBool object) {
+	public T1 caseExprBool(ExprBool object) {
 		return null;
 	}
 
@@ -173,7 +173,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExpression(Expression object) {
+	public T1 caseExpression(Expression object) {
 		return null;
 	}
 
@@ -188,7 +188,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExprFloat(ExprFloat object) {
+	public T1 caseExprFloat(ExprFloat object) {
 		return null;
 	}
 
@@ -203,7 +203,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExprInt(ExprInt object) {
+	public T1 caseExprInt(ExprInt object) {
 		return null;
 	}
 
@@ -218,7 +218,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExprList(ExprList object) {
+	public T1 caseExprList(ExprList object) {
 		return null;
 	}
 
@@ -233,7 +233,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExprString(ExprString object) {
+	public T1 caseExprString(ExprString object) {
 		return null;
 	}
 
@@ -248,7 +248,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExprUnary(ExprUnary object) {
+	public T1 caseExprUnary(ExprUnary object) {
 		return null;
 	}
 
@@ -263,7 +263,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseExprVar(ExprVar object) {
+	public T1 caseExprVar(ExprVar object) {
 		return null;
 	}
 
@@ -278,7 +278,22 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseFSM(FSM object) {
+	public T1 caseFSM(FSM object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Comparable</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Comparable</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public <T> T1 caseComparable(Comparable<T> object) {
 		return null;
 	}
 
@@ -293,7 +308,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInstAssign(InstAssign object) {
+	public T1 caseInstAssign(InstAssign object) {
 		return null;
 	}
 
@@ -308,7 +323,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInstCall(InstCall object) {
+	public T1 caseInstCall(InstCall object) {
 		return null;
 	}
 
@@ -323,7 +338,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInstLoad(InstLoad object) {
+	public T1 caseInstLoad(InstLoad object) {
 		return null;
 	}
 
@@ -338,7 +353,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInstPhi(InstPhi object) {
+	public T1 caseInstPhi(InstPhi object) {
 		return null;
 	}
 
@@ -353,7 +368,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInstReturn(InstReturn object) {
+	public T1 caseInstReturn(InstReturn object) {
 		return null;
 	}
 
@@ -368,7 +383,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInstruction(Instruction object) {
+	public T1 caseInstruction(Instruction object) {
 		return null;
 	}
 
@@ -383,7 +398,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInstSpecific(InstSpecific object) {
+	public T1 caseInstSpecific(InstSpecific object) {
 		return null;
 	}
 
@@ -398,7 +413,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseInstStore(InstStore object) {
+	public T1 caseInstStore(InstStore object) {
 		return null;
 	}
 
@@ -413,7 +428,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseLocation(Location object) {
+	public T1 caseLocation(Location object) {
 		return null;
 	}
 
@@ -428,7 +443,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNode(Node object) {
+	public T1 caseNode(Node object) {
 		return null;
 	}
 
@@ -443,7 +458,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNodeBlock(NodeBlock object) {
+	public T1 caseNodeBlock(NodeBlock object) {
 		return null;
 	}
 
@@ -458,7 +473,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNodeIf(NodeIf object) {
+	public T1 caseNodeIf(NodeIf object) {
 		return null;
 	}
 
@@ -473,7 +488,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseNodeWhile(NodeWhile object) {
+	public T1 caseNodeWhile(NodeWhile object) {
 		return null;
 	}
 
@@ -488,7 +503,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T casePattern(Pattern object) {
+	public T1 casePattern(Pattern object) {
 		return null;
 	}
 
@@ -503,7 +518,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T casePort(Port object) {
+	public T1 casePort(Port object) {
 		return null;
 	}
 
@@ -518,7 +533,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseProcedure(Procedure object) {
+	public T1 caseProcedure(Procedure object) {
 		return null;
 	}
 
@@ -533,7 +548,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTag(Tag object) {
+	public T1 caseTag(Tag object) {
 		return null;
 	}
 
@@ -548,7 +563,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseType(Type object) {
+	public T1 caseType(Type object) {
 		return null;
 	}
 
@@ -563,7 +578,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTypeBool(TypeBool object) {
+	public T1 caseTypeBool(TypeBool object) {
 		return null;
 	}
 
@@ -578,7 +593,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTypeFloat(TypeFloat object) {
+	public T1 caseTypeFloat(TypeFloat object) {
 		return null;
 	}
 
@@ -593,7 +608,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTypeInt(TypeInt object) {
+	public T1 caseTypeInt(TypeInt object) {
 		return null;
 	}
 
@@ -608,7 +623,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTypeList(TypeList object) {
+	public T1 caseTypeList(TypeList object) {
 		return null;
 	}
 
@@ -623,7 +638,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTypeString(TypeString object) {
+	public T1 caseTypeString(TypeString object) {
 		return null;
 	}
 
@@ -638,7 +653,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTypeUint(TypeUint object) {
+	public T1 caseTypeUint(TypeUint object) {
 		return null;
 	}
 
@@ -653,7 +668,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseTypeVoid(TypeVoid object) {
+	public T1 caseTypeVoid(TypeVoid object) {
 		return null;
 	}
 
@@ -668,7 +683,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseUse(Use object) {
+	public T1 caseUse(Use object) {
 		return null;
 	}
 
@@ -683,7 +698,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseVar(Var object) {
+	public T1 caseVar(Var object) {
 		return null;
 	}
 
@@ -698,7 +713,7 @@ public class IrSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject)
 	 * @generated
 	 */
-	public T defaultCase(EObject object) {
+	public T1 defaultCase(EObject object) {
 		return null;
 	}
 
@@ -709,7 +724,7 @@ public class IrSwitch<T> {
 	 * @return the first non-null result returned by a <code>caseXXX</code> call.
 	 * @generated
 	 */
-	protected T doSwitch(EClass theEClass, EObject theEObject) {
+	protected T1 doSwitch(EClass theEClass, EObject theEObject) {
 		if (theEClass.eContainer() == modelPackage) {
 			return doSwitch(theEClass.getClassifierID(), theEObject);
 		}
@@ -729,7 +744,7 @@ public class IrSwitch<T> {
 	 * @return the first non-null result returned by a <code>caseXXX</code> call.
 	 * @generated
 	 */
-	public T doSwitch(EObject theEObject) {
+	public T1 doSwitch(EObject theEObject) {
 		return doSwitch(theEObject.eClass(), theEObject);
 	}
 
@@ -740,270 +755,271 @@ public class IrSwitch<T> {
 	 * @return the first non-null result returned by a <code>caseXXX</code> call.
 	 * @generated
 	 */
-	protected T doSwitch(int classifierID, EObject theEObject) {
+	protected T1 doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
 			case IrPackage.EXPRESSION: {
 				Expression expression = (Expression)theEObject;
-				T result = caseExpression(expression);
+				T1 result = caseExpression(expression);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.TYPE: {
 				Type type = (Type)theEObject;
-				T result = caseType(type);
+				T1 result = caseType(type);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.TYPE_BOOL: {
 				TypeBool typeBool = (TypeBool)theEObject;
-				T result = caseTypeBool(typeBool);
+				T1 result = caseTypeBool(typeBool);
 				if (result == null) result = caseType(typeBool);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.TYPE_FLOAT: {
 				TypeFloat typeFloat = (TypeFloat)theEObject;
-				T result = caseTypeFloat(typeFloat);
+				T1 result = caseTypeFloat(typeFloat);
 				if (result == null) result = caseType(typeFloat);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.TYPE_INT: {
 				TypeInt typeInt = (TypeInt)theEObject;
-				T result = caseTypeInt(typeInt);
+				T1 result = caseTypeInt(typeInt);
 				if (result == null) result = caseType(typeInt);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.TYPE_LIST: {
 				TypeList typeList = (TypeList)theEObject;
-				T result = caseTypeList(typeList);
+				T1 result = caseTypeList(typeList);
 				if (result == null) result = caseType(typeList);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.TYPE_STRING: {
 				TypeString typeString = (TypeString)theEObject;
-				T result = caseTypeString(typeString);
+				T1 result = caseTypeString(typeString);
 				if (result == null) result = caseType(typeString);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.TYPE_UINT: {
 				TypeUint typeUint = (TypeUint)theEObject;
-				T result = caseTypeUint(typeUint);
+				T1 result = caseTypeUint(typeUint);
 				if (result == null) result = caseType(typeUint);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.TYPE_VOID: {
 				TypeVoid typeVoid = (TypeVoid)theEObject;
-				T result = caseTypeVoid(typeVoid);
+				T1 result = caseTypeVoid(typeVoid);
 				if (result == null) result = caseType(typeVoid);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.INSTRUCTION: {
 				Instruction instruction = (Instruction)theEObject;
-				T result = caseInstruction(instruction);
+				T1 result = caseInstruction(instruction);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.NODE_BLOCK: {
 				NodeBlock nodeBlock = (NodeBlock)theEObject;
-				T result = caseNodeBlock(nodeBlock);
+				T1 result = caseNodeBlock(nodeBlock);
 				if (result == null) result = caseNode(nodeBlock);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.NODE_IF: {
 				NodeIf nodeIf = (NodeIf)theEObject;
-				T result = caseNodeIf(nodeIf);
+				T1 result = caseNodeIf(nodeIf);
 				if (result == null) result = caseNode(nodeIf);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.NODE_WHILE: {
 				NodeWhile nodeWhile = (NodeWhile)theEObject;
-				T result = caseNodeWhile(nodeWhile);
+				T1 result = caseNodeWhile(nodeWhile);
 				if (result == null) result = caseNode(nodeWhile);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.NODE: {
 				Node node = (Node)theEObject;
-				T result = caseNode(node);
+				T1 result = caseNode(node);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.PROCEDURE: {
 				Procedure procedure = (Procedure)theEObject;
-				T result = caseProcedure(procedure);
+				T1 result = caseProcedure(procedure);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.INST_ASSIGN: {
 				InstAssign instAssign = (InstAssign)theEObject;
-				T result = caseInstAssign(instAssign);
+				T1 result = caseInstAssign(instAssign);
 				if (result == null) result = caseInstruction(instAssign);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.INST_CALL: {
 				InstCall instCall = (InstCall)theEObject;
-				T result = caseInstCall(instCall);
+				T1 result = caseInstCall(instCall);
 				if (result == null) result = caseInstruction(instCall);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.INST_LOAD: {
 				InstLoad instLoad = (InstLoad)theEObject;
-				T result = caseInstLoad(instLoad);
+				T1 result = caseInstLoad(instLoad);
 				if (result == null) result = caseInstruction(instLoad);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.INST_PHI: {
 				InstPhi instPhi = (InstPhi)theEObject;
-				T result = caseInstPhi(instPhi);
+				T1 result = caseInstPhi(instPhi);
 				if (result == null) result = caseInstruction(instPhi);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.INST_RETURN: {
 				InstReturn instReturn = (InstReturn)theEObject;
-				T result = caseInstReturn(instReturn);
+				T1 result = caseInstReturn(instReturn);
 				if (result == null) result = caseInstruction(instReturn);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.INST_SPECIFIC: {
 				InstSpecific instSpecific = (InstSpecific)theEObject;
-				T result = caseInstSpecific(instSpecific);
+				T1 result = caseInstSpecific(instSpecific);
 				if (result == null) result = caseInstruction(instSpecific);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.INST_STORE: {
 				InstStore instStore = (InstStore)theEObject;
-				T result = caseInstStore(instStore);
+				T1 result = caseInstStore(instStore);
 				if (result == null) result = caseInstruction(instStore);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.LOCATION: {
 				Location location = (Location)theEObject;
-				T result = caseLocation(location);
+				T1 result = caseLocation(location);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.VAR: {
 				Var var = (Var)theEObject;
-				T result = caseVar(var);
+				T1 result = caseVar(var);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.USE: {
 				Use use = (Use)theEObject;
-				T result = caseUse(use);
+				T1 result = caseUse(use);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.EXPR_BINARY: {
 				ExprBinary exprBinary = (ExprBinary)theEObject;
-				T result = caseExprBinary(exprBinary);
+				T1 result = caseExprBinary(exprBinary);
 				if (result == null) result = caseExpression(exprBinary);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.EXPR_BOOL: {
 				ExprBool exprBool = (ExprBool)theEObject;
-				T result = caseExprBool(exprBool);
+				T1 result = caseExprBool(exprBool);
 				if (result == null) result = caseExpression(exprBool);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.EXPR_FLOAT: {
 				ExprFloat exprFloat = (ExprFloat)theEObject;
-				T result = caseExprFloat(exprFloat);
+				T1 result = caseExprFloat(exprFloat);
 				if (result == null) result = caseExpression(exprFloat);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.EXPR_INT: {
 				ExprInt exprInt = (ExprInt)theEObject;
-				T result = caseExprInt(exprInt);
+				T1 result = caseExprInt(exprInt);
 				if (result == null) result = caseExpression(exprInt);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.EXPR_LIST: {
 				ExprList exprList = (ExprList)theEObject;
-				T result = caseExprList(exprList);
+				T1 result = caseExprList(exprList);
 				if (result == null) result = caseExpression(exprList);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.EXPR_STRING: {
 				ExprString exprString = (ExprString)theEObject;
-				T result = caseExprString(exprString);
+				T1 result = caseExprString(exprString);
 				if (result == null) result = caseExpression(exprString);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.EXPR_UNARY: {
 				ExprUnary exprUnary = (ExprUnary)theEObject;
-				T result = caseExprUnary(exprUnary);
+				T1 result = caseExprUnary(exprUnary);
 				if (result == null) result = caseExpression(exprUnary);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.EXPR_VAR: {
 				ExprVar exprVar = (ExprVar)theEObject;
-				T result = caseExprVar(exprVar);
+				T1 result = caseExprVar(exprVar);
 				if (result == null) result = caseExpression(exprVar);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.DEF: {
 				Def def = (Def)theEObject;
-				T result = caseDef(def);
+				T1 result = caseDef(def);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.ACTION: {
 				Action action = (Action)theEObject;
-				T result = caseAction(action);
+				T1 result = caseAction(action);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.ACTOR: {
 				Actor actor = (Actor)theEObject;
-				T result = caseActor(actor);
+				T1 result = caseActor(actor);
+				if (result == null) result = caseComparable(actor);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.PATTERN: {
 				Pattern pattern = (Pattern)theEObject;
-				T result = casePattern(pattern);
+				T1 result = casePattern(pattern);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.PORT: {
 				Port port = (Port)theEObject;
-				T result = casePort(port);
+				T1 result = casePort(port);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.TAG: {
 				Tag tag = (Tag)theEObject;
-				T result = caseTag(tag);
+				T1 result = caseTag(tag);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case IrPackage.FSM: {
 				FSM fsm = (FSM)theEObject;
-				T result = caseFSM(fsm);
+				T1 result = caseFSM(fsm);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

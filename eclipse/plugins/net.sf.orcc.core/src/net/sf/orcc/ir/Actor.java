@@ -28,12 +28,13 @@
  */
 package net.sf.orcc.ir;
 
-import java.lang.String;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
+import java.lang.Comparable;
 import java.util.List;
 
 import net.sf.orcc.moc.MoC;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an actor. An actor has parameters, input and output ports,
@@ -44,7 +45,7 @@ import net.sf.orcc.moc.MoC;
  * @author Matthieu Wipliez
  * @model
  */
-public interface Actor extends EObject {
+public interface Actor extends EObject, Comparable<Actor> {
 
 	/**
 	 * Returns all the actions of this actor.

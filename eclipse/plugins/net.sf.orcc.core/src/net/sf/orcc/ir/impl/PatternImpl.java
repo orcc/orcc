@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.ir.impl;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,12 +44,13 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	private Map<Port, Var> variableMap;
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	protected PatternImpl() {
 		super();
+		ports = new ArrayList<Port>();
+		numTokensMap = new LinkedHashMap<Port, Integer>();
+		peekedMap = new LinkedHashMap<Port, Var>();
+		variableMap = new LinkedHashMap<Port, Var>();
+		inverseVariableMap = new LinkedHashMap<Var, Port>();
 	}
 
 	/**

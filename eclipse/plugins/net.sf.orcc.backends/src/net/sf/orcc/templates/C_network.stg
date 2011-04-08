@@ -90,7 +90,7 @@ goDeclareNumSuccessors(map,outputs) ::= <<
 >>
 
 goDeclareSuccPerPort(port) ::= <<
-struct actor_s *<GetInstanceId(instance)>_<port>_successors[] = {<successors(map.(port))>};
+struct actor_s *<GetInstanceId(instance)>_<port.name>_successors[] = {<successors(map.(port))>};
 >>
 
 goDeclareSuccs(map,outputs) ::= <<
@@ -104,14 +104,14 @@ goDeclarePredSucc(network, inputs, outputs) ::= <<
 <endif><
 if(!outputs.empty)
 ><goDeclareSuccs(network.successorsMap.(instance), outputs)>
-struct actor_s **<GetInstanceId(instance)>_successors[] = {<outputs: {port | <GetInstanceId(instance)>_<port>_successors}; separator=", ">};
+struct actor_s **<GetInstanceId(instance)>_successors[] = {<outputs: {port | <GetInstanceId(instance)>_<port.name>_successors}; separator=", ">};
 <endif>
 >>
 
 goDeclarePredsSuccs(instance) ::= <<
 <if (instance.actor)><goDeclarePredSucc(
-					inputs=instance.actor.inputs.list,
-                    outputs=instance.actor.outputs.list)>
+					inputs=instance.actor.inputs,
+                    outputs=instance.actor.outputs)>
 <elseif (instance.broadcast)><goDeclarePredSucc(
 					inputs=instance.broadcast.inputs.list,
 					outputs=instance.broadcast.outputs.list)>
@@ -276,13 +276,13 @@ struct actor_s *actors<if(thread)>_<thread><endif>[] = {<declareActorArray(insta
 
 NumInputs(instance) ::= <<
 <if (instance.actor)
-><instance.actor.inputs.length><
+><length(instance.actor.inputs)><
 elseif (instance.broadcast)>1<else>0<endif>
 >>
 
 NumOutputs(instance) ::= <<
 <if (instance.actor)
-><instance.actor.outputs.length><
+><length(instance.actor.outputs)><
 elseif (instance.broadcast)><instance.broadcast.numOutputs><else>0<endif>
 >>
 
@@ -302,7 +302,7 @@ fillActorsStructs(instances) ::= <<
 
 actorInitialize(instance) ::= <<
 <if (instance.actor)>
-extern void <instance.id>_initialize(<instance.actor.inputs.list: { port | unsigned int fifo_<port>_id}; separator=", ">);
+extern void <instance.id>_initialize(<instance.actor.inputs: { port | unsigned int fifo_<port.name>_id}; separator=", ">);
 <endif>
 >>
 
@@ -336,7 +336,7 @@ int is_timeout(){
 
 printInitialize(instance) ::= <<
 <if(instance.actor)>
-<instance.id>_initialize(<instance.actor.inputs.list: { port | <network.incomingMap.(instance).(port).fifoId>}; separator=",">);<
+<instance.id>_initialize(<instance.actor.inputs: { port | <network.incomingMap.(instance).(port).fifoId>}; separator=",">);<
 endif>
 >>
 
@@ -408,9 +408,9 @@ printUpperCaseMedium(port, instance) ::= <<
 
 fifoInit(instance, port, connectionId) ::= <<
 <if(instance.actor)
->fifo<printMedium(port,instance)>_<port.type>_init(<instance.id>_<port>, <connectionId.value>/*To complete !*/);<
+>fifo<printMedium(port,instance)>_<port.type>_init(<instance.id>_<port.name>, <connectionId.value>/*To complete !*/);<
 else
->fifo<printMedium(port,instance)>_<port.type>_init(bcast_<instance.id>_<port>, <connectionId.value>/*To complete !*/);<
+>fifo<printMedium(port,instance)>_<port.type>_init(bcast_<instance.id>_<port.name>, <connectionId.value>/*To complete !*/);<
 endif>
 >>
 

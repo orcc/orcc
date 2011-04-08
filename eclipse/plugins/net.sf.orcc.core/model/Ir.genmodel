@@ -195,5 +195,8 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute Ir.ecore#//Tag/identifiers"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//FSM"/>
+    <genClasses image="false" ecoreClass="Ir.ecore#//Comparable">
+      <genTypeParameters ecoreTypeParameter="Ir.ecore#//Comparable/T"/>
+    </genClasses>
   </genPackages>
 </genmodel:GenModel>

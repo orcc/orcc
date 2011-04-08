@@ -485,6 +485,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	public Var getLocal(String name) {
 		if (localsMap == null) {
 			localsMap = new HashMap<String, Var>();
+			for (Var var : getLocals()) {
+				localsMap.put(var.getIndexedName(), var);
+			}
 			eAdapters().add(new MapAdapter());
 		}
 
@@ -537,6 +540,9 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	public Var getParameter(String name) {
 		if (paramsMap == null) {
 			paramsMap = new HashMap<String, Var>();
+			for (Var var : getParameters()) {
+				paramsMap.put(var.getIndexedName(), var);
+			}
 			eAdapters().add(new MapAdapter());
 		}
 

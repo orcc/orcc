@@ -199,8 +199,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	/**
 	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getFsm()
 	 * @generated
 	 * @ordered
@@ -223,8 +222,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public NotificationChain basicSetFsm(FSM newFsm, NotificationChain msgs) {
@@ -235,6 +233,11 @@ public class ActorImpl extends EObjectImpl implements Actor {
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
+	}
+
+	@Override
+	public int compareTo(Actor o) {
+		return getName().compareTo(o.getName());
 	}
 
 	/**
@@ -459,8 +462,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Action> getActionsOutsideFsm() {
@@ -479,8 +481,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public FSM getFsm() {
@@ -502,6 +503,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	public Port getInput(String name) {
 		if (inputsMap == null) {
 			inputsMap = new HashMap<String, Port>();
+			for (Port port : getInputs()) {
+				inputsMap.put(port.getName(), port);
+			}
 			eAdapters().add(new MapAdapter());
 		}
 
@@ -520,6 +524,10 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	public Map<String, Port> getInputsMap() {
+		if (inputsMap == null) {
+			inputsMap = new HashMap<String, Port>();
+		}
+
 		return inputsMap;
 	}
 
@@ -540,6 +548,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	public Port getOutput(String name) {
 		if (outputsMap == null) {
 			outputsMap = new HashMap<String, Port>();
+			for (Port port : getOutputs()) {
+				outputsMap.put(port.getName(), port);
+			}
 			eAdapters().add(new MapAdapter());
 		}
 
@@ -558,6 +569,10 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	public Map<String, Port> getOutputsMap() {
+		if (outputsMap == null) {
+			outputsMap = new HashMap<String, Port>();
+		}
+
 		return outputsMap;
 	}
 
@@ -585,6 +600,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	public Var getParameter(String name) {
 		if (parametersMap == null) {
 			parametersMap = new HashMap<String, Var>();
+			for (Var var : getParameters()) {
+				parametersMap.put(var.getName(), var);
+			}
 			eAdapters().add(new MapAdapter());
 		}
 
@@ -603,6 +621,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	public Map<String, Var> getParametersMap() {
+		if (parametersMap == null) {
+			parametersMap = new HashMap<String, Var>();
+		}
 		return parametersMap;
 	}
 
@@ -617,9 +638,12 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	@Override
-	public Procedure getProcedure(String string) {
+	public Procedure getProcedure(String name) {
 		if (proceduresMap == null) {
 			proceduresMap = new HashMap<String, Procedure>();
+			for (Procedure procedure : getProcs()) {
+				proceduresMap.put(procedure.getName(), procedure);
+			}
 			eAdapters().add(new MapAdapter());
 		}
 
@@ -658,6 +682,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	public Var getStateVar(String name) {
 		if (stateVarsMap == null) {
 			stateVarsMap = new HashMap<String, Var>();
+			for (Var var : getStateVars()) {
+				stateVarsMap.put(var.getName(), var);
+			}
 			eAdapters().add(new MapAdapter());
 		}
 
@@ -665,6 +692,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	public Map<String, Var> getStateVariablesMap() {
+		if (stateVarsMap == null) {
+			stateVarsMap = new HashMap<String, Var>();
+		}
 		return stateVarsMap;
 	}
 
@@ -732,8 +762,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setFsm(FSM newFsm) {

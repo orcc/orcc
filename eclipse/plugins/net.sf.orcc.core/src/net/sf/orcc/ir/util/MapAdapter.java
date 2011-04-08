@@ -41,7 +41,6 @@ import net.sf.orcc.ir.impl.ProcedureImpl;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
-import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an adapter that maintains a map of variables from a list
@@ -67,53 +66,47 @@ public class MapAdapter implements Adapter {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void notifyChanged(Notification notification) {
-		Map<String, ? extends EObject> map;
+		Map<String, ? extends Object> map;
 		String name;
-		EObject object;
+		Object object = notification.getEventType() == Notification.ADD ? notification
+				.getNewValue() : notification.getOldValue();
 
 		if (notification.getFeature() == IrPackage.eINSTANCE
 				.getProcedure_Locals()) {
 			map = ((ProcedureImpl) target).getLocalsMap();
-			object = (Var) notification.getNewValue();
 			name = ((Var) object).getIndexedName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getProcedure_Parameters()) {
 			map = ((ProcedureImpl) target).getParametersMap();
-			object = (Var) notification.getNewValue();
 			name = ((Var) object).getIndexedName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_Inputs()) {
 			map = ((ActorImpl) target).getInputsMap();
-			object = (Port) notification.getNewValue();
 			name = ((Port) object).getName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_Outputs()) {
 			map = ((ActorImpl) target).getOutputsMap();
-			object = (Port) notification.getNewValue();
 			name = ((Port) object).getName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_Parameters()) {
 			map = ((ActorImpl) target).getParametersMap();
-			object = (Var) notification.getNewValue();
 			name = ((Var) object).getName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_Procs()) {
 			map = ((ActorImpl) target).getProceduresMap();
-			object = (Procedure) notification.getNewValue();
 			name = ((Procedure) object).getName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_StateVars()) {
 			map = ((ActorImpl) target).getStateVariablesMap();
-			object = (Var) notification.getNewValue();
 			name = ((Var) object).getName();
 		} else {
 			return;
 		}
 
 		if (notification.getEventType() == Notification.ADD) {
-			((Map<String, EObject>) map).put(name, object);
+			((Map<String, Object>) map).put(name, object);
 		} else if (notification.getEventType() == Notification.REMOVE) {
-			((Map<String, EObject>) map).remove(name);
+			((Map<String, Object>) map).remove(name);
 		}
 	}
 
