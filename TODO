@@ -1,8 +1,0 @@
-removal of Read/Write
-change multi-token read/write functions
-add "C release" with full inline
-
-allow arbitrary-sized integers in Fifo_int class
-investigate the possibility of doing computations on arbitrary-sized integers in C (possibly add an option for that)
-
-implement I/O actors
