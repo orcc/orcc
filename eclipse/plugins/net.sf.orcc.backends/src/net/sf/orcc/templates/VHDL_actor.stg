@@ -66,14 +66,14 @@ signal <variable.name>_data_p2       : std_logic_vector(<variable.type.type.size
 signal <variable.name>_q_p2          : std_logic_vector(<variable.type.type.size> -1 downto 0);
 
 <else>
-type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
-constant <variable> : memory_type_<variable><if(variable.initialized)> := <variable.initialValue><endif>;
+type memory_type_<variable.name> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
+constant <variable.name> : memory_type_<variable.name><if(variable.initialized)> := <variable.initialValue><endif>;
 <endif>
 <else>
 <if(variable.assignable)>
 signal <variable.name> : <variable.type>;
 <else>
-constant <variable> : <variable.type> := <variable.initialValue>;
+constant <variable.name> : <variable.type> := <variable.initialValue>;
 <endif>
 <endif>
 >>
@@ -149,26 +149,26 @@ resetReadWriteEnable(variable) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Print cast operations (when source.size != target.size)
 ///////////////////////////////////////////////////////////////////////////////
-CastStore(target, targetSize, value, cast)::= <<
+CastStore(targetName, targetType, value, cast)::= <<
 <if(cast.extended)
-><target.indexedName> := <value><
+><targetName> := <value><
 else
-><if(target.type.uint)
-><target.indexedName> := ucast(<value>, <value.type.size>, <targetSize>)<  
+><if(targetType.uint)
+><targetName> := ucast(<value>, <value.type.size>, <targetType.size>)<  
   else
-><target.indexedName> := cast(<value>, <value.type.size>, <targetSize>)<  
+><targetName> := cast(<value>, <value.type.size>, <targetType.size>)<  
   endif><
 endif>
 >>
 
-CastLoad(target, source, cast)::= <<
+CastLoad(targetName, targetType, source, cast)::= <<
 <if(cast.extended)
-><target> := <source><
+><targetName> := <source><
 else
-><if(target.type.uint)
-><target> := ucast(<source>, <source.type.size>, <target.type.size>)<
+><if(targetType.uint)
+><targetName> := ucast(<source>, <source.type.size>, <targetType.size>)<
   else
-><target> := cast(<source>, <source.type.size>, <target.type.size>)<
+><targetName> := cast(<source>, <source.type.size>, <targetType.size>)<
   endif><
 endif>
 >>
@@ -181,7 +181,7 @@ endif>
 
 printAssign(assign) ::= <<
 <if (assign.cast)
-><CastStore(target=assign.target.variable, targetSize=assign.target.variable.type.size, value=assign.value, cast=assign.cast)>;<
+><CastStore(targetName=assign.target.variable.indexedName, targetType=assign.target.variable.type, value=assign.value, cast=assign.cast)>;<
 else
 ><assign.target.variable.indexedName> := <assign.value>;<
 endif>
@@ -209,23 +209,23 @@ else
 endif>
 >>
 
-getPortSize(variable) ::= <<
+getPortType(variable) ::= <<
 <if (action.inputPattern.inverseVariableMap.(variable))
-><action.inputPattern.inverseVariableMap.(variable).type.size><
+><action.inputPattern.inverseVariableMap.(variable).type><
 else
-><action.outputPattern.inverseVariableMap.(variable).type.size><
+><action.outputPattern.inverseVariableMap.(variable).type><
 endif>
 >>
 
 printLoad(load) ::= <<
 <if(load.indexes)
 ><if (action.inputPattern.inverseVariableMap.(load.source.variable) || action.outputPattern.inverseVariableMap.(load.source.variable))
-><if(load.cast)><CastLoad(target=load.target, source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;<
-else><load.target.variable.indexedName> := <procedure.name>_<getPort(load.source.variable.name)>;<
+><if(load.cast)><CastLoad(targetName=load.target.variable.indexedName, targetType=load.target.variable.type, source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;<
+else><load.target.variable.indexedName> := <procedure.name>_<getPort(load.source.variable)>;<
 endif
-><else><load.target.variable.indexedName> := <load.source.name>(<load.indexes : {index | <index>}; separator=", ">);<
+><else><load.target.variable.indexedName> := <load.source.variable.name>(<load.indexes : {index | <index>}; separator=", ">);<
 endif
-><else><load.target.variable.indexedName> := <load.source.name>;<endif>
+><else><load.target.variable.indexedName> := <load.source.variable.name>;<endif>
 >>
 
 // a "return" must be transformed when the attribute "transformReturn"
@@ -245,7 +245,7 @@ printStore(store) ::= <<
 <if(store.indexes)
  ><if(action.inputPattern.inverseVariableMap.(store.target.variable) || action.outputPattern.inverseVariableMap.(store.target.variable))
   ><if(store.cast)
-    ><CastStore(value=store.value, target={<procedure.name>_<getPort(store.target)>}, targetSize={<getPortSize(store.target)>}, cast=store.cast)>;<
+    ><CastStore(value=store.value, targetName={<procedure.name>_<getPort(store.target.variable)>}, targetType={<getPortType(store.target)>}, cast=store.cast)>;<
    else
     ><procedure.name>_<getPort(store.target.variable)> := <store.value>;<
    endif><
@@ -344,7 +344,7 @@ printBlockNode(blockNode) ::= <<
 // if node
 printIfNode(ifNode) ::= <<
 
-if (<ifNode.value>) then
+if (<ifNode.condition>) then
   <printNodes(ifNode.thenNodes)><if(ifNode.elseNodes)>
 else
   <printNodes(ifNode.elseNodes)>
@@ -356,7 +356,7 @@ end if;
 // while node
 printWhileNode(whileNode) ::= <<
 
-while (<whileNode.value>) loop
+while (<whileNode.condition>) loop
   <printNodes(whileNode.nodes)><printBlockNode(whileNode.joinNode)>
 end loop;
 >>

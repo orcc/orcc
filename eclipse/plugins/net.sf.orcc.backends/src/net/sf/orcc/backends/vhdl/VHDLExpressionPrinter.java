@@ -29,6 +29,8 @@
  */
 package net.sf.orcc.backends.vhdl;
 
+import java.util.Iterator;
+
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -45,7 +47,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.impl.ExprBinaryImpl;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.util.OrccUtil;
 
 /**
  * This class defines a VHDL expression printer.
@@ -231,7 +232,16 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	@Override
 	public void visit(ExprList expr, Object... args) {
 		builder.append('(');
-		builder.append(OrccUtil.toString(expr.getValue(), ", "));
+
+		Iterator<Expression> it = expr.getValue().iterator();
+		if (it.hasNext()) {
+			it.next().accept(this);
+			while (it.hasNext()) {
+				builder.append(", ");
+				it.next().accept(this, Integer.MAX_VALUE);
+			}
+		}
+
 		builder.append(')');
 	}
 
