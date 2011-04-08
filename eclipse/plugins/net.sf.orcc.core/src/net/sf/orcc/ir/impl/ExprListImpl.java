@@ -47,7 +47,7 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	 * @ordered
 	 */
 	protected EList<Expression> value;
-
+	
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -77,6 +77,20 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 				return getValue();
 		}
 		return super.eGet(featureID, resolve, coreType);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.EXPR_LIST__VALUE:
+				return ((InternalEList<?>)getValue()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -171,20 +185,6 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 			value = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.EXPR_LIST__VALUE);
 		}
 		return value;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case IrPackage.EXPR_LIST__VALUE:
-				return ((InternalEList<?>)getValue()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	@Override

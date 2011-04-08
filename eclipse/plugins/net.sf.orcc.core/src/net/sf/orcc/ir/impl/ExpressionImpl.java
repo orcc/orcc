@@ -31,7 +31,6 @@ package net.sf.orcc.ir.impl;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.util.ExpressionInterpreter;
-import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.ecore.EClass;
@@ -108,13 +107,6 @@ public abstract class ExpressionImpl extends EObjectImpl implements Expression {
 	@Override
 	public boolean isVarExpr() {
 		return false;
-	}
-
-	@Override
-	public String toString() {
-		ExpressionPrinter printer = new ExpressionPrinter();
-		accept(printer, Integer.MAX_VALUE);
-		return printer.toString();
 	}
 
 }
