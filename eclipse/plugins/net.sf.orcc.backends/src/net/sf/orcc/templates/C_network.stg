@@ -365,7 +365,7 @@ void *scheduler(void *data) {
 			si.num_firings = 0;
 			my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
-			printf("%2i  %5i\t<if (options.newScheduler)>%5i\t<endif>%s\t%s\n", sched-\>id, si.num_firings, <if (options.newScheduler)>si.ports, <endif>si.reason == starved ? "starved" : "full", my_actor-\>name);
+			printf("%2i  %5i\t%s\t%s\n", sched-\>id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
 		}
 		<if(options.needDynamicMapping)>

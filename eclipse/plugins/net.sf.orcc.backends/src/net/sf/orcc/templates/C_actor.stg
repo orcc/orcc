@@ -316,6 +316,9 @@ if (<pattern.numTokensMap.(port)> \> SIZE_<port.name> - index_<port.name> + <get
 	<if(options.newScheduler)>
 	if(!<instance.id>.sched-\>round_robin || i \> 0) {
 		sched_add_schedulable(<instance.id>.sched, &<successor.id>, RING_TOPOLOGY);
+#ifdef PRINT_FIRINGS
+		printf("\tFull port: <port.name>\n");
+#endif
 	}
 	<endif>
 }
@@ -448,6 +451,9 @@ printInputPatternPort(port) ::= <<
 if (index_<port.name> + <pattern.numTokensMap.(port)> \> numTokens_<port.name>) {
 	if(!<instance.id>.sched-\>round_robin || i \> 0) {
 		sched_add_schedulable(<instance.id>.sched, &<options.network.predecessorsMap.(instance).(port).id>, RING_TOPOLOGY);
+#ifdef PRINT_FIRINGS
+		printf("\tEmpty port: <port.name>\n");
+#endif
 	}
 }
 >>
@@ -618,6 +624,8 @@ instance(instance, options) ::= <<
 <if(options.newScheduler)>
 #define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
 <endif>
+
+// #define PRINT_FIRINGS
 
 ////////////////////////////////////////////////////////////////////////////////
 // Instance
