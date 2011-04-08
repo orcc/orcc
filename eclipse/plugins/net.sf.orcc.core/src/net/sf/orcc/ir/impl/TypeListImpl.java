@@ -349,9 +349,4 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__TYPE, newType, newType));
 	}
 
-	@Override
-	public String toString() {
-		return super.toString();
-	}
-
 }

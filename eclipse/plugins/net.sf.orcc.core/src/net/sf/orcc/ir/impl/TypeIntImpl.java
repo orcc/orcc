@@ -181,9 +181,18 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_INT__SIZE, oldSize, size));
 	}
 
+	/**
+	 * @generated
+	 */
 	@Override
 	public String toString() {
-		return super.toString();
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (size: ");
+		result.append(size);
+		result.append(')');
+		return result.toString();
 	}
 
 }

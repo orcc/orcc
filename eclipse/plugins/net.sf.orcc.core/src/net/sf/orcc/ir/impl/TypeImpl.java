@@ -35,7 +35,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.TypeInterpreter;
-import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.ir.util.TypeVisitor;
 
 import org.eclipse.emf.ecore.EClass;
@@ -116,13 +115,6 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 	@Override
 	public boolean isVoid() {
 		return false;
-	}
-
-	@Override
-	public String toString() {
-		TypePrinter printer = new TypePrinter();
-		accept(printer);
-		return printer.toString();
 	}
 
 }

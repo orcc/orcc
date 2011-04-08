@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.util;
 
 import java.util.Iterator;
-import java.util.List;
 
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -141,19 +140,18 @@ public class ExpressionPrinter implements ExpressionVisitor {
 
 	@Override
 	public void visit(ExprList expr, Object... args) {
-		List<Expression> list = expr.getValue();
-		if (list.isEmpty()) {
-			builder.append("[]");
-		} else {
-			Iterator<Expression> it = list.iterator();
-			builder.append('[');
-			builder.append(it.next().toString());
+		builder.append('[');
+
+		Iterator<Expression> it = expr.getValue().iterator();
+		if (it.hasNext()) {
+			it.next().accept(this);
 			while (it.hasNext()) {
 				builder.append(", ");
-				builder.append(it.next().toString());
+				it.next().accept(this, Integer.MAX_VALUE);
 			}
-			builder.append(']');
 		}
+
+		builder.append(']');
 	}
 
 	@Override
