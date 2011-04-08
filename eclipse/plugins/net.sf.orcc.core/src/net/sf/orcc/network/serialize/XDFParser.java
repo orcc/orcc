@@ -539,7 +539,7 @@ public class XDFParser {
 		if (vertexName.isEmpty()) {
 			return null;
 		} else {
-			return new Port(IrFactory.eINSTANCE.createLocation(), null,
+			return IrFactory.eINSTANCE.createPort(IrFactory.eINSTANCE.createLocation(), null,
 					portName);
 		}
 	}
@@ -854,7 +854,7 @@ public class XDFParser {
 		}
 
 		// creates a port
-		Port port = new Port(location, type, name);
+		Port port = IrFactory.eINSTANCE.createPort(location, type, name);
 
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");

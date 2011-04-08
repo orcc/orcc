@@ -191,9 +191,8 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Port/type"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Tag">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Tag/identifiers"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute Ir.ecore#//Tag/identifiers"/>
     </genClasses>
     <genClasses image="false" ecoreClass="Ir.ecore#//ActionScheduler"/>
-    <genClasses image="false" ecoreClass="Ir.ecore#//String"/>
   </genPackages>
 </genmodel:GenModel>

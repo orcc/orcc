@@ -60,7 +60,7 @@ public interface Tag extends EObject {
 	 * Returns identifiers of the tag.
 	 * 
 	 * @return a list of identifier
-	 * @model containment="true" dataType="org.eclipse.emf.ecore.EString"
+	 * @model dataType="org.eclipse.emf.ecore.EString" upper="-1"
 	 */
 	EList<String> getIdentifiers();
 

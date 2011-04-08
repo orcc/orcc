@@ -6,12 +6,12 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -706,6 +706,15 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return port;
 	}
 
+	@Override
+	public Port createPort(Location location, Type type, String name) {
+		PortImpl port = new PortImpl();
+		port.setLocation(location);
+		port.setName(name);
+		port.setType(type);
+		return port;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -735,6 +744,20 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Tag createTag() {
 		TagImpl tag = new TagImpl();
 		return tag;
+	}
+
+	@Override
+	public Tag createTag(String tagName) {
+		TagImpl tag = new TagImpl();
+		tag.getIdentifiers().add(tagName);
+		return tag;
+	}
+
+	@Override
+	public Tag createTag(Tag tag) {
+		TagImpl newTag = new TagImpl();
+		newTag.getIdentifiers().addAll(tag.getIdentifiers());
+		return newTag;
 	}
 
 	/**

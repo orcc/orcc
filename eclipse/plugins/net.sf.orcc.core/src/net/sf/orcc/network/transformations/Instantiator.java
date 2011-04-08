@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.network.transformations;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,6 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
-import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
 
@@ -80,15 +80,16 @@ public class Instantiator implements INetworkTransformation {
 	 */
 	private void checkParameters(Network network) {
 		for (Instance instance : network.getInstances()) {
-			OrderedMap<String, Var> parameters;
+			List<Var> parameters;
 			if (instance.isActor()) {
 				parameters = instance.getActor().getParameters();
 			} else {
-				parameters = instance.getNetwork().getParameters();
+				parameters = instance.getNetwork().getParameters().getList();
 			}
 
 			// check all parameters declared have a value
 			Map<String, Expression> values = instance.getParameters();
+			Map<String, Var> paramsMap = new HashMap<String, Var>();
 			for (Var parameter : parameters) {
 				String name = parameter.getName();
 				Expression value = values.get(name);
@@ -98,11 +99,13 @@ public class Instantiator implements INetworkTransformation {
 							+ instance.getId() + " has no value for parameter "
 							+ name);
 				}
+				
+				paramsMap.put(name, parameter);
 			}
 
 			// check that the values all reference a parameter
 			for (String name : values.keySet()) {
-				Var parameter = parameters.get(name);
+				Var parameter = paramsMap.get(name);
 				if (parameter == null) {
 					throw new OrccRuntimeException("In network \""
 							+ network.getName() + "\": Instance "
@@ -115,7 +118,7 @@ public class Instantiator implements INetworkTransformation {
 	}
 
 	private void checkPorts(String id, Set<Connection> connections,
-			OrderedMap<String, Port> ports) throws OrccException {
+			List<Port> ports) throws OrccException {
 		for (Port port : ports) {
 			boolean portUsed = false;
 			for (Connection connection : connections) {
@@ -143,9 +146,9 @@ public class Instantiator implements INetworkTransformation {
 					Network network = instance.getNetwork();
 
 					Set<Connection> connections = graph.incomingEdgesOf(vertex);
-					checkPorts(id, connections, network.getInputs());
+					checkPorts(id, connections, network.getInputs().getList());
 					connections = graph.outgoingEdgesOf(vertex);
-					checkPorts(id, connections, network.getOutputs());
+					checkPorts(id, connections, network.getOutputs().getList());
 				} else {
 					Actor actor = instance.getActor();
 

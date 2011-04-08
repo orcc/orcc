@@ -30,7 +30,6 @@ package net.sf.orcc.tools.normalizer;
 
 import java.util.List;
 
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Expression;
@@ -41,7 +40,6 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines a transform that changes the load/store on FIFO arrays so
@@ -53,11 +51,9 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 
-	private OrderedMap<String, Var> stateVars;
-
 	private void updateIndex(Var var, List<Expression> indexes) {
 		if (indexes.size() < 2) {
-			Var varCount = stateVars.get(var.getName() + "_count");
+			Var varCount = actor.getStateVar(var.getName() + "_count");
 			ExprBinary expr = IrFactory.eINSTANCE.createExprBinary(
 					IrFactory.eINSTANCE.createExprVar(varCount), OpBinary.PLUS,
 					indexes.get(0), IrFactory.eINSTANCE.createTypeInt(32));
@@ -69,17 +65,11 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
-		stateVars = actor.getStateVars();
-		super.visit(actor);
-	}
-
-	@Override
 	public void visit(InstLoad load) {
 		Use use = load.getSource();
 		Var var = use.getVariable();
 		if (!var.isGlobal() && isPort(var)) {
-			use.setVariable(stateVars.get(var.getName()));
+			use.setVariable(actor.getStateVar(var.getName()));
 			updateIndex(var, load.getIndexes());
 		}
 	}
@@ -89,7 +79,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 		Def def = store.getTarget();
 		Var var = def.getVariable();
 		if (!var.isGlobal() && isPort(var)) {
-			def.setVariable(stateVars.get(var.getName()));
+			def.setVariable(actor.getStateVar(var.getName()));
 			updateIndex(var, store.getIndexes());
 		}
 	}

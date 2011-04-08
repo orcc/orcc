@@ -87,6 +87,8 @@ public class MapAdapter implements Adapter {
 			System.out.println("TODO");
 		} else if (notification.getFeatureID(Actor.class) == IrPackage.ACTOR__OUTPUTS) {
 			System.out.println("TODO");
+		} else if (notification.getFeatureID(Actor.class) == IrPackage.ACTOR__STATE_VARS) {
+			System.out.println("TODO");
 		}
 	}
 

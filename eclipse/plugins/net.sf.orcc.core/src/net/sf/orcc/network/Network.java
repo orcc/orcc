@@ -206,19 +206,19 @@ public class Network {
 							actor.getOutputs());
 				} else if (instance.isBroadcast()) {
 					Broadcast bcast = instance.getBroadcast();
-					computePredSucc(vertex, bcast.getInputs(),
-							bcast.getOutputs());
+					computePredSucc(vertex, bcast.getInputs().getList(), bcast
+							.getOutputs().getList());
 				} else if (instance.isNetwork()) {
 					Network network = instance.getNetwork();
-					computePredSucc(vertex, network.getInputs(),
-							network.getOutputs());
+					computePredSucc(vertex, network.getInputs().getList(),
+							network.getOutputs().getList());
 				}
 			}
 		}
 	}
 
-	private void computePredSucc(Vertex vertex,
-			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs) {
+	private void computePredSucc(Vertex vertex, List<Port> inputs,
+			List<Port> outputs) {
 		Map<Port, Instance> predMap = new LinkedHashMap<Port, Instance>();
 		predecessorsMap.put(vertex.getInstance(), predMap);
 		Set<Connection> incoming = graph.incomingEdgesOf(vertex);

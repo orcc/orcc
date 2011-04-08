@@ -79,13 +79,14 @@ public class Broadcast {
 
 		inputs = new OrderedMap<String, Port>();
 		String name = "input";
-		inputs.put(name, new Port(location, type, name));
+		inputs.put(name, IrFactory.eINSTANCE.createPort(location, type, name));
 
 		outputs = new OrderedMap<String, Port>();
 		for (int i = 0; i < numOutputs; i++) {
 			location = IrFactory.eINSTANCE.createLocation();
 			name = "output_" + i;
-			outputs.put(name, new Port(location, type, name));
+			outputs.put(name,
+					IrFactory.eINSTANCE.createPort(location, type, name));
 		}
 	}
 

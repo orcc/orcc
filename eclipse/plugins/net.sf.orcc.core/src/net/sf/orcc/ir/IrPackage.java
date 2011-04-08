@@ -1600,7 +1600,7 @@ public interface IrPackage extends EPackage {
 	int TAG = 38;
 
 	/**
-	 * The feature id for the '<em><b>Identifiers</b></em>' containment reference list.
+	 * The feature id for the '<em><b>Identifiers</b></em>' attribute list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1637,25 +1637,6 @@ public interface IrPackage extends EPackage {
 	int ACTION_SCHEDULER_FEATURE_COUNT = 0;
 
 	/**
-	 * The meta object id for the '{@link java.lang.String <em>String</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see java.lang.String
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getString()
-	 * @generated
-	 */
-	int STRING = 40;
-
-	/**
-	 * The number of structural features of the '<em>String</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int STRING_FEATURE_COUNT = 0;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1663,7 +1644,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 41;
+	int OP_BINARY = 40;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1673,7 +1654,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 42;
+	int OP_UNARY = 41;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
@@ -3036,15 +3017,15 @@ public interface IrPackage extends EPackage {
 	EClass getTag();
 
 	/**
-	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Tag#getIdentifiers <em>Identifiers</em>}'.
+	 * Returns the meta object for the attribute list '{@link net.sf.orcc.ir.Tag#getIdentifiers <em>Identifiers</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Identifiers</em>'.
+	 * @return the meta object for the attribute list '<em>Identifiers</em>'.
 	 * @see net.sf.orcc.ir.Tag#getIdentifiers()
 	 * @see #getTag()
 	 * @generated
 	 */
-	EReference getTag_Identifiers();
+	EAttribute getTag_Identifiers();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.ActionScheduler <em>Action Scheduler</em>}'.
@@ -3056,17 +3037,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getActionScheduler();
-
-	/**
-	 * Returns the meta object for class '{@link java.lang.String <em>String</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>String</em>'.
-	 * @see java.lang.String
-	 * @model instanceClass="java.lang.String"
-	 * @generated
-	 */
-	EClass getString();
 
 	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}'.
@@ -4116,12 +4086,12 @@ public interface IrPackage extends EPackage {
 		EClass TAG = eINSTANCE.getTag();
 
 		/**
-		 * The meta object literal for the '<em><b>Identifiers</b></em>' containment reference list feature.
+		 * The meta object literal for the '<em><b>Identifiers</b></em>' attribute list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TAG__IDENTIFIERS = eINSTANCE.getTag_Identifiers();
+		EAttribute TAG__IDENTIFIERS = eINSTANCE.getTag_Identifiers();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.ActionScheduler <em>Action Scheduler</em>}' class.
@@ -4132,16 +4102,6 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass ACTION_SCHEDULER = eINSTANCE.getActionScheduler();
-
-		/**
-		 * The meta object literal for the '{@link java.lang.String <em>String</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see java.lang.String
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getString()
-		 * @generated
-		 */
-		EClass STRING = eINSTANCE.getString();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.

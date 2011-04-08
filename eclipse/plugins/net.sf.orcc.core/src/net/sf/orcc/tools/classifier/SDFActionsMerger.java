@@ -47,7 +47,6 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.transformations.SSATransformation;
@@ -89,7 +88,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 
 		List<Expression> callExprs = setProcedureParameters(body, inputPattern,
 				outputPattern);
-		actor.getProcs().put(body.getName(), body);
+		actor.getProcs().add(body);
 		List<Node> thenNodes = nodeIf.getThenNodes();
 		NodeBlock node = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
@@ -107,7 +106,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		List<Expression> callExprs = setProcedureParameters(scheduler,
 				inputPattern, outputPattern);
 
-		actor.getProcs().put(scheduler.getName(), scheduler);
+		actor.getProcs().add(scheduler);
 		Var returnVar = target.newTempLocalVariable(file,
 				scheduler.getReturnType(), scheduler.getName() + "_ret");
 		node.add(IrFactory.eINSTANCE.createInstCall(
@@ -224,8 +223,10 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		// merges actions
 		Procedure body = mergeSDFBodies(actions);
 
-		Action action = new Action(IrFactory.eINSTANCE.createLocation(),
-				new Tag(), input, output, scheduler, body);
+		Action action = IrFactory.eINSTANCE
+				.createAction(IrFactory.eINSTANCE.createLocation(),
+						IrFactory.eINSTANCE.createTag(), input, output,
+						scheduler, body);
 
 		// removes the actions, add the action merged
 		actor.getActions().removeAll(actions);

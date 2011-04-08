@@ -37,7 +37,6 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
-import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -71,7 +70,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		OrderedMap<String, Var> stateVariables = actor.getStateVars();
+		List<Var> stateVariables = actor.getStateVars();
 		Iterator<Var> it = stateVariables.iterator();
 		while (it.hasNext()) {
 			Var variable = it.next();

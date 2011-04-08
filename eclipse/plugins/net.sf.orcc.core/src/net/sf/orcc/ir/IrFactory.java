@@ -496,6 +496,8 @@ public interface IrFactory extends EFactory {
 	 */
 	Port createPort();
 
+	Port createPort(Location location, Type type, String name);
+
 	/**
 	 * Returns a new object of class '<em>Procedure</em>'.
 	 * <!-- begin-user-doc
@@ -528,6 +530,10 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Tag createTag();
+
+	Tag createTag(String tagName);
+
+	Tag createTag(Tag tag);
 
 	/**
 	 * Returns a new object of class '<em>Type Bool</em>'.

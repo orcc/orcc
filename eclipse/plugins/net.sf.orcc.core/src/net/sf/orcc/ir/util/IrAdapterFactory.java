@@ -270,10 +270,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createActionSchedulerAdapter();
 			}
 			@Override
-			public Adapter caseString(String object) {
-				return createStringAdapter();
-			}
-			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -850,20 +846,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createActionSchedulerAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.lang.String <em>String</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.lang.String
-	 * @generated
-	 */
-	public Adapter createStringAdapter() {
 		return null;
 	}
 

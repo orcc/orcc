@@ -111,7 +111,6 @@ import net.sf.orcc.ir.impl.NodeInterpreter;
 import net.sf.orcc.ir.util.ExpressionInterpreter;
 import net.sf.orcc.ir.util.TypeInterpreter;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.OrderedMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -652,7 +651,7 @@ public class IRWriter {
 	 */
 	private JsonArray writeActionTag(Tag tag) {
 		JsonArray array = new JsonArray();
-		for (String identifier : tag) {
+		for (String identifier : tag.getIdentifiers()) {
 			array.add(new JsonPrimitive(identifier));
 		}
 
@@ -755,7 +754,7 @@ public class IRWriter {
 	 *            an ordered map of global variables
 	 * @return a JSON array
 	 */
-	private JsonArray writeGlobalVariables(OrderedMap<String, Var> variables) {
+	private JsonArray writeGlobalVariables(List<Var> variables) {
 		JsonArray array = new JsonArray();
 		for (Var variable : variables) {
 			array.add(writeGlobalVariable(variable));
@@ -812,7 +811,7 @@ public class IRWriter {
 		return array;
 	}
 
-	private JsonArray writePorts(OrderedMap<String, Port> ports) {
+	private JsonArray writePorts(List<Port> ports) {
 		JsonArray array = new JsonArray();
 		for (Port port : ports) {
 			array.add(writePort(port));
@@ -849,7 +848,7 @@ public class IRWriter {
 	 *            an ordered map of procedures
 	 * @return a JSON array
 	 */
-	private JsonArray writeProcedures(OrderedMap<String, Procedure> procedures) {
+	private JsonArray writeProcedures(List<Procedure> procedures) {
 		JsonArray array = new JsonArray();
 		for (Procedure procedure : procedures) {
 			array.add(writeProcedure(procedure));

@@ -126,6 +126,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 */
 	protected static final String NAME_EDEFAULT = null;
 
+	private Map<String, Port> inputsMap;
+
 	/**
 	 * the class of this actor. Initialized to unknown.
 	 */
@@ -150,6 +152,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Port> outputs;
+
+	private Map<String, Port> outputsMap;
 
 	/**
 	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
@@ -201,14 +205,12 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 */
 	protected boolean native_ = NATIVE_EDEFAULT;
 
+	private Map<String, Var> stateVarsMap;
+
 	/**
 	 * holds template-specific data.
 	 */
 	private Object templateData;
-
-	private Map<String, Port> inputsMap;
-
-	private Map<String, Port> outputsMap;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -600,6 +602,16 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		} else {
 			return name.substring(index + 1);
 		}
+	}
+	
+	@Override
+	public Var getStateVar(String name) {
+		if (stateVarsMap == null) {
+			stateVarsMap = new HashMap<String, Var>();
+			eAdapters().add(new MapAdapter());
+		}
+
+		return stateVarsMap.get(name);
 	}
 
 	/**

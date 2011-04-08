@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 
@@ -61,8 +62,8 @@ public class CSDFMoC extends AbstractMoC {
 	 */
 	public CSDFMoC() {
 		actions = new ArrayList<Action>();
-		inputPattern = new Pattern();
-		outputPattern = new Pattern();
+		inputPattern = IrFactory.eINSTANCE.createPattern();
+		outputPattern = IrFactory.eINSTANCE.createPattern();
 	}
 
 	@Override

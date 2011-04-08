@@ -93,8 +93,8 @@ public class RenameTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		checkVariables(actor.getParameters().getList());
-		checkVariables(actor.getStateVars().getList());
+		checkVariables(actor.getParameters());
+		checkVariables(actor.getStateVars());
 
 		super.visit(actor);
 	}

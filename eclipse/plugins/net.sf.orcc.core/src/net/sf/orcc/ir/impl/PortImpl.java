@@ -41,36 +41,6 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  */
 public class PortImpl extends EObjectImpl implements Port {
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The default value of the '{@link #getNumTokensConsumed() <em>Num Tokens Consumed</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getNumTokensConsumed()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int NUM_TOKENS_CONSUMED_EDEFAULT = 0;
-
-	/**
-	 * The default value of the '{@link #getNumTokensProduced() <em>Num Tokens Produced</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getNumTokensProduced()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int NUM_TOKENS_PRODUCED_EDEFAULT = 0;
-
-	/**
 	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -79,6 +49,16 @@ public class PortImpl extends EObjectImpl implements Port {
 	 * @ordered
 	 */
 	protected Location location;
+
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -91,6 +71,16 @@ public class PortImpl extends EObjectImpl implements Port {
 	protected String name = NAME_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getNumTokensConsumed() <em>Num Tokens Consumed</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getNumTokensConsumed()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int NUM_TOKENS_CONSUMED_EDEFAULT = 0;
+
+	/**
 	 * The cached value of the '{@link #getNumTokensConsumed() <em>Num Tokens Consumed</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -99,6 +89,16 @@ public class PortImpl extends EObjectImpl implements Port {
 	 * @ordered
 	 */
 	protected int numTokensConsumed = NUM_TOKENS_CONSUMED_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getNumTokensProduced() <em>Num Tokens Produced</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getNumTokensProduced()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int NUM_TOKENS_PRODUCED_EDEFAULT = 0;
 
 	/**
 	 * The cached value of the '{@link #getNumTokensProduced() <em>Num Tokens Produced</em>}' attribute.

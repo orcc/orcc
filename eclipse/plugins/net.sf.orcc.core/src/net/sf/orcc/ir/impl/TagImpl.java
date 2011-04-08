@@ -7,37 +7,32 @@
 package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Tag;
 
-import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.InternalEList;
+import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Tag</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Tag</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.TagImpl#getIdentifiers <em>Identifiers</em>}</li>
+ * <li>{@link net.sf.orcc.ir.impl.TagImpl#getIdentifiers <em>Identifiers</em>}</li>
  * </ul>
  * </p>
- *
+ * 
  * @generated
  */
-public class TagImpl extends EObjectImpl implements Iterable<String>, Tag {
+public class TagImpl extends EObjectImpl implements Tag {
 	/**
-	 * The cached value of the '{@link #getIdentifiers() <em>Identifiers</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getIdentifiers() <em>Identifiers</em>}'
+	 * attribute list. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getIdentifiers()
 	 * @generated
 	 * @ordered
@@ -45,8 +40,8 @@ public class TagImpl extends EObjectImpl implements Iterable<String>, Tag {
 	protected EList<String> identifiers;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected TagImpl() {
@@ -54,8 +49,8 @@ public class TagImpl extends EObjectImpl implements Iterable<String>, Tag {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -64,87 +59,74 @@ public class TagImpl extends EObjectImpl implements Iterable<String>, Tag {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EList<String> getIdentifiers() {
 		if (identifiers == null) {
-			identifiers = new EObjectContainmentEList<String>(String.class, this, IrPackage.TAG__IDENTIFIERS);
+			identifiers = new EDataTypeUniqueEList<String>(String.class, this,
+					IrPackage.TAG__IDENTIFIERS);
 		}
 		return identifiers;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case IrPackage.TAG__IDENTIFIERS:
-				return ((InternalEList<?>)getIdentifiers()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.TAG__IDENTIFIERS:
-				return getIdentifiers();
+		case IrPackage.TAG__IDENTIFIERS:
+			return getIdentifiers();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.TAG__IDENTIFIERS:
-				getIdentifiers().clear();
-				getIdentifiers().addAll((Collection<? extends String>)newValue);
-				return;
+		case IrPackage.TAG__IDENTIFIERS:
+			getIdentifiers().clear();
+			getIdentifiers().addAll((Collection<? extends String>) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.TAG__IDENTIFIERS:
-				getIdentifiers().clear();
-				return;
+		case IrPackage.TAG__IDENTIFIERS:
+			getIdentifiers().clear();
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.TAG__IDENTIFIERS:
-				return identifiers != null && !identifiers.isEmpty();
+		case IrPackage.TAG__IDENTIFIERS:
+			return identifiers != null && !identifiers.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -156,13 +138,13 @@ public class TagImpl extends EObjectImpl implements Iterable<String>, Tag {
 	 *            an identifier
 	 */
 	public void add(String identifier) {
-		identifiers.add(identifier);
+		getIdentifiers().add(identifier);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof TagImpl) {
-			return identifiers.equals(((TagImpl) obj).identifiers);
+		if (obj instanceof Tag) {
+			return getIdentifiers().equals(((Tag) obj).getIdentifiers());
 		} else {
 			return false;
 		}
@@ -193,11 +175,6 @@ public class TagImpl extends EObjectImpl implements Iterable<String>, Tag {
 		return getIdentifiers().isEmpty();
 	}
 
-	@Override
-	public Iterator<String> iterator() {
-		return getIdentifiers().iterator();
-	}
-
 	/**
 	 * Returns the number of identifiers in this tag.
 	 * 
@@ -207,9 +184,4 @@ public class TagImpl extends EObjectImpl implements Iterable<String>, Tag {
 		return getIdentifiers().size();
 	}
 
-	@Override
-	public String toString() {
-		return identifiers.toString();
-	}
-
-} //TagImpl
+} // TagImpl

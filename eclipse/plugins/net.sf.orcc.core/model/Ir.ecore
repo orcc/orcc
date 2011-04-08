@@ -218,12 +218,10 @@
         resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Tag">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="identifiers" upperBound="-1"
-        eType="#//String" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="identifiers" upperBound="-1"
+        eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ActionScheduler" instanceClassName="net.sf.orcc.ir.ActionScheduler"
-      abstract="true" interface="true"/>
-  <eClassifiers xsi:type="ecore:EClass" name="String" instanceClassName="java.lang.String"
       abstract="true" interface="true"/>
   <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">
     <eLiterals name="BITAND"/>

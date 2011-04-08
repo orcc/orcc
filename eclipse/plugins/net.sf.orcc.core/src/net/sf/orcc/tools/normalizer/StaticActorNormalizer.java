@@ -54,7 +54,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines a normalizer for static actors.
@@ -174,7 +173,7 @@ public class StaticActorNormalizer {
 			for (Port port : pattern.getPorts()) {
 				Integer tokens = pattern.getNumTokens(port);
 
-				Var varCount = stateVars.get(port.getName() + "_count");
+				Var varCount = actor.getStateVar(port.getName() + "_count");
 
 				InstStore store = factory.createInstStore(varCount, factory
 						.createExprBinary(factory.createExprVar(varCount),
@@ -195,8 +194,6 @@ public class StaticActorNormalizer {
 
 	private Actor actor;
 
-	private OrderedMap<String, Var> stateVars;
-
 	private CSDFMoC staticCls;
 
 	private List<Var> variables;
@@ -207,7 +204,6 @@ public class StaticActorNormalizer {
 	public StaticActorNormalizer(Actor actor) {
 		this.actor = actor;
 		staticCls = (CSDFMoC) actor.getMoC();
-		stateVars = actor.getStateVars();
 	}
 
 	/**
@@ -229,14 +225,12 @@ public class StaticActorNormalizer {
 			Type type = factory.createTypeList(numTokens, port.getType());
 			Var var = factory.createVar(factory.createLocation(), type,
 					port.getName(), true, true);
-			stateVars.put(actor.getFile(), var.getLocation(), var.getName(),
-					var);
+			actor.getStateVars().add(var);
 
 			Var varCount = factory.createVar(factory.createLocation(),
 					factory.createTypeInt(32), port.getName() + "_count", true,
 					factory.createExprInt(0));
-			stateVars.put(actor.getFile(), varCount.getLocation(),
-					varCount.getName(), varCount);
+			actor.getStateVars().add(varCount);
 
 			InstStore store = factory.createInstStore(varCount,
 					factory.createExprInt(0));
@@ -292,11 +286,11 @@ public class StaticActorNormalizer {
 
 		Pattern input = staticCls.getInputPattern();
 		Pattern output = staticCls.getOutputPattern();
-		Tag tag = new Tag();
-		tag.add(ACTION_NAME);
+		Tag tag = IrFactory.eINSTANCE.createTag(ACTION_NAME);
 
-		return new Action(IrFactory.eINSTANCE.createLocation(), tag, input,
-				output, scheduler, body);
+		return IrFactory.eINSTANCE.createAction(
+				IrFactory.eINSTANCE.createLocation(), tag, input, output,
+				scheduler, body);
 	}
 
 	/**
@@ -374,7 +368,7 @@ public class StaticActorNormalizer {
 		Pattern inputPattern = staticCls.getInputPattern();
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
-			Var var = stateVars.get(port.getName());
+			Var var = actor.getStateVar(port.getName());
 			System.out.println("must read " + numTokens + " tokens from "
 					+ var.getName());
 		}
@@ -410,7 +404,7 @@ public class StaticActorNormalizer {
 		Pattern outputPattern = staticCls.getOutputPattern();
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
-			Var var = stateVars.get(port.getName());
+			Var var = actor.getStateVar(port.getName());
 			System.out.println("must write " + numTokens + " tokens from "
 					+ var.getName());
 		}

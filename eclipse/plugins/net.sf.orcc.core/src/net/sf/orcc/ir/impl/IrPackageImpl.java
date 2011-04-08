@@ -345,13 +345,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass stringEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EEnum opBinaryEEnum = null;
 
 	/**
@@ -1555,8 +1548,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTag_Identifiers() {
-		return (EReference)tagEClass.getEStructuralFeatures().get(0);
+	public EAttribute getTag_Identifiers() {
+		return (EAttribute)tagEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1566,15 +1559,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EClass getActionScheduler() {
 		return actionSchedulerEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getString() {
-		return stringEClass;
 	}
 
 	/**
@@ -1787,11 +1771,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(portEClass, PORT__TYPE);
 
 		tagEClass = createEClass(TAG);
-		createEReference(tagEClass, TAG__IDENTIFIERS);
+		createEAttribute(tagEClass, TAG__IDENTIFIERS);
 
 		actionSchedulerEClass = createEClass(ACTION_SCHEDULER);
-
-		stringEClass = createEClass(STRING);
 
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
@@ -2019,11 +2001,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getPort_Type(), this.getType(), null, "type", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(tagEClass, Tag.class, "Tag", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getTag_Identifiers(), this.getString(), null, "identifiers", null, 0, -1, Tag.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTag_Identifiers(), theEcorePackage.getEString(), "identifiers", null, 0, -1, Tag.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(actionSchedulerEClass, ActionScheduler.class, "ActionScheduler", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
-
-		initEClass(stringEClass, String.class, "String", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 
 		// Initialize enums and add enum literals
 		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");

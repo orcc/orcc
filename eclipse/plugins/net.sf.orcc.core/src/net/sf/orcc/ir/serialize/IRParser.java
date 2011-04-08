@@ -64,6 +64,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.EStructuralFeature;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
@@ -82,6 +84,7 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -130,11 +133,9 @@ public class IRParser {
 
 	private String file;
 
-	private OrderedMap<String, Port> inputs;
+	private Actor actor;
 
 	private boolean isInitialize;
-
-	private OrderedMap<String, Port> outputs;
 
 	final private OrderedMap<String, Procedure> procs;
 
@@ -165,7 +166,7 @@ public class IRParser {
 			// removes the first untagged action found
 			return untaggedActions.remove(0);
 		} else {
-			Tag tag = new Tag();
+			Tag tag = IrFactory.eINSTANCE.createTag();
 			for (int i = 0; i < array.size(); i++) {
 				tag.add(array.get(i).getAsString());
 			}
@@ -216,14 +217,14 @@ public class IRParser {
 	 */
 	private Action parseAction(JsonArray array) {
 		JsonArray tagArray = array.get(0).getAsJsonArray();
-		Tag tag = new Tag();
+		Tag tag = IrFactory.eINSTANCE.createTag();
 		for (int i = 0; i < tagArray.size(); i++) {
 			tag.add(tagArray.get(i).getAsString());
 		}
 
 		vars = new Scope<String, Var>(vars, true);
-		Pattern ip = parsePattern(inputs, array.get(1).getAsJsonArray());
-		Pattern op = parsePattern(outputs, array.get(2).getAsJsonArray());
+		Pattern ip = parseInputPattern(array.get(1).getAsJsonArray());
+		Pattern op = parseOutputPattern(array.get(2).getAsJsonArray());
 
 		Procedure body = parseProc(array.get(4).getAsJsonArray());
 
@@ -239,8 +240,8 @@ public class IRParser {
 
 		vars = vars.getParent().getParent();
 
-		Action action = new Action(body.getLocation(), tag, ip, op, scheduler,
-				body);
+		Action action = IrFactory.eINSTANCE.createAction(body.getLocation(),
+				tag, ip, op, scheduler, body);
 		putAction(tag, action);
 		return action;
 	}
@@ -252,13 +253,12 @@ public class IRParser {
 	 *            a JSON array whose each entry encodes an action
 	 * @return a list of actions
 	 */
-	private List<Action> parseActions(JsonArray array) {
-		List<Action> actions = new ArrayList<Action>();
+	@SuppressWarnings("unchecked")
+	private void parseActions(EStructuralFeature feature, JsonArray array) {
 		for (int i = 0; i < array.size(); i++) {
-			actions.add(parseAction(array.get(i).getAsJsonArray()));
+			Action action = parseAction(array.get(i).getAsJsonArray());
+			((List<Action>) actor.eGet(feature)).add(action);
 		}
-
-		return actions;
 	}
 
 	/**
@@ -302,41 +302,47 @@ public class IRParser {
 					new BufferedReader(new InputStreamReader(in)))
 					.getAsJsonObject();
 
+			actor = IrFactory.eINSTANCE.createActor();
+
 			file = obj.get(KEY_SOURCE_FILE).getAsString();
+			actor.setFile(file);
 			String name = obj.get(KEY_NAME).getAsString();
+			actor.setName(name);
 
 			JsonArray array = obj.get(KEY_PARAMETERS).getAsJsonArray();
-			OrderedMap<String, Var> parameters = parseGlobalVariables(array);
+			parseGlobalVariables(IrPackage.eINSTANCE.getActor_Parameters(),
+					array);
 			vars = new Scope<String, Var>(vars, true);
 
-			boolean nativeFlag = obj.get(KEY_NATIVE).getAsBoolean();
+			actor.setNative(obj.get(KEY_NATIVE).getAsBoolean());
 
-			inputs = parsePorts(obj.get(KEY_INPUTS).getAsJsonArray());
-			outputs = parsePorts(obj.get(KEY_OUTPUTS).getAsJsonArray());
+			parsePorts(IrPackage.eINSTANCE.getActor_Inputs(),
+					obj.get(KEY_INPUTS).getAsJsonArray());
+			parsePorts(IrPackage.eINSTANCE.getActor_Outputs(),
+					obj.get(KEY_OUTPUTS).getAsJsonArray());
 
 			array = obj.get(KEY_STATE_VARS).getAsJsonArray();
-			OrderedMap<String, Var> stateVars = parseGlobalVariables(array);
+			parseGlobalVariables(IrPackage.eINSTANCE.getActor_StateVars(),
+					array);
 
 			array = obj.get(KEY_PROCEDURES).getAsJsonArray();
 			for (JsonElement element : array) {
 				Procedure proc = parseProc(element.getAsJsonArray());
 				procs.put(file, proc.getLocation(), proc.getName(), proc);
+				actor.getProcs().add(proc);
 			}
 
 			array = obj.get(KEY_ACTIONS).getAsJsonArray();
-			List<Action> actions = parseActions(array);
+			parseActions(IrPackage.eINSTANCE.getActor_Actions(), array);
 
 			// a bit dirty, this one...
 			// when isInitialize is true, don't put actions in hash tables.
 			isInitialize = true;
 			array = obj.get(KEY_INITIALIZES).getAsJsonArray();
-			List<Action> initializes = parseActions(array);
+			parseActions(IrPackage.eINSTANCE.getActor_Initializes(), array);
 
 			array = obj.get(KEY_ACTION_SCHED).getAsJsonArray();
-			ActionScheduler sched = parseActionScheduler(array);
-
-			Actor actor = new Actor(name, file, parameters, inputs, outputs,
-					nativeFlag, stateVars, procs, actions, initializes, sched);
+			actor.setActionScheduler(parseActionScheduler(array));
 
 			return actor;
 		} catch (RuntimeException e) {
@@ -464,8 +470,9 @@ public class IRParser {
 	 *            A list of JSON-encoded {@link VarGlobal}.
 	 * @return A {@link List}&lt;{@link VarGlobal}&gt;.
 	 */
-	private OrderedMap<String, Var> parseGlobalVariables(JsonArray arrayGlobals) {
-		OrderedMap<String, Var> stateVars = new OrderedMap<String, Var>();
+	@SuppressWarnings("unchecked")
+	private void parseGlobalVariables(EStructuralFeature feature,
+			JsonArray arrayGlobals) {
 		for (JsonElement element : arrayGlobals) {
 			JsonArray array = element.getAsJsonArray();
 
@@ -482,13 +489,11 @@ public class IRParser {
 
 			Var stateVar = IrFactory.eINSTANCE.createVar(location, type, name,
 					assignable, init);
-			stateVars.put(file, location, name, stateVar);
+			((List<Var>) actor.eGet(feature)).add(stateVar);
 
 			// register the state variable
 			vars.put(file, location, name, stateVar);
 		}
-
-		return stateVars;
 	}
 
 	/**
@@ -786,11 +791,37 @@ public class IRParser {
 		return node;
 	}
 
-	private Pattern parsePattern(OrderedMap<String, Port> ports, JsonArray array) {
-		Pattern pattern = new Pattern();
+	private Pattern parseInputPattern(JsonArray array) {
+		Pattern pattern = IrFactory.eINSTANCE.createPattern();
 		for (int i = 0; i < array.size(); i++) {
 			JsonArray patternArray = array.get(i).getAsJsonArray();
-			Port port = ports.get(patternArray.get(0).getAsString());
+			Port port = actor.getInput(patternArray.get(0).getAsString());
+
+			int numTokens = patternArray.get(1).getAsInt();
+			pattern.setNumTokens(port, numTokens);
+
+			if (!patternArray.get(2).isJsonNull()) {
+				Var peeked = parseLocalVariable(patternArray.get(2)
+						.getAsJsonArray());
+				pattern.setPeeked(port, peeked);
+			}
+
+			Var variable = parseLocalVariable(patternArray.get(3)
+					.getAsJsonArray());
+			pattern.setVariable(port, variable);
+
+			// register the variable definition
+			vars.put(file, variable.getLocation(), variable.getName(), variable);
+		}
+
+		return pattern;
+	}
+
+	private Pattern parseOutputPattern(JsonArray array) {
+		Pattern pattern = IrFactory.eINSTANCE.createPattern();
+		for (int i = 0; i < array.size(); i++) {
+			JsonArray patternArray = array.get(i).getAsJsonArray();
+			Port port = actor.getOutput(patternArray.get(0).getAsString());
 
 			int numTokens = patternArray.get(1).getAsInt();
 			pattern.setNumTokens(port, numTokens);
@@ -819,8 +850,8 @@ public class IRParser {
 	 *            an array of JSON-encoded ports
 	 * @return an ordered map of ports
 	 */
-	private OrderedMap<String, Port> parsePorts(JsonArray array) {
-		OrderedMap<String, Port> ports = new OrderedMap<String, Port>();
+	@SuppressWarnings("unchecked")
+	private void parsePorts(EStructuralFeature feature, JsonArray array) {
 		for (JsonElement element : array) {
 			JsonArray port = element.getAsJsonArray();
 
@@ -828,11 +859,9 @@ public class IRParser {
 			Type type = parseType(port.get(1));
 			String name = port.get(2).getAsString();
 
-			Port po = new Port(location, type, name);
-			ports.put(file, location, name, po);
+			Port po = IrFactory.eINSTANCE.createPort(location, type, name);
+			((List<Port>) actor.eGet(feature)).add(po);
 		}
-
-		return ports;
 	}
 
 	/**

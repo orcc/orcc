@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Tag;
 
 /**
@@ -80,8 +81,8 @@ public class ActionList implements Iterable<Action> {
 			// [a]; [a, b]; [a, b, c]
 
 			int tagLength = 1;
-			Tag currentTag = new Tag(tagLength);
-			for (String id : tag) {
+			Tag currentTag = IrFactory.eINSTANCE.createTag();
+			for (String id : tag.getIdentifiers()) {
 				currentTag.add(id);
 
 				List<Action> actions = tagMap.get(currentTag);
@@ -96,7 +97,7 @@ public class ActionList implements Iterable<Action> {
 
 				// creates a new list and copies the tag in it
 				tagLength++;
-				currentTag = new Tag(tagLength, currentTag);
+				currentTag = IrFactory.eINSTANCE.createTag(currentTag);
 			}
 		}
 	}

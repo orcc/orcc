@@ -174,6 +174,15 @@ public interface Actor extends EObject {
 	String getSimpleName();
 
 	/**
+	 * Returns the state variable with the given name.
+	 * 
+	 * @param name
+	 *            name of a state variable
+	 * @return the state variable with the given name
+	 */
+	Var getStateVar(String name);
+
+	/**
 	 * Returns the ordered map of state variables.
 	 * 
 	 * @return the ordered map of state variables
@@ -219,8 +228,8 @@ public interface Actor extends EObject {
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getActionScheduler <em>Action Scheduler</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc
+	 * --> <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Action Scheduler</em>' containment reference.
 	 * @see #getActionScheduler()
 	 * @generated
@@ -229,8 +238,7 @@ public interface Actor extends EObject {
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getFile <em>File</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @param value the new value of the '<em>File</em>' attribute.
 	 * @see #getFile()
 	 * @generated
@@ -254,10 +262,12 @@ public interface Actor extends EObject {
 	void setName(String name);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#isNative <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Native</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#isNative
+	 * <em>Native</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Native</em>' attribute.
 	 * @see #isNative()
 	 * @generated
 	 */

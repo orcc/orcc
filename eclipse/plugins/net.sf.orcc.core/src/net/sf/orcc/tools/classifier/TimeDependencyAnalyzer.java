@@ -39,6 +39,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.Pattern;
@@ -134,7 +135,7 @@ public class TimeDependencyAnalyzer {
 		// Create the reference action that will be compared to the list of
 		// action
 
-		Pattern higherPriorityPattern = new Pattern();
+		Pattern higherPriorityPattern = IrFactory.eINSTANCE.createPattern();
 		List<Action> higherPriorityActions = new ArrayList<Action>();
 
 		if (it.hasNext()) {
