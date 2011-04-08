@@ -1,4 +1,53 @@
 ///////////////////////////////////////////////////////////////////////////////
+// Types and variables
+///////////////////////////////////////////////////////////////////////////////
+
+// the dimensions of a list: [dim1][dim2]...[dimn]
+// does not output anything if $value$ is empty
+listSize(values) ::= <<
+<values : {value | [<value>]} >
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+listValue(values) ::= <<
+{<values; wrap, separator=", ">}
+>>
+
+variableDeclaration(variable) ::= <<
+<variable.type> <variable.indexedName><listSize(variable.type.dimensions)>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Constants
+///////////////////////////////////////////////////////////////////////////////
+
+Constant(constant) ::= <<
+<if (constant.booleanExpr)><printBool(constant)><
+elseif (constant.intExpr)><printInt(constant)><
+elseif (constant.listExpr)><printList(constant)><
+elseif (constant.stringExpr)><printString(constant)><
+endif>
+>>
+
+
+printBool(constant) ::= <<
+<if (constant.value)>true<else>false<endif>
+>>
+
+printInt(number) ::= <<
+<number><if (number.long)>L<endif>
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+printList(constant) ::= <<
+{<constant.value: Constant(); wrap, separator=", ">}
+>>
+
+printString(constant) ::= <<
+"<constant>"
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // include Actors
 includeActor(actor) ::= <<
 #include "<if (!actor.packageAsList.empty)><actor.packageAsList; separator="/">/<endif><actor.simpleName>.h"
@@ -10,18 +59,9 @@ includeActors(actors) ::= <<
 
 ///////////////////////////////////////////////////////////////////////////////
 // initialize Instances
-argumentList(parameter) ::= <<
-<parameter>
-<if (instance.parameters.(parameter).stringExpr)
->"<instance.parameters.(parameter).indexedName>"<
-else
-><instance.parameters.(parameter).indexedName><
-endif>
->>
-
 initializeInstance(instance) ::= <<
 <if (instance.actor.parameters.list)
->("<instance.hierarchicalId: {id | <id>}; separator="/">", <instance.actor.parameters.list: argumentList(); separator=", ">, NETWORK_PROFILING_MODE)<
+>("<instance.hierarchicalId: {id | <id>}; separator="/">", <instance.actor.parameters.list: {param | <Constant(instance.parameters.(param.indexedName))>}; separator=", ">, NETWORK_PROFILING_MODE)<
 else
 >("<instance.hierarchicalId: {id | <id>}; separator="/">", NETWORK_PROFILING_MODE)<
 endif>

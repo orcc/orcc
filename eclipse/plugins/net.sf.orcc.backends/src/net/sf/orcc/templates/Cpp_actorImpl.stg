@@ -71,7 +71,7 @@ const <variableDeclaration(variable)> = <Constant(variable.initialValue)>;<\n><e
 StateVarAllocation(variable) ::= <<
 <if(variable.assignable)>
 <if (variable.type.dimensionsExpr)>
-<variable.indexedName>(new <variable.type><listSize(variable.type.dimensionsExpr)>),
+<variable.indexedName>(new <variable.type><listSize(variable.type.dimensions)>),
 <else>
 <if (variable.initialized)>
 <variable.indexedName>(<Constant(variable.initialValue)>),
@@ -218,7 +218,7 @@ while (<whileNode.condition>) {
 
 procedure(procedure) ::= <<
 <if(!procedure.native)
-><procedure.returnType> <actor.simpleName>::<procedure.name>(<procedure.parameters: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
+><procedure.returnType> <actor.simpleName>::<procedure.name>(<procedure.parameters: variableDeclaration(); wrap, anchor, separator=", ">)
 {
 <if(procedure.locals)>
 	<procedure.locals: {local | <variableDeclaration(local)>;<\n>}>
@@ -226,7 +226,7 @@ procedure(procedure) ::= <<
 <endif>
 	<printNodes(procedure.nodes)>}<
 else
-	>extern <procedure.returnType> <procedure.name>(<procedure.parameters: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">);
+	>extern <procedure.returnType> <procedure.name>(<procedure.parameters: variableDeclaration(); wrap, anchor, separator=", ">);
 <endif>
 >>
 
