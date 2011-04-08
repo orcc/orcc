@@ -538,36 +538,4 @@ void <actor.simpleName>::initialize()
 <endif>
 
 
-void <actor.simpleName>::getFifoStatus()
-{
-<if(actor.inputs.list)>
-  	for(int i=0; i\<<actor.simpleName>_nbInputs; i++) 
-	{
-		m_initialAvails[i] = m_avails[i] = m_poTabIn[i]-\>getCount();
-	}
-<endif>
-<if(actor.outputs.list)>
-	for(int i=0; i\<<actor.simpleName>_nbOutputs; i++) 
-	{
-	   m_initialRooms[i] = m_rooms[i] = m_poTabOut[i]-\>getRooms();
-	}
-<endif>
-}
-
-void <actor.simpleName>::updateFifoStatus()
-{
-<if(actor.inputs.list)>
-  	for(int i=0; i\<<actor.simpleName>_nbInputs; i++) 
-	{
-	   m_poTabIn[i]-\>setCount(m_initialAvails[i] - m_avails[i]);
-	}
-<endif>
-<if(actor.outputs.list)>
-	for(int i=0; i\<<actor.simpleName>_nbOutputs; i++) 
-	{
-		m_poTabOut[i]-\>setRooms(m_initialRooms[i] - m_rooms[i]);
-	}
-<endif>
-}
-
 >>

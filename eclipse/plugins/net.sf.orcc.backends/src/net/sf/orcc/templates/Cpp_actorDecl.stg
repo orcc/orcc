@@ -179,10 +179,6 @@ actor(actor, options) ::= <<
 	const bool hasRooms(int port, int iSize) const {return  (m_rooms[port] \>= iSize);};
 <endif>
 
-	void getFifoStatus();
-
-	void updateFifoStatus();
-
 	private:
 	static const char* className;
 
@@ -192,16 +188,7 @@ actor(actor, options) ::= <<
 	////////////////////////////////////////////////////////////////////////////////
 	// Non-const state variables of the actor
 	<actor.stateVars.list: nonConstStateVar()>
-	////////////////////////////////////////////////////////////////////////////////
-	// Fifo Status members
-<if(actor.inputs.list)>
-	int m_initialAvails[<actor.simpleName>_nbInputs];
-	int m_avails[<actor.simpleName>_nbInputs];
-<endif>
-<if(actor.outputs.list)>
-	int m_initialRooms[<actor.simpleName>_nbOutputs];
-	int m_rooms[<actor.simpleName>_nbOutputs];
-<endif>
+
 	};
 
 <actor.packageAsList: endNamespace()>
