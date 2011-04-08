@@ -128,7 +128,7 @@ public class FSMBuilder {
 		}
 
 		Set<String> states = new TreeSet<String>(graph.vertexSet());
-		FSM fsm = new FSM();
+		FSM fsm = IrFactory.eINSTANCE.createFSM();
 
 		// adds states by alphabetical order
 		for (String source : states) {

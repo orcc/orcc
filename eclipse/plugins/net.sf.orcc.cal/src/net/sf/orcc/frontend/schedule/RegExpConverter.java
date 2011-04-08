@@ -40,6 +40,7 @@ import java.util.TreeMap;
 import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
 
@@ -101,7 +102,7 @@ public class RegExpConverter {
 	 * @return an FSM
 	 */
 	public FSM convert(ActionList actionList) {
-		FSM fsm = new FSM();
+		FSM fsm = IrFactory.eINSTANCE.createFSM();
 		ThompsonBuilder thompsonBuilder = new ThompsonBuilder();
 		Automaton eNFA = thompsonBuilder.build(regexp);
 		Automaton DFA = new eNFAtoDFA(eNFA).convert();

@@ -54,7 +54,6 @@ import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.frontend.schedule.RegExpConverter;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -527,10 +526,8 @@ public class ActorTransformer {
 			// transform FSM
 			AstSchedule schedule = astActor.getSchedule();
 			AstScheduleRegExp scheduleRegExp = astActor.getScheduleRegExp();
-			ActionScheduler scheduler;
 			if (schedule == null && scheduleRegExp == null) {
-				scheduler = new ActionScheduler(sortedActions.getAllActions(),
-						null);
+				actor.getActionsOutsideFsm().addAll(sortedActions.getAllActions());
 			} else {
 				FSM fsm = null;
 				if (schedule != null) {
@@ -541,8 +538,9 @@ public class ActorTransformer {
 							scheduleRegExp);
 					fsm = converter.convert(sortedActions);
 				}
-				scheduler = new ActionScheduler(
-						sortedActions.getUntaggedActions(), fsm);
+				
+				actor.getActionsOutsideFsm().addAll(sortedActions.getUntaggedActions());
+				actor.setFsm(fsm);
 			}
 
 			context.restoreScope();
@@ -554,7 +552,6 @@ public class ActorTransformer {
 
 			actor.getActions().addAll(actions.getAllActions());
 			actor.getInitializes().addAll(initializes.getAllActions());
-			actor.setActionScheduler(scheduler);
 
 			return actor;
 		} finally {

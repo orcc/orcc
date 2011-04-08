@@ -66,22 +66,20 @@ public class CActorTemplateData {
 	 * Builds the input pattern
 	 */
 	private void buildInputPattern(Actor actor) {
-		if (actor.getActionScheduler() != null) {
-			List<Action> actions = actor.getActionScheduler().getActions();
+		List<Action> actions = actor.getActionsOutsideFsm();
 
-			for (Action action : actions) {
-				Pattern actionPattern = action.getInputPattern();
-				for (Port port : actionPattern.getPorts()) {
-					Integer numTokens = inputPattern.getNumTokens(port);
-					if (numTokens == null) {
-						numTokens = actionPattern.getNumTokens(port);
-					} else {
-						numTokens = Math.max(numTokens,
-								actionPattern.getNumTokens(port));
-					}
-
-					inputPattern.setNumTokens(port, numTokens);
+		for (Action action : actions) {
+			Pattern actionPattern = action.getInputPattern();
+			for (Port port : actionPattern.getPorts()) {
+				Integer numTokens = inputPattern.getNumTokens(port);
+				if (numTokens == null) {
+					numTokens = actionPattern.getNumTokens(port);
+				} else {
+					numTokens = Math.max(numTokens,
+							actionPattern.getNumTokens(port));
 				}
+
+				inputPattern.setNumTokens(port, numTokens);
 			}
 		}
 	}
@@ -90,11 +88,7 @@ public class CActorTemplateData {
 	 * Builds the transition pattern map.
 	 */
 	private void buildTransitionPattern(Actor actor) {
-		if (actor.getActionScheduler() == null) {
-			return;
-		}
-
-		FSM fsm = actor.getActionScheduler().getFsm();
+		FSM fsm = actor.getFsm();
 		if (fsm == null) {
 			return;
 		}

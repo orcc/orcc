@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -245,8 +244,8 @@ public class StaticActorNormalizer {
 	 *            an action
 	 */
 	private void addStaticAction(Action action) {
-		actor.getActionScheduler().getActions().add(action);
 		actor.getActions().add(action);
+		actor.getActionsOutsideFsm().add(action);
 	}
 
 	/**
@@ -254,11 +253,10 @@ public class StaticActorNormalizer {
 	 */
 	private void cleanupActor() {
 		// removes FSM
-		ActionScheduler sched = actor.getActionScheduler();
-		sched.setFsm(null);
+		actor.setFsm(null);
 
 		// removes all actions from action scheduler
-		sched.getActions().clear();
+		actor.getActionsOutsideFsm().clear();
 
 		// all action scheduler now just return true
 		for (Action action : actor.getActions()) {

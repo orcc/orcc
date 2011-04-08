@@ -65,7 +65,6 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -623,17 +622,17 @@ public class IRWriter {
 	 *            the action scheduler of the actor this writer was built with
 	 * @return the action scheduler encoded in JSON
 	 */
-	private JsonArray writeActionScheduler(ActionScheduler scheduler) {
+	private JsonArray writeActionScheduler(Actor actor) {
 		JsonArray array = new JsonArray();
 
 		JsonArray actions = new JsonArray();
 		array.add(actions);
-		for (Action action : scheduler.getActions()) {
+		for (Action action : actor.getActionsOutsideFsm()) {
 			actions.add(writeActionTag(action.getTag()));
 		}
 
-		if (scheduler.hasFsm()) {
-			array.add(writeFSM(scheduler.getFsm()));
+		if (actor.hasFsm()) {
+			array.add(writeFSM(actor.getFsm()));
 		} else {
 			array.add(null);
 		}
@@ -674,7 +673,7 @@ public class IRWriter {
 		obj.add(KEY_ACTIONS, writeActions(actor.getActions()));
 		obj.add(KEY_INITIALIZES, writeActions(actor.getInitializes()));
 
-		array = writeActionScheduler(actor.getActionScheduler());
+		array = writeActionScheduler(actor);
 		obj.add(KEY_ACTION_SCHED, array);
 		return obj;
 	}

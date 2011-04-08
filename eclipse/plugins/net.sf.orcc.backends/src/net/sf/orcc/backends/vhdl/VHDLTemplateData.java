@@ -83,7 +83,7 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 				}
 			}
 
-			if (actor.getActionScheduler().hasFsm()) {
+			if (actor.hasFsm()) {
 				signals.add("FSM");
 			}
 		}

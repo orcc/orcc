@@ -36,7 +36,6 @@ import java.util.Set;
 
 import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
@@ -257,17 +256,15 @@ public class ActionSplitter extends AbstractActorVisitor {
 	 *            action scheduler
 	 */
 	private void addFsm() {
-		ActionScheduler scheduler = actor.getActionScheduler();
-
-		fsm = new FSM();
+		fsm = IrFactory.eINSTANCE.createFSM();
 		fsm.setInitialState("init");
 		fsm.addState("init");
-		for (Action action : scheduler.getActions()) {
+		for (Action action : actor.getActionsOutsideFsm()) {
 			fsm.addTransition("init", action, "init");
 		}
 
-		scheduler.getActions().clear();
-		scheduler.setFsm(fsm);
+		actor.getActionsOutsideFsm().clear();
+		actor.setFsm(fsm);
 	}
 
 	@Override
@@ -301,11 +298,11 @@ public class ActionSplitter extends AbstractActorVisitor {
 	 * Visits all actions of this actor.
 	 */
 	private void visitAllActions() {
-		fsm = actor.getActionScheduler().getFsm();
+		fsm = actor.getFsm();
 		if (fsm == null) {
 			// no FSM: simply visit all the actions
-			List<Action> actions = new ArrayList<Action>(actor
-					.getActionScheduler().getActions());
+			List<Action> actions = new ArrayList<Action>(
+					actor.getActionsOutsideFsm());
 			for (Action action : actions) {
 				// an FSM will be created if needed, from "init" to "init" (and
 				// intermediate transitions created by the BranchVisitor)

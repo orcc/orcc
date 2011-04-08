@@ -64,12 +64,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.EStructuralFeature;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprList;
@@ -109,6 +106,8 @@ import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.impl.NodeImpl;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
+
+import org.eclipse.emf.ecore.EStructuralFeature;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -269,19 +268,19 @@ public class IRParser {
 	 *            second entry is a JSON-encoded FSM
 	 * @return an action scheduler
 	 */
-	private ActionScheduler parseActionScheduler(JsonArray array) {
+	private void parseActionScheduler(JsonArray array) {
 		JsonArray actionArray = array.get(0).getAsJsonArray();
-		List<Action> actions = new ArrayList<Action>();
 		for (JsonElement element : actionArray) {
-			actions.add(getAction(element.getAsJsonArray()));
+			actor.getActionsOutsideFsm().add(
+					getAction(element.getAsJsonArray()));
 		}
 
 		FSM fsm = null;
 		JsonElement fsmElement = array.get(1);
 		if (fsmElement.isJsonArray()) {
 			fsm = parseFSM(fsmElement.getAsJsonArray());
+			actor.setFsm(fsm);
 		}
-		return new ActionScheduler(actions, fsm);
 	}
 
 	/**
@@ -342,7 +341,7 @@ public class IRParser {
 			parseActions(IrPackage.eINSTANCE.getActor_Initializes(), array);
 
 			array = obj.get(KEY_ACTION_SCHED).getAsJsonArray();
-			actor.setActionScheduler(parseActionScheduler(array));
+			parseActionScheduler(array);
 
 			return actor;
 		} catch (RuntimeException e) {
@@ -435,7 +434,7 @@ public class IRParser {
 
 	private FSM parseFSM(JsonArray array) {
 		String initialState = array.get(0).getAsString();
-		FSM fsm = new FSM();
+		FSM fsm = IrFactory.eINSTANCE.createFSM();
 		JsonArray stateArray = array.get(1).getAsJsonArray();
 		for (int i = 0; i < stateArray.size(); i++) {
 			fsm.addState(stateArray.get(i).getAsString());

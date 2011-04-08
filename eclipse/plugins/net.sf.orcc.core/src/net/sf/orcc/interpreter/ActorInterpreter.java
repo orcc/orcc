@@ -34,12 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
@@ -74,6 +71,8 @@ import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;
 import net.sf.orcc.runtime.Fifo_int;
 import net.sf.orcc.util.OrccUtil;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines an actor that can be interpreted by calling
@@ -170,11 +169,6 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	protected Expression returnValue;
 
 	/**
-	 * Actor's action scheduler
-	 */
-	protected ActionScheduler sched;
-
-	/**
 	 * Creates a new interpreted actor instance for simulation or debug
 	 * 
 	 * @param id
@@ -193,9 +187,8 @@ public class ActorInterpreter extends AbstractActorVisitor {
 		exprInterpreter = new ExpressionEvaluator();
 
 		// Get actor FSM properties
-		sched = actor.getActionScheduler();
-		if (sched.hasFsm()) {
-			fsmState = sched.getFsm().getInitialState().getName();
+		if (actor.hasFsm()) {
+			fsmState = actor.getFsm().getInitialState().getName();
 		} else {
 			fsmState = "IDLE";
 		}
@@ -289,19 +282,19 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	 * @return the schedulable action or null
 	 */
 	public Action getNextAction() {
-		if (sched.hasFsm()) {
-			// Check for untagged actions first
-			for (Action action : sched.getActions()) {
-				if (isSchedulable(action)) {
-					if (checkOutputPattern(action.getOutputPattern())) {
-						return action;
-					}
-					break;
+		// Check next schedulable action in respect of the priority order
+		for (Action action : actor.getActionsOutsideFsm()) {
+			if (isSchedulable(action)) {
+				if (checkOutputPattern(action.getOutputPattern())) {
+					return action;
 				}
+				break;
 			}
+		}
 
+		if (actor.hasFsm()) {
 			// Then check for next FSM transition
-			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
+			for (NextStateInfo info : actor.getFsm().getTransitions(fsmState)) {
 				Action action = info.getAction();
 				if (isSchedulable(action)) {
 					// Update FSM state
@@ -312,17 +305,8 @@ public class ActorInterpreter extends AbstractActorVisitor {
 					break;
 				}
 			}
-		} else {
-			// Check next schedulable action in respect of the priority order
-			for (Action action : sched.getActions()) {
-				if (isSchedulable(action)) {
-					if (checkOutputPattern(action.getOutputPattern())) {
-						return action;
-					}
-					break;
-				}
-			}
 		}
+
 		return null;
 	}
 
