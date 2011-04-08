@@ -64,6 +64,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -80,9 +81,9 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 
 import com.google.inject.Inject;
 
@@ -96,11 +97,6 @@ public class ActorTransformer {
 
 	@Inject
 	private AstTransformer astTransformer;
-
-	/**
-	 * The file in which the actor is defined.
-	 */
-	private String file;
 
 	/**
 	 * A map from AST ports to IR ports.
@@ -152,7 +148,7 @@ public class ActorTransformer {
 			Procedure procedure = context.getProcedure();
 
 			// creates loop variable and initializes it
-			Var loopVar = procedure.newTempLocalVariable(file,
+			Var loopVar = procedure.newTempLocalVariable(
 					IrFactory.eINSTANCE.createTypeInt(32), "num_repeats");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(loopVar,
 					IrFactory.eINSTANCE.createExprInt(0));
@@ -175,8 +171,7 @@ public class ActorTransformer {
 						OpBinary.PLUS, IrFactory.eINSTANCE.createExprInt(i),
 						IrFactory.eINSTANCE.createTypeInt(32)));
 
-				Var tmpVar = procedure
-						.newTempLocalVariable(file, type, "token");
+				Var tmpVar = procedure.newTempLocalVariable(type, "token");
 				InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
 						tmpVar, portVariable, indexes);
 				block.add(load);
@@ -253,7 +248,7 @@ public class ActorTransformer {
 			Procedure procedure = context.getProcedure();
 
 			// creates loop variable and initializes it
-			Var loopVar = procedure.newTempLocalVariable(file,
+			Var loopVar = procedure.newTempLocalVariable(
 					IrFactory.eINSTANCE.createTypeInt(32), "num_repeats");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(loopVar,
 					IrFactory.eINSTANCE.createExprInt(0));
@@ -271,8 +266,7 @@ public class ActorTransformer {
 
 				// each expression of an output pattern must be of type list
 				// so they are necessarily variables
-				Var tmpVar = procedure
-						.newTempLocalVariable(file, type, "token");
+				Var tmpVar = procedure.newTempLocalVariable(type, "token");
 				Expression expression = astTransformer
 						.transformExpression(value);
 				Use use = ((ExprVar) expression).getUse();
@@ -372,10 +366,10 @@ public class ActorTransformer {
 		Location location = IrFactory.eINSTANCE.createLocation();
 
 		// transform tag
-		Tag tag = new Tag();
+		Tag tag = IrFactory.eINSTANCE.createTag();
 
-		Pattern inputPattern = new Pattern(0);
-		Pattern outputPattern = new Pattern(0);
+		Pattern inputPattern = IrFactory.eINSTANCE.createPattern();
+		Pattern outputPattern = IrFactory.eINSTANCE.createPattern();
 
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
 				"isSchedulable_init_actor", location,
@@ -389,8 +383,8 @@ public class ActorTransformer {
 		astTransformer.addReturn(body, null);
 
 		// creates action
-		Action action = new Action(location, tag, inputPattern, outputPattern,
-				scheduler, body);
+		Action action = IrFactory.eINSTANCE.createAction(location, tag,
+				inputPattern, outputPattern, scheduler, body);
 		return action;
 	}
 
@@ -476,42 +470,30 @@ public class ActorTransformer {
 	 * @return the actor in IR form
 	 */
 	public Actor transform(String file, AstActor astActor) {
-		this.file = file;
+		Actor actor = IrFactory.eINSTANCE.createActor();
+		actor.setFile(file);
 
-		astTransformer.setFile(file);
+		astTransformer.setIrActor(actor);
 
 		Context context = astTransformer.getContext();
 		try {
 			Location location = Util.getLocation(astActor);
 
 			// parameters
-			OrderedMap<String, Var> parameters = new OrderedMap<String, Var>();
-			astTransformer.setGlobalsMap(parameters);
 			for (AstVariable astVariable : astActor.getParameters()) {
-				astTransformer.transformGlobalVariable(astVariable);
+				astTransformer.transformGlobalVariable(
+						IrPackage.eINSTANCE.getActor_Parameters(), astVariable);
 			}
 
-			// map for state variables
-			// state variables are transformed on demand when referenced by
-			// expressions or statements
-			// this allows imported variables to be transparently handled
-			OrderedMap<String, Var> stateVars = new OrderedMap<String, Var>();
-			astTransformer.setGlobalsMap(stateVars);
-
 			// transform ports
-			OrderedMap<String, Port> inputs = transformPorts(astActor
-					.getInputs());
-			OrderedMap<String, Port> outputs = transformPorts(astActor
-					.getOutputs());
+			transformPorts(IrPackage.eINSTANCE.getActor_Inputs(),
+					astActor.getInputs());
+			transformPorts(IrPackage.eINSTANCE.getActor_Outputs(),
+					astActor.getOutputs());
 
 			// creates a new scope before translating things with local
 			// variables
 			context.newScope();
-
-			// retrieves the procedure map
-			// like state variables, this is populated on demand
-			OrderedMap<String, Procedure> procedures = astTransformer
-					.getProcedures();
 
 			// transform actions
 			ActionList actions = transformActions(astActor.getActions());
@@ -522,8 +504,7 @@ public class ActorTransformer {
 			// add call to initialize procedure (if any)
 			Procedure initialize = astTransformer.getInitialize();
 			if (initialize != null) {
-				procedures
-						.put(file, location, initialize.getName(), initialize);
+				actor.getProcs().add(initialize);
 
 				if (initializes.isEmpty()) {
 					Action action = createInitialize();
@@ -568,12 +549,14 @@ public class ActorTransformer {
 
 			// create IR actor
 			AstEntity entity = (AstEntity) astActor.eContainer();
+			actor.setName(net.sf.orcc.cal.util.Util.getQualifiedName(entity));
+			actor.setNative(entity.isNative());
 
-			return new Actor(
-					net.sf.orcc.cal.util.Util.getQualifiedName(entity), file,
-					parameters, inputs, outputs, entity.isNative(), stateVars,
-					procedures, actions.getAllActions(),
-					initializes.getAllActions(), scheduler);
+			actor.getActions().addAll(actions.getAllActions());
+			actor.getInitializes().addAll(initializes.getAllActions());
+			actor.setActionScheduler(scheduler);
+
+			return actor;
 		} finally {
 			// cleanup
 			astTransformer.clear();
@@ -599,15 +582,16 @@ public class ActorTransformer {
 		Tag tag;
 		String name;
 		if (astTag == null) {
-			tag = new Tag();
+			tag = IrFactory.eINSTANCE.createTag();
 			name = "untagged_" + untaggedCount++;
 		} else {
-			tag = new Tag(astAction.getTag().getIdentifiers());
-			name = OrccUtil.toString(tag, "_");
+			tag = IrFactory.eINSTANCE.createTag();
+			tag.getIdentifiers().addAll(astAction.getTag().getIdentifiers());
+			name = OrccUtil.toString(tag.getIdentifiers(), "_");
 		}
 
-		Pattern inputPattern = new Pattern();
-		Pattern outputPattern = new Pattern();
+		Pattern inputPattern = IrFactory.eINSTANCE.createPattern();
+		Pattern outputPattern = IrFactory.eINSTANCE.createPattern();
 
 		// creates scheduler and body
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
@@ -624,8 +608,8 @@ public class ActorTransformer {
 		transformActionScheduler(astAction, scheduler, inputPattern);
 
 		// creates IR action and add it to action list
-		Action action = new Action(location, tag, inputPattern, outputPattern,
-				scheduler, body);
+		Action action = IrFactory.eINSTANCE.createAction(location, tag,
+				inputPattern, outputPattern, scheduler, body);
 		actionList.add(action);
 	}
 
@@ -687,7 +671,7 @@ public class ActorTransformer {
 		Context oldContext = astTransformer.newContext(scheduler);
 		Context context = astTransformer.getContext();
 
-		Var result = context.getProcedure().newTempLocalVariable(file,
+		Var result = context.getProcedure().newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		List<AstExpression> guards = astAction.getGuards();
@@ -842,21 +826,24 @@ public class ActorTransformer {
 	/**
 	 * Transforms the given AST ports in an ordered map of IR ports.
 	 * 
+	 * @param feature
 	 * @param portList
 	 *            a list of AST ports
 	 * @return an ordered map of IR ports
 	 */
-	private OrderedMap<String, Port> transformPorts(List<AstPort> portList) {
-		OrderedMap<String, Port> ports = new OrderedMap<String, Port>();
+	@SuppressWarnings("unchecked")
+	private void transformPorts(EStructuralFeature feature,
+			List<AstPort> portList) {
 		for (AstPort astPort : portList) {
 			Location location = Util.getLocation(astPort);
 			Type type = astPort.getIrType();
-			Port port = new Port(location, type, astPort.getName());
+			Port port = IrFactory.eINSTANCE.createPort(location, type,
+					astPort.getName());
 			mapPorts.put(astPort, port);
-			ports.put(file, location, port.getName(), port);
+			((List<Port>) actor.eGet(feature)).add(port);
 		}
-
-		return ports;
 	}
+
+	private Actor actor;
 
 }

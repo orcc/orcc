@@ -70,8 +70,6 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 
 	private Actor actor;
 
-	private String file;
-
 	private Procedure target;
 
 	/**
@@ -107,8 +105,8 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 				inputPattern, outputPattern);
 
 		actor.getProcs().add(scheduler);
-		Var returnVar = target.newTempLocalVariable(file,
-				scheduler.getReturnType(), scheduler.getName() + "_ret");
+		Var returnVar = target.newTempLocalVariable(scheduler.getReturnType(),
+				scheduler.getName() + "_ret");
 		node.add(IrFactory.eINSTANCE.createInstCall(
 				IrFactory.eINSTANCE.createLocation(), returnVar, scheduler,
 				callExprs));
@@ -128,7 +126,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 				"isSchedulable_SDF", IrFactory.eINSTANCE.createLocation(),
 				IrFactory.eINSTANCE.createTypeBool());
 
-		Var result = procedure.newTempLocalVariable(file,
+		Var result = procedure.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		// create "then" nodes
@@ -346,7 +344,6 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	@Override
 	public void visit(Actor actor) {
 		this.actor = actor;
-		this.file = actor.getFile();
 
 		ActionScheduler scheduler = actor.getActionScheduler();
 		FSM fsm = scheduler.getFsm();

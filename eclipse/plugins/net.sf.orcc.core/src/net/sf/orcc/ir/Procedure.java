@@ -198,15 +198,13 @@ public interface Procedure extends EObject {
 	 * Creates a new local variable that can be used to hold intermediate
 	 * results. The variable is added to {@link #procedure}'s locals.
 	 * 
-	 * @param file
-	 *            the file in which this procedure resides
 	 * @param type
 	 *            type of the variable
 	 * @param name
 	 *            hint for the variable name
 	 * @return a new local variable
 	 */
-	Var newTempLocalVariable(String file, Type type, String hint);
+	Var newTempLocalVariable(Type type, String hint);
 
 	/**
 	 * Set the CFG of this procedure.

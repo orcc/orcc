@@ -43,6 +43,7 @@ import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.UniqueEdge;
@@ -196,7 +197,8 @@ public class FSMBuilder {
 	private void parseTransitions(List<AstTransition> transitions) {
 		for (AstTransition transition : transitions) {
 			String source = transition.getSource().getName();
-			Tag tag = new Tag(transition.getTag().getIdentifiers());
+			Tag tag = IrFactory.eINSTANCE.createTag(transition.getTag()
+					.getIdentifiers());
 			String target = transition.getTarget().getName();
 			graph.addVertex(source);
 			graph.addVertex(target);

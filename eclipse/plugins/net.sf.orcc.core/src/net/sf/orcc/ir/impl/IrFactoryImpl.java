@@ -715,6 +715,11 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return port;
 	}
 
+	@Override
+	public Port createPort(Port port) {
+		return EcoreUtil.copy(port);
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -743,6 +748,13 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 */
 	public Tag createTag() {
 		TagImpl tag = new TagImpl();
+		return tag;
+	}
+
+	@Override
+	public Tag createTag(List<String> identifiers) {
+		TagImpl tag = new TagImpl();
+		tag.getIdentifiers().addAll(identifiers);
 		return tag;
 	}
 

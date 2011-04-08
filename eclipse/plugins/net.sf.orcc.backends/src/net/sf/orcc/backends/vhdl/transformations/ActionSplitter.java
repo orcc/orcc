@@ -44,7 +44,6 @@ import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Var;
@@ -115,7 +114,6 @@ public class ActionSplitter extends AbstractActorVisitor {
 					IrFactory.eINSTANCE.createLocation(),
 					IrFactory.eINSTANCE.createTypeBool());
 			Var result = scheduler.newTempLocalVariable(
-					ActionSplitter.this.actor.getFile(),
 					IrFactory.eINSTANCE.createTypeBool(), "result");
 			result.setIndex(1);
 
@@ -134,13 +132,13 @@ public class ActionSplitter extends AbstractActorVisitor {
 			body.getNodes().add(block);
 
 			// tag
-			Tag tag = new Tag();
-			tag.add(name);
+			Tag tag = IrFactory.eINSTANCE.createTag(name);
 
-			Action action = new Action(IrFactory.eINSTANCE.createLocation(),
-					tag, new Pattern(), currentAction.getOutputPattern(),
-					scheduler, body);
-			currentAction.setOutputPattern(new Pattern());
+			Action action = IrFactory.eINSTANCE.createAction(
+					IrFactory.eINSTANCE.createLocation(), tag,
+					IrFactory.eINSTANCE.createPattern(),
+					currentAction.getOutputPattern(), scheduler, body);
+			currentAction.setOutputPattern(IrFactory.eINSTANCE.createPattern());
 
 			// add action to actor's actions
 			ActionSplitter.this.actor.getActions().add(action);

@@ -35,6 +35,7 @@ import java.util.Map;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.Pattern;
@@ -99,7 +100,7 @@ public class CActorTemplateData {
 		}
 
 		for (Transition transition : fsm.getTransitions()) {
-			Pattern pattern = new Pattern();
+			Pattern pattern = IrFactory.eINSTANCE.createPattern();
 			for (NextStateInfo info : transition.getNextStateInfo()) {
 				Pattern actionPattern = info.getAction().getInputPattern();
 				for (Port port : actionPattern.getPorts()) {
@@ -124,7 +125,7 @@ public class CActorTemplateData {
 	 * port mask defines the port(s) read by actions in each transition.
 	 */
 	public void computeTemplateMaps(Actor actor) {
-		inputPattern = new Pattern();
+		inputPattern = IrFactory.eINSTANCE.createPattern();
 		transitionPattern = new HashMap<FSM.Transition, Pattern>();
 
 		buildInputPattern(actor);

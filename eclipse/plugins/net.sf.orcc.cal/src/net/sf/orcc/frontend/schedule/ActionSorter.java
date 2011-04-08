@@ -37,6 +37,7 @@ import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
 
@@ -153,9 +154,11 @@ public class ActionSorter {
 			for (AstInequality inequality : priority.getInequalities()) {
 				// the grammar requires there be at least two tags
 				Iterator<AstTag> it = inequality.getTags().iterator();
-				Tag previousTag = new Tag(it.next().getIdentifiers());
+				Tag previousTag = IrFactory.eINSTANCE.createTag(it.next()
+						.getIdentifiers());
 				while (it.hasNext()) {
-					Tag tag = new Tag(it.next().getIdentifiers());
+					Tag tag = IrFactory.eINSTANCE.createTag(it.next()
+							.getIdentifiers());
 					List<Action> sources = actionList
 							.getTaggedActions(previousTag);
 					List<Action> targets = actionList.getTaggedActions(tag);

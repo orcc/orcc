@@ -167,7 +167,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		actor.setTemplateData(templateData);
 
 		// remove initialization procedure (we could do better)
-		Procedure initProc = actor.getProcs().get("_initialize");
+		Procedure initProc = actor.getProcedure("_initialize");
 		if (initProc != null) {
 			initProc.setNative(true);
 		}

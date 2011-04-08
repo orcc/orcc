@@ -61,6 +61,7 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -70,6 +71,7 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -85,10 +87,10 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
-import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -144,7 +146,7 @@ public class AstTransformer {
 			Procedure calledProcedure = mapFunctions.get(astFunction);
 
 			// generates a new target
-			Var target = procedure.newTempLocalVariable(file,
+			Var target = procedure.newTempLocalVariable(
 					calledProcedure.getReturnType(),
 					"call_" + calledProcedure.getName());
 
@@ -181,8 +183,8 @@ public class AstTransformer {
 					}
 				}
 
-				target = context.getProcedure().newTempLocalVariable(file,
-						type, "_tmp_if");
+				target = context.getProcedure().newTempLocalVariable(type,
+						"_tmp_if");
 				indexes = new ArrayList<Expression>(0);
 			}
 
@@ -222,7 +224,7 @@ public class AstTransformer {
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
 
-			Var target = context.getProcedure().newTempLocalVariable(file,
+			Var target = context.getProcedure().newTempLocalVariable(
 					expression.getIrType(), "local_" + var.getName());
 
 			InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
@@ -293,9 +295,12 @@ public class AstTransformer {
 
 			Var var = context.getVariable(astVariable);
 			if (var == null) {
-				var = globals.get(astVariable.getName());
+				var = actor.getStateVar(astVariable.getName());
 				if (var == null) {
-					var = transformGlobalVariable(astVariable);
+					var = actor.getParameter(astVariable.getName());
+					if (var == null) {
+						var = transformGlobalVariable(astVariable);
+					}
 				}
 			}
 
@@ -352,7 +357,7 @@ public class AstTransformer {
 
 			Procedure procedure = context.getProcedure();
 			Type listType = IrFactory.eINSTANCE.createTypeList(size, type);
-			target = procedure.newTempLocalVariable(file, listType, "_list");
+			target = procedure.newTempLocalVariable(listType, "_list");
 		}
 
 		/**
@@ -817,12 +822,12 @@ public class AstTransformer {
 			Location location = Util.getLocation(astCall);
 			String name = astCall.getProcedure().getName();
 			if ("print".equals(name) || "println".equals(name)) {
-				Procedure procedure = procedures.get("print");
+				Procedure procedure = actor.getProcedure("print");
 				if (procedure == null) {
 					procedure = IrFactory.eINSTANCE.createProcedure("print",
 							location, IrFactory.eINSTANCE.createTypeVoid());
 					procedure.setNative(true);
-					procedures.put("print", procedure);
+					actor.getProcs().add(procedure);
 				}
 
 				List<AstExpression> astParameters = astCall.getParameters();
@@ -843,6 +848,8 @@ public class AstTransformer {
 
 	}
 
+	private Actor actor;
+
 	/**
 	 * allows creation of unique names
 	 */
@@ -855,16 +862,6 @@ public class AstTransformer {
 	 */
 	final private ExpressionTransformer exprTransformer;
 
-	/**
-	 * The file in which the actor is defined.
-	 */
-	private String file;
-
-	/**
-	 * a map of global variables (parameters and state variables)
-	 */
-	private OrderedMap<String, Var> globals;
-
 	private Procedure initialize;
 
 	/**
@@ -876,11 +873,6 @@ public class AstTransformer {
 	 * A map from AST procedures to IR procedures.
 	 */
 	final private Map<AstProcedure, Procedure> mapProcedures;
-
-	/**
-	 * the list of procedures of the IR actor.
-	 */
-	private OrderedMap<String, Procedure> procedures;
 
 	/**
 	 * statement transformer.
@@ -898,8 +890,6 @@ public class AstTransformer {
 		stmtTransformer = new StatementTransformer();
 
 		context = new Context(null, null);
-
-		procedures = new OrderedMap<String, Procedure>();
 	}
 
 	/**
@@ -940,8 +930,6 @@ public class AstTransformer {
 		exprTransformer.clearTarget();
 
 		context = new Context(null, null);
-
-		procedures = new OrderedMap<String, Procedure>();
 
 		// clear the initialize procedure that may have been created
 		initialize = null;
@@ -1012,7 +1000,7 @@ public class AstTransformer {
 			Var local = context.getMapGlobals().get(global);
 			if (local == null) {
 				// creates a new local variable
-				local = context.getProcedure().newTempLocalVariable(file,
+				local = context.getProcedure().newTempLocalVariable(
 						global.getType(), "local_" + global.getName());
 				context.getMapGlobals().put(global, local);
 			}
@@ -1066,7 +1054,7 @@ public class AstTransformer {
 		if (var.isGlobal()) {
 			Var local = context.getMapGlobals().get(var);
 			if (local == null) {
-				local = context.getProcedure().newTempLocalVariable(file,
+				local = context.getProcedure().newTempLocalVariable(
 						var.getType(), "local_" + var.getName());
 				context.getMapGlobals().put(var, local);
 			}
@@ -1080,15 +1068,6 @@ public class AstTransformer {
 		}
 
 		return var;
-	}
-
-	/**
-	 * Returns the procedure map.
-	 * 
-	 * @return the procedure map
-	 */
-	public OrderedMap<String, Procedure> getProcedures() {
-		return procedures;
 	}
 
 	/**
@@ -1209,23 +1188,13 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Sets the field "file" with the given value.
+	 * Sets the IR actor.
 	 * 
-	 * @param file
-	 *            a file name
+	 * @param actor
+	 *            IR actor
 	 */
-	public void setFile(String file) {
-		this.file = file;
-	}
-
-	/**
-	 * Sets the map in which global variables should be put.
-	 * 
-	 * @param globals
-	 *            a map
-	 */
-	public void setGlobalsMap(OrderedMap<String, Var> globals) {
-		this.globals = globals;
+	public void setIrActor(Actor actor) {
+		this.actor = actor;
 	}
 
 	/**
@@ -1320,7 +1289,7 @@ public class AstTransformer {
 			procedure.setNative(true);
 		}
 
-		procedures.put(file, location, name, procedure);
+		actor.getProcs().add(procedure);
 		mapFunctions.put(astFunction, procedure);
 	}
 
@@ -1334,6 +1303,22 @@ public class AstTransformer {
 	 * @return an ordered map of IR state variables
 	 */
 	public Var transformGlobalVariable(AstVariable astVariable) {
+		return transformGlobalVariable(
+				IrPackage.eINSTANCE.getActor_StateVars(), astVariable);
+	}
+
+	/**
+	 * Transforms AST state variables to IR state variables. The initial value
+	 * of an AST state variable is evaluated to a constant by
+	 * {@link #exprEvaluator}.
+	 * 
+	 * @param stateVariables
+	 *            a list of AST state variables
+	 * @return an ordered map of IR state variables
+	 */
+	@SuppressWarnings("unchecked")
+	public Var transformGlobalVariable(EStructuralFeature feature,
+			AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
 		AstType astType = astVariable.getType();
 		Type type = EcoreUtil.copy(astVariable.getIrType());
@@ -1393,7 +1378,7 @@ public class AstTransformer {
 			restoreContext(oldContext);
 		}
 
-		globals.put(file, variable.getLocation(), variable.getName(), variable);
+		((List<Var>) actor.eGet(feature)).add(variable);
 
 		return variable;
 	}
@@ -1486,7 +1471,7 @@ public class AstTransformer {
 			procedure.setNative(true);
 		}
 
-		procedures.put(file, location, name, procedure);
+		actor.getProcs().add(procedure);
 		mapProcedures.put(astProcedure, procedure);
 	}
 

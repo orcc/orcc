@@ -142,6 +142,15 @@ public interface Actor extends EObject {
 	List<String> getPackageAsList();
 
 	/**
+	 * Returns the parameter with the given name.
+	 * 
+	 * @param name
+	 *            name of a parameter
+	 * @return the parameter with the given name
+	 */
+	Var getParameter(String name);
+
+	/**
 	 * Returns the ordered map of parameters.
 	 * 
 	 * @return the ordered map of parameters
@@ -157,6 +166,15 @@ public interface Actor extends EObject {
 	 * @return a port whose name matches the given name
 	 */
 	Port getPort(String name);
+
+	/**
+	 * Returns the procedure with the given name.
+	 * 
+	 * @param name
+	 *            name of a procedure
+	 * @return the procedure with the given name
+	 */
+	Procedure getProcedure(String string);
 
 	/**
 	 * Returns the ordered map of procedures.
@@ -227,19 +245,24 @@ public interface Actor extends EObject {
 	void resetTokenProduction();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getActionScheduler <em>Action Scheduler</em>}' containment reference.
-	 * <!-- begin-user-doc
+	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getActionScheduler
+	 * <em>Action Scheduler</em>}' containment reference. <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Action Scheduler</em>' containment reference.
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Action Scheduler</em>' containment
+	 *            reference.
 	 * @see #getActionScheduler()
 	 * @generated
 	 */
 	void setActionScheduler(ActionScheduler value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getFile <em>File</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>File</em>' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getFile <em>File</em>}
+	 * ' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>File</em>' attribute.
 	 * @see #getFile()
 	 * @generated
 	 */

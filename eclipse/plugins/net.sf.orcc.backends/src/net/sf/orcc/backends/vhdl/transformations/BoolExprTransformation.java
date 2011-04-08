@@ -129,7 +129,7 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 * @return a new boolean local variable
 	 */
 	private Var newVariable() {
-		return procedure.newTempLocalVariable("",
+		return procedure.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(), "bool_expr");
 	}
 

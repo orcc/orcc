@@ -35,6 +35,7 @@ import net.sf.orcc.cal.cal.AstRegExpTag;
 import net.sf.orcc.cal.cal.AstRegExpUnary;
 import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Tag;
 
 public class ThompsonBuilder extends CalSwitch<Void> {
@@ -110,7 +111,8 @@ public class ThompsonBuilder extends CalSwitch<Void> {
 
 		eNFA.addVertex(initialCurrent);
 		eNFA.addVertex(finalCurrent);
-		Tag label = new Tag(term.getTag().getIdentifiers());
+		Tag label = IrFactory.eINSTANCE.createTag(term.getTag()
+				.getIdentifiers());
 		eNFA.registerLetter(label);
 		eNFA.addEdge(initialCurrent, finalCurrent, new SimpleEdge(label));
 

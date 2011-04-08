@@ -38,6 +38,7 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
@@ -71,7 +72,8 @@ public class SerDesAdder implements INetworkTransformation {
 	private void createIncomingConnection(Connection connection, Vertex vertex,
 			Vertex vertexBCast) {
 		// creates new input port of broadcast
-		Port bcastInput = new Port(connection.getTarget());
+		Port bcastInput = IrFactory.eINSTANCE
+				.createPort(connection.getTarget());
 		bcastInput.setName("input");
 
 		// creates a connection between the vertex and the broadcast
@@ -95,8 +97,8 @@ public class SerDesAdder implements INetworkTransformation {
 			// new connection
 			Vertex target = graph.getEdgeTarget(connection);
 			Port srcPort = connection.getSource();
-			Port outputPort = new Port(srcPort.getLocation(),
-					srcPort.getType(), "output_" + i);
+			Port outputPort = IrFactory.eINSTANCE.createPort(
+					srcPort.getLocation(), srcPort.getType(), "output_" + i);
 			i++;
 
 			Map<String, IAttribute> attributes = connection.getAttributes();
@@ -239,7 +241,7 @@ public class SerDesAdder implements INetworkTransformation {
 
 							Port srcPort = connection.getSource();
 							srcPort.setType(port.getType());
-							Port tgtPort = new Port(port);
+							Port tgtPort = IrFactory.eINSTANCE.createPort(port);
 
 							Connection incoming = new Connection(srcPort,
 									tgtPort, connection.getAttributes());
@@ -261,7 +263,7 @@ public class SerDesAdder implements INetworkTransformation {
 								.iterator();
 
 						Connection connection = it.next();
-						Port srcPort = new Port(port);
+						Port srcPort = IrFactory.eINSTANCE.createPort(port);
 						Port tgtPort = connection.getTarget();
 						tgtPort.setType(port.getType());
 						Vertex vTgt = graph.getEdgeTarget(connection);
