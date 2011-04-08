@@ -28,66 +28,16 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an action tag as a list of strings.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class Tag implements Iterable<String> {
-
-	private List<String> identifiers;
-
-	/**
-	 * Creates an empty tag.
-	 */
-	public Tag() {
-		this(0);
-	}
-
-	/**
-	 * Creates an empty tag with a given initial size.
-	 * 
-	 * @param size
-	 *            initial size of the tag
-	 * 
-	 */
-	public Tag(int size) {
-		identifiers = new ArrayList<String>(size);
-	}
-
-	/**
-	 * Creates a tag with a given initial size and initializes it with the given
-	 * tag.
-	 * 
-	 * @param size
-	 *            initial size of the tag
-	 * @param tag
-	 *            tag to initialize this tag from
-	 */
-	public Tag(int size, Tag tag) {
-		identifiers = new ArrayList<String>(size);
-		identifiers.addAll(tag.identifiers);
-	}
-
-	/**
-	 * Creates a tag from a list of identifiers.
-	 */
-	public Tag(List<String> identifiers) {
-		this.identifiers = new ArrayList<String>(identifiers);
-	}
-	
-	/**
-	 * Creates a tag from a single identifier.
-	 */
-	public Tag(String identifier) {
-		identifiers = new ArrayList<String>();
-		add(identifier);
-	}
+public interface Tag extends EObject {
 
 	/**
 	 * Adds an identifier to this tag.
@@ -95,18 +45,7 @@ public class Tag implements Iterable<String> {
 	 * @param identifier
 	 *            an identifier
 	 */
-	public void add(String identifier) {
-		identifiers.add(identifier);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Tag) {
-			return identifiers.equals(((Tag) obj).identifiers);
-		} else {
-			return false;
-		}
-	}
+	void add(String identifier);
 
 	/**
 	 * Returns the identifier at the given index.
@@ -115,50 +54,28 @@ public class Tag implements Iterable<String> {
 	 *            index of the identifier to return
 	 * @return the identifier at the given index
 	 */
-	public String get(int index) {
-		return identifiers.get(index);
-	}
+	String get(int index);
 
 	/**
 	 * Returns identifiers of the tag.
 	 * 
 	 * @return a list of identifier
+	 * @model containment="true" dataType="org.eclipse.emf.ecore.EString"
 	 */
-	public List<String> getIdentifiers() {
-		return identifiers;
-	}
-
-	@Override
-	public int hashCode() {
-		return identifiers.hashCode();
-	}
+	EList<String> getIdentifiers();
 
 	/**
 	 * Returns true if this tag is empty.
 	 * 
 	 * @return true if this tag is empty
 	 */
-	public boolean isEmpty() {
-		return identifiers.isEmpty();
-	}
-
-	@Override
-	public Iterator<String> iterator() {
-		return identifiers.iterator();
-	}
+	boolean isEmpty();
 
 	/**
 	 * Returns the number of identifiers in this tag.
 	 * 
 	 * @return the number of identifiers in this tag
 	 */
-	public int size() {
-		return identifiers.size();
-	}
-
-	@Override
-	public String toString() {
-		return identifiers.toString();
-	}
+	int size();
 
 }

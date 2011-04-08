@@ -28,11 +28,12 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.ArrayList;
+import java.lang.String;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import java.util.List;
 
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines an actor. An actor has parameters, input and output ports,
@@ -41,175 +42,41 @@ import net.sf.orcc.util.OrderedMap;
  * in which actions should be scheduled.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class Actor implements Comparable<Actor> {
-
-	private List<Action> actions;
-
-	private ActionScheduler actionScheduler;
-
-	/**
-	 * The RVC-CAL file this actor was defined in.
-	 */
-	private String file;
-
-	private List<Action> initializes;
-
-	private OrderedMap<String, Port> inputs;
-
-	/**
-	 * the class of this actor. Initialized to unknown.
-	 */
-	private MoC moc;
-
-	private String name;
-
-	private boolean nativeFlag;
-
-	private OrderedMap<String, Port> outputs;
-
-	private OrderedMap<String, Var> parameters;
-
-	private OrderedMap<String, Procedure> procs;
-
-	private OrderedMap<String, Var> stateVars;
-
-	/**
-	 * holds template-specific data.
-	 */
-	private Object templateData;
-
-	/**
-	 * Creates a new actor.
-	 * 
-	 * @param name
-	 *            actor name
-	 * @param file
-	 *            the RVC-CAL file this actor was defined in
-	 * @param parameters
-	 *            an ordered map of parameters
-	 * @param inputs
-	 *            an ordered map of input ports
-	 * @param outputs
-	 *            an ordered map of output ports
-	 * @param stateVars
-	 *            an ordered map of state variables
-	 * @param procs
-	 *            an ordered map of procedures
-	 * @param actions
-	 *            a list of actions
-	 * @param initializes
-	 *            a list of initialize actions
-	 * @param scheduler
-	 *            an action scheduler
-	 */
-	public Actor(String name, String file,
-			OrderedMap<String, Var> parameters,
-			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
-			boolean nativeFlag, OrderedMap<String, Var> stateVars,
-			OrderedMap<String, Procedure> procs, List<Action> actions,
-			List<Action> initializes, ActionScheduler scheduler) {
-		this.actions = actions;
-		this.file = file;
-		this.initializes = initializes;
-		this.inputs = inputs;
-		this.name = name;
-		this.nativeFlag = nativeFlag;
-		this.outputs = outputs;
-		this.parameters = parameters;
-		this.procs = procs;
-		this.actionScheduler = scheduler;
-		this.stateVars = stateVars;
-		this.moc = null;
-	}
-
-	/**
-	 * Creates a new actor with the given MoC.
-	 * 
-	 * @param name
-	 *            actor name
-	 * @param file
-	 *            the RVC-CAL file this actor was defined in
-	 * @param parameters
-	 *            an ordered map of parameters
-	 * @param inputs
-	 *            an ordered map of input ports
-	 * @param outputs
-	 *            an ordered map of output ports
-	 * @param stateVars
-	 *            an ordered map of state variables
-	 * @param procs
-	 *            an ordered map of procedures
-	 * @param actions
-	 *            a list of actions
-	 * @param initializes
-	 *            a list of initialize actions
-	 * @param scheduler
-	 *            an action scheduler
-	 * @param moc
-	 *            a MoC
-	 */
-	public Actor(String name, String file,
-			OrderedMap<String, Var> parameters,
-			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
-			boolean nativeFlag, OrderedMap<String, Var> stateVars,
-			OrderedMap<String, Procedure> procs, List<Action> actions,
-			List<Action> initializes, ActionScheduler scheduler, MoC moc) {
-		this.actions = actions;
-		this.file = file;
-		this.initializes = initializes;
-		this.inputs = inputs;
-		this.name = name;
-		this.nativeFlag = nativeFlag;
-		this.outputs = outputs;
-		this.parameters = parameters;
-		this.procs = procs;
-		this.actionScheduler = scheduler;
-		this.stateVars = stateVars;
-		this.moc = moc;
-	}
-
-	@Override
-	public int compareTo(Actor actor) {
-		return name.compareTo(actor.getName());
-	}
+public interface Actor extends EObject {
 
 	/**
 	 * Returns all the actions of this actor.
 	 * 
 	 * @return all the actions of this actor
+	 * @model containment="true"
 	 */
-	public List<Action> getActions() {
-		return actions;
-	}
+	EList<Action> getActions();
 
 	/**
 	 * Returns the action scheduler of this actor.
 	 * 
 	 * @return the action scheduler of this actor
+	 * @model containment="true"
 	 */
-	public ActionScheduler getActionScheduler() {
-		return actionScheduler;
-	}
+	ActionScheduler getActionScheduler();
 
 	/**
 	 * Returns the RVC-CAL file this actor was declared in.
 	 * 
 	 * @return the RVC-CAL file this actor was declared in
+	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
-	public String getFile() {
-		return file;
-	}
+	String getFile();
 
 	/**
 	 * Returns the list of initialize actions.
 	 * 
 	 * @return the list of initialize actions
+	 * @model containment="true"
 	 */
-	public List<Action> getInitializes() {
-		return initializes;
-	}
+	EList<Action> getInitializes();
 
 	/**
 	 * Returns the input port whose name matches the given name.
@@ -218,36 +85,30 @@ public class Actor implements Comparable<Actor> {
 	 *            the port name
 	 * @return an input port whose name matches the given name
 	 */
-	public Port getInput(String name) {
-		return inputs.get(name);
-	}
+	Port getInput(String name);
 
 	/**
 	 * Returns the ordered map of input ports.
 	 * 
 	 * @return the ordered map of input ports
+	 * @model containment="true"
 	 */
-	public OrderedMap<String, Port> getInputs() {
-		return inputs;
-	}
+	EList<Port> getInputs();
 
 	/**
 	 * Returns the MoC of this actor.
 	 * 
 	 * @return an MoC
 	 */
-	public MoC getMoC() {
-		return moc;
-	}
+	MoC getMoC();
 
 	/**
 	 * Returns the name of this actor.
 	 * 
 	 * @return the name of this actor
+	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
-	public String getName() {
-		return name;
-	}
+	String getName();
 
 	/**
 	 * Returns the output port whose name matches the given name.
@@ -256,55 +117,37 @@ public class Actor implements Comparable<Actor> {
 	 *            the port name
 	 * @return an output port whose name matches the given name
 	 */
-	public Port getOutput(String name) {
-		return outputs.get(name);
-	}
+	Port getOutput(String name);
 
 	/**
 	 * Returns the ordered map of output ports.
 	 * 
 	 * @return the ordered map of output ports
+	 * @model containment="true"
 	 */
-	public OrderedMap<String, Port> getOutputs() {
-		return outputs;
-	}
+	EList<Port> getOutputs();
 
 	/**
 	 * Returns the package of this actor.
 	 * 
 	 * @return the package of this actor
 	 */
-	public String getPackage() {
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return "";
-		} else {
-			return name.substring(0, index);
-		}
-	}
+	String getPackage();
 
 	/**
 	 * Returns the package of this actor as a list of strings.
 	 * 
 	 * @return the package of this actor as a list of strings
 	 */
-	public List<String> getPackageAsList() {
-		String[] segments = name.split("\\.");
-		List<String> list = new ArrayList<String>(segments.length - 1);
-		for (int i = 0; i < segments.length - 1; i++) {
-			list.add(segments[i]);
-		}
-		return list;
-	}
+	List<String> getPackageAsList();
 
 	/**
 	 * Returns the ordered map of parameters.
 	 * 
 	 * @return the ordered map of parameters
+	 * @model containment="true"
 	 */
-	public OrderedMap<String, Var> getParameters() {
-		return parameters;
-	}
+	EList<Var> getParameters();
 
 	/**
 	 * Returns the port whose name matches the given name.
@@ -313,63 +156,44 @@ public class Actor implements Comparable<Actor> {
 	 *            the port name
 	 * @return a port whose name matches the given name
 	 */
-	public Port getPort(String name) {
-		if (inputs.contains(name)) {
-			return inputs.get(name);
-		}
-
-		return outputs.get(name);
-	}
+	Port getPort(String name);
 
 	/**
 	 * Returns the ordered map of procedures.
 	 * 
 	 * @return the ordered map of procedures
+	 * @model containment="true"
 	 */
-	public OrderedMap<String, Procedure> getProcs() {
-		return procs;
-	}
+	EList<Procedure> getProcs();
 
 	/**
 	 * Returns the simple name of this actor.
 	 * 
 	 * @return the simple name of this actor
 	 */
-	public String getSimpleName() {
-		int index = name.lastIndexOf('.');
-		if (index == -1) {
-			return name;
-		} else {
-			return name.substring(index + 1);
-		}
-	}
+	String getSimpleName();
 
 	/**
 	 * Returns the ordered map of state variables.
 	 * 
 	 * @return the ordered map of state variables
+	 * @model containment="true"
 	 */
-	public OrderedMap<String, Var> getStateVars() {
-		return stateVars;
-	}
+	EList<Var> getStateVars();
 
 	/**
 	 * Returns an object with template-specific data.
 	 * 
 	 * @return an object with template-specific data
 	 */
-	public Object getTemplateData() {
-		return templateData;
-	}
+	Object getTemplateData();
 
 	/**
 	 * Returns true if the actor has a Model of Computation.
 	 * 
 	 * @return true if actor has MoC, otherwise false.
 	 */
-	public Boolean hasMoC() {
-		return moc != null;
-	}
+	boolean hasMoC();
 
 	/**
 	 * Returns <code>true</code> if this actor is a <code>system</code> actor,
@@ -379,28 +203,39 @@ public class Actor implements Comparable<Actor> {
 	 * 
 	 * @return <code>true</code> if this actor is a <code>system</code> actor,
 	 *         <code>false</code> otherwise
+	 * @model
 	 */
-	public boolean isNative() {
-		return nativeFlag;
-	}
+	boolean isNative();
 
 	/**
 	 * Resets input consumption rates.
 	 */
-	public void resetTokenConsumption() {
-		for (Port port : inputs) {
-			port.resetTokenConsumption();
-		}
-	}
+	void resetTokenConsumption();
 
 	/**
 	 * Resets output production rates.
 	 */
-	public void resetTokenProduction() {
-		for (Port port : outputs) {
-			port.resetTokenProduction();
-		}
-	}
+	void resetTokenProduction();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getActionScheduler <em>Action Scheduler</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Action Scheduler</em>' containment reference.
+	 * @see #getActionScheduler()
+	 * @generated
+	 */
+	void setActionScheduler(ActionScheduler value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getFile <em>File</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>File</em>' attribute.
+	 * @see #getFile()
+	 * @generated
+	 */
+	void setFile(String value);
 
 	/**
 	 * Sets the MoC of this actor.
@@ -408,9 +243,7 @@ public class Actor implements Comparable<Actor> {
 	 * @param moc
 	 *            an MoC
 	 */
-	public void setMoC(MoC moc) {
-		this.moc = moc;
-	}
+	void setMoC(MoC moc);
 
 	/**
 	 * Sets the name of this actor.
@@ -418,9 +251,17 @@ public class Actor implements Comparable<Actor> {
 	 * @param name
 	 *            the new name of this actor
 	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+	void setName(String name);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#isNative <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Native</em>' attribute.
+	 * @see #isNative()
+	 * @generated
+	 */
+	void setNative(boolean value);
 
 	/**
 	 * Sets the template data associated with this actor. Template data should
@@ -429,13 +270,6 @@ public class Actor implements Comparable<Actor> {
 	 * @param templateData
 	 *            an object with template-specific data
 	 */
-	public void setTemplateData(Object templateData) {
-		this.templateData = templateData;
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
+	void setTemplateData(Object templateData);
 
 }

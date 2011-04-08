@@ -33,7 +33,7 @@ package net.sf.orcc.moc;
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
- * 
+ * @model
  */
 public interface MoC {
 

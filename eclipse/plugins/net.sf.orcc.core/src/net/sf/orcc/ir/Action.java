@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * This class defines an action. An action has a location, a tag, an input and
  * an output pattern. Contrarily to the original CAL model, the scheduling
@@ -36,102 +38,48 @@ package net.sf.orcc.ir;
  * 
  * @author Matthieu Wipliez
  * @author Samuel Keller
- * 
+ * @model
  */
-public class Action {
-
-	private Procedure body;
-
-	private Pattern inputPattern;
-
-	private Location location;
-
-	private Pattern outputPattern;
-
-	private Procedure scheduler;
-
-	private Tag tag;
-
-	/**
-	 * Creates a new action.
-	 * 
-	 * @param location
-	 *            location of the action
-	 * @param tag
-	 *            action tag
-	 * @param inputPattern
-	 *            input pattern
-	 * @param outputPattern
-	 *            output pattern
-	 * @param scheduler
-	 *            procedure that computes scheduling information
-	 * @param body
-	 *            procedure that holds the body of the action
-	 */
-	public Action(Location location, Tag tag, Pattern inputPattern,
-			Pattern outputPattern, Procedure scheduler, Procedure body) {
-		this.location = location;
-		this.body = body;
-		this.inputPattern = inputPattern;
-		this.outputPattern = outputPattern;
-		this.scheduler = scheduler;
-		this.tag = tag;
-	}
+public interface Action extends EObject {
 
 	/**
 	 * Returns the procedure that holds the body of this action.
 	 * 
 	 * @return the procedure that holds the body of this action
+	 * @model containment="true"
 	 */
-	public Procedure getBody() {
-		return body;
-	}
+	Procedure getBody();
 
 	/**
 	 * Returns the input pattern of this action.
 	 * 
 	 * @return the input pattern of this action
+	 * @model containment="true"
 	 */
-	public Pattern getInputPattern() {
-		return inputPattern;
-	}
+	Pattern getInputPattern();
 
 	/**
 	 * Returns the location of this action.
 	 * 
 	 * @return the location of this action
+	 * @model containment="true"
 	 */
-	public Location getLocation() {
-		return location;
-	}
+	Location getLocation();
 
 	/**
 	 * Returns action name (tag or body name)
 	 * 
 	 * @return action name
 	 */
-	public String getName() {
-		if (tag.isEmpty()) {
-			return body.getName();
-		} else {
-			String str = "";
-			for (int i = 0; i < tag.size() - 1; i++) {
-				str += tag.get(i) + "_";
-			}
-
-			str += tag.get(tag.size() - 1);
-			return str;
-		}
-	}
+	String getName();
 
 	/**
 	 * Returns the output pattern of this action.
 	 * 
 	 * @return the output pattern of this action
+	 * @model containment="true"
 	 */
-	public Pattern getOutputPattern() {
-		return outputPattern;
-	}
+	Pattern getOutputPattern();
 
 	/**
 	 * Returns the procedure that holds the scheduling information of this
@@ -139,23 +87,45 @@ public class Action {
 	 * 
 	 * @return the procedure that holds the scheduling information of this
 	 *         action
+	 * @model containment="true"
 	 */
-	public Procedure getScheduler() {
-		return scheduler;
-	}
+	Procedure getScheduler();
 
 	/**
 	 * Returns the tag of this action.
 	 * 
 	 * @return the tag of this action
+	 * @model containment="true"
 	 */
-	public Tag getTag() {
-		return tag;
-	}
+	Tag getTag();
 
-	public void setLocation(Location location) {
-		this.location = location;
-	}
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Action#getBody <em>Body</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Body</em>' containment reference.
+	 * @see #getBody()
+	 * @generated
+	 */
+	void setBody(Procedure value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Action#getInputPattern <em>Input Pattern</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Input Pattern</em>' containment reference.
+	 * @see #getInputPattern()
+	 * @generated
+	 */
+	void setInputPattern(Pattern value);
+
+	/**
+	 * Sets the location of this action.
+	 * 
+	 * @param location
+	 *            a location
+	 */
+	void setLocation(Location location);
 
 	/**
 	 * Sets the output pattern of this action to the given pattern.
@@ -163,13 +133,26 @@ public class Action {
 	 * @param pattern
 	 *            a pattern
 	 */
-	public void setOutputPattern(Pattern pattern) {
-		outputPattern = pattern;
-	}
+	void setOutputPattern(Pattern pattern);
 
-	@Override
-	public String toString() {
-		return getName();
-	}
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Action#getScheduler <em>Scheduler</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Scheduler</em>' containment reference.
+	 * @see #getScheduler()
+	 * @generated
+	 */
+	void setScheduler(Procedure value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Action#getTag <em>Tag</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Tag</em>' containment reference.
+	 * @see #getTag()
+	 * @generated
+	 */
+	void setTag(Tag value);
 
 }

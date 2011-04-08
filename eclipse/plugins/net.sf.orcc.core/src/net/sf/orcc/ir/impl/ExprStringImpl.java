@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import java.lang.String;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;

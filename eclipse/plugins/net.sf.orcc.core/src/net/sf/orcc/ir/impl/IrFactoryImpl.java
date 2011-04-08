@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -35,7 +37,10 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeFloat;
@@ -172,9 +177,48 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.EXPR_UNARY: return createExprUnary();
 			case IrPackage.EXPR_VAR: return createExprVar();
 			case IrPackage.DEF: return createDef();
+			case IrPackage.ACTION: return createAction();
+			case IrPackage.ACTOR: return createActor();
+			case IrPackage.PATTERN: return createPattern();
+			case IrPackage.PORT: return createPort();
+			case IrPackage.TAG: return createTag();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Action createAction() {
+		ActionImpl action = new ActionImpl();
+		return action;
+	}
+
+	@Override
+	public Action createAction(Location location, Tag tag,
+			Pattern inputPattern, Pattern outputPattern, Procedure scheduler,
+			Procedure body) {
+		ActionImpl action = new ActionImpl();
+		action.setBody(body);
+		action.setInputPattern(inputPattern);
+		action.setLocation(location);
+		action.setOutputPattern(outputPattern);
+		action.setScheduler(scheduler);
+		action.setTag(tag);
+		return action;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Actor createActor() {
+		ActorImpl actor = new ActorImpl();
+		return actor;
 	}
 
 	/**
@@ -643,6 +687,26 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Pattern createPattern() {
+		PatternImpl pattern = new PatternImpl();
+		return pattern;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Port createPort() {
+		PortImpl port = new PortImpl();
+		return port;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -661,6 +725,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		procedure.setReturnType(EcoreUtil.copy(returnType));
 
 		return procedure;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Tag createTag() {
+		TagImpl tag = new TagImpl();
+		return tag;
 	}
 
 	/**

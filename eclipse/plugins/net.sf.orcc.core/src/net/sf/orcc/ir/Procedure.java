@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import java.lang.String;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;

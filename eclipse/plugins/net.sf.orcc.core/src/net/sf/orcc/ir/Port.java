@@ -28,108 +28,86 @@
  */
 package net.sf.orcc.ir;
 
+import java.lang.String;
+import org.eclipse.emf.ecore.EObject;
+
 /**
- * This class defines a port. A port is just a variable, with a location, a
- * type, a name.
+ * This class defines a port. A port has a location, a type, a name.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class Port {
-
-	/**
-	 * port location
-	 */
-	private Location location;
-
-	/**
-	 * port name
-	 */
-	private String name;
-
-	/**
-	 * the number of tokens consumed by this port.
-	 */
-	private int tokensConsumed;
-
-	/**
-	 * the number of tokens produced by this port.
-	 */
-	private int tokensProduced;
-
-	/**
-	 * port type
-	 */
-	private Type type;
-
-	/**
-	 * Creates a new port with the given location, type, and name.
-	 * 
-	 * @param location
-	 *            the port location
-	 * @param type
-	 *            the port type
-	 * @param name
-	 *            the port name
-	 */
-	public Port(Location location, Type type, String name) {
-		this.location = location;
-		this.type = type;
-		this.name = name;
-	}
-
-	/**
-	 * Creates a new port that has the same characteristics as the given port,
-	 * with an empty list of uses.
-	 */
-	public Port(Port port) {
-		this(port.getLocation(), port.getType(), port.getName());
-	}
+public interface Port extends EObject {
 
 	/**
 	 * Returns the location of this port.
 	 * 
 	 * @return the location of this port
+	 * @model containment="true"
 	 */
-	public Location getLocation() {
-		return location;
-	}
+	Location getLocation();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getLocation <em>Location</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Location</em>' containment reference.
+	 * @see #getLocation()
+	 * @generated
+	 */
+	void setLocation(Location value);
 
 	/**
 	 * Returns the name of this port.
 	 * 
 	 * @return the name of this port
+	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
-	public String getName() {
-		return name;
-	}
+	String getName();
 
 	/**
 	 * Returns the number of tokens consumed by this port.
 	 * 
 	 * @return the number of tokens consumed by this port
+	 * @model
 	 */
-	public int getNumTokensConsumed() {
-		return tokensConsumed;
-	}
+	int getNumTokensConsumed();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Num Tokens Consumed</em>' attribute.
+	 * @see #getNumTokensConsumed()
+	 * @generated
+	 */
+	void setNumTokensConsumed(int value);
 
 	/**
 	 * Returns the number of tokens produced by this port.
 	 * 
 	 * @return the number of tokens produced by this port
+	 * @model
 	 */
-	public int getNumTokensProduced() {
-		return tokensProduced;
-	}
+	int getNumTokensProduced();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensProduced <em>Num Tokens Produced</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Num Tokens Produced</em>' attribute.
+	 * @see #getNumTokensProduced()
+	 * @generated
+	 */
+	void setNumTokensProduced(int value);
 
 	/**
 	 * Returns the type of this port.
 	 * 
 	 * @return the type of this port
+	 * @model containment="true"
 	 */
-	public Type getType() {
-		return type;
-	}
+	Type getType();
 
 	/**
 	 * Increases the number of tokens consumed by this port by the given
@@ -140,13 +118,7 @@ public class Port {
 	 * @throws IllegalArgumentException
 	 *             if n is less or equal to zero
 	 */
-	public void increaseTokenConsumption(int n) {
-		if (n <= 0) {
-			throw new IllegalArgumentException();
-		}
-
-		tokensConsumed += n;
-	}
+	void increaseTokenConsumption(int n);
 
 	/**
 	 * Increases the number of tokens produced by this port by the given
@@ -157,27 +129,17 @@ public class Port {
 	 * @throws IllegalArgumentException
 	 *             if n is less or equal to zero
 	 */
-	public void increaseTokenProduction(int n) {
-		if (n <= 0) {
-			throw new IllegalArgumentException();
-		}
-
-		tokensProduced += n;
-	}
+	void increaseTokenProduction(int n);
 
 	/**
 	 * Resets the number of tokens consumed by this port.
 	 */
-	public void resetTokenConsumption() {
-		tokensConsumed = 0;
-	}
+	void resetTokenConsumption();
 
 	/**
 	 * Resets the number of tokens produced by this port.
 	 */
-	public void resetTokenProduction() {
-		tokensProduced = 0;
-	}
+	void resetTokenProduction();
 
 	/**
 	 * Sets the name of this port.
@@ -185,9 +147,7 @@ public class Port {
 	 * @param name
 	 *            the new name of this port
 	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+	void setName(String name);
 
 	/**
 	 * Sets the type of this port.
@@ -195,13 +155,6 @@ public class Port {
 	 * @param type
 	 *            the new type of this port
 	 */
-	public void setType(Type type) {
-		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
+	void setType(Type type);
 
 }

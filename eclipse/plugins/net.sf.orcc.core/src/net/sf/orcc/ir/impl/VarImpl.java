@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import java.lang.String;
 import java.util.Collection;
 
 import net.sf.orcc.ir.Def;

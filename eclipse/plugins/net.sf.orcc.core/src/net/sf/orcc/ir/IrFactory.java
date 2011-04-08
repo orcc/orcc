@@ -27,6 +27,43 @@ public interface IrFactory extends EFactory {
 	IrFactory eINSTANCE = net.sf.orcc.ir.impl.IrFactoryImpl.init();
 
 	/**
+	 * Returns a new object of class '<em>Action</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Action</em>'.
+	 * @generated
+	 */
+	Action createAction();
+	
+	/**
+	 * Creates a new action.
+	 * 
+	 * @param location
+	 *            location of the action
+	 * @param tag
+	 *            action tag
+	 * @param inputPattern
+	 *            input pattern
+	 * @param outputPattern
+	 *            output pattern
+	 * @param scheduler
+	 *            procedure that computes scheduling information
+	 * @param body
+	 *            procedure that holds the body of the action
+	 */
+	Action createAction(Location location, Tag tag, Pattern inputPattern,
+			Pattern outputPattern, Procedure scheduler, Procedure body);
+
+	/**
+	 * Returns a new object of class '<em>Actor</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Actor</em>'.
+	 * @generated
+	 */
+	Actor createActor();
+
+	/**
 	 * Returns a new object of class '<em>Def</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -442,6 +479,24 @@ public interface IrFactory extends EFactory {
 	NodeWhile createNodeWhile();
 
 	/**
+	 * Returns a new object of class '<em>Pattern</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Pattern</em>'.
+	 * @generated
+	 */
+	Pattern createPattern();
+
+	/**
+	 * Returns a new object of class '<em>Port</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Port</em>'.
+	 * @generated
+	 */
+	Port createPort();
+
+	/**
 	 * Returns a new object of class '<em>Procedure</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -464,6 +519,15 @@ public interface IrFactory extends EFactory {
 	 *            The procedure return type.
 	 */
 	Procedure createProcedure(String name, Location location, Type returnType);
+
+	/**
+	 * Returns a new object of class '<em>Tag</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Tag</em>'.
+	 * @generated
+	 */
+	Tag createTag();
 
 	/**
 	 * Returns a new object of class '<em>Type Bool</em>'.
