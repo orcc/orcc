@@ -54,7 +54,7 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose): Context(C){
+Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, bool noMultiCore): Context(C){
 	clock_t timer = clock ();
 	
 	//Set property of the decoder
@@ -65,6 +65,7 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose): Co
 	this->fifoFn = NULL;
 	this->running = false;
 	this->scheduler = NULL;
+	this->noMultiCore = noMultiCore;
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);

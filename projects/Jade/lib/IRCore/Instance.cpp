@@ -119,6 +119,17 @@ Procedure* Instance::getProcedure(string name){
 
 	return (*it).second;
 }
+string Instance::getMapping(){
+	map<string, IRAttribute*>::iterator it;
+
+	it = attributes->find("map");
+
+	if (it == attributes->end()){
+		return "";
+	}
+	
+	return "";
+}
 
 void Instance::setActor(Actor* actor){
 	this->actor = actor;

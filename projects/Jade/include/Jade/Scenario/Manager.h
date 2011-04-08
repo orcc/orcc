@@ -75,7 +75,7 @@ public:
 	 *
 	 * @param verbose : display actions taken
      */
-	Manager(DecoderEngine* engine, bool verify = false, bool verbose = false);
+	Manager(DecoderEngine* engine, int optLevel = 0, bool verify = false, bool verbose = false);
 
 	/*!
      *  @brief Start the manager
@@ -211,6 +211,9 @@ private:
 	
 	/** Verbose events */
 	bool verbose;
+
+	/** optimization level*/
+	int optLevel;
 };
 
 #endif

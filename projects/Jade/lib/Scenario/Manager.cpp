@@ -54,10 +54,11 @@
 using namespace std;
 using namespace llvm;
 
-Manager::Manager(DecoderEngine* engine, bool verify, bool verbose){
+Manager::Manager(DecoderEngine* engine, int optLevel, bool verify, bool verbose){
 	this->engine = engine;
 	this->verbose = verbose;
 	this->verify = verify;
+	this->optLevel = optLevel;
 }
 
 bool Manager::start(std::string scFile){
@@ -152,6 +153,11 @@ bool Manager::runLoadEvent(LoadEvent* loadEvent){
 	//Loading decoder
 	int id = loadEvent->getId();
 	engine->load(network, id);
+
+	// Optimize decoder
+	if (optLevel > 0){
+		engine->optimize(network, optLevel);
+	}
 
 	//Store resulting network
 	networks.insert(pair<int, Network*>(id, network));

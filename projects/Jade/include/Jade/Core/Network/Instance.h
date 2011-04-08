@@ -433,6 +433,13 @@ public:
 	 */
 	std::map<std::string, IRAttribute*>* getAttributes() {return attributes;};
 
+	 /**
+	 * @brief Returns the mapping name.
+	 * 
+	 * @return the name of the mapping
+	 */
+	std::string getMapping();
+
 	/**
 	 * @brief Set the map of attributes of this instance.
 	 * 

@@ -79,7 +79,7 @@ static int Filesize(){
 	return st.st_size;
 }
 
-RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool verbose): Context(C) {
+RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool noMultiCore, bool verbose): Context(C) {
 	this->decoder = decoder;
 	this->configuration = decoder->getConfiguration();
 	this->scheduler = NULL;

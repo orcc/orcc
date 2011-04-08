@@ -68,6 +68,7 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 							 string system, 
 							 string outputDir, 
 							 bool noMerging,
+							 bool noMultiCore,
 							 bool verbose): Context(C) {	
 	//Set properties	
 	this->library = library;
@@ -76,6 +77,7 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 	this->fifoty = fifoty;
 	this->noMerging = noMerging;
 	this->outputDir = outputDir;
+	this->noMultiCore = noMultiCore;
 
 	//Select the fifo used
 	FifoMng::setFifoTy(fifo, library, defaultFifoSize, outputDir);
@@ -100,12 +102,13 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	configuration->setActors(requieredActors);
 
 	if (verbose){
+		cout << "---> The given configuration requiered " << requieredActors->size() << " actors for "<<configuration->getInstances()->size() << " instances.\n";
 		cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 		timer = clock ();
 	}
 	
 	//Create decoder
-	Decoder* decoder = new Decoder(Context, configuration, verbose);
+	Decoder* decoder = new Decoder(Context, configuration, verbose, noMultiCore);
 	
 	if (verbose){
 		cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

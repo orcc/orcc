@@ -136,6 +136,10 @@ DisableCoreFiles("disable-core-files", Hidden,
                    desc("Disable emission of core files if possible"));
 
 cl::opt<bool> 
+disableMultiCore("nomulticore", desc("Deactivate multicore support"),
+					   init(false));
+
+cl::opt<bool> 
 NoLazyCompilation("disable-lazy-compilation",
                   desc("Disable JIT lazy compilation"),
                   init(false));
@@ -240,6 +244,11 @@ void startCmdLine(){
 	//Load network
 	engine->load(network, 3);
 
+	// Optimizing decoder
+	if (optLevel > 0){
+		engine->optimize(network, optLevel);
+	}
+
 	// Verify the given decoder if needed
 	if (Verify){
 		engine->verify(network, "error.txt");
@@ -277,7 +286,7 @@ int main(int argc, char **argv) {
 	setOptions();
 	
 	//Loading decoderEngine
-	engine = new DecoderEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, Verbose);
+	engine = new DecoderEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose);
 
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
