@@ -78,7 +78,7 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 		for (Port port : ports) {
 			if (pattern.getNumTokens(port) == 1) {
 				Var oldTarget = pattern.getVariableMap().get(port);
-				if (!oldTarget.getUses().isEmpty()) {
+				if (!oldTarget.getUses().isEmpty() && oldTarget.getUses().get(0).eContainer() != null) {
 					Instruction instruction = EcoreHelper.getContainerOfType(
 							oldTarget.getUses().get(0), Instruction.class);
 

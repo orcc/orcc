@@ -31,6 +31,8 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
 import net.sf.orcc.ir.Action;
@@ -65,9 +67,9 @@ public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 				// clean up uses
 				ternaryOperation.setTarget(null);
 
-				ternaryOperation.setConditionValue(null);
-				ternaryOperation.setTrueValue(null);
-				ternaryOperation.setFalseValue(null);
+				EcoreUtil.delete(ternaryOperation.getConditionValue(), true);
+				EcoreUtil.delete(ternaryOperation.getTrueValue(), true);
+				EcoreUtil.delete(ternaryOperation.getFalseValue(), true);
 
 				// remove instruction
 				itInstruction.remove();

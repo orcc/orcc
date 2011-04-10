@@ -72,7 +72,7 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 		// be inserted before it
 		itInstruction.previous();
 
-		for (Expression expr : indexes) {
+		for (Expression expr : new ArrayList<Expression>(indexes)) {
 			Var indexVar = procedure.newTempLocalVariable(
 					IrFactory.eINSTANCE.createTypeInt(), "index");
 			listIndex.add(IrFactory.eINSTANCE.createExprVar(indexVar));

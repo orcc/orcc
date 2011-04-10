@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -126,11 +127,8 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 		}
 	};
 
-	private String file;
-
 	@Override
 	public void visit(Actor actor) {
-		this.file = actor.getFile();
 		super.visit(actor);
 	}
 
@@ -174,7 +172,7 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 
 	@Override
 	public void visit(InstPhi phi) {
-		ListIterator<Expression> it = phi.getValues().listIterator();
+		ListIterator<Expression> it = new ArrayList<Expression>(phi.getValues()).listIterator();
 		while (it.hasNext()) {
 			it.set((Expression) it.next()
 					.accept(exprInterpreter, itInstruction));

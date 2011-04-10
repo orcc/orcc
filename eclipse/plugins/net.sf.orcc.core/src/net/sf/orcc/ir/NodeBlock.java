@@ -100,4 +100,13 @@ public interface NodeBlock extends Node {
 	 */
 	ListIterator<Instruction> listIterator();
 
+	/**
+	 * Returns a list iterator over the elements in this list already positioned
+	 * at index (in proper sequence).
+	 * 
+	 * @return a list iterator over the elements in this list already positioned
+	 *         at index (in proper sequence)
+	 */
+	ListIterator<Instruction> listIterator(int index);
+
 }

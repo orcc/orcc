@@ -87,8 +87,11 @@ public class TernaryOperationAdder extends AbstractActorVisitor {
 
 				newBlockNode.add(ternaryOp);
 			} else {
+				int index = nodeBlock.getInstructions().indexOf(instruction);
 				newBlockNode.add(instruction);
+				it = nodeBlock.listIterator(index);
 			}
+
 		}
 
 	}

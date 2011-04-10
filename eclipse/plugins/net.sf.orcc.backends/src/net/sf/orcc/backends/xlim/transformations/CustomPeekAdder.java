@@ -80,19 +80,24 @@ public class CustomPeekAdder extends AbstractActorVisitor {
 
 			List<Use> uses = new ArrayList<Use>(oldTarget.getUses());
 			for (Use use : uses) {
-				InstLoad load = EcoreHelper.getContainerOfType(use
-						.getVariable().getDefs().get(0), InstLoad.class);
+				if (!use.getVariable().getDefs().isEmpty()) {
+					InstLoad load = EcoreHelper.getContainerOfType(use
+							.getVariable().getDefs().get(0), InstLoad.class);
 
-				int index = ((ExprInt) load.getIndexes().get(0)).getIntValue();
-				indexToVariableMap.put(index, load.getTarget().getVariable());
+					int index = ((ExprInt) load.getIndexes().get(0))
+							.getIntValue();
+					indexToVariableMap.put(index, load.getTarget()
+							.getVariable());
 
-				// clean up uses
-				load.setTarget(null);
-				load.setSource(null);
+					// clean up uses
+					load.setTarget(null);
+					load.setSource(null);
 
-				// remove instruction
-				toBeRemoved.add(load);
-				action.getScheduler().getLocals().remove(oldTarget.getName());
+					// remove instruction
+					toBeRemoved.add(load);
+					action.getScheduler().getLocals()
+							.remove(oldTarget.getName());
+				}
 			}
 
 			customPeekedMap.put(port, indexToVariableMap);
