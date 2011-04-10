@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.backends.instructions.InstTernary;
+import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -248,8 +248,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 			return stringExpr;
 		}
 
-		public Object interpret(InstTernary ternaryOperation,
-				Object... args) {
+		public Object interpret(InstTernary ternaryOperation, Object... args) {
 			Var target = variableToLocalVariableMap.get(ternaryOperation
 					.getTarget());
 
@@ -260,9 +259,8 @@ public class InlineTransformation extends AbstractActorVisitor {
 			Expression falseValue = (Expression) ternaryOperation
 					.getFalseValue().accept(this, args);
 
-			InstTernary t = InstructionsFactory.eINSTANCE
-					.createInstTernary(target, conditionValue, trueValue,
-							falseValue);
+			InstTernary t = InstructionsFactory.eINSTANCE.createInstTernary(
+					target, conditionValue, trueValue, falseValue);
 			return t;
 		}
 
@@ -334,7 +332,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 		// except for list (reference is using)
 		variableToLocalVariableMap = new HashMap<Var, Var>();
 		for (Var var : function.getLocals()) {
-			Var newVar = procedure.newTempLocalVariable("", var.getType(),
+			Var newVar = procedure.newTempLocalVariable(var.getType(),
 					procedure.getName() + "_" + var.getName() + "_"
 							+ call.getLocation().getStartLine() + "_"
 							+ call.getLocation().getStartColumn());
@@ -351,7 +349,7 @@ public class InlineTransformation extends AbstractActorVisitor {
 						.getVariable();
 				variableToLocalVariableMap.put(var, newVar);
 			} else {
-				Var newVar = procedure.newTempLocalVariable("", var.getType(),
+				Var newVar = procedure.newTempLocalVariable(var.getType(),
 						procedure.getName() + "_" + var.getName() + "_"
 								+ call.getLocation().getStartLine() + "_"
 								+ call.getLocation().getStartColumn());

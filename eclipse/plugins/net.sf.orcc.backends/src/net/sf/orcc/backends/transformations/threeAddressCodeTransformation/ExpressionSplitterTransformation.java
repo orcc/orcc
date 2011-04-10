@@ -34,30 +34,27 @@ import java.util.ListIterator;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.impl.NodeImpl;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.impl.NodeImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
 
@@ -74,9 +71,9 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 	private class ExpressionSplitter extends AbstractExpressionInterpreter {
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
+		public Object interpret(ExprBinary expr, Object... args) {
 			Type type = expr.getType();
-			BinaryOp op = expr.getOp();
+			OpBinary op = expr.getOp();
 			Expression e1 = (Expression) expr.getE1().accept(this, args);
 			Expression e2 = (Expression) expr.getE2().accept(this, args);
 
@@ -84,52 +81,58 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 			expr.setE2(e2);
 
 			// Create a new binary expression
-			Expression binExpr = new BinaryExpr(e1, op, e2, type);
+			Expression binExpr = IrFactory.eINSTANCE.createExprBinary(e1, op,
+					e2, type);
 
 			// Make a new assignment to the binary expression
-			VarLocal target = procedure.newTempLocalVariable(file, type,
+			Var target = procedure.newTempLocalVariable(type,
 					procedure.getName() + "_" + "expr");
-			Assign assign = new Assign(target, binExpr);
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
+					binExpr);
 
 			// Add assignment to instruction's list
 			instrs.add(assign);
 
-			return new VarExpr(new Use(target));
+			return IrFactory.eINSTANCE.createExprVar(target);
 		}
 
 		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
+		public Object interpret(ExprUnary expr, Object... args) {
 			Expression varExpr = expr.getExpr();
 			Type type = expr.getType();
 
 			varExpr = (Expression) varExpr.accept(this, args);
 
-			BinaryExpr binaryExpr = transformUnaryExpr(expr.getOp(), varExpr);
+			ExprBinary binaryExpr = transformUnaryExpr(expr.getOp(), varExpr);
 
 			// Make a new assignment to the binary expression
-			VarLocal target = procedure.newTempLocalVariable(file, type,
+			Var target = procedure.newTempLocalVariable(type,
 					procedure.getName() + "_" + "expr");
-			Assign assign = new Assign(target, binaryExpr);
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
+					binaryExpr);
 
 			// Add assignment to instruction's list
 			instrs.add(assign);
 
-			return new VarExpr(new Use(target));
+			return IrFactory.eINSTANCE.createExprVar(target);
 		}
 
-		public BinaryExpr transformUnaryExpr(UnaryOp op, Expression expr) {
+		public ExprBinary transformUnaryExpr(OpUnary op, Expression expr) {
 			Expression constExpr;
 			Type type = expr.getType();
 
 			switch (op) {
 			case MINUS:
-				constExpr = new IntExpr(0);
-				return new BinaryExpr(constExpr, BinaryOp.MINUS, expr, type);
+				constExpr = IrFactory.eINSTANCE.createExprInt(0);
+				return IrFactory.eINSTANCE.createExprBinary(constExpr,
+						OpBinary.MINUS, expr, type);
 			case LOGIC_NOT:
-				constExpr = new BoolExpr(false);
-				return new BinaryExpr(expr, BinaryOp.EQ, constExpr, type);
+				constExpr = IrFactory.eINSTANCE.createExprBool(false);
+				return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
+						constExpr, type);
 			case BITNOT:
-				return new BinaryExpr(expr, BinaryOp.BITXOR, expr, type);
+				return IrFactory.eINSTANCE.createExprBinary(expr,
+						OpBinary.BITXOR, expr, type);
 			default:
 				throw new OrccRuntimeException("unsupported operator");
 			}
@@ -138,8 +141,6 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 	}
 
 	private ExpressionSplitter expressionSplitter;
-
-	private String file;
 
 	private List<Instruction> instrs;
 
@@ -168,16 +169,15 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		this.file = actor.getFile();
 		super.visit(actor);
 	}
 
 	@Override
-	public void visit(Assign assign) {
+	public void visit(InstAssign assign) {
 		Expression value = assign.getValue();
 
 		if (value.isBinaryExpr()) {
-			BinaryExpr binExpr = (BinaryExpr) value;
+			ExprBinary binExpr = (ExprBinary) value;
 			Expression e1 = binExpr.getE1();
 			Expression e2 = binExpr.getE2();
 
@@ -194,9 +194,8 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 				binExpr.setE2(visitExpression(e2, itInstruction));
 				itInstruction.next();
 			}
-			Use.addUses(assign, assign.getValue());
 		} else if (value.isUnaryExpr()) {
-			UnaryExpr unaryExpr = (UnaryExpr) value;
+			ExprUnary unaryExpr = (ExprUnary) value;
 			itInstruction.previous();
 
 			// Transform unary expression into binary expression
@@ -206,12 +205,11 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 					unaryExpr.getOp(), newExpr));
 
 			itInstruction.next();
-			Use.addUses(assign, assign.getValue());
 		}
 	}
 
 	@Override
-	public void visit(Call call) {
+	public void visit(InstCall call) {
 		List<Expression> parameters = call.getParameters();
 		for (Expression parameter : parameters) {
 			if (parameter.isBinaryExpr() || parameter.isUnaryExpr()) {
@@ -222,26 +220,22 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 				itInstruction.next();
 			}
 		}
-		Use.addUses(call, call.getParameters());
 	}
 
 	@Override
 	public void visit(NodeIf nodeIf) {
-		Expression value = nodeIf.getValue();
-		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
-			Expression newValue = visitExpression(nodeIf.getValue(),
-					getItr(itNode));
-			nodeIf.setValue(newValue);
-			Use.addUses(nodeIf, newValue);
+		Expression condition = nodeIf.getCondition();
+		if ((condition.isBinaryExpr()) || (condition.isUnaryExpr())) {
+			Expression newCondition = visitExpression(condition, getItr(itNode));
+			nodeIf.setCondition(newCondition);
 		}
 		super.visit(nodeIf);
 	}
 
 	@Override
-	public void visit(Load load) {
+	public void visit(InstLoad load) {
 		itInstruction.previous();
 		visitIndexes(load.getIndexes(), itInstruction);
-		Use.addUses(load, load.getIndexes());
 		itInstruction.next();
 	}
 
@@ -258,30 +252,27 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Return returnInstr) {
+	public void visit(InstReturn returnInstr) {
 		if (returnInstr.getValue() != null) {
 			itInstruction.previous();
 			Expression newValue = visitExpression(returnInstr.getValue(),
 					itInstruction);
 			returnInstr.setValue(newValue);
-			Use.addUses(returnInstr, newValue);
 			itInstruction.next();
 		}
 	}
 
 	@Override
-	public void visit(Store store) {
+	public void visit(InstStore store) {
 		Expression value = store.getValue();
 
 		itInstruction.previous();
 
 		visitIndexes(store.getIndexes(), itInstruction);
-		Use.addUses(store, store.getIndexes());
 
 		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
 			Expression newValue = visitExpression(value, itInstruction);
 			store.setValue(newValue);
-			Use.addUses(store, newValue);
 		}
 
 		itInstruction.next();
@@ -296,11 +287,10 @@ public class ExpressionSplitterTransformation extends AbstractActorVisitor {
 			it.next();
 		}
 
-		Expression value = nodeWhile.getValue();
-		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
-			Expression expr = visitExpression(nodeWhile.getValue(), it);
-			nodeWhile.setValue(expr);
-			Use.addUses(nodeWhile, expr);
+		Expression condition = nodeWhile.getCondition();
+		if ((condition.isBinaryExpr()) || (condition.isUnaryExpr())) {
+			Expression newCondition = visitExpression(condition, it);
+			nodeWhile.setCondition(newCondition);
 		}
 
 		super.visit(nodeWhile);

@@ -31,27 +31,27 @@ package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Cast;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
 
@@ -68,8 +68,8 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 	private class CastExprInterpreter extends AbstractExpressionInterpreter {
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
-			BinaryOp op = expr.getOp();
+		public Object interpret(ExprBinary expr, Object... args) {
+			OpBinary op = expr.getOp();
 			Expression e1 = expr.getE1();
 			Expression e2 = expr.getE2();
 
@@ -108,7 +108,7 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 		}
 
 		@Override
-		public Object interpret(VarExpr expr, Object... args) {
+		public Object interpret(ExprVar expr, Object... args) {
 			Type type = (Type) args[0];
 
 			// Check coherence between expression and type
@@ -116,51 +116,51 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 
 			if (cast.isExtended() || cast.isTrunced()) {
 				// Make a new assignment to the binary expression
-				VarLocal newVar = procedure.newTempLocalVariable(file,
-						cast.getTarget(), procedure.getName() + "_" + "expr");
+				Var newVar = procedure.newTempLocalVariable(cast.getTarget(),
+						procedure.getName() + "_" + "expr");
 
 				newVar.setIndex(1);
 
-				Assign assign = new Assign(newVar, expr);
+				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
+						newVar, expr);
 
 				// Add assignement to instruction's list
 				itInstruction.add(assign);
 
-				return new VarExpr(new Use(newVar));
+				return IrFactory.eINSTANCE.createExprVar(newVar);
 			}
 
 			return expr;
 		}
 
-		private boolean isSpecificOperation(BinaryOp op) {
-			return op == BinaryOp.MOD;
+		private boolean isSpecificOperation(OpBinary op) {
+			return op == OpBinary.MOD;
 		}
 
 	}
 
 	private boolean castType;
 
-	private String file;
-
 	public CastAdderTransformation(boolean castType) {
 		this.castType = castType;
 	}
 
-	private VarLocal castTarget(VarLocal target, Type type) {
+	private Var castTarget(Var target, Type type) {
 		Cast castTarget = new Cast(target.getType(), type);
 
 		if (castType & castTarget.isDifferent()) {
 			Location location = target.getLocation();
 
 			// Make a new assignment to the binary expression
-			VarLocal transitionVar = procedure.newTempLocalVariable(file,
+			Var transitionVar = procedure.newTempLocalVariable(
 					castTarget.getTarget(), procedure.getName() + "_" + "expr");
 
 			transitionVar.setIndex(1);
 
-			VarExpr varExpr = new VarExpr(new Use(transitionVar));
+			ExprVar varExpr = IrFactory.eINSTANCE.createExprVar(transitionVar);
 
-			Assign newAssign = new Assign(location, target, varExpr);
+			InstAssign newAssign = IrFactory.eINSTANCE.createInstAssign(
+					location, target, varExpr);
 
 			// Add assignement to instruction's list
 			itInstruction.add(newAssign);
@@ -170,14 +170,14 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 			Location location = target.getLocation();
 
 			// Make a new assignment to the binary expression
-			VarLocal transitionVar = procedure.newTempLocalVariable(file,
+			Var transitionVar = procedure.newTempLocalVariable(
 					castTarget.getTarget(), procedure.getName() + "_" + "expr");
 
 			transitionVar.setIndex(1);
 
-			VarExpr varExpr = new VarExpr(new Use(transitionVar));
-
-			Assign newAssign = new Assign(location, target, varExpr);
+			ExprVar varExpr = IrFactory.eINSTANCE.createExprVar(transitionVar);
+			InstAssign newAssign = IrFactory.eINSTANCE.createInstAssign(
+					location, target, varExpr);
 
 			// Add assignement to instruction's list
 			itInstruction.add(newAssign);
@@ -190,16 +190,15 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		this.file = actor.getFile();
 		super.visit(actor);
 	}
 
 	@Override
-	public void visit(Assign assign) {
+	public void visit(InstAssign assign) {
 		Expression value = assign.getValue();
 
 		if (value.isBinaryExpr()) {
-			BinaryExpr binExpr = (BinaryExpr) value;
+			ExprBinary binExpr = (ExprBinary) value;
 
 			itInstruction.previous();
 
@@ -209,53 +208,49 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 			if (expr != binExpr) {
 				assign.setValue(expr);
 			}
-			Use.addUses(assign, expr);
 
 			itInstruction.next();
 
 			if (!binExpr.getOp().isComparison()) {
-				VarLocal newVar = castTarget(assign.getTarget(),
+				Var newVar = castTarget(assign.getTarget().getVariable(),
 						binExpr.getType());
-				assign.setTarget(newVar);
+				assign.setTarget(IrFactory.eINSTANCE.createDef(newVar));
 			}
 		}
 	}
 
 	@Override
-	public void visit(Call call) {
+	public void visit(InstCall call) {
 		List<Expression> parameters = call.getParameters();
 		Procedure procedure = call.getProcedure();
 		if (!procedure.isNative()) {
-			List<VarLocal> variables = call.getProcedure().getParameters()
-					.getList();
+			List<Var> variables = call.getProcedure().getParameters();
 
 			for (Expression parameter : parameters) {
-				Var var = variables
-						.get(parameters.indexOf(parameter));
+				Var var = variables.get(parameters.indexOf(parameter));
 				itInstruction.previous();
 				Expression newParam = (Expression) parameter.accept(
 						new CastExprInterpreter(), var.getType());
 				parameters.set(parameters.indexOf(parameter), newParam);
 				itInstruction.next();
 			}
-			Use.addUses(call, call.getParameters());
 		}
 	}
 
 	@Override
-	public void visit(Load load) {
-		VarLocal target = load.getTarget();
+	public void visit(InstLoad load) {
+		Var target = load.getTarget().getVariable();
 		Use use = load.getSource();
 
-		VarLocal newVar = castTarget(target, use.getVariable().getType());
+		Var newVar = castTarget(target, use.getVariable().getType());
 
-		load.setTarget(newVar);
+		load.setTarget(IrFactory.eINSTANCE.createDef(newVar));
 	}
 
 	@Override
-	public void visit(PhiAssignment phi) {
+	public void visit(InstPhi phi) {
 		List<Expression> values = phi.getValues();
-		Type type = phi.getTarget().getType();
+		Type type = phi.getTarget().getVariable().getType();
 
 		for (Expression value : values) {
 			int indexValue = values.indexOf(value);
@@ -275,33 +270,31 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 					new CastExprInterpreter(), type);
 			values.set(indexValue, newValue);
 		}
-		Use.addUses(phi, phi.getValues());
 	}
 
 	@Override
-	public void visit(Return returnInstr) {
+	public void visit(InstReturn returnInstr) {
 		Type returnType = procedure.getReturnType();
 
 		if ((returnType != null) && (!returnType.isVoid())) {
 			itInstruction.previous();
 			Expression value = returnInstr.getValue();
-			
+
 			// Check if value is not void
-			if (value != null){
+			if (value != null) {
 				Expression newValue = (Expression) value.accept(
 						new CastExprInterpreter(), returnType);
 				returnInstr.setValue(newValue);
-				Use.addUses(returnInstr, returnInstr.getValue());
 			}
-			
+
 			itInstruction.next();
 		}
 	}
 
 	@Override
-	public void visit(Store store) {
+	public void visit(InstStore store) {
 		Expression value = store.getValue();
-		Var target = store.getTarget();
+		Var target = store.getTarget().getVariable();
 
 		itInstruction.previous();
 
@@ -310,7 +303,6 @@ public class CastAdderTransformation extends AbstractActorVisitor {
 
 		if (value != newValue) {
 			store.setValue(newValue);
-			Use.addUses(store, newValue);
 		}
 
 		itInstruction.next();
