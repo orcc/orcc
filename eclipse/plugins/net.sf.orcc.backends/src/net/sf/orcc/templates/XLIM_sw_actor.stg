@@ -791,10 +791,10 @@ design(instance) ::= <<
 	<instance.actor.actions: action(); separator="\n">
 	
 	\<!-- ACTION SCHEDULER --\>
-	<if(instance.actor.actionScheduler.fsm)>
-	<schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)>
+	<if(instance.actor.fsm)>
+	<schedulerFSM(actions=instance.actor.actionsOutsideFsm, fsm=instance.actor.fsm)>
 	<else>
-	<scheduler(actions=instance.actor.actionScheduler.actions)>
+	<scheduler(actions=instance.actor.actionsOutsideFsm)>
 	<endif>
 \</design\>
 >>

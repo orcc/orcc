@@ -115,8 +115,7 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 							} else {
 								Var localNewTarget = action
 										.getBody()
-										.newTempLocalVariable(null,
-												expr.getType(),
+										.newTempLocalVariable(expr.getType(),
 												"scalar_" + oldTarget.getName());
 								localNewTarget.setAssignable(true);
 								localNewTarget.setIndex(1);
@@ -141,9 +140,9 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 							store.setValue(null);
 						}
 					} else {
-						Var localNewTarget = action.getBody()
+						Var localNewTarget = action
+								.getBody()
 								.newTempLocalVariable(
-										null,
 										((TypeList) oldTarget.getType())
 												.getElementType(),
 										"scalar_" + oldTarget.getName());

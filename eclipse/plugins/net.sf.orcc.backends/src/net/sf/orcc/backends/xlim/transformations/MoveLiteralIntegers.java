@@ -83,8 +83,8 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 		public Object interpret(ExprBool expr, Object... args) {
 			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			Var var = procedure.newTempLocalVariable(file, type,
-					procedure.getName() + "_" + "litteral_integer");
+			Var var = procedure.newTempLocalVariable(type, procedure.getName()
+					+ "_" + "litteral_integer");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(var, expr);
 
 			// Add assignment to instruction's list
@@ -103,8 +103,8 @@ public class MoveLiteralIntegers extends AbstractActorVisitor {
 		public Object interpret(ExprInt expr, Object... args) {
 			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			Var var = procedure.newTempLocalVariable(file, type,
-					procedure.getName() + "_" + "litteral_integer");
+			Var var = procedure.newTempLocalVariable(type, procedure.getName()
+					+ "_" + "litteral_integer");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(var, expr);
 
 			// Add assignment to instruction's list

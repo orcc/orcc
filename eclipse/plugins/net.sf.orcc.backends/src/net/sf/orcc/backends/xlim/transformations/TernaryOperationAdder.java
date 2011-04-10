@@ -30,8 +30,8 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.ListIterator;
 
-import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.backends.instructions.InstTernary;
+import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -98,7 +98,7 @@ public class TernaryOperationAdder extends AbstractActorVisitor {
 		Var oldCondVar = condVar;
 
 		Expression condExpr = nodeIf.getCondition();
-		condVar = procedure.newTempLocalVariable(null,
+		condVar = procedure.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(), "ifCondition_"
 						+ nodeIf.getLocation().getStartLine());
 		condVar.setIndex(1);

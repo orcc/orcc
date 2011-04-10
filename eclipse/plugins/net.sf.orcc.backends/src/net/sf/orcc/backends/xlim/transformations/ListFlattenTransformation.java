@@ -73,7 +73,7 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 		itInstruction.previous();
 
 		for (Expression expr : indexes) {
-			Var indexVar = procedure.newTempLocalVariable("",
+			Var indexVar = procedure.newTempLocalVariable(
 					IrFactory.eINSTANCE.createTypeInt(), "index");
 			listIndex.add(IrFactory.eINSTANCE.createExprVar(indexVar));
 
@@ -84,7 +84,7 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 		}
 
 		// creates the variable that will hold the concatenation of indexes
-		Var indexVar = procedure.newTempLocalVariable("",
+		Var indexVar = procedure.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeInt(), "concat_index");
 
 		// sets indexVar as memory index
