@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.ActorPrinter;
@@ -165,12 +167,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 		VHDLTemplateData templateData = new VHDLTemplateData();
 		templateData.initializeFrom(actor);
 		actor.setTemplateData(templateData);
-
-		// remove initialization procedure (we could do better)
-		Procedure initProc = actor.getProcedure("_initialize");
-		if (initProc != null) {
-			initProc.setNative(true);
-		}
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {
@@ -221,6 +217,13 @@ public class VHDLBackendImpl extends AbstractBackend {
 			interpreter.initialize();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+
+		// remove initialization procedure (we could do better)
+		Procedure initProc = actor.getProcedure("_initialize");
+		if (initProc != null) {
+			EcoreUtil.remove(initProc);
+			initProc.setNative(true);
 		}
 	}
 
