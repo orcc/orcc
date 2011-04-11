@@ -41,5 +41,5 @@ domReady(function()
 {
 	var instanceOne = new ImageFlow();
 	//instanceOne.init({ ImageFlowID:'myImageFlow', reflections: 0, reflectionP: 0.0 });
-	instanceOne.init({ ImageFlowID:'myImageFlow', reflectionGET: '&bgc=ffffff&fade_start=20%', startID: 3 });
+	instanceOne.init({ ImageFlowID:'myImageFlow', reflectionGET: '&bgc=ffffff&fade_start=20%', buttons:true, startID: 4 });
 });
