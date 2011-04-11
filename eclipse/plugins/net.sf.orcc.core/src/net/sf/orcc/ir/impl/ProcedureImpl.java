@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +18,6 @@ import net.sf.orcc.ir.CFG;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
@@ -29,7 +27,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.ir.util.MapAdapter;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -63,62 +60,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public class ProcedureImpl extends EObjectImpl implements Procedure {
-
-	private class InstDeleter extends AbstractActorVisitor {
-		
-		private boolean keepVisiting;
-
-		private List<Instruction> instructions;
-		
-		private int indexInst;
-
-		public InstDeleter(List<Instruction> instructions) {
-			this.instructions = instructions;
-			keepVisiting = true;
-		}
-		
-		@Override
-		public void visit(NodeBlock block) {
-			if (instructions.isEmpty() || !keepVisiting) {
-				keepVisiting = false;
-				return;
-			}
-
-			List<Instruction> blockInsts = block.getInstructions();
-			
-			int i = 0;
-			while (i < blockInsts.size()) {
-				Instruction inst = blockInsts.get(i);
-				if (inst == instructions.get(indexInst)) {
-					// blockInsts.remove(i);
-					EcoreHelper.delete(inst);
-					indexInst++;
-					if (indexInst >= instructions.size()) {
-						keepVisiting = false;
-						return;
-					}
-				} else {
-					i++;
-				}
-			}
-		}
-		
-		@Override
-		public void visit(List<Node> nodes) {
-			if (keepVisiting) {
-				ListIterator<Node> oldItNode = itNode;
-				itNode = nodes.listIterator();
-				while (itNode.hasNext() && keepVisiting) {
-					Node node = itNode.next();
-					node.accept(this);
-				}
-				
-				// restore old iterator
-				itNode = oldItNode;
-			}
-		}
-
-	}
 
 	/**
 	 * This class visits the procedure to find the state variables used.
@@ -711,33 +652,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 				IrFactory.eINSTANCE.createLocation(), type, name, true, 0);
 		getLocals().add(variable);
 		return variable;
-	}
-
-	@Override
-	public void removeInstructions(List<Instruction> instructions) {
-		new InstDeleter(instructions).visit(this);
-	}
-
-	@Override
-	public void removeLocals(List<Var> variables) {
-		if (variables.isEmpty()) {
-			return;
-		}
-
-		int indexVar = 0;
-		int i = 0;
-		while (i < locals.size()) {
-			Var local = locals.get(i);
-			if (local == variables.get(indexVar)) {
-				locals.remove(i);
-				indexVar++;
-				if (indexVar >= variables.size()) {
-					break;
-				}
-			} else {
-				i++;
-			}
-		}
 	}
 
 	/**

@@ -45,6 +45,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class removes phi assignments and transforms them to copies.
@@ -55,15 +56,20 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 public class PhiRemoval extends AbstractActorVisitor {
 
 	private class PhiRemover extends AbstractActorVisitor {
-
+		
 		@Override
-		public void visit(InstPhi phi) {
-			instructionsToRemove.add(phi);
+		public void visit(NodeBlock block) {
+			for (int i = 0; i < block.getInstructions().size();) {
+				Instruction instruction = block.getInstructions().get(i);
+				if (instruction instanceof InstPhi) {
+					EcoreHelper.delete(instruction);
+				} else {
+					i++;
+				}
+			}
 		}
 
 	}
-
-	private List<Instruction> instructionsToRemove;
 
 	private List<Var> localsToRemove;
 
@@ -148,12 +154,12 @@ public class PhiRemoval extends AbstractActorVisitor {
 	@Override
 	public void visit(Procedure procedure) {
 		localsToRemove = new ArrayList<Var>();
-		instructionsToRemove = new ArrayList<Instruction>();
 
 		super.visit(procedure);
 
-		procedure.removeLocals(localsToRemove);
-		procedure.removeInstructions(instructionsToRemove);
+		for (Var local : localsToRemove) {
+			procedure.getLocals().remove(local);
+		}
 	}
 
 }

@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Use;
 
 import org.eclipse.emf.common.util.TreeIterator;
@@ -95,15 +97,30 @@ public class EcoreHelper {
 	}
 
 	/**
-	 * Deletes the given EObject from its container and removes the references
-	 * it is involved in. Equivalent to
-	 * <code>EcoreUtil.delete(eObject, true);</code>.
+	 * Removes the uses of the given instruction, removes the definition (if it
+	 * has one), and finally removes the instruction itself from its container.
 	 * 
-	 * @param eObject
-	 *            the object to delete
+	 * @param instruction
+	 *            an instruction
 	 */
-	public static void delete(EObject eObject) {
-		EcoreUtil.delete(eObject, true);
+	public static void delete(Instruction instruction) {
+		TreeIterator<EObject> it = instruction.eAllContents();
+		while (it.hasNext()) {
+			EObject descendant = it.next();
+			if (descendant instanceof Use) {
+				Use use = (Use) descendant;
+				use.setVariable(null);
+			}
+		}
+
+		for (EObject eObject : instruction.eContents()) {
+			if (eObject instanceof Def) {
+				Def def = (Def) eObject;
+				def.setVariable(null);
+			}
+		}
+
+		EcoreUtil.remove(instruction);
 	}
 
 	/**
@@ -155,7 +172,7 @@ public class EcoreHelper {
 				uses.add((Use) descendant);
 			}
 		}
-		
+
 		return uses;
 	}
 
