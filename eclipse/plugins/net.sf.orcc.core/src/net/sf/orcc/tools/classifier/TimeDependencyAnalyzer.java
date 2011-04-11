@@ -36,12 +36,11 @@ import jp.ac.kobe_u.cs.cream.DefaultSolver;
 import jp.ac.kobe_u.cs.cream.Solution;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 
 /**
@@ -100,9 +99,8 @@ public class TimeDependencyAnalyzer {
 	public boolean isTimeDependent(Actor actor) {
 		this.actor = actor;
 
-		ActionScheduler sched = actor.getActionScheduler();
-		if (sched.hasFsm()) {
-			FSM fsm = sched.getFsm();
+		if (actor.hasFsm()) {
+			FSM fsm = actor.getFsm();
 			for (Transition transition : fsm.getTransitions()) {
 				List<Action> actions = new ArrayList<Action>();
 				for (NextStateInfo stateInfo : transition.getNextStateInfo()) {
@@ -116,7 +114,7 @@ public class TimeDependencyAnalyzer {
 
 			return false;
 		} else {
-			return isTimeDependent(sched.getActions());
+			return isTimeDependent(actor.getActionsOutsideFsm());
 		}
 	}
 

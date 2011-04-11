@@ -39,7 +39,6 @@ import jp.ac.kobe_u.cs.cream.DefaultSolver;
 import jp.ac.kobe_u.cs.cream.IntVariable;
 import jp.ac.kobe_u.cs.cream.Solution;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
@@ -118,8 +117,7 @@ public class ConfigurationAnalyzer {
 		ports = new ArrayList<Port>();
 		configurations = new HashMap<Action, Map<Port, Expression>>();
 
-		ActionScheduler sched = actor.getActionScheduler();
-		if (sched.hasFsm()) {
+		if (actor.hasFsm()) {
 			findConfigurationPorts();
 			if (!ports.isEmpty()) {
 				createConfigurations();
@@ -167,7 +165,7 @@ public class ConfigurationAnalyzer {
 		List<Action> previous = new ArrayList<Action>();
 
 		// visits the scheduler of each action departing from the initial state
-		FSM fsm = actor.getActionScheduler().getFsm();
+		FSM fsm = actor.getFsm();
 		String initialState = fsm.getInitialState().getName();
 		for (NextStateInfo info : fsm.getTransitions(initialState)) {
 			ConstraintBuilder visitor = new ConstraintBuilder(actor);
@@ -198,7 +196,7 @@ public class ConfigurationAnalyzer {
 		// visits the scheduler of each action departing from the initial state
 		List<Set<Port>> ports = new ArrayList<Set<Port>>();
 
-		FSM fsm = actor.getActionScheduler().getFsm();
+		FSM fsm = actor.getFsm();
 		String initialState = fsm.getInitialState().getName();
 		for (NextStateInfo info : fsm.getTransitions(initialState)) {
 			PeekVisitor visitor = new PeekVisitor();

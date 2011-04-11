@@ -34,14 +34,13 @@ import java.util.Set;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
 import net.sf.orcc.moc.KPNMoC;
@@ -131,7 +130,7 @@ public class ActorClassifier implements ActorVisitor {
 
 				if (!moc.isCSDF()) {
 					// not CSDF, tries QSDF
-					if (actor.getActionScheduler().hasFsm()) {
+					if (actor.hasFsm()) {
 						try {
 							moc = classifyQSDF();
 						} catch (OrccRuntimeException e) {
@@ -162,7 +161,7 @@ public class ActorClassifier implements ActorVisitor {
 
 		ActorState state = new ActorState(actor);
 		if (state.isEmpty()) {
-			FSM fsm = actor.getActionScheduler().getFsm();
+			FSM fsm = actor.getFsm();
 			if (fsm == null || !isCycloStaticFsm(fsm)) {
 				// no state, no cyclo-static FSM => dynamic
 				return new KPNMoC();
@@ -214,7 +213,7 @@ public class ActorClassifier implements ActorVisitor {
 		interpretedActor.setConfiguration(configuration);
 
 		// schedule the actor
-		String initialState = actor.getActionScheduler().getFsm()
+		String initialState = actor.getFsm()
 				.getInitialState().getName();
 		int nbPhases = 0;
 		final int MAX_PHASES = 16384;
@@ -243,8 +242,7 @@ public class ActorClassifier implements ActorVisitor {
 	 * @return an MoC
 	 */
 	private MoC classifyQSDF() {
-		ActionScheduler sched = actor.getActionScheduler();
-		FSM fsm = sched.getFsm();
+		FSM fsm = actor.getFsm();
 		if (isQuasiStaticFsm(fsm)) {
 			String initialState = fsm.getInitialState().getName();
 

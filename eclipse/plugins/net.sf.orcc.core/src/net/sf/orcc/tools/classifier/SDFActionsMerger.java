@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
@@ -320,7 +319,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 
 	private FSM updateFSM(State initialState,
 			DirectedGraph<State, UniqueEdge> graph) {
-		FSM fsm = new FSM();
+		FSM fsm = IrFactory.eINSTANCE.createFSM();
 
 		// Set states of the fsm
 		for (State state : graph.vertexSet()) {
@@ -345,11 +344,10 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	public void visit(Actor actor) {
 		this.actor = actor;
 
-		ActionScheduler scheduler = actor.getActionScheduler();
-		FSM fsm = scheduler.getFsm();
+		FSM fsm = actor.getFsm();
 		if (fsm == null) {
-			List<Action> actions = scheduler.getActions();
-			List<Action> mergedActions = tryAndMerge(scheduler.getActions());
+			List<Action> actions = actor.getActionsOutsideFsm();
+			List<Action> mergedActions = tryAndMerge(actions);
 			actions.clear();
 			actions.addAll(mergedActions);
 		} else {
@@ -359,7 +357,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 			}
 
 			// Update the fsm
-			scheduler.setFsm(updateFSM(fsm.getInitialState(), graph));
+			actor.setFsm(updateFSM(fsm.getInitialState(), graph));
 		}
 	}
 
