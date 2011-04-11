@@ -97,7 +97,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	public void visit(InstCall call) {
 		if (call.hasResult()) {
 			Var target = call.getTarget().getVariable();
-			if (!target.isUsed()) {
+			if (target != null && !target.isUsed()) {
 				handleInstruction(target, call);
 			}
 		}
