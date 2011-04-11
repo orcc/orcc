@@ -24,32 +24,12 @@ EClass getIrClass(String name) :
     net::sf::orcc::ir::IrPackage::eINSTANCE.getEClassifier(name)
 ;
 
-addList(EReference this, String name, EClassifier type) :
-    let opp = new EReference :
-        opp.setName(name) ->
-        opp.setEType(eContainingClass) ->
-        setEOpposite(opp) ->
-        opp.setEOpposite(this) ->
-        opp.setUpperBound(-1) ->
-        eReferenceType.eStructuralFeatures.add(opp)
-;
-
-addReference(EClass clasz, String typeName, String attributeName) :
+addReference(EClass clasz, String typeName, boolean containment, String attributeName) :
 	let etype = getIrClass(typeName) :
 	let field = new EReference :
 	field.setEType(etype) ->
 	field.setName(attributeName) ->
-	field.setTransient(true) ->
-	field.setLowerBound(0) ->
-	field.setUpperBound(1) ->
-	clasz.eStructuralFeatures.add(field)
-;
-
-addAttribute(EClass clasz, String typeName, String attributeName) :
-	let etype = getEcoreDataType(typeName) :
-	let field = new EAttribute :
-	field.setEType(etype) ->
-	field.setName(attributeName) ->
+	field.setContainment(containment) ->
 	field.setTransient(true) ->
 	field.setLowerBound(0) ->
 	field.setUpperBound(1) ->
@@ -60,17 +40,17 @@ process(EClass this) :
 	switch (this.name) {
 		case "AstExpression": (
 			// add an "irType" reference to expressions
-			addReference(this, "Type", "irType")
+			addReference(this, "Type", false, "irType")
 		)
 
 		case "AstFunction": (
 			// add an "irType" reference to functions
-			addReference(this, "Type", "irType")
+			addReference(this, "Type", false, "irType")
 		)
 
 		case "AstPort": (
 			// add an "irType" reference to ports
-			addReference(this, "Type", "irType")
+			addReference(this, "Type", false, "irType")
 		)
 
 		case "AstSchedule": (
@@ -88,10 +68,10 @@ process(EClass this) :
         
 		case "AstVariable": (
 			// add an "irType" reference to variables 
-			addReference(this, "Type", "irType") -> 
+			addReference(this, "Type", false, "irType") -> 
 		
 			// add an "initialValue" value field to variables
-			addAttribute(this, "EJavaObject", "initialValue")
+			addReference(this, "Expression", true, "initialValue")
 		)
 
 		default:
