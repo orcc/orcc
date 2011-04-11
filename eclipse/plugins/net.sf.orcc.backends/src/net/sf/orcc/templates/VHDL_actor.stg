@@ -449,7 +449,7 @@ OutputsManag() ::= <<
 ---------------------------------------------------------------------------
 -- Transmission manager
 ---------------------------------------------------------------------------
-<actor.outputs.list : printArbiter(); separator="\n\n">
+<actor.outputs : printArbiter(); separator="\n\n">
 >>
 
 // instanciate an arbiter which manage the communication between actors.
@@ -480,16 +480,16 @@ variable <action.scheduler.name>_<port.name> : <port.type>;<
 endif>}; separator="\n">
 }>  --
 begin
-  <actor.actions: {action|-- test if "<action>" action is schedulable
+  <actor.actions: {action|-- test if "<action.name>" action is schedulable
 <action.inputPattern.ports: { port |<printRead(procedure=action.scheduler, port=port, variable=action.inputPattern.peekedMap.(port))>}; separator="\n">
 <printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n\n">
 
   --
   -- Test the action's inputs to fire (or not) an action  
-  <actor.actions : {action|<action>_go \<= '0';}; separator="\n">
-  <actor.inputs.list :{port|<port.name>_ack \<= '0';}; separator="\n">  
-<if(actor.actionScheduler.fsm)    
->  <printActionFireFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)><
+  <actor.actions : {action|<action.name>_go \<= '0';}; separator="\n">
+  <actor.inputs :{port|<port.name>_ack \<= '0';}; separator="\n">  
+<if(actor.fsm)    
+>  <printActionFireFSM(actions=actor.actionsOutsideFsm, fsm=actor.fsm)><
 else  
 >  if <actor.actions: printActionFire(); separator="\n  elsif">
   end if;<
@@ -501,21 +501,21 @@ end process;
 
 // prints the condition on the ack and go signals according to the input and output pattern
 printActionFire(action) ::= <<
-((isSchedulable_<action>_go <action.inputPattern.ports : {port| and <port.name>_send }>) = '1') then
+((isSchedulable_<action.name>_go <action.inputPattern.ports : {port| and <port.name>_send }>) = '1') then
 <if(action.inputPattern.ports)
 >< if(action.outputPattern.ports)
->    <action>_go \<= isSchedulable_<action>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">;
+>    <action.name>_go \<= isSchedulable_<action.name>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">;
     <action.inputPattern.ports : {
-      port|<port.name>_ack \<= isSchedulable_<action>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">} ; separator=";\n">;<
+      port|<port.name>_ack \<= isSchedulable_<action.name>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">} ; separator=";\n">;<
   else
->    <action>_go \<= isSchedulable_<action>_go;
-    <action.inputPattern.ports : {port|<port.name>_ack \<= isSchedulable_<action>_go;} ; separator="\n"><
+>    <action.name>_go \<= isSchedulable_<action.name>_go;
+    <action.inputPattern.ports : {port|<port.name>_ack \<= isSchedulable_<action.name>_go;} ; separator="\n"><
   endif><
 else
 >< if(action.outputPattern.ports)
->    <action>_go \<= isSchedulable_<action>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">;<
+>    <action.name>_go \<= isSchedulable_<action.name>_go and <action.outputPattern.ports : {port|<port.name>_rdy}; separator=" and ">;<
   else
->    <action>_go \<= isSchedulable_<action>_go;<
+>    <action.name>_go \<= isSchedulable_<action.name>_go;<
   endif><
 endif>  
 >>
@@ -560,19 +560,19 @@ variable <action.body.name>_<port.name> : <port.type>;}>
 }>  --
 begin
   if reset_n = '0' then
-<if(actor.stateVars.list)>
-    <actor.stateVars.list: stateConst()>    --
+<if(actor.stateVars)>
+    <actor.stateVars: stateConst()>    --
 <endif>
-    <actor.outputs.list : port_out_init()>    --
-<if(actor.actionScheduler.fsm)>
-    FSM    \<= s_<actor.actionScheduler.fsm.initialState>;    --
+    <actor.outputs : port_out_init()>    --
+<if(actor.fsm)>
+    FSM    \<= s_<actor.fsm.initialState>;    --
 <endif>
   elsif rising_edge(clock) then
-    <actor.outputs.list :{port|<port.name>_isend \<= '0';}; separator="\n">
-    <actor.stateVars.list: resetReadWriteEnable()>
+    <actor.outputs :{port|<port.name>_isend \<= '0';}; separator="\n">
+    <actor.stateVars: resetReadWriteEnable()>
     --  
-<if(actor.actionScheduler.fsm)>
-    <executeCoreFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)>
+<if(actor.fsm)>
+    <executeCoreFSM(actions=actor.actionsOutsideFsm, fsm=actor.fsm)>
 <else>
     <executeCore(actor.actions)>
 <endif>
@@ -588,8 +588,8 @@ action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port
 >>
 
 actionTestScheduler(action) ::= <<
-(<action>_go = '1') then
-  -- body of "<action>" action
+(<action.name>_go = '1') then
+  -- body of "<action.name>" action
   <printActionBody(action)><
   if(action.outputPattern.ports)>
   <action.outputPattern.ports: {port|<port.name>_isend \<= '1';}; separator="\n">
@@ -680,10 +680,10 @@ entity <actor.simpleName> is
   port (
   -- Inputs
   clock    : in  std_logic;
-  reset_n  : in  std_logic<if(actor.inputs.list || actor.outputs.list)>;<endif>
-  <actor.inputs.list: PrintInputPorts(); separator=";\n"><if(actor.inputs.list && actor.outputs.list)>;<endif>
+  reset_n  : in  std_logic<if(actor.inputs || actor.outputs)>;<endif>
+  <actor.inputs: PrintInputPorts(); separator=";\n"><if(actor.inputs && actor.outputs)>;<endif>
   -- Outputs
-  <actor.outputs.list: PrintOutputPorts(); separator=";\n">);
+  <actor.outputs: PrintOutputPorts(); separator=";\n">);
 end <actor.simpleName>;
 
 
@@ -693,24 +693,24 @@ architecture rtl_<actor.simpleName> of <actor.simpleName> is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
-  <actor.actions:       {action| signal <action>_go    : std_logic;}; separator="\n">
+  <actor.actions:       {action| signal <action.name>_go    : std_logic;}; separator="\n">
   --
-  <actor.outputs.list :IOsManagementSignals(); separator="\n">
+  <actor.outputs :IOsManagementSignals(); separator="\n">
   --
-  <actor.stateVars.list: signalDeclaration()>
+  <actor.stateVars: signalDeclaration()>
 
-<if (actor.procs.list)
+<if (actor.procs)
 >  ---------------------------------------------------------------------------
   -- Functions and procedures
   ---------------------------------------------------------------------------
-  <actor.procs.list: {proc|<function(procedure=proc)>}; separator="\n\n"><
+  <actor.procs: {proc|<function(procedure=proc)>}; separator="\n\n"><
 endif>
 
-<if(actor.actionScheduler.fsm)
+<if(actor.fsm)
 >  ---------------------------------------------------------------------------
   -- FSM
   ---------------------------------------------------------------------------
-  type FSM_type is (<actor.actionScheduler.fsm.states: {state|s_<state>}; separator=", ">);
+  type FSM_type is (<actor.fsm.states: {state|s_<state>}; separator=", ">);
   signal FSM : FSM_type;
 <endif>
 
@@ -722,7 +722,7 @@ begin
 
   <OutputsManag()>
   
-  <actor.stateVars.list: ramDeclaration()>
+  <actor.stateVars: ramDeclaration()>
 
 end architecture rtl_<actor.simpleName>;
 
