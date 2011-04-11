@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprList;
@@ -134,7 +136,7 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 			if (initValue == null) {
 				initValue = value;
 			} else {
-				if (!initValue.equals(value)) {
+				if (!EcoreUtil.equals(initValue, value)) {
 					return true;
 				}
 			}
@@ -183,7 +185,7 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 		customInitMap = new HashMap<Var, Boolean>();
 		initValueMap = new HashMap<Var, Expression>();
 		for (Var variable : actor.getStateVars()) {
-			Expression initialValue = variable.getInitialValue();
+			Expression initialValue = variable.getValue();
 			if (variable.getType().isList() && variable.isAssignable()
 					&& initialValue != null) {
 				initValue = null;
