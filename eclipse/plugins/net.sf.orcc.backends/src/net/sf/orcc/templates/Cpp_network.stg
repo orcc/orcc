@@ -60,8 +60,8 @@ includeActors(actors) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // initialize Instances
 initializeInstance(instance) ::= <<
-<if (instance.actor.parameters.list)
->("<instance.hierarchicalId: {id | <id>}; separator="/">", <instance.actor.parameters.list: {param | <Constant(instance.parameters.(param.indexedName))>}; separator=", ">, NETWORK_PROFILING_MODE)<
+<if (instance.actor.parameters)
+>("<instance.hierarchicalId: {id | <id>}; separator="/">", <instance.actor.parameters: {param | <Constant(instance.parameters.(param.indexedName))>}; separator=", ">, NETWORK_PROFILING_MODE)<
 else
 >("<instance.hierarchicalId: {id | <id>}; separator="/">", NETWORK_PROFILING_MODE)<
 endif>

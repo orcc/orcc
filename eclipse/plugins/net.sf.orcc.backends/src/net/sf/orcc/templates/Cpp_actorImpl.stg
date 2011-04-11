@@ -301,7 +301,7 @@ i++;
 >>
 
 actionTest(action) ::= <<
-if(<inputPattern(action.inputPattern)>isSchedulable_<action>())
+if(<inputPattern(action.inputPattern)>isSchedulable_<action.name>())
 {
 	<if(!action.outputPattern.empty)>
 	if(<outputPattern(pattern=action.outputPattern)>)
@@ -352,13 +352,13 @@ int <actor.simpleName>::schedule()
 
 actionCallState(nextState) ::= <<
 <actionTrace(nextState.action)>
-<nextState.action.body.name>();
+<nextState.action.name>();
 _FSM_state = state_<nextState.targetState>;
 res = true;
 >>
 
 actionTestState(nextState) ::= <<
-if(<inputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.action>())
+if(<inputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.action.name>())
 {
 	<if(!nextState.action.outputPattern.empty)>
 	if(<outputPattern(nextState.action.outputPattern)>)
@@ -428,7 +428,7 @@ int <actor.simpleName>::schedule()
 	while (res)
 	{
 		res = false;
-			
+		
 		<if(actions)>
 		if(outside_FSM_scheduler())
 		{
@@ -459,11 +459,11 @@ constructor(parameters, stateVars) ::= <<
 <endif>
 :
 <parameters: {param | <param.indexedName>(<param.indexedName>),}; wrap, separator="\n">
-<if(actor.actionScheduler.fsm)>
-_FSM_state(state_<actor.actionScheduler.fsm.initialState>),
+<if(actor.fsm)>
+_FSM_state(state_<actor.fsm.initialState>),
 <endif>
 <stateVars : StateVarAllocation()>
-ActorAKA("<actor.simpleName>", instanceName, <length(actor.inputs.list)>, <length(actor.outputs.list)>, eProfilingMode)
+ActorAKA("<actor.simpleName>", instanceName, <length(actor.inputs)>, <length(actor.outputs)>, eProfilingMode)
 {
 <stateVars : ListStateVarInitialization()>
 }
@@ -497,11 +497,11 @@ extern TraceAka g_oTracer;
 
 const char* <actor.simpleName>::className = "<actor.simpleName>";
 
-<defineConstantVars(actor.stateVars.list)>
+<defineConstantVars(actor.stateVars)>
 
-<constructor(parameters=actor.parameters.list, stateVars=actor.stateVars.list)>
+<constructor(parameters=actor.parameters, stateVars=actor.stateVars)>
 
-<destructor(stateVars=actor.stateVars.list)>
+<destructor(stateVars=actor.stateVars)>
 
 void <actor.simpleName>::initializeActor()
 {
@@ -510,7 +510,7 @@ void <actor.simpleName>::initializeActor()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-<actor.procs.list: procedure()>
+<actor.procs: procedure()>
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
 <actor.actions: action()>
@@ -531,10 +531,10 @@ void <actor.simpleName>::initialize()
 <endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
-<if(actor.actionScheduler.fsm)>
-<schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)>
+<if(actor.fsm)>
+<schedulerFSM(actions=actor.actionsOutsideFsm, fsm=actor.fsm)>
 <else>
-<scheduler(actions=actor.actionScheduler.actions)>
+<scheduler(actions=actor.actionsOutsideFsm)>
 <endif>
 
 

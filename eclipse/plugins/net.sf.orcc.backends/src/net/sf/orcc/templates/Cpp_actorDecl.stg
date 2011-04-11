@@ -89,7 +89,7 @@ int schedule();
 >>
 
 constructor(parameters) ::= <<
-<if (actor.parameters.list)>
+<if (actor.parameters)>
 <actor.simpleName>(const char*, <parameters: {input | <input.type>}; separator=", ">, AKA_PROFILING_MODE );
 <else>
 <actor.simpleName>(const char*, AKA_PROFILING_MODE);
@@ -128,14 +128,14 @@ actor(actor, options) ::= <<
 	// Input FIFOs
 	enum
 	{
-		<actor.inputs.list: {input | <actor.simpleName>_<input.name>,}; separator="\n">
+		<actor.inputs: {input | <actor.simpleName>_<input.name>,}; separator="\n">
 		<actor.simpleName>_nbInputs
 	};
 	////////////////////////////////////////////////////////////////////////////////
 	// Output FIFOs
 	enum
 	{
-		<actor.outputs.list: {input | <actor.simpleName>_<input.name>,}; separator="\n">
+		<actor.outputs: {input | <actor.simpleName>_<input.name>,}; separator="\n">
 		<actor.simpleName>_nbOutputs
 	};
 
@@ -144,13 +144,13 @@ actor(actor, options) ::= <<
 	{
 
 	public:
-		<constructor(actor.parameters.list)>
+		<constructor(actor.parameters)>
 		~<actor.simpleName>();
 	
 		void initializeActor();
 	////////////////////////////////////////////////////////////////////////////////
 	// Functions/procedures
-		<actor.procs.list: procedure()>
+		<actor.procs: procedure()>
 	////////////////////////////////////////////////////////////////////////////////
 	// Actions
 		<actor.actions: action()>
@@ -165,17 +165,17 @@ actor(actor, options) ::= <<
 	<endif>
 	////////////////////////////////////////////////////////////////////////////////
 	// Action scheduler
-<if(actor.actionScheduler.fsm)>
-	<schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)>
+<if(actor.fsm)>
+	<schedulerFSM(actions=actor.actionsOutsideFsm, fsm=actor.fsm)>
 <else>
-	<scheduler(actions=actor.actionScheduler.actions)>
+	<scheduler(actions=actor.actionsOutsideFsm)>
 <endif>
 
 	private:
-<if(actor.inputs.list)>
+<if(actor.inputs)>
 	const bool hasTokens(int port, int iSize) const {return  (m_avails[port] \>= iSize);};
 <endif>
-<if(actor.outputs.list)>
+<if(actor.outputs)>
 	const bool hasRooms(int port, int iSize) const {return  (m_rooms[port] \>= iSize);};
 <endif>
 
@@ -184,10 +184,10 @@ actor(actor, options) ::= <<
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Parameters
-	<parameters(actor.parameters.list)>
+	<parameters(actor.parameters)>
 	////////////////////////////////////////////////////////////////////////////////
 	// Non-const state variables of the actor
-	<actor.stateVars.list: nonConstStateVar()>
+	<actor.stateVars: nonConstStateVar()>
 
 	};
 
