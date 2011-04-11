@@ -150,15 +150,15 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 */
 	protected EList<Port> inputs;
 
-	private Map<String, Integer> mapInputs;
+	private Map<String, Port> mapInputs;
 
-	private Map<String, Integer> mapOutputs;
+	private Map<String, Port> mapOutputs;
 
-	private Map<String, Integer> mapParameters;
+	private Map<String, Var> mapParameters;
 
-	private Map<String, Integer> mapProcedures;
+	private Map<String, Procedure> mapProcedures;
 
-	private Map<String, Integer> mapStateVars;
+	private Map<String, Var> mapStateVars;
 
 	/**
 	 * the class of this actor. Initialized to unknown.
@@ -236,11 +236,11 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected ActorImpl() {
 		super();
 
-		mapInputs = new HashMap<String, Integer>();
-		mapOutputs = new HashMap<String, Integer>();
-		mapParameters = new HashMap<String, Integer>();
-		mapProcedures = new HashMap<String, Integer>();
-		mapStateVars = new HashMap<String, Integer>();
+		mapInputs = new HashMap<String, Port>();
+		mapOutputs = new HashMap<String, Port>();
+		mapParameters = new HashMap<String, Var>();
+		mapProcedures = new HashMap<String, Procedure>();
+		mapStateVars = new HashMap<String, Var>();
 
 		eAdapters().add(new MapAdapter());
 	}
@@ -552,7 +552,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Port getInput(String name) {
-		return getInputs().get(mapInputs.get(name));
+		return mapInputs.get(name);
 	}
 
 	/**
@@ -568,7 +568,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return inputs;
 	}
 
-	public Map<String, Integer> getInputsMap() {
+	public Map<String, Port> getInputsMap() {
 		return mapInputs;
 	}
 
@@ -588,7 +588,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Port getOutput(String name) {
-		return getOutputs().get(mapOutputs.get(name));
+		return mapOutputs.get(name);
 	}
 
 	/**
@@ -604,7 +604,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return outputs;
 	}
 
-	public Map<String, Integer> getOutputsMap() {
+	public Map<String, Port> getOutputsMap() {
 		return mapOutputs;
 	}
 
@@ -630,12 +630,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Var getParameter(String name) {
-		Integer index = mapParameters.get(name);
-		if (index == null) {
-			return null;
-		} else {
-			return getParameters().get(index);
-		}
+		return mapParameters.get(name);
 	}
 
 	/**
@@ -651,7 +646,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return parameters;
 	}
 
-	public Map<String, Integer> getParametersMap() {
+	public Map<String, Var> getParametersMap() {
 		return mapParameters;
 	}
 
@@ -667,15 +662,10 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Procedure getProcedure(String name) {
-		Integer index = mapProcedures.get(name);
-		if (index == null) {
-			return null;
-		} else {
-			return getProcs().get(index);
-		}
+		return mapProcedures.get(name);
 	}
 
-	public Map<String, Integer> getProceduresMap() {
+	public Map<String, Procedure> getProceduresMap() {
 		return mapProcedures;
 	}
 
@@ -704,15 +694,10 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Var getStateVar(String name) {
-		Integer index = mapStateVars.get(name);
-		if (index == null) {
-			return null;
-		} else {
-			return getStateVars().get(index);
-		}
+		return mapStateVars.get(name);
 	}
 
-	public Map<String, Integer> getStateVariablesMap() {
+	public Map<String, Var> getStateVariablesMap() {
 		return mapStateVars;
 	}
 

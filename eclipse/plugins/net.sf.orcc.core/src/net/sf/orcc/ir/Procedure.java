@@ -207,12 +207,22 @@ public interface Procedure extends EObject {
 	Var newTempLocalVariable(Type type, String hint);
 
 	/**
-	 * Removes the given local variable.
+	 * Removes the given instructions. This runs in linear time, whereas
+	 * removing each instruction separately runs in quadratical time.
 	 * 
-	 * @param variable
-	 *            a local variable
+	 * @param instructions
+	 *            a list of instructions
 	 */
-	void removeLocal(Var variable);
+	void removeInstructions(List<Instruction> instructions);
+
+	/**
+	 * Removes the given local variables. This runs in linear time, whereas
+	 * removing each variable separately runs in quadratical time.
+	 * 
+	 * @param variables
+	 *            a list of local variables
+	 */
+	void removeLocals(List<Var> variables);
 
 	/**
 	 * Set the CFG of this procedure.

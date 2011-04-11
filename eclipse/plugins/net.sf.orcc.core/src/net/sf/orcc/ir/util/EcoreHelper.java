@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -143,6 +144,19 @@ public class EcoreHelper {
 		}
 
 		return null;
+	}
+
+	public static List<Use> getUses(EObject eObject) {
+		List<Use> uses = new ArrayList<Use>();
+		TreeIterator<EObject> it = eObject.eAllContents();
+		while (it.hasNext()) {
+			EObject descendant = it.next();
+			if (descendant instanceof Use) {
+				uses.add((Use) descendant);
+			}
+		}
+		
+		return uses;
 	}
 
 }
