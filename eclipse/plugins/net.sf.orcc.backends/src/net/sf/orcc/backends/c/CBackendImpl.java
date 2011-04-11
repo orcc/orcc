@@ -303,6 +303,9 @@ public class CBackendImpl extends AbstractBackend {
 
 			// print CMakeLists
 			printCMake(workingNetwork);
+			if (!codesign && !dynamicMapping && instancesTarget != null) {
+				printMapping(workingNetwork);
+			}
 		}
 	}
 
@@ -323,6 +326,13 @@ public class CBackendImpl extends AbstractBackend {
 		printer.getOptions().put("newScheduler", newScheduler);
 		return printer.print(instance.getId() + ".c", path, instance,
 				"instance");
+	}
+
+	private void printMapping(Network network) {
+		NetworkPrinter networkPrinter = new NetworkPrinter("C_mapping");
+		networkPrinter.getOptions().put("mapping", instancesTarget);
+		networkPrinter.print(network.getName() + ".xcf", path, network,
+				"mapping");
 	}
 
 	@Override

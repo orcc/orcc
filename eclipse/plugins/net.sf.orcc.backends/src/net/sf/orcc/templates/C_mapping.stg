@@ -1,0 +1,17 @@
+mapping(network, options) ::= <<
+
+\<?xml version="1.0" encoding="UTF-8"?\>
+\<Configuration\>
+	\<Partitioning\>
+		<options.mapping.keys : {key | <core(id=i0, instances=options.mapping.(key))>}; separator="\n">
+	\</Partitioning\>
+\</Configuration\>
+
+>>
+
+core(id, instances) ::= <<
+\<Partition id="<id>"\>
+	<instances : {instance | \<Instance id="<instance.id>"/\>}; separator="\n">
+\</Partition\>
+>>
+
