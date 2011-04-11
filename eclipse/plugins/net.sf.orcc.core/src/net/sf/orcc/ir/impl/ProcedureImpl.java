@@ -491,7 +491,12 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	@Override
 	public Var getLocal(String name) {
-		return getLocals().get(mapLocals.get(name));
+		Integer index = mapLocals.get(name);
+		if (index == null) {
+			return null;
+		} else {
+			return getLocals().get(index);
+		}
 	}
 
 	/**

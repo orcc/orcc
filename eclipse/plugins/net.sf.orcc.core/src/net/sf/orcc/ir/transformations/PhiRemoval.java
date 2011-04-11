@@ -30,8 +30,6 @@ package net.sf.orcc.ir.transformations;
 
 import java.util.ListIterator;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -48,7 +46,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.AbstractInstructionVisitor;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class removes phi assignments and transforms them to copies.
@@ -62,8 +59,7 @@ public class PhiRemoval extends AbstractActorVisitor {
 
 		@Override
 		public void visit(InstPhi phi) {
-			EcoreHelper.deleteObjects(phi.getValues());
-			EcoreUtil.delete(phi.getTarget(), true);
+			procedure.removeLocal(phi.getTarget().getVariable());
 			itInstruction.remove();
 		}
 
