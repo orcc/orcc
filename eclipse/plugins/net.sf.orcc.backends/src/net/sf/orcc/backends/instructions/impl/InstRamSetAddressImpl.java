@@ -6,12 +6,15 @@
  */
 package net.sf.orcc.backends.instructions.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import net.sf.orcc.backends.instructions.InstRamSetAddress;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.impl.ExprIntImpl;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 
@@ -155,6 +158,23 @@ public class InstRamSetAddressImpl extends InstRamImpl implements
 					this, InstructionsPackage.INST_RAM_SET_ADDRESS__INDEXES);
 		}
 		return indexes;
+	}
+
+	/**
+	 * Returns a list containing the sizes of the indexes.
+	 * 
+	 * @return a list containing the sizes of the indexes
+	 */
+	public List<Integer> getIndexesSizes() {
+		List<Integer> dimensions = getVariable().getType().getDimensions();
+		List<Integer> indexSizes = new ArrayList<Integer>(dimensions.size());
+		for (int size : dimensions) {
+			// index goes from 0 to size - 1, and we remove the sign bit
+			int indexSize = ExprIntImpl.getSize(size - 1) - 1;
+			indexSizes.add(indexSize);
+		}
+
+		return indexSizes;
 	}
 
 	/**
