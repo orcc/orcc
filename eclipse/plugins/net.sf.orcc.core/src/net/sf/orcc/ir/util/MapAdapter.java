@@ -64,9 +64,8 @@ public class MapAdapter implements Adapter {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void notifyChanged(Notification notification) {
-		Map<String, ? extends Object> map;
+		Map<String, Integer> map;
 		String name;
 		Object object = notification.getEventType() == Notification.ADD ? notification
 				.getNewValue() : notification.getOldValue();
@@ -104,9 +103,9 @@ public class MapAdapter implements Adapter {
 		}
 
 		if (notification.getEventType() == Notification.ADD) {
-			((Map<String, Object>) map).put(name, object);
+			map.put(name, notification.getPosition());
 		} else if (notification.getEventType() == Notification.REMOVE) {
-			((Map<String, Object>) map).remove(name);
+			map.remove(name);
 		}
 	}
 

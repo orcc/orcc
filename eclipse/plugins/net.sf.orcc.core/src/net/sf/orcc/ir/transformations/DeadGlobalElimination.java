@@ -38,8 +38,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 /**
  * This class defines a very simple Dead Global Elimination.
  * 
@@ -60,7 +58,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 			InstStore store = EcoreHelper.getContainerOfType(def,
 					InstStore.class);
 			if (store != null) {
-				EcoreUtil.delete(store, true);
+				EcoreHelper.delete(store);
 			}
 		}
 	}

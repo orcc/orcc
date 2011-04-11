@@ -207,6 +207,14 @@ public interface Procedure extends EObject {
 	Var newTempLocalVariable(Type type, String hint);
 
 	/**
+	 * Removes the given local variable.
+	 * 
+	 * @param variable
+	 *            a local variable
+	 */
+	void removeLocal(Var variable);
+
+	/**
 	 * Set the CFG of this procedure.
 	 * 
 	 * @param the

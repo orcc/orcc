@@ -102,9 +102,34 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	}
 
+	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
 	private CFG graph;
 
-	private Map<String, Var> localsMap;
+	/**
+	 * The cached value of the '{@link #getLocals() <em>Locals</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getLocals()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> locals;
 
 	/**
 	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
@@ -116,13 +141,11 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected Location location;
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
+	 * A map from name to index in the locals list.
 	 */
-	protected static final String NAME_EDEFAULT = null;
+	private Map<String, Integer> mapLocals;
+
+	private Map<String, Integer> mapParameters;
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -134,6 +157,15 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected String name = NAME_EDEFAULT;
 
 	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
+
+	/**
 	 * The cached value of the '{@link #getNodes() <em>Nodes</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getNodes()
@@ -142,7 +174,14 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 */
 	protected EList<Node> nodes;
 
-	private Map<String, Var> paramsMap;
+	/**
+	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getParameters()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Var> parameters;
 
 	private Expression result;
 
@@ -156,47 +195,16 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	protected Type returnType;
 
 	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getLocals() <em>Locals</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLocals()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Var> locals;
-
-	/**
-	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getParameters()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Var> parameters;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
+	 * 
 	 */
 	protected ProcedureImpl() {
 		super();
+
+		mapLocals = new HashMap<String, Integer>();
+		mapParameters = new HashMap<String, Integer>();
+
+		eAdapters().add(new MapAdapter());
 	}
 
 	/**
@@ -483,15 +491,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	@Override
 	public Var getLocal(String name) {
-		if (localsMap == null) {
-			localsMap = new HashMap<String, Var>();
-			for (Var var : getLocals()) {
-				localsMap.put(var.getIndexedName(), var);
-			}
-			eAdapters().add(new MapAdapter());
-		}
-
-		return localsMap.get(name);
+		return getLocals().get(mapLocals.get(name));
 	}
 
 	/**
@@ -505,8 +505,8 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		return locals;
 	}
 
-	public Map<String, Var> getLocalsMap() {
-		return localsMap;
+	public Map<String, Integer> getLocalsMap() {
+		return mapLocals;
 	}
 
 	/**
@@ -538,15 +538,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 
 	@Override
 	public Var getParameter(String name) {
-		if (paramsMap == null) {
-			paramsMap = new HashMap<String, Var>();
-			for (Var var : getParameters()) {
-				paramsMap.put(var.getIndexedName(), var);
-			}
-			eAdapters().add(new MapAdapter());
-		}
-
-		return paramsMap.get(name);
+		return getParameters().get(mapParameters.get(name));
 	}
 
 	/**
@@ -558,6 +550,10 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 			parameters = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.PROCEDURE__PARAMETERS);
 		}
 		return parameters;
+	}
+
+	public Map<String, Integer> getParametersMap() {
+		return mapParameters;
 	}
 
 	public Expression getResult() {
@@ -616,6 +612,11 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 				IrFactory.eINSTANCE.createLocation(), type, name, true, 0);
 		getLocals().add(variable);
 		return variable;
+	}
+
+	@Override
+	public void removeLocal(Var variable) {
+		getLocals().remove(mapLocals.get(variable.getIndexedName()));
 	}
 
 	/**
@@ -705,10 +706,6 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 		result.append(native_);
 		result.append(')');
 		return result.toString();
-	}
-
-	public Map<String, Var> getParametersMap() {
-		return paramsMap;
 	}
 
 } // ProcedureImpl

@@ -58,15 +58,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class ActorImpl extends EObjectImpl implements Actor {
 	/**
-	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getActions()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Action> actions;
-
-	/**
 	 * The default value of the '{@link #getFile() <em>File</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getFile()
@@ -76,6 +67,43 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected static final String FILE_EDEFAULT = null;
 
 	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getActions()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Action> actions;
+
+	/**
+	 * The cached value of the '{@link #getActionsOutsideFsm() <em>Actions Outside Fsm</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getActionsOutsideFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Action> actionsOutsideFsm;
+
+	/**
 	 * The cached value of the '{@link #getFile() <em>File</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getFile()
@@ -83,6 +111,15 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected String file = FILE_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected FSM fsm;
 
 	/**
 	 * The cached value of the '{@link #getInitializes() <em>Initializes</em>}' containment reference list.
@@ -102,16 +139,15 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 */
 	protected EList<Port> inputs;
 
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
+	private Map<String, Integer> mapInputs;
 
-	private Map<String, Port> inputsMap;
+	private Map<String, Integer> mapOutputs;
+
+	private Map<String, Integer> mapParameters;
+
+	private Map<String, Integer> mapProcedures;
+
+	private Map<String, Integer> mapStateVars;
 
 	/**
 	 * the class of this actor. Initialized to unknown.
@@ -128,6 +164,15 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected String name = NAME_EDEFAULT;
 
 	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
+
+	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOutputs()
@@ -135,8 +180,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Port> outputs;
-
-	private Map<String, Port> outputsMap;
 
 	/**
 	 * The cached value of the '{@link #getParameters() <em>Parameters</em>}' containment reference list.
@@ -146,10 +189,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Var> parameters;
-
-	private Map<String, Var> parametersMap;
-
-	private Map<String, Procedure> proceduresMap;
 
 	/**
 	 * The cached value of the '{@link #getProcs() <em>Procs</em>}' containment reference list.
@@ -170,55 +209,23 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected EList<Var> stateVars;
 
 	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getActionsOutsideFsm() <em>Actions Outside Fsm</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getActionsOutsideFsm()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Action> actionsOutsideFsm;
-
-	/**
-	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFsm()
-	 * @generated
-	 * @ordered
-	 */
-	protected FSM fsm;
-
-	private Map<String, Var> stateVarsMap;
-
-	/**
 	 * holds template-specific data.
 	 */
 	private Object templateData;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
 	 */
 	protected ActorImpl() {
 		super();
+
+		mapInputs = new HashMap<String, Integer>();
+		mapOutputs = new HashMap<String, Integer>();
+		mapParameters = new HashMap<String, Integer>();
+		mapProcedures = new HashMap<String, Integer>();
+		mapStateVars = new HashMap<String, Integer>();
+
+		eAdapters().add(new MapAdapter());
 	}
 
 	/**
@@ -501,15 +508,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Port getInput(String name) {
-		if (inputsMap == null) {
-			inputsMap = new HashMap<String, Port>();
-			for (Port port : getInputs()) {
-				inputsMap.put(port.getName(), port);
-			}
-			eAdapters().add(new MapAdapter());
-		}
-
-		return inputsMap.get(name);
+		return getInputs().get(mapInputs.get(name));
 	}
 
 	/**
@@ -523,12 +522,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return inputs;
 	}
 
-	public Map<String, Port> getInputsMap() {
-		if (inputsMap == null) {
-			inputsMap = new HashMap<String, Port>();
-		}
-
-		return inputsMap;
+	public Map<String, Integer> getInputsMap() {
+		return mapInputs;
 	}
 
 	@Override
@@ -546,15 +541,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Port getOutput(String name) {
-		if (outputsMap == null) {
-			outputsMap = new HashMap<String, Port>();
-			for (Port port : getOutputs()) {
-				outputsMap.put(port.getName(), port);
-			}
-			eAdapters().add(new MapAdapter());
-		}
-
-		return outputsMap.get(name);
+		return getOutputs().get(mapOutputs.get(name));
 	}
 
 	/**
@@ -568,12 +555,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return outputs;
 	}
 
-	public Map<String, Port> getOutputsMap() {
-		if (outputsMap == null) {
-			outputsMap = new HashMap<String, Port>();
-		}
-
-		return outputsMap;
+	public Map<String, Integer> getOutputsMap() {
+		return mapOutputs;
 	}
 
 	@Override
@@ -598,15 +581,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Var getParameter(String name) {
-		if (parametersMap == null) {
-			parametersMap = new HashMap<String, Var>();
-			for (Var var : getParameters()) {
-				parametersMap.put(var.getName(), var);
-			}
-			eAdapters().add(new MapAdapter());
-		}
-
-		return parametersMap.get(name);
+		return getParameters().get(mapParameters.get(name));
 	}
 
 	/**
@@ -620,11 +595,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return parameters;
 	}
 
-	public Map<String, Var> getParametersMap() {
-		if (parametersMap == null) {
-			parametersMap = new HashMap<String, Var>();
-		}
-		return parametersMap;
+	public Map<String, Integer> getParametersMap() {
+		return mapParameters;
 	}
 
 	@Override
@@ -639,22 +611,11 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Procedure getProcedure(String name) {
-		if (proceduresMap == null) {
-			proceduresMap = new HashMap<String, Procedure>();
-			for (Procedure procedure : getProcs()) {
-				proceduresMap.put(procedure.getName(), procedure);
-			}
-			eAdapters().add(new MapAdapter());
-		}
-
-		return proceduresMap.get(name);
+		return getProcs().get(mapProcedures.get(name));
 	}
 
-	public Map<String, Procedure> getProceduresMap() {
-		if (proceduresMap == null) {
-			proceduresMap = new HashMap<String, Procedure>();
-		}
-		return proceduresMap;
+	public Map<String, Integer> getProceduresMap() {
+		return mapProcedures;
 	}
 
 	/**
@@ -680,22 +641,11 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public Var getStateVar(String name) {
-		if (stateVarsMap == null) {
-			stateVarsMap = new HashMap<String, Var>();
-			for (Var var : getStateVars()) {
-				stateVarsMap.put(var.getName(), var);
-			}
-			eAdapters().add(new MapAdapter());
-		}
-
-		return stateVarsMap.get(name);
+		return getStateVars().get(mapStateVars.get(name));
 	}
 
-	public Map<String, Var> getStateVariablesMap() {
-		if (stateVarsMap == null) {
-			stateVarsMap = new HashMap<String, Var>();
-		}
-		return stateVarsMap;
+	public Map<String, Integer> getStateVariablesMap() {
+		return mapStateVars;
 	}
 
 	/**

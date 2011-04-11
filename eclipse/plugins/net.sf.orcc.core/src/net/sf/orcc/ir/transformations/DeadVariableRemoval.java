@@ -35,13 +35,13 @@ import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
-
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a very simple Dead Var Elimination.
@@ -53,47 +53,41 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	protected boolean changed;
 
+	private void handleInstruction(Var target, Instruction instruction) {
+		// do not remove assign to variables that are used by writes
+		if (isPort(target)) {
+			return;
+		}
+
+		// saves block and index
+		NodeBlock block = instruction.getBlock();
+		int index = itInstruction.previousIndex();
+
+		// remove assign
+		EcoreHelper.delete(instruction);
+
+		// set itInstruction
+		itInstruction = block.getInstructions().listIterator(index);
+
+		// remove result
+		procedure.removeLocal(target);
+		changed = true;
+	}
+
 	@Override
 	public void visit(InstAssign assign) {
-		Var variable = assign.getTarget().getVariable();
-		if (!variable.isUsed()) {
-			// do not remove assign to variables that are used by writes
-			if (isPort(variable)) {
-				return;
-			}
-
-			// remove def/uses
-			assign.getTarget().setVariable(null);
-			EcoreUtil.delete(assign.getValue(), true);
-
-			// remove instruction
-			itInstruction.remove();
-
-			procedure.getLocals().remove(variable);
-			changed = true;
+		Var target = assign.getTarget().getVariable();
+		if (!target.isUsed()) {
+			handleInstruction(target, assign);
 		}
 	}
 
 	@Override
 	public void visit(InstCall call) {
 		if (call.hasResult()) {
-			Var variable = call.getTarget().getVariable();
-			if (!variable.isUsed()) {
-				// do not remove call to variables that are used by writes
-				if (isPort(variable)) {
-					return;
-				}
-
-				// remove def/uses
-				call.getTarget().setVariable(null);
-				EcoreHelper.deleteObjects(call.getParameters());
-
-				// remove instruction
-				itInstruction.remove();
-
-				// remove result
-				procedure.getLocals().remove(variable);
-				changed = true;
+			Var target = call.getTarget().getVariable();
+			if (!target.isUsed()) {
+				handleInstruction(target, call);
 			}
 		}
 	}
@@ -102,42 +96,31 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	public void visit(InstLoad load) {
 		Var target = load.getTarget().getVariable();
 		if (!target.isUsed()) {
-			// do not remove loads to variables that are used by writes
-			if (isPort(target)) {
-				return;
-			}
-
-			// remove def/uses
-			load.getTarget().setVariable(null);
-			load.getSource().setVariable(null);
-			EcoreHelper.deleteObjects(load.getIndexes());
-
-			// remove instruction
-			itInstruction.remove();
-
-			procedure.getLocals().remove(target);
-			changed = true;
+			handleInstruction(target, load);
 		}
 	}
 
 	@Override
 	public void visit(InstPhi phi) {
-		Var variable = phi.getTarget().getVariable();
-		if (!variable.isUsed()) {
-			// do not remove phi to variables that are used by writes
-			if (isPort(variable)) {
+		Var target = phi.getTarget().getVariable();
+		if (!target.isUsed()) {
+			handleInstruction(target, phi);
+		}
+	}
+
+	@Override
+	public void visit(InstStore store) {
+		Var target = store.getTarget().getVariable();
+		if (!target.isUsed()) {
+			// do not remove stores to variables that are used by writes, or
+			// variables that are parameters
+			if (!target.isGlobal()
+					&& (isPort(target) || target.eContainmentFeature() == IrPackage.eINSTANCE
+							.getProcedure_Parameters())) {
 				return;
 			}
 
-			// remove def/uses
-			phi.getTarget().setVariable(null);
-			EcoreHelper.deleteObjects(phi.getValues());
-
-			// remove instruction
-			itInstruction.remove();
-
-			procedure.getLocals().remove(variable);
-			changed = true;
+			handleInstruction(target, store);
 		}
 	}
 
@@ -159,31 +142,6 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			}
 
 			super.visit(procedure);
-		}
-	}
-
-	@Override
-	public void visit(InstStore store) {
-		Var target = store.getTarget().getVariable();
-		if (!target.isUsed()) {
-			// do not remove stores to variables that are used by writes, or
-			// variables that are parameters
-			if (!target.isGlobal()
-					&& (isPort(target) || target.eContainmentFeature() == IrPackage.eINSTANCE
-							.getProcedure_Parameters())) {
-				return;
-			}
-
-			// remove def/uses
-			store.getTarget().setVariable(null);
-			EcoreHelper.deleteObjects(store.getIndexes());
-			EcoreUtil.delete(store.getValue(), true);
-
-			// remove instruction
-			itInstruction.remove();
-
-			procedure.getLocals().remove(target);
-			changed = true;
 		}
 	}
 
