@@ -41,6 +41,7 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines an actor transformation that transforms assignments whose
@@ -110,16 +111,18 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	 */
 	private void createNewBlock(NodeBlock block) {
 		List<Instruction> instructions = block.getInstructions();
+		int index = itInstruction.previousIndex();
 
 		NodeBlock targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		targetBlock.getInstructions().addAll(
-				instructions.subList(itInstruction.nextIndex(),
-						instructions.size()));
+				instructions.subList(index, instructions.size()));
 
-		// adds this block after the NodeIf
+		// no instructions will be visited in the current block
+		itInstruction = instructions.listIterator(index);
+
+		// adds this block after the NodeIf, and moves the iterator back so the
+		// new block will be visited next
 		itNode.add(targetBlock);
-
-		// moves the iterator back so the new block will be visited next
 		itNode.previous();
 	}
 
@@ -141,13 +144,11 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				createIfNode(target, expr);
 
-				// remove definition
-				assign.getTarget().setVariable(null);
-
-				// go back to this assign, and deletes it
+				// saves the current block
 				NodeBlock block = assign.getBlock();
-				itInstruction.previous();
-				itInstruction.remove();
+
+				// deletes the assign
+				EcoreHelper.delete(assign);
 
 				// move the rest of instructions to a new block
 				createNewBlock(block);
@@ -165,7 +166,6 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 				createIfNode(local, expr);
 
 				// moves this return and remaining instructions to a new block
-				itInstruction.previous();
 				createNewBlock(returnInstr.getBlock());
 			}
 		}
@@ -182,7 +182,6 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 				createIfNode(local, expr);
 
 				// moves this store and remaining instructions to a new block
-				itInstruction.previous();
 				createNewBlock(store.getBlock());
 			}
 		}

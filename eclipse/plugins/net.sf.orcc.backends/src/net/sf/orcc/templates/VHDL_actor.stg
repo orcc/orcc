@@ -149,26 +149,26 @@ resetReadWriteEnable(variable) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Print cast operations (when source.size != target.size)
 ///////////////////////////////////////////////////////////////////////////////
-CastStore(targetName, targetType, value, cast)::= <<
+CastStore(targetName, targetTypeIsUint, targetSize, value, cast)::= <<
 <if(cast.extended)
 ><targetName> := <value><
 else
-><if(targetType.uint)
-><targetName> := ucast(<value>, <value.type.size>, <targetType.size>)<  
+><if(targetTypeIsUint)
+><targetName> := ucast(<value>, <value.type.size>, <targetSize>)<  
   else
-><targetName> := cast(<value>, <value.type.size>, <targetType.size>)<  
+><targetName> := cast(<value>, <value.type.size>, <targetSize>)<  
   endif><
 endif>
 >>
 
-CastLoad(targetName, targetType, source, cast)::= <<
+CastLoad(targetName, targetTypeIsUint, targetSize, source, cast)::= <<
 <if(cast.extended)
 ><targetName> := <source><
 else
-><if(targetType.uint)
-><targetName> := ucast(<source>, <source.type.size>, <targetType.size>)<
+><if(targetTypeIsUint)
+><targetName> := ucast(<source>, <source.type.size>, <targetSize>)<
   else
-><targetName> := cast(<source>, <source.type.size>, <targetType.size>)<
+><targetName> := cast(<source>, <source.type.size>, caca<targetSize>)<
   endif><
 endif>
 >>
@@ -181,7 +181,9 @@ endif>
 
 printAssign(assign) ::= <<
 <if (assign.cast)
-><CastStore(targetName=assign.target.variable.indexedName, targetType=assign.target.variable.type, value=assign.value, cast=assign.cast)>;<
+><CastStore(targetName=assign.target.variable.indexedName,
+targetTypeIsUint=assign.target.variable.type.uint, targetSize=assign.target.variable.type.size,
+value=assign.value, cast=assign.cast)>;<
 else
 ><assign.target.variable.indexedName> := <assign.value>;<
 endif>
@@ -209,18 +211,28 @@ else
 endif>
 >>
 
-getPortType(variable) ::= <<
+getPortTypeUint(variable) ::= <<
 <if (action.inputPattern.inverseVariableMap.(variable))
-><action.inputPattern.inverseVariableMap.(variable).type><
+><action.inputPattern.inverseVariableMap.(variable).type.uint><
 else
-><action.outputPattern.inverseVariableMap.(variable).type><
+><action.outputPattern.inverseVariableMap.(variable).type.uint><
+endif>
+>>
+
+getPortTypeSize(variable) ::= <<
+<if (action.inputPattern.inverseVariableMap.(variable))
+><action.inputPattern.inverseVariableMap.(variable).type.size><
+else
+><action.outputPattern.inverseVariableMap.(variable).type.size><
 endif>
 >>
 
 printLoad(load) ::= <<
 <if(load.indexes)
 ><if (action.inputPattern.inverseVariableMap.(load.source.variable) || action.outputPattern.inverseVariableMap.(load.source.variable))
-><if(load.cast)><CastLoad(targetName=load.target.variable.indexedName, targetType=load.target.variable.type, source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;<
+><if(load.cast)><CastLoad(targetName=load.target.variable.indexedName,
+targetTypeIsUint=load.target.variable.type.uint, targetSize=load.target.variable.size,
+source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;<
 else><load.target.variable.indexedName> := <procedure.name>_<getPort(load.source.variable)>;<
 endif
 ><else><load.target.variable.indexedName> := <load.source.variable.name>(<load.indexes : {index | <index>}; separator=", ">);<
@@ -245,7 +257,9 @@ printStore(store) ::= <<
 <if(store.indexes)
  ><if(action.inputPattern.inverseVariableMap.(store.target.variable) || action.outputPattern.inverseVariableMap.(store.target.variable))
   ><if(store.cast)
-    ><CastStore(value=store.value, targetName={<procedure.name>_<getPort(store.target.variable)>}, targetType={<getPortType(store.target)>}, cast=store.cast)>;<
+    ><CastStore(targetName={<procedure.name>_<getPort(store.target.variable)>},
+targetTypeIsUint=getPortTypeUint(store.target.variable), targetSize=getPortTypeSize(store.target.variable),
+cast=store.cast, value=store.value)>;<
    else
     ><procedure.name>_<getPort(store.target.variable)> := <store.value>;<
    endif><
