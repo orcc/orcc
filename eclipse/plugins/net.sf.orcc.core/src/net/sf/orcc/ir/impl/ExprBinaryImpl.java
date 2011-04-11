@@ -41,6 +41,16 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 
 	public static final Object LEFT = new Object();
 
+	/**
+	 * The default value of the '{@link #getOp() <em>Op</em>}' attribute. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getOp()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final OpBinary OP_EDEFAULT = OpBinary.BITAND;
+
 	public static final Object RIGHT = new Object();
 
 	/**
@@ -60,16 +70,6 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	 * @ordered
 	 */
 	protected Expression e2;
-
-	/**
-	 * The default value of the '{@link #getOp() <em>Op</em>}' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getOp()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final OpBinary OP_EDEFAULT = OpBinary.BITAND;
 
 	/**
 	 * The cached value of the '{@link #getOp() <em>Op</em>}' attribute. <!--
@@ -291,6 +291,11 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	 */
 	public Type getType() {
 		return type;
+	}
+
+	@Override
+	public boolean isBinaryExpr() {
+		return true;
 	}
 
 	/**

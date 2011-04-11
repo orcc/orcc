@@ -46,7 +46,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class EcoreHelper {
 
-	public static <T extends EObject> Collection<T> copyWithUses(Collection<? extends T> eObjects) {
+	public static <T extends EObject> Collection<T> copyWithUses(
+			Collection<? extends T> eObjects) {
 		Copier copier = new Copier();
 		Collection<T> result = copier.copyAll(eObjects);
 		copier.copyReferences();
@@ -90,6 +91,18 @@ public class EcoreHelper {
 		}
 
 		return result;
+	}
+
+	/**
+	 * Deletes the given EObject from its container and removes the references
+	 * it is involved in. Equivalent to
+	 * <code>EcoreUtil.delete(eObject, true);</code>.
+	 * 
+	 * @param eObject
+	 *            the object to delete
+	 */
+	public static void delete(EObject eObject) {
+		EcoreUtil.delete(eObject, true);
 	}
 
 	/**
