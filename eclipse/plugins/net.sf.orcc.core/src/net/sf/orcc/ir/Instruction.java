@@ -69,9 +69,9 @@ public interface Instruction extends EObject {
 	NodeBlock getBlock();
 
 	/**
-	 * Returns instruction casting type if needed.
+	 * Returns a Cast object if this instruction requires casting.
 	 * 
-	 * @return Type of cast made by this instruction
+	 * @return a Cast object if this instruction requires casting
 	 */
 	Cast getCast();
 
@@ -82,6 +82,25 @@ public interface Instruction extends EObject {
 	 * @model containment="true"
 	 */
 	public Location getLocation();
+
+	/**
+	 * Returns the predicate associated with this instruction. This is used by
+	 * if-conversion.
+	 * 
+	 * @return the predicate associated with this instruction
+	 * @model
+	 */
+	Expression getPredicate();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Instruction#getPredicate <em>Predicate</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Predicate</em>' reference.
+	 * @see #getPredicate()
+	 * @generated
+	 */
+	void setPredicate(Expression value);
 
 	/**
 	 * Returns <code>true</code> if the instruction is an Assign.

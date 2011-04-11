@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Use;
 
@@ -97,6 +98,25 @@ public class EcoreHelper {
 	}
 
 	/**
+	 * Removes the uses of the given expression and removes the expression itself from its container.
+	 * 
+	 * @param expression
+	 *            an expression
+	 */
+	public static void delete(Expression expression) {
+		TreeIterator<EObject> it = expression.eAllContents();
+		while (it.hasNext()) {
+			EObject descendant = it.next();
+			if (descendant instanceof Use) {
+				Use use = (Use) descendant;
+				use.setVariable(null);
+			}
+		}
+
+		EcoreUtil.remove(expression);
+	}
+
+	/**
 	 * Removes the uses of the given instruction, removes the definition (if it
 	 * has one), and finally removes the instruction itself from its container.
 	 * 
@@ -124,15 +144,14 @@ public class EcoreHelper {
 	}
 
 	/**
-	 * Deletes recursively all objects in the given list and removes them from
-	 * any feature that references them.
+	 * Deletes the given expressions.
 	 * 
-	 * @param objects
-	 *            a list of objects
+	 * @param expressions
+	 *            a list of expressions
 	 */
-	public static void deleteObjects(List<? extends EObject> objects) {
-		while (!objects.isEmpty()) {
-			EcoreUtil.delete(objects.get(0), true);
+	public static void delete(List<Expression> expressions) {
+		while (!expressions.isEmpty()) {
+			delete(expressions.get(0));
 		}
 	}
 

@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.backends.vhdl.ram;
 
-import net.sf.orcc.backends.instructions.InstSplit;
-import net.sf.orcc.ir.InstSpecific;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.transformations.IfConverter;
+import net.sf.orcc.ir.util.ActorVisitor;
 
 /**
  * This class defines a transformation that extracts the SplitInstructions from
@@ -39,13 +39,11 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class ConditionedSplitExtractor extends AbstractActorVisitor {
+public class ConditionedSplitExtractor implements ActorVisitor {
 
 	@Override
-	public void visit(InstSpecific instruction) {
-		if (instruction instanceof InstSplit) {
-			// do something here
-		}
+	public void visit(Actor actor) {
+		new IfConverter().doSwitch(actor);
 	}
 
 }

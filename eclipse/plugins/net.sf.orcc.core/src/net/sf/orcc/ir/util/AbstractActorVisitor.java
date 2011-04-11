@@ -31,6 +31,8 @@ package net.sf.orcc.ir.util;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.eclipse.emf.ecore.EObject;
+
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
@@ -67,8 +69,10 @@ import net.sf.orcc.ir.impl.NodeVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractActorVisitor implements ActorVisitor,
-		ExpressionVisitor, InstructionVisitor, NodeVisitor {
+public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
+		ActorVisitor, ExpressionVisitor, InstructionVisitor, NodeVisitor {
+
+	protected static final Object NULL = new Object();
 
 	/**
 	 * current action being visited (if any).
@@ -112,6 +116,223 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 		this.visitFull = visitFull;
 	}
 
+	@Override
+	public Object caseAction(Action action) {
+		doSwitch(action.getInputPattern());
+		doSwitch(action.getOutputPattern());
+		doSwitch(action.getScheduler());
+		doSwitch(action.getBody());
+		
+		return null;
+	}
+
+	@Override
+	public Object caseActor(Actor actor) {
+		for (Var parameter : actor.getParameters()) {
+			doSwitch(parameter);
+		}
+		
+		for (Var stateVar : actor.getStateVars()) {
+			doSwitch(stateVar);
+		}
+		
+		for (Procedure procedure : actor.getProcs()) {
+			doSwitch(procedure);
+		}
+		
+		for (Action action : actor.getActions()) {
+			doSwitch(action);
+		}
+		
+		for (Action initialize : actor.getInitializes()) {
+			doSwitch(initialize);
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public Object caseExprBinary(ExprBinary expr) {
+		doSwitch(expr.getE1());
+		doSwitch(expr.getE2());
+		return null;
+	}
+
+	@Override
+	public Object caseExprBool(ExprBool expr) {
+		return null;
+	}
+	
+	@Override
+	public Object caseExprFloat(ExprFloat expr) {
+		return null;
+	}
+
+	@Override
+	public Object caseExprInt(ExprInt expr) {
+		return null;
+	}
+	
+	@Override
+	public Object caseExprList(ExprList expr) {
+		return null;
+	}
+
+	@Override
+	public Object caseExprString(ExprString expr) {
+		return null;
+	}
+	
+	@Override
+	public Object caseExprUnary(ExprUnary expr) {
+		doSwitch(expr.getExpr());
+		return null;
+	}
+
+	@Override
+	public Object caseExprVar(ExprVar var) {
+		return null;
+	}
+	
+	@Override
+	public Object caseInstAssign(InstAssign assign) {
+		if (visitFull) {
+			doSwitch(assign.getValue());
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseInstCall(InstCall call) {
+		if (visitFull) {
+			for (Expression expr : call.getParameters()) {
+				doSwitch(expr);
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public Object caseInstLoad(InstLoad load) {
+		if (visitFull) {
+			for (Expression expr : load.getIndexes()) {
+				doSwitch(expr);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseInstPhi(InstPhi phi) {
+		if (visitFull) {
+			for (Expression expr : phi.getValues()) {
+				doSwitch(expr);
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public Object caseInstReturn(InstReturn returnInstr) {
+		if (visitFull) {
+			Expression expr = returnInstr.getValue();
+			if (expr != null) {
+				doSwitch(expr);
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseInstSpecific(InstSpecific inst) {
+		// default implementation does nothing
+		return null;
+	}
+	
+	@Override
+	public Object caseInstStore(InstStore store) {
+		if (visitFull) {
+			for (Expression expr : store.getIndexes()) {
+				doSwitch(expr);
+			}
+			
+			doSwitch(store.getValue());
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseNodeBlock(NodeBlock block) {
+		itInstruction = block.listIterator();
+		while (itInstruction.hasNext()) {
+			Instruction instruction = itInstruction.next();
+			doSwitch(instruction);
+		}
+		return null;
+	}
+	
+	@Override
+	public Object caseNodeIf(NodeIf nodeIf) {
+		if (visitFull) {
+			doSwitch(nodeIf.getCondition());
+		}
+
+		doSwitch(nodeIf.getThenNodes());
+		doSwitch(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getJoinNode());
+		return null;
+	}
+
+	@Override
+	public Object caseNodeWhile(NodeWhile nodeWhile) {
+		if (visitFull) {
+			doSwitch(nodeWhile.getCondition());
+		}
+
+		doSwitch(nodeWhile.getNodes());
+		doSwitch(nodeWhile.getJoinNode());
+		return null;
+	}
+	
+	@Override
+	public Object casePattern(Pattern pattern) {
+		return null;
+	}
+	
+	@Override
+	public Object caseProcedure(Procedure procedure) {
+		this.procedure = procedure;
+		doSwitch(procedure.getNodes());
+		return null;
+	}
+
+	@Override
+	public Object doSwitch(EObject theEObject) {
+		if (theEObject == null) {
+			return null;
+		}
+		return doSwitch(theEObject.eClass(), theEObject);
+	}
+	
+	/**
+	 * Visits the nodes of the given node list.
+	 * 
+	 * @param nodes
+	 *            a list of nodes that belong to a procedure
+	 */
+	public Object doSwitch(List<Node> nodes) {
+		ListIterator<Node> oldItNode = itNode;
+		itNode = nodes.listIterator();
+		while (itNode.hasNext()) {
+			Node node = itNode.next();
+			doSwitch(node);
+		}
+
+		// restore old iterator
+		itNode = oldItNode;
+		return null;
+	}
+
 	/**
 	 * Returns <code>true</code> if the variable is not in the locals nor
 	 * parameters of the current procedure.
@@ -128,7 +349,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 
 		return false;
 	}
-
+	
 	/**
 	 * Visits the given action.
 	 * 
@@ -164,7 +385,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 			visit(action);
 		}
 	}
-
+	
 	@Override
 	public void visit(ExprBinary expr, Object... args) {
 		expr.getE1().accept(this, args);
@@ -174,7 +395,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	@Override
 	public void visit(ExprBool expr, Object... args) {
 	}
-
+	
 	@Override
 	public void visit(ExprFloat expr, Object... args) {
 	}
@@ -182,7 +403,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	@Override
 	public void visit(ExprInt expr, Object... args) {
 	}
-
+	
 	@Override
 	public void visit(ExprList expr, Object... args) {
 	}
@@ -190,7 +411,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	@Override
 	public void visit(ExprString expr, Object... args) {
 	}
-
+	
 	@Override
 	public void visit(ExprUnary expr, Object... args) {
 		expr.getExpr().accept(this, args);
@@ -199,7 +420,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	@Override
 	public void visit(ExprVar expr, Object... args) {
 	}
-
+	
 	@Override
 	public void visit(InstAssign assign) {
 		if (visitFull) {
@@ -215,7 +436,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 			}
 		}
 	}
-
+	
 	@Override
 	public void visit(InstLoad load) {
 		if (visitFull) {
@@ -233,7 +454,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 			}
 		}
 	}
-
+	
 	@Override
 	public void visit(InstReturn returnInstr) {
 		if (visitFull) {
@@ -245,10 +466,10 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	}
 
 	@Override
-	public void visit(InstSpecific node) {
+	public void visit(InstSpecific inst) {
 		// default implementation does nothing
 	}
-
+	
 	@Override
 	public void visit(InstStore store) {
 		if (visitFull) {
@@ -265,8 +486,6 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 * 
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
-	 * @param args
-	 *            arguments
 	 */
 	public void visit(List<Node> nodes) {
 		ListIterator<Node> oldItNode = itNode;
@@ -275,11 +494,11 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 			Node node = itNode.next();
 			node.accept(this);
 		}
-		
+
 		// restore old iterator
 		itNode = oldItNode;
 	}
-
+	
 	@Override
 	public void visit(NodeBlock nodeBlock) {
 		itInstruction = nodeBlock.listIterator();
@@ -299,7 +518,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 		visit(nodeIf.getElseNodes());
 		visit(nodeIf.getJoinNode());
 	}
-
+	
 	@Override
 	public void visit(NodeWhile nodeWhile) {
 		if (visitFull) {
@@ -318,7 +537,7 @@ public abstract class AbstractActorVisitor implements ActorVisitor,
 	 */
 	public void visit(Pattern pattern) {
 	}
-
+	
 	/**
 	 * Visits the given procedure.
 	 * 

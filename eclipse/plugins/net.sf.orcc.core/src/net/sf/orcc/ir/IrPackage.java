@@ -286,12 +286,21 @@ public interface IrPackage extends EPackage {
 	int INSTRUCTION__LOCATION = 0;
 
 	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTRUCTION__PREDICATE = 1;
+
+	/**
 	 * The number of structural features of the '<em>Instruction</em>' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int INSTRUCTION_FEATURE_COUNT = 1;
+	int INSTRUCTION_FEATURE_COUNT = 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
@@ -561,6 +570,15 @@ public interface IrPackage extends EPackage {
 	int INST_ASSIGN__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_ASSIGN__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
 	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -601,6 +619,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_CALL__LOCATION = INSTRUCTION__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CALL__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -655,6 +682,15 @@ public interface IrPackage extends EPackage {
 	int INST_LOAD__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_LOAD__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -705,6 +741,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_PHI__LOCATION = INSTRUCTION__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_PHI__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Old Variable</b></em>' reference. <!--
@@ -761,6 +806,15 @@ public interface IrPackage extends EPackage {
 	int INST_RETURN__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RETURN__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -796,6 +850,15 @@ public interface IrPackage extends EPackage {
 	int INST_SPECIFIC__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_SPECIFIC__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
 	 * The number of structural features of the '<em>Inst Specific</em>' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -821,6 +884,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_STORE__LOCATION = INSTRUCTION__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_STORE__PREDICATE = INSTRUCTION__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -1847,6 +1919,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getInstruction_Location();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Instruction#getPredicate <em>Predicate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Predicate</em>'.
+	 * @see net.sf.orcc.ir.Instruction#getPredicate()
+	 * @see #getInstruction()
+	 * @generated
+	 */
+	EReference getInstruction_Predicate();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeBlock <em>Node Block</em>}'.
@@ -3262,6 +3345,14 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference INSTRUCTION__LOCATION = eINSTANCE.getInstruction_Location();
+
+		/**
+		 * The meta object literal for the '<em><b>Predicate</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INSTRUCTION__PREDICATE = eINSTANCE.getInstruction_Predicate();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl <em>Node Block</em>}' class.

@@ -88,7 +88,7 @@ public class ListFlattenTransformation extends AbstractActorVisitor {
 				IrFactory.eINSTANCE.createTypeInt(), "concat_index");
 
 		// sets indexVar as memory index
-		EcoreHelper.deleteObjects(indexes);
+		EcoreHelper.delete(indexes);
 		indexes.add(IrFactory.eINSTANCE.createExprVar(indexVar));
 
 		// add a special assign instruction that assigns the index variable the

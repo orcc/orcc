@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
@@ -27,6 +28,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.InstructionImpl#getLocation <em>Location</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.InstructionImpl#getPredicate <em>Predicate</em>}</li>
  * </ul>
  * </p>
  *
@@ -34,6 +36,16 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  */
 public abstract class InstructionImpl extends EObjectImpl implements Instruction {
 	private Location location;
+
+	/**
+	 * The cached value of the '{@link #getPredicate() <em>Predicate</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPredicate()
+	 * @generated
+	 * @ordered
+	 */
+	protected Expression predicate;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -73,6 +85,9 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 		switch (featureID) {
 			case IrPackage.INSTRUCTION__LOCATION:
 				return getLocation();
+			case IrPackage.INSTRUCTION__PREDICATE:
+				if (resolve) return getPredicate();
+				return basicGetPredicate();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -101,6 +116,8 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 		switch (featureID) {
 			case IrPackage.INSTRUCTION__LOCATION:
 				return location != null;
+			case IrPackage.INSTRUCTION__PREDICATE:
+				return predicate != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -115,6 +132,9 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 		switch (featureID) {
 			case IrPackage.INSTRUCTION__LOCATION:
 				setLocation((Location)newValue);
+				return;
+			case IrPackage.INSTRUCTION__PREDICATE:
+				setPredicate((Expression)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -140,6 +160,9 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 		switch (featureID) {
 			case IrPackage.INSTRUCTION__LOCATION:
 				setLocation((Location)null);
+				return;
+			case IrPackage.INSTRUCTION__PREDICATE:
+				setPredicate((Expression)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -192,6 +215,44 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 
 	public void setLocation(Location location) {
 		this.location = location;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Expression getPredicate() {
+		if (predicate != null && predicate.eIsProxy()) {
+			InternalEObject oldPredicate = (InternalEObject)predicate;
+			predicate = (Expression)eResolveProxy(oldPredicate);
+			if (predicate != oldPredicate) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INSTRUCTION__PREDICATE, oldPredicate, predicate));
+			}
+		}
+		return predicate;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Expression basicGetPredicate() {
+		return predicate;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setPredicate(Expression newPredicate) {
+		Expression oldPredicate = predicate;
+		predicate = newPredicate;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INSTRUCTION__PREDICATE, oldPredicate, predicate));
 	}
 
 } //InstructionImpl
