@@ -38,25 +38,22 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * This class performs if-conversion on the given procedure.
+ * This class performs the inverse of if-conversion on the given procedure.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class IfConverter extends AbstractActorVisitor {
+public class IfDeconverter extends AbstractActorVisitor {
 
 	private Expression currentPredicate;
 
-	private NodeBlock targetBlock;
+	private Node target;
 
 	@Override
 	public Object caseNodeBlock(NodeBlock block) {
@@ -64,53 +61,41 @@ public class IfConverter extends AbstractActorVisitor {
 		while (!instructions.isEmpty()) {
 			Instruction inst = instructions.get(0);
 
-			// annotate with predicate
-			inst.setPredicate(currentPredicate);
+			Expression predicate = inst.getPredicate();
+			NodeBlock targetBlock;
+			if (predicate == null) {
+				if (currentPredicate == null) {
+					if (target == null) {
+						// if target does not exist yet, create it
+						target = IrFactory.eINSTANCE.createNodeBlock();
+						procedure.getNodes().add(target);
+					}
+				} else {
+					// end current if
+					currentPredicate = null;
+					target = IrFactory.eINSTANCE.createNodeBlock();
+					procedure.getNodes().add(target);
+				}
+				targetBlock = (NodeBlock) target;
+			} else {
+				if (currentPredicate == null) {
+					target = IrFactory.eINSTANCE.createNodeIf();
+					((NodeIf) target).setCondition(predicate);
+					((NodeIf) target).setJoinNode(IrFactory.eINSTANCE.createNodeBlock());
+					procedure.getNodes().add(target);
 
-			// move to target block
-			targetBlock.add(inst);
+					currentPredicate = predicate;
+				}
+
+				inst.setPredicate(null);
+				targetBlock = procedure.getLast(((NodeIf) target)
+						.getThenNodes());
+			}
+
+			((NodeBlock) targetBlock).getInstructions().add(inst);
 		}
 
-		// remove this block
 		EcoreUtil.remove(block);
-
-		return NULL;
-	}
-
-	@Override
-	public Object caseNodeIf(NodeIf nodeIf) {
-		Expression previousPredicate = currentPredicate;
-
-		// predicate for "then" branch
-		currentPredicate = EcoreHelper.copy(nodeIf.getCondition());
-		if (previousPredicate != null) {
-			currentPredicate = IrFactory.eINSTANCE.createExprBinary(
-					EcoreHelper.copy(previousPredicate),
-					OpBinary.LOGIC_AND, currentPredicate,
-					IrFactory.eINSTANCE.createTypeBool());
-		}
-		doSwitch(nodeIf.getThenNodes());
-
-		// predicate for "else" branch
-		currentPredicate = IrFactory.eINSTANCE.createExprUnary(
-				OpUnary.LOGIC_NOT,
-				EcoreHelper.copy(nodeIf.getCondition()),
-				IrFactory.eINSTANCE.createTypeBool());
-		if (previousPredicate != null) {
-			currentPredicate = IrFactory.eINSTANCE.createExprBinary(
-					EcoreHelper.copy(previousPredicate),
-					OpBinary.LOGIC_AND, currentPredicate,
-					IrFactory.eINSTANCE.createTypeBool());
-		}
-		doSwitch(nodeIf.getElseNodes());
-
-		// restore predicate for "join" node
-		currentPredicate = previousPredicate;
-		doSwitch(nodeIf.getJoinNode());
-
-		// deletes condition and node
-		EcoreHelper.delete(nodeIf.getCondition());
-		EcoreUtil.remove(nodeIf);
 
 		return NULL;
 	}
@@ -122,17 +107,10 @@ public class IfConverter extends AbstractActorVisitor {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		targetBlock = IrFactory.eINSTANCE.createNodeBlock();
-		super.caseProcedure(procedure);
-		procedure.getNodes().add(targetBlock);
-		return NULL;
-	}
+		this.procedure = procedure;
+		target = null;
 
-	@Override
-	public Object doSwitch(List<Node> nodes) {
-		while (!nodes.isEmpty()) {
-			doSwitch(nodes.get(0));
-		}
+		doSwitch(procedure.getNodes().get(0));
 
 		return NULL;
 	}

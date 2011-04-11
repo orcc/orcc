@@ -576,7 +576,7 @@ public class AstTransformer {
 				Location location = Util.getLocation(expression);
 
 				indexes = new ArrayList<Expression>(
-						EcoreHelper.copyWithUses(currentIndexes));
+						EcoreHelper.copy(currentIndexes));
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 				i++;
 

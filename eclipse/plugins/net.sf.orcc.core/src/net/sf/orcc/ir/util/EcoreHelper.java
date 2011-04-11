@@ -50,40 +50,19 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  */
 public class EcoreHelper {
 
-	public static <T extends EObject> Collection<T> copyWithUses(
-			Collection<? extends T> eObjects) {
-		Copier copier = new Copier();
-		Collection<T> result = copier.copyAll(eObjects);
-		copier.copyReferences();
-
-		TreeIterator<EObject> it = EcoreUtil.getAllContents(eObjects, true);
-		while (it.hasNext()) {
-			EObject obj = it.next();
-
-			if (obj instanceof Use) {
-				Use use = (Use) obj;
-				Use copyUse = (Use) copier.get(use);
-				copyUse.setVariable(use.getVariable());
-			}
-		}
-
-		return result;
-	}
-
 	/**
-	 * Returns a deep copy of the given object, and updates uses.
+	 * Returns a deep copy of the given expressions, and updates uses.
 	 * 
-	 * @param <T>
-	 * @param eObject
-	 * @return a deep copy of the given object with uses correctly updated
+	 * @param expressions
+	 *            a list of expressions
+	 * @return a deep copy of the given expressions with uses correctly updated
 	 */
-	public static <T extends EObject> T copyWithUses(T eObject) {
+	public static Collection<Expression> copy(Collection<Expression> expressions) {
 		Copier copier = new Copier();
-		@SuppressWarnings("unchecked")
-		T result = (T) copier.copy(eObject);
+		Collection<Expression> result = copier.copyAll(expressions);
 		copier.copyReferences();
 
-		TreeIterator<EObject> it = EcoreUtil.getAllContents(eObject, true);
+		TreeIterator<EObject> it = EcoreUtil.getAllContents(expressions, true);
 		while (it.hasNext()) {
 			EObject obj = it.next();
 
@@ -98,7 +77,34 @@ public class EcoreHelper {
 	}
 
 	/**
-	 * Removes the uses of the given expression and removes the expression itself from its container.
+	 * Returns a deep copy of the given expression, and updates uses.
+	 * 
+	 * @param expression
+	 *            an expression
+	 * @return a deep copy of the given expression with uses correctly updated
+	 */
+	public static Expression copy(Expression expression) {
+		Copier copier = new Copier();
+		Expression result = (Expression) copier.copy(expression);
+		copier.copyReferences();
+
+		TreeIterator<EObject> it = EcoreUtil.getAllContents(expression, true);
+		while (it.hasNext()) {
+			EObject obj = it.next();
+
+			if (obj instanceof Use) {
+				Use use = (Use) obj;
+				Use copyUse = (Use) copier.get(use);
+				copyUse.setVariable(use.getVariable());
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Removes the uses of the given expression and removes the expression
+	 * itself from its container.
 	 * 
 	 * @param expression
 	 *            an expression

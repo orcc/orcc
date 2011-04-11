@@ -122,7 +122,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		doSwitch(action.getOutputPattern());
 		doSwitch(action.getScheduler());
 		doSwitch(action.getBody());
-		
+
 		return null;
 	}
 
@@ -131,26 +131,26 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		for (Var parameter : actor.getParameters()) {
 			doSwitch(parameter);
 		}
-		
+
 		for (Var stateVar : actor.getStateVars()) {
 			doSwitch(stateVar);
 		}
-		
+
 		for (Procedure procedure : actor.getProcs()) {
 			doSwitch(procedure);
 		}
-		
+
 		for (Action action : actor.getActions()) {
 			doSwitch(action);
 		}
-		
+
 		for (Action initialize : actor.getInitializes()) {
 			doSwitch(initialize);
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public Object caseExprBinary(ExprBinary expr) {
 		doSwitch(expr.getE1());
@@ -162,7 +162,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	public Object caseExprBool(ExprBool expr) {
 		return null;
 	}
-	
+
 	@Override
 	public Object caseExprFloat(ExprFloat expr) {
 		return null;
@@ -172,7 +172,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	public Object caseExprInt(ExprInt expr) {
 		return null;
 	}
-	
+
 	@Override
 	public Object caseExprList(ExprList expr) {
 		return null;
@@ -182,7 +182,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	public Object caseExprString(ExprString expr) {
 		return null;
 	}
-	
+
 	@Override
 	public Object caseExprUnary(ExprUnary expr) {
 		doSwitch(expr.getExpr());
@@ -193,7 +193,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	public Object caseExprVar(ExprVar var) {
 		return null;
 	}
-	
+
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
 		if (visitFull) {
@@ -211,7 +211,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Object caseInstLoad(InstLoad load) {
 		if (visitFull) {
@@ -231,7 +231,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Object caseInstReturn(InstReturn returnInstr) {
 		if (visitFull) {
@@ -248,14 +248,14 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		// default implementation does nothing
 		return null;
 	}
-	
+
 	@Override
 	public Object caseInstStore(InstStore store) {
 		if (visitFull) {
 			for (Expression expr : store.getIndexes()) {
 				doSwitch(expr);
 			}
-			
+
 			doSwitch(store.getValue());
 		}
 		return null;
@@ -270,7 +270,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Object caseNodeIf(NodeIf nodeIf) {
 		if (visitFull) {
@@ -293,12 +293,12 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		doSwitch(nodeWhile.getJoinNode());
 		return null;
 	}
-	
+
 	@Override
 	public Object casePattern(Pattern pattern) {
 		return null;
 	}
-	
+
 	@Override
 	public Object caseProcedure(Procedure procedure) {
 		this.procedure = procedure;
@@ -313,7 +313,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		}
 		return doSwitch(theEObject.eClass(), theEObject);
 	}
-	
+
 	/**
 	 * Visits the nodes of the given node list.
 	 * 
@@ -349,7 +349,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 
 		return false;
 	}
-	
+
 	/**
 	 * Visits the given action.
 	 * 
@@ -385,7 +385,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 			visit(action);
 		}
 	}
-	
+
 	@Override
 	public void visit(ExprBinary expr, Object... args) {
 		expr.getE1().accept(this, args);
@@ -395,7 +395,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	@Override
 	public void visit(ExprBool expr, Object... args) {
 	}
-	
+
 	@Override
 	public void visit(ExprFloat expr, Object... args) {
 	}
@@ -403,7 +403,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	@Override
 	public void visit(ExprInt expr, Object... args) {
 	}
-	
+
 	@Override
 	public void visit(ExprList expr, Object... args) {
 	}
@@ -411,7 +411,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	@Override
 	public void visit(ExprString expr, Object... args) {
 	}
-	
+
 	@Override
 	public void visit(ExprUnary expr, Object... args) {
 		expr.getExpr().accept(this, args);
@@ -420,7 +420,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	@Override
 	public void visit(ExprVar expr, Object... args) {
 	}
-	
+
 	@Override
 	public void visit(InstAssign assign) {
 		if (visitFull) {
@@ -436,7 +436,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 			}
 		}
 	}
-	
+
 	@Override
 	public void visit(InstLoad load) {
 		if (visitFull) {
@@ -454,7 +454,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 			}
 		}
 	}
-	
+
 	@Override
 	public void visit(InstReturn returnInstr) {
 		if (visitFull) {
@@ -469,7 +469,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	public void visit(InstSpecific inst) {
 		// default implementation does nothing
 	}
-	
+
 	@Override
 	public void visit(InstStore store) {
 		if (visitFull) {
@@ -498,7 +498,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		// restore old iterator
 		itNode = oldItNode;
 	}
-	
+
 	@Override
 	public void visit(NodeBlock nodeBlock) {
 		itInstruction = nodeBlock.listIterator();
@@ -518,7 +518,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		visit(nodeIf.getElseNodes());
 		visit(nodeIf.getJoinNode());
 	}
-	
+
 	@Override
 	public void visit(NodeWhile nodeWhile) {
 		if (visitFull) {
@@ -537,7 +537,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	 */
 	public void visit(Pattern pattern) {
 	}
-	
+
 	/**
 	 * Visits the given procedure.
 	 * 
