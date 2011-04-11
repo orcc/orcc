@@ -340,7 +340,9 @@ elseif (instr.store)><printStore(store=instr)><
 elseif (instr.ramRead)><printRamRead(ramRead=instr)><
 elseif (instr.ramWrite)><printRamWrite(ramWrite=instr)><
 elseif (instr.ramSetAddress)><printRamSetAddress(ramSetAddress=instr)><
-endif>}; separator="\n">
+endif>
+
+}>
 >>
 
 printNodes(nodes) ::= <<
@@ -359,11 +361,11 @@ printBlockNode(blockNode) ::= <<
 printIfNode(ifNode) ::= <<
 
 if (<ifNode.condition>) then
-  <printNodes(ifNode.thenNodes)><if(ifNode.elseNodes)>
-else
-  <printNodes(ifNode.elseNodes)>
+  <printNodes(ifNode.thenNodes)><if(ifNode.elseNodes)
+>else
+  <printNodes(ifNode.elseNodes)
+><endif>
 end if;
-<endif>
 <printBlockNode(ifNode.joinNode)>
 >>
 
@@ -496,8 +498,7 @@ endif>}; separator="\n">
 begin
   <actor.actions: {action|-- test if "<action.name>" action is schedulable
 <action.inputPattern.ports: { port |<printRead(procedure=action.scheduler, port=port, variable=action.inputPattern.peekedMap.(port))>}; separator="\n">
-<printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n\n">
-
+<printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n">
   --
   -- Test the action's inputs to fire (or not) an action  
   <actor.actions : {action|<action.name>_go \<= '0';}; separator="\n">
@@ -648,12 +649,12 @@ endif>
 
 switchTransition(transition) ::= <<
 when s_<transition.sourceState> =\>
-  if <transition.nextStateInfo: actionTestState(); separator="\n      elsif">
+  if <transition.nextStateInfo: actionTestState(); separator="\n  elsif">
   end if;
 >>
 
 actionTestState(nextState) ::= <<
-    <actionTestScheduler(nextState.action)>      FSM \<= s_<nextState.targetState>;
+  <actionTestScheduler(nextState.action)>    FSM \<= s_<nextState.targetState>;
 >>
 
 
