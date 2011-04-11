@@ -29,5 +29,17 @@ ${orcc_SOURCE_DIR}/src/thread.c
 ${orcc_SOURCE_DIR}/src/genetic.c
 )
 
+add_library(roxml
+${orcc_SOURCE_DIR}/src/libroxml/roxml.c
+${orcc_SOURCE_DIR}/src/libroxml/roxml-internal.c
+${orcc_SOURCE_DIR}/src/libroxml/roxml-parse-engine.c
+${orcc_SOURCE_DIR}/src/libroxml/roxml-internal.h
+${orcc_SOURCE_DIR}/src/libroxml/roxml-parse-engine.h
+${orcc_SOURCE_DIR}/src/libroxml/roxml-defines.h
+${orcc_SOURCE_DIR}/src/libroxml/roxml-parser.c
+${orcc_SOURCE_DIR}/src/libroxml/roxml_win32_native.h
+)
+
 install (TARGETS orcc DESTINATION lib)
+install (TARGETS roxml DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include/orcc PATTERN ".svn" EXCLUDE)
