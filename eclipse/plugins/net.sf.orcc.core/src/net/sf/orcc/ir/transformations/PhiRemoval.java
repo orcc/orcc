@@ -28,13 +28,13 @@
  */
 package net.sf.orcc.ir.transformations;
 
-import java.util.ListIterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstPhi;
-import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
@@ -42,9 +42,8 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.AbstractInstructionVisitor;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -55,48 +54,22 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class PhiRemoval extends AbstractActorVisitor {
 
-	private class PhiRemover extends AbstractInstructionVisitor {
+	private class PhiRemover extends AbstractActorVisitor {
 
 		@Override
 		public void visit(InstPhi phi) {
-			procedure.removeLocal(phi.getTarget().getVariable());
-			itInstruction.remove();
-		}
-
-		@Override
-		public void visit(InstSpecific node) {
-			// nothing to do here
+			instructionsToRemove.add(phi);
 		}
 
 	}
 
-	private void removePhis(NodeBlock join) {
-		ListIterator<Instruction> it = join.listIterator();
-		while (it.hasNext()) {
-			itInstruction = it;
-			it.next().accept(new PhiRemover());
-		}
-	}
+	private List<Instruction> instructionsToRemove;
 
-	private NodeBlock targetBlock;
+	private List<Var> localsToRemove;
 
 	private int phiIndex;
 
-	@Override
-	public void visit(NodeIf node) {
-		NodeBlock join = node.getJoinNode();
-		targetBlock = procedure.getLast(node.getThenNodes());
-		phiIndex = 0;
-		join.accept(this);
-
-		targetBlock = procedure.getLast(node.getElseNodes());
-		phiIndex = 1;
-		join.accept(this);
-		removePhis(join);
-
-		visit(node.getThenNodes());
-		visit(node.getElseNodes());
-	}
+	private NodeBlock targetBlock;
 
 	@Override
 	public void visit(InstPhi phi) {
@@ -111,7 +84,7 @@ public class PhiRemoval extends AbstractActorVisitor {
 		if (source.getIndex() == 0
 				&& source.eContainmentFeature() != IrPackage.eINSTANCE
 						.getProcedure_Parameters()) {
-			procedure.getLocals().remove(source);
+			localsToRemove.add(source);
 			if (target.getType().isBool()) {
 				expr = IrFactory.eINSTANCE.createExprBool(false);
 			} else {
@@ -126,6 +99,22 @@ public class PhiRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
+	public void visit(NodeIf node) {
+		NodeBlock join = node.getJoinNode();
+		targetBlock = procedure.getLast(node.getThenNodes());
+		phiIndex = 0;
+		join.accept(this);
+
+		targetBlock = procedure.getLast(node.getElseNodes());
+		phiIndex = 1;
+		join.accept(this);
+		join.accept(new PhiRemover());
+
+		visit(node.getThenNodes());
+		visit(node.getElseNodes());
+	}
+
+	@Override
 	public void visit(NodeWhile node) {
 		// the node before the while.
 		if (itNode.hasPrevious()) {
@@ -133,11 +122,11 @@ public class PhiRemoval extends AbstractActorVisitor {
 			if (previousNode.isBlockNode()) {
 				targetBlock = (NodeBlock) previousNode;
 			} else {
-				targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
+				targetBlock = IrFactory.eINSTANCE.createNodeBlock();
 				itNode.add(targetBlock);
 			}
 		} else {
-			targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			targetBlock = IrFactory.eINSTANCE.createNodeBlock();
 			itNode.add(targetBlock);
 		}
 
@@ -152,8 +141,19 @@ public class PhiRemoval extends AbstractActorVisitor {
 		targetBlock = procedure.getLast(node.getNodes());
 		phiIndex = 1;
 		join.accept(this);
-		removePhis(join);
+		join.accept(new PhiRemover());
 		visit(node.getNodes());
+	}
+
+	@Override
+	public void visit(Procedure procedure) {
+		localsToRemove = new ArrayList<Var>();
+		instructionsToRemove = new ArrayList<Instruction>();
+
+		super.visit(procedure);
+
+		procedure.removeLocals(localsToRemove);
+		procedure.removeInstructions(instructionsToRemove);
 	}
 
 }

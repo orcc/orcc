@@ -33,7 +33,8 @@ import java.util.List;
 
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
@@ -47,19 +48,26 @@ import net.sf.orcc.ir.util.EcoreHelper;
 public class DeadGlobalElimination extends AbstractActorVisitor {
 
 	/**
-	 * Removes the given definitions of an unused state variable.
+	 * Removes the instructions that define an unused state variable.
 	 * 
 	 * @param definitions
 	 *            a list of definitions
 	 */
-	private void remove(List<Def> definitions) {
+	private void remove(Var variable) {
+		List<Def> definitions = variable.getDefs();
 		while (!definitions.isEmpty()) {
 			Def def = definitions.get(0);
-			InstStore store = EcoreHelper.getContainerOfType(def,
-					InstStore.class);
-			if (store != null) {
-				EcoreHelper.delete(store);
-			}
+			Instruction instruction = EcoreHelper.getContainerOfType(def,
+					Instruction.class);
+			EcoreHelper.delete(instruction);
+		}
+
+		List<Use> uses = variable.getUses();
+		while (!uses.isEmpty()) {
+			Use use = uses.get(0);
+			Instruction instruction = EcoreHelper.getContainerOfType(use,
+					Instruction.class);
+			EcoreHelper.delete(instruction);
 		}
 	}
 
@@ -70,7 +78,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 		while (it.hasNext()) {
 			Var variable = it.next();
 			if (!variable.isUsed()) {
-				remove(variable.getDefs());
+				remove(variable);
 				it.remove();
 			}
 		}

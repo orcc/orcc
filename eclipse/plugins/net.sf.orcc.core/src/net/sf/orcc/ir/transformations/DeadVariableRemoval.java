@@ -28,8 +28,10 @@
  */
 package net.sf.orcc.ir.transformations;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
@@ -39,6 +41,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
@@ -53,24 +56,32 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 
 	protected boolean changed;
 
+	private List<Instruction> instructionsToVisit;
+
+	private List<Var> unusedLocals;
+
 	private void handleInstruction(Var target, Instruction instruction) {
 		// do not remove assign to variables that are used by writes
 		if (isPort(target)) {
 			return;
 		}
 
-		// saves block and index
-		NodeBlock block = instruction.getBlock();
-		int index = itInstruction.previousIndex();
+		List<Use> uses = EcoreHelper.getUses(instruction);
+		for (Use use : uses) {
+			for (Def def : use.getVariable().getDefs()) {
+				Instruction instDef = EcoreHelper.getContainerOfType(def,
+						Instruction.class);
+				if (instDef != null) {
+					instructionsToVisit.add(instDef);
+				}
+			}
+		}
 
-		// remove assign
+		// remove instruction
 		EcoreHelper.delete(instruction);
 
-		// set itInstruction
-		itInstruction = block.getInstructions().listIterator(index);
-
-		// remove result
-		procedure.removeLocal(target);
+		// adds target to list of to-be-removed variables
+		unusedLocals.add(target);
 		changed = true;
 	}
 
@@ -95,7 +106,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	@Override
 	public void visit(InstLoad load) {
 		Var target = load.getTarget().getVariable();
-		if (!target.isUsed()) {
+		if (target != null && !target.isUsed()) {
 			handleInstruction(target, load);
 		}
 	}
@@ -103,7 +114,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	@Override
 	public void visit(InstPhi phi) {
 		Var target = phi.getTarget().getVariable();
-		if (!target.isUsed()) {
+		if (target != null && !target.isUsed()) {
 			handleInstruction(target, phi);
 		}
 	}
@@ -125,23 +136,36 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
+	public void visit(NodeBlock block) {
+		// adds all instructions to the list
+		instructionsToVisit.addAll(block.getInstructions());
+	}
+
+	@Override
 	public void visit(Procedure procedure) {
-		changed = true;
+		unusedLocals = new ArrayList<Var>();
+		instructionsToVisit = new ArrayList<Instruction>();
 
-		while (changed) {
-			changed = false;
-
-			// first shot: removes locals not used by any instruction
-			Iterator<Var> it = procedure.getLocals().iterator();
-			while (it.hasNext()) {
-				Var local = it.next();
-				if (!local.isUsed() && !local.isDefined()) {
-					changed = true;
-					it.remove();
-				}
+		// first shot: removes locals not used by any instruction
+		List<Var> locals = procedure.getLocals();
+		for (Var local : locals) {
+			if (!local.isUsed() && !local.isDefined()) {
+				unusedLocals.add(local);
 			}
+		}
 
-			super.visit(procedure);
+		// step 1: adds all instructions to the list
+		super.visit(procedure);
+
+		// step 2: keep visiting instructions until there are none left
+		while (!instructionsToVisit.isEmpty()) {
+			Instruction instruction = instructionsToVisit.remove(0);
+			instruction.accept(this);
+		}
+
+		// procedure.removeLocals(unusedLocals);
+		for (Var var : unusedLocals) {
+			procedure.getLocals().remove(var);
 		}
 	}
 
