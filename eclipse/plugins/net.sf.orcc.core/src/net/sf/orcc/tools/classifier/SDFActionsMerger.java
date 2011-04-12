@@ -271,14 +271,14 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		List<Var> parameters = procedure.getParameters();
 
 		// Add inputs to procedure parameters
-		for (Entry<Port, Var> entry : inputPattern.getVariableMap().entrySet()) {
+		for (Entry<Port, Var> entry : inputPattern.getPortToVarMap().entrySet()) {
 			Var var = entry.getValue();
 			parameters.add(var);
 			exprs.add(IrFactory.eINSTANCE.createExprVar(var));
 		}
 
 		// Add outputs to procedure parameters
-		for (Entry<Port, Var> entry : outputPattern.getVariableMap().entrySet()) {
+		for (Entry<Port, Var> entry : outputPattern.getPortToVarMap().entrySet()) {
 			Var var = entry.getValue();
 			parameters.add(var);
 			exprs.add(IrFactory.eINSTANCE.createExprVar(var));

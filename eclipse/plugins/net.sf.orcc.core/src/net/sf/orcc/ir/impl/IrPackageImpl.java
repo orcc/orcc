@@ -1566,7 +1566,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getPattern_InverseVariableMap() {
+	public EReference getPattern_Ports() {
 		return (EReference)patternEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -1584,7 +1584,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getPattern_Ports() {
+	public EReference getPattern_PortToVarMap() {
 		return (EReference)patternEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -1593,7 +1593,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getPattern_VariableMap() {
+	public EReference getPattern_VarToPortMap() {
 		return (EReference)patternEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -1982,10 +1982,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(actorEClass, ACTOR__MO_C);
 
 		patternEClass = createEClass(PATTERN);
-		createEReference(patternEClass, PATTERN__INVERSE_VARIABLE_MAP);
-		createEReference(patternEClass, PATTERN__NUM_TOKENS_MAP);
 		createEReference(patternEClass, PATTERN__PORTS);
-		createEReference(patternEClass, PATTERN__VARIABLE_MAP);
+		createEReference(patternEClass, PATTERN__NUM_TOKENS_MAP);
+		createEReference(patternEClass, PATTERN__PORT_TO_VAR_MAP);
+		createEReference(patternEClass, PATTERN__VAR_TO_PORT_MAP);
 
 		portEClass = createEClass(PORT);
 		createEReference(portEClass, PORT__LOCATION);
@@ -2244,10 +2244,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getActor_MoC(), theMocPackage.getMoC(), null, "moC", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(patternEClass, Pattern.class, "Pattern", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getPattern_InverseVariableMap(), this.getVarToPortMapEntry(), null, "inverseVariableMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getPattern_NumTokensMap(), this.getPortToEIntegerObjectMapEntry(), null, "numTokensMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getPattern_Ports(), this.getPort(), null, "ports", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getPattern_VariableMap(), this.getPortToVarMapEntry(), null, "variableMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPattern_NumTokensMap(), this.getPortToEIntegerObjectMapEntry(), null, "numTokensMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPattern_PortToVarMap(), this.getPortToVarMapEntry(), null, "portToVarMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPattern_VarToPortMap(), this.getVarToPortMapEntry(), null, "varToPortMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getPort_Location(), this.getLocation(), null, "location", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

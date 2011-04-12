@@ -31,10 +31,10 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.PatternImpl#getInverseVariableMap <em>Inverse Variable Map</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.PatternImpl#getNumTokensMap <em>Num Tokens Map</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.PatternImpl#getPorts <em>Ports</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.PatternImpl#getVariableMap <em>Variable Map</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.PatternImpl#getNumTokensMap <em>Num Tokens Map</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.PatternImpl#getPortToVarMap <em>Port To Var Map</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.PatternImpl#getVarToPortMap <em>Var To Port Map</em>}</li>
  * </ul>
  * </p>
  *
@@ -46,14 +46,14 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 */
 	private static final long serialVersionUID = 1L;
 	/**
-	 * The cached value of the '{@link #getInverseVariableMap() <em>Inverse Variable Map</em>}' map.
+	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getInverseVariableMap()
+	 * @see #getPorts()
 	 * @generated
 	 * @ordered
 	 */
-	protected EMap<Var, Port> inverseVariableMap;
+	protected EList<Port> ports;
 	/**
 	 * The cached value of the '{@link #getNumTokensMap() <em>Num Tokens Map</em>}' map.
 	 * <!-- begin-user-doc -->
@@ -64,24 +64,23 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 */
 	protected EMap<Port, Integer> numTokensMap;
 	/**
-	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' reference list.
+	 * The cached value of the '{@link #getPortToVarMap() <em>Port To Var Map</em>}' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getPorts()
+	 * @see #getPortToVarMap()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Port> ports;
+	protected EMap<Port, Var> portToVarMap;
 	/**
-	 * The cached value of the '{@link #getVariableMap() <em>Variable Map</em>}' map.
+	 * The cached value of the '{@link #getVarToPortMap() <em>Var To Port Map</em>}' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getVariableMap()
+	 * @see #getVarToPortMap()
 	 * @generated
 	 * @ordered
 	 */
-	protected EMap<Port, Var> variableMap;
-
+	protected EMap<Var, Port> varToPortMap;
 	/**
 	 * @generated
 	 */
@@ -106,8 +105,8 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	public void clear() {
 		getPorts().clear();
 		getNumTokensMap().clear();
-		getVariableMap().clear();
-		getInverseVariableMap().clear();
+		getVarToPortMap().clear();
+		getPortToVarMap().clear();
 	}
 
 	@Override
@@ -117,7 +116,7 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public boolean contains(Var var) {
-		return getInverseVariableMap().containsKey(var);
+		return getVarToPortMap().containsKey(var);
 	}
 
 	/**
@@ -128,17 +127,17 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.PATTERN__INVERSE_VARIABLE_MAP:
-				if (coreType) return getInverseVariableMap();
-				else return getInverseVariableMap().map();
+			case IrPackage.PATTERN__PORTS:
+				return getPorts();
 			case IrPackage.PATTERN__NUM_TOKENS_MAP:
 				if (coreType) return getNumTokensMap();
 				else return getNumTokensMap().map();
-			case IrPackage.PATTERN__PORTS:
-				return getPorts();
-			case IrPackage.PATTERN__VARIABLE_MAP:
-				if (coreType) return getVariableMap();
-				else return getVariableMap().map();
+			case IrPackage.PATTERN__PORT_TO_VAR_MAP:
+				if (coreType) return getPortToVarMap();
+				else return getPortToVarMap().map();
+			case IrPackage.PATTERN__VAR_TO_PORT_MAP:
+				if (coreType) return getVarToPortMap();
+				else return getVarToPortMap().map();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -151,12 +150,12 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.PATTERN__INVERSE_VARIABLE_MAP:
-				return ((InternalEList<?>)getInverseVariableMap()).basicRemove(otherEnd, msgs);
 			case IrPackage.PATTERN__NUM_TOKENS_MAP:
 				return ((InternalEList<?>)getNumTokensMap()).basicRemove(otherEnd, msgs);
-			case IrPackage.PATTERN__VARIABLE_MAP:
-				return ((InternalEList<?>)getVariableMap()).basicRemove(otherEnd, msgs);
+			case IrPackage.PATTERN__PORT_TO_VAR_MAP:
+				return ((InternalEList<?>)getPortToVarMap()).basicRemove(otherEnd, msgs);
+			case IrPackage.PATTERN__VAR_TO_PORT_MAP:
+				return ((InternalEList<?>)getVarToPortMap()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -169,25 +168,16 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.PATTERN__INVERSE_VARIABLE_MAP:
-				return inverseVariableMap != null && !inverseVariableMap.isEmpty();
-			case IrPackage.PATTERN__NUM_TOKENS_MAP:
-				return numTokensMap != null && !numTokensMap.isEmpty();
 			case IrPackage.PATTERN__PORTS:
 				return ports != null && !ports.isEmpty();
-			case IrPackage.PATTERN__VARIABLE_MAP:
-				return variableMap != null && !variableMap.isEmpty();
+			case IrPackage.PATTERN__NUM_TOKENS_MAP:
+				return numTokensMap != null && !numTokensMap.isEmpty();
+			case IrPackage.PATTERN__PORT_TO_VAR_MAP:
+				return portToVarMap != null && !portToVarMap.isEmpty();
+			case IrPackage.PATTERN__VAR_TO_PORT_MAP:
+				return varToPortMap != null && !varToPortMap.isEmpty();
 		}
 		return super.eIsSet(featureID);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof PatternImpl) {
-			return ((PatternImpl) obj).getNumTokensMap().equals(numTokensMap);
-		} else {
-			return false;
-		}
 	}
 
 	/**
@@ -199,18 +189,18 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.PATTERN__INVERSE_VARIABLE_MAP:
-				((EStructuralFeature.Setting)getInverseVariableMap()).set(newValue);
-				return;
-			case IrPackage.PATTERN__NUM_TOKENS_MAP:
-				((EStructuralFeature.Setting)getNumTokensMap()).set(newValue);
-				return;
 			case IrPackage.PATTERN__PORTS:
 				getPorts().clear();
 				getPorts().addAll((Collection<? extends Port>)newValue);
 				return;
-			case IrPackage.PATTERN__VARIABLE_MAP:
-				((EStructuralFeature.Setting)getVariableMap()).set(newValue);
+			case IrPackage.PATTERN__NUM_TOKENS_MAP:
+				((EStructuralFeature.Setting)getNumTokensMap()).set(newValue);
+				return;
+			case IrPackage.PATTERN__PORT_TO_VAR_MAP:
+				((EStructuralFeature.Setting)getPortToVarMap()).set(newValue);
+				return;
+			case IrPackage.PATTERN__VAR_TO_PORT_MAP:
+				((EStructuralFeature.Setting)getVarToPortMap()).set(newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -233,32 +223,20 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.PATTERN__INVERSE_VARIABLE_MAP:
-				getInverseVariableMap().clear();
+			case IrPackage.PATTERN__PORTS:
+				getPorts().clear();
 				return;
 			case IrPackage.PATTERN__NUM_TOKENS_MAP:
 				getNumTokensMap().clear();
 				return;
-			case IrPackage.PATTERN__PORTS:
-				getPorts().clear();
+			case IrPackage.PATTERN__PORT_TO_VAR_MAP:
+				getPortToVarMap().clear();
 				return;
-			case IrPackage.PATTERN__VARIABLE_MAP:
-				getVariableMap().clear();
+			case IrPackage.PATTERN__VAR_TO_PORT_MAP:
+				getVarToPortMap().clear();
 				return;
 		}
 		super.eUnset(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EMap<Var, Port> getInverseVariableMap() {
-		if (inverseVariableMap == null) {
-			inverseVariableMap = new EcoreEMap<Var,Port>(IrPackage.Literals.VAR_TO_PORT_MAP_ENTRY, VarToPortMapEntryImpl.class, this, IrPackage.PATTERN__INVERSE_VARIABLE_MAP);
-		}
-		return inverseVariableMap;
 	}
 
 	@Override
@@ -290,9 +268,21 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 		return ports;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EMap<Port, Var> getPortToVarMap() {
+		if (portToVarMap == null) {
+			portToVarMap = new EcoreEMap<Port,Var>(IrPackage.Literals.PORT_TO_VAR_MAP_ENTRY, PortToVarMapEntryImpl.class, this, IrPackage.PATTERN__PORT_TO_VAR_MAP);
+		}
+		return portToVarMap;
+	}
+
 	@Override
 	public Var getVariable(Port port) {
-		return getVariableMap().get(port);
+		return getPortToVarMap().get(port);
 	}
 
 	/**
@@ -300,11 +290,11 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EMap<Port, Var> getVariableMap() {
-		if (variableMap == null) {
-			variableMap = new EcoreEMap<Port,Var>(IrPackage.Literals.PORT_TO_VAR_MAP_ENTRY, PortToVarMapEntryImpl.class, this, IrPackage.PATTERN__VARIABLE_MAP);
+	public EMap<Var, Port> getVarToPortMap() {
+		if (varToPortMap == null) {
+			varToPortMap = new EcoreEMap<Var,Port>(IrPackage.Literals.VAR_TO_PORT_MAP_ENTRY, VarToPortMapEntryImpl.class, this, IrPackage.PATTERN__VAR_TO_PORT_MAP);
 		}
-		return variableMap;
+		return varToPortMap;
 	}
 
 	@Override
@@ -338,10 +328,10 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	public void remove(Port port) {
 		getPorts().remove(port);
 		getNumTokensMap().remove(port);
-		Var var = getVariableMap().removeKey(port);
+		Var var = getPortToVarMap().removeKey(port);
 
-		// Remove peek and variable entry from inverseVariableMap
-		getInverseVariableMap().remove(var);
+		// Remove variable entry from portOfVar
+		getVarToPortMap().remove(var);
 	}
 
 	@Override
@@ -353,8 +343,8 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	@Override
 	public void setVariable(Port port, Var var) {
 		checkPortPresence(port);
-		getVariableMap().put(port, var);
-		getInverseVariableMap().put(var, port);
+		getPortToVarMap().put(port, var);
+		getVarToPortMap().put(var, port);
 	}
 
 	@Override

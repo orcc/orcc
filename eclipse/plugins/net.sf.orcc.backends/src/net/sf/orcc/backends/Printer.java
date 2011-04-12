@@ -44,10 +44,12 @@ import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.emf.common.util.EMap;
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.ModelAdaptor;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 /**
  * This class defines a printer.
@@ -95,6 +97,16 @@ public class Printer {
 				Printer.class.getClassLoader());
 		group.registerRenderer(Expression.class, new ExpressionRenderer());
 		group.registerRenderer(Type.class, new TypeRenderer());
+
+		group.registerModelAdaptor(EMap.class, new ModelAdaptor() {
+
+			@Override
+			public Object getProperty(ST st, Object o, Object property,
+					String propertyName) throws STNoSuchPropertyException {
+				return ((EMap<?, ?>) o).get(property);
+			}
+		});
+
 		options = new HashMap<String, Object>();
 		customAttributes = new HashMap<String, Object>();
 	}
@@ -125,7 +137,7 @@ public class Printer {
 	protected void printTemplate(ST template, String file) {
 		try {
 			template.add("options", options);
-			for(String attribute : customAttributes.keySet()){
+			for (String attribute : customAttributes.keySet()) {
 				template.add(attribute, customAttributes.get(attribute));
 			}
 

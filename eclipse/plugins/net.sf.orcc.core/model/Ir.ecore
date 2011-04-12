@@ -218,14 +218,14 @@
     </eGenericSuperTypes>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Pattern">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="inverseVariableMap" upperBound="-1"
-        eType="#//VarToPortMapEntry" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="numTokensMap" upperBound="-1"
-        eType="#//PortToEIntegerObjectMapEntry" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="variableMap" upperBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="numTokensMap" upperBound="-1"
+        eType="#//PortToEIntegerObjectMapEntry" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="portToVarMap" upperBound="-1"
         eType="#//PortToVarMapEntry" containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="varToPortMap" upperBound="-1"
+        eType="#//VarToPortMapEntry" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Port">
     <eStructuralFeatures xsi:type="ecore:EReference" name="location" eType="#//Location"

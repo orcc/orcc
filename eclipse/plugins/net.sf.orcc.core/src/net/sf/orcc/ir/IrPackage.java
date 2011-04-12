@@ -1635,13 +1635,13 @@ public interface IrPackage extends EPackage {
 	int PATTERN = 36;
 
 	/**
-	 * The feature id for the '<em><b>Inverse Variable Map</b></em>' map.
+	 * The feature id for the '<em><b>Ports</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN__INVERSE_VARIABLE_MAP = 0;
+	int PATTERN__PORTS = 0;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Map</b></em>' map.
@@ -1653,22 +1653,22 @@ public interface IrPackage extends EPackage {
 	int PATTERN__NUM_TOKENS_MAP = 1;
 
 	/**
-	 * The feature id for the '<em><b>Ports</b></em>' reference list.
+	 * The feature id for the '<em><b>Port To Var Map</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN__PORTS = 2;
+	int PATTERN__PORT_TO_VAR_MAP = 2;
 
 	/**
-	 * The feature id for the '<em><b>Variable Map</b></em>' map.
+	 * The feature id for the '<em><b>Var To Port Map</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN__VARIABLE_MAP = 3;
+	int PATTERN__VAR_TO_PORT_MAP = 3;
 
 	/**
 	 * The number of structural features of the '<em>Pattern</em>' class.
@@ -3270,15 +3270,15 @@ public interface IrPackage extends EPackage {
 	EClass getPattern();
 
 	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getInverseVariableMap <em>Inverse Variable Map</em>}'.
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Pattern#getPorts <em>Ports</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Inverse Variable Map</em>'.
-	 * @see net.sf.orcc.ir.Pattern#getInverseVariableMap()
+	 * @return the meta object for the reference list '<em>Ports</em>'.
+	 * @see net.sf.orcc.ir.Pattern#getPorts()
 	 * @see #getPattern()
 	 * @generated
 	 */
-	EReference getPattern_InverseVariableMap();
+	EReference getPattern_Ports();
 
 	/**
 	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getNumTokensMap <em>Num Tokens Map</em>}'.
@@ -3292,26 +3292,26 @@ public interface IrPackage extends EPackage {
 	EReference getPattern_NumTokensMap();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Pattern#getPorts <em>Ports</em>}'.
+	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getPortToVarMap <em>Port To Var Map</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Ports</em>'.
-	 * @see net.sf.orcc.ir.Pattern#getPorts()
+	 * @return the meta object for the map '<em>Port To Var Map</em>'.
+	 * @see net.sf.orcc.ir.Pattern#getPortToVarMap()
 	 * @see #getPattern()
 	 * @generated
 	 */
-	EReference getPattern_Ports();
+	EReference getPattern_PortToVarMap();
 
 	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getVariableMap <em>Variable Map</em>}'.
+	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getVarToPortMap <em>Var To Port Map</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Variable Map</em>'.
-	 * @see net.sf.orcc.ir.Pattern#getVariableMap()
+	 * @return the meta object for the map '<em>Var To Port Map</em>'.
+	 * @see net.sf.orcc.ir.Pattern#getVarToPortMap()
 	 * @see #getPattern()
 	 * @generated
 	 */
-	EReference getPattern_VariableMap();
+	EReference getPattern_VarToPortMap();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Port <em>Port</em>}'.
@@ -4553,12 +4553,12 @@ public interface IrPackage extends EPackage {
 		EClass PATTERN = eINSTANCE.getPattern();
 
 		/**
-		 * The meta object literal for the '<em><b>Inverse Variable Map</b></em>' map feature.
+		 * The meta object literal for the '<em><b>Ports</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PATTERN__INVERSE_VARIABLE_MAP = eINSTANCE.getPattern_InverseVariableMap();
+		EReference PATTERN__PORTS = eINSTANCE.getPattern_Ports();
 
 		/**
 		 * The meta object literal for the '<em><b>Num Tokens Map</b></em>' map feature.
@@ -4569,20 +4569,20 @@ public interface IrPackage extends EPackage {
 		EReference PATTERN__NUM_TOKENS_MAP = eINSTANCE.getPattern_NumTokensMap();
 
 		/**
-		 * The meta object literal for the '<em><b>Ports</b></em>' reference list feature.
+		 * The meta object literal for the '<em><b>Port To Var Map</b></em>' map feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PATTERN__PORTS = eINSTANCE.getPattern_Ports();
+		EReference PATTERN__PORT_TO_VAR_MAP = eINSTANCE.getPattern_PortToVarMap();
 
 		/**
-		 * The meta object literal for the '<em><b>Variable Map</b></em>' map feature.
+		 * The meta object literal for the '<em><b>Var To Port Map</b></em>' map feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PATTERN__VARIABLE_MAP = eINSTANCE.getPattern_VariableMap();
+		EReference PATTERN__VAR_TO_PORT_MAP = eINSTANCE.getPattern_VarToPortMap();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PortImpl <em>Port</em>}' class.

@@ -65,14 +65,6 @@ public interface Pattern extends EObject {
 	boolean contains(Var var);
 
 	/**
-	 * Returns the inverse variable map.
-	 * 
-	 * @return the inverse variable map
-	 * @model keyType="Var" valueType="Port"
-	 */
-	EMap<Var, Port> getInverseVariableMap();
-
-	/**
 	 * Returns the number of tokens produced (or consumed) by the given port.
 	 * 
 	 * @return the number of tokens produced (or consumed) by the given port
@@ -96,6 +88,14 @@ public interface Pattern extends EObject {
 	EList<Port> getPorts();
 
 	/**
+	 * Returns a variable to port map.
+	 * 
+	 * @return a variable to port map
+	 * @model keyType="Port" valueType="Var"
+	 */
+	EMap<Port, Var> getPortToVarMap();
+
+	/**
 	 * Returns the variable that contains tokens produced (or consumed) by the
 	 * given port.
 	 * 
@@ -105,12 +105,12 @@ public interface Pattern extends EObject {
 	Var getVariable(Port port);
 
 	/**
-	 * Returns the variable map.
+	 * Returns a port to variable map.
 	 * 
-	 * @return the variable map
-	 * @model containment="true" keyType="Port" valueType="Var"
+	 * @return a port to variable map
+	 * @model keyType="Var" valueType="Port"
 	 */
-	EMap<Port, Var> getVariableMap();
+	EMap<Var, Port> getVarToPortMap();
 
 	/**
 	 * Returns <code>true</code> if this pattern is empty.

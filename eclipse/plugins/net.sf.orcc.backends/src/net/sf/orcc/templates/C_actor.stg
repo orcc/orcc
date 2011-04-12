@@ -164,18 +164,18 @@ endif>
 >>
 
 getPort(variable) ::= <<
-<if (action.inputPattern.inverseVariableMap.(variable))
-><action.inputPattern.inverseVariableMap.(variable).name><
-elseif (action.inputPattern.inverseVariableMap.(variable))
-><action.outputPattern.inverseVariableMap.(variable).name><
+<if (action.inputPattern.varToPortMap.(variable))
+><action.inputPattern.varToPortMap.(variable).name><
+elseif (action.outputPattern.varToPortMap.(variable))
+><action.outputPattern.varToPortMap.(variable).name><
 else
-><action.peekPattern.inverseVariableMap.(variable).name><
+><action.peekPattern.varToPortMap.(variable).name><
 endif>
 >>
 
 printLoad(load) ::= <<
 
-<if (action.inputPattern.inverseVariableMap.(load.source.variable) || action.outputPattern.inverseVariableMap.(load.source.variable) || action.peekPattern.inverseVariableMap.(load.source.variable))
+<if (action.inputPattern.varToPortMap.(load.source.variable) || action.outputPattern.varToPortMap.(load.source.variable) || action.peekPattern.varToPortMap.(load.source.variable))
 ><load.target.variable.indexedName> = tokens_<getPort(load.source.variable)>[(index_<getPort(load.source.variable)> + <first(load.indexes)>) % SIZE_<getPort(load.source.variable)>];<
 else
 ><load.target.variable.indexedName> = <load.source.variable.name><load.indexes : {index | [<index>]}>;<
@@ -204,7 +204,7 @@ endif>
 
 printStore(store) ::= <<
 
-<if (action.inputPattern.inverseVariableMap.(store.target.variable) || action.outputPattern.inverseVariableMap.(store.target.variable) || action.peekPattern.inverseVariableMap.(store.target.variable))
+<if (action.inputPattern.varToPortMap.(store.target.variable) || action.outputPattern.varToPortMap.(store.target.variable) || action.peekPattern.varToPortMap.(store.target.variable))
 >tokens_<getPort(store.target.variable)>[(index_<getPort(store.target.variable)> + <first(store.indexes)>) % SIZE_<getPort(store.target.variable)>] = <store.value>;<
 else
 ><store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;<
