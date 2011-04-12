@@ -97,27 +97,27 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 *            a port
 	 */
 	private void checkPortPresence(Port port) {
-		if (!ports.contains(port)) {
-			ports.add(port);
+		if (!getPorts().contains(port)) {
+			getPorts().add(port);
 		}
 	}
 
 	@Override
 	public void clear() {
-		ports.clear();
-		numTokensMap.clear();
-		variableMap.clear();
-		inverseVariableMap.clear();
+		getPorts().clear();
+		getNumTokensMap().clear();
+		getVariableMap().clear();
+		getInverseVariableMap().clear();
 	}
 
 	@Override
 	public boolean contains(Port port) {
-		return ports.contains(port);
+		return getPorts().contains(port);
 	}
 
 	@Override
 	public boolean contains(Var var) {
-		return inverseVariableMap.containsKey(var);
+		return getInverseVariableMap().containsKey(var);
 	}
 
 	/**
@@ -263,7 +263,7 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public Integer getNumTokens(Port port) {
-		return numTokensMap.get(port);
+		return getNumTokensMap().get(port);
 	}
 
 	/**
@@ -292,7 +292,7 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public Var getVariable(Port port) {
-		return variableMap.get(port);
+		return getVariableMap().get(port);
 	}
 
 	/**
@@ -309,7 +309,7 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public boolean isEmpty() {
-		return ports.isEmpty();
+		return getPorts().isEmpty();
 	}
 
 	@Override
@@ -336,30 +336,30 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public void remove(Port port) {
-		ports.remove(port);
-		numTokensMap.remove(port);
-		Var var = variableMap.removeKey(port);
+		getPorts().remove(port);
+		getNumTokensMap().remove(port);
+		Var var = getVariableMap().removeKey(port);
 
 		// Remove peek and variable entry from inverseVariableMap
-		inverseVariableMap.remove(var);
+		getInverseVariableMap().remove(var);
 	}
 
 	@Override
 	public void setNumTokens(Port port, int numTokens) {
 		checkPortPresence(port);
-		numTokensMap.put(port, numTokens);
+		getNumTokensMap().put(port, numTokens);
 	}
 
 	@Override
 	public void setVariable(Port port, Var var) {
 		checkPortPresence(port);
-		variableMap.put(port, var);
-		inverseVariableMap.put(var, port);
+		getVariableMap().put(port, var);
+		getInverseVariableMap().put(var, port);
 	}
 
 	@Override
 	public String toString() {
-		return numTokensMap.toString();
+		return getNumTokensMap().toString();
 	}
 
 	@Override

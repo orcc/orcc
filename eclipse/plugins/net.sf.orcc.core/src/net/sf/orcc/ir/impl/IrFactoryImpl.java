@@ -425,6 +425,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public FSM createFSM() {
+		FSMImpl fsm = new FSMImpl();
+		return fsm;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -728,6 +738,26 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
+		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
+		return portToEIntegerObjectMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Port, Var> createPortToVarMapEntry() {
+		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
+		return portToVarMapEntry;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -756,46 +786,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Tag createTag() {
 		TagImpl tag = new TagImpl();
 		return tag;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public FSM createFSM() {
-		FSMImpl fsm = new FSMImpl();
-		return fsm;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Var, Port> createVarToPortMapEntry() {
-		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
-		return varToPortMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Port, Var> createPortToVarMapEntry() {
-		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
-		return portToVarMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
-		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
-		return portToEIntegerObjectMapEntry;
 	}
 
 	@Override
@@ -979,6 +969,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Var createVar(Type type, String name, boolean assignable, int index) {
 		return createVar(IrFactory.eINSTANCE.createLocation(), type, name,
 				assignable, index);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Var, Port> createVarToPortMapEntry() {
+		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
+		return varToPortMapEntry;
 	}
 
 	/**

@@ -225,12 +225,12 @@ public class IRParser {
 		Pattern ip = parseInputPattern(array.get(1).getAsJsonArray());
 		Pattern op = parseOutputPattern(array.get(2).getAsJsonArray());
 
-		Procedure body = parseProc(array.get(4).getAsJsonArray());
+		Procedure body = parseProc(array.get(5).getAsJsonArray());
 
 		// add peeked vars
 		vars = new Scope<String, Var>(vars, true);
 		Pattern pp = parseInputPattern(array.get(3).getAsJsonArray());
-		Procedure scheduler = parseProc(array.get(3).getAsJsonArray());
+		Procedure scheduler = parseProc(array.get(4).getAsJsonArray());
 
 		vars = vars.getParent().getParent();
 

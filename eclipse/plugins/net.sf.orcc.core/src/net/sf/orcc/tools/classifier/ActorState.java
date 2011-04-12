@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -111,7 +113,7 @@ public class ActorState {
 				// oops not static!
 				throw new OrccRuntimeException("null state variable");
 			} else {
-				if (!value.equals(entry.getValue())) {
+				if (!EcoreUtil.equals(value, entry.getValue())) {
 					return false;
 				}
 			}

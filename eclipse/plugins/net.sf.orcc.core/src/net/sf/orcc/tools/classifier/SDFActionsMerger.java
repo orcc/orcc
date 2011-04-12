@@ -52,6 +52,7 @@ import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.util.UniqueEdge;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
 /**
@@ -307,8 +308,9 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 
 			while (it.hasNext()) {
 				Action currentAction = it.next();
-				if (!input.equals(currentAction.getInputPattern())
-						|| !output.equals(currentAction.getOutputPattern())) {
+				if (!EcoreUtil.equals(input, currentAction.getInputPattern())
+						|| !EcoreUtil.equals(output,
+								currentAction.getOutputPattern())) {
 					// one pattern is not equal to another
 					return new ArrayList<Action>(actions);
 				}

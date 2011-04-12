@@ -342,7 +342,8 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	final public boolean isPort(Var variable) {
 		if (action != null) {
 			return action.getInputPattern().contains(variable)
-					|| action.getOutputPattern().contains(variable);
+					|| action.getOutputPattern().contains(variable)
+					|| action.getPeekPattern().contains(variable);
 		}
 
 		return false;

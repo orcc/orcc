@@ -199,6 +199,15 @@ public interface IrFactory extends EFactory {
 	ExprVar createExprVar(Var variable);
 
 	/**
+	 * Returns a new object of class '<em>FSM</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>FSM</em>'.
+	 * @generated
+	 */
+	FSM createFSM();
+
+	/**
 	 * Returns a new object of class '<em>Inst Assign</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -535,15 +544,6 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	Tag createTag();
-
-	/**
-	 * Returns a new object of class '<em>FSM</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>FSM</em>'.
-	 * @generated
-	 */
-	FSM createFSM();
 
 	Tag createTag(List<String> identifiers);
 
