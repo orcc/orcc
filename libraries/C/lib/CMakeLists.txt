@@ -12,34 +12,35 @@ find_package(SDL_image REQUIRED)
 include_directories(${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR})
 
 # Orcc library
-include_directories(${orcc_SOURCE_DIR}/include)
+include_directories(${orcc_SOURCE_DIR}/orcc/include)
 
 add_library (orcc
-${orcc_SOURCE_DIR}/src/compareyuv.c
-${orcc_SOURCE_DIR}/src/display.c
-${orcc_SOURCE_DIR}/src/getopt.c
-${orcc_SOURCE_DIR}/src/img_display.c
-${orcc_SOURCE_DIR}/src/img_read.c
-${orcc_SOURCE_DIR}/src/scheduler.c
-${orcc_SOURCE_DIR}/src/source.c
-${orcc_SOURCE_DIR}/src/writer.c
-${orcc_SOURCE_DIR}/src/source_no_loop.c
-${orcc_SOURCE_DIR}/src/orcc_util.c
-${orcc_SOURCE_DIR}/src/thread.c
-${orcc_SOURCE_DIR}/src/genetic.c
+${orcc_SOURCE_DIR}/orcc/src/compareyuv.c
+${orcc_SOURCE_DIR}/orcc/src/display.c
+${orcc_SOURCE_DIR}/orcc/src/getopt.c
+${orcc_SOURCE_DIR}/orcc/src/img_display.c
+${orcc_SOURCE_DIR}/orcc/src/img_read.c
+${orcc_SOURCE_DIR}/orcc/src/scheduler.c
+${orcc_SOURCE_DIR}/orcc/src/source.c
+${orcc_SOURCE_DIR}/orcc/src/writer.c
+${orcc_SOURCE_DIR}/orcc/src/source_no_loop.c
+${orcc_SOURCE_DIR}/orcc/src/orcc_util.c
+${orcc_SOURCE_DIR}/orcc/src/thread.c
+${orcc_SOURCE_DIR}/orcc/src/genetic.c
 )
+
+# Roxml library
+include_directories(${orcc_SOURCE_DIR}/roxml/include)
 
 add_library(roxml
-${orcc_SOURCE_DIR}/src/libroxml/roxml.c
-${orcc_SOURCE_DIR}/src/libroxml/roxml-internal.c
-${orcc_SOURCE_DIR}/src/libroxml/roxml-parse-engine.c
-${orcc_SOURCE_DIR}/src/libroxml/roxml-internal.h
-${orcc_SOURCE_DIR}/src/libroxml/roxml-parse-engine.h
-${orcc_SOURCE_DIR}/src/libroxml/roxml-defines.h
-${orcc_SOURCE_DIR}/src/libroxml/roxml-parser.c
-${orcc_SOURCE_DIR}/src/libroxml/roxml_win32_native.h
+${orcc_SOURCE_DIR}/roxml/src/roxml.c
+${orcc_SOURCE_DIR}/roxml/src/roxml-internal.c
+${orcc_SOURCE_DIR}/roxml/src/roxml-parse-engine.c
+${orcc_SOURCE_DIR}/roxml/src/roxml-parser.c
 )
 
+# Installation
 install (TARGETS orcc DESTINATION lib)
 install (TARGETS roxml DESTINATION lib)
-install(DIRECTORY include/ DESTINATION include/orcc PATTERN ".svn" EXCLUDE)
+install(DIRECTORY orcc/include/ DESTINATION include/orcc PATTERN ".svn" EXCLUDE)
+install (FILES roxml/include/roxml.h DESTINATION include/roxml)
