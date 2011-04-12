@@ -28,92 +28,45 @@
  */
 package net.sf.orcc.moc;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class defines the CSDF MoC. A CSDF actor has a sequence of fixed
  * production/consumption rates.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model extends="net.sf.orcc.moc.MoC"
  */
-public class CSDFMoC extends AbstractMoC {
-
-	/**
-	 * a list of actions that can be scheduled statically.
-	 */
-	private List<Action> actions;
-
-	private Pattern inputPattern;
-
-	protected int numberOfPhases;
-
-	private Pattern outputPattern;
-
-	/**
-	 * Creates a new CSDF MoC.
-	 */
-	public CSDFMoC() {
-		actions = new ArrayList<Action>();
-		inputPattern = IrFactory.eINSTANCE.createPattern();
-		outputPattern = IrFactory.eINSTANCE.createPattern();
-	}
-
-	@Override
-	public Object accept(MoCInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	/**
-	 * Adds the given action to the list of actions that can be scheduled
-	 * statically.
-	 * 
-	 * @param action
-	 *            an action
-	 */
-	public void addAction(Action action) {
-		actions.add(action);
-	}
-
-	/**
-	 * Adds the given actions to the list of actions that can be scheduled
-	 * statically.
-	 * 
-	 * @param action
-	 *            an action
-	 */
-	public void addActions(List<Action> actions) {
-		this.actions.addAll(actions);
-	}
+public interface CSDFMoC extends MoC {
 
 	/**
 	 * Returns the list of actions that can be scheduled statically.
 	 * 
 	 * @return the list of actions that can be scheduled statically
+	 * @model
 	 */
-	public List<Action> getActions() {
-		return actions;
-	}
+	EList<Action> getActions();
 
 	/**
 	 * Returns the input pattern of this CSDF MoC.
 	 * 
 	 * @return the input pattern of this CSDF MoC
+	 * @model
 	 */
-	public Pattern getInputPattern() {
-		return inputPattern;
-	}
+	Pattern getInputPattern();
 
-	public int getNumberOfPhases() {
-		return numberOfPhases;
-	}
+	/**
+	 * Returns the number of phases of this MoC.
+	 * 
+	 * @return the number of phases of this MoC
+	 * @model
+	 */
+	int getNumberOfPhases();
 
 	/**
 	 * Returns the number of tokens consumed by this port.
@@ -122,13 +75,7 @@ public class CSDFMoC extends AbstractMoC {
 	 *            an input port
 	 * @return the number of tokens consumed by this port.
 	 */
-	public int getNumTokensConsumed(Port port) {
-		Integer numTokens = inputPattern.getNumTokens(port);
-		if (numTokens == null) {
-			return 0;
-		}
-		return numTokens;
-	}
+	int getNumTokensConsumed(Port port);
 
 	/**
 	 * Returns the number of tokens written to this port.
@@ -137,27 +84,15 @@ public class CSDFMoC extends AbstractMoC {
 	 *            an output port
 	 * @return the number of tokens written to this port.
 	 */
-	public int getNumTokensProduced(Port port) {
-		Integer numTokens = outputPattern.getNumTokens(port);
-		if (numTokens == null) {
-			return 0;
-		}
-		return numTokens;
-	}
+	int getNumTokensProduced(Port port);
 
 	/**
 	 * Returns the output pattern of this CSDF MoC.
 	 * 
 	 * @return the output pattern of this CSDF MoC
+	 * @model
 	 */
-	public Pattern getOutputPattern() {
-		return outputPattern;
-	}
-
-	@Override
-	public boolean isCSDF() {
-		return true;
-	}
+	Pattern getOutputPattern();
 
 	/**
 	 * Set the input pattern of this CSDF MoC.
@@ -165,13 +100,9 @@ public class CSDFMoC extends AbstractMoC {
 	 * @param pattern
 	 *            the input pattern of this CSDF MoC
 	 */
-	public void setInputPattern(Pattern pattern) {
-		this.inputPattern = pattern;
-	}
+	void setInputPattern(Pattern pattern);
 
-	public void setNumberOfPhases(int numberOfPhases) {
-		this.numberOfPhases = numberOfPhases;
-	}
+	void setNumberOfPhases(int numberOfPhases);
 
 	/**
 	 * Set the output pattern of this CSDF MoC.
@@ -179,9 +110,7 @@ public class CSDFMoC extends AbstractMoC {
 	 * @param pattern
 	 *            set the output pattern
 	 */
-	public void setOutputPattern(Pattern pattern) {
-		this.outputPattern = pattern;
-	}
+	void setOutputPattern(Pattern pattern);
 
 	/**
 	 * Saves the number of tokens consumed by input ports of the given actor.
@@ -189,11 +118,7 @@ public class CSDFMoC extends AbstractMoC {
 	 * @param actor
 	 *            an actor
 	 */
-	public void setTokenConsumptions(Actor actor) {
-		for (Port port : actor.getInputs()) {
-			inputPattern.setNumTokens(port, port.getNumTokensConsumed());
-		}
-	}
+	void setNumTokensConsumed(Actor actor);
 
 	/**
 	 * Saves the number of tokens written to output ports of the given actor.
@@ -201,21 +126,6 @@ public class CSDFMoC extends AbstractMoC {
 	 * @param actor
 	 *            an actor
 	 */
-	public void setTokenProductions(Actor actor) {
-		for (Port port : actor.getOutputs()) {
-			outputPattern.setNumTokens(port, port.getNumTokensProduced());
-		}
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("CSDF input ports: ");
-		builder.append(inputPattern);
-		builder.append('\n');
-		builder.append("CSDF output ports: ");
-		builder.append(outputPattern);
-		return builder.toString();
-	}
+	void setNumTokensProduced(Actor actor);
 
 }

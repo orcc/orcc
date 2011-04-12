@@ -34,36 +34,8 @@ package net.sf.orcc.moc;
  * is equal to 1.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model extends="net.sf.orcc.moc.CSDFMoC"
  */
-public class SDFMoC extends CSDFMoC {
-
-	/**
-	 * Creates a new SDF MoC.
-	 */
-	public SDFMoC() {
-		numberOfPhases = 1;
-	}
-
-	@Override
-	public Object accept(MoCInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public boolean isSDF() {
-		return true;
-	}
-	
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("input ports: ");
-		builder.append(getInputPattern());
-		builder.append('\n');
-		builder.append("output ports: ");
-		builder.append(getOutputPattern());
-		return builder.toString();
-	}
+public interface SDFMoC extends CSDFMoC {
 
 }

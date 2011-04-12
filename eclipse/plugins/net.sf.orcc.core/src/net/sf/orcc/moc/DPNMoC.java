@@ -34,29 +34,8 @@ package net.sf.orcc.moc;
  * rates.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model extends="net.sf.orcc.moc.MoC"
  */
-public class DPNMoC extends AbstractMoC {
-
-	/**
-	 * Creates a new DPN MoC.
-	 */
-	public DPNMoC() {
-	}
-
-	@Override
-	public Object accept(MoCInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public boolean isDPN() {
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "Dataflow Process Network";
-	}
+public interface DPNMoC extends MoC {
 
 }

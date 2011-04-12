@@ -34,29 +34,8 @@ package net.sf.orcc.moc;
  * DPN it cannot be time-dependent.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model extends="net.sf.orcc.moc.MoC"
  */
-public class KPNMoC extends AbstractMoC {
-
-	/**
-	 * Creates a new KPN MoC.
-	 */
-	public KPNMoC() {
-	}
-
-	@Override
-	public Object accept(MoCInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public boolean isKPN() {
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "Kahn Process Network";
-	}
+public interface KPNMoC extends MoC {
 
 }

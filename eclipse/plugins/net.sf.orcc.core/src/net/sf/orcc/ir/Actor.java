@@ -111,6 +111,7 @@ public interface Actor extends EObject, Comparable<Actor> {
 	 * Returns the MoC of this actor.
 	 * 
 	 * @return an MoC
+	 * @model containment="true"
 	 */
 	MoC getMoC();
 

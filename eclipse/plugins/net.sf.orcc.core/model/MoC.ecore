@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="moc"
+    nsURI="http:///net/sf/orcc/moc.ecore" nsPrefix="net.sf.orcc.moc">
+  <eClassifiers xsi:type="ecore:EClass" name="MoC" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="CSDFMoC" eSuperTypes="#//MoC">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
+        eType="ecore:EClass Ir.ecore#//Action"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputPattern" eType="ecore:EClass Ir.ecore#//Pattern"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="numberOfPhases" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputPattern" eType="ecore:EClass Ir.ecore#//Pattern"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DPNMoC" eSuperTypes="#//MoC"/>
+  <eClassifiers xsi:type="ecore:EClass" name="KPNMoC" eSuperTypes="#//MoC"/>
+  <eClassifiers xsi:type="ecore:EClass" name="QSDFMoC" eSuperTypes="#//MoC">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="configurations">
+      <eGenericType eClassifier="#//EMap">
+        <eTypeArguments eClassifier="ecore:EClass Ir.ecore#//Action"/>
+        <eTypeArguments eClassifier="#//SDFMoC"/>
+      </eGenericType>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SDFMoC" eSuperTypes="#//CSDFMoC"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="EMap" instanceClassName="org.eclipse.emf.common.util.EMap">
+    <eTypeParameters name="T"/>
+    <eTypeParameters name="T1"/>
+  </eClassifiers>
+</ecore:EPackage>

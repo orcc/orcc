@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,25 +28,16 @@
  */
 package net.sf.orcc.moc;
 
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * This class defines a Model of Computation.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
- * @model
+ * @model abstract="true"
  */
-public interface MoC {
-
-	/**
-	 * Accepts the given MoC interpreter.
-	 * 
-	 * @param interpreter
-	 *            an interpreter
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	Object accept(MoCInterpreter interpreter, Object... args);
+public interface MoC extends EObject {
 
 	/**
 	 * Returns true if this MoC is CSDF.

@@ -51,6 +51,8 @@ import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 
+import net.sf.orcc.moc.MocPackage;
+import net.sf.orcc.moc.impl.MocPackageImpl;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
@@ -411,11 +413,16 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		// Initialize simple dependencies
 		EcorePackage.eINSTANCE.eClass();
 
+		// Obtain or create and register interdependencies
+		MocPackageImpl theMocPackage = (MocPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(MocPackage.eNS_URI) instanceof MocPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(MocPackage.eNS_URI) : MocPackage.eINSTANCE);
+
 		// Create package meta-data objects
 		theIrPackage.createPackageContents();
+		theMocPackage.createPackageContents();
 
 		// Initialize created meta-data
 		theIrPackage.initializePackageContents();
+		theMocPackage.initializePackageContents();
 
 		// Mark meta-data to indicate it can't be changed
 		theIrPackage.freeze();
@@ -1502,6 +1509,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getActor_MoC() {
+		return (EReference)actorEClass.getEStructuralFeatures().get(12);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getPattern() {
 		return patternEClass;
 	}
@@ -1797,6 +1813,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEAttribute(actorEClass, ACTOR__NATIVE);
 		createEReference(actorEClass, ACTOR__ACTIONS_OUTSIDE_FSM);
 		createEReference(actorEClass, ACTOR__FSM);
+		createEReference(actorEClass, ACTOR__MO_C);
 
 		patternEClass = createEClass(PATTERN);
 
@@ -1844,6 +1861,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Obtain other dependent packages
 		EcorePackage theEcorePackage = (EcorePackage)EPackage.Registry.INSTANCE.getEPackage(EcorePackage.eNS_URI);
+		MocPackage theMocPackage = (MocPackage)EPackage.Registry.INSTANCE.getEPackage(MocPackage.eNS_URI);
 
 		// Create type parameters
 		addETypeParameter(comparableEClass, "T");
@@ -2036,6 +2054,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEAttribute(getActor_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_ActionsOutsideFsm(), this.getAction(), null, "actionsOutsideFsm", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Fsm(), this.getFSM(), null, "fsm", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getActor_MoC(), theMocPackage.getMoC(), null, "moC", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(patternEClass, Pattern.class, "Pattern", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 

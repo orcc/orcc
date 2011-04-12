@@ -42,9 +42,8 @@ import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.moc.DPNMoC;
-import net.sf.orcc.moc.KPNMoC;
 import net.sf.orcc.moc.MoC;
+import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.util.UniqueEdge;
@@ -104,7 +103,7 @@ public class ActorClassifier implements ActorVisitor {
 		if (actions.isEmpty()) {
 			System.out.println("actor " + actor
 					+ " does not contain any actions, defaults to dynamic");
-			actor.setMoC(new KPNMoC());
+			actor.setMoC(MocFactory.eINSTANCE.createKPNMoC());
 			return;
 		}
 
@@ -112,7 +111,7 @@ public class ActorClassifier implements ActorVisitor {
 		MoC moc;
 		TimeDependencyAnalyzer tdAnalyzer = new TimeDependencyAnalyzer();
 		if (tdAnalyzer.isTimeDependent(actor)) {
-			moc = new DPNMoC();
+			moc = MocFactory.eINSTANCE.createDPNMoC();
 			showMarker();
 		} else {
 			// merges actions with the same input/output pattern together
@@ -164,12 +163,12 @@ public class ActorClassifier implements ActorVisitor {
 			FSM fsm = actor.getFsm();
 			if (fsm == null || !isCycloStaticFsm(fsm)) {
 				// no state, no cyclo-static FSM => dynamic
-				return new KPNMoC();
+				return MocFactory.eINSTANCE.createKPNMoC();
 			}
 		}
 
 		// creates the MoC
-		CSDFMoC csdfMoc = new CSDFMoC();
+		CSDFMoC csdfMoc = MocFactory.eINSTANCE.createCSDFMoC();
 		int nbPhases = 0;
 
 		// loops until the actor goes back to the initial state, or there is a
@@ -178,19 +177,19 @@ public class ActorClassifier implements ActorVisitor {
 		String initialState = interpreter.getFsmState();
 		do {
 			interpreter.schedule();
-			csdfMoc.addAction(interpreter.getScheduledAction());
+			csdfMoc.getActions().add(interpreter.getScheduledAction());
 			nbPhases++;
 		} while ((!state.isInitialState() || !interpreter.getFsmState().equals(
 				initialState))
 				&& nbPhases < MAX_PHASES);
 
 		if (nbPhases == MAX_PHASES) {
-			return new KPNMoC();
+			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
 		// set token rates
-		csdfMoc.setTokenConsumptions(actor);
-		csdfMoc.setTokenProductions(actor);
+		csdfMoc.setNumTokensConsumed(actor);
+		csdfMoc.setNumTokensProduced(actor);
 		csdfMoc.setNumberOfPhases(nbPhases);
 
 		return csdfMoc;
@@ -207,7 +206,7 @@ public class ActorClassifier implements ActorVisitor {
 	 * @return a static class
 	 */
 	private SDFMoC classifyFsmConfiguration(Map<Port, Expression> configuration) {
-		SDFMoC sdfMoc = new SDFMoC();
+		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
 
 		AbstractInterpreter interpretedActor = newInterpreter();
 		interpretedActor.setConfiguration(configuration);
@@ -220,7 +219,7 @@ public class ActorClassifier implements ActorVisitor {
 		do {
 			interpretedActor.schedule();
 			Action latest = interpretedActor.getScheduledAction();
-			sdfMoc.addAction(latest);
+			sdfMoc.getActions().add(latest);
 			nbPhases++;
 		} while (!interpretedActor.getFsmState().equals(initialState)
 				&& nbPhases < MAX_PHASES);
@@ -230,8 +229,8 @@ public class ActorClassifier implements ActorVisitor {
 		}
 
 		// set token rates
-		sdfMoc.setTokenConsumptions(actor);
-		sdfMoc.setTokenProductions(actor);
+		sdfMoc.setNumTokensConsumed(actor);
+		sdfMoc.setNumTokensProduced(actor);
 
 		return sdfMoc;
 	}
@@ -251,25 +250,25 @@ public class ActorClassifier implements ActorVisitor {
 			analyzer.analyze(actor);
 
 			// will unroll for each branch departing from the initial state
-			QSDFMoC quasiStatic = new QSDFMoC();
+			QSDFMoC quasiStatic = MocFactory.eINSTANCE.createQSDFMoC();
 
 			for (NextStateInfo info : fsm.getTransitions(initialState)) {
 				Action action = info.getAction();
 				Map<Port, Expression> configuration = analyzer
 						.getConfiguration(action);
 				if (configuration == null) {
-					return new KPNMoC();
+					return MocFactory.eINSTANCE.createKPNMoC();
 				}
 				SDFMoC staticClass = classifyFsmConfiguration(configuration);
 
-				quasiStatic.addConfiguration(action, staticClass);
+				quasiStatic.getConfigurations().put(action, staticClass);
 			}
 
 			return quasiStatic;
 		} else {
 			System.out.println(actor.getName()
 					+ " has an FSM that is NOT compatible with quasi-static");
-			return new KPNMoC();
+			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 	}
 
@@ -292,21 +291,18 @@ public class ActorClassifier implements ActorVisitor {
 
 			// 2) an actor with many actions after the SDFActionMerger
 			// transformation has been applied is dynamic
-			return new KPNMoC();
+			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
 		// schedule
-		SDFMoC sdfMoc = new SDFMoC();
+		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
 		AbstractInterpreter interpretedActor = newInterpreter();
 		interpretedActor.schedule();
-		sdfMoc.addAction(interpretedActor.getScheduledAction());
+		sdfMoc.getActions().add(interpretedActor.getScheduledAction());
 
 		// set token rates
-		sdfMoc.setTokenConsumptions(actor);
-		sdfMoc.setTokenProductions(actor);
-
-		// an SDF actor is a specific CSDF with 1 phase
-		sdfMoc.setNumberOfPhases(1);
+		sdfMoc.setNumTokensConsumed(actor);
+		sdfMoc.setNumTokensProduced(actor);
 
 		return sdfMoc;
 	}
@@ -412,7 +408,7 @@ public class ActorClassifier implements ActorVisitor {
 			System.out.println("Error of classification for actor " + actor
 					+ ":" + e);
 			System.out.println("Set actor moc of " + actor + " to default");
-			actor.setMoC(new DPNMoC());
+			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
 		}
 	}
 

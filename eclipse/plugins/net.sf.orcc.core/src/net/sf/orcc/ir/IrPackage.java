@@ -1598,13 +1598,22 @@ public interface IrPackage extends EPackage {
 	int ACTOR__FSM = COMPARABLE_FEATURE_COUNT + 11;
 
 	/**
+	 * The feature id for the '<em><b>Mo C</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__MO_C = COMPARABLE_FEATURE_COUNT + 12;
+
+	/**
 	 * The number of structural features of the '<em>Actor</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR_FEATURE_COUNT = COMPARABLE_FEATURE_COUNT + 12;
+	int ACTOR_FEATURE_COUNT = COMPARABLE_FEATURE_COUNT + 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
@@ -3054,6 +3063,17 @@ public interface IrPackage extends EPackage {
 	EReference getActor_Fsm();
 
 	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Actor#getMoC <em>Mo C</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Mo C</em>'.
+	 * @see net.sf.orcc.ir.Actor#getMoC()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EReference getActor_MoC();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Pattern <em>Pattern</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4162,6 +4182,14 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ACTOR__FSM = eINSTANCE.getActor_Fsm();
+
+		/**
+		 * The meta object literal for the '<em><b>Mo C</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTOR__MO_C = eINSTANCE.getActor_MoC();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.

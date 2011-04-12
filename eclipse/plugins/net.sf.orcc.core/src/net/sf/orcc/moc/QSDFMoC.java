@@ -28,13 +28,11 @@
  */
 package net.sf.orcc.moc;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.orcc.ir.Action;
+
+import org.eclipse.emf.common.util.EMap;
 
 /**
  * This class defines a quasi-static dataflow (QSDF) MoC. QSDF is a model that
@@ -43,54 +41,34 @@ import net.sf.orcc.ir.Action;
  * class associates one action with one static class.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model extends="net.sf.orcc.moc.MoC"
  */
-public class QSDFMoC extends AbstractMoC {
-
-	private Map<Action, SDFMoC> configurations;
-	
-	/**
-	 * Creates a new quasi-static MoC.
-	 */
-	public QSDFMoC() {
-		configurations = new LinkedHashMap<Action, SDFMoC>();
-	}
-
-	@Override
-	public Object accept(MoCInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	/**
-	 * Adds a configuration to this quasi-static MoC. A configuration is given
-	 * by an action and associated with a SDF MoC.
-	 * 
-	 * @param action
-	 *            a configuration action
-	 * @param moc
-	 *            a SDF MoC
-	 */
-	public void addConfiguration(Action action, SDFMoC moc) {
-		configurations.put(action, moc);
-	}
+public interface QSDFMoC extends MoC {
 	
 	/**
 	 * Return the configurations of this quasi-static MoC.
 	 * 
 	 * @return a map of configurations
+	 * @model
 	 */
-	public Map<Action, SDFMoC> getConfigurations() {
-		return configurations;
-	}
+	EMap<Action, SDFMoC> getConfigurations();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.moc.QSDFMoC#getConfigurations <em>Configurations</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Configurations</em>' attribute.
+	 * @see #getConfigurations()
+	 * @generated
+	 */
+	void setConfigurations(EMap<Action, SDFMoC> value);
 
 	/**
 	 * Returns the set of configuration actions.
 	 * 
 	 * @return the set of configuration actions
 	 */
-	public Set<Action> getActions() {
-		return configurations.keySet();
-	}
+	Set<Action> getActions();
 
 	/**
 	 * Returns the SDF MoC that is associated with the configuration given by
@@ -100,36 +78,6 @@ public class QSDFMoC extends AbstractMoC {
 	 *            a configuration action
 	 * @return a SDF MoC
 	 */
-	public SDFMoC getStaticClass(Action action) {
-		return configurations.get(action);
-	}
-
-	@Override
-	public boolean isQuasiStatic() {
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		Iterator<Entry<Action, SDFMoC>> it = configurations.entrySet()
-				.iterator();
-		Entry<Action, SDFMoC> entry = it.next();
-		builder.append("QSDF configuration ");
-		builder.append(entry.getKey());
-		builder.append('\n');
-		builder.append(entry.getValue().toString());
-
-		while (it.hasNext()) {
-			entry = it.next();
-			builder.append('\n');
-			builder.append("QSDF configuration ");
-			builder.append(entry.getKey());
-			builder.append('\n');
-			builder.append(entry.getValue().toString());
-		}
-
-		return builder.toString();
-	}
+	SDFMoC getStaticClass(Action action);
 
 }

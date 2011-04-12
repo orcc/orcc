@@ -51,21 +51,13 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#isNative <em>Native</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActionsOutsideFsm <em>Actions Outside Fsm</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFsm <em>Fsm</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getMoC <em>Mo C</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class ActorImpl extends EObjectImpl implements Actor {
-	/**
-	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getActions()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Action> actions;
-
 	/**
 	 * The default value of the '{@link #getFile() <em>File</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -76,6 +68,43 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected static final String FILE_EDEFAULT = null;
 
 	/**
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String NAME_EDEFAULT = null;
+
+	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getActions()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Action> actions;
+
+	/**
+	 * The cached value of the '{@link #getActionsOutsideFsm() <em>Actions Outside Fsm</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getActionsOutsideFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Action> actionsOutsideFsm;
+
+	/**
 	 * The cached value of the '{@link #getFile() <em>File</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getFile()
@@ -83,6 +112,15 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected String file = FILE_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected FSM fsm;
 
 	/**
 	 * The cached value of the '{@link #getInitializes() <em>Initializes</em>}' containment reference list.
@@ -102,15 +140,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 */
 	protected EList<Port> inputs;
 
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
 	private Map<String, Port> mapInputs;
 
 	private Map<String, Port> mapOutputs;
@@ -122,9 +151,14 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	private Map<String, Var> mapStateVars;
 
 	/**
-	 * the class of this actor. Initialized to unknown.
+	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getMoC()
+	 * @generated
+	 * @ordered
 	 */
-	private MoC moc;
+	protected MoC moC;
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -134,6 +168,15 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
@@ -172,43 +215,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected EList<Var> stateVars;
 
 	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getActionsOutsideFsm() <em>Actions Outside Fsm</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getActionsOutsideFsm()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Action> actionsOutsideFsm;
-
-	/**
-	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFsm()
-	 * @generated
-	 * @ordered
-	 */
-	protected FSM fsm;
-
-	/**
 	 * holds template-specific data.
 	 */
 	private Object templateData;
@@ -237,6 +243,21 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		fsm = newFsm;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__FSM, oldFsm, newFsm);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetMoC(MoC newMoC, NotificationChain msgs) {
+		MoC oldMoC = moC;
+		moC = newMoC;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__MO_C, oldMoC, newMoC);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -278,6 +299,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return getActionsOutsideFsm();
 			case IrPackage.ACTOR__FSM:
 				return getFsm();
+			case IrPackage.ACTOR__MO_C:
+				return getMoC();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -306,6 +329,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return ((InternalEList<?>)getStateVars()).basicRemove(otherEnd, msgs);
 			case IrPackage.ACTOR__FSM:
 				return basicSetFsm(null, msgs);
+			case IrPackage.ACTOR__MO_C:
+				return basicSetMoC(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -341,6 +366,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return actionsOutsideFsm != null && !actionsOutsideFsm.isEmpty();
 			case IrPackage.ACTOR__FSM:
 				return fsm != null;
+			case IrPackage.ACTOR__MO_C:
+				return moC != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -397,6 +424,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 			case IrPackage.ACTOR__FSM:
 				setFsm((FSM)newValue);
 				return;
+			case IrPackage.ACTOR__MO_C:
+				setMoC((MoC)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -452,6 +482,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return;
 			case IrPackage.ACTOR__FSM:
 				setFsm((FSM)null);
+				return;
+			case IrPackage.ACTOR__MO_C:
+				setMoC((MoC)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -526,9 +559,13 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return mapInputs;
 	}
 
-	@Override
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public MoC getMoC() {
-		return moc;
+		return moC;
 	}
 
 	/**
@@ -675,7 +712,7 @@ public class ActorImpl extends EObjectImpl implements Actor {
 
 	@Override
 	public boolean hasMoC() {
-		return moc != null;
+		return moC != null;
 	}
 
 	/**
@@ -729,9 +766,23 @@ public class ActorImpl extends EObjectImpl implements Actor {
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__FSM, newFsm, newFsm));
 	}
 
-	@Override
-	public void setMoC(MoC moc) {
-		this.moc = moc;
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setMoC(MoC newMoC) {
+		if (newMoC != moC) {
+			NotificationChain msgs = null;
+			if (moC != null)
+				msgs = ((InternalEObject)moC).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTOR__MO_C, null, msgs);
+			if (newMoC != null)
+				msgs = ((InternalEObject)newMoC).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTOR__MO_C, null, msgs);
+			msgs = basicSetMoC(newMoC, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__MO_C, newMoC, newMoC));
 	}
 
 	/**
