@@ -31,8 +31,8 @@ package net.sf.orcc.ir;
 import org.eclipse.emf.ecore.EObject;
 import java.util.List;
 
-import net.sf.orcc.ir.impl.NodeInterpreter;
-import net.sf.orcc.ir.impl.NodeVisitor;
+import net.sf.orcc.ir.util.NodeInterpreter;
+import net.sf.orcc.ir.util.NodeVisitor;
 
 /**
  * This class defines a node in the CFG.

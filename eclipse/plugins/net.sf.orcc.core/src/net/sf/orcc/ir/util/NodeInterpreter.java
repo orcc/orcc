@@ -26,99 +26,51 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.ir.util;
 
-import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.InstCall;
-import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.InstPhi;
-import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.InstSpecific;
-import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 
 /**
- * This interface defines an instruction interpreter.
+ * This interface defines a node interpreter.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface InstructionInterpreter {
+public interface NodeInterpreter {
 
 	/**
-	 * Interprets an assign instruction.
+	 * Interprets a block node.
 	 * 
-	 * @param assign
-	 *            an assign instruction
+	 * @param node
+	 *            a block node
 	 * @param args
 	 *            arguments
 	 * @return an object
 	 */
-	public Object interpret(InstAssign assign, Object... args);
+	public Object interpret(NodeBlock node, Object... args);
 
 	/**
-	 * Interprets a call instruction.
+	 * Interprets an if node.
 	 * 
-	 * @param call
-	 *            a call instruction
+	 * @param node
+	 *            an if node
 	 * @param args
 	 *            arguments
 	 * @return an object
 	 */
-	public Object interpret(InstCall call, Object... args);
+	public Object interpret(NodeIf node, Object... args);
 
 	/**
-	 * Interprets a load instruction.
+	 * Interprets a while node.
 	 * 
-	 * @param load
-	 *            a load instruction
+	 * @param node
+	 *            a while node
 	 * @param args
 	 *            arguments
 	 * @return an object
 	 */
-	public Object interpret(InstLoad load, Object... args);
-
-	/**
-	 * Interprets a phi assignment instruction.
-	 * 
-	 * @param phi
-	 *            a phi assignment instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(InstPhi phi, Object... args);
-
-	/**
-	 * Interprets a return instruction.
-	 * 
-	 * @param returnInst
-	 *            a return instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(InstReturn returnInst, Object... args);
-
-	/**
-	 * Interprets a specific instruction.
-	 * 
-	 * @param specific
-	 *            a specific instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(InstSpecific specific, Object... args);
-
-	/**
-	 * Interprets a store instruction.
-	 * 
-	 * @param store
-	 *            a store instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(InstStore store, Object... args);
+	public Object interpret(NodeWhile node, Object... args);
 
 }

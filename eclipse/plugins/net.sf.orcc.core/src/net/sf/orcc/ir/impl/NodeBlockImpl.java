@@ -13,6 +13,8 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.util.NodeInterpreter;
+import net.sf.orcc.ir.util.NodeVisitor;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;

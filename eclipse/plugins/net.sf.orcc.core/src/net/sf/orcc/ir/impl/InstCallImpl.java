@@ -18,6 +18,8 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.InstructionInterpreter;
+import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;

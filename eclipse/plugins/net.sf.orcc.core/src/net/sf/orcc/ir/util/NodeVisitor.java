@@ -26,51 +26,42 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.ir.util;
 
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 
 /**
- * This interface defines a node interpreter.
+ * This interface defines a node visitor.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface NodeInterpreter {
+public interface NodeVisitor {
 
 	/**
-	 * Interprets a block node.
+	 * Visits a block node.
 	 * 
 	 * @param node
 	 *            a block node
-	 * @param args
-	 *            arguments
-	 * @return an object
 	 */
-	public Object interpret(NodeBlock node, Object... args);
+	public void visit(NodeBlock node);
 
 	/**
-	 * Interprets an if node.
+	 * Visits an if node.
 	 * 
 	 * @param node
 	 *            an if node
-	 * @param args
-	 *            arguments
-	 * @return an object
 	 */
-	public Object interpret(NodeIf node, Object... args);
+	public void visit(NodeIf node);
 
 	/**
-	 * Interprets a while node.
+	 * Visits a while node.
 	 * 
 	 * @param node
 	 *            a while node
-	 * @param args
-	 *            arguments
-	 * @return an object
 	 */
-	public Object interpret(NodeWhile node, Object... args);
+	public void visit(NodeWhile node);
 
 }

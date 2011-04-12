@@ -29,8 +29,9 @@
 package net.sf.orcc.ir;
 
 import org.eclipse.emf.ecore.EObject;
-import net.sf.orcc.ir.impl.InstructionInterpreter;
-import net.sf.orcc.ir.impl.InstructionVisitor;
+
+import net.sf.orcc.ir.util.InstructionInterpreter;
+import net.sf.orcc.ir.util.InstructionVisitor;
 
 /**
  * This class defines an instruction.

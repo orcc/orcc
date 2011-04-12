@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.impl;
+package net.sf.orcc.ir.util;
 
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;

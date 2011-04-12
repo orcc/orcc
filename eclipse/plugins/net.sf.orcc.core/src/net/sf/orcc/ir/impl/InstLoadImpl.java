@@ -15,6 +15,8 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.util.InstructionInterpreter;
+import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
