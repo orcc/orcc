@@ -107,21 +107,24 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				Use useArray = IrFactory.eINSTANCE.createUse(buffer);
 				load.setSource(useArray);
 				// change index --> writeIndex+index
-				Expression expression1 = load.getIndexes().get(0);
-				Expression expression2 = IrFactory.eINSTANCE
-						.createExprVar(IrFactory.eINSTANCE
-								.createUse(writeIndex));
-				Expression newExpression = IrFactory.eINSTANCE
-						.createExprBinary(expression1, OpBinary.PLUS,
-								expression2, port.getType());
 				Expression maskValue = IrFactory.eINSTANCE
 						.createExprInt(bufferSize - 1);
-				Expression mask = IrFactory.eINSTANCE.createExprBinary(
-						newExpression, OpBinary.BITAND, maskValue, typeI32);
+				Expression index = IrFactory.eINSTANCE
+						.createExprVar(writeIndex);
 				if (!load.getIndexes().isEmpty()) {
-					load.getIndexes().set(0, mask);
-				} else {
+					Expression expression1 = load.getIndexes().get(0);
+					Expression sum = IrFactory.eINSTANCE.createExprBinary(
+							expression1, OpBinary.PLUS, index, port.getType());
+					Expression mask = IrFactory.eINSTANCE.createExprBinary(sum,
+							OpBinary.BITAND, maskValue,
+							IrFactory.eINSTANCE.createTypeInt(32));
+
 					load.getIndexes().add(mask);
+				} else {
+					Expression mask2 = IrFactory.eINSTANCE.createExprBinary(
+							index, OpBinary.BITAND, maskValue,
+							IrFactory.eINSTANCE.createTypeInt(32));
+					load.getIndexes().add(mask2);
 				}
 			}
 		}
@@ -197,8 +200,10 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private boolean repeatInput = false;
 	private Var result;
 	private Action store;
-	private Type typeBool = IrFactory.eINSTANCE.createTypeBool();
-	private Type typeI32 = IrFactory.eINSTANCE.createTypeInt(32);
+	// private Type IrFactory.eINSTANCE.createTypeBool() =
+	// IrFactory.eINSTANCE.createIrFactory.eINSTANCE.createTypeBool()();
+	// private Type IrFactory.eINSTANCE.createTypeInt(32) =
+	// IrFactory.eINSTANCE.createTypeInt(32);
 	private Action write;
 	private List<Var> writeIndexes = new ArrayList<Var>();
 
@@ -266,7 +271,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		NodeBlock bodyNode = body.getFirst();
 		EList<Var> locals = body.getLocals();
-		Var index = IrFactory.eINSTANCE.createVar(typeI32, "index", true, 1);
+		Var index = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "index", true, 1);
 		locals.add(index);
 		Var writeIndex = writeIndexes.get(position);
 		Instruction loadInd = IrFactory.eINSTANCE.createInstLoad(index,
@@ -274,11 +281,14 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		bodyNode.add(loadInd);
 
-		Var indexInc = IrFactory.eINSTANCE.createVar(typeI32, "index", true, 2);
+		Var indexInc = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "index", true, 2);
 		locals.add(indexInc);
 		Expression value = IrFactory.eINSTANCE.createExprBinary(
 				IrFactory.eINSTANCE.createExprVar(index), OpBinary.PLUS,
-				IrFactory.eINSTANCE.createExprInt(1), typeI32);
+				IrFactory.eINSTANCE.createExprInt(1),
+				IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign = IrFactory.eINSTANCE.createInstAssign(indexInc,
 				value);
 		bodyNode.add(assign);
@@ -299,8 +309,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		// scheduler
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
 				"isSchedulable_" + name, IrFactory.eINSTANCE.createLocation(),
-				typeBool);
-		Var result = scheduler.newTempLocalVariable(typeBool, "actionResult");
+				IrFactory.eINSTANCE.createTypeBool());
+		Var result = scheduler.newTempLocalVariable(
+				IrFactory.eINSTANCE.createTypeBool(), "actionResult");
 		result.setIndex(1);
 
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -354,7 +365,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private Var createCounter(String name) {
 		Var newCounter = IrFactory.eINSTANCE.createVar(
-				IrFactory.eINSTANCE.createLocation(), typeI32, name, true,
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), name, true,
 				IrFactory.eINSTANCE.createExprInt(0));
 
 		Expression expression = IrFactory.eINSTANCE.createExprInt(0);
@@ -392,15 +404,19 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		// scheduler
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
 				"isSchedulable_" + name, IrFactory.eINSTANCE.createLocation(),
-				typeBool);
-		Var temp = scheduler.newTempLocalVariable(typeBool, "temp");
+				IrFactory.eINSTANCE.createTypeBool());
+		Var temp = scheduler.newTempLocalVariable(
+				IrFactory.eINSTANCE.createTypeBool(), "temp");
 		temp.setIndex(1);
 
 		scheduler.getLocals().add(temp);
-		result = IrFactory.eINSTANCE.createVar(typeBool, "result", true, 0);
+		result = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeBool(), "result", true, 0);
 
 		scheduler.getLocals().add(result);
-		Var localCounter = IrFactory.eINSTANCE.createVar(counter.getType(),
+		Var localCounter = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), counter.getType(),
 				"localCounter", true, 1);
 		scheduler.getLocals().add(localCounter);
 		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -412,7 +428,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Expression counterExpression = IrFactory.eINSTANCE
 				.createExprVar(localCounter);
 		Expression expression = IrFactory.eINSTANCE.createExprBinary(
-				counterExpression, OpBinary.EQ, guardValue, typeBool);
+				counterExpression, OpBinary.EQ, guardValue,
+				IrFactory.eINSTANCE.createTypeBool());
 		block.add(IrFactory.eINSTANCE.createInstAssign(temp, expression));
 		block.add(IrFactory.eINSTANCE.createInstAssign(result,
 				IrFactory.eINSTANCE.createExprVar(temp)));
@@ -478,7 +495,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Expression counterExpression = IrFactory.eINSTANCE
 				.createExprVar(readCounter);
 		Expression expression = IrFactory.eINSTANCE.createExprBinary(
-				counterExpression, OpBinary.LT, guardValue, typeBool);
+				counterExpression, OpBinary.LT, guardValue,
+				IrFactory.eINSTANCE.createTypeBool());
 
 		Action newStoreAction = createAction(expression, storeName);
 		defineStoreBody(readCounter, storeList, newStoreAction.getBody(),
@@ -523,6 +541,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Action newUntaggedAction = createAction(expression,
 				"untagged_" + port.getName());
 		Var localINPUT = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
 				IrFactory.eINSTANCE.createTypeList(1, port.getType()),
 				port.getName(), true, 0);
 
@@ -556,10 +575,12 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Expression counterExpression = IrFactory.eINSTANCE
 				.createExprVar(writeCounter);
 		Expression expression = IrFactory.eINSTANCE.createExprBinary(
-				counterExpression, OpBinary.LT, guardValue, typeBool);
+				counterExpression, OpBinary.LT, guardValue,
+				IrFactory.eINSTANCE.createTypeBool());
 		Action newWriteAction = createAction(expression, writeName);
 
-		Var OUTPUT = IrFactory.eINSTANCE.createVar(port.getType(),
+		Var OUTPUT = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), port.getType(),
 				port.getName() + "_OUTPUT", true, 0);
 		defineWriteBody(writeCounter, writeList, newWriteAction.getBody(),
 				OUTPUT);
@@ -584,34 +605,39 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private void defineStoreBody(Var readCounter, Var storeList,
 			Procedure body, Var buffer, Var writeIndex) {
+
 		NodeBlock bodyNode = body.getFirst();
 
 		EList<Var> locals = body.getLocals();
-		Var counter = IrFactory.eINSTANCE.createVar(readCounter.getType(),
+		Var counter = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), readCounter.getType(),
 				port.getName() + "_Local_counter", true, 1);
 		locals.add(counter);
 		Instruction load1 = IrFactory.eINSTANCE.createInstLoad(counter,
 				readCounter);
 		bodyNode.add(load1);
-
-		Var index = IrFactory.eINSTANCE.createVar(typeI32, "writeIndex", true,
-				1);
+		Var index = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "writeIndex", true, 1);
 		locals.add(index);
 		Instruction loadIndex = IrFactory.eINSTANCE.createInstLoad(index,
 				writeIndex);
 		bodyNode.add(loadIndex);
 
-		Var mask = IrFactory.eINSTANCE.createVar(typeI32, "mask", true, 1);
+		Var mask = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "mask", true, 1);
 		locals.add(mask);
 		Expression exprMask = IrFactory.eINSTANCE.createExprInt(bufferSize - 1);
 		Expression maskValue = IrFactory.eINSTANCE.createExprBinary(
 				IrFactory.eINSTANCE.createExprVar(index), OpBinary.BITAND,
-				exprMask, typeI32);
+				exprMask, IrFactory.eINSTANCE.createTypeInt(32));
 		InstAssign assignMask = IrFactory.eINSTANCE.createInstAssign(mask,
 				maskValue);
 		bodyNode.add(assignMask);
 
-		Var input = IrFactory.eINSTANCE.createVar(port.getType(),
+		Var input = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), port.getType(),
 				port.getName() + "_Input", true, 1);
 		locals.add(input);
 		List<Expression> load2Index = new ArrayList<Expression>(1);
@@ -621,39 +647,42 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Instruction load2 = IrFactory.eINSTANCE.createInstLoad(input, buffer,
 				load2Index);
 		bodyNode.add(load2);
-
 		List<Expression> store1Index = new ArrayList<Expression>(1);
 		store1Index.add(IrFactory.eINSTANCE.createExprVar(counter));
 		Instruction store1 = IrFactory.eINSTANCE.createInstStore(
 				IrFactory.eINSTANCE.createLocation(), storeList, store1Index,
 				IrFactory.eINSTANCE.createExprVar(input));
 		bodyNode.add(store1);
-
 		// globalCounter= globalCounter + 1
-		Var counter2 = IrFactory.eINSTANCE.createVar(readCounter.getType(),
+		Var counter2 = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), readCounter.getType(),
 				port.getName() + "_Local_counter", true, 2);
 		locals.add(counter2);
 		Expression storeIndexElement = IrFactory.eINSTANCE
 				.createExprVar(counter);
 		Expression inc1 = IrFactory.eINSTANCE.createExprInt(1);
 		Expression assignValue = IrFactory.eINSTANCE.createExprBinary(
-				storeIndexElement, OpBinary.PLUS, inc1, typeI32);
+				storeIndexElement, OpBinary.PLUS, inc1,
+				IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign = IrFactory.eINSTANCE.createInstAssign(counter2,
 				assignValue);
 		bodyNode.add(assign);
 		Instruction store2 = IrFactory.eINSTANCE.createInstStore(readCounter,
 				IrFactory.eINSTANCE.createExprVar(counter2));
 		bodyNode.add(store2);
-
-		Var tmp = IrFactory.eINSTANCE.createVar(typeI32, "tmp", true, 1);
+		Var tmp = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "tmp", true, 1);
 		locals.add(tmp);
+
+		Expression inc2 = IrFactory.eINSTANCE.createExprInt(1);
 		Expression incValue = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(index), OpBinary.PLUS, inc1,
-				typeI32);
+				IrFactory.eINSTANCE.createExprVar(index), OpBinary.PLUS, inc2,
+				IrFactory.eINSTANCE.createTypeInt(32));
+
 		Instruction assign2 = IrFactory.eINSTANCE.createInstAssign(tmp,
 				incValue);
 		bodyNode.add(assign2);
-
 		Instruction store3 = IrFactory.eINSTANCE.createInstStore(writeIndex,
 				IrFactory.eINSTANCE.createExprVar(tmp));
 		bodyNode.add(store3);
@@ -677,24 +706,28 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		NodeBlock bodyNode = body.getFirst();
 
 		EList<Var> locals = body.getLocals();
-		Var counter = IrFactory.eINSTANCE.createVar(readCounter.getType(),
+		Var counter = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), readCounter.getType(),
 				port.getName() + "_Local_counter", true, 1);
 		locals.add(counter);
 		Instruction load1 = IrFactory.eINSTANCE.createInstLoad(counter,
 				readCounter);
 		bodyNode.add(load1);
 
-		Var mask = IrFactory.eINSTANCE.createVar(typeI32, "mask", true, 1);
+		Var mask = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "mask", true, 1);
 		locals.add(mask);
 		Expression exprmask = IrFactory.eINSTANCE.createExprInt(bufferSize - 1);
 		Expression maskValue = IrFactory.eINSTANCE.createExprBinary(
 				IrFactory.eINSTANCE.createExprVar(counter), OpBinary.BITAND,
-				exprmask, typeI32);
+				exprmask, IrFactory.eINSTANCE.createTypeInt(32));
 		InstAssign assignMask = IrFactory.eINSTANCE.createInstAssign(mask,
 				maskValue);
 		bodyNode.add(assignMask);
 
-		Var input = IrFactory.eINSTANCE.createVar(port.getType(),
+		Var input = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), port.getType(),
 				port.getName() + "_Input", true, 1);
 		locals.add(input);
 		List<Expression> load2Index = new ArrayList<Expression>(1);
@@ -716,7 +749,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				IrFactory.eINSTANCE.createExprVar(input));
 		bodyNode.add(store1);
 
-		Var counter2 = IrFactory.eINSTANCE.createVar(readCounter.getType(),
+		Var counter2 = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), readCounter.getType(),
 				port.getName() + "_Local_counter", true, 2);
 		locals.add(counter2);
 		Instruction assign = IrFactory.eINSTANCE.createInstAssign(counter2,
@@ -743,14 +777,16 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			Procedure body, Var OUTPUT) {
 		NodeBlock bodyNode = body.getFirst();
 		EList<Var> locals = body.getLocals();
-		Var counter1 = IrFactory.eINSTANCE.createVar(writeCounter.getType(),
+		Var counter1 = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), writeCounter.getType(),
 				port.getName() + "_Local_writeCounter", true, outputIndex);
 		locals.add(counter1);
 		Instruction load1 = IrFactory.eINSTANCE.createInstLoad(counter1,
 				writeCounter);
 		bodyNode.add(load1);
 
-		Var output = IrFactory.eINSTANCE.createVar(port.getType(),
+		Var output = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), port.getType(),
 				port.getName() + "_LocalOutput", true, outputIndex);
 		locals.add(output);
 		List<Expression> load2Index = new ArrayList<Expression>(1);
@@ -759,8 +795,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				writeList, load2Index);
 		bodyNode.add(load2);
 
-		Var out = IrFactory.eINSTANCE.createVar(port.getType(), "_LocalTemp",
-				true, outputIndex);
+		Var out = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), port.getType(),
+				"_LocalTemp", true, outputIndex);
 		locals.add(out);
 		Use assign1Expr = IrFactory.eINSTANCE.createUse(output);
 		Expression assign1Value = IrFactory.eINSTANCE
@@ -769,14 +806,16 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				assign1Value);
 		bodyNode.add(assign1);
 
-		Var counter2 = IrFactory.eINSTANCE.createVar(writeCounter.getType(),
+		Var counter2 = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), writeCounter.getType(),
 				port.getName() + "_Local_writeCounter_2", true, outputIndex);
 		locals.add(counter2);
 		Expression assign2IndexElement = IrFactory.eINSTANCE
 				.createExprVar(counter1);
 		Expression e2Assign2 = IrFactory.eINSTANCE.createExprInt(1);
 		Expression assign2Value = IrFactory.eINSTANCE.createExprBinary(
-				assign2IndexElement, OpBinary.PLUS, e2Assign2, typeI32);
+				assign2IndexElement, OpBinary.PLUS, e2Assign2,
+				IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign2 = IrFactory.eINSTANCE.createInstAssign(counter2,
 				assign2Value);
 		bodyNode.add(assign2);
@@ -812,8 +851,10 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		NodeBlock bodyNode = scheduler.getLast();
 		EList<Var> locals = scheduler.getLocals();
 
-		Var localRead = IrFactory.eINSTANCE.createVar(typeI32, "readIndex",
-				true, inputIndex);
+		Var localRead = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "readIndex", true,
+				inputIndex);
 
 		locals.add(localRead);
 		Instruction InstLoad = IrFactory.eINSTANCE.createInstLoad(localRead,
@@ -822,37 +863,46 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		bodyNode.add(index, InstLoad);
 		index++;
 
-		Var localWrite = IrFactory.eINSTANCE.createVar(typeI32, "writeIndex",
-				true, inputIndex);
+		Var localWrite = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "writeIndex", true,
+				inputIndex);
 		locals.add(localWrite);
 		Instruction Load2 = IrFactory.eINSTANCE.createInstLoad(localWrite,
 				writeIndex);
 		bodyNode.add(index, Load2);
 		index++;
 
-		Var diff = IrFactory.eINSTANCE.createVar(typeI32, "diff", true,
-				inputIndex);
+		Var diff = IrFactory.eINSTANCE
+				.createVar(IrFactory.eINSTANCE.createLocation(),
+						IrFactory.eINSTANCE.createTypeInt(32), "diff", true,
+						inputIndex);
 		locals.add(diff);
 		Expression value = IrFactory.eINSTANCE.createExprBinary(
 				IrFactory.eINSTANCE.createExprVar(readIndex), OpBinary.MINUS,
-				IrFactory.eINSTANCE.createExprVar(writeIndex), typeI32);
+				IrFactory.eINSTANCE.createExprVar(writeIndex),
+				IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign = IrFactory.eINSTANCE.createInstAssign(diff, value);
 		bodyNode.add(index, assign);
 		index++;
 
-		Var conditionVar = IrFactory.eINSTANCE.createVar(typeBool, "condition",
-				true, inputIndex);
+		Var conditionVar = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeBool(), "condition", true,
+				inputIndex);
 		locals.add(conditionVar);
 		Expression value2 = IrFactory.eINSTANCE.createExprBinary(
 				IrFactory.eINSTANCE.createExprVar(diff), op, reference,
-				typeBool);
+				IrFactory.eINSTANCE.createTypeBool());
 		Instruction assign2 = IrFactory.eINSTANCE.createInstAssign(
 				conditionVar, value2);
 		bodyNode.add(index, assign2);
 		index++;
 
-		Var myResult = IrFactory.eINSTANCE.createVar(typeBool, "myResult",
-				true, inputIndex);
+		Var myResult = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeBool(), "myResult", true,
+				inputIndex);
 		locals.add(myResult);
 		int returnIndex = bodyNode.getInstructions().size() - 1;
 		InstReturn actionReturn = (InstReturn) bodyNode.getInstructions().get(
@@ -861,7 +911,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		// VarLocal currentResult
 		Expression e = IrFactory.eINSTANCE.createExprBinary(returnExpr,
 				OpBinary.LOGIC_AND,
-				IrFactory.eINSTANCE.createExprVar(conditionVar), typeBool);
+				IrFactory.eINSTANCE.createExprVar(conditionVar),
+				IrFactory.eINSTANCE.createTypeBool());
 		Instruction assign3 = IrFactory.eINSTANCE.createInstAssign(myResult, e);
 
 		bodyNode.add(returnIndex, assign3);
@@ -884,7 +935,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		blkNode = done.getScheduler().getFirst();
 		EList<Var> schedulerLocals = done.getScheduler().getLocals();
-		Var localCounter = IrFactory.eINSTANCE.createVar(counter.getType(),
+		Var localCounter = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(), counter.getType(),
 				"localCounterModif", true, portIndex);
 		schedulerLocals.add(localCounter);
 
@@ -892,14 +944,16 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				counter);
 		blkNode.add(1, load);
 
-		Var temp = IrFactory.eINSTANCE.createVar(typeBool, "temp", true,
-				portIndex);
+		Var temp = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeBool(), "temp", true, portIndex);
 		schedulerLocals.add(temp);
 		Expression guardValue = IrFactory.eINSTANCE.createExprInt(numTokens);
 		Expression counterExpression = IrFactory.eINSTANCE
 				.createExprVar(localCounter);
 		Expression schedulerValue = IrFactory.eINSTANCE.createExprBinary(
-				counterExpression, OpBinary.EQ, guardValue, typeBool);
+				counterExpression, OpBinary.EQ, guardValue,
+				IrFactory.eINSTANCE.createTypeBool());
 		Instruction assign = IrFactory.eINSTANCE.createInstAssign(temp,
 				schedulerValue);
 		int index = blkNode.getInstructions().size() - 1;
@@ -911,7 +965,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Expression resultExpression = IrFactory.eINSTANCE.createExprVar(temp);
 		Expression expression = IrFactory.eINSTANCE.createExprBinary(
 				buffrerExpression, OpBinary.LOGIC_AND, resultExpression,
-				typeBool);
+				IrFactory.eINSTANCE.createTypeBool());
 		Instruction bufferAssign = IrFactory.eINSTANCE.createInstAssign(result,
 				expression);
 		blkNode.add(index, bufferAssign);
@@ -1128,10 +1182,12 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				repeatInput = true;
 				// create new process action
 				process = createProcessAction(action);
+
 				String storeName = "newStateStore" + action.getName();
 				String processName = "newStateProcess" + action.getName();
 				fsm.addState(processName);
 				fsm.addTransition(processName, process, targetName);
+
 				// move action's Output pattern to new process action
 				moveOutputPattern(action, process);
 
@@ -1139,14 +1195,17 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						IrFactory.eINSTANCE.createLocation(), entryType,
 						"buffer", true, true);
 				Var untagReadIndex = IrFactory.eINSTANCE.createVar(
-						IrFactory.eINSTANCE.createLocation(), typeI32,
+						IrFactory.eINSTANCE.createLocation(),
+						IrFactory.eINSTANCE.createTypeInt(32),
 						"UntagReadIndex", true,
 						IrFactory.eINSTANCE.createExprInt(0));
 				Var untagWriteIndex = IrFactory.eINSTANCE.createVar(
-						IrFactory.eINSTANCE.createLocation(), typeI32,
+						IrFactory.eINSTANCE.createLocation(),
+						IrFactory.eINSTANCE.createTypeInt(32),
 						"UntagWriteIndex", true,
 						IrFactory.eINSTANCE.createExprInt(0));
 				// if input repeat detected --> treat all input ports
+
 				for (Entry<Port, Integer> entry : action.getInputPattern()
 						.getNumTokensMap().entrySet()) {
 					numTokens = entry.getValue();
@@ -1174,20 +1233,23 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						createUntaggedAction(untagReadIndex, untagWriteIndex,
 								untagBuffer, port);
 					}
+
 					String counterName = action.getName() + "NewStoreCounter"
 							+ inputIndex;
 					Var counter = createCounter(counterName);
 					String listName = action.getName() + "NewStoreList"
 							+ inputIndex;
 					Var tab = createTab(listName, entryType, numTokens);
+
 					store = createStoreAction(action.getName(), counter, tab,
 							untagBuffer, untagWriteIndex);
+
 					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
 							tab);
 					modifyProcessAction.visit(process.getBody());
 					fsm.addState(storeName);
-					fsm.addTransition(storeName, store, storeName);
 
+					fsm.addTransition(storeName, store, storeName);
 					// create a new store done action once
 					if (inputIndex == 1) {
 						done = createDoneAction(action.getName()
@@ -1211,6 +1273,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				fsm.replaceTarget(sourceName, action, storeName);
 
 				break;
+
 			}
 		}
 		inputIndex = 0;
@@ -1315,11 +1378,13 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 							IrFactory.eINSTANCE.createLocation(), entryType,
 							"buffer", true, true);
 					Var untagReadIndex = IrFactory.eINSTANCE.createVar(
-							IrFactory.eINSTANCE.createLocation(), typeI32,
+							IrFactory.eINSTANCE.createLocation(),
+							IrFactory.eINSTANCE.createTypeInt(32),
 							"UntagReadIndex", true,
 							IrFactory.eINSTANCE.createExprInt(0));
 					Var untagWriteIndex = IrFactory.eINSTANCE.createVar(
-							IrFactory.eINSTANCE.createLocation(), typeI32,
+							IrFactory.eINSTANCE.createLocation(),
+							IrFactory.eINSTANCE.createTypeInt(32),
 							"UntagWriteIndex", true,
 							IrFactory.eINSTANCE.createExprInt(0));
 					inputPorts.add(verifPort);
@@ -1368,16 +1433,19 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 							.createExprBinary(IrFactory.eINSTANCE
 									.createExprVar(tokensToSend), OpBinary.GT,
 									IrFactory.eINSTANCE.createExprInt(0),
-									typeBool);
+									IrFactory.eINSTANCE.createTypeBool());
 					String actionName = "untaggedWrite_" + port.getName();
 					Action untaggedWrite = createAction(condition, actionName);
 					Pattern pattern = untaggedWrite.getOutputPattern();
 					pattern.setNumTokens(port, 1);
-					Var OUTPUT = IrFactory.eINSTANCE.createVar(port.getType(),
-							port.getName() + "OUTPUT", true, 0);
+					Var OUTPUT = IrFactory.eINSTANCE.createVar(
+							IrFactory.eINSTANCE.createLocation(),
+							port.getType(), port.getName() + "OUTPUT", true, 0);
 					pattern.setVariable(port, OUTPUT);
 					// add instruction: tokensToSend = tokensToSend - 1 ;
-					Var numTokenToSend = IrFactory.eINSTANCE.createVar(typeI32,
+					Var numTokenToSend = IrFactory.eINSTANCE.createVar(
+							IrFactory.eINSTANCE.createLocation(),
+							IrFactory.eINSTANCE.createTypeInt(32),
 							"numTokensToSend", true, 0);
 					Instruction load = IrFactory.eINSTANCE.createInstLoad(
 							numTokenToSend, tokensToSend);
@@ -1385,11 +1453,14 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 							.getLast();
 					untaggedBlkNode.add(load);
 					Var decNbTokensToSend = IrFactory.eINSTANCE.createVar(
-							typeI32, "decNbTokensToSend", true, 0);
+							IrFactory.eINSTANCE.createLocation(),
+							IrFactory.eINSTANCE.createTypeInt(32),
+							"decNbTokensToSend", true, 0);
 					Expression value = IrFactory.eINSTANCE.createExprBinary(
 							IrFactory.eINSTANCE.createExprVar(numTokenToSend),
 							OpBinary.MINUS,
-							IrFactory.eINSTANCE.createExprInt(1), typeI32);
+							IrFactory.eINSTANCE.createExprInt(1),
+							IrFactory.eINSTANCE.createTypeInt(32));
 					Instruction assign = IrFactory.eINSTANCE.createInstAssign(
 							decNbTokensToSend, value);
 					untaggedBlkNode.add(assign);
@@ -1423,20 +1494,23 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	private void updateUntagIndex(Action action, Var writeIndex, int numTokens) {
 		NodeBlock blkNode = action.getBody().getLast();
 		EList<Var> locals = action.getBody().getLocals();
-		Var localWriteIndex = IrFactory.eINSTANCE.createVar(typeI32,
-				"localWriteIndex", true, 0);
+		Var localWriteIndex = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "localWriteIndex", true,
+				0);
 
 		locals.add(localWriteIndex);
 		Instruction load = IrFactory.eINSTANCE.createInstLoad(localWriteIndex,
 				writeIndex);
 		blkNode.add(load);
-		Var updatedIndex = IrFactory.eINSTANCE.createVar(typeI32,
-				"updatedIndex", true, 0);
+		Var updatedIndex = IrFactory.eINSTANCE.createVar(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeInt(32), "updatedIndex", true, 0);
 		locals.add(updatedIndex);
 		Expression value = IrFactory.eINSTANCE.createExprBinary(
 				IrFactory.eINSTANCE.createExprVar(localWriteIndex),
 				OpBinary.PLUS, IrFactory.eINSTANCE.createExprInt(numTokens),
-				typeI32);
+				IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign = IrFactory.eINSTANCE.createInstAssign(updatedIndex,
 				value);
 		blkNode.add(assign);
