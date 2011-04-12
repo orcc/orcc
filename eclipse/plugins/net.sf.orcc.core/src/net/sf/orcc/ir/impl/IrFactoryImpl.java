@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.impl;
 
+import java.util.Map;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -184,6 +185,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.PORT: return createPort();
 			case IrPackage.TAG: return createTag();
 			case IrPackage.FSM: return createFSM();
+			case IrPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
+			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
+			case IrPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -201,13 +205,14 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	@Override
 	public Action createAction(Location location, Tag tag,
-			Pattern inputPattern, Pattern outputPattern, Procedure scheduler,
+			Pattern inputPattern, Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
 			Procedure body) {
 		ActionImpl action = new ActionImpl();
 		action.setBody(body);
 		action.setInputPattern(inputPattern);
 		action.setLocation(location);
 		action.setOutputPattern(outputPattern);
+		action.setPeekedPattern(peekedPattern);
 		action.setScheduler(scheduler);
 		action.setTag(tag);
 		return action;
@@ -761,6 +766,36 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public FSM createFSM() {
 		FSMImpl fsm = new FSMImpl();
 		return fsm;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Var, Port> createVarToPortMapEntry() {
+		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
+		return varToPortMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
+		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
+		return portToEIntegerObjectMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Port, Var> createPortToVarMapEntry() {
+		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
+		return portToVarMapEntry;
 	}
 
 	@Override

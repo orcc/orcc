@@ -13,10 +13,13 @@ import net.sf.orcc.moc.MocPackage;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
 
-import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.util.EcoreEMap;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model object '
@@ -32,7 +35,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  */
 public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	/**
-	 * The cached value of the '{@link #getConfigurations() <em>Configurations</em>}' attribute.
+	 * The cached value of the '{@link #getConfigurations() <em>Configurations</em>}' map.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
 	 * @see #getConfigurations()
@@ -57,7 +60,8 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case MocPackage.QSDF_MO_C__CONFIGURATIONS:
-				return getConfigurations();
+				if (coreType) return getConfigurations();
+				else return getConfigurations().map();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -70,7 +74,7 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case MocPackage.QSDF_MO_C__CONFIGURATIONS:
-				return configurations != null;
+				return configurations != null && !configurations.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -79,12 +83,11 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case MocPackage.QSDF_MO_C__CONFIGURATIONS:
-				setConfigurations((EMap<Action, SDFMoC>)newValue);
+				((EStructuralFeature.Setting)getConfigurations()).set(newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -107,7 +110,7 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case MocPackage.QSDF_MO_C__CONFIGURATIONS:
-				setConfigurations((EMap<Action, SDFMoC>)null);
+				getConfigurations().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -123,6 +126,9 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	 * @generated
 	 */
 	public EMap<Action, SDFMoC> getConfigurations() {
+		if (configurations == null) {
+			configurations = new EcoreEMap<Action,SDFMoC>(MocPackage.Literals.ACTION_TO_SDF_MO_CMAP_ENTRY, ActionToSDFMoCMapEntryImpl.class, this, MocPackage.QSDF_MO_C__CONFIGURATIONS);
+		}
 		return configurations;
 	}
 
@@ -131,11 +137,13 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setConfigurations(EMap<Action, SDFMoC> newConfigurations) {
-		EMap<Action, SDFMoC> oldConfigurations = configurations;
-		configurations = newConfigurations;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.QSDF_MO_C__CONFIGURATIONS, oldConfigurations, configurations));
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case MocPackage.QSDF_MO_C__CONFIGURATIONS:
+				return ((InternalEList<?>)getConfigurations()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	@Override
@@ -146,21 +154,6 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 	@Override
 	public boolean isQuasiStatic() {
 		return true;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy()) return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (configurations: ");
-		result.append(configurations);
-		result.append(')');
-		return result.toString();
 	}
 
 } // QSDFMoCImpl

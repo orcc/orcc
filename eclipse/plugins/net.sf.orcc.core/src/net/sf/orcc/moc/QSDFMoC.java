@@ -44,24 +44,14 @@ import org.eclipse.emf.common.util.EMap;
  * @model extends="net.sf.orcc.moc.MoC"
  */
 public interface QSDFMoC extends MoC {
-	
+
 	/**
 	 * Return the configurations of this quasi-static MoC.
 	 * 
 	 * @return a map of configurations
-	 * @model
+	 * @model keyType="Action" valueType="SDFMoC"
 	 */
 	EMap<Action, SDFMoC> getConfigurations();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.moc.QSDFMoC#getConfigurations <em>Configurations</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Configurations</em>' attribute.
-	 * @see #getConfigurations()
-	 * @generated
-	 */
-	void setConfigurations(EMap<Action, SDFMoC> value);
 
 	/**
 	 * Returns the set of configuration actions.

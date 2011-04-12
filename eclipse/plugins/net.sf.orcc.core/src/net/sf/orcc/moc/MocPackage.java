@@ -184,7 +184,7 @@ public interface MocPackage extends EPackage {
 	int QSDF_MO_C = 4;
 
 	/**
-	 * The feature id for the '<em><b>Configurations</b></em>' attribute.
+	 * The feature id for the '<em><b>Configurations</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -257,6 +257,43 @@ public interface MocPackage extends EPackage {
 	int SDF_MO_C_FEATURE_COUNT = CSDF_MO_C_FEATURE_COUNT + 0;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.moc.impl.ActionToSDFMoCMapEntryImpl <em>Action To SDF Mo CMap Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.moc.impl.ActionToSDFMoCMapEntryImpl
+	 * @see net.sf.orcc.moc.impl.MocPackageImpl#getActionToSDFMoCMapEntry()
+	 * @generated
+	 */
+	int ACTION_TO_SDF_MO_CMAP_ENTRY = 6;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTION_TO_SDF_MO_CMAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTION_TO_SDF_MO_CMAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>Action To SDF Mo CMap Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTION_TO_SDF_MO_CMAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
 	 * The meta object id for the '<em>EMap</em>' data type.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -264,7 +301,7 @@ public interface MocPackage extends EPackage {
 	 * @see net.sf.orcc.moc.impl.MocPackageImpl#getEMap()
 	 * @generated
 	 */
-	int EMAP = 6;
+	int EMAP = 7;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.moc.MoC <em>Mo C</em>}'.
@@ -361,15 +398,15 @@ public interface MocPackage extends EPackage {
 	EClass getQSDFMoC();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.moc.QSDFMoC#getConfigurations <em>Configurations</em>}'.
+	 * Returns the meta object for the map '{@link net.sf.orcc.moc.QSDFMoC#getConfigurations <em>Configurations</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Configurations</em>'.
+	 * @return the meta object for the map '<em>Configurations</em>'.
 	 * @see net.sf.orcc.moc.QSDFMoC#getConfigurations()
 	 * @see #getQSDFMoC()
 	 * @generated
 	 */
-	EAttribute getQSDFMoC_Configurations();
+	EReference getQSDFMoC_Configurations();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.moc.SDFMoC <em>SDF Mo C</em>}'.
@@ -380,6 +417,40 @@ public interface MocPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getSDFMoC();
+
+	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Action To SDF Mo CMap Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Action To SDF Mo CMap Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyType="net.sf.orcc.ir.Action"
+	 *        valueType="net.sf.orcc.moc.SDFMoC"
+	 * @generated
+	 */
+	EClass getActionToSDFMoCMapEntry();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getActionToSDFMoCMapEntry()
+	 * @generated
+	 */
+	EReference getActionToSDFMoCMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getActionToSDFMoCMapEntry()
+	 * @generated
+	 */
+	EReference getActionToSDFMoCMapEntry_Value();
 
 	/**
 	 * Returns the meta object for data type '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}'.
@@ -488,12 +559,12 @@ public interface MocPackage extends EPackage {
 		 */
 		EClass QSDF_MO_C = eINSTANCE.getQSDFMoC();
 		/**
-		 * The meta object literal for the '<em><b>Configurations</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Configurations</b></em>' map feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute QSDF_MO_C__CONFIGURATIONS = eINSTANCE.getQSDFMoC_Configurations();
+		EReference QSDF_MO_C__CONFIGURATIONS = eINSTANCE.getQSDFMoC_Configurations();
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.moc.impl.SDFMoCImpl <em>SDF Mo C</em>}' class.
 		 * <!-- begin-user-doc -->
@@ -503,6 +574,29 @@ public interface MocPackage extends EPackage {
 		 * @generated
 		 */
 		EClass SDF_MO_C = eINSTANCE.getSDFMoC();
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.moc.impl.ActionToSDFMoCMapEntryImpl <em>Action To SDF Mo CMap Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.moc.impl.ActionToSDFMoCMapEntryImpl
+		 * @see net.sf.orcc.moc.impl.MocPackageImpl#getActionToSDFMoCMapEntry()
+		 * @generated
+		 */
+		EClass ACTION_TO_SDF_MO_CMAP_ENTRY = eINSTANCE.getActionToSDFMoCMapEntry();
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTION_TO_SDF_MO_CMAP_ENTRY__KEY = eINSTANCE.getActionToSDFMoCMapEntry_Key();
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTION_TO_SDF_MO_CMAP_ENTRY__VALUE = eINSTANCE.getActionToSDFMoCMapEntry_Value();
 		/**
 		 * The meta object literal for the '<em>EMap</em>' data type.
 		 * <!-- begin-user-doc -->

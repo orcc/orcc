@@ -46,13 +46,16 @@ public interface IrFactory extends EFactory {
 	 *            input pattern
 	 * @param outputPattern
 	 *            output pattern
+	 * @param peekedPattern
+	 *            peeked pattern
 	 * @param scheduler
 	 *            procedure that computes scheduling information
 	 * @param body
 	 *            procedure that holds the body of the action
 	 */
 	Action createAction(Location location, Tag tag, Pattern inputPattern,
-			Pattern outputPattern, Procedure scheduler, Procedure body);
+			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
+			Procedure body);
 
 	/**
 	 * Returns a new object of class '<em>Actor</em>'.

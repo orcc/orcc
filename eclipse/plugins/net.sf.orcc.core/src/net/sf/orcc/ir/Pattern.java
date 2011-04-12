@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class defines a pattern. A pattern is a map between ports and the number
@@ -68,8 +68,9 @@ public interface Pattern extends EObject {
 	 * Returns the inverse variable map.
 	 * 
 	 * @return the inverse variable map
+	 * @model keyType="Var" valueType="Port"
 	 */
-	Map<Var, Port> getInverseVariableMap();
+	EMap<Var, Port> getInverseVariableMap();
 
 	/**
 	 * Returns the number of tokens produced (or consumed) by the given port.
@@ -82,30 +83,17 @@ public interface Pattern extends EObject {
 	 * Returns the number of tokens map.
 	 * 
 	 * @return the number of tokens map
+	 * @model keyType="Port" valueType="Integer"
 	 */
-	Map<Port, Integer> getNumTokensMap();
-
-	/**
-	 * Returns the variable that contains the tokens peeked by the given port.
-	 * May be <code>null</code> if the port is not peeked.
-	 * 
-	 * @return the variable that contains the tokens peeked by the given port
-	 */
-	Var getPeeked(Port port);
-
-	/**
-	 * Returns the peeked map.
-	 * 
-	 * @return the peeked map
-	 */
-	Map<Port, Var> getPeekedMap();
+	EMap<Port, Integer> getNumTokensMap();
 
 	/**
 	 * Returns the ports of this pattern.
 	 * 
 	 * @return the ports of this pattern
+	 * @model
 	 */
-	List<Port> getPorts();
+	EList<Port> getPorts();
 
 	/**
 	 * Returns the variable that contains tokens produced (or consumed) by the
@@ -120,8 +108,9 @@ public interface Pattern extends EObject {
 	 * Returns the variable map.
 	 * 
 	 * @return the variable map
+	 * @model containment="true" keyType="Port" valueType="Var"
 	 */
-	Map<Port, Var> getVariableMap();
+	EMap<Port, Var> getVariableMap();
 
 	/**
 	 * Returns <code>true</code> if this pattern is empty.
@@ -159,16 +148,6 @@ public interface Pattern extends EObject {
 	 *            number of tokens produced (or consumed) by the given port
 	 */
 	void setNumTokens(Port port, int numTokens);
-
-	/**
-	 * Sets the variable in which tokens are peeked from the given port.
-	 * 
-	 * @param port
-	 *            a port
-	 * @param peeked
-	 *            a variable that contains tokens peeked by the given port
-	 */
-	void setPeeked(Port port, Var peeked);
 
 	/**
 	 * Sets the variable that contains tokens produced (or consumed) by the

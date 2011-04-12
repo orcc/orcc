@@ -8,6 +8,8 @@ package net.sf.orcc.moc.util;
 
 import java.util.List;
 
+import java.util.Map;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.moc.*;
 
 import org.eclipse.emf.ecore.EClass;
@@ -129,6 +131,12 @@ public class MocSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case MocPackage.ACTION_TO_SDF_MO_CMAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<Action, SDFMoC> actionToSDFMoCMapEntry = (Map.Entry<Action, SDFMoC>)theEObject;
+				T result = caseActionToSDFMoCMapEntry(actionToSDFMoCMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -220,6 +228,21 @@ public class MocSwitch<T> {
 	 * @generated
 	 */
 	public T caseSDFMoC(SDFMoC object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Action To SDF Mo CMap Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Action To SDF Mo CMap Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseActionToSDFMoCMapEntry(Map.Entry<Action, SDFMoC> object) {
 		return null;
 	}
 

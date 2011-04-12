@@ -7,6 +7,7 @@
 package net.sf.orcc.ir.impl;
 
 import java.lang.Comparable;
+import java.util.Map;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -53,6 +54,7 @@ import net.sf.orcc.ir.Var;
 
 import net.sf.orcc.moc.MocPackage;
 import net.sf.orcc.moc.impl.MocPackageImpl;
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
@@ -349,6 +351,34 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass comparableEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass eMapEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass varToPortMapEntryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass portToEIntegerObjectMapEntryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass portToVarMapEntryEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1392,6 +1422,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getAction_PeekedPattern() {
+		return (EReference)actionEClass.getEStructuralFeatures().get(6);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getActor() {
 		return actorEClass;
 	}
@@ -1527,6 +1566,42 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getPattern_InverseVariableMap() {
+		return (EReference)patternEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getPattern_NumTokensMap() {
+		return (EReference)patternEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getPattern_Ports() {
+		return (EReference)patternEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getPattern_VariableMap() {
+		return (EReference)patternEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getPort() {
 		return portEClass;
 	}
@@ -1610,6 +1685,96 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EClass getComparable() {
 		return comparableEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getEMap() {
+		return eMapEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getVarToPortMapEntry() {
+		return varToPortMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getVarToPortMapEntry_Key() {
+		return (EReference)varToPortMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getVarToPortMapEntry_Value() {
+		return (EReference)varToPortMapEntryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getPortToEIntegerObjectMapEntry() {
+		return portToEIntegerObjectMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getPortToEIntegerObjectMapEntry_Key() {
+		return (EReference)portToEIntegerObjectMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getPortToEIntegerObjectMapEntry_Value() {
+		return (EAttribute)portToEIntegerObjectMapEntryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getPortToVarMapEntry() {
+		return portToVarMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getPortToVarMapEntry_Key() {
+		return (EReference)portToVarMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getPortToVarMapEntry_Value() {
+		return (EReference)portToVarMapEntryEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1799,6 +1964,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(actionEClass, ACTION__OUTPUT_PATTERN);
 		createEReference(actionEClass, ACTION__SCHEDULER);
 		createEReference(actionEClass, ACTION__TAG);
+		createEReference(actionEClass, ACTION__PEEKED_PATTERN);
 
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
@@ -1816,6 +1982,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(actorEClass, ACTOR__MO_C);
 
 		patternEClass = createEClass(PATTERN);
+		createEReference(patternEClass, PATTERN__INVERSE_VARIABLE_MAP);
+		createEReference(patternEClass, PATTERN__NUM_TOKENS_MAP);
+		createEReference(patternEClass, PATTERN__PORTS);
+		createEReference(patternEClass, PATTERN__VARIABLE_MAP);
 
 		portEClass = createEClass(PORT);
 		createEReference(portEClass, PORT__LOCATION);
@@ -1830,6 +2000,20 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		fsmEClass = createEClass(FSM);
 
 		comparableEClass = createEClass(COMPARABLE);
+
+		eMapEClass = createEClass(EMAP);
+
+		varToPortMapEntryEClass = createEClass(VAR_TO_PORT_MAP_ENTRY);
+		createEReference(varToPortMapEntryEClass, VAR_TO_PORT_MAP_ENTRY__KEY);
+		createEReference(varToPortMapEntryEClass, VAR_TO_PORT_MAP_ENTRY__VALUE);
+
+		portToEIntegerObjectMapEntryEClass = createEClass(PORT_TO_EINTEGER_OBJECT_MAP_ENTRY);
+		createEReference(portToEIntegerObjectMapEntryEClass, PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY);
+		createEAttribute(portToEIntegerObjectMapEntryEClass, PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE);
+
+		portToVarMapEntryEClass = createEClass(PORT_TO_VAR_MAP_ENTRY);
+		createEReference(portToVarMapEntryEClass, PORT_TO_VAR_MAP_ENTRY__KEY);
+		createEReference(portToVarMapEntryEClass, PORT_TO_VAR_MAP_ENTRY__VALUE);
 
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
@@ -1865,6 +2049,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Create type parameters
 		addETypeParameter(comparableEClass, "T");
+		addETypeParameter(eMapEClass, "T");
+		addETypeParameter(eMapEClass, "T1");
 
 		// Set bounds for type parameters
 
@@ -2040,6 +2226,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getAction_OutputPattern(), this.getPattern(), null, "outputPattern", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_Scheduler(), this.getProcedure(), null, "scheduler", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_Tag(), this.getTag(), null, "tag", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getAction_PeekedPattern(), this.getPattern(), null, "peekedPattern", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getActor_Actions(), this.getAction(), null, "actions", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2057,6 +2244,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getActor_MoC(), theMocPackage.getMoC(), null, "moC", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(patternEClass, Pattern.class, "Pattern", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getPattern_InverseVariableMap(), this.getVarToPortMapEntry(), null, "inverseVariableMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPattern_NumTokensMap(), this.getPortToEIntegerObjectMapEntry(), null, "numTokensMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPattern_Ports(), this.getPort(), null, "ports", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPattern_VariableMap(), this.getPortToVarMapEntry(), null, "variableMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getPort_Location(), this.getLocation(), null, "location", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2071,6 +2262,20 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(fsmEClass, net.sf.orcc.ir.FSM.class, "FSM", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(comparableEClass, Comparable.class, "Comparable", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(eMapEClass, EMap.class, "EMap", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(varToPortMapEntryEClass, Map.Entry.class, "VarToPortMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getVarToPortMapEntry_Key(), this.getVar(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getVarToPortMapEntry_Value(), this.getPort(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(portToEIntegerObjectMapEntryEClass, Map.Entry.class, "PortToEIntegerObjectMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getPortToEIntegerObjectMapEntry_Key(), this.getPort(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPortToEIntegerObjectMapEntry_Value(), theEcorePackage.getEIntegerObject(), "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(portToVarMapEntryEClass, Map.Entry.class, "PortToVarMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getPortToVarMapEntry_Key(), this.getPort(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPortToVarMapEntry_Value(), this.getVar(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");

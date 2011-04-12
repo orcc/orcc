@@ -1452,13 +1452,22 @@ public interface IrPackage extends EPackage {
 	int ACTION__TAG = 5;
 
 	/**
+	 * The feature id for the '<em><b>Peeked Pattern</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTION__PEEKED_PATTERN = 6;
+
+	/**
 	 * The number of structural features of the '<em>Action</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION_FEATURE_COUNT = 6;
+	int ACTION_FEATURE_COUNT = 7;
 
 	/**
 	 * The meta object id for the '{@link java.lang.Comparable <em>Comparable</em>}' class.
@@ -1626,13 +1635,49 @@ public interface IrPackage extends EPackage {
 	int PATTERN = 36;
 
 	/**
+	 * The feature id for the '<em><b>Inverse Variable Map</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PATTERN__INVERSE_VARIABLE_MAP = 0;
+
+	/**
+	 * The feature id for the '<em><b>Num Tokens Map</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PATTERN__NUM_TOKENS_MAP = 1;
+
+	/**
+	 * The feature id for the '<em><b>Ports</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PATTERN__PORTS = 2;
+
+	/**
+	 * The feature id for the '<em><b>Variable Map</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PATTERN__VARIABLE_MAP = 3;
+
+	/**
 	 * The number of structural features of the '<em>Pattern</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN_FEATURE_COUNT = 0;
+	int PATTERN_FEATURE_COUNT = 4;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PortImpl <em>Port</em>}' class.
@@ -1746,6 +1791,136 @@ public interface IrPackage extends EPackage {
 	int FSM_FEATURE_COUNT = 0;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.emf.common.util.EMap
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getEMap()
+	 * @generated
+	 */
+	int EMAP = 41;
+
+	/**
+	 * The number of structural features of the '<em>EMap</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EMAP_FEATURE_COUNT = 0;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.VarToPortMapEntryImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
+	 * @generated
+	 */
+	int VAR_TO_PORT_MAP_ENTRY = 42;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR_TO_PORT_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR_TO_PORT_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>Var To Port Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR_TO_PORT_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
+	 * @generated
+	 */
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 43;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>Port To EInteger Object Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.PortToVarMapEntryImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
+	 * @generated
+	 */
+	int PORT_TO_VAR_MAP_ENTRY = 44;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_VAR_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_VAR_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>Port To Var Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_VAR_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1753,7 +1928,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 41;
+	int OP_BINARY = 45;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1763,7 +1938,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 42;
+	int OP_UNARY = 46;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
@@ -2921,6 +3096,17 @@ public interface IrPackage extends EPackage {
 	EReference getAction_Tag();
 
 	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Action#getPeekedPattern <em>Peeked Pattern</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Peeked Pattern</em>'.
+	 * @see net.sf.orcc.ir.Action#getPeekedPattern()
+	 * @see #getAction()
+	 * @generated
+	 */
+	EReference getAction_PeekedPattern();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Actor <em>Actor</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3084,6 +3270,50 @@ public interface IrPackage extends EPackage {
 	EClass getPattern();
 
 	/**
+	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getInverseVariableMap <em>Inverse Variable Map</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Inverse Variable Map</em>'.
+	 * @see net.sf.orcc.ir.Pattern#getInverseVariableMap()
+	 * @see #getPattern()
+	 * @generated
+	 */
+	EReference getPattern_InverseVariableMap();
+
+	/**
+	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getNumTokensMap <em>Num Tokens Map</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Num Tokens Map</em>'.
+	 * @see net.sf.orcc.ir.Pattern#getNumTokensMap()
+	 * @see #getPattern()
+	 * @generated
+	 */
+	EReference getPattern_NumTokensMap();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Pattern#getPorts <em>Ports</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Ports</em>'.
+	 * @see net.sf.orcc.ir.Pattern#getPorts()
+	 * @see #getPattern()
+	 * @generated
+	 */
+	EReference getPattern_Ports();
+
+	/**
+	 * Returns the meta object for the map '{@link net.sf.orcc.ir.Pattern#getVariableMap <em>Variable Map</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Variable Map</em>'.
+	 * @see net.sf.orcc.ir.Pattern#getVariableMap()
+	 * @see #getPattern()
+	 * @generated
+	 */
+	EReference getPattern_VariableMap();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Port <em>Port</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3189,6 +3419,119 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getComparable();
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>EMap</em>'.
+	 * @see org.eclipse.emf.common.util.EMap
+	 * @model instanceClass="org.eclipse.emf.common.util.EMap" typeParameters="T T1"
+	 * @generated
+	 */
+	EClass getEMap();
+
+	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Var To Port Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Var To Port Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyType="net.sf.orcc.ir.Var"
+	 *        valueType="net.sf.orcc.ir.Port"
+	 * @generated
+	 */
+	EClass getVarToPortMapEntry();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getVarToPortMapEntry()
+	 * @generated
+	 */
+	EReference getVarToPortMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getVarToPortMapEntry()
+	 * @generated
+	 */
+	EReference getVarToPortMapEntry_Value();
+
+	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Port To EInteger Object Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyType="net.sf.orcc.ir.Port"
+	 *        valueDataType="org.eclipse.emf.ecore.EIntegerObject"
+	 * @generated
+	 */
+	EClass getPortToEIntegerObjectMapEntry();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getPortToEIntegerObjectMapEntry()
+	 * @generated
+	 */
+	EReference getPortToEIntegerObjectMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getPortToEIntegerObjectMapEntry()
+	 * @generated
+	 */
+	EAttribute getPortToEIntegerObjectMapEntry_Value();
+
+	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Port To Var Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyType="net.sf.orcc.ir.Port"
+	 *        valueType="net.sf.orcc.ir.Var"
+	 * @generated
+	 */
+	EClass getPortToVarMapEntry();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getPortToVarMapEntry()
+	 * @generated
+	 */
+	EReference getPortToVarMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getPortToVarMapEntry()
+	 * @generated
+	 */
+	EReference getPortToVarMapEntry_Value();
 
 	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}'.
@@ -4078,6 +4421,14 @@ public interface IrPackage extends EPackage {
 		EReference ACTION__TAG = eINSTANCE.getAction_Tag();
 
 		/**
+		 * The meta object literal for the '<em><b>Peeked Pattern</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTION__PEEKED_PATTERN = eINSTANCE.getAction_PeekedPattern();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ActorImpl <em>Actor</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -4202,6 +4553,38 @@ public interface IrPackage extends EPackage {
 		EClass PATTERN = eINSTANCE.getPattern();
 
 		/**
+		 * The meta object literal for the '<em><b>Inverse Variable Map</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PATTERN__INVERSE_VARIABLE_MAP = eINSTANCE.getPattern_InverseVariableMap();
+
+		/**
+		 * The meta object literal for the '<em><b>Num Tokens Map</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PATTERN__NUM_TOKENS_MAP = eINSTANCE.getPattern_NumTokensMap();
+
+		/**
+		 * The meta object literal for the '<em><b>Ports</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PATTERN__PORTS = eINSTANCE.getPattern_Ports();
+
+		/**
+		 * The meta object literal for the '<em><b>Variable Map</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PATTERN__VARIABLE_MAP = eINSTANCE.getPattern_VariableMap();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PortImpl <em>Port</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -4288,6 +4671,94 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass COMPARABLE = eINSTANCE.getComparable();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.emf.common.util.EMap
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getEMap()
+		 * @generated
+		 */
+		EClass EMAP = eINSTANCE.getEMap();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.VarToPortMapEntryImpl <em>Var To Port Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.VarToPortMapEntryImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
+		 * @generated
+		 */
+		EClass VAR_TO_PORT_MAP_ENTRY = eINSTANCE.getVarToPortMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VAR_TO_PORT_MAP_ENTRY__KEY = eINSTANCE.getVarToPortMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference VAR_TO_PORT_MAP_ENTRY__VALUE = eINSTANCE.getVarToPortMapEntry_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl <em>Port To EInteger Object Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.PortToEIntegerObjectMapEntryImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
+		 * @generated
+		 */
+		EClass PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = eINSTANCE.getPortToEIntegerObjectMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__KEY = eINSTANCE.getPortToEIntegerObjectMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = eINSTANCE.getPortToEIntegerObjectMapEntry_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.PortToVarMapEntryImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
+		 * @generated
+		 */
+		EClass PORT_TO_VAR_MAP_ENTRY = eINSTANCE.getPortToVarMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PORT_TO_VAR_MAP_ENTRY__KEY = eINSTANCE.getPortToVarMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PORT_TO_VAR_MAP_ENTRY__VALUE = eINSTANCE.getPortToVarMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.

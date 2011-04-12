@@ -14,14 +14,14 @@
   <eClassifiers xsi:type="ecore:EClass" name="DPNMoC" eSuperTypes="#//MoC"/>
   <eClassifiers xsi:type="ecore:EClass" name="KPNMoC" eSuperTypes="#//MoC"/>
   <eClassifiers xsi:type="ecore:EClass" name="QSDFMoC" eSuperTypes="#//MoC">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="configurations">
-      <eGenericType eClassifier="#//EMap">
-        <eTypeArguments eClassifier="ecore:EClass Ir.ecore#//Action"/>
-        <eTypeArguments eClassifier="#//SDFMoC"/>
-      </eGenericType>
-    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="configurations" upperBound="-1"
+        eType="#//ActionToSDFMoCMapEntry" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SDFMoC" eSuperTypes="#//CSDFMoC"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ActionToSDFMoCMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="ecore:EClass Ir.ecore#//Action"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//SDFMoC"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EDataType" name="EMap" instanceClassName="org.eclipse.emf.common.util.EMap">
     <eTypeParameters name="T"/>
     <eTypeParameters name="T1"/>

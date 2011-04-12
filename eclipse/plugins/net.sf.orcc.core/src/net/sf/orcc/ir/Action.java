@@ -82,6 +82,14 @@ public interface Action extends EObject {
 	Pattern getOutputPattern();
 
 	/**
+	 * Returns the peeked pattern of this action.
+	 * 
+	 * @return the peeked pattern of this action
+	 * @model containment="true"
+	 */
+	Pattern getPeekedPattern();
+
+	/**
 	 * Returns the procedure that holds the scheduling information of this
 	 * action.
 	 * 
@@ -110,14 +118,20 @@ public interface Action extends EObject {
 	void setBody(Procedure value);
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Action#getInputPattern <em>Input Pattern</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Input Pattern</em>' containment reference.
-	 * @see #getInputPattern()
-	 * @generated
+	 * Sets the input pattern of this action to the given pattern.
+	 * 
+	 * @param pattern
+	 *            a pattern
 	 */
-	void setInputPattern(Pattern value);
+	void setInputPattern(Pattern pattern);
+
+	/**
+	 * Sets the peeked pattern of this action to the given pattern.
+	 * 
+	 * @param pattern
+	 *            a pattern
+	 */
+	void setPeekedPattern(Pattern pattern);
 
 	/**
 	 * Sets the location of this action.

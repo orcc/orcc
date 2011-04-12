@@ -6,6 +6,9 @@
  */
 package net.sf.orcc.moc.impl;
 
+import java.util.Map;
+
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
 import net.sf.orcc.moc.KPNMoC;
@@ -71,6 +74,7 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 			case MocPackage.KPN_MO_C: return createKPNMoC();
 			case MocPackage.QSDF_MO_C: return createQSDFMoC();
 			case MocPackage.SDF_MO_C: return createSDFMoC();
+			case MocPackage.ACTION_TO_SDF_MO_CMAP_ENTRY: return (EObject)createActionToSDFMoCMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -154,6 +158,16 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 		SDFMoCImpl sdfMoC = new SDFMoCImpl();
 		sdfMoC.setNumberOfPhases(1);
 		return sdfMoC;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Action, SDFMoC> createActionToSDFMoCMapEntry() {
+		ActionToSDFMoCMapEntryImpl actionToSDFMoCMapEntry = new ActionToSDFMoCMapEntryImpl();
+		return actionToSDFMoCMapEntry;
 	}
 
 	/**

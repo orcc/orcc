@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.util.Map;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -51,6 +52,7 @@ import net.sf.orcc.ir.Var;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -241,6 +243,22 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public <T> Adapter caseComparable(Comparable<T> object) {
 				return createComparableAdapter();
+			}
+			@Override
+			public <T, T1> Adapter caseEMap(EMap<T, T1> object) {
+				return createEMapAdapter();
+			}
+			@Override
+			public Adapter caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
+				return createVarToPortMapEntryAdapter();
+			}
+			@Override
+			public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
+				return createPortToEIntegerObjectMapEntryAdapter();
+			}
+			@Override
+			public Adapter casePortToVarMapEntry(Map.Entry<Port, Var> object) {
+				return createPortToVarMapEntryAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -478,6 +496,62 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createComparableAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.emf.common.util.EMap
+	 * @generated
+	 */
+	public Adapter createEMapAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Var To Port Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createVarToPortMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createPortToEIntegerObjectMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createPortToVarMapEntryAdapter() {
 		return null;
 	}
 

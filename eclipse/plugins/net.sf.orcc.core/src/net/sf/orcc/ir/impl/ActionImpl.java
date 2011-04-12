@@ -23,9 +23,8 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Action</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Action</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -35,16 +34,17 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getOutputPattern <em>Output Pattern</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getScheduler <em>Scheduler</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getTag <em>Tag</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getPeekedPattern <em>Peeked Pattern</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class ActionImpl extends EObjectImpl implements Action {
+
 	/**
 	 * The cached value of the '{@link #getBody() <em>Body</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getBody()
 	 * @generated
 	 * @ordered
@@ -63,8 +63,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 
 	/**
 	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getLocation()
 	 * @generated
 	 * @ordered
@@ -83,8 +82,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 
 	/**
 	 * The cached value of the '{@link #getScheduler() <em>Scheduler</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getScheduler()
 	 * @generated
 	 * @ordered
@@ -93,8 +91,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 
 	/**
 	 * The cached value of the '{@link #getTag() <em>Tag</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTag()
 	 * @generated
 	 * @ordered
@@ -102,8 +99,17 @@ public class ActionImpl extends EObjectImpl implements Action {
 	protected Tag tag;
 
 	/**
+	 * The cached value of the '{@link #getPeekedPattern() <em>Peeked Pattern</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @see #getPeekedPattern()
+	 * @generated
+	 * @ordered
+	 */
+	protected Pattern peekedPattern;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected ActionImpl() {
@@ -111,30 +117,11 @@ public class ActionImpl extends EObjectImpl implements Action {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	protected EClass eStaticClass() {
-		return IrPackage.Literals.ACTION;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Procedure getBody() {
-		return body;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetBody(Procedure newBody, NotificationChain msgs) {
+	public NotificationChain basicSetBody(Procedure newBody,
+			NotificationChain msgs) {
 		Procedure oldBody = body;
 		body = newBody;
 		if (eNotificationRequired()) {
@@ -145,39 +132,11 @@ public class ActionImpl extends EObjectImpl implements Action {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setBody(Procedure newBody) {
-		if (newBody != body) {
-			NotificationChain msgs = null;
-			if (body != null)
-				msgs = ((InternalEObject)body).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__BODY, null, msgs);
-			if (newBody != null)
-				msgs = ((InternalEObject)newBody).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__BODY, null, msgs);
-			msgs = basicSetBody(newBody, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__BODY, newBody, newBody));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Pattern getInputPattern() {
-		return inputPattern;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetInputPattern(Pattern newInputPattern, NotificationChain msgs) {
+	public NotificationChain basicSetInputPattern(Pattern newInputPattern,
+			NotificationChain msgs) {
 		Pattern oldInputPattern = inputPattern;
 		inputPattern = newInputPattern;
 		if (eNotificationRequired()) {
@@ -188,39 +147,11 @@ public class ActionImpl extends EObjectImpl implements Action {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setInputPattern(Pattern newInputPattern) {
-		if (newInputPattern != inputPattern) {
-			NotificationChain msgs = null;
-			if (inputPattern != null)
-				msgs = ((InternalEObject)inputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__INPUT_PATTERN, null, msgs);
-			if (newInputPattern != null)
-				msgs = ((InternalEObject)newInputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__INPUT_PATTERN, null, msgs);
-			msgs = basicSetInputPattern(newInputPattern, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__INPUT_PATTERN, newInputPattern, newInputPattern));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Location getLocation() {
-		return location;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetLocation(Location newLocation, NotificationChain msgs) {
+	public NotificationChain basicSetLocation(Location newLocation,
+			NotificationChain msgs) {
 		Location oldLocation = location;
 		location = newLocation;
 		if (eNotificationRequired()) {
@@ -231,39 +162,11 @@ public class ActionImpl extends EObjectImpl implements Action {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setLocation(Location newLocation) {
-		if (newLocation != location) {
-			NotificationChain msgs = null;
-			if (location != null)
-				msgs = ((InternalEObject)location).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__LOCATION, null, msgs);
-			if (newLocation != null)
-				msgs = ((InternalEObject)newLocation).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__LOCATION, null, msgs);
-			msgs = basicSetLocation(newLocation, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__LOCATION, newLocation, newLocation));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Pattern getOutputPattern() {
-		return outputPattern;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetOutputPattern(Pattern newOutputPattern, NotificationChain msgs) {
+	public NotificationChain basicSetOutputPattern(Pattern newOutputPattern,
+			NotificationChain msgs) {
 		Pattern oldOutputPattern = outputPattern;
 		outputPattern = newOutputPattern;
 		if (eNotificationRequired()) {
@@ -274,39 +177,26 @@ public class ActionImpl extends EObjectImpl implements Action {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setOutputPattern(Pattern newOutputPattern) {
-		if (newOutputPattern != outputPattern) {
-			NotificationChain msgs = null;
-			if (outputPattern != null)
-				msgs = ((InternalEObject)outputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__OUTPUT_PATTERN, null, msgs);
-			if (newOutputPattern != null)
-				msgs = ((InternalEObject)newOutputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__OUTPUT_PATTERN, null, msgs);
-			msgs = basicSetOutputPattern(newOutputPattern, msgs);
-			if (msgs != null) msgs.dispatch();
+	public NotificationChain basicSetPeekedPattern(Pattern newPeekedPattern,
+			NotificationChain msgs) {
+		Pattern oldPeekedPattern = peekedPattern;
+		peekedPattern = newPeekedPattern;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__PEEKED_PATTERN, oldPeekedPattern, newPeekedPattern);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__OUTPUT_PATTERN, newOutputPattern, newOutputPattern));
+		return msgs;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Procedure getScheduler() {
-		return scheduler;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetScheduler(Procedure newScheduler, NotificationChain msgs) {
+	public NotificationChain basicSetScheduler(Procedure newScheduler,
+			NotificationChain msgs) {
 		Procedure oldScheduler = scheduler;
 		scheduler = newScheduler;
 		if (eNotificationRequired()) {
@@ -317,36 +207,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setScheduler(Procedure newScheduler) {
-		if (newScheduler != scheduler) {
-			NotificationChain msgs = null;
-			if (scheduler != null)
-				msgs = ((InternalEObject)scheduler).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__SCHEDULER, null, msgs);
-			if (newScheduler != null)
-				msgs = ((InternalEObject)newScheduler).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__SCHEDULER, null, msgs);
-			msgs = basicSetScheduler(newScheduler, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__SCHEDULER, newScheduler, newScheduler));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Tag getTag() {
-		return tag;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public NotificationChain basicSetTag(Tag newTag, NotificationChain msgs) {
@@ -360,51 +221,7 @@ public class ActionImpl extends EObjectImpl implements Action {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setTag(Tag newTag) {
-		if (newTag != tag) {
-			NotificationChain msgs = null;
-			if (tag != null)
-				msgs = ((InternalEObject)tag).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__TAG, null, msgs);
-			if (newTag != null)
-				msgs = ((InternalEObject)newTag).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__TAG, null, msgs);
-			msgs = basicSetTag(newTag, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__TAG, newTag, newTag));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case IrPackage.ACTION__BODY:
-				return basicSetBody(null, msgs);
-			case IrPackage.ACTION__INPUT_PATTERN:
-				return basicSetInputPattern(null, msgs);
-			case IrPackage.ACTION__LOCATION:
-				return basicSetLocation(null, msgs);
-			case IrPackage.ACTION__OUTPUT_PATTERN:
-				return basicSetOutputPattern(null, msgs);
-			case IrPackage.ACTION__SCHEDULER:
-				return basicSetScheduler(null, msgs);
-			case IrPackage.ACTION__TAG:
-				return basicSetTag(null, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -422,13 +239,65 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return getScheduler();
 			case IrPackage.ACTION__TAG:
 				return getTag();
+			case IrPackage.ACTION__PEEKED_PATTERN:
+				return getPeekedPattern();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.ACTION__BODY:
+				return basicSetBody(null, msgs);
+			case IrPackage.ACTION__INPUT_PATTERN:
+				return basicSetInputPattern(null, msgs);
+			case IrPackage.ACTION__LOCATION:
+				return basicSetLocation(null, msgs);
+			case IrPackage.ACTION__OUTPUT_PATTERN:
+				return basicSetOutputPattern(null, msgs);
+			case IrPackage.ACTION__SCHEDULER:
+				return basicSetScheduler(null, msgs);
+			case IrPackage.ACTION__TAG:
+				return basicSetTag(null, msgs);
+			case IrPackage.ACTION__PEEKED_PATTERN:
+				return basicSetPeekedPattern(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean eIsSet(int featureID) {
+		switch (featureID) {
+			case IrPackage.ACTION__BODY:
+				return body != null;
+			case IrPackage.ACTION__INPUT_PATTERN:
+				return inputPattern != null;
+			case IrPackage.ACTION__LOCATION:
+				return location != null;
+			case IrPackage.ACTION__OUTPUT_PATTERN:
+				return outputPattern != null;
+			case IrPackage.ACTION__SCHEDULER:
+				return scheduler != null;
+			case IrPackage.ACTION__TAG:
+				return tag != null;
+			case IrPackage.ACTION__PEEKED_PATTERN:
+				return peekedPattern != null;
+		}
+		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -452,13 +321,24 @@ public class ActionImpl extends EObjectImpl implements Action {
 			case IrPackage.ACTION__TAG:
 				setTag((Tag)newValue);
 				return;
+			case IrPackage.ACTION__PEEKED_PATTERN:
+				setPeekedPattern((Pattern)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.ACTION;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -482,32 +362,35 @@ public class ActionImpl extends EObjectImpl implements Action {
 			case IrPackage.ACTION__TAG:
 				setTag((Tag)null);
 				return;
+			case IrPackage.ACTION__PEEKED_PATTERN:
+				setPeekedPattern((Pattern)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.ACTION__BODY:
-				return body != null;
-			case IrPackage.ACTION__INPUT_PATTERN:
-				return inputPattern != null;
-			case IrPackage.ACTION__LOCATION:
-				return location != null;
-			case IrPackage.ACTION__OUTPUT_PATTERN:
-				return outputPattern != null;
-			case IrPackage.ACTION__SCHEDULER:
-				return scheduler != null;
-			case IrPackage.ACTION__TAG:
-				return tag != null;
-		}
-		return super.eIsSet(featureID);
+	public Procedure getBody() {
+		return body;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Pattern getInputPattern() {
+		return inputPattern;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Location getLocation() {
+		return location;
 	}
 
 	@Override
@@ -525,4 +408,162 @@ public class ActionImpl extends EObjectImpl implements Action {
 		}
 	}
 
-} //ActionImpl
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Pattern getOutputPattern() {
+		return outputPattern;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Pattern getPeekedPattern() {
+		return peekedPattern;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Procedure getScheduler() {
+		return scheduler;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Tag getTag() {
+		return tag;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setBody(Procedure newBody) {
+		if (newBody != body) {
+			NotificationChain msgs = null;
+			if (body != null)
+				msgs = ((InternalEObject)body).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__BODY, null, msgs);
+			if (newBody != null)
+				msgs = ((InternalEObject)newBody).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__BODY, null, msgs);
+			msgs = basicSetBody(newBody, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__BODY, newBody, newBody));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setInputPattern(Pattern newInputPattern) {
+		if (newInputPattern != inputPattern) {
+			NotificationChain msgs = null;
+			if (inputPattern != null)
+				msgs = ((InternalEObject)inputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__INPUT_PATTERN, null, msgs);
+			if (newInputPattern != null)
+				msgs = ((InternalEObject)newInputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__INPUT_PATTERN, null, msgs);
+			msgs = basicSetInputPattern(newInputPattern, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__INPUT_PATTERN, newInputPattern, newInputPattern));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setLocation(Location newLocation) {
+		if (newLocation != location) {
+			NotificationChain msgs = null;
+			if (location != null)
+				msgs = ((InternalEObject)location).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__LOCATION, null, msgs);
+			if (newLocation != null)
+				msgs = ((InternalEObject)newLocation).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__LOCATION, null, msgs);
+			msgs = basicSetLocation(newLocation, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__LOCATION, newLocation, newLocation));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setOutputPattern(Pattern newOutputPattern) {
+		if (newOutputPattern != outputPattern) {
+			NotificationChain msgs = null;
+			if (outputPattern != null)
+				msgs = ((InternalEObject)outputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__OUTPUT_PATTERN, null, msgs);
+			if (newOutputPattern != null)
+				msgs = ((InternalEObject)newOutputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__OUTPUT_PATTERN, null, msgs);
+			msgs = basicSetOutputPattern(newOutputPattern, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__OUTPUT_PATTERN, newOutputPattern, newOutputPattern));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setPeekedPattern(Pattern newPeekedPattern) {
+		if (newPeekedPattern != peekedPattern) {
+			NotificationChain msgs = null;
+			if (peekedPattern != null)
+				msgs = ((InternalEObject)peekedPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__PEEKED_PATTERN, null, msgs);
+			if (newPeekedPattern != null)
+				msgs = ((InternalEObject)newPeekedPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__PEEKED_PATTERN, null, msgs);
+			msgs = basicSetPeekedPattern(newPeekedPattern, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__PEEKED_PATTERN, newPeekedPattern, newPeekedPattern));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setScheduler(Procedure newScheduler) {
+		if (newScheduler != scheduler) {
+			NotificationChain msgs = null;
+			if (scheduler != null)
+				msgs = ((InternalEObject)scheduler).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__SCHEDULER, null, msgs);
+			if (newScheduler != null)
+				msgs = ((InternalEObject)newScheduler).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__SCHEDULER, null, msgs);
+			msgs = basicSetScheduler(newScheduler, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__SCHEDULER, newScheduler, newScheduler));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setTag(Tag newTag) {
+		if (newTag != tag) {
+			NotificationChain msgs = null;
+			if (tag != null)
+				msgs = ((InternalEObject)tag).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__TAG, null, msgs);
+			if (newTag != null)
+				msgs = ((InternalEObject)newTag).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__TAG, null, msgs);
+			msgs = basicSetTag(newTag, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__TAG, newTag, newTag));
+	}
+
+} // ActionImpl

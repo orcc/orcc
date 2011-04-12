@@ -6,6 +6,8 @@
  */
 package net.sf.orcc.moc.impl;
 
+import java.util.Map;
+
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.impl.IrPackageImpl;
 import net.sf.orcc.moc.CSDFMoC;
@@ -21,7 +23,6 @@ import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
-import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EcorePackage;
@@ -71,6 +72,13 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	 * @generated
 	 */
 	private EClass sdfMoCEClass = null;
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass actionToSDFMoCMapEntryEClass = null;
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -233,8 +241,8 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getQSDFMoC_Configurations() {
-		return (EAttribute)qsdfMoCEClass.getEStructuralFeatures().get(0);
+	public EReference getQSDFMoC_Configurations() {
+		return (EReference)qsdfMoCEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -244,6 +252,33 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	 */
 	public EClass getSDFMoC() {
 		return sdfMoCEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getActionToSDFMoCMapEntry() {
+		return actionToSDFMoCMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActionToSDFMoCMapEntry_Key() {
+		return (EReference)actionToSDFMoCMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getActionToSDFMoCMapEntry_Value() {
+		return (EReference)actionToSDFMoCMapEntryEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -296,9 +331,13 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		kpnMoCEClass = createEClass(KPN_MO_C);
 
 		qsdfMoCEClass = createEClass(QSDF_MO_C);
-		createEAttribute(qsdfMoCEClass, QSDF_MO_C__CONFIGURATIONS);
+		createEReference(qsdfMoCEClass, QSDF_MO_C__CONFIGURATIONS);
 
 		sdfMoCEClass = createEClass(SDF_MO_C);
+
+		actionToSDFMoCMapEntryEClass = createEClass(ACTION_TO_SDF_MO_CMAP_ENTRY);
+		createEReference(actionToSDFMoCMapEntryEClass, ACTION_TO_SDF_MO_CMAP_ENTRY__KEY);
+		createEReference(actionToSDFMoCMapEntryEClass, ACTION_TO_SDF_MO_CMAP_ENTRY__VALUE);
 
 		// Create data types
 		eMapEDataType = createEDataType(EMAP);
@@ -357,14 +396,13 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		initEClass(kpnMoCEClass, KPNMoC.class, "KPNMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(qsdfMoCEClass, QSDFMoC.class, "QSDFMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		EGenericType g1 = createEGenericType(this.getEMap());
-		EGenericType g2 = createEGenericType(theIrPackage.getAction());
-		g1.getETypeArguments().add(g2);
-		g2 = createEGenericType(this.getSDFMoC());
-		g1.getETypeArguments().add(g2);
-		initEAttribute(getQSDFMoC_Configurations(), g1, "configurations", null, 0, 1, QSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getQSDFMoC_Configurations(), this.getActionToSDFMoCMapEntry(), null, "configurations", null, 0, -1, QSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(sdfMoCEClass, SDFMoC.class, "SDFMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(actionToSDFMoCMapEntryEClass, Map.Entry.class, "ActionToSDFMoCMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getActionToSDFMoCMapEntry_Key(), theIrPackage.getAction(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getActionToSDFMoCMapEntry_Value(), this.getSDFMoC(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize data types
 		initEDataType(eMapEDataType, EMap.class, "EMap", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
