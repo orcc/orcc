@@ -101,7 +101,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		@Override
 		public void visit(InstLoad load) {
-
 			if (load.getSource().getVariable().getName()
 					.equals(currentPort.getName())) {
 				// change tab Name
@@ -119,7 +118,11 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						.createExprInt(bufferSize - 1);
 				Expression mask = IrFactory.eINSTANCE.createExprBinary(
 						newExpression, OpBinary.BITAND, maskValue, typeI32);
-				load.getIndexes().set(0, mask);
+				if (!load.getIndexes().isEmpty()) {
+					load.getIndexes().set(0, mask);
+				} else {
+					load.getIndexes().add(mask);
+				}
 			}
 		}
 	}
@@ -351,7 +354,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private Var createCounter(String name) {
 		Var newCounter = IrFactory.eINSTANCE.createVar(
-				IrFactory.eINSTANCE.createLocation(), typeI32, name, true, 0);
+				IrFactory.eINSTANCE.createLocation(), typeI32, name, true,
+				IrFactory.eINSTANCE.createExprInt(0));
 
 		Expression expression = IrFactory.eINSTANCE.createExprInt(0);
 		newCounter.setInitialValue(expression);
@@ -1106,8 +1110,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	/**
-	 *For every Input of the action this method creates the new
-	 * required actions
+	 * For every Input of the action this method creates the new required
+	 * actions
 	 * 
 	 * @param action
 	 *            action to transform
@@ -1136,10 +1140,12 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 						"buffer", true, true);
 				Var untagReadIndex = IrFactory.eINSTANCE.createVar(
 						IrFactory.eINSTANCE.createLocation(), typeI32,
-						"UntagReadIndex", true, 0);
+						"UntagReadIndex", true,
+						IrFactory.eINSTANCE.createExprInt(0));
 				Var untagWriteIndex = IrFactory.eINSTANCE.createVar(
 						IrFactory.eINSTANCE.createLocation(), typeI32,
-						"UntagWriteIndex", true, 0);
+						"UntagWriteIndex", true,
+						IrFactory.eINSTANCE.createExprInt(0));
 				// if input repeat detected --> treat all input ports
 				for (Entry<Port, Integer> entry : action.getInputPattern()
 						.getNumTokensMap().entrySet()) {
@@ -1310,10 +1316,12 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 							"buffer", true, true);
 					Var untagReadIndex = IrFactory.eINSTANCE.createVar(
 							IrFactory.eINSTANCE.createLocation(), typeI32,
-							"UntagReadIndex", true, 0);
+							"UntagReadIndex", true,
+							IrFactory.eINSTANCE.createExprInt(0));
 					Var untagWriteIndex = IrFactory.eINSTANCE.createVar(
 							IrFactory.eINSTANCE.createLocation(), typeI32,
-							"UntagWriteIndex", true, 0);
+							"UntagWriteIndex", true,
+							IrFactory.eINSTANCE.createExprInt(0));
 					inputPorts.add(verifPort);
 					untagBuffer = createTab(verifPort.getName() + "_buffer",
 							entryType, bufferSize);
