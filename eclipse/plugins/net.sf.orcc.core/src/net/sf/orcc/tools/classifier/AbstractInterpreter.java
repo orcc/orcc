@@ -265,9 +265,9 @@ public class AbstractInterpreter extends ActorInterpreter {
 		// unlike parent, do not check the number of tokens present on FIFOs
 
 		// allocates peeked variables
-		Pattern pattern = action.getInputPattern();
+		Pattern pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
-			Var peeked = pattern.getPeeked(port);
+			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
 				peeked.setValue((Expression) peeked.getType().accept(
 						listAllocator));

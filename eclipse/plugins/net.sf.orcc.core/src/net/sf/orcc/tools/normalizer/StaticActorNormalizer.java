@@ -288,7 +288,7 @@ public class StaticActorNormalizer {
 
 		return IrFactory.eINSTANCE.createAction(
 				IrFactory.eINSTANCE.createLocation(), tag, input, output,
-				scheduler, body);
+				IrFactory.eINSTANCE.createPattern(), scheduler, body);
 	}
 
 	/**

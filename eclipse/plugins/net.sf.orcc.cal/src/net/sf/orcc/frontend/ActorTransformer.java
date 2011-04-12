@@ -339,7 +339,7 @@ public class ActorTransformer {
 	 * @param result
 	 *            target local variable
 	 */
-	private void createActionTest(AstAction astAction, Pattern inputPattern,
+	private void createActionTest(AstAction astAction, Pattern peekPattern,
 			Var result) {
 		List<AstExpression> guards = astAction.getGuards();
 		if (guards.isEmpty()) {
@@ -347,7 +347,7 @@ public class ActorTransformer {
 					IrFactory.eINSTANCE.createExprBool(true));
 			addInstruction(assign);
 		} else {
-			transformInputPatternPeek(astAction, inputPattern);
+			transformInputPatternPeek(astAction, peekPattern);
 			// local variables are not transformed because they are not
 			// supposed to be available for guards
 			// astTransformer.transformLocalVariables(astAction.getVariables());
@@ -369,6 +369,7 @@ public class ActorTransformer {
 
 		Pattern inputPattern = IrFactory.eINSTANCE.createPattern();
 		Pattern outputPattern = IrFactory.eINSTANCE.createPattern();
+		Pattern peekPattern = IrFactory.eINSTANCE.createPattern();
 
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
 				"isSchedulable_init_actor", location,
@@ -383,7 +384,7 @@ public class ActorTransformer {
 
 		// creates action
 		Action action = IrFactory.eINSTANCE.createAction(location, tag,
-				inputPattern, outputPattern, scheduler, body);
+				inputPattern, outputPattern, peekPattern, scheduler, body);
 		return action;
 	}
 
@@ -403,60 +404,6 @@ public class ActorTransformer {
 		return IrFactory.eINSTANCE.createVar(location,
 				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()),
 				port.getName(), true, 0);
-	}
-
-	/**
-	 * Fills the target IR input pattern.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param inputPattern
-	 *            target IR input pattern
-	 */
-	private void fillsInputPattern(AstAction astAction, Pattern inputPattern) {
-		List<AstInputPattern> astInputPattern = astAction.getInputs();
-		for (AstInputPattern pattern : astInputPattern) {
-			Port port = mapPorts.get(pattern.getPort());
-			List<AstVariable> tokens = pattern.getTokens();
-
-			// evaluates token consumption
-			int totalConsumption = tokens.size();
-			int repeat = 1;
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator(null)
-						.evaluateAsInteger(astRepeat);
-				totalConsumption *= repeat;
-			}
-			inputPattern.setNumTokens(port, totalConsumption);
-		}
-	}
-
-	/**
-	 * Fills the target IR output pattern.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param outputPattern
-	 *            target IR output pattern
-	 */
-	private void fillsOutputPattern(AstAction astAction, Pattern outputPattern) {
-		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
-		for (AstOutputPattern pattern : astOutputPattern) {
-			Port port = mapPorts.get(pattern.getPort());
-			List<AstExpression> values = pattern.getValues();
-
-			// evaluates token consumption
-			int totalConsumption = values.size();
-			int repeat = 1;
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator(null)
-						.evaluateAsInteger(astRepeat);
-				totalConsumption *= repeat;
-			}
-			outputPattern.setNumTokens(port, totalConsumption);
-		}
 	}
 
 	/**
@@ -527,7 +474,8 @@ public class ActorTransformer {
 			AstSchedule schedule = astActor.getSchedule();
 			AstScheduleRegExp scheduleRegExp = astActor.getScheduleRegExp();
 			if (schedule == null && scheduleRegExp == null) {
-				actor.getActionsOutsideFsm().addAll(sortedActions.getAllActions());
+				actor.getActionsOutsideFsm().addAll(
+						sortedActions.getAllActions());
 			} else {
 				FSM fsm = null;
 				if (schedule != null) {
@@ -538,8 +486,9 @@ public class ActorTransformer {
 							scheduleRegExp);
 					fsm = converter.convert(sortedActions);
 				}
-				
-				actor.getActionsOutsideFsm().addAll(sortedActions.getUntaggedActions());
+
+				actor.getActionsOutsideFsm().addAll(
+						sortedActions.getUntaggedActions());
 				actor.setFsm(fsm);
 			}
 
@@ -589,6 +538,7 @@ public class ActorTransformer {
 
 		Pattern inputPattern = IrFactory.eINSTANCE.createPattern();
 		Pattern outputPattern = IrFactory.eINSTANCE.createPattern();
+		Pattern peekPattern = IrFactory.eINSTANCE.createPattern();
 
 		// creates scheduler and body
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
@@ -597,16 +547,13 @@ public class ActorTransformer {
 		Procedure body = IrFactory.eINSTANCE.createProcedure(name, location,
 				IrFactory.eINSTANCE.createTypeVoid());
 
-		// fills the patterns and procedures
-		fillsInputPattern(astAction, inputPattern);
-		fillsOutputPattern(astAction, outputPattern);
-
+		// transforms action body and scheduler
 		transformActionBody(astAction, body, inputPattern, outputPattern);
-		transformActionScheduler(astAction, scheduler, inputPattern);
+		transformActionScheduler(astAction, scheduler, peekPattern);
 
 		// creates IR action and add it to action list
 		Action action = IrFactory.eINSTANCE.createAction(location, tag,
-				inputPattern, outputPattern, scheduler, body);
+				inputPattern, outputPattern, peekPattern, scheduler, body);
 		actionList.add(action);
 	}
 
@@ -624,7 +571,7 @@ public class ActorTransformer {
 		Context oldContext = astTransformer.newContext(body);
 
 		for (AstInputPattern pattern : astAction.getInputs()) {
-			transformInputPattern(pattern, inputPattern, false);
+			transformInputPattern(pattern, inputPattern);
 		}
 
 		astTransformer.transformLocalVariables(astAction.getVariables());
@@ -664,7 +611,7 @@ public class ActorTransformer {
 	 *            {@link #fillsInputPattern(AstAction, Pattern)}
 	 */
 	private void transformActionScheduler(AstAction astAction,
-			Procedure scheduler, Pattern inputPattern) {
+			Procedure scheduler, Pattern peekPattern) {
 		Context oldContext = astTransformer.newContext(scheduler);
 		Context context = astTransformer.getContext();
 
@@ -672,13 +619,13 @@ public class ActorTransformer {
 				IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		List<AstExpression> guards = astAction.getGuards();
-		if (inputPattern.isEmpty() && guards.isEmpty()) {
+		if (peekPattern.isEmpty() && guards.isEmpty()) {
 			// the action is always fireable
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(result,
 					IrFactory.eINSTANCE.createExprBool(true));
 			addInstruction(assign);
 		} else {
-			createActionTest(astAction, inputPattern, result);
+			createActionTest(astAction, peekPattern, result);
 		}
 
 		astTransformer.restoreContext(oldContext);
@@ -718,7 +665,7 @@ public class ActorTransformer {
 	 *            an input pattern
 	 */
 	private void transformInputPattern(AstInputPattern pattern,
-			Pattern irInputPattern, boolean peek) {
+			Pattern irInputPattern) {
 		Context context = astTransformer.getContext();
 		Port port = mapPorts.get(pattern.getPort());
 		List<AstVariable> tokens = pattern.getTokens();
@@ -732,14 +679,11 @@ public class ActorTransformer {
 					.evaluateAsInteger(astRepeat);
 			totalConsumption *= repeat;
 		}
+		irInputPattern.setNumTokens(port, totalConsumption);
 
 		// create port variable
 		Var variable = createPortVariable(port, totalConsumption);
-		if (peek) {
-			irInputPattern.setPeeked(port, variable);
-		} else {
-			irInputPattern.setVariable(port, variable);
-		}
+		irInputPattern.setVariable(port, variable);
 
 		// declare tokens
 		for (AstVariable token : tokens) {
@@ -760,7 +704,7 @@ public class ActorTransformer {
 	 *            an AST action
 	 */
 	private void transformInputPatternPeek(final AstAction astAction,
-			Pattern inputPattern) {
+			Pattern peekPattern) {
 		final Set<AstInputPattern> patterns = new HashSet<AstInputPattern>();
 		VoidSwitch peekVariables = new VoidSwitch() {
 
@@ -783,7 +727,7 @@ public class ActorTransformer {
 
 		// add peeks for each pattern of the patterns set
 		for (AstInputPattern pattern : patterns) {
-			transformInputPattern(pattern, inputPattern, true);
+			transformInputPattern(pattern, peekPattern);
 		}
 	}
 
@@ -810,6 +754,7 @@ public class ActorTransformer {
 						.evaluateAsInteger(astRepeat);
 				totalConsumption *= repeat;
 			}
+			irOutputPattern.setNumTokens(port, totalConsumption);
 
 			// create port variable
 			Var variable = createPortVariable(port, totalConsumption);

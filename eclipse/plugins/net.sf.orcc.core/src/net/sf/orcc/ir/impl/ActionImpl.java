@@ -34,7 +34,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getOutputPattern <em>Output Pattern</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getScheduler <em>Scheduler</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getTag <em>Tag</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getPeekedPattern <em>Peeked Pattern</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getPeekPattern <em>Peek Pattern</em>}</li>
  * </ul>
  * </p>
  *
@@ -99,14 +99,14 @@ public class ActionImpl extends EObjectImpl implements Action {
 	protected Tag tag;
 
 	/**
-	 * The cached value of the '{@link #getPeekedPattern() <em>Peeked Pattern</em>}' containment reference.
+	 * The cached value of the '{@link #getPeekPattern() <em>Peek Pattern</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getPeekedPattern()
+	 * @see #getPeekPattern()
 	 * @generated
 	 * @ordered
 	 */
-	protected Pattern peekedPattern;
+	protected Pattern peekPattern;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -177,15 +177,15 @@ public class ActionImpl extends EObjectImpl implements Action {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetPeekedPattern(Pattern newPeekedPattern,
-			NotificationChain msgs) {
-		Pattern oldPeekedPattern = peekedPattern;
-		peekedPattern = newPeekedPattern;
+	public NotificationChain basicSetPeekPattern(Pattern newPeekPattern, NotificationChain msgs) {
+		Pattern oldPeekPattern = peekPattern;
+		peekPattern = newPeekPattern;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__PEEKED_PATTERN, oldPeekedPattern, newPeekedPattern);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__PEEK_PATTERN, oldPeekPattern, newPeekPattern);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -239,8 +239,8 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return getScheduler();
 			case IrPackage.ACTION__TAG:
 				return getTag();
-			case IrPackage.ACTION__PEEKED_PATTERN:
-				return getPeekedPattern();
+			case IrPackage.ACTION__PEEK_PATTERN:
+				return getPeekPattern();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -265,8 +265,8 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return basicSetScheduler(null, msgs);
 			case IrPackage.ACTION__TAG:
 				return basicSetTag(null, msgs);
-			case IrPackage.ACTION__PEEKED_PATTERN:
-				return basicSetPeekedPattern(null, msgs);
+			case IrPackage.ACTION__PEEK_PATTERN:
+				return basicSetPeekPattern(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -290,8 +290,8 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return scheduler != null;
 			case IrPackage.ACTION__TAG:
 				return tag != null;
-			case IrPackage.ACTION__PEEKED_PATTERN:
-				return peekedPattern != null;
+			case IrPackage.ACTION__PEEK_PATTERN:
+				return peekPattern != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -321,8 +321,8 @@ public class ActionImpl extends EObjectImpl implements Action {
 			case IrPackage.ACTION__TAG:
 				setTag((Tag)newValue);
 				return;
-			case IrPackage.ACTION__PEEKED_PATTERN:
-				setPeekedPattern((Pattern)newValue);
+			case IrPackage.ACTION__PEEK_PATTERN:
+				setPeekPattern((Pattern)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -362,8 +362,8 @@ public class ActionImpl extends EObjectImpl implements Action {
 			case IrPackage.ACTION__TAG:
 				setTag((Tag)null);
 				return;
-			case IrPackage.ACTION__PEEKED_PATTERN:
-				setPeekedPattern((Pattern)null);
+			case IrPackage.ACTION__PEEK_PATTERN:
+				setPeekPattern((Pattern)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -420,8 +420,8 @@ public class ActionImpl extends EObjectImpl implements Action {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Pattern getPeekedPattern() {
-		return peekedPattern;
+	public Pattern getPeekPattern() {
+		return peekPattern;
 	}
 
 	/**
@@ -516,18 +516,18 @@ public class ActionImpl extends EObjectImpl implements Action {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setPeekedPattern(Pattern newPeekedPattern) {
-		if (newPeekedPattern != peekedPattern) {
+	public void setPeekPattern(Pattern newPeekPattern) {
+		if (newPeekPattern != peekPattern) {
 			NotificationChain msgs = null;
-			if (peekedPattern != null)
-				msgs = ((InternalEObject)peekedPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__PEEKED_PATTERN, null, msgs);
-			if (newPeekedPattern != null)
-				msgs = ((InternalEObject)newPeekedPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__PEEKED_PATTERN, null, msgs);
-			msgs = basicSetPeekedPattern(newPeekedPattern, msgs);
+			if (peekPattern != null)
+				msgs = ((InternalEObject)peekPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__PEEK_PATTERN, null, msgs);
+			if (newPeekPattern != null)
+				msgs = ((InternalEObject)newPeekPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__PEEK_PATTERN, null, msgs);
+			msgs = basicSetPeekPattern(newPeekPattern, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__PEEKED_PATTERN, newPeekedPattern, newPeekedPattern));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__PEEK_PATTERN, newPeekPattern, newPeekPattern));
 	}
 
 	/**

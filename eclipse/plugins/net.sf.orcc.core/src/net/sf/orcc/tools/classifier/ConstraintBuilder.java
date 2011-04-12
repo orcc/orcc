@@ -433,9 +433,9 @@ public class ConstraintBuilder extends ActorInterpreter {
 		allocatePattern(inputPattern);
 		allocatePattern(outputPattern);
 
-		Pattern pattern = action.getInputPattern();
+		Pattern pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
-			Var peeked = pattern.getPeeked(port);
+			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
 				// allocate list for peeked
 				peeked.setValue((Expression) peeked.getType().accept(

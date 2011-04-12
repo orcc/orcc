@@ -229,18 +229,13 @@ public class IRParser {
 
 		// add peeked vars
 		vars = new Scope<String, Var>(vars, true);
-		for (Port port : ip.getPorts()) {
-			Var peeked = ip.getPeeked(port);
-			if (peeked != null) {
-				vars.put(file, peeked.getLocation(), peeked.getName(), peeked);
-			}
-		}
+		Pattern pp = parseInputPattern(array.get(3).getAsJsonArray());
 		Procedure scheduler = parseProc(array.get(3).getAsJsonArray());
 
 		vars = vars.getParent().getParent();
 
 		Action action = IrFactory.eINSTANCE.createAction(body.getLocation(),
-				tag, ip, op, scheduler, body);
+				tag, ip, op, pp, scheduler, body);
 		putAction(tag, action);
 		return action;
 	}
@@ -799,13 +794,7 @@ public class IRParser {
 			int numTokens = patternArray.get(1).getAsInt();
 			pattern.setNumTokens(port, numTokens);
 
-			if (!patternArray.get(2).isJsonNull()) {
-				Var peeked = parseLocalVariable(patternArray.get(2)
-						.getAsJsonArray());
-				pattern.setPeeked(port, peeked);
-			}
-
-			Var variable = parseLocalVariable(patternArray.get(3)
+			Var variable = parseLocalVariable(patternArray.get(2)
 					.getAsJsonArray());
 			pattern.setVariable(port, variable);
 
@@ -825,13 +814,7 @@ public class IRParser {
 			int numTokens = patternArray.get(1).getAsInt();
 			pattern.setNumTokens(port, numTokens);
 
-			if (!patternArray.get(2).isJsonNull()) {
-				Var peeked = parseLocalVariable(patternArray.get(2)
-						.getAsJsonArray());
-				pattern.setPeeked(port, peeked);
-			}
-
-			Var variable = parseLocalVariable(patternArray.get(3)
+			Var variable = parseLocalVariable(patternArray.get(2)
 					.getAsJsonArray());
 			pattern.setVariable(port, variable);
 

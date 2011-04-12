@@ -45,13 +45,9 @@ import org.eclipse.emf.common.util.EMap;
  */
 public interface QSDFMoC extends MoC {
 
-	/**
-	 * Return the configurations of this quasi-static MoC.
-	 * 
-	 * @return a map of configurations
-	 * @model keyType="Action" valueType="SDFMoC"
-	 */
-	EMap<Action, SDFMoC> getConfigurations();
+	// to generate a normal Java map (non-serializable)
+	// @model
+	// dataType="org.eclipse.emf.ecore.EMap<net.sf.orcc.ir.Action, net.sf.orcc.moc.SDFMoC>"
 
 	/**
 	 * Returns the set of configuration actions.
@@ -59,6 +55,14 @@ public interface QSDFMoC extends MoC {
 	 * @return the set of configuration actions
 	 */
 	Set<Action> getActions();
+
+	/**
+	 * Return the configurations of this quasi-static MoC.
+	 * 
+	 * @return a map of configurations
+	 * @model keyType="net.sf.orcc.ir.Action" valueType="net.sf.orcc.moc.SDFMoC"
+	 */
+	EMap<Action, SDFMoC> getConfigurations();
 
 	/**
 	 * Returns the SDF MoC that is associated with the configuration given by

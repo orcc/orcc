@@ -34,6 +34,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
+
 	/**
 	 * The cached value of the '{@link #getConfigurations() <em>Configurations</em>}' map.
 	 * <!-- begin-user-doc --> <!--

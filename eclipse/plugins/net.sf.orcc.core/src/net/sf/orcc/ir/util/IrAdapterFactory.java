@@ -253,12 +253,12 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createVarToPortMapEntryAdapter();
 			}
 			@Override
-			public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
-				return createPortToEIntegerObjectMapEntryAdapter();
-			}
-			@Override
 			public Adapter casePortToVarMapEntry(Map.Entry<Port, Var> object) {
 				return createPortToVarMapEntryAdapter();
+			}
+			@Override
+			public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
+				return createPortToEIntegerObjectMapEntryAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -528,20 +528,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createPortToEIntegerObjectMapEntryAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -552,6 +538,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createPortToVarMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To EInteger Object Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createPortToEIntegerObjectMapEntryAdapter() {
 		return null;
 	}
 

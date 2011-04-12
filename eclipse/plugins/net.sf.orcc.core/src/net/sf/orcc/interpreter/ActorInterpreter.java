@@ -373,7 +373,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 		}
 
 		// allocates peeked variables
-		pattern = action.getPeekedPattern();
+		pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {

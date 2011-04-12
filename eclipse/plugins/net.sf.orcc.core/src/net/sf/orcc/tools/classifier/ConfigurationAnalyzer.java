@@ -84,9 +84,9 @@ public class ConfigurationAnalyzer {
 
 		@Override
 		public void visit(Action action) {
-			Pattern pattern = action.getInputPattern();
+			Pattern pattern = action.getPeekPattern();
 			for (Port port : pattern.getPorts()) {
-				if (pattern.getPeeked(port) != null) {
+				if (pattern.getVariable(port) != null) {
 					candidates.add(port);
 				}
 			}

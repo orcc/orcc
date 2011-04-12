@@ -115,7 +115,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -563,6 +562,7 @@ public class IRWriter {
 		array.add(writeActionTag(action.getTag()));
 		array.add(writeActionPattern(action.getInputPattern()));
 		array.add(writeActionPattern(action.getOutputPattern()));
+		array.add(writeActionPattern(action.getPeekPattern()));
 		array.add(writeProcedure(action.getScheduler()));
 		array.add(writeProcedure(action.getBody()));
 
@@ -585,12 +585,6 @@ public class IRWriter {
 
 			patternArray.add(new JsonPrimitive(port.getName()));
 			patternArray.add(new JsonPrimitive(pattern.getNumTokens(port)));
-			Var peeked = pattern.getPeeked(port);
-			if (peeked == null) {
-				patternArray.add(new JsonNull());
-			} else {
-				patternArray.add(writeLocalVariable(peeked));
-			}
 			patternArray.add(writeLocalVariable(pattern.getVariable(port)));
 		}
 

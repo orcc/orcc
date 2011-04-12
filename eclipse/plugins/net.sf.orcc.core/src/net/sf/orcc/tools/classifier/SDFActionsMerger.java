@@ -213,6 +213,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 	private List<Action> mergeActions(List<Action> actions) {
 		Pattern input = actions.get(0).getInputPattern();
 		Pattern output = actions.get(0).getInputPattern();
+		Pattern peek = actions.get(0).getPeekPattern();
 
 		// creates a isSchedulable function
 		Procedure scheduler = createIsSchedulable(input);
@@ -220,10 +221,10 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		// merges actions
 		Procedure body = mergeSDFBodies(actions);
 
-		Action action = IrFactory.eINSTANCE
-				.createAction(IrFactory.eINSTANCE.createLocation(),
-						IrFactory.eINSTANCE.createTag(), input, output,
-						scheduler, body);
+		Action action = IrFactory.eINSTANCE.createAction(
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTag(), input, output, peek,
+				scheduler, body);
 
 		// removes the actions, add the action merged
 		actor.getActions().removeAll(actions);

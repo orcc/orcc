@@ -186,8 +186,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.TAG: return createTag();
 			case IrPackage.FSM: return createFSM();
 			case IrPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
 			case IrPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
+			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -212,7 +212,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		action.setInputPattern(inputPattern);
 		action.setLocation(location);
 		action.setOutputPattern(outputPattern);
-		action.setPeekedPattern(peekedPattern);
+		action.setPeekPattern(peekedPattern);
 		action.setScheduler(scheduler);
 		action.setTag(tag);
 		return action;
@@ -783,9 +783,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
-		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
-		return portToEIntegerObjectMapEntry;
+	public Map.Entry<Port, Var> createPortToVarMapEntry() {
+		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
+		return portToVarMapEntry;
 	}
 
 	/**
@@ -793,9 +793,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<Port, Var> createPortToVarMapEntry() {
-		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
-		return portToVarMapEntry;
+	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
+		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
+		return portToEIntegerObjectMapEntry;
 	}
 
 	@Override
