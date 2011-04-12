@@ -74,9 +74,9 @@ public class CustomPeekAdder extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Pattern pattern) {
-		for (Port port : pattern.getPeekedMap().keySet()) {
+		for (Port port : pattern.getPorts()) {
 			Map<Integer, Var> indexToVariableMap = new HashMap<Integer, Var>();
-			Var oldTarget = pattern.getPeeked(port);
+			Var oldTarget = pattern.getVariable(port);
 
 			List<Use> uses = new ArrayList<Use>(oldTarget.getUses());
 			for (Use use : uses) {

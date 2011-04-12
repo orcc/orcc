@@ -136,6 +136,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 			Action action = IrFactory.eINSTANCE.createAction(
 					IrFactory.eINSTANCE.createLocation(), tag,
 					IrFactory.eINSTANCE.createPattern(),
+					IrFactory.eINSTANCE.createPattern(),
 					currentAction.getOutputPattern(), scheduler, body);
 			currentAction.setOutputPattern(IrFactory.eINSTANCE.createPattern());
 

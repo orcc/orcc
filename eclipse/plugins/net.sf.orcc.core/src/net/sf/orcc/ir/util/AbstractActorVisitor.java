@@ -358,6 +358,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 		this.action = action;
 		visit(action.getInputPattern());
 		visit(action.getOutputPattern());
+		visit(action.getPeekPattern());
 		visit(action.getScheduler());
 		visit(action.getBody());
 		this.action = null;

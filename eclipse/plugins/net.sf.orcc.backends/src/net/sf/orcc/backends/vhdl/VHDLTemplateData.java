@@ -76,9 +76,9 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 			}
 
 			for (Action action : actor.getActions()) {
-				Pattern inputPattern = action.getInputPattern();
-				for (Port port : inputPattern.getPorts()) {
-					if (inputPattern.getPeeked(port) != null) {
+				Pattern peekPattern = action.getPeekPattern();
+				for (Port port : peekPattern.getPorts()) {
+					if (peekPattern.getVariable(port) != null) {
 						String name = port.getName() + "_data";
 						signals.add(name);
 					}
