@@ -84,6 +84,15 @@ static struct mapping_s* compute_mapping(individual *individual,
 	return mapping;
 }
 
+static void initialize_mapping_file(){
+	mappingFile = fopen("genetic_mapping.xcf", "w");
+	if (mappingFile == NULL) {
+		perror("I/O error during opening of mapping file.");
+	}
+	fprintf(mappingFile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	fprintf(mappingFile, "<!-- GENETIC ALGORITHM -->\n\n");
+}
+
 static void write_mapping(population *pop, struct genetic_s *genetic_info) {
 	if (mappingFile != NULL) {
 		int i, j, k;
@@ -401,16 +410,10 @@ void *monitor(void *data) {
 	source_active_genetic();
 	//Compare_active_genetic();
 
-	mappingFile = fopen("genetic_mapping.xcf", "w");
-	if (mappingFile == NULL) {
-		perror("I/O error during opening of mapping file.");
-	}
-	fprintf(mappingFile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-	fprintf(mappingFile, "<!-- GENETIC ALGORITHM -->\n\n");
-
 	// Initialize
 	printf("\nGenerate initial population...\n\n");
 	population = initialize_population(monitoring->genetic_info);
+	initialize_mapping_file();
 
 	print_actor_list(population->individuals[evalIndNb],
 			monitoring->genetic_info);
