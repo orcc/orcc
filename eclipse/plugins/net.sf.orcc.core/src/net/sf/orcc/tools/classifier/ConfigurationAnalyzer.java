@@ -43,9 +43,9 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
@@ -166,8 +166,8 @@ public class ConfigurationAnalyzer {
 
 		// visits the scheduler of each action departing from the initial state
 		FSM fsm = actor.getFsm();
-		String initialState = fsm.getInitialState().getName();
-		for (NextStateInfo info : fsm.getTransitions(initialState)) {
+		State initialState = fsm.getInitialState();
+		for (Action targetAction : fsm.getTargetActions(initialState)) {
 			ConstraintBuilder visitor = new ConstraintBuilder(actor);
 
 			// add negated constraints of previous actions
@@ -177,15 +177,14 @@ public class ConfigurationAnalyzer {
 			}
 
 			// add constraint of current action
-			Action action = info.getAction();
 			visitor.setNegateConstraints(false);
-			visitor.visitAction(action);
+			visitor.visitAction(targetAction);
 
 			// add current action to "previous" list
-			previous.add(action);
+			previous.add(targetAction);
 
 			// create the configuration for this action based on the constraints
-			createConfiguration(action, visitor);
+			createConfiguration(targetAction, visitor);
 		}
 	}
 
@@ -197,10 +196,10 @@ public class ConfigurationAnalyzer {
 		List<Set<Port>> ports = new ArrayList<Set<Port>>();
 
 		FSM fsm = actor.getFsm();
-		String initialState = fsm.getInitialState().getName();
-		for (NextStateInfo info : fsm.getTransitions(initialState)) {
+		State initialState = fsm.getInitialState();
+		for (Action action : fsm.getTargetActions(initialState)) {
 			PeekVisitor visitor = new PeekVisitor();
-			visitor.visit(info.getAction());
+			visitor.visit(action);
 			ports.add(visitor.getCandidates());
 		}
 

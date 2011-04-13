@@ -37,7 +37,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.util.ActorVisitor;
@@ -115,7 +114,7 @@ public class ActorClassifier implements ActorVisitor {
 			showMarker();
 		} else {
 			// merges actions with the same input/output pattern together
-			//new SDFActionsMerger().visit(actor);
+			// new SDFActionsMerger().visit(actor);
 
 			// first tries SDF with *all* the actions of the actor
 			moc = classifySDF(actions);
@@ -174,7 +173,7 @@ public class ActorClassifier implements ActorVisitor {
 		// loops until the actor goes back to the initial state, or there is a
 		// data-dependent condition
 		final int MAX_PHASES = 16384;
-		String initialState = interpreter.getFsmState();
+		State initialState = interpreter.getFsmState();
 		do {
 			interpreter.schedule();
 			csdfMoc.getActions().add(interpreter.getScheduledAction());
@@ -212,8 +211,7 @@ public class ActorClassifier implements ActorVisitor {
 		interpretedActor.setConfiguration(configuration);
 
 		// schedule the actor
-		String initialState = actor.getFsm()
-				.getInitialState().getName();
+		String initialState = actor.getFsm().getInitialState().getName();
 		int nbPhases = 0;
 		final int MAX_PHASES = 16384;
 		do {
@@ -243,7 +241,7 @@ public class ActorClassifier implements ActorVisitor {
 	private MoC classifyQSDF() {
 		FSM fsm = actor.getFsm();
 		if (isQuasiStaticFsm(fsm)) {
-			String initialState = fsm.getInitialState().getName();
+			State initialState = fsm.getInitialState();
 
 			// analyze the configuration of this actor
 			ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer();
@@ -252,8 +250,7 @@ public class ActorClassifier implements ActorVisitor {
 			// will unroll for each branch departing from the initial state
 			QSDFMoC quasiStatic = MocFactory.eINSTANCE.createQSDFMoC();
 
-			for (NextStateInfo info : fsm.getTransitions(initialState)) {
-				Action action = info.getAction();
+			for (Action action : fsm.getTargetActions(initialState)) {
 				Map<Port, Expression> configuration = analyzer
 						.getConfiguration(action);
 				if (configuration == null) {

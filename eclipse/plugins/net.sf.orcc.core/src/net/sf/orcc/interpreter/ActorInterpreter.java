@@ -55,12 +55,13 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.State;
+import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -155,7 +156,7 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	/**
 	 * Actor's FSM current state
 	 */
-	protected String fsmState;
+	protected State fsmState;
 
 	protected ListAllocator listAllocator;
 
@@ -188,9 +189,9 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 		// Get actor FSM properties
 		if (actor.hasFsm()) {
-			fsmState = actor.getFsm().getInitialState().getName();
+			fsmState = actor.getFsm().getInitialState();
 		} else {
-			fsmState = "IDLE";
+			fsmState = null;
 		}
 
 		// Get the parameters value from instance map
@@ -268,11 +269,11 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	}
 
 	/**
-	 * Returns the name of the current FSM state.
+	 * Returns the current FSM state.
 	 * 
-	 * @return the name of the current FSM state
+	 * @return the current FSM state
 	 */
-	public String getFsmState() {
+	public State getFsmState() {
 		return fsmState;
 	}
 
@@ -294,12 +295,16 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 		if (actor.hasFsm()) {
 			// Then check for next FSM transition
-			for (NextStateInfo info : actor.getFsm().getTransitions(fsmState)) {
-				Action action = info.getAction();
+			Transition transition = actor.getFsm().getTransitionsMap().get(fsmState);
+			Iterator<Action> itA = transition.getTargetActions().iterator();
+			Iterator<State> itS = transition.getTargetStates().iterator();
+			while (itA.hasNext() && itS.hasNext()) {
+				Action action = itA.next();
+				State target = itS.next();
 				if (isSchedulable(action)) {
 					// Update FSM state
 					if (checkOutputPattern(action.getOutputPattern())) {
-						fsmState = info.getTargetState().getName();
+						fsmState = target;
 						return action;
 					}
 					break;
@@ -471,8 +476,8 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	 * instance state.
 	 * 
 	 */
-	public void setFsmState(String newState) {
-		fsmState = newState;
+	public void setFsmState(State state) {
+		fsmState = state;
 	}
 
 	public void setProcess(OrccProcess process) {

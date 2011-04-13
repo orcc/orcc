@@ -60,7 +60,7 @@
     <genClasses ecoreClass="Ir.ecore#//FSM">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/initialState"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/states"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/transitionMap"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/transitionsMap"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//State">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//State/name"/>

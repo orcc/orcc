@@ -36,7 +36,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Transition;
@@ -95,8 +94,8 @@ public class CActorTemplateData {
 
 		for (Transition transition : fsm.getTransitions()) {
 			Pattern pattern = IrFactory.eINSTANCE.createPattern();
-			for (NextStateInfo info : transition.getNextStateInfo()) {
-				Pattern actionPattern = info.getAction().getInputPattern();
+			for (Action action : transition.getTargetActions()) {
+				Pattern actionPattern = action.getInputPattern();
 				for (Port port : actionPattern.getPorts()) {
 					Integer numTokens = pattern.getNumTokens(port);
 					if (numTokens == null) {

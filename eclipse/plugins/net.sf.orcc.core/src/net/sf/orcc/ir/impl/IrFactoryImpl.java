@@ -12,48 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.ir.*;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.ExprBinary;
-import net.sf.orcc.ir.ExprBool;
-import net.sf.orcc.ir.ExprFloat;
-import net.sf.orcc.ir.ExprInt;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.ExprUnary;
-import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.InstCall;
-import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.InstPhi;
-import net.sf.orcc.ir.InstReturn;
-import net.sf.orcc.ir.InstSpecific;
-import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.OpUnary;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeBool;
-import net.sf.orcc.ir.TypeFloat;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.TypeString;
-import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Var;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
@@ -756,36 +714,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public State createState() {
-		StateImpl state = new StateImpl();
-		return state;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Transition createTransition() {
-		TransitionImpl transition = new TransitionImpl();
-		return transition;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<State, Transition> createStateToTransitionMapEntry() {
-		StateToTransitionMapEntryImpl stateToTransitionMapEntry = new StateToTransitionMapEntryImpl();
-		return stateToTransitionMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Map.Entry<Port, Var> createPortToVarMapEntry() {
 		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
 		return portToVarMapEntry;
@@ -817,6 +745,33 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public State createState() {
+		StateImpl state = new StateImpl();
+		return state;
+	}
+
+	@Override
+	public State createState(String name) {
+		StateImpl state = new StateImpl();
+		state.setName(name);
+		return state;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<State, Transition> createStateToTransitionMapEntry() {
+		StateToTransitionMapEntryImpl stateToTransitionMapEntry = new StateToTransitionMapEntryImpl();
+		return stateToTransitionMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public Tag createTag() {
 		TagImpl tag = new TagImpl();
 		return tag;
@@ -841,6 +796,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		TagImpl newTag = new TagImpl();
 		newTag.getIdentifiers().addAll(tag.getIdentifiers());
 		return newTag;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Transition createTransition() {
+		TransitionImpl transition = new TransitionImpl();
+		return transition;
 	}
 
 	/**

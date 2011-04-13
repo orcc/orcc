@@ -103,12 +103,21 @@ public interface FSM extends EObject {
 	List<State> getTargetStates(State state);
 
 	/**
+	 * Returns the transition associated with the given state.
+	 * 
+	 * @param state
+	 *            a state
+	 * @return the transition associated with the given state
+	 */
+	Transition getTransition(State state);
+
+	/**
 	 * Returns a state to transition map.
 	 * 
 	 * @return a state to transition map
 	 * @model keyType="State" valueType="Transition"
 	 */
-	EMap<State, Transition> getTransitionMap();
+	EMap<State, Transition> getTransitionsMap();
 
 	/**
 	 * Returns the list of transitions of this FSM as a list of
@@ -142,7 +151,8 @@ public interface FSM extends EObject {
 
 	/**
 	 * Replaces the target of the transition from the <code>source</code> state
-	 * and whose action equals to the given action by the given <code>target</code> state.
+	 * and whose action equals to the given action by the given
+	 * <code>target</code> state.
 	 * 
 	 * @param source
 	 *            source state

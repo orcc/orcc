@@ -92,6 +92,7 @@ import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
@@ -428,16 +429,18 @@ public class IRParser {
 	}
 
 	private FSM parseFSM(JsonArray array) {
-		String initialState = array.get(0).getAsString();
+		Map<String, State> stateMap = new HashMap<String, State>();
+		
 		FSM fsm = IrFactory.eINSTANCE.createFSM();
 		JsonArray stateArray = array.get(1).getAsJsonArray();
 		for (int i = 0; i < stateArray.size(); i++) {
-			fsm.addState(stateArray.get(i).getAsString());
+			String name = stateArray.get(i).getAsString();
+			stateMap.put(name, IrFactory.eINSTANCE.createState(name));
 		}
 
-		// set the initial state *after* initializing the states to get a
-		// prettier order
-		fsm.setInitialState(initialState);
+		// set the initial state after initializing the states map
+		String initialStateName = array.get(0).getAsString();
+		fsm.setInitialState(stateMap.get(initialStateName));
 
 		JsonArray transitionsArray = array.get(2).getAsJsonArray();
 		for (JsonElement element : transitionsArray) {
@@ -448,7 +451,7 @@ public class IRParser {
 				JsonArray targetArray = targetElement.getAsJsonArray();
 				Action action = getAction(targetArray.get(0).getAsJsonArray());
 				String target = targetArray.get(1).getAsString();
-				fsm.addTransition(source, action, target);
+				fsm.addTransition(stateMap.get(source), action, stateMap.get(target));
 			}
 		}
 

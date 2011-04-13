@@ -87,16 +87,16 @@ public class ActionSplitter extends AbstractActorVisitor {
 		/**
 		 * name of the source state
 		 */
-		private String sourceName;
+		private State source;
 
 		/**
 		 * name of the target state
 		 */
-		private String targetName;
+		private State target;
 
-		public AbstractBranchVisitor(String sourceName, String targetName) {
-			this.sourceName = sourceName;
-			this.targetName = targetName;
+		public AbstractBranchVisitor(State source, State target) {
+			this.source = source;
+			this.target = target;
 		}
 
 		/**
@@ -178,10 +178,12 @@ public class ActionSplitter extends AbstractActorVisitor {
 
 			// add state and transitions
 			String newStateName = newAction.getName();
-			fsm.addState(newStateName);
+			State newState = IrFactory.eINSTANCE.createState(newStateName);
+			statesMap.put(newStateName, newState);
+			fsm.getStates().add(newState);
 
-			fsm.replaceTarget(sourceName, currentAction, newStateName);
-			fsm.addTransition(newStateName, newAction, targetName);
+			fsm.replaceTarget(source, currentAction, newState);
+			fsm.addTransition(newState, newAction, target);
 		}
 
 		/**
@@ -208,12 +210,12 @@ public class ActionSplitter extends AbstractActorVisitor {
 			replaceTransition(nextAction);
 
 			// set new source state to the new state name
-			sourceName = newActionName;
+			source = statesMap.get(newActionName);
 		}
 
 		@Override
 		public void visit(Action action) {
-			this.branchName = targetName + "_" + action.getName();
+			this.branchName = target.getName() + "_" + action.getName();
 			nextAction = action;
 			visitInBranch();
 		}
@@ -250,6 +252,8 @@ public class ActionSplitter extends AbstractActorVisitor {
 	 */
 	private Map<String, Integer> stateNames;
 
+	private Map<String, State> statesMap;
+
 	/**
 	 * Adds an FSM to the given action scheduler.
 	 * 
@@ -258,10 +262,12 @@ public class ActionSplitter extends AbstractActorVisitor {
 	 */
 	private void addFsm() {
 		fsm = IrFactory.eINSTANCE.createFSM();
-		fsm.setInitialState("init");
-		fsm.addState("init");
+		
+		State initState = statesMap.get("init");
+		fsm.getStates().add(initState);
+		fsm.setInitialState(initState);
 		for (Action action : actor.getActionsOutsideFsm()) {
-			fsm.addTransition("init", action, "init");
+			fsm.addTransition(initState, action, initState);
 		}
 
 		actor.getActionsOutsideFsm().clear();
@@ -272,6 +278,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 	public void visit(Actor actor) {
 		this.actor = actor;
 		stateNames = new HashMap<String, Integer>();
+		statesMap = new HashMap<String, State>();
 		visitAllActions();
 
 		DataMover mover = new DataMover(actor);
@@ -281,18 +288,18 @@ public class ActionSplitter extends AbstractActorVisitor {
 	}
 
 	/**
-	 * Visits the given transition characterized by its source name, target name
-	 * and action.
+	 * Visits the given transition characterized by its source, target and
+	 * action.
 	 * 
-	 * @param sourceName
-	 *            name of source state
-	 * @param targetName
-	 *            name of target state
+	 * @param source
+	 *            source state
+	 * @param target
+	 *            target state
 	 * @param action
 	 *            action associated with transition
 	 */
-	private void visit(String sourceName, String targetName, Action action) {
-		new AbstractBranchVisitor(sourceName, targetName).visit(action);
+	private void visit(State source, State target, Action action) {
+		new AbstractBranchVisitor(source, target).visit(action);
 	}
 
 	/**
@@ -304,13 +311,15 @@ public class ActionSplitter extends AbstractActorVisitor {
 			// no FSM: simply visit all the actions
 			List<Action> actions = new ArrayList<Action>(
 					actor.getActionsOutsideFsm());
+
+			State initState = IrFactory.eINSTANCE.createState("init");
+			statesMap.put("init", initState);
+
 			for (Action action : actions) {
 				// an FSM will be created if needed, from "init" to "init" (and
 				// intermediate transitions created by the BranchVisitor)
 
-				String sourceName = "init";
-				String targetName = "init";
-				visit(sourceName, targetName, action);
+				visit(initState, initState, action);
 			}
 		} else {
 			// with an FSM: visits all transitions
@@ -318,13 +327,9 @@ public class ActionSplitter extends AbstractActorVisitor {
 			Set<UniqueEdge> edges = graph.edgeSet();
 			for (UniqueEdge edge : edges) {
 				State source = graph.getEdgeSource(edge);
-				String sourceName = source.getName();
-
 				State target = graph.getEdgeTarget(edge);
-				String targetName = target.getName();
-
 				Action action = (Action) edge.getObject();
-				visit(sourceName, targetName, action);
+				visit(source, target, action);
 			}
 		}
 	}

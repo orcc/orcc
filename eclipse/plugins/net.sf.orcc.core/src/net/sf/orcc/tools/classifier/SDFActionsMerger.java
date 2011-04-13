@@ -326,18 +326,18 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 
 		// Set states of the fsm
 		for (State state : graph.vertexSet()) {
-			fsm.addState(state.getName());
+			fsm.getStates().add(state);
 		}
 
 		// Set initial state
-		fsm.setInitialState(initialState.toString());
+		fsm.setInitialState(initialState);
 
 		// Set transitions of the fsm
 		for (UniqueEdge edge : graph.edgeSet()) {
 			State source = graph.getEdgeSource(edge);
 			State target = graph.getEdgeTarget(edge);
 			Action action = (Action) edge.getObject();
-			fsm.addTransition(source.getName(), action, target.getName());
+			fsm.addTransition(source, action, target);
 		}
 
 		return fsm;

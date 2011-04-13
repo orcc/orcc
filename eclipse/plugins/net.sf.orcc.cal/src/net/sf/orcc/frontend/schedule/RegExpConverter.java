@@ -41,6 +41,7 @@ import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
 
@@ -54,7 +55,7 @@ public class RegExpConverter {
 	 * Associate for each state in the automaton a String representation for the
 	 * FSM.
 	 */
-	private Map<Integer, String> nameMap;
+	private Map<Integer, State> nameMap;
 
 	private AstScheduleRegExp regexp;
 
@@ -67,7 +68,7 @@ public class RegExpConverter {
 	 */
 	public RegExpConverter(AstScheduleRegExp scheduleRegExp) {
 		regexp = scheduleRegExp;
-		nameMap = new TreeMap<Integer, String>();
+		nameMap = new TreeMap<Integer, State>();
 	}
 
 	/**
@@ -84,13 +85,13 @@ public class RegExpConverter {
 	private void addTransitions(FSM fsm, Integer source,
 			Map<Action, Integer> targets) {
 		List<Action> nextActions = new ArrayList<Action>(targets.keySet());
-		String sourceName = nameMap.get(source);
+		State sourceState = nameMap.get(source);
 
 		// add the transitions in the right order
 		for (Action action : nextActions) {
 			Integer target = targets.get(action);
-			String targetName = nameMap.get(target);
-			fsm.addTransition(sourceName, action, targetName);
+			State targetState = nameMap.get(target);
+			fsm.addTransition(sourceState, action, targetState);
 		}
 	}
 
@@ -112,9 +113,9 @@ public class RegExpConverter {
 		// Convert the states to String and add them to the FSM.
 		Set<Integer> states = DFA.vertexSet();
 		for (Integer state : states) {
-			String fsmName = formatState(state);
-			nameMap.put(state, fsmName);
-			fsm.addState(fsmName);
+			State fsmState = formatState(state);
+			nameMap.put(state, fsmState);
+			fsm.getStates().add(fsmState);
 		}
 		// Add the transitions
 		for (Integer source : states) {
@@ -123,14 +124,14 @@ public class RegExpConverter {
 			addTransitions(fsm, source, targets);
 		}
 
-		String initialName = nameMap.get(DFA.getInitialState());
-		fsm.setInitialState(initialName);
+		State initialState = nameMap.get(DFA.getInitialState());
+		fsm.setInitialState(initialState);
 
 		return fsm;
 	}
 
-	private String formatState(Integer s) {
-		return "State" + s;
+	private State formatState(Integer s) {
+		return IrFactory.eINSTANCE.createState("State" + s);
 	}
 
 	/**

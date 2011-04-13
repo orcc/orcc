@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -86,7 +87,6 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -94,6 +94,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Type;
@@ -685,8 +686,8 @@ public class IRWriter {
 
 		JsonArray stateArray = new JsonArray();
 		array.add(stateArray);
-		for (String stateName : fsm.getStates()) {
-			stateArray.add(new JsonPrimitive(stateName));
+		for (State state : fsm.getStates()) {
+			stateArray.add(new JsonPrimitive(state.getName()));
 		}
 
 		JsonArray transitionsArray = new JsonArray();
@@ -701,13 +702,17 @@ public class IRWriter {
 			JsonArray actionsArray = new JsonArray();
 			transitionArray.add(actionsArray);
 
-			for (NextStateInfo info : transition.getNextStateInfo()) {
+			Iterator<Action> itA = transition.getTargetActions().iterator();
+			Iterator<State> itS = transition.getTargetStates().iterator();
+			while (itA.hasNext() && itS.hasNext()) {
+				Action action = itA.next();
+				State target = itS.next();
+
 				JsonArray actionArray = new JsonArray();
 				actionsArray.add(actionArray);
 
-				actionArray.add(writeActionTag(info.getAction().getTag()));
-				actionArray.add(new JsonPrimitive(info.getTargetState()
-						.getName()));
+				actionArray.add(writeActionTag(action.getTag()));
+				actionArray.add(new JsonPrimitive(target.getName()));
 			}
 		}
 

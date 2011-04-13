@@ -37,13 +37,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.UniqueEdge;
@@ -91,8 +91,8 @@ public class FSMBuilder {
 	 * @param targets
 	 *            an (action, state) map of targets
 	 */
-	private void addTransitions(FSM fsm, String source,
-			Map<Action, String> targets) {
+	private void addTransitions(FSM fsm, State source,
+			Map<Action, State> targets) {
 		// Note: The higher the priority the lower the rank
 		List<Action> nextActions = new ArrayList<Action>(targets.keySet());
 		Collections.sort(nextActions, new Comparator<Action>() {
@@ -107,7 +107,7 @@ public class FSMBuilder {
 
 		// add the transitions in the right order
 		for (Action action : nextActions) {
-			String target = targets.get(action);
+			State target = targets.get(action);
 			fsm.addTransition(source, action, target);
 		}
 	}
@@ -127,22 +127,27 @@ public class FSMBuilder {
 			actionRank.put(action, rank++);
 		}
 
-		Set<String> states = new TreeSet<String>(graph.vertexSet());
+		List<String> states = new ArrayList<String>(graph.vertexSet());
+		Collections.sort(states);
+		Map<String, State> statesMap = new HashMap<String, State>();
 		FSM fsm = IrFactory.eINSTANCE.createFSM();
 
 		// adds states by alphabetical order
-		for (String source : states) {
-			fsm.addState(source);
+		for (String name : states) {
+			State state = IrFactory.eINSTANCE.createState(name);
+			fsm.getStates().add(state);
+			statesMap.put(name, state);
 		}
 
 		// adds transitions
 		for (String source : states) {
-			Map<Action, String> targets = getTargets(fsm, source, actionList);
-			addTransitions(fsm, source, targets);
+			Map<Action, State> targets = getTargets(fsm, statesMap, source,
+					actionList);
+			addTransitions(fsm, statesMap.get(source), targets);
 		}
 
 		// set initial state
-		fsm.setInitialState(initialState);
+		fsm.setInitialState(statesMap.get(initialState));
 
 		return fsm;
 	}
@@ -167,9 +172,9 @@ public class FSMBuilder {
 	 *            a list of actions
 	 * @return an (action, target state) map
 	 */
-	private Map<Action, String> getTargets(FSM fsm, String source,
-			ActionList actionList) {
-		Map<Action, String> targets = new HashMap<Action, String>();
+	private Map<Action, State> getTargets(FSM fsm,
+			Map<String, State> statesMap, String source, ActionList actionList) {
+		Map<Action, State> targets = new HashMap<Action, State>();
 		Set<UniqueEdge> edges = graph.outgoingEdgesOf(source);
 		for (UniqueEdge edge : edges) {
 			String target = graph.getEdgeTarget(edge);
@@ -180,7 +185,7 @@ public class FSMBuilder {
 				System.out.println("non-existent target state: " + edge);
 			} else {
 				for (Action action : actions) {
-					targets.put(action, target);
+					targets.put(action, statesMap.get(target));
 				}
 			}
 		}

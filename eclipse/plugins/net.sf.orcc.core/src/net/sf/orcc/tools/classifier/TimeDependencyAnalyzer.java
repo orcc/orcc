@@ -39,7 +39,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Transition;
 
@@ -103,8 +102,8 @@ public class TimeDependencyAnalyzer {
 			FSM fsm = actor.getFsm();
 			for (Transition transition : fsm.getTransitions()) {
 				List<Action> actions = new ArrayList<Action>();
-				for (NextStateInfo stateInfo : transition.getNextStateInfo()) {
-					actions.add(stateInfo.getAction());
+				for (Action action : transition.getTargetActions()) {
+					actions.add(action);
 				}
 
 				if (isTimeDependent(actions)) {
