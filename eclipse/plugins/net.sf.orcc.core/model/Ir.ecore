@@ -146,7 +146,8 @@
   <eClassifiers xsi:type="ecore:EClass" name="InstLoad" eSuperTypes="#//Instruction">
     <eStructuralFeatures xsi:type="ecore:EReference" name="indexes" upperBound="-1"
         eType="#//Expression" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="#//Use"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="#//Use"
+        containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Def"
         containment="true" resolveProxies="false"/>
   </eClassifiers>

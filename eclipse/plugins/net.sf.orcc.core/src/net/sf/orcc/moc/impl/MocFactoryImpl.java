@@ -9,6 +9,7 @@ package net.sf.orcc.moc.impl;
 import java.util.Map;
 
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.moc.*;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
 import net.sf.orcc.moc.KPNMoC;

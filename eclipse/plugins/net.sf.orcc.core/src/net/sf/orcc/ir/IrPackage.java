@@ -505,7 +505,7 @@ public interface IrPackage extends EPackage {
 		EReference INST_LOAD__INDEXES = eINSTANCE.getInstLoad_Indexes();
 
 		/**
-		 * The meta object literal for the '<em><b>Source</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Source</b></em>' containment reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */

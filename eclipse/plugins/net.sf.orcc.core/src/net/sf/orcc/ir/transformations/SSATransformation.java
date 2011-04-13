@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.ir.Def;
-import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -54,8 +53,10 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.AbstractExpressionVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class converts the given actor to SSA form.
@@ -64,30 +65,6 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * 
  */
 public class SSATransformation extends AbstractActorVisitor {
-
-	/**
-	 * This class replaces uses of a given variables by another variable
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class UseUpdater extends AbstractExpressionVisitor {
-
-		@Override
-		public void visit(ExprVar expr, Object... args) {
-			Use use = expr.getUse();
-			Var oldVar = use.getVariable();
-			if (!oldVar.isGlobal()) {
-				Var newVar = uses.get(oldVar.getName());
-				if (newVar != null) {
-					// newVar may be null if oldVar is a function parameter for
-					// instance
-					use.setVariable(newVar);
-				}
-			}
-		}
-
-	}
 
 	/**
 	 * ith branch (or 0 if we are not in a branch)
@@ -248,10 +225,8 @@ public class SSATransformation extends AbstractActorVisitor {
 	 * @param definition
 	 *            a definition
 	 */
-	private Def replaceDef(Def definition) {
-		if (definition == null) {
-			return null;
-		} else {
+	private void replaceDef(Def definition) {
+		if (definition != null) {
 			Var target = definition.getVariable();
 			String name = target.getName();
 
@@ -271,7 +246,7 @@ public class SSATransformation extends AbstractActorVisitor {
 				insertPhi(oldVar, newTarget);
 			}
 
-			return IrFactory.eINSTANCE.createDef(newTarget);
+			definition.setVariable(newTarget);
 		}
 	}
 
@@ -282,8 +257,25 @@ public class SSATransformation extends AbstractActorVisitor {
 	 *            an expression
 	 */
 	private void replaceUses(Expression expression) {
-		if (expression != null) {
-			expression.accept(new UseUpdater());
+		if (expression == null) {
+			return;
+		}
+
+		TreeIterator<EObject> it = expression.eAllContents();
+		while (it.hasNext()) {
+			EObject descendant = it.next();
+			if (descendant instanceof Use) {
+				Use use = (Use) descendant;
+				Var oldVar = use.getVariable();
+				if (!oldVar.isGlobal()) {
+					Var newVar = uses.get(oldVar.getName());
+					if (newVar != null) {
+						// newVar may be null if oldVar is a function parameter
+						// for instance
+						use.setVariable(newVar);
+					}
+				}
+			}
 		}
 	}
 
@@ -294,8 +286,8 @@ public class SSATransformation extends AbstractActorVisitor {
 	 *            a list of expressions
 	 */
 	private void replaceUses(List<Expression> expressions) {
-		for (Expression value : expressions) {
-			value.accept(new UseUpdater());
+		for (Expression expression : expressions) {
+			replaceUses(expression);
 		}
 	}
 
@@ -337,13 +329,13 @@ public class SSATransformation extends AbstractActorVisitor {
 	@Override
 	public void visit(InstAssign assign) {
 		replaceUses(assign.getValue());
-		assign.setTarget(replaceDef(assign.getTarget()));
+		replaceDef(assign.getTarget());
 	}
 
 	@Override
 	public void visit(InstCall call) {
 		replaceUses(call.getParameters());
-		call.setTarget(replaceDef(call.getTarget()));
+		replaceDef(call.getTarget());
 	}
 
 	@Override
@@ -377,7 +369,7 @@ public class SSATransformation extends AbstractActorVisitor {
 	@Override
 	public void visit(InstLoad load) {
 		replaceUses(load.getIndexes());
-		load.setTarget(replaceDef(load.getTarget()));
+		replaceDef(load.getTarget());
 	}
 
 	@Override

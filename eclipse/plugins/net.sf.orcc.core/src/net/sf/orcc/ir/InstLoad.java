@@ -51,7 +51,7 @@ public interface InstLoad extends Instruction {
 	 * Returns the variable loaded by this load instruction.
 	 * 
 	 * @return the variable loaded by this load instruction
-	 * @model
+	 * @model containment="true"
 	 */
 	Use getSource();
 

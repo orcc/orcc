@@ -52,7 +52,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	protected EList<Expression> indexes;
 
 	/**
-	 * The cached value of the '{@link #getSource() <em>Source</em>}' reference.
+	 * The cached value of the '{@link #getSource() <em>Source</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getSource()
 	 * @generated
@@ -91,22 +91,13 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Use basicGetSource() {
-		return source;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case IrPackage.INST_LOAD__INDEXES:
 				return getIndexes();
 			case IrPackage.INST_LOAD__SOURCE:
-				if (resolve) return getSource();
-				return basicGetSource();
+				return getSource();
 			case IrPackage.INST_LOAD__TARGET:
 				return getTarget();
 		}
@@ -123,6 +114,8 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 		switch (featureID) {
 			case IrPackage.INST_LOAD__INDEXES:
 				return ((InternalEList<?>)getIndexes()).basicRemove(otherEnd, msgs);
+			case IrPackage.INST_LOAD__SOURCE:
+				return basicSetSource(null, msgs);
 			case IrPackage.INST_LOAD__TARGET:
 				return basicSetTarget(null, msgs);
 		}
@@ -231,15 +224,22 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * @generated
 	 */
 	public Use getSource() {
-		if (source != null && source.eIsProxy()) {
-			InternalEObject oldSource = (InternalEObject)source;
-			source = (Use)eResolveProxy(oldSource);
-			if (source != oldSource) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INST_LOAD__SOURCE, oldSource, source));
-			}
-		}
 		return source;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetSource(Use newSource, NotificationChain msgs) {
+		Use oldSource = source;
+		source = newSource;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__SOURCE, oldSource, newSource);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -275,10 +275,17 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 * @generated
 	 */
 	public void setSource(Use newSource) {
-		Use oldSource = source;
-		source = newSource;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__SOURCE, oldSource, source));
+		if (newSource != source) {
+			NotificationChain msgs = null;
+			if (source != null)
+				msgs = ((InternalEObject)source).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__SOURCE, null, msgs);
+			if (newSource != null)
+				msgs = ((InternalEObject)newSource).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.INST_LOAD__SOURCE, null, msgs);
+			msgs = basicSetSource(newSource, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__SOURCE, newSource, newSource));
 	}
 
 	/**
