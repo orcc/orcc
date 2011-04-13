@@ -30,10 +30,8 @@ package net.sf.orcc.ir.transformations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
@@ -57,6 +55,7 @@ import net.sf.orcc.ir.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class converts the given actor to SSA form.
@@ -122,36 +121,6 @@ public class SSATransformation extends AbstractActorVisitor {
 	}
 
 	/**
-	 * Find all the CFG nodes in the given node, and puts them in the given set.
-	 * 
-	 * @param nodes
-	 *            resultant set of nodes
-	 * @param node
-	 *            a CFG node
-	 */
-	private void findNodes(Set<Node> nodes, Node node) {
-		nodes.add(node);
-		if (node.isIfNode()) {
-			NodeIf nodeIf = (NodeIf) node;
-			for (Node subNode : nodeIf.getThenNodes()) {
-				findNodes(nodes, subNode);
-			}
-
-			for (Node subNode : nodeIf.getElseNodes()) {
-				findNodes(nodes, subNode);
-			}
-
-			nodes.add(nodeIf.getJoinNode());
-		} else if (node.isWhileNode()) {
-			NodeWhile nodeWhile = (NodeWhile) node;
-			for (Node subNode : nodeWhile.getNodes()) {
-				findNodes(nodes, subNode);
-			}
-			nodes.add(nodeWhile.getJoinNode());
-		}
-	}
-
-	/**
 	 * Inserts a phi in the (current) join node.
 	 * 
 	 * @param oldVar
@@ -183,11 +152,20 @@ public class SSATransformation extends AbstractActorVisitor {
 			join.add(phi);
 
 			if (loop != null) {
-				replaceUsesInLoop(oldVar, target);
+				List<Use> uses = new ArrayList<Use>(oldVar.getUses());
+				for (Use use : uses) {
+					Node node = EcoreHelper.getContainerOfType(use, Node.class);
+
+					// only changes uses that are in the loop
+					if (node != join && EcoreUtil.isAncestor(loop, node)) {
+						use.setVariable(target);
+					}
+				}
 			}
 		}
 
 		// replace use
+		EcoreHelper.removeUses(phi.getValues().get(branch - 1));
 		phi.getValues().set(branch - 1,
 				IrFactory.eINSTANCE.createExprVar(newVar));
 	}
@@ -288,30 +266,6 @@ public class SSATransformation extends AbstractActorVisitor {
 	private void replaceUses(List<Expression> expressions) {
 		for (Expression expression : expressions) {
 			replaceUses(expression);
-		}
-	}
-
-	/**
-	 * Replaces uses of the given variable <code>oldVar</code> by uses of the
-	 * given variable <code>newVar</code> in the current loop.
-	 * 
-	 * @param oldVar
-	 *            old variable
-	 * @param newVar
-	 *            new variable
-	 */
-	private void replaceUsesInLoop(Var oldVar, Var newVar) {
-		List<Use> uses = new ArrayList<Use>(oldVar.getUses());
-		Set<Node> nodes = new HashSet<Node>();
-		findNodes(nodes, loop);
-
-		for (Use use : uses) {
-			Node node = EcoreHelper.getContainerOfType(use, Node.class);
-
-			// only changes uses that are in the loop
-			if (node != join && nodes.contains(node)) {
-				use.setVariable(newVar);
-			}
 		}
 	}
 

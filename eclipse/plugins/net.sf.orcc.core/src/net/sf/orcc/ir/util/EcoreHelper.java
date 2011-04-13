@@ -110,15 +110,7 @@ public class EcoreHelper {
 	 *            an expression
 	 */
 	public static void delete(Expression expression) {
-		TreeIterator<EObject> it = expression.eAllContents();
-		while (it.hasNext()) {
-			EObject descendant = it.next();
-			if (descendant instanceof Use) {
-				Use use = (Use) descendant;
-				use.setVariable(null);
-			}
-		}
-
+		removeUses(expression);
 		EcoreUtil.remove(expression);
 	}
 
@@ -130,22 +122,8 @@ public class EcoreHelper {
 	 *            an instruction
 	 */
 	public static void delete(Instruction instruction) {
-		TreeIterator<EObject> it = instruction.eAllContents();
-		while (it.hasNext()) {
-			EObject descendant = it.next();
-			if (descendant instanceof Use) {
-				Use use = (Use) descendant;
-				use.setVariable(null);
-			}
-		}
-
-		for (EObject eObject : instruction.eContents()) {
-			if (eObject instanceof Def) {
-				Def def = (Def) eObject;
-				def.setVariable(null);
-			}
-		}
-
+		removeUses(instruction);
+		removeDefs(instruction);
 		EcoreUtil.remove(instruction);
 	}
 
@@ -199,6 +177,38 @@ public class EcoreHelper {
 		}
 
 		return uses;
+	}
+
+	/**
+	 * Removes the defs present in the given instruction.
+	 * 
+	 * @param instruction
+	 *            an instruction
+	 */
+	public static void removeDefs(Instruction instruction) {
+		for (EObject eObject : instruction.eContents()) {
+			if (eObject instanceof Def) {
+				Def def = (Def) eObject;
+				def.setVariable(null);
+			}
+		}
+	}
+
+	/**
+	 * Removes the uses present in the given object.
+	 * 
+	 * @param eObject
+	 *            an object
+	 */
+	public static void removeUses(EObject eObject) {
+		TreeIterator<EObject> it = eObject.eAllContents();
+		while (it.hasNext()) {
+			EObject descendant = it.next();
+			if (descendant instanceof Use) {
+				Use use = (Use) descendant;
+				use.setVariable(null);
+			}
+		}
 	}
 
 }

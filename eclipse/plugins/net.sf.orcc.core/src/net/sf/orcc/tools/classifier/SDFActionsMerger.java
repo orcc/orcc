@@ -31,7 +31,6 @@ package net.sf.orcc.tools.classifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -43,7 +42,6 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Var;
@@ -271,15 +269,13 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 		List<Var> parameters = procedure.getParameters();
 
 		// Add inputs to procedure parameters
-		for (Entry<Port, Var> entry : inputPattern.getPortToVarMap().entrySet()) {
-			Var var = entry.getValue();
+		for (Var var : inputPattern.getVariables()) {
 			parameters.add(var);
 			exprs.add(IrFactory.eINSTANCE.createExprVar(var));
 		}
 
 		// Add outputs to procedure parameters
-		for (Entry<Port, Var> entry : outputPattern.getPortToVarMap().entrySet()) {
-			Var var = entry.getValue();
+		for (Var var : outputPattern.getVariables()) {
 			parameters.add(var);
 			exprs.add(IrFactory.eINSTANCE.createExprVar(var));
 		}
