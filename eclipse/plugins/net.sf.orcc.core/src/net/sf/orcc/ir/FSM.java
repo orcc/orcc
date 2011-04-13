@@ -142,7 +142,7 @@ public interface FSM extends EObject {
 	 *            source state
 	 * @param action
 	 *            action associated with the transition
-	 * @param newTargetName
+	 * @param target
 	 *            new target state
 	 */
 	void replaceTarget(State source, Action action, State target);
