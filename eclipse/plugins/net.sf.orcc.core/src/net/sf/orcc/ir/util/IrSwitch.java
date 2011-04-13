@@ -391,21 +391,6 @@ public class IrSwitch<T2> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>State To Transition Map Entry</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>State To Transition Map Entry</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T2 caseStateToTransitionMapEntry(Map.Entry<State, Transition> object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>State To Transitions Map Entry</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -1178,12 +1163,6 @@ public class IrSwitch<T2> {
 			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: {
 				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToEIntegerObjectMapEntry = (Map.Entry<Port, Integer>)theEObject;
 				T2 result = casePortToEIntegerObjectMapEntry(portToEIntegerObjectMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.STATE_TO_TRANSITION_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<State, Transition> stateToTransitionMapEntry = (Map.Entry<State, Transition>)theEObject;
-				T2 result = caseStateToTransitionMapEntry(stateToTransitionMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

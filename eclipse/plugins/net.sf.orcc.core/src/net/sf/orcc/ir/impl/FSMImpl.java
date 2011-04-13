@@ -99,7 +99,6 @@ public class FSMImpl extends EObjectImpl implements FSM {
 		Transitions transitions = getTransitions(source);
 		if (transitions == null) {
 			transitions = IrFactory.eINSTANCE.createTransitions();
-			transitions.setSourceState(source);
 			getTransitions().put(source, transitions);
 		}
 		

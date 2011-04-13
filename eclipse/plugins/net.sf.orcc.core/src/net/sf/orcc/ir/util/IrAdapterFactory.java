@@ -271,10 +271,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createPortToEIntegerObjectMapEntryAdapter();
 			}
 			@Override
-			public Adapter caseStateToTransitionMapEntry(Map.Entry<State, Transition> object) {
-				return createStateToTransitionMapEntryAdapter();
-			}
-			@Override
 			public Adapter caseStateToTransitionsMapEntry(Map.Entry<State, Transitions> object) {
 				return createStateToTransitionsMapEntryAdapter();
 			}
@@ -598,20 +594,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createTransitionAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>State To Transition Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createStateToTransitionMapEntryAdapter() {
 		return null;
 	}
 

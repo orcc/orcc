@@ -66,7 +66,6 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//State/name"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Transitions">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Transitions/sourceState"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Transitions/list"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Transition">
@@ -233,10 +232,6 @@
     <genClasses ecoreClass="Ir.ecore#//PortToEIntegerObjectMapEntry">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//PortToEIntegerObjectMapEntry/key"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//PortToEIntegerObjectMapEntry/value"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//StateToTransitionMapEntry">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//StateToTransitionMapEntry/key"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//StateToTransitionMapEntry/value"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//StateToTransitionsMapEntry">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//StateToTransitionsMapEntry/key"/>
