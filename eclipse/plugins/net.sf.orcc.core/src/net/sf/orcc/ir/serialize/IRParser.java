@@ -435,7 +435,9 @@ public class IRParser {
 		JsonArray stateArray = array.get(1).getAsJsonArray();
 		for (int i = 0; i < stateArray.size(); i++) {
 			String name = stateArray.get(i).getAsString();
-			stateMap.put(name, IrFactory.eINSTANCE.createState(name));
+			State state = IrFactory.eINSTANCE.createState(name);
+			stateMap.put(name, state);
+			fsm.getStates().add(state);
 		}
 
 		// set the initial state after initializing the states map

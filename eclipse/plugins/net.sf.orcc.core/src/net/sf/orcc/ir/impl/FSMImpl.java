@@ -20,6 +20,7 @@ import java.util.ListIterator;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
@@ -96,6 +97,11 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	@Override
 	public void addTransition(State source, Action action, State target) {
 		Transition transition = getTransition(source);
+		if (transition == null) {
+			transition = IrFactory.eINSTANCE.createTransition();
+			transition.setSourceState(source);
+			getTransitionsMap().put(source, transition);
+		}
 		transition.getTargetActions().add(action);
 		transition.getTargetStates().add(target);
 	}

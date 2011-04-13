@@ -100,7 +100,7 @@ void <instance.id>_initialize(<instance.actor.inputs: { port | unsigned int fifo
 	<if(instance.actor.fsm)>
 	
 	/* Set initial state to current FSM state */
-	_FSM_state = my_state_<instance.actor.fsm.initialState>;
+	_FSM_state = my_state_<instance.actor.fsm.initialState.name>;
 	<endif>
 	
 	/* Set initial value to global variable */
@@ -435,7 +435,7 @@ actionTestState(action, targetState, restActions, restStates) ::= <<
 if (<checkInputPattern(action.inputPattern)>isSchedulable_<action.name>()) {
 	<if (action.outputPattern)>
 	<printOutputPattern(action.outputPattern)>
-		_FSM_state = my_state_<transition.sourceState>;
+		_FSM_state = my_state_<transition.sourceState.name>;
 		si-\>num_firings = i;
 		si-\>reason = full;
 		goto finished;
@@ -443,7 +443,7 @@ if (<checkInputPattern(action.inputPattern)>isSchedulable_<action.name>()) {
 	<endif>
 	<action.body.name>();
 	i++;
-	goto l_<targetState>;
+	goto l_<targetState.name>;
 } else {
 	<schedulingStates(restActions, restStates)>
 }
@@ -473,7 +473,7 @@ schedulingStates(actions, states) ::= <<
 ><actionTestState(action=first(actions), targetState=first(states), restActions=rest(actions), restStates=rest(states))><
 else
 ><printTransitionPattern(pattern=instance.actor.templateData.transitionPattern.(transition))>
-_FSM_state = my_state_<transition.sourceState>;
+_FSM_state = my_state_<transition.sourceState.name>;
 goto finished;<
 endif>
 >>
@@ -481,7 +481,7 @@ endif>
 printTransition(transition) ::= <<
 
 
-l_<transition.sourceState>:
+l_<transition.sourceState.name>:
 	<if (actions)>
 	<instance.id>_outside_FSM_scheduler(si);
 	i += si-\>num_firings;
@@ -497,8 +497,8 @@ l_<transition.sourceState>:
 
 switchTransition(transition) ::= <<
 
-case my_state_<transition.sourceState>:
-	goto l_<transition.sourceState>;
+case my_state_<transition.sourceState.name>:
+	goto l_<transition.sourceState.name>;
 >>
 
 printSwitch(transitions) ::= <<
@@ -549,12 +549,12 @@ finished:
 
 statesFSM(fsm) ::= <<
 enum states {
-	my_state_<first(fsm.states)> = 0,
-	<rest(fsm.states) : {state | my_state_<state>}; separator=",\n">
+	my_state_<first(fsm.states).name> = 0,
+	<rest(fsm.states) : {state | my_state_<state.name>}; separator=",\n">
 };
 
 static char *stateNames[] = {
-	<fsm.states : {state | "<state>"}; separator=",\n">
+	<fsm.states : {state | "<state.name>"}; separator=",\n">
 };
 
 static enum states _FSM_state;
