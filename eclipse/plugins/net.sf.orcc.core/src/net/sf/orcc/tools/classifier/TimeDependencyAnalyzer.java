@@ -38,10 +38,10 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.FSM.NextStateInfo;
-import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Transition;
 
 /**
  * This class defines a configuration analyzer.

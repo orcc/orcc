@@ -23,6 +23,9 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.NextStateInfo;
+import net.sf.orcc.ir.State;
+import net.sf.orcc.ir.Transition;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.ecore.EClass;

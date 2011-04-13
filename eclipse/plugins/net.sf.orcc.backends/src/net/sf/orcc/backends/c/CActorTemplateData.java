@@ -36,10 +36,10 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.FSM.NextStateInfo;
-import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Transition;
 
 /**
  * This class allows the string template accessing informations about
@@ -120,7 +120,7 @@ public class CActorTemplateData {
 	 */
 	public void computeTemplateMaps(Actor actor) {
 		inputPattern = IrFactory.eINSTANCE.createPattern();
-		transitionPattern = new HashMap<FSM.Transition, Pattern>();
+		transitionPattern = new HashMap<Transition, Pattern>();
 
 		buildInputPattern(actor);
 		buildTransitionPattern(actor);

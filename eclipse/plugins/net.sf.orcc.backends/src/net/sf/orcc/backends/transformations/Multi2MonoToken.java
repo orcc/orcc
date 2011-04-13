@@ -41,7 +41,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.FSM.State;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;

@@ -37,9 +37,9 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.FSM.NextStateInfo;
-import net.sf.orcc.ir.FSM.State;
+import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
@@ -343,7 +343,7 @@ public class ActorClassifier implements ActorVisitor {
 			State target = graph.getEdgeTarget(edge);
 
 			DepthFirstIterator<State, UniqueEdge> it;
-			it = new DepthFirstIterator<FSM.State, UniqueEdge>(graph, target);
+			it = new DepthFirstIterator<State, UniqueEdge>(graph, target);
 
 			boolean cyclesBackToInitialState = false;
 			while (it.hasNext()) {
