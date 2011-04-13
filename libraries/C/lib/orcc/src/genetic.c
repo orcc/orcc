@@ -38,6 +38,8 @@
 #include "orcc_thread.h"
 #include "orcc_scheduler.h"
 
+static FILE *mappingFile;
+
 int clean_cache(int size) {
 	int i, res = 0;
 	int *table = (int*) malloc(size * sizeof(int));
@@ -82,36 +84,34 @@ static struct mapping_s* compute_mapping(individual *individual,
 	return mapping;
 }
 
-static int write_better_mapping(population *pop, struct genetic_s *genetic_info) {
-	FILE *mappingFile = fopen("better_mapping.txt", "w");
+static void write_mapping(population *pop, struct genetic_s *genetic_info) {
 	if (mappingFile != NULL) {
 		int i, j, k;
-		fprintf(mappingFile, "// Better mapping\n\n");
+		fprintf(mappingFile, "<!-- POPULATION N°%i -->\n", pop->generation_nb);
 
-		for (i = 0; i < genetic_info->population_size
-				* genetic_info->keep_ratio; i++) {
+		for (i = 0; i < genetic_info->population_size; i++) {
 			struct mapping_s* mapping = compute_mapping(pop->individuals[i],
 					genetic_info);
-			fprintf(mappingFile, "// Mapping n°%i (%f fps)\n\n", i,
-					pop->individuals[i]->fps);
+			fprintf(mappingFile,
+					"<Configuration pop-id=\"%i\" ind-id=\"%i\" fps=\"%f\">\n",
+					pop->generation_nb, i, pop->individuals[i]->fps);
+			fprintf(mappingFile, "\t<Partitioning>\n");
 
 			for (j = 0; j < genetic_info->threads_nb; j++) {
-				fprintf(mappingFile, "<Partition id=\"%i\">\n", j);
-
+				fprintf(mappingFile, "\t\t<Partition id=\"%i\">\n", j);
 				for (k = 0; k < mapping->actors_per_threads[j]; k++) {
-					fprintf(mappingFile, "\t<Instance actor-id=\"%s/0\"/>\n",
+					fprintf(mappingFile, "\t\t\t<Instance id=\"%s\"/>\n",
 							mapping->actors_mapping[j][k]->name);
 				}
-
-				fprintf(mappingFile, "</Partition>\n\n");
+				fprintf(mappingFile, "\t\t</Partition>\n");
 			}
-		}
 
-		fclose(mappingFile);
+			fprintf(mappingFile, "\t</Partitioning>\n");
+			fprintf(mappingFile, "</Configuration>\n\n");
+		}
 	} else {
-		perror("I/O error during writing of final mapping file");
+		perror("I/O error during writing of mapping file");
 	}
-	return 0;
 }
 
 static void print_mapping(individual *ind, struct genetic_s *genetic_info) {
@@ -401,6 +401,13 @@ void *monitor(void *data) {
 	source_active_genetic();
 	//Compare_active_genetic();
 
+	mappingFile = fopen("genetic_mapping.xcf", "w");
+	if (mappingFile == NULL) {
+		perror("I/O error during opening of mapping file.");
+	}
+	fprintf(mappingFile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+	fprintf(mappingFile, "<!-- GENETIC ALGORITHM -->\n\n");
+
 	// Initialize
 	printf("\nGenerate initial population...\n\n");
 	population = initialize_population(monitoring->genetic_info);
@@ -450,6 +457,7 @@ void *monitor(void *data) {
 					== monitoring->genetic_info->generation_nb - 1) {
 				break;
 			} else {
+				write_mapping(population, monitoring->genetic_info);
 				printf("\nCompute next generation...\n\n");
 				population = compute_next_population(population,
 						monitoring->genetic_info);
@@ -464,8 +472,10 @@ void *monitor(void *data) {
 		clear_fifos();
 		initialize_instances();
 	}
-	//write_better_mapping(population, monitoring->genetic_info);
 	//active_fps_printing();
+	if (mappingFile != NULL) {
+		fclose(mappingFile);
+	}
 	exit(0);
 
 	return NULL;

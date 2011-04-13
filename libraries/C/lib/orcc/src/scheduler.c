@@ -146,7 +146,8 @@ struct mapping_s * map_actors(struct actor_s **actors, int actors_nb) {
 
 		mapping->ids = (int*) malloc(sizeof(int));
 		mapping->actors_per_threads = (int*) malloc(sizeof(int));
-		mapping->actors_mapping = (struct actor_s ***) malloc(sizeof(struct actor_s **));
+		mapping->actors_mapping = (struct actor_s ***) malloc(
+				sizeof(struct actor_s **));
 
 		mapping->ids[0] = 0;
 		mapping->actors_per_threads[0] = actors_nb;
@@ -155,7 +156,7 @@ struct mapping_s * map_actors(struct actor_s **actors, int actors_nb) {
 		configuration = roxml_load_doc(mapping_file);
 		if (configuration == NULL) {
 			printf("I/O error when reading mapping file.\n");
-			exit(0);
+			exit(1);
 		}
 
 		partitioning = roxml_get_chld(configuration, NULL, 0);
@@ -189,6 +190,7 @@ struct mapping_s * map_actors(struct actor_s **actors, int actors_nb) {
 						actors_nb);
 			}
 		}
+		roxml_close(configuration);
 	}
 
 	return mapping;
