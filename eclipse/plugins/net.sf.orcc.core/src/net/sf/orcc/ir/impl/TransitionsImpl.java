@@ -9,13 +9,16 @@ package net.sf.orcc.ir.impl;
 import java.util.Collection;
 
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
@@ -27,6 +30,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.TransitionsImpl#getList <em>List</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.TransitionsImpl#getSourceState <em>Source State</em>}</li>
  * </ul>
  * </p>
  *
@@ -41,6 +45,16 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 	 * @ordered
 	 */
 	protected EList<Transition> list;
+
+	/**
+	 * The cached value of the '{@link #getSourceState() <em>Source State</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getSourceState()
+	 * @generated
+	 * @ordered
+	 */
+	protected State sourceState;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -59,6 +73,9 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 		switch (featureID) {
 			case IrPackage.TRANSITIONS__LIST:
 				return getList();
+			case IrPackage.TRANSITIONS__SOURCE_STATE:
+				if (resolve) return getSourceState();
+				return basicGetSourceState();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -86,6 +103,8 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 		switch (featureID) {
 			case IrPackage.TRANSITIONS__LIST:
 				return list != null && !list.isEmpty();
+			case IrPackage.TRANSITIONS__SOURCE_STATE:
+				return sourceState != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -101,6 +120,9 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 			case IrPackage.TRANSITIONS__LIST:
 				getList().clear();
 				getList().addAll((Collection<? extends Transition>)newValue);
+				return;
+			case IrPackage.TRANSITIONS__SOURCE_STATE:
+				setSourceState((State)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -125,6 +147,9 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 			case IrPackage.TRANSITIONS__LIST:
 				getList().clear();
 				return;
+			case IrPackage.TRANSITIONS__SOURCE_STATE:
+				setSourceState((State)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -138,6 +163,44 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 			list = new EObjectContainmentEList<Transition>(Transition.class, this, IrPackage.TRANSITIONS__LIST);
 		}
 		return list;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public State getSourceState() {
+		if (sourceState != null && sourceState.eIsProxy()) {
+			InternalEObject oldSourceState = (InternalEObject)sourceState;
+			sourceState = (State)eResolveProxy(oldSourceState);
+			if (sourceState != oldSourceState) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.TRANSITIONS__SOURCE_STATE, oldSourceState, sourceState));
+			}
+		}
+		return sourceState;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public State basicGetSourceState() {
+		return sourceState;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setSourceState(State newSourceState) {
+		State oldSourceState = sourceState;
+		sourceState = newSourceState;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TRANSITIONS__SOURCE_STATE, oldSourceState, sourceState));
 	}
 
 } // TransitionsImpl

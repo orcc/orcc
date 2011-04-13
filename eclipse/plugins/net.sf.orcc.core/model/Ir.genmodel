@@ -67,6 +67,7 @@
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Transitions">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Transitions/list"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Transitions/sourceState"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Transition">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Transition/action"/>
@@ -89,6 +90,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/numTokensMap"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/portToVarMap"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/varToPortMap"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/variables"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Procedure">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/location"/>
@@ -232,10 +234,6 @@
     <genClasses ecoreClass="Ir.ecore#//PortToEIntegerObjectMapEntry">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//PortToEIntegerObjectMapEntry/key"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//PortToEIntegerObjectMapEntry/value"/>
-    </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//StateToTransitionsMapEntry">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//StateToTransitionsMapEntry/key"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//StateToTransitionsMapEntry/value"/>
     </genClasses>
   </genPackages>
   <genPackages prefix="Moc" basePackage="net.sf.orcc" disposableProviderFactory="true"

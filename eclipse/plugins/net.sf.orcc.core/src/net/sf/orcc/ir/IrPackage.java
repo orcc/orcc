@@ -427,7 +427,7 @@ public interface IrPackage extends EPackage {
 		EReference FSM__STATES = eINSTANCE.getFSM_States();
 
 		/**
-		 * The meta object literal for the '<em><b>Transitions</b></em>' map feature.
+		 * The meta object literal for the '<em><b>Transitions</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -828,6 +828,14 @@ public interface IrPackage extends EPackage {
 		EReference PATTERN__VAR_TO_PORT_MAP = eINSTANCE.getPattern_VarToPortMap();
 
 		/**
+		 * The meta object literal for the '<em><b>Variables</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PATTERN__VARIABLES = eINSTANCE.getPattern_Variables();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PortImpl <em>Port</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.PortImpl
@@ -1020,30 +1028,12 @@ public interface IrPackage extends EPackage {
 		EReference TRANSITIONS__LIST = eINSTANCE.getTransitions_List();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.StateToTransitionsMapEntryImpl <em>State To Transitions Map Entry</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.StateToTransitionsMapEntryImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getStateToTransitionsMapEntry()
-		 * @generated
-		 */
-		EClass STATE_TO_TRANSITIONS_MAP_ENTRY = eINSTANCE.getStateToTransitionsMapEntry();
-
-		/**
-		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Source State</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference STATE_TO_TRANSITIONS_MAP_ENTRY__KEY = eINSTANCE.getStateToTransitionsMapEntry_Key();
-
-		/**
-		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference STATE_TO_TRANSITIONS_MAP_ENTRY__VALUE = eINSTANCE.getStateToTransitionsMapEntry_Value();
+		EReference TRANSITIONS__SOURCE_STATE = eINSTANCE.getTransitions_SourceState();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TagImpl <em>Tag</em>}' class.
@@ -1738,7 +1728,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 48;
+	int OP_BINARY = 47;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1747,7 +1737,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 49;
+	int OP_UNARY = 48;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
@@ -1836,7 +1826,7 @@ public interface IrPackage extends EPackage {
 	int FSM__STATES = 1;
 
 	/**
-	 * The feature id for the '<em><b>Transitions</b></em>' map.
+	 * The feature id for the '<em><b>Transitions</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1929,13 +1919,22 @@ public interface IrPackage extends EPackage {
 	int TRANSITIONS__LIST = 0;
 
 	/**
+	 * The feature id for the '<em><b>Source State</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__SOURCE_STATE = 1;
+
+	/**
 	 * The number of structural features of the '<em>Transitions</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRANSITIONS_FEATURE_COUNT = 1;
+	int TRANSITIONS_FEATURE_COUNT = 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TagImpl <em>Tag</em>}' class.
@@ -2105,13 +2104,22 @@ public interface IrPackage extends EPackage {
 	int PATTERN__VAR_TO_PORT_MAP = 3;
 
 	/**
+	 * The feature id for the '<em><b>Variables</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PATTERN__VARIABLES = 4;
+
+	/**
 	 * The number of structural features of the '<em>Pattern</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PATTERN_FEATURE_COUNT = 4;
+	int PATTERN_FEATURE_COUNT = 5;
 
 	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
@@ -3299,43 +3307,6 @@ public interface IrPackage extends EPackage {
 	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.StateToTransitionsMapEntryImpl <em>State To Transitions Map Entry</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.StateToTransitionsMapEntryImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getStateToTransitionsMapEntry()
-	 * @generated
-	 */
-	int STATE_TO_TRANSITIONS_MAP_ENTRY = 47;
-
-	/**
-	 * The feature id for the '<em><b>Key</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int STATE_TO_TRANSITIONS_MAP_ENTRY__KEY = 0;
-
-	/**
-	 * The feature id for the '<em><b>Value</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int STATE_TO_TRANSITIONS_MAP_ENTRY__VALUE = 1;
-
-	/**
-	 * The number of structural features of the '<em>State To Transitions Map Entry</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int STATE_TO_TRANSITIONS_MAP_ENTRY_FEATURE_COUNT = 2;
-
-	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Action <em>Action</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Action</em>'.
@@ -3885,10 +3856,10 @@ public interface IrPackage extends EPackage {
 	EReference getFSM_States();
 
 	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.ir.FSM#getTransitions <em>Transitions</em>}'.
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.FSM#getTransitions <em>Transitions</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Transitions</em>'.
+	 * @return the meta object for the containment reference list '<em>Transitions</em>'.
 	 * @see net.sf.orcc.ir.FSM#getTransitions()
 	 * @see #getFSM()
 	 * @generated
@@ -4446,6 +4417,17 @@ public interface IrPackage extends EPackage {
 	EReference getPattern_VarToPortMap();
 
 	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Pattern#getVariables <em>Variables</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Variables</em>'.
+	 * @see net.sf.orcc.ir.Pattern#getVariables()
+	 * @see #getPattern()
+	 * @generated
+	 */
+	EReference getPattern_Variables();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Port <em>Port</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Port</em>'.
@@ -4716,38 +4698,15 @@ public interface IrPackage extends EPackage {
 	EReference getTransitions_List();
 
 	/**
-	 * Returns the meta object for class '{@link java.util.Map.Entry <em>State To Transitions Map Entry</em>}'.
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Transitions#getSourceState <em>Source State</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>State To Transitions Map Entry</em>'.
-	 * @see java.util.Map.Entry
-	 * @model keyType="net.sf.orcc.ir.State"
-	 *        valueType="net.sf.orcc.ir.Transitions"
+	 * @return the meta object for the reference '<em>Source State</em>'.
+	 * @see net.sf.orcc.ir.Transitions#getSourceState()
+	 * @see #getTransitions()
 	 * @generated
 	 */
-	EClass getStateToTransitionsMapEntry();
-
-	/**
-	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Key</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getStateToTransitionsMapEntry()
-	 * @generated
-	 */
-	EReference getStateToTransitionsMapEntry_Key();
-
-	/**
-	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Value</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getStateToTransitionsMapEntry()
-	 * @generated
-	 */
-	EReference getStateToTransitionsMapEntry_Value();
+	EReference getTransitions_SourceState();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Tag <em>Tag</em>}'.

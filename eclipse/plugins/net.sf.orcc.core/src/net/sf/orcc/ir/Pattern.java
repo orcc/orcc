@@ -72,7 +72,9 @@ public interface Pattern extends EObject {
 	Integer getNumTokens(Port port);
 
 	/**
-	 * Returns the number of tokens map.
+	 * Returns the number of tokens map. To be used in templates. Use
+	 * {@link #getNumTokens(Port)} to retrieve the number of tokens
+	 * produced/consumed by a given port.
 	 * 
 	 * @return the number of tokens map
 	 * @model keyType="Port" valueType="Integer"
@@ -88,7 +90,8 @@ public interface Pattern extends EObject {
 	EList<Port> getPorts();
 
 	/**
-	 * Returns a variable to port map.
+	 * Returns a variable to port map. To be used in templates. Use
+	 * {@link #setVariable(Port, Var)} to modify this map.
 	 * 
 	 * @return a variable to port map
 	 * @model keyType="Port" valueType="Var"
@@ -105,7 +108,16 @@ public interface Pattern extends EObject {
 	Var getVariable(Port port);
 
 	/**
-	 * Returns a port to variable map.
+	 * Returns the variables contained in this pattern.
+	 * 
+	 * @return the variables contained of this pattern
+	 * @model containment="true"
+	 */
+	EList<Var> getVariables();
+
+	/**
+	 * Returns a port to variable map. To be used in templates. Use
+	 * {@link #setVariable(Port, Var)} to modify this map.
 	 * 
 	 * @return a port to variable map
 	 * @model keyType="Var" valueType="Port"

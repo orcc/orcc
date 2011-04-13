@@ -34,8 +34,10 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.ActorImpl;
+import net.sf.orcc.ir.impl.FSMImpl;
 import net.sf.orcc.ir.impl.ProcedureImpl;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -66,47 +68,51 @@ public class MapAdapter implements Adapter {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void notifyChanged(Notification notification) {
-		Map<String, ? extends Object> map;
-		String name;
+		Map<? extends Object, ? extends Object> map;
+		Object key;
 		Object object = notification.getEventType() == Notification.ADD ? notification
 				.getNewValue() : notification.getOldValue();
 
 		if (notification.getFeature() == IrPackage.eINSTANCE
 				.getProcedure_Locals()) {
 			map = ((ProcedureImpl) target).getLocalsMap();
-			name = ((Var) object).getIndexedName();
+			key = ((Var) object).getIndexedName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getProcedure_Parameters()) {
 			map = ((ProcedureImpl) target).getParametersMap();
-			name = ((Var) object).getIndexedName();
+			key = ((Var) object).getIndexedName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_Inputs()) {
 			map = ((ActorImpl) target).getInputsMap();
-			name = ((Port) object).getName();
+			key = ((Port) object).getName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_Outputs()) {
 			map = ((ActorImpl) target).getOutputsMap();
-			name = ((Port) object).getName();
+			key = ((Port) object).getName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_Parameters()) {
 			map = ((ActorImpl) target).getParametersMap();
-			name = ((Var) object).getName();
+			key = ((Var) object).getName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_Procs()) {
 			map = ((ActorImpl) target).getProceduresMap();
-			name = ((Procedure) object).getName();
+			key = ((Procedure) object).getName();
 		} else if (notification.getFeature() == IrPackage.eINSTANCE
 				.getActor_StateVars()) {
 			map = ((ActorImpl) target).getStateVariablesMap();
-			name = ((Var) object).getName();
+			key = ((Var) object).getName();
+		} else if (notification.getFeature() == IrPackage.eINSTANCE
+				.getFSM_Transitions()) {
+			map = ((FSMImpl) target).getTransitionsMap();
+			key = ((Transitions) object).getSourceState();
 		} else {
 			return;
 		}
 
 		if (notification.getEventType() == Notification.ADD) {
-			((Map<String, Object>) map).put(name, object);
+			((Map<Object, Object>) map).put(key, object);
 		} else if (notification.getEventType() == Notification.REMOVE) {
-			map.remove(name);
+			map.remove(key);
 		}
 	}
 

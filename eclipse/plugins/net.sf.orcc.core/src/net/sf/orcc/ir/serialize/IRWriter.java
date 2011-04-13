@@ -61,7 +61,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
@@ -693,16 +692,17 @@ public class IRWriter {
 
 		JsonArray transitionsArray = new JsonArray();
 		array.add(transitionsArray);
-		for (Entry<State, Transitions> entry : fsm.getTransitions()) {
+		for (Transitions transitions : fsm.getTransitions()) {
 			JsonArray transitionArray = new JsonArray();
 			transitionsArray.add(transitionArray);
 
-			transitionArray.add(new JsonPrimitive(entry.getKey().getName()));
+			transitionArray.add(new JsonPrimitive(transitions.getSourceState()
+					.getName()));
 
 			JsonArray actionsArray = new JsonArray();
 			transitionArray.add(actionsArray);
 
-			for (Transition transition : entry.getValue().getList()) {
+			for (Transition transition : transitions.getList()) {
 				JsonArray actionArray = new JsonArray();
 				actionsArray.add(actionArray);
 

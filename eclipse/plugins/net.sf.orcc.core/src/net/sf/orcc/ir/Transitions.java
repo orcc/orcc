@@ -48,4 +48,20 @@ public interface Transitions extends EObject {
 	 */
 	EList<Transition> getList();
 
+	/**
+	 * Returns the source state of this transition list.
+	 * 
+	 * @return the source state of this transition list
+	 * @model
+	 */
+	State getSourceState();
+
+	/**
+	 * Sets the source state of this transition list.
+	 * 
+	 * @param state
+	 *            the source state of this transition list
+	 */
+	void setSourceState(State state);
+
 }

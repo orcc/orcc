@@ -122,7 +122,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	@Override
 	public void visit(InstStore store) {
 		Var target = store.getTarget().getVariable();
-		if (!target.isUsed()) {
+		if (target != null && !target.isUsed()) {
 			// do not remove stores to variables that are used by writes, or
 			// variables that are parameters
 			if (!target.isGlobal()

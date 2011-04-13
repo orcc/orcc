@@ -31,7 +31,6 @@ package net.sf.orcc.backends.c;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -39,7 +38,6 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
 
@@ -95,9 +93,9 @@ public class CActorTemplateData {
 			return;
 		}
 
-		for (Entry<State, Transitions> entry : fsm.getTransitions()) {
+		for (Transitions transitions : fsm.getTransitions()) {
 			Pattern pattern = IrFactory.eINSTANCE.createPattern();
-			for (Transition transition : entry.getValue().getList()) {
+			for (Transition transition : transitions.getList()) {
 				Action action = transition.getAction();
 				Pattern actionPattern = action.getInputPattern();
 				for (Port port : actionPattern.getPorts()) {
@@ -113,7 +111,7 @@ public class CActorTemplateData {
 				}
 			}
 
-			transitionPattern.put(entry.getValue(), pattern);
+			transitionPattern.put(transitions, pattern);
 		}
 	}
 

@@ -73,8 +73,7 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor {
 
 	@Override
 	public void visit(Pattern pattern) {
-		List<Port> ports = new ArrayList<Port>(pattern.getNumTokensMap()
-				.keySet());
+		List<Port> ports = new ArrayList<Port>(pattern.getPorts());
 		for (Port port : ports) {
 			if (pattern.getNumTokens(port) == 1) {
 				Var oldTarget = pattern.getVariable(port);

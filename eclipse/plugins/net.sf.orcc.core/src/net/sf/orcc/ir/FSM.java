@@ -35,7 +35,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
 import org.jgrapht.DirectedGraph;
 
@@ -105,12 +104,12 @@ public interface FSM extends EObject {
 	Transitions getTransitions(State state);
 
 	/**
-	 * Returns a state to transition map.
+	 * Returns a list of transitions.
 	 * 
-	 * @return a state to transition map
-	 * @model keyType="State" valueType="Transitions"
+	 * @return a list of transitions.
+	 * @model containment="true"
 	 */
-	EMap<State, Transitions> getTransitions();
+	EList<Transitions> getTransitions();
 
 	/**
 	 * Prints a graph representation of this FSM.

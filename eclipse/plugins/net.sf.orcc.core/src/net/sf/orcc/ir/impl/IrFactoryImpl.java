@@ -150,7 +150,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
 			case IrPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
 			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
-			case IrPackage.STATE_TO_TRANSITIONS_MAP_ENTRY: return (EObject)createStateToTransitionsMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -756,16 +755,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		StateImpl state = new StateImpl();
 		state.setName(name);
 		return state;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<State, Transitions> createStateToTransitionsMapEntry() {
-		StateToTransitionsMapEntryImpl stateToTransitionsMapEntry = new StateToTransitionsMapEntryImpl();
-		return stateToTransitionsMapEntry;
 	}
 
 	/**

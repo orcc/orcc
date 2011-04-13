@@ -29,6 +29,7 @@
 package net.sf.orcc.frontend;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
@@ -36,6 +37,12 @@ import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
 import net.sf.orcc.ir.transformations.SSATransformation;
+import net.sf.orcc.util.OrccUtil;
+
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 import com.google.inject.Inject;
 
@@ -82,6 +89,19 @@ public class Frontend {
 			Actor actor = actorTransformer.transform(file, astActor);
 			new SSATransformation().visit(actor);
 			new IRWriter(actor).write(outputFolder.toString(), prettyPrint);
+
+			ResourceSet set = new ResourceSetImpl();
+			String pathName = outputFolder + File.separator
+					+ OrccUtil.getFile(actor) + ".ir";
+			Resource resource = set.createResource(URI.createFileURI(pathName));
+			resource.getContents().add(actor);
+			try {
+				resource.save(null);
+				System.out.println();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();
 		}

@@ -32,7 +32,6 @@ import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
@@ -222,11 +221,9 @@ public class ActorInterpreter extends AbstractActorVisitor {
 	 */
 	protected boolean checkOutputPattern(Pattern outputPattern) {
 		if (outputPattern != null) {
-			for (Entry<Port, Integer> entry : outputPattern.getNumTokensMap()
-					.entrySet()) {
-				Port outputPort = entry.getKey();
-				Integer nbOfTokens = entry.getValue();
-				if (!fifos.get(outputPort.getName()).hasRoom(nbOfTokens)) {
+			for (Port port : outputPattern.getPorts()) {
+				Integer nbOfTokens = outputPattern.getNumTokens(port);
+				if (!fifos.get(port.getName()).hasRoom(nbOfTokens)) {
 					return false;
 				}
 			}

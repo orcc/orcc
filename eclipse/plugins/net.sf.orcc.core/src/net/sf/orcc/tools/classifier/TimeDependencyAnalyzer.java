@@ -31,7 +31,6 @@ package net.sf.orcc.tools.classifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import jp.ac.kobe_u.cs.cream.DefaultSolver;
 import jp.ac.kobe_u.cs.cream.Solution;
@@ -41,7 +40,6 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
 
@@ -103,9 +101,9 @@ public class TimeDependencyAnalyzer {
 
 		if (actor.hasFsm()) {
 			FSM fsm = actor.getFsm();
-			for (Entry<State, Transitions> entry : fsm.getTransitions()) {
+			for (Transitions transitions : fsm.getTransitions()) {
 				List<Action> actions = new ArrayList<Action>();
-				for (Transition transition : entry.getValue().getList()) {
+				for (Transition transition : transitions.getList()) {
 					actions.add(transition.getAction());
 				}
 

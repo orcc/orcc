@@ -29,14 +29,13 @@
 package net.sf.orcc.backends.llvm;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.NextStateInfo;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -284,8 +283,7 @@ public class LLVMTemplateData {
 		if (!pattern.isEmpty()) {
 			patterns.put(pattern, id++);
 			computeNumTokens(pattern.getNumTokensMap());
-			computeVars(pattern.getVariableMap());
-			computeVars(pattern.getPeekedMap());
+			computeVars(pattern.getVariables());
 		}
 	}
 
@@ -311,7 +309,7 @@ public class LLVMTemplateData {
 		types.put(var.getType(), id++);
 	}
 
-	private void computeVars(Map<Port, Var> vars) {
+	private void computeVars(List<Var> vars) {
 		if (!vars.isEmpty()) {
 			varPattern.put(vars, id++);
 		}

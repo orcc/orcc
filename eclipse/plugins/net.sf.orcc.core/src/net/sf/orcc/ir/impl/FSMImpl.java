@@ -13,8 +13,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
@@ -24,19 +26,17 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
+import net.sf.orcc.ir.util.MapAdapter;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.ext.DOTExporter;
@@ -78,20 +78,25 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	 */
 	protected EList<State> states;
 	/**
-	 * The cached value of the '{@link #getTransitions() <em>Transitions</em>}' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * The cached value of the '{@link #getTransitions() <em>Transitions</em>}' containment reference list.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTransitions()
 	 * @generated
 	 * @ordered
 	 */
-	protected EMap<State, Transitions> transitions;
+	protected EList<Transitions> transitions;
+	
+	private Map<State, Transitions> transitionsMap;
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
+	 * 
 	 */
 	protected FSMImpl() {
 		super();
+
+		transitionsMap = new HashMap<State, Transitions>();
+		eAdapters().add(new MapAdapter());
 	}
 
 	@Override
@@ -99,10 +104,12 @@ public class FSMImpl extends EObjectImpl implements FSM {
 		Transitions transitions = getTransitions(source);
 		if (transitions == null) {
 			transitions = IrFactory.eINSTANCE.createTransitions();
-			getTransitions().put(source, transitions);
+			transitions.setSourceState(source);
+			getTransitions().add(transitions);
 		}
-		
-		Transition transition = IrFactory.eINSTANCE.createTransition(action, target);		
+
+		Transition transition = IrFactory.eINSTANCE.createTransition(action,
+				target);
 		transitions.getList().add(transition);
 	}
 
@@ -127,8 +134,7 @@ public class FSMImpl extends EObjectImpl implements FSM {
 			case IrPackage.FSM__STATES:
 				return getStates();
 			case IrPackage.FSM__TRANSITIONS:
-				if (coreType) return getTransitions();
-				else return getTransitions().map();
+				return getTransitions();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -182,7 +188,8 @@ public class FSMImpl extends EObjectImpl implements FSM {
 				getStates().addAll((Collection<? extends State>)newValue);
 				return;
 			case IrPackage.FSM__TRANSITIONS:
-				((EStructuralFeature.Setting)getTransitions()).set(newValue);
+				getTransitions().clear();
+				getTransitions().addAll((Collection<? extends Transitions>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -279,16 +286,20 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EMap<State, Transitions> getTransitions() {
+	public EList<Transitions> getTransitions() {
 		if (transitions == null) {
-			transitions = new EcoreEMap<State,Transitions>(IrPackage.Literals.STATE_TO_TRANSITIONS_MAP_ENTRY, StateToTransitionsMapEntryImpl.class, this, IrPackage.FSM__TRANSITIONS);
+			transitions = new EObjectContainmentEList<Transitions>(Transitions.class, this, IrPackage.FSM__TRANSITIONS);
 		}
 		return transitions;
 	}
 
 	@Override
 	public Transitions getTransitions(State state) {
-		return getTransitions().get(state);
+		return transitionsMap.get(state);
+	}
+
+	public Map<State, Transitions> getTransitionsMap() {
+		return transitionsMap;
 	}
 
 	@Override
