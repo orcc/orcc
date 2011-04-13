@@ -850,70 +850,63 @@ public class IrSwitch<T2> {
 	 */
 	protected T2 doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
-			case IrPackage.EXPRESSION: {
-				Expression expression = (Expression)theEObject;
-				T2 result = caseExpression(expression);
+			case IrPackage.ACTOR: {
+				Actor actor = (Actor)theEObject;
+				T2 result = caseActor(actor);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.TYPE: {
-				Type type = (Type)theEObject;
-				T2 result = caseType(type);
+			case IrPackage.PORT: {
+				Port port = (Port)theEObject;
+				T2 result = casePort(port);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.TYPE_BOOL: {
-				TypeBool typeBool = (TypeBool)theEObject;
-				T2 result = caseTypeBool(typeBool);
-				if (result == null) result = caseType(typeBool);
+			case IrPackage.FSM: {
+				FSM fsm = (FSM)theEObject;
+				T2 result = caseFSM(fsm);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.TYPE_FLOAT: {
-				TypeFloat typeFloat = (TypeFloat)theEObject;
-				T2 result = caseTypeFloat(typeFloat);
-				if (result == null) result = caseType(typeFloat);
+			case IrPackage.STATE: {
+				State state = (State)theEObject;
+				T2 result = caseState(state);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.TYPE_INT: {
-				TypeInt typeInt = (TypeInt)theEObject;
-				T2 result = caseTypeInt(typeInt);
-				if (result == null) result = caseType(typeInt);
+			case IrPackage.TRANSITION: {
+				Transition transition = (Transition)theEObject;
+				T2 result = caseTransition(transition);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.TYPE_LIST: {
-				TypeList typeList = (TypeList)theEObject;
-				T2 result = caseTypeList(typeList);
-				if (result == null) result = caseType(typeList);
+			case IrPackage.ACTION: {
+				Action action = (Action)theEObject;
+				T2 result = caseAction(action);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.TYPE_STRING: {
-				TypeString typeString = (TypeString)theEObject;
-				T2 result = caseTypeString(typeString);
-				if (result == null) result = caseType(typeString);
+			case IrPackage.TAG: {
+				Tag tag = (Tag)theEObject;
+				T2 result = caseTag(tag);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.TYPE_UINT: {
-				TypeUint typeUint = (TypeUint)theEObject;
-				T2 result = caseTypeUint(typeUint);
-				if (result == null) result = caseType(typeUint);
+			case IrPackage.PATTERN: {
+				Pattern pattern = (Pattern)theEObject;
+				T2 result = casePattern(pattern);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.TYPE_VOID: {
-				TypeVoid typeVoid = (TypeVoid)theEObject;
-				T2 result = caseTypeVoid(typeVoid);
-				if (result == null) result = caseType(typeVoid);
+			case IrPackage.PROCEDURE: {
+				Procedure procedure = (Procedure)theEObject;
+				T2 result = caseProcedure(procedure);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.INSTRUCTION: {
-				Instruction instruction = (Instruction)theEObject;
-				T2 result = caseInstruction(instruction);
+			case IrPackage.NODE: {
+				Node node = (Node)theEObject;
+				T2 result = caseNode(node);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -938,15 +931,9 @@ public class IrSwitch<T2> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.NODE: {
-				Node node = (Node)theEObject;
-				T2 result = caseNode(node);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.PROCEDURE: {
-				Procedure procedure = (Procedure)theEObject;
-				T2 result = caseProcedure(procedure);
+			case IrPackage.INSTRUCTION: {
+				Instruction instruction = (Instruction)theEObject;
+				T2 result = caseInstruction(instruction);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -999,21 +986,9 @@ public class IrSwitch<T2> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.LOCATION: {
-				Location location = (Location)theEObject;
-				T2 result = caseLocation(location);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.VAR: {
-				Var var = (Var)theEObject;
-				T2 result = caseVar(var);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.USE: {
-				Use use = (Use)theEObject;
-				T2 result = caseUse(use);
+			case IrPackage.EXPRESSION: {
+				Expression expression = (Expression)theEObject;
+				T2 result = caseExpression(expression);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -1073,45 +1048,82 @@ public class IrSwitch<T2> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case IrPackage.TYPE: {
+				Type type = (Type)theEObject;
+				T2 result = caseType(type);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_BOOL: {
+				TypeBool typeBool = (TypeBool)theEObject;
+				T2 result = caseTypeBool(typeBool);
+				if (result == null) result = caseType(typeBool);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_FLOAT: {
+				TypeFloat typeFloat = (TypeFloat)theEObject;
+				T2 result = caseTypeFloat(typeFloat);
+				if (result == null) result = caseType(typeFloat);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_INT: {
+				TypeInt typeInt = (TypeInt)theEObject;
+				T2 result = caseTypeInt(typeInt);
+				if (result == null) result = caseType(typeInt);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_LIST: {
+				TypeList typeList = (TypeList)theEObject;
+				T2 result = caseTypeList(typeList);
+				if (result == null) result = caseType(typeList);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_STRING: {
+				TypeString typeString = (TypeString)theEObject;
+				T2 result = caseTypeString(typeString);
+				if (result == null) result = caseType(typeString);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_UINT: {
+				TypeUint typeUint = (TypeUint)theEObject;
+				T2 result = caseTypeUint(typeUint);
+				if (result == null) result = caseType(typeUint);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_VOID: {
+				TypeVoid typeVoid = (TypeVoid)theEObject;
+				T2 result = caseTypeVoid(typeVoid);
+				if (result == null) result = caseType(typeVoid);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.LOCATION: {
+				Location location = (Location)theEObject;
+				T2 result = caseLocation(location);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case IrPackage.DEF: {
 				Def def = (Def)theEObject;
 				T2 result = caseDef(def);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.ACTION: {
-				Action action = (Action)theEObject;
-				T2 result = caseAction(action);
+			case IrPackage.VAR: {
+				Var var = (Var)theEObject;
+				T2 result = caseVar(var);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case IrPackage.ACTOR: {
-				Actor actor = (Actor)theEObject;
-				T2 result = caseActor(actor);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.PATTERN: {
-				Pattern pattern = (Pattern)theEObject;
-				T2 result = casePattern(pattern);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.PORT: {
-				Port port = (Port)theEObject;
-				T2 result = casePort(port);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TAG: {
-				Tag tag = (Tag)theEObject;
-				T2 result = caseTag(tag);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.FSM: {
-				FSM fsm = (FSM)theEObject;
-				T2 result = caseFSM(fsm);
+			case IrPackage.USE: {
+				Use use = (Use)theEObject;
+				T2 result = caseUse(use);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -1130,18 +1142,6 @@ public class IrSwitch<T2> {
 			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: {
 				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToEIntegerObjectMapEntry = (Map.Entry<Port, Integer>)theEObject;
 				T2 result = casePortToEIntegerObjectMapEntry(portToEIntegerObjectMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.STATE: {
-				State state = (State)theEObject;
-				T2 result = caseState(state);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.TRANSITION: {
-				Transition transition = (Transition)theEObject;
-				T2 result = caseTransition(transition);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

@@ -83,44 +83,44 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	protected IrSwitch<Adapter> modelSwitch =
 		new IrSwitch<Adapter>() {
 			@Override
-			public Adapter caseExpression(Expression object) {
-				return createExpressionAdapter();
+			public Adapter caseActor(Actor object) {
+				return createActorAdapter();
 			}
 			@Override
-			public Adapter caseType(Type object) {
-				return createTypeAdapter();
+			public Adapter casePort(Port object) {
+				return createPortAdapter();
 			}
 			@Override
-			public Adapter caseTypeBool(TypeBool object) {
-				return createTypeBoolAdapter();
+			public Adapter caseFSM(FSM object) {
+				return createFSMAdapter();
 			}
 			@Override
-			public Adapter caseTypeFloat(TypeFloat object) {
-				return createTypeFloatAdapter();
+			public Adapter caseState(State object) {
+				return createStateAdapter();
 			}
 			@Override
-			public Adapter caseTypeInt(TypeInt object) {
-				return createTypeIntAdapter();
+			public Adapter caseTransition(Transition object) {
+				return createTransitionAdapter();
 			}
 			@Override
-			public Adapter caseTypeList(TypeList object) {
-				return createTypeListAdapter();
+			public Adapter caseAction(Action object) {
+				return createActionAdapter();
 			}
 			@Override
-			public Adapter caseTypeString(TypeString object) {
-				return createTypeStringAdapter();
+			public Adapter caseTag(Tag object) {
+				return createTagAdapter();
 			}
 			@Override
-			public Adapter caseTypeUint(TypeUint object) {
-				return createTypeUintAdapter();
+			public Adapter casePattern(Pattern object) {
+				return createPatternAdapter();
 			}
 			@Override
-			public Adapter caseTypeVoid(TypeVoid object) {
-				return createTypeVoidAdapter();
+			public Adapter caseProcedure(Procedure object) {
+				return createProcedureAdapter();
 			}
 			@Override
-			public Adapter caseInstruction(Instruction object) {
-				return createInstructionAdapter();
+			public Adapter caseNode(Node object) {
+				return createNodeAdapter();
 			}
 			@Override
 			public Adapter caseNodeBlock(NodeBlock object) {
@@ -135,12 +135,8 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createNodeWhileAdapter();
 			}
 			@Override
-			public Adapter caseNode(Node object) {
-				return createNodeAdapter();
-			}
-			@Override
-			public Adapter caseProcedure(Procedure object) {
-				return createProcedureAdapter();
+			public Adapter caseInstruction(Instruction object) {
+				return createInstructionAdapter();
 			}
 			@Override
 			public Adapter caseInstAssign(InstAssign object) {
@@ -171,16 +167,8 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createInstStoreAdapter();
 			}
 			@Override
-			public Adapter caseLocation(Location object) {
-				return createLocationAdapter();
-			}
-			@Override
-			public Adapter caseVar(Var object) {
-				return createVarAdapter();
-			}
-			@Override
-			public Adapter caseUse(Use object) {
-				return createUseAdapter();
+			public Adapter caseExpression(Expression object) {
+				return createExpressionAdapter();
 			}
 			@Override
 			public Adapter caseExprBinary(ExprBinary object) {
@@ -215,32 +203,52 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createExprVarAdapter();
 			}
 			@Override
+			public Adapter caseType(Type object) {
+				return createTypeAdapter();
+			}
+			@Override
+			public Adapter caseTypeBool(TypeBool object) {
+				return createTypeBoolAdapter();
+			}
+			@Override
+			public Adapter caseTypeFloat(TypeFloat object) {
+				return createTypeFloatAdapter();
+			}
+			@Override
+			public Adapter caseTypeInt(TypeInt object) {
+				return createTypeIntAdapter();
+			}
+			@Override
+			public Adapter caseTypeList(TypeList object) {
+				return createTypeListAdapter();
+			}
+			@Override
+			public Adapter caseTypeString(TypeString object) {
+				return createTypeStringAdapter();
+			}
+			@Override
+			public Adapter caseTypeUint(TypeUint object) {
+				return createTypeUintAdapter();
+			}
+			@Override
+			public Adapter caseTypeVoid(TypeVoid object) {
+				return createTypeVoidAdapter();
+			}
+			@Override
+			public Adapter caseLocation(Location object) {
+				return createLocationAdapter();
+			}
+			@Override
 			public Adapter caseDef(Def object) {
 				return createDefAdapter();
 			}
 			@Override
-			public Adapter caseAction(Action object) {
-				return createActionAdapter();
+			public Adapter caseVar(Var object) {
+				return createVarAdapter();
 			}
 			@Override
-			public Adapter caseActor(Actor object) {
-				return createActorAdapter();
-			}
-			@Override
-			public Adapter casePattern(Pattern object) {
-				return createPatternAdapter();
-			}
-			@Override
-			public Adapter casePort(Port object) {
-				return createPortAdapter();
-			}
-			@Override
-			public Adapter caseTag(Tag object) {
-				return createTagAdapter();
-			}
-			@Override
-			public Adapter caseFSM(FSM object) {
-				return createFSMAdapter();
+			public Adapter caseUse(Use object) {
+				return createUseAdapter();
 			}
 			@Override
 			public <T, T1> Adapter caseEMap(EMap<T, T1> object) {
@@ -257,14 +265,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
 				return createPortToEIntegerObjectMapEntryAdapter();
-			}
-			@Override
-			public Adapter caseState(State object) {
-				return createStateAdapter();
-			}
-			@Override
-			public Adapter caseTransition(Transition object) {
-				return createTransitionAdapter();
 			}
 			@Override
 			public Adapter caseStateToTransitionMapEntry(Map.Entry<State, Transition> object) {
