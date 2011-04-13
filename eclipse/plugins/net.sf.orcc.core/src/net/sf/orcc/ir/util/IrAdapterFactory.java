@@ -7,6 +7,7 @@
 package net.sf.orcc.ir.util;
 
 import java.util.Map;
+
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -239,10 +240,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseFSM(FSM object) {
 				return createFSMAdapter();
-			}
-			@Override
-			public <T> Adapter caseComparable(Comparable<T> object) {
-				return createComparableAdapter();
 			}
 			@Override
 			public <T, T1> Adapter caseEMap(EMap<T, T1> object) {
@@ -482,20 +479,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createFSMAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.lang.Comparable <em>Comparable</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.lang.Comparable
-	 * @generated
-	 */
-	public Adapter createComparableAdapter() {
 		return null;
 	}
 

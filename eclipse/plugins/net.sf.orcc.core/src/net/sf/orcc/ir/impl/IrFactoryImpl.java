@@ -6,10 +6,10 @@
  */
 package net.sf.orcc.ir.impl;
 
-import java.util.Map;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;

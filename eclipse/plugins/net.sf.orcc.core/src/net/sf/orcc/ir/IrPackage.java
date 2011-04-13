@@ -1470,25 +1470,6 @@ public interface IrPackage extends EPackage {
 	int ACTION_FEATURE_COUNT = 7;
 
 	/**
-	 * The meta object id for the '{@link java.lang.Comparable <em>Comparable</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see java.lang.Comparable
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getComparable()
-	 * @generated
-	 */
-	int COMPARABLE = 40;
-
-	/**
-	 * The number of structural features of the '<em>Comparable</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int COMPARABLE_FEATURE_COUNT = 0;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ActorImpl <em>Actor</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1505,7 +1486,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS = COMPARABLE_FEATURE_COUNT + 0;
+	int ACTOR__ACTIONS = 0;
 
 	/**
 	 * The feature id for the '<em><b>File</b></em>' attribute.
@@ -1514,7 +1495,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FILE = COMPARABLE_FEATURE_COUNT + 1;
+	int ACTOR__FILE = 1;
 
 	/**
 	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
@@ -1523,7 +1504,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INITIALIZES = COMPARABLE_FEATURE_COUNT + 2;
+	int ACTOR__INITIALIZES = 2;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -1532,7 +1513,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INPUTS = COMPARABLE_FEATURE_COUNT + 3;
+	int ACTOR__INPUTS = 3;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1541,7 +1522,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NAME = COMPARABLE_FEATURE_COUNT + 4;
+	int ACTOR__NAME = 4;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -1550,7 +1531,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__OUTPUTS = COMPARABLE_FEATURE_COUNT + 5;
+	int ACTOR__OUTPUTS = 5;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -1559,7 +1540,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PARAMETERS = COMPARABLE_FEATURE_COUNT + 6;
+	int ACTOR__PARAMETERS = 6;
 
 	/**
 	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
@@ -1568,7 +1549,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PROCS = COMPARABLE_FEATURE_COUNT + 7;
+	int ACTOR__PROCS = 7;
 
 	/**
 	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
@@ -1577,7 +1558,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__STATE_VARS = COMPARABLE_FEATURE_COUNT + 8;
+	int ACTOR__STATE_VARS = 8;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute.
@@ -1586,7 +1567,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NATIVE = COMPARABLE_FEATURE_COUNT + 9;
+	int ACTOR__NATIVE = 9;
 
 	/**
 	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
@@ -1595,7 +1576,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS_OUTSIDE_FSM = COMPARABLE_FEATURE_COUNT + 10;
+	int ACTOR__ACTIONS_OUTSIDE_FSM = 10;
 
 	/**
 	 * The feature id for the '<em><b>Fsm</b></em>' containment reference.
@@ -1604,7 +1585,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FSM = COMPARABLE_FEATURE_COUNT + 11;
+	int ACTOR__FSM = 11;
 
 	/**
 	 * The feature id for the '<em><b>Mo C</b></em>' containment reference.
@@ -1613,7 +1594,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__MO_C = COMPARABLE_FEATURE_COUNT + 12;
+	int ACTOR__MO_C = 12;
 
 	/**
 	 * The number of structural features of the '<em>Actor</em>' class.
@@ -1622,7 +1603,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR_FEATURE_COUNT = COMPARABLE_FEATURE_COUNT + 13;
+	int ACTOR_FEATURE_COUNT = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
@@ -1798,7 +1779,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getEMap()
 	 * @generated
 	 */
-	int EMAP = 41;
+	int EMAP = 40;
 
 	/**
 	 * The number of structural features of the '<em>EMap</em>' class.
@@ -1817,7 +1798,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 42;
+	int VAR_TO_PORT_MAP_ENTRY = 41;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -1854,7 +1835,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 43;
+	int PORT_TO_VAR_MAP_ENTRY = 42;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -1891,7 +1872,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 44;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 43;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -1928,7 +1909,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 45;
+	int OP_BINARY = 44;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1938,7 +1919,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 46;
+	int OP_UNARY = 45;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
@@ -3410,17 +3391,6 @@ public interface IrPackage extends EPackage {
 	EClass getFSM();
 
 	/**
-	 * Returns the meta object for class '{@link java.lang.Comparable <em>Comparable</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Comparable</em>'.
-	 * @see java.lang.Comparable
-	 * @model instanceClass="java.lang.Comparable" typeParameters="T"
-	 * @generated
-	 */
-	EClass getComparable();
-
-	/**
 	 * Returns the meta object for class '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4661,16 +4631,6 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass FSM = eINSTANCE.getFSM();
-
-		/**
-		 * The meta object literal for the '{@link java.lang.Comparable <em>Comparable</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see java.lang.Comparable
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getComparable()
-		 * @generated
-		 */
-		EClass COMPARABLE = eINSTANCE.getComparable();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}' class.

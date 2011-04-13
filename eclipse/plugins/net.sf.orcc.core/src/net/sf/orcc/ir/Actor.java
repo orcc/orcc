@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import java.lang.Comparable;
 import java.util.List;
 
 import net.sf.orcc.moc.MoC;
@@ -45,7 +44,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * @model
  */
-public interface Actor extends EObject, Comparable<Actor> {
+public interface Actor extends EObject {
 
 	/**
 	 * Returns all the actions of this actor.

@@ -213,9 +213,6 @@
         resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="moC" eType="ecore:EClass MoC.ecore#//MoC"
         containment="true" resolveProxies="false"/>
-    <eGenericSuperTypes eClassifier="#//Comparable">
-      <eTypeArguments eClassifier="#//Actor"/>
-    </eGenericSuperTypes>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Pattern">
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
@@ -241,10 +238,6 @@
         eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="FSM"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Comparable" instanceClassName="java.lang.Comparable"
-      abstract="true" interface="true">
-    <eTypeParameters name="T"/>
-  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="EMap" instanceClassName="org.eclipse.emf.common.util.EMap"
       abstract="true" interface="true">
     <eTypeParameters name="T"/>

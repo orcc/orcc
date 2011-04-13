@@ -263,11 +263,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return msgs;
 	}
 
-	@Override
-	public int compareTo(Actor o) {
-		return getName().compareTo(o.getName());
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

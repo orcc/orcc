@@ -30,13 +30,14 @@ package net.sf.orcc.network;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
@@ -323,7 +324,7 @@ public class Network {
 	 * @return a list of actors
 	 */
 	public List<Actor> getActors() {
-		Set<Actor> actors = new TreeSet<Actor>();
+		Set<Actor> actors = new HashSet<Actor>();
 		for (Vertex vertex : getGraph().vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
@@ -337,7 +338,16 @@ public class Network {
 			}
 		}
 
-		return new ArrayList<Actor>(actors);
+		List<Actor> list = new ArrayList<Actor>(actors);
+		Collections.sort(list, new Comparator<Actor>() {
+
+			@Override
+			public int compare(Actor o1, Actor o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+
+		return list;
 	}
 
 	/**

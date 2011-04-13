@@ -6,8 +6,8 @@
  */
 package net.sf.orcc.ir.impl;
 
-import java.lang.Comparable;
 import java.util.Map;
+
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -51,14 +51,13 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-
 import net.sf.orcc.moc.MocPackage;
 import net.sf.orcc.moc.impl.MocPackageImpl;
+
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
-import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EcorePackage;
@@ -344,13 +343,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass fsmEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass comparableEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1683,15 +1675,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getComparable() {
-		return comparableEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getEMap() {
 		return eMapEClass;
 	}
@@ -1999,8 +1982,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		fsmEClass = createEClass(FSM);
 
-		comparableEClass = createEClass(COMPARABLE);
-
 		eMapEClass = createEClass(EMAP);
 
 		varToPortMapEntryEClass = createEClass(VAR_TO_PORT_MAP_ENTRY);
@@ -2048,7 +2029,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		MocPackage theMocPackage = (MocPackage)EPackage.Registry.INSTANCE.getEPackage(MocPackage.eNS_URI);
 
 		// Create type parameters
-		addETypeParameter(comparableEClass, "T");
 		addETypeParameter(eMapEClass, "T");
 		addETypeParameter(eMapEClass, "T1");
 
@@ -2080,10 +2060,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		exprStringEClass.getESuperTypes().add(this.getExpression());
 		exprUnaryEClass.getESuperTypes().add(this.getExpression());
 		exprVarEClass.getESuperTypes().add(this.getExpression());
-		EGenericType g1 = createEGenericType(this.getComparable());
-		EGenericType g2 = createEGenericType(this.getActor());
-		g1.getETypeArguments().add(g2);
-		actorEClass.getEGenericSuperTypes().add(g1);
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(expressionEClass, Expression.class, "Expression", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -2260,8 +2236,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEAttribute(getTag_Identifiers(), theEcorePackage.getEString(), "identifiers", null, 0, -1, Tag.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(fsmEClass, net.sf.orcc.ir.FSM.class, "FSM", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-
-		initEClass(comparableEClass, Comparable.class, "Comparable", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(eMapEClass, EMap.class, "EMap", IS_ABSTRACT, IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 
