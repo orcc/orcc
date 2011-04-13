@@ -46,11 +46,6 @@ struct genetic_s {
 	int use_ring_topology;
 };
 
-struct mapping_s {
-	int *actors_per_threads;
-	struct actor_s ***actors_mapping;
-};
-
 typedef struct gene_s {
 	struct actor_s *actor;
 	int mapped_core;

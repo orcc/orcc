@@ -20,12 +20,16 @@ project (<network.name>)
 find_library(orcc_LIBRARY orcc)
 find_path(orcc_INCLUDE_DIR NAMES orcc_fifo.h orcc_types.h
   PATH_SUFFIXES include/orcc)
+  
+find_library(roxml_LIBRARY roxml)
+find_path(roxml_INCLUDE_DIR NAMES roxml.h
+  PATH_SUFFIXES include/roxml)
 
 find_package(SDL REQUIRED)
 find_package(Threads REQUIRED)
 
 # Common include directories
-include_directories(${orcc_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
+include_directories(${orcc_INCLUDE_DIR} ${roxml_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
 
 set(filenames
 <network.name>.c
@@ -33,6 +37,6 @@ set(filenames
 
 add_executable(<network.name> ${filenames})
 
-target_link_libraries(<network.name> ${orcc_LIBRARY} ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(<network.name> ${orcc_LIBRARY} ${roxml_LIBRARY} ${SDL_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 
 >>

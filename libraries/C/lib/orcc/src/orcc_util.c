@@ -60,6 +60,9 @@ char *yuv_file;
 // write file
 char *write_file;
 
+// mapping file
+char *mapping_file;
+
 // Pause function
 void wait_for_key() {
 #ifdef _WIN32
@@ -107,7 +110,7 @@ void print_usage() {
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
-	const char *ostr = "i:o:w:";
+	const char *ostr = "i:o:w:m:";
 	int c;
 
 	program = argv[0];
@@ -129,6 +132,9 @@ void init_orcc(int argc, char *argv[]) {
 			break;
 		case 'w':
 			write_file = strdup(optarg);
+			break;
+		case 'm':
+			mapping_file = strdup(optarg);
 			break;
 		default:
 			fprintf(stderr, "skipping option -%c\n", c);

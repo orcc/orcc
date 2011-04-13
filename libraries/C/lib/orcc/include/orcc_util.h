@@ -39,6 +39,9 @@ extern char *yuv_file;
 // write file
 extern char *write_file;
 
+// mapping file
+extern char *mapping_file;
+
 
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);

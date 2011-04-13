@@ -51,10 +51,12 @@ struct actor_s {
 	int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
 	int in_waiting; /** idem with the waiting list. */
 	struct scheduler_s *sched; /** scheduler which execute this actor. */
+	int mapping; /** id of the processor core mapped to this actor. */
 };
 
 struct scheduler_s {
 	int id; /** Unique ID of this scheduler */
+	int schedulers_nb;
 
 	/* Round robin */
 	int num_actors; /** number of actors managed by this scheduler */
@@ -85,6 +87,13 @@ struct waiting_s {
 	unsigned int next_waiting;
 };
 
+struct mapping_s {
+	int thread_nb;
+	int *ids;
+	int *actors_per_threads;
+	struct actor_s ***actors_mapping;
+};
+
 #include "orcc_scheduler.inl"
 
 /**
@@ -96,5 +105,6 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 		struct sync_s *sync);
 void sched_reinit(struct scheduler_s *sched, int num_actors,
 		struct actor_s **actors, int use_ring_topology, int schedulers_nb);
+struct mapping_s * map_actors(struct actor_s **actors, int actors_nb);
 
 #endif

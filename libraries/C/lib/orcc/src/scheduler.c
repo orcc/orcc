@@ -1,8 +1,40 @@
+/*
+ * Copyright (c) 2011, IRISA
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IRISA nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "orcc_types.h"
 #include "orcc_fifo.h"
 #include "orcc_scheduler.h"
+#include "orcc_util.h"
+#include "roxml.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduling functions
@@ -18,6 +50,7 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 	int i;
 
 	sched->id = id;
+	sched->schedulers_nb = schedulers_nb;
 
 	sched->num_actors = num_actors;
 	sched->actors = actors;
@@ -88,4 +121,75 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 		}
 	}
 
+}
+
+struct actor_s * find_actor(char *name, struct actor_s **actors, int actors_nb) {
+	int i;
+	for (i = 0; i < actors_nb; i++) {
+		if (strcmp(name, actors[i]->name) == 0) {
+			return actors[i];
+		}
+	}
+	printf("Error: Actor %s doesn't exist in the description.\n", name);
+	exit(0);
+}
+
+struct mapping_s * map_actors(struct actor_s **actors, int actors_nb) {
+	int i, j, size;
+	char *nb, *name;
+	node_t *configuration, *partitioning, *partition, *instance, *attribute;
+	struct mapping_s *mapping = (struct mapping_s *) malloc(
+			sizeof(struct mapping_s));
+
+	if (mapping_file == NULL) {
+		mapping->thread_nb = 1;
+
+		mapping->ids = (int*) malloc(sizeof(int));
+		mapping->actors_per_threads = (int*) malloc(sizeof(int));
+		mapping->actors_mapping = (struct actor_s ***) malloc(sizeof(struct actor_s **));
+
+		mapping->ids[0] = 0;
+		mapping->actors_per_threads[0] = actors_nb;
+		mapping->actors_mapping[0] = actors;
+	} else {
+		configuration = roxml_load_doc(mapping_file);
+		if (configuration == NULL) {
+			printf("I/O error when reading mapping file.\n");
+			exit(0);
+		}
+
+		partitioning = roxml_get_chld(configuration, NULL, 0);
+		name = roxml_get_name(partitioning, NULL, 0);
+
+		mapping->thread_nb = roxml_get_chld_nb(partitioning);
+		mapping->ids = (int*) malloc(mapping->thread_nb * sizeof(int));
+		mapping->actors_per_threads = (int*) malloc(
+				mapping->thread_nb * sizeof(int));
+		mapping->actors_mapping = (struct actor_s ***) malloc(
+				mapping->thread_nb * sizeof(struct actor_s **));
+
+		for (i = 0; i < mapping->thread_nb; i++) {
+			partition = roxml_get_chld(partitioning, NULL, i);
+			name = roxml_get_name(partition, NULL, 0);
+			mapping->actors_per_threads[i] = roxml_get_chld_nb(partition);
+
+			attribute = roxml_get_attr(partition, "id", 0);
+			nb = roxml_get_content(attribute, NULL, 0, &size);
+			mapping->ids[i] = atoi(nb);
+
+			mapping->actors_mapping[i] = (struct actor_s **) malloc(
+					mapping->actors_per_threads[i] * sizeof(struct actor_s *));
+
+			for (j = 0; j < mapping->actors_per_threads[i]; j++) {
+				instance = roxml_get_chld(partition, NULL, j);
+				name = roxml_get_name(instance, NULL, 0);
+				attribute = roxml_get_attr(instance, "id", 0);
+				name = roxml_get_content(attribute, NULL, 0, &size);
+				mapping->actors_mapping[i][j] = find_actor(name, actors,
+						actors_nb);
+			}
+		}
+	}
+
+	return mapping;
 }

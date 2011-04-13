@@ -267,8 +267,8 @@ declareActorArray(instances, addComma = false) ::= <<
 ><endif>
 >>
 
-declareActorsArray(instances, thread=false) ::= <<
-struct actor_s *actors<if(thread)>_<thread><endif>[] = {<declareActorArray(instances)>};
+declareActorsArray(instances) ::= <<
+struct actor_s *actors[] = {<declareActorArray(instances)>};
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -360,7 +360,7 @@ void *scheduler(void *data) {
 	
 	<endif>
 	while (1) {
-		my_actor = sched_get_next<if(options.newScheduler)>_schedulable(sched, RING_TOPOLOGY, <if(options.needDynamicMapping || options.threads)>THREAD_NB<else>1<endif>)<else>(sched)<endif>;
+		my_actor = sched_get_next<if(options.newScheduler)>_schedulable(sched, RING_TOPOLOGY)<else>(sched)<endif>;
 		if(my_actor != NULL){
 			si.num_firings = 0;
 			my_actor-\>sched_func(&si);
@@ -463,8 +463,10 @@ network(network, options) ::= <<
 #include "orcc_genetic.h"
 <endif>
 
-<if (options.threads || options.needDynamicMapping)>
+<if (options.needDynamicMapping)>
 #define THREAD_NB <options.threadsNb>
+<else>
+#define MAX_THREAD_NB 10
 <endif>
 <if(options.newScheduler)>
 #define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
@@ -515,13 +517,7 @@ network(network, options) ::= <<
 
 <fillActorsStructs(network.instances)>
 
-<if(options.threads)>
-<options.threads.keys: {th | <declareActorsArray(instances=options.threads.(th),thread=th)>}; separator="\n">
-
-struct actor_s **actors[] = {<options.threads.keys: {th | actors_<th>}; separator=", ">};
-<else>
 <declareActorsArray(instances=network.instances)>
-<endif>
 
 <if (options.needDynamicMapping)>
 extern int source_is_stopped();
@@ -543,16 +539,23 @@ extern int clean_cache(int size);
 <printInitializes(network.instances)>
 
 static void launcher() {
-<if(options.needDynamicMapping || options.threads)>
 	int i;
 	
-	cpu_set_t cpuset; 
-	thread_struct threads[THREAD_NB]<if(options.needDynamicMapping)>, thread_monitor<endif>;
-	thread_id_struct threads_id[THREAD_NB]<if(options.needDynamicMapping)>, thread_monitor_id<endif>;
+	cpu_set_t cpuset;
+	<if(!options.needDynamicMapping)>
+	thread_struct threads[MAX_THREAD_NB];
+	thread_id_struct threads_id[MAX_THREAD_NB];
+	
+	struct mapping_s *mapping = map_actors(actors, sizeof(actors) / sizeof(actors[0]));
+	struct scheduler_s *schedulers = (struct scheduler_s *) malloc(mapping-\>thread_nb * sizeof(struct scheduler_s));
+	struct waiting_s *waiting_schedulables = (struct waiting_s *) malloc(mapping-\>thread_nb * sizeof(struct waiting_s));
+	<else>
+	thread_struct threads[THREAD_NB], thread_monitor;
+	thread_id_struct threads_id[THREAD_NB], thread_monitor_id;
 	
 	struct scheduler_s schedulers[THREAD_NB];
 	struct waiting_s waiting_schedulables[THREAD_NB];
-	<if(options.needDynamicMapping)>
+	
 	struct sync_s sched_sync;
 	struct genetic_s genetic_info;
 	struct monitor_s monitoring;
@@ -560,22 +563,25 @@ static void launcher() {
 	sync_init(&sched_sync);
 	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB, <if(options.newScheduler)>RING_TOPOLOGY<else>0<endif>);
 	monitor_init(&monitoring, &sched_sync, &genetic_info);
-	
-	<else>
-	int actors_size[] = {<options.threads.keys: {th | sizeof(actors_<th>) / sizeof(actors_<th>[0])}; separator=", ">};
 	<endif>
 	
 	initialize_instances();
 	
-	for(i=0; i \< THREAD_NB; i++){
-		sched_init(&schedulers[i], i, <if(options.needDynamicMapping)>0<else>actors_size[i]<endif>, <if(options.needDynamicMapping)>NULL<else>actors[i]<endif>, &waiting_schedulables[i], &waiting_schedulables[(i+1) % THREAD_NB], THREAD_NB, <if(options.needDynamicMapping)>&sched_sync<else>NULL<endif>);
+	<if(!options.needDynamicMapping)>
+	for(i=0; i \< mapping-\>thread_nb; i++){
+		sched_init(&schedulers[i], mapping-\>ids[i], mapping-\>actors_per_threads[i], mapping-\>actors_mapping[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping-\>thread_nb], mapping-\>thread_nb, NULL);
 	}
+	<else>
+	for(i=0; i \< THREAD_NB; i++){
+		sched_init(&schedulers[i], i, 0, NULL, &waiting_schedulables[i], &waiting_schedulables[(i+1) % THREAD_NB], THREAD_NB, &sched_sync);
+	}
+	<endif>
 	
 	<if(options.newScheduler && !options.needDynamicMapping)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
 	
 	clear_cpu_set(cpuset);
 	
-	for(i=0; i \< THREAD_NB; i++){
+	for(i=0; i \< <if(options.needDynamicMapping)>THREAD_NB<else>mapping-\>thread_nb<endif>; i++){
 		thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
 		set_thread_affinity(cpuset, i, threads[i]);
 	}
@@ -583,29 +589,12 @@ static void launcher() {
 	thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
 	<endif>
 	
-	for(i=0; i \< THREAD_NB; i++){
+	for(i=0; i \< <if(options.needDynamicMapping)>THREAD_NB<else>mapping-\>thread_nb<endif>; i++){
 		thread_join(threads[i]);
 	}
 	<if(options.needDynamicMapping)>
 	thread_join(thread_monitor);
 	<endif>
-<else>
-	cpu_set_t cpuset; 
-
-	struct scheduler_s sched;
-	struct waiting_s waiting_schedulable;
-	
-	clear_cpu_set(cpuset);
-	set_this_process_affinity(cpuset, 0);
-	
-	initialize_instances();
-
-	sched_init(&sched, 0, sizeof(actors) / sizeof(actors[0]), actors, &waiting_schedulable, &waiting_schedulable, 1, NULL);
-	
-	<if(options.newScheduler)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
-		
-	(*scheduler)((void*) &sched);
-<endif>
 }
 
 ////////////////////////////////////////////////////////////////////////////////

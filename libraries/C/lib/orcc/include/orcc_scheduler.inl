@@ -102,11 +102,10 @@ static void sched_add_ring_waiting_list(struct scheduler_s *sched) {
  * Add waited actors to the schedulable list.
  * This function use mesh topology of communications.
  */
-static void sched_add_mesh_waiting_list(struct scheduler_s *sched,
-		int num_schedulers) {
+static void sched_add_mesh_waiting_list(struct scheduler_s *sched) {
 	int i;
 	struct actor_s *actor;
-	for (i = 0; i < num_schedulers; i++) {
+	for (i = 0; i < sched->schedulers_nb; i++) {
 		struct waiting_s *wait = sched->mesh_waiting_schedulable[i];
 		while (wait->next_entry - wait->next_waiting >= 1) {
 			actor = wait->waiting_actors[wait->next_waiting % MAX_ACTORS];
@@ -125,11 +124,11 @@ static void sched_add_mesh_waiting_list(struct scheduler_s *sched,
  * This method is used by the data/demand driven scheduler.
  */
 static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched,
-		int use_ring_topology, int num_schedulers) {
+		int use_ring_topology) {
 	struct actor_s *actor;
 	// check if other schedulers sent some schedulable actors
 	use_ring_topology ? sched_add_ring_waiting_list(sched)
-			: sched_add_mesh_waiting_list(sched, num_schedulers);
+			: sched_add_mesh_waiting_list(sched);
 	if (sched->ddd_next_schedulable == sched->ddd_next_entry) {
 		// static actors list is used when schedulable list is empty
 		actor = sched_get_next(sched);
