@@ -1763,13 +1763,40 @@ public interface IrPackage extends EPackage {
 	int FSM = 39;
 
 	/**
+	 * The feature id for the '<em><b>Initial State</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__INITIAL_STATE = 0;
+
+	/**
+	 * The feature id for the '<em><b>States</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__STATES = 1;
+
+	/**
+	 * The feature id for the '<em><b>Transition Map</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FSM__TRANSITION_MAP = 2;
+
+	/**
 	 * The number of structural features of the '<em>FSM</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int FSM_FEATURE_COUNT = 0;
+	int FSM_FEATURE_COUNT = 3;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}' class.
@@ -1902,6 +1929,117 @@ public interface IrPackage extends EPackage {
 	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.StateImpl <em>State</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.StateImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getState()
+	 * @generated
+	 */
+	int STATE = 44;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE__NAME = 0;
+
+	/**
+	 * The number of structural features of the '<em>State</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE_FEATURE_COUNT = 1;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TransitionImpl <em>Transition</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.TransitionImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransition()
+	 * @generated
+	 */
+	int TRANSITION = 45;
+
+	/**
+	 * The feature id for the '<em><b>Target Actions</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITION__TARGET_ACTIONS = 0;
+
+	/**
+	 * The feature id for the '<em><b>Target States</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITION__TARGET_STATES = 1;
+
+	/**
+	 * The feature id for the '<em><b>Source State</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITION__SOURCE_STATE = 2;
+
+	/**
+	 * The number of structural features of the '<em>Transition</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITION_FEATURE_COUNT = 3;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.StateToTransitionMapEntryImpl <em>State To Transition Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.StateToTransitionMapEntryImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getStateToTransitionMapEntry()
+	 * @generated
+	 */
+	int STATE_TO_TRANSITION_MAP_ENTRY = 46;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE_TO_TRANSITION_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE_TO_TRANSITION_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>State To Transition Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE_TO_TRANSITION_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1909,7 +2047,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 44;
+	int OP_BINARY = 47;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1919,7 +2057,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 45;
+	int OP_UNARY = 48;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
@@ -3391,6 +3529,39 @@ public interface IrPackage extends EPackage {
 	EClass getFSM();
 
 	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.FSM#getInitialState <em>Initial State</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Initial State</em>'.
+	 * @see net.sf.orcc.ir.FSM#getInitialState()
+	 * @see #getFSM()
+	 * @generated
+	 */
+	EReference getFSM_InitialState();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.FSM#getStates <em>States</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>States</em>'.
+	 * @see net.sf.orcc.ir.FSM#getStates()
+	 * @see #getFSM()
+	 * @generated
+	 */
+	EReference getFSM_States();
+
+	/**
+	 * Returns the meta object for the map '{@link net.sf.orcc.ir.FSM#getTransitionMap <em>Transition Map</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the map '<em>Transition Map</em>'.
+	 * @see net.sf.orcc.ir.FSM#getTransitionMap()
+	 * @see #getFSM()
+	 * @generated
+	 */
+	EReference getFSM_TransitionMap();
+
+	/**
 	 * Returns the meta object for class '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3502,6 +3673,104 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getPortToEIntegerObjectMapEntry_Value();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.State <em>State</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>State</em>'.
+	 * @see net.sf.orcc.ir.State
+	 * @generated
+	 */
+	EClass getState();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.State#getName <em>Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see net.sf.orcc.ir.State#getName()
+	 * @see #getState()
+	 * @generated
+	 */
+	EAttribute getState_Name();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Transition <em>Transition</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Transition</em>'.
+	 * @see net.sf.orcc.ir.Transition
+	 * @generated
+	 */
+	EClass getTransition();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Transition#getTargetActions <em>Target Actions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Target Actions</em>'.
+	 * @see net.sf.orcc.ir.Transition#getTargetActions()
+	 * @see #getTransition()
+	 * @generated
+	 */
+	EReference getTransition_TargetActions();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Transition#getTargetStates <em>Target States</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Target States</em>'.
+	 * @see net.sf.orcc.ir.Transition#getTargetStates()
+	 * @see #getTransition()
+	 * @generated
+	 */
+	EReference getTransition_TargetStates();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Transition#getSourceState <em>Source State</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Source State</em>'.
+	 * @see net.sf.orcc.ir.Transition#getSourceState()
+	 * @see #getTransition()
+	 * @generated
+	 */
+	EReference getTransition_SourceState();
+
+	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>State To Transition Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>State To Transition Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyType="net.sf.orcc.ir.State"
+	 *        valueType="net.sf.orcc.ir.Transition"
+	 * @generated
+	 */
+	EClass getStateToTransitionMapEntry();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getStateToTransitionMapEntry()
+	 * @generated
+	 */
+	EReference getStateToTransitionMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getStateToTransitionMapEntry()
+	 * @generated
+	 */
+	EReference getStateToTransitionMapEntry_Value();
 
 	/**
 	 * Returns the meta object for enum '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}'.
@@ -4633,6 +4902,30 @@ public interface IrPackage extends EPackage {
 		EClass FSM = eINSTANCE.getFSM();
 
 		/**
+		 * The meta object literal for the '<em><b>Initial State</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference FSM__INITIAL_STATE = eINSTANCE.getFSM_InitialState();
+
+		/**
+		 * The meta object literal for the '<em><b>States</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference FSM__STATES = eINSTANCE.getFSM_States();
+
+		/**
+		 * The meta object literal for the '<em><b>Transition Map</b></em>' map feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference FSM__TRANSITION_MAP = eINSTANCE.getFSM_TransitionMap();
+
+		/**
 		 * The meta object literal for the '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -4719,6 +5012,84 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute PORT_TO_EINTEGER_OBJECT_MAP_ENTRY__VALUE = eINSTANCE.getPortToEIntegerObjectMapEntry_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.StateImpl <em>State</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.StateImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getState()
+		 * @generated
+		 */
+		EClass STATE = eINSTANCE.getState();
+
+		/**
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute STATE__NAME = eINSTANCE.getState_Name();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TransitionImpl <em>Transition</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.TransitionImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransition()
+		 * @generated
+		 */
+		EClass TRANSITION = eINSTANCE.getTransition();
+
+		/**
+		 * The meta object literal for the '<em><b>Target Actions</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRANSITION__TARGET_ACTIONS = eINSTANCE.getTransition_TargetActions();
+
+		/**
+		 * The meta object literal for the '<em><b>Target States</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRANSITION__TARGET_STATES = eINSTANCE.getTransition_TargetStates();
+
+		/**
+		 * The meta object literal for the '<em><b>Source State</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRANSITION__SOURCE_STATE = eINSTANCE.getTransition_SourceState();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.StateToTransitionMapEntryImpl <em>State To Transition Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.StateToTransitionMapEntryImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getStateToTransitionMapEntry()
+		 * @generated
+		 */
+		EClass STATE_TO_TRANSITION_MAP_ENTRY = eINSTANCE.getStateToTransitionMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference STATE_TO_TRANSITION_MAP_ENTRY__KEY = eINSTANCE.getStateToTransitionMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference STATE_TO_TRANSITION_MAP_ENTRY__VALUE = eINSTANCE.getStateToTransitionMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.

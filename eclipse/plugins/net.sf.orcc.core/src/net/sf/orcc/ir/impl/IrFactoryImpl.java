@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -188,6 +189,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
 			case IrPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
 			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
+			case IrPackage.STATE: return createState();
+			case IrPackage.TRANSITION: return createTransition();
+			case IrPackage.STATE_TO_TRANSITION_MAP_ENTRY: return (EObject)createStateToTransitionMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -745,6 +749,36 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
 		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
 		return portToEIntegerObjectMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public State createState() {
+		StateImpl state = new StateImpl();
+		return state;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Transition createTransition() {
+		TransitionImpl transition = new TransitionImpl();
+		return transition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<State, Transition> createStateToTransitionMapEntry() {
+		StateToTransitionMapEntryImpl stateToTransitionMapEntry = new StateToTransitionMapEntryImpl();
+		return stateToTransitionMapEntry;
 	}
 
 	/**

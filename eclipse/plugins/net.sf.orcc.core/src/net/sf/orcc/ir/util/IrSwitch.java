@@ -9,6 +9,7 @@ package net.sf.orcc.ir.util;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -341,6 +342,51 @@ public class IrSwitch<T2> {
 	 * @generated
 	 */
 	public T2 casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>State</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>State</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T2 caseState(State object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Transition</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Transition</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T2 caseTransition(Transition object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>State To Transition Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>State To Transition Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T2 caseStateToTransitionMapEntry(Map.Entry<State, Transition> object) {
 		return null;
 	}
 
@@ -1084,6 +1130,24 @@ public class IrSwitch<T2> {
 			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: {
 				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToEIntegerObjectMapEntry = (Map.Entry<Port, Integer>)theEObject;
 				T2 result = casePortToEIntegerObjectMapEntry(portToEIntegerObjectMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.STATE: {
+				State state = (State)theEObject;
+				T2 result = caseState(state);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TRANSITION: {
+				Transition transition = (Transition)theEObject;
+				T2 result = caseTransition(transition);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.STATE_TO_TRANSITION_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<State, Transition> stateToTransitionMapEntry = (Map.Entry<State, Transition>)theEObject;
+				T2 result = caseStateToTransitionMapEntry(stateToTransitionMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

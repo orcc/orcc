@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
 import java.io.File;
 import java.util.List;
@@ -47,26 +49,16 @@ import org.jgrapht.DirectedGraph;
 public interface FSM extends EObject {
 
 	/**
-	 * Adds a state with the given name only if the given state is not already
-	 * present.
-	 * 
-	 * @param name
-	 *            name of a state
-	 * @return the state created
-	 */
-	State addState(String name);
-
-	/**
-	 * Adds a transition between two state with the given action.
+	 * Adds a transition between two states with the given action.
 	 * 
 	 * @param source
-	 *            name of the source state
+	 *            source state
 	 * @param action
 	 *            an action
 	 * @param target
-	 *            name of the target state
+	 *            target state
 	 */
-	void addTransition(String source, Action action, String target);
+	void addTransition(State source, Action action, State target);
 
 	/**
 	 * Creates and returns a graph representation of this FSM. Note that the
@@ -80,6 +72,7 @@ public interface FSM extends EObject {
 	 * Returns the initial state.
 	 * 
 	 * @return the initial state
+	 * @model
 	 */
 	State getInitialState();
 
@@ -87,8 +80,35 @@ public interface FSM extends EObject {
 	 * Returns the list of states sorted by alphabetical order.
 	 * 
 	 * @return the list of states sorted by alphabetical order
+	 * @model containment="true"
 	 */
-	List<String> getStates();
+	EList<State> getStates();
+
+	/**
+	 * Returns the actions accessible from the given state.
+	 * 
+	 * @param state
+	 *            a state
+	 * @return the actions accessible from the given state
+	 */
+	List<Action> getTargetActions(State state);
+
+	/**
+	 * Returns the states accessible from the given state.
+	 * 
+	 * @param state
+	 *            a state
+	 * @return the states accessible from the given state
+	 */
+	List<State> getTargetStates(State state);
+
+	/**
+	 * Returns a state to transition map.
+	 * 
+	 * @return a state to transition map
+	 * @model keyType="State" valueType="Transition"
+	 */
+	EMap<State, Transition> getTransitionMap();
 
 	/**
 	 * Returns the list of transitions of this FSM as a list of
@@ -98,15 +118,6 @@ public interface FSM extends EObject {
 	 *         {@link Transition}
 	 */
 	List<Transition> getTransitions();
-
-	/**
-	 * Returns the transitions departing from the given state.
-	 * 
-	 * @param state
-	 *            a state name
-	 * @return a list of next state transitions
-	 */
-	List<NextStateInfo> getTransitions(String state);
 
 	/**
 	 * Prints a graph representation of this FSM.
@@ -119,36 +130,35 @@ public interface FSM extends EObject {
 	void printGraph(File file) throws OrccException;
 
 	/**
-	 * Removes the transition from the state whose name is given by
-	 * <code>source</code> and whose action equals to the given action.
+	 * Removes the transition from the given <code>source</code> state that is
+	 * associated with the given action.
 	 * 
 	 * @param source
-	 *            name of source state
+	 *            source state
 	 * @param action
 	 *            action associated with the transition
 	 */
-	void removeTransition(String source, Action action);
+	void removeTransition(State source, Action action);
 
 	/**
-	 * Replaces the target of the transition from the state whose name is given
-	 * by <code>source</code> and whose action equals to the given action by a
-	 * target state with the given name.
+	 * Replaces the target of the transition from the <code>source</code> state
+	 * and whose action equals to the given action by the given <code>target</code> state.
 	 * 
 	 * @param source
-	 *            name of source state
+	 *            source state
 	 * @param action
 	 *            action associated with the transition
 	 * @param newTargetName
-	 *            name of the new target state
+	 *            new target state
 	 */
-	void replaceTarget(String source, Action action, String newTargetName);
+	void replaceTarget(State source, Action action, State target);
 
 	/**
 	 * Sets the initial state of this FSM to the given state.
 	 * 
 	 * @param state
-	 *            a state name
+	 *            a state
 	 */
-	void setInitialState(String state);
+	void setInitialState(State state);
 
 }

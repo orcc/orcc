@@ -84,22 +84,22 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/parameters"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//InstAssign">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//InstAssign/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstAssign/target"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstAssign/value"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//InstCall">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstCall/parameters"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//InstCall/procedure"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//InstCall/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstCall/target"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//InstLoad">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstLoad/indexes"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//InstLoad/source"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//InstLoad/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstLoad/target"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//InstPhi">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//InstPhi/oldVariable"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//InstPhi/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstPhi/target"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstPhi/values"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//InstReturn">
@@ -108,7 +108,7 @@
     <genClasses ecoreClass="Ir.ecore#//InstSpecific"/>
     <genClasses ecoreClass="Ir.ecore#//InstStore">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstStore/indexes"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//InstStore/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstStore/target"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstStore/value"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Location">
@@ -126,7 +126,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/assignable"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/global"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/uses"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/defs"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/defs"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Use">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Use/variable"/>
@@ -147,7 +147,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//ExprInt/value"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//ExprList">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprList/value"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprList/value"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//ExprString">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//ExprString/value"/>
@@ -160,7 +160,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprVar/use"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Def">
-      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference Ir.ecore#//Def/variable"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Def/variable"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Action">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/body"/>
@@ -200,9 +200,13 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Port/type"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Tag">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute Ir.ecore#//Tag/identifiers"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Tag/identifiers"/>
     </genClasses>
-    <genClasses ecoreClass="Ir.ecore#//FSM"/>
+    <genClasses ecoreClass="Ir.ecore#//FSM">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/initialState"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/states"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/transitionMap"/>
+    </genClasses>
     <genClasses image="false" ecoreClass="Ir.ecore#//EMap">
       <genTypeParameters ecoreTypeParameter="Ir.ecore#//EMap/T"/>
       <genTypeParameters ecoreTypeParameter="Ir.ecore#//EMap/T1"/>
@@ -218,6 +222,18 @@
     <genClasses ecoreClass="Ir.ecore#//PortToEIntegerObjectMapEntry">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//PortToEIntegerObjectMapEntry/key"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//PortToEIntegerObjectMapEntry/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//State">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//State/name"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//Transition">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Transition/targetActions"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Transition/targetStates"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Transition/sourceState"/>
+    </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//StateToTransitionMapEntry">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//StateToTransitionMapEntry/key"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//StateToTransitionMapEntry/value"/>
     </genClasses>
   </genPackages>
   <genPackages prefix="Moc" basePackage="net.sf.orcc" disposableProviderFactory="true"

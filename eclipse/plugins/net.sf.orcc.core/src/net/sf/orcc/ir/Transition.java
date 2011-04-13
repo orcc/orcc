@@ -1,49 +1,74 @@
+/*
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 package net.sf.orcc.ir;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
- * A transition in the FSM.
+ * This class defines a transition of a Finite State Machine.
  * 
  * @author Matthieu Wipliez
- * 
+ * @model
  */
-public class Transition {
-
-	public List<NextStateInfo> nextStateInfo;
-
-	public State sourceState;
+public interface Transition extends EObject {
 
 	/**
-	 * Creates a transition from a source state.
+	 * Returns the source state of this transition.
 	 * 
-	 * @param sourceState
-	 *            source state
+	 * @return the source state of this transition
+	 * @model
 	 */
-	public Transition(State sourceState) {
-		this.sourceState = sourceState;
-		this.nextStateInfo = new ArrayList<NextStateInfo>();
-	}
+	State getSourceState();
 
-	public List<NextStateInfo> getNextStateInfo() {
-		return nextStateInfo;
-	}
+	/**
+	 * Returns the list of actions that are the target of this transition.
+	 * 
+	 * @return the list of actions that are the target of this transition
+	 * @model
+	 */
+	EList<Action> getTargetActions();
 
-	public State getSourceState() {
-		return sourceState;
-	}
+	/**
+	 * Returns the list of states that are the target of this transition.
+	 * 
+	 * @return the list of states that are the target of this transition
+	 * @model
+	 */
+	EList<State> getTargetStates();
 
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		for (NextStateInfo info : nextStateInfo) {
-			builder.append(sourceState);
-			builder.append(' ');
-			builder.append(info.toString());
-			builder.append('\n');
-		}
-		return builder.toString();
-	}
+	/**
+	 * Sets the source state of this transition.
+	 * 
+	 * @param state
+	 *            the source state of this transition
+	 */
+	void setSourceState(State state);
 
 }
