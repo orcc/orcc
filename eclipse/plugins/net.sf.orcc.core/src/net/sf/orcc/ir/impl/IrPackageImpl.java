@@ -43,6 +43,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Transition;
+import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeFloat;
@@ -386,6 +387,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private EClass transitionsEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	private EClass transitionEClass = null;
 
 	/**
@@ -394,6 +402,13 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass stateToTransitionMapEntryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass stateToTransitionsMapEntryEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -1716,7 +1731,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getFSM_TransitionsMap() {
+	public EReference getFSM_Transitions() {
 		return (EReference)fsmEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -1833,6 +1848,33 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getTransitions() {
+		return transitionsEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getTransitions_SourceState() {
+		return (EReference)transitionsEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getTransitions_List() {
+		return (EReference)transitionsEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getTransition() {
 		return transitionEClass;
 	}
@@ -1842,7 +1884,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTransition_TargetActions() {
+	public EReference getTransition_Action() {
 		return (EReference)transitionEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -1851,17 +1893,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTransition_TargetStates() {
+	public EReference getTransition_State() {
 		return (EReference)transitionEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getTransition_SourceState() {
-		return (EReference)transitionEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1889,6 +1922,33 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 */
 	public EReference getStateToTransitionMapEntry_Value() {
 		return (EReference)stateToTransitionMapEntryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getStateToTransitionsMapEntry() {
+		return stateToTransitionsMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getStateToTransitionsMapEntry_Key() {
+		return (EReference)stateToTransitionsMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getStateToTransitionsMapEntry_Value() {
+		return (EReference)stateToTransitionsMapEntryEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1963,15 +2023,18 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		fsmEClass = createEClass(FSM);
 		createEReference(fsmEClass, FSM__INITIAL_STATE);
 		createEReference(fsmEClass, FSM__STATES);
-		createEReference(fsmEClass, FSM__TRANSITIONS_MAP);
+		createEReference(fsmEClass, FSM__TRANSITIONS);
 
 		stateEClass = createEClass(STATE);
 		createEAttribute(stateEClass, STATE__NAME);
 
+		transitionsEClass = createEClass(TRANSITIONS);
+		createEReference(transitionsEClass, TRANSITIONS__SOURCE_STATE);
+		createEReference(transitionsEClass, TRANSITIONS__LIST);
+
 		transitionEClass = createEClass(TRANSITION);
-		createEReference(transitionEClass, TRANSITION__TARGET_ACTIONS);
-		createEReference(transitionEClass, TRANSITION__TARGET_STATES);
-		createEReference(transitionEClass, TRANSITION__SOURCE_STATE);
+		createEReference(transitionEClass, TRANSITION__ACTION);
+		createEReference(transitionEClass, TRANSITION__STATE);
 
 		actionEClass = createEClass(ACTION);
 		createEReference(actionEClass, ACTION__BODY);
@@ -2142,6 +2205,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(stateToTransitionMapEntryEClass, STATE_TO_TRANSITION_MAP_ENTRY__KEY);
 		createEReference(stateToTransitionMapEntryEClass, STATE_TO_TRANSITION_MAP_ENTRY__VALUE);
 
+		stateToTransitionsMapEntryEClass = createEClass(STATE_TO_TRANSITIONS_MAP_ENTRY);
+		createEReference(stateToTransitionsMapEntryEClass, STATE_TO_TRANSITIONS_MAP_ENTRY__KEY);
+		createEReference(stateToTransitionsMapEntryEClass, STATE_TO_TRANSITIONS_MAP_ENTRY__VALUE);
+
 		// Create enums
 		opBinaryEEnum = createEEnum(OP_BINARY);
 		opUnaryEEnum = createEEnum(OP_UNARY);
@@ -2233,15 +2300,18 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(fsmEClass, net.sf.orcc.ir.FSM.class, "FSM", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getFSM_InitialState(), this.getState(), null, "initialState", null, 0, 1, net.sf.orcc.ir.FSM.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getFSM_States(), this.getState(), null, "states", null, 0, -1, net.sf.orcc.ir.FSM.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getFSM_TransitionsMap(), this.getStateToTransitionMapEntry(), null, "transitionsMap", null, 0, -1, net.sf.orcc.ir.FSM.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getFSM_Transitions(), this.getStateToTransitionsMapEntry(), null, "transitions", null, 0, -1, net.sf.orcc.ir.FSM.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(stateEClass, State.class, "State", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getState_Name(), theEcorePackage.getEString(), "name", null, 0, 1, State.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+		initEClass(transitionsEClass, Transitions.class, "Transitions", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getTransitions_SourceState(), this.getState(), null, "sourceState", null, 0, 1, Transitions.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTransitions_List(), this.getTransition(), null, "list", null, 0, -1, Transitions.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
 		initEClass(transitionEClass, Transition.class, "Transition", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getTransition_TargetActions(), this.getAction(), null, "targetActions", null, 0, -1, Transition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTransition_TargetStates(), this.getState(), null, "targetStates", null, 0, -1, Transition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTransition_SourceState(), this.getState(), null, "sourceState", null, 0, 1, Transition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTransition_Action(), this.getAction(), null, "action", null, 0, 1, Transition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTransition_State(), this.getState(), null, "state", null, 0, 1, Transition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(actionEClass, Action.class, "Action", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getAction_Body(), this.getProcedure(), null, "body", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2411,6 +2481,10 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(stateToTransitionMapEntryEClass, Map.Entry.class, "StateToTransitionMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getStateToTransitionMapEntry_Key(), this.getState(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getStateToTransitionMapEntry_Value(), this.getTransition(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(stateToTransitionsMapEntryEClass, Map.Entry.class, "StateToTransitionsMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getStateToTransitionsMapEntry_Key(), this.getState(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getStateToTransitionsMapEntry_Value(), this.getTransitions(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");

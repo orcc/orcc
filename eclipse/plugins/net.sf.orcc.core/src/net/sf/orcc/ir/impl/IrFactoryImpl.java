@@ -112,6 +112,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.PORT: return createPort();
 			case IrPackage.FSM: return createFSM();
 			case IrPackage.STATE: return createState();
+			case IrPackage.TRANSITIONS: return createTransitions();
 			case IrPackage.TRANSITION: return createTransition();
 			case IrPackage.ACTION: return createAction();
 			case IrPackage.TAG: return createTag();
@@ -150,6 +151,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
 			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
 			case IrPackage.STATE_TO_TRANSITION_MAP_ENTRY: return (EObject)createStateToTransitionMapEntry();
+			case IrPackage.STATE_TO_TRANSITIONS_MAP_ENTRY: return (EObject)createStateToTransitionsMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -714,6 +716,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Map.Entry<State, Transition> createStateToTransitionMapEntry() {
+		StateToTransitionMapEntryImpl stateToTransitionMapEntry = new StateToTransitionMapEntryImpl();
+		return stateToTransitionMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public Map.Entry<Port, Var> createPortToVarMapEntry() {
 		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
 		return portToVarMapEntry;
@@ -762,9 +774,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<State, Transition> createStateToTransitionMapEntry() {
-		StateToTransitionMapEntryImpl stateToTransitionMapEntry = new StateToTransitionMapEntryImpl();
-		return stateToTransitionMapEntry;
+	public Map.Entry<State, Transitions> createStateToTransitionsMapEntry() {
+		StateToTransitionsMapEntryImpl stateToTransitionsMapEntry = new StateToTransitionsMapEntryImpl();
+		return stateToTransitionsMapEntry;
 	}
 
 	/**
@@ -806,6 +818,24 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Transition createTransition() {
 		TransitionImpl transition = new TransitionImpl();
 		return transition;
+	}
+
+	@Override
+	public Transition createTransition(Action action, State target) {
+		TransitionImpl transition = new TransitionImpl();
+		transition.setAction(action);
+		transition.setState(target);
+		return transition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Transitions createTransitions() {
+		TransitionsImpl transitions = new TransitionsImpl();
+		return transitions;
 	}
 
 	/**

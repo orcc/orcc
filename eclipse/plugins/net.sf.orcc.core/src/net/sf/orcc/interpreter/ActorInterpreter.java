@@ -62,6 +62,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
+import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -295,16 +296,13 @@ public class ActorInterpreter extends AbstractActorVisitor {
 
 		if (actor.hasFsm()) {
 			// Then check for next FSM transition
-			Transition transition = actor.getFsm().getTransitionsMap().get(fsmState);
-			Iterator<Action> itA = transition.getTargetActions().iterator();
-			Iterator<State> itS = transition.getTargetStates().iterator();
-			while (itA.hasNext() && itS.hasNext()) {
-				Action action = itA.next();
-				State target = itS.next();
+			Transitions transitions = actor.getFsm().getTransitions(fsmState);
+			for (Transition transition : transitions.getList()) {
+				Action action = transition.getAction();
 				if (isSchedulable(action)) {
 					// Update FSM state
 					if (checkOutputPattern(action.getOutputPattern())) {
-						fsmState = target;
+						fsmState = transition.getState();
 						return action;
 					}
 					break;

@@ -431,21 +431,21 @@ while (1) {
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
 
-actionTestState(action, targetState, restActions, restStates) ::= <<
-if (<checkInputPattern(action.inputPattern)>isSchedulable_<action.name>()) {
-	<if (action.outputPattern)>
-	<printOutputPattern(action.outputPattern)>
-		_FSM_state = my_state_<transition.sourceState.name>;
+actionTestState(sourceState, transition, restTransitions) ::= <<
+if (<checkInputPattern(transition.action.inputPattern)>isSchedulable_<transition.action.name>()) {
+	<if (transition.action.outputPattern)>
+	<printOutputPattern(transition.action.outputPattern)>
+		_FSM_state = my_state_<sourceState.name>;
 		si-\>num_firings = i;
 		si-\>reason = full;
 		goto finished;
 	}
 	<endif>
-	<action.body.name>();
+	<transition.action.body.name>();
 	i++;
-	goto l_<targetState.name>;
+	goto l_<transition.state.name>;
 } else {
-	<schedulingStates(restActions, restStates)>
+	<schedulingStates(sourceState, restTransitions)>
 }
 >>
 
@@ -468,37 +468,37 @@ si-\>num_firings = i;
 si-\>reason = starved;
 >>
 
-schedulingStates(actions, states) ::= <<
-<if (first(states))
-><actionTestState(action=first(actions), targetState=first(states), restActions=rest(actions), restStates=rest(states))><
+schedulingStates(sourceState, transitions) ::= <<
+<if (first(transitions))
+><actionTestState(sourceState=sourceState, transition=first(transitions), restTransitions=rest(transitions))><
 else
-><printTransitionPattern(pattern=instance.actor.templateData.transitionPattern.(transition))>
-_FSM_state = my_state_<transition.sourceState.name>;
+><printTransitionPattern(pattern=instance.actor.templateData.transitionPattern.(transitions))>
+_FSM_state = my_state_<sourceState.name>;
 goto finished;<
 endif>
 >>
 
-printTransition(transition) ::= <<
+printTransition(sourceState, transitions) ::= <<
 
 
-l_<transition.sourceState.name>:
+l_<sourceState.name>:
 	<if (actions)>
 	<instance.id>_outside_FSM_scheduler(si);
 	i += si-\>num_firings;
 	<endif>
-	<if (transition.targetStates.empty)>
-	printf("stuck in state \"<transition.sourceState>\" in the instance <instance.id>\n");
+	<if (transitions.list.empty)>
+	printf("stuck in state \"<sourceState.name>\" in the instance <instance.id>\n");
 	wait_for_key();
 	exit(1);
 	<else>
-	<schedulingStates(transition.targetActions, transition.targetStates)>
+	<schedulingStates(sourceState, transitions.list)>
 	<endif>
 >>
 
-switchTransition(transition) ::= <<
+switchTransition(entry) ::= <<
 
-case my_state_<transition.sourceState.name>:
-	goto l_<transition.sourceState.name>;
+case my_state_<entry.key.name>:
+	goto l_<entry.key.name>;
 >>
 
 printSwitch(transitions) ::= <<
@@ -536,7 +536,7 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	<printSwitch(fsm.transitions)>
 
 	// FSM transitions
-<fsm.transitions: printTransition()>
+<fsm.transitions: {entry|<printTransition(entry.key, entry.value)>}>
 finished:
 <if(options.enableTrace)>
 	<printCloseFiles()>

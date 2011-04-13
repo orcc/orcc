@@ -31,6 +31,7 @@ package net.sf.orcc.backends.c;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -38,7 +39,9 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
+import net.sf.orcc.ir.Transitions;
 
 /**
  * This class allows the string template accessing informations about
@@ -59,7 +62,7 @@ public class CActorTemplateData {
 	 * Map that associates a transition with the minimum input pattern that
 	 * allows all actions in the transition to fire
 	 */
-	private Map<Transition, Pattern> transitionPattern;
+	private Map<Transitions, Pattern> transitionPattern;
 
 	/**
 	 * Builds the input pattern
@@ -92,9 +95,10 @@ public class CActorTemplateData {
 			return;
 		}
 
-		for (Transition transition : fsm.getTransitions()) {
+		for (Entry<State, Transitions> entry : fsm.getTransitions()) {
 			Pattern pattern = IrFactory.eINSTANCE.createPattern();
-			for (Action action : transition.getTargetActions()) {
+			for (Transition transition : entry.getValue().getList()) {
+				Action action = transition.getAction();
 				Pattern actionPattern = action.getInputPattern();
 				for (Port port : actionPattern.getPorts()) {
 					Integer numTokens = pattern.getNumTokens(port);
@@ -109,7 +113,7 @@ public class CActorTemplateData {
 				}
 			}
 
-			transitionPattern.put(transition, pattern);
+			transitionPattern.put(entry.getValue(), pattern);
 		}
 	}
 
@@ -119,7 +123,7 @@ public class CActorTemplateData {
 	 */
 	public void computeTemplateMaps(Actor actor) {
 		inputPattern = IrFactory.eINSTANCE.createPattern();
-		transitionPattern = new HashMap<Transition, Pattern>();
+		transitionPattern = new HashMap<Transitions, Pattern>();
 
 		buildInputPattern(actor);
 		buildTransitionPattern(actor);
@@ -142,7 +146,7 @@ public class CActorTemplateData {
 	 * 
 	 * @return a map of transitions to pattern
 	 */
-	public Map<Transition, Pattern> getTransitionPattern() {
+	public Map<Transitions, Pattern> getTransitionPattern() {
 		return transitionPattern;
 	}
 

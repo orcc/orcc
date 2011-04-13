@@ -427,12 +427,12 @@ public interface IrPackage extends EPackage {
 		EReference FSM__STATES = eINSTANCE.getFSM_States();
 
 		/**
-		 * The meta object literal for the '<em><b>Transitions Map</b></em>' map feature.
+		 * The meta object literal for the '<em><b>Transitions</b></em>' map feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference FSM__TRANSITIONS_MAP = eINSTANCE.getFSM_TransitionsMap();
+		EReference FSM__TRANSITIONS = eINSTANCE.getFSM_Transitions();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.InstAssignImpl <em>Inst Assign</em>}' class.
@@ -1002,6 +1002,32 @@ public interface IrPackage extends EPackage {
 		EAttribute STATE__NAME = eINSTANCE.getState_Name();
 
 		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TransitionsImpl <em>Transitions</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.TransitionsImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransitions()
+		 * @generated
+		 */
+		EClass TRANSITIONS = eINSTANCE.getTransitions();
+
+		/**
+		 * The meta object literal for the '<em><b>Source State</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRANSITIONS__SOURCE_STATE = eINSTANCE.getTransitions_SourceState();
+
+		/**
+		 * The meta object literal for the '<em><b>List</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRANSITIONS__LIST = eINSTANCE.getTransitions_List();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.StateToTransitionMapEntryImpl <em>State To Transition Map Entry</em>}' class.
 		 * <!-- begin-user-doc
 		 * --> <!-- end-user-doc -->
@@ -1024,6 +1050,32 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference STATE_TO_TRANSITION_MAP_ENTRY__VALUE = eINSTANCE.getStateToTransitionMapEntry_Value();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.StateToTransitionsMapEntryImpl <em>State To Transitions Map Entry</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.StateToTransitionsMapEntryImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getStateToTransitionsMapEntry()
+		 * @generated
+		 */
+		EClass STATE_TO_TRANSITIONS_MAP_ENTRY = eINSTANCE.getStateToTransitionsMapEntry();
+
+		/**
+		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference STATE_TO_TRANSITIONS_MAP_ENTRY__KEY = eINSTANCE.getStateToTransitionsMapEntry_Key();
+
+		/**
+		 * The meta object literal for the '<em><b>Value</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference STATE_TO_TRANSITIONS_MAP_ENTRY__VALUE = eINSTANCE.getStateToTransitionsMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TagImpl <em>Tag</em>}' class.
@@ -1051,25 +1103,20 @@ public interface IrPackage extends EPackage {
 		EClass TRANSITION = eINSTANCE.getTransition();
 
 		/**
-		 * The meta object literal for the '<em><b>Source State</b></em>' reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>Action</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TRANSITION__SOURCE_STATE = eINSTANCE.getTransition_SourceState();
+		EReference TRANSITION__ACTION = eINSTANCE.getTransition_Action();
 
 		/**
-		 * The meta object literal for the '<em><b>Target Actions</b></em>' reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * The meta object literal for the '<em><b>State</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference TRANSITION__TARGET_ACTIONS = eINSTANCE.getTransition_TargetActions();
-
-		/**
-		 * The meta object literal for the '<em><b>Target States</b></em>' reference list feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference TRANSITION__TARGET_STATES = eINSTANCE.getTransition_TargetStates();
+		EReference TRANSITION__STATE = eINSTANCE.getTransition_State();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeImpl <em>Type</em>}' class.
@@ -1309,7 +1356,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getAction()
 	 * @generated
 	 */
-	int ACTION = 5;
+	int ACTION = 6;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ActorImpl <em>Actor</em>}' class.
@@ -1445,7 +1492,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getDef()
 	 * @generated
 	 */
-	int DEF = 39;
+	int DEF = 40;
 
 	/**
 	 * The singleton instance of the package.
@@ -1462,7 +1509,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getEMap()
 	 * @generated
 	 */
-	int EMAP = 42;
+	int EMAP = 43;
 
 	/**
 	 * The package name.
@@ -1494,7 +1541,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 22;
+	int EXPR_BINARY = 23;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprBoolImpl <em>Expr Bool</em>}' class.
@@ -1503,7 +1550,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprBool()
 	 * @generated
 	 */
-	int EXPR_BOOL = 23;
+	int EXPR_BOOL = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprFloatImpl
@@ -1514,7 +1561,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprFloat()
 	 * @generated
 	 */
-	int EXPR_FLOAT = 24;
+	int EXPR_FLOAT = 25;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprIntImpl <em>Expr Int</em>}' class.
@@ -1523,7 +1570,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprInt()
 	 * @generated
 	 */
-	int EXPR_INT = 25;
+	int EXPR_INT = 26;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprListImpl <em>Expr List</em>}' class.
@@ -1532,7 +1579,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprList()
 	 * @generated
 	 */
-	int EXPR_LIST = 26;
+	int EXPR_LIST = 27;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprStringImpl
@@ -1543,7 +1590,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprString()
 	 * @generated
 	 */
-	int EXPR_STRING = 27;
+	int EXPR_STRING = 28;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprUnaryImpl
@@ -1554,7 +1601,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 28;
+	int EXPR_UNARY = 29;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExprVarImpl <em>Expr Var</em>}' class.
@@ -1563,7 +1610,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExprVar()
 	 * @generated
 	 */
-	int EXPR_VAR = 29;
+	int EXPR_VAR = 30;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExpressionImpl
@@ -1574,7 +1621,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExpression()
 	 * @generated
 	 */
-	int EXPRESSION = 21;
+	int EXPRESSION = 22;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.FSMImpl <em>FSM</em>}' class.
@@ -1594,7 +1641,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstruction()
 	 * @generated
 	 */
-	int INSTRUCTION = 13;
+	int INSTRUCTION = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstAssignImpl
@@ -1605,7 +1652,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstAssign()
 	 * @generated
 	 */
-	int INST_ASSIGN = 14;
+	int INST_ASSIGN = 15;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstCallImpl <em>Inst Call</em>}' class.
@@ -1614,7 +1661,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstCall()
 	 * @generated
 	 */
-	int INST_CALL = 15;
+	int INST_CALL = 16;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstLoadImpl <em>Inst Load</em>}' class.
@@ -1623,7 +1670,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstLoad()
 	 * @generated
 	 */
-	int INST_LOAD = 16;
+	int INST_LOAD = 17;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstPhiImpl <em>Inst Phi</em>}' class.
@@ -1632,7 +1679,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstPhi()
 	 * @generated
 	 */
-	int INST_PHI = 17;
+	int INST_PHI = 18;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstReturnImpl
@@ -1643,7 +1690,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstReturn()
 	 * @generated
 	 */
-	int INST_RETURN = 18;
+	int INST_RETURN = 19;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstSpecificImpl
@@ -1654,7 +1701,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstSpecific()
 	 * @generated
 	 */
-	int INST_SPECIFIC = 19;
+	int INST_SPECIFIC = 20;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.InstStoreImpl
@@ -1665,7 +1712,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getInstStore()
 	 * @generated
 	 */
-	int INST_STORE = 20;
+	int INST_STORE = 21;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.LocationImpl <em>Location</em>}' class.
@@ -1674,7 +1721,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getLocation()
 	 * @generated
 	 */
-	int LOCATION = 38;
+	int LOCATION = 39;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
@@ -1683,7 +1730,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNode()
 	 * @generated
 	 */
-	int NODE = 9;
+	int NODE = 10;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl
@@ -1694,7 +1741,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeBlock()
 	 * @generated
 	 */
-	int NODE_BLOCK = 10;
+	int NODE_BLOCK = 11;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeIfImpl <em>Node If</em>}' class.
@@ -1703,7 +1750,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeIf()
 	 * @generated
 	 */
-	int NODE_IF = 11;
+	int NODE_IF = 12;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeWhileImpl
@@ -1714,7 +1761,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getNodeWhile()
 	 * @generated
 	 */
-	int NODE_WHILE = 12;
+	int NODE_WHILE = 13;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpBinary <em>Op Binary</em>}' enum.
@@ -1723,7 +1770,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 47;
+	int OP_BINARY = 49;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1732,7 +1779,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 48;
+	int OP_UNARY = 50;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
@@ -1741,7 +1788,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPattern()
 	 * @generated
 	 */
-	int PATTERN = 7;
+	int PATTERN = 8;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PortImpl <em>Port</em>}' class.
@@ -1821,13 +1868,13 @@ public interface IrPackage extends EPackage {
 	int FSM__STATES = 1;
 
 	/**
-	 * The feature id for the '<em><b>Transitions Map</b></em>' map.
+	 * The feature id for the '<em><b>Transitions</b></em>' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int FSM__TRANSITIONS_MAP = 2;
+	int FSM__TRANSITIONS = 2;
 
 	/**
 	 * The number of structural features of the '<em>FSM</em>' class. <!--
@@ -1846,7 +1893,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 45;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 46;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PortToVarMapEntryImpl <em>Port To Var Map Entry</em>}' class.
@@ -1856,7 +1903,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 44;
+	int PORT_TO_VAR_MAP_ENTRY = 45;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
@@ -1865,7 +1912,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getProcedure()
 	 * @generated
 	 */
-	int PROCEDURE = 8;
+	int PROCEDURE = 9;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.StateImpl <em>State</em>}' class.
@@ -1895,6 +1942,43 @@ public interface IrPackage extends EPackage {
 	int STATE_FEATURE_COUNT = 1;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TransitionsImpl <em>Transitions</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.TransitionsImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransitions()
+	 * @generated
+	 */
+	int TRANSITIONS = 4;
+
+	/**
+	 * The feature id for the '<em><b>Source State</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__SOURCE_STATE = 0;
+
+	/**
+	 * The feature id for the '<em><b>List</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__LIST = 1;
+
+	/**
+	 * The number of structural features of the '<em>Transitions</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS_FEATURE_COUNT = 2;
+
+	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.StateToTransitionMapEntryImpl <em>State To Transition Map Entry</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1902,7 +1986,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getStateToTransitionMapEntry()
 	 * @generated
 	 */
-	int STATE_TO_TRANSITION_MAP_ENTRY = 46;
+	int STATE_TO_TRANSITION_MAP_ENTRY = 47;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TagImpl <em>Tag</em>}' class.
@@ -1911,7 +1995,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTag()
 	 * @generated
 	 */
-	int TAG = 6;
+	int TAG = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TransitionImpl
@@ -1922,32 +2006,25 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTransition()
 	 * @generated
 	 */
-	int TRANSITION = 4;
+	int TRANSITION = 5;
 
 	/**
-	 * The feature id for the '<em><b>Target Actions</b></em>' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>Action</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRANSITION__TARGET_ACTIONS = 0;
+	int TRANSITION__ACTION = 0;
 
 	/**
-	 * The feature id for the '<em><b>Target States</b></em>' reference list.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * The feature id for the '<em><b>State</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TRANSITION__TARGET_STATES = 1;
-
-	/**
-	 * The feature id for the '<em><b>Source State</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int TRANSITION__SOURCE_STATE = 2;
+	int TRANSITION__STATE = 1;
 
 	/**
 	 * The number of structural features of the '<em>Transition</em>' class.
@@ -1955,7 +2032,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int TRANSITION_FEATURE_COUNT = 3;
+	int TRANSITION_FEATURE_COUNT = 2;
 
 	/**
 	 * The feature id for the '<em><b>Body</b></em>' containment reference. <!--
@@ -2805,7 +2882,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getType()
 	 * @generated
 	 */
-	int TYPE = 30;
+	int TYPE = 31;
 
 	/**
 	 * The number of structural features of the '<em>Type</em>' class. <!--
@@ -2823,7 +2900,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeBool()
 	 * @generated
 	 */
-	int TYPE_BOOL = 31;
+	int TYPE_BOOL = 32;
 
 	/**
 	 * The number of structural features of the '<em>Type Bool</em>' class. <!--
@@ -2843,7 +2920,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeFloat()
 	 * @generated
 	 */
-	int TYPE_FLOAT = 32;
+	int TYPE_FLOAT = 33;
 
 	/**
 	 * The number of structural features of the '<em>Type Float</em>' class.
@@ -2860,7 +2937,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeInt()
 	 * @generated
 	 */
-	int TYPE_INT = 33;
+	int TYPE_INT = 34;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -2887,7 +2964,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeList()
 	 * @generated
 	 */
-	int TYPE_LIST = 34;
+	int TYPE_LIST = 35;
 
 	/**
 	 * The feature id for the '<em><b>Size Expr</b></em>' containment reference.
@@ -2924,7 +3001,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeString()
 	 * @generated
 	 */
-	int TYPE_STRING = 35;
+	int TYPE_STRING = 36;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -2950,7 +3027,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeUint()
 	 * @generated
 	 */
-	int TYPE_UINT = 36;
+	int TYPE_UINT = 37;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute. <!--
@@ -2977,7 +3054,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeVoid()
 	 * @generated
 	 */
-	int TYPE_VOID = 37;
+	int TYPE_VOID = 38;
 
 	/**
 	 * The number of structural features of the '<em>Type Void</em>' class. <!--
@@ -3049,7 +3126,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
 	 */
-	int USE = 41;
+	int USE = 42;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.VarImpl <em>Var</em>}' class.
@@ -3058,7 +3135,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 	 * @generated
 	 */
-	int VAR = 40;
+	int VAR = 41;
 
 	/**
 	 * The feature id for the '<em><b>Index</b></em>' attribute. <!--
@@ -3191,7 +3268,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 43;
+	int VAR_TO_PORT_MAP_ENTRY = 44;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference. <!--
@@ -3298,6 +3375,43 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int STATE_TO_TRANSITION_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.StateToTransitionsMapEntryImpl <em>State To Transitions Map Entry</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.StateToTransitionsMapEntryImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getStateToTransitionsMapEntry()
+	 * @generated
+	 */
+	int STATE_TO_TRANSITIONS_MAP_ENTRY = 48;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE_TO_TRANSITIONS_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE_TO_TRANSITIONS_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>State To Transitions Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE_TO_TRANSITIONS_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Action <em>Action</em>}'.
@@ -3849,15 +3963,15 @@ public interface IrPackage extends EPackage {
 	EReference getFSM_States();
 
 	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.ir.FSM#getTransitionsMap <em>Transitions Map</em>}'.
+	 * Returns the meta object for the map '{@link net.sf.orcc.ir.FSM#getTransitions <em>Transitions</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Transitions Map</em>'.
-	 * @see net.sf.orcc.ir.FSM#getTransitionsMap()
+	 * @return the meta object for the map '<em>Transitions</em>'.
+	 * @see net.sf.orcc.ir.FSM#getTransitions()
 	 * @see #getFSM()
 	 * @generated
 	 */
-	EReference getFSM_TransitionsMap();
+	EReference getFSM_Transitions();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstAssign <em>Inst Assign</em>}'.
@@ -4659,6 +4773,38 @@ public interface IrPackage extends EPackage {
 	EAttribute getState_Name();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Transitions <em>Transitions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Transitions</em>'.
+	 * @see net.sf.orcc.ir.Transitions
+	 * @generated
+	 */
+	EClass getTransitions();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Transitions#getSourceState <em>Source State</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Source State</em>'.
+	 * @see net.sf.orcc.ir.Transitions#getSourceState()
+	 * @see #getTransitions()
+	 * @generated
+	 */
+	EReference getTransitions_SourceState();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.ir.Transitions#getList <em>List</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>List</em>'.
+	 * @see net.sf.orcc.ir.Transitions#getList()
+	 * @see #getTransitions()
+	 * @generated
+	 */
+	EReference getTransitions_List();
+
+	/**
 	 * Returns the meta object for class '{@link java.util.Map.Entry <em>State To Transition Map Entry</em>}'.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
@@ -4691,6 +4837,40 @@ public interface IrPackage extends EPackage {
 	EReference getStateToTransitionMapEntry_Value();
 
 	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>State To Transitions Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>State To Transitions Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyType="net.sf.orcc.ir.State"
+	 *        valueType="net.sf.orcc.ir.Transitions"
+	 * @generated
+	 */
+	EClass getStateToTransitionsMapEntry();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getStateToTransitionsMapEntry()
+	 * @generated
+	 */
+	EReference getStateToTransitionsMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getStateToTransitionsMapEntry()
+	 * @generated
+	 */
+	EReference getStateToTransitionsMapEntry_Value();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Tag <em>Tag</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Tag</em>'.
@@ -4721,34 +4901,26 @@ public interface IrPackage extends EPackage {
 	EClass getTransition();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Transition#getSourceState <em>Source State</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Source State</em>'.
-	 * @see net.sf.orcc.ir.Transition#getSourceState()
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Transition#getAction <em>Action</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Action</em>'.
+	 * @see net.sf.orcc.ir.Transition#getAction()
 	 * @see #getTransition()
 	 * @generated
 	 */
-	EReference getTransition_SourceState();
+	EReference getTransition_Action();
 
 	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Transition#getTargetActions <em>Target Actions</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Target Actions</em>'.
-	 * @see net.sf.orcc.ir.Transition#getTargetActions()
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Transition#getState <em>State</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>State</em>'.
+	 * @see net.sf.orcc.ir.Transition#getState()
 	 * @see #getTransition()
 	 * @generated
 	 */
-	EReference getTransition_TargetActions();
-
-	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Transition#getTargetStates <em>Target States</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Target States</em>'.
-	 * @see net.sf.orcc.ir.Transition#getTargetStates()
-	 * @see #getTransition()
-	 * @generated
-	 */
-	EReference getTransition_TargetStates();
+	EReference getTransition_State();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Type <em>Type</em>}'.

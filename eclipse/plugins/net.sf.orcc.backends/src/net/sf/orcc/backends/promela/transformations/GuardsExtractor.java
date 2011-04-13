@@ -144,7 +144,7 @@ public class GuardsExtractor extends AbstractActorVisitor {
 		// of priority
 		else {
 			for (Transition trans : actor.getActionScheduler().getFsm()
-					.getTransitions()) {
+					.getList()) {
 				List<Expression> prevGuards = new ArrayList<Expression>();
 				for (NextStateInfo nsi : trans.getNextStateInfo()) {
 					addPriorityToGuard(nsi.getAction(), prevGuards);

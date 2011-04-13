@@ -361,6 +361,21 @@ public class IrSwitch<T2> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Transitions</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Transitions</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T2 caseTransitions(Transitions object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Transition</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -387,6 +402,21 @@ public class IrSwitch<T2> {
 	 * @generated
 	 */
 	public T2 caseStateToTransitionMapEntry(Map.Entry<State, Transition> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>State To Transitions Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>State To Transitions Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T2 caseStateToTransitionsMapEntry(Map.Entry<State, Transitions> object) {
 		return null;
 	}
 
@@ -874,6 +904,12 @@ public class IrSwitch<T2> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case IrPackage.TRANSITIONS: {
+				Transitions transitions = (Transitions)theEObject;
+				T2 result = caseTransitions(transitions);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case IrPackage.TRANSITION: {
 				Transition transition = (Transition)theEObject;
 				T2 result = caseTransition(transition);
@@ -1148,6 +1184,12 @@ public class IrSwitch<T2> {
 			case IrPackage.STATE_TO_TRANSITION_MAP_ENTRY: {
 				@SuppressWarnings("unchecked") Map.Entry<State, Transition> stateToTransitionMapEntry = (Map.Entry<State, Transition>)theEObject;
 				T2 result = caseStateToTransitionMapEntry(stateToTransitionMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.STATE_TO_TRANSITIONS_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<State, Transitions> stateToTransitionsMapEntry = (Map.Entry<State, Transitions>)theEObject;
+				T2 result = caseStateToTransitionsMapEntry(stateToTransitionsMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

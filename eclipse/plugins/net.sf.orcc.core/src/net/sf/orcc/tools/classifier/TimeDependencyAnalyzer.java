@@ -31,6 +31,7 @@ package net.sf.orcc.tools.classifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import jp.ac.kobe_u.cs.cream.DefaultSolver;
 import jp.ac.kobe_u.cs.cream.Solution;
@@ -40,7 +41,9 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
+import net.sf.orcc.ir.Transitions;
 
 /**
  * This class defines a configuration analyzer.
@@ -100,10 +103,10 @@ public class TimeDependencyAnalyzer {
 
 		if (actor.hasFsm()) {
 			FSM fsm = actor.getFsm();
-			for (Transition transition : fsm.getTransitions()) {
+			for (Entry<State, Transitions> entry : fsm.getTransitions()) {
 				List<Action> actions = new ArrayList<Action>();
-				for (Action action : transition.getTargetActions()) {
-					actions.add(action);
+				for (Transition transition : entry.getValue().getList()) {
+					actions.add(transition.getAction());
 				}
 
 				if (isTimeDependent(actions)) {
@@ -157,7 +160,8 @@ public class TimeDependencyAnalyzer {
 
 				// Add the current action to higherPriorityActions
 				higherPriorityActions.add(lowerPriorityAction);
-				higherPriorityPattern.updatePattern(lowerPriorityAction.getInputPattern());
+				higherPriorityPattern.updatePattern(lowerPriorityAction
+						.getInputPattern());
 			}
 		}
 

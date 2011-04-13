@@ -99,6 +99,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createStateAdapter();
 			}
 			@Override
+			public Adapter caseTransitions(Transitions object) {
+				return createTransitionsAdapter();
+			}
+			@Override
 			public Adapter caseTransition(Transition object) {
 				return createTransitionAdapter();
 			}
@@ -269,6 +273,10 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseStateToTransitionMapEntry(Map.Entry<State, Transition> object) {
 				return createStateToTransitionMapEntryAdapter();
+			}
+			@Override
+			public Adapter caseStateToTransitionsMapEntry(Map.Entry<State, Transitions> object) {
+				return createStateToTransitionsMapEntryAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -566,6 +574,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Transitions <em>Transitions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.Transitions
+	 * @generated
+	 */
+	public Adapter createTransitionsAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Transition <em>Transition</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -590,6 +612,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createStateToTransitionMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>State To Transitions Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createStateToTransitionsMapEntryAdapter() {
 		return null;
 	}
 

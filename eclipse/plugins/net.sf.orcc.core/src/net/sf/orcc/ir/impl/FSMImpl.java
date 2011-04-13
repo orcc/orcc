@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
@@ -24,6 +23,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
+import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -52,7 +52,7 @@ import org.jgrapht.graph.DirectedMultigraph;
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.FSMImpl#getInitialState <em>Initial State</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.FSMImpl#getStates <em>States</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.FSMImpl#getTransitionsMap <em>Transitions Map</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.FSMImpl#getTransitions <em>Transitions</em>}</li>
  * </ul>
  * </p>
  *
@@ -78,14 +78,14 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	 */
 	protected EList<State> states;
 	/**
-	 * The cached value of the '{@link #getTransitionsMap() <em>Transitions Map</em>}' map.
+	 * The cached value of the '{@link #getTransitions() <em>Transitions</em>}' map.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getTransitionsMap()
+	 * @see #getTransitions()
 	 * @generated
 	 * @ordered
 	 */
-	protected EMap<State, Transition> transitionsMap;
+	protected EMap<State, Transitions> transitions;
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -96,14 +96,15 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	@Override
 	public void addTransition(State source, Action action, State target) {
-		Transition transition = getTransition(source);
-		if (transition == null) {
-			transition = IrFactory.eINSTANCE.createTransition();
-			transition.setSourceState(source);
-			getTransitionsMap().put(source, transition);
+		Transitions transitions = getTransitions(source);
+		if (transitions == null) {
+			transitions = IrFactory.eINSTANCE.createTransitions();
+			transitions.setSourceState(source);
+			getTransitions().put(source, transitions);
 		}
-		transition.getTargetActions().add(action);
-		transition.getTargetStates().add(target);
+		
+		Transition transition = IrFactory.eINSTANCE.createTransition(action, target);		
+		transitions.getList().add(transition);
 	}
 
 	/**
@@ -126,9 +127,9 @@ public class FSMImpl extends EObjectImpl implements FSM {
 				return basicGetInitialState();
 			case IrPackage.FSM__STATES:
 				return getStates();
-			case IrPackage.FSM__TRANSITIONS_MAP:
-				if (coreType) return getTransitionsMap();
-				else return getTransitionsMap().map();
+			case IrPackage.FSM__TRANSITIONS:
+				if (coreType) return getTransitions();
+				else return getTransitions().map();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -143,8 +144,8 @@ public class FSMImpl extends EObjectImpl implements FSM {
 		switch (featureID) {
 			case IrPackage.FSM__STATES:
 				return ((InternalEList<?>)getStates()).basicRemove(otherEnd, msgs);
-			case IrPackage.FSM__TRANSITIONS_MAP:
-				return ((InternalEList<?>)getTransitionsMap()).basicRemove(otherEnd, msgs);
+			case IrPackage.FSM__TRANSITIONS:
+				return ((InternalEList<?>)getTransitions()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -160,8 +161,8 @@ public class FSMImpl extends EObjectImpl implements FSM {
 				return initialState != null;
 			case IrPackage.FSM__STATES:
 				return states != null && !states.isEmpty();
-			case IrPackage.FSM__TRANSITIONS_MAP:
-				return transitionsMap != null && !transitionsMap.isEmpty();
+			case IrPackage.FSM__TRANSITIONS:
+				return transitions != null && !transitions.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -181,8 +182,8 @@ public class FSMImpl extends EObjectImpl implements FSM {
 				getStates().clear();
 				getStates().addAll((Collection<? extends State>)newValue);
 				return;
-			case IrPackage.FSM__TRANSITIONS_MAP:
-				((EStructuralFeature.Setting)getTransitionsMap()).set(newValue);
+			case IrPackage.FSM__TRANSITIONS:
+				((EStructuralFeature.Setting)getTransitions()).set(newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -210,8 +211,8 @@ public class FSMImpl extends EObjectImpl implements FSM {
 			case IrPackage.FSM__STATES:
 				getStates().clear();
 				return;
-			case IrPackage.FSM__TRANSITIONS_MAP:
-				getTransitionsMap().clear();
+			case IrPackage.FSM__TRANSITIONS:
+				getTransitions().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -223,14 +224,13 @@ public class FSMImpl extends EObjectImpl implements FSM {
 				UniqueEdge.class);
 		for (State source : getStates()) {
 			graph.addVertex(source);
-			Transition transition = getTransition(source);
+			Transitions transitions = getTransitions(source);
 
-			Iterator<Action> itA = transition.getTargetActions().iterator();
-			Iterator<State> itS = transition.getTargetStates().iterator();
-			while (itA.hasNext() && itS.hasNext()) {
-				State target = itS.next();
+			for (Transition transition : transitions.getList()) {
+				State target = transition.getState();
 				graph.addVertex(target);
-				graph.addEdge(source, target, new UniqueEdge(itA.next()));
+				graph.addEdge(source, target,
+						new UniqueEdge(transition.getAction()));
 			}
 		}
 
@@ -265,34 +265,31 @@ public class FSMImpl extends EObjectImpl implements FSM {
 	}
 
 	@Override
-	public List<Action> getTargetActions(State state) {
-		return getTransition(state).getTargetActions();
-	}
-
-	@Override
-	public List<State> getTargetStates(State state) {
-		return getTransition(state).getTargetStates();
-	}
-
-	@Override
-	public Transition getTransition(State state) {
-		return getTransitionsMap().get(state);
-	}
-
-	@Override
-	public List<Transition> getTransitions() {
-		return new ArrayList<Transition>(getTransitionsMap().values());
+	public List<Action> getTargetActions(State source) {
+		Transitions transitions = getTransitions(source);
+		List<Action> actions = new ArrayList<Action>();
+		if (transitions != null) {
+			for (Transition transition : transitions.getList()) {
+				actions.add(transition.getAction());
+			}
+		}
+		return actions;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EMap<State, Transition> getTransitionsMap() {
-		if (transitionsMap == null) {
-			transitionsMap = new EcoreEMap<State,Transition>(IrPackage.Literals.STATE_TO_TRANSITION_MAP_ENTRY, StateToTransitionMapEntryImpl.class, this, IrPackage.FSM__TRANSITIONS_MAP);
+	public EMap<State, Transitions> getTransitions() {
+		if (transitions == null) {
+			transitions = new EcoreEMap<State,Transitions>(IrPackage.Literals.STATE_TO_TRANSITIONS_MAP_ENTRY, StateToTransitionsMapEntryImpl.class, this, IrPackage.FSM__TRANSITIONS);
 		}
-		return transitionsMap;
+		return transitions;
+	}
+
+	@Override
+	public Transitions getTransitions(State state) {
+		return getTransitions().get(state);
 	}
 
 	@Override
@@ -310,14 +307,13 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	@Override
 	public void removeTransition(State source, Action action) {
-		Transition transition = getTransition(source);
-		ListIterator<Action> it = transition.getTargetActions().listIterator();
+		Transitions transitions = getTransitions(source);
+		Iterator<Transition> it = transitions.getList().iterator();
 		while (it.hasNext()) {
-			Action candidate = it.next();
+			Transition transition = it.next();
+			Action candidate = transition.getAction();
 			if (candidate == action) {
-				int index = it.previousIndex();
 				it.remove();
-				transition.getTargetStates().remove(index);
 				return;
 			}
 		}
@@ -325,14 +321,14 @@ public class FSMImpl extends EObjectImpl implements FSM {
 
 	@Override
 	public void replaceTarget(State source, Action action, State target) {
-		Transition transition = getTransition(source);
-		ListIterator<Action> it = transition.getTargetActions().listIterator();
+		Transitions transitions = getTransitions(source);
+		Iterator<Transition> it = transitions.getList().iterator();
 		while (it.hasNext()) {
-			Action candidate = it.next();
+			Transition transition = it.next();
+			Action candidate = transition.getAction();
 			if (candidate == action) {
-				int index = it.previousIndex();
 				// updates target state of this transition
-				transition.getTargetStates().set(index, target);
+				transition.setState(target);
 				return;
 			}
 		}

@@ -28,15 +28,15 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.EMap;
-import org.eclipse.emf.ecore.EObject;
 import java.io.File;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.util.UniqueEdge;
 
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
+import org.eclipse.emf.ecore.EObject;
 import org.jgrapht.DirectedGraph;
 
 /**
@@ -85,22 +85,15 @@ public interface FSM extends EObject {
 	EList<State> getStates();
 
 	/**
-	 * Returns the actions accessible from the given state.
+	 * Returns the list of actions that are the target of transitions from the
+	 * given source state.
 	 * 
-	 * @param state
-	 *            a state
-	 * @return the actions accessible from the given state
+	 * @param source
+	 *            a state.
+	 * @return the list of actions that are the target of transitions from the
+	 *         given source state
 	 */
-	List<Action> getTargetActions(State state);
-
-	/**
-	 * Returns the states accessible from the given state.
-	 * 
-	 * @param state
-	 *            a state
-	 * @return the states accessible from the given state
-	 */
-	List<State> getTargetStates(State state);
+	List<Action> getTargetActions(State source);
 
 	/**
 	 * Returns the transition associated with the given state.
@@ -109,24 +102,15 @@ public interface FSM extends EObject {
 	 *            a state
 	 * @return the transition associated with the given state
 	 */
-	Transition getTransition(State state);
+	Transitions getTransitions(State state);
 
 	/**
 	 * Returns a state to transition map.
 	 * 
 	 * @return a state to transition map
-	 * @model keyType="State" valueType="Transition"
+	 * @model keyType="State" valueType="Transitions"
 	 */
-	EMap<State, Transition> getTransitionsMap();
-
-	/**
-	 * Returns the list of transitions of this FSM as a list of
-	 * {@link Transition}.
-	 * 
-	 * @return the list of transitions of this FSM as a list of
-	 *         {@link Transition}
-	 */
-	List<Transition> getTransitions();
+	EMap<State, Transitions> getTransitions();
 
 	/**
 	 * Prints a graph representation of this FSM.

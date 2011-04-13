@@ -28,46 +28,40 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * This class defines a transition of a Finite State Machine.
+ * This class defines a container of a list of transitions of a Finite State
+ * Machine.
  * 
  * @author Matthieu Wipliez
  * @model
  */
-public interface Transition extends EObject {
+public interface Transitions extends EObject {
 
 	/**
-	 * Returns the list of actions that are the target of this transition.
+	 * Returns the transitions.
 	 * 
-	 * @return the list of actions that are the target of this transition
+	 * @return the transitions
+	 * @model containment="true"
+	 */
+	EList<Transition> getList();
+
+	/**
+	 * Returns the source state of this transition.
+	 * 
+	 * @return the source state of this transition
 	 * @model
 	 */
-	Action getAction();
+	State getSourceState();
 
 	/**
-	 * Returns the list of states that are the target of this transition.
-	 * 
-	 * @return the list of states that are the target of this transition
-	 * @model
-	 */
-	State getState();
-
-	/**
-	 * Sets the action that is the target of this transition.
-	 * 
-	 * @param action
-	 *            the action that is the target of this transition
-	 */
-	void setAction(Action action);
-
-	/**
-	 * Sets the state that is the target of this transition.
+	 * Sets the source state of this transition.
 	 * 
 	 * @param state
-	 *            the state that is the target of this transition
+	 *            the source state of this transition
 	 */
-	void setState(State state);
+	void setSourceState(State state);
 
 }
