@@ -272,7 +272,7 @@ public class CBackendImpl extends AbstractBackend {
 			workingNetwork.computeTemplateMaps();
 
 			NetworkPrinter printer = new NetworkPrinter("C_network");
-			printer.setTypePrinter(CTypePrinter.class);
+			printer.setTypePrinter(new CTypePrinter());
 
 			instancesTarget = null;
 			for (String mappedThing : mapping.values()) {
@@ -317,8 +317,8 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
 		InstancePrinter printer = new InstancePrinter("C_actor", !debugMode);
-		printer.setExpressionPrinter(CExpressionPrinter.class);
-		printer.setTypePrinter(CTypePrinter.class);
+		printer.setExpressionPrinter(new CExpressionPrinter());
+		printer.setTypePrinter(new CTypePrinter());
 		printer.getOptions().put("network", workingNetwork);
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.getOptions().put("enableTrace", enableTrace);

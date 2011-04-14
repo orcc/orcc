@@ -35,7 +35,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.util.TypeVisitor;
 
 /**
  * This class defines the default type printer.
@@ -43,63 +42,42 @@ import net.sf.orcc.ir.util.TypeVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class TypePrinter implements TypeVisitor {
+public class TypePrinter extends IrSwitch<String> {
 
-	protected StringBuilder builder;
-
-	/**
-	 * Creates a new type printer.
-	 */
-	public TypePrinter() {
-		builder = new StringBuilder();
+	@Override
+	public String caseTypeBool(TypeBool type) {
+		return "bool";
 	}
 
 	@Override
-	public String toString() {
-		return builder.toString();
+	public String caseTypeFloat(TypeFloat type) {
+		return "float";
 	}
 
 	@Override
-	public void visit(TypeBool type) {
-		builder.append("bool");
+	public String caseTypeInt(TypeInt type) {
+		return "int(size=" + type.getSize() + ")";
 	}
 
 	@Override
-	public void visit(TypeFloat type) {
-		builder.append("float");
+	public String caseTypeList(TypeList type) {
+		return "List(type:" + doSwitch(type.getType()) + ", size="
+				+ type.getSize() + ")";
 	}
 
 	@Override
-	public void visit(TypeInt type) {
-		builder.append("int(size=");
-		builder.append(type.getSize());
-		builder.append(")");
+	public String caseTypeString(TypeString type) {
+		return "String";
 	}
 
 	@Override
-	public void visit(TypeList type) {
-		builder.append("List(type:");
-		type.getType().accept(this);
-		builder.append(", size=");
-		builder.append(type.getSize());
-		builder.append(")");
+	public String caseTypeUint(TypeUint type) {
+		return "uint(size=" + type.getSize() + ")";
 	}
 
 	@Override
-	public void visit(TypeString type) {
-		builder.append("String");
-	}
-
-	@Override
-	public void visit(TypeUint type) {
-		builder.append("uint(size=");
-		builder.append(type.getSize());
-		builder.append(")");
-	}
-
-	@Override
-	public void visit(TypeVoid type) {
-		builder.append("void");
+	public String caseTypeVoid(TypeVoid type) {
+		return "void";
 	}
 
 }

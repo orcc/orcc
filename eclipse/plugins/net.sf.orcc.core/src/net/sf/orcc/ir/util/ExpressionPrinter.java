@@ -41,7 +41,6 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
-import net.sf.orcc.ir.impl.ExprBinaryImpl;
 
 /**
  * This class defines the default expression printer.
@@ -49,20 +48,93 @@ import net.sf.orcc.ir.impl.ExprBinaryImpl;
  * @author Matthieu Wipliez
  * 
  */
-public class ExpressionPrinter implements ExpressionVisitor {
+public class ExpressionPrinter extends IrSwitch<String> {
 
-	protected StringBuilder builder;
+	protected int branch;
+
+	protected int precedence;
 
 	/**
 	 * Creates a new expression printer.
 	 */
 	public ExpressionPrinter() {
-		builder = new StringBuilder();
+		branch = 0; // left
+		precedence = Integer.MAX_VALUE;
 	}
 
 	@Override
-	public String toString() {
-		return builder.toString();
+	public String caseExprBinary(ExprBinary expr) {
+		OpBinary op = expr.getOp();
+		if (op.needsParentheses(precedence, branch)) {
+			return "(" + doSwitch(expr.getE1(), op.getPrecedence(), 0) + " "
+					+ toString(op) + " "
+					+ doSwitch(expr.getE2(), op.getPrecedence(), 1) + ")";
+		} else {
+			return doSwitch(expr.getE1(), op.getPrecedence(), 0) + " "
+					+ toString(op) + " "
+					+ doSwitch(expr.getE2(), op.getPrecedence(), 1);
+		}
+	}
+
+	@Override
+	public String caseExprBool(ExprBool expr) {
+		return String.valueOf(expr.isValue());
+	}
+
+	@Override
+	public String caseExprFloat(ExprFloat expr) {
+		return String.valueOf(expr.getValue());
+	}
+
+	@Override
+	public String caseExprInt(ExprInt expr) {
+		return String.valueOf(expr.getValue());
+	}
+
+	@Override
+	public String caseExprList(ExprList expr) {
+		StringBuilder builder = new StringBuilder();
+		builder.append('[');
+
+		Iterator<Expression> it = expr.getValue().iterator();
+		if (it.hasNext()) {
+			doSwitch(it.next());
+			while (it.hasNext()) {
+				builder.append(", ").append(
+						doSwitch(it.next(), Integer.MAX_VALUE, 0));
+			}
+		}
+
+		return builder.append(']').toString();
+	}
+
+	@Override
+	public String caseExprString(ExprString expr) {
+		return String.valueOf(expr.getValue());
+	}
+
+	@Override
+	public String caseExprUnary(ExprUnary expr) {
+		return toString(expr.getOp())
+				+ doSwitch(expr.getExpr(), Integer.MIN_VALUE, branch);
+	}
+
+	@Override
+	public String caseExprVar(ExprVar expr) {
+		return expr.getUse().getVariable().getIndexedName();
+	}
+
+	public String doSwitch(Expression expression, int newPrecedence,
+			int newBranch) {
+		int oldBranch = branch;
+		int oldPrecedence = precedence;
+
+		branch = newBranch;
+		precedence = newPrecedence;
+		String result = doSwitch(expression);
+		precedence = oldPrecedence;
+		branch = oldBranch;
+		return result;
 	}
 
 	/**
@@ -77,29 +149,6 @@ public class ExpressionPrinter implements ExpressionVisitor {
 	}
 
 	/**
-	 * Returns the string representation of the binary expression whose
-	 * precedence level is given.
-	 * 
-	 * @param nextPrec
-	 *            precedence level to be used when printing e1 and e2
-	 * @param e1
-	 *            left expression
-	 * @param op
-	 *            binary operator
-	 * @param e2
-	 *            right expression
-	 * @return the string representation of the binary expression
-	 */
-	protected void toString(int nextPrec, Expression e1, OpBinary op,
-			Expression e2) {
-		e1.accept(this, nextPrec, ExprBinaryImpl.LEFT);
-		builder.append(" ");
-		builder.append(toString(op));
-		builder.append(" ");
-		e2.accept(this, nextPrec, ExprBinaryImpl.RIGHT);
-	}
-
-	/**
 	 * Returns the string representation of the given unary operator.
 	 * 
 	 * @param op
@@ -108,66 +157,6 @@ public class ExpressionPrinter implements ExpressionVisitor {
 	 */
 	protected String toString(OpUnary op) {
 		return op.getText();
-	}
-
-	@Override
-	public void visit(ExprBinary expr, Object... args) {
-		OpBinary op = expr.getOp();
-
-		if (op.needsParentheses(args)) {
-			builder.append("(");
-			toString(op.getPrecedence(), expr.getE1(), op, expr.getE2());
-			builder.append(")");
-		} else {
-			toString(op.getPrecedence(), expr.getE1(), op, expr.getE2());
-		}
-	}
-
-	@Override
-	public void visit(ExprBool expr, Object... args) {
-		builder.append(expr.isValue());
-	}
-
-	@Override
-	public void visit(ExprInt expr, Object... args) {
-		builder.append(expr.getValue());
-	}
-
-	@Override
-	public void visit(ExprFloat expr, Object... args) {
-		builder.append(expr.getValue());
-	}
-
-	@Override
-	public void visit(ExprList expr, Object... args) {
-		builder.append('[');
-
-		Iterator<Expression> it = expr.getValue().iterator();
-		if (it.hasNext()) {
-			it.next().accept(this);
-			while (it.hasNext()) {
-				builder.append(", ");
-				it.next().accept(this, Integer.MAX_VALUE);
-			}
-		}
-
-		builder.append(']');
-	}
-
-	@Override
-	public void visit(ExprString expr, Object... args) {
-		builder.append(expr.getValue());
-	}
-
-	@Override
-	public void visit(ExprUnary expr, Object... args) {
-		builder.append(toString(expr.getOp()));
-		expr.getExpr().accept(this, Integer.MIN_VALUE);
-	}
-
-	@Override
-	public void visit(ExprVar expr, Object... args) {
-		builder.append(expr.getUse().getVariable().getIndexedName());
 	}
 
 }

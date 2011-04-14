@@ -37,7 +37,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.ExpressionPrinter;
@@ -63,7 +62,7 @@ public class Printer {
 
 		@Override
 		public String toString(Object o, String formatString, Locale locale) {
-			return Printer.this.toString((Expression) o);
+			return expressionPrinter.doSwitch((Expression) o);
 		}
 
 	}
@@ -72,19 +71,20 @@ public class Printer {
 
 		@Override
 		public String toString(Object o, String formatString, Locale locale) {
-			return Printer.this.toString((Type) o);
+			return typePrinter.doSwitch((Type) o);
 		}
 
 	}
 
 	protected Map<String, Object> customAttributes;
 
-	private Class<? extends ExpressionPrinter> expressionPrinter;
+	private ExpressionPrinter expressionPrinter;
 
 	protected STGroup group;
+
 	protected Map<String, Object> options;
 
-	private Class<? extends TypePrinter> typePrinter;
+	private TypePrinter typePrinter;
 
 	/**
 	 * Creates a new printer.
@@ -176,42 +176,12 @@ public class Printer {
 		group.registerRenderer(attributeType, renderer);
 	}
 
-	public void setExpressionPrinter(Class<? extends ExpressionPrinter> printer) {
+	public void setExpressionPrinter(ExpressionPrinter printer) {
 		this.expressionPrinter = printer;
 	}
 
-	public void setTypePrinter(Class<? extends TypePrinter> printer) {
+	public void setTypePrinter(TypePrinter printer) {
 		this.typePrinter = printer;
-	}
-
-	private String toString(Expression expression) {
-		ExpressionPrinter printer;
-		try {
-			printer = expressionPrinter.newInstance();
-		} catch (InstantiationException e) {
-			throw new OrccRuntimeException(
-					"expression printer cannot be instantiated", e);
-		} catch (IllegalAccessException e) {
-			throw new OrccRuntimeException(
-					"expression printer cannot be instantiated", e);
-		}
-		expression.accept(printer, Integer.MAX_VALUE);
-		return printer.toString();
-	}
-
-	private String toString(Type type) {
-		TypePrinter printer;
-		try {
-			printer = typePrinter.newInstance();
-		} catch (InstantiationException e) {
-			throw new OrccRuntimeException(
-					"type printer cannot be instantiated", e);
-		} catch (IllegalAccessException e) {
-			throw new OrccRuntimeException(
-					"type printer cannot be instantiated", e);
-		}
-		type.accept(printer);
-		return printer.toString();
 	}
 
 }

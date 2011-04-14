@@ -39,10 +39,6 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  */
 public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 
-	public static final Object LEFT = new Object();
-
-	public static final Object RIGHT = new Object();
-
 	/**
 	 * The cached value of the '{@link #getE1() <em>E1</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

@@ -28,16 +28,13 @@
  */
 package net.sf.orcc.ir;
 
-import java.lang.String;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-
-import net.sf.orcc.ir.impl.ExprBinaryImpl;
+import java.util.Map;
 
 import org.eclipse.emf.common.util.Enumerator;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class defines the binary operators of the IR.
@@ -901,8 +898,7 @@ public enum OpBinary implements Enumerator {
 	 * @return <code>true</code> if a binary expression involving this operator
 	 *         needs parentheses
 	 */
-	public boolean needsParentheses(Object[] args) {
-		int parentPrec = (Integer) args[0];
+	public boolean needsParentheses(int parentPrec, int branch) {
 		int currentPrec = getPrecedence();
 		if (parentPrec < currentPrec) {
 			// if the parent precedence is lower than the precedence of this
@@ -917,15 +913,11 @@ public enum OpBinary implements Enumerator {
 			// expression tree contradicts the normal operator precedence as
 			// implemented by the test below
 
-			// parent is a binary expression, so args[1] is defined
-			Object thisBranch = args[1];
-			boolean res;
 			if (isRightAssociative()) {
-				res = (thisBranch == ExprBinaryImpl.LEFT);
+				return (branch == 0);
 			} else {
-				res = (thisBranch == ExprBinaryImpl.RIGHT);
+				return (branch == 1);
 			}
-			return res;
 		} else {
 			return false;
 		}

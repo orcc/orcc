@@ -33,7 +33,6 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.util.TypePrinter;
 
 /**
@@ -45,37 +44,30 @@ import net.sf.orcc.ir.util.TypePrinter;
 public class CTypePrinter extends TypePrinter {
 
 	@Override
-	public void visit(TypeBool type) {
+	public String caseTypeBool(TypeBool type) {
 		// boolean is a C int.
-		builder.append("i32");
+		return "i32";
 	}
 
 	@Override
-	public void visit(TypeInt type) {
-		builder.append("i");
-		builder.append(type.getSize());
+	public String caseTypeInt(TypeInt type) {
+		return "i" + type.getSize();
 	}
 
 	@Override
-	public void visit(TypeList type) {
+	public String caseTypeList(TypeList type) {
 		// size will be printed later
-		type.getType().accept(this);
+		return doSwitch(type.getType());
 	}
 
 	@Override
-	public void visit(TypeString type) {
-		builder.append("char *");
+	public String caseTypeString(TypeString type) {
+		return "char *";
 	}
 
 	@Override
-	public void visit(TypeUint type) {
-		builder.append("u");
-		builder.append(type.getSize());
-	}
-
-	@Override
-	public void visit(TypeVoid type) {
-		builder.append("void");
+	public String caseTypeUint(TypeUint type) {
+		return "u" + type.getSize();
 	}
 
 }
