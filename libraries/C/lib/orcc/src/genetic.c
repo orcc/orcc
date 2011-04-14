@@ -84,8 +84,12 @@ static struct mapping_s* compute_mapping(individual *individual,
 	return mapping;
 }
 
-static void initialize_mapping_file(){
-	mappingFile = fopen("genetic_mapping.xcf", "w");
+static void initialize_mapping_file() {
+	if (output_genetic == NULL) {
+		mappingFile = fopen("genetic_mapping.xcf", "w");
+	} else {
+		mappingFile = fopen(output_genetic, "w");
+	}
 	if (mappingFile == NULL) {
 		perror("I/O error during opening of mapping file.");
 	}

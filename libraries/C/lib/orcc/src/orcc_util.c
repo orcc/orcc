@@ -63,6 +63,9 @@ char *write_file;
 // mapping file
 char *mapping_file;
 
+// output file of genetic algorithm
+char *output_genetic;
+
 // Pause function
 void wait_for_key() {
 #ifdef _WIN32
@@ -110,7 +113,7 @@ void print_usage() {
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
-	const char *ostr = "i:o:w:m:";
+	const char *ostr = "i:o:w:m:og:";
 	int c;
 
 	program = argv[0];
@@ -136,6 +139,8 @@ void init_orcc(int argc, char *argv[]) {
 		case 'm':
 			mapping_file = strdup(optarg);
 			break;
+		case 'og':
+			output_genetic = strdup(optarg);
 		default:
 			fprintf(stderr, "skipping option -%c\n", c);
 			break;

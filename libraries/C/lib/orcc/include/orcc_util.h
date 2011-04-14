@@ -42,6 +42,9 @@ extern char *write_file;
 // mapping file
 extern char *mapping_file;
 
+// output file of genetic algorithm
+extern char *output_genetic;
+
 
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
