@@ -13,7 +13,7 @@ listValue(values) ::= <<
 {<values; wrap, separator=", ">}
 >>
 
-variableDeclaration(variable) ::= <<
+varDecl(variable) ::= <<
 <variable.type> <variable.indexedName><listSize(variable.type.dimensions)>
 >>
 

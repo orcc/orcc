@@ -42,8 +42,8 @@ import net.sf.orcc.ir.ExprBool;
 public class CppExprPrinter extends CExpressionPrinter {
 
 	@Override
-	public void visit(ExprBool expr, Object... args) {
-		builder.append(expr.isValue() ? "true" : "false");
+	public String caseExprBool(ExprBool expr) {
+		return expr.isValue() ? "true" : "false";
 	}
 
 }

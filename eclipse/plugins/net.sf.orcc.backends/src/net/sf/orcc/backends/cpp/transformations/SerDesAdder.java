@@ -181,9 +181,6 @@ public class SerDesAdder implements INetworkTransformation {
 		OrderedMap<String, Port> outputs = network.getOutputs();
 
 		if (inputs.getLength() > 0 || outputs.getLength() > 0) {
-			// Vertex serdes = new Vertex(new Instance("SerDes", new SerDes(
-			// inputs.getLength(), outputs.getLength())));
-
 			for (Connection conn : graph.edgeSet()) {
 				if (graph.getEdgeSource(conn).isPort()) {
 					IAttribute attr = conn.getAttribute("busRef");

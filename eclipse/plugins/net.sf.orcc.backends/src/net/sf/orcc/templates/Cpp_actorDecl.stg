@@ -8,12 +8,8 @@ listSize(values) ::= <<
 <values : {value | [<value>]} >
 >>
 
-variableDeclaration(variable) ::= <<
-<if (variable.type.dimensionsExpr)
-><variable.type> (*<variable.indexedName>)<listSize(rest(variable.type.dimensionsExpr)) ><
-else
-><variable.type> <variable.indexedName><
-endif>
+varDecl(variable) ::= <<
+<variable.type> <variable.indexedName><listSize(variable.type.dimensions)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,7 +17,7 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 nonConstStateVar(variable) ::= <<
 <if(variable.assignable)>
-<variableDeclaration(variable)>;<\n>
+<varDecl(variable)>;<\n>
 <endif>
 >>
 
@@ -35,7 +31,7 @@ nonConstStateVar(variable) ::= <<
 procedure(procedure) ::= <<
 
 <if(!procedure.native)
-><procedure.returnType> <procedure.name>(<procedure.parameters: variableDeclaration(); wrap, anchor, separator=", ">);<
+><procedure.returnType> <procedure.name>(<procedure.parameters: varDecl(); wrap, anchor, separator=", ">);<
 endif>
 
 >>
@@ -63,16 +59,16 @@ int schedule();
 // Scheduler with FSM
 
 stateScheduler(transition) ::= <<
-bool <transition.sourceState>_state_scheduler();
+bool <transition.sourceState.name>_state_scheduler();
 
 >>
 
-getState(state) ::= <<state_<state> >>
+getState(state) ::= <<state_<state.name> >>
 
 schedulerFSM(actions, fsm) ::= <<
 enum states 
 {
-	state_<first(fsm.states)> = 0,
+	state_<first(fsm.states).name> = 0,
 	<rest(fsm.states) : getState(); separator=",\n">
 };
 
@@ -182,12 +178,9 @@ actor(actor, options) ::= <<
 	private:
 	static const char* className;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Parameters
-	<parameters(actor.parameters)>
-	////////////////////////////////////////////////////////////////////////////////
-	// Non-const state variables of the actor
-	<actor.stateVars: nonConstStateVar()>
+    <parameters(actor.parameters)>
+
+	<actor.stateVars: {var | <varDecl(var)>;}; separator="\n">
 
 	};
 

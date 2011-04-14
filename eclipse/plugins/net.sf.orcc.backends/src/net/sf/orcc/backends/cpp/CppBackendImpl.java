@@ -194,13 +194,11 @@ public class CppBackendImpl extends AbstractBackend {
 		ActorPrinter actorPrinter = new ActorPrinter("Cpp_actorImpl");
 		ActorPrinter headerPrinter = new ActorPrinter("Cpp_actorDecl");
 
-		// TODO printers
-		System.err.println("CppBackendImpl.printActor(Actor): must set printers");
-		//actorPrinter.setExpressionPrinter(CppExprPrinter.class);
-		//actorPrinter.setTypePrinter(CppTypePrinter.class);
-		//headerPrinter.setExpressionPrinter(CppExprPrinter.class);
-		//headerPrinter.setTypePrinter(CppTypePrinter.class);
-
+		actorPrinter.setTypePrinter(new CppTypePrinter());
+		headerPrinter.setTypePrinter(new CppTypePrinter());
+		actorPrinter.setExpressionPrinter(new CppExprPrinter());
+		headerPrinter.setExpressionPrinter(new CppExprPrinter());
+		
 		String hier = path + File.separator
 				+ actor.getPackage().replace('.', File.separatorChar);
 		new File(hier).mkdirs();
@@ -228,16 +226,15 @@ public class CppBackendImpl extends AbstractBackend {
 	private void printNetwork(Network network) throws OrccException {
 		NetworkPrinter printer = new NetworkPrinter("Cpp_network");
 
-		// TODO printers
-		System.err.println("CppBackendImpl.printNetwork(Network): must set printers");
-		//printer.setExpressionPrinter(CppExprPrinter.class);
-		//printer.setTypePrinter(CppTypePrinter.class);
+		printer.setExpressionPrinter(new CppExprPrinter());
+		printer.setTypePrinter(new CppTypePrinter());
 
-		printer.getOptions().put("needSerDes", needSerDes);
 		// compute thread lists if need
 		printer.getOptions().put("threads", computeMapping(network));
 		// compute kind of fifos
 		printer.getOptions().put("fifoKind", computeFifoKind(network));
+
+		printer.getOptions().put("needSerDes", needSerDes);
 		
 		printer.print(network.getName() + ".cpp", path, network, "network");
 

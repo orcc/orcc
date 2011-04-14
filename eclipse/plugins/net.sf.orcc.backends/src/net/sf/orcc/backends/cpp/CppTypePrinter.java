@@ -42,32 +42,33 @@ import net.sf.orcc.ir.TypeUint;
  */
 public class CppTypePrinter extends CTypePrinter {
 
-	private void printInt(int size) {
+	private String printInt(int size) {
 		if (size <= 8) {
-			builder.append("char");
+			return "char";
 		} else if (size <= 16) {
-			builder.append("short");
+			return "short";
 		} else if (size <= 32) {
-			builder.append("int");
+			return "int";
 		} else if (size <= 64) {
-			builder.append("long long");
+			return "long long";
+		} else {
+			return null;
 		}
 	}
 
 	@Override
-	public void visit(TypeBool type) {
-		builder.append("bool");
+	public String caseTypeInt(TypeInt type) {
+		return printInt(type.getSize());
 	}
 
 	@Override
-	public void visit(TypeInt type) {
-		printInt(type.getSize());
+	public String caseTypeBool(TypeBool type) {
+		return "bool";
 	}
 
 	@Override
-	public void visit(TypeUint type) {
-		builder.append("unsigned ");
-		printInt(type.getSize());
+	public String caseTypeUint(TypeUint type) {
+		return "unsigned " + printInt(type.getSize());
 	}
 
 }
