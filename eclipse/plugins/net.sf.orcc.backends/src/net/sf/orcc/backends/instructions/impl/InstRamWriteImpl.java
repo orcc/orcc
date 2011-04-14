@@ -10,6 +10,7 @@ import net.sf.orcc.backends.instructions.InstRamWrite;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -204,8 +205,8 @@ public class InstRamWriteImpl extends InstRamImpl implements InstRamWrite {
 
 	@Override
 	public String toString() {
-		return getVariable().getName() + "_p" + getPort() + " <= "
-				+ getValue().toString();
+		return "RamWrite(" + getVariable().getName() + "_p" + getPort() + ", "
+				+ new ExpressionPrinter().doSwitch(getValue()) + ")";
 	}
 
 } // InstRamWriteImpl

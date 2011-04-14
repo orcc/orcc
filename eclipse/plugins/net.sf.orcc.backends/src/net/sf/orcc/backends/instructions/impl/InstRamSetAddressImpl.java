@@ -15,6 +15,7 @@ import net.sf.orcc.backends.instructions.InstructionsPackage;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.impl.ExprIntImpl;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 
@@ -188,8 +189,14 @@ public class InstRamSetAddressImpl extends InstRamImpl implements
 
 	@Override
 	public String toString() {
-		return getVariable().getName() + "_address_p" + getPort() + " <= "
-				+ indexes.toString();
+		StringBuilder builder = new StringBuilder();
+		builder.append("RamSetAddress(").append(getVariable().getName())
+				.append("_address_p").append(getPort());
+		for (Expression index : indexes) {
+			builder.append(", ");
+			builder.append(new ExpressionPrinter().doSwitch(index));
+		}
+		builder.append(")");
+		return builder.toString();
 	}
-
 } // InstRamSetAddressImpl

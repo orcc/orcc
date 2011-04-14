@@ -183,7 +183,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				}
 
 				addSplitInstruction(instructions);
-				executeTwoPendingReads(ram);
+				executeTwoPendingReads(instructions, ram);
 			}
 		} else {
 			addSetAddress(instructions, indexes, 1, var);
@@ -226,11 +226,12 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		ram.setLastAccessRead(false);
 	}
 
-	private boolean executeTwoPendingReads(RAM ram) {
+	private boolean executeTwoPendingReads(List<Instruction> instructions,
+			RAM ram) {
 		List<InstRamRead> reads = pendingReads.get(ram);
 		Iterator<InstRamRead> it = reads.iterator();
 		for (int i = 0; it.hasNext() && i < 2; i++) {
-			itInstruction.add(it.next());
+			instructions.add(indexInst++, it.next());
 			it.remove();
 		}
 
@@ -274,14 +275,15 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		super.caseProcedure(procedure);
 
 		NodeBlock block = procedure.getLast();
-		itInstruction = block.lastListIterator();
 		for (RAM ram : ramMap.values()) {
 			// set the RAM as "never accessed"
 			ram.reset();
 
 			boolean hasMorePendingReads;
+			List<Instruction> instructions = block.getInstructions();
+			indexInst = instructions.size();
 			do {
-				hasMorePendingReads = executeTwoPendingReads(ram);
+				hasMorePendingReads = executeTwoPendingReads(instructions, ram);
 			} while (hasMorePendingReads);
 		}
 		return null;

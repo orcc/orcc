@@ -42,4 +42,9 @@ public class InstSplitImpl extends InstSpecificImpl implements InstSplit {
 		return InstructionsPackage.Literals.INST_SPLIT;
 	}
 
+	@Override
+	public String toString() {
+		return "<split>";
+	}
+
 } //InstSplitImpl

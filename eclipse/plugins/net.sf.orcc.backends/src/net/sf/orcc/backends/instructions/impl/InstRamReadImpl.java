@@ -8,15 +8,12 @@ package net.sf.orcc.backends.instructions.impl;
 
 import net.sf.orcc.backends.instructions.InstRamRead;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
-
 import net.sf.orcc.ir.Def;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
@@ -204,8 +201,8 @@ public class InstRamReadImpl extends InstRamImpl implements InstRamRead {
 
 	@Override
 	public String toString() {
-		return getTarget().getVariable().getName() + " := "
-				+ getVariable().getName() + "_q_p" + getPort();
+		return "RamRead(" + getTarget().getVariable().getName() + ", "
+				+ getVariable().getName() + "_q_p" + getPort() + ")";
 	}
 
 } // InstRamReadImpl
