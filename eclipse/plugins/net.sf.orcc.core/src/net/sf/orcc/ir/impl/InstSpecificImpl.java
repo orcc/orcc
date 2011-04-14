@@ -32,11 +32,13 @@ public class InstSpecificImpl extends InstructionImpl implements InstSpecific {
 
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		System.err.println("InstSpecificImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(InstructionVisitor visitor) {
+		System.err.println("InstSpecificImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

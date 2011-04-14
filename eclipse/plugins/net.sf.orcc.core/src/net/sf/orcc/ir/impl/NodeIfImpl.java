@@ -88,11 +88,13 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 
 	@Override
 	public Object accept(NodeInterpreter interpreter, Object... args) {
+		System.err.println("NodeIfImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(NodeVisitor visitor) {
+		System.err.println("NodeIfImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

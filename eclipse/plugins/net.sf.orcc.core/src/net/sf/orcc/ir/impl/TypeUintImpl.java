@@ -67,11 +67,13 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 
 	@Override
 	public Object accept(TypeInterpreter interpreter) {
+		System.err.println("TypeUintImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this);
 	}
 
 	@Override
 	public void accept(TypeVisitor visitor) {
+		System.err.println("TypeUintImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

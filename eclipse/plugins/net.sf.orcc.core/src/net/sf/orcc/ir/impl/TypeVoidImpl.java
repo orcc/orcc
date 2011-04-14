@@ -55,11 +55,13 @@ public class TypeVoidImpl extends TypeImpl implements TypeVoid {
 
 	@Override
 	public Object accept(TypeInterpreter interpreter) {
+		System.err.println("TypeVoidImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this);
 	}
 
 	@Override
 	public void accept(TypeVisitor visitor) {
+		System.err.println("TypeVoidImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

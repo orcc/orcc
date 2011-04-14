@@ -54,11 +54,13 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 
 	@Override
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+		System.err.println("ExprVarImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(ExpressionVisitor visitor, Object... args) {
+		System.err.println("ExprVarImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this, args);
 	}
 

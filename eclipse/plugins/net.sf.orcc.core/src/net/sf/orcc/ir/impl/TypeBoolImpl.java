@@ -33,11 +33,13 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 
 	@Override
 	public Object accept(TypeInterpreter interpreter) {
+		System.err.println("TypeBoolImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this);
 	}
 
 	@Override
 	public void accept(TypeVisitor visitor) {
+		System.err.println("TypeBoolImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

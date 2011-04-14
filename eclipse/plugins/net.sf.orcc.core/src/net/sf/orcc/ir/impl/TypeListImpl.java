@@ -84,11 +84,13 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 
 	@Override
 	public Object accept(TypeInterpreter interpreter) {
+		System.err.println("TypeListImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this);
 	}
 
 	@Override
 	public void accept(TypeVisitor visitor) {
+		System.err.println("TypeListImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

@@ -78,11 +78,13 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 
 	@Override
 	public Object accept(NodeInterpreter interpreter, Object... args) {
+		System.err.println("NodeWhileImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(NodeVisitor visitor) {
+		System.err.println("NodeWhileImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

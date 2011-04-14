@@ -86,11 +86,13 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		System.err.println("InstCallImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(InstructionVisitor visitor) {
+		System.err.println("InstCallImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

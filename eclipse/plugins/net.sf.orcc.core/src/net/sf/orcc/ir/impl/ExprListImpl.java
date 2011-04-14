@@ -58,11 +58,13 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 
 	@Override
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+		System.err.println("ExprListImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(ExpressionVisitor visitor, Object... args) {
+		System.err.println("ExprListImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this, args);
 	}
 

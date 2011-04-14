@@ -53,11 +53,13 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		System.err.println("InstReturnImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(InstructionVisitor visitor) {
+		System.err.println("InstReturnImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

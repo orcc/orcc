@@ -84,11 +84,13 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		System.err.println("InstPhiImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(InstructionVisitor visitor) {
+		System.err.println("InstPhiImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

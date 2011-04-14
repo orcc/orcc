@@ -54,11 +54,13 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 
 	@Override
 	public Object accept(TypeInterpreter interpreter) {
+		System.err.println("TypeFloatImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this);
 	}
 
 	@Override
 	public void accept(TypeVisitor visitor) {
+		System.err.println("TypeFloatImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 

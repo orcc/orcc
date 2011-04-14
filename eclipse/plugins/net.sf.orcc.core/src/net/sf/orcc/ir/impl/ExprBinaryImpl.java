@@ -100,11 +100,13 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 
 	@Override
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+		System.err.println("ExprBinaryImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(ExpressionVisitor visitor, Object... args) {
+		System.err.println("ExprBinaryImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this, args);
 	}
 

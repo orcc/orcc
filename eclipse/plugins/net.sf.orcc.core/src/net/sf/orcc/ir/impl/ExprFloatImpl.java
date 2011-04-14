@@ -65,11 +65,13 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 
 	@Override
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+		System.err.println("ExprFloatImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(ExpressionVisitor visitor, Object... args) {
+		System.err.println("ExprFloatImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this, args);
 	}
 
