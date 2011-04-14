@@ -71,7 +71,7 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 		ActorVisitor<T>, ExpressionVisitor, InstructionVisitor, NodeVisitor {
 
 	protected static final Object NULL = new Object();
-	
+
 	/**
 	 * current action being visited (if any).
 	 */
@@ -95,6 +95,8 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	protected Procedure procedure;
 
 	private final boolean visitFull;
+
+	protected List<Node> nodes;
 
 	/**
 	 * Creates a new abstract actor visitor that visits all nodes and
@@ -331,14 +333,22 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	 *            a list of nodes that belong to a procedure
 	 */
 	public Object doSwitch(List<Node> nodes) {
+		List<Node> oldNodes = this.nodes;
 		int oldIndexNode = indexNode;
+
+		this.nodes = nodes;
 		for (indexNode = 0; indexNode < nodes.size(); indexNode++) {
 			doSwitch(nodes.get(indexNode));
 		}
 
-		// restore old index
+		// restore
 		indexNode = oldIndexNode;
+		this.nodes = oldNodes;
 		return null;
+	}
+	
+	protected Node getNode() {
+		return nodes.get(indexNode);
 	}
 
 	/**
@@ -350,7 +360,8 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	 *         parameters of the current procedure
 	 */
 	final public boolean isPort(Var variable) {
-		System.err.println("isPort(variable): Please switch to the EMF-based API");
+		System.err
+				.println("isPort(variable): Please switch to the EMF-based API");
 		if (action != null) {
 			return action.getInputPattern().contains(variable)
 					|| action.getOutputPattern().contains(variable)
@@ -500,7 +511,8 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	 *            a list of nodes that belong to a procedure
 	 */
 	public void visit(List<Node> nodes) {
-		System.err.println("visit(List<Node>): Please switch to the EMF-based API");
+		System.err
+				.println("visit(List<Node>): Please switch to the EMF-based API");
 		ListIterator<Node> oldItNode = itNode;
 		itNode = nodes.listIterator();
 		while (itNode.hasNext()) {
@@ -549,7 +561,8 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	 *            an pattern
 	 */
 	public void visit(Pattern pattern) {
-		System.err.println("visit(Pattern): Please switch to the EMF-based API");
+		System.err
+				.println("visit(Pattern): Please switch to the EMF-based API");
 	}
 
 	/**
@@ -559,7 +572,8 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	 *            a procedure
 	 */
 	public void visit(Procedure procedure) {
-		System.err.println("visit(Procedure): Please switch to the EMF-based API");
+		System.err
+				.println("visit(Procedure): Please switch to the EMF-based API");
 		this.procedure = procedure;
 		List<Node> nodes = procedure.getNodes();
 		visit(nodes);

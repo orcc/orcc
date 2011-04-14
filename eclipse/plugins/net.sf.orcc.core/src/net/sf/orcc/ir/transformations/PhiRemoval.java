@@ -35,7 +35,6 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstPhi;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
@@ -58,15 +57,10 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 	private class PhiRemover extends AbstractActorVisitor<Object> {
 		
 		@Override
-		public void visit(NodeBlock block) {
-			for (int i = 0; i < block.getInstructions().size();) {
-				Instruction instruction = block.getInstructions().get(i);
-				if (instruction instanceof InstPhi) {
-					EcoreHelper.delete(instruction);
-				} else {
-					i++;
-				}
-			}
+		public Object caseInstPhi(InstPhi phi) {
+			EcoreHelper.delete(phi);
+			indexInst--;
+			return null;
 		}
 
 	}
@@ -110,47 +104,44 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 		NodeBlock join = node.getJoinNode();
 		targetBlock = procedure.getLast(node.getThenNodes());
 		phiIndex = 0;
-		join.accept(this);
+		caseNodeBlock(join);
 
 		targetBlock = procedure.getLast(node.getElseNodes());
 		phiIndex = 1;
-		join.accept(this);
-		join.accept(new PhiRemover());
+		caseNodeBlock(join);
+		new PhiRemover().caseNodeBlock(join);
 
-		visit(node.getThenNodes());
-		visit(node.getElseNodes());
+		doSwitch(node.getThenNodes());
+		doSwitch(node.getElseNodes());
 		return NULL;
 	}
 
 	@Override
 	public Object caseNodeWhile(NodeWhile node) {
 		// the node before the while.
-		if (itNode.hasPrevious()) {
-			Node previousNode = itNode.previous();
+		if (indexNode > 0) {
+			Node previousNode = nodes.get(indexNode - 1);
 			if (previousNode.isBlockNode()) {
 				targetBlock = (NodeBlock) previousNode;
 			} else {
 				targetBlock = IrFactory.eINSTANCE.createNodeBlock();
-				itNode.add(targetBlock);
+				nodes.add(indexNode, targetBlock);
 			}
 		} else {
 			targetBlock = IrFactory.eINSTANCE.createNodeBlock();
-			itNode.add(targetBlock);
+			nodes.add(indexNode, targetBlock);
 		}
 
 		NodeBlock join = node.getJoinNode();
 		phiIndex = 0;
-		join.accept(this);
-
-		// go back to the while
-		itNode.next();
+		caseNodeBlock(join);
 
 		// last node of the while
 		targetBlock = procedure.getLast(node.getNodes());
 		phiIndex = 1;
-		join.accept(this);
-		join.accept(new PhiRemover());
-		visit(node.getNodes());
+		caseNodeBlock(join);
+		new PhiRemover().caseNodeBlock(join);
+		doSwitch(node.getNodes());
 		return NULL;
 	}
 
@@ -158,7 +149,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 	public Object caseProcedure(Procedure procedure) {
 		localsToRemove = new ArrayList<Var>();
 
-		super.visit(procedure);
+		super.caseProcedure(procedure);
 
 		for (Var local : localsToRemove) {
 			procedure.getLocals().remove(local);

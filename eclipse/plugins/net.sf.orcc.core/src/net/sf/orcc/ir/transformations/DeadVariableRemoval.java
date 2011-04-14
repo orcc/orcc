@@ -61,8 +61,9 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 	private List<Var> unusedLocals;
 
 	private void handleInstruction(Var target, Instruction instruction) {
-		// do not remove assign to variables that are used by writes
-		if (isPort(target)) {
+		// do not remove assign to variables of patterns
+		if (target.eContainmentFeature() == IrPackage.eINSTANCE
+				.getPattern_Variables()) {
 			return;
 		}
 
@@ -88,7 +89,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
 		Var target = assign.getTarget().getVariable();
-		if (!target.isUsed()) {
+		if (target != null && !target.isUsed()) {
 			handleInstruction(target, assign);
 		}
 		return NULL;
@@ -129,9 +130,8 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 		if (target != null && !target.isUsed()) {
 			// do not remove stores to variables that are used by writes, or
 			// variables that are parameters
-			if (!target.isGlobal()
-					&& (isPort(target) || target.eContainmentFeature() == IrPackage.eINSTANCE
-							.getProcedure_Parameters())) {
+			if (target.eContainmentFeature() == IrPackage.eINSTANCE
+					.getProcedure_Parameters()) {
 				return NULL;
 			}
 
@@ -161,19 +161,19 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 		}
 
 		// step 1: adds all instructions to the list
-		super.visit(procedure);
+		super.caseProcedure(procedure);
 
 		// step 2: keep visiting instructions until there are none left
 		while (!instructionsToVisit.isEmpty()) {
 			Instruction instruction = instructionsToVisit.remove(0);
-			instruction.accept(this);
+			doSwitch(instruction);
 		}
 
 		// procedure.removeLocals(unusedLocals);
 		for (Var var : unusedLocals) {
 			procedure.getLocals().remove(var);
 		}
-		
+
 		return NULL;
 	}
 

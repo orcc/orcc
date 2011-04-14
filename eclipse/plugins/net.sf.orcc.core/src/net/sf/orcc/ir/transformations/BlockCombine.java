@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.transformations;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -46,60 +48,59 @@ public class BlockCombine extends AbstractActorVisitor<Object> {
 	private NodeBlock previous;
 
 	@Override
-	public Object caseNodeBlock(NodeBlock node) {
+	public Object caseNodeBlock(NodeBlock block) {
 		if (previous == null) {
-			previous = node;
+			previous = block;
 		} else {
 			// add instructions of this block after previous block's
 			// instructions
-			previous.getInstructions().addAll(node.getInstructions());
+			previous.getInstructions().addAll(block.getInstructions());
 
 			// remove this block
-			itNode.remove();
+			EcoreUtil.remove(block);
+			indexNode--;
 		}
-		
-		return NULL;
+
+		return null;
 	}
 
 	@Override
 	public Object caseNodeIf(NodeIf node) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
-		visit(node.getThenNodes());
+		doSwitch(node.getThenNodes());
 
 		// so that previous blocks are not linked to else branch
 		previous = null;
-		visit(node.getElseNodes());
+		doSwitch(node.getElseNodes());
 
 		// so that neither then nor else branch are linked to this join
 		// as a matter of fact, this also ensures correctness in nested ifs
 		previous = null;
-		visit(node.getJoinNode());
+		doSwitch(node.getJoinNode());
 
 		// we do not set previous to null again, because join may be combined
 		// with next blocks (actually it needs to be).
-		
-		return NULL;
+
+		return null;
 	}
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
 		previous = null;
-		super.visit(procedure);
-		
-		return NULL;
+		return super.caseProcedure(procedure);
 	}
 
 	@Override
 	public Object caseNodeWhile(NodeWhile node) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
-		visit(node.getNodes());
+		doSwitch(node.getNodes());
 
 		// no previous block to be linked to
 		previous = null;
-		
-		return NULL;
+
+		return null;
 	}
 
 }
