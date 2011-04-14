@@ -468,9 +468,9 @@ si-\>num_firings = i;
 si-\>reason = starved;
 >>
 
-schedulingStates(sourceState, transitions) ::= <<
-<if (first(transitions))
-><actionTestState(sourceState=sourceState, transition=first(transitions), restTransitions=rest(transitions))><
+schedulingStates(sourceState, transitionsList) ::= <<
+<if (first(transitionsList))
+><actionTestState(sourceState=sourceState, transition=first(transitionsList), restTransitions=rest(transitionsList))><
 else
 ><printTransitionPattern(pattern=instance.actor.templateData.transitionPattern.(transitions))>
 _FSM_state = my_state_<sourceState.name>;
@@ -478,20 +478,20 @@ goto finished;<
 endif>
 >>
 
-printTransition(sourceState, transitions) ::= <<
+printTransition(transitions) ::= <<
 
 
-l_<sourceState.name>:
+l_<transitions.sourceState.name>:
 	<if (actions)>
 	<instance.id>_outside_FSM_scheduler(si);
 	i += si-\>num_firings;
 	<endif>
-	<if (transitions.empty)>
-	printf("stuck in state \"<sourceState.name>\" in the instance <instance.id>\n");
+	<if (transitions.list.empty)>
+	printf("stuck in state \"<transitions.sourceState.name>\" in the instance <instance.id>\n");
 	wait_for_key();
 	exit(1);
 	<else>
-	<schedulingStates(sourceState, transitions)>
+	<schedulingStates(transitions.sourceState, transitions.list)>
 	<endif>
 >>
 
@@ -536,7 +536,7 @@ void <instance.id>_scheduler(struct schedinfo_s *si) {
 	<printSwitch(fsm.transitions)>
 
 	// FSM transitions
-<fsm.transitions: {transitions|<printTransition(transitions.sourceState, transitions.list)>}>
+<fsm.transitions: printTransition()>
 finished:
 <if(options.enableTrace)>
 	<printCloseFiles()>

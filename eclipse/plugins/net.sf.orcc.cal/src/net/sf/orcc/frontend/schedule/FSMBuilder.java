@@ -45,6 +45,8 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
+import net.sf.orcc.ir.Transition;
+import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.UniqueEdge;
 
@@ -84,14 +86,12 @@ public class FSMBuilder {
 	 * Add transitions from source to each (action, state) couple from targets.
 	 * The transitions are ordered by descending priority of the actions.
 	 * 
-	 * @param fsm
-	 *            the FSM being created
-	 * @param source
-	 *            source state
+	 * @param transitions
+	 *            transitions object
 	 * @param targets
 	 *            an (action, state) map of targets
 	 */
-	private void addTransitions(FSM fsm, State source,
+	private void addTransitions(Transitions transitions,
 			Map<Action, State> targets) {
 		// Note: The higher the priority the lower the rank
 		List<Action> nextActions = new ArrayList<Action>(targets.keySet());
@@ -108,7 +108,9 @@ public class FSMBuilder {
 		// add the transitions in the right order
 		for (Action action : nextActions) {
 			State target = targets.get(action);
-			fsm.addTransition(source, action, target);
+			Transition transition = IrFactory.eINSTANCE.createTransition(
+					action, target);
+			transitions.getList().add(transition);
 		}
 	}
 
@@ -143,7 +145,12 @@ public class FSMBuilder {
 		for (String source : states) {
 			Map<Action, State> targets = getTargets(fsm, statesMap, source,
 					actionList);
-			addTransitions(fsm, statesMap.get(source), targets);
+
+			Transitions transitions = IrFactory.eINSTANCE.createTransitions();
+			transitions.setSourceState(statesMap.get(source));
+
+			addTransitions(transitions, targets);
+			fsm.getTransitions().add(transitions);
 		}
 
 		// set initial state
