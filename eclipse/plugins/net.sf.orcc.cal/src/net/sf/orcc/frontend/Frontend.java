@@ -87,7 +87,7 @@ public class Frontend {
 	public void compile(String file, AstActor astActor) throws OrccException {
 		try {
 			Actor actor = actorTransformer.transform(file, astActor);
-			new SSATransformation().visit(actor);
+			new SSATransformation().doSwitch(actor);
 			new IRWriter(actor).write(outputFolder.toString(), prettyPrint);
 
 			ResourceSet set = new ResourceSetImpl();

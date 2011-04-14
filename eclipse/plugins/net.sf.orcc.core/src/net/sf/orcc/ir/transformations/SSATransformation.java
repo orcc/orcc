@@ -281,19 +281,21 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public void visit(InstAssign assign) {
+	public Object caseInstAssign(InstAssign assign) {
 		replaceUses(assign.getValue());
 		replaceDef(assign.getTarget());
+		return null;
 	}
 
 	@Override
-	public void visit(InstCall call) {
+	public Object caseInstCall(InstCall call) {
 		replaceUses(call.getParameters());
 		replaceDef(call.getTarget());
+		return null;
 	}
 
 	@Override
-	public void visit(NodeIf nodeIf) {
+	public Object caseNodeIf(NodeIf nodeIf) {
 		int outerBranch = branch;
 		NodeBlock outerJoin = join;
 		NodeWhile outerLoop = loop;
@@ -304,13 +306,13 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 		loop = null;
 
 		branch = 1;
-		visit(nodeIf.getThenNodes());
+		doSwitch(nodeIf.getThenNodes());
 
 		// restore variables used in phi assignments
 		restoreVariables();
 
 		branch = 2;
-		visit(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getElseNodes());
 
 		// commit phi
 		NodeBlock innerJoin = join;
@@ -318,34 +320,38 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 		join = outerJoin;
 		loop = outerLoop;
 		commitPhi(innerJoin);
+		return null;
 	}
 
 	@Override
-	public void visit(InstLoad load) {
+	public Object caseInstLoad(InstLoad load) {
 		replaceUses(load.getIndexes());
 		replaceDef(load.getTarget());
+		return null;
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
+	public Object caseProcedure(Procedure procedure) {
 		definitions.clear();
 		uses.clear();
-		super.visit(procedure);
+		return super.caseProcedure(procedure);
 	}
 
 	@Override
-	public void visit(InstReturn returnInstr) {
+	public Object caseInstReturn(InstReturn returnInstr) {
 		replaceUses(returnInstr.getValue());
+		return null;
 	}
 
 	@Override
-	public void visit(InstStore store) {
+	public Object caseInstStore(InstStore store) {
 		replaceUses(store.getIndexes());
 		replaceUses(store.getValue());
+		return null;
 	}
 
 	@Override
-	public void visit(NodeWhile nodeWhile) {
+	public Object caseNodeWhile(NodeWhile nodeWhile) {
 		int outerBranch = branch;
 		NodeBlock outerJoin = join;
 		NodeWhile outerLoop = loop;
@@ -356,7 +362,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 		join = nodeWhile.getJoinNode();
 		loop = nodeWhile;
 
-		visit(nodeWhile.getNodes());
+		doSwitch(nodeWhile.getNodes());
 
 		// commit phi
 		NodeBlock innerJoin = join;
@@ -364,6 +370,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 		join = outerJoin;
 		loop = outerLoop;
 		commitPhi(innerJoin);
+		return null;
 	}
 
 }

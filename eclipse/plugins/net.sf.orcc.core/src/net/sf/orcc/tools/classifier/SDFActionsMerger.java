@@ -64,7 +64,7 @@ import org.jgrapht.DirectedGraph;
  * @author Matthieu Wipliez
  * 
  */
-public class SDFActionsMerger extends AbstractActorVisitor {
+public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 
 	private Actor actor;
 
@@ -140,7 +140,7 @@ public class SDFActionsMerger extends AbstractActorVisitor {
 				.createExprVar(result))));
 
 		// convert to SSA form
-		new SSATransformation().visit(procedure);
+		new SSATransformation().doSwitch(procedure);
 
 		return procedure;
 	}

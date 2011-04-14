@@ -97,7 +97,6 @@ import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.TypeInt;
@@ -106,10 +105,7 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.ExpressionInterpreter;
-import net.sf.orcc.ir.util.InstructionInterpreter;
-import net.sf.orcc.ir.util.NodeInterpreter;
-import net.sf.orcc.ir.util.TypeInterpreter;
+import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.util.OrccUtil;
 
 import com.google.gson.Gson;
@@ -125,327 +121,7 @@ import com.google.gson.JsonPrimitive;
  * @author Matthieu Wipliez
  * 
  */
-public class IRWriter {
-
-	/**
-	 * This class defines an expression writer that serializes an expression to
-	 * JSON.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private static class ExpressionWriter implements ExpressionInterpreter {
-
-		@Override
-		public Object interpret(ExprBinary expr, Object... args) {
-			JsonArray array = new JsonArray();
-			array.add(new JsonPrimitive(EXPR_BINARY));
-			array.add(new JsonPrimitive(expr.getOp().getText()));
-			array.add(writeExpression(expr.getE1()));
-			array.add(writeExpression(expr.getE2()));
-			array.add(writeType(expr.getType()));
-			return array;
-		}
-
-		@Override
-		public Object interpret(ExprBool expr, Object... args) {
-			return new JsonPrimitive(expr.isValue());
-		}
-
-		@Override
-		public Object interpret(ExprFloat expr, Object... args) {
-			return new JsonPrimitive(expr.getValue());
-		}
-
-		@Override
-		public Object interpret(ExprInt expr, Object... args) {
-			return new JsonPrimitive(expr.getValue());
-		}
-
-		@Override
-		public Object interpret(ExprList expr, Object... args) {
-			JsonArray array = new JsonArray();
-			array.add(new JsonPrimitive(EXPR_LIST));
-			for (Expression expression : expr.getValue()) {
-				array.add(writeExpression(expression));
-			}
-			return array;
-		}
-
-		@Override
-		public Object interpret(ExprString expr, Object... args) {
-			return new JsonPrimitive(expr.getValue());
-		}
-
-		@Override
-		public Object interpret(ExprUnary expr, Object... args) {
-			JsonArray array = new JsonArray();
-			array.add(new JsonPrimitive(EXPR_UNARY));
-			array.add(new JsonPrimitive(expr.getOp().getText()));
-			array.add(writeExpression(expr.getExpr()));
-			array.add(writeType(expr.getType()));
-			return array;
-		}
-
-		@Override
-		public Object interpret(ExprVar expr, Object... args) {
-			JsonArray array = new JsonArray();
-			array.add(new JsonPrimitive(EXPR_VAR));
-			array.add(writeVariable(expr.getUse().getVariable()));
-			return array;
-		}
-
-	}
-
-	/**
-	 * This class defines an instruction writer that serializes an instruction
-	 * to JSON.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private static class InstructionWriter implements InstructionInterpreter {
-
-		@Override
-		public Object interpret(InstAssign assign, Object... args) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(INSTR_ASSIGN));
-			array.add(writeLocation(assign.getLocation()));
-
-			array.add(writeVariable(assign.getTarget().getVariable()));
-			array.add(writeExpression(assign.getValue()));
-
-			return array;
-		}
-
-		@Override
-		public Object interpret(InstCall call, Object... args) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(INSTR_CALL));
-			array.add(writeLocation(call.getLocation()));
-
-			array.add(new JsonPrimitive(call.getProcedure().getName()));
-			array.add(writeExpressions(call.getParameters()));
-
-			array.add(call.hasResult() ? writeVariable(call.getTarget()
-					.getVariable()) : null);
-
-			return array;
-		}
-
-		@Override
-		public Object interpret(InstLoad load, Object... args) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(INSTR_LOAD));
-			array.add(writeLocation(load.getLocation()));
-
-			array.add(writeVariable(load.getTarget().getVariable()));
-			array.add(writeVariable(load.getSource().getVariable()));
-			array.add(writeExpressions(load.getIndexes()));
-
-			return array;
-		}
-
-		@Override
-		public Object interpret(InstPhi phi, Object... args) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(INSTR_PHI));
-			array.add(writeLocation(phi.getLocation()));
-
-			array.add(writeVariable(phi.getTarget().getVariable()));
-			array.add(writeExpressions(phi.getValues()));
-
-			return array;
-		}
-
-		@Override
-		public Object interpret(InstReturn returnInst, Object... args) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(INSTR_RETURN));
-			array.add(writeLocation(returnInst.getLocation()));
-
-			Expression value = returnInst.getValue();
-			if (value == null) {
-				array.add(null);
-			} else {
-				array.add(writeExpression(value));
-			}
-
-			return array;
-		}
-
-		@Override
-		public Object interpret(InstSpecific specific, Object... args) {
-			throw new OrccRuntimeException(
-					"IR writer cannot write specific instructions");
-		}
-
-		@Override
-		public Object interpret(InstStore store, Object... args) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(INSTR_STORE));
-			array.add(writeLocation(store.getLocation()));
-
-			array.add(writeVariable(store.getTarget().getVariable()));
-			array.add(writeExpressions(store.getIndexes()));
-			array.add(writeExpression(store.getValue()));
-
-			return array;
-		}
-
-	}
-
-	/**
-	 * This class defines a node writer that serializes a CFG node to JSON.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private static class NodeWriter implements NodeInterpreter {
-
-		@Override
-		public Object interpret(NodeBlock node, Object... args) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(NODE_BLOCK));
-			array.add(writeLocation(node.getLocation()));
-
-			array.add(writeIntructions(node.getInstructions()));
-
-			return array;
-		}
-
-		@Override
-		public Object interpret(NodeIf node, Object... args) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(NODE_IF));
-			array.add(writeLocation(node.getLocation()));
-
-			array.add(writeExpression(node.getCondition()));
-			array.add(writeNodes(node.getThenNodes()));
-			array.add(writeNodes(node.getElseNodes()));
-
-			array.add(writeNode(node.getJoinNode()));
-
-			return array;
-		}
-
-		@Override
-		public Object interpret(NodeWhile node, Object... args) {
-			JsonArray array = new JsonArray();
-
-			array.add(new JsonPrimitive(NODE_WHILE));
-			array.add(writeLocation(node.getLocation()));
-
-			array.add(writeExpression(node.getCondition()));
-			array.add(writeNodes(node.getNodes()));
-			array.add(writeNode(node.getJoinNode()));
-
-			return array;
-		}
-	}
-
-	/**
-	 * This class defines a type writer that serializes a type to JSON.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private static class TypeWriter implements TypeInterpreter {
-
-		@Override
-		public Object interpret(TypeBool type) {
-			return new JsonPrimitive(TypeBool.NAME);
-		}
-
-		@Override
-		public Object interpret(TypeFloat type) {
-			return new JsonPrimitive(TypeFloat.NAME);
-		}
-
-		@Override
-		public Object interpret(TypeInt type) {
-			JsonArray array = new JsonArray();
-			array.add(new JsonPrimitive(TypeInt.NAME));
-			array.add(new JsonPrimitive(type.getSize()));
-			return array;
-		}
-
-		@Override
-		public Object interpret(TypeList type) {
-			JsonArray array = new JsonArray();
-			array.add(new JsonPrimitive(TypeList.NAME));
-			array.add(writeExpression(type.getSizeExpr()));
-			array.add(writeType(type.getType()));
-			return array;
-		}
-
-		@Override
-		public Object interpret(TypeString type) {
-			return new JsonPrimitive(TypeString.NAME);
-		}
-
-		@Override
-		public Object interpret(TypeUint type) {
-			JsonArray array = new JsonArray();
-			array.add(new JsonPrimitive(TypeUint.NAME));
-			array.add(new JsonPrimitive(type.getSize()));
-			return array;
-		}
-
-		@Override
-		public Object interpret(TypeVoid type) {
-			return new JsonPrimitive(TypeVoid.NAME);
-		}
-
-	}
-
-	/**
-	 * Writes the given expression as JSON.
-	 * 
-	 * @param expression
-	 *            an expression
-	 * @return a JSON array
-	 */
-	private static JsonElement writeExpression(Expression expression) {
-		return (JsonElement) expression.accept(new ExpressionWriter());
-	}
-
-	/**
-	 * Serializes the given list of expressions as JSON array whose each member
-	 * is set to the result of {@link #writeExpression(Expression)}.
-	 * 
-	 * @param expressions
-	 *            a list of expressions
-	 * @return a JSON array
-	 */
-	private static JsonArray writeExpressions(List<Expression> expressions) {
-		JsonArray array = new JsonArray();
-		for (Expression expression : expressions) {
-			array.add(writeExpression(expression));
-		}
-
-		return array;
-	}
-
-	private static JsonElement writeInstruction(Instruction instruction) {
-		return (JsonElement) instruction.accept(new InstructionWriter());
-	}
-
-	private static JsonArray writeIntructions(List<Instruction> instructions) {
-		JsonArray array = new JsonArray();
-		for (Instruction instruction : instructions) {
-			array.add(writeInstruction(instruction));
-		}
-		return array;
-	}
+public class IRWriter extends IrSwitch<JsonElement> {
 
 	private static JsonArray writeLocation(Location location) {
 		if (location == null) {
@@ -458,37 +134,6 @@ public class IRWriter {
 		array.add(new JsonPrimitive(location.getEndColumn()));
 
 		return array;
-	}
-
-	private static JsonElement writeNode(Node node) {
-		return (JsonElement) node.accept(new NodeWriter());
-	}
-
-	/**
-	 * Writes the given nodes.
-	 * 
-	 * @param nodes
-	 *            a list of nodes
-	 * @return a JSON array
-	 */
-	private static JsonArray writeNodes(List<Node> nodes) {
-		JsonArray array = new JsonArray();
-		for (Node node : nodes) {
-			array.add(writeNode(node));
-		}
-
-		return array;
-	}
-
-	/**
-	 * Writes the given type as JSON.
-	 * 
-	 * @param type
-	 *            a type
-	 * @return JSON content, as a string or an array
-	 */
-	private static JsonElement writeType(Type type) {
-		return (JsonElement) type.accept(new TypeWriter());
 	}
 
 	/**
@@ -515,6 +160,245 @@ public class IRWriter {
 	 */
 	public IRWriter(Actor actor) {
 		this.actor = actor;
+	}
+
+	@Override
+	public JsonArray caseExprBinary(ExprBinary expr) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(EXPR_BINARY));
+		array.add(new JsonPrimitive(expr.getOp().getText()));
+		array.add(doSwitch(expr.getE1()));
+		array.add(doSwitch(expr.getE2()));
+		array.add(doSwitch(expr.getType()));
+		return array;
+	}
+
+	@Override
+	public JsonPrimitive caseExprBool(ExprBool expr) {
+		return new JsonPrimitive(expr.isValue());
+	}
+
+	@Override
+	public JsonPrimitive caseExprFloat(ExprFloat expr) {
+		return new JsonPrimitive(expr.getValue());
+	}
+
+	@Override
+	public JsonPrimitive caseExprInt(ExprInt expr) {
+		return new JsonPrimitive(expr.getValue());
+	}
+
+	@Override
+	public JsonArray caseExprList(ExprList expr) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(EXPR_LIST));
+		for (Expression expression : expr.getValue()) {
+			array.add(doSwitch(expression));
+		}
+		return array;
+	}
+
+	@Override
+	public JsonPrimitive caseExprString(ExprString expr) {
+		return new JsonPrimitive(expr.getValue());
+	}
+
+	@Override
+	public JsonArray caseExprUnary(ExprUnary expr) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(EXPR_UNARY));
+		array.add(new JsonPrimitive(expr.getOp().getText()));
+		array.add(doSwitch(expr.getExpr()));
+		array.add(doSwitch(expr.getType()));
+		return array;
+	}
+
+	@Override
+	public JsonArray caseExprVar(ExprVar expr) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(EXPR_VAR));
+		array.add(writeVariable(expr.getUse().getVariable()));
+		return array;
+	}
+
+	@Override
+	public JsonArray caseInstAssign(InstAssign assign) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(INSTR_ASSIGN));
+		array.add(writeLocation(assign.getLocation()));
+
+		array.add(writeVariable(assign.getTarget().getVariable()));
+		array.add(doSwitch(assign.getValue()));
+
+		return array;
+	}
+
+	@Override
+	public JsonArray caseInstCall(InstCall call) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(INSTR_CALL));
+		array.add(writeLocation(call.getLocation()));
+
+		array.add(new JsonPrimitive(call.getProcedure().getName()));
+		array.add(writeExpressions(call.getParameters()));
+
+		array.add(call.hasResult() ? writeVariable(call.getTarget()
+				.getVariable()) : null);
+
+		return array;
+	}
+
+	@Override
+	public JsonArray caseInstLoad(InstLoad load) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(INSTR_LOAD));
+		array.add(writeLocation(load.getLocation()));
+
+		array.add(writeVariable(load.getTarget().getVariable()));
+		array.add(writeVariable(load.getSource().getVariable()));
+		array.add(writeExpressions(load.getIndexes()));
+
+		return array;
+	}
+
+	@Override
+	public JsonArray caseInstPhi(InstPhi phi) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(INSTR_PHI));
+		array.add(writeLocation(phi.getLocation()));
+
+		array.add(writeVariable(phi.getTarget().getVariable()));
+		array.add(writeExpressions(phi.getValues()));
+
+		return array;
+	}
+
+	@Override
+	public JsonArray caseInstReturn(InstReturn returnInst) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(INSTR_RETURN));
+		array.add(writeLocation(returnInst.getLocation()));
+
+		Expression value = returnInst.getValue();
+		if (value == null) {
+			array.add(null);
+		} else {
+			array.add(doSwitch(value));
+		}
+
+		return array;
+	}
+
+	@Override
+	public JsonArray caseInstSpecific(InstSpecific specific) {
+		throw new OrccRuntimeException(
+				"IR writer cannot write specific instructions");
+	}
+
+	@Override
+	public JsonArray caseInstStore(InstStore store) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(INSTR_STORE));
+		array.add(writeLocation(store.getLocation()));
+
+		array.add(writeVariable(store.getTarget().getVariable()));
+		array.add(writeExpressions(store.getIndexes()));
+		array.add(doSwitch(store.getValue()));
+
+		return array;
+	}
+
+	@Override
+	public JsonArray caseNodeBlock(NodeBlock node) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(NODE_BLOCK));
+		array.add(writeLocation(node.getLocation()));
+
+		array.add(writeIntructions(node.getInstructions()));
+
+		return array;
+	}
+
+	@Override
+	public JsonArray caseNodeIf(NodeIf node) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(NODE_IF));
+		array.add(writeLocation(node.getLocation()));
+
+		array.add(doSwitch(node.getCondition()));
+		array.add(writeNodes(node.getThenNodes()));
+		array.add(writeNodes(node.getElseNodes()));
+
+		array.add(doSwitch(node.getJoinNode()));
+
+		return array;
+	}
+
+	@Override
+	public JsonArray caseNodeWhile(NodeWhile node) {
+		JsonArray array = new JsonArray();
+
+		array.add(new JsonPrimitive(NODE_WHILE));
+		array.add(writeLocation(node.getLocation()));
+
+		array.add(doSwitch(node.getCondition()));
+		array.add(writeNodes(node.getNodes()));
+		array.add(doSwitch(node.getJoinNode()));
+
+		return array;
+	}
+
+	@Override
+	public JsonPrimitive caseTypeBool(TypeBool type) {
+		return new JsonPrimitive(TypeBool.NAME);
+	}
+
+	@Override
+	public JsonPrimitive caseTypeFloat(TypeFloat type) {
+		return new JsonPrimitive(TypeFloat.NAME);
+	}
+
+	@Override
+	public JsonArray caseTypeInt(TypeInt type) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(TypeInt.NAME));
+		array.add(new JsonPrimitive(type.getSize()));
+		return array;
+	}
+
+	@Override
+	public JsonArray caseTypeList(TypeList type) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(TypeList.NAME));
+		array.add(doSwitch(type.getSizeExpr()));
+		array.add(doSwitch(type.getType()));
+		return array;
+	}
+
+	@Override
+	public JsonPrimitive caseTypeString(TypeString type) {
+		return new JsonPrimitive(TypeString.NAME);
+	}
+
+	@Override
+	public JsonArray caseTypeUint(TypeUint type) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(TypeUint.NAME));
+		array.add(new JsonPrimitive(type.getSize()));
+		return array;
+	}
+
+	@Override
+	public JsonPrimitive caseTypeVoid(TypeVoid type) {
+		return new JsonPrimitive(TypeVoid.NAME);
 	}
 
 	public void write(String outputDir, boolean prettyPrint)
@@ -674,6 +558,23 @@ public class IRWriter {
 	}
 
 	/**
+	 * Serializes the given list of expressions as JSON array whose each member
+	 * is set to the result of {@link #writeExpression(Expression)}.
+	 * 
+	 * @param expressions
+	 *            a list of expressions
+	 * @return a JSON array
+	 */
+	private JsonArray writeExpressions(List<Expression> expressions) {
+		JsonArray array = new JsonArray();
+		for (Expression expression : expressions) {
+			array.add(doSwitch(expression));
+		}
+
+		return array;
+	}
+
+	/**
 	 * Writes a Finite State Machine as JSON.
 	 * 
 	 * @param fsm
@@ -729,14 +630,13 @@ public class IRWriter {
 		array.add(new JsonPrimitive(variable.getName()));
 		array.add(new JsonPrimitive(variable.isAssignable()));
 		array.add(writeLocation(variable.getLocation()));
-		array.add(writeType(variable.getType()));
+		array.add(doSwitch(variable.getType()));
 
 		Expression constant = variable.getInitialValue();
 		if (constant == null) {
 			array.add(null);
 		} else {
-			JsonElement constantValue = writeExpression(constant);
-			array.add(constantValue);
+			array.add(doSwitch(constant));
 		}
 
 		return array;
@@ -757,6 +657,14 @@ public class IRWriter {
 		return array;
 	}
 
+	private JsonArray writeIntructions(List<Instruction> instructions) {
+		JsonArray array = new JsonArray();
+		for (Instruction instruction : instructions) {
+			array.add(doSwitch(instruction));
+		}
+		return array;
+	}
+
 	/**
 	 * Serializes the given variable declaration to JSON.
 	 * 
@@ -771,7 +679,7 @@ public class IRWriter {
 		array.add(new JsonPrimitive(variable.isAssignable()));
 		array.add(new JsonPrimitive(variable.getIndex()));
 		array.add(writeLocation(variable.getLocation()));
-		array.add(writeType(variable.getType()));
+		array.add(doSwitch(variable.getType()));
 
 		return array;
 	}
@@ -792,6 +700,22 @@ public class IRWriter {
 	}
 
 	/**
+	 * Writes the given nodes.
+	 * 
+	 * @param nodes
+	 *            a list of nodes
+	 * @return a JSON array
+	 */
+	private JsonArray writeNodes(List<Node> nodes) {
+		JsonArray array = new JsonArray();
+		for (Node node : nodes) {
+			array.add(doSwitch(node));
+		}
+
+		return array;
+	}
+
+	/**
 	 * Writes the given port.
 	 * 
 	 * @param port
@@ -801,7 +725,7 @@ public class IRWriter {
 	private JsonArray writePort(Port port) {
 		JsonArray array = new JsonArray();
 		array.add(writeLocation(port.getLocation()));
-		array.add(writeType(port.getType()));
+		array.add(doSwitch(port.getType()));
 		array.add(new JsonPrimitive(port.getName()));
 		return array;
 	}
@@ -827,7 +751,7 @@ public class IRWriter {
 		array.add(new JsonPrimitive(procedure.getName()));
 		array.add(new JsonPrimitive(procedure.isNative()));
 		array.add(writeLocation(procedure.getLocation()));
-		array.add(writeType(procedure.getReturnType()));
+		array.add(doSwitch(procedure.getReturnType()));
 
 		array.add(writeLocalVariables(procedure.getParameters()));
 		array.add(writeLocalVariables(procedure.getLocals()));
