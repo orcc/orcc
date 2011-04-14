@@ -181,8 +181,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		actorPrinter = new ActorPrinter("VHDL_actor", !debugMode);
-		actorPrinter.setExpressionPrinter(VHDLExpressionPrinter.class);
-		actorPrinter.setTypePrinter(VHDLTypePrinter.class);
+
+		// TODO printers
+		System.err.println("VHDLBackendImpl.doXdfCodeGeneration(Network): must set printers");
+		//actorPrinter.setExpressionPrinter(VHDLExpressionPrinter.class);
+		//actorPrinter.setTypePrinter(VHDLTypePrinter.class);
 
 		// checks output folder exists, and if not creates it
 		File folder = new File(path + File.separator + "Design");

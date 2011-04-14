@@ -108,8 +108,10 @@ public class PromelaBackendImpl extends AbstractBackend {
 		network.flatten();
 
 		instancePrinter = new InstancePrinter("PROMELA_actor");
-		instancePrinter.setExpressionPrinter(PromelaExprPrinter.class);
-		instancePrinter.setTypePrinter(PromelaTypePrinter.class);
+		// TODO printers
+		System.err.println("PromelaBackendImpl.doXdfCodeGeneration(Network): must set printers");
+		//instancePrinter.setExpressionPrinter(PromelaExprPrinter.class);
+		//instancePrinter.setTypePrinter(PromelaTypePrinter.class);
 		instancePrinter.getOptions().put("guards", guards);
 
 		List<Actor> actors = network.getActors();
@@ -136,7 +138,10 @@ public class PromelaBackendImpl extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) {
 		NetworkPrinter printer = new NetworkPrinter("PROMELA_network");
-		printer.setTypePrinter(PromelaTypePrinter.class);
+
+		// TODO printers
+		System.err.println("PromelaBackendImpl.printNetwork(Network): must set printers");
+		// printer.setTypePrinter(PromelaTypePrinter.class);
 		printer.print("main_" + network.getName() + ".pml", path, network, "network");
 	}
 }

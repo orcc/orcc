@@ -37,7 +37,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
@@ -99,8 +98,10 @@ public class JavaBackendImpl extends AbstractBackend {
 		List<Actor> actors = parseActors(files);
 
 		actorPrinter = new ActorPrinter("Java_actor", true);
-		actorPrinter.setExpressionPrinter(CppExprPrinter.class);
-		actorPrinter.setTypePrinter(JavaTypePrinter.class);
+		// TODO printers
+		System.err.println("JavaBackendImpl.doVtlCodeGeneration(List<File>): must set printers");
+		//actorPrinter.setExpressionPrinter(CppExprPrinter.class);
+		//actorPrinter.setTypePrinter(JavaTypePrinter.class);
 
 		transformActors(actors);
 		printActors(actors);

@@ -194,10 +194,12 @@ public class CppBackendImpl extends AbstractBackend {
 		ActorPrinter actorPrinter = new ActorPrinter("Cpp_actorImpl");
 		ActorPrinter headerPrinter = new ActorPrinter("Cpp_actorDecl");
 
-		actorPrinter.setExpressionPrinter(CppExprPrinter.class);
-		actorPrinter.setTypePrinter(CppTypePrinter.class);
-		headerPrinter.setExpressionPrinter(CppExprPrinter.class);
-		headerPrinter.setTypePrinter(CppTypePrinter.class);
+		// TODO printers
+		System.err.println("CppBackendImpl.printActor(Actor): must set printers");
+		//actorPrinter.setExpressionPrinter(CppExprPrinter.class);
+		//actorPrinter.setTypePrinter(CppTypePrinter.class);
+		//headerPrinter.setExpressionPrinter(CppExprPrinter.class);
+		//headerPrinter.setTypePrinter(CppTypePrinter.class);
 
 		String hier = path + File.separator
 				+ actor.getPackage().replace('.', File.separatorChar);
@@ -226,8 +228,10 @@ public class CppBackendImpl extends AbstractBackend {
 	private void printNetwork(Network network) throws OrccException {
 		NetworkPrinter printer = new NetworkPrinter("Cpp_network");
 
-		printer.setExpressionPrinter(CppExprPrinter.class);
-		printer.setTypePrinter(CppTypePrinter.class);
+		// TODO printers
+		System.err.println("CppBackendImpl.printNetwork(Network): must set printers");
+		//printer.setExpressionPrinter(CppExprPrinter.class);
+		//printer.setTypePrinter(CppTypePrinter.class);
 
 		printer.getOptions().put("needSerDes", needSerDes);
 		// compute thread lists if need

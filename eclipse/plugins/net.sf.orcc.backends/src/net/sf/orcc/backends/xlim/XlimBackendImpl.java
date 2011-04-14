@@ -161,8 +161,11 @@ public class XlimBackendImpl extends AbstractBackend {
 		} else {
 			printer = new InstancePrinter("XLIM_sw_actor", true);
 		}
-		printer.setExpressionPrinter(XlimExprPrinter.class);
-		printer.setTypePrinter(XlimTypePrinter.class);
+		
+		// TODO printers
+		System.err.println("XlimBackendImpl.printInstance(Instance): must set printers");
+		//printer.setExpressionPrinter(XlimExprPrinter.class);
+		//printer.setTypePrinter(XlimTypePrinter.class);
 		return printer.print(instance.getId() + ".xlim", path, instance,
 				"instance");
 	}
@@ -186,8 +189,11 @@ public class XlimBackendImpl extends AbstractBackend {
 			file += ".c";
 			printer = new NetworkPrinter("XLIM_sw_network");
 		}
-		printer.setExpressionPrinter(XlimExprPrinter.class);
-		printer.setTypePrinter(XlimTypePrinter.class);
+
+		// TODO printers
+		System.err.println("XlimBackendImpl.printNetwork(Network): must set printers");
+		//printer.setExpressionPrinter(XlimExprPrinter.class);
+		//printer.setTypePrinter(XlimTypePrinter.class);
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.print(file, path, network, "network");
 		if (!hardwareGen) {
