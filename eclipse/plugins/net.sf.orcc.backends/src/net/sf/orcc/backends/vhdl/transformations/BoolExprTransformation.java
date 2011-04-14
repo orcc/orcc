@@ -88,7 +88,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 				createNewBlock(block);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -105,7 +105,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 				createNewBlock(returnInstr.getBlock());
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -123,7 +123,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 				createNewBlock(store.getBlock());
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -156,7 +156,9 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 				IrFactory.eINSTANCE.createExprBool(false));
 		block.add(assign);
 
-		itNode.add(node);
+		// increments index and adds the if after the current block
+		indexNode++;
+		getNodes().add(indexNode, node);
 	}
 
 	/**
@@ -167,20 +169,15 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 	 *            list iterator
 	 */
 	private void createNewBlock(NodeBlock block) {
-		List<Instruction> instructions = block.getInstructions();
-		int index = itInstruction.previousIndex();
-
+		// adds a new block after the if node created
+		// the index is not incremented so the created block will be visited too
 		NodeBlock targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		getNodes().add(indexNode, targetBlock);
+
+		// moves instructions
+		List<Instruction> instructions = block.getInstructions();
 		targetBlock.getInstructions().addAll(
-				instructions.subList(index, instructions.size()));
-
-		// no instructions will be visited in the current block
-		itInstruction = instructions.listIterator(index);
-
-		// adds this block after the NodeIf, and moves the iterator back so the
-		// new block will be visited next
-		itNode.add(targetBlock);
-		itNode.previous();
+				instructions.subList(indexInst, instructions.size()));
 	}
 
 	/**

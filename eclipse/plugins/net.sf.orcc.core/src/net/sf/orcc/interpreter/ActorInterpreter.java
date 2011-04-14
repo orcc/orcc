@@ -250,7 +250,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		}
 
 		// Interpret the whole action
-		visit(action.getBody());
+		doSwitch(action.getBody());
 
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
@@ -344,7 +344,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			// Get initializing procedure if any
 			for (Action action : actor.getInitializes()) {
 				if (isSchedulable(action)) {
-					visit(action.getBody());
+					doSwitch(action.getBody());
 					continue;
 				}
 			}
@@ -385,7 +385,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			}
 		}
 
-		visit(action.getScheduler());
+		doSwitch(action.getScheduler());
 		if (returnValue != null && returnValue.isBooleanExpr()) {
 			return ((ExprBool) returnValue).isValue();
 		} else {
@@ -480,11 +480,10 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public void visit(InstAssign instr) {
+	public Object caseInstAssign(InstAssign instr) {
 		try {
 			Var target = instr.getTarget().getVariable();
-			target.setValue((Expression) instr.getValue().accept(
-					exprInterpreter));
+			target.setValue(exprInterpreter.doSwitch(instr.getValue()));
 		} catch (OrccRuntimeException e) {
 			String file;
 			if (actor == null) {
@@ -495,10 +494,11 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 			throw new OrccRuntimeException(file, instr.getLocation(), "", e);
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstCall call) {
+	public Object caseInstCall(InstCall call) {
 		// Get called procedure
 		Procedure proc = call.getProcedure();
 
@@ -517,8 +517,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 						String unescaped = OrccUtil.getUnescapedString(str);
 						process.write(unescaped);
 					} else {
-						Object value = callParams.get(i)
-								.accept(exprInterpreter);
+						Expression value = exprInterpreter.doSwitch(callParams
+								.get(i));
 						process.write(String.valueOf(value));
 					}
 				}
@@ -527,47 +527,47 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			List<Var> procParams = proc.getParameters();
 			for (int i = 0; i < callParams.size(); i++) {
 				Var procVar = procParams.get(i);
-				procVar.setValue((Expression) callParams.get(i).accept(
-						exprInterpreter));
+				procVar.setValue(exprInterpreter.doSwitch(callParams.get(i)));
 			}
 
 			// Interpret procedure body
-			visit(proc);
+			doSwitch(proc);
 
 			// Get procedure result if any
 			if (call.hasResult()) {
 				call.getTarget().getVariable().setValue(returnValue);
 			}
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(NodeIf node) {
+	public Object caseNodeIf(NodeIf node) {
 		// Interpret first expression ("if" condition)
-		Expression condition = (Expression) node.getCondition().accept(
-				exprInterpreter);
+		Expression condition = exprInterpreter.doSwitch(node.getCondition());
 
 		// if (condition is true)
 		if (condition != null && condition.isBooleanExpr()) {
 			int oldBranch = branch;
 			if (((ExprBool) condition).isValue()) {
-				visit(node.getThenNodes());
+				doSwitch(node.getThenNodes());
 				branch = 0;
 			} else {
-				visit(node.getElseNodes());
+				doSwitch(node.getElseNodes());
 				branch = 1;
 			}
 
-			visit(node.getJoinNode());
+			doSwitch(node.getJoinNode());
 			branch = oldBranch;
 		} else {
 			throw new OrccRuntimeException("Condition not boolean at line "
 					+ node.getLocation().getStartLine() + "\n");
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstLoad instr) {
+	public Object caseInstLoad(InstLoad instr) {
 		Var target = instr.getTarget().getVariable();
 		Var source = instr.getSource().getVariable();
 		if (instr.getIndexes().isEmpty()) {
@@ -577,8 +577,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				Expression value = source.getValue();
 				for (Expression index : instr.getIndexes()) {
 					if (value.isListExpr()) {
-						value = ((ExprList) value).get((ExprInt) index
-								.accept(exprInterpreter));
+						value = ((ExprList) value)
+								.get((ExprInt) exprInterpreter.doSwitch(index));
 					}
 				}
 				target.setValue(EcoreUtil.copy(value));
@@ -588,17 +588,18 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 								+ instr.getLocation().getStartLine());
 			}
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstPhi phi) {
+	public Object caseInstPhi(InstPhi phi) {
 		Expression value = phi.getValues().get(branch);
-		phi.getTarget().getVariable()
-				.setValue((Expression) value.accept(exprInterpreter));
+		phi.getTarget().getVariable().setValue(exprInterpreter.doSwitch(value));
+		return null;
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
+	public Object caseProcedure(Procedure procedure) {
 		if (procedure.isNative()) {
 			int numParams = procedure.getParameters().size();
 			Class<?>[] parameterTypes = new Class<?>[numParams];
@@ -641,40 +642,41 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				}
 			}
 
-			super.visit(procedure);
+			super.caseProcedure(procedure);
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstReturn instr) {
+	public Object caseInstReturn(InstReturn instr) {
 		if (instr.getValue() != null) {
-			returnValue = (Expression) instr.getValue().accept(exprInterpreter);
+			returnValue = exprInterpreter.doSwitch(instr.getValue());
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstSpecific instr) {
+	public Object caseInstSpecific(InstSpecific instr) {
 		throw new OrccRuntimeException("does not know how to interpret a "
 				+ "specific instruction");
 	}
 
 	@Override
-	public void visit(InstStore instr) {
+	public Object caseInstStore(InstStore instr) {
 		Var var = instr.getTarget().getVariable();
-		Expression value = (Expression) instr.getValue()
-				.accept(exprInterpreter);
+		Expression value = exprInterpreter.doSwitch(instr.getValue());
 		if (instr.getIndexes().isEmpty()) {
 			var.setValue(value);
 		} else {
 			try {
 				Expression target = var.getValue();
 				Iterator<Expression> it = instr.getIndexes().iterator();
-				ExprInt index = (ExprInt) it.next().accept(exprInterpreter);
+				ExprInt index = (ExprInt) exprInterpreter.doSwitch(it.next());
 				while (it.hasNext()) {
 					if (target.isListExpr()) {
 						target = ((ExprList) target).get(index);
 					}
-					index = (ExprInt) it.next().accept(exprInterpreter);
+					index = (ExprInt) exprInterpreter.doSwitch(it.next());
 				}
 
 				if (target.isListExpr()) {
@@ -686,28 +688,27 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 								+ instr.getLocation().getStartLine());
 			}
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(NodeWhile node) {
+	public Object caseNodeWhile(NodeWhile node) {
 		int oldBranch = branch;
 		branch = 0;
-		visit(node.getJoinNode());
+		doSwitch(node.getJoinNode());
 
 		// Interpret first expression ("while" condition)
-		Expression condition = (Expression) node.getCondition().accept(
-				exprInterpreter);
+		Expression condition = exprInterpreter.doSwitch(node.getCondition());
 
 		// while (condition is true) do
 		if (condition != null && condition.isBooleanExpr()) {
 			branch = 1;
 			while (((ExprBool) condition).isValue()) {
-				visit(node.getNodes());
-				visit(node.getJoinNode());
+				doSwitch(node.getNodes());
+				doSwitch(node.getJoinNode());
 
 				// Interpret next value of "while" condition
-				condition = (Expression) node.getCondition().accept(
-						exprInterpreter);
+				condition = exprInterpreter.doSwitch(node.getCondition());
 				if (condition == null || !condition.isBooleanExpr()) {
 					throw new OrccRuntimeException(
 							"Condition not boolean at line "
@@ -720,6 +721,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		}
 
 		branch = oldBranch;
+		return null;
 	}
 
 	private void writeFifo(Expression value, Fifo fifo, int numTokens) {

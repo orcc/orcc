@@ -127,7 +127,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	private void addSetAddress(List<Expression> indexes, int port, Var var) {
 		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
 				.createInstRamSetAddress(port, var, indexes);
-		itInstruction.add(rsa);
+		getInstructions().add(indexInst, rsa);
 	}
 
 	/**

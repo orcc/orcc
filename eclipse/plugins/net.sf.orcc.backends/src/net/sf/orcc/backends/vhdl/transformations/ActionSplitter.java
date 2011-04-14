@@ -129,7 +129,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 			currentAction = nextAction;
 			nextAction = null;
 
-			visit(currentAction.getBody());
+			doSwitch(currentAction.getBody());
 		}
 		return null;
 	}
@@ -143,7 +143,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 
 		DataMover mover = new DataMover(actor);
 		for (Action action : actor.getActions()) {
-			mover.visit(action);
+			mover.doSwitch(action);
 		}
 		return null;
 	}
@@ -293,7 +293,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	private void visit(State source, State target, Action action) {
 		this.source = source;
 		this.target = target;
-		visit(action);
+		doSwitch(action);
 	}
 
 	/**

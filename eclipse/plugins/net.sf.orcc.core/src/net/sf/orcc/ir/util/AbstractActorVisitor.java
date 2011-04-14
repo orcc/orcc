@@ -31,8 +31,6 @@ package net.sf.orcc.ir.util;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.eclipse.emf.ecore.EObject;
-
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
@@ -60,6 +58,8 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * This abstract class implements a no-op visitor on an actor. This class should
  * be extended by classes that implement actor visitors and transformations.
@@ -83,11 +83,15 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 
 	protected int indexNode;
 
+	private List<Instruction> instructions;
+
 	protected ListIterator<Action> itAction;
 
 	protected ListIterator<Instruction> itInstruction;
 
 	protected ListIterator<Node> itNode;
+
+	private List<Node> nodes;
 
 	/**
 	 * current procedure being visited
@@ -95,8 +99,6 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	protected Procedure procedure;
 
 	private final boolean visitFull;
-
-	protected List<Node> nodes;
 
 	/**
 	 * Creates a new abstract actor visitor that visits all nodes and
@@ -346,9 +348,13 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 		this.nodes = oldNodes;
 		return null;
 	}
-	
+
 	protected Node getNode() {
 		return nodes.get(indexNode);
+	}
+
+	protected List<Node> getNodes() {
+		return nodes;
 	}
 
 	/**

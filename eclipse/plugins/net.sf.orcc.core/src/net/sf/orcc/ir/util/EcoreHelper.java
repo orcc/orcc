@@ -39,6 +39,7 @@ import net.sf.orcc.ir.Use;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
@@ -161,6 +162,31 @@ public class EcoreHelper {
 
 		if (ele.eContainer() != null) {
 			return getContainerOfType(ele.eContainer(), type);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the list that contains this object, or <code>null</code>.
+	 * 
+	 * @param <T>
+	 *            type of the objects contained in the list
+	 * @param <T1>
+	 *            type of the object as a specialization of <code>T</code>
+	 * @param eObject
+	 *            the object
+	 * @return the list that contains this object, or <code>null</code>
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends EObject, T1 extends T> List<T> getContainingList(
+			T1 eObject) {
+		EStructuralFeature feature = eObject.eContainingFeature();
+		if (feature.getUpperBound() == EStructuralFeature.UNBOUNDED_MULTIPLICITY) {
+			Object obj = eObject.eGet(feature);
+			if (obj != null && List.class.isAssignableFrom(obj.getClass())) {
+				return (List<T>) obj;
+			}
 		}
 
 		return null;

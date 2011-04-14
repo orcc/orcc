@@ -42,9 +42,9 @@ public class RAMTransformation implements ActorVisitor<Object> {
 
 	@Override
 	public Object doSwitch(Actor actor) {
-		new RAMInstructionScheduler().visit(actor);
-		new ConditionedSplitExtractor().visit(actor);
-		new ActionSplitter().visit(actor);
+		new RAMInstructionScheduler().doSwitch(actor);
+		new ConditionedSplitExtractor().doSwitch(actor);
+		new ActionSplitter().doSwitch(actor);
 
 		return null;
 	}

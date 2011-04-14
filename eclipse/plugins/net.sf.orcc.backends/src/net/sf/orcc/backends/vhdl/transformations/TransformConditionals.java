@@ -44,7 +44,6 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.IrSwitch;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -57,94 +56,86 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Nicolas Siret
  * 
  */
-public class TransformConditionals extends AbstractActorVisitor<Object> {
+public class TransformConditionals extends AbstractActorVisitor<Expression> {
 
-	private class TransformExpressionInterpreter extends IrSwitch<Expression> {
-
-		@Override
-		public Expression caseExprBinary(ExprBinary expr) {
-			Expression e1 = doSwitch(expr.getE1());
-			Expression e2 = doSwitch(expr.getE2());
-			OpBinary op = expr.getOp();
-			Type type = expr.getType();
-			return IrFactory.eINSTANCE.createExprBinary(e1, op, e2, type);
-		}
-
-		@Override
-		public Expression caseExprBool(ExprBool expr) {
-			return expr;
-		}
-
-		@Override
-		public Expression caseExprFloat(ExprFloat expr) {
-			return expr;
-		}
-
-		@Override
-		public Expression caseExprInt(ExprInt expr) {
-			return expr;
-		}
-
-		@Override
-		public Expression caseExprList(ExprList expr) {
-			return expr;
-		}
-
-		@Override
-		public Expression caseExprString(ExprString expr) {
-			return expr;
-		}
-
-		@Override
-		public Expression caseExprUnary(ExprUnary expr) {
-			OpUnary op = expr.getOp();
-			Expression subExpr = expr.getExpr();
-			if (op == OpUnary.LOGIC_NOT) {
-				if (subExpr.isVarExpr()) {
-					// "not a" => "a = false"
-					return IrFactory.eINSTANCE.createExprBinary(subExpr,
-							OpBinary.EQ,
-							IrFactory.eINSTANCE.createExprBool(false),
-							IrFactory.eINSTANCE.createTypeBool());
-				} else {
-					// "not (expr)" => "(expr) = false"
-					return IrFactory.eINSTANCE.createExprBinary(
-							doSwitch(subExpr), OpBinary.EQ,
-							IrFactory.eINSTANCE.createExprBool(false),
-							IrFactory.eINSTANCE.createTypeBool());
-				}
-			} else {
-				return IrFactory.eINSTANCE.createExprUnary(op,
-						doSwitch(subExpr), EcoreUtil.copy(expr.getType()));
-			}
-		}
-
-		@Override
-		public Expression caseExprVar(ExprVar expr) {
-			if (expr.getType().isBool()) {
-				return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
-						IrFactory.eINSTANCE.createExprBool(true),
-						IrFactory.eINSTANCE.createTypeBool());
-			} else {
-				return expr;
-			}
-		}
-
+	@Override
+	public Expression caseExprBinary(ExprBinary expr) {
+		Expression e1 = doSwitch(expr.getE1());
+		Expression e2 = doSwitch(expr.getE2());
+		OpBinary op = expr.getOp();
+		Type type = expr.getType();
+		return IrFactory.eINSTANCE.createExprBinary(e1, op, e2, type);
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf nodeIf) {
-		nodeIf.setCondition(new TransformExpressionInterpreter()
-				.doSwitch(nodeIf.getCondition()));
-		super.visit(nodeIf);
+	public Expression caseExprBool(ExprBool expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprFloat(ExprFloat expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprInt(ExprInt expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprList(ExprList expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprString(ExprString expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprUnary(ExprUnary expr) {
+		OpUnary op = expr.getOp();
+		Expression subExpr = expr.getExpr();
+		if (op == OpUnary.LOGIC_NOT) {
+			if (subExpr.isVarExpr()) {
+				// "not a" => "a = false"
+				return IrFactory.eINSTANCE.createExprBinary(subExpr,
+						OpBinary.EQ, IrFactory.eINSTANCE.createExprBool(false),
+						IrFactory.eINSTANCE.createTypeBool());
+			} else {
+				// "not (expr)" => "(expr) = false"
+				return IrFactory.eINSTANCE.createExprBinary(doSwitch(subExpr),
+						OpBinary.EQ, IrFactory.eINSTANCE.createExprBool(false),
+						IrFactory.eINSTANCE.createTypeBool());
+			}
+		} else {
+			return IrFactory.eINSTANCE.createExprUnary(op, doSwitch(subExpr),
+					EcoreUtil.copy(expr.getType()));
+		}
+	}
+
+	@Override
+	public Expression caseExprVar(ExprVar expr) {
+		if (expr.getType().isBool()) {
+			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
+					IrFactory.eINSTANCE.createExprBool(true),
+					IrFactory.eINSTANCE.createTypeBool());
+		} else {
+			return expr;
+		}
+	}
+
+	@Override
+	public Expression caseNodeIf(NodeIf nodeIf) {
+		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		super.caseNodeIf(nodeIf);
 		return null;
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
-		nodeWhile.setCondition(new TransformExpressionInterpreter()
-				.doSwitch(nodeWhile.getCondition()));
-		super.visit(nodeWhile);
+	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		super.caseNodeWhile(nodeWhile);
 		return null;
 	}
 

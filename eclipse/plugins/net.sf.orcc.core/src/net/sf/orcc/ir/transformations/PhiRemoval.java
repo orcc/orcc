@@ -46,6 +46,9 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
+
 /**
  * This class removes phi assignments and transforms them to copies.
  * 
@@ -55,7 +58,7 @@ import net.sf.orcc.ir.util.EcoreHelper;
 public class PhiRemoval extends AbstractActorVisitor<Object> {
 
 	private class PhiRemover extends AbstractActorVisitor<Object> {
-		
+
 		@Override
 		public Object caseInstPhi(InstPhi phi) {
 			EcoreHelper.delete(phi);
@@ -101,6 +104,8 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseNodeIf(NodeIf node) {
+		List<Node> nodes = EcoreHelper.getContainingList(node);
+
 		NodeBlock join = node.getJoinNode();
 		targetBlock = procedure.getLast(node.getThenNodes());
 		phiIndex = 0;
@@ -120,16 +125,16 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 	public Object caseNodeWhile(NodeWhile node) {
 		// the node before the while.
 		if (indexNode > 0) {
-			Node previousNode = nodes.get(indexNode - 1);
+			Node previousNode = getNodes().get(indexNode - 1);
 			if (previousNode.isBlockNode()) {
 				targetBlock = (NodeBlock) previousNode;
 			} else {
 				targetBlock = IrFactory.eINSTANCE.createNodeBlock();
-				nodes.add(indexNode, targetBlock);
+				getNodes().add(indexNode, targetBlock);
 			}
 		} else {
 			targetBlock = IrFactory.eINSTANCE.createNodeBlock();
-			nodes.add(indexNode, targetBlock);
+			getNodes().add(indexNode, targetBlock);
 		}
 
 		NodeBlock join = node.getJoinNode();
