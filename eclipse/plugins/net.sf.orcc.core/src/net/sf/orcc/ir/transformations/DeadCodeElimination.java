@@ -51,7 +51,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadCodeElimination extends AbstractActorVisitor {
+public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 
 	private void addNodes(List<Node> nodes, NodeBlock join, int index) {
 		itNode.previous();
@@ -92,16 +92,18 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		// remove dead ifs and whiles
-		super.visit(actor);
+		super.caseActor(actor);
 
 		// combines adjacent blocks that may have been created
-		new BlockCombine().visit(actor);
+		new BlockCombine().doSwitch(actor);
+		
+		return NULL;
 	}
 
 	@Override
-	public void visit(NodeIf node) {
+	public Object caseNodeIf(NodeIf node) {
 		Expression condition = node.getCondition();
 		if (condition.isBooleanExpr()) {
 			if (((ExprBool) condition).isValue()) {
@@ -110,6 +112,8 @@ public class DeadCodeElimination extends AbstractActorVisitor {
 				addNodes(node.getElseNodes(), node.getJoinNode(), 1);
 			}
 		}
+		
+		return NULL;
 	}
 
 }

@@ -41,12 +41,12 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class BlockCombine extends AbstractActorVisitor {
+public class BlockCombine extends AbstractActorVisitor<Object> {
 
 	private NodeBlock previous;
 
 	@Override
-	public void visit(NodeBlock node) {
+	public Object caseNodeBlock(NodeBlock node) {
 		if (previous == null) {
 			previous = node;
 		} else {
@@ -57,10 +57,12 @@ public class BlockCombine extends AbstractActorVisitor {
 			// remove this block
 			itNode.remove();
 		}
+		
+		return NULL;
 	}
 
 	@Override
-	public void visit(NodeIf node) {
+	public Object caseNodeIf(NodeIf node) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
 		visit(node.getThenNodes());
@@ -76,22 +78,28 @@ public class BlockCombine extends AbstractActorVisitor {
 
 		// we do not set previous to null again, because join may be combined
 		// with next blocks (actually it needs to be).
+		
+		return NULL;
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
+	public Object caseProcedure(Procedure procedure) {
 		previous = null;
 		super.visit(procedure);
+		
+		return NULL;
 	}
 
 	@Override
-	public void visit(NodeWhile node) {
+	public Object caseNodeWhile(NodeWhile node) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
 		visit(node.getNodes());
 
 		// no previous block to be linked to
 		previous = null;
+		
+		return NULL;
 	}
 
 }

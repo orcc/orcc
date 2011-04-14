@@ -67,11 +67,11 @@ import net.sf.orcc.ir.Var;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
-		ActorVisitor, ExpressionVisitor, InstructionVisitor, NodeVisitor {
+public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
+		ActorVisitor<T>, ExpressionVisitor, InstructionVisitor, NodeVisitor {
 
 	protected static final Object NULL = new Object();
-
+	
 	/**
 	 * current action being visited (if any).
 	 */
@@ -119,7 +119,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseAction(Action action) {
+	public T caseAction(Action action) {
 		doSwitch(action.getInputPattern());
 		doSwitch(action.getOutputPattern());
 		doSwitch(action.getScheduler());
@@ -129,7 +129,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseActor(Actor actor) {
+	public T caseActor(Actor actor) {
 		for (Var parameter : actor.getParameters()) {
 			doSwitch(parameter);
 		}
@@ -154,50 +154,50 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseExprBinary(ExprBinary expr) {
+	public T caseExprBinary(ExprBinary expr) {
 		doSwitch(expr.getE1());
 		doSwitch(expr.getE2());
 		return null;
 	}
 
 	@Override
-	public Object caseExprBool(ExprBool expr) {
+	public T caseExprBool(ExprBool expr) {
 		return null;
 	}
 
 	@Override
-	public Object caseExprFloat(ExprFloat expr) {
+	public T caseExprFloat(ExprFloat expr) {
 		return null;
 	}
 
 	@Override
-	public Object caseExprInt(ExprInt expr) {
+	public T caseExprInt(ExprInt expr) {
 		return null;
 	}
 
 	@Override
-	public Object caseExprList(ExprList expr) {
+	public T caseExprList(ExprList expr) {
 		return null;
 	}
 
 	@Override
-	public Object caseExprString(ExprString expr) {
+	public T caseExprString(ExprString expr) {
 		return null;
 	}
 
 	@Override
-	public Object caseExprUnary(ExprUnary expr) {
+	public T caseExprUnary(ExprUnary expr) {
 		doSwitch(expr.getExpr());
 		return null;
 	}
 
 	@Override
-	public Object caseExprVar(ExprVar var) {
+	public T caseExprVar(ExprVar var) {
 		return null;
 	}
 
 	@Override
-	public Object caseInstAssign(InstAssign assign) {
+	public T caseInstAssign(InstAssign assign) {
 		if (visitFull) {
 			doSwitch(assign.getValue());
 		}
@@ -205,7 +205,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseInstCall(InstCall call) {
+	public T caseInstCall(InstCall call) {
 		if (visitFull) {
 			for (Expression expr : call.getParameters()) {
 				doSwitch(expr);
@@ -215,7 +215,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseInstLoad(InstLoad load) {
+	public T caseInstLoad(InstLoad load) {
 		if (visitFull) {
 			for (Expression expr : load.getIndexes()) {
 				doSwitch(expr);
@@ -225,7 +225,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseInstPhi(InstPhi phi) {
+	public T caseInstPhi(InstPhi phi) {
 		if (visitFull) {
 			for (Expression expr : phi.getValues()) {
 				doSwitch(expr);
@@ -235,7 +235,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseInstReturn(InstReturn returnInstr) {
+	public T caseInstReturn(InstReturn returnInstr) {
 		if (visitFull) {
 			Expression expr = returnInstr.getValue();
 			if (expr != null) {
@@ -246,13 +246,13 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseInstSpecific(InstSpecific inst) {
+	public T caseInstSpecific(InstSpecific inst) {
 		// default implementation does nothing
 		return null;
 	}
 
 	@Override
-	public Object caseInstStore(InstStore store) {
+	public T caseInstStore(InstStore store) {
 		if (visitFull) {
 			for (Expression expr : store.getIndexes()) {
 				doSwitch(expr);
@@ -264,7 +264,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseNodeBlock(NodeBlock block) {
+	public T caseNodeBlock(NodeBlock block) {
 		int oldIndexInst = indexInst;
 		List<Instruction> instructions = block.getInstructions();
 		for (indexInst = 0; indexInst < instructions.size(); indexInst++) {
@@ -277,7 +277,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseNodeIf(NodeIf nodeIf) {
+	public T caseNodeIf(NodeIf nodeIf) {
 		if (visitFull) {
 			doSwitch(nodeIf.getCondition());
 		}
@@ -289,7 +289,7 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object caseNodeWhile(NodeWhile nodeWhile) {
+	public T caseNodeWhile(NodeWhile nodeWhile) {
 		if (visitFull) {
 			doSwitch(nodeWhile.getCondition());
 		}
@@ -300,19 +300,24 @@ public abstract class AbstractActorVisitor extends IrSwitch<Object> implements
 	}
 
 	@Override
-	public Object casePattern(Pattern pattern) {
+	public T casePattern(Pattern pattern) {
 		return null;
 	}
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
+	public T caseProcedure(Procedure procedure) {
 		this.procedure = procedure;
 		doSwitch(procedure.getNodes());
 		return null;
 	}
 
 	@Override
-	public Object doSwitch(EObject theEObject) {
+	public T doSwitch(Actor actor) {
+		return doSwitch((EObject) actor);
+	}
+
+	@Override
+	public T doSwitch(EObject theEObject) {
 		if (theEObject == null) {
 			return null;
 		}

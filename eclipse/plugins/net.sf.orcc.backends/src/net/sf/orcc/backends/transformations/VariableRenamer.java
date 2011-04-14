@@ -45,7 +45,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class VariableRenamer extends AbstractActorVisitor {
+public class VariableRenamer extends AbstractActorVisitor<Object> {
 
 	@Override
 	public void visit(Procedure procedure) {

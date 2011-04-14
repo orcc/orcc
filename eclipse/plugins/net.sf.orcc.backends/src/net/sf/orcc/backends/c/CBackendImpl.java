@@ -201,13 +201,13 @@ public class CBackendImpl extends AbstractBackend {
 			new ActorNormalizer().visit(actor);
 		}
 
-		ActorVisitor[] transformations = { new TypeSizeTransformation(),
+		ActorVisitor<?>[] transformations = { new TypeSizeTransformation(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new DeadVariableRemoval(),
 				new RenameTransformation(replacementMap), new PhiRemoval() };
 
-		for (ActorVisitor transformation : transformations) {
-			transformation.visit(actor);
+		for (ActorVisitor<?> transformation : transformations) {
+			transformation.doSwitch(actor);
 		}
 
 		CActorTemplateData data = new CActorTemplateData();

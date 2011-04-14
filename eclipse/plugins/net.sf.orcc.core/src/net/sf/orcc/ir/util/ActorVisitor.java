@@ -36,7 +36,15 @@ import net.sf.orcc.ir.Actor;
  * @author Matthieu Wipliez
  * 
  */
-public interface ActorVisitor {
+public interface ActorVisitor<T> {
+
+	/**
+	 * Visits the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	public T doSwitch(Actor actor);
 
 	/**
 	 * Visits the given actor.

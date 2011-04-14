@@ -53,9 +53,9 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Matthieu Wipliez
  * 
  */
-public class PhiRemoval extends AbstractActorVisitor {
+public class PhiRemoval extends AbstractActorVisitor<Object> {
 
-	private class PhiRemover extends AbstractActorVisitor {
+	private class PhiRemover extends AbstractActorVisitor<Object> {
 		
 		@Override
 		public void visit(NodeBlock block) {
@@ -78,7 +78,7 @@ public class PhiRemoval extends AbstractActorVisitor {
 	private NodeBlock targetBlock;
 
 	@Override
-	public void visit(InstPhi phi) {
+	public Object caseInstPhi(InstPhi phi) {
 		Var target = phi.getTarget().getVariable();
 		ExprVar sourceExpr = (ExprVar) phi.getValues().get(phiIndex);
 		Var source = sourceExpr.getUse().getVariable();
@@ -102,10 +102,11 @@ public class PhiRemoval extends AbstractActorVisitor {
 
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, expr);
 		targetBlock.add(assign);
+		return NULL;
 	}
 
 	@Override
-	public void visit(NodeIf node) {
+	public Object caseNodeIf(NodeIf node) {
 		NodeBlock join = node.getJoinNode();
 		targetBlock = procedure.getLast(node.getThenNodes());
 		phiIndex = 0;
@@ -118,10 +119,11 @@ public class PhiRemoval extends AbstractActorVisitor {
 
 		visit(node.getThenNodes());
 		visit(node.getElseNodes());
+		return NULL;
 	}
 
 	@Override
-	public void visit(NodeWhile node) {
+	public Object caseNodeWhile(NodeWhile node) {
 		// the node before the while.
 		if (itNode.hasPrevious()) {
 			Node previousNode = itNode.previous();
@@ -149,10 +151,11 @@ public class PhiRemoval extends AbstractActorVisitor {
 		join.accept(this);
 		join.accept(new PhiRemover());
 		visit(node.getNodes());
+		return NULL;
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
+	public Object caseProcedure(Procedure procedure) {
 		localsToRemove = new ArrayList<Var>();
 
 		super.visit(procedure);
@@ -160,6 +163,7 @@ public class PhiRemoval extends AbstractActorVisitor {
 		for (Var local : localsToRemove) {
 			procedure.getLocals().remove(local);
 		}
+		return NULL;
 	}
 
 }

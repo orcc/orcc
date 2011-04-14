@@ -65,7 +65,7 @@ public class ProcedureImpl extends EObjectImpl implements Procedure {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class ProcVisitor extends AbstractActorVisitor {
+	private class ProcVisitor extends AbstractActorVisitor<Object> {
 
 		private Set<Var> loadedVariables;
 

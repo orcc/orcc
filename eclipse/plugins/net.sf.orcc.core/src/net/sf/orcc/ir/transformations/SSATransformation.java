@@ -63,7 +63,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class SSATransformation extends AbstractActorVisitor {
+public class SSATransformation extends AbstractActorVisitor<Object> {
 
 	/**
 	 * ith branch (or 0 if we are not in a branch)

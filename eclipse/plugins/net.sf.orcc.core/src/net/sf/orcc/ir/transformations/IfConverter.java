@@ -52,7 +52,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class IfConverter extends AbstractActorVisitor {
+public class IfConverter extends AbstractActorVisitor<Object> {
 
 	private Expression currentPredicate;
 

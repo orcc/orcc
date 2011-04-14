@@ -45,7 +45,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class RenameTransformation extends AbstractActorVisitor {
+public class RenameTransformation extends AbstractActorVisitor<Object> {
 
 	private final Pattern pattern;
 
@@ -92,15 +92,15 @@ public class RenameTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
 
-		super.visit(actor);
+		return super.caseActor(actor);
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
+	public Object caseProcedure(Procedure procedure) {
 		String name = procedure.getName();
 		if (transformations != null && transformations.containsKey(name)) {
 			procedure.setName(transformations.get(name));
@@ -110,6 +110,7 @@ public class RenameTransformation extends AbstractActorVisitor {
 
 		checkVariables(procedure.getParameters());
 		checkVariables(procedure.getLocals());
+		return NULL;
 	}
 
 }

@@ -47,7 +47,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Jerome Gorin
  * 
  */
-public class TypeSizeTransformation extends AbstractActorVisitor {
+public class TypeSizeTransformation extends AbstractActorVisitor<Object> {
 
 	private void checkPorts(List<Port> ports) {
 		for (Port port : ports) {
@@ -91,20 +91,21 @@ public class TypeSizeTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
 		checkPorts(actor.getInputs());
 		checkPorts(actor.getOutputs());
 
-		super.visit(actor);
+		return super.caseActor(actor);
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
+	public Object caseProcedure(Procedure procedure) {
 		checkVariables(procedure.getParameters());
 		checkVariables(procedure.getLocals());
 		checkType(procedure.getReturnType());
+		return NULL;
 	}
 
 }

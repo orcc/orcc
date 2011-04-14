@@ -53,7 +53,7 @@ import net.sf.orcc.ir.Var;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ExpressionEvaluator implements ExpressionInterpreter {
+public class ExpressionEvaluator extends IrSwitch<Expression> {
 
 	private boolean throwException;
 
@@ -67,7 +67,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	 *             if the expression cannot be evaluated as an integer
 	 */
 	public int evaluateAsInteger(Expression expr) {
-		Expression value = (Expression) expr.accept(this);
+		Expression value = doSwitch(expr);
 		if (value != null && value.isIntExpr()) {
 			return ((ExprInt) value).getIntValue();
 		}
@@ -77,16 +77,16 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(ExprBinary expr, Object... args) {
-		Expression val1 = (Expression) expr.getE1().accept(this);
-		Expression val2 = (Expression) expr.getE2().accept(this);
+	public Expression caseExprBinary(ExprBinary expr) {
+		Expression val1 = doSwitch(expr.getE1());
+		Expression val2 = doSwitch(expr.getE2());
 		Expression result = interpretBinaryExpr(val1, expr.getOp(), val2);
 
 		if (result == null) {
 			// will throw exception if uninitialized variable used
 			throwException = true;
-			expr.getE1().accept(this);
-			expr.getE2().accept(this);
+			doSwitch(expr.getE1());
+			doSwitch(expr.getE2());
 			throwException = false;
 
 			// if no exception has been thrown, throw it now
@@ -101,46 +101,46 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(ExprBool expr, Object... args) {
+	public Expression caseExprBool(ExprBool expr) {
 		return EcoreUtil.copy(expr);
 	}
 
 	@Override
-	public Object interpret(ExprFloat expr, Object... args) {
+	public Expression caseExprFloat(ExprFloat expr) {
 		return EcoreUtil.copy(expr);
 	}
 
 	@Override
-	public Object interpret(ExprInt expr, Object... args) {
+	public Expression caseExprInt(ExprInt expr) {
 		return EcoreUtil.copy(expr);
 	}
 
 	@Override
-	public Object interpret(ExprList expr, Object... args) {
+	public Expression caseExprList(ExprList expr) {
 		ExprList list = IrFactory.eINSTANCE.createExprList();
 		List<Expression> expressions = expr.getValue();
 		List<Expression> values = list.getValue();
 		for (Expression expression : expressions) {
-			values.add((Expression) expression.accept(this));
+			values.add(doSwitch(expression));
 		}
 
 		return list;
 	}
 
 	@Override
-	public Object interpret(ExprString expr, Object... args) {
+	public Expression caseExprString(ExprString expr) {
 		return EcoreUtil.copy(expr);
 	}
 
 	@Override
-	public Object interpret(ExprUnary expr, Object... args) {
-		Expression value = (Expression) expr.getExpr().accept(this);
+	public Expression caseExprUnary(ExprUnary expr) {
+		Expression value = doSwitch(expr.getExpr());
 		Expression result = interpretUnaryExpr(expr.getOp(), value);
 
 		if (result == null) {
 			// will throw exception if uninitialized variable used
 			throwException = true;
-			expr.getExpr().accept(this);
+			doSwitch(expr.getExpr());
 			throwException = false;
 
 			// if no exception has been thrown, throw it now
@@ -153,7 +153,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(ExprVar expr, Object... args) {
+	public Expression caseExprVar(ExprVar expr) {
 		Var var = expr.getUse().getVariable();
 		Expression value = var.getValue();
 		if (value == null) {

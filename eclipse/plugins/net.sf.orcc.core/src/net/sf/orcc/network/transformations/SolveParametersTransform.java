@@ -28,24 +28,26 @@
  */
 package net.sf.orcc.network.transformations;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a network transformation that closes actors in a network.
@@ -56,28 +58,45 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class SolveParametersTransform extends AbstractExpressionInterpreter
-		implements INetworkTransformation {
+public class SolveParametersTransform extends IrSwitch<Expression> implements
+		INetworkTransformation {
 
 	private Network network;
 
 	@Override
-	public Object interpret(ExprBinary expr, Object... args) {
-		Expression e1 = (Expression) expr.getE1().accept(this);
-		Expression e2 = (Expression) expr.getE2().accept(this);
+	public Expression caseExprBinary(ExprBinary expr) {
+		Expression e1 = doSwitch(expr.getE1());
+		Expression e2 = doSwitch(expr.getE2());
 		return IrFactory.eINSTANCE.createExprBinary(e1, expr.getOp(), e2,
 				expr.getType());
 	}
 
 	@Override
-	public Object interpret(ExprUnary expr, Object... args) {
-		Expression subExpr = (Expression) expr.getExpr().accept(this);
+	public Expression caseExpression(Expression expr) {
+		return EcoreUtil.copy(expr);
+	}
+
+	@Override
+	public Expression caseExprList(ExprList expr) {
+		ExprList list = IrFactory.eINSTANCE.createExprList();
+		List<Expression> expressions = expr.getValue();
+		List<Expression> values = list.getValue();
+		for (Expression expression : expressions) {
+			values.add(doSwitch(expression));
+		}
+
+		return list;
+	}
+
+	@Override
+	public Expression caseExprUnary(ExprUnary expr) {
+		Expression subExpr = doSwitch(expr.getExpr());
 		return IrFactory.eINSTANCE.createExprUnary(expr.getOp(), subExpr,
 				expr.getType());
 	}
 
 	@Override
-	public Object interpret(ExprVar expr, Object... args) {
+	public Expression caseExprVar(ExprVar expr) {
 		Var var = expr.getUse().getVariable();
 		OrderedMap<String, Var> variables = network.getVariables();
 		Var variable = variables.get(var.getName());
@@ -100,9 +119,9 @@ public class SolveParametersTransform extends AbstractExpressionInterpreter
 						+ " has no value");
 			}
 
-			Expression resolvedValue = (Expression) value.accept(this);
-			Expression constantValue = (Expression) resolvedValue
-					.accept(new ExpressionEvaluator());
+			Expression resolvedValue = doSwitch(value);
+			Expression constantValue = new ExpressionEvaluator()
+					.doSwitch(resolvedValue);
 			entry.setValue(constantValue);
 		}
 	}

@@ -45,7 +45,7 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadGlobalElimination extends AbstractActorVisitor {
+public class DeadGlobalElimination extends AbstractActorVisitor<Object> {
 
 	/**
 	 * Removes the instructions that define an unused state variable.
@@ -72,7 +72,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		List<Var> stateVariables = actor.getStateVars();
 		Iterator<Var> it = stateVariables.iterator();
 		while (it.hasNext()) {
@@ -82,6 +82,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor {
 				it.remove();
 			}
 		}
+		return NULL;
 	}
 
 }

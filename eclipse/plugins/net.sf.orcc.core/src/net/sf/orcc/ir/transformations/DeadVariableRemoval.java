@@ -52,7 +52,7 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadVariableRemoval extends AbstractActorVisitor {
+public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 
 	protected boolean changed;
 
@@ -86,41 +86,45 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(InstAssign assign) {
+	public Object caseInstAssign(InstAssign assign) {
 		Var target = assign.getTarget().getVariable();
 		if (!target.isUsed()) {
 			handleInstruction(target, assign);
 		}
+		return NULL;
 	}
 
 	@Override
-	public void visit(InstCall call) {
+	public Object caseInstCall(InstCall call) {
 		if (call.hasResult()) {
 			Var target = call.getTarget().getVariable();
 			if (target != null && !target.isUsed()) {
 				handleInstruction(target, call);
 			}
 		}
+		return NULL;
 	}
 
 	@Override
-	public void visit(InstLoad load) {
+	public Object caseInstLoad(InstLoad load) {
 		Var target = load.getTarget().getVariable();
 		if (target != null && !target.isUsed()) {
 			handleInstruction(target, load);
 		}
+		return NULL;
 	}
 
 	@Override
-	public void visit(InstPhi phi) {
+	public Object caseInstPhi(InstPhi phi) {
 		Var target = phi.getTarget().getVariable();
 		if (target != null && !target.isUsed()) {
 			handleInstruction(target, phi);
 		}
+		return NULL;
 	}
 
 	@Override
-	public void visit(InstStore store) {
+	public Object caseInstStore(InstStore store) {
 		Var target = store.getTarget().getVariable();
 		if (target != null && !target.isUsed()) {
 			// do not remove stores to variables that are used by writes, or
@@ -128,21 +132,23 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 			if (!target.isGlobal()
 					&& (isPort(target) || target.eContainmentFeature() == IrPackage.eINSTANCE
 							.getProcedure_Parameters())) {
-				return;
+				return NULL;
 			}
 
 			handleInstruction(target, store);
 		}
+		return NULL;
 	}
 
 	@Override
-	public void visit(NodeBlock block) {
+	public Object caseNodeBlock(NodeBlock block) {
 		// adds all instructions to the list
 		instructionsToVisit.addAll(block.getInstructions());
+		return NULL;
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
+	public Object caseProcedure(Procedure procedure) {
 		unusedLocals = new ArrayList<Var>();
 		instructionsToVisit = new ArrayList<Instruction>();
 
@@ -167,6 +173,8 @@ public class DeadVariableRemoval extends AbstractActorVisitor {
 		for (Var var : unusedLocals) {
 			procedure.getLocals().remove(var);
 		}
+		
+		return NULL;
 	}
 
 }
