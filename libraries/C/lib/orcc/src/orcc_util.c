@@ -141,6 +141,7 @@ void init_orcc(int argc, char *argv[]) {
 			break;
 		case 'g':
 			output_genetic = strdup(optarg);
+			break;
 		default:
 			fprintf(stderr, "skipping option -%c\n", c);
 			break;

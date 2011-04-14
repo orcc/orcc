@@ -430,9 +430,8 @@ void *monitor(void *data) {
 				monitoring->genetic_info);
 
 		// Backup informations to compute partial fps except first time
-		if (evalIndNb != 0 || population->generation_nb != 0) {
-			backup_partial_start_info();
-		}
+		backup_partial_start_info();
+
 		// wakeup all threads
 		for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
 			semaphore_set(monitoring->genetic_info->schedulers[i].sem_thread);
