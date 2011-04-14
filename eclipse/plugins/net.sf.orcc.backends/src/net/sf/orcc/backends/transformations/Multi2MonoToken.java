@@ -137,6 +137,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private class ModifyProcessActionStore extends AbstractActorVisitor {
 		private Var tab;
+
 		public ModifyProcessActionStore(Var tab) {
 			this.tab = tab;
 		}
@@ -174,28 +175,27 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			}
 		}
 	}
-	
-	private List<Action> AddedUntaggedActions = new ArrayList<Action>();
-	private int bufferSize = 0;
+
+	private List<Action> AddedUntaggedActions;
+	private int bufferSize;
 	private Action done;
 	private Type entryType;
 	private FSM fsm;
-	private List<Var> inputBuffers = new ArrayList<Var>();
-	private int inputIndex = 0;
-	private List<Port> inputPorts = new ArrayList<Port>();
-	private List<Action> noRepeatActions = new ArrayList<Action>();
-	private List<Action> noRepeatActionsDone = new ArrayList<Action>();
+	private List<Var> inputBuffers;
+	private int inputIndex;
+	private List<Port> inputPorts;
+	private List<Action> noRepeatActions;
 	private int numTokens;
-	private int outputIndex = 0;
+	private int outputIndex;
 	private Port port;
 	private Action process;
-	private List<Var> readIndexes = new ArrayList<Var>() ;
-	private boolean repeatInput = false;
+	private List<Var> readIndexes;
+	private boolean repeatInput;
 	private Var result;
 	private Action store;
-	private Map<String, State> statesMap = new HashMap<String, State>();
+	private Map<String, State> statesMap;
 	private Action write;
-	private List<Var> writeIndexes = new ArrayList<Var>();
+	private List<Var> writeIndexes;
 
 	/**
 	 * transforms the transformed action to a transition action
@@ -233,20 +233,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 		actor.getActionsOutsideFsm().clear();
 		actor.setFsm(fsm);
-	}
-
-	/**
-	 * this method returns the closest power of 2 of x --> optimal buffer size
-	 * 
-	 * @param x
-	 * @return closest power of 2 of x
-	 */
-	private int closestPow_2(int x) {
-		int p = 1;
-		while (p < x) {
-			p = p * 2;
-		}
-		return p;
 	}
 
 	/**
@@ -975,27 +961,30 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		for (UniqueEdge edge : edges) {
 			Action action = (Action) edge.getObject();
 			if (noRepeatActions.contains(action)) {
-				for (Entry<Port, Var> entry : action.getInputPattern().getPortToVarMap().entrySet()) {
-					if (!noRepeatActionsDone.contains(action)) {
-						Port port = entry.getKey();
-						if (inputPorts.contains(port)) {
-							int position = portPosition(inputPorts, port);
-							Procedure body = action.getBody();
-							Var buffer = inputBuffers.get(position);
-							Var writeIndex = writeIndexes
+				ListIterator<Port> it = action.getInputPattern().getPorts()
+						.listIterator();
+				while (it.hasNext()) {
+					Port port = it.next();
+					if (inputPorts.contains(port)) {
+						int position = portPosition(inputPorts, port);
+						Procedure body = action.getBody();
+						Var buffer = inputBuffers.get(position);
+						Var writeIndex = writeIndexes.get(position);
+						Var readIndex = readIndexes.get(position);
 
-							.get(position);
-							Var readIndex = readIndexes.get(position);
-							action.getInputPattern().remove(port);
-							ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-									buffer, writeIndex, port, bufferSize);
-							modifyActionScheduler.visit(action);
-							modifyActionSchedulability(action, writeIndex,
-									readIndex, OpBinary.NE,
-									IrFactory.eINSTANCE.createExprInt(0));
-							consumeToken(body, position);
-							noRepeatActionsDone.add(action);
-						}
+						int index = it.previousIndex();
+						action.getInputPattern().remove(port);
+						it = action.getInputPattern().getPorts()
+								.listIterator(index);
+
+						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
+								buffer, writeIndex, port, bufferSize);
+						modifyActionScheduler.visit(action);
+						modifyActionSchedulability(action, writeIndex,
+								readIndex, OpBinary.NE,
+								IrFactory.eINSTANCE.createExprInt(0));
+						consumeToken(body, position);
+						noRepeatActions.remove(action);
 					}
 				}
 			}
@@ -1010,13 +999,13 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 */
 	private void modifyRepeatActionsInFSM() {
 		fsm = actor.getFsm();
-		
+
 		if (fsm == null) {
 			List<Action> actions = new ArrayList<Action>(
 					actor.getActionsOutsideFsm());
 			State initState = IrFactory.eINSTANCE.createState("init");
 			statesMap.put("init", initState);
-			//statesMap.put("init", initState);
+			// statesMap.put("init", initState);
 			// no FSM: simply visit all the actions
 			addFsm();
 			for (Action action : actions) {
@@ -1102,35 +1091,9 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
 		targetPattern.getPorts().addAll(sourcePattern.getPorts());
 		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
-		targetPattern.getVarToPortMap().putAll(
-				sourcePattern.getVarToPortMap());
+		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
 	}
-
-	/**
-	 * This method return the closest power of 2 of the maximum repeat value of
-	 * a port
-	 * 
-	 * @param action
-	 *            action containing the port
-	 * @param port
-	 *            repeat port
-	 * @return optimal buffer size
-	 */
-	private int OptimalBufferSize(Action action, Port port) {
-		int size = 0;
-		int optimalSize = 0;
-		for (Entry<Port, Integer> entry : action.getInputPattern()
-				.getNumTokensMap().entrySet()) {
-			if (entry.getKey() == port) {
-				if (entry.getValue() > size) {
-					size = entry.getValue();
-				}
-			}
-		}
-		optimalSize = closestPow_2(size);
-		return optimalSize;
-	}
-
+	
 	/**
 	 * returns the position of a port in a port list
 	 * 
@@ -1172,16 +1135,19 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				// create new process action
 				process = createProcessAction(action);
 				String storeName = "newStateStore" + action.getName();
-				State storeState = IrFactory.eINSTANCE.createState(storeName); 
+				State storeState = IrFactory.eINSTANCE.createState(storeName);
 				fsm.getStates().add(storeState);
 				String processName = "newStateProcess" + action.getName();
-				State processState = IrFactory.eINSTANCE.createState(processName);
+				State processState = IrFactory.eINSTANCE
+						.createState(processName);
 				statesMap.put(processName, processState);
 				fsm.getStates().add(processState);
 				fsm.addTransition(processState, process, targetState);
 
 				// move action's Output pattern to new process action
 				moveOutputPattern(action, process);
+				// Pattern actionPattern = action.getOutputPattern();
+				// process.setOutputPattern(actionPattern);
 
 				Var untagBuffer = IrFactory.eINSTANCE.createVar(
 						IrFactory.eINSTANCE.createLocation(), entryType,
@@ -1285,7 +1251,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				.getNumTokensMap().entrySet()) {
 			int verifNumTokens = verifEntry.getValue();
 			if (verifNumTokens > 1) {
-				String processName = "newStateProcess" + action.getName();	
+				String processName = "newStateProcess" + action.getName();
 				String writeName = "newStateWrite" + action.getName();
 				State writeState = IrFactory.eINSTANCE.createState(writeName);
 				fsm.getStates().add(writeState);
@@ -1293,7 +1259,8 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				// inputs
 				if (!repeatInput) {
 					process = createProcessAction(action);
-					State processState = IrFactory.eINSTANCE.createState(processName);
+					State processState = IrFactory.eINSTANCE
+							.createState(processName);
 					fsm.getStates().add(processState);
 					fsm.replaceTarget(sourceState, action, processState);
 					fsm.addTransition(processState, process, writeState);
@@ -1515,6 +1482,17 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	@Override
 	public void visit(Actor actor) {
 		this.actor = actor;
+		inputIndex = 0;
+		outputIndex = 0;
+		repeatInput = false;
+		bufferSize = 0;
+		AddedUntaggedActions = new ArrayList<Action>();
+		inputBuffers = new ArrayList<Var>();
+		inputPorts = new ArrayList<Port>();
+		noRepeatActions = new ArrayList<Action>();
+		readIndexes = new ArrayList<Var>();
+		statesMap = new HashMap<String, State>();
+		writeIndexes = new ArrayList<Var>();
 		modifyRepeatActionsInFSM();
 		modifyNoRepeatActionsInFSM();
 		modifyUntaggedActions(actor);
