@@ -314,12 +314,12 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	}
 
 	@Override
-	public T doSwitch(Actor actor) {
+	public final T doSwitch(Actor actor) {
 		return doSwitch((EObject) actor);
 	}
 
 	@Override
-	public T doSwitch(EObject theEObject) {
+	public final T doSwitch(EObject theEObject) {
 		if (theEObject == null) {
 			return null;
 		}
@@ -332,7 +332,7 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
 	 */
-	public Object doSwitch(List<Node> nodes) {
+	public final T doSwitch(List<Node> nodes) {
 		List<Node> oldNodes = this.nodes;
 		int oldIndexNode = indexNode;
 

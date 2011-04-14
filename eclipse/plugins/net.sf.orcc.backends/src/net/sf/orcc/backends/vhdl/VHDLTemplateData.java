@@ -76,7 +76,7 @@ public class VHDLTemplateData {
 		}
 
 		@Override
-		public Set<String> doSwitch(Actor actor) {
+		public Set<String> caseActor(Actor actor) {
 			for (Port port : actor.getInputs()) {
 				signals.add(port.getName() + "_send");
 			}

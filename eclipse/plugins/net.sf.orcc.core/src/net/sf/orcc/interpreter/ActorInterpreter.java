@@ -83,7 +83,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ActorInterpreter extends AbstractActorVisitor {
+public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 	private class JavaExpressionConverter implements ExpressionInterpreter {
 

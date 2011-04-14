@@ -34,7 +34,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -125,15 +124,6 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		targetBlock = IrFactory.eINSTANCE.createNodeBlock();
 		super.caseProcedure(procedure);
 		procedure.getNodes().add(targetBlock);
-		return NULL;
-	}
-
-	@Override
-	public Object doSwitch(List<Node> nodes) {
-		while (!nodes.isEmpty()) {
-			doSwitch(nodes.get(0));
-		}
-
 		return NULL;
 	}
 
