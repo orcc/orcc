@@ -204,32 +204,38 @@ endif>
 >>
 
 getPort(variable) ::= <<
-<if (action.inputPattern.inverseVariableMap.(variable))
-><action.inputPattern.inverseVariableMap.(variable).name><
+<if (action.inputPattern.varToPortMap.(variable))
+><action.inputPattern.varToPortMap.(variable).name><
+elseif (action.outputPattern.varToPortMap.(variable))
+><action.outputPattern.varToPortMap.(variable).name><
 else
-><action.outputPattern.inverseVariableMap.(variable).name><
+><action.peekPattern.varToPortMap.(variable).name><
 endif>
 >>
 
 getPortTypeUint(variable) ::= <<
-<if (action.inputPattern.inverseVariableMap.(variable))
-><action.inputPattern.inverseVariableMap.(variable).type.uint><
+<if (action.inputPattern.varToPortMap.(variable))
+><action.inputPattern.varToPortMap.(variable).type.uint><
+elseif (action.outputPattern.varToPortMap.(variable))
+><action.outputPattern.varToPortMap.(variable).type.uint><
 else
-><action.outputPattern.inverseVariableMap.(variable).type.uint><
+><action.peekPattern.varToPortMap.(variable).type.uint><
 endif>
 >>
 
 getPortTypeSize(variable) ::= <<
-<if (action.inputPattern.inverseVariableMap.(variable))
-><action.inputPattern.inverseVariableMap.(variable).type.size><
+<if (action.inputPattern.varToPortMap.(variable))
+><action.inputPattern.varToPortMap.(variable).type.size><
+elseif (action.outputPattern.varToPortMap.(variable))
+><action.outputPattern.varToPortMap.(variable).type.size><
 else
-><action.outputPattern.inverseVariableMap.(variable).type.size><
+><action.peekPattern.varToPortMap.(variable).type.size><
 endif>
 >>
 
 printLoad(load) ::= <<
 <if(load.indexes)
-><if (action.inputPattern.inverseVariableMap.(load.source.variable) || action.outputPattern.inverseVariableMap.(load.source.variable))
+><if (action.inputPattern.varToPortMap.(load.source.variable) || action.outputPattern.varToPortMap.(load.source.variable) || action.peekPattern.varToPortMap.(load.source.variable))
 ><if(load.cast)><CastLoad(targetName=load.target.variable.indexedName,
 targetTypeIsUint=load.target.variable.type.uint, targetSize=load.target.variable.size,
 source={<procedure.name>_<getPort(load.source.variable)>}, cast=load.cast)>;<
@@ -255,7 +261,7 @@ endif>
 
 printStore(store) ::= <<
 <if(store.indexes)
- ><if(action.inputPattern.inverseVariableMap.(store.target.variable) || action.outputPattern.inverseVariableMap.(store.target.variable))
+ ><if(action.inputPattern.varToPortMap.(store.target.variable) || action.outputPattern.varToPortMap.(store.target.variable) || action.peekPattern.varToPortMap.(store.target.variable))
   ><if(store.cast)
     ><CastStore(targetName={<procedure.name>_<getPort(store.target.variable)>},
 targetTypeIsUint=getPortTypeUint(store.target.variable), targetSize=getPortTypeSize(store.target.variable),
@@ -491,13 +497,13 @@ port map (
 Actor_Scheduler(actor) ::= <<
 <actor.simpleName>_scheduler : process(<actor.templateData.signals; wrap, anchor, separator=", ">)
   <actor.actions : { action |<printLocals(action.scheduler)>
-variable <action.scheduler.name>_go : std_logic; <action.inputPattern.ports: {port | <if(action.inputPattern.peekedMap.(port))>
+variable <action.scheduler.name>_go : std_logic; <action.inputPattern.ports: {port | <if(action.peekPattern.portToVarMap.(port))>
 variable <action.scheduler.name>_<port.name> : <port.type>;<
 endif>}; separator="\n">
 }>  --
 begin
   <actor.actions: {action|-- test if "<action.name>" action is schedulable
-<action.inputPattern.ports: { port |<printRead(procedure=action.scheduler, port=port, variable=action.inputPattern.peekedMap.(port))>}; separator="\n">
+<action.inputPattern.ports: { port |<printRead(procedure=action.scheduler, port=port, variable=action.peekPattern.portToVarMap.(port))>}; separator="\n">
 <printProcedure(procedure=action.scheduler, transformReturn="true")>}; separator="\n">
   --
   -- Test the action's inputs to fire (or not) an action  
@@ -550,14 +556,14 @@ else
 endif>
 >>
 
-TransitionFire(transition) ::= <<
-    when s_<transition.sourceState> =\>
-      if <transition.nextStateInfo: actionFire(); separator="\n      elsif">
+TransitionFire(transitions) ::= <<
+    when s_<transitions.sourceState.name> =\>
+      if <transitions.list: actionFire(); separator="\n      elsif">
       end if;
 >>
 
-actionFire(nextstate) ::= <<
-    <printActionFire(nextstate.action)>
+actionFire(transition) ::= <<
+    <printActionFire(transition.action)>
 >>
 
 
@@ -580,7 +586,7 @@ begin
 <endif>
     <actor.outputs : port_out_init()>    --
 <if(actor.fsm)>
-    FSM    \<= s_<actor.fsm.initialState>;    --
+    FSM    \<= s_<actor.fsm.initialState.name>;    --
 <endif>
   elsif rising_edge(clock) then
     <actor.outputs :{port|<port.name>_isend \<= '0';}; separator="\n">
@@ -597,9 +603,9 @@ end process <actor.simpleName>_execute;
 >>
 
 printActionBody(action) ::= <<
-<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.variableMap.(port))>}; separator="\n">
+<action.inputPattern.ports: { port |<printRead(procedure=action.body, port=port, variable=action.inputPattern.portToVarMap.(port))>}; separator="\n">
 <printProcedure(procedure=action.body, transformReturn="true")><
-action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.variableMap.(port))>}; separator="\n">
+action.outputPattern.ports: { port |<printWrite(procedure=action.body, port=port, variable=action.outputPattern.portToVarMap.(port))>}; separator="\n">
 >>
 
 actionTestScheduler(action) ::= <<
@@ -647,14 +653,14 @@ end case;<
 endif>
 >>
 
-switchTransition(transition) ::= <<
-when s_<transition.sourceState> =\>
-  if <transition.nextStateInfo: actionTestState(); separator="\n  elsif">
+switchTransition(transitions) ::= <<
+when s_<transitions.sourceState.name> =\>
+  if <transitions.list: actionTestState(); separator="\n  elsif">
   end if;
 >>
 
-actionTestState(nextState) ::= <<
-  <actionTestScheduler(nextState.action)>    FSM \<= s_<nextState.targetState>;
+actionTestState(transition) ::= <<
+  <actionTestScheduler(transition.action)>    FSM \<= s_<transition.state.name>;
 >>
 
 
@@ -725,7 +731,7 @@ endif>
 >  ---------------------------------------------------------------------------
   -- FSM
   ---------------------------------------------------------------------------
-  type FSM_type is (<actor.fsm.states: {state|s_<state>}; separator=", ">);
+  type FSM_type is (<actor.fsm.states: {state|s_<state.name>}; separator=", ">);
   signal FSM : FSM_type;
 <endif>
 

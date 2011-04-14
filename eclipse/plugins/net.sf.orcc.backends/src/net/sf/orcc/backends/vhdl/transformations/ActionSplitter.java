@@ -136,8 +136,8 @@ public class ActionSplitter extends AbstractActorVisitor {
 			Action action = IrFactory.eINSTANCE.createAction(
 					IrFactory.eINSTANCE.createLocation(), tag,
 					IrFactory.eINSTANCE.createPattern(),
-					IrFactory.eINSTANCE.createPattern(),
-					currentAction.getOutputPattern(), scheduler, body);
+					currentAction.getOutputPattern(),
+					IrFactory.eINSTANCE.createPattern(), scheduler, body);
 			currentAction.setOutputPattern(IrFactory.eINSTANCE.createPattern());
 
 			// add action to actor's actions
@@ -262,7 +262,7 @@ public class ActionSplitter extends AbstractActorVisitor {
 	 */
 	private void addFsm() {
 		fsm = IrFactory.eINSTANCE.createFSM();
-		
+
 		State initState = statesMap.get("init");
 		fsm.getStates().add(initState);
 		fsm.setInitialState(initState);
