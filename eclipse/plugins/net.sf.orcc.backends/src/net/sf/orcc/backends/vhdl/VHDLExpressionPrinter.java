@@ -45,7 +45,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.impl.ExprBinaryImpl;
 import net.sf.orcc.ir.util.ExpressionPrinter;
 
 /**
@@ -67,27 +66,19 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	 * @param e2
 	 *            second expression
 	 */
-	private void printCall(String function, Expression e1, Expression e2,
+	private String printCall(String function, Expression e1, Expression e2,
 			Type size) {
 		// parent precedence is the highest possible to prevent top-level binary
 		// expression from being parenthesized
 		int nextPrec = Integer.MAX_VALUE;
 
-		int s_op = Cast.getSizeOfType(size);
-
-		builder.append(function);
-		builder.append("(");
-		e1.accept(this, nextPrec, ExprBinaryImpl.LEFT);
-		builder.append(", ");
-		e2.accept(this, nextPrec, ExprBinaryImpl.RIGHT);
-		builder.append(", ");
+		String call = function + "(" + doSwitch(e1, nextPrec, 0) + ", "
+				+ doSwitch(e2, nextPrec, 1) + ", ";
 		if (function == "bitand") {
-			Type sizee = getLub(e1.getType(), e2.getType());
-			int s_e = Cast.getSizeOfType(sizee);
-			builder.append(s_e + ", ");
+			Type lub = getLub(e1.getType(), e2.getType());
+			call += Cast.getSizeOfType(lub) + ", ";
 		}
-		builder.append(s_op);
-		builder.append(")");
+		return call + Cast.getSizeOfType(size) + ")";
 	}
 
 	/**
@@ -173,7 +164,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	}
 
 	@Override
-	public void visit(ExprBinary expr, Object... args) {
+	public String caseExprBinary(ExprBinary expr) {
 		OpBinary op = expr.getOp();
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
@@ -181,27 +172,20 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 
 		switch (op) {
 		case BITAND:
-			printCall("bitand", e1, e2, size);
-			break;
+			return printCall("bitand", e1, e2, size);
 		case BITOR:
-			printCall("bitor", e1, e2, size);
-			break;
+			return printCall("bitor", e1, e2, size);
 		case BITXOR:
-			printCall("bitxor", e1, e2, size);
-			break;
+			return printCall("bitxor", e1, e2, size);
 		case DIV:
 		case DIV_INT:
-			printCall("div", e1, e2, size);
-			break;
+			return printCall("div", e1, e2, size);
 		case MOD:
-			printCall("get_mod", e1, e2, size);
-			break;
+			return printCall("get_mod", e1, e2, size);
 		case SHIFT_LEFT:
-			printCall("shift_left", e1, e2, size);
-			break;
+			return printCall("shift_left", e1, e2, size);
 		case SHIFT_RIGHT:
-			printCall("shift_right", e1, e2, size);
-			break;
+			return printCall("shift_right", e1, e2, size);
 		default: {
 			int currentPrec = op.getPrecedence();
 			int nextPrec;
@@ -213,58 +197,55 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 				nextPrec = currentPrec;
 			}
 
-			if (op.needsParentheses(args)) {
-				builder.append("(");
-				toString(nextPrec, expr.getE1(), op, expr.getE2());
-				builder.append(")");
+			if (op.needsParentheses(precedence, branch)) {
+				return "(" + doSwitch(expr.getE1(), nextPrec, 0) + " "
+						+ toString(op) + " "
+						+ doSwitch(expr.getE2(), nextPrec, 1) + ")";
 			} else {
-				toString(nextPrec, expr.getE1(), op, expr.getE2());
+				return doSwitch(expr.getE1(), nextPrec, 0) + " " + toString(op)
+						+ " " + doSwitch(expr.getE2(), nextPrec, 1);
 			}
 		}
 		}
 	}
 
 	@Override
-	public void visit(ExprBool expr, Object... args) {
-		builder.append(expr.isValue() ? "'1'" : "'0'");
+	public String caseExprBool(ExprBool expr) {
+		return expr.isValue() ? "'1'" : "'0'";
 	}
 
 	@Override
-	public void visit(ExprList expr, Object... args) {
+	public String caseExprList(ExprList expr) {
+		StringBuilder builder = new StringBuilder();
 		builder.append('(');
 
 		Iterator<Expression> it = expr.getValue().iterator();
 		if (it.hasNext()) {
-			it.next().accept(this);
+			builder.append(doSwitch(it.next()));
 			while (it.hasNext()) {
-				builder.append(", ");
-				it.next().accept(this, Integer.MAX_VALUE);
+				builder.append(", ").append(
+						doSwitch(it.next(), Integer.MAX_VALUE, 0));
 			}
 		}
 
 		builder.append(')');
+		return builder.toString();
 	}
 
 	@Override
-	public void visit(ExprString expr, Object... args) {
-		builder.append('"');
-		builder.append(expr.getValue());
-		builder.append('"');
+	public String caseExprString(ExprString expr) {
+		return '"' + expr.getValue() + '"';
 	}
 
 	@Override
-	public void visit(ExprUnary expr, Object... args) {
+	public String caseExprUnary(ExprUnary expr) {
 		OpUnary op = expr.getOp();
 		switch (op) {
 		case BITNOT:
-			builder.append("bitnot");
-			builder.append("(");
-			expr.getExpr().accept(this, Integer.MIN_VALUE);
-			builder.append(Cast.getSizeOfType(expr.getExpr().getType()));
-			builder.append(")");
-			break;
+			return "bitnot(" + doSwitch(expr.getExpr(), Integer.MIN_VALUE, 0)
+					+ ", " + Cast.getSizeOfType(expr.getExpr().getType()) + ")";
 		default:
-			super.visit(expr, args);
+			return super.caseExprUnary(expr);
 		}
 	}
 

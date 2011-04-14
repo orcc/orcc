@@ -35,7 +35,6 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.util.TypePrinter;
 
 /**
@@ -52,24 +51,17 @@ public class VHDLTypePrinter extends TypePrinter {
 	 * @param size
 	 *            an integer that gives the number of bits
 	 */
-	private void printInt(int size) {
+	private String printInt(int size) {
 		// limits size to 32 bit signed int
 		if (size >= 32) {
 			size = 32;
 		}
 
 		long bound = (long) 1 << (size - 1);
-		builder.append("integer range ");
-		builder.append(bound - 1);
-		builder.append(" downto -");
-
-		if (bound < 2147483647) {
-			// up to 1073741824, fine
-			builder.append(bound);
-		} else {
-			// because Altera only allows bounds down to"-2147483647"
-			builder.append(bound - 1);
-		}
+		return "integer range " + (bound - 1) + " downto -"
+				+ ((bound < 2147483647) ? bound : (bound - 1));
+		// up to 1073741824, fine
+		// because Altera only allows bounds down to "-2147483647"
 	}
 
 	/**
@@ -78,46 +70,40 @@ public class VHDLTypePrinter extends TypePrinter {
 	 * @param size
 	 *            an unsigned integer that gives the number of bits
 	 */
-	private void printUint(int size) {
+	private String printUint(int size) {
 		// limits size to 31 bit unsigned int
 		if (size >= 31) {
 			size = 31;
 		}
 
 		long bound = (long) 1 << size;
-		builder.append("integer range ");
-		builder.append(bound - 1);
-		builder.append(" downto 0");
+		return "integer range " + (bound - 1) + " downto 0";
 	}
 
 	@Override
-	public void visit(TypeBool type) {
-		builder.append("std_logic");
+	public String caseTypeBool(TypeBool type) {
+		return "std_logic";
 	}
 
 	@Override
-	public void visit(TypeInt type) {
-		printInt(type.getSize());
+	public String caseTypeInt(TypeInt type) {
+		return printInt(type.getSize());
 	}
 
 	@Override
-	public void visit(TypeList type) {
+	public String caseTypeList(TypeList type) {
 		// size will be printed later
-		type.getType().accept(this);
+		return doSwitch(type.getType());
 	}
 
 	@Override
-	public void visit(TypeString type) {
+	public String caseTypeString(TypeString type) {
 		throw new OrccRuntimeException("unsupported String type");
 	}
 
 	@Override
-	public void visit(TypeUint type) {
-		printUint(type.getSize());
-	}
-
-	@Override
-	public void visit(TypeVoid type) {
+	public String caseTypeUint(TypeUint type) {
+		return printUint(type.getSize());
 	}
 
 }

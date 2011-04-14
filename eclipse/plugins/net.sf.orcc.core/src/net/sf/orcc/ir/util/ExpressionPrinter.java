@@ -98,7 +98,7 @@ public class ExpressionPrinter extends IrSwitch<String> {
 
 		Iterator<Expression> it = expr.getValue().iterator();
 		if (it.hasNext()) {
-			doSwitch(it.next());
+			builder.append(doSwitch(it.next()));
 			while (it.hasNext()) {
 				builder.append(", ").append(
 						doSwitch(it.next(), Integer.MAX_VALUE, 0));

@@ -68,7 +68,64 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Nicolas Siret
  * 
  */
-public class BoolExprTransformation extends AbstractActorVisitor {
+public class BoolExprTransformation extends AbstractActorVisitor<Object> {
+
+	@Override
+	public Object caseInstAssign(InstAssign assign) {
+		Var target = assign.getTarget().getVariable();
+		if (target.getType().isBool()) {
+			Expression expr = assign.getValue();
+			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
+				createIfNode(target, expr);
+
+				// saves the current block
+				NodeBlock block = assign.getBlock();
+
+				// deletes the assign
+				EcoreHelper.delete(assign);
+
+				// move the rest of instructions to a new block
+				createNewBlock(block);
+			}
+		}
+		
+		return null;
+	}
+
+	@Override
+	public Object caseInstReturn(InstReturn returnInstr) {
+		if (procedure.getReturnType().isBool()) {
+			Expression expr = returnInstr.getValue();
+			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
+				Var local = newVariable();
+				returnInstr.setValue(IrFactory.eINSTANCE.createExprVar(local));
+				createIfNode(local, expr);
+
+				// moves this return and remaining instructions to a new block
+				createNewBlock(returnInstr.getBlock());
+			}
+		}
+		
+		return null;
+	}
+
+	@Override
+	public Object caseInstStore(InstStore store) {
+		Var target = store.getTarget().getVariable();
+		if (target.getType().isBool()) {
+			Expression expr = store.getValue();
+			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
+				Var local = newVariable();
+				store.setValue(IrFactory.eINSTANCE.createExprVar(local));
+				createIfNode(local, expr);
+
+				// moves this store and remaining instructions to a new block
+				createNewBlock(store.getBlock());
+			}
+		}
+		
+		return null;
+	}
 
 	/**
 	 * Creates an "if" node that assign <code>true</code> or <code>false</code>
@@ -134,57 +191,6 @@ public class BoolExprTransformation extends AbstractActorVisitor {
 	private Var newVariable() {
 		return procedure.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(), "bool_expr");
-	}
-
-	@Override
-	public void visit(InstAssign assign) {
-		Var target = assign.getTarget().getVariable();
-		if (target.getType().isBool()) {
-			Expression expr = assign.getValue();
-			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
-				createIfNode(target, expr);
-
-				// saves the current block
-				NodeBlock block = assign.getBlock();
-
-				// deletes the assign
-				EcoreHelper.delete(assign);
-
-				// move the rest of instructions to a new block
-				createNewBlock(block);
-			}
-		}
-	}
-
-	@Override
-	public void visit(InstReturn returnInstr) {
-		if (procedure.getReturnType().isBool()) {
-			Expression expr = returnInstr.getValue();
-			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
-				Var local = newVariable();
-				returnInstr.setValue(IrFactory.eINSTANCE.createExprVar(local));
-				createIfNode(local, expr);
-
-				// moves this return and remaining instructions to a new block
-				createNewBlock(returnInstr.getBlock());
-			}
-		}
-	}
-
-	@Override
-	public void visit(InstStore store) {
-		Var target = store.getTarget().getVariable();
-		if (target.getType().isBool()) {
-			Expression expr = store.getValue();
-			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
-				Var local = newVariable();
-				store.setValue(IrFactory.eINSTANCE.createExprVar(local));
-				createIfNode(local, expr);
-
-				// moves this store and remaining instructions to a new block
-				createNewBlock(store.getBlock());
-			}
-		}
 	}
 
 }

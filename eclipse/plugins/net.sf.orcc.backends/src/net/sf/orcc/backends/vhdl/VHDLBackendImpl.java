@@ -129,7 +129,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		evaluateInitializeActions(actor);
 
-		ActorVisitor[] transformationsCodegen = {
+		ActorVisitor<?>[] transformationsCodegen = {
 				// cleanup code
 				new DeadGlobalElimination(),
 				new DeadCodeElimination(),
@@ -160,8 +160,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new RenameTransformation(adjacentUnderscores, "_") };
 
 		// applies transformations
-		for (ActorVisitor transformation : transformationsCodegen) {
-			transformation.visit(actor);
+		for (ActorVisitor<?> transformation : transformationsCodegen) {
+			transformation.doSwitch(actor);
 		}
 
 		VHDLTemplateData templateData = new VHDLTemplateData();
@@ -181,11 +181,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		actorPrinter = new ActorPrinter("VHDL_actor", !debugMode);
-
-		// TODO printers
-		System.err.println("VHDLBackendImpl.doXdfCodeGeneration(Network): must set printers");
-		//actorPrinter.setExpressionPrinter(VHDLExpressionPrinter.class);
-		//actorPrinter.setTypePrinter(VHDLTypePrinter.class);
+		actorPrinter.setExpressionPrinter(new VHDLExpressionPrinter());
+		actorPrinter.setTypePrinter(new VHDLTypePrinter());
 
 		// checks output folder exists, and if not creates it
 		File folder = new File(path + File.separator + "Design");

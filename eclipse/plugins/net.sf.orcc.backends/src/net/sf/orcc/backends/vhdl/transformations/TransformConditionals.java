@@ -44,7 +44,9 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.ExpressionInterpreter;
+import net.sf.orcc.ir.util.IrSwitch;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines an actor transformation that transform the simple
@@ -55,48 +57,46 @@ import net.sf.orcc.ir.util.ExpressionInterpreter;
  * @author Nicolas Siret
  * 
  */
-public class TransformConditionals extends AbstractActorVisitor {
+public class TransformConditionals extends AbstractActorVisitor<Object> {
 
-	private class TransformExpressionInterpreter implements
-			ExpressionInterpreter {
+	private class TransformExpressionInterpreter extends IrSwitch<Expression> {
 
 		@Override
-		public Object interpret(ExprBinary expr, Object... args) {
-			Expression e1 = (Expression) expr.getE1().accept(
-					(ExpressionInterpreter) this);
-			Expression e2 = (Expression) expr.getE2().accept(this);
+		public Expression caseExprBinary(ExprBinary expr) {
+			Expression e1 = doSwitch(expr.getE1());
+			Expression e2 = doSwitch(expr.getE2());
 			OpBinary op = expr.getOp();
 			Type type = expr.getType();
 			return IrFactory.eINSTANCE.createExprBinary(e1, op, e2, type);
 		}
 
 		@Override
-		public Object interpret(ExprBool expr, Object... args) {
+		public Expression caseExprBool(ExprBool expr) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(ExprFloat expr, Object... args) {
+		public Expression caseExprFloat(ExprFloat expr) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(ExprInt expr, Object... args) {
+		public Expression caseExprInt(ExprInt expr) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(ExprList expr, Object... args) {
+		public Expression caseExprList(ExprList expr) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(ExprString expr, Object... args) {
+		public Expression caseExprString(ExprString expr) {
 			return expr;
 		}
 
 		@Override
-		public Object interpret(ExprUnary expr, Object... args) {
+		public Expression caseExprUnary(ExprUnary expr) {
 			OpUnary op = expr.getOp();
 			Expression subExpr = expr.getExpr();
 			if (op == OpUnary.LOGIC_NOT) {
@@ -108,21 +108,19 @@ public class TransformConditionals extends AbstractActorVisitor {
 							IrFactory.eINSTANCE.createTypeBool());
 				} else {
 					// "not (expr)" => "(expr) = false"
-					subExpr = (Expression) subExpr.accept(this);
-					return IrFactory.eINSTANCE.createExprBinary(subExpr,
-							OpBinary.EQ,
+					return IrFactory.eINSTANCE.createExprBinary(
+							doSwitch(subExpr), OpBinary.EQ,
 							IrFactory.eINSTANCE.createExprBool(false),
 							IrFactory.eINSTANCE.createTypeBool());
 				}
 			} else {
-				subExpr = (Expression) subExpr.accept(this);
-				Type type = expr.getType();
-				return IrFactory.eINSTANCE.createExprUnary(op, subExpr, type);
+				return IrFactory.eINSTANCE.createExprUnary(op,
+						doSwitch(subExpr), EcoreUtil.copy(expr.getType()));
 			}
 		}
 
 		@Override
-		public Object interpret(ExprVar expr, Object... args) {
+		public Expression caseExprVar(ExprVar expr) {
 			if (expr.getType().isBool()) {
 				return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
 						IrFactory.eINSTANCE.createExprBool(true),
@@ -134,24 +132,20 @@ public class TransformConditionals extends AbstractActorVisitor {
 
 	}
 
-	private ExpressionInterpreter exprInterpreter;
-
-	public TransformConditionals() {
-		exprInterpreter = new TransformExpressionInterpreter();
+	@Override
+	public Object caseNodeIf(NodeIf nodeIf) {
+		nodeIf.setCondition(new TransformExpressionInterpreter()
+				.doSwitch(nodeIf.getCondition()));
+		super.visit(nodeIf);
+		return null;
 	}
 
 	@Override
-	public void visit(NodeIf node) {
-		node.setCondition((Expression) node.getCondition().accept(
-				exprInterpreter));
-		super.visit(node);
-	}
-
-	@Override
-	public void visit(NodeWhile node) {
-		node.setCondition((Expression) node.getCondition().accept(
-				exprInterpreter));
-		super.visit(node);
+	public Object caseNodeWhile(NodeWhile nodeWhile) {
+		nodeWhile.setCondition(new TransformExpressionInterpreter()
+				.doSwitch(nodeWhile.getCondition()));
+		super.visit(nodeWhile);
+		return null;
 	}
 
 }

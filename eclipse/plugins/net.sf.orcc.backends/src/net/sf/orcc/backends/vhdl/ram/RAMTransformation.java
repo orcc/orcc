@@ -36,15 +36,22 @@ import net.sf.orcc.ir.util.ActorVisitor;
  * This class defines the transformation of IR to use RAMs.
  * 
  * @author Matthieu Wipliez
- *
+ * 
  */
-public class RAMTransformation implements ActorVisitor {
+public class RAMTransformation implements ActorVisitor<Object> {
 
 	@Override
-	public void visit(Actor actor) {
+	public Object doSwitch(Actor actor) {
 		new RAMInstructionScheduler().visit(actor);
 		new ConditionedSplitExtractor().visit(actor);
 		new ActionSplitter().visit(actor);
+
+		return null;
 	}
-	
+
+	@Override
+	public void visit(Actor actor) {
+		// to be removed eventually
+	}
+
 }

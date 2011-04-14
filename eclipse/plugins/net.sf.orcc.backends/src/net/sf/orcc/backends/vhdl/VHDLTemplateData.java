@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprList;
@@ -47,6 +45,8 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 /**
  * This class defines template data for the VHDL back-end.
  * 
@@ -54,7 +54,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Nicolas Siret
  * 
  */
-public class VHDLTemplateData extends AbstractActorVisitor {
+public class VHDLTemplateData {
 
 	/**
 	 * This class defines a visitor that computes the sensitivity list of the
@@ -63,10 +63,20 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class SensitivityComputer extends AbstractActorVisitor {
+	private class SensitivityComputer extends AbstractActorVisitor<Set<String>> {
+
+		/**
+		 * the set of signals that appear in the sensitivity list of the
+		 * scheduler process.
+		 */
+		private Set<String> signals;
+
+		public SensitivityComputer() {
+			signals = new LinkedHashSet<String>();
+		}
 
 		@Override
-		public void visit(Actor actor) {
+		public Set<String> doSwitch(Actor actor) {
 			for (Port port : actor.getInputs()) {
 				signals.add(port.getName() + "_send");
 			}
@@ -88,14 +98,17 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 			if (actor.hasFsm()) {
 				signals.add("FSM");
 			}
+
+			return signals;
 		}
 
 		@Override
-		public void visit(InstLoad node) {
-			Var var = node.getSource().getVariable();
+		public Set<String> caseInstLoad(InstLoad load) {
+			Var var = load.getSource().getVariable();
 			if (!var.getType().isList() && var.isAssignable()) {
 				signals.add(var.getName());
 			}
+			return signals;
 		}
 
 	}
@@ -105,12 +118,6 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 	private Expression initValue;
 
 	private Map<Var, Expression> initValueMap;
-
-	/**
-	 * the set of signals that appear in the sensitivity list of the scheduler
-	 * process.
-	 */
-	private Set<String> signals;
 
 	/**
 	 * Returns <code>true</code> if the given variable has an initial value that
@@ -163,13 +170,15 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 		return initValueMap;
 	}
 
+	private List<String> signals;
+
 	/**
 	 * Returns the list of variables.
 	 * 
 	 * @return the list of variables
 	 */
 	public List<String> getSignals() {
-		return new ArrayList<String>(signals);
+		return signals;
 	}
 
 	/**
@@ -179,8 +188,8 @@ public class VHDLTemplateData extends AbstractActorVisitor {
 	 *            an actor
 	 */
 	public void initializeFrom(Actor actor) {
-		signals = new LinkedHashSet<String>();
-		new SensitivityComputer().visit(actor);
+		signals = new ArrayList<String>(
+				new SensitivityComputer().doSwitch(actor));
 
 		customInitMap = new HashMap<Var, Boolean>();
 		initValueMap = new HashMap<Var, Expression>();

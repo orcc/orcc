@@ -40,12 +40,19 @@ import net.sf.orcc.ir.util.ActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class ConditionedSplitExtractor implements ActorVisitor {
+public class ConditionedSplitExtractor implements ActorVisitor<Object> {
+
+	@Override
+	public Object doSwitch(Actor actor) {
+		new IfConverter().doSwitch(actor);
+		new IfDeconverter().doSwitch(actor);
+
+		return null;
+	}
 
 	@Override
 	public void visit(Actor actor) {
-		new IfConverter().doSwitch(actor);
-		new IfDeconverter().doSwitch(actor);
+		// to be removed eventually
 	}
 
 }

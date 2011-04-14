@@ -45,7 +45,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class DataMover extends AbstractActorVisitor {
+public class DataMover extends AbstractActorVisitor<Object> {
 
 	//private NodeBlock targetBlock;
 
@@ -58,7 +58,6 @@ public class DataMover extends AbstractActorVisitor {
 		// visit expressions too
 		super(true);
 
-		this.actor = actor;
 		//variableMap = new HashMap<Var, Var>();
 	}
 //

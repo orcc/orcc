@@ -57,7 +57,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class RAMInstructionScheduler extends AbstractActorVisitor {
+public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 	private Map<RAM, List<InstRamRead>> pendingReads;
 
@@ -239,7 +239,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		pendingReads = new HashMap<RAM, List<InstRamRead>>();
 		ramMap = new HashMap<Var, RAM>();
 		for (Var variable : actor.getStateVars()) {
@@ -252,12 +252,14 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 
 		for (Action action : actor.getActions()) {
 			this.action = action;
-			visit(action.getBody());
+			doSwitch(action.getBody());
 		}
+
+		return null;
 	}
 
 	@Override
-	public void visit(InstLoad load) {
+	public Object caseInstLoad(InstLoad load) {
 		Var var = load.getSource().getVariable();
 		if (!load.getIndexes().isEmpty() && var.isAssignable()
 				&& var.isGlobal()) {
@@ -265,11 +267,12 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 
 			convertLoad(load);
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
-		super.visit(procedure);
+	public Object caseProcedure(Procedure procedure) {
+		super.caseProcedure(procedure);
 
 		NodeBlock block = procedure.getLast();
 		itInstruction = block.lastListIterator();
@@ -282,15 +285,17 @@ public class RAMInstructionScheduler extends AbstractActorVisitor {
 				hasMorePendingReads = executeTwoPendingReads(ram);
 			} while (hasMorePendingReads);
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstStore store) {
+	public Object caseInstStore(InstStore store) {
 		Var var = store.getTarget().getVariable();
 		if (!store.getIndexes().isEmpty() && var.isGlobal()) {
 			itInstruction.remove();
 			convertStore(store);
 		}
+		return null;
 	}
 
 }

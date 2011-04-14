@@ -40,6 +40,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
@@ -59,187 +60,17 @@ import org.jgrapht.DirectedGraph;
  * @author Matthieu Wipliez
  * 
  */
-public class ActionSplitter extends AbstractActorVisitor {
+public class ActionSplitter extends AbstractActorVisitor<Object> {
 
 	/**
-	 * This class contains an abstract branch visitor.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
+	 * name of the branch being visited
 	 */
-	public class AbstractBranchVisitor extends AbstractActorVisitor {
+	private String branchName;
 
-		/**
-		 * name of the branch being visited
-		 */
-		private String branchName;
-
-		/**
-		 * action being visited
-		 */
-		private Action currentAction;
-
-		/**
-		 * action to visit next (may be null)
-		 */
-		private Action nextAction;
-
-		/**
-		 * name of the source state
-		 */
-		private State source;
-
-		/**
-		 * name of the target state
-		 */
-		private State target;
-
-		public AbstractBranchVisitor(State source, State target) {
-			this.source = source;
-			this.target = target;
-		}
-
-		/**
-		 * Creates a new empty action with the given name.
-		 * 
-		 * @param name
-		 *            action name
-		 * @return a new empty action with the given name
-		 */
-		private Action createNewAction(Expression condition, String name) {
-			// scheduler
-			Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
-					"isSchedulable_" + name,
-					IrFactory.eINSTANCE.createLocation(),
-					IrFactory.eINSTANCE.createTypeBool());
-			Var result = scheduler.newTempLocalVariable(
-					IrFactory.eINSTANCE.createTypeBool(), "result");
-			result.setIndex(1);
-
-			NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			block.add(IrFactory.eINSTANCE.createInstAssign(result, condition));
-			block.add(IrFactory.eINSTANCE.createInstReturn(IrFactory.eINSTANCE
-					.createExprVar(result)));
-			scheduler.getNodes().add(block);
-
-			// body
-			Procedure body = IrFactory.eINSTANCE.createProcedure(name,
-					IrFactory.eINSTANCE.createLocation(),
-					IrFactory.eINSTANCE.createTypeVoid());
-			block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			block.add(IrFactory.eINSTANCE.createInstReturn());
-			body.getNodes().add(block);
-
-			// tag
-			Tag tag = IrFactory.eINSTANCE.createTag(name);
-
-			Action action = IrFactory.eINSTANCE.createAction(
-					IrFactory.eINSTANCE.createLocation(), tag,
-					IrFactory.eINSTANCE.createPattern(),
-					currentAction.getOutputPattern(),
-					IrFactory.eINSTANCE.createPattern(), scheduler, body);
-			currentAction.setOutputPattern(IrFactory.eINSTANCE.createPattern());
-
-			// add action to actor's actions
-			ActionSplitter.this.actor.getActions().add(action);
-
-			return action;
-		}
-
-		/**
-		 * Returns a new unique state name.
-		 * 
-		 * @return a new unique state name
-		 */
-		private String getNewStateName() {
-			String stateName = branchName;
-			Integer count = stateNames.get(stateName);
-			if (count == null) {
-				count = 1;
-			}
-			stateNames.put(stateName, count + 1);
-
-			return stateName + "_" + count;
-		}
-
-		/**
-		 * Replaces the transition <code>source</code> -&gt; <code>target</code>
-		 * by a transition <code>source</code> -&gt; <code>newState</code> -&gt;
-		 * <code>target</code>.
-		 * 
-		 * @param newAction
-		 *            the newly-created action
-		 */
-		private void replaceTransition(Action newAction) {
-			// add an FSM if the actor does not have one
-			if (fsm == null) {
-				addFsm();
-			}
-
-			// add state and transitions
-			String newStateName = newAction.getName();
-			State newState = IrFactory.eINSTANCE.createState(newStateName);
-			statesMap.put(newStateName, newState);
-			fsm.getStates().add(newState);
-
-			fsm.replaceTarget(source, currentAction, newState);
-			fsm.addTransition(newState, newAction, target);
-		}
-
-		/**
-		 * Split the current action
-		 */
-		private void splitAction() {
-			String newActionName = getNewStateName();
-
-			// create new action
-			nextAction = createNewAction(
-					IrFactory.eINSTANCE.createExprBool(true), newActionName);
-
-			// remove the SplitInstruction
-			itInstruction.previous();
-			itInstruction.remove();
-
-			// move code
-			CodeMover codeMover = new CodeMover();
-			codeMover.setTargetProcedure(nextAction.getBody());
-			codeMover.moveInstructions(itInstruction);
-			codeMover.moveNodes(itNode);
-
-			// update transitions
-			replaceTransition(nextAction);
-
-			// set new source state to the new state name
-			source = statesMap.get(newActionName);
-		}
-
-		@Override
-		public void visit(Action action) {
-			this.branchName = target.getName() + "_" + action.getName();
-			nextAction = action;
-			visitInBranch();
-		}
-
-		@Override
-		public void visit(InstSpecific instruction) {
-			if (instruction instanceof InstSplit) {
-				splitAction();
-			}
-		}
-
-		/**
-		 * Visits the next action(s) without updating the branch name.
-		 */
-		private void visitInBranch() {
-			while (nextAction != null) {
-				currentAction = nextAction;
-				nextAction = null;
-
-				visit(currentAction.getBody());
-			}
-		}
-
-	}
+	/**
+	 * action being visited
+	 */
+	private Action currentAction;
 
 	/**
 	 * FSM of the actor. May be null if the actor has no FSM. May be updated if
@@ -248,11 +79,26 @@ public class ActionSplitter extends AbstractActorVisitor {
 	private FSM fsm;
 
 	/**
+	 * action to visit next (may be null)
+	 */
+	private Action nextAction;
+
+	/**
+	 * name of the source state
+	 */
+	private State source;
+
+	/**
 	 * Map used to create new unique state names.
 	 */
 	private Map<String, Integer> stateNames;
 
 	private Map<String, State> statesMap;
+
+	/**
+	 * name of the target state
+	 */
+	private State target;
 
 	/**
 	 * Adds an FSM to the given action scheduler.
@@ -275,7 +121,21 @@ public class ActionSplitter extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseAction(Action action) {
+		this.branchName = target.getName() + "_" + action.getName();
+		nextAction = action;
+
+		while (nextAction != null) {
+			currentAction = nextAction;
+			nextAction = null;
+
+			visit(currentAction.getBody());
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseActor(Actor actor) {
 		this.actor = actor;
 		stateNames = new HashMap<String, Integer>();
 		statesMap = new HashMap<String, State>();
@@ -285,6 +145,138 @@ public class ActionSplitter extends AbstractActorVisitor {
 		for (Action action : actor.getActions()) {
 			mover.visit(action);
 		}
+		return null;
+	}
+
+	@Override
+	public Object caseInstSpecific(InstSpecific instruction) {
+		if (instruction instanceof InstSplit) {
+			splitAction(instruction);
+		}
+		return null;
+	}
+
+	/**
+	 * Creates a new empty action with the given name.
+	 * 
+	 * @param name
+	 *            action name
+	 * @return a new empty action with the given name
+	 */
+	private Action createNewAction(Expression condition, String name) {
+		// scheduler
+		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
+				"isSchedulable_" + name, IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeBool());
+		Var result = scheduler.newTempLocalVariable(
+				IrFactory.eINSTANCE.createTypeBool(), "result");
+		result.setIndex(1);
+
+		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		block.add(IrFactory.eINSTANCE.createInstAssign(result, condition));
+		block.add(IrFactory.eINSTANCE.createInstReturn(IrFactory.eINSTANCE
+				.createExprVar(result)));
+		scheduler.getNodes().add(block);
+
+		// body
+		Procedure body = IrFactory.eINSTANCE.createProcedure(name,
+				IrFactory.eINSTANCE.createLocation(),
+				IrFactory.eINSTANCE.createTypeVoid());
+		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		block.add(IrFactory.eINSTANCE.createInstReturn());
+		body.getNodes().add(block);
+
+		// tag
+		Tag tag = IrFactory.eINSTANCE.createTag(name);
+
+		Action action = IrFactory.eINSTANCE.createAction(
+				IrFactory.eINSTANCE.createLocation(), tag,
+				IrFactory.eINSTANCE.createPattern(),
+				currentAction.getOutputPattern(),
+				IrFactory.eINSTANCE.createPattern(), scheduler, body);
+		currentAction.setOutputPattern(IrFactory.eINSTANCE.createPattern());
+
+		// add action to actor's actions
+		ActionSplitter.this.actor.getActions().add(action);
+
+		return action;
+	}
+
+	/**
+	 * Returns a new unique state name.
+	 * 
+	 * @return a new unique state name
+	 */
+	private String getNewStateName() {
+		String stateName = branchName;
+		Integer count = stateNames.get(stateName);
+		if (count == null) {
+			count = 1;
+		}
+		stateNames.put(stateName, count + 1);
+
+		return stateName + "_" + count;
+	}
+
+	/**
+	 * Replaces the transition <code>source</code> -&gt; <code>target</code> by
+	 * a transition <code>source</code> -&gt; <code>newState</code> -&gt;
+	 * <code>target</code>.
+	 * 
+	 * @param newAction
+	 *            the newly-created action
+	 */
+	private void replaceTransition(Action newAction) {
+		// add an FSM if the actor does not have one
+		if (fsm == null) {
+			addFsm();
+		}
+
+		// add state and transitions
+		String newStateName = newAction.getName();
+		State newState = IrFactory.eINSTANCE.createState(newStateName);
+		statesMap.put(newStateName, newState);
+		fsm.getStates().add(newState);
+
+		fsm.replaceTarget(source, currentAction, newState);
+		fsm.addTransition(newState, newAction, target);
+	}
+
+	/**
+	 * Split the current action
+	 */
+	private void splitAction(Instruction instruction) {
+		String newActionName = getNewStateName();
+
+		// create new action
+		nextAction = createNewAction(IrFactory.eINSTANCE.createExprBool(true),
+				newActionName);
+
+		// remove the SplitInstruction
+		itInstruction.previous();
+		itInstruction.remove();
+
+		// move instructions
+		NodeBlock targetBlock = nextAction.getBody().getFirst();
+		int index = itInstruction.nextIndex();
+		List<Instruction> instructions = instruction.getBlock().getInstructions();
+		while (instructions.size() > index) {
+			targetBlock.getInstructions().add(instructions.get(index));
+		}
+		
+		// move nodes
+		/*List<Node> targetNodes = nextAction.getBody().getNodes();
+		index = itNode.nextIndex();
+		List<Instruction> instructions = instruction.getBlock().getInstructions();
+		while (instructions.size() > index) {
+			targetBlock.getInstructions().add(instructions.get(index));
+		}*/
+
+		// update transitions
+		replaceTransition(nextAction);
+
+		// set new source state to the new state name
+		source = statesMap.get(newActionName);
 	}
 
 	/**
@@ -299,7 +291,9 @@ public class ActionSplitter extends AbstractActorVisitor {
 	 *            action associated with transition
 	 */
 	private void visit(State source, State target, Action action) {
-		new AbstractBranchVisitor(source, target).visit(action);
+		this.source = source;
+		this.target = target;
+		visit(action);
 	}
 
 	/**

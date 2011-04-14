@@ -46,7 +46,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Herve Yviquel
  * 
  */
-public class ListDeclarationTransformation extends AbstractActorVisitor {
+public class ListDeclarationTransformation extends AbstractActorVisitor<Object> {
 
 	/**
 	 * Flattens a multi-dimensional list expression to a list with a single
@@ -70,7 +70,7 @@ public class ListDeclarationTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		// VHDL synthesizers don't support multi-dimensional memory yet
 		for (Var variable : actor.getStateVars()) {
 			if (variable.getType().isList() && variable.getInitialValue() != null) {
@@ -79,6 +79,7 @@ public class ListDeclarationTransformation extends AbstractActorVisitor {
 				variable.setInitialValue(list);
 			}
 		}
+		return null;
 	}
 
 }
