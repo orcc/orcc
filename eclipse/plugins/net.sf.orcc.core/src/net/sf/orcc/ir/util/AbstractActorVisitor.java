@@ -83,15 +83,11 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 
 	protected int indexNode;
 
-	private List<Instruction> instructions;
-
 	protected ListIterator<Action> itAction;
 
 	protected ListIterator<Instruction> itInstruction;
 
 	protected ListIterator<Node> itNode;
-
-	private List<Node> nodes;
 
 	/**
 	 * current procedure being visited
@@ -335,26 +331,13 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	 *            a list of nodes that belong to a procedure
 	 */
 	public final T doSwitch(List<Node> nodes) {
-		List<Node> oldNodes = this.nodes;
 		int oldIndexNode = indexNode;
-
-		this.nodes = nodes;
 		for (indexNode = 0; indexNode < nodes.size(); indexNode++) {
 			doSwitch(nodes.get(indexNode));
 		}
 
-		// restore
 		indexNode = oldIndexNode;
-		this.nodes = oldNodes;
 		return null;
-	}
-
-	protected Node getNode() {
-		return nodes.get(indexNode);
-	}
-
-	protected List<Node> getNodes() {
-		return nodes;
 	}
 
 	/**

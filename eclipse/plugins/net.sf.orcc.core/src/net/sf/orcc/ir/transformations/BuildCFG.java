@@ -46,7 +46,7 @@ import net.sf.orcc.ir.util.NodeInterpreter;
  * @author Jerome Gorin
  * 
  */
-public class BuildCFG extends AbstractActorVisitor {
+public class BuildCFG extends AbstractActorVisitor<Object> {
 
 	/**
 	 * This class defines a CFG builder.

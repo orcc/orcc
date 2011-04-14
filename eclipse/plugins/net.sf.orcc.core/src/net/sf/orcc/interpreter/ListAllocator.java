@@ -38,7 +38,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.util.TypeInterpreter;
+import net.sf.orcc.ir.util.IrSwitch;
 
 /**
  * This class defines an allocator that allocates a List from a type.
@@ -47,46 +47,46 @@ import net.sf.orcc.ir.util.TypeInterpreter;
  * @author Matthieu Wipliez
  * 
  */
-public class ListAllocator implements TypeInterpreter {
+public class ListAllocator extends IrSwitch<Expression> {
 
 	@Override
-	public Object interpret(TypeBool type) {
+	public Expression caseTypeBool(TypeBool type) {
 		return IrFactory.eINSTANCE.createExprBool();
 	}
 
 	@Override
-	public Object interpret(TypeFloat type) {
+	public Expression caseTypeFloat(TypeFloat type) {
 		return IrFactory.eINSTANCE.createExprFloat();
 	}
 
 	@Override
-	public Object interpret(TypeInt type) {
+	public Expression caseTypeInt(TypeInt type) {
 		return IrFactory.eINSTANCE.createExprInt();
 	}
 
 	@Override
-	public Object interpret(TypeList type) {
+	public Expression caseTypeList(TypeList type) {
 		int size = type.getSize();
 		ExprList list = IrFactory.eINSTANCE.createExprList();
 		for (int i = 0; i < size; i++) {
-			list.getValue().add((Expression) type.getType().accept(this));
+			list.getValue().add(doSwitch(type.getType()));
 		}
 
 		return list;
 	}
 
 	@Override
-	public Object interpret(TypeString type) {
+	public Expression caseTypeString(TypeString type) {
 		return IrFactory.eINSTANCE.createExprString();
 	}
 
 	@Override
-	public Object interpret(TypeUint type) {
+	public Expression caseTypeUint(TypeUint type) {
 		return IrFactory.eINSTANCE.createExprInt();
 	}
 
 	@Override
-	public Object interpret(TypeVoid type) {
+	public Expression caseTypeVoid(TypeVoid type) {
 		return null;
 	}
 

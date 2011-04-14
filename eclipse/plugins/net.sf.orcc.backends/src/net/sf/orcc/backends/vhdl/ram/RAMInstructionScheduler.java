@@ -49,6 +49,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines a visitor that transforms loads and stores to RAM
@@ -73,25 +74,18 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 * @param var
 	 *            variable
 	 */
-	private void addEarlySetAddress(List<Expression> indexes, int port, Var var) {
+	private void addEarlySetAddress(List<Instruction> instructions,
+			List<Expression> indexes, int port, Var var) {
 		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
 				.createInstRamSetAddress(port, var, indexes);
 
-		// save index
-		int index = itInstruction.nextIndex() + 1;
-
 		// insert the RSA before the previous split instruction
-		while (itInstruction.hasPrevious()) {
-			Instruction instruction = itInstruction.previous();
+		for (int i = indexInst - 1; i > 0; i--) {
+			Instruction instruction = instructions.get(i);
 			if (instruction instanceof InstSplit) {
-				itInstruction.add(rsa);
+				instructions.add(i, rsa);
 				break;
 			}
-		}
-
-		// back to index
-		while (itInstruction.nextIndex() != index) {
-			itInstruction.next();
 		}
 	}
 
@@ -124,18 +118,20 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 * @param var
 	 *            variable
 	 */
-	private void addSetAddress(List<Expression> indexes, int port, Var var) {
+	private void addSetAddress(List<Instruction> instructions,
+			List<Expression> indexes, int port, Var var) {
 		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
 				.createInstRamSetAddress(port, var, indexes);
-		getInstructions().add(indexInst, rsa);
+		instructions.add(indexInst++, rsa);
 	}
 
 	/**
 	 * Adds a SplitInstruction.
 	 * 
 	 */
-	private void addSplitInstruction() {
-		itInstruction.add(InstructionsFactory.eINSTANCE.createInstSplit());
+	private void addSplitInstruction(List<Instruction> instructions) {
+		instructions.add(indexInst++,
+				InstructionsFactory.eINSTANCE.createInstSplit());
 	}
 
 	/**
@@ -148,10 +144,11 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 * @param port
 	 *            a port
 	 */
-	private void addWrite(RAM ram, InstStore store, int port) {
+	private void addWrite(List<Instruction> instructions, RAM ram,
+			InstStore store, int port) {
 		InstRamWrite write = InstructionsFactory.eINSTANCE.createInstRamWrite(
 				port, store.getTarget().getVariable(), store.getValue());
-		itInstruction.add(write);
+		instructions.add(indexInst++, write);
 	}
 
 	/**
@@ -161,6 +158,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            a Load
 	 */
 	private void convertLoad(InstLoad load) {
+		List<Instruction> instructions = EcoreHelper.getContainingList(load);
 		List<Expression> indexes = load.getIndexes();
 		Var var = load.getSource().getVariable();
 
@@ -171,24 +169,24 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 			int ajustedPort = port % 2 + 1;
 			if (ram.isWaitCycleNeeded()) {
-				addSetAddress(indexes, ajustedPort, var);
+				addSetAddress(instructions, indexes, ajustedPort, var);
 			} else {
-				addEarlySetAddress(indexes, ajustedPort, var);
+				addEarlySetAddress(instructions, indexes, ajustedPort, var);
 			}
 			addPendingRead(ram, load, ajustedPort);
 
 			if (port % 2 == 1) {
 				// two ports have been used
 				if (ram.isWaitCycleNeeded()) {
-					addSplitInstruction();
+					addSplitInstruction(instructions);
 					ram.setWaitCycleNeeded(false);
 				}
 
-				addSplitInstruction();
+				addSplitInstruction(instructions);
 				executeTwoPendingReads(ram);
 			}
 		} else {
-			addSetAddress(indexes, 1, var);
+			addSetAddress(instructions, indexes, 1, var);
 			addPendingRead(ram, load, 1);
 
 			ram.setLastAccessRead(true);
@@ -204,6 +202,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            a Store
 	 */
 	private void convertStore(InstStore store) {
+		List<Instruction> instructions = EcoreHelper.getContainingList(store);
 		List<Expression> indexes = store.getIndexes();
 		Var var = store.getTarget().getVariable();
 
@@ -213,15 +212,15 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			port = ram.getLastPortUsed() + 1;
 			if (port > 0 && port % 2 == 0) {
 				// port == 2, 4, 6, 8...
-				addSplitInstruction();
+				addSplitInstruction(instructions);
 			}
 		} else {
 			port = 0;
 		}
 
 		int ajustedPort = port % 2 + 1;
-		addSetAddress(indexes, ajustedPort, var);
-		addWrite(ram, store, ajustedPort);
+		addSetAddress(instructions, indexes, ajustedPort, var);
+		addWrite(instructions, ram, store, ajustedPort);
 
 		ram.setLastPortUsed(port);
 		ram.setLastAccessRead(false);
@@ -263,9 +262,9 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		Var var = load.getSource().getVariable();
 		if (!load.getIndexes().isEmpty() && var.isAssignable()
 				&& var.isGlobal()) {
-			itInstruction.remove();
-
 			convertLoad(load);
+			EcoreHelper.delete(load);
+			indexInst--;
 		}
 		return null;
 	}
@@ -292,8 +291,9 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	public Object caseInstStore(InstStore store) {
 		Var var = store.getTarget().getVariable();
 		if (!store.getIndexes().isEmpty() && var.isGlobal()) {
-			itInstruction.remove();
 			convertStore(store);
+			EcoreHelper.delete(store);
+			indexInst--;
 		}
 		return null;
 	}

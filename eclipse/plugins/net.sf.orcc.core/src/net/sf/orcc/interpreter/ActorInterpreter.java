@@ -207,7 +207,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	protected void allocatePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Var var = pattern.getVariable(port);
-			var.setValue((Expression) var.getType().accept(listAllocator));
+			var.setValue(listAllocator.doSwitch(var.getType()));
 		}
 	}
 
@@ -332,8 +332,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				if (initConst == null) {
 					if (type.isList()) {
 						// Allocate empty array variable
-						stateVar.setValue((Expression) type
-								.accept(listAllocator));
+						stateVar.setValue(listAllocator.doSwitch(type));
 					}
 				} else {
 					// initialize
@@ -377,8 +376,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				peeked.setValue((Expression) peeked.getType().accept(
-						listAllocator));
+				peeked.setValue(listAllocator.doSwitch(peeked.getType()));
 				int numTokens = pattern.getNumTokens(port);
 				Fifo fifo = fifos.get(port.getName());
 				peekFifo(peeked.getValue(), fifo, numTokens);
@@ -638,7 +636,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			for (Var local : procedure.getLocals()) {
 				Type type = local.getType();
 				if (type.isList()) {
-					local.setValue((Expression) type.accept(listAllocator));
+					local.setValue(listAllocator.doSwitch(type));
 				}
 			}
 

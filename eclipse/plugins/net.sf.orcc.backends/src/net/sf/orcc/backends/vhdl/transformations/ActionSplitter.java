@@ -42,6 +42,7 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
@@ -49,6 +50,7 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -151,7 +153,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstSpecific(InstSpecific instruction) {
 		if (instruction instanceof InstSplit) {
-			splitAction(instruction);
+			splitAction((InstSplit) instruction);
 		}
 		return null;
 	}
@@ -245,7 +247,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	/**
 	 * Split the current action
 	 */
-	private void splitAction(Instruction instruction) {
+	private void splitAction(InstSplit instSplit) {
 		String newActionName = getNewStateName();
 
 		// create new action
@@ -253,24 +255,19 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 				newActionName);
 
 		// remove the SplitInstruction
-		itInstruction.previous();
-		itInstruction.remove();
+		NodeBlock block = instSplit.getBlock();
+		EcoreHelper.delete(instSplit);
 
 		// move instructions
 		NodeBlock targetBlock = nextAction.getBody().getFirst();
-		int index = itInstruction.nextIndex();
-		List<Instruction> instructions = instruction.getBlock().getInstructions();
-		while (instructions.size() > index) {
-			targetBlock.getInstructions().add(instructions.get(index));
-		}
-		
+		List<Instruction> instructions = block.getInstructions();
+		targetBlock.getInstructions().addAll(
+				instructions.subList(indexInst, instructions.size()));
+
 		// move nodes
-		/*List<Node> targetNodes = nextAction.getBody().getNodes();
-		index = itNode.nextIndex();
-		List<Instruction> instructions = instruction.getBlock().getInstructions();
-		while (instructions.size() > index) {
-			targetBlock.getInstructions().add(instructions.get(index));
-		}*/
+		List<Node> targetNodes = nextAction.getBody().getNodes();
+		List<Node> nodes = EcoreHelper.getContainingList(block);
+		targetNodes.addAll(nodes.subList(indexNode, nodes.size()));
 
 		// update transitions
 		replaceTransition(nextAction);

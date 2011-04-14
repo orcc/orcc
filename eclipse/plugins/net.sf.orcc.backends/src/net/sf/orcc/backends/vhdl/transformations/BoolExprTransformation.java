@@ -36,6 +36,7 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Var;
@@ -76,7 +77,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 		if (target.getType().isBool()) {
 			Expression expr = assign.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
-				createIfNode(target, expr);
+				createIfNode(assign, target, expr);
 
 				// saves the current block
 				NodeBlock block = assign.getBlock();
@@ -99,7 +100,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				Var local = newVariable();
 				returnInstr.setValue(IrFactory.eINSTANCE.createExprVar(local));
-				createIfNode(local, expr);
+				createIfNode(returnInstr, local, expr);
 
 				// moves this return and remaining instructions to a new block
 				createNewBlock(returnInstr.getBlock());
@@ -117,7 +118,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				Var local = newVariable();
 				store.setValue(IrFactory.eINSTANCE.createExprVar(local));
-				createIfNode(local, expr);
+				createIfNode(store, local, expr);
 
 				// moves this store and remaining instructions to a new block
 				createNewBlock(store.getBlock());
@@ -137,28 +138,31 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 	 * @param expr
 	 *            an expression
 	 */
-	private void createIfNode(Var target, Expression expr) {
-		NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
-		node.setCondition(expr);
-		node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
+	private void createIfNode(Instruction instruction, Var target,
+			Expression expr) {
+		NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
+		nodeIf.setCondition(expr);
+		nodeIf.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
 
 		// add "then" nodes
 		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		node.getThenNodes().add(block);
+		nodeIf.getThenNodes().add(block);
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 				IrFactory.eINSTANCE.createExprBool(true));
 		block.add(assign);
 
 		// add "else" nodes
 		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		node.getElseNodes().add(block);
+		nodeIf.getElseNodes().add(block);
 		assign = IrFactory.eINSTANCE.createInstAssign(target,
 				IrFactory.eINSTANCE.createExprBool(false));
 		block.add(assign);
 
 		// increments index and adds the if after the current block
 		indexNode++;
-		getNodes().add(indexNode, node);
+		List<Node> nodes = EcoreHelper.getContainingList(EcoreHelper
+				.getContainerOfType(instruction, Node.class));
+		nodes.add(indexNode, nodeIf);
 	}
 
 	/**
@@ -172,7 +176,8 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 		// adds a new block after the if node created
 		// the index is not incremented so the created block will be visited too
 		NodeBlock targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		getNodes().add(indexNode, targetBlock);
+		List<Node> nodes = EcoreHelper.getContainingList(block);
+		nodes.add(indexNode, targetBlock);
 
 		// moves instructions
 		List<Instruction> instructions = block.getInstructions();
