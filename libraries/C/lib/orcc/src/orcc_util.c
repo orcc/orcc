@@ -113,7 +113,7 @@ void print_usage() {
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
-	const char *ostr = "i:o:w:m:og:";
+	const char *ostr = "i:o:w:m:g:";
 	int c;
 
 	program = argv[0];
@@ -139,7 +139,7 @@ void init_orcc(int argc, char *argv[]) {
 		case 'm':
 			mapping_file = strdup(optarg);
 			break;
-		case 'og':
+		case 'g':
 			output_genetic = strdup(optarg);
 		default:
 			fprintf(stderr, "skipping option -%c\n", c);
