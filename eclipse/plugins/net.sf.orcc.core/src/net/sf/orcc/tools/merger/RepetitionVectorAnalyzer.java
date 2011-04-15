@@ -71,11 +71,11 @@ public class RepetitionVectorAnalyzer {
 	private void calculateRate(Vertex vertex, Rational rate)
 			throws OrccException {
 		Instance instance = vertex.getInstance();
-		if (!instance.getContentClass().isSDF()) {
+		if (!instance.getMoC().isSDF()) {
 			throw new OrccException("class" + instance.getClasz()
 					+ "is not static!");
 		}
-		SDFMoC SdfActor = (SDFMoC) instance.getContentClass();
+		SDFMoC moc = (SDFMoC) instance.getMoC();
 
 		rationals.put(vertex, rate);
 
@@ -84,10 +84,10 @@ public class RepetitionVectorAnalyzer {
 			if (tgt.isInstance()) {
 				if (!rationals.containsKey(tgt)) {
 
-					int produced = SdfActor.getNumTokensProduced(connection
+					int produced = moc.getNumTokensProduced(connection
 							.getSource());
-					int consumed = getStaticClass(tgt).getNumTokensConsumed(
-							connection.getTarget());
+					int consumed = ((SDFMoC) tgt.getInstance().getMoC())
+							.getNumTokensConsumed(connection.getTarget());
 
 					Rational outgoingRate = rate.mul(new Rational(produced,
 							consumed));
@@ -95,14 +95,15 @@ public class RepetitionVectorAnalyzer {
 				}
 			}
 		}
+
 		for (Connection connection : graph.incomingEdgesOf(vertex)) {
 			Vertex src = graph.getEdgeSource(connection);
 			if (src.isInstance()) {
 				if (!rationals.containsKey(src)) {
 
-					int produced = getStaticClass(src).getNumTokensProduced(
-							connection.getSource());
-					int consumed = SdfActor.getNumTokensConsumed(connection
+					int produced = ((SDFMoC) src.getInstance().getMoC())
+							.getNumTokensProduced(connection.getSource());
+					int consumed = moc.getNumTokensConsumed(connection
 							.getTarget());
 
 					Rational incomingRate = rate.mul(new Rational(consumed,
@@ -126,10 +127,10 @@ public class RepetitionVectorAnalyzer {
 			Vertex tgt = graph.getEdgeTarget(connection);
 
 			if (src.isInstance() && tgt.isInstance()) {
-				int produced = getStaticClass(src).getNumTokensProduced(
-						connection.getSource());
-				int consumed = getStaticClass(tgt).getNumTokensConsumed(
-						connection.getTarget());
+				int produced = ((SDFMoC) src.getInstance().getMoC())
+						.getNumTokensProduced(connection.getSource());
+				int consumed = ((SDFMoC) tgt.getInstance().getMoC())
+						.getNumTokensConsumed(connection.getTarget());
 
 				int srcRate = repetitionVector.get(src);
 				int tgtRate = repetitionVector.get(tgt);
@@ -153,14 +154,13 @@ public class RepetitionVectorAnalyzer {
 	public Map<Vertex, Integer> getRepetitionVector() throws OrccException {
 		if (repetitionVector != null) {
 			Vertex vertex = null;
-			
+
 			for (Vertex v : graph.vertexSet()) {
 				if (v.isInstance()) {
 					vertex = v;
 					break;
 				}
 			}
-			// Vertex vertex = (Vertex) graph.vertexSet().toArray()[0];
 
 			calculateRate(vertex, new Rational(1, 1));
 
@@ -180,21 +180,14 @@ public class RepetitionVectorAnalyzer {
 
 			checkConsistency();
 
-			// multiply the actor repetition count with its number of phases
-
 			for (Map.Entry<Vertex, Integer> entry : repetitionVector.entrySet()) {
 				Integer val = entry.getValue();
-				int nbPhases = getStaticClass(entry.getKey())
-						.getNumberOfPhases();
+				SDFMoC moc = (SDFMoC) entry.getKey().getInstance().getMoC();
+				int nbPhases = moc.getNumberOfPhases();
 				entry.setValue(val * nbPhases);
 			}
 		}
 		return repetitionVector;
-	}
-
-	private SDFMoC getStaticClass(Vertex vertex) {
-		SDFMoC staticClass = (SDFMoC) vertex.getInstance().getContentClass();
-		return staticClass;
 	}
 
 }

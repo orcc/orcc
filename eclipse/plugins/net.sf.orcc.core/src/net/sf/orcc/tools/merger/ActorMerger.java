@@ -59,10 +59,12 @@ public class ActorMerger implements INetworkTransformation {
 
 		StaticSubsetDetector detector = new StaticSubsetDetector(network);
 
+		DirectedGraph<Vertex, Connection> subgraph;
+
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
 
-			DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
-					graph, vertices, null);
+			subgraph = new DirectedSubgraph<Vertex, Connection>(graph,
+					vertices, null);
 
 			scheduler = new SASFlatScheduler(subgraph);
 
@@ -71,6 +73,7 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	private void mergeActors(Set<Vertex> vertices) {
+		
 	}
 
 }

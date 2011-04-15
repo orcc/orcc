@@ -29,13 +29,12 @@
 
 package net.sf.orcc.tools.merger;
 
-import java.util.List;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 
 /**
  * This class computes a static schedule from the given network. All instances
@@ -56,12 +55,18 @@ public class SASFlatScheduler extends AbstractScheduler {
 		Schedule schedule = new Schedule();
 		schedule.setIterationCount(1);
 
-		List<Vertex> sort = new TopologicalSorter(graph).topologicalSort();
-		for (Vertex vertex : sort) {
+		TopologicalOrderIterator<Vertex, Connection> it = new TopologicalOrderIterator<Vertex, Connection>(
+				graph);
+
+		while (it.hasNext()) {
+			Vertex vertex = it.next();
+
 			if (vertex.isInstance()) {
 				int rep = repetitionVector.get(vertex);
+				Iterand iterand = null;
 				for (int i = 0; i < rep; i++) {
-					schedule.add(new Iterand(vertex));
+					iterand = new Iterand(vertex);
+					schedule.add(iterand);
 				}
 			}
 		}

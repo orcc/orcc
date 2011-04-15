@@ -32,7 +32,6 @@ package net.sf.orcc.tools.merger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -50,6 +49,7 @@ import net.sf.orcc.network.Vertex;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.StrongConnectivityInspector;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 
 /**
  * This class detects statically schedulable regions of the graph. A region
@@ -64,8 +64,6 @@ public class StaticSubsetDetector {
 
 	private Set<Vertex> discovered = new HashSet<Vertex>();
 	private Set<Vertex> finished = new HashSet<Vertex>();
-
-	private List<Vertex> orderedVertices;
 
 	private Set<Set<Vertex>> staticRegionSet;
 
@@ -137,7 +135,7 @@ public class StaticSubsetDetector {
 			if (scc.size() > 1) {
 				if (scc.remove(clusterVertex)) {
 					for (Vertex v : scc) {
-						MoC clasz = v.getInstance().getContentClass();
+						MoC clasz = v.getInstance().getMoC();
 						if (!clasz.isSDF()) {
 							ret = false;
 						}
@@ -161,7 +159,7 @@ public class StaticSubsetDetector {
 
 		while (!stack.isEmpty()) {
 			Vertex v = stack.pop();
-			MoC clasz = v.getInstance().getContentClass();
+			MoC clasz = v.getInstance().getMoC();
 			if (clasz.isSDF()) {
 				if (!discovered.contains(v)) {
 					discovered.add(v);
@@ -172,7 +170,7 @@ public class StaticSubsetDetector {
 					finished.add(v);
 					for (Connection edge : graph.outgoingEdgesOf(v)) {
 						Vertex tgtVertex = graph.getEdgeTarget(edge);
-						clasz = tgtVertex.getInstance().getContentClass();
+						clasz = tgtVertex.getInstance().getMoC();
 						if (!discovered.contains(tgtVertex) && clasz.isSDF()) {
 							if (vertices != null) {
 								List<Vertex> l = new LinkedList<Vertex>(
@@ -199,19 +197,16 @@ public class StaticSubsetDetector {
 
 		staticRegionSet = new HashSet<Set<Vertex>>();
 		List<List<Vertex>> staticRegionList = new ArrayList<List<Vertex>>();
-		orderedVertices = new LinkedList<Vertex>();
 
 		// 1) orders vertices according to finishing time.
-		orderedVertices = new TopologicalSorter(graph).topologicalSort();
 		discovered = new HashSet<Vertex>();
 		finished = new HashSet<Vertex>();
 
-		// 2) detects static region considering vertices in order
-		// of increasing finishing time
-		Iterator<Vertex> it = orderedVertices.iterator();
+		TopologicalOrderIterator<Vertex, Connection> it = new TopologicalOrderIterator<Vertex, Connection>(
+				graph);
 		while (it.hasNext()) {
 			Vertex vertex = it.next();
-			MoC clasz = vertex.getInstance().getContentClass();
+			MoC clasz = vertex.getInstance().getMoC();
 			if (!discovered.contains(vertex) && clasz.isSDF()) {
 				List<Vertex> set = new LinkedList<Vertex>();
 				staticRegionList.add(set);
