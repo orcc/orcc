@@ -28,9 +28,11 @@
  */
 package net.sf.orcc.ir.transformations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -38,6 +40,7 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -55,54 +58,27 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 	private Predicate currentPredicate;
 
-	private Node target;
+	private List<NodeIf> nodeIfList;
 
 	@Override
 	public Object caseNodeBlock(NodeBlock block) {
 		Procedure procedure = EcoreHelper.getContainerOfType(block,
 				Procedure.class);
+		NodeBlock targetBlock = null;
 
 		List<Instruction> instructions = block.getInstructions();
 		while (!instructions.isEmpty()) {
 			Instruction inst = instructions.get(0);
 
 			Predicate predicate = inst.getPredicate();
-			NodeBlock targetBlock;
-			if (predicate == null || predicate.isEmpty()) {
-				if (currentPredicate.isEmpty()) {
-					if (target == null) {
-						// if target does not exist yet, create it
-						target = IrFactory.eINSTANCE.createNodeBlock();
-						procedure.getNodes().add(target);
-					}
-				} else {
-					// end current if
-					currentPredicate.clear();
-					target = IrFactory.eINSTANCE.createNodeBlock();
-					procedure.getNodes().add(target);
-				}
-				targetBlock = (NodeBlock) target;
-			} else {
-				if (currentPredicate.isEmpty()) {
-					for (Expression condition : predicate.getExpressions()) {
-						target = IrFactory.eINSTANCE.createNodeIf();
-						((NodeIf) target).setCondition(condition);
-						((NodeIf) target).setJoinNode(IrFactory.eINSTANCE
-								.createNodeBlock());
-						procedure.getNodes().add(target);
-
-						currentPredicate.add(condition);
-					}
-				}
-
-				inst.getPredicate().clear();
-				targetBlock = procedure.getLast(((NodeIf) target)
-						.getThenNodes());
+			if (!predicate.isSameAs(currentPredicate)) {
+				targetBlock = updateTargetBlock(procedure, predicate);
 			}
 
-			((NodeBlock) targetBlock).getInstructions().add(inst);
+			targetBlock.getInstructions().add(inst);
 		}
 
+		// remove this block
 		EcoreUtil.remove(block);
 
 		return NULL;
@@ -115,12 +91,92 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		currentPredicate = IrFactory.eINSTANCE.createPredicate();
-		target = null;
+		nodeIfList = new ArrayList<NodeIf>();
+
+		// initialized to "null" so that the first empty predicate will create
+		// an unconditional block
+		currentPredicate = null;
 
 		doSwitch(procedure.getNodes().get(0));
 
 		return NULL;
+	}
+
+	/**
+	 * Returns the list of nodes that matches the given condition (if any).
+	 * 
+	 * @param parentNodes
+	 *            list of nodes to which the "if" we're looking for belongs
+	 * @param condition
+	 *            a condition
+	 * @return the list of nodes that matches the given condition, or
+	 *         <code>null</code>
+	 */
+	private List<Node> findNodes(List<Node> parentNodes, Expression condition) {
+		for (NodeIf nodeIf : nodeIfList) {
+			List<Node> nodes = EcoreHelper.getContainingList(nodeIf);
+			if (EcoreUtil.equals(condition, nodeIf.getCondition())
+					&& parentNodes == nodes) {
+				return nodeIf.getThenNodes();
+			} else {
+				if (condition.isUnaryExpr()) {
+					ExprUnary unary = (ExprUnary) condition;
+					Expression expr = unary.getExpr();
+
+					if (unary.getOp() == OpUnary.LOGIC_NOT
+							&& EcoreUtil.equals(expr, nodeIf.getCondition())
+							&& parentNodes == nodes) {
+						return nodeIf.getElseNodes();
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Updates targetBlock according to the given predicate.
+	 * 
+	 * @param procedure
+	 *            the current procedure
+	 * @param predicate
+	 *            a predicate
+	 */
+	private NodeBlock updateTargetBlock(Procedure procedure, Predicate predicate) {
+		currentPredicate = IrFactory.eINSTANCE.createPredicate();
+		List<Node> parentNodes = procedure.getNodes();
+
+		if (predicate.isEmpty()) {
+			// unconditioned predicate => forgets all ifs
+			nodeIfList.clear();
+
+			// creates a new block
+			NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
+			procedure.getNodes().add(block);
+			return block;
+		} else {
+			for (Expression condition : predicate.getExpressions()) {
+				List<Node> nodes = findNodes(parentNodes, condition);
+				if (nodes == null) {
+					// create a new if
+					NodeIf nodeIf = IrFactory.eINSTANCE.createNodeIf();
+					nodeIf.setCondition(condition);
+					nodeIf.setJoinNode(IrFactory.eINSTANCE.createNodeBlock());
+					nodeIfList.add(nodeIf);
+					parentNodes.add(nodeIf);
+
+					// use the nodes of the "then" branch
+					parentNodes = nodeIf.getThenNodes();
+				} else {
+					parentNodes = nodes;
+				}
+
+				currentPredicate.add(condition);
+			}
+
+			return procedure.getLast(parentNodes);
+		}
 	}
 
 }
