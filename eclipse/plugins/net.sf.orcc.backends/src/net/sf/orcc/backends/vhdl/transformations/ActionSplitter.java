@@ -199,7 +199,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		currentAction.setOutputPattern(IrFactory.eINSTANCE.createPattern());
 
 		// add action to actor's actions
-		ActionSplitter.this.actor.getActions().add(action);
+		actor.getActions().add(action);
 
 		return action;
 	}

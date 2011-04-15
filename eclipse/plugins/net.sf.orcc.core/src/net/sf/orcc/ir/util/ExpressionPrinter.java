@@ -30,6 +30,8 @@ package net.sf.orcc.ir.util;
 
 import java.util.Iterator;
 
+import org.eclipse.emf.ecore.EObject;
+
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -124,6 +126,15 @@ public class ExpressionPrinter extends IrSwitch<String> {
 		return expr.getUse().getVariable().getIndexedName();
 	}
 
+	@Override
+	public String doSwitch(EObject theEObject) {
+		if (theEObject == null) {
+			return "null";
+		} else {
+			return super.doSwitch(theEObject);
+		}
+	}
+
 	public String doSwitch(Expression expression, int newPrecedence,
 			int newBranch) {
 		int oldBranch = branch;
@@ -136,7 +147,7 @@ public class ExpressionPrinter extends IrSwitch<String> {
 		branch = oldBranch;
 		return result;
 	}
-
+	
 	/**
 	 * Returns the string representation of the given binary operator.
 	 * 
