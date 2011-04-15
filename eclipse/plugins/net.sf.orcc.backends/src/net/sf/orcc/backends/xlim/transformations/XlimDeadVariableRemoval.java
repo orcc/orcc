@@ -31,8 +31,6 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
 import net.sf.orcc.ir.Action;
@@ -52,32 +50,17 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 
 	@Override
-	public void visit(InstSpecific specific) {
+	public Object caseInstSpecific(InstSpecific specific) {
 		if (specific instanceof InstTernary) {
 			InstTernary ternaryOperation = (InstTernary) specific;
 
-			Var variable = ternaryOperation.getTarget().getVariable();
-			if (!variable.isUsed()) {
-				// do not remove ternaryOperation to variables that are used by
-				// writes
-				if (isPort(variable)) {
-					return;
-				}
-
-				// clean up uses
-				ternaryOperation.setTarget(null);
-
-				EcoreUtil.delete(ternaryOperation.getConditionValue(), true);
-				EcoreUtil.delete(ternaryOperation.getTrueValue(), true);
-				EcoreUtil.delete(ternaryOperation.getFalseValue(), true);
-
-				// remove instruction
-				itInstruction.remove();
-
-				procedure.getLocals().remove(variable.getName());
-				changed = true;
+			Var target = ternaryOperation.getTarget().getVariable();
+			if (target != null && !target.isUsed()) {
+				handleInstruction(target, ternaryOperation);
 			}
+			return NULL;
 		}
+		return super.caseInstSpecific(specific);
 	}
 
 	@Override

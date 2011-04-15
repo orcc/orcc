@@ -66,7 +66,7 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor<Object> 
 			Type type = target.getType();
 			// Allocate value field of list if it is initialized
 			if (type.isList() && target.getValue() == null) {
-				target.setValue((Expression) type.accept(listAllocator));
+				target.setValue((Expression) listAllocator.doSwitch(type));
 			}
 			super.visit(instr);
 		}
