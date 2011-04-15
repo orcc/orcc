@@ -45,6 +45,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
@@ -214,9 +215,11 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 			boolean hasMorePendingReads;
 			List<Instruction> instructions = block.getInstructions();
-			indexInst = instructions.size();
+			indexInst = instructions.size() - 1; // before the return
+			Predicate predicate = IrFactory.eINSTANCE.createPredicate();
 			do {
-				hasMorePendingReads = executeTwoPendingReads(instructions, ram);
+				hasMorePendingReads = executeTwoPendingReads(instructions,
+						predicate, ram);
 			} while (hasMorePendingReads);
 		}
 		return null;
@@ -251,13 +254,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 			if (port % 2 == 1) {
 				// two ports have been used
-				if (ram.isWaitCycleNeeded()) {
-					addSplitInstruction(instructions, predicate);
-					ram.setWaitCycleNeeded(false);
-				}
-
-				addSplitInstruction(instructions, predicate);
-				executeTwoPendingReads(instructions, ram);
+				executeTwoPendingReads(instructions, predicate, ram);
 			}
 		} else {
 			addSetAddress(instructions, predicate, indexes, 1, var);
@@ -303,16 +300,40 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		ram.setPredicate(predicate);
 	}
 
+	/**
+	 * Executes at most two pending reads. This method inserts split
+	 * instructions as necessary before the reads.
+	 * 
+	 * @param instructions
+	 *            a list of instructions that this method should add
+	 *            instructions to
+	 * @param predicate
+	 *            predicate of instructions
+	 * @param ram
+	 *            a RAM
+	 * @return <code>true</code> if there are still pending reads
+	 */
 	private boolean executeTwoPendingReads(List<Instruction> instructions,
-			RAM ram) {
+			Predicate predicate, RAM ram) {
 		List<InstRamRead> reads = pendingReads.get(ram);
-		Iterator<InstRamRead> it = reads.iterator();
-		for (int i = 0; it.hasNext() && i < 2; i++) {
-			instructions.add(indexInst++, it.next());
-			it.remove();
-		}
+		if (reads.isEmpty()) {
+			return false;
+		} else {
+			if (ram.isWaitCycleNeeded()) {
+				addSplitInstruction(instructions, predicate);
+				ram.setWaitCycleNeeded(false);
+			}
 
-		return it.hasNext();
+			addSplitInstruction(instructions, predicate);
+
+			Iterator<InstRamRead> it = reads.iterator();
+			for (int i = 0; it.hasNext() && i < 2; i++) {
+				instructions.add(indexInst++, it.next());
+				it.remove();
+			}
+
+			return it.hasNext();
+		}
 	}
 
 }
