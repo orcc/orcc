@@ -53,7 +53,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Herve Yviquel
  * 
  */
-public class TernaryOperationAdder extends AbstractActorVisitor {
+public class TernaryOperationAdder extends AbstractActorVisitor<Object> {
 
 	private NodeBlock newBlockNode;
 	private Var condVar;

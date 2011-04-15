@@ -49,7 +49,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class ConstantPhiValuesTransformation extends AbstractActorVisitor {
+public class ConstantPhiValuesTransformation extends AbstractActorVisitor<Object> {
 
 	@Override
 	public void visit(InstPhi phi) {

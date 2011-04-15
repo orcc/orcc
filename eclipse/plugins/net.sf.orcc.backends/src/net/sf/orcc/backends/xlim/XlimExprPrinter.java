@@ -44,7 +44,7 @@ import net.sf.orcc.ir.util.ExpressionPrinter;
 public class XlimExprPrinter extends ExpressionPrinter {
 
 	@Override
-	public void visit(ExprBinary expr, Object... args) {
+	public String caseExprBinary(ExprBinary expr) {
 		OpBinary op = expr.getOp();
 		int currentPrec = op.getPrecedence();
 
@@ -57,22 +57,23 @@ public class XlimExprPrinter extends ExpressionPrinter {
 			nextPrec = currentPrec;
 		}
 
-		if (op.needsParentheses(args)) {
-			builder.append("(");
-			toString(nextPrec, expr.getE1(), op, expr.getE2());
-			builder.append(")");
+		if (op.needsParentheses(precedence, branch)) {
+			return "(" + doSwitch(expr.getE1(), nextPrec, 0) + " "
+					+ toString(op) + " " + doSwitch(expr.getE2(), nextPrec, 1)
+					+ ")";
 		} else {
-			toString(nextPrec, expr.getE1(), op, expr.getE2());
+			return doSwitch(expr.getE1(), nextPrec, 0) + " " + toString(op)
+					+ " " + doSwitch(expr.getE2(), nextPrec, 1);
 		}
 	}
 
 	@Override
-	public void visit(ExprBool expr, Object... args) {
-		builder.append(expr.isValue() ? "1" : "0");
+	public String caseExprBool(ExprBool expr) {
+		return expr.isValue() ? "1" : "0";
 	}
 
 	@Override
-	public void visit(ExprList expr, Object... args) {
+	public String caseExprList(ExprList expr) {
 		throw new OrccRuntimeException("List expression not supported");
 	}
 

@@ -52,7 +52,7 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Herve Yviquel
  * 
  */
-public class CustomPeekAdder extends AbstractActorVisitor {
+public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 
 	private Map<Port, Map<Integer, Var>> customPeekedMap;
 

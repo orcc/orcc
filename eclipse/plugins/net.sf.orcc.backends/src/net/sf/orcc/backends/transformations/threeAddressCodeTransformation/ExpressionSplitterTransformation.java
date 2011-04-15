@@ -28,35 +28,28 @@
  */
 package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.OpUnary;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.impl.NodeImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
+import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * Split expression and effective node that contains more than one fundamental
@@ -64,257 +57,147 @@ import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
  * 
  * @author Jerome GORIN
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
-public class ExpressionSplitterTransformation extends AbstractActorVisitor {
-
-	private class ExpressionSplitter extends AbstractExpressionInterpreter {
-
-		@Override
-		public Object interpret(ExprBinary expr, Object... args) {
-			Type type = expr.getType();
-			OpBinary op = expr.getOp();
-			Expression e1 = (Expression) expr.getE1().accept(this, args);
-			Expression e2 = (Expression) expr.getE2().accept(this, args);
-
-			expr.setE1(e1);
-			expr.setE2(e2);
-
-			// Create a new binary expression
-			Expression binExpr = IrFactory.eINSTANCE.createExprBinary(e1, op,
-					e2, type);
-
-			// Make a new assignment to the binary expression
-			Var target = procedure.newTempLocalVariable(type,
-					procedure.getName() + "_" + "expr");
-			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
-					binExpr);
-
-			// Add assignment to instruction's list
-			instrs.add(assign);
-
-			return IrFactory.eINSTANCE.createExprVar(target);
-		}
-
-		@Override
-		public Object interpret(ExprUnary expr, Object... args) {
-			Expression varExpr = expr.getExpr();
-			Type type = expr.getType();
-
-			varExpr = (Expression) varExpr.accept(this, args);
-
-			ExprBinary binaryExpr = transformUnaryExpr(expr.getOp(), varExpr);
-
-			// Make a new assignment to the binary expression
-			Var target = procedure.newTempLocalVariable(type,
-					procedure.getName() + "_" + "expr");
-			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
-					binaryExpr);
-
-			// Add assignment to instruction's list
-			instrs.add(assign);
-
-			return IrFactory.eINSTANCE.createExprVar(target);
-		}
-
-		public ExprBinary transformUnaryExpr(OpUnary op, Expression expr) {
-			Expression constExpr;
-			Type type = expr.getType();
-
-			switch (op) {
-			case MINUS:
-				constExpr = IrFactory.eINSTANCE.createExprInt(0);
-				return IrFactory.eINSTANCE.createExprBinary(constExpr,
-						OpBinary.MINUS, expr, type);
-			case LOGIC_NOT:
-				constExpr = IrFactory.eINSTANCE.createExprBool(false);
-				return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
-						constExpr, type);
-			case BITNOT:
-				return IrFactory.eINSTANCE.createExprBinary(expr,
-						OpBinary.BITXOR, expr, type);
-			default:
-				throw new OrccRuntimeException("unsupported operator");
-			}
-		}
-
-	}
-
-	private ExpressionSplitter expressionSplitter;
-
-	private List<Instruction> instrs;
+public class ExpressionSplitterTransformation extends
+		AbstractActorVisitor<Expression> {
 
 	public ExpressionSplitterTransformation() {
-		expressionSplitter = new ExpressionSplitter();
-		instrs = new ArrayList<Instruction>();
-	}
-
-	/**
-	 * Returns an iterator over the last instruction of the previous block. A
-	 * new block is created.
-	 * 
-	 * @param it
-	 * @return
-	 */
-	private ListIterator<Instruction> getItr(ListIterator<Node> it) {
-		// Create a new basic block
-		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-
-		// Add it before the current node
-		it.previous();
-		it.add(block);
-
-		return block.listIterator();
+		super(true);
 	}
 
 	@Override
-	public void visit(Actor actor) {
-		super.visit(actor);
+	public Expression caseExprBinary(ExprBinary expr) {
+		expr.setE1(doSwitch(expr.getE1()));
+		expr.setE2(doSwitch(expr.getE2()));
+
+		// Make a new assignment to the binary expression
+		Var target = procedure.newTempLocalVariable(
+				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
+						+ "expr");
+		// Add assignment to instruction's list
+		EcoreHelper.addInstBeforeExpr(expr,
+				IrFactory.eINSTANCE.createInstAssign(target, expr));
+
+		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
 	@Override
-	public void visit(InstAssign assign) {
-		Expression value = assign.getValue();
+	public Expression caseExprUnary(ExprUnary expr) {
+		expr.setExpr(doSwitch(expr.getExpr()));
 
-		if (value.isBinaryExpr()) {
-			ExprBinary binExpr = (ExprBinary) value;
-			Expression e1 = binExpr.getE1();
-			Expression e2 = binExpr.getE2();
+		// Make a new assignment to the binary expression
+		Var target = procedure.newTempLocalVariable(
+				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
+						+ "expr");
+		// Add assignment to instruction's list
+		EcoreHelper.addInstBeforeExpr(expr, IrFactory.eINSTANCE
+				.createInstAssign(target, transformUnaryExpr(expr)));
 
-			if (e1.isBinaryExpr() || e1.isUnaryExpr()) {
-				// Split expression e1
-				itInstruction.previous();
-				binExpr.setE1(visitExpression(e1, itInstruction));
-				itInstruction.next();
-			}
-
-			if (e2.isBinaryExpr() || e2.isUnaryExpr()) {
-				// Split expression e2
-				itInstruction.previous();
-				binExpr.setE2(visitExpression(e2, itInstruction));
-				itInstruction.next();
-			}
-		} else if (value.isUnaryExpr()) {
-			ExprUnary unaryExpr = (ExprUnary) value;
-			itInstruction.previous();
-
-			// Transform unary expression into binary expression
-			Expression newExpr = visitExpression(unaryExpr.getExpr(),
-					itInstruction);
-			assign.setValue(expressionSplitter.transformUnaryExpr(
-					unaryExpr.getOp(), newExpr));
-
-			itInstruction.next();
-		}
+		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
 	@Override
-	public void visit(InstCall call) {
-		List<Expression> parameters = call.getParameters();
-		for (Expression parameter : parameters) {
-			if (parameter.isBinaryExpr() || parameter.isUnaryExpr()) {
-				itInstruction.previous();
-				Expression newParameter = visitExpression(parameter,
-						itInstruction);
-				parameters.set(parameters.indexOf(parameter), newParameter);
-				itInstruction.next();
-			}
-		}
+	public Expression caseInstAssign(InstAssign assign) {
+		assign.setValue(doSwitch(assign.getValue()));
+		return null;
 	}
 
 	@Override
-	public void visit(NodeIf nodeIf) {
-		Expression condition = nodeIf.getCondition();
-		if ((condition.isBinaryExpr()) || (condition.isUnaryExpr())) {
-			Expression newCondition = visitExpression(condition, getItr(itNode));
-			nodeIf.setCondition(newCondition);
+	public Expression caseInstCall(InstCall call) {
+		EList<Expression> parameters = call.getParameters();
+		EList<Expression> newParameters = new BasicEList<Expression>();
+		for (Expression expr : parameters) {
+			newParameters.add(doSwitch(expr));
 		}
-		super.visit(nodeIf);
+		parameters.clear();
+		parameters.addAll(newParameters);
+		return null;
 	}
 
 	@Override
-	public void visit(InstLoad load) {
-		itInstruction.previous();
-		visitIndexes(load.getIndexes(), itInstruction);
-		itInstruction.next();
+	public Expression caseInstLoad(InstLoad load) {
+		EList<Expression> indexes = load.getIndexes();
+		EList<Expression> newIndexes = new BasicEList<Expression>();
+		for (Expression expr : indexes) {
+			newIndexes.add(doSwitch(expr));
+		}
+		indexes.clear();
+		indexes.addAll(newIndexes);
+		return null;
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
-		// set the label counter to prevent new nodes from having the same label
-		// as existing nodes
-		List<Node> nodes = procedure.getNodes();
-		if (nodes.size() > 0) {
-			Node lastNode = nodes.get(nodes.size() - 1);
-			NodeImpl.setLabelCount(lastNode.getLabel() + 2);
+	public Expression caseInstPhi(InstPhi phi) {
+		EList<Expression> values = phi.getValues();
+		EList<Expression> newValues = new BasicEList<Expression>();
+		for (Expression expr : values) {
+			newValues.add(doSwitch(expr));
 		}
-		super.visit(procedure);
+		values.clear();
+		values.addAll(newValues);
+		return null;
 	}
 
 	@Override
-	public void visit(InstReturn returnInstr) {
-		if (returnInstr.getValue() != null) {
-			itInstruction.previous();
-			Expression newValue = visitExpression(returnInstr.getValue(),
-					itInstruction);
-			returnInstr.setValue(newValue);
-			itInstruction.next();
+	public Expression caseInstReturn(InstReturn returnInstr) {
+		Expression expr = returnInstr.getValue();
+		if (expr != null) {
+			returnInstr.setValue(doSwitch(expr));
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstStore store) {
-		Expression value = store.getValue();
-
-		itInstruction.previous();
-
-		visitIndexes(store.getIndexes(), itInstruction);
-
-		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
-			Expression newValue = visitExpression(value, itInstruction);
-			store.setValue(newValue);
+	public Expression caseInstStore(InstStore store) {
+		EList<Expression> indexes = store.getIndexes();
+		EList<Expression> newIndexes = new BasicEList<Expression>();
+		for (Expression expr : indexes) {
+			newIndexes.add(doSwitch(expr));
 		}
-
-		itInstruction.next();
+		indexes.clear();
+		indexes.addAll(newIndexes);
+		doSwitch(store.getValue());
+		return null;
 	}
 
 	@Override
-	public void visit(NodeWhile nodeWhile) {
-		ListIterator<Instruction> it = nodeWhile.getJoinNode().listIterator();
-
-		// Go to the end of joinNode
-		while (it.hasNext()) {
-			it.next();
-		}
-
-		Expression condition = nodeWhile.getCondition();
-		if ((condition.isBinaryExpr()) || (condition.isUnaryExpr())) {
-			Expression newCondition = visitExpression(condition, it);
-			nodeWhile.setCondition(newCondition);
-		}
-
-		super.visit(nodeWhile);
+	public Expression caseNodeIf(NodeIf nodeIf) {
+		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		doSwitch(nodeIf.getThenNodes());
+		doSwitch(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getJoinNode());
+		return null;
 	}
 
-	private Expression visitExpression(Expression value,
-			ListIterator<Instruction> it) {
-		instrs.clear();
-		Expression expr = (Expression) value.accept(expressionSplitter);
-
-		for (Instruction instr : instrs) {
-			it.add(instr);
-		}
-
-		return expr;
+	@Override
+	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		doSwitch(nodeWhile.getNodes());
+		doSwitch(nodeWhile.getJoinNode());
+		return null;
 	}
 
-	private void visitIndexes(List<Expression> indexes,
-			ListIterator<Instruction> it) {
-		for (Expression value : indexes) {
-			if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
-				Expression newValue = visitExpression(value, it);
-				indexes.set(indexes.indexOf(value), newValue);
-			}
+	public ExprBinary transformUnaryExpr(ExprUnary expr) {
+		Expression constExpr;
+		Type type = expr.getType();
+
+		switch (expr.getOp()) {
+		case MINUS:
+			constExpr = IrFactory.eINSTANCE.createExprInt(0);
+			return IrFactory.eINSTANCE.createExprBinary(constExpr,
+					OpBinary.MINUS, expr, type);
+		case LOGIC_NOT:
+			constExpr = IrFactory.eINSTANCE.createExprBool(false);
+			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
+					constExpr, type);
+		case BITNOT:
+			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.BITXOR,
+					expr, type);
+		default:
+			throw new OrccRuntimeException("unsupported operator");
 		}
 	}
+
 }

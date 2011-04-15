@@ -35,6 +35,9 @@ import java.util.List;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Use;
 
 import org.eclipse.emf.common.util.TreeIterator;
@@ -47,6 +50,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * This class contains several methods to help the manipulation of EMF models.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
 public class EcoreHelper {
@@ -237,4 +241,40 @@ public class EcoreHelper {
 		}
 	}
 
+	/**
+	 * Add the given instruction before the given expression. If the expression
+	 * is contained by an instruction then the instruction to add is put
+	 * directly before, else the instruction is put to the previous nodeblock
+	 * which is created if needed.
+	 * 
+	 * @param expression
+	 *            an expression
+	 * @param instruction
+	 *            the instruction to add before the given expression
+	 */
+	public static void addInstBeforeExpr(Expression expression,
+			Instruction instruction) {
+		Instruction instContainer = EcoreHelper.getContainerOfType(expression,
+				Instruction.class);
+		if (instContainer != null) {
+			List<Instruction> instructions = EcoreHelper
+					.getContainingList(instContainer);
+			instructions.add(instructions.indexOf(instContainer), instruction);
+		} else {
+			Node nodeContainer = EcoreHelper.getContainerOfType(expression,
+					Node.class);
+			List<Node> nodes = EcoreHelper.getContainingList(nodeContainer);
+			int index = nodes.indexOf(nodeContainer);
+			if (index > 0) {
+				Node previousNode = nodes.get(index - 1);
+				if (previousNode.isBlockNode()) {
+					((NodeBlock) previousNode).add(instruction);
+					return;
+				}
+			}
+			NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
+			nodeBlock.add(instruction);
+			nodes.add(index, nodeBlock);
+		}
+	}
 }

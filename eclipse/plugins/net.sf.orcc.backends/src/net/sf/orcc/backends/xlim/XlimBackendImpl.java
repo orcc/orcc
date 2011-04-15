@@ -107,19 +107,19 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		actor.setTemplateData(new XlimActorTemplateData());
 
-		ActorVisitor[] transformations = { new ArrayInitializeTransformation(),
+		ActorVisitor<?>[] transformations = {
+				new ArrayInitializeTransformation(),
 				new TernaryOperationAdder(),
 				new XlimInlineTransformation(true, true),
 				new UnaryListToScalarTransformation(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new XlimDeadVariableRemoval(),
-				new ListFlattenTransformation(),
+				new XlimDeadVariableRemoval(), new ListFlattenTransformation(),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(true),
 				new ConstantPhiValuesTransformation(),
 				new MoveLiteralIntegers(), new XlimVariableRenamer() };
 
-		for (ActorVisitor transformation : transformations) {
+		for (ActorVisitor<?> transformation : transformations) {
 			transformation.visit(actor);
 		}
 
@@ -161,11 +161,12 @@ public class XlimBackendImpl extends AbstractBackend {
 		} else {
 			printer = new InstancePrinter("XLIM_sw_actor", true);
 		}
-		
+
 		// TODO printers
-		System.err.println("XlimBackendImpl.printInstance(Instance): must set printers");
-		//printer.setExpressionPrinter(XlimExprPrinter.class);
-		//printer.setTypePrinter(XlimTypePrinter.class);
+		System.err
+				.println("XlimBackendImpl.printInstance(Instance): must set printers");
+		// printer.setExpressionPrinter(XlimExprPrinter.class);
+		// printer.setTypePrinter(XlimTypePrinter.class);
 		return printer.print(instance.getId() + ".xlim", path, instance,
 				"instance");
 	}
@@ -191,9 +192,10 @@ public class XlimBackendImpl extends AbstractBackend {
 		}
 
 		// TODO printers
-		System.err.println("XlimBackendImpl.printNetwork(Network): must set printers");
-		//printer.setExpressionPrinter(XlimExprPrinter.class);
-		//printer.setTypePrinter(XlimTypePrinter.class);
+		System.err
+				.println("XlimBackendImpl.printNetwork(Network): must set printers");
+		// printer.setExpressionPrinter(XlimExprPrinter.class);
+		// printer.setTypePrinter(XlimTypePrinter.class);
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.print(file, path, network, "network");
 		if (!hardwareGen) {

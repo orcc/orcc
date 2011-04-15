@@ -72,7 +72,7 @@ import net.sf.orcc.ir.util.NodeInterpreter;
  * @author Herve Yviquel
  * 
  */
-public class InlineTransformation extends AbstractActorVisitor {
+public class InlineTransformation extends AbstractActorVisitor<Object> {
 
 	protected class InlineCloner implements NodeInterpreter,
 			InstructionInterpreter, ExpressionInterpreter {

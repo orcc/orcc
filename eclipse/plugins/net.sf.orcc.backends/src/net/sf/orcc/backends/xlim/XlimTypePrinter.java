@@ -33,7 +33,6 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.util.TypePrinter;
 
 /**
@@ -44,39 +43,30 @@ import net.sf.orcc.ir.util.TypePrinter;
  */
 public class XlimTypePrinter extends TypePrinter {
 
-	private void printInt(int size) {
-		builder.append("int");
+	@Override
+	public String caseTypeBool(TypeBool type) {
+		return "bool";
 	}
 
 	@Override
-	public void visit(TypeBool type) {
-		builder.append("bool");
+	public String caseTypeInt(TypeInt type) {
+		return "int";
 	}
 
 	@Override
-	public void visit(TypeInt type) {
-		printInt(type.getSize());
-	}
-
-	@Override
-	public void visit(TypeList type) {
+	public String caseTypeList(TypeList type) {
 		// size will be printed later
-		type.getType().accept(this);
+		return doSwitch(type.getType());
 	}
 
 	@Override
-	public void visit(TypeString type) {
-		builder.append("String");
+	public String caseTypeString(TypeString type) {
+		return "String";
 	}
 
 	@Override
-	public void visit(TypeUint type) {
-		builder.append("uint");
-	}
-
-	@Override
-	public void visit(TypeVoid type) {
-		builder.append("void");
+	public String caseTypeUint(TypeUint type) {
+		return "uint";
 	}
 
 }

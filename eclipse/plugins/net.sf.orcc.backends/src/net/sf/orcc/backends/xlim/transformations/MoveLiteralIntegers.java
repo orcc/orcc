@@ -28,34 +28,33 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-
-import net.sf.orcc.backends.instructions.InstTernary;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
 import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
-import net.sf.orcc.ir.InstSpecific;
+import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
-import net.sf.orcc.ir.util.ExpressionInterpreter;
+import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * 
@@ -67,163 +66,161 @@ import net.sf.orcc.ir.util.ExpressionInterpreter;
  * @author Herve Yviquel
  * 
  */
-public class MoveLiteralIntegers extends AbstractActorVisitor {
+public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
 
-	private ExpressionInterpreter exprInterpreter = new AbstractExpressionInterpreter() {
-
-		@Override
-		public Object interpret(ExprBinary expr, Object... args) {
-			Expression e1 = (Expression) expr.getE1().accept(this, args);
-			Expression e2 = (Expression) expr.getE2().accept(this, args);
-			return IrFactory.eINSTANCE.createExprBinary(e1, expr.getOp(), e2,
-					expr.getType());
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public Object interpret(ExprBool expr, Object... args) {
-			Type type = expr.getType();
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			Var var = procedure.newTempLocalVariable(type, procedure.getName()
-					+ "_" + "litteral_integer");
-			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(var, expr);
-
-			// Add assignment to instruction's list
-			if (it.hasPrevious()) {
-				it.previous();
-			}
-			it.add(assign);
-			if (it.hasNext()) {
-				it.next();
-			}
-			return IrFactory.eINSTANCE.createExprVar(var);
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public Object interpret(ExprInt expr, Object... args) {
-			Type type = expr.getType();
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			Var var = procedure.newTempLocalVariable(type, procedure.getName()
-					+ "_" + "litteral_integer");
-			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(var, expr);
-
-			// Add assignment to instruction's list
-			if (it.hasPrevious()) {
-				it.previous();
-			}
-			it.add(assign);
-			if (it.hasNext()) {
-				it.next();
-			}
-			return IrFactory.eINSTANCE.createExprVar(var);
-		}
-
-		@Override
-		public Object interpret(ExprUnary expr, Object... args) {
-			Expression e = (Expression) expr.getExpr().accept(this, args);
-			return IrFactory.eINSTANCE.createExprUnary(expr.getOp(), e,
-					expr.getType());
-		}
-	};
-
-	@Override
-	public void visit(Actor actor) {
-		super.visit(actor);
+	public MoveLiteralIntegers() {
+		super(true);
 	}
 
 	@Override
-	public void visit(InstAssign assign) {
-		assign.setValue((Expression) assign.getValue().accept(exprInterpreter,
-				itInstruction));
+	public Expression caseExprBinary(ExprBinary expr) {
+		expr.setE1(doSwitch(expr.getE1()));
+		expr.setE2(doSwitch(expr.getE2()));
+		return expr;
 	}
 
 	@Override
-	public void visit(NodeIf nodeIf) {
-		// Check the presence of a NodeBlock before and create one if needed
-		if (itInstruction == null) {
-			Procedure procedure = nodeIf.getProcedure();
-			int index = procedure.getNodes().indexOf(nodeIf);
-			NodeBlock newBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			procedure.getNodes().add(index, newBlock);
-			itInstruction = newBlock.getInstructions().listIterator();
+	public Expression caseExprBool(ExprBool expr) {
+		return createExprVarAndAssign(expr);
+	}
+
+	@Override
+	public Expression caseExprFloat(ExprFloat expr) {
+		return createExprVarAndAssign(expr);
+	}
+
+	@Override
+	public Expression caseExprInt(ExprInt expr) {
+		return createExprVarAndAssign(expr);
+	}
+
+	@Override
+	public Expression caseExprList(ExprList expr) {
+		return createExprVarAndAssign(expr);
+	}
+
+	@Override
+	public Expression caseExprString(ExprString expr) {
+		return createExprVarAndAssign(expr);
+	}
+
+	@Override
+	public Expression caseExprUnary(ExprUnary expr) {
+		expr.setExpr(doSwitch(expr.getExpr()));
+		return expr;
+	}
+
+	@Override
+	public Expression caseInstAssign(InstAssign assign) {
+		assign.setValue(doSwitch(assign.getValue()));
+		return null;
+	}
+
+	@Override
+	public Expression caseInstCall(InstCall call) {
+		EList<Expression> parameters = call.getParameters();
+		EList<Expression> newParameters = new BasicEList<Expression>();
+		for (Expression expr : parameters) {
+			newParameters.add(doSwitch(expr));
 		}
-		ListIterator<Instruction> instructionIteratorBackup = itInstruction;
-		nodeIf.setCondition((Expression) nodeIf.getCondition().accept(
-				exprInterpreter, itInstruction));
-		visit(nodeIf.getThenNodes());
-		itInstruction = instructionIteratorBackup;
-		visit(nodeIf.getElseNodes());
-		itInstruction = instructionIteratorBackup;
-		// Unusually visit method to doesn't add new instructions in join node
-		for (Instruction instr : nodeIf.getJoinNode().getInstructions()) {
-			instr.accept(this);
+		parameters.clear();
+		parameters.addAll(newParameters);
+		return null;
+	}
+
+	@Override
+	public Expression caseInstLoad(InstLoad load) {
+		EList<Expression> indexes = load.getIndexes();
+		EList<Expression> newIndexes = new BasicEList<Expression>();
+		for (Expression expr : indexes) {
+			newIndexes.add(doSwitch(expr));
 		}
+		indexes.clear();
+		indexes.addAll(newIndexes);
+		return null;
 	}
 
 	@Override
-	public void visit(List<Node> nodes) {
-		for (int i = 0; i < nodes.size(); i++) {
-			Node node = nodes.get(i);
-			node.accept(this);
-			i = nodes.indexOf(node);
+	public Expression caseInstPhi(InstPhi phi) {
+		EList<Expression> values = phi.getValues();
+		EList<Expression> newValues = new BasicEList<Expression>();
+		for (Expression expr : values) {
+			newValues.add(doSwitch(expr));
 		}
+		values.clear();
+		values.addAll(newValues);
+		return null;
 	}
 
 	@Override
-	public void visit(InstPhi phi) {
-		ListIterator<Expression> it = new ArrayList<Expression>(phi.getValues()).listIterator();
-		while (it.hasNext()) {
-			it.set((Expression) it.next()
-					.accept(exprInterpreter, itInstruction));
+	public Expression caseInstReturn(InstReturn returnInstr) {
+		Expression expr = returnInstr.getValue();
+		if (expr != null) {
+			returnInstr.setValue(doSwitch(expr));
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
-		super.visit(procedure);
-	}
-
-	@Override
-	public void visit(InstStore store) {
-		store.setValue((Expression) store.getValue().accept(exprInterpreter,
-				itInstruction));
-	}
-
-	@Override
-	public void visit(InstSpecific node) {
-		if (node instanceof InstTernary) {
-			InstTernary ternaryOperation = (InstTernary) node;
-
-			ternaryOperation
-					.setConditionValue((Expression) ternaryOperation
-							.getConditionValue().accept(exprInterpreter,
-									itInstruction));
-			ternaryOperation.setTrueValue((Expression) ternaryOperation
-					.getTrueValue().accept(exprInterpreter, itInstruction));
-			ternaryOperation.setFalseValue((Expression) ternaryOperation
-					.getFalseValue().accept(exprInterpreter, itInstruction));
+	public Expression caseInstStore(InstStore store) {
+		EList<Expression> indexes = store.getIndexes();
+		EList<Expression> newIndexes = new BasicEList<Expression>();
+		for (Expression expr : indexes) {
+			newIndexes.add(doSwitch(expr));
 		}
+		indexes.clear();
+		indexes.addAll(newIndexes);
+		doSwitch(store.getValue());
+		return null;
 	}
 
 	@Override
-	public void visit(NodeWhile nodeWhile) {
-		// Check the presence of a NodeBlock before and create one if needed
-		if (itInstruction == null) {
-			Procedure procedure = nodeWhile.getProcedure();
-			int index = procedure.getNodes().indexOf(nodeWhile);
-			NodeBlock newBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			procedure.getNodes().add(index, newBlock);
-			itInstruction = newBlock.getInstructions().listIterator();
-		}
-		ListIterator<Instruction> instructionIteratorBackup = itInstruction;
-		nodeWhile.setCondition((Expression) nodeWhile.getCondition().accept(
-				exprInterpreter, itInstruction));
-		visit(nodeWhile.getNodes());
-		itInstruction = instructionIteratorBackup;
-		// Unusually visit method to doesn't add new instructions in join node
-		for (Instruction instr : nodeWhile.getJoinNode().getInstructions()) {
-			instr.accept(this);
+	public Expression caseNodeIf(NodeIf nodeIf) {
+		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		doSwitch(nodeIf.getThenNodes());
+		doSwitch(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getJoinNode());
+		return null;
+	}
+
+	@Override
+	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		doSwitch(nodeWhile.getNodes());
+		doSwitch(nodeWhile.getJoinNode());
+		return null;
+	}
+
+	private Expression createExprVarAndAssign(Expression expr) {
+		// Make a new assignment to the binary expression
+		Var target = procedure.newTempLocalVariable(
+				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
+						+ "expr");
+		// Add assignment to instruction's list
+		EcoreHelper.addInstBeforeExpr(expr,
+				IrFactory.eINSTANCE.createInstAssign(target, expr));
+
+		return IrFactory.eINSTANCE.createExprVar(target);
+	}
+
+	public ExprBinary transformUnaryExpr(ExprUnary expr) {
+		Expression constExpr;
+		Type type = expr.getType();
+
+		switch (expr.getOp()) {
+		case MINUS:
+			constExpr = IrFactory.eINSTANCE.createExprInt(0);
+			return IrFactory.eINSTANCE.createExprBinary(constExpr,
+					OpBinary.MINUS, expr, type);
+		case LOGIC_NOT:
+			constExpr = IrFactory.eINSTANCE.createExprBool(false);
+			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
+					constExpr, type);
+		case BITNOT:
+			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.BITXOR,
+					expr, type);
+		default:
+			throw new OrccRuntimeException("unsupported operator");
 		}
 	}
 
