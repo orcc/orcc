@@ -39,13 +39,13 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
-import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.StrongConnectivityInspector;
@@ -95,9 +95,9 @@ public class StaticSubsetDetector {
 					graph.getEdgeTarget(connection), connection);
 		}
 
-		Actor cluster = new Actor("cluster", "", null,
-				new OrderedMap<String, Port>(), new OrderedMap<String, Port>(),
-				false, null, null, null, null, null);
+		Actor cluster = IrFactory.eINSTANCE.createActor();
+		cluster.setName("cluster");
+
 		Instance inst = new Instance(cluster.getName(), cluster.getName());
 		inst.setContents(cluster);
 		Vertex clusterVertex = new Vertex(inst);
@@ -110,18 +110,18 @@ public class StaticSubsetDetector {
 
 			if (!vertices.contains(srcVertex) && vertices.contains(tgtVertex)) {
 
-				Port tgtPort = new Port(edge.getTarget());
+				Port tgtPort = IrFactory.eINSTANCE.createPort(edge.getTarget());
 				tgtPort.setName("input_" + outIndex++);
-				cluster.getInputs().put(tgtPort.getName(), tgtPort);
+				cluster.getInputs().add(tgtPort);
 				Connection incoming = new Connection(edge.getSource(), tgtPort,
 						edge.getAttributes());
 				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
 			} else if (vertices.contains(srcVertex)
 					&& !vertices.contains(tgtVertex)) {
 
-				Port srcPort = new Port(edge.getSource());
+				Port srcPort = IrFactory.eINSTANCE.createPort(edge.getSource());
 				srcPort.setName("output_" + inIndex++);
-				cluster.getOutputs().put(srcPort.getName(), srcPort);
+				cluster.getOutputs().add(srcPort);
 				Connection outgoing = new Connection(srcPort, edge.getTarget(),
 						edge.getAttributes());
 				clusteredGraph.addEdge(clusterVertex, tgtVertex, outgoing);

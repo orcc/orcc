@@ -239,7 +239,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 			port.increaseTokenConsumption(numTokens);
 		}
 
-		visit(action.getBody());
+		doSwitch(action.getBody());
 
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
@@ -278,7 +278,8 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 		// check isSchedulable procedure
 		setSchedulableMode(true);
-		visit(action.getScheduler());
+		doSwitch(action.getScheduler());
+
 		if (returnValue == null) {
 			throw new OrccRuntimeException("could not determine if action "
 					+ action.toString() + " is schedulable");

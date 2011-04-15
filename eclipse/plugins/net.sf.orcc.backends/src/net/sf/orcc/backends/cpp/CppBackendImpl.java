@@ -133,12 +133,12 @@ public class CppBackendImpl extends AbstractBackend {
 			new ActorClassifier().doSwitch(actor);
 		}
 
-		ActorVisitor[] transformations = { new DeadGlobalElimination(),
+		ActorVisitor<?>[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
 				new PhiRemoval() };
 
-		for (ActorVisitor transformation : transformations) {
-			transformation.visit(actor);
+		for (ActorVisitor<?> transformation : transformations) {
+			transformation.doSwitch(actor);
 		}
 	}
 
@@ -198,12 +198,13 @@ public class CppBackendImpl extends AbstractBackend {
 		headerPrinter.setTypePrinter(new CppTypePrinter());
 		actorPrinter.setExpressionPrinter(new CppExprPrinter());
 		headerPrinter.setExpressionPrinter(new CppExprPrinter());
-		
+
 		String hier = path + File.separator
 				+ actor.getPackage().replace('.', File.separatorChar);
 		new File(hier).mkdirs();
 
-		actorPrinter.print(actor.getSimpleName() + ".cpp", hier, actor, "actor");
+		actorPrinter
+				.print(actor.getSimpleName() + ".cpp", hier, actor, "actor");
 		headerPrinter.print(actor.getSimpleName() + ".h", hier, actor, "actor");
 
 		return false;
@@ -235,7 +236,7 @@ public class CppBackendImpl extends AbstractBackend {
 		printer.getOptions().put("fifoKind", computeFifoKind(network));
 
 		printer.getOptions().put("needSerDes", needSerDes);
-		
+
 		printer.print(network.getName() + ".cpp", path, network, "network");
 
 		printCMake(network);

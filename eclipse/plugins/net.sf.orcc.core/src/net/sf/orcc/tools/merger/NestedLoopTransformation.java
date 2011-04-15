@@ -181,7 +181,6 @@ public class NestedLoopTransformation {
 		schedule.setIterationCount(1);
 
 		computeOptimalParens(schedule, 0, size - 1);
-		System.out.println(schedule);
 	}
 
 }
