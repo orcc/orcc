@@ -48,12 +48,13 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 public class VariableRenamer extends AbstractActorVisitor<Object> {
 
 	@Override
-	public void visit(Procedure procedure) {
+	public Object caseProcedure(Procedure procedure) {
 		String procName = procedure.getName();
 		for (Var var : procedure.getLocals()) {
 			Var local = (Var) var;
 			var.setName(procName + "_" + local.getName());
 		}
+		return null;
 	}
 
 }

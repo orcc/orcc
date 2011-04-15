@@ -45,6 +45,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
 /**
@@ -268,7 +269,7 @@ public class Instantiator implements INetworkTransformation {
 		// check port types match
 		Type srcType = srcPortType;
 		Type dstType = dstPortType;
-		if (!srcType.equals(dstType)) {
+		if (!EcoreUtil.equals(srcType, dstType)) {
 			throw new OrccException("Type error: port " + sourceString + " is "
 					+ srcType + ", port " + targetString + " is " + dstType);
 		}

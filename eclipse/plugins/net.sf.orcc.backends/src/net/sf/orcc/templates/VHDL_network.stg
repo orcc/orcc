@@ -301,42 +301,46 @@ broadcast_<name> : entity work.broadcast
     clock         =\> clock,
     reset_n       =\> reset_n);
     --
-    <outgoingMap.(instance).values: {connections|<connections:{connection | <printBroadToOut(connection=connection, map=network.successorsMap.(instance), 
-															vmap=network.targetMap.(connection))>}>}>
+    <outgoingMap.(instance).values: {connections|<connections:{connection | <printBroadToOut(tgtVertex=network.targetMap.(connection))>}>}>
 >>
 
-printBroadToOut(connection, map, vmap) ::= <<
-<if(vmap.port)
-><vmap.port>_data \<= <name>_fromBroad_data;<
+/** Print connection between broadcast and output
+ * tgtVertex: target vertex of the connection (supposed to be a port)
+ * 
+ */
+printBroadToOut(tgtVertex) ::= <<
+<if(tgtVertex.port)
+><tgtVertex.port.name>_data \<= <name>_fromBroad_data;<
 endif>
 >>
 
 printBroadcastOutputs(connections, index, network , instance, control) ::= <<
-<connections: { connection | <printBroadcastOutput( connection=connection, index=index, map=network.successorsMap.(instance),
-    			vmap=network.targetMap.(connection), control=control)>}; separator="\n">		
+<connections: { connection | <printBroadcastOutput( connection=connection, index=index, portSuccMap=network.successorsMap.(instance),
+    			tgtVertex=network.targetMap.(connection), control=control)>}; separator="\n">		
 >>
 
 /** Print output connections of a broadcast to the maps:
  * 
- * connection: connection of the instance (e.g. a connection between two instance)
+ * connection: connection of the instance (e.g. a connection between two instances)
  * index: index of the output (e.g. 1, 2, 3, ...)
- * map: contains the successor of the connection (e.g. an instance)
- * vmap: contain the target of the connection (e.g. a port of the network)
+ * portSuccMap: a map that associates each port of an instance to the successors of this port
+ * tgtVertex: target of the connection (e.g. a port of the network)
+ * control: "send" or "ack"
  * 
- */ 
-printBroadcastOutput(connection, index, map, vmap, control) ::= <<
-<if(first(map.(connection.source)))
+ */
+printBroadcastOutput(connection, index, portSuccMap, tgtVertex, control) ::= <<
+<if(first(portSuccMap.(connection.source)))
 ><if(connection.attributes)
->output_<control>(<index>) =\> <instance.id>_<connection.source>_<control>,<
+>output_<control>(<index>) =\> <instance.id>_<connection.source.name>_<control>,<
 else
->output_<control>(<index>) =\> <first(map.(connection.source)).id>_<connection.target>_<control>,<
+>output_<control>(<index>) =\> <first(portSuccMap.(connection.source)).id>_<connection.target.name>_<control>,<
 endif><
 else
->output_<control>(<index>) =\> <vmap.port>_<control>,<
+>output_<control>(<index>) =\> <tgtVertex.port.name>_<control>,<
 endif>
 >>
 
-broadcastType(connection, name, direction) ::=<<
+broadcastType(connection, name, direction) ::= <<
 <if(connection.target.type.bool)
 >signal <name>_<direction>_data : std_logic;<
 else

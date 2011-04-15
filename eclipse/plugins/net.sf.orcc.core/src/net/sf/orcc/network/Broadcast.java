@@ -31,6 +31,8 @@ package net.sf.orcc.network;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
@@ -60,7 +62,7 @@ public class Broadcast {
 	/**
 	 * Creates a new broadcast whose name is composed from the given actor name
 	 * and port name. The broadcast will have the number of outputs given and
-	 * the given type.
+	 * the given type. Type is copied.
 	 * 
 	 * @param actorName
 	 *            name of the source actor
@@ -73,20 +75,23 @@ public class Broadcast {
 	 */
 	public Broadcast(int numOutputs, Type type) {
 		this.numOutputs = numOutputs;
-		this.type = type;
+		this.type = EcoreUtil.copy(type);
 
 		Location location = IrFactory.eINSTANCE.createLocation();
 
 		inputs = new OrderedMap<String, Port>();
 		String name = "input";
-		inputs.put(name, IrFactory.eINSTANCE.createPort(location, type, name));
+		inputs.put(name, IrFactory.eINSTANCE.createPort(location,
+				EcoreUtil.copy(type), name));
 
 		outputs = new OrderedMap<String, Port>();
 		for (int i = 0; i < numOutputs; i++) {
 			location = IrFactory.eINSTANCE.createLocation();
 			name = "output_" + i;
-			outputs.put(name,
-					IrFactory.eINSTANCE.createPort(location, type, name));
+			outputs.put(
+					name,
+					IrFactory.eINSTANCE.createPort(location,
+							EcoreUtil.copy(type), name));
 		}
 	}
 

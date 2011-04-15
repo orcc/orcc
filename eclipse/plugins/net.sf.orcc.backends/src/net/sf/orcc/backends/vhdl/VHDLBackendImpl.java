@@ -253,10 +253,12 @@ public class VHDLBackendImpl extends AbstractBackend {
 		printTestbench(instancePrinter, instance);
 		printTCL(instance);
 
-		NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
-		networkPrinter.getOptions().put("fifoSize", fifoSize);
-
 		network.computeTemplateMaps();
+
+		NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
+		networkPrinter.setExpressionPrinter(new VHDLExpressionPrinter());
+		networkPrinter.setTypePrinter(new VHDLTypePrinter());
+		networkPrinter.getOptions().put("fifoSize", fifoSize);
 
 		networkPrinter.print(network.getName() + ".vhd", path + File.separator
 				+ "Design", network, "network");
