@@ -46,6 +46,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -87,6 +88,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				break;
 			}
 		}
+		indexInst++;
 	}
 
 	/**
@@ -161,9 +163,10 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		List<Instruction> instructions = EcoreHelper.getContainingList(load);
 		List<Expression> indexes = load.getIndexes();
 		Var var = load.getSource().getVariable();
+		Predicate predicate = load.getPredicate();
 
 		RAM ram = ramMap.get(var);
-		if (ram.isLastAccessRead()) {
+		if (ram.isLastAccessRead() && ram.getPredicate().isSameAs(predicate)) {
 			int port = ram.getLastPortUsed() + 1;
 			ram.setLastPortUsed(port);
 
@@ -191,6 +194,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 			ram.setLastAccessRead(true);
 			ram.setLastPortUsed(0);
+			ram.setPredicate(predicate);
 			ram.setWaitCycleNeeded(true);
 		}
 	}
@@ -205,10 +209,11 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		List<Instruction> instructions = EcoreHelper.getContainingList(store);
 		List<Expression> indexes = store.getIndexes();
 		Var var = store.getTarget().getVariable();
+		Predicate predicate = store.getPredicate();
 
 		RAM ram = ramMap.get(var);
 		int port;
-		if (ram.isLastAccessWrite()) {
+		if (ram.isLastAccessWrite() && ram.getPredicate().isSameAs(predicate)) {
 			port = ram.getLastPortUsed() + 1;
 			if (port > 0 && port % 2 == 0) {
 				// port == 2, 4, 6, 8...
@@ -224,6 +229,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 		ram.setLastPortUsed(port);
 		ram.setLastAccessRead(false);
+		ram.setPredicate(predicate);
 	}
 
 	private boolean executeTwoPendingReads(List<Instruction> instructions,

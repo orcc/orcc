@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.backends.vhdl.ram;
 
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Predicate;
+
 /**
  * This class defines a RAM.
  * 
@@ -42,6 +45,8 @@ public class RAM {
 
 	private int lastPortUsed;
 
+	private Predicate predicate;
+
 	private boolean waitCycleNeeded;
 
 	/**
@@ -52,6 +57,15 @@ public class RAM {
 
 	public int getLastPortUsed() {
 		return lastPortUsed;
+	}
+
+	/**
+	 * Returns the predicate of the last instruction that accessed this RAM.
+	 * 
+	 * @return the predicate of the last instruction that accessed this RAM
+	 */
+	public Predicate getPredicate() {
+		return predicate;
 	}
 
 	public boolean isLastAccessRead() {
@@ -66,8 +80,14 @@ public class RAM {
 		return waitCycleNeeded;
 	}
 
+	/**
+	 * Resets this RAM. Sets the <code>alreadyAccessed</code> to
+	 * <code>false</code>, and resets the predicate this RAM was last accessed
+	 * with.
+	 */
 	public void reset() {
 		alreadyAccessed = false;
+		predicate = IrFactory.eINSTANCE.createPredicate();
 	}
 
 	public void setLastAccessRead(boolean lastAccessRead) {
@@ -77,6 +97,16 @@ public class RAM {
 
 	public void setLastPortUsed(int lastPortUsed) {
 		this.lastPortUsed = lastPortUsed;
+	}
+
+	/**
+	 * Sets the predicate this RAM was last accessed with.
+	 * 
+	 * @param predicate
+	 *            the predicate this RAM was last accessed with
+	 */
+	public void setPredicate(Predicate predicate) {
+		this.predicate = predicate;
 	}
 
 	public void setWaitCycleNeeded(boolean waitCycleNeeded) {

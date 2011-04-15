@@ -30,6 +30,8 @@ package net.sf.orcc.backends.vhdl.ram;
 
 import net.sf.orcc.backends.vhdl.transformations.ActionSplitter;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.transformations.IfConverter;
+import net.sf.orcc.ir.transformations.IfDeconverter;
 import net.sf.orcc.ir.util.ActorVisitor;
 
 /**
@@ -42,8 +44,10 @@ public class RAMTransformation implements ActorVisitor<Object> {
 
 	@Override
 	public Object doSwitch(Actor actor) {
+		new IfConverter().doSwitch(actor);
 		new RAMInstructionScheduler().doSwitch(actor);
 		new ConditionedSplitExtractor().doSwitch(actor);
+		new IfDeconverter().doSwitch(actor);
 		new ActionSplitter().doSwitch(actor);
 
 		return null;

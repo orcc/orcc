@@ -29,8 +29,6 @@
 package net.sf.orcc.backends.vhdl.ram;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.transformations.IfConverter;
-import net.sf.orcc.ir.transformations.IfDeconverter;
 import net.sf.orcc.ir.util.ActorVisitor;
 
 /**
@@ -44,9 +42,6 @@ public class ConditionedSplitExtractor implements ActorVisitor<Object> {
 
 	@Override
 	public Object doSwitch(Actor actor) {
-		new IfConverter().doSwitch(actor);
-		new IfDeconverter().doSwitch(actor);
-
 		return null;
 	}
 
