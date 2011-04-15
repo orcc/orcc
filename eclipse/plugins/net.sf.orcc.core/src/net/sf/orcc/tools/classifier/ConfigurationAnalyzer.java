@@ -62,34 +62,18 @@ public class ConfigurationAnalyzer {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class PeekVisitor extends AbstractActorVisitor {
-
-		private Set<Port> candidates;
-
-		/**
-		 * Creates a new peek visitor.
-		 */
-		public PeekVisitor() {
-			candidates = new HashSet<Port>();
-		}
-
-		/**
-		 * Returns the set of candidate ports.
-		 * 
-		 * @return the set of candidate ports
-		 */
-		public Set<Port> getCandidates() {
-			return candidates;
-		}
+	private class PeekVisitor extends AbstractActorVisitor<Set<Port>> {
 
 		@Override
-		public void visit(Action action) {
+		public Set<Port> caseAction(Action action) {
+			Set<Port> candidates = new HashSet<Port>();
 			Pattern pattern = action.getPeekPattern();
 			for (Port port : pattern.getPorts()) {
 				if (pattern.getVariable(port) != null) {
 					candidates.add(port);
 				}
 			}
+			return candidates;
 		}
 
 	}
@@ -198,9 +182,7 @@ public class ConfigurationAnalyzer {
 		FSM fsm = actor.getFsm();
 		State initialState = fsm.getInitialState();
 		for (Action action : fsm.getTargetActions(initialState)) {
-			PeekVisitor visitor = new PeekVisitor();
-			visitor.visit(action);
-			ports.add(visitor.getCandidates());
+			ports.add(new PeekVisitor().doSwitch(action));
 		}
 
 		// add all ports peeked

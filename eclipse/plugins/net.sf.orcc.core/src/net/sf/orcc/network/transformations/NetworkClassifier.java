@@ -63,7 +63,7 @@ public class NetworkClassifier implements INetworkTransformation {
 				
 				if (!actor.hasMoC()){
 					//Actor has not been classified
-					new ActorClassifier().visit(actor);
+					new ActorClassifier().doSwitch(actor);
 				}
 				
 				MoC clasz = actor.getMoC();

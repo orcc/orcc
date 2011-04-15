@@ -112,7 +112,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		if (classify) {
 			if (!actor.getSimpleName().equals("BufferCurrPic")&&
 					!actor.getSimpleName().equals("SplitSpsInfo")){
-				new ActorClassifier().visit(actor);
+				new ActorClassifier().doSwitch(actor);
 
 				if (normalize) {
 					new ActorNormalizer().visit(actor);

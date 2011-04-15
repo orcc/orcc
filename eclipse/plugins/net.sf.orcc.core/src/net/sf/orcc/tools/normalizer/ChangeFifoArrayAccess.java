@@ -49,7 +49,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Jerome Gorin
  * 
  */
-public class ChangeFifoArrayAccess extends AbstractActorVisitor {
+public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 
 	private void updateIndex(Var var, List<Expression> indexes) {
 		if (indexes.size() < 2) {
@@ -65,23 +65,25 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(InstLoad load) {
+	public Object caseInstLoad(InstLoad load) {
 		Use use = load.getSource();
 		Var var = use.getVariable();
 		if (!var.isGlobal() && isPort(var)) {
 			use.setVariable(actor.getStateVar(var.getName()));
 			updateIndex(var, load.getIndexes());
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstStore store) {
+	public Object caseInstStore(InstStore store) {
 		Def def = store.getTarget();
 		Var var = def.getVariable();
 		if (!var.isGlobal() && isPort(var)) {
 			def.setVariable(actor.getStateVar(var.getName()));
 			updateIndex(var, store.getIndexes());
 		}
+		return null;
 	}
 
 }

@@ -45,9 +45,9 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	private boolean schedulableMode;
 
 	@Override
-	public Object interpret(ExprBinary expr, Object... args) {
-		Expression val1 = (Expression) expr.getE1().accept(this);
-		Expression val2 = (Expression) expr.getE2().accept(this);
+	public Expression caseExprBinary(ExprBinary expr) {
+		Expression val1 = doSwitch(expr.getE1());
+		Expression val2 = doSwitch(expr.getE2());
 		Expression result = interpretBinaryExpr(val1, expr.getOp(), val2);
 
 		// only throws an exception if we are in schedulable mode and the result
@@ -59,8 +59,8 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	}
 
 	@Override
-	public Object interpret(ExprUnary expr, Object... args) {
-		Expression value = (Expression) expr.getExpr().accept(this);
+	public Expression caseExprUnary(ExprUnary expr) {
+		Expression value = doSwitch(expr.getExpr());
 		Expression result = interpretUnaryExpr(expr.getOp(), value);
 
 		if (schedulableMode && value == null) {

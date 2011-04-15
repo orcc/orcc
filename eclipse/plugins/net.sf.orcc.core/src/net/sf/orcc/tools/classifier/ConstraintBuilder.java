@@ -59,8 +59,8 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.IrSwitch;
 
 public class ConstraintBuilder extends ActorInterpreter {
 
@@ -71,8 +71,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class ConstraintExpressionVisitor extends
-			AbstractExpressionInterpreter {
+	private class ConstraintExpressionVisitor extends IrSwitch<Object> {
 
 		/**
 		 * Creates a new constraint expression visitor.
@@ -149,9 +148,9 @@ public class ConstraintBuilder extends ActorInterpreter {
 		}
 
 		@Override
-		public Object interpret(ExprBinary expr, Object... args) {
-			Object o1 = expr.getE1().accept(this);
-			Object o2 = expr.getE2().accept(this);
+		public Object caseExprBinary(ExprBinary expr) {
+			Object o1 = doSwitch(expr.getE1());
+			Object o2 = doSwitch(expr.getE2());
 
 			OpBinary op = expr.getOp();
 			if (negateConstraints && op.isComparison()) {
@@ -178,20 +177,20 @@ public class ConstraintBuilder extends ActorInterpreter {
 		}
 
 		@Override
-		public Object interpret(ExprList expr, Object... args) {
+		public Object caseExprList(ExprList expr) {
 			throw new OrccRuntimeException("unsupported list expression");
 		}
 
 		@Override
-		public Object interpret(ExprString expr, Object... args) {
+		public Object caseExprString(ExprString expr) {
 			throw new OrccRuntimeException("unsupported string expression");
 		}
 
 		@Override
-		public Object interpret(ExprUnary expr, Object... args) {
+		public Object caseExprUnary(ExprUnary expr) {
 			switch (expr.getOp()) {
 			case LOGIC_NOT: {
-				Object obj = expr.getExpr().accept(this);
+				Object obj = doSwitch(expr.getExpr());
 				if (obj instanceof IntVariable) {
 					return addConstraint((IntVariable) obj, OpBinary.EQ,
 							IrFactory.eINSTANCE.createExprInt(0));
@@ -200,7 +199,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 			}
 
 			case MINUS:
-				Object obj = expr.getExpr().accept(this);
+				Object obj = doSwitch(expr.getExpr());
 				if (obj instanceof IntVariable) {
 					return ((IntVariable) obj).negate();
 				} else if (obj instanceof ExprInt) {
@@ -212,7 +211,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 		}
 
 		@Override
-		public Object interpret(ExprVar expr, Object... args) {
+		public Object caseExprVar(ExprVar expr) {
 			Var var = expr.getUse().getVariable();
 			if (var == null) {
 				throw new OrccRuntimeException("unknown variable");
@@ -383,19 +382,20 @@ public class ConstraintBuilder extends ActorInterpreter {
 	}
 
 	@Override
-	public void visit(InstAssign assign) {
+	public Object caseInstAssign(InstAssign assign) {
 		if (initializeMode) {
-			super.visit(assign);
+			super.caseInstAssign(assign);
 		} else {
 			ConstraintExpressionVisitor visitor = new ConstraintExpressionVisitor();
-			assign.getValue().accept(visitor);
+			visitor.doSwitch(assign.getValue());
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstLoad load) {
+	public Object caseInstLoad(InstLoad load) {
 		// execute the load
-		super.visit(load);
+		super.caseInstLoad(load);
 
 		if (!initializeMode) {
 			Var source = load.getSource().getVariable();
@@ -416,6 +416,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 
 			associateVariable(load.getTarget().getVariable(), source);
 		}
+		return null;
 	}
 
 	/**
@@ -438,8 +439,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
 				// allocate list for peeked
-				peeked.setValue((Expression) peeked.getType().accept(
-						listAllocator));
+				peeked.setValue(listAllocator.doSwitch(peeked.getType()));
 
 				// associate variable
 				Var source = vars.get(peeked);
@@ -451,7 +451,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 			}
 		}
 
-		visit(action.getScheduler());
+		doSwitch(action.getScheduler());
 	}
 
 }

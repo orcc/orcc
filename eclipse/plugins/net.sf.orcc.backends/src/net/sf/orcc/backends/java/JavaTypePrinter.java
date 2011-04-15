@@ -44,30 +44,30 @@ import net.sf.orcc.ir.util.TypePrinter;
 public class JavaTypePrinter extends TypePrinter {
 
 	@Override
-	public void visit(TypeBool type) {
-		builder.append("boolean");
+	public String caseTypeBool(TypeBool type) {
+		return "boolean";
 	}
 
 	@Override
-	public void visit(TypeInt type) {
-		builder.append("int");
+	public String caseTypeInt(TypeInt type) {
+		return "int";
 	}
 
 	@Override
-	public void visit(TypeList type) {
+	public String caseTypeList(TypeList type) {
 		// size will be printed later
-		type.getType().accept(this);
+		return doSwitch(type.getType());
 	}
 
 	@Override
-	public void visit(TypeString type) {
-		builder.append("String");
+	public String caseTypeString(TypeString type) {
+		return "String";
 	}
 
 	@Override
-	public void visit(TypeUint type) {
+	public String caseTypeUint(TypeUint type) {
 		// no unsigned in Java, and size is not taken in consideration anyway
-		builder.append("int");
+		return "int";
 	}
 
 }

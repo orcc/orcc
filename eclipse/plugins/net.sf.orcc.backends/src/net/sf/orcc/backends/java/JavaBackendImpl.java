@@ -77,13 +77,13 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorVisitor[] transformations = { new DeadGlobalElimination(),
+		ActorVisitor<?>[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
 				new RenameTransformation(this.transformations),
 				new PhiRemoval() };
 
-		for (ActorVisitor transformation : transformations) {
-			transformation.visit(actor);
+		for (ActorVisitor<?> transformation : transformations) {
+			transformation.doSwitch(actor);
 		}
 
 	}

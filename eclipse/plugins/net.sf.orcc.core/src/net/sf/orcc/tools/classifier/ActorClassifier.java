@@ -65,7 +65,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
  * @author Matthieu Wipliez
  * 
  */
-public class ActorClassifier implements ActorVisitor {
+public class ActorClassifier implements ActorVisitor<Object> {
 
 	private Actor actor;
 
@@ -304,6 +304,22 @@ public class ActorClassifier implements ActorVisitor {
 		return sdfMoc;
 	}
 
+	@Override
+	public Object doSwitch(Actor actor) {
+		try {
+			this.actor = actor;
+			classify();
+			actor = null;
+		} catch (Exception e) {
+			System.out.println("Error of classification for actor " + actor
+					+ ":" + e);
+			System.out.println("Set actor moc of " + actor + " to default");
+			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
+		}
+
+		return null;
+	}
+
 	/**
 	 * Returns <code>true</code> if the given FSM looks like the FSM of a
 	 * cyclo-static actor, <code>false</code> otherwise. A potentially
@@ -397,16 +413,8 @@ public class ActorClassifier implements ActorVisitor {
 
 	@Override
 	public void visit(Actor actor) {
-		try {
-			this.actor = actor;
-			classify();
-			actor = null;
-		} catch (Exception e) {
-			System.out.println("Error of classification for actor " + actor
-					+ ":" + e);
-			System.out.println("Set actor moc of " + actor + " to default");
-			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
-		}
+		throw new OrccRuntimeException(
+				"ActorNormalizer.visit(Actor): please use doSwitch");
 	}
 
 }

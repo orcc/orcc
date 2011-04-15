@@ -130,7 +130,7 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
-			new ActorClassifier().visit(actor);
+			new ActorClassifier().doSwitch(actor);
 		}
 
 		ActorVisitor[] transformations = { new DeadGlobalElimination(),

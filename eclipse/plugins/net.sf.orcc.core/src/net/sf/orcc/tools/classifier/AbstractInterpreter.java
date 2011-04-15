@@ -81,8 +81,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	@Override
 	public void visit(NodeIf node) {
 		// Interpret first expression ("if" condition)
-		Expression condition = (Expression) node.getCondition().accept(
-				exprInterpreter);
+		Expression condition = exprInterpreter.doSwitch(node.getCondition());
 
 		int oldBranch = branch;
 		if (condition != null && condition.isBooleanExpr()) {
@@ -117,7 +116,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 			Expression value = source.getValue();
 			for (Expression index : instr.getIndexes()) {
 				if (value != null && value.isListExpr()) {
-					index = (Expression) index.accept(exprInterpreter);
+					index = exprInterpreter.doSwitch(index);
 					if (index == null) {
 						value = null;
 						break;
@@ -141,21 +140,21 @@ public class AbstractInterpreter extends ActorInterpreter {
 	public void visit(InstStore instr) {
 		Var var = instr.getTarget().getVariable();
 		if (instr.getIndexes().isEmpty()) {
-			var.setValue((Expression) instr.getValue().accept(exprInterpreter));
+			var.setValue(exprInterpreter.doSwitch(instr.getValue()));
 		} else {
 			Expression target = var.getValue();
 			Iterator<Expression> it = instr.getIndexes().iterator();
-			ExprInt index = (ExprInt) it.next().accept(exprInterpreter);
+			ExprInt index = (ExprInt) exprInterpreter.doSwitch(it.next());
 
 			while (it.hasNext()) {
 				if (target != null && target.isListExpr() && index != null) {
 					target = ((ExprList) target).get(index);
 				}
-				index = (ExprInt) it.next().accept(exprInterpreter);
+				index = (ExprInt) exprInterpreter.doSwitch(it.next());
 			}
 
-			Expression value = (Expression) instr.getValue().accept(
-					exprInterpreter);
+			Expression value = (Expression) exprInterpreter.doSwitch(instr
+					.getValue());
 			if (target != null && target.isListExpr() && index != null) {
 				((ExprList) target).set(index, value);
 			}
@@ -169,8 +168,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 		visit(node.getJoinNode());
 
 		// Interpret first expression ("while" condition)
-		Expression condition = (Expression) node.getCondition().accept(
-				exprInterpreter);
+		Expression condition = exprInterpreter.doSwitch(node.getCondition());
 
 		if (condition != null && condition.isBooleanExpr()) {
 			branch = 1;
@@ -179,8 +177,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 				visit(node.getJoinNode());
 
 				// Interpret next value of "while" condition
-				condition = (Expression) node.getCondition().accept(
-						exprInterpreter);
+				condition = exprInterpreter.doSwitch(node.getCondition());
 				if (schedulableMode
 						&& (condition == null || !condition.isBooleanExpr())) {
 					throw new OrccRuntimeException(
@@ -269,8 +266,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				peeked.setValue((Expression) peeked.getType().accept(
-						listAllocator));
+				peeked.setValue(listAllocator.doSwitch(peeked.getType()));
 
 				if (configuration != null && configuration.containsKey(port)
 						&& !portRead.get(port)) {
