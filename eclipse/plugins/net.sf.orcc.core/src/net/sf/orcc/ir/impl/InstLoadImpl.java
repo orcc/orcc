@@ -15,6 +15,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.InstructionInterpreter;
 import net.sf.orcc.ir.util.InstructionVisitor;
 
@@ -79,13 +80,15 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		System.err.println("InstLoadImpl.accept(interpreter): Please switch to the EMF-based API");
+		System.err
+				.println("InstLoadImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(InstructionVisitor visitor) {
-		System.err.println("InstLoadImpl.accept(visitor): Please switch to the EMF-based API");
+		System.err
+				.println("InstLoadImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 
@@ -230,11 +233,11 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetSource(Use newSource, NotificationChain msgs) {
+	public NotificationChain basicSetSource(Use newSource,
+			NotificationChain msgs) {
 		Use oldSource = source;
 		source = newSource;
 		if (eNotificationRequired()) {
@@ -253,11 +256,11 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
@@ -291,8 +294,7 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setTarget(Def newTarget) {
@@ -307,6 +309,21 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_LOAD__TARGET, newTarget, newTarget));
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.toString());
+		builder.append("Load(")
+				.append(getTarget().getVariable().getIndexedName())
+				.append(", ").append(getSource().getVariable().getName());
+		for (Expression index : getIndexes()) {
+			builder.append("[");
+			builder.append(new ExpressionPrinter().doSwitch(index));
+			builder.append("]");
+		}
+		return builder.append(")").toString();
 	}
 
 } // InstLoadImpl

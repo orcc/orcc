@@ -12,6 +12,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.InstructionInterpreter;
 import net.sf.orcc.ir.util.InstructionVisitor;
 
@@ -63,13 +64,15 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		System.err.println("InstAssignImpl.accept(interpreter): Please switch to the EMF-based API");
+		System.err
+				.println("InstAssignImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(InstructionVisitor visitor) {
-		System.err.println("InstAssignImpl.accept(visitor): Please switch to the EMF-based API");
+		System.err
+				.println("InstAssignImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 
@@ -208,11 +211,11 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
@@ -236,8 +239,7 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setTarget(Def newTarget) {
@@ -272,4 +274,9 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_ASSIGN__VALUE, newValue, newValue));
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + "Assign(" + target.getVariable().getIndexedName() + ", "
+				+ new ExpressionPrinter().doSwitch(getValue()) + ")";
+	}
 } // InstAssignImpl

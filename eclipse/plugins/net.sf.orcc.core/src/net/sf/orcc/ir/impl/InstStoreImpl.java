@@ -14,6 +14,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.InstructionInterpreter;
 import net.sf.orcc.ir.util.InstructionVisitor;
 
@@ -78,13 +79,15 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		System.err.println("InstStoreImpl.accept(interpreter): Please switch to the EMF-based API");
+		System.err
+				.println("InstStoreImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(InstructionVisitor visitor) {
-		System.err.println("InstStoreImpl.accept(visitor): Please switch to the EMF-based API");
+		System.err
+				.println("InstStoreImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 
@@ -248,11 +251,11 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetTarget(Def newTarget, NotificationChain msgs) {
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
@@ -276,8 +279,7 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setTarget(Def newTarget) {
@@ -310,6 +312,21 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_STORE__VALUE, newValue, newValue));
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.toString());
+		builder.append("Store(").append(getTarget().getVariable().getName());
+		for (Expression index : getIndexes()) {
+			builder.append("[");
+			builder.append(new ExpressionPrinter().doSwitch(index));
+			builder.append("]");
+		}
+		return builder.append(", ")
+				.append(new ExpressionPrinter().doSwitch(getValue()))
+				.append(")").toString();
 	}
 
 } // InstStoreImpl

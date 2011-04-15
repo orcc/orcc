@@ -9,6 +9,7 @@ package net.sf.orcc.ir.impl;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.InstructionInterpreter;
 import net.sf.orcc.ir.util.InstructionVisitor;
 
@@ -21,9 +22,8 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Inst Return</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Inst Return</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -36,15 +36,15 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected Expression value;/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	protected Expression value;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected InstReturnImpl() {
@@ -53,22 +53,24 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		System.err.println("InstReturnImpl.accept(interpreter): Please switch to the EMF-based API");
+		System.err
+				.println("InstReturnImpl.accept(interpreter): Please switch to the EMF-based API");
 		return interpreter.interpret(this, args);
 	}
 
 	@Override
 	public void accept(InstructionVisitor visitor) {
-		System.err.println("InstReturnImpl.accept(visitor): Please switch to the EMF-based API");
+		System.err
+				.println("InstReturnImpl.accept(visitor): Please switch to the EMF-based API");
 		visitor.visit(this);
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetValue(Expression newValue, NotificationChain msgs) {
+	public NotificationChain basicSetValue(Expression newValue,
+			NotificationChain msgs) {
 		Expression oldValue = value;
 		value = newValue;
 		if (eNotificationRequired()) {
@@ -79,8 +81,7 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -93,12 +94,12 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case IrPackage.INST_RETURN__VALUE:
 				return basicSetValue(null, msgs);
@@ -107,8 +108,7 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -121,8 +121,7 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -136,8 +135,7 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -146,8 +144,7 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -161,8 +158,7 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Expression getValue() {
@@ -175,8 +171,7 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setValue(Expression newValue) {
@@ -193,4 +188,10 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_RETURN__VALUE, newValue, newValue));
 	}
 
-} //InstReturnImpl
+	@Override
+	public String toString() {
+		return super.toString() + "Return("
+				+ new ExpressionPrinter().doSwitch(getValue()) + ")";
+	}
+
+} // InstReturnImpl

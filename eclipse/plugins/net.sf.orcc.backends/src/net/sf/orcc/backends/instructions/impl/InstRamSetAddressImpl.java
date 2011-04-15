@@ -190,13 +190,16 @@ public class InstRamSetAddressImpl extends InstRamImpl implements
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
+		builder.append(super.toString());
 		builder.append("RamSetAddress(").append(getVariable().getName())
 				.append("_address_p").append(getPort());
 		for (Expression index : indexes) {
-			builder.append(", ");
+			builder.append("[");
 			builder.append(new ExpressionPrinter().doSwitch(index));
+			builder.append("]");
 		}
 		builder.append(")");
 		return builder.toString();
 	}
+
 } // InstRamSetAddressImpl
