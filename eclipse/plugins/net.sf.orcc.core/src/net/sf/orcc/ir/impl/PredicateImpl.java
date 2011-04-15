@@ -54,6 +54,16 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 		super();
 	}
 
+	@Override
+	public void add(Expression expression) {
+		getExpressions().add(expression);
+	}
+
+	@Override
+	public void clear() {
+		getExpressions().clear();
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

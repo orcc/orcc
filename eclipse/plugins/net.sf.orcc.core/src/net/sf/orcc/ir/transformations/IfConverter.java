@@ -59,18 +59,17 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseNodeBlock(NodeBlock block) {
 		List<Instruction> instructions = block.getInstructions();
-		while (!instructions.isEmpty()) {
-			Instruction inst = instructions.get(0);
-
-			// annotate with predicate
-			inst.setPredicate(currentPredicate);
-
-			// move to target block
-			targetBlock.add(inst);
+		// annotate with predicate
+		for (Instruction instruction : instructions) {
+			instruction.setPredicate(currentPredicate);
 		}
+
+		// move to target block
+		targetBlock.getInstructions().addAll(instructions);
 
 		// remove this block
 		EcoreUtil.remove(block);
+		indexNode--;
 
 		return NULL;
 	}

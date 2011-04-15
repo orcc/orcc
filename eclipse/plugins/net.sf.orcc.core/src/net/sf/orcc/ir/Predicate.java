@@ -40,6 +40,19 @@ import org.eclipse.emf.ecore.EObject;
 public interface Predicate extends EObject {
 
 	/**
+	 * Adds an expression to this predicate.
+	 * 
+	 * @param expression
+	 *            an expression
+	 */
+	void add(Expression expression);
+
+	/**
+	 * Clears this predicate.
+	 */
+	void clear();
+
+	/**
 	 * Returns the list of expressions of this predicate.
 	 * 
 	 * @return the list of expressions of this predicate

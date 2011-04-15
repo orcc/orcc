@@ -68,7 +68,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 			Predicate predicate = inst.getPredicate();
 			NodeBlock targetBlock;
-			if (predicate.isEmpty()) {
+			if (predicate == null || predicate.isEmpty()) {
 				if (currentPredicate.isEmpty()) {
 					if (target == null) {
 						// if target does not exist yet, create it
@@ -77,7 +77,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 					}
 				} else {
 					// end current if
-					currentPredicate.getExpressions().clear();
+					currentPredicate.clear();
 					target = IrFactory.eINSTANCE.createNodeBlock();
 					procedure.getNodes().add(target);
 				}
@@ -91,11 +91,11 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 								.createNodeBlock());
 						procedure.getNodes().add(target);
 
-						currentPredicate.getExpressions().add(condition);
+						currentPredicate.add(condition);
 					}
 				}
 
-				inst.getPredicate().getExpressions().clear();
+				inst.getPredicate().clear();
 				targetBlock = procedure.getLast(((NodeIf) target)
 						.getThenNodes());
 			}
@@ -115,8 +115,8 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		target = null;
 		currentPredicate = IrFactory.eINSTANCE.createPredicate();
+		target = null;
 
 		doSwitch(procedure.getNodes().get(0));
 
