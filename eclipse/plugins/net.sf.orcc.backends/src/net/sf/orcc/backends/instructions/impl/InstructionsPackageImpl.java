@@ -7,6 +7,7 @@
 package net.sf.orcc.backends.instructions.impl;
 
 import net.sf.orcc.backends.instructions.InstAssignIndex;
+import net.sf.orcc.backends.instructions.InstGetElementPtr;
 import net.sf.orcc.backends.instructions.InstRam;
 import net.sf.orcc.backends.instructions.InstRamRead;
 import net.sf.orcc.backends.instructions.InstRamSetAddress;
@@ -81,6 +82,13 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * @generated
 	 */
 	private EClass instRamWriteEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass instGetElementPtrEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -323,6 +331,42 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getInstGetElementPtr() {
+		return instGetElementPtrEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstGetElementPtr_Indexes() {
+		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstGetElementPtr_Target() {
+		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstGetElementPtr_Source() {
+		return (EReference)instGetElementPtrEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public InstructionsFactory getInstructionsFactory() {
 		return (InstructionsFactory)getEFactoryInstance();
 	}
@@ -371,6 +415,11 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 
 		instRamWriteEClass = createEClass(INST_RAM_WRITE);
 		createEReference(instRamWriteEClass, INST_RAM_WRITE__VALUE);
+
+		instGetElementPtrEClass = createEClass(INST_GET_ELEMENT_PTR);
+		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__INDEXES);
+		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__TARGET);
+		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__SOURCE);
 	}
 
 	/**
@@ -411,6 +460,7 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		instRamReadEClass.getESuperTypes().add(this.getInstRam());
 		instRamSetAddressEClass.getESuperTypes().add(this.getInstRam());
 		instRamWriteEClass.getESuperTypes().add(this.getInstRam());
+		instGetElementPtrEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(instTernaryEClass, InstTernary.class, "InstTernary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -438,6 +488,11 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 
 		initEClass(instRamWriteEClass, InstRamWrite.class, "InstRamWrite", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getInstRamWrite_Value(), theIrPackage.getExpression(), null, "value", null, 0, 1, InstRamWrite.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(instGetElementPtrEClass, InstGetElementPtr.class, "InstGetElementPtr", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstGetElementPtr_Indexes(), theIrPackage.getExpression(), null, "indexes", null, 0, -1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstGetElementPtr_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstGetElementPtr_Source(), theIrPackage.getUse(), null, "source", null, 0, 1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

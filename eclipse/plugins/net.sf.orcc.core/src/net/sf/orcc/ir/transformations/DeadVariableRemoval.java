@@ -60,7 +60,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 
 	private List<Var> unusedLocals;
 
-	private void handleInstruction(Var target, Instruction instruction) {
+	protected void handleInstruction(Var target, Instruction instruction) {
 		// do not remove assign to variables of patterns
 		if (target.eContainmentFeature() == IrPackage.eINSTANCE
 				.getPattern_Variables()) {

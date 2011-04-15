@@ -6,6 +6,7 @@
  */
 package net.sf.orcc.backends.instructions.impl;
 
+import net.sf.orcc.backends.instructions.*;
 import java.util.List;
 
 import net.sf.orcc.backends.instructions.InstAssignIndex;
@@ -87,6 +88,7 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 			case InstructionsPackage.INST_RAM_READ: return createInstRamRead();
 			case InstructionsPackage.INST_RAM_SET_ADDRESS: return createInstRamSetAddress();
 			case InstructionsPackage.INST_RAM_WRITE: return createInstRamWrite();
+			case InstructionsPackage.INST_GET_ELEMENT_PTR: return createInstGetElementPtr();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -158,6 +160,16 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 	public InstRamWrite createInstRamWrite() {
 		InstRamWriteImpl instRamWrite = new InstRamWriteImpl();
 		return instRamWrite;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public InstGetElementPtr createInstGetElementPtr() {
+		InstGetElementPtrImpl instGetElementPtr = new InstGetElementPtrImpl();
+		return instGetElementPtr;
 	}
 
 	@Override

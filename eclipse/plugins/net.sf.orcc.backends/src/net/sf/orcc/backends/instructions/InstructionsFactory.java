@@ -73,6 +73,15 @@ public interface InstructionsFactory extends EFactory {
 	 */
 	InstRamWrite createInstRamWrite();
 
+	/**
+	 * Returns a new object of class '<em>Inst Get Element Ptr</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Inst Get Element Ptr</em>'.
+	 * @generated
+	 */
+	InstGetElementPtr createInstGetElementPtr();
+
 	InstRamWrite createInstRamWrite(int port, Var variable, Expression value);
 
 	/**

@@ -149,6 +149,14 @@ public class InstructionsSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case InstructionsPackage.INST_GET_ELEMENT_PTR: {
+				InstGetElementPtr instGetElementPtr = (InstGetElementPtr)theEObject;
+				T result = caseInstGetElementPtr(instGetElementPtr);
+				if (result == null) result = caseInstSpecific(instGetElementPtr);
+				if (result == null) result = caseInstruction(instGetElementPtr);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -255,6 +263,21 @@ public class InstructionsSwitch<T> {
 	 * @generated
 	 */
 	public T caseInstRamWrite(InstRamWrite object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Inst Get Element Ptr</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Inst Get Element Ptr</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseInstGetElementPtr(InstGetElementPtr object) {
 		return null;
 	}
 
