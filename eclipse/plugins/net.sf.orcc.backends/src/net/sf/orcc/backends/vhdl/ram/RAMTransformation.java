@@ -47,8 +47,8 @@ public class RAMTransformation implements ActorVisitor<Object> {
 		new IfConverter().doSwitch(actor);
 		new RAMInstructionScheduler().doSwitch(actor);
 		new ConditionedSplitExtractor().doSwitch(actor);
-		new IfDeconverter().doSwitch(actor);
 		new ActionSplitter().doSwitch(actor);
+		new IfDeconverter().doSwitch(actor);
 
 		return null;
 	}

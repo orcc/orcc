@@ -260,7 +260,7 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		if (predicate != null) {
+		if (predicate != null && !predicate.isEmpty()) {
 			for (Expression condition : getPredicate().getExpressions()) {
 				builder.append("<");
 				String str = new ExpressionPrinter().doSwitch(condition);

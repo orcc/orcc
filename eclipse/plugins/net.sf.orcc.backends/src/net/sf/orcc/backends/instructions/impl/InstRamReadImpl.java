@@ -175,7 +175,7 @@ public class InstRamReadImpl extends InstRamImpl implements InstRamRead {
 
 	@Override
 	public String toString() {
-		return "RamRead(" + getTarget().getVariable().getIndexedName() + ", "
+		return super.toString() + "RamRead(" + getTarget().getVariable().getIndexedName() + ", "
 				+ getVariable().getName() + "_q_p" + getPort() + ")";
 	}
 

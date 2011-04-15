@@ -97,7 +97,10 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 		// an unconditional block
 		currentPredicate = null;
 
-		doSwitch(procedure.getNodes().get(0));
+		List<Node> nodes = procedure.getNodes();
+		if (!nodes.isEmpty()) {
+			doSwitch(nodes.get(0));
+		}
 
 		return NULL;
 	}

@@ -44,7 +44,7 @@ public class InstSplitImpl extends InstSpecificImpl implements InstSplit {
 
 	@Override
 	public String toString() {
-		return "<split>";
+		return super.toString() + "<split>";
 	}
 
 } //InstSplitImpl

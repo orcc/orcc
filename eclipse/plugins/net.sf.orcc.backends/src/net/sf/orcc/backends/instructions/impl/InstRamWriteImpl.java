@@ -179,7 +179,7 @@ public class InstRamWriteImpl extends InstRamImpl implements InstRamWrite {
 
 	@Override
 	public String toString() {
-		return "RamWrite(" + getVariable().getName() + "_p" + getPort() + ", "
+		return super.toString() + "RamWrite(" + getVariable().getName() + "_p" + getPort() + ", "
 				+ new ExpressionPrinter().doSwitch(getValue()) + ")";
 	}
 

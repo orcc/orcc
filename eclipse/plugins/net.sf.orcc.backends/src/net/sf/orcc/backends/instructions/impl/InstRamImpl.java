@@ -212,20 +212,9 @@ public abstract class InstRamImpl extends InstSpecificImpl implements InstRam {
 		return super.eIsSet(featureID);
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (port: ");
-		result.append(port);
-		result.append(')');
-		return result.toString();
+		return super.toString();
 	}
 
 } //InstRamImpl

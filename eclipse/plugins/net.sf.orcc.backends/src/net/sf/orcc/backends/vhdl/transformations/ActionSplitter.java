@@ -42,8 +42,8 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
@@ -178,6 +178,10 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		block.add(IrFactory.eINSTANCE.createInstAssign(result, condition));
 		block.add(IrFactory.eINSTANCE.createInstReturn(IrFactory.eINSTANCE
 				.createExprVar(result)));
+		Predicate predicate = IrFactory.eINSTANCE.createPredicate();
+		for (Instruction instruction : block.getInstructions()) {
+			instruction.setPredicate(predicate);
+		}
 		scheduler.getNodes().add(block);
 
 		// body
@@ -185,7 +189,9 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 				IrFactory.eINSTANCE.createLocation(),
 				IrFactory.eINSTANCE.createTypeVoid());
 		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		block.add(IrFactory.eINSTANCE.createInstReturn());
+		Instruction inst = IrFactory.eINSTANCE.createInstReturn();
+		inst.setPredicate(predicate);
+		block.add(inst);
 		body.getNodes().add(block);
 
 		// tag
@@ -261,13 +267,8 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		// move instructions
 		NodeBlock targetBlock = nextAction.getBody().getFirst();
 		List<Instruction> instructions = block.getInstructions();
-		targetBlock.getInstructions().addAll(
+		targetBlock.getInstructions().addAll(0,
 				instructions.subList(indexInst, instructions.size()));
-
-		// move nodes
-		List<Node> targetNodes = nextAction.getBody().getNodes();
-		List<Node> nodes = EcoreHelper.getContainingList(block);
-		targetNodes.addAll(nodes.subList(indexNode, nodes.size()));
 
 		// update transitions
 		replaceTransition(nextAction);
