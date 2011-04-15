@@ -37,7 +37,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -74,7 +73,7 @@ import org.jgrapht.DirectedGraph;
  * @author Khaled Jerbi
  * 
  */
-public class Multi2MonoToken extends AbstractActorVisitor {
+public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	/**
 	 * This class defines a visitor that substitutes the peek from the port to
 	 * the new buffer and changes the index from (index) to
@@ -83,7 +82,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @author Khaled Jerbi
 	 * 
 	 */
-	private class ModifyActionScheduler extends AbstractActorVisitor {
+	private class ModifyActionScheduler extends AbstractActorVisitor<Object> {
 		private Var buffer;
 		private int bufferSize;
 		private Port currentPort;
@@ -98,7 +97,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		}
 
 		@Override
-		public void visit(InstLoad load) {
+		public Object caseInstLoad(InstLoad load) {
 			if (load.getSource().getVariable().getName()
 					.equals(currentPort.getName())) {
 				// change tab Name
@@ -125,6 +124,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					load.getIndexes().add(mask2);
 				}
 			}
+			return null;
 		}
 	}
 
@@ -135,7 +135,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @author Khaled Jerbi
 	 * 
 	 */
-	private class ModifyProcessActionStore extends AbstractActorVisitor {
+	private class ModifyProcessActionStore extends AbstractActorVisitor<Object> {
 		private Var tab;
 
 		public ModifyProcessActionStore(Var tab) {
@@ -143,11 +143,12 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		}
 
 		@Override
-		public void visit(InstLoad load) {
+		public Object caseInstLoad(InstLoad load) {
 			if (load.getSource().getVariable().getName().equals(port.getName())) {
 				Use useArray = IrFactory.eINSTANCE.createUse(tab);
 				load.setSource(useArray);
 			}
+			return null ;
 		}
 	}
 
@@ -158,7 +159,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	 * @author Khaled JERBI
 	 * 
 	 */
-	private class ModifyProcessActionWrite extends AbstractActorVisitor {
+	private class ModifyProcessActionWrite extends AbstractActorVisitor<Object> {
 
 		private Var tab;
 
@@ -167,12 +168,13 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		}
 
 		@Override
-		public void visit(InstStore store) {
+		public Object caseInstStore(InstStore store) {
 			if (store.getTarget().getVariable().getName()
 					.equals(port.getName())) {
 				Def target = IrFactory.eINSTANCE.createDef(tab);
 				store.setTarget(target);
 			}
+			return null ;
 		}
 	}
 
@@ -213,7 +215,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 			Var readIndex) {
 		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 				buffer, writeIndex, port, bufferSize);
-		modifyActionScheduler.visit(action.getScheduler());
+		modifyActionScheduler.doSwitch(action.getScheduler());
 		modifyActionSchedulability(action, writeIndex, readIndex, OpBinary.GE,
 				IrFactory.eINSTANCE.createExprInt(numTokens));
 	}
@@ -255,7 +257,6 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Var writeIndex = writeIndexes.get(position);
 		Instruction loadInd = IrFactory.eINSTANCE.createInstLoad(index,
 				writeIndex);
-
 		bodyNode.add(loadInd);
 
 		Var indexInc = IrFactory.eINSTANCE.createVar(
@@ -531,7 +532,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		Pattern pattern = newUntaggedAction.getInputPattern();
 		pattern.setNumTokens(port, 1);
 		pattern.setVariable(port, localINPUT);
-		actor.getActionsOutsideFsm().add(0, newUntaggedAction);
+		actor.getActionsOutsideFsm().add(newUntaggedAction);
 		AddedUntaggedActions.add(newUntaggedAction);
 		return newUntaggedAction;
 	}
@@ -979,7 +980,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 								buffer, writeIndex, port, bufferSize);
-						modifyActionScheduler.visit(action);
+						modifyActionScheduler.doSwitch(action);
 						modifyActionSchedulability(action, writeIndex,
 								readIndex, OpBinary.NE,
 								IrFactory.eINSTANCE.createExprInt(0));
@@ -1204,7 +1205,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 					ModifyProcessActionStore modifyProcessAction = new ModifyProcessActionStore(
 							tab);
-					modifyProcessAction.visit(process.getBody());
+					modifyProcessAction.doSwitch(process.getBody());
 					fsm.addTransition(storeState, store, storeState);
 					// create a new store done action once
 					if (inputIndex == 1) {
@@ -1286,7 +1287,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 
 					ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
 							tab);
-					modifyProcessActionWrite.visit(process.getBody());
+					modifyProcessActionWrite.doSwitch(process.getBody());
 					fsm.addTransition(writeState, write, writeState);
 
 					// create a new write done action once
@@ -1327,7 +1328,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 				action.getInputPattern().remove(verifPort);
 				ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 						buffer, writeIndex, verifPort, bufferSize);
-				modifyActionScheduler.visit(action);
+				modifyActionScheduler.doSwitch(action);
 				modifyActionSchedulability(action, writeIndex, readIndex,
 						OpBinary.GE,
 						IrFactory.eINSTANCE.createExprInt(verifNumTokens));
@@ -1362,7 +1363,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 					action.getInputPattern().remove(verifPort);
 					ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 							untagBuffer, untagWriteIndex, verifPort, bufferSize);
-					modifyActionScheduler.visit(action);
+					modifyActionScheduler.doSwitch(action);
 					modifyActionSchedulability(action, untagWriteIndex,
 							untagReadIndex, OpBinary.GE,
 							IrFactory.eINSTANCE.createExprInt(verifNumTokens));
@@ -1480,7 +1481,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		this.actor = actor;
 		inputIndex = 0;
 		outputIndex = 0;
@@ -1496,6 +1497,7 @@ public class Multi2MonoToken extends AbstractActorVisitor {
 		modifyRepeatActionsInFSM();
 		modifyNoRepeatActionsInFSM();
 		modifyUntaggedActions(actor);
+		return null;
 	}
 
 	/**
