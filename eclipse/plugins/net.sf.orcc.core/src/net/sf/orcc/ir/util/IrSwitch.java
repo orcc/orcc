@@ -346,6 +346,21 @@ public class IrSwitch<T2> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Predicate</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Predicate</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T2 casePredicate(Predicate object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>State</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -1148,6 +1163,12 @@ public class IrSwitch<T2> {
 			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: {
 				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToEIntegerObjectMapEntry = (Map.Entry<Port, Integer>)theEObject;
 				T2 result = casePortToEIntegerObjectMapEntry(portToEIntegerObjectMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.PREDICATE: {
+				Predicate predicate = (Predicate)theEObject;
+				T2 result = casePredicate(predicate);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

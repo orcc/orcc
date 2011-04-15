@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.ecore.EObject;
-
 import net.sf.orcc.ir.util.InstructionInterpreter;
 import net.sf.orcc.ir.util.InstructionVisitor;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an instruction.
@@ -85,13 +85,13 @@ public interface Instruction extends EObject {
 	public Location getLocation();
 
 	/**
-	 * Returns the predicate associated with this instruction. This is used by
-	 * if-conversion.
+	 * Returns the predicate associated with this instruction as a list of
+	 * expressions. This is used by if-conversion.
 	 * 
 	 * @return the predicate associated with this instruction
 	 * @model
 	 */
-	Expression getPredicate();
+	Predicate getPredicate();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Instruction#getPredicate <em>Predicate</em>}' reference.
@@ -101,7 +101,7 @@ public interface Instruction extends EObject {
 	 * @see #getPredicate()
 	 * @generated
 	 */
-	void setPredicate(Expression value);
+	void setPredicate(Predicate value);
 
 	/**
 	 * Returns <code>true</code> if the instruction is an Assign.

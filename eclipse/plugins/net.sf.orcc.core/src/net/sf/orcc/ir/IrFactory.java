@@ -700,6 +700,15 @@ public interface IrFactory extends EFactory {
 	Use createUse();
 
 	/**
+	 * Returns a new object of class '<em>Predicate</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Predicate</em>'.
+	 * @generated
+	 */
+	Predicate createPredicate();
+
+	/**
 	 * Creates a new use of the given variable.
 	 * 
 	 * @param variable

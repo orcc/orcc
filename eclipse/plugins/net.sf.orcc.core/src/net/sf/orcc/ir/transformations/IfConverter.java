@@ -31,14 +31,13 @@ package net.sf.orcc.ir.transformations;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
+import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
@@ -53,7 +52,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class IfConverter extends AbstractActorVisitor<Object> {
 
-	private Expression currentPredicate;
+	private Predicate currentPredicate;
 
 	private NodeBlock targetBlock;
 
@@ -78,29 +77,20 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseNodeIf(NodeIf nodeIf) {
-		Expression previousPredicate = currentPredicate;
+		Predicate previousPredicate = currentPredicate;
 
 		// predicate for "then" branch
-		currentPredicate = EcoreHelper.copy(nodeIf.getCondition());
-		if (previousPredicate != null) {
-			currentPredicate = IrFactory.eINSTANCE.createExprBinary(
-					EcoreHelper.copy(previousPredicate),
-					OpBinary.LOGIC_AND, currentPredicate,
-					IrFactory.eINSTANCE.createTypeBool());
-		}
+		currentPredicate = EcoreUtil.copy(previousPredicate);
+		currentPredicate.getExpressions().add(
+				EcoreHelper.copy(nodeIf.getCondition()));
 		doSwitch(nodeIf.getThenNodes());
 
 		// predicate for "else" branch
-		currentPredicate = IrFactory.eINSTANCE.createExprUnary(
-				OpUnary.LOGIC_NOT,
-				EcoreHelper.copy(nodeIf.getCondition()),
-				IrFactory.eINSTANCE.createTypeBool());
-		if (previousPredicate != null) {
-			currentPredicate = IrFactory.eINSTANCE.createExprBinary(
-					EcoreHelper.copy(previousPredicate),
-					OpBinary.LOGIC_AND, currentPredicate,
-					IrFactory.eINSTANCE.createTypeBool());
-		}
+		currentPredicate = EcoreUtil.copy(previousPredicate);
+		currentPredicate.getExpressions().add(
+				IrFactory.eINSTANCE.createExprUnary(OpUnary.LOGIC_NOT,
+						EcoreHelper.copy(nodeIf.getCondition()),
+						IrFactory.eINSTANCE.createTypeBool()));
 		doSwitch(nodeIf.getElseNodes());
 
 		// restore predicate for "join" node
@@ -121,6 +111,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
+		currentPredicate = IrFactory.eINSTANCE.createPredicate();
 		targetBlock = IrFactory.eINSTANCE.createNodeBlock();
 		super.caseProcedure(procedure);
 		procedure.getNodes().add(targetBlock);

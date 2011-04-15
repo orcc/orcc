@@ -6,7 +6,6 @@
  */
 package net.sf.orcc.ir;
 
-import java.lang.String;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
@@ -622,10 +621,29 @@ public interface IrPackage extends EPackage {
 
 		/**
 		 * The meta object literal for the '<em><b>Predicate</b></em>' reference feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INSTRUCTION__PREDICATE = eINSTANCE.getInstruction_Predicate();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PredicateImpl <em>Predicate</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.PredicateImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPredicate()
+		 * @generated
+		 */
+		EClass PREDICATE = eINSTANCE.getPredicate();
+
+		/**
+		 * The meta object literal for the '<em><b>Expressions</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PREDICATE__EXPRESSIONS = eINSTANCE.getPredicate_Expressions();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.LocationImpl <em>Location</em>}' class.
@@ -1728,7 +1746,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 47;
+	int OP_BINARY = 48;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1737,7 +1755,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 48;
+	int OP_UNARY = 49;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
@@ -2327,9 +2345,9 @@ public interface IrPackage extends EPackage {
 	int INSTRUCTION__LOCATION = 0;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -2344,6 +2362,16 @@ public interface IrPackage extends EPackage {
 	int INSTRUCTION_FEATURE_COUNT = 2;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PredicateImpl <em>Predicate</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.PredicateImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPredicate()
+	 * @generated
+	 */
+	int PREDICATE = 47;
+
+	/**
 	 * The feature id for the '<em><b>Location</b></em>' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -2352,9 +2380,9 @@ public interface IrPackage extends EPackage {
 	int INST_ASSIGN__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -2394,9 +2422,9 @@ public interface IrPackage extends EPackage {
 	int INST_CALL__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -2446,9 +2474,9 @@ public interface IrPackage extends EPackage {
 	int INST_LOAD__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -2498,9 +2526,9 @@ public interface IrPackage extends EPackage {
 	int INST_PHI__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -2550,9 +2578,9 @@ public interface IrPackage extends EPackage {
 	int INST_RETURN__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -2583,9 +2611,9 @@ public interface IrPackage extends EPackage {
 	int INST_SPECIFIC__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -2608,9 +2636,9 @@ public interface IrPackage extends EPackage {
 	int INST_STORE__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
@@ -3305,6 +3333,24 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY_FEATURE_COUNT = 2;
+
+	/**
+	 * The feature id for the '<em><b>Expressions</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PREDICATE__EXPRESSIONS = 0;
+
+	/**
+	 * The number of structural features of the '<em>Predicate</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PREDICATE_FEATURE_COUNT = 1;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Action <em>Action</em>}'.
@@ -4079,16 +4125,36 @@ public interface IrPackage extends EPackage {
 	EReference getInstruction_Location();
 
 	/**
-	 * Returns the meta object for the reference '
-	 * {@link net.sf.orcc.ir.Instruction#getPredicate <em>Predicate</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Instruction#getPredicate <em>Predicate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Predicate</em>'.
 	 * @see net.sf.orcc.ir.Instruction#getPredicate()
 	 * @see #getInstruction()
 	 * @generated
 	 */
 	EReference getInstruction_Predicate();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Predicate <em>Predicate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Predicate</em>'.
+	 * @see net.sf.orcc.ir.Predicate
+	 * @generated
+	 */
+	EClass getPredicate();
+
+	/**
+	 * Returns the meta object for the reference list '{@link net.sf.orcc.ir.Predicate#getExpressions <em>Expressions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Expressions</em>'.
+	 * @see net.sf.orcc.ir.Predicate#getExpressions()
+	 * @see #getPredicate()
+	 * @generated
+	 */
+	EReference getPredicate_Expressions();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.InstSpecific <em>Inst Specific</em>}'.

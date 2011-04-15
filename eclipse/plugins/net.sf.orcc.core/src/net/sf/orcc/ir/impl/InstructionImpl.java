@@ -6,12 +6,12 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.Predicate;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -45,7 +45,7 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 	 * @generated
 	 * @ordered
 	 */
-	protected Expression predicate;
+	protected Predicate predicate;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -134,7 +134,7 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 				setLocation((Location)newValue);
 				return;
 			case IrPackage.INSTRUCTION__PREDICATE:
-				setPredicate((Expression)newValue);
+				setPredicate((Predicate)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -162,7 +162,7 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 				setLocation((Location)null);
 				return;
 			case IrPackage.INSTRUCTION__PREDICATE:
-				setPredicate((Expression)null);
+				setPredicate((Predicate)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -222,10 +222,10 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Expression getPredicate() {
+	public Predicate getPredicate() {
 		if (predicate != null && predicate.eIsProxy()) {
 			InternalEObject oldPredicate = (InternalEObject)predicate;
-			predicate = (Expression)eResolveProxy(oldPredicate);
+			predicate = (Predicate)eResolveProxy(oldPredicate);
 			if (predicate != oldPredicate) {
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.INSTRUCTION__PREDICATE, oldPredicate, predicate));
@@ -239,7 +239,7 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Expression basicGetPredicate() {
+	public Predicate basicGetPredicate() {
 		return predicate;
 	}
 
@@ -248,8 +248,8 @@ public abstract class InstructionImpl extends EObjectImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setPredicate(Expression newPredicate) {
-		Expression oldPredicate = predicate;
+	public void setPredicate(Predicate newPredicate) {
+		Predicate oldPredicate = predicate;
 		predicate = newPredicate;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INSTRUCTION__PREDICATE, oldPredicate, predicate));

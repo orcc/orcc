@@ -38,8 +38,10 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -51,20 +53,23 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class IfDeconverter extends AbstractActorVisitor<Object> {
 
-	private Expression currentPredicate;
+	private Predicate currentPredicate;
 
 	private Node target;
 
 	@Override
 	public Object caseNodeBlock(NodeBlock block) {
+		Procedure procedure = EcoreHelper.getContainerOfType(block,
+				Procedure.class);
+
 		List<Instruction> instructions = block.getInstructions();
 		while (!instructions.isEmpty()) {
 			Instruction inst = instructions.get(0);
 
-			Expression predicate = inst.getPredicate();
+			Predicate predicate = inst.getPredicate();
 			NodeBlock targetBlock;
-			if (predicate == null) {
-				if (currentPredicate == null) {
+			if (predicate.isEmpty()) {
+				if (currentPredicate.isEmpty()) {
 					if (target == null) {
 						// if target does not exist yet, create it
 						target = IrFactory.eINSTANCE.createNodeBlock();
@@ -72,22 +77,25 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 					}
 				} else {
 					// end current if
-					currentPredicate = null;
+					currentPredicate.getExpressions().clear();
 					target = IrFactory.eINSTANCE.createNodeBlock();
 					procedure.getNodes().add(target);
 				}
 				targetBlock = (NodeBlock) target;
 			} else {
-				if (currentPredicate == null) {
-					target = IrFactory.eINSTANCE.createNodeIf();
-					((NodeIf) target).setCondition(predicate);
-					((NodeIf) target).setJoinNode(IrFactory.eINSTANCE.createNodeBlock());
-					procedure.getNodes().add(target);
+				if (currentPredicate.isEmpty()) {
+					for (Expression condition : predicate.getExpressions()) {
+						target = IrFactory.eINSTANCE.createNodeIf();
+						((NodeIf) target).setCondition(condition);
+						((NodeIf) target).setJoinNode(IrFactory.eINSTANCE
+								.createNodeBlock());
+						procedure.getNodes().add(target);
 
-					currentPredicate = predicate;
+						currentPredicate.getExpressions().add(condition);
+					}
 				}
 
-				inst.setPredicate(null);
+				inst.getPredicate().getExpressions().clear();
 				targetBlock = procedure.getLast(((NodeIf) target)
 						.getThenNodes());
 			}
@@ -107,8 +115,8 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		this.procedure = procedure;
 		target = null;
+		currentPredicate = IrFactory.eINSTANCE.createPredicate();
 
 		doSwitch(procedure.getNodes().get(0));
 

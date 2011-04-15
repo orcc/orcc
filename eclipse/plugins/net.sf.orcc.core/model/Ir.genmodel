@@ -235,6 +235,9 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//PortToEIntegerObjectMapEntry/key"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//PortToEIntegerObjectMapEntry/value"/>
     </genClasses>
+    <genClasses ecoreClass="Ir.ecore#//Predicate">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Predicate/expressions"/>
+    </genClasses>
   </genPackages>
   <genPackages prefix="Moc" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="MoC.ecore#/">
