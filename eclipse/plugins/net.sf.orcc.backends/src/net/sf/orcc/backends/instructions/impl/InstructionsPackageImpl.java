@@ -18,6 +18,7 @@ import net.sf.orcc.backends.instructions.InstTernary;
 
 import net.sf.orcc.ir.IrPackage;
 
+import net.sf.orcc.moc.MocPackage;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
@@ -129,6 +130,7 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 
 		// Initialize simple dependencies
 		IrPackage.eINSTANCE.eClass();
+		MocPackage.eINSTANCE.eClass();
 
 		// Create package meta-data objects
 		theInstructionsPackage.createPackageContents();
@@ -424,7 +426,7 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 
 		initEClass(instSplitEClass, InstSplit.class, "InstSplit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
-		initEClass(instRamEClass, InstRam.class, "InstRam", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEClass(instRamEClass, InstRam.class, "InstRam", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getInstRam_Port(), ecorePackage.getEInt(), "port", null, 0, 1, InstRam.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstRam_Variable(), theIrPackage.getVar(), null, "variable", null, 0, 1, InstRam.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

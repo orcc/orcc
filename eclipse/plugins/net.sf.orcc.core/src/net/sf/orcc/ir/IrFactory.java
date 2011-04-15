@@ -391,15 +391,6 @@ public interface IrFactory extends EFactory {
 	InstReturn createInstReturn(Location location, Expression value);
 
 	/**
-	 * Returns a new object of class '<em>Inst Specific</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return a new object of class '<em>Inst Specific</em>'.
-	 * @generated
-	 */
-	InstSpecific createInstSpecific();
-
-	/**
 	 * Returns a new object of class '<em>Inst Store</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->

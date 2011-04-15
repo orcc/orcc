@@ -36,7 +36,7 @@ import net.sf.orcc.ir.Var;
  * associated to a var.
  * 
  * @author Matthieu Wipliez
- * @model extends="net.sf.orcc.ir.InstSpecific"
+ * @model abstract="true" extends="net.sf.orcc.ir.InstSpecific"
  */
 public interface InstRam extends InstSpecific {
 

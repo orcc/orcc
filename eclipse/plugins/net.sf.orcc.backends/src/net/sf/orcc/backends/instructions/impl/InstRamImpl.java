@@ -34,7 +34,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  *
  * @generated
  */
-public class InstRamImpl extends InstSpecificImpl implements InstRam {
+public abstract class InstRamImpl extends InstSpecificImpl implements InstRam {
 	/**
 	 * The default value of the '{@link #getPort() <em>Port</em>}' attribute.
 	 * <!-- begin-user-doc -->

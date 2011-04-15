@@ -22,18 +22,16 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- * <li>{@link net.sf.orcc.backends.instructions.impl.InstRamReadImpl#getTarget
- * <em>Target</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.impl.InstRamReadImpl#getTarget <em>Target</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class InstRamReadImpl extends InstRamImpl implements InstRamRead {
 	/**
-	 * The cached value of the '{@link #getTarget() <em>Target</em>}'
-	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * The cached value of the '{@link #getTarget() <em>Target</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTarget()
 	 * @generated
 	 * @ordered
@@ -42,7 +40,6 @@ public class InstRamReadImpl extends InstRamImpl implements InstRamRead {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected InstRamReadImpl() {
@@ -51,7 +48,6 @@ public class InstRamReadImpl extends InstRamImpl implements InstRamRead {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public NotificationChain basicSetTarget(Def newTarget,
@@ -59,79 +55,68 @@ public class InstRamReadImpl extends InstRamImpl implements InstRamRead {
 		Def oldTarget = target;
 		target = newTarget;
 		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET,
-					InstructionsPackage.INST_RAM_READ__TARGET, oldTarget,
-					newTarget);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_RAM_READ__TARGET, oldTarget, newTarget);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case InstructionsPackage.INST_RAM_READ__TARGET:
-			return getTarget();
+			case InstructionsPackage.INST_RAM_READ__TARGET:
+				return getTarget();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case InstructionsPackage.INST_RAM_READ__TARGET:
-			return basicSetTarget(null, msgs);
+			case InstructionsPackage.INST_RAM_READ__TARGET:
+				return basicSetTarget(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-		case InstructionsPackage.INST_RAM_READ__TARGET:
-			return target != null;
+			case InstructionsPackage.INST_RAM_READ__TARGET:
+				return target != null;
 		}
 		return super.eIsSet(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case InstructionsPackage.INST_RAM_READ__TARGET:
-			setTarget((Def) newValue);
-			return;
+			case InstructionsPackage.INST_RAM_READ__TARGET:
+				setTarget((Def)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -141,22 +126,20 @@ public class InstRamReadImpl extends InstRamImpl implements InstRamRead {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case InstructionsPackage.INST_RAM_READ__TARGET:
-			setTarget((Def) null);
-			return;
+			case InstructionsPackage.INST_RAM_READ__TARGET:
+				setTarget((Def)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Def getTarget() {
@@ -174,34 +157,25 @@ public class InstRamReadImpl extends InstRamImpl implements InstRamRead {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void setTarget(Def newTarget) {
 		if (newTarget != target) {
 			NotificationChain msgs = null;
 			if (target != null)
-				msgs = ((InternalEObject) target).eInverseRemove(this,
-						EOPPOSITE_FEATURE_BASE
-								- InstructionsPackage.INST_RAM_READ__TARGET,
-						null, msgs);
+				msgs = ((InternalEObject)target).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_RAM_READ__TARGET, null, msgs);
 			if (newTarget != null)
-				msgs = ((InternalEObject) newTarget).eInverseAdd(this,
-						EOPPOSITE_FEATURE_BASE
-								- InstructionsPackage.INST_RAM_READ__TARGET,
-						null, msgs);
+				msgs = ((InternalEObject)newTarget).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - InstructionsPackage.INST_RAM_READ__TARGET, null, msgs);
 			msgs = basicSetTarget(newTarget, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					InstructionsPackage.INST_RAM_READ__TARGET, newTarget,
-					newTarget));
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_RAM_READ__TARGET, newTarget, newTarget));
 	}
 
 	@Override
 	public String toString() {
-		return "RamRead(" + getTarget().getVariable().getName() + ", "
+		return "RamRead(" + getTarget().getVariable().getIndexedName() + ", "
 				+ getVariable().getName() + "_q_p" + getPort() + ")";
 	}
 

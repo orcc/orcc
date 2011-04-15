@@ -126,7 +126,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.INST_LOAD: return createInstLoad();
 			case IrPackage.INST_PHI: return createInstPhi();
 			case IrPackage.INST_RETURN: return createInstReturn();
-			case IrPackage.INST_SPECIFIC: return createInstSpecific();
 			case IrPackage.INST_STORE: return createInstStore();
 			case IrPackage.EXPR_BINARY: return createExprBinary();
 			case IrPackage.EXPR_BOOL: return createExprBool();
@@ -552,15 +551,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		instReturn.setLocation(location);
 		instReturn.setValue(value);
 		return instReturn;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public InstSpecific createInstSpecific() {
-		InstSpecificImpl instSpecific = new InstSpecificImpl();
-		return instSpecific;
 	}
 
 	/**

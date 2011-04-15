@@ -81,6 +81,15 @@ public interface InstructionsPackage extends EPackage {
 	int INST_TERNARY__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
 
 	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
 	 * The feature id for the '<em><b>Condition Value</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -145,6 +154,15 @@ public interface InstructionsPackage extends EPackage {
 	int INST_ASSIGN_INDEX__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
 
 	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_ASSIGN_INDEX__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -200,6 +218,15 @@ public interface InstructionsPackage extends EPackage {
 	int INST_SPLIT__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
 
 	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_SPLIT__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
 	 * The number of structural features of the '<em>Inst Split</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -227,6 +254,15 @@ public interface InstructionsPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_RAM__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Port</b></em>' attribute.
@@ -273,6 +309,15 @@ public interface InstructionsPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_RAM_READ__LOCATION = INST_RAM__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__PREDICATE = INST_RAM__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Port</b></em>' attribute.
@@ -330,6 +375,15 @@ public interface InstructionsPackage extends EPackage {
 	int INST_RAM_SET_ADDRESS__LOCATION = INST_RAM__LOCATION;
 
 	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__PREDICATE = INST_RAM__PREDICATE;
+
+	/**
 	 * The feature id for the '<em><b>Port</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -383,6 +437,15 @@ public interface InstructionsPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_RAM_WRITE__LOCATION = INST_RAM__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__PREDICATE = INST_RAM__PREDICATE;
 
 	/**
 	 * The feature id for the '<em><b>Port</b></em>' attribute.
