@@ -31,7 +31,7 @@ package net.sf.orcc.ui.preferences;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.preferences.PreferenceConstants;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -51,7 +51,7 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 	public OrccPreferencePage() {
 		super(GRID);
 
-		InstanceScope scope = new InstanceScope();
+		ConfigurationScope scope = new ConfigurationScope();
 		IPreferenceStore store = new ScopedPreferenceStore(scope,
 				OrccActivator.PLUGIN_ID);
 		setPreferenceStore(store);
