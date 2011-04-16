@@ -37,6 +37,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
@@ -64,9 +65,9 @@ public class JavaBackendImpl extends AbstractBackend {
 		main(JavaBackendImpl.class, args);
 	}
 
-	private final Map<String, String> transformations;
-
 	private ActorPrinter actorPrinter;
+
+	private final Map<String, String> transformations;
 
 	public JavaBackendImpl() {
 		transformations = new HashMap<String, String>();
@@ -98,10 +99,8 @@ public class JavaBackendImpl extends AbstractBackend {
 		List<Actor> actors = parseActors(files);
 
 		actorPrinter = new ActorPrinter("Java_actor", true);
-		// TODO printers
-		System.err.println("JavaBackendImpl.doVtlCodeGeneration(List<File>): must set printers");
-		//actorPrinter.setExpressionPrinter(CppExprPrinter.class);
-		//actorPrinter.setTypePrinter(JavaTypePrinter.class);
+		actorPrinter.setExpressionPrinter(new CppExprPrinter());
+		actorPrinter.setTypePrinter(new JavaTypePrinter());
 
 		transformActors(actors);
 		printActors(actors);
@@ -116,6 +115,10 @@ public class JavaBackendImpl extends AbstractBackend {
 		// print network
 		write("Printing network...\n");
 		printNetwork(network);
+	}
+
+	@Override
+	protected void initializeOptions() {
 	}
 
 	@Override

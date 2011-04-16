@@ -29,12 +29,12 @@
 package net.sf.orcc.backends;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * This interface defines a back-end.
@@ -68,20 +68,12 @@ public interface Backend {
 	void compileXDF(String inputFile) throws OrccException;
 
 	/**
-	 * Set the launch configuration of this plugin.
+	 * Sets the options of this back-end.
 	 * 
-	 * @param configuration
-	 *            the launch configuration of this plugin
+	 * @param options
+	 *            a map of string to object
 	 */
-	void setLaunchConfiguration(ILaunchConfiguration configuration);
-
-	/**
-	 * Sets the options of this backends.
-	 * 
-	 * @param outputFolder
-	 *            output folder
-	 */
-	public void setOptions() throws OrccException;
+	public void setOptions(Map<String, Object> options) throws OrccException;
 
 	/**
 	 * Sets the output folder of this back-end. This is the folder where files

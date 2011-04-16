@@ -227,6 +227,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	public void initializeOptions() {
+		debugMode = getAttribute(DEBUG_MODE, true);
+	}
+
+	@Override
 	protected boolean printActor(Actor actor) {
 		return actorPrinter.print(actor.getName() + ".vhd", path
 				+ File.separator + "Design", actor, "actor");
@@ -292,11 +297,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 				printTestbench(printer, subInstance);
 			}
 		}
-	}
-
-	@Override
-	public void setOptions() throws OrccException {
-		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
 }

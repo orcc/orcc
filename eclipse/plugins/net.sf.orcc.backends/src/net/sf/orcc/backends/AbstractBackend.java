@@ -49,6 +49,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccProcess;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.Instance;
@@ -56,9 +57,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.util.WriteListener;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * This class is an abstract implementation of {@link Backend}. The two entry
@@ -105,9 +104,11 @@ public abstract class AbstractBackend implements Backend {
 					.split(File.pathSeparator));
 			String outputFolder = args[2];
 
+			Map<String, Object> options = new HashMap<String, Object>();
+
 			try {
 				AbstractBackend backend = clasz.newInstance();
-				backend.setOptions();
+				backend.setOptions(options);
 				backend.setOutputFolder(outputFolder);
 				backend.compileVTL(vtlFolders);
 				backend.compileXDF(inputFile);
@@ -122,11 +123,6 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	/**
-	 * the configuration used to launch this back-end.
-	 */
-	private ILaunchConfiguration configuration;
-
-	/**
 	 * Fifo size used in backend.
 	 */
 	protected int fifoSize;
@@ -137,6 +133,8 @@ public abstract class AbstractBackend implements Backend {
 	 * the progress monitor
 	 */
 	private IProgressMonitor monitor;
+
+	private Map<String, Object> options;
 
 	/**
 	 * Path where output files will be written.
@@ -290,18 +288,13 @@ public abstract class AbstractBackend implements Backend {
 	 * @param defaultValue
 	 *            the value to use if no value is found
 	 * @return the value or the default value if no value was found.
-	 * @throws OrccException
 	 */
-	final public boolean getAttribute(String attributeName, boolean defaultValue)
-			throws OrccException {
-		if (configuration == null) {
+	final public boolean getAttribute(String attributeName, boolean defaultValue) {
+		Object obj = options.get(attributeName);
+		if (obj instanceof Boolean) {
+			return (Boolean) obj;
+		} else {
 			return defaultValue;
-		}
-
-		try {
-			return configuration.getAttribute(attributeName, defaultValue);
-		} catch (CoreException e) {
-			throw new OrccException("could not read configuration", e);
 		}
 	}
 
@@ -314,18 +307,13 @@ public abstract class AbstractBackend implements Backend {
 	 * @param defaultValue
 	 *            the value to use if no value is found
 	 * @return the value or the default value if no value was found.
-	 * @throws OrccException
 	 */
-	final public int getAttribute(String attributeName, int defaultValue)
-			throws OrccException {
-		if (configuration == null) {
+	final public int getAttribute(String attributeName, int defaultValue) {
+		Object obj = options.get(attributeName);
+		if (obj instanceof Integer) {
+			return (Integer) obj;
+		} else {
 			return defaultValue;
-		}
-
-		try {
-			return configuration.getAttribute(attributeName, defaultValue);
-		} catch (CoreException e) {
-			throw new OrccException("could not read configuration", e);
 		}
 	}
 
@@ -338,19 +326,15 @@ public abstract class AbstractBackend implements Backend {
 	 * @param defaultValue
 	 *            the value to use if no value is found
 	 * @return the value or the default value if no value was found.
-	 * @throws OrccException
 	 */
 	@SuppressWarnings("unchecked")
 	final public Map<String, String> getAttribute(String attributeName,
-			Map<String, String> defaultValue) throws OrccException {
-		if (configuration == null) {
+			Map<String, String> defaultValue) {
+		Object obj = options.get(attributeName);
+		if (obj instanceof Map<?, ?>) {
+			return (Map<String, String>) obj;
+		} else {
 			return defaultValue;
-		}
-
-		try {
-			return configuration.getAttribute(attributeName, defaultValue);
-		} catch (CoreException e) {
-			throw new OrccException("could not read configuration", e);
 		}
 	}
 
@@ -363,18 +347,13 @@ public abstract class AbstractBackend implements Backend {
 	 * @param defaultValue
 	 *            the value to use if no value is found
 	 * @return the value or the default value if no value was found.
-	 * @throws OrccException
 	 */
-	final public String getAttribute(String attributeName, String defaultValue)
-			throws OrccException {
-		if (configuration == null) {
+	final public String getAttribute(String attributeName, String defaultValue) {
+		Object obj = options.get(attributeName);
+		if (obj instanceof String) {
+			return (String) obj;
+		} else {
 			return defaultValue;
-		}
-
-		try {
-			return configuration.getAttribute(attributeName, defaultValue);
-		} catch (CoreException e) {
-			throw new OrccException("could not read configuration", e);
 		}
 	}
 
@@ -384,20 +363,15 @@ public abstract class AbstractBackend implements Backend {
 	 * attributes.
 	 * 
 	 * @return a map of attribute keys and values.
-	 * @throws OrccException
 	 */
-	@SuppressWarnings("unchecked")
-	final public Map<String, Object> getAttributes() throws OrccException {
-		if (configuration == null) {
-			return new HashMap<String, Object>();
-		}
-
-		try {
-			return configuration.getAttributes();
-		} catch (CoreException e) {
-			throw new OrccException("could not read configuration", e);
-		}
+	final public Map<String, Object> getAttributes() {
+		return options;
 	}
+
+	/**
+	 * Called when options are initialized.
+	 */
+	abstract protected void initializeOptions();
 
 	/**
 	 * Returns true if this process has been canceled.
@@ -547,13 +521,9 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	@Override
-	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
-		this.configuration = configuration;
-	}
-
-	@Override
-	public void setOptions() throws OrccException {
-
+	public void setOptions(Map<String, Object> options) {
+		this.options = options;
+		initializeOptions();
 	}
 
 	@Override

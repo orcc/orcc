@@ -45,6 +45,7 @@ import net.sf.orcc.ir.util.ExpressionPrinter;
  * This class defines an LLVM expression printer.
  * 
  * @author Jerome GORIN
+ * @author Matthieu Wipliez
  * 
  */
 public class LLVMExprPrinter extends ExpressionPrinter {
@@ -125,12 +126,12 @@ public class LLVMExprPrinter extends ExpressionPrinter {
 	}
 
 	@Override
-	public void visit(ExprBinary expr, Object... args) {
+	public String caseExprBinary(ExprBinary expr) {
 		OpBinary op = expr.getOp();
 		Type type;
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
-		LLVMTypePrinter typePrinter = new LLVMTypePrinter();
+		StringBuilder builder = new StringBuilder();
 
 		if (e1 instanceof ExprVar) {
 			Use use = ((ExprVar) e1).getUse();
@@ -149,46 +150,45 @@ public class LLVMExprPrinter extends ExpressionPrinter {
 		}
 
 		builder.append(toString(op));
-
-		type.accept(typePrinter);
-
-		builder.append(" " + typePrinter.toString() + " ");
+		builder.append(" ");
+		builder.append(new LLVMTypePrinter().doSwitch(type));
+		builder.append(" ");
 
 		if (e1 instanceof ExprVar) {
 			builder.append("%");
 		}
-		expr.getE1().accept(this);
+		builder.append(doSwitch(expr.getE1()));
 		builder.append(", ");
 		if (e2 instanceof ExprVar) {
 			builder.append("%");
 		}
-		expr.getE2().accept(this);
+		builder.append(doSwitch(expr.getE2()));
+		return builder.toString();
 	}
 
 	@Override
-	public void visit(ExprBool expr, Object... args) {
-		builder.append(expr.isValue() ? '1' : '0');
+	public String caseExprBool(ExprBool expr) {
+		return expr.isValue() ? "1" : "0";
 	}
 
 	@Override
-	public void visit(ExprInt expr, Object... args) {
-		builder.append(expr.getValue());
+	public String caseExprInt(ExprInt expr) {
+		return expr.getValue().toString();
 	}
 
 	@Override
-	public void visit(ExprList expr, Object... args) {
+	public String caseExprList(ExprList expr) {
 		throw new OrccRuntimeException("List expression not supported");
 	}
 
 	@Override
-	public void visit(ExprUnary expr, Object... args) {
-		System.err.println("oops: unary expr");
-		// throw new OrccRuntimeException("no unary expressions in LLVM");
+	public String caseExprUnary(ExprUnary expr) {
+		throw new OrccRuntimeException("no unary expressions in LLVM");
 	}
 
 	@Override
-	public void visit(ExprVar expr, Object... args) {
-		builder.append(expr.getUse().getVariable());
+	public String caseExprVar(ExprVar expr) {
+		return expr.getUse().getVariable().getIndexedName();
 	}
 
 }

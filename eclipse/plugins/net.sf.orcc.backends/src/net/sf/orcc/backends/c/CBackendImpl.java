@@ -96,8 +96,8 @@ public class CBackendImpl extends AbstractBackend {
 	private boolean merger2;
 	private boolean newScheduler;
 	private boolean normalize;
-	private int threadsNb;
 	private boolean ringTopology;
+	private int threadsNb;
 	private Network workingNetwork;
 
 	private void computeMapping(Network network) {
@@ -309,6 +309,26 @@ public class CBackendImpl extends AbstractBackend {
 		}
 	}
 
+	@Override
+	public void initializeOptions() {
+		mapping = getAttribute(MAPPING, new HashMap<String, String>());
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		merge = getAttribute("net.sf.orcc.backends.merge", false);
+		merger2 = getAttribute("net.sf.orcc.backends.merger2", false);
+		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
+		dynamicMapping = getAttribute("net.sf.orcc.backends.dynamicMapping",
+				false);
+		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
+		debugMode = getAttribute(DEBUG_MODE, true);
+		threadsNb = Integer.parseInt(getAttribute(
+				"net.sf.orcc.backends.processorsNumber", "1"));
+		enableTrace = getAttribute("net.sf.orcc.backends.enableTrace", false);
+		String topology = getAttribute(
+				"net.sf.orcc.backends.newScheduler.topology", "Ring");
+		ringTopology = topology.equals("Ring");
+	}
+
 	private void printCMake(Network network) {
 		NetworkPrinter networkPrinter = new NetworkPrinter("C_CMakeLists");
 		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
@@ -333,26 +353,6 @@ public class CBackendImpl extends AbstractBackend {
 		networkPrinter.getOptions().put("mapping", instancesTarget);
 		networkPrinter.print(network.getName() + ".xcf", path, network,
 				"mapping");
-	}
-
-	@Override
-	public void setOptions() throws OrccException {
-		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		merge = getAttribute("net.sf.orcc.backends.merge", false);
-		merger2 = getAttribute("net.sf.orcc.backends.merger2", false);
-		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
-		dynamicMapping = getAttribute("net.sf.orcc.backends.dynamicMapping",
-				false);
-		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
-		debugMode = getAttribute(DEBUG_MODE, true);
-		threadsNb = Integer.parseInt(getAttribute(
-				"net.sf.orcc.backends.processorsNumber", "1"));
-		enableTrace = getAttribute("net.sf.orcc.backends.enableTrace", false);
-		String topology = getAttribute(
-				"net.sf.orcc.backends.newScheduler.topology", "Ring");
-		ringTopology = topology.equals("Ring");
 	}
 
 }

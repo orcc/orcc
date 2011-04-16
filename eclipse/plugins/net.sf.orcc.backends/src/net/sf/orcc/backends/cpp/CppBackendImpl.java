@@ -190,6 +190,13 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	public void initializeOptions() {
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		merge = getAttribute("net.sf.orcc.backends.merge", false);
+	}
+
+	@Override
 	protected boolean printActor(Actor actor) {
 		ActorPrinter actorPrinter = new ActorPrinter("Cpp_actorImpl");
 		ActorPrinter headerPrinter = new ActorPrinter("Cpp_actorDecl");
@@ -240,12 +247,5 @@ public class CppBackendImpl extends AbstractBackend {
 		printer.print(network.getName() + ".cpp", path, network, "network");
 
 		printCMake(network);
-	}
-
-	@Override
-	public void setOptions() throws OrccException {
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		merge = getAttribute("net.sf.orcc.backends.merge", false);
 	}
 }

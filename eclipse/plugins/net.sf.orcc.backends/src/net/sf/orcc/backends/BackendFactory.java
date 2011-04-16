@@ -37,6 +37,7 @@ import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.plugins.PluginFactory;
@@ -51,7 +52,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * A factory class that contains a list of back-ends and their options. The
@@ -107,8 +107,15 @@ public class BackendFactory extends PluginFactory {
 	 * @throws Exception
 	 */
 	public void runBackend(IProgressMonitor monitor, WriteListener listener,
-			ILaunchConfiguration configuration) throws Exception {
-		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
+			Map<String, Object> options) throws Exception {
+		String outputFolder;
+		Object obj = options.get(OUTPUT_FOLDER);
+		if (obj instanceof String) {
+			outputFolder = (String) obj;
+		} else {
+			outputFolder = "";
+		}
+
 		if (outputFolder.isEmpty()) {
 			String tmpdir = System.getProperty("java.io.tmpdir");
 			File output = new File(tmpdir, "orcc");
@@ -116,16 +123,15 @@ public class BackendFactory extends PluginFactory {
 			outputFolder = output.getAbsolutePath();
 		}
 
-		String backend = configuration.getAttribute(BACKEND, "");
+		String backend = (String) options.get(BACKEND);
 
 		Backend backendObj = (Backend) plugins.get(backend);
-		backendObj.setLaunchConfiguration(configuration);
-		backendObj.setOptions();
+		backendObj.setOptions(options);
 		backendObj.setOutputFolder(outputFolder);
 		backendObj.setProgressMonitor(monitor);
 		backendObj.setWriteListener(listener);
 
-		String name = configuration.getAttribute(PROJECT, "");
+		String name = (String) options.get(PROJECT);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = root.getProject(name);
 
@@ -135,8 +141,8 @@ public class BackendFactory extends PluginFactory {
 		// an actor is only compiled if it needs to (based on modification date)
 		backendObj.compileVTL(vtlFolders);
 
-		if (configuration.getAttribute(COMPILE_XDF, false)) {
-			String xdfFile = configuration.getAttribute(XDF_FILE, "");
+		if ((Boolean) options.get(COMPILE_XDF)) {
+			String xdfFile = (String) options.get(XDF_FILE);
 			backendObj.compileXDF(xdfFile);
 		}
 	}

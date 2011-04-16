@@ -29,6 +29,9 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
+
+import java.util.Map;
+
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccProcess;
 import net.sf.orcc.backends.BackendFactory;
@@ -53,6 +56,7 @@ import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void launch(ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		OrccProcess process = new OrccProcess(launch, configuration, monitor);
@@ -68,7 +72,7 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 			try {
 				BackendFactory factory = BackendFactory.getInstance();
 				factory.runBackend(process.getProgressMonitor(), process,
-						configuration);
+						(Map<String, Object>) configuration.getAttributes());
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if we
 				// got an

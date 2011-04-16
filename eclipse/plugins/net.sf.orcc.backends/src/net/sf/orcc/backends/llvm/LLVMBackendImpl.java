@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
+
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
@@ -138,11 +140,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		List<Actor> actors = parseActors(files);
 
 		printer = new ActorPrinter("LLVM_actor", !debugMode);
-		// TODO printers
-		System.err
-				.println("LLVMBackendImpl.doVtlCodeGeneration(List<File>): must set printers");
-		// printer.setExpressionPrinter(LLVMExprPrinter.class);
-		// printer.setTypePrinter(LLVMTypePrinter.class);
+		printer.setExpressionPrinter(new LLVMExprPrinter());
+		printer.setTypePrinter(new LLVMTypePrinter());
 
 		// transforms and prints actors
 		transformActors(actors);
@@ -179,6 +178,17 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// JadeToolbox is required to finalize actors
 		runJadeToolBox(actors);
+	}
+
+	@Override
+	public void initializeOptions() {
+		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
+		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		jadeToolbox = new ConfigurationScope().getNode(OrccActivator.PLUGIN_ID)
+				.get(P_JADETOOLBOX, "");
+		debugMode = getAttribute(DEBUG_MODE, false);
 	}
 
 	@Override
@@ -230,17 +240,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 			System.err.println("Jade toolbox error : ");
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void setOptions() throws OrccException {
-		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
-		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		jadeToolbox = OrccActivator.getDefault().getPreferenceStore()
-				.getString(P_JADETOOLBOX);
-		debugMode = getAttribute(DEBUG_MODE, false);
 	}
 
 	private void startExec(String[] cmd) throws IOException {

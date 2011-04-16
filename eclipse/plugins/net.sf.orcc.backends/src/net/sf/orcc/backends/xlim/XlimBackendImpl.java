@@ -147,6 +147,15 @@ public class XlimBackendImpl extends AbstractBackend {
 		printNetwork(network);
 	}
 
+	@Override
+	public void initializeOptions() {
+		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
+		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
+				"xc2vp30-7-ff1152");
+		mapping = getAttribute(OrccLaunchConstants.MAPPING,
+				new HashMap<String, String>());
+	}
+
 	private void printCMake(Network network) {
 		NetworkPrinter networkPrinter = new NetworkPrinter("XLIM_sw_CMakeLists");
 		networkPrinter.print("CMakeLists.txt", path, network, "CMakeLists");
@@ -206,20 +215,11 @@ public class XlimBackendImpl extends AbstractBackend {
 		}
 	}
 
-	@Override
-	public void setOptions() throws OrccException {
-		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
-		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
-				"xc2vp30-7-ff1152");
-		mapping = getAttribute(OrccLaunchConstants.MAPPING,
-				new HashMap<String, String>());
+	public void setFpgaType(String fpgaType) {
+		this.fpgaType = fpgaType;
 	}
 
 	public void setHardwareGen(Boolean hardwareGen) {
 		this.hardwareGen = hardwareGen;
-	}
-
-	public void setFpgaType(String fpgaType) {
-		this.fpgaType = fpgaType;
 	}
 }

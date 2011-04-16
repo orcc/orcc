@@ -45,39 +45,34 @@ import net.sf.orcc.ir.util.TypePrinter;
 public class LLVMTypePrinter extends TypePrinter {
 
 	@Override
-	public void visit(TypeBool type) {
+	public String caseTypeBool(TypeBool type) {
 		// boolean is a 1-bit integer.
-		builder.append("i1");
+		return "i1";
 	}
 
 	@Override
-	public void visit(TypeInt type) {
-		builder.append("i"+type.getSize());
+	public String caseTypeInt(TypeInt type) {
+		return "i" + type.getSize();
 	}
 
 	@Override
-	public void visit(TypeList type) {
-		builder.append("[");
-		builder.append(type.getSize());
-
-		builder.append(" x ");
-		type.getType().accept(this);
-		builder.append("]");
+	public String caseTypeList(TypeList type) {
+		return "[" + type.getSize() + " x " + doSwitch(type.getType()) + "]";
 	}
 
 	@Override
-	public void visit(TypeString type) {
-		builder.append("["+type.getSize()+" x i8]");
+	public String caseTypeString(TypeString type) {
+		return "[" + type.getSize() + " x i8]";
 	}
 
 	@Override
-	public void visit(TypeUint type) {
-		builder.append("i"+type.getSize());
+	public String caseTypeUint(TypeUint type) {
+		return "i" + type.getSize();
 	}
 
 	@Override
-	public void visit(TypeVoid type) {
-		builder.append("void");
+	public String caseTypeVoid(TypeVoid type) {
+		return "void";
 	}
 
 }
