@@ -30,95 +30,84 @@ package net.sf.orcc.backends.llvm.transformations;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
-import net.sf.orcc.backends.llvm.instructions.GEP;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.backends.instructions.InstGetElementPtr;
+import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * Add GetElementPtr instructions in actor IR.
  * 
- * 
  * @author Jerome Gorin
+ * @author Herve Yviquel
  * 
  */
-public class AddGEPTransformation extends AbstractActorVisitor {
+public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 
-	private String file;
-
-	private Var addGEP(Var array, Type type,
-			List<Expression> indexes, ListIterator<Instruction> it) {
+	private Var addGEP(Var array, Type type, List<Expression> indexes,
+			NodeBlock node) {
 		List<Expression> GepIndexes = new ArrayList<Expression>(indexes);
 
 		// Make a new localVariable that will contains the elt to access
-		VarLocal eltVar = procedure.newTempLocalVariable(file, type,
+		Var eltVar = procedure.newTempLocalVariable(EcoreUtil.copy(type),
 				array.getName() + "_" + "elt");
 
-		GEP gepInstr = new GEP(eltVar, new Use(array), GepIndexes);
-
-		it.add(gepInstr);
+		InstGetElementPtr gep = InstructionsFactory.eINSTANCE
+				.createInstGetElementPtr(eltVar, array, GepIndexes);
+		node.add(indexInst, gep);
 
 		return eltVar;
 	}
 
-	private void removeIndexes(Instruction instr, List<Expression> indexes) {
-		Use.removeUses(instr, indexes);
-		indexes.clear();
-	}
-
 	@Override
-	public void visit(Actor actor) {
-		this.file = actor.getFile();
-		super.visit(actor);
-	}
-
-	@Override
-	public void visit(Load load) {
-		Use source = load.getSource();
-		VarLocal target = load.getTarget();
+	public Object caseInstLoad(InstLoad load) {
+		Var source = load.getSource().getVariable();
+		Var target = load.getTarget().getVariable();
 		List<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
 			itInstruction.previous();
 
-			Var newSource = addGEP(source.getVariable(), target.getType(),
-					indexes, itInstruction);
+			Var newSource = addGEP(source, target.getType(), indexes,
+					load.getBlock());
 
-			load.setSource(new Use(newSource));
-			removeIndexes(load, indexes);
+			load.setSource(IrFactory.eINSTANCE.createUse(newSource));
+			EcoreHelper.delete(indexes);
 
 			itInstruction.next();
 		}
-
+		return null;
 	}
 
 	@Override
-	public void visit(Store store) {
-		Var target = store.getTarget();
+	public Object caseInstStore(InstStore store) {
+		Var target = store.getTarget().getVariable();
 		List<Expression> indexes = store.getIndexes();
 
 		if (!indexes.isEmpty()) {
 			itInstruction.previous();
 			TypeList typeList = (TypeList) target.getType();
 
-			Var newTarget = addGEP(target, typeList.getElementType(),
-					indexes, itInstruction);
+			Var newTarget = addGEP(target, typeList.getElementType(), indexes,
+					store.getBlock());
 
-			store.setTarget(newTarget);
-			removeIndexes(store, indexes);
+			store.setTarget(IrFactory.eINSTANCE.createDef(newTarget));
+			EcoreHelper.delete(indexes);
 
 			itInstruction.next();
 		}
+		return null;
 	}
 
 }

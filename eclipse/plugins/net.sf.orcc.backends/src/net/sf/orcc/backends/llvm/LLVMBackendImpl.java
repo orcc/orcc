@@ -47,8 +47,8 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.ActorPrinter;
-import net.sf.orcc.backends.llvm.transformations.AddGEPTransformation;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
+import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
@@ -110,8 +110,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		if (classify) {
-			if (!actor.getSimpleName().equals("BufferCurrPic")&&
-					!actor.getSimpleName().equals("SplitSpsInfo")){
+			if (!actor.getSimpleName().equals("BufferCurrPic")
+					&& !actor.getSimpleName().equals("SplitSpsInfo")) {
 				new ActorClassifier().doSwitch(actor);
 
 				if (normalize) {
@@ -120,13 +120,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 			}
 		}
 
-		ActorVisitor[] transformations = { new TypeSizeTransformation(),
+		ActorVisitor<?>[] transformations = { new TypeSizeTransformation(),
 				new BoolToIntTransformation(), new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
-				new ThreeAddressCodeTransformation(),
-				new AddGEPTransformation() };
+				new ThreeAddressCodeTransformation(), new GetElementPtrAdder() };
 
-		for (ActorVisitor transformation : transformations) {
+		for (ActorVisitor<?> transformation : transformations) {
 			transformation.visit(actor);
 		}
 
@@ -140,9 +139,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		printer = new ActorPrinter("LLVM_actor", !debugMode);
 		// TODO printers
-		System.err.println("LLVMBackendImpl.doVtlCodeGeneration(List<File>): must set printers");
-		//printer.setExpressionPrinter(LLVMExprPrinter.class);
-		//printer.setTypePrinter(LLVMTypePrinter.class);
+		System.err
+				.println("LLVMBackendImpl.doVtlCodeGeneration(List<File>): must set printers");
+		// printer.setExpressionPrinter(LLVMExprPrinter.class);
+		// printer.setTypePrinter(LLVMTypePrinter.class);
 
 		// transforms and prints actors
 		transformActors(actors);
