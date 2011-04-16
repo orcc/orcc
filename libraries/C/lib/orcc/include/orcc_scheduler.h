@@ -103,12 +103,26 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
 		struct waiting_s *ring_sending_schedulable, int schedulers_nb,
 		struct sync_s *sync);
+
+/**
+ * Reinitializes the given scheduler.
+ */
 void sched_reinit(struct scheduler_s *sched, int num_actors,
 		struct actor_s **actors, int use_ring_topology, int schedulers_nb);
 
+/**
+ * Computes a partitionment of actors on threads from an XML file given in parameter.
+ */
 struct mapping_s * map_actors(struct actor_s **actors, int actors_nb);
 
+/**
+ * Creates a mapping structure.
+ */
 struct mapping_s* allocate_mapping(int number_of_threads);
-void delete_mapping(struct mapping_s* mapping);
+
+/**
+ * Releases memory of the given mapping structure.
+ */
+void delete_mapping(struct mapping_s* mapping, int clean_all);
 
 #endif

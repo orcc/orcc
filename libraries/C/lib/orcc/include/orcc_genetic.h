@@ -62,26 +62,42 @@ typedef struct population_s {
 	individual **individuals;
 } population;
 
+/**
+ * Main routine of the genetic algorithm.
+ */
 void *monitor(void *data);
+
+/**
+ * Initialize the given genetic structure.
+ */
 void genetic_init(struct genetic_s *genetic_info, int population_size,
 		int generation_nb, double keep_ratio, double crossover_ratio,
 		struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb,
 		int threads_nb, int use_ring_topology);
+
+/**
+ * Initialize the given monitor structure.
+ */
 void monitor_init(struct monitor_s *monitoring, struct sync_s *sync,
 		struct genetic_s *genetic_info);
+
+/**
+ * Allocate and read a parameter-sized table to clean processor cache.
+ */
 int clean_cache(int size);
 
+// Display functions
 extern float compute_partial_fps();
 extern void backup_partial_start_info();
 extern void backup_partial_end_info();
 extern void active_fps_printing();
 extern void remove_fps_printing();
 
+// Source functions
 extern void source_active_genetic();
 extern void source_close();
-//extern void Compare_active_genetic();
-//extern void Compare_close();
 
+// Application functions
 extern void initialize_instances();
 extern void clear_fifos();
 extern int is_timeout();

@@ -39,17 +39,44 @@
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
 
-int clean_cache(int size) {
-	int i, res = 0;
-	int *table = (int*) malloc(size * sizeof(int));
-	memset(table, 0, size);
-	for (i = 0; i < size; i++) {
-		res += table[i];
-	}
-	free(table);
-	return res;
+///////////////////////////////////////////////////////////////////////////////
+// Initializers
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Initialize the given genetic structure.
+ */
+void genetic_init(struct genetic_s *genetic_info, int population_size,
+		int generation_nb, double keep_ratio, double crossover_ratio,
+		struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb,
+		int threads_nb, int use_ring_topology) {
+	genetic_info->population_size = population_size;
+	genetic_info->generation_nb = generation_nb;
+	genetic_info->keep_ratio = keep_ratio;
+	genetic_info->crossover_ratio = crossover_ratio;
+	genetic_info->actors = actors;
+	genetic_info->schedulers = schedulers;
+	genetic_info->actors_nb = actors_nb;
+	genetic_info->threads_nb = threads_nb;
+	genetic_info->use_ring_topology = use_ring_topology;
 }
 
+/**
+ * Initialize the given monitor structure.
+ */
+void monitor_init(struct monitor_s *monitoring, struct sync_s *sync,
+		struct genetic_s *genetic_info) {
+	monitoring->sync = sync;
+	monitoring->genetic_info = genetic_info;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Various manipulations of structures
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Compute a mapping from a given individual.
+ */
 static struct mapping_s* compute_mapping(individual *individual,
 		struct genetic_s *genetic_info) {
 	int i, j, k;
@@ -78,6 +105,167 @@ static struct mapping_s* compute_mapping(individual *individual,
 	return mapping;
 }
 
+/**
+ * Test the equality of two given individuals.
+ */
+static int individual_equal(individual* ind1, individual* ind2,
+		struct genetic_s *genetic_info) {
+	int i, equal = 1;
+	for (i = 0; i < genetic_info->actors_nb && equal; i++) {
+		equal = (ind1->genes[i] == ind2->genes[i]);
+	}
+	return equal;
+}
+
+/**
+ * Check if a given individual is already contained in a given population.
+ */
+static int is_contained(individual* ind, population* pop, int size,
+		struct genetic_s *genetic_info) {
+	int i, contains = 0;
+	for (i = 0; i < size && !contains; i++) {
+		contains = individual_equal(ind, pop->individuals[i], genetic_info);
+	}
+	return contains;
+}
+
+/**
+ * Clone a gene.
+ */
+static gene* copy_gene(gene *g) {
+	gene *new_g = (gene*) malloc(sizeof(gene));
+	new_g->actor = g->actor;
+	new_g->mapped_core = g->mapped_core;
+	return new_g;
+}
+
+/**
+ * Clone an individual.
+ */
+static individual* copy_individual(individual *ind,
+		struct genetic_s *genetic_info) {
+	int i;
+	individual *new_ind = (individual*) malloc(sizeof(individual));
+	new_ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	new_ind->fps = ind->fps;
+	new_ind->old_fps = ind->old_fps;
+	for (i = 0; i < genetic_info->actors_nb; i++) {
+		new_ind->genes[i] = copy_gene(ind->genes[i]);
+	}
+	return new_ind;
+}
+
+/**
+ * Compare the evaluations of two individuals.
+ */
+static int compare_individual_fps(void const *a, void const *b) {
+	individual const **pi1 = (individual const**) a;
+	individual const **pi2 = (individual const**) b;
+	individual const *i1 = *pi1;
+	individual const *i2 = *pi2;
+
+	if (i2->fps < i1->fps) {
+		return -1;
+	} else if (i2->fps > i1->fps) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+/**
+ * Create a constant individual with the given id.
+ */
+static individual* generate_constant_individual(struct genetic_s *genetic_info,
+		int thread) {
+	int i;
+	individual* ind = (individual*) malloc(sizeof(individual));
+	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	ind->fps = -1;
+	ind->old_fps = -1;
+
+	// Initialize genes randomly
+	for (i = 0; i < genetic_info->actors_nb; i++) {
+		ind->genes[i] = (gene*) malloc(sizeof(gene));
+		ind->genes[i]->actor = genetic_info->actors[i];
+		ind->genes[i]->mapped_core = thread;
+	}
+
+	return ind;
+}
+
+/**
+ * Create a random individual.
+ */
+static individual* generate_random_individual(struct genetic_s *genetic_info) {
+	int i;
+	individual* ind = (individual*) malloc(sizeof(individual));
+	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	ind->fps = -1;
+	ind->old_fps = -1;
+
+	// Initialize genes randomly
+	for (i = 0; i < genetic_info->actors_nb; i++) {
+		ind->genes[i] = (gene*) malloc(sizeof(gene));
+		ind->genes[i]->actor = genetic_info->actors[i];
+		ind->genes[i]->mapped_core = rand() % genetic_info->threads_nb;
+	}
+
+	return ind;
+}
+
+/**
+ * Map some actors on available threads according to the given individual.
+ */
+static void map_actors_on_threads(individual *individual,
+		struct genetic_s *genetic_info) {
+	int i;
+	struct mapping_s *mapping = compute_mapping(individual, genetic_info);
+
+	for (i = 0; i < genetic_info->threads_nb; i++) {
+		sched_reinit(&genetic_info->schedulers[i], mapping->partitions_size[i],
+				mapping->partitions_of_actors[i],
+				genetic_info->use_ring_topology, genetic_info->threads_nb);
+	}
+
+	delete_mapping(mapping, 0);
+}
+
+/**
+ * Release the given population structure.
+ */
+static void destroy_population(population *pop, struct genetic_s *genetic_info) {
+	int i, j;
+	for (i = 0; i < genetic_info->population_size; i++) {
+		for (j = 0; j < genetic_info->actors_nb; j++) {
+			free(pop->individuals[i]->genes[j]);
+		}
+		free(pop->individuals[i]);
+	}
+	free(pop);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// I/O functions
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Allocate and read a parameter-sized table to clean processor cache.
+ */
+int clean_cache(int size) {
+	int i, res = 0;
+	int *table = (int*) malloc(size * sizeof(int));
+	memset(table, 0, size);
+	for (i = 0; i < size; i++) {
+		res += table[i];
+	}
+	free(table);
+	return res;
+}
+
+/**
+ * Write the header of a mapping file.
+ */
 static void initialize_mapping_file() {
 	// Open file
 	FILE *mappingFile;
@@ -98,6 +286,9 @@ static void initialize_mapping_file() {
 	fclose(mappingFile);
 }
 
+/**
+ * Write a mapping in a file.
+ */
 static void write_mapping(population *pop, struct genetic_s *genetic_info) {
 	int i, j, k;
 	FILE *mappingFile;
@@ -134,13 +325,16 @@ static void write_mapping(population *pop, struct genetic_s *genetic_info) {
 		fprintf(mappingFile, "\t</Partitioning>\n");
 		fprintf(mappingFile, "</Configuration>\n\n");
 
-		delete_mapping(mapping);
+		delete_mapping(mapping, 1);
 	}
 
 	// Close file
 	fclose(mappingFile);
 }
 
+/**
+ * Print a mapping.
+ */
 static void print_mapping(individual *ind, struct genetic_s *genetic_info) {
 	int i;
 	printf("{");
@@ -153,6 +347,9 @@ static void print_mapping(individual *ind, struct genetic_s *genetic_info) {
 	printf("}\n");
 }
 
+/**
+ * Print the actor list of an individual.
+ */
 static void print_actor_list(individual *ind, struct genetic_s *genetic_info) {
 	int i;
 	printf("Actor list =\n");
@@ -163,59 +360,13 @@ static void print_actor_list(individual *ind, struct genetic_s *genetic_info) {
 
 }
 
-static int individual_equal(individual* ind1, individual* ind2,
-		struct genetic_s *genetic_info) {
-	int i, equal = 1;
-	for (i = 0; i < genetic_info->actors_nb && equal; i++) {
-		equal = (ind1->genes[i] == ind2->genes[i]);
-	}
-	return equal;
-}
+///////////////////////////////////////////////////////////////////////////////
+// Genetic functions
+///////////////////////////////////////////////////////////////////////////////
 
-static int is_contained(individual* ind, population* pop, int size,
-		struct genetic_s *genetic_info) {
-	int i, contains = 0;
-	for (i = 0; i < size && !contains; i++) {
-		contains = individual_equal(ind, pop->individuals[i], genetic_info);
-	}
-	return contains;
-}
-
-static gene* copy_gene(gene *g) {
-	gene *new_g = (gene*) malloc(sizeof(gene));
-	new_g->actor = g->actor;
-	new_g->mapped_core = g->mapped_core;
-	return new_g;
-}
-
-static individual* copy_individual(individual *ind,
-		struct genetic_s *genetic_info) {
-	int i;
-	individual *new_ind = (individual*) malloc(sizeof(individual));
-	new_ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
-	new_ind->fps = ind->fps;
-	new_ind->old_fps = ind->old_fps;
-	for (i = 0; i < genetic_info->actors_nb; i++) {
-		new_ind->genes[i] = copy_gene(ind->genes[i]);
-	}
-	return new_ind;
-}
-
-static int compare_individual_fps(void const *a, void const *b) {
-	individual const **pi1 = (individual const**) a;
-	individual const **pi2 = (individual const**) b;
-	individual const *i1 = *pi1;
-	individual const *i2 = *pi2;
-
-	if (i2->fps < i1->fps) {
-		return -1;
-	} else if (i2->fps > i1->fps) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
+/**
+ * Select an individual from a population with a one-turn tournament.
+ */
 static individual* selection(population *pop, struct genetic_s *genetic_info) {
 	individual* i1 = pop->individuals[rand() % genetic_info->population_size];
 	individual* i2 = pop->individuals[rand() % genetic_info->population_size];
@@ -226,6 +377,9 @@ static individual* selection(population *pop, struct genetic_s *genetic_info) {
 	}
 }
 
+/**
+ * Create two new individuals from crossover of two parents.
+ */
 static void crossover(individual **children, individual **parents,
 		struct genetic_s *genetic_info) {
 	int i, cut = rand() % (genetic_info->actors_nb - 1) + 1;
@@ -252,6 +406,9 @@ static void crossover(individual **children, individual **parents,
 	}
 }
 
+/**
+ * Create a mutated individual from an original one.
+ */
 static individual* mutation(individual *original,
 		struct genetic_s *genetic_info) {
 	individual *mutated = (individual*) malloc(sizeof(individual));
@@ -271,66 +428,9 @@ static individual* mutation(individual *original,
 	return mutated;
 }
 
-static individual* generate_constant_individual(struct genetic_s *genetic_info,
-		int thread) {
-	int i;
-	individual* ind = (individual*) malloc(sizeof(individual));
-	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
-	ind->fps = -1;
-	ind->old_fps = -1;
-
-	// Initialize genes randomly
-	for (i = 0; i < genetic_info->actors_nb; i++) {
-		ind->genes[i] = (gene*) malloc(sizeof(gene));
-		ind->genes[i]->actor = genetic_info->actors[i];
-		ind->genes[i]->mapped_core = thread;
-	}
-
-	return ind;
-}
-
-static individual* generate_random_individual(struct genetic_s *genetic_info) {
-	int i;
-	individual* ind = (individual*) malloc(sizeof(individual));
-	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
-	ind->fps = -1;
-	ind->old_fps = -1;
-
-	// Initialize genes randomly
-	for (i = 0; i < genetic_info->actors_nb; i++) {
-		ind->genes[i] = (gene*) malloc(sizeof(gene));
-		ind->genes[i]->actor = genetic_info->actors[i];
-		ind->genes[i]->mapped_core = rand() % genetic_info->threads_nb;
-	}
-
-	return ind;
-}
-
-static void map_actors_on_threads(individual *individual,
-		struct genetic_s *genetic_info) {
-	int i;
-	struct mapping_s *mapping = compute_mapping(individual, genetic_info);
-
-	for (i = 0; i < genetic_info->threads_nb; i++) {
-		sched_reinit(&genetic_info->schedulers[i], mapping->partitions_size[i],
-				mapping->partitions_of_actors[i],
-				genetic_info->use_ring_topology, genetic_info->threads_nb);
-	}
-
-	delete_mapping(mapping);
-}
-
-static void destroy_population(population *pop, struct genetic_s *genetic_info) {
-	int i, j;
-	for (i = 0; i < genetic_info->population_size; i++) {
-		for (j = 0; j < genetic_info->actors_nb; j++) {
-			free(pop->individuals[i]->genes[j]);
-		}
-		free(pop->individuals[i]);
-	}
-	free(pop);
-}
-
+/**
+ * Compute the next population.
+ */
 static population* compute_next_population(population *pop,
 		struct genetic_s *genetic_info) {
 	int i, free, last;
@@ -392,6 +492,9 @@ static population* compute_next_population(population *pop,
 	return next_pop;
 }
 
+/**
+ * Create the first population.
+ */
 static population* initialize_population(struct genetic_s *genetic_info) {
 	int i;
 
@@ -421,6 +524,9 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 	return pop;
 }
 
+/**
+ * Main routine of the genetic algorithm.
+ */
 void *monitor(void *data) {
 	struct monitor_s *monitoring = (struct monitor_s *) data;
 	int i, evalIndNb = 0;
@@ -502,23 +608,4 @@ void *monitor(void *data) {
 	return NULL;
 }
 
-void genetic_init(struct genetic_s *genetic_info, int population_size,
-		int generation_nb, double keep_ratio, double crossover_ratio,
-		struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb,
-		int threads_nb, int use_ring_topology) {
-	genetic_info->population_size = population_size;
-	genetic_info->generation_nb = generation_nb;
-	genetic_info->keep_ratio = keep_ratio;
-	genetic_info->crossover_ratio = crossover_ratio;
-	genetic_info->actors = actors;
-	genetic_info->schedulers = schedulers;
-	genetic_info->actors_nb = actors_nb;
-	genetic_info->threads_nb = threads_nb;
-	genetic_info->use_ring_topology = use_ring_topology;
-}
 
-void monitor_init(struct monitor_s *monitoring, struct sync_s *sync,
-		struct genetic_s *genetic_info) {
-	monitoring->sync = sync;
-	monitoring->genetic_info = genetic_info;
-}

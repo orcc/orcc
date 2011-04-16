@@ -95,6 +95,10 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 		struct actor_s **actors, int use_ring_topology, int schedulers_nb) {
 	int i;
 
+	if (sched->actors != NULL) {
+		free(sched->actors);
+	}
+
 	sched->actors = actors;
 	sched->num_actors = num_actors;
 	sched->rr_next_schedulable = 0;
@@ -123,6 +127,13 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Mapping functions
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Find actor by its name in the given table.
+ */
 static struct actor_s * find_actor(char *name, struct actor_s **actors,
 		int actors_nb) {
 	int i;
@@ -135,6 +146,9 @@ static struct actor_s * find_actor(char *name, struct actor_s **actors,
 	exit(0);
 }
 
+/**
+ * Creates a mapping structure.
+ */
 struct mapping_s* allocate_mapping(int number_of_threads) {
 	struct mapping_s *mapping = (struct mapping_s *) malloc(
 			sizeof(struct mapping_s));
@@ -146,13 +160,25 @@ struct mapping_s* allocate_mapping(int number_of_threads) {
 	return mapping;
 }
 
-void delete_mapping(struct mapping_s* mapping) {
+/**
+ * Releases memory of the given mapping structure.
+ */
+void delete_mapping(struct mapping_s* mapping, int clean_all) {
+	if (clean_all) {
+		int i;
+		for (i = 0; i < mapping->number_of_threads; i++) {
+			free(mapping->partitions_of_actors[i]);
+		}
+	}
 	free(mapping->partitions_of_actors);
 	free(mapping->partitions_size);
 	free(mapping->threads_ids);
 	free(mapping);
 }
 
+/**
+ * Computes a partitionment of actors on threads from an XML file given in parameter.
+ */
 struct mapping_s * map_actors(struct actor_s **actors, int actors_nb) {
 	int i, j, size;
 	char *nb, *name;
