@@ -12,7 +12,7 @@ public class Activator extends Plugin {
 	private static Activator plugin;
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "net.sf.orcc.plugins.backends";
+	public static final String PLUGIN_ID = "net.sf.orcc.backends";
 
 	/**
 	 * Returns the shared instance

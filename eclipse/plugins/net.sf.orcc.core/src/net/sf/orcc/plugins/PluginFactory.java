@@ -42,7 +42,6 @@ import net.sf.orcc.plugins.impl.TextBoxOptionImpl;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Plugin;
 
 /**
  * A factory class that contains a list of plugins and their options. The
@@ -260,7 +259,7 @@ public class PluginFactory {
 
 			try {
 				Object obj = element.createExecutableExtension("class");
-				plugins.put(name, (Plugin) obj);
+				plugins.put(name, obj);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
