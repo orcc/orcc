@@ -54,8 +54,10 @@ import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
@@ -107,8 +109,8 @@ public abstract class AbstractBackend implements Backend {
 				AbstractBackend backend = clasz.newInstance();
 				backend.setOptions();
 				backend.setOutputFolder(outputFolder);
-				backend.compileVTL(null, vtlFolders);
-				backend.compileXDF(null, inputFile);
+				backend.compileVTL(vtlFolders);
+				backend.compileXDF(inputFile);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
 				e.printStackTrace();
@@ -129,15 +131,17 @@ public abstract class AbstractBackend implements Backend {
 	 */
 	protected int fifoSize;
 
+	private WriteListener listener;
+
+	/**
+	 * the progress monitor
+	 */
+	private IProgressMonitor monitor;
+
 	/**
 	 * Path where output files will be written.
 	 */
 	protected String path;
-
-	/**
-	 * the process that launched this backend
-	 */
-	private OrccProcess process;
 
 	/**
 	 * Path of the folder that contains VTL under IR form.
@@ -145,9 +149,7 @@ public abstract class AbstractBackend implements Backend {
 	private List<String> vtlFolders;
 
 	@Override
-	final public void compileVTL(OrccProcess process, List<String> vtlFolders)
-			throws OrccException {
-		this.process = process;
+	final public void compileVTL(List<String> vtlFolders) throws OrccException {
 		this.vtlFolders = vtlFolders;
 
 		// lists actors
@@ -169,10 +171,7 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	@Override
-	final public void compileXDF(OrccProcess process, String inputFile)
-			throws OrccException {
-		this.process = process;
-
+	final public void compileXDF(String inputFile) throws OrccException {
 		// set FIFO size
 		this.fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 
@@ -406,10 +405,10 @@ public abstract class AbstractBackend implements Backend {
 	 * @return true if this process has been canceled
 	 */
 	protected boolean isCanceled() {
-		if (process == null) {
+		if (monitor == null) {
 			return false;
 		} else {
-			return process.getProgressMonitor().isCanceled();
+			return monitor.isCanceled();
 		}
 	}
 
@@ -563,6 +562,16 @@ public abstract class AbstractBackend implements Backend {
 		path = new File(outputFolder).getAbsolutePath();
 	}
 
+	@Override
+	public void setProgressMonitor(IProgressMonitor monitor) {
+		this.monitor = monitor;
+	}
+
+	@Override
+	public void setWriteListener(WriteListener listener) {
+		this.listener = listener;
+	}
+
 	/**
 	 * Transforms instances of the given network.
 	 * 
@@ -584,10 +593,10 @@ public abstract class AbstractBackend implements Backend {
 	 *            a string
 	 */
 	final public void write(String text) {
-		if (process == null) {
+		if (listener == null) {
 			System.out.print(text);
 		} else {
-			process.write(text);
+			listener.writeText(text);
 		}
 	}
 

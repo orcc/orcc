@@ -211,8 +211,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	private void evaluateInitializeActions(Actor actor) {
 		// initializes the actor
 		Map<String, Expression> parameters = Collections.emptyMap();
-		ActorInterpreter interpreter = new ActorInterpreter(parameters, actor,
-				null);
+		ActorInterpreter interpreter = new ActorInterpreter(parameters, actor);
 		try {
 			interpreter.initialize();
 		} catch (Exception e) {

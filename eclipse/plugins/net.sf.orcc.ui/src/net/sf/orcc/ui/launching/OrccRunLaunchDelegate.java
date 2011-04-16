@@ -28,10 +28,18 @@
  */
 package net.sf.orcc.ui.launching;
 
-import net.sf.orcc.debug.model.OrccProcess;
+import static net.sf.orcc.OrccLaunchConstants.BACKEND;
+import net.sf.orcc.OrccActivator;
+import net.sf.orcc.OrccProcess;
+import net.sf.orcc.backends.BackendFactory;
+import net.sf.orcc.network.Network;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
@@ -48,7 +56,37 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		OrccProcess process = new OrccProcess(launch, configuration, monitor);
 		launch.addProcess(process);
-		process.start("backend");
+
+		try {
+			monitor.subTask("Launching backend...");
+			process.writeText("\n");
+			process.writeText("*********************************************"
+					+ "**********************************\n");
+			process.writeText("Launching Orcc backend...\n");
+			String backend = configuration.getAttribute(BACKEND, "");
+			try {
+				BackendFactory factory = BackendFactory.getInstance();
+				factory.runBackend(process.getProgressMonitor(), process,
+						configuration);
+			} catch (Exception e) {
+				// clear actor pool because it might not have been done if we
+				// got an
+				// error too soon
+				Network.clearActorPool();
+
+				IStatus status = new Status(IStatus.ERROR,
+						OrccActivator.PLUGIN_ID, backend
+								+ " backend could not generate code", e);
+				throw new CoreException(status);
+			}
+			process.writeText("Orcc backend done.");
+		} finally {
+			process.terminate();
+
+			DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
+			DebugEvent[] events = { event };
+			DebugPlugin.getDefault().fireDebugEventSet(events);
+		}
 	}
 
 }

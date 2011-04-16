@@ -202,7 +202,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	 *            a configuration analyzer
 	 */
 	public AbstractInterpreter(Actor actor) {
-		super(new HashMap<String, Expression>(), actor, null);
+		super(new HashMap<String, Expression>(), actor);
 
 		exprInterpreter = new AbstractExpressionEvaluator();
 	}

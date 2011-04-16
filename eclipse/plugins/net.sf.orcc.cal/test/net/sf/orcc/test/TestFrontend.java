@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -15,6 +16,7 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.serialize.IRParser;
 
 import org.eclipse.emf.common.util.URI;
@@ -129,7 +131,8 @@ public class TestFrontend {
 			fail("unexpected exception when compiling file " + path);
 		}
 
-		ActorInterpreter interpreter = new ActorInterpreter(null, actor, null);
+		ActorInterpreter interpreter = new ActorInterpreter(
+				Collections.<String, Expression> emptyMap(), actor);
 		interpreter.schedule();
 	}
 

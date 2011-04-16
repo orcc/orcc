@@ -28,12 +28,21 @@
  */
 package net.sf.orcc.tools;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.debug.model.OrccProcess;
+import org.eclipse.core.runtime.IProgressMonitor;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.util.WriteListener;
+
+/**
+ * This interface defines an actor analyzer.
+ * 
+ * @author Herve Yviquel
+ * @author Matthieu Wipliez
+ *
+ */
 public interface ActorAnalyzer {
 
-	void analyzeFunctionalUnit(OrccProcess process, String functionalUnit, String vtlFolder)
+	void analyzeFunctionalUnit(String functionalUnit, String vtlFolder)
 			throws OrccException;
 
 	/**
@@ -44,5 +53,21 @@ public interface ActorAnalyzer {
 	 *            output folder
 	 */
 	public void setOutputFolder(String outputFolder);
+
+	/**
+	 * Sets the progress monitor used by this back-end.
+	 * 
+	 * @param monitor
+	 *            a progress monitor
+	 */
+	void setProgressMonitor(IProgressMonitor monitor);
+
+	/**
+	 * Sets the write listener used by this back-end.
+	 * 
+	 * @param monitor
+	 *            a write listener
+	 */
+	void setWriteListener(WriteListener listener);
 
 }

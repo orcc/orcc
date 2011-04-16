@@ -34,10 +34,19 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRParser;
+import net.sf.orcc.util.WriteListener;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
+/**
+ * This class defines an abstract actor analyzer.
+ * 
+ * @author Herve Yviquel
+ * @author Matthieu Wipliez
+ *
+ */
 public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 
 	/**
@@ -54,7 +63,7 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 			try {
 				AbstractActorAnalyzer analyzer = clasz.newInstance();
 				analyzer.setOutputFolder(outputFolder);
-				analyzer.analyzeFunctionalUnit(null, inputFile, vtlFolder);
+				analyzer.analyzeFunctionalUnit(inputFile, vtlFolder);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
 				e.printStackTrace();
@@ -68,7 +77,9 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 	/**
 	 * the process that launched this analyzer
 	 */
-	private OrccProcess process;
+	protected WriteListener listener;
+
+	private IProgressMonitor monitor;
 
 	/**
 	 * Analyze the given actor.
@@ -79,11 +90,9 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 	abstract public void analyze(Actor actor) throws OrccException;
 
 	@Override
-	public void analyzeFunctionalUnit(OrccProcess process, String inputFile,
-			String vtlFolder) throws OrccException {
-		this.process = process;
-
-		write("Parsing Actor...\n");
+	public void analyzeFunctionalUnit(String inputFile, String vtlFolder)
+			throws OrccException {
+		listener.writeText("Parsing Actor...\n");
 
 		Actor actor;
 
@@ -119,11 +128,21 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 	 * @return true if this process has been canceled
 	 */
 	protected boolean isCanceled() {
-		if (process == null) {
+		if (monitor == null) {
 			return false;
 		} else {
-			return process.getProgressMonitor().isCanceled();
+			return monitor.isCanceled();
 		}
+	}
+
+	@Override
+	public void setProgressMonitor(IProgressMonitor monitor) {
+		this.monitor = monitor;
+	}
+
+	@Override
+	public void setWriteListener(WriteListener listener) {
+		this.listener = listener;
 	}
 
 	/**
@@ -133,17 +152,5 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 	 *            the actor
 	 */
 	abstract public void transform(Actor actor) throws OrccException;
-
-	/**
-	 * Writes the given text to the process's normal output.
-	 * 
-	 * @param text
-	 *            a string
-	 */
-	final public void write(String text) {
-		if (process != null) {
-			process.write(text);
-		}
-	}
 
 }

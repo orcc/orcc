@@ -255,7 +255,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 	private boolean initializeMode;
 
 	public ConstraintBuilder(Actor actor) {
-		super(new HashMap<String, Expression>(0), actor, null);
+		super(new HashMap<String, Expression>(0), actor);
 		network = new Network();
 		variableConstraints = new HashMap<String, IntVariable>();
 		vars = new HashMap<Var, Var>();

@@ -28,10 +28,16 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
+import net.sf.orcc.OrccActivator;
 import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.network.Network;
+import net.sf.orcc.plugins.simulators.SimulatorFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
@@ -53,9 +59,32 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		OrccProcess process = new OrccProcess(launch, configuration, monitor);
 		launch.addProcess(process);
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-			process.start("debugger");
+			// TODO debug
 		} else {
-			process.start("simulator");
+			String simulator = configuration.getAttribute(SIMULATOR, "");
+			try {
+				SimulatorFactory factory = SimulatorFactory.getInstance();
+				factory.runSimulator(this, launch, configuration, option);
+			} catch (Exception e) {
+				// clear actor pool because it might not have been done if we
+				// got an
+				// error too soon
+				Network.clearActorPool();
+				e.printStackTrace();
+
+				Throwable throwable = e;
+				StringBuilder builder = new StringBuilder();
+				while (throwable != null && throwable.getCause() != throwable) {
+					builder.append(throwable.getLocalizedMessage());
+					builder.append('\n');
+					throwable = throwable.getCause();
+				}
+
+				IStatus status = new Status(IStatus.ERROR,
+						OrccActivator.PLUGIN_ID, simulator
+								+ " simulation error: " + builder.toString());
+				throw new CoreException(status);
+			}
 		}
 	}
 }

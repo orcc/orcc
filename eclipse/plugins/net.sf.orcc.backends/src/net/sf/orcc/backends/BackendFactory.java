@@ -42,12 +42,14 @@ import net.sf.orcc.OrccActivator;
 import net.sf.orcc.plugins.PluginFactory;
 import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
@@ -96,13 +98,15 @@ public class BackendFactory extends PluginFactory {
 	/**
 	 * Runs the back-end specified by the configuration.
 	 * 
-	 * @param process
-	 *            the process that launched the back-end
+	 * @param monitor
+	 *            progress monitor
+	 * @param listener
+	 *            write listener
 	 * @param configuration
 	 *            launch configuration
 	 * @throws Exception
 	 */
-	public void runBackend(OrccProcess process,
+	public void runBackend(IProgressMonitor monitor, WriteListener listener,
 			ILaunchConfiguration configuration) throws Exception {
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 		if (outputFolder.isEmpty()) {
@@ -118,6 +122,8 @@ public class BackendFactory extends PluginFactory {
 		backendObj.setLaunchConfiguration(configuration);
 		backendObj.setOptions();
 		backendObj.setOutputFolder(outputFolder);
+		backendObj.setProgressMonitor(monitor);
+		backendObj.setWriteListener(listener);
 
 		String name = configuration.getAttribute(PROJECT, "");
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -127,11 +133,11 @@ public class BackendFactory extends PluginFactory {
 
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)
-		backendObj.compileVTL(process, vtlFolders);
+		backendObj.compileVTL(vtlFolders);
 
 		if (configuration.getAttribute(COMPILE_XDF, false)) {
 			String xdfFile = configuration.getAttribute(XDF_FILE, "");
-			backendObj.compileXDF(process, xdfFile);
+			backendObj.compileXDF(xdfFile);
 		}
 	}
 

@@ -30,8 +30,11 @@ package net.sf.orcc.backends;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.plugins.Plugin;
+import net.sf.orcc.util.WriteListener;
 
 /**
  * This interface defines a back-end.
@@ -45,31 +48,24 @@ public interface Backend extends Plugin {
 	 * Compiles the VTL by loading IR files, transforming actors and printing
 	 * them.
 	 * 
-	 * @param process
-	 *            the process that launched the back-end, so we can report
-	 *            messages to it
 	 * @param vtlFolders
 	 *            absolute path of folders that contains IR files
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void compileVTL(OrccProcess process, List<String> vtlFolders)
-			throws OrccException;
+	void compileVTL(List<String> vtlFolders) throws OrccException;
 
 	/**
 	 * Loads a hierarchical XDF network and compile it. Compilation may include
 	 * instantiation, flattening, transforming, printing the network, or a
 	 * subset of these steps.
 	 * 
-	 * @param process
-	 *            the process that launched the back-end, so we can report
-	 *            messages to it
 	 * @param inputFile
 	 *            absolute path of top-level input network
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void compileXDF(OrccProcess process, String inputFile) throws OrccException;
+	void compileXDF(String inputFile) throws OrccException;
 
 	/**
 	 * Sets the options of this backends.
@@ -87,5 +83,21 @@ public interface Backend extends Plugin {
 	 *            output folder
 	 */
 	public void setOutputFolder(String outputFolder);
+
+	/**
+	 * Sets the progress monitor used by this back-end.
+	 * 
+	 * @param monitor
+	 *            a progress monitor
+	 */
+	void setProgressMonitor(IProgressMonitor monitor);
+
+	/**
+	 * Sets the write listener used by this back-end.
+	 * 
+	 * @param monitor
+	 *            a write listener
+	 */
+	void setWriteListener(WriteListener listener);
 
 }

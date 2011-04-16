@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
@@ -165,8 +164,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 */
 	private Map<String, Expression> parameters;
 
-	private OrccProcess process;
-
 	protected Expression returnValue;
 
 	/**
@@ -179,8 +176,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * @param actor
 	 *            actor class definition
 	 */
-	public ActorInterpreter(Map<String, Expression> parameters, Actor actor,
-			OrccProcess process) {
+	public ActorInterpreter(Map<String, Expression> parameters, Actor actor) {
 		// Set instance name and actor class definition at parent level
 		this.actor = actor;
 
@@ -463,20 +459,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		this.fifos = fifos;
 	}
 
-	/**
-	 * Set the interpreter FSM state. Must be used with caution. This method is
-	 * useful for synchronizing the interpretation with an external actor's
-	 * instance state.
-	 * 
-	 */
-	public void setFsmState(State state) {
-		fsmState = state;
-	}
-
-	public void setProcess(OrccProcess process) {
-		this.process = process;
-	}
-
 	@Override
 	public Object caseInstAssign(InstAssign instr) {
 		try {
@@ -505,20 +487,17 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 		// Special "print" case
 		if (call.isPrint()) {
-			if (process != null) {
-				for (int i = 0; i < callParams.size(); i++) {
-					if (callParams.get(i).isStringExpr()) {
-						// String characters rework for escaped control
-						// management
-						String str = ((ExprString) callParams.get(i))
-								.getValue();
-						String unescaped = OrccUtil.getUnescapedString(str);
-						process.write(unescaped);
-					} else {
-						Expression value = exprInterpreter.doSwitch(callParams
-								.get(i));
-						process.write(String.valueOf(value));
-					}
+			for (int i = 0; i < callParams.size(); i++) {
+				if (callParams.get(i).isStringExpr()) {
+					// String characters rework for escaped control
+					// management
+					String str = ((ExprString) callParams.get(i)).getValue();
+					String unescaped = OrccUtil.getUnescapedString(str);
+					System.out.print(unescaped);
+				} else {
+					Expression value = exprInterpreter.doSwitch(callParams
+							.get(i));
+					System.out.print(String.valueOf(value));
 				}
 			}
 		} else {

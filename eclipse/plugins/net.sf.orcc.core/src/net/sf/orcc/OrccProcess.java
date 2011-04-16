@@ -26,24 +26,17 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends;
-
-import static net.sf.orcc.OrccLaunchConstants.BACKEND;
+package net.sf.orcc;
 
 import java.io.IOException;
 
-import net.sf.orcc.OrccActivator;
-import net.sf.orcc.network.Network;
+import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.PlatformObject;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.IStreamListener;
@@ -58,7 +51,8 @@ import org.eclipse.debug.core.model.IStreamsProxy;
  * @author Matthieu Wipliez
  * 
  */
-public class OrccProcess extends PlatformObject implements IProcess {
+public class OrccProcess extends PlatformObject implements IProcess,
+		WriteListener {
 
 	/**
 	 * This class defines an implementation of stream monitor.
@@ -204,45 +198,10 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	public void setAttribute(String key, String value) {
 	}
 
-	/**
-	 * Starts this process.
-	 * @throws CoreException
-	 */
-	public void start() throws CoreException {
-		try {
-			monitor.subTask("Launching backend...");
-			write("\n");
-			write("*********************************************"
-					+ "**********************************\n");
-			write("Launching Orcc backend...\n");
-			String backend = configuration.getAttribute(BACKEND, "");
-			try {
-				BackendFactory factory = BackendFactory.getInstance();
-				factory.runBackend(this, configuration);
-			} catch (Exception e) {
-				// clear actor pool because it might not have been done if we
-				// got an
-				// error too soon
-				Network.clearActorPool();
-
-				IStatus status = new Status(IStatus.ERROR,
-						OrccActivator.PLUGIN_ID, backend
-								+ " backend could not generate code", e);
-				throw new CoreException(status);
-			}
-			write("Orcc backend done.");
-		} finally {
-			terminated = true;
-
-			DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
-			DebugEvent[] events = { event };
-			DebugPlugin.getDefault().fireDebugEventSet(events);
-		}
-	}
-
 	@Override
 	public void terminate() throws DebugException {
 		monitor.setCanceled(true);
+		terminated = true;
 	}
 
 	/**
@@ -251,7 +210,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	 * @param text
 	 *            a string
 	 */
-	public void write(String text) {
+	public void writeText(String text) {
 		((OrccMonitor) proxy.getOutputStreamMonitor()).write(text);
 	}
 

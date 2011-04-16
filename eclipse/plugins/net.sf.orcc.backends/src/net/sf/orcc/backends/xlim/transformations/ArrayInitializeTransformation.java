@@ -31,7 +31,6 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -56,8 +55,8 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor<Object> 
 	private class SpecialActorInterpreter extends ActorInterpreter {
 
 		public SpecialActorInterpreter(Map<String, Expression> parameters,
-				Actor actor, OrccProcess process) {
-			super(parameters, actor, process);
+				Actor actor) {
+			super(parameters, actor);
 		}
 
 		@Override
@@ -77,7 +76,7 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor<Object> 
 	@Override
 	public void visit(Actor actor) {
 		actorInterpreter = new SpecialActorInterpreter(
-				new HashMap<String, Expression>(0), actor, null);
+				new HashMap<String, Expression>(0), actor);
 
 		// Initialize value field if there is an initial value
 		for (Var stateVar : actor.getStateVars()) {

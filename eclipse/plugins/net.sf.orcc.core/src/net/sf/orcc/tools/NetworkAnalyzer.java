@@ -30,10 +30,20 @@ package net.sf.orcc.tools;
 
 import java.util.List;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.debug.model.OrccProcess;
+import org.eclipse.core.runtime.IProgressMonitor;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.util.WriteListener;
+
+/**
+ * This interface defines a network analyzer.
+ * 
+ * @author Herve Yviquel
+ * @author Matthieu Wipliez
+ *
+ */
 public interface NetworkAnalyzer {
+
 	/**
 	 * Analyzes the VTL by loading IR files, transforming actors and printing
 	 * them.
@@ -46,8 +56,7 @@ public interface NetworkAnalyzer {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	public void analyzeVTL(OrccProcess process, List<String> vtlFolders)
-			throws OrccException;
+	public void analyzeVTL(List<String> vtlFolders) throws OrccException;
 
 	/**
 	 * Loads a hierarchical XDF network and analyze it. Analyze may include
@@ -62,7 +71,7 @@ public interface NetworkAnalyzer {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	public void analyzeXDF(OrccProcess process, String inputFile) throws OrccException;
+	public void analyzeXDF(String inputFile) throws OrccException;
 
 	/**
 	 * Sets the output folder of this back-end. This is the folder where files
@@ -72,4 +81,21 @@ public interface NetworkAnalyzer {
 	 *            output folder
 	 */
 	public void setOutputFolder(String outputFolder);
+
+	/**
+	 * Sets the progress monitor used by this back-end.
+	 * 
+	 * @param monitor
+	 *            a progress monitor
+	 */
+	void setProgressMonitor(IProgressMonitor monitor);
+
+	/**
+	 * Sets the write listener used by this back-end.
+	 * 
+	 * @param monitor
+	 *            a write listener
+	 */
+	void setWriteListener(WriteListener listener);
+
 }

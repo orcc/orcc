@@ -41,16 +41,24 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.WriteListener;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
+/**
+ * This class defines an abstract network analyzer.
+ * 
+ * @author Herve Yviquel
+ * @author Matthieu Wipliez
+ *
+ */
 public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 
 	/**
@@ -69,7 +77,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 				AbstractNetworkAnalyzer analyzer = clasz.newInstance();
 				analyzer.setOutputFolder(outputFolder);
 				analyzer.setVtlFolders(vtlFolders);
-				analyzer.analyzeXDF(null, inputFile);
+				analyzer.analyzeXDF(inputFile);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
 				e.printStackTrace();
@@ -85,14 +93,16 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	protected Map<String, Object> analysis;
 
 	/**
+	 * the process that launched this analyzer
+	 */
+	protected WriteListener listener;
+
+	private IProgressMonitor monitor;
+
+	/**
 	 * Path where output files will be written.
 	 */
 	protected String path;
-
-	/**
-	 * the process that launched this analyzer
-	 */
-	private OrccProcess process;
 
 	/**
 	 * Path of the folder that contains VTL under IR form.
@@ -132,13 +142,13 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		}
 	}
 
-	public void analyzeVTL(OrccProcess process, List<String> vtlFolders)
+	public void analyzeVTL(WriteListener listener, List<String> vtlFolders)
 			throws OrccException {
-		this.process = process;
+		this.listener = listener;
 		this.vtlFolders = vtlFolders;
 
 		// lists actors
-		write("Lists actors...\n");
+		listener.writeText("Lists actors...\n");
 		List<File> vtlFiles = new ArrayList<File>();
 		for (String folder : vtlFolders) {
 			findFiles(vtlFiles, new File(folder));
@@ -157,22 +167,19 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	}
 
 	@Override
-	final public void analyzeXDF(OrccProcess process, String inputFile)
-			throws OrccException {
-		this.process = process;
-
+	final public void analyzeXDF(String inputFile) throws OrccException {
 		// parses top network
-		write("Parsing XDF network...\n");
+		listener.writeText("Parsing XDF network...\n");
 		Network network = new XDFParser(inputFile).parseNetwork();
 		network.updateIdentifiers();
 		if (isCanceled()) {
 			return;
 		}
 
-		write("Instantiating actors...\n");
+		listener.writeText("Instantiating actors...\n");
 		network.instantiate(vtlFolders);
 		Network.clearActorPool();
-		write("Instantiation done\n");
+		listener.writeText("Instantiation done\n");
 
 		if (isCanceled()) {
 			return;
@@ -203,10 +210,10 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	 * @return true if this process has been canceled
 	 */
 	protected boolean isCanceled() {
-		if (process == null) {
+		if (monitor == null) {
 			return false;
 		} else {
-			return process.getProgressMonitor().isCanceled();
+			return monitor.isCanceled();
 		}
 	}
 
@@ -229,20 +236,18 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		path = new File(outputFolder).getAbsolutePath();
 	}
 
+	@Override
+	public void setProgressMonitor(IProgressMonitor monitor) {
+		this.monitor = monitor;
+	}
+
 	public void setVtlFolders(List<String> vtlFolders) {
 		this.vtlFolders = vtlFolders;
 	}
 
-	/**
-	 * Writes the given text to the process's normal output.
-	 * 
-	 * @param text
-	 *            a string
-	 */
-	final public void write(String text) {
-		if (process != null) {
-			process.write(text);
-		}
+	@Override
+	public void setWriteListener(WriteListener listener) {
+		this.listener = listener;
 	}
 
 }
