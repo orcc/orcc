@@ -6,15 +6,9 @@ Bundle-Version: 0.9.3.v20110228
 Bundle-Activator: net.sf.orcc.OrccActivator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
- org.eclipse.debug.ui,
  org.eclipse.emf.common,
  org.eclipse.emf.ecore,
  org.eclipse.jdt.core,
- org.eclipse.jface.text,
- org.eclipse.ui,
- org.eclipse.ui.console,
- org.eclipse.ui.editors,
- org.eclipse.ui.ide,
  org.ietr.libs;bundle-version="1.2.8"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

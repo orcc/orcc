@@ -56,6 +56,7 @@ import net.sf.orcc.plugins.simulators.Simulator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 public class JadeSimulatorImpl implements Simulator {
@@ -100,7 +101,7 @@ public class JadeSimulatorImpl implements Simulator {
 	 * Input stimulus file name
 	 */
 	protected String stimulusFile;
-	
+
 	/**
 	 * Traces folder
 	 */
@@ -115,7 +116,7 @@ public class JadeSimulatorImpl implements Simulator {
 	 * input XDF network file name
 	 */
 	protected String xdfFile;
-	
+
 	/**
 	 * XDF network flatten file
 	 */
@@ -134,11 +135,11 @@ public class JadeSimulatorImpl implements Simulator {
 		this.debugMode = debugMode;
 	}
 
-	private void flatten(){
+	private void flatten() {
 		try {
 			Network network = new XDFParser(xdfFile).parseNetwork();
 			network.flatten();
-					
+
 			XDFWriter writer = new XDFWriter(new File(vtlFolder), network);
 			xdfFlattenFile = writer.getFile();
 		} catch (OrccException e) {
@@ -187,14 +188,13 @@ public class JadeSimulatorImpl implements Simulator {
 		// TODO Auto-generated method stub
 
 	}
-	
-	
+
 	@Override
 	public void run() {
 		// Flatten the network
 		flatten();
-		
-		//Preparing command line
+
+		// Preparing command line
 		List<String> cmdList = new ArrayList<String>();
 		cmdList.add(execJade);
 		cmdList.add("-xdf");
@@ -208,15 +208,15 @@ public class JadeSimulatorImpl implements Simulator {
 			cmdList.add("-w");
 			cmdList.add(tracesFolder);
 		}
-		
+
 		if (!refVideo.equals("")) {
 			cmdList.add("-o");
 			cmdList.add(refVideo);
 		}
-		
+
 		String[] cmd = cmdList.toArray(new String[] {});
 
-		//Run application
+		// Run application
 		Runtime run = Runtime.getRuntime();
 
 		try {
@@ -285,8 +285,8 @@ public class JadeSimulatorImpl implements Simulator {
 			xdfFile = configuration.getAttribute(XDF_FILE, "");
 			tracesFolder = configuration.getAttribute(TRACES_FOLDER, "");
 			refVideo = configuration.getAttribute(REFERENCE_FILE, "");
-			execJade = OrccActivator.getDefault().getPreferenceStore()
-					.getString(P_JADE);
+			execJade = new InstanceScope().getNode(OrccActivator.PLUGIN_ID)
+					.get(P_JADE, "");
 
 			// Jade location has not been set
 			if (execJade.equals("")) {

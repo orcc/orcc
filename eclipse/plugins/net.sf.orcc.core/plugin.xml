@@ -12,5 +12,11 @@
             uri="platform:/resource/net.sf.orcc.core/model/Ir.ecore">
       </package>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.sf.orcc.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

@@ -31,7 +31,7 @@ package net.sf.orcc.ui.editor;
 import java.util.Comparator;
 import java.util.List;
 
-import net.sf.orcc.OrccActivator;
+import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFolder;
@@ -165,11 +165,11 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 
 	@Override
 	protected IDialogSettings getDialogSettings() {
-		IDialogSettings settings = OrccActivator.getDefault()
+		IDialogSettings settings = OrccUiActivator.getDefault()
 				.getDialogSettings().getSection(DIALOG_SETTINGS);
 
 		if (settings == null) {
-			settings = OrccActivator.getDefault().getDialogSettings()
+			settings = OrccUiActivator.getDefault().getDialogSettings()
 					.addNewSection(DIALOG_SETTINGS);
 		}
 

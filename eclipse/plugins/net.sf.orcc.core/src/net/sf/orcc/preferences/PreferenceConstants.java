@@ -36,6 +36,7 @@ package net.sf.orcc.preferences;
 public class PreferenceConstants {
 
 	public static final String P_JADE = "jadePath";
+
 	public static final String P_JADETOOLBOX = "jadeToolboxPath";
 
 }

@@ -45,8 +45,8 @@ import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
 
 /**
- * This class defines an implementation of {@link IProcess} to launch the
- * front-end and back-end of Orcc.
+ * This class defines an implementation of {@link IProcess} to launch a back-end
+ * or a simulator.
  * 
  * @author Matthieu Wipliez
  * 

@@ -31,10 +31,13 @@ package net.sf.orcc.ui.preferences;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.preferences.PreferenceConstants;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 /**
  * This class represents a preference page that is contributed to the
@@ -47,7 +50,11 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 
 	public OrccPreferencePage() {
 		super(GRID);
-		setPreferenceStore(OrccActivator.getDefault().getPreferenceStore());
+
+		InstanceScope scope = new InstanceScope();
+		IPreferenceStore store = new ScopedPreferenceStore(scope,
+				OrccActivator.PLUGIN_ID);
+		setPreferenceStore(store);
 		setDescription("General settings for Orcc");
 	}
 
@@ -58,10 +65,10 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 	 */
 	@Override
 	public void createFieldEditors() {
-		addField(new FileFieldEditor(PreferenceConstants.P_JADE, "&Jade executable path:",
-				getFieldEditorParent()));
-		addField(new FileFieldEditor(PreferenceConstants.P_JADETOOLBOX, "&Jade toolbox path:",
-				getFieldEditorParent()));
+		addField(new FileFieldEditor(PreferenceConstants.P_JADE,
+				"&Jade executable path:", getFieldEditorParent()));
+		addField(new FileFieldEditor(PreferenceConstants.P_JADETOOLBOX,
+				"&Jade toolbox path:", getFieldEditorParent()));
 	}
 
 	@Override

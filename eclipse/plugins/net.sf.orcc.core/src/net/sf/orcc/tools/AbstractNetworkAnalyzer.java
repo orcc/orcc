@@ -57,7 +57,7 @@ import org.stringtemplate.v4.STGroup;
  * 
  * @author Herve Yviquel
  * @author Matthieu Wipliez
- *
+ * 
  */
 public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 
@@ -142,9 +142,8 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		}
 	}
 
-	public void analyzeVTL(WriteListener listener, List<String> vtlFolders)
-			throws OrccException {
-		this.listener = listener;
+	@Override
+	public void analyzeVTL(List<String> vtlFolders) throws OrccException {
 		this.vtlFolders = vtlFolders;
 
 		// lists actors

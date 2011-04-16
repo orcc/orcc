@@ -28,13 +28,13 @@
  */
 package net.sf.orcc;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class OrccActivator extends AbstractUIPlugin {
+public class OrccActivator extends Plugin {
 
 	// The shared instance
 	private static OrccActivator plugin;

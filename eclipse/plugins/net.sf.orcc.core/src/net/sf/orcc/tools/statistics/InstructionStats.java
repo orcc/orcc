@@ -50,7 +50,7 @@ import net.sf.orcc.network.Network;
  */
 public class InstructionStats {
 
-	private class InstructionStatsBuilder extends AbstractActorVisitor {
+	private class InstructionStatsBuilder extends AbstractActorVisitor<Object> {
 
 		private InstructionStatsElement statsElement;
 
