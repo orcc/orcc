@@ -6,7 +6,9 @@ Bundle-Version: 0.9.3.v20110228
 Bundle-Activator: net.sf.orcc.ui.OrccUiActivator
 Require-Bundle: net.sf.graphiti.model;bundle-version="1.2.8",
  net.sf.graphiti.ui;bundle-version="1.2.8",
+ net.sf.orcc.backends;bundle-version="0.9.3",
  net.sf.orcc.core;bundle-version="0.9.3",
+ net.sf.orcc.simulators;bundle-version="0.9.3",
  org.ietr.libs;bundle-version="1.2.8",
  org.eclipse.core.expressions,
  org.eclipse.core.resources,

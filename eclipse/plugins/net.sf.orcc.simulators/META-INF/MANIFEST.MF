@@ -8,10 +8,17 @@ Require-Bundle: org.ietr.libs;bundle-version="1.2.8",
  net.sf.orcc.core;bundle-version="0.9.3",
  org.eclipse.core.runtime,
  org.eclipse.debug.core,
+ org.eclipse.debug.ui;bundle-version="3.6.1",
  org.eclipse.emf.ecore,
- org.eclipse.ui
+ org.eclipse.jface.text;bundle-version="3.6.1",
+ org.eclipse.ui,
+ org.eclipse.ui.editors;bundle-version="3.6.1",
+ org.eclipse.ui.ide;bundle-version="3.6.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: IETR/INSA Rennes
-Export-Package: net.sf.orcc.simulators,
- net.sf.orcc.simulators.interpreter
+Export-Package: net.sf.orcc.debug.model,
+ net.sf.orcc.plugins.simulators,
+ net.sf.orcc.simulators,
+ net.sf.orcc.simulators.interpreter,
+ net.sf.orcc.simulators.jade

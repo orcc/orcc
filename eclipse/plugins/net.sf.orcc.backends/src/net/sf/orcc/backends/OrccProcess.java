@@ -26,17 +26,14 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.debug.model;
+package net.sf.orcc.backends;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
 import java.io.IOException;
 
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.plugins.backends.BackendFactory;
-import net.sf.orcc.plugins.simulators.SimulatorFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -203,87 +200,37 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		return terminated;
 	}
 
-	/**
-	 * Calls one of the backends.
-	 * 
-	 * @throws CoreException
-	 */
-	private void launchBackend() throws CoreException {
-		String backend = configuration.getAttribute(BACKEND, "");
-		try {
-			BackendFactory factory = BackendFactory.getInstance();
-			factory.runBackend(this, configuration);
-		} catch (Exception e) {
-			// clear actor pool because it might not have been done if we got an
-			// error too soon
-			Network.clearActorPool();
-
-			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					backend + " backend could not generate code", e);
-			throw new CoreException(status);
-		}
-	}
-
-	/**
-	 * Calls one of the simulators.
-	 * 
-	 * @throws CoreException
-	 */
-	private void launchSimulator(String option) throws CoreException {
-		String simulator = configuration.getAttribute(SIMULATOR, "");
-		try {
-			SimulatorFactory factory = SimulatorFactory.getInstance();
-			factory.runSimulator(this, launch, configuration, option);
-		} catch (Exception e) {
-			// clear actor pool because it might not have been done if we got an
-			// error too soon
-			Network.clearActorPool();
-			e.printStackTrace();
-
-			Throwable throwable = e;
-			StringBuilder builder = new StringBuilder();
-			while (throwable != null && throwable.getCause() != throwable) {
-				builder.append(throwable.getLocalizedMessage());
-				builder.append('\n');
-				throwable = throwable.getCause();
-			}
-
-			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					simulator + " simulation error: " + builder.toString());
-			throw new CoreException(status);
-		}
-	}
-
 	@Override
 	public void setAttribute(String key, String value) {
 	}
 
 	/**
-	 * Starts this process with the given option
-	 * 
-	 * @param option
-	 *            "backend" and/or ("simulator" or "debugger")
+	 * Starts this process.
 	 * @throws CoreException
 	 */
-	public void start(String option) throws CoreException {
+	public void start() throws CoreException {
 		try {
-			if (option.equals("backend")) {
-				monitor.subTask("Launching backend...");
-				write("\n");
-				write("*********************************************"
-						+ "**********************************\n");
-				write("Launching Orcc backend...\n");
-				launchBackend();
-				write("Orcc backend done.");
-			} else if (option.equals("simulator") || option.equals("debugger")) {
-				monitor.subTask("Launching simulator...");
-				write("\n");
-				write("*********************************************"
-						+ "**********************************\n");
-				write("Launching Orcc simulator...\n");
-				launchSimulator(option);
-				write("Orcc simulation done.");
+			monitor.subTask("Launching backend...");
+			write("\n");
+			write("*********************************************"
+					+ "**********************************\n");
+			write("Launching Orcc backend...\n");
+			String backend = configuration.getAttribute(BACKEND, "");
+			try {
+				BackendFactory factory = BackendFactory.getInstance();
+				factory.runBackend(this, configuration);
+			} catch (Exception e) {
+				// clear actor pool because it might not have been done if we
+				// got an
+				// error too soon
+				Network.clearActorPool();
+
+				IStatus status = new Status(IStatus.ERROR,
+						OrccActivator.PLUGIN_ID, backend
+								+ " backend could not generate code", e);
+				throw new CoreException(status);
 			}
+			write("Orcc backend done.");
 		} finally {
 			terminated = true;
 

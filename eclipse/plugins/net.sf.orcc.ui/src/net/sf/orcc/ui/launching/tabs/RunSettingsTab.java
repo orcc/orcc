@@ -35,8 +35,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.plugins.PluginOption;
-import net.sf.orcc.plugins.backends.BackendFactory;
 import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;

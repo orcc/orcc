@@ -160,5 +160,50 @@
          </option>
       </simulator>
    </extension>
-
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="net.sf.orcc.debug.sourceLookup.OrccSourcePathComputerDelegate"
+            id="net.sf.orcc.debug.sourcePathComputer.cal">
+      </sourcePathComputer>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            class="net.sf.orcc.debug.sourceLookup.OrccSourceLookupDirector"
+            id="net.sf.orcc.debug.sourceLookupDirector.cal"
+            name="Orcc (RVC-CAL) Source Lookup Director">
+      </sourceLocator>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="net.sf.orcc.debug.presentation.OrccModelPresentation"
+            id="net.sf.orcc.core.model">
+      </debugModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            class="net.sf.orcc.debug.model.OrccLineBreakpoint"
+            id="net.sf.orcc.debug.lineBreakpoint"
+            markerType="net.sf.orcc.debug.lineBreakpoint.marker">
+      </breakpoint>
+   </extension>
+   <extension
+		id="net.sf.orcc.debug.lineBreakpoint.marker"
+		point="org.eclipse.core.resources.markers">
+		<super type="org.eclipse.debug.core.lineBreakpointMarker"/>
+		<persistent value="true"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.texteditor.ITextEditor"
+            class="net.sf.orcc.debug.breakpoints.OrccBreakpointAdapterFactory">
+         <adapter
+               type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>

@@ -38,7 +38,7 @@ import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.plugins.backends.BackendFactory;
+import net.sf.orcc.backends.BackendFactory;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;

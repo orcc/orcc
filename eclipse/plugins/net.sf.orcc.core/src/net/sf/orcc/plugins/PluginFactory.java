@@ -33,21 +33,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.orcc.plugins.backends.Backend;
 import net.sf.orcc.plugins.impl.BrowseFileOptionImpl;
 import net.sf.orcc.plugins.impl.CheckboxOptionImpl;
 import net.sf.orcc.plugins.impl.ComboboxItemImpl;
 import net.sf.orcc.plugins.impl.ComboboxOptionImpl;
 import net.sf.orcc.plugins.impl.PluginOptionImpl;
 import net.sf.orcc.plugins.impl.TextBoxOptionImpl;
-import net.sf.orcc.plugins.simulators.Simulator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 
 /**
  * A factory class that contains a list of plugins and their options. The
- * pluginss are classes that implement either the {@link Backend} or the
+ * plugins are classes that implement either the {@link Backend} or the
  * {@link Simulator} interface and are declared in either the
  * <code>net.sf.orcc.plugin.backend</code> or the
  * <code>net.sf.orcc.plugin.simulator</code> extension point.

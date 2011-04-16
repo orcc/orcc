@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins.backends;
+package net.sf.orcc.backends;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.sf.orcc.OrccActivator;
-import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.plugins.PluginFactory;
 import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.util.OrccUtil;
