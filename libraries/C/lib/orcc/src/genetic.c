@@ -39,8 +39,6 @@
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
 
-static FILE *mappingFile;
-
 int clean_cache(int size) {
 	int i, res = 0;
 	int *table = (int*) malloc(size * sizeof(int));
@@ -55,12 +53,7 @@ int clean_cache(int size) {
 static struct mapping_s* compute_mapping(individual *individual,
 		struct genetic_s *genetic_info) {
 	int i, j, k;
-	struct mapping_s *mapping = (struct mapping_s*) malloc(
-			sizeof(struct mapping_s));
-	mapping->actors_per_threads = (int*) malloc(
-			genetic_info->threads_nb * sizeof(int));
-	mapping->actors_mapping = (struct actor_s***) malloc(
-			genetic_info->threads_nb * sizeof(struct actor_s **));
+	struct mapping_s *mapping = allocate_mapping(genetic_info->threads_nb);
 
 	for (i = 0; i < genetic_info->threads_nb; i++) {
 		struct actor_s **actors_tmp = (struct actor_s**) malloc(
@@ -74,11 +67,11 @@ static struct mapping_s* compute_mapping(individual *individual,
 			}
 		}
 
-		mapping->actors_mapping[i] = (struct actor_s**) malloc(
+		mapping->partitions_of_actors[i] = (struct actor_s**) malloc(
 				k * sizeof(struct actor_s*));
-		memcpy(mapping->actors_mapping[i], actors_tmp,
+		memcpy(mapping->partitions_of_actors[i], actors_tmp,
 				k * sizeof(struct actor_s*));
-		mapping->actors_per_threads[i] = k;
+		mapping->partitions_size[i] = k;
 		free(actors_tmp);
 	}
 
@@ -86,6 +79,8 @@ static struct mapping_s* compute_mapping(individual *individual,
 }
 
 static void initialize_mapping_file() {
+	// Open file
+	FILE *mappingFile;
 	if (output_genetic == NULL) {
 		mappingFile = fopen("genetic_mapping.xcf", "w");
 	} else {
@@ -94,38 +89,56 @@ static void initialize_mapping_file() {
 	if (mappingFile == NULL) {
 		perror("I/O error during opening of mapping file.");
 	}
+
+	// Write header
 	fprintf(mappingFile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 	fprintf(mappingFile, "<!-- GENETIC ALGORITHM -->\n\n");
+
+	// Close file
+	fclose(mappingFile);
 }
 
 static void write_mapping(population *pop, struct genetic_s *genetic_info) {
-	if (mappingFile != NULL) {
-		int i, j, k;
-		fprintf(mappingFile, "<!-- POPULATION N°%i -->\n", pop->generation_nb);
+	int i, j, k;
+	FILE *mappingFile;
 
-		for (i = 0; i < genetic_info->population_size; i++) {
-			struct mapping_s* mapping = compute_mapping(pop->individuals[i],
-					genetic_info);
-			fprintf(mappingFile,
-					"<Configuration pop-id=\"%i\" ind-id=\"%i\" fps=\"%f\">\n",
-					pop->generation_nb, i, pop->individuals[i]->fps);
-			fprintf(mappingFile, "\t<Partitioning>\n");
-
-			for (j = 0; j < genetic_info->threads_nb; j++) {
-				fprintf(mappingFile, "\t\t<Partition id=\"%i\">\n", j);
-				for (k = 0; k < mapping->actors_per_threads[j]; k++) {
-					fprintf(mappingFile, "\t\t\t<Instance id=\"%s\"/>\n",
-							mapping->actors_mapping[j][k]->name);
-				}
-				fprintf(mappingFile, "\t\t</Partition>\n");
-			}
-
-			fprintf(mappingFile, "\t</Partitioning>\n");
-			fprintf(mappingFile, "</Configuration>\n\n");
-		}
+	// Open file
+	if (output_genetic == NULL) {
+		mappingFile = fopen("genetic_mapping.xcf", "a");
 	} else {
-		perror("I/O error during writing of mapping file");
+		mappingFile = fopen(output_genetic, "a");
 	}
+	if (mappingFile == NULL) {
+		perror("I/O error during opening of mapping file.");
+	}
+
+	fprintf(mappingFile, "<!-- POPULATION N°%i -->\n", pop->generation_nb);
+
+	for (i = 0; i < genetic_info->population_size; i++) {
+		struct mapping_s* mapping = compute_mapping(pop->individuals[i],
+				genetic_info);
+		fprintf(mappingFile,
+				"<Configuration pop-id=\"%i\" ind-id=\"%i\" fps=\"%f\">\n",
+				pop->generation_nb, i, pop->individuals[i]->fps);
+		fprintf(mappingFile, "\t<Partitioning>\n");
+
+		for (j = 0; j < genetic_info->threads_nb; j++) {
+			fprintf(mappingFile, "\t\t<Partition id=\"%i\">\n", j);
+			for (k = 0; k < mapping->partitions_size[j]; k++) {
+				fprintf(mappingFile, "\t\t\t<Instance id=\"%s\"/>\n",
+						mapping->partitions_of_actors[j][k]->name);
+			}
+			fprintf(mappingFile, "\t\t</Partition>\n");
+		}
+
+		fprintf(mappingFile, "\t</Partitioning>\n");
+		fprintf(mappingFile, "</Configuration>\n\n");
+
+		delete_mapping(mapping);
+	}
+
+	// Close file
+	fclose(mappingFile);
 }
 
 static void print_mapping(individual *ind, struct genetic_s *genetic_info) {
@@ -299,10 +312,12 @@ static void map_actors_on_threads(individual *individual,
 	struct mapping_s *mapping = compute_mapping(individual, genetic_info);
 
 	for (i = 0; i < genetic_info->threads_nb; i++) {
-		sched_reinit(&genetic_info->schedulers[i],
-				mapping->actors_per_threads[i], mapping->actors_mapping[i],
+		sched_reinit(&genetic_info->schedulers[i], mapping->partitions_size[i],
+				mapping->partitions_of_actors[i],
 				genetic_info->use_ring_topology, genetic_info->threads_nb);
 	}
+
+	delete_mapping(mapping);
 }
 
 static void destroy_population(population *pop, struct genetic_s *genetic_info) {
@@ -411,11 +426,11 @@ void *monitor(void *data) {
 	int i, evalIndNb = 0;
 	population *population;
 
+	// Set native actor in genetic mode
 	remove_fps_printing();
 	source_active_genetic();
-	//Compare_active_genetic();
 
-	// Initialize
+	// Initialize population
 	printf("\nGenerate initial population...\n\n");
 	population = initialize_population(monitoring->genetic_info);
 	initialize_mapping_file();
@@ -429,7 +444,7 @@ void *monitor(void *data) {
 		print_mapping(population->individuals[evalIndNb],
 				monitoring->genetic_info);
 
-		// Backup informations to compute partial fps except first time
+		// Start timer and counter
 		backup_partial_start_info();
 
 		// wakeup all threads
@@ -441,20 +456,24 @@ void *monitor(void *data) {
 		for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
 			semaphore_wait(monitoring->sync->sem_monitor);
 		}
+
+		// Stop timer and counter
 		backup_partial_end_info();
 
+		population->individuals[evalIndNb]->fps = compute_partial_fps();
+
+		// Print evaluation results
+		printf("Evaluation of mapping %i = ", evalIndNb);
 		if (is_timeout()) {
-			printf("Evaluation of mapping %i = TIMEOUT\n", evalIndNb);
+			printf("TIMEOUT");
 		} else {
-			population->individuals[evalIndNb]->fps = compute_partial_fps();
-			printf("Evaluation of mapping %i = %f fps", evalIndNb,
-					population->individuals[evalIndNb]->fps);
-			if (population->individuals[evalIndNb]->old_fps == -1) {
-				printf("\n");
-			} else {
-				printf(" (old = %f fps)\n",
-						population->individuals[evalIndNb]->old_fps);
-			}
+			printf("%f fps", population->individuals[evalIndNb]->fps);
+		}
+		if (population->individuals[evalIndNb]->old_fps == -1) {
+			printf("\n");
+		} else {
+			printf(" (old = %f fps)\n",
+					population->individuals[evalIndNb]->old_fps);
 		}
 
 		evalIndNb++;
@@ -474,14 +493,9 @@ void *monitor(void *data) {
 		map_actors_on_threads(population->individuals[evalIndNb],
 				monitoring->genetic_info);
 
-		//Compare_close();
 		source_close();
 		clear_fifos();
 		initialize_instances();
-	}
-	//active_fps_printing();
-	if (mappingFile != NULL) {
-		fclose(mappingFile);
 	}
 	exit(0);
 

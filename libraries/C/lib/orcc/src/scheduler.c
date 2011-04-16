@@ -123,7 +123,8 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 
 }
 
-struct actor_s * find_actor(char *name, struct actor_s **actors, int actors_nb) {
+static struct actor_s * find_actor(char *name, struct actor_s **actors,
+		int actors_nb) {
 	int i;
 	for (i = 0; i < actors_nb; i++) {
 		if (strcmp(name, actors[i]->name) == 0) {
@@ -134,24 +135,35 @@ struct actor_s * find_actor(char *name, struct actor_s **actors, int actors_nb) 
 	exit(0);
 }
 
+struct mapping_s* allocate_mapping(int number_of_threads) {
+	struct mapping_s *mapping = (struct mapping_s *) malloc(
+			sizeof(struct mapping_s));
+	mapping->number_of_threads = number_of_threads;
+	mapping->threads_ids = (int*) malloc(number_of_threads * sizeof(int));
+	mapping->partitions_of_actors = (struct actor_s ***) malloc(
+			number_of_threads * sizeof(struct actor_s **));
+	mapping->partitions_size = (int*) malloc(number_of_threads * sizeof(int));
+	return mapping;
+}
+
+void delete_mapping(struct mapping_s* mapping) {
+	free(mapping->partitions_of_actors);
+	free(mapping->partitions_size);
+	free(mapping->threads_ids);
+	free(mapping);
+}
+
 struct mapping_s * map_actors(struct actor_s **actors, int actors_nb) {
 	int i, j, size;
 	char *nb, *name;
 	node_t *configuration, *partitioning, *partition, *instance, *attribute;
-	struct mapping_s *mapping = (struct mapping_s *) malloc(
-			sizeof(struct mapping_s));
+	struct mapping_s *mapping;
 
 	if (mapping_file == NULL) {
-		mapping->thread_nb = 1;
-
-		mapping->ids = (int*) malloc(sizeof(int));
-		mapping->actors_per_threads = (int*) malloc(sizeof(int));
-		mapping->actors_mapping = (struct actor_s ***) malloc(
-				sizeof(struct actor_s **));
-
-		mapping->ids[0] = 0;
-		mapping->actors_per_threads[0] = actors_nb;
-		mapping->actors_mapping[0] = actors;
+		mapping = allocate_mapping(1);
+		mapping->threads_ids[0] = 0;
+		mapping->partitions_size[0] = actors_nb;
+		mapping->partitions_of_actors[0] = actors;
 	} else {
 		configuration = roxml_load_doc(mapping_file);
 		if (configuration == NULL) {
@@ -162,31 +174,26 @@ struct mapping_s * map_actors(struct actor_s **actors, int actors_nb) {
 		partitioning = roxml_get_chld(configuration, NULL, 0);
 		name = roxml_get_name(partitioning, NULL, 0);
 
-		mapping->thread_nb = roxml_get_chld_nb(partitioning);
-		mapping->ids = (int*) malloc(mapping->thread_nb * sizeof(int));
-		mapping->actors_per_threads = (int*) malloc(
-				mapping->thread_nb * sizeof(int));
-		mapping->actors_mapping = (struct actor_s ***) malloc(
-				mapping->thread_nb * sizeof(struct actor_s **));
+		mapping = allocate_mapping(roxml_get_chld_nb(partitioning));
 
-		for (i = 0; i < mapping->thread_nb; i++) {
+		for (i = 0; i < mapping->number_of_threads; i++) {
 			partition = roxml_get_chld(partitioning, NULL, i);
 			name = roxml_get_name(partition, NULL, 0);
-			mapping->actors_per_threads[i] = roxml_get_chld_nb(partition);
+			mapping->partitions_size[i] = roxml_get_chld_nb(partition);
 
 			attribute = roxml_get_attr(partition, "id", 0);
 			nb = roxml_get_content(attribute, NULL, 0, &size);
-			mapping->ids[i] = atoi(nb);
+			mapping->threads_ids[i] = atoi(nb);
 
-			mapping->actors_mapping[i] = (struct actor_s **) malloc(
-					mapping->actors_per_threads[i] * sizeof(struct actor_s *));
+			mapping->partitions_of_actors[i] = (struct actor_s **) malloc(
+					mapping->partitions_size[i] * sizeof(struct actor_s *));
 
-			for (j = 0; j < mapping->actors_per_threads[i]; j++) {
+			for (j = 0; j < mapping->partitions_size[i]; j++) {
 				instance = roxml_get_chld(partition, NULL, j);
 				name = roxml_get_name(instance, NULL, 0);
 				attribute = roxml_get_attr(instance, "id", 0);
 				name = roxml_get_content(attribute, NULL, 0, &size);
-				mapping->actors_mapping[i][j] = find_actor(name, actors,
+				mapping->partitions_of_actors[i][j] = find_actor(name, actors,
 						actors_nb);
 			}
 		}

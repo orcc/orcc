@@ -88,10 +88,10 @@ struct waiting_s {
 };
 
 struct mapping_s {
-	int thread_nb;
-	int *ids;
-	int *actors_per_threads;
-	struct actor_s ***actors_mapping;
+	int number_of_threads;
+	int *threads_ids;
+	struct actor_s ***partitions_of_actors;
+	int *partitions_size;
 };
 
 #include "orcc_scheduler.inl"
@@ -105,6 +105,10 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 		struct sync_s *sync);
 void sched_reinit(struct scheduler_s *sched, int num_actors,
 		struct actor_s **actors, int use_ring_topology, int schedulers_nb);
+
 struct mapping_s * map_actors(struct actor_s **actors, int actors_nb);
+
+struct mapping_s* allocate_mapping(int number_of_threads);
+void delete_mapping(struct mapping_s* mapping);
 
 #endif
