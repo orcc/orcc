@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,140 +28,46 @@
  */
 package net.sf.orcc.plugins.simulators;
 
-import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import net.sf.orcc.debug.model.OrccProcess;
-import net.sf.orcc.plugins.Plugin;
+import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
 
-public interface Simulator extends Plugin, Runnable {
-
-	/**
-	 * Simulator automaton control states
-	 */
-	public enum SimulatorState {
-		IDLE, CONFIGURED, RUNNING, SUSPENDED, STEPPING, TERMINATED
-	}
-
-	/**
-	 * Simulator automaton control events
-	 */
-	public enum SimulatorEvent {
-		CLEAR_BREAKPOINT, START, RESUME, SET_BREAKPOINT, SUSPEND, STEP_ALL, STEP_OVER, STEP_INTO, STEP_RETURN, TERMINATE
-	}
+/**
+ * This interface defines a simulator.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
+public interface Simulator {
 
 	/**
-	 * Debug stack frame content definition.
+	 * Set the launch configuration of this plugin.
 	 * 
-	 * @author plagalay
-	 * 
+	 * @param configuration
+	 *            the launch configuration of this plugin
 	 */
-	public class DebugStackFrame {
-		public String actorFilename;
-		public Integer codeLine;
-		public String currentAction;
-		public String fsmState;
-		public Integer nbOfFirings;
-		public Map<String, Object> stateVars;
-
-		public DebugStackFrame() {
-			actorFilename = "";
-			codeLine = 0;
-			stateVars = new HashMap<String, Object>();
-			nbOfFirings = 0;
-			currentAction = "";
-		}
-	}
+	void setLaunchConfiguration(ILaunchConfiguration configuration);
 
 	/**
-	 * Add the listener <code>listener</code> to the registered listeners. Must
-	 * be called before starting the simulator thread.
-	 * 
-	 * @param listener
-	 *            The PropertyChangeListener to add.
+	 * Starts the simulation.
 	 */
-	public void addPropertyChangeListener(PropertyChangeListener listener);
+	void start();
 
 	/**
-	 * Synchronous configuration of the simulator. Must be called before
-	 * starting the simulator thread.
+	 * Sets the progress monitor used by this back-end.
 	 * 
-	 * @param process
-	 *            the parent OrccProcess of this plugin
 	 * @param monitor
-	 *            the progress monitor associated with this plugin
-	 * @param debugMode
-	 *            true if simulator is launched as a debugger
+	 *            a progress monitor
 	 */
-	void configure(OrccProcess process, IProgressMonitor monitor,
-			boolean debugMode);
+	void setProgressMonitor(IProgressMonitor monitor);
 
 	/**
-	 * Get a list corresponding to the simulated actors instances identifiers.
+	 * Sets the write listener used by this back-end.
 	 * 
-	 * @return List<String> of instances identifiers
+	 * @param monitor
+	 *            a write listener
 	 */
-	public List<String> getActorsInstanceIds();
+	void setWriteListener(WriteListener listener);
 
-	/**
-	 * Get Actor model name from the specified instance ID
-	 * 
-	 * @param instanceId
-	 * @return Actor model name
-	 */
-	public String getActorName(String instanceId);
-
-	/**
-	 * Get the name of the network to simulate
-	 * 
-	 * @return String : network name
-	 */
-	public String getNetworkName();
-
-	/**
-	 * Get the current action stack frame from the specified actor instance.
-	 * 
-	 * @param instanceID
-	 *            : actor instance unique identifier
-	 * @return A DebugStackFrame description
-	 */
-	public DebugStackFrame getStackFrame(String instanceID);
-
-	/**
-	 * Return the current simulator thread state.
-	 * 
-	 * @return simulator state
-	 */
-	public SimulatorState getSimulatorState();
-
-	/**
-	 * Indicate if the target simulator is currently in "stepping" mode
-	 * 
-	 * @return true if stepping, false otherwise
-	 */
-	public boolean isStepping();
-
-	/**
-	 * Receive a message with data content from master caller
-	 * 
-	 * @param event
-	 *            CLEAR_BREAKPOINT : remove a breakpoint from the simulator list
-	 *            (must be associated with 2 arguments data : the file name and
-	 *            the line number of the source code); START : requires the
-	 *            simulator to start; RESUME : run the network; SET_BREAKPOINT :
-	 *            add a breakpoint to the simulator list (data = file name and
-	 *            line number); STEP_ALL : requires a step over all the actors
-	 *            of the simulated network; STEP_INTO/OVER/RETURN : step
-	 *            into/over/return from an actor action (data = target actor
-	 *            instance ID); SUSPEND : stop the network execution until next
-	 *            RESUME or a STEP command; TERMINATE : end of the simulation
-	 *            required
-	 * 
-	 * @param data
-	 */
-	public void message(SimulatorEvent event, Object[] data);
 }

@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="net.sf.orcc.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="net.sf.orcc.backends" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="net.sf.orcc.core" id="simulators" name="simulators"/>
+         <meta.schema plugin="net.sf.orcc.backends" id="backend" name="backend"/>
       </appInfo>
       <documentation>
-         Allows a plugin to declare an Orcc simulator.
+         Allows a plugin to declare backends.
       </documentation>
    </annotation>
 
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="simulator" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="backend" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,7 +47,7 @@
       </complexType>
    </element>
 
-   <element name="simulator">
+   <element name="backend">
       <complexType>
          <sequence minOccurs="0" maxOccurs="unbounded">
             <element ref="option"/>
@@ -65,7 +65,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":net.sf.orcc.plugins.simulators.Simulator"/>
+                  <meta.attribute kind="java" basedOn=":net.sf.orcc.backends.Backend"/>
                </appInfo>
             </annotation>
          </attribute>

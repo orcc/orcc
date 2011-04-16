@@ -89,7 +89,7 @@ public class BackendFactory extends PluginFactory {
 						+ ".options");
 
 		parseOptions(elements);
-		elements = registry.getConfigurationElementsFor(OrccActivator.PLUGIN_ID
+		elements = registry.getConfigurationElementsFor(Activator.PLUGIN_ID
 				+ ".backends");
 
 		parsePlugins(elements);

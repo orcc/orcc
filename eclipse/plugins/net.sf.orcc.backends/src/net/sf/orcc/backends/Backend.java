@@ -30,11 +30,11 @@ package net.sf.orcc.backends;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import net.sf.orcc.OrccException;
-import net.sf.orcc.plugins.Plugin;
 import net.sf.orcc.util.WriteListener;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * This interface defines a back-end.
@@ -42,7 +42,7 @@ import net.sf.orcc.util.WriteListener;
  * @author Matthieu Wipliez
  * 
  */
-public interface Backend extends Plugin {
+public interface Backend {
 
 	/**
 	 * Compiles the VTL by loading IR files, transforming actors and printing
@@ -66,6 +66,14 @@ public interface Backend extends Plugin {
 	 *             if something goes wrong
 	 */
 	void compileXDF(String inputFile) throws OrccException;
+
+	/**
+	 * Set the launch configuration of this plugin.
+	 * 
+	 * @param configuration
+	 *            the launch configuration of this plugin
+	 */
+	void setLaunchConfiguration(ILaunchConfiguration configuration);
 
 	/**
 	 * Sets the options of this backends.

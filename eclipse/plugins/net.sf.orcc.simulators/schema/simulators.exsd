@@ -1,24 +1,24 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="net.sf.orcc.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="net.sf.orcc.simulators" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appInfo>
-         <meta.schema plugin="net.sf.orcc.core" id="backend" name="backend"/>
-      </appInfo>
+      <appinfo>
+         <meta.schema plugin="net.sf.orcc.simulators" id="simulators" name="simulators"/>
+      </appinfo>
       <documentation>
-         Allows a plugin to declare backends.
+         Allows a plugin to declare an Orcc simulator.
       </documentation>
    </annotation>
 
    <element name="extension">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element />
-         </appInfo>
+         </appinfo>
       </annotation>
       <complexType>
          <sequence>
-            <element ref="backend" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="simulator" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -39,15 +39,15 @@
                <documentation>
                   
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
-   <element name="backend">
+   <element name="simulator">
       <complexType>
          <sequence minOccurs="0" maxOccurs="unbounded">
             <element ref="option"/>
@@ -64,9 +64,9 @@
                <documentation>
                   
                </documentation>
-               <appInfo>
-                  <meta.attribute kind="java" basedOn=":net.sf.orcc.plugins.backends.Backend"/>
-               </appInfo>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":net.sf.orcc.plugins.simulators.Simulator"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -79,45 +79,45 @@
                <documentation>
                   
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="identifier" basedOn="net.sf.orcc.core.options/option/@id"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="since"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          [Enter the first release in which this extension point appears.]
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="examples"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          [Enter extension point usage example here.]
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="apiinfo"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          [Enter API information here.]
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="implementation"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          [Enter information about supplied implementation of this extension point.]
       </documentation>

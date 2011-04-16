@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -34,27 +34,26 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.sf.orcc.OrccActivator;
-import net.sf.orcc.debug.model.OrccDebugTarget;
-import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.plugins.PluginFactory;
 import net.sf.orcc.plugins.PluginOption;
-import net.sf.orcc.plugins.simulators.Simulator.SimulatorEvent;
+import net.sf.orcc.simulators.Activator;
+import net.sf.orcc.util.WriteListener;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
- * A factory class that contains a list of simulators and their options. The
- * simulators are classes that implement the {@link Simulator} interface and are
- * declared in the <code>net.sf.orcc.plugin.simulator</code> extension point.
+ * This class defines a factory class that contains a list of simulators and
+ * their options. The simulators are classes that implement the
+ * {@link Simulator} interface and are declared in the
+ * <code>net.sf.orcc.simulators.simulator</code> extension point.
  * 
  * @author Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
  * 
  */
 public class SimulatorFactory extends PluginFactory {
@@ -84,7 +83,7 @@ public class SimulatorFactory extends PluginFactory {
 						+ ".options");
 
 		parseOptions(elements);
-		elements = registry.getConfigurationElementsFor(OrccActivator.PLUGIN_ID
+		elements = registry.getConfigurationElementsFor(Activator.PLUGIN_ID
 				+ ".simulators");
 
 		parsePlugins(elements);
@@ -99,45 +98,16 @@ public class SimulatorFactory extends PluginFactory {
 	 *            launch configuration
 	 * @throws Exception
 	 */
-	public void runSimulator(OrccProcess process, ILaunch launch,
-			ILaunchConfiguration configuration, String option) throws Exception {
+	public void runSimulator(IProgressMonitor monitor, WriteListener listener,
+			ILaunch launch, ILaunchConfiguration configuration)
+			throws Exception {
 		// Get the simulator plugin
-		String simulator = configuration.getAttribute(SIMULATOR, "");
-		Simulator simuObj = (Simulator) plugins.get(simulator);
-		// Set the launch configuration of the simulator
-		simuObj.setLaunchConfiguration(configuration);
-		// Create a new thread from the Runnable simulator
-		Thread simulatorThread = new Thread(simuObj);
-
-		// Create and link a new debug target to the thread if we are in DEBUG
-		// mode. Then start the thread. Send a configuration message to the
-		// thread if we are not in debug mode.
-		try {
-			if (option.equals("debugger")) {
-				// Set the parent OrccProcess of the simulator, the progress
-				// monitor and activate debug mode
-				simuObj.configure(process, process.getProgressMonitor(), true);
-				// Add the DebugTarget as a listener of the simulator
-				OrccDebugTarget target = new OrccDebugTarget(launch, process,
-						(Simulator) simuObj);
-				launch.addDebugTarget(target);
-				((Simulator) simuObj).addPropertyChangeListener(target);
-				// Start the thread...
-				simulatorThread.start();
-			} else {
-				simuObj.configure(process, process.getProgressMonitor(), false);
-				// Start the thread...
-				simulatorThread.start();
-			}
-			// Start the simulator
-			((Simulator) simuObj).message(SimulatorEvent.START, null);
-			// ...wait for the end of simulation
-			simulatorThread.join();
-		} catch (Exception e) {
-			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					"simulator error", e);
-			throw new CoreException(status);
-		}
+		String simulatorName = configuration.getAttribute(SIMULATOR, "");
+		Simulator simulator = (Simulator) plugins.get(simulatorName);
+		simulator.setLaunchConfiguration(configuration);
+		simulator.setProgressMonitor(monitor);
+		simulator.setWriteListener(listener);
+		simulator.start();
 	}
 
 }

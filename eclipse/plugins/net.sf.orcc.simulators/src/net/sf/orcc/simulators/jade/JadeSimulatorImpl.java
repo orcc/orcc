@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.simulators.jade;
 
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.REFERENCE_FILE;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
@@ -37,7 +35,6 @@ import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE;
 
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -48,92 +45,68 @@ import java.util.List;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.plugins.simulators.Simulator;
+import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
+/**
+ * This class implements a simulator with the Just-In-Time Adaptive Decoder
+ * Engine (Jade).
+ * 
+ * @author Jerome Gorin
+ * @author Matthieu Wipliez
+ * 
+ */
 public class JadeSimulatorImpl implements Simulator {
-
-	/**
-	 * Indicate to the simulator implementation the we are in debug mode.
-	 */
-	protected boolean debugMode;
 
 	/**
 	 * Path of Jade executable
 	 */
-	protected String execJade;
-
-	/**
-	 * default FIFO size.
-	 */
-	protected int fifoSize;
+	private String execJade;
 
 	/**
 	 * Master caller associated process for jade I/O access.
 	 */
-	protected Process jadeProcess;
+	private Process jadeProcess;
 
-	/**
-	 * Monitor associated to the simulator execution. Used for user
-	 * cancellation.
-	 */
-	protected IProgressMonitor monitor = null;
-
-	/**
-	 * Master caller associated process for console I/O access.
-	 */
-	protected OrccProcess orccProcess;
+	private WriteListener listener;
 
 	/**
 	 * Reference video file
 	 */
-	protected String refVideo;
+	private String refVideo;
 
 	/**
 	 * Input stimulus file name
 	 */
-	protected String stimulusFile;
+	private String stimulusFile;
 
 	/**
 	 * Traces folder
 	 */
-	protected String tracesFolder;
+	private String tracesFolder;
 
 	/**
 	 * Folder where the VTL is
 	 */
-	protected String vtlFolder;
+	private String vtlFolder;
 
 	/**
 	 * input XDF network file name
 	 */
-	protected String xdfFile;
+	private String xdfFile;
 
 	/**
 	 * XDF network flatten file
 	 */
 	protected File xdfFlattenFile;
-
-	@Override
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-
-	}
-
-	@Override
-	public void configure(OrccProcess process, IProgressMonitor monitor,
-			boolean debugMode) {
-		this.orccProcess = process;
-		this.monitor = monitor;
-		this.debugMode = debugMode;
-	}
 
 	private void flatten() {
 		try {
@@ -148,49 +121,39 @@ public class JadeSimulatorImpl implements Simulator {
 	}
 
 	@Override
-	public String getActorName(String instanceId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		try {
+			// Get configuration attributes
+			stimulusFile = configuration.getAttribute(INPUT_STIMULUS, "");
+			vtlFolder = configuration.getAttribute(VTL_FOLDER, "");
+			xdfFile = configuration.getAttribute(XDF_FILE, "");
+			tracesFolder = configuration.getAttribute(TRACES_FOLDER, "");
+			refVideo = configuration.getAttribute(REFERENCE_FILE, "");
+			execJade = new InstanceScope().getNode(OrccActivator.PLUGIN_ID)
+					.get(P_JADE, "");
 
-	@Override
-	public List<String> getActorsInstanceIds() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getNetworkName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public SimulatorState getSimulatorState() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public DebugStackFrame getStackFrame(String instanceID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isStepping() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void message(SimulatorEvent event, Object[] data) {
-		// TODO Auto-generated method stub
+			// Jade location has not been set
+			if (execJade.equals("")) {
+				throw new OrccRuntimeException(
+						"Jade path must first be set in window->Preference->Orcc");
+			}
+		} catch (CoreException e) {
+			throw new OrccRuntimeException(e.getMessage());
+		}
 
 	}
 
 	@Override
-	public void run() {
+	public void setProgressMonitor(IProgressMonitor monitor) {
+	}
+
+	@Override
+	public void setWriteListener(WriteListener listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void start() {
 		// Flatten the network
 		flatten();
 
@@ -235,7 +198,7 @@ public class JadeSimulatorImpl implements Simulator {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							orccProcess.write(line + "\n");
+							listener.writeText(line + "\n");
 						}
 					} finally {
 						reader.close();
@@ -256,7 +219,7 @@ public class JadeSimulatorImpl implements Simulator {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							orccProcess.write("Generation error :" + line
+							listener.writeText("Generation error :" + line
 									+ "\n");
 						}
 					} finally {
@@ -273,30 +236,6 @@ public class JadeSimulatorImpl implements Simulator {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
-		try {
-			// Get configuration attributes
-			stimulusFile = configuration.getAttribute(INPUT_STIMULUS, "");
-			vtlFolder = configuration.getAttribute(VTL_FOLDER, "");
-			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-			xdfFile = configuration.getAttribute(XDF_FILE, "");
-			tracesFolder = configuration.getAttribute(TRACES_FOLDER, "");
-			refVideo = configuration.getAttribute(REFERENCE_FILE, "");
-			execJade = new InstanceScope().getNode(OrccActivator.PLUGIN_ID)
-					.get(P_JADE, "");
-
-			// Jade location has not been set
-			if (execJade.equals("")) {
-				throw new OrccRuntimeException(
-						"Jade path must first be set in window->Preference->Orcc");
-			}
-		} catch (CoreException e) {
-			throw new OrccRuntimeException(e.getMessage());
-		}
-
 	}
 
 }

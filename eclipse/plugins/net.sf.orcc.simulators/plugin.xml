@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="simulators" name="simulators" schema="schema/simulators.exsd"/>
    <extension
          point="net.sf.orcc.core.options">
       <option
@@ -114,7 +115,7 @@
       </option>
    </extension>
    <extension
-         point="net.sf.orcc.core.simulators">
+         point="net.sf.orcc.simulators.simulators">
       <simulator
             class="net.sf.orcc.simulators.interpreter.InterpreterSimulatorImpl"
             name="Visitor interpreter and debugger">

@@ -42,6 +42,7 @@ import net.sf.orcc.plugins.impl.TextBoxOptionImpl;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Plugin;
 
 /**
  * A factory class that contains a list of plugins and their options. The
@@ -58,6 +59,11 @@ import org.eclipse.core.runtime.IConfigurationElement;
 public class PluginFactory {
 
 	/**
+	 * list of options.
+	 */
+	protected Map<String, PluginOption> options;
+
+	/**
 	 * list of options of a plugin.
 	 */
 	protected Map<String, List<PluginOption>> pluginOptions;
@@ -65,12 +71,11 @@ public class PluginFactory {
 	/**
 	 * list of plugins.
 	 */
-	protected final Map<String, Plugin> plugins = new TreeMap<String, Plugin>();
+	protected final Map<String, Object> plugins;
 
-	/**
-	 * list of options.
-	 */
-	protected Map<String, PluginOption> options;
+	protected PluginFactory() {
+		plugins = new TreeMap<String, Object>();
+	}
 
 	/**
 	 * Returns the list of options associated to the plugin with the given name.
@@ -82,78 +87,12 @@ public class PluginFactory {
 	}
 
 	/**
-	 * Indicate if a plugin contains the "deactivate front-end" option.
-	 * 
-	 * @return true if "deactivate front-end" is present otherwise false
-	 * @throws CoreException
-	 *             if something goes wrong
-	 */
-	public boolean hasFEOption(String plugin) throws CoreException {
-		List<PluginOption> options = getOptions(plugin);
-		if (options != null) {
-			// return the identifier of the first "browseFile" option
-			for (PluginOption option : options) {
-				if (option instanceof PluginOptionImpl) {
-					String id = option.getIdentifier();
-					if ((id.equals("net.sf.orcc.plugins.backends.deactivateFE"))
-							|| (id.equals("net.sf.orcc.plugins.simulators.deactivateFE"))) {
-						return true;
-					}
-				}
-			}
-		}
-		// Desactive FE is not present return false
-		return false;
-	}
-
-	/**
 	 * Returns the list of the names of registered backend or simulator plugins
 	 * 
 	 * @return the list of the names of registered backend or simulator plugins
 	 */
 	public List<String> listPlugins() {
 		return new ArrayList<String>(plugins.keySet());
-	}
-
-	/**
-	 * Returns the list of options referenced by the list of "option" elements.
-	 * 
-	 * @param elements
-	 *            a list of "option" elements
-	 * @return a list of options
-	 */
-	protected List<PluginOption> parsePluginOptions(
-			IConfigurationElement[] elements) {
-		List<PluginOption> pluginOptions = new ArrayList<PluginOption>();
-		for (IConfigurationElement element : elements) {
-			String id = element.getAttribute("id");
-			PluginOption option = options.get(id);
-			pluginOptions.add(option);
-		}
-
-		return pluginOptions;
-	}
-
-	/**
-	 * Parses the "plugin" elements as plugins.
-	 * 
-	 * @param elements
-	 *            a list of "plugin" elements
-	 */
-	protected void parsePlugins(IConfigurationElement[] elements) {
-		for (IConfigurationElement element : elements) {
-			String name = element.getAttribute("name");
-			IConfigurationElement[] optionLists = element.getChildren();
-			List<PluginOption> options = parsePluginOptions(optionLists);
-			this.pluginOptions.put(name, options);
-
-			try {
-				Object obj = element.createExecutableExtension("class");
-				plugins.put(name, (Plugin) obj);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	/**
@@ -185,20 +124,6 @@ public class PluginFactory {
 	 */
 	protected CheckboxOption parseCheckbox(IConfigurationElement element) {
 		CheckboxOption option = new CheckboxOptionImpl();
-		List<PluginOption> options = parseOptions(element.getChildren());
-		option.setOptions(options);
-		return option;
-	}
-
-	/**
-	 * Parses the given configuration element as a "textbox" option.
-	 * 
-	 * @param element
-	 *            a configuration element
-	 * @return a "textbox" option
-	 */
-	protected TextBoxOption parseTexbox(IConfigurationElement element) {
-		TextBoxOption option = new TextBoxOptionImpl();
 		List<PluginOption> options = parseOptions(element.getChildren());
 		option.setOptions(options);
 		return option;
@@ -299,5 +224,60 @@ public class PluginFactory {
 		}
 
 		return options;
+	}
+
+	/**
+	 * Returns the list of options referenced by the list of "option" elements.
+	 * 
+	 * @param elements
+	 *            a list of "option" elements
+	 * @return a list of options
+	 */
+	protected List<PluginOption> parsePluginOptions(
+			IConfigurationElement[] elements) {
+		List<PluginOption> pluginOptions = new ArrayList<PluginOption>();
+		for (IConfigurationElement element : elements) {
+			String id = element.getAttribute("id");
+			PluginOption option = options.get(id);
+			pluginOptions.add(option);
+		}
+
+		return pluginOptions;
+	}
+
+	/**
+	 * Parses the "plugin" elements as plugins.
+	 * 
+	 * @param elements
+	 *            a list of "plugin" elements
+	 */
+	protected void parsePlugins(IConfigurationElement[] elements) {
+		for (IConfigurationElement element : elements) {
+			String name = element.getAttribute("name");
+			IConfigurationElement[] optionLists = element.getChildren();
+			List<PluginOption> options = parsePluginOptions(optionLists);
+			this.pluginOptions.put(name, options);
+
+			try {
+				Object obj = element.createExecutableExtension("class");
+				plugins.put(name, (Plugin) obj);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Parses the given configuration element as a "textbox" option.
+	 * 
+	 * @param element
+	 *            a configuration element
+	 * @return a "textbox" option
+	 */
+	protected TextBoxOption parseTexbox(IConfigurationElement element) {
+		TextBoxOption option = new TextBoxOptionImpl();
+		List<PluginOption> options = parseOptions(element.getChildren());
+		option.setOptions(options);
+		return option;
 	}
 }

@@ -45,6 +45,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 
 /**
+ * This class implements a launch configuration delegate to launch a backend.
  * 
  * @author Matthieu Wipliez
  * 

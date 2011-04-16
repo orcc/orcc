@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension-point id="backends" name="backends" schema="schema/backends.exsd"/>
    <extension
-         point="net.sf.orcc.core.backends">
+         point="net.sf.orcc.backends.backends">
       <backend
             class="net.sf.orcc.backends.c.CBackendImpl"
             name="C">
