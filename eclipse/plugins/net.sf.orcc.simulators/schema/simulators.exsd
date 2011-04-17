@@ -65,7 +65,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":net.sf.orcc.plugins.simulators.Simulator"/>
+                  <meta.attribute kind="java" basedOn=":net.sf.orcc.simulators.Simulator"/>
                </appinfo>
             </annotation>
          </attribute>

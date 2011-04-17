@@ -30,7 +30,6 @@ package net.sf.orcc.simulators;
 
 import java.util.Map;
 
-import net.sf.orcc.plugins.simulators.Simulator;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;

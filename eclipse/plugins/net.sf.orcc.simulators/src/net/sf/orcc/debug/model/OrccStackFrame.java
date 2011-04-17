@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.debug.model;
 
-import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
+import net.sf.orcc.simulators.Simulator.DebugStackFrame;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;

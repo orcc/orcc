@@ -117,7 +117,7 @@
    <extension
          point="net.sf.orcc.simulators.simulators">
       <simulator
-            class="net.sf.orcc.simulators.interpreter.InterpreterSimulatorImpl"
+            class="net.sf.orcc.simulators.SlowInterpreter"
             name="Visitor interpreter and debugger">
          <option
                id="net.sf.orcc.simulators.enableTraces">

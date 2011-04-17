@@ -34,9 +34,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.plugins.simulators.Simulator;
-import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
-import net.sf.orcc.plugins.simulators.Simulator.SimulatorEvent;
+import net.sf.orcc.simulators.Simulator;
+import net.sf.orcc.simulators.Simulator.DebugStackFrame;
+import net.sf.orcc.simulators.Simulator.SimulatorEvent;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;

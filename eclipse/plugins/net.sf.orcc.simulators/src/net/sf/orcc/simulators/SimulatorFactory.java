@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins.simulators;
+package net.sf.orcc.simulators;
 
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
@@ -37,7 +37,6 @@ import java.util.Map;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.plugins.PluginFactory;
 import net.sf.orcc.plugins.PluginOption;
-import net.sf.orcc.simulators.Activator;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IConfigurationElement;
