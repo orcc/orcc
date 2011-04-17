@@ -28,13 +28,6 @@
  */
 package net.sf.orcc.debug.model;
 
-import net.sf.orcc.simulators.Simulator.DebugStackFrame;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -62,118 +55,42 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 	 * @param id
 	 *            stack frame id (0 is the bottom of the stack)
 	 */
-	public OrccStackFrame(OrccThread thread, DebugStackFrame frame, int id) {
+	public OrccStackFrame(OrccThread thread, int id) {
 		super((OrccDebugTarget) thread.getDebugTarget());
 		fId = id;
 		fThread = thread;
-		// fFileName = new File(frame.actorFilename).getName();
-		// Get relative path in the workspace :
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		if (frame.actorFilename.length() > 0) {
-			IFile file = root.getFileForLocation(new Path(frame.actorFilename));
-			fFileName = file.getProjectRelativePath().toString();
-		}else {
-			fFileName = "";
-		}
-		fLineNumber = frame.codeLine;
-		try {
-			fName = "ACTOR : " + thread.getActorName() + " (fired "
-					+ frame.nbOfFirings + " times) - " + "ACTION : "
-					+ frame.currentAction; // + " (line " + frame.codeLine +
-											// ")";
-		} catch (DebugException e) {
-			e.printStackTrace();
-		}
-		int numVars = frame.stateVars.size();
-		fVariables = new IVariable[numVars + 1];
-		OrccValue value = new OrccValue(
-				(OrccDebugTarget) thread.getDebugTarget(), frame.fsmState, null);
-		fVariables[0] = new OrccVariable(this, "FSM state", value);
-		String[] varNames = frame.stateVars.keySet().toArray(new String[0]);
-		for (int i = 1; i < numVars + 1; i++) {
-			Object var = frame.stateVars.get(varNames[i - 1]);
-			if ((var != null) && var.getClass().isArray()) {
-				IVariable[] subVars = null;
-				if (((Object[]) var).length < 1024 * 1024) {
-					subVars = new IVariable[((Object[]) var).length];
-					for (Integer j = 0; j < ((Object[]) var).length; j++) {
-						OrccValue subValue = new OrccValue(
-								(OrccDebugTarget) thread.getDebugTarget(),
-								((Object[]) var)[j], null);
-						subVars[j] = new OrccVariable(this, j.toString(),
-								subValue);
-					}
-				}
-				value = new OrccValue(
-						(OrccDebugTarget) thread.getDebugTarget(), var, subVars);
-			} else {
-				value = new OrccValue(
-						(OrccDebugTarget) thread.getDebugTarget(), var, null);
-			}
-			fVariables[i] = new OrccVariable(this, varNames[i - 1], value);
-		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
-	 */
+	@Override
 	public boolean canResume() {
 		return getThread().canResume();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#canStepInto()
-	 */
+	@Override
 	public boolean canStepInto() {
 		return getThread().canStepInto();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#canStepOver()
-	 */
+	@Override
 	public boolean canStepOver() {
 		return getThread().canStepOver();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#canStepReturn()
-	 */
+	@Override
 	public boolean canStepReturn() {
 		return getThread().canStepReturn();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
-	 */
+	@Override
 	public boolean canSuspend() {
 		return getThread().canSuspend();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
-	 */
+	@Override
 	public boolean canTerminate() {
 		return getThread().canTerminate();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof OrccStackFrame) {
@@ -188,20 +105,12 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getCharEnd()
-	 */
+	@Override
 	public int getCharEnd() throws DebugException {
 		return -1;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getCharStart()
-	 */
+	@Override
 	public int getCharStart() throws DebugException {
 		return -1;
 	}
@@ -215,29 +124,17 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 		return fId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getLineNumber()
-	 */
+	@Override
 	public int getLineNumber() throws DebugException {
 		return fLineNumber;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getName()
-	 */
+	@Override
 	public String getName() throws DebugException {
 		return fName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getRegisterGroups()
-	 */
+	@Override
 	public IRegisterGroup[] getRegisterGroups() throws DebugException {
 		return null;
 	}
@@ -251,130 +148,74 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 		return fFileName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getThread()
-	 */
+	@Override
 	public IThread getThread() {
 		return fThread;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getVariables()
-	 */
+	@Override
 	public IVariable[] getVariables() throws DebugException {
 		return fVariables;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		return getSourceName().hashCode() + fId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#hasRegisterGroups()
-	 */
+	@Override
 	public boolean hasRegisterGroups() throws DebugException {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#hasVariables()
-	 */
+	@Override
 	public boolean hasVariables() throws DebugException {
 		return fVariables.length > 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#isStepping()
-	 */
+	@Override
 	public boolean isStepping() {
 		return getThread().isStepping();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
-	 */
+	@Override
 	public boolean isSuspended() {
 		return getThread().isSuspended();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
-	 */
+	@Override
 	public boolean isTerminated() {
 		return getThread().isTerminated();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
-	 */
+	@Override
 	public void resume() throws DebugException {
 		getThread().resume();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#stepInto()
-	 */
+	@Override
 	public void stepInto() throws DebugException {
 		getThread().stepInto();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#stepOver()
-	 */
+	@Override
 	public void stepOver() throws DebugException {
 		getThread().stepOver();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#stepReturn()
-	 */
+	@Override
 	public void stepReturn() throws DebugException {
 		getThread().stepReturn();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
-	 */
+	@Override
 	public void suspend() throws DebugException {
 		getThread().suspend();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
-	 */
+	@Override
 	public void terminate() throws DebugException {
 		getThread().terminate();
 	}
+
 }

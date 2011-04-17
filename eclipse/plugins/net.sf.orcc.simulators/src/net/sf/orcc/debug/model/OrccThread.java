@@ -72,56 +72,32 @@ public class OrccThread extends OrccDebugElement implements IThread {
 		this.actorName = actorName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
-	 */
+	@Override
 	public boolean canResume() {
 		return isSuspended() && !isStepping();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#canStepInto()
-	 */
+	@Override
 	public boolean canStepInto() {
 		return isSuspended() && !isStepping();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#canStepOver()
-	 */
+	@Override
 	public boolean canStepOver() {
 		return isSuspended() && !isStepping();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#canStepReturn()
-	 */
+	@Override
 	public boolean canStepReturn() {
 		return isSuspended() && !isStepping();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
-	 */
+	@Override
 	public boolean canSuspend() {
 		return !isSuspended();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
-	 */
+	@Override
 	public boolean canTerminate() {
 		return target.canTerminate();
 	}
@@ -130,11 +106,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 		return actorName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getBreakpoints()
-	 */
+	@Override
 	public IBreakpoint[] getBreakpoints() {
 		if (breakpoints == null) {
 			return new IBreakpoint[0];
@@ -142,43 +114,26 @@ public class OrccThread extends OrccDebugElement implements IThread {
 		return breakpoints;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getName()
-	 */
+	@Override
 	public String getName() throws DebugException {
 		return threadId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getPriority()
-	 */
+	@Override
 	public int getPriority() throws DebugException {
 		return 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getStackFrames()
-	 */
+	@Override
 	public IStackFrame[] getStackFrames() throws DebugException {
 		if (isSuspended()) {
-			return new IStackFrame[] { new OrccStackFrame(this,
-					target.getStackFrame(threadId), 0) };
+			return new IStackFrame[0];
 		} else {
 			return new IStackFrame[0];
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getTopStackFrame()
-	 */
+	@Override
 	public IStackFrame getTopStackFrame() throws DebugException {
 		IStackFrame[] frames = getStackFrames();
 		if (frames.length > 0) {
@@ -187,47 +142,27 @@ public class OrccThread extends OrccDebugElement implements IThread {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#hasStackFrames()
-	 */
+	@Override
 	public boolean hasStackFrames() throws DebugException {
 		return isSuspended();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#isStepping()
-	 */
+	@Override
 	public boolean isStepping() {
-		return target.isStepping() && !isTerminated();
+		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
-	 */
+	@Override
 	public boolean isSuspended() {
 		return target.isSuspended() && !isTerminated();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
-	 */
+	@Override
 	public boolean isTerminated() {
 		return target.isTerminated();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
-	 */
+	@Override
 	public void resume() throws DebugException {
 		target.resume();
 	}
@@ -244,48 +179,29 @@ public class OrccThread extends OrccDebugElement implements IThread {
 		this.breakpoints = breakpoints;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#stepInto()
-	 */
+	@Override
 	public void stepInto() throws DebugException {
 		target.stepInto(threadId);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#stepOver()
-	 */
+	@Override
 	public void stepOver() throws DebugException {
 		target.stepOver(threadId);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStep#stepReturn()
-	 */
+	@Override
 	public void stepReturn() throws DebugException {
 		target.stepReturn(threadId);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
-	 */
+	@Override
 	public void suspend() throws DebugException {
 		target.suspend();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
-	 */
+	@Override
 	public void terminate() throws DebugException {
 		target.terminate();
 	}
+
 }

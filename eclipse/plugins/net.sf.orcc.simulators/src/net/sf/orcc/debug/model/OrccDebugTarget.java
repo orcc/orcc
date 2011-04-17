@@ -31,12 +31,9 @@ package net.sf.orcc.debug.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.simulators.Simulator;
-import net.sf.orcc.simulators.Simulator.DebugStackFrame;
-import net.sf.orcc.simulators.Simulator.SimulatorEvent;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -75,6 +72,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 
 	// threads
 	private IThread[] fThreads;
+
 	private Map<String, OrccThread> threadMap;
 
 	/**
@@ -100,47 +98,19 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		fProcess = process;
 		fSimulator = simulator;
 		threadMap = new HashMap<String, OrccThread>();
-		List<String> threadIds = fSimulator.getActorsInstanceIds();
-		fThreads = new IThread[threadIds.size()];
-		int idx = 0;
-		for (String threadId : threadIds) {
-			fThreads[idx] = new OrccThread(this, threadId,
-					fSimulator.getActorName(threadId));
-			threadMap.put(threadId, (OrccThread) fThreads[idx]);
-			idx++;
-		}
+
 		DebugPlugin.getDefault().getBreakpointManager()
 				.addBreakpointListener(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse
-	 * .debug.core.model.IBreakpoint)
-	 */
+	@Override
 	public void breakpointAdded(IBreakpoint breakpoint) {
 		if (supportsBreakpoint(breakpoint)) {
-			try {
-				if (breakpoint.isEnabled()) {
-					Object[] data = new Object[2];
-					data[0] = breakpoint.getMarker().getResource().getName();
-					data[1] = (((ILineBreakpoint) breakpoint).getLineNumber());
-					fSimulator.message(SimulatorEvent.SET_BREAKPOINT, data);
-				}
-			} catch (CoreException e) {
-			}
+
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse
-	 * .debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
-	 */
+	@Override
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
 		if (supportsBreakpoint(breakpoint)) {
 			try {
@@ -188,141 +158,69 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse
-	 * .debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
-	 */
+	@Override
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
 		if (supportsBreakpoint(breakpoint)) {
-			try {
-				Object[] data = new Object[2];
-				data[0] = breakpoint.getMarker().getResource().getName();
-				data[1] = (((ILineBreakpoint) breakpoint).getLineNumber());
-				fSimulator.message(SimulatorEvent.CLEAR_BREAKPOINT, data);
-			} catch (CoreException e) {
-			}
+
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDisconnect#canDisconnect()
-	 */
+	@Override
 	public boolean canDisconnect() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
-	 */
+	@Override
 	public boolean canResume() {
 		return !isTerminated() && isSuspended();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
-	 */
+	@Override
 	public boolean canSuspend() {
 		return !isTerminated() && !isSuspended();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
-	 */
+	@Override
 	public boolean canTerminate() {
 		return getProcess().canTerminate();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDisconnect#disconnect()
-	 */
+	@Override
 	public void disconnect() throws DebugException {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
-	 */
 	@Override
 	public IDebugTarget getDebugTarget() {
 		return this;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
-	 */
 	@Override
 	public ILaunch getLaunch() {
 		return fLaunch;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.core.model.IMemoryBlockRetrieval#getMemoryBlock(long,
-	 * long)
-	 */
+	@Override
 	public IMemoryBlock getMemoryBlock(long startAddress, long length)
 			throws DebugException {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugTarget#getName()
-	 */
+	@Override
 	public String getName() throws DebugException {
-		String name = fSimulator.getNetworkName();
-		if (name == null) {
-			name = "RVC-CAL model";
-		}
-		return name;
+		return "";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugTarget#getProcess()
-	 */
+	@Override
 	public IProcess getProcess() {
 		return fProcess;
 	}
 
-	public DebugStackFrame getStackFrame(String instanceId) {
-		return fSimulator.getStackFrame(instanceId);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugTarget#getThreads()
-	 */
+	@Override
 	public IThread[] getThreads() throws DebugException {
 		return fThreads;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
-	 */
+	@Override
 	public boolean hasThreads() throws DebugException {
 		return true;
 	}
@@ -339,49 +237,23 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDisconnect#isDisconnected()
-	 */
+	@Override
 	public boolean isDisconnected() {
 		return false;
 	}
 
-	/**
-	 * Check if any debug thread is currently stepping
-	 * 
-	 * @return
-	 */
-	public boolean isStepping() {
-		return fSimulator.isStepping();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
-	 */
+	@Override
 	public boolean isSuspended() {
 		return fSuspended;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
-	 */
+	@Override
 	public boolean isTerminated() {
 		fTerminated = getProcess().isTerminated();
 		return fTerminated;
 	}
 
-	/**
-	 * Listen to the properties changes from target simulator
-	 * 
-	 * @param event
-	 *            : received event from target simulator plugin
-	 */
+	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		OrccThread orccThread = threadMap.get(event.getNewValue());
 		if (orccThread != null) {
@@ -412,13 +284,8 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
-	 */
+	@Override
 	public void resume() throws DebugException {
-		fSimulator.message(SimulatorEvent.RESUME, null);
 	}
 
 	/**
@@ -459,7 +326,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 *             if the request fails
 	 */
 	protected void step() throws DebugException {
-		fSimulator.message(SimulatorEvent.STEP_ALL, null);
 	}
 
 	/**
@@ -469,9 +335,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @throws DebugException
 	 */
 	protected void stepInto(String instanceId) throws DebugException {
-		Object[] data = new Object[1];
-		data[0] = instanceId;
-		fSimulator.message(SimulatorEvent.STEP_INTO, data);
 	}
 
 	/**
@@ -481,9 +344,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @throws DebugException
 	 */
 	protected void stepOver(String instanceId) throws DebugException {
-		Object[] data = new Object[1];
-		data[0] = instanceId;
-		fSimulator.message(SimulatorEvent.STEP_OVER, data);
 	}
 
 	/**
@@ -493,18 +353,9 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @throws DebugException
 	 */
 	protected void stepReturn(String instanceId) throws DebugException {
-		Object[] data = new Object[1];
-		data[0] = instanceId;
-		fSimulator.message(SimulatorEvent.STEP_RETURN, data);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.core.model.IDebugTarget#supportsBreakpoint(org.eclipse
-	 * .debug.core.model.IBreakpoint)
-	 */
+	@Override
 	public boolean supportsBreakpoint(IBreakpoint breakpoint) {
 		if (breakpoint.getModelIdentifier().equals(ID_ORCC_DEBUG_MODEL)) {
 			IMarker marker = breakpoint.getMarker();
@@ -523,24 +374,13 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.core.model.IMemoryBlockRetrieval#supportsStorageRetrieval
-	 * ()
-	 */
+	@Override
 	public boolean supportsStorageRetrieval() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
-	 */
+	@Override
 	public void suspend() throws DebugException {
-		fSimulator.message(SimulatorEvent.SUSPEND, null);
 	}
 
 	/**
@@ -557,13 +397,8 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		fireSuspendEvent(detail);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
-	 */
+	@Override
 	public void terminate() throws DebugException {
-		fSimulator.message(SimulatorEvent.TERMINATE, null);
 	}
 
 	/**
@@ -576,4 +411,5 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 				.removeBreakpointListener(this);
 		fireTerminateEvent();
 	}
+
 }
