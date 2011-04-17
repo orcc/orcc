@@ -36,6 +36,7 @@ import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -107,6 +108,11 @@ public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseExprUnary(ExprUnary expr) {
 		expr.setExpr(doSwitch(expr.getExpr()));
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprVar(ExprVar expr) {
 		return expr;
 	}
 

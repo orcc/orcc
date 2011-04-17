@@ -30,7 +30,13 @@ package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -84,6 +90,31 @@ public class ExpressionSplitterTransformation extends
 	}
 
 	@Override
+	public Expression caseExprBool(ExprBool expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprFloat(ExprFloat expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprInt(ExprInt expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprList(ExprList expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprString(ExprString expr) {
+		return expr;
+	}
+
+	@Override
 	public Expression caseExprUnary(ExprUnary expr) {
 		expr.setExpr(doSwitch(expr.getExpr()));
 
@@ -96,6 +127,11 @@ public class ExpressionSplitterTransformation extends
 				.createInstAssign(target, transformUnaryExpr(expr)));
 
 		return IrFactory.eINSTANCE.createExprVar(target);
+	}
+
+	@Override
+	public Expression caseExprVar(ExprVar expr) {
+		return expr;
 	}
 
 	@Override
