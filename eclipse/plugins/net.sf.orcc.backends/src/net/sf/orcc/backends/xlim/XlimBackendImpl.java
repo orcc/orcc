@@ -39,6 +39,7 @@ import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
 import net.sf.orcc.backends.xlim.transformations.ArrayInitializeTransformation;
@@ -49,7 +50,6 @@ import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
 import net.sf.orcc.backends.xlim.transformations.TernaryOperationAdder;
 import net.sf.orcc.backends.xlim.transformations.UnaryListToScalarTransformation;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
-import net.sf.orcc.backends.xlim.transformations.XlimInlineTransformation;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BuildCFG;
@@ -110,7 +110,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		ActorVisitor<?>[] transformations = {
 				new ArrayInitializeTransformation(),
 				new TernaryOperationAdder(),
-				new XlimInlineTransformation(true, true),
+				new InlineTransformation(true, true),
 				new UnaryListToScalarTransformation(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattenTransformation(),

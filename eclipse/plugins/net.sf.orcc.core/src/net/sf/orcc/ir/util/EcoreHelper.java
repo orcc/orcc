@@ -56,23 +56,65 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 public class EcoreHelper {
 
 	/**
-	 * Returns a deep copy of the given expressions, and updates uses.
+	 * Add the given instruction before the given expression. If the expression
+	 * is contained by an instruction then the instruction to add is put
+	 * directly before, else the instruction is put to the previous nodeblock
+	 * which is created if needed.
 	 * 
-	 * @param expressions
-	 *            a list of expressions
-	 * @return a deep copy of the given expressions with uses correctly updated
+	 * @param expression
+	 *            an expression
+	 * @param instruction
+	 *            the instruction to add before the given expression
 	 */
-	public static Collection<Expression> copy(Collection<Expression> expressions) {
+	public static void addInstBeforeExpr(Expression expression,
+			Instruction instruction) {
+		Instruction instContainer = EcoreHelper.getContainerOfType(expression,
+				Instruction.class);
+		if (instContainer != null) {
+			List<Instruction> instructions = EcoreHelper
+					.getContainingList(instContainer);
+			instructions.add(instructions.indexOf(instContainer), instruction);
+		} else {
+			Node nodeContainer = EcoreHelper.getContainerOfType(expression,
+					Node.class);
+			List<Node> nodes = EcoreHelper.getContainingList(nodeContainer);
+			int index = nodes.indexOf(nodeContainer);
+			if (index > 0) {
+				Node previousNode = nodes.get(index - 1);
+				if (previousNode.isBlockNode()) {
+					((NodeBlock) previousNode).add(instruction);
+					return;
+				}
+			}
+			NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
+			nodeBlock.add(instruction);
+			nodes.add(index, nodeBlock);
+		}
+	}
+
+	/**
+	 * Returns a deep copy of the given objects, and updates def/use chains.
+	 * 
+	 * @param eObjects
+	 *            a list of objects
+	 * @return a deep copy of the given objects with def/use chains correctly
+	 *         updated
+	 */
+	public static <T extends EObject> Collection<T> copy(Collection<T> eObjects) {
 		Copier copier = new Copier();
-		Collection<Expression> result = copier.copyAll(expressions);
+		Collection<T> result = copier.copyAll(eObjects);
 		copier.copyReferences();
 
-		TreeIterator<EObject> it = EcoreUtil.getAllContents(expressions, true);
+		TreeIterator<EObject> it = EcoreUtil.getAllContents(eObjects);
 		while (it.hasNext()) {
-			EObject obj = it.next();
+			EObject object = it.next();
 
-			if (obj instanceof Use) {
-				Use use = (Use) obj;
+			if (object instanceof Def) {
+				Def def = (Def) object;
+				Def copyDef = (Def) copier.get(def);
+				copyDef.setVariable(def.getVariable());
+			} else if (object instanceof Use) {
+				Use use = (Use) object;
 				Use copyUse = (Use) copier.get(use);
 				copyUse.setVariable(use.getVariable());
 			}
@@ -88,17 +130,22 @@ public class EcoreHelper {
 	 *            an expression
 	 * @return a deep copy of the given expression with uses correctly updated
 	 */
-	public static Expression copy(Expression expression) {
+	public static <T extends EObject> T copy(T eObject) {
 		Copier copier = new Copier();
-		Expression result = (Expression) copier.copy(expression);
+		@SuppressWarnings("unchecked")
+		T result = (T) copier.copy(eObject);
 		copier.copyReferences();
 
-		TreeIterator<EObject> it = EcoreUtil.getAllContents(expression, true);
+		TreeIterator<EObject> it = EcoreUtil.getAllContents(eObject, true);
 		while (it.hasNext()) {
-			EObject obj = it.next();
+			EObject object = it.next();
 
-			if (obj instanceof Use) {
-				Use use = (Use) obj;
+			if (object instanceof Def) {
+				Def def = (Def) object;
+				Def copyDef = (Def) copier.get(def);
+				copyDef.setVariable(def.getVariable());
+			} else if (object instanceof Use) {
+				Use use = (Use) object;
 				Use copyUse = (Use) copier.get(use);
 				copyUse.setVariable(use.getVariable());
 			}
@@ -241,40 +288,4 @@ public class EcoreHelper {
 		}
 	}
 
-	/**
-	 * Add the given instruction before the given expression. If the expression
-	 * is contained by an instruction then the instruction to add is put
-	 * directly before, else the instruction is put to the previous nodeblock
-	 * which is created if needed.
-	 * 
-	 * @param expression
-	 *            an expression
-	 * @param instruction
-	 *            the instruction to add before the given expression
-	 */
-	public static void addInstBeforeExpr(Expression expression,
-			Instruction instruction) {
-		Instruction instContainer = EcoreHelper.getContainerOfType(expression,
-				Instruction.class);
-		if (instContainer != null) {
-			List<Instruction> instructions = EcoreHelper
-					.getContainingList(instContainer);
-			instructions.add(instructions.indexOf(instContainer), instruction);
-		} else {
-			Node nodeContainer = EcoreHelper.getContainerOfType(expression,
-					Node.class);
-			List<Node> nodes = EcoreHelper.getContainingList(nodeContainer);
-			int index = nodes.indexOf(nodeContainer);
-			if (index > 0) {
-				Node previousNode = nodes.get(index - 1);
-				if (previousNode.isBlockNode()) {
-					((NodeBlock) previousNode).add(instruction);
-					return;
-				}
-			}
-			NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
-			nodeBlock.add(instruction);
-			nodes.add(index, nodeBlock);
-		}
-	}
 }
