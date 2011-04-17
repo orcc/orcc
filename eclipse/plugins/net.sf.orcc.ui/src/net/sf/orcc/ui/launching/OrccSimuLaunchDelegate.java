@@ -35,7 +35,7 @@ import java.util.Map;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccProcess;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.plugins.simulators.SimulatorFactory;
+import net.sf.orcc.simulators.SimulatorFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;

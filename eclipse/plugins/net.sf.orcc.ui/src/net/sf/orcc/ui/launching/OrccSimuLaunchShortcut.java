@@ -37,7 +37,7 @@ import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.plugins.simulators.SimulatorFactory;
+import net.sf.orcc.simulators.SimulatorFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
