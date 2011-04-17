@@ -202,7 +202,6 @@ public class OrccProcess extends PlatformObject implements IProcess,
 
 	@Override
 	public void terminate() throws DebugException {
-		monitor.setCanceled(true);
 		terminated = true;
 
 		DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
