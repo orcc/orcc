@@ -38,8 +38,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +54,7 @@ import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -153,19 +152,7 @@ public abstract class AbstractBackend implements Backend {
 
 		// lists actors
 		write("Lists actors...\n");
-		List<File> vtlFiles = new ArrayList<File>();
-		for (String folder : vtlFolders) {
-			findFiles(vtlFiles, new File(folder));
-		}
-
-		Collections.sort(vtlFiles, new Comparator<File>() {
-
-			@Override
-			public int compare(File f1, File f2) {
-				return f1.compareTo(f2);
-			}
-
-		});
+		List<File> vtlFiles = OrccUtil.getAllFilenames(vtlFolders);
 		doVtlCodeGeneration(vtlFiles);
 	}
 
@@ -267,16 +254,6 @@ public abstract class AbstractBackend implements Backend {
 			return numCached;
 		} catch (InterruptedException e) {
 			throw new OrccException("actors could not be printed", e);
-		}
-	}
-
-	private void findFiles(List<File> vtlFiles, File vtl) {
-		for (File file : vtl.listFiles()) {
-			if (file.isDirectory()) {
-				findFiles(vtlFiles, file);
-			} else if (file.getName().endsWith(".json")) {
-				vtlFiles.add(file);
-			}
 		}
 	}
 

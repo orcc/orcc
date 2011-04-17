@@ -28,12 +28,16 @@
  */
 package net.sf.orcc.util;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -55,6 +59,83 @@ import org.stringtemplate.v4.STGroupFile;
  * 
  */
 public class OrccUtil {
+
+	private static void findFiles(List<File> vtlFiles, File vtl) {
+		for (File file : vtl.listFiles()) {
+			if (file.isDirectory()) {
+				findFiles(vtlFiles, file);
+			} else if (file.getName().endsWith(".json")) {
+				vtlFiles.add(file);
+			}
+		}
+	}
+
+	private static void findFiles(List<IFile> vtlFiles, IFolder vtl)
+			throws CoreException {
+		for (IResource resource : vtl.members()) {
+			if (resource.getType() == IResource.FOLDER) {
+				findFiles(vtlFiles, (IFolder) resource);
+			} else if (resource.getType() == IResource.FILE
+					&& resource.getFileExtension().equals("json")) {
+				vtlFiles.add((IFile) resource);
+			}
+		}
+	}
+
+	/**
+	 * Returns all the IR files in the given folders.
+	 * 
+	 * @param srcFolders
+	 *            a list of folders
+	 * @return a list of files
+	 */
+	public static List<File> getAllFilenames(List<String> srcFolders) {
+		List<File> vtlFiles = new ArrayList<File>();
+		for (String folder : srcFolders) {
+			findFiles(vtlFiles, new File(folder));
+		}
+
+		// sort them by name
+		Collections.sort(vtlFiles, new Comparator<File>() {
+
+			@Override
+			public int compare(File f1, File f2) {
+				return f1.compareTo(f2);
+			}
+
+		});
+
+		return vtlFiles;
+	}
+
+	/**
+	 * Returns all the IR files in the given folders.
+	 * 
+	 * @param srcFolders
+	 *            a list of folders
+	 * @return a list of files
+	 * @throws CoreException
+	 */
+	public static List<IFile> getAllFiles(List<IFolder> srcFolders)
+			throws CoreException {
+		List<IFile> vtlFiles = new ArrayList<IFile>();
+		for (IFolder folder : srcFolders) {
+			findFiles(vtlFiles, folder);
+		}
+
+		// sort them by name
+		Collections.sort(vtlFiles, new Comparator<IFile>() {
+
+			@Override
+			public int compare(IFile f1, IFile f2) {
+				return f1.getFullPath().toOSString()
+						.compareTo(f2.getFullPath().toOSString());
+			}
+
+		});
+
+		return vtlFiles;
+	}
 
 	/**
 	 * Returns the list of ALL source folders of the required projects as well
