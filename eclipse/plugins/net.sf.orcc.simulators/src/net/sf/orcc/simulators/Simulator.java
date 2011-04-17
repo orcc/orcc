@@ -69,7 +69,10 @@ public interface Simulator {
 
 	/**
 	 * Starts the simulation.
+	 * 
+	 * @param mode
+	 *            mode is "run" or "debug"
 	 */
-	void start();
+	void start(String mode);
 
 }

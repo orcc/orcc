@@ -43,7 +43,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 
 /**
@@ -62,47 +61,41 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		OrccProcess process = new OrccProcess(launch, configuration, monitor);
 		launch.addProcess(process);
 
-		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-			
-		} else {
+		try {
+			String simulatorName = configuration.getAttribute(SIMULATOR, "");
+
+			monitor.subTask("Launching simulator...");
+			process.writeText("\n");
+			process.writeText("*********************************************"
+					+ "**********************************\n");
+			process.writeText("Launching " + simulatorName + "...\n");
+
 			try {
-				String simulatorName = configuration
-						.getAttribute(SIMULATOR, "");
+				SimulatorFactory factory = SimulatorFactory.getInstance();
+				factory.runSimulator(monitor, process, mode,
+						(Map<String, Object>) configuration.getAttributes());
+			} catch (Exception e) {
+				// clear actor pool because it might not have been done if
+				// we got an error too soon
+				Network.clearActorPool();
+				monitor.setCanceled(true);
 
-				monitor.subTask("Launching simulator...");
-				process.writeText("\n");
-				process.writeText("*********************************************"
-						+ "**********************************\n");
-				process.writeText("Launching " + simulatorName + "...\n");
-
-				try {
-					SimulatorFactory factory = SimulatorFactory.getInstance();
-					factory.runSimulator(monitor, process,
-							(Map<String, Object>) configuration.getAttributes());
-				} catch (Exception e) {
-					// clear actor pool because it might not have been done if
-					// we got an error too soon
-					Network.clearActorPool();
-
-					Throwable throwable = e;
-					StringBuilder builder = new StringBuilder();
-					while (throwable != null
-							&& throwable.getCause() != throwable) {
-						builder.append(throwable.getLocalizedMessage());
-						builder.append('\n');
-						throwable = throwable.getCause();
-					}
-
-					IStatus status = new Status(IStatus.ERROR,
-							OrccActivator.PLUGIN_ID, simulatorName
-									+ " simulation error: "
-									+ builder.toString());
-					throw new CoreException(status);
+				Throwable throwable = e;
+				StringBuilder builder = new StringBuilder();
+				while (throwable != null && throwable.getCause() != throwable) {
+					builder.append(throwable.getLocalizedMessage());
+					builder.append('\n');
+					throwable = throwable.getCause();
 				}
-				process.writeText("Orcc backend done.");
-			} finally {
-				process.terminate();
+
+				IStatus status = new Status(IStatus.ERROR,
+						OrccActivator.PLUGIN_ID, simulatorName
+								+ " simulation error: " + builder.toString());
+				throw new CoreException(status);
 			}
+			process.writeText("Orcc backend done.");
+		} finally {
+			process.terminate();
 		}
 	}
 }

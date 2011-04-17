@@ -97,7 +97,7 @@ public class SimulatorFactory extends PluginFactory {
 	 * @throws Exception
 	 */
 	public void runSimulator(IProgressMonitor monitor, WriteListener listener,
-			Map<String, Object> options) throws Exception {
+			String mode, Map<String, Object> options) throws Exception {
 		// Get the simulator plugin
 		String simulatorName = (String) options.get(SIMULATOR);
 		Simulator simulator = (Simulator) plugins.get(simulatorName);
@@ -105,7 +105,7 @@ public class SimulatorFactory extends PluginFactory {
 		simulator.setOptions(options);
 		simulator.setProgressMonitor(monitor);
 		simulator.setWriteListener(listener);
-		simulator.start();
+		simulator.start(mode);
 	}
 
 }

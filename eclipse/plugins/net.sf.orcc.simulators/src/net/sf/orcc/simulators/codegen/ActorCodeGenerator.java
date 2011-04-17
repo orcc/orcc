@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,53 +26,43 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.simulators;
+package net.sf.orcc.simulators.codegen;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.BundleContext;
+import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
+import static org.objectweb.asm.Opcodes.V1_6;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
+
+import org.objectweb.asm.ClassWriter;
 
 /**
- * The activator class controls the plug-in life cycle
+ * This class defines an actor code generator using ASM.
+ * 
+ * @author Matthieu Wipliez
+ * 
  */
-public class Activator extends AbstractUIPlugin {
-
-	// The plug-in ID
-	public static final String PLUGIN_ID = "net.sf.orcc.simulators"; //$NON-NLS-1$
-
-	// The shared instance
-	private static Activator plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+public class ActorCodeGenerator extends AbstractActorVisitor<Object> {
 
 	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
+	 * Returns bytecode for the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @return the bytecode for the given actor
 	 */
-	public static Activator getDefault() {
-		return plugin;
+	public InputStream generate(Actor actor) {
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		cw.visit(V1_6, ACC_PUBLIC, "MPEG/MPEG4/part2/Algo_Add", null,
+				"java/lang/Object", null);
+		cw.visitSource(new File(actor.getFile()).getName(), null);
+
+		byte[] code = cw.toByteArray();
+		return new ByteArrayInputStream(code);
 	}
 
 }

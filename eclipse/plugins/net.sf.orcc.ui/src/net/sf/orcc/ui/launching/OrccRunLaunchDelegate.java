@@ -73,9 +73,9 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 						(Map<String, Object>) configuration.getAttributes());
 			} catch (Exception e) {
 				// clear actor pool because it might not have been done if we
-				// got an
-				// error too soon
+				// got an error too soon
 				Network.clearActorPool();
+				monitor.setCanceled(true);
 
 				IStatus status = new Status(IStatus.ERROR,
 						OrccActivator.PLUGIN_ID, backend

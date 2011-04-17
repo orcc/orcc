@@ -213,7 +213,7 @@ public class SlowInterpreter extends AbstractSimulator {
 	}
 
 	@Override
-	public void start() {
+	public void start(String mode) {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
 			Network network = new XDFParser(xdfFile).parseNetwork();

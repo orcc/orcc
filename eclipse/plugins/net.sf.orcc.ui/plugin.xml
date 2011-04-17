@@ -92,9 +92,7 @@
             id="net.sf.orcc.simuLaunchConfigurationType"
             modes="debug, run"
             name="Orcc simulation"
-            public="true"
-            sourceLocatorId="net.sf.orcc.debug.sourceLookupDirector.cal"
-            sourcePathComputerId="net.sf.orcc.debug.sourcePathComputer.cal">
+            public="true">
       </launchConfigurationType>
    </extension>
    <extension
@@ -620,5 +618,18 @@
                tab="net.sf.orcc.ui.properties.tab.graph.variables">
          </propertySection>
       </propertySections>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="net.sf.orcc.CalEditor.BreakpointRulerActions"
+            targetID="net.sf.orcc.cal.Cal">
+         <action
+               actionID="RulerDoubleClick"
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+               id="net.sf.orcc.ui.actions.ManageBreakpointRulerAction"
+               label="Add breakpoint">
+         </action>
+      </editorContribution>
    </extension>
 </plugin>
