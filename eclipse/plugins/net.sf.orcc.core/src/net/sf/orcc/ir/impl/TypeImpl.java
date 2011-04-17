@@ -34,8 +34,6 @@ import java.util.List;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.util.TypeInterpreter;
-import net.sf.orcc.ir.util.TypeVisitor;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
@@ -56,12 +54,6 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 	protected TypeImpl() {
 		super();
 	}
-
-	@Override
-	public abstract Object accept(TypeInterpreter interpreter);
-
-	@Override
-	public abstract void accept(TypeVisitor visitor);
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

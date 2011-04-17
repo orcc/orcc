@@ -6,12 +6,10 @@
  */
 package net.sf.orcc.ir.impl;
 
-import java.lang.String;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.util.ExpressionInterpreter;
 import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -55,12 +53,6 @@ public class ExprStringImpl extends ExpressionImpl implements ExprString {
 	 */
 	protected ExprStringImpl() {
 		super();
-	}
-
-	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
-		System.err.println("ExprStringImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this, args);
 	}
 
 	@Override

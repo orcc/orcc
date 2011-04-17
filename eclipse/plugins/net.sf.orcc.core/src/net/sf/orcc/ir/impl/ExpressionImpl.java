@@ -30,7 +30,6 @@ package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.util.ExpressionInterpreter;
 import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.ecore.EClass;
@@ -52,10 +51,6 @@ public abstract class ExpressionImpl extends EObjectImpl implements Expression {
 	protected ExpressionImpl() {
 		super();
 	}
-
-	@Override
-	public abstract Object accept(ExpressionInterpreter interpreter,
-			Object... args);
 
 	@Override
 	public abstract void accept(ExpressionVisitor visitor, Object... args);

@@ -65,7 +65,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
-import net.sf.orcc.ir.util.ExpressionInterpreter;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;
@@ -84,64 +83,14 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
-	private class JavaExpressionConverter implements ExpressionInterpreter {
-
-		@Override
-		public Object interpret(ExprBinary expr, Object... args) {
-			return null;
-		}
-
-		@Override
-		public Object interpret(ExprBool expr, Object... args) {
-			return expr.isValue();
-		}
-
-		@Override
-		public Object interpret(ExprFloat expr, Object... args) {
-			return expr.getValue();
-		}
-
-		@Override
-		public Object interpret(ExprInt expr, Object... args) {
-			return expr.getIntValue();
-		}
-
-		@Override
-		public Object interpret(ExprList expr, Object... args) {
-			Object[] values = new Object[expr.getValue().size()];
-			int i = 0;
-			for (Expression subExpr : expr.getValue()) {
-				if (subExpr != null) {
-					values[i] = subExpr.accept(this);
-				}
-				i++;
-			}
-			return values;
-		}
-
-		@Override
-		public Object interpret(ExprString expr, Object... args) {
-			return expr.getValue();
-		}
-
-		@Override
-		public Object interpret(ExprUnary expr, Object... args) {
-			return null;
-		}
-
-		@Override
-		public Object interpret(ExprVar expr, Object... args) {
-			return expr.getUse().getVariable().getValue().accept(this);
-		}
-
-	}
-
 	/**
-	 * Actor's Intermediate Representation duplication for "inline" visiting
-	 * interpretation
+	 * actor being interpreted
 	 */
 	private Actor actor;
 
+	/**
+	 * branch being visited
+	 */
 	protected int branch;
 
 	protected ExpressionEvaluator exprInterpreter;
@@ -155,7 +104,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	/**
 	 * Actor's FSM current state
 	 */
-	protected State fsmState;
+	private State fsmState;
 
 	protected ListAllocator listAllocator;
 
@@ -163,8 +112,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * Actor's constant parameters to be set at initialization time
 	 */
 	private Map<String, Expression> parameters;
-
-	protected Expression returnValue;
 
 	/**
 	 * Creates a new interpreted actor instance for simulation or debug
@@ -204,6 +151,291 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		for (Port port : pattern.getPorts()) {
 			Var var = pattern.getVariable(port);
 			var.setValue(listAllocator.doSwitch(var.getType()));
+		}
+	}
+
+	@Override
+	public Object caseExprBinary(ExprBinary expr) {
+		return null;
+	}
+
+	@Override
+	public Object caseExprBool(ExprBool expr) {
+		return expr.isValue();
+	}
+
+	@Override
+	public Object caseExprFloat(ExprFloat expr) {
+		return expr.getValue();
+	}
+
+	@Override
+	public Object caseExprInt(ExprInt expr) {
+		return expr.getIntValue();
+	}
+
+	@Override
+	public Object caseExprList(ExprList expr) {
+		Object[] values = new Object[expr.getValue().size()];
+		int i = 0;
+		for (Expression subExpr : expr.getValue()) {
+			if (subExpr != null) {
+				values[i] = doSwitch(subExpr);
+			}
+			i++;
+		}
+		return values;
+	}
+
+	@Override
+	public Object caseExprString(ExprString expr) {
+		return expr.getValue();
+	}
+
+	@Override
+	public Object caseExprUnary(ExprUnary expr) {
+		return null;
+	}
+
+	@Override
+	public Object caseExprVar(ExprVar expr) {
+		return doSwitch(expr.getUse().getVariable().getValue());
+	}
+
+	@Override
+	public Object caseInstAssign(InstAssign instr) {
+		try {
+			Var target = instr.getTarget().getVariable();
+			target.setValue(exprInterpreter.doSwitch(instr.getValue()));
+		} catch (OrccRuntimeException e) {
+			String file;
+			if (actor == null) {
+				file = "";
+			} else {
+				file = actor.getFile();
+			}
+
+			throw new OrccRuntimeException(file, instr.getLocation(), "", e);
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseInstCall(InstCall call) {
+		// Get called procedure
+		Procedure proc = call.getProcedure();
+
+		// Set the input parameters of the called procedure if any
+		List<Expression> callParams = call.getParameters();
+
+		// Special "print" case
+		if (call.isPrint()) {
+			for (int i = 0; i < callParams.size(); i++) {
+				if (callParams.get(i).isStringExpr()) {
+					// String characters rework for escaped control
+					// management
+					String str = ((ExprString) callParams.get(i)).getValue();
+					String unescaped = OrccUtil.getUnescapedString(str);
+					System.out.print(unescaped);
+				} else {
+					Expression value = exprInterpreter.doSwitch(callParams
+							.get(i));
+					System.out.print(String.valueOf(value));
+				}
+			}
+		} else {
+			List<Var> procParams = proc.getParameters();
+			for (int i = 0; i < callParams.size(); i++) {
+				Var procVar = procParams.get(i);
+				procVar.setValue(exprInterpreter.doSwitch(callParams.get(i)));
+			}
+
+			// Interpret procedure body
+			if (call.hasResult()) {
+				call.getTarget().getVariable()
+						.setValue((Expression) doSwitch(proc));
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseInstLoad(InstLoad instr) {
+		Var target = instr.getTarget().getVariable();
+		Var source = instr.getSource().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			target.setValue(EcoreUtil.copy(source.getValue()));
+		} else {
+			try {
+				Expression value = source.getValue();
+				for (Expression index : instr.getIndexes()) {
+					if (value.isListExpr()) {
+						value = ((ExprList) value)
+								.get((ExprInt) exprInterpreter.doSwitch(index));
+					}
+				}
+				target.setValue(EcoreUtil.copy(value));
+			} catch (IndexOutOfBoundsException e) {
+				throw new OrccRuntimeException(
+						"Array index out of bounds at line "
+								+ instr.getLocation().getStartLine());
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseInstPhi(InstPhi phi) {
+		Expression value = phi.getValues().get(branch);
+		phi.getTarget().getVariable().setValue(exprInterpreter.doSwitch(value));
+		return null;
+	}
+
+	@Override
+	public Object caseInstReturn(InstReturn instr) {
+		if (instr.getValue() == null) {
+			return null;
+		}
+		return exprInterpreter.doSwitch(instr.getValue());
+	}
+
+	@Override
+	public Object caseInstSpecific(InstSpecific instr) {
+		throw new OrccRuntimeException("does not know how to interpret a "
+				+ "specific instruction");
+	}
+
+	@Override
+	public Object caseInstStore(InstStore instr) {
+		Var var = instr.getTarget().getVariable();
+		Expression value = exprInterpreter.doSwitch(instr.getValue());
+		if (instr.getIndexes().isEmpty()) {
+			var.setValue(value);
+		} else {
+			try {
+				Expression target = var.getValue();
+				Iterator<Expression> it = instr.getIndexes().iterator();
+				ExprInt index = (ExprInt) exprInterpreter.doSwitch(it.next());
+				while (it.hasNext()) {
+					if (target.isListExpr()) {
+						target = ((ExprList) target).get(index);
+					}
+					index = (ExprInt) exprInterpreter.doSwitch(it.next());
+				}
+
+				if (target.isListExpr()) {
+					((ExprList) target).set(index, value);
+				}
+			} catch (IndexOutOfBoundsException e) {
+				throw new OrccRuntimeException(
+						"Array index out of bounds at line "
+								+ instr.getLocation().getStartLine());
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseNodeIf(NodeIf node) {
+		// Interpret first expression ("if" condition)
+		Expression condition = exprInterpreter.doSwitch(node.getCondition());
+
+		// if (condition is true)
+		if (condition != null && condition.isBooleanExpr()) {
+			int oldBranch = branch;
+			if (((ExprBool) condition).isValue()) {
+				doSwitch(node.getThenNodes());
+				branch = 0;
+			} else {
+				doSwitch(node.getElseNodes());
+				branch = 1;
+			}
+
+			doSwitch(node.getJoinNode());
+			branch = oldBranch;
+		} else {
+			throw new OrccRuntimeException("Condition not boolean at line "
+					+ node.getLocation().getStartLine() + "\n");
+		}
+		return null;
+	}
+
+	@Override
+	public Object caseNodeWhile(NodeWhile node) {
+		int oldBranch = branch;
+		branch = 0;
+		doSwitch(node.getJoinNode());
+
+		// Interpret first expression ("while" condition)
+		Expression condition = exprInterpreter.doSwitch(node.getCondition());
+
+		// while (condition is true) do
+		if (condition != null && condition.isBooleanExpr()) {
+			branch = 1;
+			while (((ExprBool) condition).isValue()) {
+				doSwitch(node.getNodes());
+				doSwitch(node.getJoinNode());
+
+				// Interpret next value of "while" condition
+				condition = exprInterpreter.doSwitch(node.getCondition());
+				if (condition == null || !condition.isBooleanExpr()) {
+					throw new OrccRuntimeException(
+							"Condition not boolean at line "
+									+ node.getLocation().getStartLine() + "\n");
+				}
+			}
+		} else {
+			throw new OrccRuntimeException("Condition not boolean at line "
+					+ node.getLocation().getStartLine() + "\n");
+		}
+
+		branch = oldBranch;
+		return null;
+	}
+
+	@Override
+	public Object caseProcedure(Procedure procedure) {
+		if (procedure.isNative()) {
+			int numParams = procedure.getParameters().size();
+			Class<?>[] parameterTypes = new Class<?>[numParams];
+			Object[] args = new Object[numParams];
+			int i = 0;
+			for (Var parameter : procedure.getParameters()) {
+				args[i] = doSwitch(parameter.getValue());
+				parameterTypes[i] = args[i].getClass();
+
+				i++;
+			}
+
+			String methodName = procedure.getName();
+			try {
+				Class<?> clasz = Class.forName(actor.getName());
+				Method method = clasz.getMethod(procedure.getName(),
+						parameterTypes);
+				Object res = method.invoke(null, args);
+				if (res instanceof Boolean) {
+					return IrFactory.eINSTANCE.createExprBool((Boolean) res);
+				} else if (res instanceof Integer) {
+					return IrFactory.eINSTANCE.createExprInt((Integer) res);
+				} else {
+					return null;
+				}
+			} catch (Exception e) {
+				throw new OrccRuntimeException(
+						"exception during native procedure call to "
+								+ methodName);
+			}
+		} else {
+			// Allocate local List variables
+			for (Var local : procedure.getLocals()) {
+				Type type = local.getType();
+				if (type.isList()) {
+					local.setValue(listAllocator.doSwitch(type));
+				}
+			}
+
+			super.caseProcedure(procedure);
+			return null;
 		}
 	}
 
@@ -379,9 +611,9 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			}
 		}
 
-		doSwitch(action.getScheduler());
-		if (returnValue != null && returnValue.isBooleanExpr()) {
-			return ((ExprBool) returnValue).isValue();
+		Object result = doSwitch(action.getScheduler());
+		if (result instanceof ExprBool) {
+			return ((ExprBool) result).isValue();
 		} else {
 			return false;
 		}
@@ -457,248 +689,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 */
 	public void setFifos(Map<String, Fifo> fifos) {
 		this.fifos = fifos;
-	}
-
-	@Override
-	public Object caseInstAssign(InstAssign instr) {
-		try {
-			Var target = instr.getTarget().getVariable();
-			target.setValue(exprInterpreter.doSwitch(instr.getValue()));
-		} catch (OrccRuntimeException e) {
-			String file;
-			if (actor == null) {
-				file = "";
-			} else {
-				file = actor.getFile();
-			}
-
-			throw new OrccRuntimeException(file, instr.getLocation(), "", e);
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstCall(InstCall call) {
-		// Get called procedure
-		Procedure proc = call.getProcedure();
-
-		// Set the input parameters of the called procedure if any
-		List<Expression> callParams = call.getParameters();
-
-		// Special "print" case
-		if (call.isPrint()) {
-			for (int i = 0; i < callParams.size(); i++) {
-				if (callParams.get(i).isStringExpr()) {
-					// String characters rework for escaped control
-					// management
-					String str = ((ExprString) callParams.get(i)).getValue();
-					String unescaped = OrccUtil.getUnescapedString(str);
-					System.out.print(unescaped);
-				} else {
-					Expression value = exprInterpreter.doSwitch(callParams
-							.get(i));
-					System.out.print(String.valueOf(value));
-				}
-			}
-		} else {
-			List<Var> procParams = proc.getParameters();
-			for (int i = 0; i < callParams.size(); i++) {
-				Var procVar = procParams.get(i);
-				procVar.setValue(exprInterpreter.doSwitch(callParams.get(i)));
-			}
-
-			// Interpret procedure body
-			doSwitch(proc);
-
-			// Get procedure result if any
-			if (call.hasResult()) {
-				call.getTarget().getVariable().setValue(returnValue);
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseNodeIf(NodeIf node) {
-		// Interpret first expression ("if" condition)
-		Expression condition = exprInterpreter.doSwitch(node.getCondition());
-
-		// if (condition is true)
-		if (condition != null && condition.isBooleanExpr()) {
-			int oldBranch = branch;
-			if (((ExprBool) condition).isValue()) {
-				doSwitch(node.getThenNodes());
-				branch = 0;
-			} else {
-				doSwitch(node.getElseNodes());
-				branch = 1;
-			}
-
-			doSwitch(node.getJoinNode());
-			branch = oldBranch;
-		} else {
-			throw new OrccRuntimeException("Condition not boolean at line "
-					+ node.getLocation().getStartLine() + "\n");
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstLoad(InstLoad instr) {
-		Var target = instr.getTarget().getVariable();
-		Var source = instr.getSource().getVariable();
-		if (instr.getIndexes().isEmpty()) {
-			target.setValue(EcoreUtil.copy(source.getValue()));
-		} else {
-			try {
-				Expression value = source.getValue();
-				for (Expression index : instr.getIndexes()) {
-					if (value.isListExpr()) {
-						value = ((ExprList) value)
-								.get((ExprInt) exprInterpreter.doSwitch(index));
-					}
-				}
-				target.setValue(EcoreUtil.copy(value));
-			} catch (IndexOutOfBoundsException e) {
-				throw new OrccRuntimeException(
-						"Array index out of bounds at line "
-								+ instr.getLocation().getStartLine());
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstPhi(InstPhi phi) {
-		Expression value = phi.getValues().get(branch);
-		phi.getTarget().getVariable().setValue(exprInterpreter.doSwitch(value));
-		return null;
-	}
-
-	@Override
-	public Object caseProcedure(Procedure procedure) {
-		if (procedure.isNative()) {
-			int numParams = procedure.getParameters().size();
-			Class<?>[] parameterTypes = new Class<?>[numParams];
-			Object[] args = new Object[numParams];
-			int i = 0;
-			for (Var parameter : procedure.getParameters()) {
-				args[i] = parameter.getValue().accept(
-						new JavaExpressionConverter());
-				parameterTypes[i] = args[i].getClass();
-
-				i++;
-			}
-
-			String methodName = procedure.getName();
-			try {
-				Class<?> clasz = Class.forName(actor.getName());
-				Method method = clasz.getMethod(procedure.getName(),
-						parameterTypes);
-				Object res = method.invoke(null, args);
-				if (res instanceof Boolean) {
-					returnValue = IrFactory.eINSTANCE
-							.createExprBool((Boolean) res);
-				} else if (res instanceof Integer) {
-					returnValue = IrFactory.eINSTANCE
-							.createExprInt((Integer) res);
-				} else {
-					returnValue = null;
-				}
-			} catch (Exception e) {
-				throw new OrccRuntimeException(
-						"exception during native procedure call to "
-								+ methodName);
-			}
-		} else {
-			// Allocate local List variables
-			for (Var local : procedure.getLocals()) {
-				Type type = local.getType();
-				if (type.isList()) {
-					local.setValue(listAllocator.doSwitch(type));
-				}
-			}
-
-			super.caseProcedure(procedure);
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstReturn(InstReturn instr) {
-		if (instr.getValue() != null) {
-			returnValue = exprInterpreter.doSwitch(instr.getValue());
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstSpecific(InstSpecific instr) {
-		throw new OrccRuntimeException("does not know how to interpret a "
-				+ "specific instruction");
-	}
-
-	@Override
-	public Object caseInstStore(InstStore instr) {
-		Var var = instr.getTarget().getVariable();
-		Expression value = exprInterpreter.doSwitch(instr.getValue());
-		if (instr.getIndexes().isEmpty()) {
-			var.setValue(value);
-		} else {
-			try {
-				Expression target = var.getValue();
-				Iterator<Expression> it = instr.getIndexes().iterator();
-				ExprInt index = (ExprInt) exprInterpreter.doSwitch(it.next());
-				while (it.hasNext()) {
-					if (target.isListExpr()) {
-						target = ((ExprList) target).get(index);
-					}
-					index = (ExprInt) exprInterpreter.doSwitch(it.next());
-				}
-
-				if (target.isListExpr()) {
-					((ExprList) target).set(index, value);
-				}
-			} catch (IndexOutOfBoundsException e) {
-				throw new OrccRuntimeException(
-						"Array index out of bounds at line "
-								+ instr.getLocation().getStartLine());
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseNodeWhile(NodeWhile node) {
-		int oldBranch = branch;
-		branch = 0;
-		doSwitch(node.getJoinNode());
-
-		// Interpret first expression ("while" condition)
-		Expression condition = exprInterpreter.doSwitch(node.getCondition());
-
-		// while (condition is true) do
-		if (condition != null && condition.isBooleanExpr()) {
-			branch = 1;
-			while (((ExprBool) condition).isValue()) {
-				doSwitch(node.getNodes());
-				doSwitch(node.getJoinNode());
-
-				// Interpret next value of "while" condition
-				condition = exprInterpreter.doSwitch(node.getCondition());
-				if (condition == null || !condition.isBooleanExpr()) {
-					throw new OrccRuntimeException(
-							"Condition not boolean at line "
-									+ node.getLocation().getStartLine() + "\n");
-				}
-			}
-		} else {
-			throw new OrccRuntimeException("Condition not boolean at line "
-					+ node.getLocation().getStartLine() + "\n");
-		}
-
-		branch = oldBranch;
-		return null;
 	}
 
 	private void writeFifo(Expression value, Fifo fifo, int numTokens) {

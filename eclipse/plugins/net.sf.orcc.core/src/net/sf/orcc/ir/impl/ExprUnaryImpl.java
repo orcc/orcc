@@ -11,7 +11,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.util.ExpressionInterpreter;
 import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -79,12 +78,6 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 		this.expr = expr;
 		this.op = op;
 		this.type = type;
-	}
-
-	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
-		System.err.println("ExprUnaryImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this, args);
 	}
 
 	@Override

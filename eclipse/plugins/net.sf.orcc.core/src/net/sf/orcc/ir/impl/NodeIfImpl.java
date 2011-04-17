@@ -13,7 +13,6 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.util.NodeInterpreter;
 import net.sf.orcc.ir.util.NodeVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -84,12 +83,6 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 */
 	protected NodeIfImpl() {
 		super();
-	}
-
-	@Override
-	public Object accept(NodeInterpreter interpreter, Object... args) {
-		System.err.println("NodeIfImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this, args);
 	}
 
 	@Override

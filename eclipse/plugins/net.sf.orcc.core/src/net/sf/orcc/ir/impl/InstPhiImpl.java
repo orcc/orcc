@@ -13,19 +13,14 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.InstructionInterpreter;
 import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -80,12 +75,6 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 */
 	protected InstPhiImpl() {
 		super();
-	}
-
-	@Override
-	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		System.err.println("InstPhiImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this, args);
 	}
 
 	@Override

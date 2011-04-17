@@ -30,8 +30,6 @@ package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.util.TypeInterpreter;
-import net.sf.orcc.ir.util.TypeVisitor;
 
 import org.eclipse.emf.ecore.EClass;
 
@@ -51,18 +49,6 @@ public class TypeVoidImpl extends TypeImpl implements TypeVoid {
 	 */
 	protected TypeVoidImpl() {
 		super();
-	}
-
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		System.err.println("TypeVoidImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		System.err.println("TypeVoidImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	@Override

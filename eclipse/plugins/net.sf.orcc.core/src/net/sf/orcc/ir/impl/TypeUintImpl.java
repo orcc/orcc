@@ -30,8 +30,6 @@ package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.util.TypeInterpreter;
-import net.sf.orcc.ir.util.TypeVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
@@ -63,18 +61,6 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	 */
 	protected TypeUintImpl() {
 		super();
-	}
-
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		System.err.println("TypeUintImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		System.err.println("TypeUintImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	/**

@@ -10,15 +10,12 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.util.ExpressionInterpreter;
 import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 /**
@@ -50,12 +47,6 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 	 */
 	protected ExprVarImpl() {
 		super();
-	}
-
-	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
-		System.err.println("ExprVarImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this, args);
 	}
 
 	@Override

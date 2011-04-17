@@ -37,8 +37,6 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
-import net.sf.orcc.ir.util.TypeInterpreter;
-import net.sf.orcc.ir.util.TypeVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -80,18 +78,6 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	 */
 	protected TypeListImpl() {
 		super();
-	}
-
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		System.err.println("TypeListImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		System.err.println("TypeListImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	/**

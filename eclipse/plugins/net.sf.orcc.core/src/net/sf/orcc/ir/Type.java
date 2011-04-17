@@ -30,9 +30,6 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
-import net.sf.orcc.ir.util.TypeInterpreter;
-import net.sf.orcc.ir.util.TypeVisitor;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -44,23 +41,6 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public interface Type extends EObject {
-
-	/**
-	 * Accepts an interpreter.
-	 * 
-	 * @param interpreter
-	 *            an interpreter
-	 * @return an object
-	 */
-	public Object accept(TypeInterpreter interpreter);
-
-	/**
-	 * Accepts a visitor.
-	 * 
-	 * @param visitor
-	 *            a visitor
-	 */
-	public void accept(TypeVisitor visitor);
 
 	/**
 	 * Returns a list of dimensions of this type. Returns an empty list if the

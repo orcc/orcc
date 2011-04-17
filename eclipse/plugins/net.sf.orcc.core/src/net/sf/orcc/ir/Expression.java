@@ -28,10 +28,9 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.ecore.EObject;
-
-import net.sf.orcc.ir.util.ExpressionInterpreter;
 import net.sf.orcc.ir.util.ExpressionVisitor;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This interface defines an expression.
@@ -42,17 +41,6 @@ import net.sf.orcc.ir.util.ExpressionVisitor;
  * 
  */
 public interface Expression extends EObject {
-
-	/**
-	 * Accepts an interpreter.
-	 * 
-	 * @param interpreter
-	 *            an expression interpreter
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object accept(ExpressionInterpreter interpreter, Object... args);
 
 	/**
 	 * Accepts a visitor.

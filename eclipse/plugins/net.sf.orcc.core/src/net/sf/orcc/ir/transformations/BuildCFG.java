@@ -37,7 +37,6 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.NodeInterpreter;
 
 /**
  * This class defines a transformation to build the CFG of procedures.
@@ -46,110 +45,82 @@ import net.sf.orcc.ir.util.NodeInterpreter;
  * @author Jerome Gorin
  * 
  */
-public class BuildCFG extends AbstractActorVisitor<Object> {
-
-	/**
-	 * This class defines a CFG builder.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class CFGBuilder implements NodeInterpreter {
-
-		/**
-		 * Creates a new CFG builder.
-		 */
-		public CFGBuilder() {
-			graph = new CFG();
-		}
-
-		@Override
-		public Object interpret(NodeBlock node, Object... args) {
-			Node previous = (Node) args[0];
-			graph.addVertex(node);
-			if (previous != null) {
-				graph.addEdge(previous, node);
-			}
-
-			return node;
-		}
-
-		@Override
-		public Object interpret(NodeIf node, Object... args) {
-			Node previous = (Node) args[0];
-			Node last;
-			graph.addVertex(node);
-			if (previous != null) {
-				graph.addEdge(previous, node);
-			}
-
-			Node join = node.getJoinNode();
-			graph.addVertex(join);
-
-			if (node.getThenNodes().isEmpty()) {
-				graph.addEdge(previous, join);
-			} else {
-				last = (Node) visit(node.getThenNodes(), node);
-				graph.addEdge(last, join);
-			}
-
-			if (node.getElseNodes().isEmpty()) {
-				graph.addEdge(previous, join);
-			} else {
-				last = (Node) visit(node.getElseNodes(), node);
-				graph.addEdge(last, join);
-			}
-
-			return join;
-		}
-
-		@Override
-		public Object interpret(NodeWhile node, Object... args) {
-			Node previous = (Node) args[0];
-
-			Node join = node.getJoinNode();
-			graph.addVertex(join);
-
-			if (previous != null) {
-				graph.addEdge(previous, join);
-			}
-
-			graph.addVertex(node);
-			graph.addEdge(join, node);
-
-			Node last = (Node) visit(node.getNodes(), join);
-			graph.addEdge(last, join);
-
-			return node;
-		}
-
-		/**
-		 * Visits the given node list.
-		 * 
-		 * @param nodes
-		 *            a list of nodes
-		 * @param previous
-		 *            the previous node, or <code>null</code> if there is none
-		 * @return the last node of the node list
-		 */
-		public Object visit(List<Node> nodes, Node previous) {
-			Object last = previous;
-			for (Node node : nodes) {
-				last = node.accept(this, last);
-			}
-
-			return last;
-		}
-
-	}
+public class BuildCFG extends AbstractActorVisitor<Node> {
 
 	private CFG graph;
 
+	private Node last;
+
 	@Override
-	public void visit(Procedure procedure) {
-		CFGBuilder builder = new CFGBuilder();
-		builder.visit(procedure.getNodes(), null);
+	public Node caseNodeBlock(NodeBlock node) {
+		graph.addVertex(node);
+		if (last != null) {
+			graph.addEdge(last, node);
+		}
+
+		return node;
+	}
+
+	@Override
+	public Node caseNodeIf(NodeIf node) {
+		graph.addVertex(node);
+		if (last != null) {
+			graph.addEdge(last, node);
+		}
+
+		Node join = node.getJoinNode();
+		graph.addVertex(join);
+
+		last = node;
+		last = doSwitch(node.getThenNodes());
+		graph.addEdge(last, join);
+
+		last = node;
+		last = doSwitch(node.getElseNodes());
+		graph.addEdge(last, join);
+
+		return join;
+	}
+
+	@Override
+	public Node caseNodeWhile(NodeWhile node) {
+		Node join = node.getJoinNode();
+		graph.addVertex(join);
+
+		if (last != null) {
+			graph.addEdge(last, join);
+		}
+
+		graph.addVertex(node);
+		graph.addEdge(join, node);
+
+		last = join;
+		last = doSwitch(node.getNodes());
+		graph.addEdge(last, join);
+
+		return node;
+	}
+
+	@Override
+	public Node caseProcedure(Procedure procedure) {
+		graph = new CFG();
 		procedure.setGraph(graph);
+		return super.caseProcedure(procedure);
+	}
+
+	/**
+	 * Visits the given node list.
+	 * 
+	 * @param nodes
+	 *            a list of nodes
+	 * @return the last node of the node list
+	 */
+	public Node doSwitch(List<Node> nodes) {
+		for (Node node : nodes) {
+			last = doSwitch(node);
+		}
+
+		return last;
 	}
 
 }

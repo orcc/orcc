@@ -16,7 +16,6 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.ir.util.InstructionInterpreter;
 import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -76,13 +75,6 @@ public class InstLoadImpl extends InstructionImpl implements InstLoad {
 	 */
 	protected InstLoadImpl() {
 		super();
-	}
-
-	@Override
-	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		System.err
-				.println("InstLoadImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this, args);
 	}
 
 	@Override

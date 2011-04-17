@@ -278,14 +278,13 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 		// check isSchedulable procedure
 		setSchedulableMode(true);
-		doSwitch(action.getScheduler());
 
-		if (returnValue == null) {
+		Object result = doSwitch(action.getScheduler());
+		if (result == null) {
 			throw new OrccRuntimeException("could not determine if action "
 					+ action.toString() + " is schedulable");
 		}
-		return returnValue.isBooleanExpr()
-				&& ((ExprBool) returnValue).isValue();
+		return (result instanceof ExprBool) && ((ExprBool) result).isValue();
 	}
 
 	/**

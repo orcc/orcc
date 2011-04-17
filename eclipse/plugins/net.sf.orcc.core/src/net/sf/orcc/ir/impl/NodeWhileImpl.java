@@ -13,7 +13,6 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.util.NodeInterpreter;
 import net.sf.orcc.ir.util.NodeVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -74,12 +73,6 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 */
 	protected NodeWhileImpl() {
 		super();
-	}
-
-	@Override
-	public Object accept(NodeInterpreter interpreter, Object... args) {
-		System.err.println("NodeWhileImpl.accept(interpreter): Please switch to the EMF-based API");
-		return interpreter.interpret(this, args);
 	}
 
 	@Override

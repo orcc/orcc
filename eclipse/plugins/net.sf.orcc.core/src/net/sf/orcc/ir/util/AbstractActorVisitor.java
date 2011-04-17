@@ -267,13 +267,14 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	public T caseNodeBlock(NodeBlock block) {
 		int oldIndexInst = indexInst;
 		List<Instruction> instructions = block.getInstructions();
-		for (indexInst = 0; indexInst < instructions.size(); indexInst++) {
+		T result = null;
+		for (indexInst = 0; indexInst < instructions.size() && result == null; indexInst++) {
 			doSwitch(instructions.get(indexInst));
 		}
 
 		// restore old index
 		indexInst = oldIndexInst;
-		return null;
+		return result;
 	}
 
 	@Override
@@ -307,8 +308,7 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	@Override
 	public T caseProcedure(Procedure procedure) {
 		this.procedure = procedure;
-		doSwitch(procedure.getNodes());
-		return null;
+		return doSwitch(procedure.getNodes());
 	}
 
 	@Override
@@ -330,14 +330,15 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
 	 */
-	public final T doSwitch(List<Node> nodes) {
+	public T doSwitch(List<Node> nodes) {
 		int oldIndexNode = indexNode;
-		for (indexNode = 0; indexNode < nodes.size(); indexNode++) {
-			doSwitch(nodes.get(indexNode));
+		T result = null;
+		for (indexNode = 0; indexNode < nodes.size() && result == null; indexNode++) {
+			result = doSwitch(nodes.get(indexNode));
 		}
 
 		indexNode = oldIndexNode;
-		return null;
+		return result;
 	}
 
 	/**

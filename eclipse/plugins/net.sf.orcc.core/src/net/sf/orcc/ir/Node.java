@@ -28,11 +28,11 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.ecore.EObject;
 import java.util.List;
 
-import net.sf.orcc.ir.util.NodeInterpreter;
 import net.sf.orcc.ir.util.NodeVisitor;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a node in the CFG.
@@ -41,17 +41,6 @@ import net.sf.orcc.ir.util.NodeVisitor;
  * @model abstract="true"
  */
 public interface Node extends EObject {
-
-	/**
-	 * Accepts the given node interpreter.
-	 * 
-	 * @param interpreter
-	 *            an interpreter
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object accept(NodeInterpreter interpreter, Object... args);
 
 	/**
 	 * Accepts the given node visitor.

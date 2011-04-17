@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.util.InstructionInterpreter;
 import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.ecore.EObject;
@@ -40,17 +39,6 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  */
 public interface Instruction extends EObject {
-
-	/**
-	 * Accepts the given instruction interpreter.
-	 * 
-	 * @param interpreter
-	 *            an interpreter
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	Object accept(InstructionInterpreter interpreter, Object... args);
 
 	/**
 	 * Accepts the given instruction visitor.
