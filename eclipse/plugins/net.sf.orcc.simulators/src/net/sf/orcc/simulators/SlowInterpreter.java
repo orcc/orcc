@@ -35,6 +35,7 @@ import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +45,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
@@ -201,7 +203,10 @@ public class SlowInterpreter extends AbstractSimulator {
 							instance.getParameters(), clonedActor);
 					interpreters.put(instance, interpreter);
 				} else if (instance.isBroadcast()) {
-
+					Actor actor = IrFactory.eINSTANCE.createActor();
+					ActorInterpreter interpreter = new ActorInterpreter(
+							instance.getParameters(), actor);
+					interpreters.put(instance, interpreter);
 				}
 			}
 		}
@@ -210,6 +215,7 @@ public class SlowInterpreter extends AbstractSimulator {
 	@Override
 	public void start() {
 		try {
+			interpreters = new HashMap<Instance, ActorInterpreter>();
 			Network network = new XDFParser(xdfFile).parseNetwork();
 
 			// Instantiate the network

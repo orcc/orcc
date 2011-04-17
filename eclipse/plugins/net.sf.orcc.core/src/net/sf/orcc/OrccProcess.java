@@ -36,7 +36,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.IStreamListener;
@@ -202,6 +204,10 @@ public class OrccProcess extends PlatformObject implements IProcess,
 	public void terminate() throws DebugException {
 		monitor.setCanceled(true);
 		terminated = true;
+
+		DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
+		DebugEvent[] events = { event };
+		DebugPlugin.getDefault().fireDebugEventSet(events);
 	}
 
 	/**
