@@ -130,7 +130,7 @@
          </option>
       </simulator>
       <simulator
-            class="net.sf.orcc.simulators.jade.JadeSimulatorImpl"
+            class="net.sf.orcc.simulators.JadeSimulatorImpl"
             name="Jade">
          <option
                id="net.sf.orcc.simulators.enableTraces">

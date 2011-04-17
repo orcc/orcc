@@ -29,6 +29,9 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
+
+import java.util.Map;
+
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccProcess;
 import net.sf.orcc.network.Network;
@@ -55,6 +58,7 @@ import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void launch(ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		OrccProcess process = new OrccProcess(launch, configuration, monitor);
@@ -75,8 +79,8 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 
 				try {
 					SimulatorFactory factory = SimulatorFactory.getInstance();
-					factory.runSimulator(monitor, process, launch,
-							configuration);
+					factory.runSimulator(monitor, process,
+							(Map<String, Object>) configuration.getAttributes());
 				} catch (Exception e) {
 					// clear actor pool because it might not have been done if
 					// we got an error too soon
@@ -107,5 +111,4 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 			}
 		}
 	}
-
 }

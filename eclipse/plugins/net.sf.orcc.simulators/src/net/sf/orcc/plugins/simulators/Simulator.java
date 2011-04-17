@@ -28,10 +28,12 @@
  */
 package net.sf.orcc.plugins.simulators;
 
+import java.util.Map;
+
+import net.sf.orcc.OrccException;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * This interface defines a simulator.
@@ -42,17 +44,12 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 public interface Simulator {
 
 	/**
-	 * Set the launch configuration of this plugin.
+	 * Sets the options of this back-end.
 	 * 
-	 * @param configuration
-	 *            the launch configuration of this plugin
+	 * @param options
+	 *            a map of string to object
 	 */
-	void setLaunchConfiguration(ILaunchConfiguration configuration);
-
-	/**
-	 * Starts the simulation.
-	 */
-	void start();
+	public void setOptions(Map<String, Object> options) throws OrccException;
 
 	/**
 	 * Sets the progress monitor used by this back-end.
@@ -69,5 +66,10 @@ public interface Simulator {
 	 *            a write listener
 	 */
 	void setWriteListener(WriteListener listener);
+
+	/**
+	 * Starts the simulation.
+	 */
+	void start();
 
 }

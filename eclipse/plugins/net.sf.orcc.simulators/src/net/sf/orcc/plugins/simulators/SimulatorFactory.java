@@ -32,6 +32,7 @@ import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.plugins.PluginFactory;
@@ -43,8 +44,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * This class defines a factory class that contains a list of simulators and
@@ -99,12 +98,12 @@ public class SimulatorFactory extends PluginFactory {
 	 * @throws Exception
 	 */
 	public void runSimulator(IProgressMonitor monitor, WriteListener listener,
-			ILaunch launch, ILaunchConfiguration configuration)
-			throws Exception {
+			Map<String, Object> options) throws Exception {
 		// Get the simulator plugin
-		String simulatorName = configuration.getAttribute(SIMULATOR, "");
+		String simulatorName = (String) options.get(SIMULATOR);
 		Simulator simulator = (Simulator) plugins.get(simulatorName);
-		simulator.setLaunchConfiguration(configuration);
+
+		simulator.setOptions(options);
 		simulator.setProgressMonitor(monitor);
 		simulator.setWriteListener(listener);
 		simulator.start();

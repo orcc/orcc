@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.simulators.jade;
+package net.sf.orcc.simulators;
 
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.REFERENCE_FILE;
@@ -48,13 +48,8 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.serialize.XDFWriter;
-import net.sf.orcc.plugins.simulators.Simulator;
-import net.sf.orcc.util.WriteListener;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * This class implements a simulator with the Just-In-Time Adaptive Decoder
@@ -64,7 +59,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
  * @author Matthieu Wipliez
  * 
  */
-public class JadeSimulatorImpl implements Simulator {
+public class JadeSimulatorImpl extends AbstractSimulator {
 
 	/**
 	 * Path of Jade executable
@@ -75,8 +70,6 @@ public class JadeSimulatorImpl implements Simulator {
 	 * Master caller associated process for jade I/O access.
 	 */
 	private Process jadeProcess;
-
-	private WriteListener listener;
 
 	/**
 	 * Reference video file
@@ -106,7 +99,7 @@ public class JadeSimulatorImpl implements Simulator {
 	/**
 	 * XDF network flatten file
 	 */
-	protected File xdfFlattenFile;
+	private File xdfFlattenFile;
 
 	private void flatten() {
 		try {
@@ -121,35 +114,21 @@ public class JadeSimulatorImpl implements Simulator {
 	}
 
 	@Override
-	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
-		try {
-			// Get configuration attributes
-			stimulusFile = configuration.getAttribute(INPUT_STIMULUS, "");
-			vtlFolder = configuration.getAttribute(VTL_FOLDER, "");
-			xdfFile = configuration.getAttribute(XDF_FILE, "");
-			tracesFolder = configuration.getAttribute(TRACES_FOLDER, "");
-			refVideo = configuration.getAttribute(REFERENCE_FILE, "");
-			execJade = new InstanceScope().getNode(OrccActivator.PLUGIN_ID)
-					.get(P_JADE, "");
+	public void initializeOptions() {
+		// Get configuration attributes
+		stimulusFile = getAttribute(INPUT_STIMULUS, "");
+		vtlFolder = getAttribute(VTL_FOLDER, "");
+		xdfFile = getAttribute(XDF_FILE, "");
+		tracesFolder = getAttribute(TRACES_FOLDER, "");
+		refVideo = getAttribute(REFERENCE_FILE, "");
+		execJade = new InstanceScope().getNode(OrccActivator.PLUGIN_ID).get(
+				P_JADE, "");
 
-			// Jade location has not been set
-			if (execJade.equals("")) {
-				throw new OrccRuntimeException(
-						"Jade path must first be set in window->Preference->Orcc");
-			}
-		} catch (CoreException e) {
-			throw new OrccRuntimeException(e.getMessage());
+		// Jade location has not been set
+		if (execJade.equals("")) {
+			throw new OrccRuntimeException(
+					"Jade path must first be set in window->Preference->Orcc");
 		}
-
-	}
-
-	@Override
-	public void setProgressMonitor(IProgressMonitor monitor) {
-	}
-
-	@Override
-	public void setWriteListener(WriteListener listener) {
-		this.listener = listener;
 	}
 
 	@Override
@@ -198,7 +177,7 @@ public class JadeSimulatorImpl implements Simulator {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							listener.writeText(line + "\n");
+							write(line + "\n");
 						}
 					} finally {
 						reader.close();
@@ -219,8 +198,7 @@ public class JadeSimulatorImpl implements Simulator {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							listener.writeText("Generation error :" + line
-									+ "\n");
+							write("Generation error :" + line + "\n");
 						}
 					} finally {
 						reader.close();
