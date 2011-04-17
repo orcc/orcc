@@ -16,5 +16,12 @@
             class="net.sf.orcc.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.emf.ecore.extension_parser">
+      <parser
+            class="net.sf.orcc.ir.impl.IrResourceFactoryImpl"
+            type="ir">
+      </parser>
+   </extension>
 
 </plugin>

@@ -30,6 +30,7 @@ package net.sf.orcc.backends;
 
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -105,11 +106,11 @@ public abstract class AbstractBackend implements Backend {
 			String outputFolder = args[2];
 
 			Map<String, Object> options = new HashMap<String, Object>();
+			options.put(OUTPUT_FOLDER, outputFolder);
 
 			try {
 				AbstractBackend backend = clasz.newInstance();
 				backend.setOptions(options);
-				backend.setOutputFolder(outputFolder);
 				backend.compileVTL(vtlFolders);
 				backend.compileXDF(inputFile);
 			} catch (Exception e) {
@@ -523,13 +524,26 @@ public abstract class AbstractBackend implements Backend {
 	@Override
 	public void setOptions(Map<String, Object> options) {
 		this.options = options;
-		initializeOptions();
-	}
+		
+		String outputFolder;
+		Object obj = options.get(OUTPUT_FOLDER);
+		if (obj instanceof String) {
+			outputFolder = (String) obj;
+		} else {
+			outputFolder = "";
+		}
 
-	@Override
-	final public void setOutputFolder(String outputFolder) {
+		if (outputFolder.isEmpty()) {
+			String tmpdir = System.getProperty("java.io.tmpdir");
+			File output = new File(tmpdir, "orcc");
+			output.mkdir();
+			outputFolder = output.getAbsolutePath();
+		}
+		
 		// set output path
 		path = new File(outputFolder).getAbsolutePath();
+		
+		initializeOptions();
 	}
 
 	@Override

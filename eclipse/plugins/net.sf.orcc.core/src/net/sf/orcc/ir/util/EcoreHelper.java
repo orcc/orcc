@@ -28,10 +28,14 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -39,10 +43,16 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 
@@ -285,6 +295,44 @@ public class EcoreHelper {
 				Use use = (Use) descendant;
 				use.setVariable(null);
 			}
+		}
+	}
+
+	/**
+	 * Serializes the given actor to the given output folder.
+	 * 
+	 * @param outputFolder
+	 *            output folder
+	 * @param actor
+	 *            an actor
+	 * @return <code>true</code> if the serialization succeeded
+	 */
+	public static boolean serializeActor(String outputFolder, Actor actor) {
+		// check that the factory is registered
+		// (only happens in command-line mode)
+		// ...
+		// duck you command line :)
+		Map<String, Object> extToFactoryMap = Resource.Factory.Registry.INSTANCE
+				.getExtensionToFactoryMap();
+		Object instance = extToFactoryMap.get("ir");
+		if (instance == null) {
+			instance = new IrResourceFactoryImpl();
+			extToFactoryMap.put("ir", instance);
+		}
+
+		// serialization
+		ResourceSet set = new ResourceSetImpl();
+		String pathName = outputFolder + File.separator
+				+ OrccUtil.getFile(actor) + ".ir";
+		Resource resource = set.createResource(URI.createFileURI(pathName));
+		resource.getContents().add(actor);
+		try {
+			resource.save(null);
+			return true;
+		} catch (IOException e) {
+			// uncomment to see details of exception
+			// e.printStackTrace();
+			return false;
 		}
 	}
 

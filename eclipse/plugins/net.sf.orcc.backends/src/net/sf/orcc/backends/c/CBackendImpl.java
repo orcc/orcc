@@ -51,6 +51,7 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -208,6 +209,10 @@ public class CBackendImpl extends AbstractBackend {
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
+			if (!EcoreHelper.serializeActor(path, actor)) {
+				System.out.println("oops " + transformation + " "
+						+ actor.getName());
+			}
 		}
 
 		CActorTemplateData data = new CActorTemplateData();

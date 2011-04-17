@@ -30,11 +30,9 @@ package net.sf.orcc.backends;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
-import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,28 +106,12 @@ public class BackendFactory extends PluginFactory {
 	 */
 	public void runBackend(IProgressMonitor monitor, WriteListener listener,
 			Map<String, Object> options) throws Exception {
-		String outputFolder;
-		Object obj = options.get(OUTPUT_FOLDER);
-		if (obj instanceof String) {
-			outputFolder = (String) obj;
-		} else {
-			outputFolder = "";
-		}
+		String backendName = (String) options.get(BACKEND);
+		Backend backend = (Backend) plugins.get(backendName);
 
-		if (outputFolder.isEmpty()) {
-			String tmpdir = System.getProperty("java.io.tmpdir");
-			File output = new File(tmpdir, "orcc");
-			output.mkdir();
-			outputFolder = output.getAbsolutePath();
-		}
-
-		String backend = (String) options.get(BACKEND);
-
-		Backend backendObj = (Backend) plugins.get(backend);
-		backendObj.setOptions(options);
-		backendObj.setOutputFolder(outputFolder);
-		backendObj.setProgressMonitor(monitor);
-		backendObj.setWriteListener(listener);
+		backend.setOptions(options);
+		backend.setProgressMonitor(monitor);
+		backend.setWriteListener(listener);
 
 		String name = (String) options.get(PROJECT);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -139,11 +121,11 @@ public class BackendFactory extends PluginFactory {
 
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)
-		backendObj.compileVTL(vtlFolders);
+		backend.compileVTL(vtlFolders);
 
 		if ((Boolean) options.get(COMPILE_XDF)) {
 			String xdfFile = (String) options.get(XDF_FILE);
-			backendObj.compileXDF(xdfFile);
+			backend.compileXDF(xdfFile);
 		}
 	}
 

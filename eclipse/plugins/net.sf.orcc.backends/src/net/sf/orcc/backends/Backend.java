@@ -76,15 +76,6 @@ public interface Backend {
 	public void setOptions(Map<String, Object> options) throws OrccException;
 
 	/**
-	 * Sets the output folder of this back-end. This is the folder where files
-	 * will be generated.
-	 * 
-	 * @param outputFolder
-	 *            output folder
-	 */
-	public void setOutputFolder(String outputFolder);
-
-	/**
 	 * Sets the progress monitor used by this back-end.
 	 * 
 	 * @param monitor
