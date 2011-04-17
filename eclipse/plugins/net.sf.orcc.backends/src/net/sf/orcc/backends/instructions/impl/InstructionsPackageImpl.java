@@ -7,6 +7,7 @@
 package net.sf.orcc.backends.instructions.impl;
 
 import net.sf.orcc.backends.instructions.InstAssignIndex;
+import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.backends.instructions.InstGetElementPtr;
 import net.sf.orcc.backends.instructions.InstRam;
 import net.sf.orcc.backends.instructions.InstRamRead;
@@ -89,6 +90,13 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * @generated
 	 */
 	private EClass instGetElementPtrEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass instCastEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -367,6 +375,33 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getInstCast() {
+		return instCastEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstCast_Target() {
+		return (EReference)instCastEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInstCast_Source() {
+		return (EReference)instCastEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public InstructionsFactory getInstructionsFactory() {
 		return (InstructionsFactory)getEFactoryInstance();
 	}
@@ -420,6 +455,10 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__INDEXES);
 		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__TARGET);
 		createEReference(instGetElementPtrEClass, INST_GET_ELEMENT_PTR__SOURCE);
+
+		instCastEClass = createEClass(INST_CAST);
+		createEReference(instCastEClass, INST_CAST__TARGET);
+		createEReference(instCastEClass, INST_CAST__SOURCE);
 	}
 
 	/**
@@ -461,6 +500,7 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		instRamSetAddressEClass.getESuperTypes().add(this.getInstRam());
 		instRamWriteEClass.getESuperTypes().add(this.getInstRam());
 		instGetElementPtrEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
+		instCastEClass.getESuperTypes().add(theIrPackage.getInstSpecific());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(instTernaryEClass, InstTernary.class, "InstTernary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -493,6 +533,10 @@ public class InstructionsPackageImpl extends EPackageImpl implements Instruction
 		initEReference(getInstGetElementPtr_Indexes(), theIrPackage.getExpression(), null, "indexes", null, 0, -1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstGetElementPtr_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstGetElementPtr_Source(), theIrPackage.getUse(), null, "source", null, 0, 1, InstGetElementPtr.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(instCastEClass, InstCast.class, "InstCast", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInstCast_Target(), theIrPackage.getDef(), null, "target", null, 0, 1, InstCast.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getInstCast_Source(), theIrPackage.getUse(), null, "source", null, 0, 1, InstCast.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

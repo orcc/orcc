@@ -107,4 +107,11 @@ public interface Type extends EObject {
 	 */
 	public boolean isVoid();
 
+	/**
+	 * Returns the size of this type.
+	 * 
+	 * @return the size of this type
+	 */
+	public int getSize();
+
 }

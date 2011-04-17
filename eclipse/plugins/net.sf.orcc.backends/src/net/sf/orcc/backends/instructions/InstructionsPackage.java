@@ -550,6 +550,62 @@ public interface InstructionsPackage extends EPackage {
 
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.instructions.impl.InstCastImpl <em>Inst Cast</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.instructions.impl.InstCastImpl
+	 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstCast()
+	 * @generated
+	 */
+	int INST_CAST = 8;
+
+	/**
+	 * The feature id for the '<em><b>Location</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CAST__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
+
+	/**
+	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CAST__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CAST__TARGET = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Source</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CAST__SOURCE = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Inst Cast</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CAST_FEATURE_COUNT = IrPackage.INST_SPECIFIC_FEATURE_COUNT + 2;
+
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstTernary <em>Inst Ternary</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -795,6 +851,38 @@ public interface InstructionsPackage extends EPackage {
 	EReference getInstGetElementPtr_Source();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.instructions.InstCast <em>Inst Cast</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Inst Cast</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstCast
+	 * @generated
+	 */
+	EClass getInstCast();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstCast#getTarget <em>Target</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Target</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstCast#getTarget()
+	 * @see #getInstCast()
+	 * @generated
+	 */
+	EReference getInstCast_Target();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.instructions.InstCast#getSource <em>Source</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Source</em>'.
+	 * @see net.sf.orcc.backends.instructions.InstCast#getSource()
+	 * @see #getInstCast()
+	 * @generated
+	 */
+	EReference getInstCast_Source();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1015,6 +1103,32 @@ public interface InstructionsPackage extends EPackage {
 		 * @generated
 		 */
 		EReference INST_GET_ELEMENT_PTR__SOURCE = eINSTANCE.getInstGetElementPtr_Source();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.instructions.impl.InstCastImpl <em>Inst Cast</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.instructions.impl.InstCastImpl
+		 * @see net.sf.orcc.backends.instructions.impl.InstructionsPackageImpl#getInstCast()
+		 * @generated
+		 */
+		EClass INST_CAST = eINSTANCE.getInstCast();
+
+		/**
+		 * The meta object literal for the '<em><b>Target</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INST_CAST__TARGET = eINSTANCE.getInstCast_Target();
+
+		/**
+		 * The meta object literal for the '<em><b>Source</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INST_CAST__SOURCE = eINSTANCE.getInstCast_Source();
 
 	}
 

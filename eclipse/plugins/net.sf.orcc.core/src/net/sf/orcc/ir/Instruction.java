@@ -58,13 +58,6 @@ public interface Instruction extends EObject {
 	NodeBlock getBlock();
 
 	/**
-	 * Returns a Cast object if this instruction requires casting.
-	 * 
-	 * @return a Cast object if this instruction requires casting
-	 */
-	Cast getCast();
-
-	/**
 	 * Returns the location of this instruction.
 	 * 
 	 * @return the location of this instruction

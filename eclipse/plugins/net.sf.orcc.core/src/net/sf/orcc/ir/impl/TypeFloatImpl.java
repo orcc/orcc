@@ -69,5 +69,10 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 	public boolean isFloat() {
 		return true;
 	}
+	
+	@Override
+	public int getSize() {
+		return 32;
+	}
 
 }

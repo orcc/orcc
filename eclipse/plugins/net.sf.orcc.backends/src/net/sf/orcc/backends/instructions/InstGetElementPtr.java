@@ -16,34 +16,30 @@ import org.eclipse.emf.common.util.EList;
 /**
  * <!-- begin-user-doc --> A representation of the model object '
  * <em><b>Inst Get Element Ptr</b></em>'. <!-- end-user-doc -->
- * 
+ *
  * <p>
  * The following features are supported:
  * <ul>
- * <li>{@link net.sf.orcc.backends.instructions.InstGetElementPtr#getIndexes
- * <em>Indexes</em>}</li>
- * <li>{@link net.sf.orcc.backends.instructions.InstGetElementPtr#getTarget <em>
- * Target</em>}</li>
- * <li>{@link net.sf.orcc.backends.instructions.InstGetElementPtr#getSource <em>
- * Source</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.InstGetElementPtr#getIndexes <em>Indexes</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.InstGetElementPtr#getTarget <em>Target</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.instructions.InstGetElementPtr#getSource <em>Source</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstGetElementPtr()
  * @model
  * @generated
  */
 public interface InstGetElementPtr extends InstSpecific {
 	/**
-	 * Returns the value of the '<em><b>Indexes</b></em>' containment reference
-	 * list. The list contents are of type {@link net.sf.orcc.ir.Expression}.
+	 * Returns the value of the '<em><b>Indexes</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.ir.Expression}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Indexes</em>' containment reference list isn't
 	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Indexes</em>' containment reference list.
 	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstGetElementPtr_Indexes()
 	 * @model containment="true"
@@ -55,11 +51,10 @@ public interface InstGetElementPtr extends InstSpecific {
 	 * Returns the value of the '<em><b>Target</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Target</em>' containment reference isn't
-	 * clear, there really should be more of a description here...
+	 * If the meaning of the '<em>Target</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Target</em>' containment reference.
 	 * @see #setTarget(Def)
 	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstGetElementPtr_Target()
@@ -69,13 +64,10 @@ public interface InstGetElementPtr extends InstSpecific {
 	Def getTarget();
 
 	/**
-	 * Sets the value of the '
-	 * {@link net.sf.orcc.backends.instructions.InstGetElementPtr#getTarget
-	 * <em>Target</em>}' containment reference. <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Target</em>' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstGetElementPtr#getTarget <em>Target</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Target</em>' containment reference.
 	 * @see #getTarget()
 	 * @generated
 	 */
@@ -85,11 +77,10 @@ public interface InstGetElementPtr extends InstSpecific {
 	 * Returns the value of the '<em><b>Source</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Source</em>' containment reference isn't
-	 * clear, there really should be more of a description here...
+	 * If the meaning of the '<em>Source</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Source</em>' containment reference.
 	 * @see #setSource(Use)
 	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstGetElementPtr_Source()
@@ -99,13 +90,10 @@ public interface InstGetElementPtr extends InstSpecific {
 	Use getSource();
 
 	/**
-	 * Sets the value of the '
-	 * {@link net.sf.orcc.backends.instructions.InstGetElementPtr#getSource
-	 * <em>Source</em>}' containment reference. <!-- begin-user-doc --> <!--
-	 * end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Source</em>' containment reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstGetElementPtr#getSource <em>Source</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Source</em>' containment reference.
 	 * @see #getSource()
 	 * @generated
 	 */

@@ -70,5 +70,10 @@ public class TypeVoidImpl extends TypeImpl implements TypeVoid {
 	public boolean isVoid() {
 		return true;
 	}
+	
+	@Override
+	public int getSize() {
+		return 0;
+	}
 
 }

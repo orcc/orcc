@@ -6,7 +6,6 @@
  */
 package net.sf.orcc.ir.impl;
 
-
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.TypeBool;
 
@@ -23,6 +22,7 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected TypeBoolImpl() {
@@ -36,6 +36,7 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -46,6 +47,11 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 	@Override
 	public boolean isBool() {
 		return true;
+	}
+
+	@Override
+	public int getSize() {
+		return 1;
 	}
 
 }

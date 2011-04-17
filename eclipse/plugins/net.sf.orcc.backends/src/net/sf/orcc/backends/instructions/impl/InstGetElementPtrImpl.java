@@ -10,10 +10,8 @@ import java.util.Collection;
 
 import net.sf.orcc.backends.instructions.InstGetElementPtr;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
-import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.impl.InstSpecificImpl;
 
@@ -59,6 +57,15 @@ public class InstGetElementPtrImpl extends InstSpecificImpl implements
 	protected EList<Expression> indexes;
 
 	/**
+	 * The cached value of the '{@link #getTarget() <em>Target</em>}'
+	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #getTarget()
+	 * @generated
+	 * @ordered
+	 */
+	protected Def target;
+	/**
 	 * The cached value of the '{@link #getSource() <em>Source</em>}'
 	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -69,66 +76,12 @@ public class InstGetElementPtrImpl extends InstSpecificImpl implements
 	protected Use source;
 
 	/**
-	 * The cached value of the '{@link #getTarget() <em>Target</em>}'
-	 * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @see #getTarget()
-	 * @generated
-	 * @ordered
-	 */
-	protected Def target;
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 */
 	protected InstGetElementPtrImpl() {
 		super();
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public NotificationChain basicSetSource(Use newSource,
-			NotificationChain msgs) {
-		Use oldSource = source;
-		source = newSource;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET,
-					InstructionsPackage.INST_GET_ELEMENT_PTR__SOURCE,
-					oldSource, newSource);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public NotificationChain basicSetTarget(Def newTarget,
-			NotificationChain msgs) {
-		Def oldTarget = target;
-		target = newTarget;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this,
-					Notification.SET,
-					InstructionsPackage.INST_GET_ELEMENT_PTR__TARGET,
-					oldTarget, newTarget);
-			if (msgs == null)
-				msgs = notification;
-			else
-				msgs.add(notification);
-		}
-		return msgs;
 	}
 
 	/**
@@ -241,24 +194,6 @@ public class InstGetElementPtrImpl extends InstSpecificImpl implements
 		super.eUnset(featureID);
 	}
 
-	@Override
-	public Cast getCast() {
-		Type tgt = target.getVariable().getType();
-		Type src = source.getVariable().getType();
-
-		if (src == null) {
-			return null;
-		}
-
-		Cast cast = new Cast(src, tgt);
-
-		if (cast.isExtended() || cast.isTrunced()) {
-			return cast;
-		}
-
-		return null;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -277,6 +212,68 @@ public class InstGetElementPtrImpl extends InstSpecificImpl implements
 	 * 
 	 * @generated
 	 */
+	public Def getTarget() {
+		return target;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public NotificationChain basicSetTarget(Def newTarget,
+			NotificationChain msgs) {
+		Def oldTarget = target;
+		target = newTarget;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET,
+					InstructionsPackage.INST_GET_ELEMENT_PTR__TARGET,
+					oldTarget, newTarget);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public void setTarget(Def newTarget) {
+		if (newTarget != target) {
+			NotificationChain msgs = null;
+			if (target != null)
+				msgs = ((InternalEObject) target)
+						.eInverseRemove(
+								this,
+								EOPPOSITE_FEATURE_BASE
+										- InstructionsPackage.INST_GET_ELEMENT_PTR__TARGET,
+								null, msgs);
+			if (newTarget != null)
+				msgs = ((InternalEObject) newTarget)
+						.eInverseAdd(
+								this,
+								EOPPOSITE_FEATURE_BASE
+										- InstructionsPackage.INST_GET_ELEMENT_PTR__TARGET,
+								null, msgs);
+			msgs = basicSetTarget(newTarget, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					InstructionsPackage.INST_GET_ELEMENT_PTR__TARGET,
+					newTarget, newTarget));
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
 	public Use getSource() {
 		return source;
 	}
@@ -286,18 +283,21 @@ public class InstGetElementPtrImpl extends InstSpecificImpl implements
 	 * 
 	 * @generated
 	 */
-	public Def getTarget() {
-		return target;
-	}
-
-	@Override
-	public boolean isGep() {
-		return true;
-	}
-
-	@Override
-	public boolean isLoad() {
-		return true;
+	public NotificationChain basicSetSource(Use newSource,
+			NotificationChain msgs) {
+		Use oldSource = source;
+		source = newSource;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET,
+					InstructionsPackage.INST_GET_ELEMENT_PTR__SOURCE,
+					oldSource, newSource);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -331,35 +331,14 @@ public class InstGetElementPtrImpl extends InstSpecificImpl implements
 					newSource, newSource));
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public void setTarget(Def newTarget) {
-		if (newTarget != target) {
-			NotificationChain msgs = null;
-			if (target != null)
-				msgs = ((InternalEObject) target)
-						.eInverseRemove(
-								this,
-								EOPPOSITE_FEATURE_BASE
-										- InstructionsPackage.INST_GET_ELEMENT_PTR__TARGET,
-								null, msgs);
-			if (newTarget != null)
-				msgs = ((InternalEObject) newTarget)
-						.eInverseAdd(
-								this,
-								EOPPOSITE_FEATURE_BASE
-										- InstructionsPackage.INST_GET_ELEMENT_PTR__TARGET,
-								null, msgs);
-			msgs = basicSetTarget(newTarget, msgs);
-			if (msgs != null)
-				msgs.dispatch();
-		} else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					InstructionsPackage.INST_GET_ELEMENT_PTR__TARGET,
-					newTarget, newTarget));
+	@Override
+	public boolean isGep() {
+		return true;
+	}
+
+	@Override
+	public boolean isLoad() {
+		return true;
 	}
 
 } // InstGetElementPtrImpl
