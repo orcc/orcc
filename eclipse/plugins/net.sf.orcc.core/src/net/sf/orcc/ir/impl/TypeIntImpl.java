@@ -146,6 +146,11 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 	}
 
 	@Override
+	public int getSizeInBits() {
+		return size;
+	}
+
+	@Override
 	public boolean isInt() {
 		return true;
 	}

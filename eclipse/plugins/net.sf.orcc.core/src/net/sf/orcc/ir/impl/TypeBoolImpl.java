@@ -45,13 +45,13 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 	}
 
 	@Override
-	public boolean isBool() {
-		return true;
+	public int getSizeInBits() {
+		return 1;
 	}
 
 	@Override
-	public int getSize() {
-		return 1;
+	public boolean isBool() {
+		return true;
 	}
 
 }

@@ -146,6 +146,11 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	}
 
 	@Override
+	public int getSizeInBits() {
+		return size;
+	}
+
+	@Override
 	public boolean isLong() {
 		return (size > 32);
 	}

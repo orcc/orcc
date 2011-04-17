@@ -236,6 +236,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		return type;
 	}
 
+	@Override
 	public int getSize() {
 		if (sizeExpr == null) {
 			// Size depends on a actor parameter.
@@ -253,6 +254,11 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	 */
 	public Expression getSizeExpr() {
 		return sizeExpr;
+	}
+
+	@Override
+	public int getSizeInBits() {
+		return getType().getSizeInBits();
 	}
 
 	/**

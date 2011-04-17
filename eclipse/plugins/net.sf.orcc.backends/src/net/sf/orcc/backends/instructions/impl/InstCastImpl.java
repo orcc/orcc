@@ -249,7 +249,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 		Type targetType = target.getVariable().getType();
 		Type sourceType = source.getVariable().getType();
 
-		return sourceType.getSize() < targetType.getSize();
+		return sourceType.getSizeInBits() < targetType.getSizeInBits();
 	}
 
 	/**
@@ -297,7 +297,7 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 		Type targetType = target.getVariable().getType();
 		Type sourceType = source.getVariable().getType();
 
-		return sourceType.getSize() > targetType.getSize();
+		return sourceType.getSizeInBits() > targetType.getSizeInBits();
 	}
 
 	/**

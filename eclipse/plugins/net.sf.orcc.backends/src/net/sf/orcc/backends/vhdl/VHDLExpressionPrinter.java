@@ -31,7 +31,6 @@ package net.sf.orcc.backends.vhdl;
 
 import java.util.Iterator;
 
-import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprList;
@@ -76,9 +75,9 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 				+ doSwitch(e2, nextPrec, 1) + ", ";
 		if (function == "bitand") {
 			Type lub = getLub(e1.getType(), e2.getType());
-			call += Cast.getSizeOfType(lub) + ", ";
+			call += lub.getSizeInBits() + ", ";
 		}
-		return call + Cast.getSizeOfType(size) + ")";
+		return call + size.getSizeInBits() + ")";
 	}
 
 	/**
@@ -243,7 +242,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		switch (op) {
 		case BITNOT:
 			return "bitnot(" + doSwitch(expr.getExpr(), Integer.MIN_VALUE, 0)
-					+ ", " + Cast.getSizeOfType(expr.getExpr().getType()) + ")";
+					+ ", " + expr.getExpr().getType().getSizeInBits() + ")";
 		default:
 			return super.caseExprUnary(expr);
 		}

@@ -66,13 +66,13 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 	}
 
 	@Override
-	public boolean isFloat() {
-		return true;
+	public int getSizeInBits() {
+		return 32;
 	}
 	
 	@Override
-	public int getSize() {
-		return 32;
+	public boolean isFloat() {
+		return true;
 	}
 
 }

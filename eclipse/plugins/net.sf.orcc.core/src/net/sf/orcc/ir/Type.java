@@ -59,6 +59,14 @@ public interface Type extends EObject {
 	public List<Expression> getDimensionsExpr();
 
 	/**
+	 * Returns the size in bits of this type. If this type is a list, the size
+	 * returned is that of the innermost type.
+	 * 
+	 * @return the size in bits of this type
+	 */
+	public int getSizeInBits();
+
+	/**
 	 * Returns true if this type is <tt>bool</tt>.
 	 * 
 	 * @return true if this type is <tt>bool</tt>
@@ -106,12 +114,5 @@ public interface Type extends EObject {
 	 * @return true if this type is <tt>void</tt>
 	 */
 	public boolean isVoid();
-
-	/**
-	 * Returns the size of this type.
-	 * 
-	 * @return the size of this type
-	 */
-	public int getSize();
 
 }

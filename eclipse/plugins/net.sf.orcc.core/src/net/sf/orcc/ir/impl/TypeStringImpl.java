@@ -146,6 +146,11 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 	}
 
 	@Override
+	public int getSizeInBits() {
+		return size;
+	}
+
+	@Override
 	public boolean isString() {
 		return true;
 	}

@@ -55,7 +55,6 @@ import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.validation.CalJavaValidator;
-import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -1045,7 +1044,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			// conditions, guard expressions, calls to built-in functions
 			maxSize = 32;
 		} else {
-			maxSize = Cast.getSizeOfType(targetType);
+			maxSize = targetType.getSizeInBits();
 		}
 	}
 
