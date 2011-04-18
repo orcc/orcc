@@ -70,8 +70,6 @@ import org.eclipse.emf.ecore.EObject;
 public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 		ActorVisitor<T>, ExpressionVisitor, InstructionVisitor, NodeVisitor {
 
-	protected static final Object NULL = new Object();
-
 	/**
 	 * current action being visited (if any).
 	 */

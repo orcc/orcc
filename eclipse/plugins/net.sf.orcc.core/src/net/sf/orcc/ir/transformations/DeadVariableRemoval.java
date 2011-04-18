@@ -92,7 +92,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 		if (target != null && !target.isUsed()) {
 			handleInstruction(target, assign);
 		}
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 				handleInstruction(target, call);
 			}
 		}
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 		if (target != null && !target.isUsed()) {
 			handleInstruction(target, load);
 		}
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 		if (target != null && !target.isUsed()) {
 			handleInstruction(target, phi);
 		}
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -132,19 +132,19 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 			// variables that are parameters
 			if (target.eContainmentFeature() == IrPackage.eINSTANCE
 					.getProcedure_Parameters()) {
-				return NULL;
+				return null;
 			}
 
 			handleInstruction(target, store);
 		}
-		return NULL;
+		return null;
 	}
 
 	@Override
 	public Object caseNodeBlock(NodeBlock block) {
 		// adds all instructions to the list
 		instructionsToVisit.addAll(block.getInstructions());
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -174,7 +174,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 			procedure.getLocals().remove(var);
 		}
 
-		return NULL;
+		return null;
 	}
 
 }

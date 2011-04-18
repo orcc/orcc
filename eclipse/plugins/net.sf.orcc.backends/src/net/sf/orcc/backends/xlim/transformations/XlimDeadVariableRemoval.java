@@ -58,7 +58,7 @@ public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 			if (target != null && !target.isUsed()) {
 				handleInstruction(target, ternaryOperation);
 			}
-			return NULL;
+			return null;
 		}
 		return super.caseInstSpecific(specific);
 	}

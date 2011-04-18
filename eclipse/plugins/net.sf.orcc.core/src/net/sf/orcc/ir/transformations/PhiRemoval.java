@@ -96,7 +96,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, expr);
 		targetBlock.add(assign);
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 
 		doSwitch(node.getThenNodes());
 		doSwitch(node.getElseNodes());
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 		caseNodeBlock(join);
 		new PhiRemover().caseNodeBlock(join);
 		doSwitch(node.getNodes());
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -155,7 +155,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 		for (Var local : localsToRemove) {
 			procedure.getLocals().remove(local);
 		}
-		return NULL;
+		return null;
 	}
 
 }

@@ -99,7 +99,7 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 		// combines adjacent blocks that may have been created
 		new BlockCombine().doSwitch(actor);
 		
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 			}
 		}
 		
-		return NULL;
+		return null;
 	}
 
 }

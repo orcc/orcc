@@ -82,7 +82,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor<Object> {
 				it.remove();
 			}
 		}
-		return NULL;
+		return null;
 	}
 
 }

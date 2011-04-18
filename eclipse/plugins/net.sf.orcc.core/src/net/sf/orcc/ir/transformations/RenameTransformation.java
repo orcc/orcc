@@ -110,7 +110,7 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 
 		checkVariables(procedure.getParameters());
 		checkVariables(procedure.getLocals());
-		return NULL;
+		return null;
 	}
 
 }
