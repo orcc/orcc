@@ -148,7 +148,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				Use useArray = IrFactory.eINSTANCE.createUse(tab);
 				load.setSource(useArray);
 			}
-			return null ;
+			return null;
 		}
 	}
 
@@ -174,7 +174,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				Def target = IrFactory.eINSTANCE.createDef(tab);
 				store.setTarget(target);
 			}
-			return null ;
+			return null;
 		}
 	}
 
@@ -193,6 +193,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private Action process;
 	private List<Var> readIndexes;
 	private boolean repeatInput;
+	private boolean repeatOutput;
 	private Var result;
 	private Action store;
 	private Map<String, State> statesMap;
@@ -512,11 +513,13 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            global variable counter
 	 * @param storeList
 	 *            global variable list to store
+	 * @param priority
+	 *            whether to put the untagged action as high priority or not
 	 * @return new untagged action
 	 */
 
 	private Action createUntaggedAction(Var readIndex, Var writeIndex,
-			Var storeList, Port port) {
+			Var storeList, Port port, boolean priority) {
 		Expression expression = IrFactory.eINSTANCE.createExprBool(true);
 		Action newUntaggedAction = createAction(expression,
 				"untagged_" + port.getName());
@@ -532,7 +535,11 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		Pattern pattern = newUntaggedAction.getInputPattern();
 		pattern.setNumTokens(port, 1);
 		pattern.setVariable(port, localINPUT);
-		actor.getActionsOutsideFsm().add(newUntaggedAction);
+		if (priority) {
+			actor.getActionsOutsideFsm().add(0, newUntaggedAction);
+		} else {
+			actor.getActionsOutsideFsm().add(newUntaggedAction);
+		}
 		AddedUntaggedActions.add(newUntaggedAction);
 		return newUntaggedAction;
 	}
@@ -1094,7 +1101,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
 		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
 	}
-	
+
 	/**
 	 * returns the position of a port in a port list
 	 * 
@@ -1190,7 +1197,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 								+ port.getName());
 						writeIndexes.add(untagWriteIndex);
 						createUntaggedAction(untagReadIndex, untagWriteIndex,
-								untagBuffer, port);
+								untagBuffer, port, true);
 					}
 
 					String counterName = action.getName() + "NewStoreCounter"
@@ -1219,6 +1226,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					}
 					actionToTransition(action, untagBuffer, untagWriteIndex,
 							untagReadIndex);
+					//action.getInputPattern().remove(port);
 				}
 
 				action.getInputPattern().clear();
@@ -1252,6 +1260,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				.getNumTokensMap().entrySet()) {
 			int verifNumTokens = verifEntry.getValue();
 			if (verifNumTokens > 1) {
+				repeatOutput = true;
 				String processName = "newStateProcess" + action.getName();
 				String writeName = "newStateWrite" + action.getName();
 				State writeState = IrFactory.eINSTANCE.createState(writeName);
@@ -1359,7 +1368,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 							+ verifPort.getName());
 					writeIndexes.add(untagWriteIndex);
 					createUntaggedAction(untagReadIndex, untagWriteIndex,
-							untagBuffer, verifPort);
+							untagBuffer, verifPort, false);
 					action.getInputPattern().remove(verifPort);
 					ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 							untagBuffer, untagWriteIndex, verifPort, bufferSize);
@@ -1486,6 +1495,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		inputIndex = 0;
 		outputIndex = 0;
 		repeatInput = false;
+		repeatOutput = false;
 		bufferSize = 0;
 		AddedUntaggedActions = new ArrayList<Action>();
 		inputBuffers = new ArrayList<Var>();
@@ -1514,9 +1524,14 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private void visitTransition(State sourceState, State targetState,
 			Action action) {
 		createActionsSet(action, sourceState, targetState);
+		if(repeatInput && !repeatOutput){
+			//output pattern already copied in process action
+			action.getOutputPattern().clear();
+		}
 		if (!repeatInput && !noRepeatActions.contains(action)) {
 			noRepeatActions.add(action);
 		}
 		repeatInput = false;
+		repeatOutput = false;
 	}
 }
