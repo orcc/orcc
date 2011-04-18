@@ -41,6 +41,7 @@
 
 #include "Jade/ZLib/zlib.h"
 
+#include "llvm/Support/Path.h"
 #include "llvm/Support/FileUtilities.h"
 
 #include <string>

@@ -207,6 +207,7 @@ bool Manager::runWaitEvent(WaitEvent* waitEvent){
 		cout << "-> Execute wait event :\n";
 	}
 	//sys::Sleep(waitEvent->getTime());
+	cout << "-> Wait is deprecated.\n";
 
 	if (verbose){
 		cout << "-> Wait is event.\n";

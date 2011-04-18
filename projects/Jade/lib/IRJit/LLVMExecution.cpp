@@ -75,6 +75,9 @@ extern cl::opt<bool> NoLazyCompilation;
 extern cl::list<std::string> MAttrs;
 extern cl::opt<std::string> MCPU;
 extern cl::opt<std::string> TargetTriple;
+cl::opt<bool> UseMCJIT(
+    "use-mcjit", cl::desc("Enable use of the MC-based JIT (if available)"),
+    cl::init(false));
 
 //===----------------------------------------------------------------------===//
 // main Driver function
@@ -113,6 +116,10 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder, bool verbose): Co
   // If we are supposed to override the target triple, do so now.
   if (!TargetTriple.empty())
     module->setTargetTriple(Triple::normalize(TargetTriple));
+
+    // Enable MCJIT, if desired.
+  if (UseMCJIT)
+    builder.setUseMCJIT(true);
 
   //TODO : select optimization level
   char OptLevel = '2';

@@ -104,8 +104,7 @@ bool LLVMWriter::LinkGlobalInits(llvm::GlobalVariable* variable){
     
 	if (variable->hasInitializer())
       GV->setInitializer(cast<Constant>(MapValue(variable->getInitializer(),
-                                                 ValueMap,
-												 RF_NoModuleLevelChanges)));
+                                                 ValueMap)));
     GV->setLinkage(variable->getLinkage());
     GV->setThreadLocal(variable->isThreadLocal());
     GV->setConstant(variable->isConstant());
@@ -189,7 +188,7 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
                              bool ModuleLevelChanges,
                              SmallVectorImpl<ReturnInst*> &Returns,/* AbstractConnector* fifo,*/
                              const char *NameSuffix, ClonedCodeInfo *CodeInfo) {
-   // Clone any attributes.
+    // Clone any attributes.
   if (NewFunc->arg_size() == OldFunc->arg_size())
     NewFunc->copyAttributesFrom(OldFunc);
   else {
@@ -207,8 +206,8 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
                                      .getFnAttributes()));
 
   }
-  
-    // Loop over all of the basic blocks in the function, cloning them as
+
+  // Loop over all of the basic blocks in the function, cloning them as
   // appropriate.  Note that we save BE this way in order to handle cloning of
   // recursive functions into themselves.
   //
@@ -217,29 +216,21 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
     const BasicBlock &BB = *BI;
 
     // Create a new basic block and copy instructions into it!
-    BasicBlock *CBB = CloneBasicBlock(&BB, VMap, NameSuffix, NewFunc,
-                                      CodeInfo);
+    BasicBlock *CBB = CloneBasicBlock(&BB, VMap, NameSuffix, NewFunc, CodeInfo);
     VMap[&BB] = CBB;                       // Add basic block mapping.
 
     if (ReturnInst *RI = dyn_cast<ReturnInst>(CBB->getTerminator()))
       Returns.push_back(RI);
   }
 
-   // Loop over all of the instructions in the function, fixing up operand
+  // Loop over all of the instructions in the function, fixing up operand
   // references as we go.  This uses VMap to do all the hard work.
-  //
-  map<string, Function*>::iterator it;
   for (Function::iterator BB = cast<BasicBlock>(VMap[OldFunc->begin()]),
          BE = NewFunc->end(); BB != BE; ++BB)
     // Loop over all instructions, fixing each one as we find it...
-	for (BasicBlock::iterator II = BB->begin(); II != BB->end(); ++II){ 
-	  // Remap operands.
-	  for (User::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
-		Value *V = MapValue(*op, VMap, ModuleLevelChanges ? RF_None : RF_NoModuleLevelChanges);
-		assert(V && "Referenced value not in value map!");
-		*op = V;
-	  }
-  }
+    for (BasicBlock::iterator II = BB->begin(); II != BB->end(); ++II)
+      RemapInstruction(II, VMap,
+                       ModuleLevelChanges ? RF_None : RF_NoModuleLevelChanges);
 }
 
 bool LLVMWriter::addType(string name, const Type* type){

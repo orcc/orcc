@@ -42,10 +42,12 @@
 #include "Jade/Jit/LLVMOptimizer.h"
 
 #include "llvm/Module.h"
+#include "llvm/ADT/Triple.h"
 #include "llvm/Support/PassNameParser.h"
 #include "llvm/Support/StandardPasses.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Target/TargetData.h"
+#include "llvm/Target/TargetLibraryInfo.h"
 //------------------------------
 
 using namespace llvm;
@@ -94,6 +96,18 @@ VerifyEach("verify-each", cl::desc("Verify after each transform"));
 
 void LLVMOptimizer::optimize(){
 
+   // Initialize passes
+  PassRegistry &Registry = *PassRegistry::getPassRegistry();
+  initializeCore(Registry);
+  initializeScalarOpts(Registry);
+  initializeIPO(Registry);
+  initializeAnalysis(Registry);
+  initializeIPA(Registry);
+  initializeTransformUtils(Registry);
+  initializeInstCombine(Registry);
+  initializeInstrumentation(Registry);
+  initializeTarget(Registry);
+	
   SMDiagnostic Err;
 
   Module* module = decoder->getModule();
@@ -103,7 +117,11 @@ void LLVMOptimizer::optimize(){
   //
   PassManager Passes;
 
-  // Add an appropriate TargetData instance for this module...
+  // Add an appropriate TargetLibraryInfo pass for the module's triple.
+  TargetLibraryInfo *TLI = new TargetLibraryInfo(Triple(module->getTargetTriple()));
+  Passes.add(TLI);
+
+  // Add an appropriate TargetData instance for this module.
   TargetData *TD = 0;
   const std::string &ModuleDataLayout = module->getDataLayout();
   if (!ModuleDataLayout.empty())
@@ -114,7 +132,7 @@ void LLVMOptimizer::optimize(){
   if (TD)
     Passes.add(TD);
 
-  OwningPtr<PassManager> FPasses;
+   OwningPtr<PassManager> FPasses;
   if (OptLevelO1 || OptLevelO2 || OptLevelO3) {
     FPasses.reset(new PassManager());
     if (TD)
@@ -123,7 +141,7 @@ void LLVMOptimizer::optimize(){
 
   // Create a new optimization pass for each one specified on the command line
   for (unsigned i = 0; i < PassList.size(); ++i) {
-    // Check to see if -std-compile-opts was specified before this option.  If
+     // Check to see if -std-compile-opts was specified before this option.  If
     // so, handle it.
     if (StandardCompileOpts &&
         StandardCompileOpts.getPosition() < PassList.getPosition(i)) {
@@ -150,18 +168,6 @@ void LLVMOptimizer::optimize(){
     if (OptLevelO3 && OptLevelO3.getPosition() < PassList.getPosition(i)) {
       AddOptimizationPasses(Passes, *FPasses, 3);
       OptLevelO3 = false;
-    }
-
-    const PassInfo *PassInf = PassList[i];
-    Pass *P = 0;
-    if (PassInf->getNormalCtor())
-      P = PassInf->getNormalCtor()();
-    else
-      cout << "cannot create pass: "
-             << PassInf->getPassName() << "\n";
-    if (P) {
-      PassKind Kind = P->getPassKind();
-      addPass(Passes, P);
     }
   }
 

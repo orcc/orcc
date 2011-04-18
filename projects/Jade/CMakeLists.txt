@@ -42,6 +42,8 @@ IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 						   ${LLVM_LIBRARY}/LLVMSelectionDAG.lib;
 						   ${LLVM_LIBRARY}/LLVMX86Info.lib;
 						   ${LLVM_LIBRARY}/LLVMAsmPrinter.lib;
+						   ${LLVM_LIBRARY}/LLVMX86AsmPrinter.lib;
+						   ${LLVM_LIBRARY}/LLVMX86Utils.lib;
 						   ${LLVM_LIBRARY}/LLVMCodeGen.lib;
 						   ${LLVM_LIBRARY}/LLVMScalarOpts.lib;
 						   ${LLVM_LIBRARY}/LLVMTransformUtils.lib;
@@ -52,8 +54,8 @@ IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 						   ${LLVM_LIBRARY}/LLVMTarget.lib;
 						   ${LLVM_LIBRARY}/LLVMCore.lib;
 						   ${LLVM_LIBRARY}/LLVMMC.lib;
-						   ${LLVM_LIBRARY}/LLVMSupPort.lib;
-						   ${LLVM_LIBRARY}/LLVMSystem.lib;
+						   ${LLVM_LIBRARY}/LLVMMCParser.lib;
+						   ${LLVM_LIBRARY}/LLVMSupport.lib;
 						   ${LLVM_LIBRARY}/LLVMInstCombine.lib)
 	endif( MSVC )
 else(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )

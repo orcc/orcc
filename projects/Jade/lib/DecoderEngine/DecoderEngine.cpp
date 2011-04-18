@@ -210,7 +210,7 @@ int DecoderEngine::optimize(Network* network, int optLevel){
 		return 1;
 	}
 
-	cout << "-> Start optimization of : " << network->getName().c_str();
+	cout << "-> Start optimization of : " << network->getName().c_str() << "\n";
 
 	LLVMOptimizer opt(it->second);
 	opt.optimize();
