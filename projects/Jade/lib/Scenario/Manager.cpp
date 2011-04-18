@@ -40,7 +40,6 @@
 #include <pthread.h>
 
 #include "llvm/LLVMContext.h"
-#include "llvm/System/Alarm.h"
 
 #include "Jade/DecoderEngine.h"
 #include "Jade/XDFSerialize/XDFParser.h"
@@ -207,7 +206,7 @@ bool Manager::runWaitEvent(WaitEvent* waitEvent){
 	if (verbose){
 		cout << "-> Execute wait event :\n";
 	}
-	sys::Sleep(waitEvent->getTime());
+	//sys::Sleep(waitEvent->getTime());
 
 	if (verbose){
 		cout << "-> Wait is event.\n";

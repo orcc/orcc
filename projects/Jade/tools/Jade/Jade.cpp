@@ -43,12 +43,13 @@
 
 #include "Console.h"
 
+#include "llvm/Support/Threading.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Target/TargetSelect.h"
 #include "llvm/Support/PassNameParser.h"
 #include "llvm/Support/StandardPasses.h"
 #include "llvm/Support/PrettyStackTrace.h"
-#include "llvm/System/Signals.h"
+#include "llvm/Support/Signals.h"
 
 
 #include "Jade/XDFSerialize/XDFParser.h"

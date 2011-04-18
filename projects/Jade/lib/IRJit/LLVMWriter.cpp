@@ -105,7 +105,7 @@ bool LLVMWriter::LinkGlobalInits(llvm::GlobalVariable* variable){
 	if (variable->hasInitializer())
       GV->setInitializer(cast<Constant>(MapValue(variable->getInitializer(),
                                                  ValueMap,
-												 true)));
+												 RF_NoModuleLevelChanges)));
     GV->setLinkage(variable->getLinkage());
     GV->setThreadLocal(variable->isThreadLocal());
     GV->setConstant(variable->isConstant());
@@ -235,7 +235,7 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
 	for (BasicBlock::iterator II = BB->begin(); II != BB->end(); ++II){ 
 	  // Remap operands.
 	  for (User::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
-		Value *V = MapValue(*op, VMap, ModuleLevelChanges);
+		Value *V = MapValue(*op, VMap, ModuleLevelChanges ? RF_None : RF_NoModuleLevelChanges);
 		assert(V && "Referenced value not in value map!");
 		*op = V;
 	  }

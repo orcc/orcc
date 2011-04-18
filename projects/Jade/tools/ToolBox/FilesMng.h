@@ -45,7 +45,7 @@
 #include "llvm/LLVMContext.h"
 #include "llvm/Support/IRReader.h"
 #include "llvm/Support/PassNameParser.h"
-#include "llvm/System/Signals.h"
+#include "llvm/Support/Signals.h"
 //------------------------------
 
 /**

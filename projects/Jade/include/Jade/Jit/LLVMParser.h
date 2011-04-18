@@ -41,7 +41,7 @@
 
 #include "llvm/Module.h"
 #include "llvm/LLVMContext.h"
-#include "llvm/System/Signals.h"
+#include "llvm/Support/Signals.h"
 #include "llvm/Bitcode/Archive.h"
 #include "Jade/Core/Package.h"
 //------------------------------

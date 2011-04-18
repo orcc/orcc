@@ -38,7 +38,7 @@
 //------------------------------
 #include "Jade/Util/CompressionMng.h"
 
-#include "llvm/System/Signals.h"
+#include "llvm/Support/Signals.h"
 
 #include <algorithm>
 #include <iostream>
