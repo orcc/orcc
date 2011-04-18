@@ -81,7 +81,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 		// remove this block
 		EcoreUtil.remove(block);
 
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 			doSwitch(nodes.get(0));
 		}
 
-		return NULL;
+		return null;
 	}
 
 	/**

@@ -71,7 +71,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		EcoreUtil.remove(block);
 		indexNode--;
 
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		EcoreHelper.delete(nodeIf.getCondition());
 		EcoreUtil.remove(nodeIf);
 
-		return NULL;
+		return null;
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		targetBlock = IrFactory.eINSTANCE.createNodeBlock();
 		super.caseProcedure(procedure);
 		procedure.getNodes().add(targetBlock);
-		return NULL;
+		return null;
 	}
 
 }
