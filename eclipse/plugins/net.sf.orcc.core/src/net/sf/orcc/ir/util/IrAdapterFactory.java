@@ -8,7 +8,6 @@ package net.sf.orcc.ir.util;
 
 import java.util.Map;
 
-import net.sf.orcc.ir.*;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
@@ -38,8 +37,12 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
+import net.sf.orcc.ir.Transition;
+import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeFloat;
@@ -54,7 +57,6 @@ import net.sf.orcc.ir.Var;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
-import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -255,24 +257,20 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createUseAdapter();
 			}
 			@Override
-			public <T, T1> Adapter caseEMap(EMap<T, T1> object) {
-				return createEMapAdapter();
-			}
-			@Override
-			public Adapter caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
-				return createVarToPortMapEntryAdapter();
-			}
-			@Override
-			public Adapter casePortToVarMapEntry(Map.Entry<Port, Var> object) {
-				return createPortToVarMapEntryAdapter();
+			public Adapter casePredicate(Predicate object) {
+				return createPredicateAdapter();
 			}
 			@Override
 			public Adapter casePortToEIntegerObjectMapEntry(Map.Entry<Port, Integer> object) {
 				return createPortToEIntegerObjectMapEntryAdapter();
 			}
 			@Override
-			public Adapter casePredicate(Predicate object) {
-				return createPredicateAdapter();
+			public Adapter casePortToVarMapEntry(Map.Entry<Port, Var> object) {
+				return createPortToVarMapEntryAdapter();
+			}
+			@Override
+			public Adapter caseVarToPortMapEntry(Map.Entry<Var, Port> object) {
+				return createVarToPortMapEntryAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -500,44 +498,16 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Predicate <em>Predicate</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see org.eclipse.emf.common.util.EMap
+	 * @see net.sf.orcc.ir.Predicate
 	 * @generated
 	 */
-	public Adapter createEMapAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Var To Port Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createVarToPortMapEntryAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createPortToVarMapEntryAdapter() {
+	public Adapter createPredicateAdapter() {
 		return null;
 	}
 
@@ -556,16 +526,30 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Predicate <em>Predicate</em>}'.
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Port To Var Map Entry</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Predicate
+	 * @see java.util.Map.Entry
 	 * @generated
 	 */
-	public Adapter createPredicateAdapter() {
+	public Adapter createPortToVarMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Var To Port Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createVarToPortMapEntryAdapter() {
 		return null;
 	}
 

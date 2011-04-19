@@ -12,14 +12,14 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Predicate;
 
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
-
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
@@ -36,7 +36,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class PredicateImpl extends EObjectImpl implements Predicate {
 	/**
-	 * The cached value of the '{@link #getExpressions() <em>Expressions</em>}' reference list.
+	 * The cached value of the '{@link #getExpressions() <em>Expressions</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see #getExpressions()
@@ -141,9 +141,23 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	 */
 	public EList<Expression> getExpressions() {
 		if (expressions == null) {
-			expressions = new EObjectResolvingEList<Expression>(Expression.class, this, IrPackage.PREDICATE__EXPRESSIONS);
+			expressions = new EObjectContainmentEList<Expression>(Expression.class, this, IrPackage.PREDICATE__EXPRESSIONS);
 		}
 		return expressions;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case IrPackage.PREDICATE__EXPRESSIONS:
+				return ((InternalEList<?>)getExpressions()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	@Override

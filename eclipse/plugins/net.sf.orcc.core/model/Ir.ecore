@@ -79,14 +79,14 @@
   <eClassifiers xsi:type="ecore:EClass" name="Pattern">
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
+        eType="#//Var" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="numTokensMap" upperBound="-1"
         eType="#//PortToEIntegerObjectMapEntry" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="portToVarMap" upperBound="-1"
         eType="#//PortToVarMapEntry" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="varToPortMap" upperBound="-1"
         eType="#//VarToPortMapEntry" containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
-        eType="#//Var" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Procedure">
     <eStructuralFeatures xsi:type="ecore:EReference" name="location" eType="#//Location"
@@ -260,26 +260,21 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="variable" eType="#//Var"
         eOpposite="#//Var/uses"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="EMap" instanceClassName="org.eclipse.emf.common.util.EMap"
-      abstract="true" interface="true">
-    <eTypeParameters name="T"/>
-    <eTypeParameters name="T1"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="VarToPortMapEntry" instanceClassName="java.util.Map$Entry">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//Var"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Port"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="PortToVarMapEntry" instanceClassName="java.util.Map$Entry">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//Port"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Var"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Predicate">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="expressions" upperBound="-1"
+        eType="#//Expression" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PortToEIntegerObjectMapEntry" instanceClassName="java.util.Map$Entry">
     <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType platform:/plugin/org.eclipse.emf.ecore/model/Ecore.ecore#//EIntegerObject"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Predicate">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="expressions" upperBound="-1"
-        eType="#//Expression"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PortToVarMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Var"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VarToPortMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//Var"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Port"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">
     <eLiterals name="BITAND"/>

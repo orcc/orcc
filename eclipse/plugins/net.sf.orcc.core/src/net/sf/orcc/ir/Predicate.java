@@ -56,7 +56,7 @@ public interface Predicate extends EObject {
 	 * Returns the list of expressions of this predicate.
 	 * 
 	 * @return the list of expressions of this predicate
-	 * @model
+	 * @model containment="true"
 	 */
 	EList<Expression> getExpressions();
 

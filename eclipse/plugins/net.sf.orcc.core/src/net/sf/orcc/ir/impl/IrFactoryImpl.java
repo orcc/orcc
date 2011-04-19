@@ -146,10 +146,10 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			case IrPackage.DEF: return createDef();
 			case IrPackage.VAR: return createVar();
 			case IrPackage.USE: return createUse();
-			case IrPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
-			case IrPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
-			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
 			case IrPackage.PREDICATE: return createPredicate();
+			case IrPackage.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY: return (EObject)createPortToEIntegerObjectMapEntry();
+			case IrPackage.PORT_TO_VAR_MAP_ENTRY: return (EObject)createPortToVarMapEntry();
+			case IrPackage.VAR_TO_PORT_MAP_ENTRY: return (EObject)createVarToPortMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -695,16 +695,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
-		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
-		return portToEIntegerObjectMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Predicate createPredicate() {
 		PredicateImpl predicate = new PredicateImpl();
 		return predicate;
@@ -715,9 +705,29 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Map.Entry<Port, Integer> createPortToEIntegerObjectMapEntry() {
+		PortToEIntegerObjectMapEntryImpl portToEIntegerObjectMapEntry = new PortToEIntegerObjectMapEntryImpl();
+		return portToEIntegerObjectMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public Map.Entry<Port, Var> createPortToVarMapEntry() {
 		PortToVarMapEntryImpl portToVarMapEntry = new PortToVarMapEntryImpl();
 		return portToVarMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Var, Port> createVarToPortMapEntry() {
+		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
+		return varToPortMapEntry;
 	}
 
 	/**
@@ -977,16 +987,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Var createVar(Type type, String name, boolean assignable, int index) {
 		return createVar(IrFactory.eINSTANCE.createLocation(), type, name,
 				assignable, index);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Var, Port> createVarToPortMapEntry() {
-		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
-		return varToPortMapEntry;
 	}
 
 	/**
