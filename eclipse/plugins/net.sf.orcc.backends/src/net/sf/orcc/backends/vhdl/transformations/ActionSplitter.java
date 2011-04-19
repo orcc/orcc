@@ -43,7 +43,6 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
@@ -178,9 +177,8 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		block.add(IrFactory.eINSTANCE.createInstAssign(result, condition));
 		block.add(IrFactory.eINSTANCE.createInstReturn(IrFactory.eINSTANCE
 				.createExprVar(result)));
-		Predicate predicate = IrFactory.eINSTANCE.createPredicate();
 		for (Instruction instruction : block.getInstructions()) {
-			instruction.setPredicate(predicate);
+			instruction.setPredicate(IrFactory.eINSTANCE.createPredicate());
 		}
 		scheduler.getNodes().add(block);
 
@@ -190,7 +188,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 				IrFactory.eINSTANCE.createTypeVoid());
 		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		Instruction inst = IrFactory.eINSTANCE.createInstReturn();
-		inst.setPredicate(predicate);
+		inst.setPredicate(IrFactory.eINSTANCE.createPredicate());
 		block.add(inst);
 		body.getNodes().add(block);
 

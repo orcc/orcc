@@ -75,6 +75,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 				targetBlock = updateTargetBlock(procedure, predicate);
 			}
 
+			inst.setPredicate(null);
 			targetBlock.getInstructions().add(inst);
 		}
 

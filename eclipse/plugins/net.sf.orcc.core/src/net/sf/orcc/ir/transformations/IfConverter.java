@@ -61,7 +61,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		List<Instruction> instructions = block.getInstructions();
 		// annotate with predicate
 		for (Instruction instruction : instructions) {
-			instruction.setPredicate(currentPredicate);
+			instruction.setPredicate(EcoreUtil.copy(currentPredicate));
 		}
 
 		// move to target block

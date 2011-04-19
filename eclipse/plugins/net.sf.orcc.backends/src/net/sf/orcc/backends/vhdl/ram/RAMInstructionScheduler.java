@@ -34,6 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.backends.instructions.InstRamRead;
 import net.sf.orcc.backends.instructions.InstRamSetAddress;
 import net.sf.orcc.backends.instructions.InstRamWrite;
@@ -80,7 +82,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			Predicate predicate, List<Expression> indexes, int port, Var var) {
 		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
 				.createInstRamSetAddress(port, var, indexes);
-		rsa.setPredicate(predicate);
+		rsa.setPredicate(EcoreUtil.copy(predicate));
 
 		// insert the RSA before the previous split instruction
 		for (int i = indexInst - 1; i > 0; i--) {
@@ -108,7 +110,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		InstRamRead read = InstructionsFactory.eINSTANCE.createInstRamRead(
 				port, load.getSource().getVariable(), load.getTarget()
 						.getVariable());
-		read.setPredicate(predicate);
+		read.setPredicate(EcoreUtil.copy(predicate));
 
 		List<InstRamRead> reads = pendingReads.get(ram);
 		reads.add(read);
@@ -128,7 +130,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			Predicate predicate, List<Expression> indexes, int port, Var var) {
 		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
 				.createInstRamSetAddress(port, var, indexes);
-		rsa.setPredicate(predicate);
+		rsa.setPredicate(EcoreUtil.copy(predicate));
 		instructions.add(indexInst++, rsa);
 	}
 
@@ -139,7 +141,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	private void addSplitInstruction(List<Instruction> instructions,
 			Predicate predicate) {
 		InstSplit instSplit = InstructionsFactory.eINSTANCE.createInstSplit();
-		instSplit.setPredicate(predicate);
+		instSplit.setPredicate(EcoreUtil.copy(predicate));
 		instructions.add(indexInst++, instSplit);
 	}
 
@@ -157,7 +159,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			RAM ram, InstStore store, int port) {
 		InstRamWrite write = InstructionsFactory.eINSTANCE.createInstRamWrite(
 				port, store.getTarget().getVariable(), store.getValue());
-		write.setPredicate(predicate);
+		write.setPredicate(EcoreUtil.copy(predicate));
 		instructions.add(indexInst++, write);
 	}
 

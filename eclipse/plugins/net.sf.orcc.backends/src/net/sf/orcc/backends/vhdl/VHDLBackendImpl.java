@@ -63,6 +63,7 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
@@ -162,6 +163,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 		// applies transformations
 		for (ActorVisitor<?> transformation : transformationsCodegen) {
 			transformation.doSwitch(actor);
+			if (debugMode && !EcoreHelper.serializeActor(path, actor)) {
+				System.out.println("oops " + transformation + " "
+						+ actor.getName());
+			}
 		}
 
 		VHDLTemplateData templateData = new VHDLTemplateData();
