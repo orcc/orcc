@@ -40,6 +40,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -100,7 +101,7 @@ public class Instantiator implements INetworkTransformation {
 							+ instance.getId() + " has no value for parameter "
 							+ name);
 				}
-				
+
 				paramsMap.put(name, parameter);
 			}
 
@@ -230,10 +231,10 @@ public class Instantiator implements INetworkTransformation {
 			connection.setSource(srcPort);
 
 			srcPortType = srcPort.getType();
-			sourceString = srcPort + " of " + source;
+			sourceString = srcPort.getName() + " of " + source.getId();
 		} else {
 			srcPortType = srcVertex.getPort().getType();
-			sourceString = srcVertex.getPort().toString();
+			sourceString = srcVertex.getPort().getName();
 		}
 
 		Type dstPortType;
@@ -260,10 +261,10 @@ public class Instantiator implements INetworkTransformation {
 			connection.setTarget(dstPort);
 
 			dstPortType = dstPort.getType();
-			targetString = dstPort + " of " + target;
+			targetString = dstPort.getName() + " of " + target.getId();
 		} else {
 			dstPortType = tgtVertex.getPort().getType();
-			targetString = tgtVertex.getPort().toString();
+			targetString = tgtVertex.getPort().getName();
 		}
 
 		// check port types match
@@ -271,7 +272,9 @@ public class Instantiator implements INetworkTransformation {
 		Type dstType = dstPortType;
 		if (!EcoreUtil.equals(srcType, dstType)) {
 			throw new OrccException("Type error: port " + sourceString + " is "
-					+ srcType + ", port " + targetString + " is " + dstType);
+					+ new TypePrinter().doSwitch(srcType) + ", port "
+					+ targetString + " is "
+					+ new TypePrinter().doSwitch(dstType));
 		}
 	}
 
