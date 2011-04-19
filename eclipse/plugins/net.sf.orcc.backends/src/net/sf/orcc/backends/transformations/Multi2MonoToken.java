@@ -218,7 +218,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				buffer, writeIndex, port, bufferSize);
 		modifyActionScheduler.doSwitch(action.getScheduler());
 		modifyActionSchedulability(action, writeIndex, readIndex, OpBinary.GE,
-				IrFactory.eINSTANCE.createExprInt(numTokens));
+				IrFactory.eINSTANCE.createExprInt(numTokens), port);
 	}
 
 	/**
@@ -247,13 +247,13 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @param position
 	 *            position of the buffer in inputBuffers list
 	 */
-	private void consumeToken(Procedure body, int position) {
+	private void consumeToken(Procedure body, int position, Port port) {
 
 		NodeBlock bodyNode = body.getFirst();
 		EList<Var> locals = body.getLocals();
 		Var index = IrFactory.eINSTANCE.createVar(
 				IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeInt(32), "index", true, 1);
+				IrFactory.eINSTANCE.createTypeInt(32), "index"+port.getName(), true, 1);
 		locals.add(index);
 		Var writeIndex = writeIndexes.get(position);
 		Instruction loadInd = IrFactory.eINSTANCE.createInstLoad(index,
@@ -262,7 +262,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		Var indexInc = IrFactory.eINSTANCE.createVar(
 				IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeInt(32), "index", true, 2);
+				IrFactory.eINSTANCE.createTypeInt(32), "index"+port.getName(), true, 2);
 		locals.add(indexInc);
 		Expression value = IrFactory.eINSTANCE.createExprBinary(
 				IrFactory.eINSTANCE.createExprVar(index), OpBinary.PLUS,
@@ -531,7 +531,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		defineUntaggedBody(readIndex, storeList, newUntaggedAction.getBody(),
 				localINPUT);
 		modifyActionSchedulability(newUntaggedAction, writeIndex, readIndex,
-				OpBinary.LT, IrFactory.eINSTANCE.createExprInt(bufferSize));
+				OpBinary.LT, IrFactory.eINSTANCE.createExprInt(bufferSize), port);
 		Pattern pattern = newUntaggedAction.getInputPattern();
 		pattern.setNumTokens(port, 1);
 		pattern.setVariable(port, localINPUT);
@@ -833,14 +833,14 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            read index of the buffer
 	 */
 	private void modifyActionSchedulability(Action action, Var writeIndex,
-			Var readIndex, OpBinary op, Expression reference) {
+			Var readIndex, OpBinary op, Expression reference, Port port) {
 		Procedure scheduler = action.getScheduler();
 		NodeBlock bodyNode = scheduler.getLast();
 		EList<Var> locals = scheduler.getLocals();
 
 		Var localRead = IrFactory.eINSTANCE.createVar(
 				IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeInt(32), "readIndex", true,
+				IrFactory.eINSTANCE.createTypeInt(32), "readIndex_"+port.getName()+"_"+inputIndex, true,
 				inputIndex);
 
 		locals.add(localRead);
@@ -852,7 +852,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		Var localWrite = IrFactory.eINSTANCE.createVar(
 				IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeInt(32), "writeIndex", true,
+				IrFactory.eINSTANCE.createTypeInt(32), "writeIndex_"+port.getName()+"_"+inputIndex, true,
 				inputIndex);
 		locals.add(localWrite);
 		Instruction Load2 = IrFactory.eINSTANCE.createInstLoad(localWrite,
@@ -862,7 +862,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		Var diff = IrFactory.eINSTANCE
 				.createVar(IrFactory.eINSTANCE.createLocation(),
-						IrFactory.eINSTANCE.createTypeInt(32), "diff", true,
+						IrFactory.eINSTANCE.createTypeInt(32), "diff"+port.getName()+"_"+inputIndex, true,
 						inputIndex);
 		locals.add(diff);
 		Expression value = IrFactory.eINSTANCE.createExprBinary(
@@ -875,7 +875,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		Var conditionVar = IrFactory.eINSTANCE.createVar(
 				IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeBool(), "condition", true,
+				IrFactory.eINSTANCE.createTypeBool(), "condition_"+port.getName(), true,
 				inputIndex);
 		locals.add(conditionVar);
 		Expression value2 = IrFactory.eINSTANCE.createExprBinary(
@@ -888,7 +888,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		Var myResult = IrFactory.eINSTANCE.createVar(
 				IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeBool(), "myResult", true,
+				IrFactory.eINSTANCE.createTypeBool(), "myResult_"+port.getName(), true,
 				inputIndex);
 		locals.add(myResult);
 		int returnIndex = bodyNode.getInstructions().size() - 1;
@@ -980,19 +980,19 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						Var writeIndex = writeIndexes.get(position);
 						Var readIndex = readIndexes.get(position);
 
-						int index = it.previousIndex();
-						action.getInputPattern().remove(port);
-						it = action.getInputPattern().getPorts()
-								.listIterator(index);
-
 						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 								buffer, writeIndex, port, bufferSize);
 						modifyActionScheduler.doSwitch(action);
 						modifyActionSchedulability(action, writeIndex,
 								readIndex, OpBinary.NE,
-								IrFactory.eINSTANCE.createExprInt(0));
-						consumeToken(body, position);
+								IrFactory.eINSTANCE.createExprInt(0), port);
+						consumeToken(body, position, port);
 						noRepeatActions.remove(action);
+						
+						int index = it.previousIndex();
+						action.getInputPattern().remove(port);
+						it = action.getInputPattern().getPorts()
+								.listIterator(index);
 					}
 				}
 			}
@@ -1085,7 +1085,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	}
 
 	/**
-	 * This method clones the output patterns from a source action to a target
+	 * This method copies the output patterns from a source action to a target
 	 * one
 	 * 
 	 * @param source
@@ -1093,9 +1093,27 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @param target
 	 *            target action
 	 */
-	private void moveOutputPattern(Action source, Action target) {
+	private void copyOutputPattern(Action source, Action target) {
 		Pattern targetPattern = target.getOutputPattern();
 		Pattern sourcePattern = source.getOutputPattern();
+		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
+		targetPattern.getPorts().addAll(sourcePattern.getPorts());
+		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
+		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
+	}
+	
+	/**
+	 * This method copies the output patterns from a source action to a target
+	 * one
+	 * 
+	 * @param source
+	 *            source action
+	 * @param target
+	 *            target action
+	 */
+	private void copyInputPattern(Action source, Action target) {
+		Pattern targetPattern = target.getInputPattern();
+		Pattern sourcePattern = source.getInputPattern();
 		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
 		targetPattern.getPorts().addAll(sourcePattern.getPorts());
 		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
@@ -1153,10 +1171,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				fsm.addTransition(processState, process, targetState);
 
 				// move action's Output pattern to new process action
-				moveOutputPattern(action, process);
-				// Pattern actionPattern = action.getOutputPattern();
-				// process.setOutputPattern(actionPattern);
-
+				copyOutputPattern(action, process);
+				
 				Var untagBuffer = IrFactory.eINSTANCE.createVar(
 						IrFactory.eINSTANCE.createLocation(), entryType,
 						"buffer", true, true);
@@ -1269,8 +1285,15 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				// inputs
 				if (!repeatInput) {
 					process = createProcessAction(action);
+					copyInputPattern(action, process);
 					State processState = IrFactory.eINSTANCE
 							.createState(processName);
+					action.getBody().getNodes().clear();
+					NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+					block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+					block.add(IrFactory.eINSTANCE.createInstReturn());
+					action.getBody().getNodes().add(block);
+					
 					fsm.getStates().add(processState);
 					fsm.replaceTarget(sourceState, action, processState);
 					fsm.addTransition(processState, process, writeState);
@@ -1340,7 +1363,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				modifyActionScheduler.doSwitch(action);
 				modifyActionSchedulability(action, writeIndex, readIndex,
 						OpBinary.GE,
-						IrFactory.eINSTANCE.createExprInt(verifNumTokens));
+						IrFactory.eINSTANCE.createExprInt(verifNumTokens), verifPort);
 				updateUntagIndex(action, writeIndex, verifNumTokens);
 			} else {
 				if (verifNumTokens > 1) {
@@ -1375,7 +1398,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					modifyActionScheduler.doSwitch(action);
 					modifyActionSchedulability(action, untagWriteIndex,
 							untagReadIndex, OpBinary.GE,
-							IrFactory.eINSTANCE.createExprInt(verifNumTokens));
+							IrFactory.eINSTANCE.createExprInt(verifNumTokens),verifPort);
 					updateUntagIndex(action, untagWriteIndex, verifNumTokens);
 				}
 			}
@@ -1527,6 +1550,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		if(repeatInput && !repeatOutput){
 			//output pattern already copied in process action
 			action.getOutputPattern().clear();
+		}
+		if(repeatOutput && !repeatInput){
+			action.getInputPattern().clear();
 		}
 		if (!repeatInput && !noRepeatActions.contains(action)) {
 			noRepeatActions.add(action);
