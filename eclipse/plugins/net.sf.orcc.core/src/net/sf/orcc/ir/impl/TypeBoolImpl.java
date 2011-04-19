@@ -22,7 +22,6 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected TypeBoolImpl() {
@@ -36,7 +35,6 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override

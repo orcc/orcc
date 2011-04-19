@@ -620,7 +620,7 @@ public interface IrPackage extends EPackage {
 		EReference INSTRUCTION__LOCATION = eINSTANCE.getInstruction_Location();
 
 		/**
-		 * The meta object literal for the '<em><b>Predicate</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Predicate</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -2345,7 +2345,7 @@ public interface IrPackage extends EPackage {
 	int INSTRUCTION__LOCATION = 0;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2380,7 +2380,7 @@ public interface IrPackage extends EPackage {
 	int INST_ASSIGN__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2422,7 +2422,7 @@ public interface IrPackage extends EPackage {
 	int INST_CALL__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2474,7 +2474,7 @@ public interface IrPackage extends EPackage {
 	int INST_LOAD__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2526,7 +2526,7 @@ public interface IrPackage extends EPackage {
 	int INST_PHI__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2578,7 +2578,7 @@ public interface IrPackage extends EPackage {
 	int INST_RETURN__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2611,7 +2611,7 @@ public interface IrPackage extends EPackage {
 	int INST_SPECIFIC__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2636,7 +2636,7 @@ public interface IrPackage extends EPackage {
 	int INST_STORE__LOCATION = INSTRUCTION__LOCATION;
 
 	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -4125,10 +4125,10 @@ public interface IrPackage extends EPackage {
 	EReference getInstruction_Location();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.Instruction#getPredicate <em>Predicate</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Instruction#getPredicate <em>Predicate</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Predicate</em>'.
+	 * @return the meta object for the containment reference '<em>Predicate</em>'.
 	 * @see net.sf.orcc.ir.Instruction#getPredicate()
 	 * @see #getInstruction()
 	 * @generated
@@ -4570,7 +4570,7 @@ public interface IrPackage extends EPackage {
 	 * @return the meta object for class '<em>Port To EInteger Object Map Entry</em>'.
 	 * @see java.util.Map.Entry
 	 * @model keyType="net.sf.orcc.ir.Port"
-	 *        valueDataType="org.eclipse.emf.ecore.EIntegerObject"
+	 *        valueDataType="ecore.EIntegerObject"
 	 * @generated
 	 */
 	EClass getPortToEIntegerObjectMapEntry();

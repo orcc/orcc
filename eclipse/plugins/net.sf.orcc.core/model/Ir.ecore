@@ -131,7 +131,8 @@
   <eClassifiers xsi:type="ecore:EClass" name="Instruction" abstract="true">
     <eStructuralFeatures xsi:type="ecore:EReference" name="location" eType="#//Location"
         containment="true" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="predicate" eType="#//Predicate"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="predicate" eType="#//Predicate"
+        containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="InstAssign" eSuperTypes="#//Instruction">
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//Def"

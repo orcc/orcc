@@ -66,23 +66,13 @@ public interface Instruction extends EObject {
 	public Location getLocation();
 
 	/**
-	 * Returns the predicate associated with this instruction as a list of
-	 * expressions. This is used by if-conversion.
+	 * Returns the predicate associated with this instruction. This is used by
+	 * if-conversion.
 	 * 
 	 * @return the predicate associated with this instruction
-	 * @model
+	 * @model containment="true"
 	 */
 	Predicate getPredicate();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Instruction#getPredicate <em>Predicate</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Predicate</em>' reference.
-	 * @see #getPredicate()
-	 * @generated
-	 */
-	void setPredicate(Predicate value);
 
 	/**
 	 * Returns <code>true</code> if the instruction is an Assign.
@@ -133,5 +123,14 @@ public interface Instruction extends EObject {
 	 *            the location of this instruction
 	 */
 	void setLocation(Location location);
+
+	/**
+	 * Sets the predicate associated with this instruction. This is used by
+	 * if-conversion.
+	 * 
+	 * @param predicate
+	 *            the predicate associated with this instruction
+	 */
+	void setPredicate(Predicate predicate);
 
 }
