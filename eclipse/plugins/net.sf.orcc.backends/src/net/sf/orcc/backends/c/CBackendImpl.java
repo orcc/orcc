@@ -209,7 +209,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
-			if (!EcoreHelper.serializeActor(path, actor)) {
+			if (debugMode && !EcoreHelper.serializeActor(path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}
