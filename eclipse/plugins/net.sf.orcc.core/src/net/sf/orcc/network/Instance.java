@@ -185,7 +185,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * 
 	 * @return the classification class of this instance
 	 */
-	public MoC getContentClass() {
+	public MoC getMoC() {
 		MoC clasz = null;
 
 		if (isActor()) {
