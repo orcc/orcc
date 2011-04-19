@@ -30,6 +30,7 @@ package net.sf.orcc.backends.vhdl.ram;
 
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Predicate;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines a RAM.
@@ -87,7 +88,7 @@ public class RAM {
 	 */
 	public void reset() {
 		alreadyAccessed = false;
-		predicate = IrFactory.eINSTANCE.createPredicate();
+		setPredicate(IrFactory.eINSTANCE.createPredicate());
 	}
 
 	public void setLastAccessRead(boolean lastAccessRead) {
@@ -102,11 +103,14 @@ public class RAM {
 	/**
 	 * Sets the predicate this RAM was last accessed with.
 	 * 
-	 * @param predicate
+	 * @param newPredicate
 	 *            the predicate this RAM was last accessed with
 	 */
-	public void setPredicate(Predicate predicate) {
-		this.predicate = predicate;
+	public void setPredicate(Predicate newPredicate) {
+		if (predicate != null) {
+			EcoreHelper.delete(predicate);
+		}
+		predicate = EcoreHelper.copy(newPredicate);
 	}
 
 	public void setWaitCycleNeeded(boolean waitCycleNeeded) {

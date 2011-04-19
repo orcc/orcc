@@ -72,8 +72,8 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 			Predicate predicate = inst.getPredicate();
 			if (!predicate.isSameAs(currentPredicate)) {
+				// deletes the current predicate
 				if (currentPredicate != null) {
-					// deletes the current predicate
 					EcoreHelper.delete(currentPredicate);
 				}
 
@@ -86,6 +86,11 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 			// moves the instruction
 			targetBlock.getInstructions().add(inst);
+		}
+
+		// deletes the current predicate
+		if (currentPredicate != null) {
+			EcoreHelper.delete(currentPredicate);
 		}
 
 		// remove this block
