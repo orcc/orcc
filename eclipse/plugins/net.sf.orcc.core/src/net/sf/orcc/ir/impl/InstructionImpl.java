@@ -6,13 +6,11 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Predicate;
-import net.sf.orcc.ir.util.ExpressionPrinter;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -252,12 +250,7 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		if (predicate != null && !predicate.isEmpty()) {
-			for (Expression condition : getPredicate().getExpressions()) {
-				builder.append("<");
-				String str = new ExpressionPrinter().doSwitch(condition);
-				builder.append(str);
-				builder.append(">");
-			}
+			builder.append(predicate.toString());
 			builder.append(" ");
 		}
 		return builder.toString();

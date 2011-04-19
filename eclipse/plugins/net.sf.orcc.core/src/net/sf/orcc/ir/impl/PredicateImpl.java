@@ -11,6 +11,7 @@ import java.util.Collection;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Predicate;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -168,6 +169,18 @@ public class PredicateImpl extends EObjectImpl implements Predicate {
 	@Override
 	public boolean isSameAs(Predicate predicate) {
 		return EcoreUtil.equals(this, predicate);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for (Expression condition : getExpressions()) {
+			builder.append("<");
+			String str = new ExpressionPrinter().doSwitch(condition);
+			builder.append(str);
+			builder.append(">");
+		}
+		return builder.toString();
 	}
 
 } //PredicateImpl
