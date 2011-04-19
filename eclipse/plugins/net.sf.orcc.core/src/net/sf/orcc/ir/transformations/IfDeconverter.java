@@ -72,10 +72,19 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 			Predicate predicate = inst.getPredicate();
 			if (!predicate.isSameAs(currentPredicate)) {
+				if (currentPredicate != null) {
+					// deletes the current predicate
+					EcoreHelper.delete(currentPredicate);
+				}
+
+				// updates the target block
 				targetBlock = updateTargetBlock(procedure, predicate);
 			}
 
-			inst.setPredicate(null);
+			// deletes the predicate of the instruction
+			EcoreHelper.delete(predicate);
+
+			// moves the instruction
 			targetBlock.getInstructions().add(inst);
 		}
 
@@ -165,7 +174,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 				if (nodes == null) {
 					// create a new if
 					NodeIf nodeIf = IrFactory.eINSTANCE.createNodeIf();
-					nodeIf.setCondition(condition);
+					nodeIf.setCondition(EcoreHelper.copy(condition));
 					nodeIf.setJoinNode(IrFactory.eINSTANCE.createNodeBlock());
 					nodeIfList.add(nodeIf);
 					parentNodes.add(nodeIf);
@@ -176,7 +185,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 					parentNodes = nodes;
 				}
 
-				currentPredicate.add(condition);
+				currentPredicate.add(EcoreHelper.copy(condition));
 			}
 
 			return procedure.getLast(parentNodes);

@@ -61,7 +61,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		List<Instruction> instructions = block.getInstructions();
 		// annotate with predicate
 		for (Instruction instruction : instructions) {
-			instruction.setPredicate(EcoreUtil.copy(currentPredicate));
+			instruction.setPredicate(EcoreHelper.copy(currentPredicate));
 		}
 
 		// move to target block
@@ -79,18 +79,20 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		Predicate previousPredicate = currentPredicate;
 
 		// predicate for "then" branch
-		currentPredicate = EcoreUtil.copy(previousPredicate);
+		currentPredicate = EcoreHelper.copy(previousPredicate);
 		currentPredicate.getExpressions().add(
 				EcoreHelper.copy(nodeIf.getCondition()));
 		doSwitch(nodeIf.getThenNodes());
+		EcoreHelper.delete(currentPredicate);
 
 		// predicate for "else" branch
-		currentPredicate = EcoreUtil.copy(previousPredicate);
+		currentPredicate = EcoreHelper.copy(previousPredicate);
 		currentPredicate.getExpressions().add(
 				IrFactory.eINSTANCE.createExprUnary(OpUnary.LOGIC_NOT,
 						EcoreHelper.copy(nodeIf.getCondition()),
 						IrFactory.eINSTANCE.createTypeBool()));
 		doSwitch(nodeIf.getElseNodes());
+		EcoreHelper.delete(currentPredicate);
 
 		// restore predicate for "join" node
 		currentPredicate = previousPredicate;
