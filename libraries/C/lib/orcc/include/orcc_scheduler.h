@@ -94,10 +94,15 @@ struct mapping_s {
 	int *partitions_size;
 };
 
+struct mappings_set_s {
+	int size;
+	struct mapping_s **mappings;
+};
+
 #include "orcc_scheduler.inl"
 
 /**
- * Initializes the given scheduler.
+ * Initialize the given scheduler.
  */
 void sched_init(struct scheduler_s *sched, int id, int num_actors,
 		struct actor_s **actors, struct waiting_s *ring_waiting_schedulable,
@@ -105,24 +110,35 @@ void sched_init(struct scheduler_s *sched, int id, int num_actors,
 		struct sync_s *sync);
 
 /**
- * Reinitializes the given scheduler.
+ * Reinitialize the given scheduler.
  */
 void sched_reinit(struct scheduler_s *sched, int num_actors,
 		struct actor_s **actors, int use_ring_topology, int schedulers_nb);
 
 /**
- * Computes a partitionment of actors on threads from an XML file given in parameter.
- */
-struct mapping_s * map_actors(struct actor_s **actors, int actors_nb);
-
-/**
- * Creates a mapping structure.
+ * Create a mapping structure.
  */
 struct mapping_s* allocate_mapping(int number_of_threads);
 
 /**
- * Releases memory of the given mapping structure.
+ * Release memory of the given mapping structure.
  */
 void delete_mapping(struct mapping_s* mapping, int clean_all);
+
+/**
+ * Give the id of the mapped core of the given actor in the given mapping structure.
+ */
+int find_mapped_core(struct mapping_s *mapping, struct actor_s *actor);
+
+/**
+ * Generate some mapping structure from an XCF file.
+ */
+struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
+		struct actor_s **actors, int actors_size);
+
+/**
+ * Compute a partitionment of actors on threads from an XML file given in parameter.
+ */
+struct mapping_s* map_actors(struct actor_s **actors, int actors_size);
 
 #endif

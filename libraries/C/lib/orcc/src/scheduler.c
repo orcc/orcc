@@ -135,15 +135,28 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
  * Find actor by its name in the given table.
  */
 static struct actor_s * find_actor(char *name, struct actor_s **actors,
-		int actors_nb) {
+		int actors_size) {
 	int i;
-	for (i = 0; i < actors_nb; i++) {
+	for (i = 0; i < actors_size; i++) {
 		if (strcmp(name, actors[i]->name) == 0) {
 			return actors[i];
 		}
 	}
-	printf("Error: Actor %s doesn't exist in the description.\n", name);
-	exit(0);
+	return NULL;
+}
+
+/**
+ * Give the id of the mapped core of the given actor in the given mapping structure.
+ */
+int find_mapped_core(struct mapping_s *mapping, struct actor_s *actor) {
+	int i;
+	for (i = 0; i < mapping->number_of_threads; i++) {
+		if (find_actor(actor->name, mapping->partitions_of_actors[i],
+				mapping->partitions_size[i]) != NULL) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 /**
@@ -179,52 +192,74 @@ void delete_mapping(struct mapping_s* mapping, int clean_all) {
 /**
  * Computes a partitionment of actors on threads from an XML file given in parameter.
  */
-struct mapping_s * map_actors(struct actor_s **actors, int actors_nb) {
-	int i, j, size;
+struct mapping_s* map_actors(struct actor_s **actors, int actors_size) {
+	if (mapping_file == NULL) {
+		struct mapping_s *mapping = allocate_mapping(1);
+		mapping->threads_ids[0] = 0;
+		mapping->partitions_size[0] = actors_size;
+		mapping->partitions_of_actors[0] = actors;
+		return mapping;
+	} else {
+		struct mappings_set_s *mappings_set = compute_mappings_from_file(
+				mapping_file, actors, actors_size);
+		return mappings_set->mappings[0];
+	}
+}
+
+/**
+ * Generate some mapping structure from an XCF file.
+ */
+struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
+		struct actor_s **actors, int actors_size) {
+	int i, j, k, size;
 	char *nb, *name;
 	node_t *configuration, *partitioning, *partition, *instance, *attribute;
-	struct mapping_s *mapping;
+	struct mappings_set_s *mappings_set = (struct mappings_set_s *) malloc(
+			sizeof(struct mappings_set_s));
 
-	if (mapping_file == NULL) {
-		mapping = allocate_mapping(1);
-		mapping->threads_ids[0] = 0;
-		mapping->partitions_size[0] = actors_nb;
-		mapping->partitions_of_actors[0] = actors;
-	} else {
-		configuration = roxml_load_doc(mapping_file);
-		if (configuration == NULL) {
-			printf("I/O error when reading mapping file.\n");
-			exit(1);
-		}
+	configuration = roxml_load_doc(mapping_file);
+	if (configuration == NULL) {
+		printf("I/O error when reading mapping file.\n");
+		exit(1);
+	}
 
-		partitioning = roxml_get_chld(configuration, NULL, 0);
+	mappings_set->size = roxml_get_chld_nb(configuration);
+	mappings_set->mappings = (struct mapping_s **) malloc(
+			mappings_set->size * sizeof(struct mapping_s *));
+
+	for (i = 0; i < mappings_set->size; i++) {
+		partitioning = roxml_get_chld(configuration, NULL, i);
 		name = roxml_get_name(partitioning, NULL, 0);
 
-		mapping = allocate_mapping(roxml_get_chld_nb(partitioning));
+		mappings_set->mappings[i] = allocate_mapping(
+				roxml_get_chld_nb(partitioning));
 
-		for (i = 0; i < mapping->number_of_threads; i++) {
-			partition = roxml_get_chld(partitioning, NULL, i);
+		for (j = 0; j < mappings_set->mappings[i]->number_of_threads; j++) {
+			partition = roxml_get_chld(partitioning, NULL, j);
 			name = roxml_get_name(partition, NULL, 0);
-			mapping->partitions_size[i] = roxml_get_chld_nb(partition);
+			mappings_set->mappings[i]->partitions_size[j] = roxml_get_chld_nb(
+					partition);
 
 			attribute = roxml_get_attr(partition, "id", 0);
 			nb = roxml_get_content(attribute, NULL, 0, &size);
-			mapping->threads_ids[i] = atoi(nb);
+			mappings_set->mappings[i]->threads_ids[j] = atoi(nb);
 
-			mapping->partitions_of_actors[i] = (struct actor_s **) malloc(
-					mapping->partitions_size[i] * sizeof(struct actor_s *));
+			mappings_set->mappings[i]->partitions_of_actors[j]
+					= (struct actor_s **) malloc(
+							mappings_set->mappings[i]->partitions_size[j]
+									* sizeof(struct actor_s *));
 
-			for (j = 0; j < mapping->partitions_size[i]; j++) {
-				instance = roxml_get_chld(partition, NULL, j);
+			for (k = 0; k < mappings_set->mappings[i]->partitions_size[j]; k++) {
+				instance = roxml_get_chld(partition, NULL, k);
 				name = roxml_get_name(instance, NULL, 0);
 				attribute = roxml_get_attr(instance, "id", 0);
 				name = roxml_get_content(attribute, NULL, 0, &size);
-				mapping->partitions_of_actors[i][j] = find_actor(name, actors,
-						actors_nb);
+				mappings_set->mappings[i]->partitions_of_actors[j][k]
+						= find_actor(name, actors, actors_size);
 			}
 		}
-		roxml_close(configuration);
 	}
+	roxml_close(configuration);
 
-	return mapping;
+	return mappings_set;
 }

@@ -174,6 +174,27 @@ static int compare_individual_fps(void const *a, void const *b) {
 }
 
 /**
+ * Create an individual from a given mapping structure.
+ */
+static individual* build_given_individual(struct mapping_s *mapping,
+		struct genetic_s *genetic_info) {
+	int i, j;
+	individual* ind = (individual*) malloc(sizeof(individual));
+	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	ind->fps = -1;
+	ind->old_fps = -1;
+
+	for (i = 0; i < genetic_info->actors_nb; i++) {
+		ind->genes[i] = (gene*) malloc(sizeof(gene));
+		ind->genes[i]->actor = genetic_info->actors[i];
+		ind->genes[i]->mapped_core = find_mapped_core(mapping,
+				ind->genes[i]->actor);
+	}
+
+	return ind;
+}
+
+/**
  * Create a constant individual with the given id.
  */
 static individual* generate_constant_individual(struct genetic_s *genetic_info,
@@ -184,7 +205,7 @@ static individual* generate_constant_individual(struct genetic_s *genetic_info,
 	ind->fps = -1;
 	ind->old_fps = -1;
 
-	// Initialize genes randomly
+	// Initialize genes with the value of parameter called thread
 	for (i = 0; i < genetic_info->actors_nb; i++) {
 		ind->genes[i] = (gene*) malloc(sizeof(gene));
 		ind->genes[i]->actor = genetic_info->actors[i];
@@ -263,26 +284,44 @@ int clean_cache(int size) {
 	return res;
 }
 
+static FILE* open_mapping_file(const char *opentype) {
+	FILE *mappingFile;
+
+	if (output_genetic == NULL) {
+		mappingFile = fopen("genetic_mapping.xcf", opentype);
+	} else {
+		mappingFile = fopen(output_genetic, opentype);
+	}
+
+	if (mappingFile == NULL) {
+		perror("I/O error during opening of mapping file.");
+		exit(1);
+	}
+
+	return mappingFile;
+}
+
 /**
  * Write the header of a mapping file.
  */
-static void initialize_mapping_file() {
-	// Open file
-	FILE *mappingFile;
-	if (output_genetic == NULL) {
-		mappingFile = fopen("genetic_mapping.xcf", "w");
-	} else {
-		mappingFile = fopen(output_genetic, "w");
-	}
-	if (mappingFile == NULL) {
-		perror("I/O error during opening of mapping file.");
-	}
+static void write_mapping_header() {
+	FILE *mappingFile = open_mapping_file("w");
 
-	// Write header
 	fprintf(mappingFile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 	fprintf(mappingFile, "<!-- GENETIC ALGORITHM -->\n\n");
+	fprintf(mappingFile, "<Configuration>\n");
 
-	// Close file
+	fclose(mappingFile);
+}
+
+/**
+ * Write the footer of a mapping file.
+ */
+static void write_mapping_footer() {
+	FILE *mappingFile = open_mapping_file("a");
+
+	fprintf(mappingFile, "</Configuration>\n");
+
 	fclose(mappingFile);
 }
 
@@ -291,27 +330,18 @@ static void initialize_mapping_file() {
  */
 static void write_mapping(population *pop, struct genetic_s *genetic_info) {
 	int i, j, k;
-	FILE *mappingFile;
 
-	// Open file
-	if (output_genetic == NULL) {
-		mappingFile = fopen("genetic_mapping.xcf", "a");
-	} else {
-		mappingFile = fopen(output_genetic, "a");
-	}
-	if (mappingFile == NULL) {
-		perror("I/O error during opening of mapping file.");
-	}
+	FILE *mappingFile = open_mapping_file("a");
 
 	fprintf(mappingFile, "<!-- POPULATION N°%i -->\n", pop->generation_nb);
 
 	for (i = 0; i < genetic_info->population_size; i++) {
 		struct mapping_s* mapping = compute_mapping(pop->individuals[i],
 				genetic_info);
+
 		fprintf(mappingFile,
-				"<Configuration pop-id=\"%i\" ind-id=\"%i\" fps=\"%f\">\n",
+				"\t<Partitioning pop-id=\"%i\" ind-id=\"%i\" fps=\"%f\">\n",
 				pop->generation_nb, i, pop->individuals[i]->fps);
-		fprintf(mappingFile, "\t<Partitioning>\n");
 
 		for (j = 0; j < genetic_info->threads_nb; j++) {
 			fprintf(mappingFile, "\t\t<Partition id=\"%i\">\n", j);
@@ -323,7 +353,6 @@ static void write_mapping(population *pop, struct genetic_s *genetic_info) {
 		}
 
 		fprintf(mappingFile, "\t</Partitioning>\n");
-		fprintf(mappingFile, "</Configuration>\n\n");
 
 		delete_mapping(mapping, 1);
 	}
@@ -496,7 +525,7 @@ static population* compute_next_population(population *pop,
  * Create the first population.
  */
 static population* initialize_population(struct genetic_s *genetic_info) {
-	int i;
+	int i, j, k;
 
 	// Allocate memory to store the new population
 	population *pop = (population*) malloc(sizeof(population));
@@ -511,14 +540,27 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 	srand((unsigned) time(NULL));
 
 	// Initialize first generation of individuals (constant and random)
-	for (i = 0; (i < genetic_info->population_size) && (i
-			< genetic_info->threads_nb); i++) {
+	for (i = 0; (i < genetic_info->threads_nb) && (i
+			< genetic_info->population_size); i++) {
 		pop->individuals[i] = generate_constant_individual(genetic_info, i);
 	}
-	for (i = genetic_info->threads_nb; i < genetic_info->population_size; i++) {
+	if (mapping_file == NULL) {
+		j = 0;
+	} else {
+		struct mappings_set_s *mappings_set = compute_mappings_from_file(
+				mapping_file, genetic_info->actors, genetic_info->actors_nb);
+		for (j = 0; (j < mappings_set->size) && (i + j
+				< genetic_info->population_size); j++) {
+			pop->individuals[i + j] = build_given_individual(
+					mappings_set->mappings[j], genetic_info);
+		}
+	}
+	for (k = 0; (i + j + k) < genetic_info->population_size; k++) {
 		do {
-			pop->individuals[i] = generate_random_individual(genetic_info);
-		} while (is_contained(pop->individuals[i], pop, i, genetic_info));
+			pop->individuals[i + j + k] = generate_random_individual(
+					genetic_info);
+		} while (is_contained(pop->individuals[i + j + k], pop, i + j + k,
+				genetic_info));
 	}
 
 	return pop;
@@ -539,7 +581,7 @@ void *monitor(void *data) {
 	// Initialize population
 	printf("\nGenerate initial population...\n\n");
 	population = initialize_population(monitoring->genetic_info);
-	initialize_mapping_file();
+	write_mapping_header();
 
 	print_actor_list(population->individuals[evalIndNb],
 			monitoring->genetic_info);
@@ -603,9 +645,9 @@ void *monitor(void *data) {
 		clear_fifos();
 		initialize_instances();
 	}
+	write_mapping_footer();
 	exit(0);
 
 	return NULL;
 }
-
 
