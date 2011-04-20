@@ -251,9 +251,9 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			}
 
 			// Interpret procedure body
+			Expression result = (Expression) doSwitch(proc);
 			if (call.hasResult()) {
-				call.getTarget().getVariable()
-						.setValue((Expression) doSwitch(proc));
+				call.getTarget().getVariable().setValue(result);
 			}
 		}
 		return null;
@@ -434,8 +434,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				}
 			}
 
-			super.caseProcedure(procedure);
-			return null;
+			return super.caseProcedure(procedure);
 		}
 	}
 
