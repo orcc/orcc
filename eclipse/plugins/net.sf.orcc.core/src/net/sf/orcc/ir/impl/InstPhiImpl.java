@@ -13,6 +13,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -286,6 +287,18 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_PHI__TARGET, newTarget, newTarget));
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.toString());
+		builder.append("Phi(").append(getTarget().getVariable().getIndexedName());
+		for (Expression value : getValues()) {
+			builder.append(", ");
+			builder.append(new ExpressionPrinter().doSwitch(value));
+		}
+		return builder.append(")").toString();
 	}
 
 } //InstPhiImpl

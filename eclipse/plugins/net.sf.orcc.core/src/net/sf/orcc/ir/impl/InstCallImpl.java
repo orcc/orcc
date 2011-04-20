@@ -13,6 +13,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -283,6 +284,23 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.INST_CALL__TARGET, newTarget, newTarget));
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.toString());
+		builder.append("Call(");
+		if (getTarget() != null) {
+			builder.append(getTarget().getVariable().getIndexedName()).append(", ");
+		}
+
+		builder.append(getProcedure().getName());
+		for (Expression parameter : getParameters()) {
+			builder.append(", ");
+			builder.append(new ExpressionPrinter().doSwitch(parameter));
+		}
+		return builder.append(")").toString();
 	}
 
 } // InstCallImpl
