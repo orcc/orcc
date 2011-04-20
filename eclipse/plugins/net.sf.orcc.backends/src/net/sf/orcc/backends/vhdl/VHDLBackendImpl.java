@@ -50,7 +50,6 @@ import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.ram.RAMTransformation;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
 import net.sf.orcc.backends.vhdl.transformations.ListDeclarationTransformation;
-import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -142,9 +141,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 				// transform "b := a > b;" statements to if conditionals
 				new BoolExprTransformation(),
-
-				// transforms "if (b)" to "if (b = true)"
-				new TransformConditionals(),
 
 				// flattens declarations of multi-dimensional arrays
 				new ListDeclarationTransformation(),

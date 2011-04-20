@@ -30,6 +30,16 @@ package net.sf.orcc.backends.vhdl.transformations;
 
 import java.util.List;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstReturn;
@@ -39,6 +49,10 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.OpUnary;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -69,10 +83,75 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Nicolas Siret
  * 
  */
-public class BoolExprTransformation extends AbstractActorVisitor<Object> {
+public class BoolExprTransformation extends AbstractActorVisitor<Expression> {
+
+	private boolean negateCondition;
 
 	@Override
-	public Object caseInstAssign(InstAssign assign) {
+	public Expression caseExprBinary(ExprBinary expr) {
+		Expression e1 = doSwitch(expr.getE1());
+		Expression e2 = doSwitch(expr.getE2());
+		OpBinary op = negateCondition ? expr.getOp().getInverse() : expr
+				.getOp();
+		Type type = expr.getType();
+		return IrFactory.eINSTANCE.createExprBinary(e1, op, e2, type);
+	}
+
+	@Override
+	public Expression caseExprBool(ExprBool expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprFloat(ExprFloat expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprInt(ExprInt expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprList(ExprList expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprString(ExprString expr) {
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprUnary(ExprUnary expr) {
+		OpUnary op = expr.getOp();
+		Expression subExpr = expr.getExpr();
+		if (op == OpUnary.LOGIC_NOT) {
+			// returns the sub-expression negated
+			// i.e. "x > 42" => "x <= 42"
+			negateCondition = true;
+			Expression result = doSwitch(subExpr);
+			negateCondition = false;
+			return result;
+		} else {
+			return IrFactory.eINSTANCE.createExprUnary(op, doSwitch(subExpr),
+					EcoreUtil.copy(expr.getType()));
+		}
+	}
+
+	@Override
+	public Expression caseExprVar(ExprVar expr) {
+		if (expr.getType().isBool()) {
+			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
+					IrFactory.eINSTANCE.createExprBool(!negateCondition),
+					IrFactory.eINSTANCE.createTypeBool());
+		} else {
+			return expr;
+		}
+	}
+
+	@Override
+	public Expression caseInstAssign(InstAssign assign) {
 		Var target = assign.getTarget().getVariable();
 		if (target.getType().isBool()) {
 			Expression expr = assign.getValue();
@@ -94,7 +173,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstReturn(InstReturn returnInstr) {
+	public Expression caseInstReturn(InstReturn returnInstr) {
 		if (procedure.getReturnType().isBool()) {
 			Expression expr = returnInstr.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
@@ -111,7 +190,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstStore(InstStore store) {
+	public Expression caseInstStore(InstStore store) {
 		Var target = store.getTarget().getVariable();
 		if (target.getType().isBool()) {
 			Expression expr = store.getValue();
@@ -125,6 +204,20 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 			}
 		}
 
+		return null;
+	}
+
+	@Override
+	public Expression caseNodeIf(NodeIf nodeIf) {
+		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		super.caseNodeIf(nodeIf);
+		return null;
+	}
+
+	@Override
+	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		super.caseNodeWhile(nodeWhile);
 		return null;
 	}
 
@@ -159,10 +252,9 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 		block.add(assign);
 
 		// increments index and adds the if after the current block
-		indexNode++;
 		List<Node> nodes = EcoreHelper.getContainingList(EcoreHelper
 				.getContainerOfType(instruction, Node.class));
-		nodes.add(indexNode, nodeIf);
+		nodes.add(indexNode + 1, nodeIf);
 	}
 
 	/**
@@ -177,7 +269,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Object> {
 		// the index is not incremented so the created block will be visited too
 		NodeBlock targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
 		List<Node> nodes = EcoreHelper.getContainingList(block);
-		nodes.add(indexNode, targetBlock);
+		nodes.add(indexNode + 2, targetBlock);
 
 		// moves instructions
 		List<Instruction> instructions = block.getInstructions();
