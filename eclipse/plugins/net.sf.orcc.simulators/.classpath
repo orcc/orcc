@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/asm-3.3.1.jar" sourcepath="lib/src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/asm-commons-3.3.1.jar" sourcepath="lib/src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry excluding=".svn/|net/.svn/|net/sf/.svn/|net/sf/orcc/.svn/" kind="src" path="src"/>

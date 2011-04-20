@@ -160,13 +160,6 @@
                id="net.sf.orcc.simulators.merger2">
          </option>
       </simulator>
-      <simulator
-            class="net.sf.orcc.simulators.FastInterpreter"
-            name="Fast interpreter">
-         <option
-               id="net.sf.orcc.plugins.xdfFile">
-         </option>
-      </simulator>
    </extension>
    <extension
 		id="net.sf.orcc.debug.lineBreakpoint.marker"
