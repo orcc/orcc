@@ -49,7 +49,8 @@
 void genetic_init(struct genetic_s *genetic_info, int population_size,
 		int generation_nb, double keep_ratio, double crossover_ratio,
 		struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb,
-		int threads_nb, int use_ring_topology) {
+		int threads_nb, int use_ring_topology, int groups_nb,
+		double groups_ratio) {
 	genetic_info->population_size = population_size;
 	genetic_info->generation_nb = generation_nb;
 	genetic_info->keep_ratio = keep_ratio;
@@ -59,6 +60,8 @@ void genetic_init(struct genetic_s *genetic_info, int population_size,
 	genetic_info->actors_nb = actors_nb;
 	genetic_info->threads_nb = threads_nb;
 	genetic_info->use_ring_topology = use_ring_topology;
+	genetic_info->groups_nb = groups_nb;
+	genetic_info->groups_ratio = groups_ratio;
 }
 
 /**
@@ -236,6 +239,34 @@ static individual* generate_random_individual(struct genetic_s *genetic_info) {
 }
 
 /**
+ * Create a random individual.
+ */
+static individual* generate_random_individual_by_group(
+		struct genetic_s *genetic_info) {
+	int i, j;
+	int *mapped_cores = (int *) malloc(genetic_info->groups_nb * sizeof(int));
+
+	for (j = 0; j < genetic_info->groups_nb; j++) {
+		mapped_cores[j] = rand() % genetic_info->threads_nb;
+	}
+
+	individual* ind = (individual*) malloc(sizeof(individual));
+	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	ind->fps = -1;
+	ind->old_fps = -1;
+
+	for (i = 0; i < genetic_info->actors_nb; i++) {
+		ind->genes[i] = (gene*) malloc(sizeof(gene));
+		ind->genes[i]->actor = genetic_info->actors[i];
+		ind->genes[i]->mapped_core = mapped_cores[ind->genes[i]->actor->group];
+	}
+
+	free(mapped_cores);
+
+	return ind;
+}
+
+/**
  * Map some actors on available threads according to the given individual.
  */
 static void map_actors_on_threads(individual *individual,
@@ -376,7 +407,8 @@ static void write_mapping_population(population *pop,
 	FILE *mappingFile = open_mapping_file("a");
 
 	fprintf(mappingFile, "\t<!-- ///////////////////////////// -->\n");
-	fprintf(mappingFile, "\t<!-- ////// POPULATION N°%i ////// -->\n", pop->generation_nb);
+	fprintf(mappingFile, "\t<!-- ////// POPULATION N°%i ////// -->\n",
+			pop->generation_nb);
 	fprintf(mappingFile, "\t<!-- ///////////////////////////// -->\n\n");
 	for (i = 0; i < genetic_info->population_size; i++) {
 		write_mapping_individual(pop->individuals[i], pop->generation_nb, i,
@@ -552,7 +584,7 @@ static population* compute_next_population(population *pop,
  * Create the first population.
  */
 static population* initialize_population(struct genetic_s *genetic_info) {
-	int i, j, k;
+	int i, j, k, l;
 
 	// Allocate memory to store the new population
 	population *pop = (population*) malloc(sizeof(population));
@@ -582,12 +614,17 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 					mappings_set->mappings[j], genetic_info);
 		}
 	}
-	for (k = 0; (i + j + k) < genetic_info->population_size; k++) {
+	for (k = 0; (i + j + k) < (genetic_info->population_size
+			* genetic_info->groups_ratio); k++) {
+		pop->individuals[i + j + k] = generate_random_individual_by_group(
+				genetic_info);
+	}
+	for (l = 0; (i + j + k + l) < genetic_info->population_size; l++) {
 		do {
-			pop->individuals[i + j + k] = generate_random_individual(
+			pop->individuals[i + j + k + l] = generate_random_individual(
 					genetic_info);
-		} while (is_contained(pop->individuals[i + j + k], pop, i + j + k,
-				genetic_info));
+		} while (is_contained(pop->individuals[i + j + k + l], pop,
+				i + j + k + l, genetic_info));
 	}
 
 	return pop;

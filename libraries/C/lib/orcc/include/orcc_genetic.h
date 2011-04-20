@@ -44,6 +44,10 @@ struct genetic_s {
 	int actors_nb;
 	int threads_nb;
 	int use_ring_topology;
+	struct actor_s ***groups_of_actors;
+	int *groups_size;
+	int groups_nb;
+	double groups_ratio;
 };
 
 typedef struct gene_s {
@@ -73,7 +77,8 @@ void *monitor(void *data);
 void genetic_init(struct genetic_s *genetic_info, int population_size,
 		int generation_nb, double keep_ratio, double crossover_ratio,
 		struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb,
-		int threads_nb, int use_ring_topology);
+		int threads_nb, int use_ring_topology, int groups_nb,
+		double groups_ratio);
 
 /**
  * Initialize the given monitor structure.

@@ -42,6 +42,7 @@ struct conn_s {
 
 struct actor_s {
 	char *name;
+	int group; /** id of his group. */
 	void (*sched_func)(struct schedinfo_s *);
 	int num_inputs; /** number of input ports */
 	int num_outputs; /** number of output ports */

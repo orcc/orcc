@@ -55,6 +55,10 @@ import org.jgrapht.DirectedGraph;
  */
 public class CNetworkTemplateData {
 
+	private Map<String, Integer> instanceNameToGroupIdMap;
+
+	private Map<Instance, Integer> instanceToGroupIdMap;
+
 	/**
 	 * Contains a list of Id of all connections with an other target.
 	 */
@@ -82,6 +86,8 @@ public class CNetworkTemplateData {
 	 */
 	private List<String> listMediumUsedAllInstances;
 
+	private int numberOfGroups;
+
 	/**
 	 * This map links instance's port with a StringAttribute. This
 	 * StringAttribute contains the medium connection when it exists.
@@ -89,17 +95,17 @@ public class CNetworkTemplateData {
 	private Map<Instance, Map<Port, IAttribute>> portMedium;
 
 	/**
-	 * This list contains all instance which will be launched at the beginning
-	 * of the program
-	 */
-	private List<Instance> sourceInstances;
-
-	/**
 	 * This map links instance's port with a StringAttribute. This
 	 * StringAttribute contains the medium (the string is in capital letters)
 	 * connection when it exists.
 	 */
 	private Map<Instance, Map<Port, IAttribute>> portMediumUpperCase;
+
+	/**
+	 * This list contains all instance which will be launched at the beginning
+	 * of the program
+	 */
+	private List<Instance> sourceInstances;
 
 	/**
 	 * build informations about medium of communication
@@ -271,6 +277,14 @@ public class CNetworkTemplateData {
 		return false;
 	}
 
+	public void computeHierarchicalTemplateMaps(Network network) {
+		instanceToGroupIdMap = new HashMap<Instance, Integer>();
+		numberOfGroups = 0;
+		Instance instance = new Instance("network", "");
+		instance.setContents(network);
+		recursiveGroupsComputation(instance);
+	}
+
 	/**
 	 * build all informations needed in the template data.
 	 * 
@@ -286,9 +300,11 @@ public class CNetworkTemplateData {
 		listConnectionId = new ArrayList<IAttribute>();
 		listMediumUsedAllInstances = new ArrayList<String>();
 		sourceInstances = new ArrayList<Instance>();
+		instanceNameToGroupIdMap = new HashMap<String, Integer>();
 
 		buildMediumInfo(network);
 		buildSourceInstances(network);
+		transferMap();
 	}
 
 	/**
@@ -298,6 +314,14 @@ public class CNetworkTemplateData {
 	 */
 	public List<String> getAllMediumsAllInstances() {
 		return listMediumUsedAllInstances;
+	}
+
+	public Map<String, Integer> getInstanceNameToGroupIdMap() {
+		return instanceNameToGroupIdMap;
+	}
+
+	public Map<Instance, Integer> getInstanceToGroupIdMap() {
+		return instanceToGroupIdMap;
 	}
 
 	/**
@@ -339,6 +363,10 @@ public class CNetworkTemplateData {
 		return listMediumPorts;
 	}
 
+	public int getNumberOfGroups() {
+		return numberOfGroups;
+	}
+
 	/**
 	 * Returns the map of instance's ports to get the communication medium for
 	 * this port
@@ -368,5 +396,41 @@ public class CNetworkTemplateData {
 	 */
 	public Map<Instance, Map<Port, IAttribute>> getUpperCasePortMedium() {
 		return portMediumUpperCase;
+	}
+
+	private boolean isLastedHierarchy(Network network) {
+		for (Instance instance : network.getInstances()) {
+			if (instance.isNetwork()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void recursiveGroupsComputation(Instance instance) {
+		if (instance.isNetwork()) {
+			Network network = instance.getNetwork();
+			if (isLastedHierarchy(network)) {
+				for (Instance subInstance : network.getInstances()) {
+					instanceToGroupIdMap.put(subInstance, numberOfGroups);
+				}
+				numberOfGroups++;
+			} else {
+				for (Instance subInstance : network.getInstances()) {
+					recursiveGroupsComputation(subInstance);
+				}
+			}
+		} else {
+			instanceToGroupIdMap.put(instance, numberOfGroups);
+			numberOfGroups++;
+		}
+	}
+
+	public void transferMap() {
+		for (Map.Entry<Instance, Integer> entry : instanceToGroupIdMap
+				.entrySet()) {
+			instanceNameToGroupIdMap.put(entry.getKey().getId(),
+					entry.getValue());
+		}
 	}
 }

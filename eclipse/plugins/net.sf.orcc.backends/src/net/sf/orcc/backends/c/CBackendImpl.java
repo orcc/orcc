@@ -165,6 +165,13 @@ public class CBackendImpl extends AbstractBackend {
 
 		if (codesign) {
 			options.put("threadsNb", 1);
+
+			for (String targetName : mapTargetsNetworks.keySet()) {
+				Network worknet = mapTargetsNetworks.get(targetName);
+				CNetworkTemplateData targetsData = new CNetworkTemplateData();
+				targetsData.computeTemplateMaps(worknet);
+				worknet.setTemplateData(targetsData);
+			}
 		} else {
 			if (dynamicMapping) {
 				options.put("needDynamicMapping", dynamicMapping);
@@ -175,13 +182,13 @@ public class CBackendImpl extends AbstractBackend {
 					options.put("threadsNb", instancesTarget.size());
 				}
 			}
-		}
 
-		for (String targetName : mapTargetsNetworks.keySet()) {
-			Network worknet = mapTargetsNetworks.get(targetName);
-			CNetworkTemplateData data = new CNetworkTemplateData();
-			data.computeTemplateMaps(worknet);
-			worknet.setTemplateData(data);
+			for (String targetName : mapTargetsNetworks.keySet()) {
+				Network worknet = mapTargetsNetworks.get(targetName);
+				CNetworkTemplateData targetsData = (CNetworkTemplateData) worknet
+						.getTemplateData();
+				targetsData.computeTemplateMaps(worknet);
+			}
 		}
 	}
 
@@ -221,6 +228,10 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {
+		CNetworkTemplateData data = new CNetworkTemplateData();
+		data.computeHierarchicalTemplateMaps(network);
+		network.setTemplateData(data);
+
 		network.flatten();
 
 		if (classify) {

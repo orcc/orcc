@@ -288,7 +288,7 @@ elseif (instance.broadcast)><instance.broadcast.numOutputs><else>0<endif>
 
 fillActorStruct(instance) ::= <<
 <if(instance.actor || instance.broadcast)>
-struct actor_s <GetInstanceId(instance)> = {"<GetInstanceId(instance)>", <GetInstanceId(instance)>_scheduler, <
+struct actor_s <GetInstanceId(instance)> = {"<GetInstanceId(instance)>", <network.templateData.instanceNameToGroupIdMap.(instance.id)>, <GetInstanceId(instance)>_scheduler, <
 NumInputs(instance)>, <NumOutputs(instance)>, NULL, NULL, NULL};
 <endif>
 >>
@@ -475,6 +475,7 @@ network(network, options) ::= <<
 #define POPULATION_SIZE 100
 #define GENERATION_NB 20
 
+#define GROUPS_RATIO 0.8
 #define KEEP_RATIO 0.2
 #define CROSSOVER_RATIO 0.8
 
@@ -561,7 +562,7 @@ static void launcher() {
 	struct monitor_s monitoring;
 	
 	sync_init(&sched_sync);
-	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB, <if(options.newScheduler)>RING_TOPOLOGY<else>0<endif>);
+	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), THREAD_NB, <if(options.newScheduler)>RING_TOPOLOGY<else>0<endif>, <network.templateData.numberOfGroups>, GROUPS_RATIO);
 	monitor_init(&monitoring, &sched_sync, &genetic_info);
 	<endif>
 	
