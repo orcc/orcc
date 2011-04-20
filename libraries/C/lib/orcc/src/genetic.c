@@ -315,10 +315,52 @@ static void write_mapping_header() {
 }
 
 /**
+ * Write the corresponding mapping of an individual in an already opened file.
+ */
+static void write_mapping_individual(individual *ind, int pop_id, int ind_id,
+		FILE *mappingFile, struct genetic_s *genetic_info) {
+	int j, k;
+
+	struct mapping_s* mapping = compute_mapping(ind, genetic_info);
+
+	fprintf(mappingFile,
+			"\t<Partitioning pop-id=\"%i\" ind-id=\"%i\" fps=\"%f\">\n",
+			pop_id, ind_id, ind->fps);
+
+	for (j = 0; j < genetic_info->threads_nb; j++) {
+		fprintf(mappingFile, "\t\t<Partition id=\"%i\">\n", j);
+		for (k = 0; k < mapping->partitions_size[j]; k++) {
+			fprintf(mappingFile, "\t\t\t<Instance id=\"%s\"/>\n",
+					mapping->partitions_of_actors[j][k]->name);
+		}
+		fprintf(mappingFile, "\t\t</Partition>\n");
+	}
+
+	fprintf(mappingFile, "\t</Partitioning>\n");
+
+	delete_mapping(mapping, 1);
+}
+
+/**
  * Write the footer of a mapping file.
  */
-static void write_mapping_footer() {
+static void write_mapping_footer(population *lastpop,
+		struct genetic_s *genetic_info) {
+	int i;
 	FILE *mappingFile = open_mapping_file("a");
+
+	// Sort population by descending fps value
+	qsort(lastpop->individuals, genetic_info->population_size,
+			sizeof(individual*), compare_individual_fps);
+
+	// Print better individuals
+	fprintf(mappingFile, "\t<!-- //////////////////////////// -->\n");
+	fprintf(mappingFile, "\t<!-- //// BETTER INDIVIDUALS //// -->\n");
+	fprintf(mappingFile, "\t<!-- //////////////////////////// -->\n\n");
+	for (i = 0; i < genetic_info->population_size * genetic_info->keep_ratio; i++) {
+		write_mapping_individual(lastpop->individuals[i], -1, i, mappingFile,
+				genetic_info);
+	}
 
 	fprintf(mappingFile, "</Configuration>\n");
 
@@ -326,38 +368,23 @@ static void write_mapping_footer() {
 }
 
 /**
- * Write a mapping in a file.
+ * Write a mapping of a whole population in a file.
  */
-static void write_mapping(population *pop, struct genetic_s *genetic_info) {
+static void write_mapping_population(population *pop,
+		struct genetic_s *genetic_info) {
 	int i, j, k;
-
 	FILE *mappingFile = open_mapping_file("a");
 
-	fprintf(mappingFile, "<!-- POPULATION N°%i -->\n", pop->generation_nb);
-
+	fprintf(mappingFile, "\t<!-- ///////////////////////////// -->\n");
+	fprintf(mappingFile, "\t<!-- ////// POPULATION N°%i ////// -->\n", pop->generation_nb);
+	fprintf(mappingFile, "\t<!-- ///////////////////////////// -->\n\n");
 	for (i = 0; i < genetic_info->population_size; i++) {
-		struct mapping_s* mapping = compute_mapping(pop->individuals[i],
-				genetic_info);
-
-		fprintf(mappingFile,
-				"\t<Partitioning pop-id=\"%i\" ind-id=\"%i\" fps=\"%f\">\n",
-				pop->generation_nb, i, pop->individuals[i]->fps);
-
-		for (j = 0; j < genetic_info->threads_nb; j++) {
-			fprintf(mappingFile, "\t\t<Partition id=\"%i\">\n", j);
-			for (k = 0; k < mapping->partitions_size[j]; k++) {
-				fprintf(mappingFile, "\t\t\t<Instance id=\"%s\"/>\n",
-						mapping->partitions_of_actors[j][k]->name);
-			}
-			fprintf(mappingFile, "\t\t</Partition>\n");
-		}
-
-		fprintf(mappingFile, "\t</Partitioning>\n");
-
-		delete_mapping(mapping, 1);
+		write_mapping_individual(pop->individuals[i], pop->generation_nb, i,
+				mappingFile, genetic_info);
+		fprintf(mappingFile, "\n");
 	}
+	fprintf(mappingFile, "\n\n");
 
-	// Close file
 	fclose(mappingFile);
 }
 
@@ -628,10 +655,10 @@ void *monitor(void *data) {
 
 		if (evalIndNb == monitoring->genetic_info->population_size) {
 			if (population->generation_nb
-					== monitoring->genetic_info->generation_nb - 1) {
+					== monitoring->genetic_info->generation_nb) {
 				break;
 			} else {
-				write_mapping(population, monitoring->genetic_info);
+				write_mapping_population(population, monitoring->genetic_info);
 				printf("\nCompute next generation...\n\n");
 				population = compute_next_population(population,
 						monitoring->genetic_info);
@@ -645,7 +672,7 @@ void *monitor(void *data) {
 		clear_fifos();
 		initialize_instances();
 	}
-	write_mapping_footer();
+	write_mapping_footer(population, monitoring->genetic_info);
 	exit(0);
 
 	return NULL;
