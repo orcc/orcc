@@ -93,6 +93,8 @@ public class VHDLTemplateData {
 						signals.add(name);
 					}
 				}
+
+				doSwitch(action.getScheduler());
 			}
 
 			if (actor.hasFsm()) {
