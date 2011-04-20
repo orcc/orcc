@@ -58,11 +58,14 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class TransformConditionals extends AbstractActorVisitor<Expression> {
 
+	private boolean negateCondition;
+
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
 		Expression e1 = doSwitch(expr.getE1());
 		Expression e2 = doSwitch(expr.getE2());
-		OpBinary op = expr.getOp();
+		OpBinary op = negateCondition ? expr.getOp().getInverse() : expr
+				.getOp();
 		Type type = expr.getType();
 		return IrFactory.eINSTANCE.createExprBinary(e1, op, e2, type);
 	}
@@ -97,17 +100,12 @@ public class TransformConditionals extends AbstractActorVisitor<Expression> {
 		OpUnary op = expr.getOp();
 		Expression subExpr = expr.getExpr();
 		if (op == OpUnary.LOGIC_NOT) {
-			if (subExpr.isVarExpr()) {
-				// "not a" => "a = false"
-				return IrFactory.eINSTANCE.createExprBinary(subExpr,
-						OpBinary.EQ, IrFactory.eINSTANCE.createExprBool(false),
-						IrFactory.eINSTANCE.createTypeBool());
-			} else {
-				// "not (expr)" => "(expr) = false"
-				return IrFactory.eINSTANCE.createExprBinary(doSwitch(subExpr),
-						OpBinary.EQ, IrFactory.eINSTANCE.createExprBool(false),
-						IrFactory.eINSTANCE.createTypeBool());
-			}
+			// returns the sub-expression negated
+			// i.e. "x > 42" => "x <= 42"
+			negateCondition = true;
+			Expression result = doSwitch(subExpr);
+			negateCondition = false;
+			return result;
 		} else {
 			return IrFactory.eINSTANCE.createExprUnary(op, doSwitch(subExpr),
 					EcoreUtil.copy(expr.getType()));
@@ -118,7 +116,7 @@ public class TransformConditionals extends AbstractActorVisitor<Expression> {
 	public Expression caseExprVar(ExprVar expr) {
 		if (expr.getType().isBool()) {
 			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
-					IrFactory.eINSTANCE.createExprBool(true),
+					IrFactory.eINSTANCE.createExprBool(!negateCondition),
 					IrFactory.eINSTANCE.createTypeBool());
 		} else {
 			return expr;
