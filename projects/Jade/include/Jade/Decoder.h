@@ -147,16 +147,16 @@ public:
 
 
 	/**
-     *  @brief Start the decoder
+     *  @brief Run the decoder in an infinite loop
 	 *
      */
-	void start();
+	void run();
 
 	/**
-     *  @brief Start the decoder in a specific thread
+     *  @brief Run the decoder in a specific thread with infinite loop
 	 *
      */
-	void startInThread(pthread_t* thread);
+	void runInThread(pthread_t* thread);
 
 	/**
      *  @brief Stop the execution of the decoder
@@ -177,7 +177,7 @@ private:
      *  @brief Static method for launching decoder in a thread
 	 *
      */
-	static void* threadStart( void* args );
+	static void* threadRun( void* args );
 
 	/** Module containing the final decoder */
 	llvm::Module* module;

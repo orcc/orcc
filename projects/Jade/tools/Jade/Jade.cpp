@@ -201,7 +201,7 @@ void setDirectory(std::string* dir){
 }
 
 int optLevel;
-DecoderEngine* engine;
+RVCEngine* engine;
 
 //Check options of the decoder engine
 void setOptions(){
@@ -250,17 +250,15 @@ void startCmdLine(){
 		engine->optimize(network, optLevel);
 	}
 
-	// Verify the given decoder if needed
-	if (Verify){
-		engine->verify(network, "error.txt");
-	}
-
 	// Print the given decoder if needed
 	if (OutputDir != ""){
 		engine->print(network, "module.txt");
 	}
 
-
+	// Verify the given decoder if needed
+	if (Verify){
+		engine->verify(network, "error.txt");
+	}
 
 	//Run network
 	engine->run(network, VidFile);
@@ -287,7 +285,7 @@ int main(int argc, char **argv) {
 	setOptions();
 	
 	//Loading decoderEngine
-	engine = new DecoderEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose);
+	engine = new RVCEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose);
 
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

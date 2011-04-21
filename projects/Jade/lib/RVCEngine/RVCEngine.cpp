@@ -51,6 +51,7 @@
 #include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMUtility.h"
 #include "Jade/Jit/LLVMOptimizer.h"
+#include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Optimize/FifoFnRemoval.h"
 #include "Jade/Optimize/InstanceInternalize.h"
 #include "llvm/Support/PassNameParser.h"
@@ -61,7 +62,7 @@ using namespace llvm;
 
 //extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
 
-DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
+RVCEngine::RVCEngine(llvm::LLVMContext& C,
 							 string library, 
 							 FifoTy fifo,
 							 int defaultFifoSize,
@@ -86,11 +87,11 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 	irParser = new IRParser(C, library);
 }
 
-DecoderEngine::~DecoderEngine(){
+RVCEngine::~RVCEngine(){
 	
 }
 
-int DecoderEngine::load(Network* network, int optLevel) {
+int RVCEngine::load(Network* network, int optLevel) {
 	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
 
@@ -123,7 +124,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	return 0;
 }
 
-int DecoderEngine::unload(Network* network) {
+int RVCEngine::unload(Network* network) {
 	map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(network);
@@ -140,7 +141,7 @@ int DecoderEngine::unload(Network* network) {
 }
 
 
-int DecoderEngine::stop(Network* network){
+int RVCEngine::stop(Network* network){
 	map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(network);
@@ -156,7 +157,49 @@ int DecoderEngine::stop(Network* network){
 	return 0;
 }
 
-int DecoderEngine::verify(Network* network, std::string errorFile){
+void RVCEngine::prepare(Network* network, void* input, void* output){
+	map<Network*, Decoder*>::iterator it;
+
+	it = decoders.find(network);
+
+	if (it == decoders.end()){
+		cout << "No decoders found for this network.\n";
+		exit(1);
+	}
+	
+	Decoder* decoder = it->second;
+
+	//TODO : Initialize input and output of the network
+
+	/* This is the value which can stop the scheduler
+	      This value is continiously tested by the scheduler, it MUST be an int.
+		  The scheduler only stop when this value is set to 1, otherwise the scheduler
+		   continuously test firing rules of actors
+	*/
+	int stopVal = 0;
+
+	LLVMExecution* llvmEE = decoder->getEE();
+	llvmEE->initialize(&stopVal, input, output);
+}
+
+void RVCEngine::start(Network* network){
+	map<Network*, Decoder*>::iterator it;
+
+	it = decoders.find(network);
+
+	if (it == decoders.end()){
+		cout << "No decoders found for this network.\n";
+		exit(1);
+	}
+	
+	Decoder* decoder = it->second;
+
+	LLVMExecution* llvmEE = decoder->getEE();
+	llvmEE->start();
+}
+
+
+int RVCEngine::verify(Network* network, std::string errorFile){
 	map<Network*, Decoder*>::iterator it;
 	clock_t	timer = clock ();
 	it = decoders.find(network);
@@ -175,7 +218,7 @@ int DecoderEngine::verify(Network* network, std::string errorFile){
 	return 0;
 }
 
-int DecoderEngine::run(Network* network, string input, pthread_t* thread){	
+int RVCEngine::run(Network* network, string input, pthread_t* thread){	
 	map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(network);
@@ -190,15 +233,15 @@ int DecoderEngine::run(Network* network, string input, pthread_t* thread){
 
 	//Start decoding
 	if (thread != NULL){
-		decoder->startInThread(thread);
+		decoder->runInThread(thread);
 	} else {
-		decoder->start();
+		decoder->run();
 	}
 
 	return 0;
 }
 
-int DecoderEngine::optimize(Network* network, int optLevel){
+int RVCEngine::optimize(Network* network, int optLevel){
 	clock_t	timer = clock ();
 	
 	map<Network*, Decoder*>::iterator it;
@@ -218,7 +261,7 @@ int DecoderEngine::optimize(Network* network, int optLevel){
 	cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 }
 
-int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
+int RVCEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 	map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(oldNetwork);
@@ -247,7 +290,7 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 	return 0;
 }
 
-map<string, Actor*>* DecoderEngine::parseActors(Configuration* Configuration) {
+map<string, Actor*>* RVCEngine::parseActors(Configuration* Configuration) {
 	list<string>::iterator it;
 	
 	//Resulting map of actors
@@ -282,7 +325,7 @@ map<string, Actor*>* DecoderEngine::parseActors(Configuration* Configuration) {
 	return configurationActors;
 }
 
-void DecoderEngine::doOptimizeDecoder(Decoder* decoder){
+void RVCEngine::doOptimizeDecoder(Decoder* decoder){
 //TODO : add CFGSimplification and mem2reg
 	InstanceInternalize internalize;
 	internalize.transform(decoder);
@@ -295,7 +338,7 @@ void DecoderEngine::doOptimizeDecoder(Decoder* decoder){
 	removeFifo.transform(decoder);
 }
 
-int DecoderEngine::print(Network* network, string outputFile){
+int RVCEngine::print(Network* network, string outputFile){
 	LLVMUtility utility;
 	map<Network*, Decoder*>::iterator it;
 

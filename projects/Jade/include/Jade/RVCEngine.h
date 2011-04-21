@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Description of the DecoderEngine class interface
+@brief Description of the RVCEngine class interface
 @author Jerome Gorin
-@file DecoderEngine.h
+@file RVCEngine.h
 @version 1.0
 @date 15/11/2010
 */
@@ -60,7 +60,7 @@ class Configuration;
 #include "Jade/Fifo/FifoSelection.h"
 //------------------------------
 
-class DecoderEngine {
+class RVCEngine {
 public:
 	/*!
      *  @brief Create a new Decoder Engine
@@ -69,8 +69,8 @@ public:
 	 *   
 	 *  @param C : the LLVM Context used by JIT
      */
-	DecoderEngine(llvm::LLVMContext& C, std::string library, FifoTy fifo, int defaultFifoSize, std::string system = "", std::string outputDir="", bool noMerging = false, bool noMultiCore = false, bool verbose = false);
-	~DecoderEngine();
+	RVCEngine(llvm::LLVMContext& C, std::string library, FifoTy fifo, int defaultFifoSize, std::string system = "", std::string outputDir="", bool noMerging = false, bool noMultiCore = false, bool verbose = false);
+	~RVCEngine();
 
 	/*!
      *  @brief Load the given network
@@ -80,10 +80,29 @@ public:
 	 *  @param network : the Network to load
      *
 	 *  @param optLevel : the level of optimization to apply
-	 *
-	 *  @return HDAGGraph representing the network's contents
      */
 	int load(Network* network, int optLevel);
+
+	/*!
+     *  @brief Prepare the given network
+     *
+     *  Connect the input and the output of the given network
+	 *   
+	 *  @param network : the Network to prepare
+     *
+	 *  @param input : the input of the network
+	 *
+	 *  @param output : the output of the network
+     */
+	void prepare(Network* network, void* input, void* output);
+
+	/*!
+     *  @brief Start the given network
+     *
+     *  Start the given network until a condition is reached
+     */
+	void start(Network* network);
+
 
 	/*!
      *  @brief Unload the given network

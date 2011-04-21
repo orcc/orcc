@@ -83,14 +83,20 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder,
 	this->decoder = decoder;
 	this->configuration = decoder->getConfiguration();
 	this->scheduler = NULL;
-	this->initBrInst = NULL;
-	this->schedBrInst = NULL;
+	this->initialize = NULL;
+	this->initInst = NULL;
+	this->schedInst = NULL;
+	this->stopGV = NULL;
 	this->verbose = verbose;
 
 	createScheduler();	
 }
 
 void RoundRobinScheduler::createScheduler(){
+	
+	//Create the initialize function
+	createNetworkInitialize();
+	
 	//Create the scheduler function
 	createNetworkScheduler();
 
@@ -114,8 +120,7 @@ void RoundRobinScheduler::createNetworkScheduler(){
 	LLVMContext &Context = getGlobalContext();
 
 	//Create a global value that stop the scheduler and set it to false
-	GlobalVariable* stopGV = (GlobalVariable*)module->getOrInsertGlobal("stop", Type::getInt1Ty(Context));
-	stopGV->setInitializer(ConstantInt::get(Type::getInt1Ty(Context), 0));
+	stopGV = (GlobalVariable*)module->getOrInsertGlobal("stop", Type::getInt32Ty(Context));
 	
 	// create main scheduler function
 	scheduler = cast<Function>(module->getOrInsertFunction("main", Type::getInt32Ty(Context),
@@ -129,7 +134,7 @@ void RoundRobinScheduler::createNetworkScheduler(){
 	BasicBlock* schedulerBB = BasicBlock::Create(Context, "bb", scheduler);
 	
 	// Create a branch to bb and store it for later insertions
-	initBrInst = BranchInst::Create(schedulerBB, initializeBB);
+	BranchInst* brInst = BranchInst::Create(schedulerBB, initializeBB);
 	
 	// Add a basic block return to the scheduler.
 	BasicBlock* BBReturn = BasicBlock::Create(Context, "return", scheduler);
@@ -137,8 +142,27 @@ void RoundRobinScheduler::createNetworkScheduler(){
 	ReturnInst* returnInst = ReturnInst::Create(Context, one, BBReturn);
 
 	// Load stop value and test if the scheduler must be stop
-	LoadInst* stopVal = new LoadInst(stopGV, "", schedulerBB);
-	schedBrInst = BranchInst::Create(BBReturn, schedulerBB, stopVal, schedulerBB);
+	schedInst = new LoadInst(stopGV, "", schedulerBB);
+	ICmpInst* test = new ICmpInst(*schedulerBB, ICmpInst::ICMP_EQ, schedInst, one);
+	BranchInst* schedBrInst = BranchInst::Create(BBReturn, schedulerBB, test, schedulerBB);
+}
+
+void RoundRobinScheduler::createNetworkInitialize(){
+	map<string, Instance*>::iterator it;
+	
+	Module* module = decoder->getModule();
+	LLVMContext &Context = getGlobalContext();
+	
+	// create main scheduler function
+	initialize = cast<Function>(module->getOrInsertFunction("initialize", Type::getVoidTy(Context),
+                                          (Type *)0));
+										  
+
+	// Add a basic block entry to the scheduler.
+	BasicBlock* initializeBB = BasicBlock::Create(Context, "entry", initialize);
+
+	initInst = ReturnInst::Create(Context, 0, initializeBB);
+
 }
 
 void RoundRobinScheduler::createCall(Instance* instance){
@@ -147,13 +171,13 @@ void RoundRobinScheduler::createCall(Instance* instance){
 	// Call initialize function if present
 	if (actionScheduler->hasInitializeScheduler()){
 		Function* initialize = actionScheduler->getInitializeFunction();
-		CallInst* CallInit = CallInst::Create(initialize, "", initBrInst);
+		CallInst* CallInit = CallInst::Create(initialize, "", initInst);
 		functionCall.insert(pair<Function*, CallInst*>(initialize, CallInit));
 	}
 
 	// Call scheduler function of the instance
 	Function* scheduler = actionScheduler->getSchedulerFunction();
-	CallInst* CallSched = CallInst::Create(scheduler, "", schedBrInst);
+	CallInst* CallSched = CallInst::Create(scheduler, "", schedInst);
 	CallSched->setTailCall();
 	
 

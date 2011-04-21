@@ -116,7 +116,7 @@ void Decoder::setConfiguration(Configuration* newConfiguration){
 	}
 }
 
-void Decoder::start(){
+void Decoder::run(){
 	running = true;
 
 	executionEngine->run(stimulus);
@@ -131,18 +131,18 @@ void Decoder::stop(){
 	engine.reinit(this);
 }
 
-void Decoder::startInThread(pthread_t* thread){
+void Decoder::runInThread(pthread_t* thread){
 	this->thread = thread;
 	
 	//Lock display mutex until the first image arrive
-	pthread_create( thread, NULL, &Decoder::threadStart, this );
+	pthread_create( thread, NULL, &Decoder::threadRun, this );
 
 	executionEngine->waitForFirstFrame();
 }
 
-void* Decoder::threadStart( void* args ){
+void* Decoder::threadRun( void* args ){
 	Decoder* decoder = static_cast<Decoder*>(args);
-	decoder->start();
+	decoder->run();
 	return NULL;
 }
 

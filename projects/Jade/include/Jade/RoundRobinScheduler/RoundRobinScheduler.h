@@ -77,6 +77,13 @@ public:
 	 *	@return the main llvm::Function of scheduler
      */
 	llvm::Function* getMainFunction(){return scheduler;};
+
+	/**
+     *  @brief Return the initialize function of the scheduler
+     *
+	 *	@return the initialize llvm::Function of scheduler
+     */
+	llvm::Function* getInitFunction(){return initialize;};
 	
 	/**
      *  @brief Add an instance in the scheduler
@@ -84,6 +91,13 @@ public:
 	 *	@param instance : the Instance to add
      */
 	void addInstance(Instance* instance);
+
+	/**
+     *  @brief Return the stop GV
+     *
+	 *	@return the stop GV
+     */
+	llvm::GlobalVariable* getStopGV(){return stopGV;};
 
 	/**
      *  @brief Remove an instance in the scheduler
@@ -102,6 +116,11 @@ private:
      *  @brief Create the network scheduler
      */
 	void createNetworkScheduler();
+
+	/**
+     *  @brief Create the network initializer
+     */
+	void createNetworkInitialize();
 
 	/**
      *  @brief Create a call to the action scheduler of an instance in the instance
@@ -126,12 +145,18 @@ private:
 	/** Main scheduling function */
 	llvm::Function* scheduler;
 
+	/** Initialize function */
+	llvm::Function* initialize;
+
 	/** Main scheduling component */
-	llvm::Instruction* initBrInst;
-	llvm::Instruction* schedBrInst;
+	llvm::Instruction* initInst;
+	llvm::Instruction* schedInst;
 
 	/** Function calls */
 	std::map<llvm::Function*, llvm::CallInst*> functionCall;
+
+	/** Stop scheduler GV */
+	llvm::GlobalVariable* stopGV;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

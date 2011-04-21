@@ -53,7 +53,7 @@
 using namespace std;
 using namespace llvm;
 
-Manager::Manager(DecoderEngine* engine, int optLevel, bool verify, bool verbose){
+Manager::Manager(RVCEngine* engine, int optLevel, bool verify, bool verbose){
 	this->engine = engine;
 	this->verbose = verbose;
 	this->verify = verify;

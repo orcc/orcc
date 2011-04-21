@@ -65,7 +65,9 @@ public:
 	virtual void execute(std::string stimulus){};
 	virtual void stop(pthread_t* thread){};
 	virtual llvm::Function* getMainFunction(){return NULL;};
+	virtual llvm::Function* getInitFunction(){return NULL;};
 	virtual llvm::GlobalVariable* getSource(){return NULL;};
+	virtual llvm::GlobalVariable* getStopGV(){return NULL;};
 	virtual void addInstance(Instance* instance){};
 	virtual void removeInstance(Instance* instance){};
 };

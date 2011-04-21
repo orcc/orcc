@@ -51,7 +51,7 @@
 #include "Jade/Scenario/Event/RemoveEvent.h"
 #include "Jade/Scenario/Event/ListEvent.h"
 
-class DecoderEngine;
+class RVCEngine;
 class Network;
 class Scenario;
 //------------------------------
@@ -75,7 +75,7 @@ public:
 	 *
 	 * @param verbose : display actions taken
      */
-	Manager(DecoderEngine* engine, int optLevel = 0, bool verify = false, bool verbose = false);
+	Manager(RVCEngine* engine, int optLevel = 0, bool verify = false, bool verbose = false);
 
 	/*!
      *  @brief Start the manager
@@ -198,7 +198,7 @@ private:
 
 
 	/** Decoder engine to manage*/
-	DecoderEngine* engine;
+	RVCEngine* engine;
 
 	/** Network loads */
 	std::map<int, Network*> networks;

@@ -192,9 +192,18 @@ void LLVMExecution::run(string stimulus) {
 	clock_t timer = clock ();
 	this->stimulus = stimulus;
 
+	// Set IO of the network
+	setIO();
+	
+	// Set scheduler as an infinite loop
+	Scheduler* scheduler = decoder->getScheduler();
+	GlobalVariable* stopGV = scheduler->getStopGV();
+	stopGV->setInitializer(ConstantInt::get(Type::getInt32Ty(Context), 0));
+
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
 
+	// In case of no lazy compilation, compile all
    if (NoLazyCompilation) {
 		for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
 			Function *Fn = &*I;
@@ -203,13 +212,14 @@ void LLVMExecution::run(string stimulus) {
 		}
 		cout << "--> No lazy compilation enable, the decoder has been compiled in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms \n";
 	}
-
-	setIO();
-   
-	Scheduler* scheduler = decoder->getScheduler();
+	
+	// Get scheduler functions
 	Function* func = scheduler->getMainFunction();
+	Function* init = scheduler->getInitFunction();
 
+	// Run scheduler
 	std::vector<GenericValue> noargs;
+	EE->runFunction(init, noargs);
 	GenericValue Result = EE->runFunction(func, noargs);
 }
 
@@ -229,6 +239,41 @@ void LLVMExecution::setIO(){
 	if (out != NULL){
 		setOut(out);
 	}
+}
+
+void LLVMExecution::initialize(void* stopCond, void* input, void* output){
+	//TODO : define input and output of the scheduler
+	
+	Module* module = decoder->getModule();
+	
+	// Set stop condition of the scheduler
+	Scheduler* scheduler = decoder->getScheduler();
+	GlobalVariable* stopGV = scheduler->getStopGV();
+	EE->addGlobalMapping(stopGV, stopCond);
+
+	// Run static constructors.
+    EE->runStaticConstructorsDestructors(false);
+
+	// In case of no lazy compilation, compile all
+   if (NoLazyCompilation) {
+		for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
+			Function *Fn = &*I;
+			if (!Fn->isDeclaration())
+				EE->getPointerToFunction(Fn);
+		}
+	}
+
+   	// Initialize the network
+	Function* init = scheduler->getInitFunction();
+	std::vector<GenericValue> noargs;
+	EE->runFunction(init, noargs);
+}
+
+void LLVMExecution::start(){
+	Scheduler* scheduler = decoder->getScheduler();
+	Function* main = scheduler->getMainFunction();
+	std::vector<GenericValue> noargs;
+	EE->runFunction(main, noargs);
 }
 
 void LLVMExecution::setIn(Instance* instance){

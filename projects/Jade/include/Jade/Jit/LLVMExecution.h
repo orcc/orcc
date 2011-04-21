@@ -99,11 +99,33 @@ public:
 	void mapProcedure(Procedure* procedure, void *Addr);
 
 	/**
-     *  @brief run the current decoder with the given stimulus
+     *  @brief Run the current decoder with the given stimulus
+	 *
+	 *  Initialize and run the decoder in an infinite loop. 
+	 *    No need to call the initialize function of LLVM execution.
      *
 	 *	@param stimulus : the input stimulus
      */
 	void run(std::string stimulus);
+
+	/**
+     *  @brief Initialize the decoder before the execution
+     *
+	 *	@param stopCond : the stop condition of the scheduler
+	 *
+	 *	@param input : the input of the network
+	 *
+	 *  @param output : the output of the network
+     */
+	void initialize(void* stopCond, void* input, void* output);
+
+	/**
+     *  @brief Start an execution of the decoder
+     *
+	 *  Start the execution of the decoder until condition is reached. 
+	 *		Condition MUST be set first with the initialize function.
+	 */
+	void start();
 
 	/**
      *  @brief run a specific function of the current decoder

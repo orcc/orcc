@@ -62,7 +62,7 @@ using namespace llvm::cl;
 extern opt<std::string> OutputDir;
 extern cl::opt<std::string> VTLDir;
 extern cl::opt<std::string> InputDir;
-extern DecoderEngine* engine;
+extern RVCEngine* engine;
 
 //Console control
 Manager* manager;
