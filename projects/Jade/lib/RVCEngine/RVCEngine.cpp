@@ -44,7 +44,7 @@
 #include "llvm/Support/StandardPasses.h"
 #include "Jade/Util/FifoMng.h"
 #include "Jade/Decoder.h"
-#include "Jade/DecoderEngine.h"
+#include "Jade/RVCEngine.h"
 #include "Jade/Serialize/IRParser.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Port.h"

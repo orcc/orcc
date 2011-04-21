@@ -93,7 +93,7 @@ set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_Type})
 
 # Add libraries
 add_subdirectory(lib/ConfigurationEngine)
-add_subdirectory(lib/DecoderEngine)
+add_subdirectory(lib/RVCEngine)
 add_subdirectory(lib/Graph)
 add_subdirectory(lib/Fifo) 
 add_subdirectory(lib/IRActor)

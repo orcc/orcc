@@ -53,7 +53,7 @@
 
 
 #include "Jade/XDFSerialize/XDFParser.h"
-#include "Jade/DecoderEngine.h"
+#include "Jade/RVCEngine.h"
 #include "Jade/Actor/Display.h"
 #include "Jade/Fifo/FifoSelection.h"
 #include "Jade/Scenario/Manager.h"

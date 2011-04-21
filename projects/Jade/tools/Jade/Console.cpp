@@ -40,7 +40,7 @@
 
 #include "llvm/Support/CommandLine.h"
 
-#include "Jade/DecoderEngine.h"
+#include "Jade/RVCEngine.h"
 #include "Jade/XDFSerialize/XDFParser.h"
 #include "Jade/Scenario/Manager.h"
 #include "Jade/Scenario/Event/LoadEvent.h"
