@@ -30,7 +30,7 @@
 #ifndef ORCC_H
 #define ORCC_H
 
-typedef char i8;
+typedef signed char i8;
 typedef short i16;
 typedef int i32;
 typedef long long int i64;
