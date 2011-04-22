@@ -28,18 +28,29 @@
  */
 package net.sf.orcc.frontend;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
+import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+import org.eclipse.equinox.app.IApplication;
+import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.util.CancelIndicator;
@@ -57,30 +68,9 @@ import com.google.inject.Injector;
  * @author Matthieu Wipliez
  * 
  */
-public class FrontendCli {
+public class FrontendCli implements IApplication {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		if (args.length == 2) {
-			System.out.println("setup of CAL Xtext parser");
-			Injector injector = new CalStandaloneSetup()
-					.createInjectorAndDoEMFRegistration();
-			FrontendCli fe = injector.getInstance(FrontendCli.class);
-			System.out.println("done");
-
-			fe.setVtlFolder(args[0]);
-			fe.setOutputFolder(args[1]);
-			fe.processActors();
-		} else {
-			System.err.println("Usage: Frontend "
-					+ "<absolute path of VTL folder> "
-					+ "<absolute path of output folder>");
-		}
-	}
-
-	private List<File> actors;
+	private List<IFile> actors;
 
 	@Inject
 	private Frontend frontend;
@@ -91,18 +81,20 @@ public class FrontendCli {
 
 	}
 
-	private void getActors(File vtl) {
-		for (File file : vtl.listFiles()) {
-			if (file.isDirectory()) {
-				getActors(file);
-			} else if (file.getName().endsWith(".cal")) {
-				actors.add(file);
+	private void getActors(IContainer container) throws CoreException {
+		for (IResource resource : container.members()) {
+			if (resource.getType() == IResource.FOLDER) {
+				getActors((IFolder) resource);
+			} else if (resource.getType() == IResource.FILE
+					&& resource.getFileExtension().equals("cal")) {
+				actors.add((IFile) resource);
 			}
 		}
 	}
 
-	private void processActor(File actorPath) {
-		URI uri = URI.createFileURI(actorPath.getAbsolutePath());
+	private void processActor(IFile actorPath) {
+		URI uri = URI.createPlatformResourceURI(actorPath.getFullPath()
+				.toString(), true);
 		Resource resource = resourceSet.getResource(uri, true);
 		AstEntity entity = (AstEntity) resource.getContents().get(0);
 
@@ -138,7 +130,7 @@ public class FrontendCli {
 			if (!hasErrors) {
 				AstActor actor = entity.getActor();
 				if (actor != null) {
-					frontend.compile(actorPath.getAbsolutePath(), actor);
+					frontend.compile(actorPath, actor);
 				}
 			}
 		} catch (OrccException e) {
@@ -146,28 +138,55 @@ public class FrontendCli {
 		}
 	}
 
-	public void processActors() {
-		resourceSet = new XtextResourceSet();
-		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL,
-				Boolean.TRUE);
-		for (File actor : actors) {
-			processActor(actor);
+	private void setProject(String projectName) {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject project = root.getProject(projectName);
+		actors = new ArrayList<IFile>();
+		try {
+			getActors(project);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
+		IFolder folder = OrccUtil.getOutputFolder(project);
+		frontend.setOutputFolder(folder);
+		if (!folder.exists()) {
+			try {
+				folder.create(false, false, null);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
-	private void setOutputFolder(String outputFolder) {
-		File file = new File(outputFolder);
-		if (!file.exists()) {
-			file.mkdir();
-		}
+	@Override
+	public Object start(IApplicationContext context) throws Exception {
+		Map<?, ?> map = context.getArguments();
+		String[] args = (String[]) map
+				.get(IApplicationContext.APPLICATION_ARGS);
+		if (args.length == 2) {
+			System.out.println("setup of CAL Xtext parser");
+			Injector injector = new CalStandaloneSetup()
+					.createInjectorAndDoEMFRegistration();
+			frontend = injector.getInstance(Frontend.class);
+			System.out.println("done");
 
-		frontend.setOutputFolder(outputFolder);
+			setProject(args[0]);
+
+			resourceSet = new XtextResourceSet();
+			resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL,
+					Boolean.TRUE);
+			for (IFile actor : actors) {
+				processActor(actor);
+			}
+		} else {
+			System.err.println("Usage: Frontend <project name>");
+		}
+		return null;
 	}
 
-	private void setVtlFolder(String vtlFolder) {
-		File vtl = new File(vtlFolder);
-		actors = new ArrayList<File>();
-		getActors(vtl);
+	@Override
+	public void stop() {
 	}
 
 }

@@ -10,6 +10,18 @@
        genModel = "net/sf/orcc/cal/Cal.genmodel" /> 
 	
   </extension>
+  <extension
+        id="cli"
+        point="org.eclipse.core.runtime.applications">
+     <application
+           cardinality="singleton-global"
+           thread="main"
+           visible="true">
+        <run
+              class="net.sf.orcc.frontend.FrontendCli">
+        </run>
+     </application>
+  </extension>
 
 
 
