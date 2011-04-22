@@ -34,6 +34,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.util.WriteListener;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -53,7 +54,7 @@ public interface Backend {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void compileVTL(List<String> vtlFolders) throws OrccException;
+	void compileVTL(List<IFolder> vtlFolders) throws OrccException;
 
 	/**
 	 * Loads a hierarchical XDF network and compile it. Compilation may include

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.xlim;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +58,8 @@ import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
+import org.eclipse.core.resources.IFile;
+
 /**
  * This class defines a template-based XLIM back-end.
  * 
@@ -70,16 +71,10 @@ import net.sf.orcc.network.Network;
  */
 public class XlimBackendImpl extends AbstractBackend {
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		main(XlimBackendImpl.class, args);
-	}
-
 	private String fpgaType;
+
 	private boolean hardwareGen;
+
 	private Map<String, String> mapping;
 
 	private Map<Integer, List<Instance>> computeMapping(Network network,
@@ -126,7 +121,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		// do not generate an XLIM VTL
 	}
 

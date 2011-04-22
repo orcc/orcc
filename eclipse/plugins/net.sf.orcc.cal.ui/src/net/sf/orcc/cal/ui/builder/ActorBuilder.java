@@ -114,7 +114,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		// set output folder
-		frontend.setOutputFolder(outputFolder.getLocation().toOSString());
+		frontend.setOutputFolder(outputFolder);
 
 		// whether IR is to be pretty-printed or not
 		String compactIR = project.getPersistentProperty(PRETTYPRINT_JSON);
@@ -190,8 +190,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			// and then we compile
 			AstActor actor = entity.getActor();
 			if (actor != null) {
-				String fileName = path.toOSString();
-				frontend.compile(fileName, actor);
+				frontend.compile(file, actor);
 			}
 		} catch (IOException e) {
 			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",

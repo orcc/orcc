@@ -29,9 +29,6 @@
 package net.sf.orcc.network;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +41,10 @@ import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.runtime.CoreException;
 
 /**
  * This class defines an instance. An instance has an id, a class, parameters
@@ -79,7 +80,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	/**
 	 * the absolute path this instance is defined in
 	 */
-	private File file;
+	private IFile file;
 
 	/**
 	 * the path of classes from the top-level to this instance.
@@ -203,7 +204,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * 
 	 * @return the file in which this instance is defined
 	 */
-	public File getFile() {
+	public IFile getFile() {
 		return file;
 	}
 
@@ -303,10 +304,10 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * 
 	 * @throws OrccException
 	 */
-	public void instantiate(List<String> vtlFolders) throws OrccException {
+	public void instantiate(List<IFolder> vtlFolders) throws OrccException {
 		String className = new File(clasz).getName();
-		for (String path : vtlFolders) {
-			file = new File(path, className.replace('.', '/') + ".json");
+		for (IFolder path : vtlFolders) {
+			file = path.getFile(className.replace('.', '/') + ".json");
 			if (file.exists()) {
 				break;
 			} else {
@@ -321,13 +322,12 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		if (actor == null) {
 			// try and load the actor
 			try {
-				InputStream in = new FileInputStream(file);
-				actor = new IRParser().parseActor(in);
+				actor = new IRParser().parseActor(file.getContents());
 				Network.putActorInPool(className, actor);
 			} catch (OrccException e) {
 				throw new OrccException("Could not parse instance \"" + id
 						+ "\" because: " + e.getLocalizedMessage(), e);
-			} catch (FileNotFoundException e) {
+			} catch (CoreException e) {
 				throw new OrccException("Actor \"" + className
 						+ "\" not found!\nIf this actor has errors, please "
 						+ "correct them and try again; otherwise, try to "

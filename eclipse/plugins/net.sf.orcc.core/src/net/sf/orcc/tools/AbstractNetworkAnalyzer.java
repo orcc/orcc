@@ -34,8 +34,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +46,12 @@ import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
@@ -69,14 +72,22 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 			String[] args) {
 		if (args.length == 3) {
 			String inputFile = args[0];
-			List<String> vtlFolders = Arrays.asList(args[1]
+			List<String> vtlFolderNames = Arrays.asList(args[1]
 					.split(File.pathSeparator));
+			List<IFolder> vtlFolders = new ArrayList<IFolder>(vtlFolderNames.size());
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			for (String folderName : vtlFolderNames) {
+				IFile file = root.getFileForLocation(new Path(folderName));
+				IFolder folder = (IFolder) file.getParent();
+				vtlFolders.add(folder);
+			}
+			
 			String outputFolder = args[2];
 
 			try {
 				AbstractNetworkAnalyzer analyzer = clasz.newInstance();
 				analyzer.setOutputFolder(outputFolder);
-				analyzer.setVtlFolders(vtlFolders);
+				analyzer.analyzeVTL(vtlFolders);
 				analyzer.analyzeXDF(inputFile);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
@@ -107,7 +118,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	/**
 	 * Path of the folder that contains VTL under IR form.
 	 */
-	private List<String> vtlFolders;
+	private List<IFolder> vtlFolders;
 
 	public AbstractNetworkAnalyzer(AbstractActorAnalyzer actorAnalyzer) {
 		this.actorAnalyzer = actorAnalyzer;
@@ -143,26 +154,13 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	}
 
 	@Override
-	public void analyzeVTL(List<String> vtlFolders) throws OrccException {
+	public void analyzeVTL(List<IFolder> vtlFolders) throws OrccException {
 		this.vtlFolders = vtlFolders;
 
 		// lists actors
 		listener.writeText("Lists actors...\n");
-		List<File> vtlFiles = new ArrayList<File>();
-		for (String folder : vtlFolders) {
-			findFiles(vtlFiles, new File(folder));
-		}
-
-		Collections.sort(vtlFiles, new Comparator<File>() {
-
-			@Override
-			public int compare(File f1, File f2) {
-				return f1.compareTo(f2);
-			}
-
-		});
+		List<IFile> vtlFiles = OrccUtil.getAllFiles(vtlFolders);
 		doVtlAnalyzer(vtlFiles);
-
 	}
 
 	@Override
@@ -186,20 +184,10 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 		doXdfAnalyzer(network);
 	}
 
-	abstract protected void doVtlAnalyzer(List<File> files)
+	abstract protected void doVtlAnalyzer(List<IFile> files)
 			throws OrccException;
 
 	abstract protected void doXdfAnalyzer(Network network) throws OrccException;
-
-	private void findFiles(List<File> vtlFiles, File vtl) {
-		for (File file : vtl.listFiles()) {
-			if (file.isDirectory()) {
-				findFiles(vtlFiles, file);
-			} else if (file.getName().endsWith(".json")) {
-				vtlFiles.add(file);
-			}
-		}
-	}
 
 	abstract public void importResults();
 
@@ -238,10 +226,6 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor) {
 		this.monitor = monitor;
-	}
-
-	public void setVtlFolders(List<String> vtlFolders) {
-		this.vtlFolders = vtlFolders;
 	}
 
 	@Override

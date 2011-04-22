@@ -54,10 +54,9 @@ import static net.sf.orcc.ir.serialize.IRConstants.NODE_IF;
 import static net.sf.orcc.ir.serialize.IRConstants.NODE_WHILE;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
@@ -107,6 +106,12 @@ import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.util.OrccUtil;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -401,37 +406,61 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		return new JsonPrimitive(TypeVoid.NAME);
 	}
 
-	public void write(String outputDir, boolean prettyPrint)
+	public void write(IFolder outputDir, boolean prettyPrint)
 			throws OrccException {
 		Writer writer;
 		try {
-			String folder = OrccUtil.getFolder(actor);
-			new File(outputDir + File.separator + folder).mkdirs();
-			OutputStream os = new FileOutputStream(outputDir + File.separator
-					+ OrccUtil.getFile(actor) + ".json");
+			if (!outputDir.exists()) {
+				outputDir.create(true, false, null);
+			}
+			
+			String folderName = OrccUtil.getFolder(actor);
+			IPath path = new Path(folderName);
+			IFolder folder = outputDir.getFolder(path);
+			if (!folder.exists()) {
+				folder = outputDir;
+				for (int i = 0; i < path.segmentCount(); i++) {
+					folder = folder.getFolder(path.segment(i));
+					if (!folder.exists()) {
+						folder.create(true, false, null);
+					}
+				}
+			}
+
+			IFile file = outputDir.getFile(new Path(OrccUtil.getFile(actor)
+					+ ".json"));
+			if (file.exists()) {
+				file.delete(true, null);
+			}
+
 			// write output as UTF-8
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			writer = new BufferedWriter(new OutputStreamWriter(os));
+
+			try {
+				JsonObject obj = writeActor();
+				GsonBuilder builder = new GsonBuilder();
+				builder.disableHtmlEscaping();
+				if (prettyPrint) {
+					builder.setPrettyPrinting();
+				}
+
+				Gson gson = builder.create();
+				gson.toJson(obj, writer);
+				writer.flush();
+				file.create(new ByteArrayInputStream(os.toByteArray()), 0, null);
+			} finally {
+				// because some GSON methods may throw a RuntimeException
+				try {
+					writer.close();
+				} catch (IOException e) {
+					throw new OrccException("I/O error", e);
+				}
+			}
+		} catch (CoreException e) {
+			throw new OrccException("I/O error", e);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
-		}
-
-		try {
-			JsonObject obj = writeActor();
-			GsonBuilder builder = new GsonBuilder();
-			builder.disableHtmlEscaping();
-			if (prettyPrint) {
-				builder.setPrettyPrinting();
-			}
-
-			Gson gson = builder.create();
-			gson.toJson(obj, writer);
-		} finally {
-			// because some GSON methods may throw a RuntimeException
-			try {
-				writer.close();
-			} catch (IOException e) {
-				throw new OrccException("I/O error", e);
-			}
 		}
 	}
 

@@ -54,6 +54,8 @@ import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 
+import org.eclipse.core.resources.IFile;
+
 /**
  * C++ back-end.
  * 
@@ -67,17 +69,12 @@ public class CppBackendImpl extends AbstractBackend {
 
 	public static Boolean printHeader = false;
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		main(CppBackendImpl.class, args);
-	}
-
 	private boolean classify;
+
 	private boolean merge;
+
 	private boolean needSerDes = false;
+
 	private boolean normalize;
 
 	private Map<Connection, Integer> computeFifoKind(Network network)
@@ -159,7 +156,7 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		// do not generate a C++ VTL
 	}
 

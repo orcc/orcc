@@ -33,9 +33,6 @@ import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,7 +54,17 @@ import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.equinox.app.IApplication;
+import org.eclipse.equinox.app.IApplicationContext;
 
 /**
  * This class is an abstract implementation of {@link Backend}. The two entry
@@ -90,37 +97,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractBackend implements Backend {
-
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(Class<? extends AbstractBackend> clasz,
-			String[] args) {
-		if (args.length == 3) {
-			String inputFile = args[0];
-			List<String> vtlFolders = Arrays.asList(args[1]
-					.split(File.pathSeparator));
-			String outputFolder = args[2];
-
-			Map<String, Object> options = new HashMap<String, Object>();
-			options.put(OUTPUT_FOLDER, outputFolder);
-
-			try {
-				AbstractBackend backend = clasz.newInstance();
-				backend.setOptions(options);
-				backend.compileVTL(vtlFolders);
-				backend.compileXDF(inputFile);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err.println("Usage: " + clasz.getSimpleName()
-					+ " <input XDF network> <VTL folder> <output folder>");
-		}
-	}
+public abstract class AbstractBackend implements Backend, IApplication {
 
 	/**
 	 * Fifo size used in backend.
@@ -144,15 +121,15 @@ public abstract class AbstractBackend implements Backend {
 	/**
 	 * Path of the folder that contains VTL under IR form.
 	 */
-	private List<String> vtlFolders;
+	private List<IFolder> vtlFolders;
 
 	@Override
-	final public void compileVTL(List<String> vtlFolders) throws OrccException {
+	final public void compileVTL(List<IFolder> vtlFolders) throws OrccException {
 		this.vtlFolders = vtlFolders;
 
 		// lists actors
 		write("Lists actors...\n");
-		List<File> vtlFiles = OrccUtil.getAllFilenames(vtlFolders);
+		List<IFile> vtlFiles = OrccUtil.getAllFiles(vtlFolders);
 		doVtlCodeGeneration(vtlFiles);
 	}
 
@@ -196,7 +173,7 @@ public abstract class AbstractBackend implements Backend {
 	 *            a list of IR files
 	 * @throws OrccException
 	 */
-	abstract protected void doVtlCodeGeneration(List<File> files)
+	abstract protected void doVtlCodeGeneration(List<IFile> files)
 			throws OrccException;
 
 	/**
@@ -372,7 +349,8 @@ public abstract class AbstractBackend implements Backend {
 	 * @return a list of actors
 	 * @throws OrccException
 	 */
-	final public List<Actor> parseActors(List<File> files) throws OrccException {
+	final public List<Actor> parseActors(List<IFile> files)
+			throws OrccException {
 		// NOTE: the actors are parsed but are NOT put in the actor pool because
 		// they may be transformed and not have the same properties (in
 		// particular concerning types), and instantiation then complains.
@@ -380,16 +358,15 @@ public abstract class AbstractBackend implements Backend {
 		write("Parsing " + files.size() + " actors...\n");
 		List<Actor> actors = new ArrayList<Actor>();
 		try {
-			for (File file : files) {
-				InputStream in = new FileInputStream(file);
-				Actor actor = new IRParser().parseActor(in);
+			for (IFile file : files) {
+				Actor actor = new IRParser().parseActor(file.getContents());
 				actors.add(actor);
 
 				if (isCanceled()) {
 					break;
 				}
 			}
-		} catch (IOException e) {
+		} catch (CoreException e) {
 			throw new OrccException("I/O error", e);
 		}
 		return actors;
@@ -501,7 +478,7 @@ public abstract class AbstractBackend implements Backend {
 	@Override
 	public void setOptions(Map<String, Object> options) {
 		this.options = options;
-		
+
 		String outputFolder;
 		Object obj = options.get(OUTPUT_FOLDER);
 		if (obj instanceof String) {
@@ -516,10 +493,10 @@ public abstract class AbstractBackend implements Backend {
 			output.mkdir();
 			outputFolder = output.getAbsolutePath();
 		}
-		
+
 		// set output path
 		path = new File(outputFolder).getAbsolutePath();
-		
+
 		initializeOptions();
 	}
 
@@ -531,6 +508,53 @@ public abstract class AbstractBackend implements Backend {
 	@Override
 	public void setWriteListener(WriteListener listener) {
 		this.listener = listener;
+	}
+
+	@Override
+	public Object start(IApplicationContext context) throws Exception {
+		Map<?, ?> map = context.getArguments();
+		String[] args = (String[]) map
+				.get(IApplicationContext.APPLICATION_ARGS);
+		if (args.length == 3) {
+			String inputFile = args[0];
+			List<String> vtlFolderNames = Arrays.asList(args[1]
+					.split(File.pathSeparator));
+			List<IFolder> vtlFolders = new ArrayList<IFolder>(
+					vtlFolderNames.size());
+
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			for (String folderName : vtlFolderNames) {
+				IContainer cter = root.getContainerForLocation(new Path(
+						folderName));
+				if (cter != null && cter.getType() == IResource.FOLDER) {
+					IFolder folder = (IFolder) cter;
+					vtlFolders.add(folder);
+				}
+			}
+			String outputFolder = args[2];
+
+			Map<String, Object> options = new HashMap<String, Object>();
+			options.put(OUTPUT_FOLDER, outputFolder);
+
+			try {
+				setOptions(options);
+				compileVTL(vtlFolders);
+				compileXDF(inputFile);
+				return IApplication.EXIT_OK;
+			} catch (Exception e) {
+				System.err.println("Could not print \"" + args[0] + "\"");
+				e.printStackTrace();
+			}
+		} else {
+			System.err.println("Usage: " + getClass().getSimpleName()
+					+ " <input XDF network> <VTL folder> <output folder>");
+		}
+		return IApplication.EXIT_OK;
+	}
+
+	@Override
+	public void stop() {
+
 	}
 
 	/**

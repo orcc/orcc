@@ -65,6 +65,8 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 
+import org.eclipse.core.resources.IFile;
+
 /**
  * VHDL back-end.
  * 
@@ -74,14 +76,6 @@ import net.sf.orcc.network.transformations.BroadcastAdder;
 public class VHDLBackendImpl extends AbstractBackend {
 
 	public static Pattern adjacentUnderscores = Pattern.compile("_+");
-
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		main(VHDLBackendImpl.class, args);
-	}
 
 	private ActorPrinter actorPrinter;
 
@@ -173,7 +167,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		// do not generate a VHDL VTL
 	}
 

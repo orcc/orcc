@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.promela;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +50,8 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 
+import org.eclipse.core.resources.IFile;
+
 /**
  * This class defines a template-based PROMELA back-end.
  * 
@@ -58,14 +59,6 @@ import net.sf.orcc.network.transformations.BroadcastAdder;
  * 
  */
 public class PromelaBackendImpl extends AbstractBackend {
-
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		main(PromelaBackendImpl.class, args);
-	}
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 
@@ -100,7 +93,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		// do not generate a PROMELA VTL
 	}
 

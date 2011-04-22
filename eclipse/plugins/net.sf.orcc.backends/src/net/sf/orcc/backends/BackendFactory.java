@@ -43,6 +43,7 @@ import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -117,7 +118,7 @@ public class BackendFactory extends PluginFactory {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = root.getProject(name);
 
-		List<String> vtlFolders = OrccUtil.getOutputPaths(project);
+		List<IFolder> vtlFolders = OrccUtil.getOutputFolders(project);
 
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)

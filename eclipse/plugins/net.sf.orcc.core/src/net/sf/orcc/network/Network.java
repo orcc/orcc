@@ -53,6 +53,7 @@ import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
+import org.eclipse.core.resources.IFolder;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
@@ -625,7 +626,7 @@ public class Network {
 	 *             if an actor could not be instantiated, or a connection is
 	 *             wrong
 	 */
-	public void instantiate(List<String> paths) throws OrccException {
+	public void instantiate(List<IFolder> paths) throws OrccException {
 		new Instantiator(paths).transform(this);
 	}
 

@@ -259,5 +259,29 @@
             uri="platform:/resource/net.sf.orcc.backends/model/Instructions.ecore">
       </package>
    </extension>
+   <extension
+         id="net.sf.orcc.backends.c"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.c.CBackendImpl">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="net.sf.orcc.backends.vhdl"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.vhdl.VHDLBackendImpl">
+         </run>
+      </application>
+   </extension>
 
 </plugin>

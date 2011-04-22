@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.util;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -60,16 +59,6 @@ import org.stringtemplate.v4.STGroupFile;
  */
 public class OrccUtil {
 
-	private static void findFiles(List<File> vtlFiles, File vtl) {
-		for (File file : vtl.listFiles()) {
-			if (file.isDirectory()) {
-				findFiles(vtlFiles, file);
-			} else if (file.getName().endsWith(".json")) {
-				vtlFiles.add(file);
-			}
-		}
-	}
-
 	private static void findFiles(List<IFile> vtlFiles, IFolder vtl)
 			throws CoreException {
 		for (IResource resource : vtl.members()) {
@@ -89,38 +78,14 @@ public class OrccUtil {
 	 *            a list of folders
 	 * @return a list of files
 	 */
-	public static List<File> getAllFilenames(List<String> srcFolders) {
-		List<File> vtlFiles = new ArrayList<File>();
-		for (String folder : srcFolders) {
-			findFiles(vtlFiles, new File(folder));
-		}
-
-		// sort them by name
-		Collections.sort(vtlFiles, new Comparator<File>() {
-
-			@Override
-			public int compare(File f1, File f2) {
-				return f1.compareTo(f2);
-			}
-
-		});
-
-		return vtlFiles;
-	}
-
-	/**
-	 * Returns all the IR files in the given folders.
-	 * 
-	 * @param srcFolders
-	 *            a list of folders
-	 * @return a list of files
-	 * @throws CoreException
-	 */
-	public static List<IFile> getAllFiles(List<IFolder> srcFolders)
-			throws CoreException {
+	public static List<IFile> getAllFiles(List<IFolder> srcFolders) {
 		List<IFile> vtlFiles = new ArrayList<IFile>();
-		for (IFolder folder : srcFolders) {
-			findFiles(vtlFiles, folder);
+		try {
+			for (IFolder folder : srcFolders) {
+				findFiles(vtlFiles, folder);
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 
 		// sort them by name
@@ -287,42 +252,6 @@ public class OrccUtil {
 		}
 
 		return vtlFolders;
-	}
-
-	/**
-	 * Returns the output location of the given project.
-	 * 
-	 * @param project
-	 *            a project
-	 * @return the output location of the given project, or <code>null</code> if
-	 *         none is found
-	 */
-	public static String getOutputPath(IProject project) {
-		IFolder folder = getOutputFolder(project);
-		if (folder == null) {
-			return null;
-		} else {
-			return folder.getLocation().toOSString();
-		}
-	}
-
-	/**
-	 * Returns the output locations of the given project and the project it
-	 * references in its build path.
-	 * 
-	 * @param project
-	 *            a project
-	 * @return the output location of the given project, or an empty list
-	 */
-	public static List<String> getOutputPaths(IProject project)
-			throws CoreException {
-		List<String> vtlPaths = new ArrayList<String>();
-		List<IFolder> vtlFolders = getOutputFolders(project);
-		for (IFolder folder : vtlFolders) {
-			vtlPaths.add(folder.getLocation().toOSString());
-		}
-
-		return vtlPaths;
 	}
 
 	/**

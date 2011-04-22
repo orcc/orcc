@@ -81,6 +81,7 @@ import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
@@ -415,9 +416,9 @@ public class ActorTransformer {
 	 *            the AST of the actor
 	 * @return the actor in IR form
 	 */
-	public Actor transform(String file, AstActor astActor) {
+	public Actor transform(IFile file, AstActor astActor) {
 		actor = IrFactory.eINSTANCE.createActor();
-		actor.setFile(file);
+		actor.setFile(file.getFullPath().toOSString());
 
 		astTransformer.setIrActor(actor);
 

@@ -63,6 +63,7 @@ import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -89,7 +90,7 @@ public class SlowInterpreter extends AbstractSimulator {
 
 	private String stimulusFile;
 
-	private List<String> vtlFolders;
+	private List<IFolder> vtlFolders;
 
 	private String xdfFile;
 
@@ -167,7 +168,7 @@ public class SlowInterpreter extends AbstractSimulator {
 		IProject project = root.getProject(name);
 
 		try {
-			vtlFolders = OrccUtil.getOutputPaths(project);
+			vtlFolders = OrccUtil.getOutputFolders(project);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}

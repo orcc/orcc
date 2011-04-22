@@ -49,6 +49,8 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFile;
+
 /**
  * Java back-end.
  * 
@@ -56,14 +58,6 @@ import net.sf.orcc.util.OrccUtil;
  * 
  */
 public class JavaBackendImpl extends AbstractBackend {
-
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		main(JavaBackendImpl.class, args);
-	}
 
 	private ActorPrinter actorPrinter;
 
@@ -95,7 +89,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
 		actorPrinter = new ActorPrinter("Java_actor", true);

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.tools.statistics;
 
-import java.io.File;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -36,6 +35,8 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.tools.AbstractActorAnalyzer;
 import net.sf.orcc.tools.AbstractNetworkAnalyzer;
+
+import org.eclipse.core.resources.IFile;
 
 /**
  * This class define a network analyzer that compute different statistics about
@@ -71,7 +72,7 @@ public class Statistics extends AbstractNetworkAnalyzer {
 	}
 
 	@Override
-	protected void doVtlAnalyzer(List<File> files) throws OrccException {
+	protected void doVtlAnalyzer(List<IFile> files) throws OrccException {
 		// TODO Auto-generated method stub
 
 	}

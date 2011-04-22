@@ -64,6 +64,7 @@ import net.sf.orcc.tools.merger2.NetworkMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.WriteListener;
 
+import org.eclipse.core.resources.IFile;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
@@ -76,33 +77,39 @@ import org.jgrapht.graph.DirectedMultigraph;
  */
 public class CBackendImpl extends AbstractBackend {
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		main(CBackendImpl.class, args);
-	}
-
 	private boolean classify;
+
 	private boolean codesign;
+
 	private boolean debugMode;
+
 	private boolean dynamicMapping;
+
 	private boolean enableTrace;
+
 	private Map<String, List<Instance>> instancesTarget;
+
 	private Map<String, String> mapping;
+
 	private Map<String, Network> mapTargetsNetworks;
+
 	private DirectedGraph<String, StringAttribute> mediumGraph;
+
 	private boolean merge;
+
 	private boolean merger2;
+
 	private boolean newScheduler;
+
 	private boolean normalize;
+
 	private boolean ringTopology;
+
 	private int threadsNb;
+
 	private Network workingNetwork;
 
 	private void computeMapping(Network network) {
-
 		// compute the different threads
 		instancesTarget = new HashMap<String, List<Instance>>();
 		for (Instance instance : network.getInstances()) {
@@ -264,7 +271,7 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		// do not generate a C VTL
 	}
 

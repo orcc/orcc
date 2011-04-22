@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
-
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
@@ -63,6 +61,9 @@ import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
+
 /**
  * LLVM back-end.
  * 
@@ -72,27 +73,25 @@ import net.sf.orcc.util.OrccUtil;
 public class LLVMBackendImpl extends AbstractBackend {
 
 	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		main(LLVMBackendImpl.class, args);
-	}
-
-	/**
 	 * Backend options
 	 */
 	private boolean classify;
+
 	private boolean debugMode;
+
 	/**
 	 * Path of JadeToolbox executable
 	 */
 	protected String jadeToolbox;
+
 	private String llvmGenMod;
+
 	private boolean normalize;
+
 	private String optLevel;
 
 	private ActorPrinter printer;
+
 	private final Map<String, String> transformations;
 
 	/**
@@ -136,7 +135,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
 		printer = new ActorPrinter("LLVM_actor", !debugMode);

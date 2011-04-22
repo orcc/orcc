@@ -30,6 +30,7 @@ package net.sf.orcc.tools;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import net.sf.orcc.OrccException;
@@ -56,7 +57,7 @@ public interface NetworkAnalyzer {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	public void analyzeVTL(List<String> vtlFolders) throws OrccException;
+	public void analyzeVTL(List<IFolder> vtlFolders) throws OrccException;
 
 	/**
 	 * Loads a hierarchical XDF network and analyze it. Analyze may include

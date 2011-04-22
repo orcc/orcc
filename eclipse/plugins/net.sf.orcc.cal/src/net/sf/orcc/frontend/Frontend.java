@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.frontend;
 
-import java.io.File;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstActor;
@@ -37,6 +35,9 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 
 import com.google.inject.Inject;
 
@@ -54,7 +55,7 @@ public class Frontend {
 	/**
 	 * output folder
 	 */
-	private File outputFolder;
+	private IFolder outputFolder;
 
 	/**
 	 * Pretty-print the IR
@@ -78,12 +79,13 @@ public class Frontend {
 	 *            AST of the actor
 	 * @throws OrccException
 	 */
-	public void compile(String file, AstActor astActor) throws OrccException {
+	public void compile(IFile file, AstActor astActor) throws OrccException {
 		try {
 			Actor actor = actorTransformer.transform(file, astActor);
 			new SSATransformation().doSwitch(actor);
-			new IRWriter(actor).write(outputFolder.toString(), prettyPrint);
-			EcoreHelper.serializeActor(outputFolder.toString(), actor);
+			new IRWriter(actor).write(outputFolder, prettyPrint);
+			EcoreHelper.serializeActor(outputFolder.getLocation().toOSString(),
+					actor);
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();
 		}
@@ -96,11 +98,8 @@ public class Frontend {
 	 * @param outputFolder
 	 *            absolute path of an output folder
 	 */
-	public void setOutputFolder(String outputFolder) {
-		this.outputFolder = new File(outputFolder);
-		if (!this.outputFolder.exists()) {
-			this.outputFolder.mkdir();
-		}
+	public void setOutputFolder(IFolder outputFolder) {
+		this.outputFolder = outputFolder;
 	}
 
 	public void setPrettyPrint(boolean prettyPrint) {
