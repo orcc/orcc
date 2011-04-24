@@ -84,6 +84,7 @@ import net.sf.orcc.util.OrccUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import com.google.inject.Inject;
 
@@ -420,11 +421,13 @@ public class ActorTransformer {
 		actor = IrFactory.eINSTANCE.createActor();
 		actor.setFile(file.getFullPath().toOSString());
 
+		Location location = Util.getLocation(astActor);
+		actor.setLocation(location);
+
 		astTransformer.setIrActor(actor);
 
 		Context context = astTransformer.getContext();
 		try {
-			Location location = Util.getLocation(astActor);
 
 			// parameters
 			for (AstVariable astVariable : astActor.getParameters()) {
@@ -461,8 +464,8 @@ public class ActorTransformer {
 				for (Action action : initializes) {
 					NodeBlock block = action.getBody().getFirst();
 					List<Expression> params = new ArrayList<Expression>(0);
-					block.add(0, IrFactory.eINSTANCE.createInstCall(location,
-							null, initialize, params));
+					block.add(0, IrFactory.eINSTANCE.createInstCall(
+							EcoreUtil.copy(location), null, initialize, params));
 				}
 			}
 

@@ -167,6 +167,14 @@ public interface IrPackage extends EPackage {
 		EReference ACTOR__MO_C = eINSTANCE.getActor_MoC();
 
 		/**
+		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference ACTOR__LOCATION = eINSTANCE.getActor_Location();
+
+		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -1449,13 +1457,22 @@ public interface IrPackage extends EPackage {
 	int ACTOR__MO_C = 12;
 
 	/**
+	 * The feature id for the '<em><b>Location</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__LOCATION = 13;
+
+	/**
 	 * The number of structural features of the '<em>Actor</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR_FEATURE_COUNT = 13;
+	int ACTOR_FEATURE_COUNT = 14;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.DefImpl <em>Def</em>}' class.
@@ -3516,6 +3533,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getActor_MoC();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Actor#getLocation <em>Location</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Location</em>'.
+	 * @see net.sf.orcc.ir.Actor#getLocation()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EReference getActor_Location();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Actor#getName <em>Name</em>}'.

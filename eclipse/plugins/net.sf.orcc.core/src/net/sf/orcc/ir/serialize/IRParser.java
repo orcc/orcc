@@ -42,6 +42,7 @@ import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTIONS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTION_SCHED;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INITIALIZES;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INPUTS;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_LOCATION;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_NAME;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_NATIVE;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_OUTPUTS;
@@ -300,6 +301,9 @@ public class IRParser {
 					.getAsJsonObject();
 
 			actor = IrFactory.eINSTANCE.createActor();
+			Location location = parseLocation(obj.get(KEY_LOCATION)
+					.getAsJsonArray());
+			actor.setLocation(location);
 
 			file = obj.get(KEY_SOURCE_FILE).getAsString();
 			actor.setFile(file);

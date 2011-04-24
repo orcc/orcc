@@ -79,6 +79,8 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 				// we got an error too soon
 				Network.clearActorPool();
 				monitor.setCanceled(true);
+				
+				e.printStackTrace();
 
 				Throwable throwable = e;
 				StringBuilder builder = new StringBuilder();

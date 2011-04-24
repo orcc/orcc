@@ -42,6 +42,7 @@ import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTIONS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTION_SCHED;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INITIALIZES;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INPUTS;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_LOCATION;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_NAME;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_NATIVE;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_OUTPUTS;
@@ -413,7 +414,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 			if (!outputDir.exists()) {
 				outputDir.create(true, false, null);
 			}
-			
+
 			String folderName = OrccUtil.getFolder(actor);
 			IPath path = new Path(folderName);
 			IFolder folder = outputDir.getFolder(path);
@@ -570,6 +571,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array;
 
 		obj.addProperty(KEY_SOURCE_FILE, actor.getFile());
+		obj.add(KEY_LOCATION, writeLocation(actor.getLocation()));
 		obj.addProperty(KEY_NAME, actor.getName());
 		obj.add(KEY_PARAMETERS, writeGlobalVariables(actor.getParameters()));
 		obj.add(KEY_INPUTS, writePorts(actor.getInputs()));

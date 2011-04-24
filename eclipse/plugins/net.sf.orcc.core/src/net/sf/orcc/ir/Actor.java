@@ -107,6 +107,14 @@ public interface Actor extends EObject {
 	EList<Port> getInputs();
 
 	/**
+	 * Returns the location of this actor.
+	 * 
+	 * @return the location of this actor
+	 * @model containment="true"
+	 */
+	Location getLocation();
+
+	/**
 	 * Returns the MoC of this actor.
 	 * 
 	 * @return an MoC
@@ -279,6 +287,14 @@ public interface Actor extends EObject {
 	 *            an FSM
 	 */
 	void setFsm(FSM fsm);
+
+	/**
+	 * Sets the location of this actor.
+	 * 
+	 * @param location
+	 *            a location
+	 */
+	void setLocation(Location location);
 
 	/**
 	 * Sets the MoC of this actor.

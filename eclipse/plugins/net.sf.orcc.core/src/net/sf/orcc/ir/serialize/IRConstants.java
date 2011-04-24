@@ -64,6 +64,8 @@ public interface IRConstants {
 
 	public final static String KEY_INPUTS = "inputs";
 
+	public static final String KEY_LOCATION = "location";
+
 	public final static String KEY_NAME = "name";
 
 	public static final String KEY_NATIVE = "native";
