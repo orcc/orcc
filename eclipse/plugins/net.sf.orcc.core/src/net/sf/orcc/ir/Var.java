@@ -159,6 +159,13 @@ public interface Var extends EObject {
 	boolean isInitialized();
 
 	/**
+	 * Returns <code>true</code> if this variable is local.
+	 * 
+	 * @return <code>true</code> if this variable is local
+	 */
+	boolean isLocal();
+
+	/**
 	 * Returns true if this variable is used at least once.
 	 * 
 	 * @return true if this variable is used at least once.

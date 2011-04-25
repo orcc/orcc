@@ -245,7 +245,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 			if (descendant instanceof Use) {
 				Use use = (Use) descendant;
 				Var oldVar = use.getVariable();
-				if (!oldVar.isGlobal()) {
+				if (oldVar.isLocal()) {
 					Var newVar = uses.get(oldVar.getName());
 					if (newVar != null) {
 						// newVar may be null if oldVar is a function parameter

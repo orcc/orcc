@@ -61,33 +61,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  */
 public class ActorImpl extends EObjectImpl implements Actor {
 	/**
-	 * The default value of the '{@link #getFile() <em>File</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFile()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String FILE_EDEFAULT = null;
-
-	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String NAME_EDEFAULT = null;
-
-	/**
-	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean NATIVE_EDEFAULT = false;
-
-	/**
 	 * The cached value of the '{@link #getActions() <em>Actions</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getActions()
@@ -97,14 +70,13 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected EList<Action> actions;
 
 	/**
-	 * The cached value of the '{@link #getActionsOutsideFsm() <em>Actions Outside Fsm</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getActionsOutsideFsm()
+	 * The default value of the '{@link #getFile() <em>File</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFile()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Action> actionsOutsideFsm;
+	protected static final String FILE_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getFile() <em>File</em>}' attribute.
@@ -114,15 +86,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected String file = FILE_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFsm()
-	 * @generated
-	 * @ordered
-	 */
-	protected FSM fsm;
 
 	/**
 	 * The cached value of the '{@link #getInitializes() <em>Initializes</em>}' containment reference list.
@@ -143,14 +106,13 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected EList<Port> inputs;
 
 	/**
-	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getLocation()
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected Location location;
+	protected static final String NAME_EDEFAULT = null;
 
 	private Map<String, Port> mapInputs;
 
@@ -163,16 +125,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	private Map<String, Var> mapStateVars;
 
 	/**
-	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMoC()
-	 * @generated
-	 * @ordered
-	 */
-	protected MoC moC;
-
-	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
@@ -180,15 +132,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isNative()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean native_ = NATIVE_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getOutputs() <em>Outputs</em>}' containment reference list.
@@ -225,6 +168,63 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Var> stateVars;
+
+	/**
+	 * The default value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NATIVE_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isNative() <em>Native</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #isNative()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean native_ = NATIVE_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getActionsOutsideFsm() <em>Actions Outside Fsm</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getActionsOutsideFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Action> actionsOutsideFsm;
+
+	/**
+	 * The cached value of the '{@link #getFsm() <em>Fsm</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getFsm()
+	 * @generated
+	 * @ordered
+	 */
+	protected FSM fsm;
+
+	/**
+	 * The cached value of the '{@link #getMoC() <em>Mo C</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getMoC()
+	 * @generated
+	 * @ordered
+	 */
+	protected MoC moC;
+
+	/**
+	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLocation()
+	 * @generated
+	 * @ordered
+	 */
+	protected Location location;
 
 	/**
 	 * holds template-specific data.

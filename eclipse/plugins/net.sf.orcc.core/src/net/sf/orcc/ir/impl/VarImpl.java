@@ -554,6 +554,11 @@ public class VarImpl extends EObjectImpl implements Var {
 	}
 
 	@Override
+	public boolean isLocal() {
+		return !global;
+	}
+
+	@Override
 	public boolean isUsed() {
 		return !getUses().isEmpty();
 	}
