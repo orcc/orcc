@@ -45,7 +45,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
@@ -67,20 +66,25 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	private Map<Var, RAM> ramMap;
 
 	/**
+	 * current list of instructions
+	 */
+	private List<Instruction> instructions;
+
+	/**
 	 * Adds a RamSetAddress instruction before the previous SplitInstruction.
 	 * 
 	 * @param ram
 	 *            RAM
-	 * @param indexes
-	 *            list of indexes
 	 * @param var
 	 *            variable
+	 * @param indexes
+	 *            list of expressions
 	 */
-	private void addEarlySetAddress(List<Instruction> instructions,
-			Predicate predicate, List<Expression> indexes, int port, Var var) {
+	private void addEarlySetAddress(RAM ram, Var var, List<Expression> indexes) {
+		int port = ram.getLastPortUsed() % 2 + 1;
 		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
 				.createInstRamSetAddress(port, var, indexes);
-		rsa.setPredicate(EcoreHelper.copy(predicate));
+		rsa.setPredicate(EcoreHelper.copy(ram.getPredicate()));
 
 		// insert the RSA before the previous split instruction
 		for (int i = indexInst - 1; i > 0; i--) {
@@ -94,70 +98,70 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	}
 
 	/**
-	 * Adds a RamRead to the list of pending reads on the given RAM.
+	 * Adds a RamRead to the list of pending reads on the given RAM from an
+	 * InstLoad.
 	 * 
 	 * @param ram
 	 *            a RAM
 	 * @param load
-	 *            a Load
-	 * @param port
-	 *            a port
+	 *            the InstLoad used to create the InstRamRead
 	 */
-	private void addPendingRead(Predicate predicate, RAM ram, InstLoad load,
-			int port) {
+	private void addPendingRead(RAM ram, InstLoad load) {
+		int port = ram.getLastPortUsed() % 2 + 1;
 		InstRamRead read = InstructionsFactory.eINSTANCE.createInstRamRead(
 				port, load.getSource().getVariable(), load.getTarget()
 						.getVariable());
-		read.setPredicate(EcoreHelper.copy(predicate));
+		read.setPredicate(EcoreHelper.copy(ram.getPredicate()));
 
-		List<InstRamRead> reads = pendingReads.get(ram);
-		reads.add(read);
+		// add pending read to the list
+		pendingReads.get(ram).add(read);
 	}
 
 	/**
-	 * Adds a RamSetAddress instruction.
+	 * Adds a RamSetAddress instruction at the current index.
 	 * 
-	 * @param indexes
-	 *            list of indexes
-	 * @param port
-	 *            port used
+	 * @param ram
+	 *            RAM
 	 * @param var
 	 *            variable
+	 * @param indexes
+	 *            list of expressions
 	 */
-	private void addSetAddress(List<Instruction> instructions,
-			Predicate predicate, List<Expression> indexes, int port, Var var) {
+	private void addSetAddress(RAM ram, Var var, List<Expression> indexes) {
+		int port = ram.getLastPortUsed() % 2 + 1;
 		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
 				.createInstRamSetAddress(port, var, indexes);
-		rsa.setPredicate(EcoreHelper.copy(predicate));
+		rsa.setPredicate(EcoreHelper.copy(ram.getPredicate()));
 		instructions.add(indexInst++, rsa);
 	}
 
 	/**
-	 * Adds a SplitInstruction.
+	 * Adds a split instruction at the current index in instructions.
 	 * 
+	 * @param ram
+	 *            a RAM
 	 */
-	private void addSplitInstruction(List<Instruction> instructions,
-			Predicate predicate) {
+	private void addSplitInstruction(RAM ram) {
 		InstSplit instSplit = InstructionsFactory.eINSTANCE.createInstSplit();
-		instSplit.setPredicate(EcoreHelper.copy(predicate));
+		instSplit.setPredicate(EcoreHelper.copy(ram.getPredicate()));
 		instructions.add(indexInst++, instSplit);
 	}
 
 	/**
-	 * Adds a RamWrite instruction.
+	 * Adds a RamWrite instruction at the current index.
 	 * 
+	 * @param predicate
+	 *            a predicate
 	 * @param ram
 	 *            a RAM
 	 * @param store
-	 *            a Store
-	 * @param port
-	 *            a port
+	 *            the InstStore used to create the InstRamWrite
 	 */
-	private void addWrite(List<Instruction> instructions, Predicate predicate,
-			RAM ram, InstStore store, int port) {
+	private void addWrite(RAM ram, InstStore store) {
+		int port = ram.getLastPortUsed() % 2 + 1;
 		InstRamWrite write = InstructionsFactory.eINSTANCE.createInstRamWrite(
 				port, store.getTarget().getVariable(), store.getValue());
-		write.setPredicate(EcoreHelper.copy(predicate));
+		write.setPredicate(EcoreHelper.copy(ram.getPredicate()));
 		instructions.add(indexInst++, write);
 	}
 
@@ -169,6 +173,8 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			if (variable.isAssignable() && variable.getType().isList()) {
 				RAM ram = new RAM();
 				ramMap.put(variable, ram);
+
+				// initialize the list of pending reads for this RAM
 				pendingReads.put(ram, new ArrayList<InstRamRead>(2));
 			}
 		}
@@ -214,14 +220,13 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			ram.reset();
 
 			boolean hasMorePendingReads;
-			List<Instruction> instructions = block.getInstructions();
+			instructions = block.getInstructions();
 			indexInst = instructions.size() - 1; // before the return
-			Predicate predicate = IrFactory.eINSTANCE.createPredicate();
 			do {
-				hasMorePendingReads = executeTwoPendingReads(instructions,
-						predicate, ram);
+				hasMorePendingReads = executeTwoPendingReads(ram);
 			} while (hasMorePendingReads);
 		}
+
 		return null;
 	}
 
@@ -232,7 +237,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            a Load
 	 */
 	private void convertLoad(InstLoad load) {
-		List<Instruction> instructions = EcoreHelper.getContainingList(load);
+		instructions = EcoreHelper.getContainingList(load);
 		List<Expression> indexes = load.getIndexes();
 		Var var = load.getSource().getVariable();
 		Predicate predicate = load.getPredicate();
@@ -242,28 +247,26 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			int port = ram.getLastPortUsed() + 1;
 			ram.setLastPortUsed(port);
 
-			int ajustedPort = port % 2 + 1;
-			if (ram.isWaitCycleNeeded()) {
-				addSetAddress(instructions, predicate, indexes, ajustedPort,
-						var);
+			if (port < 2) {
+				addSetAddress(ram, var, indexes);
 			} else {
-				addEarlySetAddress(instructions, predicate, indexes,
-						ajustedPort, var);
+				addEarlySetAddress(ram, var, indexes);
 			}
-			addPendingRead(predicate, ram, load, ajustedPort);
+			addPendingRead(ram, load);
 
 			if (port % 2 == 1) {
 				// two ports have been used
-				executeTwoPendingReads(instructions, predicate, ram);
+				executeTwoPendingReads(ram);
 			}
 		} else {
-			addSetAddress(instructions, predicate, indexes, 1, var);
-			addPendingRead(predicate, ram, load, 1);
-
-			ram.setLastAccessRead(true);
+			// udpate state of RAM
+			ram.setLastAccessRead();
 			ram.setLastPortUsed(0);
 			ram.setPredicate(predicate);
-			ram.setWaitCycleNeeded(true);
+
+			// set address and add pending read
+			addSetAddress(ram, var, indexes);
+			addPendingRead(ram, load);
 		}
 	}
 
@@ -274,7 +277,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            a Store
 	 */
 	private void convertStore(InstStore store) {
-		List<Instruction> instructions = EcoreHelper.getContainingList(store);
+		instructions = EcoreHelper.getContainingList(store);
 		List<Expression> indexes = store.getIndexes();
 		Var var = store.getTarget().getVariable();
 		Predicate predicate = store.getPredicate();
@@ -285,19 +288,20 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			port = ram.getLastPortUsed() + 1;
 			if (port > 0 && port % 2 == 0) {
 				// port == 2, 4, 6, 8...
-				addSplitInstruction(instructions, predicate);
+				addSplitInstruction(ram);
 			}
 		} else {
 			port = 0;
 		}
 
-		int ajustedPort = port % 2 + 1;
-		addSetAddress(instructions, predicate, indexes, ajustedPort, var);
-		addWrite(instructions, predicate, ram, store, ajustedPort);
-
+		// update state of RAM
+		ram.setLastAccessWrite();
 		ram.setLastPortUsed(port);
-		ram.setLastAccessRead(false);
 		ram.setPredicate(predicate);
+
+		// set address and write
+		addSetAddress(ram, var, indexes);
+		addWrite(ram, store);
 	}
 
 	/**
@@ -313,18 +317,16 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            a RAM
 	 * @return <code>true</code> if there are still pending reads
 	 */
-	private boolean executeTwoPendingReads(List<Instruction> instructions,
-			Predicate predicate, RAM ram) {
+	private boolean executeTwoPendingReads(RAM ram) {
 		List<InstRamRead> reads = pendingReads.get(ram);
 		if (reads.isEmpty()) {
 			return false;
 		} else {
-			if (ram.isWaitCycleNeeded()) {
-				addSplitInstruction(instructions, predicate);
-				ram.setWaitCycleNeeded(false);
+			if (ram.getLastPortUsed() < 2) {
+				addSplitInstruction(ram);
 			}
 
-			addSplitInstruction(instructions, predicate);
+			addSplitInstruction(ram);
 
 			Iterator<InstRamRead> it = reads.iterator();
 			for (int i = 0; it.hasNext() && i < 2; i++) {

@@ -48,14 +48,17 @@ public class RAM {
 
 	private Predicate predicate;
 
-	private boolean waitCycleNeeded;
-
 	/**
 	 * Creates a new RAM.
 	 */
 	public RAM() {
 	}
 
+	/**
+	 * Returns the last port used by this RAM. The port number is 0-based.
+	 * 
+	 * @return the last port used by this RAM
+	 */
 	public int getLastPortUsed() {
 		return lastPortUsed;
 	}
@@ -69,16 +72,22 @@ public class RAM {
 		return predicate;
 	}
 
+	/**
+	 * Returns <code>true</code> if this RAM was already accessed for reading.
+	 * 
+	 * @return <code>true</code> if this RAM was already accessed for reading
+	 */
 	public boolean isLastAccessRead() {
 		return alreadyAccessed && lastAccessRead;
 	}
 
+	/**
+	 * Returns <code>true</code> if this RAM was already accessed for writing.
+	 * 
+	 * @return <code>true</code> if this RAM was already accessed for writing
+	 */
 	public boolean isLastAccessWrite() {
 		return alreadyAccessed && !lastAccessRead;
-	}
-
-	public boolean isWaitCycleNeeded() {
-		return waitCycleNeeded;
 	}
 
 	/**
@@ -91,11 +100,28 @@ public class RAM {
 		setPredicate(IrFactory.eINSTANCE.createPredicate());
 	}
 
-	public void setLastAccessRead(boolean lastAccessRead) {
+	/**
+	 * Updates the state of this RAM as "already accessed for reading".
+	 */
+	public void setLastAccessRead() {
 		alreadyAccessed = true;
-		this.lastAccessRead = lastAccessRead;
+		lastAccessRead = true;
 	}
 
+	/**
+	 * Updates the state of this RAM as "already accessed for writing".
+	 */
+	public void setLastAccessWrite() {
+		alreadyAccessed = true;
+		lastAccessRead = false;
+	}
+
+	/**
+	 * Sets the last port used by this RAM. The port number is 0-based.
+	 * 
+	 * @param lastPortUsed
+	 *            last port used
+	 */
 	public void setLastPortUsed(int lastPortUsed) {
 		this.lastPortUsed = lastPortUsed;
 	}
@@ -111,10 +137,6 @@ public class RAM {
 			EcoreHelper.delete(predicate);
 		}
 		predicate = EcoreHelper.copy(newPredicate);
-	}
-
-	public void setWaitCycleNeeded(boolean waitCycleNeeded) {
-		this.waitCycleNeeded = waitCycleNeeded;
 	}
 
 }
