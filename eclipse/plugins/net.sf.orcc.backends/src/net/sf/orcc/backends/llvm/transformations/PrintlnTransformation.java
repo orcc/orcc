@@ -33,20 +33,19 @@ import java.util.List;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.VarGlobal;
+import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * Change prinln instruction into printf llvm function fashion. Parameters of
@@ -56,7 +55,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Jerome GORIN
  * 
  */
-public class PrintlnTransformation extends AbstractActorVisitor {
+public class PrintlnTransformation extends AbstractActorVisitor<Object> {
 
 	/**
 	 * Change characters in strings to fit LLVM constraints
@@ -66,9 +65,9 @@ public class PrintlnTransformation extends AbstractActorVisitor {
 	 * 
 	 */
 	private class LLVMString {
-		
+
 		private StringBuffer llvmStr;
-		
+
 		private int size;
 
 		LLVMString(String str) {
@@ -102,7 +101,7 @@ public class PrintlnTransformation extends AbstractActorVisitor {
 	/**
 	 * State variables of the actor
 	 */
-	private OrderedMap<String, VarGlobal> stateVars;
+	private EList<Var> stateVars;
 
 	/**
 	 * String counter
@@ -110,15 +109,11 @@ public class PrintlnTransformation extends AbstractActorVisitor {
 	private int strCnt;
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		strCnt = 0;
 		stateVars = actor.getStateVars();
-		OrderedMap<String, Procedure> procs = actor.getProcs();
-		Procedure print = procs.get("print");
 
-		if (print != null) {
-			procs.remove(print.getName());
-		}
+		actor.getProcs().remove(actor.getProcedure("print"));
 
 		for (Procedure proc : actor.getProcs()) {
 			visit(proc);
@@ -133,21 +128,22 @@ public class PrintlnTransformation extends AbstractActorVisitor {
 			visit(action.getBody());
 			visit(action.getScheduler());
 		}
-
+		return null;
 	}
 
 	@Override
-	public void visit(Call call) {
+	public Object caseInstCall(InstCall call) {
 		if (call.isPrint()) {
 			String value = "";
-			List<Expression> parameters = new ArrayList<Expression>();
+			List<Expression> newParameters = new ArrayList<Expression>();
+			EList<Expression> parameters = call.getParameters();
 			String name = "str" + strCnt++;
 
 			// Iterate though all the println arguments to provide an only
 			// string value
-			for (Expression expr : call.getParameters()) {
+			for (Expression expr : parameters) {
 				if (expr.isStringExpr()) {
-					String strExprVal = (((StringExpr) expr).getValue());
+					String strExprVal = (((ExprString) expr).getValue());
 					value += strExprVal;
 				} else {
 					Type type = expr.getType();
@@ -185,22 +181,24 @@ public class PrintlnTransformation extends AbstractActorVisitor {
 			TypeString type = IrFactory.eINSTANCE.createTypeString();
 			type.setSize(llvmStr.getSize());
 
-			VarGlobal variable = new VarGlobal(call.getLocation(),
-					type, name, false, new StringExpr(llvmStr.getStr()));
-			Use use = new Use(variable);
+			Var variable = IrFactory.eINSTANCE.createVar(call.getLocation(),
+					type, name, true, false);
+			variable.setInitialValue(IrFactory.eINSTANCE
+					.createExprString(llvmStr.getStr()));
 
 			// Set the created state variable into call argument
-			stateVars.put(name, variable);
-			parameters.add(new VarExpr(use));
+			stateVars.add(variable);
+			newParameters.add(IrFactory.eINSTANCE.createExprVar(variable));
 
-			for (Expression expr : call.getParameters()) {
+			for (Expression expr : parameters) {
 				if (!expr.isStringExpr()) {
-					parameters.add(expr);
+					newParameters.add(expr);
 				}
 			}
-			call.setParameters(parameters);
+			parameters.clear();
+			parameters.addAll(newParameters);
 		}
-
+		return null;
 	}
 
 }

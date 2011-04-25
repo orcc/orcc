@@ -36,14 +36,15 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * Change port of type bool declaration into port of type i32.
  * 
  * @author Jerome GORIN
  */
-public class BoolToIntTransformation extends AbstractActorVisitor {
+public class BoolToIntTransformation extends AbstractActorVisitor<Object> {
 
 	private void changeType(Var var) {
 		TypeList listType = (TypeList) var.getType();
@@ -53,17 +54,12 @@ public class BoolToIntTransformation extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Action action) {
+	public Object caseAction(Action action) {
 		// input pattern
 		Pattern pattern = action.getInputPattern();
 		for (Port port : pattern.getPorts()) {
 			Var var = pattern.getVariable(port);
 			changeType(var);
-
-			var = pattern.getPeeked(port);
-			if (var != null) {
-				changeType(var);
-			}
 		}
 
 		// output pattern
@@ -72,18 +68,19 @@ public class BoolToIntTransformation extends AbstractActorVisitor {
 			Var var = pattern.getVariable(port);
 			changeType(var);
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		// Set port to i32
 		visitPort(actor.getInputs());
 		visitPort(actor.getOutputs());
 
-		super.visit(actor);
+		return super.caseActor(actor);
 	}
 
-	public void visitPort(OrderedMap<String, Port> ports) {
+	public void visitPort(EList<Port> ports) {
 		// Transform Port into int Var
 		for (Port port : ports) {
 			if (port.getType().isBool()) {

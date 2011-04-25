@@ -35,25 +35,23 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.NextStateInfo;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Transition;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-
 
 /**
  * 
  * @author Ghislain Roquier
  * 
  */
-public class GuardsExtractor extends AbstractActorVisitor {
+public class GuardsExtractor extends AbstractActorVisitor<Object> {
 
 	private Action currAction;
 
@@ -61,7 +59,7 @@ public class GuardsExtractor extends AbstractActorVisitor {
 
 	private List<Expression> guardList;
 
-	private List<Load> loadList;
+	private List<InstLoad> loadList;
 
 	public GuardsExtractor(Map<Action, List<Expression>> guards) {
 		this.guards = guards;
@@ -73,11 +71,12 @@ public class GuardsExtractor extends AbstractActorVisitor {
 		Expression prty;
 		// if there is no guard add the guard "true"
 		if (guards.get(action).isEmpty()) {
-			guards.get(action).add(0, new BoolExpr(true));
+			guards.get(action).add(0, IrFactory.eINSTANCE.createExprBool(true));
 		}
 		// add the guards from the previous actions as not guard
 		for (Expression expr : prevGuards) {
-			prty = new UnaryExpr(UnaryOp.LOGIC_NOT, expr, expr.getType());
+			prty = IrFactory.eINSTANCE.createExprUnary(OpUnary.LOGIC_NOT, expr,
+					expr.getType());
 			guards.get(action).add(prty);
 		}
 		prevGuards.add(guards.get(action).get(0)); // TODO: if the original
@@ -88,9 +87,9 @@ public class GuardsExtractor extends AbstractActorVisitor {
 	// If the local variable derived from this variable is used in an expression
 	// then the variable is put directly in the expression instead
 	private void removeLoads() {
-		ListIterator<Load> loadIter = loadList.listIterator();
+		ListIterator<InstLoad> loadIter = loadList.listIterator();
 		while (loadIter.hasNext()) {
-			Load ld = loadIter.next();
+			InstLoad ld = loadIter.next();
 			ListIterator<Expression> itr = guardList.listIterator();
 			while (itr.hasNext()) {
 				Expression element = itr.next();
@@ -101,14 +100,15 @@ public class GuardsExtractor extends AbstractActorVisitor {
 
 	// recursively searches through the expression and finds if the local
 	// variable derived from the Load is present
-	private void replaceVarInExpr(Expression expr, Load ld) {
+	private void replaceVarInExpr(Expression expr, InstLoad ld) {
 		if (expr.isBinaryExpr()) {
-			replaceVarInExpr(((BinaryExpr) expr).getE1(), ld);
-			replaceVarInExpr(((BinaryExpr) expr).getE2(), ld);
+			replaceVarInExpr(((ExprBinary) expr).getE1(), ld);
+			replaceVarInExpr(((ExprBinary) expr).getE2(), ld);
 		} else if (expr.isVarExpr()) {
-			if (((VarExpr) expr).getVar().getVariable() == ld.getTarget()) {
+			if (((ExprVar) expr).getUse().getVariable() == ld.getTarget()) {
 				// Here I modify the model.. Should we work with a copy??
-				((VarExpr) expr).setVar(ld.getSource());
+				((ExprVar) expr).setUse(IrFactory.eINSTANCE.createUse(ld
+						.getSource().getVariable()));
 			}
 		}
 	}
@@ -118,7 +118,7 @@ public class GuardsExtractor extends AbstractActorVisitor {
 		for (Action action : actor.getActions()) {
 			currAction = action;
 			guardList = new ArrayList<Expression>();
-			loadList = new ArrayList<Load>();
+			loadList = new ArrayList<InstLoad>();
 			guards.put(currAction, guardList);
 			visit(action.getScheduler());
 			removeLoads();
@@ -133,9 +133,9 @@ public class GuardsExtractor extends AbstractActorVisitor {
 		// In each action there is an action scheduler
 		// actions not in a FSM are present in the "actions" list and appear in
 		// decreasing priority order.
-		if (!actor.getActionScheduler().hasFsm()) {
+		if (!actor.hasFsm()) {
 			List<Expression> prevGuards = new ArrayList<Expression>();
-			for (Action action : actor.getActionScheduler().getActions()) {
+			for (Action action : actor.getActions()) {
 				addPriorityToGuard(action, prevGuards);
 			}
 		}
@@ -143,18 +143,17 @@ public class GuardsExtractor extends AbstractActorVisitor {
 		// actionScheduler->transition<List>->nextStateinfo<List> also in oder
 		// of priority
 		else {
-			for (Transition trans : actor.getActionScheduler().getFsm()
-					.getList()) {
+			for (Transitions transitions : actor.getFsm().getTransitions()) {
 				List<Expression> prevGuards = new ArrayList<Expression>();
-				for (NextStateInfo nsi : trans.getNextStateInfo()) {
-					addPriorityToGuard(nsi.getAction(), prevGuards);
+				for (Transition trans : transitions.getList()) {
+					addPriorityToGuard(trans.getAction(), prevGuards);
 				}
 			}
 		}
 	}
 
 	@Override
-	public void visit(Assign assign) {
+	public void visit(InstAssign assign) {
 		// we should also consider other cases but this is enough for now
 		if (!assign.getValue().isBooleanExpr()) {
 			guardList.add(assign.getValue());
@@ -162,7 +161,7 @@ public class GuardsExtractor extends AbstractActorVisitor {
 	}
 
 	@Override
-	public void visit(Load load) {
+	public void visit(InstLoad load) {
 		loadList.add(load);
 	}
 
