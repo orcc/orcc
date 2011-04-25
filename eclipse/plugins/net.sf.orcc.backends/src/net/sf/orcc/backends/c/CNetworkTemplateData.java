@@ -107,6 +107,19 @@ public class CNetworkTemplateData {
 	 */
 	private List<Instance> sourceInstances;
 
+	private List<Instance> getInstancesRecursively(Network network) {
+		List<Instance> instances = new ArrayList<Instance>();
+		for (Instance instance : network.getInstances()) {
+			if (instance.isNetwork()) {
+				instances
+						.addAll(getInstancesRecursively(instance.getNetwork()));
+			} else {
+				instances.add(instance);
+			}
+		}
+		return instances;
+	}
+
 	/**
 	 * build informations about medium of communication
 	 * 
@@ -282,7 +295,7 @@ public class CNetworkTemplateData {
 		numberOfGroups = 0;
 		Instance instance = new Instance("network", "");
 		instance.setContents(network);
-		recursiveGroupsComputation(instance);
+		recursiveGroupsComputation(instance, 2);
 	}
 
 	/**
@@ -407,17 +420,32 @@ public class CNetworkTemplateData {
 		return true;
 	}
 
-	private void recursiveGroupsComputation(Instance instance) {
+	private boolean isNthLastedHierarchy(Network network, int n) {
+		if (n == 1) {
+			return isLastedHierarchy(network);
+		}
+		for (Instance instance : network.getInstances()) {
+			if (instance.isNetwork()) {
+				if (!isNthLastedHierarchy(instance.getNetwork(), n - 1)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private void recursiveGroupsComputation(Instance instance,
+			int hierarchyLevel) {
 		if (instance.isNetwork()) {
 			Network network = instance.getNetwork();
-			if (isLastedHierarchy(network)) {
-				for (Instance subInstance : network.getInstances()) {
+			if (isNthLastedHierarchy(network, hierarchyLevel)) {
+				for (Instance subInstance : getInstancesRecursively(network)) {
 					instanceToGroupIdMap.put(subInstance, numberOfGroups);
 				}
 				numberOfGroups++;
 			} else {
 				for (Instance subInstance : network.getInstances()) {
-					recursiveGroupsComputation(subInstance);
+					recursiveGroupsComputation(subInstance, hierarchyLevel);
 				}
 			}
 		} else {
