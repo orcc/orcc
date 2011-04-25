@@ -31,7 +31,6 @@ package net.sf.orcc.backends.llvm;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -40,11 +39,14 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Transition;
+import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
+
+import org.eclipse.emf.common.util.EMap;
 
 /**
  * This class computes a map for inserting metadata information into LLVM
@@ -84,12 +86,11 @@ public class LLVMTemplateData {
 	 * Medata container of MoCs
 	 */
 	private Map<Object, Integer> mocs;
-	
+
 	/**
 	 * Medata container of actions of MoCs
 	 */
 	private Map<Object, Integer> actionMoC;
-	
 
 	/**
 	 * Medata container of names
@@ -105,7 +106,7 @@ public class LLVMTemplateData {
 	 * Medata container of ports
 	 */
 	private Map<Object, Integer> ports;
-	
+
 	/**
 	 * Medata container of configurations
 	 */
@@ -165,26 +166,23 @@ public class LLVMTemplateData {
 		actions.put(action.getBody(), id++);
 	}
 
-	private void computeActionScheduler(ActionScheduler actSched) {
-		actionScheduler.put(actor.getActionScheduler(), id++);
-
-		if (!actSched.getActions().isEmpty()) {
-			actionScheduler.put(actSched.getActions(), id++);
+	private void computeActionScheduler() {
+		if (!actor.getActionsOutsideFsm().isEmpty()) {
+			actionScheduler.put(actor.getActionsOutsideFsm(), id++);
 		}
 
-		if (actSched.hasFsm()) {
-			FSM fsm = actSched.getFsm();
+		if (actor.hasFsm()) {
+			FSM fsm = actor.getFsm();
 			actionScheduler.put(fsm, id++);
 			actionScheduler.put(fsm.getStates(), id++);
 			actionScheduler.put(fsm.getTransitions(), id++);
 
-			for (Transition transition : fsm.getTransitions()) {
-				actionScheduler.put(transition, id++);
-				actionScheduler.put(transition.getNextStateInfo(), id++);
-				for (NextStateInfo nextState : transition.getNextStateInfo()) {
-					actionScheduler.put(nextState, id++);
+			for (Transitions transitions : fsm.getTransitions()) {
+				actionScheduler.put(transitions, id++);
+				actionScheduler.put(transitions.getList(), id++);
+				for (Transition transition : transitions.getList()) {
+					actionScheduler.put(transition, id++);
 				}
-
 			}
 		}
 	}
@@ -201,7 +199,7 @@ public class LLVMTemplateData {
 		names.put(actor.getName(), id++);
 
 		// Insert action scheduler
-		computeActionScheduler(actor.getActionScheduler());
+		computeActionScheduler();
 
 		// Insert inputs
 		for (Port input : actor.getInputs()) {
@@ -249,16 +247,14 @@ public class LLVMTemplateData {
 		computePattern(sdfmoc.getInputPattern());
 		computePattern(sdfmoc.getOutputPattern());
 	}
-	
-	private void computeQSDFMoC(QSDFMoC qsdfmoc) {
-		Map<Action, SDFMoC> configurations = qsdfmoc.getConfigurations();
-		
-		for (Entry<Action, SDFMoC> entry : configurations.entrySet()){
-			computeConfiguration(entry.getKey(), entry.getValue());
+
+	private void computeQSDFMoC(QSDFMoC qsdfMoc) {
+		for (Action action : qsdfMoc.getActions()) {
+			computeConfiguration(action, qsdfMoc.getStaticClass(action));
 		}
 	}
-	
-	private void computeConfiguration(Action action, SDFMoC sdfMoC){
+
+	private void computeConfiguration(Action action, SDFMoC sdfMoC) {
 		configurations.put(action, id++);
 		computeCSDFMoC(sdfMoC);
 	}
@@ -273,7 +269,7 @@ public class LLVMTemplateData {
 		}
 	}
 
-	private void computeNumTokens(Map<Port, Integer> numTokens) {
+	private void computeNumTokens(EMap<Port, Integer> numTokens) {
 		if (!numTokens.isEmpty()) {
 			numTokenPattern.put(numTokens, id++);
 		}
@@ -323,7 +319,6 @@ public class LLVMTemplateData {
 	public Map<Object, Integer> getActions() {
 		return actions;
 	}
-	
 
 	/**
 	 * get configurations map
@@ -342,7 +337,7 @@ public class LLVMTemplateData {
 	public Map<Object, Integer> getActionScheduler() {
 		return actionScheduler;
 	}
-	
+
 	/**
 	 * get the actions of a MoC
 	 * 
