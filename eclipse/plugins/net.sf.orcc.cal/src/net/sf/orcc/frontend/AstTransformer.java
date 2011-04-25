@@ -1208,8 +1208,8 @@ public class AstTransformer {
 			Location location = global.getLocation();
 
 			List<Expression> indexes = new ArrayList<Expression>(0);
-			InstStore store = IrFactory.eINSTANCE.createInstStore(location,
-					global, indexes, value);
+			InstStore store = IrFactory.eINSTANCE.createInstStore(
+					EcoreUtil.copy(location), global, indexes, value);
 			addInstruction(store);
 		}
 
@@ -1364,7 +1364,8 @@ public class AstTransformer {
 		if (mustInitialize) {
 			if (initialize == null) {
 				initialize = IrFactory.eINSTANCE.createProcedure("_initialize",
-						location, IrFactory.eINSTANCE.createTypeVoid());
+						EcoreUtil.copy(location),
+						IrFactory.eINSTANCE.createTypeVoid());
 			}
 
 			Context oldContext = newContext(initialize);
@@ -1372,7 +1373,8 @@ public class AstTransformer {
 
 			exprTransformer.setTarget(variable, new ArrayList<Expression>(0));
 			Expression expression = transformExpression(astVariable.getValue());
-			createAssignOrStore(location, variable, null, expression);
+			createAssignOrStore(EcoreUtil.copy(location), variable, null,
+					expression);
 			exprTransformer.clearTarget();
 
 			context.restoreScope();
@@ -1409,7 +1411,8 @@ public class AstTransformer {
 		if (value != null) {
 			exprTransformer.setTarget(local, new ArrayList<Expression>(0));
 			Expression expression = transformExpression(value);
-			createAssignOrStore(location, local, null, expression);
+			createAssignOrStore(EcoreUtil.copy(location), local, null,
+					expression);
 			exprTransformer.clearTarget();
 		}
 
