@@ -34,6 +34,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.backends.instructions.InstRamRead;
 import net.sf.orcc.backends.instructions.InstRamSetAddress;
 import net.sf.orcc.backends.instructions.InstRamWrite;
@@ -41,6 +45,7 @@ import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
@@ -48,6 +53,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
@@ -61,14 +67,19 @@ import net.sf.orcc.ir.util.EcoreHelper;
  */
 public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
-	private Map<RAM, List<InstRamRead>> pendingReads;
-
-	private Map<Var, RAM> ramMap;
-
 	/**
 	 * current list of instructions
 	 */
 	private List<Instruction> instructions;
+
+	/**
+	 * instructions that depend on a pending InstRamRead
+	 */
+	private List<Instruction> pendingInstructions;
+
+	private Map<RAM, List<InstRamRead>> pendingReads;
+
+	private Map<Var, RAM> ramMap;
 
 	/**
 	 * Adds a RamSetAddress instruction before the previous SplitInstruction.
@@ -115,6 +126,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 		// add pending read to the list
 		pendingReads.get(ram).add(read);
+		pendingInstructions.add(read);
 	}
 
 	/**
@@ -180,7 +192,6 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		}
 
 		for (Action action : actor.getActions()) {
-			this.action = action;
 			doSwitch(action.getBody());
 		}
 
@@ -189,9 +200,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstLoad(InstLoad load) {
-		Var var = load.getSource().getVariable();
-		if (!load.getIndexes().isEmpty() && var.isAssignable()
-				&& var.isGlobal()) {
+		if (isVarTransformableToRam(load.getSource().getVariable())) {
 			convertLoad(load);
 			EcoreHelper.delete(load);
 			indexInst--;
@@ -200,9 +209,44 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
+	public Object caseInstruction(Instruction instruction) {
+		// do not consider deleted instructions
+		if (instruction.eContainer() == null) {
+			return null;
+		}
+
+		TreeIterator<EObject> it = instruction.eAllContents();
+		while (it.hasNext()) {
+			EObject eObject = it.next();
+			if (eObject instanceof Use) {
+				Use use = (Use) eObject;
+				Var var = use.getVariable();
+				if (var != null && var.isLocal() && !var.getType().isList()) {
+					Def def = var.getDefs().get(0);
+					Instruction defInst = EcoreHelper.getContainerOfType(def,
+							Instruction.class);
+					if (pendingInstructions.contains(defInst)) {
+						// removes this instruction from the instruction list
+						// and adds it to the pending list
+						EcoreUtil.remove(instruction);
+						pendingInstructions.add(instruction);
+
+						// updates the index so we don't skip the next
+						// instruction
+						indexInst--;
+
+						break;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	public Object caseInstStore(InstStore store) {
-		Var var = store.getTarget().getVariable();
-		if (!store.getIndexes().isEmpty() && var.isGlobal()) {
+		if (isVarTransformableToRam(store.getTarget().getVariable())) {
 			convertStore(store);
 			EcoreHelper.delete(store);
 			indexInst--;
@@ -212,6 +256,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
+		pendingInstructions = new ArrayList<Instruction>();
 		super.caseProcedure(procedure);
 
 		NodeBlock block = procedure.getLast();
@@ -319,8 +364,9 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 */
 	private boolean executeTwoPendingReads(RAM ram) {
 		List<InstRamRead> reads = pendingReads.get(ram);
+		boolean moreReadsPending;
 		if (reads.isEmpty()) {
-			return false;
+			moreReadsPending = false;
 		} else {
 			if (ram.getLastPortUsed() < 2) {
 				addSplitInstruction(ram);
@@ -330,12 +376,41 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 
 			Iterator<InstRamRead> it = reads.iterator();
 			for (int i = 0; it.hasNext() && i < 2; i++) {
-				instructions.add(indexInst++, it.next());
+				InstRamRead read = it.next();
+				instructions.add(indexInst++, read);
+				pendingInstructions.remove(read);
 				it.remove();
 			}
 
-			return it.hasNext();
+			moreReadsPending = it.hasNext();
 		}
+
+		// add all pending instructions up to the first RamRead
+		Iterator<Instruction> itPending = pendingInstructions.iterator();
+		while (itPending.hasNext()) {
+			Instruction pending = itPending.next();
+			if (pending instanceof InstRamRead) {
+				break;
+			}
+			instructions.add(indexInst++, pending);
+			itPending.remove();
+		}
+
+		// returns true if there are more reads pending
+		return moreReadsPending;
+	}
+
+	/**
+	 * Returns <code>true</code> if the given variable can be transformed as a
+	 * RAM.
+	 * 
+	 * @param var
+	 *            a variable
+	 * @return <code>true</code> if the given variable can be transformed as a
+	 *         RAM
+	 */
+	private boolean isVarTransformableToRam(Var var) {
+		return var.isAssignable() && var.isGlobal() && var.getType().isList();
 	}
 
 }
