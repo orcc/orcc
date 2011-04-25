@@ -38,7 +38,7 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
@@ -56,16 +56,10 @@ import net.sf.orcc.ir.util.EcoreHelper;
 public class ListFlattenTransformation extends AbstractActorVisitor<Object> {
 
 	/**
-	 * Prints the indexes of an NDim array, each index is print separately and
-	 * cast to the correct size Arguments of the function are the indexes, the
-	 * indexes iterator, the instruction iterator and the instruction type.
-	 * 
-	 * @param indexes
-	 *            a list of indexes
-	 * @param type
-	 *            the instruction type
+	 * Prints the indexes of an NDim array.
 	 */
-	private void printAssignment(List<Expression> indexes, Type type) {
+	private void printAssignment(NodeBlock currentBlock,
+			List<Expression> indexes) {
 		List<Expression> listIndex = new ArrayList<Expression>(indexes.size());
 
 		// returns the load or store, and has the effect that instructions will
@@ -80,7 +74,8 @@ public class ListFlattenTransformation extends AbstractActorVisitor<Object> {
 			// add the assign instruction for each index
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(indexVar,
 					expr);
-			itInstruction.add(assign);
+			currentBlock.add(indexInst, assign);
+			indexInst++;
 		}
 
 		// creates the variable that will hold the concatenation of indexes
@@ -94,31 +89,36 @@ public class ListFlattenTransformation extends AbstractActorVisitor<Object> {
 		// add a special assign instruction that assigns the index variable the
 		// concatenation of index expressions
 		InstAssignIndex assignIndex = InstructionsFactory.eINSTANCE
-				.createInstAssignIndex(indexVar, listIndex, type);
-		itInstruction.add(assignIndex);
-
-		// so the load (or store) is not endlessly revisited
-		itInstruction.next();
+				.createInstAssignIndex(indexVar, listIndex,
+						IrFactory.eINSTANCE.createTypeInt());
+		currentBlock.add(indexInst, assignIndex);
+		indexInst++;
 	}
 
 	@Override
-	public void visit(InstLoad load) {
+	public Object caseInstLoad(InstLoad load) {
 		List<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			Type type = load.getSource().getVariable().getType();
-			printAssignment(indexes, type);
+			printAssignment(
+					EcoreHelper.getContainerOfType(load, NodeBlock.class),
+					indexes);
 		}
+
+		return null;
 	}
 
 	@Override
-	public void visit(InstStore store) {
+	public Object caseInstStore(InstStore store) {
 		List<Expression> indexes = store.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			Type type = store.getTarget().getVariable().getType();
-			printAssignment(indexes, type);
+			printAssignment(
+					EcoreHelper.getContainerOfType(store, NodeBlock.class),
+					indexes);
 		}
+
+		return null;
 	}
 
 }

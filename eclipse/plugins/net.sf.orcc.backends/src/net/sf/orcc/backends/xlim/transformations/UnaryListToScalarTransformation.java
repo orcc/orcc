@@ -31,6 +31,7 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.ir.ExprVar;
@@ -40,6 +41,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TypeList;
@@ -54,7 +56,8 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Herve Yviquel
  * 
  */
-public class UnaryListToScalarTransformation extends AbstractActorVisitor<Object> {
+public class UnaryListToScalarTransformation extends
+		AbstractActorVisitor<Object> {
 
 	private Map<Instruction, InstAssign> toBeAdded;
 	private List<Instruction> toBeRemoved;
@@ -65,19 +68,25 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor<Object
 	}
 
 	@Override
-	public void visit(InstLoad load) {
-		if (toBeRemoved.remove(load)) {
-			itInstruction.remove();
+	public Object caseNodeBlock(NodeBlock nodeBlock) {
+		ListIterator<Instruction> it = nodeBlock.listIterator();
+		while (it.hasNext()) {
+			Instruction instruction = it.next();
+			if (toBeRemoved.remove(instruction)) {
+				it.remove();
+			}
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(Pattern pattern) {
+	public Object casePattern(Pattern pattern) {
 		List<Port> ports = new ArrayList<Port>(pattern.getPorts());
 		for (Port port : ports) {
 			if (pattern.getNumTokens(port) == 1) {
 				Var oldTarget = pattern.getVariable(port);
-				if (!oldTarget.getUses().isEmpty() && oldTarget.getUses().get(0).eContainer() != null) {
+				if (!oldTarget.getUses().isEmpty()
+						&& oldTarget.getUses().get(0).eContainer() != null) {
 					Instruction instruction = EcoreHelper.getContainerOfType(
 							oldTarget.getUses().get(0), Instruction.class);
 
@@ -157,16 +166,6 @@ public class UnaryListToScalarTransformation extends AbstractActorVisitor<Object
 				}
 			}
 		}
-	}
-
-	@Override
-	public void visit(InstStore store) {
-		if (toBeRemoved.remove(store)) {
-			itInstruction.remove();
-			if (toBeAdded.containsKey(store)) {
-				itInstruction.add(toBeAdded.get(store));
-				toBeAdded.remove(store);
-			}
-		}
+		return null;
 	}
 }
