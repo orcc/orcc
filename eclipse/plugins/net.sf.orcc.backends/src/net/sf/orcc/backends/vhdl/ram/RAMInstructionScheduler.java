@@ -221,7 +221,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 			if (eObject instanceof Use) {
 				Use use = (Use) eObject;
 				Var var = use.getVariable();
-				if (var != null && var.isLocal() && !var.getType().isList()) {
+				if (var.isLocal() && !var.getType().isList()) {
 					Def def = var.getDefs().get(0);
 					Instruction defInst = EcoreHelper.getContainerOfType(def,
 							Instruction.class);
