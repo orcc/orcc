@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.xlim;
 
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,22 +41,13 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.transformations.InlineTransformation;
-import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
-import net.sf.orcc.backends.xlim.transformations.ArrayInitializeTransformation;
-import net.sf.orcc.backends.xlim.transformations.ConstantPhiValuesTransformation;
-import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
-import net.sf.orcc.backends.xlim.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
 import net.sf.orcc.backends.xlim.transformations.TernaryOperationAdder;
-import net.sf.orcc.backends.xlim.transformations.UnaryListToScalarTransformation;
-import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.transformations.BuildCFG;
-import net.sf.orcc.ir.transformations.DeadCodeElimination;
-import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.util.ActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
@@ -70,6 +63,8 @@ import org.eclipse.core.resources.IFile;
  * 
  */
 public class XlimBackendImpl extends AbstractBackend {
+
+	private boolean debugMode;
 
 	private String fpgaType;
 
@@ -103,19 +98,28 @@ public class XlimBackendImpl extends AbstractBackend {
 		actor.setTemplateData(new XlimActorTemplateData());
 
 		ActorVisitor<?>[] transformations = {
-				new ArrayInitializeTransformation(),
+				// new ArrayInitializeTransformation(),
 				new TernaryOperationAdder(),
 				new InlineTransformation(true, true),
-				new UnaryListToScalarTransformation(), new CustomPeekAdder(),
-				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new XlimDeadVariableRemoval(), new ListFlattenTransformation(),
-				new ExpressionSplitterTransformation(), new BuildCFG(),
-				new CastAdderTransformation(true),
-				new ConstantPhiValuesTransformation(),
+				// new UnaryListToScalarTransformation(), new CustomPeekAdder(),
+				// new DeadGlobalElimination(), new DeadCodeElimination(),
+				// new XlimDeadVariableRemoval(), new
+				// ListFlattenTransformation(),
+				new ExpressionSplitterTransformation(), /*
+														 * new BuildCFG(), new
+														 * CastAdderTransformation
+														 * (true), new
+														 * ConstantPhiValuesTransformation
+														 * (),
+														 */
 				new MoveLiteralIntegers(), new XlimVariableRenamer() };
 
 		for (ActorVisitor<?> transformation : transformations) {
-			transformation.visit(actor);
+			transformation.doSwitch(actor);
+			if (debugMode && !EcoreHelper.serializeActor(path, actor)) {
+				System.out.println("oops " + transformation + " "
+						+ actor.getName());
+			}
 		}
 
 	}
@@ -149,6 +153,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				"xc2vp30-7-ff1152");
 		mapping = getAttribute(OrccLaunchConstants.MAPPING,
 				new HashMap<String, String>());
+		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
 	private void printCMake(Network network) {
@@ -166,11 +171,8 @@ public class XlimBackendImpl extends AbstractBackend {
 			printer = new InstancePrinter("XLIM_sw_actor", true);
 		}
 
-		// TODO printers
-		System.err
-				.println("XlimBackendImpl.printInstance(Instance): must set printers");
-		// printer.setExpressionPrinter(XlimExprPrinter.class);
-		// printer.setTypePrinter(XlimTypePrinter.class);
+		printer.setExpressionPrinter(new XlimExprPrinter());
+		printer.setTypePrinter(new XlimTypePrinter());
 		return printer.print(instance.getId() + ".xlim", path, instance,
 				"instance");
 	}
@@ -195,11 +197,8 @@ public class XlimBackendImpl extends AbstractBackend {
 			printer = new NetworkPrinter("XLIM_sw_network");
 		}
 
-		// TODO printers
-		System.err
-				.println("XlimBackendImpl.printNetwork(Network): must set printers");
-		// printer.setExpressionPrinter(XlimExprPrinter.class);
-		// printer.setTypePrinter(XlimTypePrinter.class);
+		printer.setExpressionPrinter(new XlimExprPrinter());
+		printer.setTypePrinter(new XlimTypePrinter());
 		printer.getOptions().put("fifoSize", fifoSize);
 		printer.print(file, path, network, "network");
 		if (!hardwareGen) {
