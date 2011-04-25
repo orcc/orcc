@@ -59,7 +59,7 @@ public class TernaryOperationAdder extends AbstractActorVisitor<Object> {
 	private Var condVar;
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			if (!proc.getReturnType().isVoid()) {
 				newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -68,10 +68,11 @@ public class TernaryOperationAdder extends AbstractActorVisitor<Object> {
 				proc.getNodes().add(newBlockNode);
 			}
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(NodeBlock nodeBlock) {
+	public Object caseNodeBlock(NodeBlock nodeBlock) {
 		ListIterator<Instruction> it = nodeBlock.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
@@ -93,11 +94,11 @@ public class TernaryOperationAdder extends AbstractActorVisitor<Object> {
 			}
 
 		}
-
+		return null;
 	}
 
 	@Override
-	public void visit(NodeIf nodeIf) {
+	public Object caseNodeIf(NodeIf nodeIf) {
 		Var oldCondVar = condVar;
 
 		Expression condExpr = nodeIf.getCondition();
@@ -120,5 +121,7 @@ public class TernaryOperationAdder extends AbstractActorVisitor<Object> {
 		visit(nodeIf.getElseNodes());
 		visit(nodeIf.getJoinNode());
 		condVar = oldCondVar;
+		
+		return null;
 	}
 }
