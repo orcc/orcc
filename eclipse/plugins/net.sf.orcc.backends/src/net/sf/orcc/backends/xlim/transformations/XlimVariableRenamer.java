@@ -42,13 +42,14 @@ import net.sf.orcc.ir.Var;
 public class XlimVariableRenamer extends VariableRenamer {
 
 	@Override
-	public void visit(Pattern pattern) {
+	public Object casePattern(Pattern pattern) {
 		String actionName = action.getName();
 		for (Var var : pattern.getPortToVarMap().values()) {
 			if (!action.getBody().getLocals().contains(var)) {
 				var.setName(actionName + "_" + var.getName());
 			}
 		}
+		return super.casePattern(pattern);
 	}
 
 }

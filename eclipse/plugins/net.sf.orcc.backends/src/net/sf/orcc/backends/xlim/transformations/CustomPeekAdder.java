@@ -63,17 +63,18 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public void visit(Action action) {
+	public Object caseAction(Action action) {
 		customPeekedMap = new HashMap<Port, Map<Integer, Var>>();
 
-		super.visit(action);
-
+		super.caseAction(action);
 		((XlimActorTemplateData) actor.getTemplateData())
 				.getCustomPeekedMapPerAction().put(action, customPeekedMap);
+
+		return null;
 	}
 
 	@Override
-	public void visit(Pattern pattern) {
+	public Object casePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Map<Integer, Var> indexToVariableMap = new HashMap<Integer, Var>();
 			Var oldTarget = pattern.getVariable(port);
@@ -102,12 +103,14 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 
 			customPeekedMap.put(port, indexToVariableMap);
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstLoad load) {
+	public Object caseInstLoad(InstLoad load) {
 		if (toBeRemoved.remove(load)) {
 			itInstruction.remove();
 		}
+		return null;
 	}
 }

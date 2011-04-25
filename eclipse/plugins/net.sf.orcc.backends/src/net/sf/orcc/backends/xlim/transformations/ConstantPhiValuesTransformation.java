@@ -49,10 +49,11 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class ConstantPhiValuesTransformation extends AbstractActorVisitor<Object> {
+public class ConstantPhiValuesTransformation extends
+		AbstractActorVisitor<Object> {
 
 	@Override
-	public void visit(InstPhi phi) {
+	public Object caseInstPhi(InstPhi phi) {
 		List<Expression> values = phi.getValues();
 		Var target = phi.getTarget().getVariable();
 		EList<Var> parameters = procedure.getParameters();
@@ -75,10 +76,12 @@ public class ConstantPhiValuesTransformation extends AbstractActorVisitor<Object
 				}
 			}
 		}
+
+		return null;
 	}
 
 	@Override
-	public void visit(InstSpecific node) {
+	public Object caseInstSpecific(InstSpecific node) {
 		if (node instanceof InstTernary) {
 			InstTernary ternaryOperation = (InstTernary) node;
 			ternaryOperation.setConditionValue(clean(ternaryOperation
@@ -88,6 +91,7 @@ public class ConstantPhiValuesTransformation extends AbstractActorVisitor<Object
 			ternaryOperation.setFalseValue(clean(ternaryOperation
 					.getFalseValue()));
 		}
+		return null;
 	}
 
 	public Expression clean(Expression oldExpr) {

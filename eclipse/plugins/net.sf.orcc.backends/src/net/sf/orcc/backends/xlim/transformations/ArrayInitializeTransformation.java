@@ -60,21 +60,21 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor<Object> 
 		}
 
 		@Override
-		public void visit(InstStore instr) {
+		public Object caseInstStore(InstStore instr) {
 			Var target = instr.getTarget().getVariable();
 			Type type = target.getType();
 			// Allocate value field of list if it is initialized
 			if (type.isList() && target.getValue() == null) {
 				target.setValue((Expression) listAllocator.doSwitch(type));
 			}
-			super.visit(instr);
+			return super.caseInstStore(instr);
 		}
 	}
 
 	private ActorInterpreter actorInterpreter;
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		actorInterpreter = new SpecialActorInterpreter(
 				new HashMap<String, Expression>(0), actor);
 
@@ -103,12 +103,15 @@ public class ArrayInitializeTransformation extends AbstractActorVisitor<Object> 
 			}
 			stateVar.setValue(null);
 		}
+
+		return null;
 	}
 
 	@Override
-	public void visit(InstCall call) {
+	public Object caseInstCall(InstCall call) {
 		// Set initialize to native so it will not be printed
 		call.getProcedure().setNative(true);
+		return null;
 	}
 
 }

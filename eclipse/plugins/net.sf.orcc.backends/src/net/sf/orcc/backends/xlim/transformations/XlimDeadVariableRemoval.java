@@ -64,8 +64,8 @@ public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 	}
 
 	@Override
-	public void visit(Actor actor) {
-		super.visit(actor);
+	public Object caseActor(Actor actor) {
+		super.caseActor(actor);
 		Map<Action, Map<Port, Map<Integer, Var>>> customPeekedMapPerAction = ((XlimActorTemplateData) actor
 				.getTemplateData()).getCustomPeekedMapPerAction();
 		for (Action action : new ArrayList<Action>(
@@ -82,5 +82,6 @@ public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 				}
 			}
 		}
+		return null;
 	}
 }
