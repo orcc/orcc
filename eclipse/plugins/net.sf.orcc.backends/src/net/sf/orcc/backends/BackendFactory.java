@@ -30,8 +30,6 @@ package net.sf.orcc.backends;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
-import static net.sf.orcc.OrccLaunchConstants.PROJECT;
-import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,13 +38,8 @@ import java.util.Map;
 import net.sf.orcc.OrccActivator;
 import net.sf.orcc.plugins.PluginFactory;
 import net.sf.orcc.plugins.PluginOption;
-import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -114,19 +107,12 @@ public class BackendFactory extends PluginFactory {
 		backend.setProgressMonitor(monitor);
 		backend.setWriteListener(listener);
 
-		String name = (String) options.get(PROJECT);
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IProject project = root.getProject(name);
-
-		List<IFolder> vtlFolders = OrccUtil.getOutputFolders(project);
-
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)
-		backend.compileVTL(vtlFolders);
+		backend.compileVTL();
 
 		if ((Boolean) options.get(COMPILE_XDF)) {
-			String xdfFile = (String) options.get(XDF_FILE);
-			backend.compileXDF(xdfFile);
+			backend.compileXDF();
 		}
 	}
 

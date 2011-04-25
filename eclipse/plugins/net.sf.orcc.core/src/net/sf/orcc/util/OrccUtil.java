@@ -226,8 +226,7 @@ public class OrccUtil {
 	 *            a project
 	 * @return the output location of the given project, or an empty list
 	 */
-	public static List<IFolder> getOutputFolders(IProject project)
-			throws CoreException {
+	public static List<IFolder> getOutputFolders(IProject project) {
 		List<IFolder> vtlFolders = new ArrayList<IFolder>();
 
 		IJavaProject javaProject = JavaCore.create(project);
@@ -237,12 +236,16 @@ public class OrccUtil {
 
 		// add output folders of required projects
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		for (String name : javaProject.getRequiredProjectNames()) {
-			IProject refProject = root.getProject(name);
-			IFolder outputFolder = getOutputFolder(refProject);
-			if (outputFolder != null) {
-				vtlFolders.add(outputFolder);
+		try {
+			for (String name : javaProject.getRequiredProjectNames()) {
+				IProject refProject = root.getProject(name);
+				IFolder outputFolder = getOutputFolder(refProject);
+				if (outputFolder != null) {
+					vtlFolders.add(outputFolder);
+				}
 			}
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 
 		// add output folders of this project

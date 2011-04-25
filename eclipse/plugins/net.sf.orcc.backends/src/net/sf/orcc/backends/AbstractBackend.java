@@ -31,10 +31,11 @@ package net.sf.orcc.backends;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.PROJECT;
+import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,15 +55,13 @@ import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -104,6 +103,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected int fifoSize;
 
+	private String inputFile;
+
 	private WriteListener listener;
 
 	/**
@@ -124,9 +125,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	private List<IFolder> vtlFolders;
 
 	@Override
-	final public void compileVTL(List<IFolder> vtlFolders) throws OrccException {
-		this.vtlFolders = vtlFolders;
-
+	final public void compileVTL() throws OrccException {
 		// lists actors
 		write("Lists actors...\n");
 		List<IFile> vtlFiles = OrccUtil.getAllFiles(vtlFolders);
@@ -134,7 +133,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	}
 
 	@Override
-	final public void compileXDF(String inputFile) throws OrccException {
+	final public void compileXDF() throws OrccException {
 		// set FIFO size
 		this.fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 
@@ -479,6 +478,14 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	public void setOptions(Map<String, Object> options) {
 		this.options = options;
 
+		String name = getAttribute(PROJECT, "");
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+		IProject project = root.getProject(name);
+		vtlFolders = OrccUtil.getOutputFolders(project);
+
+		inputFile = getAttribute(XDF_FILE, "");
+
 		String outputFolder;
 		Object obj = options.get(OUTPUT_FOLDER);
 		if (obj instanceof String) {
@@ -516,30 +523,19 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		String[] args = (String[]) map
 				.get(IApplicationContext.APPLICATION_ARGS);
 		if (args.length == 3) {
-			String inputFile = args[0];
-			List<String> vtlFolderNames = Arrays.asList(args[1]
-					.split(File.pathSeparator));
-			List<IFolder> vtlFolders = new ArrayList<IFolder>(
-					vtlFolderNames.size());
-
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			for (String folderName : vtlFolderNames) {
-				IContainer cter = root.getContainerForLocation(new Path(
-						folderName));
-				if (cter != null && cter.getType() == IResource.FOLDER) {
-					IFolder folder = (IFolder) cter;
-					vtlFolders.add(folder);
-				}
-			}
+			String project = args[0];
+			String inputFile = args[1];
 			String outputFolder = args[2];
 
 			Map<String, Object> options = new HashMap<String, Object>();
+			options.put(PROJECT, project);
+			options.put(XDF_FILE, inputFile);
 			options.put(OUTPUT_FOLDER, outputFolder);
 
 			try {
 				setOptions(options);
-				compileVTL(vtlFolders);
-				compileXDF(inputFile);
+				compileVTL();
+				compileXDF();
 				return IApplication.EXIT_OK;
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
@@ -547,7 +543,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			}
 		} else {
 			System.err.println("Usage: " + getClass().getSimpleName()
-					+ " <input XDF network> <VTL folder> <output folder>");
+					+ " <project> <input XDF network> <output folder>");
 		}
 		return IApplication.EXIT_OK;
 	}

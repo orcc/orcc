@@ -28,13 +28,11 @@
  */
 package net.sf.orcc.backends;
 
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.util.WriteListener;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -49,24 +47,20 @@ public interface Backend {
 	 * Compiles the VTL by loading IR files, transforming actors and printing
 	 * them.
 	 * 
-	 * @param vtlFolders
-	 *            absolute path of folders that contains IR files
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void compileVTL(List<IFolder> vtlFolders) throws OrccException;
+	void compileVTL() throws OrccException;
 
 	/**
 	 * Loads a hierarchical XDF network and compile it. Compilation may include
 	 * instantiation, flattening, transforming, printing the network, or a
 	 * subset of these steps.
 	 * 
-	 * @param inputFile
-	 *            absolute path of top-level input network
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void compileXDF(String inputFile) throws OrccException;
+	void compileXDF() throws OrccException;
 
 	/**
 	 * Sets the options of this back-end.

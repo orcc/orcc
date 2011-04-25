@@ -67,7 +67,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
@@ -167,11 +166,7 @@ public class SlowInterpreter extends AbstractSimulator {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = root.getProject(name);
 
-		try {
-			vtlFolders = OrccUtil.getOutputFolders(project);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
+		vtlFolders = OrccUtil.getOutputFolders(project);
 	}
 
 	/**
