@@ -86,6 +86,8 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	 */
 	private FSM fsm;
 
+	private int index;
+
 	private Map<Var, Var> mapGlobals;
 
 	private Map<Var, Var> mapLocals;
@@ -141,6 +143,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 			currentAction = nextAction;
 			nextAction = null;
 
+			index = 0;
 			doSwitch(currentAction.getBody());
 		}
 		return null;
@@ -194,8 +197,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 				if (var.isLocal() && !var.getType().isList()) {
 					if (!isAncestor(procedure, var)) {
 						// update the use
-						Var local = getLocal(procedure, instruction, var);
-						use.setVariable(local);
+						updateUse(procedure, instruction, use);
 					}
 				}
 			}
@@ -266,7 +268,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		Var global = mapGlobals.get(local);
 		if (global == null) {
 			global = fac.createVar(fac.createLocation(), copy(local.getType()),
-					"signal_" + local.getName(), true, null);
+					"sg_" + local.getName(), true, null);
 			actor.getStateVars().add(global);
 			mapGlobals.put(local, global);
 
@@ -282,39 +284,6 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		}
 
 		return global;
-	}
-
-	/**
-	 * Returns the local variable in the given procedure associated with the
-	 * given local variable. If no local is associated yet, create one and adds
-	 * a load before the given instruction.
-	 * 
-	 * @param procedure
-	 *            the target procedure
-	 * @param instruction
-	 *            the current instruction
-	 * @param var
-	 *            a local variable
-	 * @return the local variable associated with the given local variable
-	 */
-	private Var getLocal(Procedure procedure, Instruction instruction, Var var) {
-		Var local = mapLocals.get(var);
-		if (local == null) {
-			local = procedure.newTempLocalVariable(copy(var.getType()),
-					var.getName());
-			mapLocals.put(var, local);
-
-			// add a load before the current instruction
-			Var global = getGlobal(var);
-			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local, global);
-			load.setPredicate(copy(instruction.getPredicate()));
-
-			NodeBlock block = instruction.getBlock();
-			int index = block.indexOf(instruction);
-			block.add(index, load);
-		}
-
-		return local;
 	}
 
 	/**
@@ -380,6 +349,37 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 
 		// set new source state to the new state name
 		source = statesMap.get(newActionName);
+	}
+
+	/**
+	 * Updates the given use using the mapLocals map. If no local is associated
+	 * yet, create one and adds a load before the given instruction.
+	 * 
+	 * @param procedure
+	 *            the target procedure
+	 * @param instruction
+	 *            the current instruction
+	 * @param use
+	 *            a use
+	 */
+	private void updateUse(Procedure procedure, Instruction instruction, Use use) {
+		Var var = use.getVariable();
+		Var local = mapLocals.get(var);
+		if (local == null) {
+			local = procedure.newTempLocalVariable(copy(var.getType()),
+					var.getName());
+			mapLocals.put(var, local);
+
+			// add a load at the beginning of the block
+			Var global = getGlobal(var);
+			InstLoad load = IrFactory.eINSTANCE.createInstLoad(local, global);
+			load.setPredicate(IrFactory.eINSTANCE.createPredicate());
+
+			NodeBlock block = instruction.getBlock();
+			block.add(index++, load);
+		}
+
+		use.setVariable(local);
 	}
 
 	/**
