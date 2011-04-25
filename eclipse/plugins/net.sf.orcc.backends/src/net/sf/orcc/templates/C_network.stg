@@ -351,7 +351,7 @@ void *scheduler(void *data) {
 	struct scheduler_s *sched = (struct scheduler_s *) data;
 	struct actor_s *my_actor;
 	struct schedinfo_s si;
-	<if(options.needDynamicMapping)>
+	<if(options.useGeneticAlgorithm)>
 	
 	int i = 0;
 	clock_t start, end;	
@@ -368,7 +368,7 @@ void *scheduler(void *data) {
 			printf("%2i  %5i\t%s\t%s\n", sched-\>id, si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
 		}
-		<if(options.needDynamicMapping)>
+		<if(options.useGeneticAlgorithm)>
 		i++;
 		if(i \> STEP_BW_CHK){
 			end = clock ();
@@ -439,7 +439,7 @@ network(network, options) ::= <<
 #include \<locale.h\>
 #include \<stdio.h\>
 #include \<stdlib.h\>
-<if (options.needDynamicMapping)>
+<if (options.useGeneticAlgorithm)>
 #include \<time.h\>
 <endif>
 
@@ -456,14 +456,14 @@ network(network, options) ::= <<
 <printMediumInclude(network.templateData.allMediumsAllInstances)>
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
-<if (options.threads || options.needDynamicMapping)>
+<if (options.threads || options.useGeneticAlgorithm)>
 #include "orcc_thread.h"
 <endif>
-<if(options.needDynamicMapping)>
+<if(options.useGeneticAlgorithm)>
 #include "orcc_genetic.h"
 <endif>
 
-<if (options.needDynamicMapping)>
+<if (options.useGeneticAlgorithm)>
 #define THREAD_NB <options.threadsNb>
 <else>
 #define MAX_THREAD_NB 10
@@ -471,7 +471,7 @@ network(network, options) ::= <<
 <if(options.newScheduler)>
 #define RING_TOPOLOGY <if(options.ringTopology)>1<else>0<endif>
 <endif>
-<if(options.needDynamicMapping)>
+<if(options.useGeneticAlgorithm)>
 #define POPULATION_SIZE 100
 #define GENERATION_NB 20
 
@@ -520,7 +520,7 @@ network(network, options) ::= <<
 
 <declareActorsArray(instances=network.instances)>
 
-<if (options.needDynamicMapping)>
+<if (options.useGeneticAlgorithm)>
 extern int source_is_stopped();
 extern int clean_cache(int size);
 
@@ -543,7 +543,7 @@ static void launcher() {
 	int i;
 	
 	cpu_set_t cpuset;
-	<if(!options.needDynamicMapping)>
+	<if(!options.useGeneticAlgorithm)>
 	thread_struct threads[MAX_THREAD_NB];
 	thread_id_struct threads_id[MAX_THREAD_NB];
 	
@@ -568,7 +568,7 @@ static void launcher() {
 	
 	initialize_instances();
 	
-	<if(!options.needDynamicMapping)>
+	<if(!options.useGeneticAlgorithm)>
 	for(i=0; i \< mapping-\>number_of_threads; i++){
 		sched_init(&schedulers[i], mapping-\>threads_ids[i], mapping-\>partitions_size[i], mapping-\>partitions_of_actors[i], &waiting_schedulables[i], &waiting_schedulables[(i+1) % mapping-\>number_of_threads], mapping-\>number_of_threads, NULL);
 	}
@@ -578,22 +578,22 @@ static void launcher() {
 	}
 	<endif>
 	
-	<if(options.newScheduler && !options.needDynamicMapping)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
+	<if(options.newScheduler && !options.useGeneticAlgorithm)><printAllAddSchedulable(network.templateData.sourceInstances)><endif>
 	
 	clear_cpu_set(cpuset);
 	
-	for(i=0; i \< <if(options.needDynamicMapping)>THREAD_NB<else>mapping-\>number_of_threads<endif>; i++){
+	for(i=0; i \< <if(options.useGeneticAlgorithm)>THREAD_NB<else>mapping-\>number_of_threads<endif>; i++){
 		thread_create(threads[i], scheduler, schedulers[i], threads_id[i]);
 		set_thread_affinity(cpuset, i, threads[i]);
 	}
-	<if(options.needDynamicMapping)>
+	<if(options.useGeneticAlgorithm)>
 	thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
 	<endif>
 	
-	for(i=0; i \< <if(options.needDynamicMapping)>THREAD_NB<else>mapping-\>number_of_threads<endif>; i++){
+	for(i=0; i \< <if(options.useGeneticAlgorithm)>THREAD_NB<else>mapping-\>number_of_threads<endif>; i++){
 		thread_join(threads[i]);
 	}
-	<if(options.needDynamicMapping)>
+	<if(options.useGeneticAlgorithm)>
 	thread_join(thread_monitor);
 	<endif>
 }
@@ -610,8 +610,8 @@ int main(int argc, char *argv[]) {
 
   launcher();
 
-  printf("End of simulation!<if(!options.needDynamicMapping)> Press a key to continue<endif>\n");
-  <if(!options.needDynamicMapping)>wait_for_key();<endif>
+  printf("End of simulation!<if(!options.useGeneticAlgorithm)> Press a key to continue<endif>\n");
+  <if(!options.useGeneticAlgorithm)>wait_for_key();<endif>
 
   return 0;
 }

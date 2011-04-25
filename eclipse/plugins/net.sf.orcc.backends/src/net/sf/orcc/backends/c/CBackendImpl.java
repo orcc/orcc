@@ -83,7 +83,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	private boolean debugMode;
 
-	private boolean dynamicMapping;
+	private boolean geneticAlgorithm;
 
 	private boolean enableTrace;
 
@@ -180,8 +180,8 @@ public class CBackendImpl extends AbstractBackend {
 				worknet.setTemplateData(targetsData);
 			}
 		} else {
-			if (dynamicMapping) {
-				options.put("needDynamicMapping", dynamicMapping);
+			if (geneticAlgorithm) {
+				options.put("useGeneticAlgorithm", geneticAlgorithm);
 				options.put("threadsNb", threadsNb);
 			} else {
 				if (instancesTarget != null) {
@@ -326,7 +326,7 @@ public class CBackendImpl extends AbstractBackend {
 
 			// print CMakeLists
 			printCMake(workingNetwork);
-			if (!codesign && !dynamicMapping && instancesTarget != null) {
+			if (!codesign && !geneticAlgorithm && instancesTarget != null) {
 				printMapping(workingNetwork);
 			}
 		}
@@ -340,8 +340,8 @@ public class CBackendImpl extends AbstractBackend {
 		merge = getAttribute("net.sf.orcc.backends.merge", false);
 		merger2 = getAttribute("net.sf.orcc.backends.merger2", false);
 		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
-		dynamicMapping = getAttribute("net.sf.orcc.backends.dynamicMapping",
-				false);
+		geneticAlgorithm = getAttribute(
+				"net.sf.orcc.backends.geneticAlgorithm", false);
 		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
 		debugMode = getAttribute(DEBUG_MODE, true);
 		threadsNb = Integer.parseInt(getAttribute(

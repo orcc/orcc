@@ -23,7 +23,7 @@
                id="net.sf.orcc.backends.newScheduler">
          </option>
          <option
-               id="net.sf.orcc.backends.dynamicMapping">
+               id="net.sf.orcc.backends.geneticAlgorithm">
          </option>
          <option
                id="net.sf.orcc.backends.enableTrace">
@@ -141,13 +141,13 @@
          </option>
          <option
                defaultValue="false"
-               description="Uses an experimental genetic algorithm to compute dynamic mapping of actors with processors"
-               id="net.sf.orcc.backends.dynamicMapping"
-               name="Use dynamic mapping (Only on linux)">
+               description="Uses an experimental genetic algorithm to search efficient mappings of the actors on the processor cores"
+               id="net.sf.orcc.backends.geneticAlgorithm"
+               name="Search efficient mappings (Only on linux)">
             <checkBox>
             	<option
 	               		defaultValue="1"
-	               		description="Specify the number of CPU cores to use during execution"
+	               		description="Specify the number of CPU cores to use for the mapping"
 	               		id="net.sf.orcc.backends.processorsNumber"
 	               		name="Number of CPU cores">
             		<textBox></textBox>
