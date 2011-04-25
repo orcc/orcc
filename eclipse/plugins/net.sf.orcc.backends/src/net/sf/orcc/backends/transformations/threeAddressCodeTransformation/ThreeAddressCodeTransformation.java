@@ -55,15 +55,16 @@ import net.sf.orcc.ir.util.ActorVisitor;
 public class ThreeAddressCodeTransformation extends
 		AbstractActorVisitor<Object> {
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		ActorVisitor<?>[] transformations = {
 				new CopyPropagationTransformation(),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
-				new CastAdderTransformation(false) };
+				new CastAdderTransformation() };
 
 		for (ActorVisitor<?> transformation : transformations) {
-			transformation.visit(actor);
+			transformation.doSwitch(actor);
 		}
+		return null;
 	}
 
 }

@@ -33,30 +33,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstPhi;
+import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.VarLocal;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
-import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * Replace occurrences with direct assignments to their corresponding values. A
@@ -66,45 +64,43 @@ import net.sf.orcc.util.OrderedMap;
  * @author Jerome GORIN
  * 
  */
-public class CopyPropagationTransformation extends AbstractActorVisitor {
+public class CopyPropagationTransformation extends
+		AbstractActorVisitor<Expression> {
 
-	private class ExpressionCopy extends AbstractExpressionInterpreter {
+	@Override
+	public Expression caseExprBinary(ExprBinary expr) {
+		expr.setE1(doSwitch(expr.getE1()));
+		expr.setE2(doSwitch(expr.getE2()));
+		return expr;
+	}
 
-		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
-			expr.setE1((Expression) expr.getE1().accept(this, args));
-			expr.setE2((Expression) expr.getE2().accept(this, args));
-			return expr;
-		}
-
-		@Override
-		public Object interpret(ListExpr expr, Object... args) {
-			List<Expression> values = expr.getValue();
-			for (Expression subExpr : values) {
-				Expression newSubExpr = (Expression) subExpr.accept(this, args);
-				if (subExpr != newSubExpr) {
-					values.set(values.indexOf(subExpr), newSubExpr);
-				}
+	@Override
+	public Expression caseExprList(ExprList expr) {
+		List<Expression> values = expr.getValue();
+		for (Expression subExpr : values) {
+			Expression newSubExpr = doSwitch(subExpr);
+			if (subExpr != newSubExpr) {
+				values.set(values.indexOf(subExpr), newSubExpr);
 			}
-			return expr;
+		}
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprUnary(ExprUnary expr) {
+		expr.setExpr(doSwitch(expr.getExpr()));
+		return expr;
+	}
+
+	@Override
+	public Expression caseExprVar(ExprVar expr) {
+		Var var = expr.getUse().getVariable();
+
+		if (copyVars.containsKey(var)) {
+			return doSwitch(copyVars.get(var));
 		}
 
-		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
-			expr.setExpr((Expression) expr.getExpr().accept(this, args));
-			return expr;
-		}
-
-		@Override
-		public Object interpret(VarExpr expr, Object... args) {
-			Var var = expr.getVar().getVariable();
-
-			if (copyVars.containsKey(var)) {
-				return copyVars.get(var).accept(this, args);
-			}
-
-			return expr;
-		}
+		return expr;
 	}
 
 	private Map<Var, Expression> copyVars;
@@ -139,7 +135,7 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 	 *            a map of variable
 	 */
 	private void removeVariables(Map<Var, Expression> vars) {
-		OrderedMap<String, VarLocal> lovalVars = procedure.getLocals();
+		EList<Var> lovalVars = procedure.getLocals();
 
 		for (Map.Entry<Var, Expression> entry : copyVars.entrySet()) {
 			Var var = entry.getKey();
@@ -155,68 +151,63 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 	 *            assign instruction
 	 */
 	@Override
-	public void visit(Assign assign) {
+	public Expression caseInstAssign(InstAssign assign) {
 		Expression value = assign.getValue();
 
 		if ((!value.isBinaryExpr()) && (!value.isUnaryExpr())) {
 			// Assign instruction can be remove
-			VarLocal target = assign.getTarget();
+			Var target = assign.getTarget().getVariable();
 			Expression expr = assign.getValue();
 
 			// Set instruction and variable as to be remove
 			copyVars.put(target, expr);
 			removedInstrs.add(assign);
 		} else {
-
-			// Check if the expression can be propagate
-			Expression newExpr = (Expression) value
-					.accept(new ExpressionCopy());
-			assign.setValue(newExpr);
-			Use.addUses(assign, newExpr);
+			assign.setValue(doSwitch(value));
 		}
+
+		return null;
 	}
 
 	@Override
-	public void visit(Call call) {
-		visitExpressions(call.getParameters());
-		Use.addUses(call, call.getParameters());
+	public Expression caseInstCall(InstCall call) {
+		EList<Expression> parameters = call.getParameters();
+		for (Expression expr : parameters) {
+			parameters.set(parameters.indexOf(expr), doSwitch(expr));
+		}
+		return null;
 	}
 
 	@Override
-	public void visit(NodeIf nodeIf) {
-		// Visit value of store
-		Expression value = nodeIf.getValue();
-		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
-		nodeIf.setValue(newExpr);
-
-		super.visit(nodeIf);
-		Use.addUses(nodeIf, newExpr);
+	public Expression caseNodeIf(NodeIf nodeIf) {
+		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		return super.caseNodeIf(nodeIf);
 	}
 
 	@Override
-	public void visit(Load load) {
-		// Visit indexes of load
-		visitExpressions(load.getIndexes());
-		Use.addUses(load, load.getIndexes());
+	public Expression caseInstLoad(InstLoad load) {
+		EList<Expression> indexes = load.getIndexes();
+		for (Expression expr : indexes) {
+			indexes.set(indexes.indexOf(expr), doSwitch(expr));
+		}
+		return null;
 	}
 
-	//
 	@Override
-	public void visit(PhiAssignment phi) {
-		List<Expression> values = phi.getValues();
-		VarLocal target = phi.getTarget();
-		OrderedMap<String, VarLocal> parameters = procedure
-				.getParameters();
+	public Expression caseInstPhi(InstPhi phi) {
+		Var target = phi.getTarget().getVariable();
+		EList<Var> parameters = procedure.getParameters();
 
-		// Visit expressions of value of phi
-		visitExpressions(values);
+		EList<Expression> values = phi.getValues();
+		for (Expression expr : values) {
+			values.set(values.indexOf(expr), doSwitch(expr));
+		}
 
 		// Remove local variable with index = 0 from value
 		for (Expression value : values) {
 			if (value.isVarExpr()) {
-				VarExpr sourceExpr = (VarExpr) value;
-				VarLocal source = (VarLocal) sourceExpr.getVar()
-						.getVariable();
+				ExprVar sourceExpr = (ExprVar) value;
+				Var source = sourceExpr.getUse().getVariable();
 
 				// Local variable must not be a parameter of the procedure
 				if (source.getIndex() == 0
@@ -230,69 +221,58 @@ public class CopyPropagationTransformation extends AbstractActorVisitor {
 						List<Expression> constants = new ArrayList<Expression>();
 
 						for (int i = 0; i < typeList.getSize(); i++) {
-							constants.add(new IntExpr(0));
+							constants.add(IrFactory.eINSTANCE.createExprInt(0));
 						}
 
-						constExpr = new ListExpr(constants);
+						constExpr = IrFactory.eINSTANCE
+								.createExprList(constants);
 					} else {
-						constExpr = new IntExpr(0);
+						constExpr = IrFactory.eINSTANCE.createExprInt(0);
 					}
 
 					values.set(values.indexOf(value), constExpr);
 				}
 			}
 		}
-		Use.addUses(phi, phi.getValues());
+		return null;
 	}
 
 	@Override
-	public void visit(Procedure procedure) {
+	public Expression caseProcedure(Procedure procedure) {
 		copyVars.clear();
 		super.visit(procedure);
 
 		// Remove useless instructions and variables
 		removeInstructions(removedInstrs);
 		removeVariables(copyVars);
+
+		return null;
 	}
 
 	@Override
-	public void visit(Return returnInstr) {
-		Expression expr = returnInstr.getValue();
+	public Expression caseInstReturn(InstReturn instReturn) {
+		Expression expr = instReturn.getValue();
 		if (expr != null) {
-			Expression newExpr = (Expression) expr.accept(new ExpressionCopy());
-			returnInstr.setValue(newExpr);
-			Use.addUses(returnInstr, newExpr);
+			instReturn.setValue(doSwitch(instReturn.getValue()));
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(Store store) {
-		// Visit value of store
-		Expression value = store.getValue();
-		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
-		store.setValue(newExpr);
+	public Expression caseInstStore(InstStore store) {
+		store.setValue(doSwitch(store.getValue()));
 
-		// Visit indexes of store
-		visitExpressions(store.getIndexes());
-		Use.addUses(store, newExpr);
+		EList<Expression> indexes = store.getIndexes();
+		for (Expression expr : indexes) {
+			indexes.set(indexes.indexOf(expr), doSwitch(expr));
+		}
+
+		return null;
 	}
 
 	@Override
-	public void visit(NodeWhile nodeWhile) {
-		Expression value = nodeWhile.getValue();
-		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
-		nodeWhile.setValue(newExpr);
-
-		super.visit(nodeWhile);
-		Use.addUses(nodeWhile, newExpr);
-	}
-
-	private void visitExpressions(List<Expression> expressions) {
-		for (Expression expr : expressions) {
-			Expression newExpr = (Expression) expr.accept(new ExpressionCopy());
-			if (expr != newExpr) {
-				expressions.set(expressions.indexOf(expr), newExpr);
-			}
-		}
+	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		return super.caseNodeWhile(nodeWhile);
 	}
 }

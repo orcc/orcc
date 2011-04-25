@@ -28,11 +28,15 @@
  */
 package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
-import java.util.List;
-
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Cast;
+import net.sf.orcc.backends.instructions.InstCast;
+import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprFloat;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.ExprString;
+import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -41,19 +45,18 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
+import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * Add cast in IR in the form of assign instruction where target's type differs
@@ -63,248 +66,205 @@ import net.sf.orcc.ir.util.AbstractExpressionInterpreter;
  * @author Herve Yviquel
  * 
  */
-public class CastAdderTransformation extends AbstractActorVisitor {
+public class CastAdderTransformation extends
+		AbstractActorVisitor<Expression> {
 
-	private class CastExprInterpreter extends AbstractExpressionInterpreter {
-
-		@Override
-		public Object interpret(ExprBinary expr, Object... args) {
-			OpBinary op = expr.getOp();
-			Expression e1 = expr.getE1();
-			Expression e2 = expr.getE2();
-
-			if (isSpecificOperation(op)) {
-				Cast specificCast = new Cast(e1.getType(), e2.getType());
-
-				if (specificCast.isExtended()) {
-					expr.setType(e2.getType());
-				} else if (specificCast.isTrunced()) {
-					expr.setType(e1.getType());
-				}
-			}
-
-			if (op.isComparison()) {
-				// Check coherence between e1 and e2
-				Cast castExprs = new Cast(e1.getType(), e2.getType());
-
-				if (castExprs.isExtended()) {
-					// Take e2 as the reference type
-					e1 = (Expression) e1.accept(this, e2.getType());
-				} else if (castExprs.isTrunced()) {
-					// Take e1 as the reference type
-					e2 = (Expression) e2.accept(this, e1.getType());
-				}
-			} else {
-				// Check coherence of the overall expression
-				e1 = (Expression) e1.accept(this, expr.getType());
-				e2 = (Expression) e2.accept(this, expr.getType());
-			}
-
-			// Set expressions
-			expr.setE1(e1);
-			expr.setE2(e2);
-
-			return expr;
-		}
-
-		@Override
-		public Object interpret(ExprVar expr, Object... args) {
-			Type type = (Type) args[0];
-
-			// Check coherence between expression and type
-			Cast cast = new Cast(expr.getType(), type);
-
-			if (cast.isExtended() || cast.isTrunced()) {
-				// Make a new assignment to the binary expression
-				Var newVar = procedure.newTempLocalVariable(cast.getTarget(),
-						procedure.getName() + "_" + "expr");
-
-				newVar.setIndex(1);
-
-				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						newVar, expr);
-
-				// Add assignement to instruction's list
-				itInstruction.add(assign);
-
-				return IrFactory.eINSTANCE.createExprVar(newVar);
-			}
-
-			return expr;
-		}
-
-		private boolean isSpecificOperation(OpBinary op) {
-			return op == OpBinary.MOD;
-		}
-
-	}
-
-	private boolean castType;
-
-	public CastAdderTransformation(boolean castType) {
-		this.castType = castType;
-	}
-
-	private Var castTarget(Var target, Type type) {
-		Cast castTarget = new Cast(target.getType(), type);
-
-		if (castType & castTarget.isDifferent()) {
-			Location location = target.getLocation();
-
-			// Make a new assignment to the binary expression
-			Var transitionVar = procedure.newTempLocalVariable(
-					castTarget.getTarget(), procedure.getName() + "_" + "expr");
-
-			transitionVar.setIndex(1);
-
-			ExprVar varExpr = IrFactory.eINSTANCE.createExprVar(transitionVar);
-
-			InstAssign newAssign = IrFactory.eINSTANCE.createInstAssign(
-					location, target, varExpr);
-
-			// Add assignement to instruction's list
-			itInstruction.add(newAssign);
-
-			return transitionVar;
-		} else if (castTarget.isExtended() || castTarget.isTrunced()) {
-			Location location = target.getLocation();
-
-			// Make a new assignment to the binary expression
-			Var transitionVar = procedure.newTempLocalVariable(
-					castTarget.getTarget(), procedure.getName() + "_" + "expr");
-
-			transitionVar.setIndex(1);
-
-			ExprVar varExpr = IrFactory.eINSTANCE.createExprVar(transitionVar);
-			InstAssign newAssign = IrFactory.eINSTANCE.createInstAssign(
-					location, target, varExpr);
-
-			// Add assignement to instruction's list
-			itInstruction.add(newAssign);
-
-			return transitionVar;
-		}
-
-		return target;
+	@Override
+	public Expression caseExprBinary(ExprBinary expr) {
+		expr.setE1(doSwitch(expr.getE1()));
+		expr.setE2(doSwitch(expr.getE2()));
+		return castExpression(expr);
 	}
 
 	@Override
-	public void visit(Actor actor) {
-		super.visit(actor);
+	public Expression caseExprBool(ExprBool expr) {
+		return castExpression(expr);
 	}
 
 	@Override
-	public void visit(InstAssign assign) {
-		Expression value = assign.getValue();
+	public Expression caseExprFloat(ExprFloat expr) {
+		return castExpression(expr);
+	}
 
-		if (value.isBinaryExpr()) {
-			ExprBinary binExpr = (ExprBinary) value;
+	@Override
+	public Expression caseExprInt(ExprInt expr) {
+		return castExpression(expr);
+	}
 
-			itInstruction.previous();
+	@Override
+	public Expression caseExprList(ExprList expr) {
+		return castExpression(expr);
+	}
 
-			Expression expr = (Expression) binExpr.accept(
-					new CastExprInterpreter(), binExpr.getType());
+	@Override
+	public Expression caseExprString(ExprString expr) {
+		return castExpression(expr);
+	}
 
-			if (expr != binExpr) {
-				assign.setValue(expr);
-			}
+	@Override
+	public Expression caseExprUnary(ExprUnary expr) {
+		expr.setExpr(doSwitch(expr.getExpr()));
+		return castExpression(expr);
+	}
 
-			itInstruction.next();
+	@Override
+	public Expression caseExprVar(ExprVar expr) {
+		return castExpression(expr);
+	}
 
-			if (!binExpr.getOp().isComparison()) {
-				Var newVar = castTarget(assign.getTarget().getVariable(),
-						binExpr.getType());
-				assign.setTarget(IrFactory.eINSTANCE.createDef(newVar));
-			}
+	@Override
+	public Expression caseInstAssign(InstAssign assign) {
+		assign.setValue(doSwitch(assign.getValue()));
+		return null;
+	}
+
+	@Override
+	public Expression caseInstCall(InstCall call) {
+		EList<Expression> parameters = call.getParameters();
+		EList<Expression> newParameters = new BasicEList<Expression>();
+		for (Expression expr : parameters) {
+			newParameters.add(doSwitch(expr));
 		}
+		parameters.clear();
+		parameters.addAll(newParameters);
+		return null;
 	}
 
 	@Override
-	public void visit(InstCall call) {
-		List<Expression> parameters = call.getParameters();
-		Procedure procedure = call.getProcedure();
-		if (!procedure.isNative()) {
-			List<Var> variables = call.getProcedure().getParameters();
-
-			for (Expression parameter : parameters) {
-				Var var = variables.get(parameters.indexOf(parameter));
-				itInstruction.previous();
-				Expression newParam = (Expression) parameter.accept(
-						new CastExprInterpreter(), var.getType());
-				parameters.set(parameters.indexOf(parameter), newParam);
-				itInstruction.next();
-			}
+	public Expression caseInstLoad(InstLoad load) {
+		EList<Expression> indexes = load.getIndexes();
+		EList<Expression> newIndexes = new BasicEList<Expression>();
+		for (Expression expr : indexes) {
+			newIndexes.add(doSwitch(expr));
 		}
-	}
+		indexes.clear();
+		indexes.addAll(newIndexes);
 
-	@Override
-	public void visit(InstLoad load) {
+		Var source = load.getSource().getVariable();
 		Var target = load.getTarget().getVariable();
-		Use use = load.getSource();
 
-		Var newVar = castTarget(target, use.getVariable().getType());
+		if (needCast(target.getType(), source.getType())) {
+			Var newTarget = procedure.newTempLocalVariable(
+					EcoreUtil.copy(source.getType()),
+					"casted_" + target.getName());
+			newTarget.setIndex(1);
 
-		load.setTarget(IrFactory.eINSTANCE.createDef(newVar));
+			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+					newTarget, target);
+
+			load.getBlock().add(indexInst, cast);
+			load.setTarget(IrFactory.eINSTANCE.createDef(newTarget));
+		}
+
+		return null;
 	}
 
 	@Override
-	public void visit(InstPhi phi) {
-		List<Expression> values = phi.getValues();
-		Type type = phi.getTarget().getVariable().getType();
+	public Expression caseInstPhi(InstPhi phi) {
+		EList<Expression> values = phi.getValues();
+		EList<Expression> newValues = new BasicEList<Expression>();
+		for (Expression expr : values) {
+			newValues.add(doSwitch(expr));
+		}
+		values.clear();
+		values.addAll(newValues);
+		return null;
+	}
 
-		for (Expression value : values) {
-			int indexValue = values.indexOf(value);
-			Node node = phi.getBlock().getPredecessors().get(indexValue);
+	@Override
+	public Expression caseInstReturn(InstReturn returnInstr) {
+		Expression expr = returnInstr.getValue();
+		if (expr != null) {
+			returnInstr.setValue(doSwitch(expr));
+		}
+		return null;
+	}
 
-			if (node.isBlockNode()) {
-				itInstruction = ((NodeBlock) node).lastListIterator();
-			} else if (node.isIfNode()) {
-				itInstruction = ((NodeIf) node).getJoinNode()
-						.lastListIterator();
+	@Override
+	public Expression caseInstStore(InstStore store) {
+		EList<Expression> indexes = store.getIndexes();
+		EList<Expression> newIndexes = new BasicEList<Expression>();
+		for (Expression expr : indexes) {
+			newIndexes.add(doSwitch(expr));
+		}
+		indexes.clear();
+		indexes.addAll(newIndexes);
+		doSwitch(store.getValue());
+		return null;
+	}
+
+	@Override
+	public Expression caseNodeIf(NodeIf nodeIf) {
+		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		doSwitch(nodeIf.getThenNodes());
+		doSwitch(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getJoinNode());
+		return null;
+	}
+
+	@Override
+	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		doSwitch(nodeWhile.getNodes());
+		doSwitch(nodeWhile.getJoinNode());
+		return null;
+	}
+
+	private Expression castExpression(Expression expr) {
+		Type parentType = getParentType(expr);
+
+		if (needCast(expr.getType(), parentType)) {
+			Var oldVar;
+			if (expr.isVarExpr()) {
+				oldVar = ((ExprVar) expr).getUse().getVariable();
 			} else {
-				itInstruction = ((NodeWhile) node).getJoinNode()
-						.lastListIterator();
+				oldVar = procedure.newTempLocalVariable(
+						EcoreUtil.copy(expr.getType()),
+						"expr_" + procedure.getName());
+				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
+						oldVar, expr);
+				EcoreHelper.addInstBeforeExpr(expr, assign);
 			}
 
-			Expression newValue = (Expression) value.accept(
-					new CastExprInterpreter(), type);
-			values.set(indexValue, newValue);
+			Var newVar = procedure.newTempLocalVariable(
+					EcoreUtil.copy(parentType),
+					"castedExpr_" + procedure.getName());
+			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+					oldVar, newVar);
+			EcoreHelper.addInstBeforeExpr(expr, cast);
+			return IrFactory.eINSTANCE.createExprVar(newVar);
 		}
+
+		return expr;
 	}
 
-	@Override
-	public void visit(InstReturn returnInstr) {
-		Type returnType = procedure.getReturnType();
-
-		if ((returnType != null) && (!returnType.isVoid())) {
-			itInstruction.previous();
-			Expression value = returnInstr.getValue();
-
-			// Check if value is not void
-			if (value != null) {
-				Expression newValue = (Expression) value.accept(
-						new CastExprInterpreter(), returnType);
-				returnInstr.setValue(newValue);
+	private Type getParentType(Expression expr) {
+		Expression parentExpr = EcoreHelper.getContainerOfType(expr,
+				Expression.class);
+		if (parentExpr != null) {
+			return parentExpr.getType();
+		} else {
+			Instruction parentInst = EcoreHelper.getContainerOfType(expr,
+					Instruction.class);
+			if (parentInst.isStore()) {
+				return ((InstStore) parentInst).getTarget().getVariable()
+						.getType();
+			} else if (parentInst.isPhi()) {
+				return ((InstPhi) parentInst).getTarget().getVariable()
+						.getType();
+			} else if (parentInst.isReturn()) {
+				return procedure.getReturnType();
+			} else if (parentInst.isCall()) {
+				int index = EcoreHelper.getContainingList(expr).indexOf(expr);
+				return ((InstCall) parentInst).getProcedure().getParameters()
+						.get(index).getType();
 			}
-
-			itInstruction.next();
 		}
+		return null;
 	}
 
-	@Override
-	public void visit(InstStore store) {
-		Expression value = store.getValue();
-		Var target = store.getTarget().getVariable();
-
-		itInstruction.previous();
-
-		Expression newValue = (Expression) value.accept(
-				new CastExprInterpreter(), target.getType());
-
-		if (value != newValue) {
-			store.setValue(newValue);
-		}
-
-		itInstruction.next();
+	private boolean needCast(Type type1, Type type2) {
+		return (type1.getClass() != type2.getClass())
+				|| (type1.getSizeInBits() != type2.getSizeInBits());
 	}
 }
