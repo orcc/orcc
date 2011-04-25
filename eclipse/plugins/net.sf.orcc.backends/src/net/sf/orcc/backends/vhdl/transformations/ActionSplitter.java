@@ -37,7 +37,6 @@ import java.util.Set;
 import net.sf.orcc.backends.instructions.InstSplit;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.Instruction;
@@ -45,9 +44,6 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
@@ -164,43 +160,31 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	 *            action name
 	 * @return a new empty action with the given name
 	 */
-	private Action createNewAction(Expression condition, String name) {
-		// scheduler
-		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
-				"isSchedulable_" + name, IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeBool());
-		Var result = scheduler.newTempLocalVariable(
-				IrFactory.eINSTANCE.createTypeBool(), "result");
-		result.setIndex(1);
+	private Action createNewAction(String name) {
+		IrFactory fac = IrFactory.eINSTANCE;
 
-		NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		block.add(IrFactory.eINSTANCE.createInstAssign(result, condition));
-		block.add(IrFactory.eINSTANCE.createInstReturn(IrFactory.eINSTANCE
-				.createExprVar(result)));
-		for (Instruction instruction : block.getInstructions()) {
-			instruction.setPredicate(IrFactory.eINSTANCE.createPredicate());
-		}
-		scheduler.getNodes().add(block);
+		// scheduler
+		Procedure scheduler = fac.createProcedure("isSchedulable_" + name,
+				fac.createLocation(), fac.createTypeBool());
+		NodeBlock block = scheduler.getFirst();
+		Instruction inst = fac.createInstReturn(fac.createExprBool(true));
+		inst.setPredicate(fac.createPredicate());
+		block.add(inst);
 
 		// body
-		Procedure body = IrFactory.eINSTANCE.createProcedure(name,
-				IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeVoid());
-		block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		Instruction inst = IrFactory.eINSTANCE.createInstReturn();
-		inst.setPredicate(IrFactory.eINSTANCE.createPredicate());
+		Procedure body = fac.createProcedure(name, fac.createLocation(),
+				fac.createTypeVoid());
+		block = body.getFirst();
+		inst = fac.createInstReturn();
+		inst.setPredicate(fac.createPredicate());
 		block.add(inst);
-		body.getNodes().add(block);
 
-		// tag
-		Tag tag = IrFactory.eINSTANCE.createTag(name);
-
-		Action action = IrFactory.eINSTANCE.createAction(
-				IrFactory.eINSTANCE.createLocation(), tag,
-				IrFactory.eINSTANCE.createPattern(),
-				currentAction.getOutputPattern(),
-				IrFactory.eINSTANCE.createPattern(), scheduler, body);
-		currentAction.setOutputPattern(IrFactory.eINSTANCE.createPattern());
+		// create action
+		Action action = fac.createAction(fac.createLocation(),
+				fac.createTag(name), fac.createPattern(),
+				currentAction.getOutputPattern(), fac.createPattern(),
+				scheduler, body);
+		currentAction.setOutputPattern(fac.createPattern());
 
 		// add action to actor's actions
 		actor.getActions().add(action);
@@ -252,11 +236,9 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	 * Split the current action
 	 */
 	private void splitAction(InstSplit instSplit) {
-		String newActionName = getNewStateName();
-
 		// create new action
-		nextAction = createNewAction(IrFactory.eINSTANCE.createExprBool(true),
-				newActionName);
+		String newActionName = getNewStateName();
+		nextAction = createNewAction(newActionName);
 
 		// remove the SplitInstruction
 		NodeBlock block = instSplit.getBlock();
