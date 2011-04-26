@@ -53,6 +53,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -81,7 +82,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 */
 	public void classify() {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IFile file = (IFile) workspace.getRoot().findMember(actor.getFile());
+		IFile file = workspace.getRoot().getFile(new Path(actor.getFile()));
 
 		try {
 			IMarker[] markers = file.findMarkers(IMarker.PROBLEM, true,
@@ -395,8 +396,8 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	private void showMarker() {
 		try {
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			IFile file = (IFile) workspace.getRoot()
-					.findMember(actor.getFile());
+			IFile file = (IFile) workspace.getRoot().getFile(
+					new Path(actor.getFile()));
 
 			IMarker marker = file.createMarker(IMarker.PROBLEM);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
