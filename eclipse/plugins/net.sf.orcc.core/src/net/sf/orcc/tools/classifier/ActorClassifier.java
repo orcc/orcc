@@ -53,7 +53,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -82,8 +81,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 */
 	public void classify() {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IFile file = workspace.getRoot().getFileForLocation(
-				new Path(actor.getFile()));
+		IFile file = (IFile) workspace.getRoot().findMember(actor.getFile());
 
 		try {
 			IMarker[] markers = file.findMarkers(IMarker.PROBLEM, true,
@@ -141,7 +139,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 
 		// set and print MoC
 		actor.setMoC(moc);
-		System.out.println("MoC of " + actor + ":");
+		System.out.println("MoC of " + actor.getName() + ":");
 		System.out.println(moc);
 		System.out.println();
 	}
@@ -313,7 +311,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		} catch (Exception e) {
 			System.out.println("Error of classification for actor " + actor
 					+ ":" + e);
-			System.out.println("Set actor moc of " + actor + " to default");
+			System.out.println("Set actor moc of " + actor.getName()
+					+ " to default");
+			System.out.println();
 			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
 		}
 
@@ -395,8 +395,8 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	private void showMarker() {
 		try {
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			IFile file = workspace.getRoot().getFileForLocation(
-					new Path(actor.getFile()));
+			IFile file = (IFile) workspace.getRoot()
+					.findMember(actor.getFile());
 
 			IMarker marker = file.createMarker(IMarker.PROBLEM);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
