@@ -194,8 +194,9 @@ printAssignIndex(assignIndex) ::= <<
 >>
 
 printCall(call) ::= <<
+lool
 <if(call.target)
-><call.target.variable.indexedName> := <call.procedure.name>(<call.procedure.loadedVariables: {var | <var>, }><call.parameters: {param | <param>, }>'1');<
+><call.target.variable.indexedName> := <call.procedure.name>(<call.procedure.loadedVariables: {var | <var.name>, }><call.parameters: {param | <param>, }>'1');<
 elseif(call.parameters)
 ><call.procedure.name>(<call.parameters; separator=", ">, '1');<
 else
@@ -391,16 +392,15 @@ end loop;
 function(procedure) ::= <<
 <if (!procedure.native)
   ><if (procedure.returnType.void)
->procedure <procedure>(<printParameters(procedure.parameters)>dummy : std_logic) is
+>procedure <procedure.name>(<printParameters(procedure.parameters)>dummy : std_logic) is
 <else
->function <procedure>(<VarUsed(procedure)><printParameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType)> is
+>function <procedure.name>(<VarUsed(procedure)><printParameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType)> is
 <endif>
   <if(procedure.locals)
 ><procedure.locals: {variable| <VarInFctDeclaration(variable)>;<\n>}><
   endif>
 begin
-  <printNodes(procedure.nodes)>
-end <procedure>;<
+  <printNodes(procedure.nodes)>end <procedure.name>;<
 endif>
 
 >>
@@ -724,8 +724,8 @@ architecture rtl_<actor.simpleName> of <actor.simpleName> is
 >  ---------------------------------------------------------------------------
   -- Functions and procedures
   ---------------------------------------------------------------------------
-  <actor.procs: {proc|<function(procedure=proc)>}; separator="\n\n"><
-endif>
+  <actor.procs: {proc|<function(procedure=proc)>}; separator="\n\n">
+<endif>
 
 <if(actor.fsm)
 >  ---------------------------------------------------------------------------
