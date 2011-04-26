@@ -73,10 +73,10 @@ public class ListDeclarationTransformation extends AbstractActorVisitor<Object> 
 	public Object caseActor(Actor actor) {
 		// VHDL synthesizers don't support multi-dimensional memory yet
 		for (Var variable : actor.getStateVars()) {
-			if (variable.getType().isList() && variable.getInitialValue() != null) {
+			if (variable.getType().isList() && variable.isInitialized()) {
 				ExprList list = IrFactory.eINSTANCE.createExprList();
 				flattenList(variable.getValue(), list);
-				variable.setInitialValue(list);
+				variable.setValue(list);
 			}
 		}
 		return null;
