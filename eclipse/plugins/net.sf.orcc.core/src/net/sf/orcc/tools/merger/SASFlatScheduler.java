@@ -50,6 +50,7 @@ public class SASFlatScheduler extends AbstractScheduler {
 		super(graph);
 	}
 
+	@Override
 	public Schedule schedule() {
 		Schedule schedule = new Schedule();
 		schedule.setIterationCount(1);

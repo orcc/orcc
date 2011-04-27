@@ -29,7 +29,6 @@
 
 package net.sf.orcc.tools.merger;
 
-
 /**
  * This interface defines a scheduler.
  * 

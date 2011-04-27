@@ -40,8 +40,8 @@ import org.jgrapht.DirectedGraph;
 
 /**
  * 
- * This class computes a looped schedule from a one-level looped schedule in order to
- * mimimize memory usage.
+ * This class computes a looped schedule from a one-level looped schedule in
+ * order to mimimize memory usage.
  * 
  * @author Ghislain Roquier
  * 

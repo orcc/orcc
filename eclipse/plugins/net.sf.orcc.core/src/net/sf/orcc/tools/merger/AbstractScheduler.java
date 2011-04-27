@@ -73,6 +73,19 @@ public abstract class AbstractScheduler implements IScheduler {
 		schedule = schedule();
 	}
 
+	private void depth(Schedule schedule) {
+		for (Iterand iterand : schedule.getIterands()) {
+			if (iterand.isSchedule()) {
+				depth++;
+				depth(iterand.getSchedule());
+				depth--;
+			} else {
+				if (depth > maxDepth)
+					maxDepth = depth;
+			}
+		}
+	}
+
 	public Map<Connection, Integer> getBufferCapacities() {
 		if (bufferCapacities == null) {
 			bufferCapacities = new HashMap<Connection, Integer>();
@@ -94,6 +107,12 @@ public abstract class AbstractScheduler implements IScheduler {
 			}
 		}
 		return bufferCapacities;
+	}
+
+	public int getDepth() {
+		depth = maxDepth = 0;
+		depth(schedule);
+		return maxDepth;
 	}
 
 	private List<Schedule> getHierarchy(Schedule schedule, Vertex vertex) {
@@ -121,31 +140,12 @@ public abstract class AbstractScheduler implements IScheduler {
 		return schedules;
 	}
 
-	public int getDepth() {
-		depth = maxDepth = 0;
-		depth(schedule);
-		return maxDepth;
-	}
-
-	private void depth(Schedule schedule) {
-		for (Iterand iterand : schedule.getIterands()) {
-			if (iterand.isSchedule()) {
-				depth++;
-				depth(iterand.getSchedule());
-				depth--;
-			} else {
-				if (depth > maxDepth)
-					maxDepth = depth;
-			}
-		}
+	public Map<Vertex, Integer> getRepetitionVector() {
+		return repetitionVector;
 	}
 
 	public Schedule getSchedule() {
 		return schedule;
-	}
-
-	public Map<Vertex, Integer> getRepetitionVector() {
-		return repetitionVector;
 	}
 
 }

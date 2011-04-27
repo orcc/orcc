@@ -75,6 +75,7 @@ public class Iterand {
 		return (type == Type.VERTEX);
 	}
 
+	@Override
 	public String toString() {
 		Object obj;
 		if (isVertex()) {
