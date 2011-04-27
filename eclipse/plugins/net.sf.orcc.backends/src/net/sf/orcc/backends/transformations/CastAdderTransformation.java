@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
+package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
@@ -62,12 +62,12 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * Add cast in IR in the form of assign instruction where target's type differs
  * from source type.
  * 
- * @author Jerome GORIN
+ * @author Jerome Goring
  * @author Herve Yviquel
+ * @author Matthieu Wipliez
  * 
  */
-public class CastAdderTransformation extends
-		AbstractActorVisitor<Expression> {
+public class CastAdderTransformation extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
@@ -267,4 +267,5 @@ public class CastAdderTransformation extends
 		return (type1.getClass() != type2.getClass())
 				|| (type1.getSizeInBits() != type2.getSizeInBits());
 	}
+
 }
