@@ -317,13 +317,12 @@ endif>
 >>
 
 printRamWrite(ramWrite) ::= <<
-<ramWrite.variable.name>_data_p<ramWrite.port>(0) \<= <
-if(ramWrite.variable.type.elementType.bool)
-><ramWrite.value>;
+<ramWrite.variable.name>_data_p<ramWrite.port><if(ramWrite.variable.type.elementType.bool)
+>(0) \<= <ramWrite.value>;
 <elseif(ramWrite.variable.type.elementType.int)
->std_logic_vector(to_signed(<ramWrite.value>, <ramWrite.variable.type.elementType.size>));
+> \<= std_logic_vector(to_signed(<ramWrite.value>, <ramWrite.variable.type.elementType.size>));
 <else
->std_logic_vector(to_unsigned(<ramWrite.value>, <ramWrite.variable.type.elementType.size>));
+> \<= std_logic_vector(to_unsigned(<ramWrite.value>, <ramWrite.variable.type.elementType.size>));
 <endif>
 <ramWrite.variable.name>_wren_p<ramWrite.port> \<= '1';
 >>
