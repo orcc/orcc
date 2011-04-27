@@ -42,8 +42,8 @@
 #include "llvm/LLVMContext.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Target/TargetSelect.h"
-#include "Jade/XDFSerialize/InstanceIdRemoval.h"
 
+#include "Jade/XDFSerialize/InstanceIdRemoval.h"
 #include "Jade/XDFSerialize/XDFParser.h"
 #include "Jade/XDFSerialize/XDFWriter.h"
 #include "Jade/Util/OptionMng.h"
