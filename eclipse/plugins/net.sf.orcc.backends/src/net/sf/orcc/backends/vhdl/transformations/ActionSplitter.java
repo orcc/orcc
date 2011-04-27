@@ -365,7 +365,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	private void updateUse(Procedure procedure, Instruction instruction, Use use) {
 		Var var = use.getVariable();
 		Var local = mapLocals.get(var);
-		if (local == null) {
+		if (!isAncestor(procedure, local)) {
 			local = procedure.newTempLocalVariable(copy(var.getType()),
 					var.getName());
 			mapLocals.put(var, local);
