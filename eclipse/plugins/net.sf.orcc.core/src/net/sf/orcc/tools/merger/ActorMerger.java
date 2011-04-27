@@ -95,6 +95,8 @@ public class ActorMerger implements INetworkTransformation {
 
 	private EList<Var> variables;
 
+	private Map<Port, Port> portsMap;
+
 	private int depth;
 
 	private void addBuffer(String name, int size, Type eltType) {
@@ -176,6 +178,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		inputs = new HashMap<Connection, Port>();
 		outputs = new HashMap<Connection, Port>();
+		portsMap = new HashMap<Port, Port>();
 
 		int index = 0;
 		for (Connection connection : graph.edgeSet()) {
@@ -194,6 +197,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				superActor.getInputs().add(port);
 				inputs.put(connection, port);
+				portsMap.put(tgtPort, port);
 
 				inputPattern.setNumTokens(port,
 						rep * tgtPort.getNumTokensConsumed());
@@ -209,6 +213,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				superActor.getOutputs().add(port);
 				outputs.put(connection, port);
+				portsMap.put(srcPort, port);
 
 				int rep = scheduler.getRepetitionVector().get(src);
 				outputPattern.setNumTokens(port,
@@ -228,7 +233,10 @@ public class ActorMerger implements INetworkTransformation {
 		for (Vertex vertex : scheduler.getSchedule().getActors()) {
 			Instance instance = vertex.getInstance();
 
-			for (Action action : instance.getActor().getActions()) {
+			Iterator<Action> it = instance.getActor().getActions().iterator();
+			// at this stage, SDF actor should have only one action
+			if (it.hasNext()) {
+				Action action = it.next();
 				String name = instance.getId() + "_" + action.getName();
 				Procedure proc = factory.createProcedure(name,
 						factory.createLocation(), factory.createTypeVoid());
@@ -236,9 +244,10 @@ public class ActorMerger implements INetworkTransformation {
 				Procedure body = action.getBody();
 				proc.getNodes().addAll(body.getNodes());
 				superActor.getProcs().add(proc);
+				new ChangeFifoArrayAccess(action.getInputPattern(),
+						action.getOutputPattern(), portsMap)
+						.doSwitch(superActor);
 			}
-			new ChangeFifoArrayAccess(instance.getId(), instance.getActor())
-					.doSwitch(superActor);
 		}
 	}
 
