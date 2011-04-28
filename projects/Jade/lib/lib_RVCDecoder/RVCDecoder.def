@@ -1,6 +1,0 @@
-LIBRARY RVCDecoder
-
-EXPORTS
- rvc_init
- rvc_close
- rvc_decode
