@@ -93,17 +93,20 @@ VidFile("i", desc("Encoded video file"), value_desc("Video filename"));
 
 cl::opt<std::string>
 VTLDir("L", desc("Video Tools Library directory"),
-	   value_desc("VTL Folder"), 
+	   value_desc("VTL Folder"),
+	   Required,
 	   init(""));
 
 cl::opt<std::string>
 InputDir("I", desc("Stimulus directory"),
-	   value_desc("A folder that contains input stimulus"),
+	   value_desc("Folder of input stimulus"),
+	   Hidden,
 	   init(""));
 
 cl::opt<std::string> 
 SystemDir("S", desc("Specifiy a specify location for package System"),
-			  value_desc("Location of package System"), 
+			  value_desc("Location of package System"),
+			  Hidden,
 			  init(""));
 
 cl::opt<std::string> 
@@ -314,7 +317,12 @@ int main(int argc, char **argv) {
 		if (Verbose){
 			cout << "> Exiting scenario mode.\n";
 		}
-	}else{
+	}else {
+		if ((VidFile == "") || (VTLDir == "") || (XDFFile == "")){
+			cout << "An input stimulus (-i), a VTL directory (-L) and an XDF Network (-xdf) is mandatory to start Jade in command line mode.\n";
+			exit(1);
+		}
+
 		//Enter in command line mode
 		startCmdLine();
 	}

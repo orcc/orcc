@@ -1,7 +1,6 @@
 The Just-In-Time Adaptive Decoder Engine (Jade) is a new RVC decoder, based on the Low Level Virtual Machine (LLVM), that dynamically instantiates several RVC decoder descriptions produce by the LLVM back-end.
 
 This project requires the following libraries:
-- LibXml V2.7.6 (http://xmlsoft.org)
 - SDL-1.2.14 (http://www.libsdl.org)
 - LLVM 2.7 (http://llvm.org)
 
