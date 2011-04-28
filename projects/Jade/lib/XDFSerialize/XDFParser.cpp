@@ -60,6 +60,10 @@ Network* XDFParser::parseXDF (llvm::LLVMContext& C){
 	return networkParser.parseNetwork();
 }
 
+Network* XDFParser::parseXDF (char* XDF, llvm::LLVMContext& C){
+	NetworkParser networkParser(C, xdfFile);
+	return networkParser.parseNetwork(XDF);
+}
 
 
 XDFParser::~XDFParser (){
