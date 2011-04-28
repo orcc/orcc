@@ -55,7 +55,7 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.ExpressionVisitor;
+import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -90,79 +90,111 @@ public class XDFWriter {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class BinOpSeqWriter implements ExpressionVisitor {
+	private class BinOpSeqWriter extends AbstractActorVisitor<Expression> {
+
+		private Element parentElt;
+
+		private int parentPrec;
+
+		public BinOpSeqWriter(Element elt, int precedence) {
+			parentElt = elt;
+			parentPrec = precedence;
+		}
 
 		@Override
-		public void visit(ExprBinary expr, Object... args) {
-			Element parent = ((Element) args[0]);
-
-			int parentPrec = (Integer) args[1];
+		public Expression caseExprBinary(ExprBinary expr) {
 			int currentPrec = expr.getOp().getPrecedence();
 
 			if (parentPrec < currentPrec) {
 				// create a new Expr element
 				Element exprElt = document.createElement("Expr");
-				parent.appendChild(exprElt);
+				parentElt.appendChild(exprElt);
 				exprElt.setAttribute("kind", "BinOpSeq");
 
-				expr.getE1().accept(this, exprElt, currentPrec);
-				writeOperator(expr.getOp(), exprElt);
-				expr.getE2().accept(this, exprElt, currentPrec);
+				Element oldParent = parentElt;
+				parentElt = exprElt;
+
+				int oldPrec = parentPrec;
+				parentPrec = currentPrec;
+
+				doSwitch(expr.getE1());
+				writeOperator(expr.getOp());
+				doSwitch(expr.getE2());
+
+				parentElt = oldParent;
+				parentPrec = oldPrec;
 			} else {
+				int oldPrec = parentPrec;
+				parentPrec = currentPrec;
+
 				// append expression 1, operator, expression 2 to the parent
-				expr.getE1().accept(this, parent, currentPrec);
-				writeOperator(expr.getOp(), parent);
-				expr.getE2().accept(this, parent, currentPrec);
+				doSwitch(expr.getE1());
+				writeOperator(expr.getOp());
+				doSwitch(expr.getE2());
+
+				parentPrec = oldPrec;
 			}
+
+			return null;
 		}
 
 		@Override
-		public void visit(ExprBool expr, Object... args) {
+		public Expression caseExprBool(ExprBool expr) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Boolean");
 			exprElt.setAttribute("value", expr.toString());
-			((Element) args[0]).appendChild(exprElt);
+			parentElt.appendChild(exprElt);
+
+			return null;
 		}
 
 		@Override
-		public void visit(ExprFloat expr, Object... args) {
+		public Expression caseExprFloat(ExprFloat expr) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Real");
-			exprElt.setAttribute("value", expr.toString());
-			((Element) args[0]).appendChild(exprElt);
+			exprElt.setAttribute("value", expr.getValue().toString());
+			parentElt.appendChild(exprElt);
+
+			return null;
 		}
 
 		@Override
-		public void visit(ExprInt expr, Object... args) {
+		public Expression caseExprInt(ExprInt expr) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Integer");
-			exprElt.setAttribute("value", expr.toString());
-			((Element) args[0]).appendChild(exprElt);
+			exprElt.setAttribute("value", expr.getValue().toString());
+			parentElt.appendChild(exprElt);
+
+			return null;
 		}
 
 		@Override
-		public void visit(ExprList expr, Object... args) {
+		public Expression caseExprList(ExprList expr) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "List");
 			for (Expression childExpr : expr.getValue()) {
-				childExpr.accept(this, args[0]);
+				doSwitch(childExpr);
 			}
+
+			return null;
 		}
 
 		@Override
-		public void visit(ExprString expr, Object... args) {
+		public Expression caseExprString(ExprString expr) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "String");
-			exprElt.setAttribute("value", expr.toString());
-			((Element) args[0]).appendChild(exprElt);
+			exprElt.setAttribute("value", expr.getValue());
+			parentElt.appendChild(exprElt);
+
+			return null;
 		}
 
 		@Override
-		public void visit(ExprUnary expr, Object... args) {
+		public Expression caseExprUnary(ExprUnary expr) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "UnaryOp");
 
@@ -170,25 +202,37 @@ public class XDFWriter {
 			op.setAttribute("name", expr.getOp().getText());
 			exprElt.appendChild(op);
 
-			// visit the expression of this unary expression
-			expr.getExpr().accept(this, exprElt, Integer.MIN_VALUE);
+			Element oldParent = parentElt;
+			parentElt = exprElt;
 
-			((Element) args[0]).appendChild(exprElt);
+			int oldPrec = parentPrec;
+			parentPrec = Integer.MIN_VALUE;
+			// visit the expression of this unary expression
+			doSwitch(expr.getExpr());
+
+			parentElt = oldParent;
+			parentPrec = oldPrec;
+
+			parentElt.appendChild(exprElt);
+
+			return null;
 		}
 
 		@Override
-		public void visit(ExprVar expr, Object... args) {
+		public Expression caseExprVar(ExprVar var) {
 			Element exprElt = document.createElement("Expr");
-			String value = expr.getUse().getVariable().getName();
+			String value = var.getUse().getVariable().getName();
 			exprElt.setAttribute("kind", "Var");
 			exprElt.setAttribute("name", value);
-			((Element) args[0]).appendChild(exprElt);
+			parentElt.appendChild(exprElt);
+
+			return null;
 		}
 
-		private void writeOperator(OpBinary op, Element parent) {
+		private void writeOperator(OpBinary op) {
 			Element opElt = document.createElement("Op");
 			opElt.setAttribute("name", op.getText());
-			parent.appendChild(opElt);
+			parentElt.appendChild(opElt);
 		}
 
 	}
@@ -470,7 +514,7 @@ public class XDFWriter {
 	 */
 	private void writeExpr(Element parent, Expression expr)
 			throws OrccException {
-		expr.accept(new BinOpSeqWriter(), parent, Integer.MIN_VALUE);
+		new BinOpSeqWriter(parent, Integer.MIN_VALUE).doSwitch(expr);
 	}
 
 	/**
