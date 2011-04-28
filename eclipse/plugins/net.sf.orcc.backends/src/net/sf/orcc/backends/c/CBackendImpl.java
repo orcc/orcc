@@ -60,7 +60,6 @@ import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.network.transformations.NetworkClassifier;
 import net.sf.orcc.network.transformations.NetworkSplitter;
-import net.sf.orcc.tools.merger2.NetworkMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.WriteListener;
 
@@ -96,8 +95,6 @@ public class CBackendImpl extends AbstractBackend {
 	private DirectedGraph<String, StringAttribute> mediumGraph;
 
 	private boolean merge;
-
-	private boolean merger2;
 
 	private boolean newScheduler;
 
@@ -245,11 +242,6 @@ public class CBackendImpl extends AbstractBackend {
 			new NetworkClassifier().transform(network);
 		}
 
-		// Experimental
-		if (merger2) {
-			new NetworkMerger().transform(network);
-		}
-
 		if (codesign) {
 			new BroadcastAdder().transform(network);
 
@@ -338,7 +330,6 @@ public class CBackendImpl extends AbstractBackend {
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		merge = getAttribute("net.sf.orcc.backends.merge", false);
-		merger2 = getAttribute("net.sf.orcc.backends.merger2", false);
 		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
 		geneticAlgorithm = getAttribute(
 				"net.sf.orcc.backends.geneticAlgorithm", false);
