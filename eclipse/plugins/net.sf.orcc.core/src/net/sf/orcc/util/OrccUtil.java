@@ -368,7 +368,7 @@ public class OrccUtil {
 	public static void setFileContents(IFile file, InputStream source)
 			throws CoreException {
 		if (file.exists()) {
-			file.setContents(source, false, false, null);
+			file.setContents(source, true, false, null);
 		} else {
 			file.create(source, true, null);
 		}
