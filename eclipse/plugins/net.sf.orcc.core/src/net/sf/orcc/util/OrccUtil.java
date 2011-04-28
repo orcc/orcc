@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.util;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -353,6 +354,24 @@ public class OrccUtil {
 		Thread.currentThread().setContextClassLoader(oldCl);
 
 		return group;
+	}
+
+	/**
+	 * Sets the contents of the given file, creating it if it does not exist.
+	 * 
+	 * @param file
+	 *            a file
+	 * @param source
+	 *            an input stream
+	 * @throws CoreException
+	 */
+	public static void setFileContents(IFile file, InputStream source)
+			throws CoreException {
+		if (file.exists()) {
+			file.setContents(source, false, false, null);
+		} else {
+			file.create(source, true, null);
+		}
 	}
 
 	/**
