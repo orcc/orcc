@@ -219,16 +219,18 @@ public class ActorMerger implements INetworkTransformation {
 		outputs = new HashMap<Connection, Port>();
 		portsMap = new HashMap<Port, Port>();
 
-		int index = 0;
+		int inIndex = 0;
+		int outIndex = 0;
 		for (Connection connection : graph.edgeSet()) {
 			Vertex src = graph.getEdgeSource(connection);
 			Vertex tgt = graph.getEdgeTarget(connection);
 
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Port tgtPort = connection.getTarget();
-				Port port = IrFactory.eINSTANCE.createPort(
-						IrFactory.eINSTANCE.createLocation(),
-						EcoreUtil.copy(tgtPort.getType()), "input_" + index++);
+				Port port = IrFactory.eINSTANCE
+						.createPort(IrFactory.eINSTANCE.createLocation(),
+								EcoreUtil.copy(tgtPort.getType()), "input_"
+										+ inIndex++);
 
 				int cns = scheduler.getRepetitionVector().get(tgt)
 						* tgtPort.getNumTokensConsumed();
@@ -243,7 +245,8 @@ public class ActorMerger implements INetworkTransformation {
 				Port srcPort = connection.getSource();
 				Port port = IrFactory.eINSTANCE.createPort(
 						IrFactory.eINSTANCE.createLocation(),
-						EcoreUtil.copy(srcPort.getType()), "output_" + index++);
+						EcoreUtil.copy(srcPort.getType()), "output_"
+								+ outIndex++);
 
 				int prd = scheduler.getRepetitionVector().get(src)
 						* srcPort.getNumTokensProduced();
@@ -262,6 +265,10 @@ public class ActorMerger implements INetworkTransformation {
 
 	}
 
+	/**
+	 * Turns actions of SDF actors into procedures
+	 * 
+	 */
 	private void createProcedures() {
 		IrFactory factory = IrFactory.eINSTANCE;
 		for (Vertex vertex : scheduler.getSchedule().getActors()) {
@@ -276,7 +283,11 @@ public class ActorMerger implements INetworkTransformation {
 						factory.createLocation(), factory.createTypeVoid());
 
 				Procedure body = action.getBody();
-				proc.getNodes().addAll(body.getNodes());
+				List<Node> nodes = body.getNodes();
+				proc.getNodes().addAll(nodes);
+				NodeBlock block = proc.getLast(nodes);
+				InstReturn ret = factory.createInstReturn();
+				block.add(ret);
 				superActor.getProcs().add(proc);
 
 				new ChangeFifoArrayAccess(action.getInputPattern(),
@@ -306,6 +317,10 @@ public class ActorMerger implements INetworkTransformation {
 		return procedure;
 	}
 
+	/**
+	 * Create global list variables to replace the FIFOs.
+	 * 
+	 */
 	private void createStateVariables() {
 		buffersMap = new HashMap<Port, Var>();
 
@@ -371,9 +386,7 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private void createStaticSchedule(Procedure procedure, Schedule schedule,
 			List<Node> nodes) {
-
 		IrFactory factory = IrFactory.eINSTANCE;
-
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
 				Instance instance = iterand.getVertex().getInstance();
@@ -382,7 +395,6 @@ public class ActorMerger implements INetworkTransformation {
 						+ action.getName());
 
 				NodeBlock block = procedure.getLast(nodes);
-
 				block.add(factory.createInstCall(factory.createLocation(),
 						null, proc, new ArrayList<Expression>()));
 			} else {
@@ -406,10 +418,8 @@ public class ActorMerger implements INetworkTransformation {
 				nodes.add(nodeWhile);
 
 				depth++;
-
 				// recursion
 				createStaticSchedule(procedure, sched, nodeWhile.getNodes());
-
 				depth--;
 
 				// Increment current while loop variable
@@ -421,7 +431,6 @@ public class ActorMerger implements INetworkTransformation {
 
 			}
 		}
-
 	}
 
 	/**
@@ -442,6 +451,12 @@ public class ActorMerger implements INetworkTransformation {
 
 		createStaticAction();
 
+		createActionScheduler();
+
+	}
+
+	private void createActionScheduler() {
+		superActor.getActionsOutsideFsm().addAll(superActor.getActions());
 	}
 
 	@Override
