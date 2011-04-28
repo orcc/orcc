@@ -16,6 +16,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -34,13 +35,13 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 
 	private Pattern outputPattern;
 
-	private Map<Port, Port> portsMap;
+	private Map<Port, Var> buffersMap;
 
-	public ChangeFifoArrayAccess(Pattern inputPattern,
-			Pattern outputPattern, Map<Port, Port> portsMap) {
+	public ChangeFifoArrayAccess(Pattern inputPattern, Pattern outputPattern,
+			Map<Port, Var> buffersMap) {
 		this.inputPattern = inputPattern;
 		this.outputPattern = outputPattern;
-		this.portsMap = portsMap;
+		this.buffersMap = buffersMap;
 	}
 
 	@Override
@@ -68,9 +69,8 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 		Port port = inputPattern.getVarToPortMap().get(var);
 
 		if (var.isLocal() && port != null) {
-			int cns = portsMap.get(port).getNumTokensConsumed();
-			var = superActor.getStateVar(portsMap.get(port).getName());
-
+			var = buffersMap.get(port);
+			int cns = ((TypeList) var.getType()).getSize();
 			loads.put(var, cns);
 
 			use.setVariable(var);
@@ -97,8 +97,9 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 		Port port = outputPattern.getVarToPortMap().get(var);
 
 		if (var.isLocal() && port != null) {
-			int prd = portsMap.get(port).getNumTokensProduced();
-			var = superActor.getStateVar(portsMap.get(port).getName());
+			var = buffersMap.get(port);
+
+			int prd = ((TypeList) var.getType()).getSize();
 
 			stores.put(var, prd);
 

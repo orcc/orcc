@@ -99,6 +99,8 @@ public class ActorMerger implements INetworkTransformation {
 
 	private int depth;
 
+	private Map<Port, Var> buffersMap;
+
 	private void addBuffer(String name, int size, Type eltType) {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Type type = factory.createTypeList(size, eltType);
@@ -128,11 +130,8 @@ public class ActorMerger implements INetworkTransformation {
 			procedure.getLocals().add(counter);
 		}
 
-		// Initialize read/write counters
-		createReads(procedure);
 		createStaticSchedule(procedure, scheduler.getSchedule(),
 				procedure.getNodes());
-		createWrites(procedure);
 
 		return procedure;
 	}
@@ -169,6 +168,46 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	/**
+	 * Creates the input pattern of the static action.
+	 * 
+	 * @return ip
+	 */
+	private Pattern createInputPattern() {
+		IrFactory factory = IrFactory.eINSTANCE;
+		Pattern ip = factory.createPattern();
+		for (Port port : superActor.getInputs()) {
+			int numTokens = port.getNumTokensConsumed();
+			Type type = factory.createTypeList(numTokens,
+					EcoreUtil.copy(port.getType()));
+			Var var = factory.createVar(factory.createLocation(), type,
+					port.getName(), false, true);
+			ip.setNumTokens(port, numTokens);
+			ip.setVariable(port, var);
+		}
+		return ip;
+	}
+
+	/**
+	 * Creates the output pattern of the static action.
+	 * 
+	 * @return op
+	 */
+	private Pattern createOutputPattern() {
+		IrFactory factory = IrFactory.eINSTANCE;
+		Pattern op = factory.createPattern();
+		for (Port port : superActor.getOutputs()) {
+			int numTokens = port.getNumTokensProduced();
+			Type type = factory.createTypeList(numTokens,
+					EcoreUtil.copy(port.getType()));
+			Var var = factory.createVar(factory.createLocation(), type,
+					port.getName(), false, true);
+			op.setNumTokens(port, numTokens);
+			op.setVariable(port, var);
+		}
+		return op;
+	}
+
+	/**
 	 * Creates input and output ports of the merged actor.
 	 * 
 	 */
@@ -191,16 +230,14 @@ public class ActorMerger implements INetworkTransformation {
 						IrFactory.eINSTANCE.createLocation(),
 						EcoreUtil.copy(tgtPort.getType()), "input_" + index++);
 
-				int rep = scheduler.getRepetitionVector().get(tgt);
-				port.increaseTokenConsumption(rep
-						* tgtPort.getNumTokensConsumed());
+				int cns = scheduler.getRepetitionVector().get(tgt)
+						* tgtPort.getNumTokensConsumed();
+				port.increaseTokenConsumption(cns);
+				inputPattern.setNumTokens(port, cns);
 
 				superActor.getInputs().add(port);
 				inputs.put(connection, port);
-				portsMap.put(tgtPort, port);
-
-				inputPattern.setNumTokens(port,
-						rep * tgtPort.getNumTokensConsumed());
+				portsMap.put(port, tgtPort);
 
 			} else if (vertices.contains(src) && !vertices.contains(tgt)) {
 				Port srcPort = connection.getSource();
@@ -208,17 +245,14 @@ public class ActorMerger implements INetworkTransformation {
 						IrFactory.eINSTANCE.createLocation(),
 						EcoreUtil.copy(srcPort.getType()), "output_" + index++);
 
-				port.increaseTokenProduction(scheduler.getRepetitionVector()
-						.get(src) * srcPort.getNumTokensProduced());
+				int prd = scheduler.getRepetitionVector().get(src)
+						* srcPort.getNumTokensProduced();
+				port.increaseTokenProduction(prd);
+				outputPattern.setNumTokens(port, prd);
 
 				superActor.getOutputs().add(port);
 				outputs.put(connection, port);
-				portsMap.put(srcPort, port);
-
-				int rep = scheduler.getRepetitionVector().get(src);
-				outputPattern.setNumTokens(port,
-						rep * srcPort.getNumTokensProduced());
-
+				portsMap.put(port, srcPort);
 			}
 		}
 
@@ -244,23 +278,11 @@ public class ActorMerger implements INetworkTransformation {
 				Procedure body = action.getBody();
 				proc.getNodes().addAll(body.getNodes());
 				superActor.getProcs().add(proc);
+
 				new ChangeFifoArrayAccess(action.getInputPattern(),
-						action.getOutputPattern(), portsMap)
+						action.getOutputPattern(), buffersMap)
 						.doSwitch(superActor);
 			}
-		}
-	}
-
-	/**
-	 * Creates the read instructions of the static action
-	 * 
-	 * @param procedure
-	 */
-	private void createReads(Procedure procedure) {
-		Pattern pattern = ((SDFMoC) superActor.getMoC()).getInputPattern();
-		for (Port port : pattern.getPorts()) {
-			Var var = superActor.getStateVar(port.getName());
-			pattern.getPortToVarMap().put(port, var);
 		}
 	}
 
@@ -285,34 +307,37 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	private void createStateVariables() {
-		SDFMoC moc = (SDFMoC) superActor.getMoC();
+		buffersMap = new HashMap<Port, Var>();
 
+		int index = 0;
 		// Create buffers for inputs
-		for (Port port : moc.getInputPattern().getPorts()) {
-			String name = port.getName();
-			int numTokens = moc.getInputPattern().getNumTokens(port);
+		for (Port port : superActor.getInputs()) {
+			String name = "buffer_" + index++;
+			int numTokens = port.getNumTokensConsumed();
 			addBuffer(name, numTokens, port.getType());
 			addCounter(name + "_r");
+			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
 		}
 
 		// Create buffers for outputs
-		for (Port port : moc.getOutputPattern().getPorts()) {
-			String name = port.getName();
-			int numTokens = moc.getOutputPattern().getNumTokens(port);
+		for (Port port : superActor.getOutputs()) {
+			String name = "buffer_" + index++;
+			int numTokens = port.getNumTokensProduced();
 			addBuffer(name, numTokens, port.getType());
 			addCounter(name + "_w");
+			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
 		}
 
 		// Create buffers for connections inside the sub-graph
-		int index = 0;
 		for (Map.Entry<Connection, Integer> entry : scheduler
 				.getBufferCapacities().entrySet()) {
 			String name = "buffer_" + index++;
-
-			addBuffer(name, entry.getValue(), entry.getKey().getSource()
-					.getType());
+			Connection conn = entry.getKey();
+			addBuffer(name, entry.getValue(), conn.getSource().getType());
 			addCounter(name + "_w");
 			addCounter(name + "_r");
+			buffersMap.put(conn.getSource(), superActor.getStateVar(name));
+			buffersMap.put(conn.getTarget(), superActor.getStateVar(name));
 		}
 	}
 
@@ -323,15 +348,16 @@ public class ActorMerger implements INetworkTransformation {
 	 * @throws OrccException
 	 */
 	private void createStaticAction() {
+		IrFactory factory = IrFactory.eINSTANCE;
+
+		Pattern ip = createInputPattern();
+		Pattern op = createOutputPattern();
 		Procedure scheduler = createScheduler();
 		Procedure body = createBody();
-		SDFMoC moc = (SDFMoC) superActor.getMoC();
 
-		IrFactory factory = IrFactory.eINSTANCE;
 		Action action = factory.createAction(factory.createLocation(),
-				factory.createTag(), moc.getInputPattern(),
-				moc.getOutputPattern(), IrFactory.eINSTANCE.createPattern(),
-				scheduler, body);
+				factory.createTag(), ip, op,
+				IrFactory.eINSTANCE.createPattern(), scheduler, body);
 
 		superActor.getActions().add(action);
 	}
@@ -399,19 +425,6 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	/**
-	 * Creates the read instructions of the static action
-	 * 
-	 * @param procedure
-	 */
-	private void createWrites(Procedure procedure) {
-		Pattern pattern = ((SDFMoC) superActor.getMoC()).getOutputPattern();
-		for (Port port : pattern.getPorts()) {
-			Var var = superActor.getStateVar(port.getName());
-			pattern.getPortToVarMap().put(port, var);
-		}
-	}
-
-	/**
 	 * Creates the merged actor.
 	 * 
 	 */
@@ -441,10 +454,8 @@ public class ActorMerger implements INetworkTransformation {
 		StaticSubsetDetector detector = new StaticSubsetDetector(network);
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
 			this.vertices = vertices;
-			subgraph = new DirectedSubgraph<Vertex, Connection>(graph,
-					vertices, null);
-			scheduler = new SASLoopScheduler(subgraph);
 
+			// make unique instances
 			Set<Actor> actors = new HashSet<Actor>();
 			for (Vertex vertex : vertices) {
 				Instance inst = vertex.getInstance();
@@ -455,6 +466,10 @@ public class ActorMerger implements INetworkTransformation {
 					actors.add(inst.getActor());
 				}
 			}
+
+			subgraph = new DirectedSubgraph<Vertex, Connection>(graph,
+					vertices, null);
+			scheduler = new SASLoopScheduler(subgraph);
 
 			// merge vertices inside a single actor
 			mergeActors();
@@ -495,4 +510,5 @@ public class ActorMerger implements INetworkTransformation {
 			}
 		}
 	}
+
 }
