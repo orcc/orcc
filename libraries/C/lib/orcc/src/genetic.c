@@ -245,12 +245,13 @@ static individual* generate_random_individual_by_group(
 		struct genetic_s *genetic_info) {
 	int i, j;
 	int *mapped_cores = (int *) malloc(genetic_info->groups_nb * sizeof(int));
+	individual* ind;
 
 	for (j = 0; j < genetic_info->groups_nb; j++) {
 		mapped_cores[j] = rand() % genetic_info->threads_nb;
 	}
 
-	individual* ind = (individual*) malloc(sizeof(individual));
+	ind = (individual*) malloc(sizeof(individual));
 	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
 	ind->fps = -1;
 	ind->old_fps = -1;
