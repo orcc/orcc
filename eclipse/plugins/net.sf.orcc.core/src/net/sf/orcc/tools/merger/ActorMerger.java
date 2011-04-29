@@ -41,7 +41,9 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
+import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
@@ -51,6 +53,7 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.SDFMoC;
@@ -60,7 +63,6 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.INetworkTransformation;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedSubgraph;
@@ -93,9 +95,9 @@ public class ActorMerger implements INetworkTransformation {
 
 	private Set<Vertex> vertices;
 
-	private EList<Var> variables;
-
 	private Map<Port, Port> portsMap;
+
+	private Map<Port, Var> inputToVarMap;
 
 	private int depth;
 
@@ -117,53 +119,96 @@ public class ActorMerger implements INetworkTransformation {
 		superActor.getStateVars().add(varCount);
 	}
 
-	private Procedure createBody() {
+	private Procedure createBody(Pattern ip, Pattern op) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
 		Procedure procedure = factory.createProcedure("staticSchedule",
 				factory.createLocation(), IrFactory.eINSTANCE.createTypeVoid());
 
 		// Add loop counters
+		Var loop = factory.createVar(factory.createLocation(),
+				factory.createTypeInt(32), "i", false, true);
+		procedure.getLocals().add(loop);
+		Var tmp = factory.createVar(factory.createLocation(),
+				factory.createTypeInt(32), "tmp", false, true);
+		procedure.getLocals().add(tmp);
 		for (int depth = 0; depth < scheduler.getDepth(); depth++) {
 			Var counter = factory.createVar(factory.createLocation(),
 					factory.createTypeInt(32), "idx_" + depth, false, true);
 			procedure.getLocals().add(counter);
 		}
 
+		createCopiesFromInputs(procedure, ip);
+
 		createStaticSchedule(procedure, scheduler.getSchedule(),
 				procedure.getNodes());
+
+		createCopiesToOutputs(procedure, op);
 
 		return procedure;
 	}
 
+	private void createCopies(Procedure procedure, Var source, Var target) {
+		IrFactory factory = IrFactory.eINSTANCE;
+
+		List<Node> nodes = procedure.getNodes();
+		Var loop = procedure.getLocal("i");
+		NodeBlock block = procedure.getLast(nodes);
+		block.add(factory.createInstAssign(loop, factory.createExprInt(0)));
+
+		Expression condition = factory.createExprBinary(
+				factory.createExprVar(loop), OpBinary.LT,
+				factory.createExprInt(((TypeList) source.getType()).getSize()),
+				factory.createTypeBool());
+
+		NodeWhile nodeWhile = factory.createNodeWhile();
+		nodeWhile.setJoinNode(factory.createNodeBlock());
+		nodeWhile.setCondition(condition);
+		nodes.add(nodeWhile);
+
+		Var tmpVar = procedure.getLocal("tmp");
+		List<Expression> indexes = new ArrayList<Expression>();
+		indexes.add(factory.createExprVar(loop));
+		InstLoad load = factory.createInstLoad(tmpVar, source, indexes);
+
+		indexes = new ArrayList<Expression>();
+		indexes.add(factory.createExprVar(loop));
+		InstStore store = factory.createInstStore(factory.createLocation(),
+				target, indexes, factory.createExprVar(tmpVar));
+		NodeBlock childBlock = procedure.getLast(nodeWhile.getNodes());
+		childBlock.add(load);
+		childBlock.add(store);
+	}
+
+	private void createCopiesFromInputs(Procedure procedure, Pattern ip) {
+		for (Port port : superActor.getInputs()) {
+			Var input = ip.getVariable(port);
+			Var buffer = procedure.getLocal("i");
+
+			createCopies(procedure, input, buffer);
+		}
+	}
+
+	private void createCopiesToOutputs(Procedure procedure, Pattern op) {
+		for (Port port : superActor.getOutputs()) {
+			Var output = op.getVariable(port);
+			Var buffer = inputToVarMap.get(port);
+
+			createCopies(procedure, buffer, output);
+		}
+	}
+
 	/**
 	 * Creates a return instruction that uses the results of the hasTokens tests
-	 * previously created.
+	 * previously created. Returns true right now.
 	 * 
 	 * @param block
 	 *            block to which return is to be added
 	 */
 	private void createInputCondition(NodeBlock block) {
 		final IrFactory factory = IrFactory.eINSTANCE;
-
-		Expression value;
-		Iterator<Var> it = variables.iterator();
-		if (it.hasNext()) {
-			Var previous = it.next();
-			value = factory.createExprVar(previous);
-
-			while (it.hasNext()) {
-				Var thisOne = it.next();
-				value = factory.createExprBinary(value, OpBinary.LOGIC_AND,
-						factory.createExprVar(thisOne),
-						factory.createTypeBool());
-				previous = thisOne;
-			}
-		} else {
-			value = factory.createExprBool(true);
-		}
-
-		InstReturn returnInstr = factory.createInstReturn(value);
+		InstReturn returnInstr = factory.createInstReturn(factory
+				.createExprBool(true));
 		block.add(returnInstr);
 	}
 
@@ -212,8 +257,9 @@ public class ActorMerger implements INetworkTransformation {
 	 * 
 	 */
 	private void createPorts() {
-		Pattern inputPattern = IrFactory.eINSTANCE.createPattern();
-		Pattern outputPattern = IrFactory.eINSTANCE.createPattern();
+		IrFactory factory = IrFactory.eINSTANCE;
+		Pattern inputPattern = factory.createPattern();
+		Pattern outputPattern = factory.createPattern();
 
 		inputs = new HashMap<Connection, Port>();
 		outputs = new HashMap<Connection, Port>();
@@ -227,8 +273,8 @@ public class ActorMerger implements INetworkTransformation {
 
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Port tgtPort = connection.getTarget();
-				Port port = IrFactory.eINSTANCE
-						.createPort(IrFactory.eINSTANCE.createLocation(),
+				Port port = factory
+						.createPort(factory.createLocation(),
 								EcoreUtil.copy(tgtPort.getType()), "input_"
 										+ inIndex++);
 
@@ -243,8 +289,7 @@ public class ActorMerger implements INetworkTransformation {
 
 			} else if (vertices.contains(src) && !vertices.contains(tgt)) {
 				Port srcPort = connection.getSource();
-				Port port = IrFactory.eINSTANCE.createPort(
-						IrFactory.eINSTANCE.createLocation(),
+				Port port = factory.createPort(factory.createLocation(),
 						EcoreUtil.copy(srcPort.getType()), "output_"
 								+ outIndex++);
 
@@ -285,9 +330,7 @@ public class ActorMerger implements INetworkTransformation {
 				Procedure body = action.getBody();
 				List<Node> nodes = body.getNodes();
 				proc.getNodes().addAll(nodes);
-				NodeBlock block = proc.getLast(nodes);
-				InstReturn ret = factory.createInstReturn();
-				block.add(ret);
+				proc.getLast(nodes).add(factory.createInstReturn());
 				superActor.getProcs().add(proc);
 
 				new ChangeFifoArrayAccess(action.getInputPattern(),
@@ -309,8 +352,6 @@ public class ActorMerger implements INetworkTransformation {
 				SCHEDULER_NAME, factory.createLocation(),
 				IrFactory.eINSTANCE.createTypeBool());
 
-		variables = procedure.getLocals();
-
 		NodeBlock block = factory.createNodeBlock();
 		procedure.getNodes().add(block);
 		createInputCondition(block);
@@ -323,6 +364,7 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private void createStateVariables() {
 		buffersMap = new HashMap<Port, Var>();
+		inputToVarMap = new HashMap<Port, Var>();
 
 		int index = 0;
 		// Create buffers for inputs
@@ -331,6 +373,7 @@ public class ActorMerger implements INetworkTransformation {
 			int numTokens = port.getNumTokensConsumed();
 			addBuffer(name, numTokens, port.getType());
 			addCounter(name + "_r");
+			inputToVarMap.put(port, superActor.getStateVar(name));
 			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
 		}
 
@@ -340,6 +383,7 @@ public class ActorMerger implements INetworkTransformation {
 			int numTokens = port.getNumTokensProduced();
 			addBuffer(name, numTokens, port.getType());
 			addCounter(name + "_w");
+			inputToVarMap.put(port, superActor.getStateVar(name));
 			buffersMap.put(portsMap.get(port), superActor.getStateVar(name));
 		}
 
@@ -368,13 +412,14 @@ public class ActorMerger implements INetworkTransformation {
 		Pattern ip = createInputPattern();
 		Pattern op = createOutputPattern();
 		Procedure scheduler = createScheduler();
-		Procedure body = createBody();
+		Procedure body = createBody(ip, op);
 
 		Action action = factory.createAction(factory.createLocation(),
-				factory.createTag(), ip, op,
-				IrFactory.eINSTANCE.createPattern(), scheduler, body);
+				factory.createTag(), ip, op, factory.createPattern(),
+				scheduler, body);
 
 		superActor.getActions().add(action);
+		superActor.getActionsOutsideFsm().add(action);
 	}
 
 	/**
@@ -410,7 +455,7 @@ public class ActorMerger implements INetworkTransformation {
 				Expression condition = factory.createExprBinary(
 						factory.createExprVar(loopVar), OpBinary.LT,
 						factory.createExprInt(sched.getIterationCount()),
-						IrFactory.eINSTANCE.createTypeBool());
+						factory.createTypeBool());
 
 				NodeWhile nodeWhile = factory.createNodeWhile();
 				nodeWhile.setJoinNode(factory.createNodeBlock());
@@ -450,13 +495,6 @@ public class ActorMerger implements INetworkTransformation {
 		createProcedures();
 
 		createStaticAction();
-
-		createActionScheduler();
-
-	}
-
-	private void createActionScheduler() {
-		superActor.getActionsOutsideFsm().addAll(superActor.getActions());
 	}
 
 	@Override
@@ -465,22 +503,12 @@ public class ActorMerger implements INetworkTransformation {
 
 		DirectedGraph<Vertex, Connection> subgraph;
 
+		// make unique instances
+
 		// static region detections
 		StaticSubsetDetector detector = new StaticSubsetDetector(network);
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
 			this.vertices = vertices;
-
-			// make unique instances
-			Set<Actor> actors = new HashSet<Actor>();
-			for (Vertex vertex : vertices) {
-				Instance inst = vertex.getInstance();
-
-				if (actors.contains(inst.getActor())) {
-					inst.setContents(EcoreUtil.copy(inst.getActor()));
-				} else {
-					actors.add(inst.getActor());
-				}
-			}
 
 			subgraph = new DirectedSubgraph<Vertex, Connection>(graph,
 					vertices, null);
