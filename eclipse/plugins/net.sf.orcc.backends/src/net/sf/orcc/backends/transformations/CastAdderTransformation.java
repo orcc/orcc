@@ -54,7 +54,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
-import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -210,7 +209,7 @@ public class CastAdderTransformation extends AbstractActorVisitor<Expression> {
 						EcoreUtil.copy(expr.getType()),
 						"expr_" + procedure.getName());
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						oldVar, expr);
+						oldVar, EcoreHelper.copy(expr));
 				EcoreHelper.addInstBeforeExpr(expr, assign);
 			}
 

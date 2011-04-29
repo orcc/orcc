@@ -188,10 +188,8 @@ public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
 				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
 						+ "expr");
 
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign();
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, EcoreHelper.copy(expr));
 		EcoreHelper.addInstBeforeExpr(expr, assign);
-		assign.setTarget(IrFactory.eINSTANCE.createDef(target));
-		assign.setValue(expr);
 
 		return IrFactory.eINSTANCE.createExprVar(target);
 	}
