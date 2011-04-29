@@ -82,9 +82,12 @@ public class ExpressionSplitterTransformation extends
 		Var target = procedure.newTempLocalVariable(
 				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
 						+ "expr");
+
 		// Add assignment to instruction's list
-		EcoreHelper.addInstBeforeExpr(expr,
-				IrFactory.eINSTANCE.createInstAssign(target, expr));
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign();
+		EcoreHelper.addInstBeforeExpr(expr, assign);
+		assign.setTarget(IrFactory.eINSTANCE.createDef(target));
+		assign.setValue(expr);
 
 		return IrFactory.eINSTANCE.createExprVar(target);
 	}
@@ -123,8 +126,10 @@ public class ExpressionSplitterTransformation extends
 				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
 						+ "expr");
 		// Add assignment to instruction's list
-		EcoreHelper.addInstBeforeExpr(expr, IrFactory.eINSTANCE
-				.createInstAssign(target, transformUnaryExpr(expr)));
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign();
+		EcoreHelper.addInstBeforeExpr(expr, assign);
+		assign.setTarget(IrFactory.eINSTANCE.createDef(target));
+		assign.setValue(transformUnaryExpr(expr));
 
 		return IrFactory.eINSTANCE.createExprVar(target);
 	}

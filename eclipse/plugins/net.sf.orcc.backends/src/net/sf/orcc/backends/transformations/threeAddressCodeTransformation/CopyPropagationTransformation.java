@@ -53,6 +53,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -67,6 +68,16 @@ import org.eclipse.emf.common.util.EList;
 public class CopyPropagationTransformation extends
 		AbstractActorVisitor<Expression> {
 
+	private Map<Var, Expression> copyVars;
+
+	private List<Instruction> removedInstrs;
+
+	public CopyPropagationTransformation() {
+		copyVars = new HashMap<Var, Expression>();
+		removedInstrs = new ArrayList<Instruction>();
+
+	}
+
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
 		expr.setE1(doSwitch(expr.getE1()));
@@ -78,10 +89,7 @@ public class CopyPropagationTransformation extends
 	public Expression caseExprList(ExprList expr) {
 		List<Expression> values = expr.getValue();
 		for (Expression subExpr : values) {
-			Expression newSubExpr = doSwitch(subExpr);
-			if (subExpr != newSubExpr) {
-				values.set(values.indexOf(subExpr), newSubExpr);
-			}
+			values.set(values.indexOf(subExpr), doSwitch(subExpr));
 		}
 		return expr;
 	}
@@ -95,53 +103,10 @@ public class CopyPropagationTransformation extends
 	@Override
 	public Expression caseExprVar(ExprVar expr) {
 		Var var = expr.getUse().getVariable();
-
 		if (copyVars.containsKey(var)) {
 			return doSwitch(copyVars.get(var));
 		}
-
 		return expr;
-	}
-
-	private Map<Var, Expression> copyVars;
-
-	private List<Instruction> removedInstrs;
-
-	public CopyPropagationTransformation() {
-		copyVars = new HashMap<Var, Expression>();
-		removedInstrs = new ArrayList<Instruction>();
-
-	}
-
-	/**
-	 * Removes the given list of instructions that store to an unused state
-	 * variable.
-	 * 
-	 * @param instructions
-	 *            a list of instructions
-	 */
-	private void removeInstructions(List<Instruction> instructions) {
-		if (instructions != null) {
-			for (Instruction instr : instructions) {
-				instr.getBlock().getInstructions().remove(instr);
-			}
-		}
-	}
-
-	/**
-	 * Removes the given list of variables from the procedure
-	 * 
-	 * @param vars
-	 *            a map of variable
-	 */
-	private void removeVariables(Map<Var, Expression> vars) {
-		EList<Var> lovalVars = procedure.getLocals();
-
-		for (Map.Entry<Var, Expression> entry : copyVars.entrySet()) {
-			Var var = entry.getKey();
-			lovalVars.remove(var.getName());
-		}
-
 	}
 
 	/**
@@ -176,12 +141,6 @@ public class CopyPropagationTransformation extends
 			parameters.set(parameters.indexOf(expr), doSwitch(expr));
 		}
 		return null;
-	}
-
-	@Override
-	public Expression caseNodeIf(NodeIf nodeIf) {
-		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
-		return super.caseNodeIf(nodeIf);
 	}
 
 	@Override
@@ -238,18 +197,6 @@ public class CopyPropagationTransformation extends
 	}
 
 	@Override
-	public Expression caseProcedure(Procedure procedure) {
-		copyVars.clear();
-		super.visit(procedure);
-
-		// Remove useless instructions and variables
-		removeInstructions(removedInstrs);
-		removeVariables(copyVars);
-
-		return null;
-	}
-
-	@Override
 	public Expression caseInstReturn(InstReturn instReturn) {
 		Expression expr = instReturn.getValue();
 		if (expr != null) {
@@ -271,8 +218,42 @@ public class CopyPropagationTransformation extends
 	}
 
 	@Override
+	public Expression caseNodeIf(NodeIf nodeIf) {
+		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		return super.caseNodeIf(nodeIf);
+	}
+
+	@Override
 	public Expression caseNodeWhile(NodeWhile nodeWhile) {
 		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
 		return super.caseNodeWhile(nodeWhile);
+	}
+
+	@Override
+	public Expression caseProcedure(Procedure procedure) {
+		copyVars.clear();
+		super.visit(procedure);
+
+		// Remove useless instructions and variables
+		EcoreHelper.delete(removedInstrs);
+		removeVariables(copyVars);
+
+		return null;
+	}
+
+	/**
+	 * Removes the given list of variables from the procedure
+	 * 
+	 * @param vars
+	 *            a map of variable
+	 */
+	private void removeVariables(Map<Var, Expression> vars) {
+		EList<Var> lovalVars = procedure.getLocals();
+
+		for (Map.Entry<Var, Expression> entry : copyVars.entrySet()) {
+			Var var = entry.getKey();
+			lovalVars.remove(var.getName());
+		}
+
 	}
 }

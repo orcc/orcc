@@ -53,7 +53,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
-import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -125,36 +124,27 @@ public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstCall(InstCall call) {
 		EList<Expression> parameters = call.getParameters();
-		EList<Expression> newParameters = new BasicEList<Expression>();
 		for (Expression expr : parameters) {
-			newParameters.add(doSwitch(expr));
+			parameters.set(parameters.indexOf(expr), doSwitch(expr));
 		}
-		parameters.clear();
-		parameters.addAll(newParameters);
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
 		EList<Expression> indexes = load.getIndexes();
-		EList<Expression> newIndexes = new BasicEList<Expression>();
 		for (Expression expr : indexes) {
-			newIndexes.add(doSwitch(expr));
+			indexes.set(indexes.indexOf(expr), doSwitch(expr));
 		}
-		indexes.clear();
-		indexes.addAll(newIndexes);
 		return null;
 	}
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
 		EList<Expression> values = phi.getValues();
-		EList<Expression> newValues = new BasicEList<Expression>();
 		for (Expression expr : values) {
-			newValues.add(doSwitch(expr));
+			values.set(values.indexOf(expr), doSwitch(expr));
 		}
-		values.clear();
-		values.addAll(newValues);
 		return null;
 	}
 
@@ -170,13 +160,9 @@ public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstStore(InstStore store) {
 		EList<Expression> indexes = store.getIndexes();
-		EList<Expression> newIndexes = new BasicEList<Expression>();
 		for (Expression expr : indexes) {
-			newIndexes.add(doSwitch(expr));
+			indexes.set(indexes.indexOf(expr), doSwitch(expr));
 		}
-		indexes.clear();
-		indexes.addAll(newIndexes);
-		doSwitch(store.getValue());
 		return null;
 	}
 
@@ -198,13 +184,14 @@ public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
 	}
 
 	private Expression createExprVarAndAssign(Expression expr) {
-		// Make a new assignment to the binary expression
 		Var target = procedure.newTempLocalVariable(
 				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
 						+ "expr");
-		// Add assignment to instruction's list
-		EcoreHelper.addInstBeforeExpr(expr,
-				IrFactory.eINSTANCE.createInstAssign(target, expr));
+
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign();
+		EcoreHelper.addInstBeforeExpr(expr, assign);
+		assign.setTarget(IrFactory.eINSTANCE.createDef(target));
+		assign.setValue(expr);
 
 		return IrFactory.eINSTANCE.createExprVar(target);
 	}

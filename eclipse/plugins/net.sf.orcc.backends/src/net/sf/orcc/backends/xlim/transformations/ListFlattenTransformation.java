@@ -62,10 +62,6 @@ public class ListFlattenTransformation extends AbstractActorVisitor<Object> {
 			List<Expression> indexes) {
 		List<Expression> listIndex = new ArrayList<Expression>(indexes.size());
 
-		// returns the load or store, and has the effect that instructions will
-		// be inserted before it
-		itInstruction.previous();
-
 		for (Expression expr : new ArrayList<Expression>(indexes)) {
 			Var indexVar = procedure.newTempLocalVariable(
 					IrFactory.eINSTANCE.createTypeInt(), "index");

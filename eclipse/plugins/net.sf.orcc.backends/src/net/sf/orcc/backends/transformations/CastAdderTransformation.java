@@ -121,24 +121,18 @@ public class CastAdderTransformation extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstCall(InstCall call) {
 		EList<Expression> parameters = call.getParameters();
-		EList<Expression> newParameters = new BasicEList<Expression>();
 		for (Expression expr : parameters) {
-			newParameters.add(doSwitch(expr));
+			parameters.set(parameters.indexOf(expr), doSwitch(expr));
 		}
-		parameters.clear();
-		parameters.addAll(newParameters);
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
 		EList<Expression> indexes = load.getIndexes();
-		EList<Expression> newIndexes = new BasicEList<Expression>();
 		for (Expression expr : indexes) {
-			newIndexes.add(doSwitch(expr));
+			indexes.set(indexes.indexOf(expr), doSwitch(expr));
 		}
-		indexes.clear();
-		indexes.addAll(newIndexes);
 
 		Var source = load.getSource().getVariable();
 		Var target = load.getTarget().getVariable();
@@ -162,12 +156,9 @@ public class CastAdderTransformation extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
 		EList<Expression> values = phi.getValues();
-		EList<Expression> newValues = new BasicEList<Expression>();
 		for (Expression expr : values) {
-			newValues.add(doSwitch(expr));
+			values.set(values.indexOf(expr), doSwitch(expr));
 		}
-		values.clear();
-		values.addAll(newValues);
 		return null;
 	}
 
@@ -183,12 +174,9 @@ public class CastAdderTransformation extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstStore(InstStore store) {
 		EList<Expression> indexes = store.getIndexes();
-		EList<Expression> newIndexes = new BasicEList<Expression>();
 		for (Expression expr : indexes) {
-			newIndexes.add(doSwitch(expr));
+			indexes.set(indexes.indexOf(expr), doSwitch(expr));
 		}
-		indexes.clear();
-		indexes.addAll(newIndexes);
 		doSwitch(store.getValue());
 		return null;
 	}

@@ -29,8 +29,10 @@
 package net.sf.orcc.backends.xlim.transformations;
 
 import net.sf.orcc.backends.transformations.VariableRenamer;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines an extension of VariableRenamer to do specified treatment
@@ -43,6 +45,7 @@ public class XlimVariableRenamer extends VariableRenamer {
 
 	@Override
 	public Object casePattern(Pattern pattern) {
+		Action action = EcoreHelper.getContainerOfType(pattern, Action.class);
 		String actionName = action.getName();
 		for (Var var : pattern.getPortToVarMap().values()) {
 			if (!action.getBody().getLocals().contains(var)) {
