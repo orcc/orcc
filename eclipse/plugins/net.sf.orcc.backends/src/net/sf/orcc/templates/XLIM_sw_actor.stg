@@ -351,10 +351,10 @@ printNotPhiNodes(NotphiNodes) ::= <<
 
 printIfNode(ifNode) ::= <<
 \<module kind="if"\>
-	\<module decision="decision_<ifNode.value>_<ifNode.location.startLine>_<ifNode.location.startColumn>" kind="test"\>
+	\<module decision="decision_<ifNode.condition.use.variable.name>_<ifNode.location.startLine>_<ifNode.location.startColumn>" kind="test"\>
 		\<operation kind="noop"\>
-			<untypedPort(dir="in", source=ifNode.value)>
-			\<port dir="out" size="1" source="decision_<ifNode.value>_<ifNode.location.startLine>_<ifNode.location.startColumn>" typeName="bool"/\>
+			<untypedPort(dir="in", source=ifNode.condition.use.variable)>
+			\<port dir="out" size="1" source="decision_<ifNode.condition.use.variable.name>_<ifNode.location.startLine>_<ifNode.location.startColumn>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="then"\>
@@ -377,13 +377,13 @@ printWhileNode(whileNode) ::= <<
 \<module kind="loop"\>
 	\<!-- joinnode --\>
 	<printPhiNodes(whileNode.joinNode)>
-	\<module decision="decision_<whileNode.value>" kind="test"\>
+	\<module decision="decision_<whileNode.condition.use.variable.name>" kind="test"\>
 		\<!-- Begin joinnode --\>
 		<printNotPhiNodes(whileNode.joinNode)>
 		\<!-- End joinnode --\>
 		\<operation kind="noop"\>
-			<untypedPort(dir="in", source=whileNode.value)>
-			\<port dir="out" size="1" source="decision_<whileNode.value>" typeName="bool"/\>
+			<untypedPort(dir="in", source=whileNode.condition.use.variable)>
+			\<port dir="out" size="1" source="decision_<whileNode.condition.use.variable.name>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="body"\>
