@@ -71,6 +71,10 @@ public class JavaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	protected void doInitializeOptions() {
+	}
+
+	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorVisitor<?>[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
@@ -109,10 +113,6 @@ public class JavaBackendImpl extends AbstractBackend {
 		// print network
 		write("Printing network...\n");
 		printNetwork(network);
-	}
-
-	@Override
-	protected void initializeOptions() {
 	}
 
 	@Override

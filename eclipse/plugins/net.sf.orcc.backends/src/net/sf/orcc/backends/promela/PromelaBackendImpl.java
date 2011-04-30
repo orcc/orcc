@@ -81,6 +81,10 @@ public class PromelaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	protected void doInitializeOptions() {
+	}
+
+	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorVisitor<?>[] transformations = {
 				new RenameTransformation(this.transformations),
@@ -112,10 +116,6 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 		new BroadcastAdder().transform(network);
 		printNetwork(network);
-	}
-
-	@Override
-	protected void initializeOptions() {
 	}
 
 	@Override

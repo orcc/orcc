@@ -118,6 +118,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	public void doInitializeOptions() {
+		debugMode = getAttribute(DEBUG_MODE, true);
+	}
+
+	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		evaluateInitializeActions(actor);
 
@@ -219,11 +224,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 		if (initProc != null) {
 			EcoreHelper.delete(initProc);
 		}
-	}
-
-	@Override
-	public void initializeOptions() {
-		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
 	@Override

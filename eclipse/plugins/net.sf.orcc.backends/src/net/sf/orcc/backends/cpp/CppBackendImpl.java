@@ -124,6 +124,13 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	public void doInitializeOptions() {
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		merge = getAttribute("net.sf.orcc.backends.merge", false);
+	}
+
+	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
@@ -184,13 +191,6 @@ public class CppBackendImpl extends AbstractBackend {
 			partName = ((ExprString) expr).getValue();
 		}
 		return partName;
-	}
-
-	@Override
-	public void initializeOptions() {
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		merge = getAttribute("net.sf.orcc.backends.merge", false);
 	}
 
 	@Override

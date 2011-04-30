@@ -82,9 +82,9 @@ public class CBackendImpl extends AbstractBackend {
 
 	private boolean debugMode;
 
-	private boolean geneticAlgorithm;
-
 	private boolean enableTrace;
+
+	private boolean geneticAlgorithm;
 
 	private Map<String, List<Instance>> instancesTarget;
 
@@ -194,6 +194,25 @@ public class CBackendImpl extends AbstractBackend {
 				targetsData.computeTemplateMaps(worknet);
 			}
 		}
+	}
+
+	@Override
+	public void doInitializeOptions() {
+		mapping = getAttribute(MAPPING, new HashMap<String, String>());
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		merge = getAttribute("net.sf.orcc.backends.merge", false);
+		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
+		geneticAlgorithm = getAttribute(
+				"net.sf.orcc.backends.geneticAlgorithm", false);
+		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
+		debugMode = getAttribute(DEBUG_MODE, true);
+		threadsNb = Integer.parseInt(getAttribute(
+				"net.sf.orcc.backends.processorsNumber", "1"));
+		enableTrace = getAttribute("net.sf.orcc.backends.enableTrace", false);
+		String topology = getAttribute(
+				"net.sf.orcc.backends.newScheduler.topology", "Ring");
+		ringTopology = topology.equals("Ring");
 	}
 
 	@Override
@@ -322,25 +341,6 @@ public class CBackendImpl extends AbstractBackend {
 				printMapping(workingNetwork);
 			}
 		}
-	}
-
-	@Override
-	public void initializeOptions() {
-		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		merge = getAttribute("net.sf.orcc.backends.merge", false);
-		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
-		geneticAlgorithm = getAttribute(
-				"net.sf.orcc.backends.geneticAlgorithm", false);
-		newScheduler = getAttribute("net.sf.orcc.backends.newScheduler", false);
-		debugMode = getAttribute(DEBUG_MODE, true);
-		threadsNb = Integer.parseInt(getAttribute(
-				"net.sf.orcc.backends.processorsNumber", "1"));
-		enableTrace = getAttribute("net.sf.orcc.backends.enableTrace", false);
-		String topology = getAttribute(
-				"net.sf.orcc.backends.newScheduler.topology", "Ring");
-		ringTopology = topology.equals("Ring");
 	}
 
 	private void printCMake(Network network) {

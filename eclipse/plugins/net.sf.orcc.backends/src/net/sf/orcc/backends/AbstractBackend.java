@@ -46,7 +46,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.OrccProcess;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.Instance;
@@ -67,14 +66,14 @@ import org.eclipse.equinox.app.IApplicationContext;
 
 /**
  * This class is an abstract implementation of {@link Backend}. The two entry
- * points of this class are the public methods
- * {@link #compileVTL(OrccProcess, String)} and
- * {@link #compileXDF(OrccProcess, String, String)} which should NOT be called
- * by back-ends themselves.
+ * points of this class are the public methods {@link #compileVTL()} and
+ * {@link #compileXDF()} which should NOT be called by back-ends themselves.
  * 
  * <p>
  * The following methods are abstract and must be implemented by back-ends:
  * <ul>
+ * <li>{@link #doInitializeOptions()} is called by {@link #setOptions(Map)} to
+ * initialize the options of the back-end.</li>
  * <li>{@link #doTransformActor(Actor)} is called by
  * {@link #transformActors(List)} to transform a list of actors.</li>
  * <li>{@link #doVtlCodeGeneration(List)} is called to compile a list of actors.
@@ -155,6 +154,11 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		}
 		doXdfCodeGeneration(network);
 	}
+
+	/**
+	 * Called when options are initialized.
+	 */
+	abstract protected void doInitializeOptions();
 
 	/**
 	 * Transforms the given actor.
@@ -321,11 +325,6 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	final public Map<String, Object> getAttributes() {
 		return options;
 	}
-
-	/**
-	 * Called when options are initialized.
-	 */
-	abstract protected void initializeOptions();
 
 	/**
 	 * Returns true if this process has been canceled.
@@ -504,7 +503,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		// set output path
 		path = new File(outputFolder).getAbsolutePath();
 
-		initializeOptions();
+		doInitializeOptions();
 	}
 
 	@Override

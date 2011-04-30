@@ -109,6 +109,17 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	public void doInitializeOptions() {
+		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
+		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
+		jadeToolbox = new ConfigurationScope().getNode(OrccActivator.PLUGIN_ID)
+				.get(P_JADETOOLBOX, "");
+		debugMode = getAttribute(DEBUG_MODE, false);
+	}
+
+	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		if (classify) {
 			if (!actor.getSimpleName().equals("BufferCurrPic")
@@ -177,17 +188,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// JadeToolbox is required to finalize actors
 		runJadeToolBox(actors);
-	}
-
-	@Override
-	public void initializeOptions() {
-		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
-		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		jadeToolbox = new ConfigurationScope().getNode(OrccActivator.PLUGIN_ID)
-				.get(P_JADETOOLBOX, "");
-		debugMode = getAttribute(DEBUG_MODE, false);
 	}
 
 	@Override

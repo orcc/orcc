@@ -104,6 +104,16 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	public void doInitializeOptions() {
+		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
+		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
+				"xc2vp30-7-ff1152");
+		mapping = getAttribute(OrccLaunchConstants.MAPPING,
+				new HashMap<String, String>());
+		debugMode = getAttribute(DEBUG_MODE, true);
+	}
+
+	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		actor.setTemplateData(new XlimActorTemplateData());
 
@@ -149,16 +159,6 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		write("Printing network...\n");
 		printNetwork(network);
-	}
-
-	@Override
-	public void initializeOptions() {
-		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
-		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
-				"xc2vp30-7-ff1152");
-		mapping = getAttribute(OrccLaunchConstants.MAPPING,
-				new HashMap<String, String>());
-		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
 	private void printCMake(Network network) {
