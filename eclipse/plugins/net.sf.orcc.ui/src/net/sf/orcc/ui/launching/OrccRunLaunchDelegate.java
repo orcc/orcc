@@ -33,7 +33,6 @@ import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import java.util.Map;
 
 import net.sf.orcc.OrccActivator;
-import net.sf.orcc.OrccProcess;
 import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.network.Network;
 

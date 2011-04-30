@@ -33,7 +33,6 @@ import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import java.util.Map;
 
 import net.sf.orcc.OrccActivator;
-import net.sf.orcc.OrccProcess;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.simulators.SimulatorFactory;
 
