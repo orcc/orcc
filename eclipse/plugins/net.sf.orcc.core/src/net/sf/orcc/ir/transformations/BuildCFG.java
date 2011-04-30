@@ -55,7 +55,12 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 	public Node caseNodeBlock(NodeBlock node) {
 		graph.addVertex(node);
 		if (last != null) {
-			graph.addEdge(last, node);
+			if (graph.containsVertex(node) && graph.containsVertex(last)) {
+				graph.addEdge(last, node);
+			}
+			else{
+				System.out.println("tututut");
+			}
 		}
 
 		return node;
@@ -103,6 +108,7 @@ public class BuildCFG extends AbstractActorVisitor<Node> {
 
 	@Override
 	public Node caseProcedure(Procedure procedure) {
+		last = null;
 		graph = new CFG();
 		procedure.setGraph(graph);
 		return super.caseProcedure(procedure);

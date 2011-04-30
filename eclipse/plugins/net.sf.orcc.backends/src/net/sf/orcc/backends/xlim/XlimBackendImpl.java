@@ -118,19 +118,22 @@ public class XlimBackendImpl extends AbstractBackend {
 		actor.setTemplateData(new XlimActorTemplateData());
 
 		ActorVisitor<?>[] transformations = {
-				new ArrayInitializeTransformation(),
-				new TernaryOperationAdder(),
-				new InlineTransformation(true, true),
-				new UnaryListToScalarTransformation(), new CustomPeekAdder(),
-				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new XlimDeadVariableRemoval(), new ListFlattenTransformation(),
+				//new ArrayInitializeTransformation(),
+				//new TernaryOperationAdder(),
+				//new InlineTransformation(true, true),
+				//new UnaryListToScalarTransformation(), new CustomPeekAdder(),
+				//new DeadGlobalElimination(), new DeadCodeElimination(),
+				//new XlimDeadVariableRemoval(), 
+				//new ListFlattenTransformation(),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
-				new CastAdderTransformation(),
-				new ConstantPhiValuesTransformation(),
-				new MoveLiteralIntegers(), new XlimVariableRenamer() };
+				//new CastAdderTransformation(),
+				//new ConstantPhiValuesTransformation(),
+				new MoveLiteralIntegers()//, new XlimVariableRenamer()
+				};
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
+			System.out.println(transformation.getClass().getCanonicalName() + " => " + actor.getName());
 			if (debugMode && !EcoreHelper.serializeActor(path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());

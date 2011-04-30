@@ -98,46 +98,35 @@ printBinaryExpr(expr) ::= <<
 \<operation kind="<BinOp.(expr.op)>"\>
 	<untypedPort(dir="in", source=expr.e1)>
 	<untypedPort(dir="in", source=expr.e2)>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
 
 printUnaryExpr(expr) ::= <<
 \<operation kind="<UnaryOp.(expr.op)>"\>
 	<untypedPort(dir="in", source=expr.expr)>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
 
 printIntExpr(expr) ::= <<
-\<operation kind="$literal_Integer" value="<expr>"\>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+\<operation kind="$literal_Integer" value="<expr.value>"\>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
 
 printBoolExpr(expr) ::= <<
-\<operation kind="$literal_Integer" value="<expr>"\>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+\<operation kind="$literal_Integer" value="<expr.value>"\>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
 
 printVarExpr(expr) ::= <<
-<if(op.cast)>
-<printCast(target=op.target, value=op.value, cast=op.cast)>
-<else>
 \<operation kind="noop"\>
 	<untypedPort(dir="in", source=expr.use.variable)>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
-<endif>
 >>
-
-printCast(target,value,cast) ::= << 
-\<operation kind="cast"\> 
-	<untypedPort(dir="in",source=value.var.variable)> 
-	<typedPort(dir="out",type=target.type,source=target)> 
-\</operation\> 
->> 
 
 ///////////////////////////////////////////////////////////////////////////////
 // XLIM Port
@@ -167,6 +156,7 @@ elseif(op.assign)><printAssign(op)><
 elseif(op.phi)><printPhiAssignment(op)><
 elseif(op.return)><printReturn(op)><
 elseif(op.assignIndex)><printAssignIndex(op)><
+elseif(op.cast)><printCast(op)><
 elseif(op.ternaryOperation)><printTernaryOperation(op)><endif>
 >>
 
@@ -179,18 +169,18 @@ printLoad(op) ::= <<
 <if(op.source.variable.type.list)
 >\<operation kind="var_ref" name="<op.source.name>"\>
 	<op.indexes: { index | <untypedPort(dir="in", source=index.var)> }; separator="\n">
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\><
 else
 >\<operation kind="noop"\>
-	<untypedPort(dir="in", source=op.source)>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+	<untypedPort(dir="in", source=op.source.variable)>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\><endif>
 >>
 
 printStore(op) ::= <<
 \<!-- Store <op> --\>
-<if (op.target.global || op.target.type.list)
+<if (op.target.variable.global || op.target.variable.type.list)
 >\<operation kind="assign" target="<op.target.name>"\>
 	<op.indexes: { index | <untypedPort(dir="in", source=index.var)> }; separator="\n">
 	<untypedPort(dir="in", source=op.value.var)>
@@ -198,7 +188,7 @@ printStore(op) ::= <<
 else
 >\<operation kind="noop"\>
 	<untypedPort(dir="in", source=op.value.var)>
-	<typedPort(dir="out", type=op.value.type, source=op.target)>
+	<typedPort(dir="out", type=op.value.type, source=op.target.variable)>
 \</operation\><endif>
 >>
 
@@ -212,7 +202,7 @@ printPhiAssignment(op) ::= <<
 \<PHI\>
 	<untypedPort(dir="in", source=first(op.values))>
 	<untypedPort(dir="in", source=rest(op.values))>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</PHI\>
 >>
 
@@ -227,16 +217,16 @@ printReturn(return) ::= <<
 
 printAssignIndex(op) ::= <<
 <if(rest(op.indexes))>
-<sizeDeclare(target=op.target, type=op.listType)>
+<sizeDeclare(target=op.target.variable, type=op.listType)>
 \<operation kind="noop"\>
 	<untypedPort(dir="in", source=first(op.indexes))>
-	<typedPort(dir="out", type=op.target.type, source=op.target, extension="_tmp_0")>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable, extension="_tmp_0")>
 \</operation\>
-<flatIndexes(indexes=rest(op.indexes), target=op.target, lastIndex="0", indexMap=op.expressionToIndexMap)>
+<flatIndexes(indexes=rest(op.indexes), target=op.target.variable, lastIndex="0", indexMap=op.expressionToIndexMap)>
 <else>
 \<operation kind="noop"\>
 	<untypedPort(dir="in", source=first(op.indexes))>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 <endif>
 >>
@@ -246,9 +236,16 @@ printTernaryOperation(op) ::= <<
 	<untypedPort(dir="in", source=op.conditionValue)>
 	<untypedPort(dir="in", source=op.trueValue)>
 	<untypedPort(dir="in", source=op.falseValue)>
-	<typedPort(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
+
+printCast(op) ::= << 
+\<operation kind="cast"\> 
+	<untypedPort(dir="in", source=op.source.variable)> 
+	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)> 
+\</operation\> 
+>> 
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO Operations

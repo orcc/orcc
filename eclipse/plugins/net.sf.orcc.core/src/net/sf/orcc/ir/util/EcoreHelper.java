@@ -76,7 +76,7 @@ public class EcoreHelper {
 	 * @param instruction
 	 *            the instruction to add before the given expression
 	 */
-	public static void addInstBeforeExpr(Expression expression,
+	public static boolean addInstBeforeExpr(Expression expression,
 			Instruction instruction) {
 		Instruction instContainer = EcoreHelper.getContainerOfType(expression,
 				Instruction.class);
@@ -84,6 +84,7 @@ public class EcoreHelper {
 			List<Instruction> instructions = EcoreHelper
 					.getContainingList(instContainer);
 			instructions.add(instructions.indexOf(instContainer), instruction);
+			return true;
 		} else {
 			Node nodeContainer = EcoreHelper.getContainerOfType(expression,
 					Node.class);
@@ -93,12 +94,13 @@ public class EcoreHelper {
 				Node previousNode = nodes.get(index - 1);
 				if (previousNode.isBlockNode()) {
 					((NodeBlock) previousNode).add(instruction);
-					return;
+					return false;
 				}
 			}
 			NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
 			nodeBlock.add(instruction);
 			nodes.add(index, nodeBlock);
+			return false;
 		}
 	}
 
