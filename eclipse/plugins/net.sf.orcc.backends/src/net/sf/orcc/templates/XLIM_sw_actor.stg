@@ -96,15 +96,15 @@ elseif(expr.varExpr)><printVarExpr(expr)><endif>
 
 printBinaryExpr(expr) ::= <<
 \<operation kind="<BinOp.(expr.op)>"\>
-	<untypedPort(dir="in", source=expr.e1)>
-	<untypedPort(dir="in", source=expr.e2)>
+	<untypedPort(dir="in", source=expr.e1.use.variable)>
+	<untypedPort(dir="in", source=expr.e2.use.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
 
 printUnaryExpr(expr) ::= <<
 \<operation kind="<UnaryOp.(expr.op)>"\>
-	<untypedPort(dir="in", source=expr.expr)>
+	<untypedPort(dir="in", source=expr.expr.use.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
@@ -167,8 +167,8 @@ printCall(op) ::= <<
 printLoad(op) ::= <<
 \<!-- Load <op> --\>
 <if(op.source.variable.type.list)
->\<operation kind="var_ref" name="<op.source.name>"\>
-	<op.indexes: { index | <untypedPort(dir="in", source=index.var)> }; separator="\n">
+>\<operation kind="var_ref" name="<op.source.variable.name>"\>
+	<op.indexes: { index | <untypedPort(dir="in", source=index.use.variable)> }; separator="\n">
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\><
 else
@@ -181,13 +181,13 @@ else
 printStore(op) ::= <<
 \<!-- Store <op> --\>
 <if (op.target.variable.global || op.target.variable.type.list)
->\<operation kind="assign" target="<op.target.name>"\>
-	<op.indexes: { index | <untypedPort(dir="in", source=index.var)> }; separator="\n">
-	<untypedPort(dir="in", source=op.value.var)>
+>\<operation kind="assign" target="<op.target.variable.name>"\>
+	<op.indexes: { index | <untypedPort(dir="in", source=index.use.variable)> }; separator="\n">
+	<untypedPort(dir="in", source=op.value.use.variable)>
 \</operation\><
 else
 >\<operation kind="noop"\>
-	<untypedPort(dir="in", source=op.value.var)>
+	<untypedPort(dir="in", source=op.value.use.variable)>
 	<typedPort(dir="out", type=op.value.type, source=op.target.variable)>
 \</operation\><endif>
 >>
@@ -200,8 +200,8 @@ printAssign(op) ::= <<
 
 printPhiAssignment(op) ::= <<
 \<PHI\>
-	<untypedPort(dir="in", source=first(op.values))>
-	<untypedPort(dir="in", source=rest(op.values))>
+	<untypedPort(dir="in", source=first(op.values).use.variable)>
+	<untypedPort(dir="in", source=rest(op.values).use.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</PHI\>
 >>
@@ -209,8 +209,8 @@ printPhiAssignment(op) ::= <<
 printReturn(return) ::= <<
 <if(return.value)>
 \<operation kind="noop"\>
-	<untypedPort(dir="in", source=return.value)>
-	<typedPort(dir="out", type=return.value.type, source=procedure, extension="_go")>
+	<untypedPort(dir="in", source=return.value.use.variable)>
+	<typedPort(dir="out", type=return.value.use.variable.type, source=procedure, extension="_go")>
 \</operation\>
 <endif>
 >>
@@ -219,13 +219,13 @@ printAssignIndex(op) ::= <<
 <if(rest(op.indexes))>
 <sizeDeclare(target=op.target.variable, type=op.listType)>
 \<operation kind="noop"\>
-	<untypedPort(dir="in", source=first(op.indexes))>
+	<untypedPort(dir="in", source=first(op.indexes).use.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable, extension="_tmp_0")>
 \</operation\>
 <flatIndexes(indexes=rest(op.indexes), target=op.target.variable, lastIndex="0", indexMap=op.expressionToIndexMap)>
 <else>
 \<operation kind="noop"\>
-	<untypedPort(dir="in", source=first(op.indexes))>
+	<untypedPort(dir="in", source=first(op.indexes).use.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 <endif>
@@ -233,9 +233,9 @@ printAssignIndex(op) ::= <<
 
 printTernaryOperation(op) ::= <<
 \<operation kind="$selector"\>
-	<untypedPort(dir="in", source=op.conditionValue)>
-	<untypedPort(dir="in", source=op.trueValue)>
-	<untypedPort(dir="in", source=op.falseValue)>
+	<untypedPort(dir="in", source=op.conditionValue.use.variable)>
+	<untypedPort(dir="in", source=op.trueValue.use.variable)>
+	<untypedPort(dir="in", source=op.falseValue.use.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
