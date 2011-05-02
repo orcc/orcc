@@ -546,10 +546,10 @@ public class ActorTransformer {
 
 		// creates scheduler and body
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
-				"isSchedulable_" + name, location,
+				"isSchedulable_" + name, EcoreUtil.copy(location),
 				IrFactory.eINSTANCE.createTypeBool());
-		Procedure body = IrFactory.eINSTANCE.createProcedure(name, location,
-				IrFactory.eINSTANCE.createTypeVoid());
+		Procedure body = IrFactory.eINSTANCE.createProcedure(name,
+				EcoreUtil.copy(location), IrFactory.eINSTANCE.createTypeVoid());
 
 		// transforms action body and scheduler
 		transformActionBody(astAction, body, inputPattern, outputPattern);

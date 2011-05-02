@@ -112,6 +112,7 @@ import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -238,8 +239,9 @@ public class IRParser {
 
 		vars = vars.getParent().getParent();
 
-		Action action = IrFactory.eINSTANCE.createAction(body.getLocation(),
-				tag, ip, op, pp, scheduler, body);
+		Action action = IrFactory.eINSTANCE.createAction(
+				EcoreUtil.copy(body.getLocation()), tag, ip, op, pp, scheduler,
+				body);
 		putAction(tag, action);
 		return action;
 	}
