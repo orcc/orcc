@@ -61,6 +61,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -102,7 +103,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected int fifoSize;
 
-	private String inputFile;
+	private IFile inputFile;
 
 	private WriteListener listener;
 
@@ -483,7 +484,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		IProject project = root.getProject(name);
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
-		inputFile = getAttribute(XDF_FILE, "");
+		inputFile = root.getFile(new Path(getAttribute(XDF_FILE, "")));
 
 		String outputFolder;
 		Object obj = options.get(OUTPUT_FOLDER);

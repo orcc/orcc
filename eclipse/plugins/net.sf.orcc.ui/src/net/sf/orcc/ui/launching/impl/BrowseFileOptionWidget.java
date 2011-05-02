@@ -38,10 +38,10 @@ import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -102,8 +102,8 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	/**
 	 * Creates a new input file option.
 	 */
-	public BrowseFileOptionWidget(OrccAbstractSettingsTab tab, BrowseFileOption option,
-			Composite parent) {
+	public BrowseFileOptionWidget(OrccAbstractSettingsTab tab,
+			BrowseFileOption option, Composite parent) {
 		this.launchConfigurationTab = tab;
 		this.option = option;
 		this.value = "";
@@ -217,7 +217,11 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 		// opens the dialog
 		if (tree.open() == Window.OK) {
 			resource = (IResource) tree.getFirstResult();
-			text.setText(resource.getLocation().toOSString());
+			if (option.isWorkspace()) {
+				text.setText(resource.getFullPath().toString());
+			} else {
+				text.setText(resource.getLocation().toOSString());
+			}
 		}
 	}
 
@@ -279,12 +283,17 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 * @return an {@link IResource} instance of the focused file/folder in text
 	 */
 	private IResource getResourceFromText() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		if (option.isFolder()) {
-			return root.getContainerForLocation(new Path(value));
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+		IPath path = new Path(value);
+		if (option.isFolder() && option.isWorkspace()) {
+			return root.getFolder(path);
+		} else if (option.isFolder()) {
+			return root.getContainerForLocation(path);
+		} else if (option.isWorkspace()) {
+			return root.getFile(path);
 		} else {
-			return root.getFileForLocation(new Path(value));
+			return root.getFileForLocation(path);
 		}
 	}
 

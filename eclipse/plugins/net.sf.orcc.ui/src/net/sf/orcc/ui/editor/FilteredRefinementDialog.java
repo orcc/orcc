@@ -56,7 +56,7 @@ import org.eclipse.ui.dialogs.SearchPattern;
  * @author Matthieu Wipliez
  * 
  */
-public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
+public class FilteredRefinementDialog extends FilteredItemsSelectionDialog {
 
 	/**
 	 * This class defines a comparator.
@@ -64,7 +64,7 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class ActorComparator implements Comparator<Object> {
+	private class ResourceComparator implements Comparator<Object> {
 
 		@Override
 		public int compare(Object o1, Object o2) {
@@ -79,9 +79,9 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class ActorFilter extends ItemsFilter {
+	private class ResourceFilter extends ItemsFilter {
 
-		public ActorFilter() {
+		public ResourceFilter() {
 			super(new SearchPattern(SearchPattern.RULE_PATTERN_MATCH));
 
 			// update pattern to look for anything before and after the original
@@ -103,11 +103,13 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 		}
 	}
 
-	private static final String DIALOG_SETTINGS = "net.sf.orcc.ui.editor.FilteredActorsDialog"; //$NON-NLS-1$
+	private static final String DIALOG_SETTINGS = "net.sf.orcc.ui.editor.FilteredRefinementDialog"; //$NON-NLS-1$
 
-	private ActorComparator comparator;
+	private ResourceComparator comparator;
 
 	private IJavaProject project;
+
+	private String fileExt;
 
 	/**
 	 * Creates a new filtered actors dialog.
@@ -115,10 +117,12 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 	 * @param project
 	 * @param shell
 	 */
-	public FilteredActorsDialog(IProject project, Shell shell) {
+	public FilteredRefinementDialog(IProject project, Shell shell,
+			String fileExt) {
 		super(shell);
 		this.project = JavaCore.create(project);
-		comparator = new ActorComparator();
+		comparator = new ResourceComparator();
+		this.fileExt = fileExt;
 	}
 
 	private void addChildren(AbstractContentProvider contentProvider,
@@ -130,12 +134,11 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 			for (IResource member : folder.members()) {
 				addChildren(contentProvider, itemsFilter, path, member);
 			}
-		} else if ("cal".equals(resource.getFileExtension())) {
+		} else if (fileExt.equals(resource.getFileExtension())) {
 			// remove file extension
-			String actorName = resource.getName();
-			actorName = actorName.substring(0, actorName.lastIndexOf('.'));
-
-			contentProvider.add(path + actorName, itemsFilter);
+			String resourceName = resource.getFullPath().removeFileExtension()
+					.lastSegment();
+			contentProvider.add(path + resourceName, itemsFilter);
 		}
 	}
 
@@ -147,7 +150,7 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 
 	@Override
 	protected ItemsFilter createFilter() {
-		return new ActorFilter();
+		return new ResourceFilter();
 	}
 
 	@Override

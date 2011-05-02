@@ -49,6 +49,10 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.serialize.XDFWriter;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
@@ -103,7 +107,10 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 
 	private void flatten() {
 		try {
-			Network network = new XDFParser(xdfFile).parseNetwork();
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			IFile file = root.getFile(new Path(xdfFile));
+			
+			Network network = new XDFParser(file).parseNetwork();
 			network.flatten();
 
 			XDFWriter writer = new XDFWriter(new File(vtlFolder), network);

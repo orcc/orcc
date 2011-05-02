@@ -167,7 +167,11 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	final public void analyzeXDF(String inputFile) throws OrccException {
 		// parses top network
 		listener.writeText("Parsing XDF network...\n");
-		Network network = new XDFParser(inputFile).parseNetwork();
+		
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IFile xdfFile = root.getFile(new Path(inputFile));
+		
+		Network network = new XDFParser(xdfFile).parseNetwork();
 		network.updateIdentifiers();
 		if (isCanceled()) {
 			return;

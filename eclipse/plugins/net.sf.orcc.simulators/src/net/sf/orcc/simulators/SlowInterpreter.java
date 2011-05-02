@@ -63,10 +63,12 @@ import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
@@ -212,7 +214,11 @@ public class SlowInterpreter extends AbstractSimulator {
 	public void start(String mode) {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
-			Network network = new XDFParser(xdfFile).parseNetwork();
+			
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			IFile file = root.getFile(new Path(xdfFile));
+			
+			Network network = new XDFParser(file).parseNetwork();
 
 			// Instantiate the network
 			network.instantiate(vtlFolders);

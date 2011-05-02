@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.network.serialize;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -70,8 +68,13 @@ import net.sf.orcc.network.attributes.TypeAttribute;
 import net.sf.orcc.network.attributes.ValueAttribute;
 import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.DomUtil;
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -484,18 +487,13 @@ public class XDFParser {
 	/**
 	 * absolute file name of the XDF file
 	 */
-	private final File file;
+	private final IFile file;
 
 	private Map<String, Instance> instances;
 
 	private Network network;
 
 	private Instance parent;
-
-	/**
-	 * parent path of {@link #file}
-	 */
-	private final String path;
 
 	/**
 	 * XDF type parser.
@@ -508,9 +506,8 @@ public class XDFParser {
 	 * @param fileName
 	 *            absolute file name of an XDF file
 	 */
-	public XDFParser(String fileName) {
-		file = new File(fileName);
-		path = file.getParent();
+	public XDFParser(IFile file) {
+		this.file = file;
 		exprParser = new ExprParser();
 		typeParser = new TypeParser();
 	}
@@ -520,8 +517,8 @@ public class XDFParser {
 	 * @param fileName
 	 * @param parent
 	 */
-	private XDFParser(String fileName, Instance parent) {
-		this(fileName);
+	private XDFParser(IFile file, Instance parent) {
+		this(file);
 		this.parent = parent;
 	}
 
@@ -539,8 +536,8 @@ public class XDFParser {
 		if (vertexName.isEmpty()) {
 			return null;
 		} else {
-			return IrFactory.eINSTANCE.createPort(IrFactory.eINSTANCE.createLocation(), null,
-					portName);
+			return IrFactory.eINSTANCE.createPort(
+					IrFactory.eINSTANCE.createLocation(), null, portName);
 		}
 	}
 
@@ -706,8 +703,8 @@ public class XDFParser {
 			Type type = cont.getResult();
 			Var var = IrFactory.eINSTANCE.createVar(location, type, name, true,
 					false);
-			network.getParameters().put(file.getAbsolutePath(), location, name,
-					var);
+			network.getParameters().put(file.getFullPath().toString(),
+					location, name, var);
 		} else if (kind.equals("Variable")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
@@ -715,8 +712,8 @@ public class XDFParser {
 			Expression expr = exprParser.parseExpr(cont.getNode());
 			Var var = IrFactory.eINSTANCE.createVar(location, type, name,
 					false, expr);
-			network.getVariables().put(file.getAbsolutePath(), location, name,
-					var);
+			network.getVariables().put(file.getFullPath().toString(), location,
+					name, var);
 		} else {
 			throw new OrccException("unsupported Decl kind: \"" + kind + "\"");
 		}
@@ -773,12 +770,17 @@ public class XDFParser {
 		newInst.getAttributes().putAll(attributes);
 		newInst.getParameters().putAll(parameters);
 
-		File file = new File(path, clasz + ".xdf");
-		if (file.exists()) {
-			// parse and set contents
-			XDFParser parser = new XDFParser(file.getAbsolutePath(), newInst);
-			Network network = parser.parseNetwork();
-			newInst.setContents(network);
+		String fileName = clasz.replace('.', '/') + ".xdf";
+		IProject project = file.getProject();
+		List<IFolder> folders = OrccUtil.getSourceFolders(project);
+		for (IFolder folder : folders) {
+			IFile refinement = folder.getFile(fileName);
+			if (refinement != null && refinement.exists()) {
+				// parse and set contents
+				XDFParser parser = new XDFParser(refinement, newInst);
+				Network network = parser.parseNetwork();
+				newInst.setContents(network);
+			}
 		}
 
 		return newInst;
@@ -795,8 +797,8 @@ public class XDFParser {
 		InputStream is;
 
 		try {
-			is = new FileInputStream(file);
-		} catch (IOException e) {
+			is = file.getContents();
+		} catch (CoreException e) {
 			throw new OrccException("I/O error when parsing network", e);
 		}
 
@@ -889,7 +891,7 @@ public class XDFParser {
 			throw new OrccException("Expected a \"name\" attribute");
 		}
 
-		this.network = new Network(file.getAbsolutePath());
+		this.network = new Network(file.getFullPath().toString());
 		instances = new HashMap<String, Instance>();
 		network.setName(name);
 

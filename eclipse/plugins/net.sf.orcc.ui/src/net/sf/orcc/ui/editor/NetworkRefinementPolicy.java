@@ -37,11 +37,7 @@ import net.sf.orcc.util.OrccUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
@@ -57,8 +53,6 @@ import org.eclipse.ui.PlatformUI;
  * 
  */
 public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
-
-	private final String[] fileExtensions = { "nl", "xdf" };
 
 	@Override
 	public String getNewRefinement(Vertex vertex) {
@@ -77,18 +71,7 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 		if (index == 0) {
 			newRefinement = selectActor(vertex, shell);
 		} else if (index == 1) {
-			// network = same behavior as before
-			newRefinement = useExistingFile(vertex, shell);
-			if (newRefinement != null) {
-				for (String extension : fileExtensions) {
-					IPath path = getAbsolutePath(vertex.getParent()
-							.getFileName(), newRefinement);
-					if (extension.equals(path.getFileExtension())) {
-						return new Path(newRefinement).removeFileExtension()
-								.toString();
-					}
-				}
-			}
+			newRefinement = selectNetwork(vertex, shell);
 		}
 
 		return newRefinement;
@@ -112,25 +95,19 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 			return null;
 		}
 
-		// first try network
-		IPath path = getAbsolutePath(vertex.getParent().getFileName(),
-				refinement);
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		for (String extension : fileExtensions) {
-			IPath extPath = path.addFileExtension(extension);
-			IResource resource = root.findMember(extPath);
-			if (resource != null && resource.getType() == IResource.FILE) {
-				return (IFile) resource;
-			}
-		}
-
-		// then actor
 		IProject project = getProject(vertex);
 		try {
 			List<IFolder> folders = OrccUtil.getAllSourceFolders(project);
 			for (IFolder folder : folders) {
-				String actorPath = refinement.replace('.', '/');
-				IFile file = folder.getFile(new Path(actorPath + ".cal"));
+				String path = refinement.replace('.', '/');
+				// first try network
+				IFile file = folder.getFile(new Path(path + ".xdf"));
+				if (file != null && file.exists()) {
+					return file;
+				}
+
+				// then actor
+				file = folder.getFile(new Path(path + ".cal"));
 				if (file != null && file.exists()) {
 					return file;
 				}
@@ -154,9 +131,38 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 	private String selectActor(Vertex vertex, Shell shell) {
 		IProject project = getProject(vertex);
 
-		FilteredActorsDialog dialog = new FilteredActorsDialog(project, shell);
+		FilteredRefinementDialog dialog = new FilteredRefinementDialog(project,
+				shell, "cal");
 		dialog.setTitle("Select actor");
 		dialog.setMessage("&Select existing actor:");
+		String refinement = getRefinement(vertex);
+		if (refinement != null) {
+			dialog.setInitialPattern(refinement);
+		}
+		int result = dialog.open();
+		if (result == Window.OK) {
+			return (String) dialog.getFirstResult();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Selects the qualified identifier of a network.
+	 * 
+	 * @param vertex
+	 *            a vertex
+	 * @param shell
+	 *            shell
+	 * @return the qualified identifier of a network
+	 */
+	private String selectNetwork(Vertex vertex, Shell shell) {
+		IProject project = getProject(vertex);
+
+		FilteredRefinementDialog dialog = new FilteredRefinementDialog(project,
+				shell, "xdf");
+		dialog.setTitle("Select network");
+		dialog.setMessage("&Select existing network:");
 		String refinement = getRefinement(vertex);
 		if (refinement != null) {
 			dialog.setInitialPattern(refinement);

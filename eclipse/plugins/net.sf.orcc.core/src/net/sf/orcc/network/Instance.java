@@ -316,7 +316,9 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		}
 		if (file == null) {
 			throw new OrccException("Actor \"" + className
-					+ "\" not found! Did you compile the VTL?");
+					+ "\" not found!\nIf this actor has errors, please "
+					+ "correct them and try again; otherwise, try to "
+					+ "refresh/clean projects.");
 		}
 		actor = Network.getActorFromPool(className);
 		if (actor == null) {

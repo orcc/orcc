@@ -265,10 +265,8 @@ public class OrccUtil {
 	 * @param project
 	 *            a project
 	 * @return a list of absolute workspace paths
-	 * @throws CoreException
 	 */
-	public static List<IFolder> getSourceFolders(IProject project)
-			throws CoreException {
+	public static List<IFolder> getSourceFolders(IProject project) {
 		List<IFolder> srcFolders = new ArrayList<IFolder>();
 
 		IJavaProject javaProject = JavaCore.create(project);
@@ -277,11 +275,16 @@ public class OrccUtil {
 		}
 
 		// iterate over package roots
-		for (IPackageFragmentRoot root : javaProject.getPackageFragmentRoots()) {
-			IResource resource = root.getCorrespondingResource();
-			if (resource != null && resource.getType() == IResource.FOLDER) {
-				srcFolders.add((IFolder) resource);
+		try {
+			for (IPackageFragmentRoot root : javaProject
+					.getPackageFragmentRoots()) {
+				IResource resource = root.getCorrespondingResource();
+				if (resource != null && resource.getType() == IResource.FOLDER) {
+					srcFolders.add((IFolder) resource);
+				}
 			}
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 
 		return srcFolders;

@@ -47,7 +47,11 @@ import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
@@ -279,8 +283,6 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 	private TreeViewer viewer;
 
-	private String xdfFile;
-
 	@Override
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -359,18 +361,22 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void initializeFrom(ILaunchConfiguration configuration) {
+		String xdfFileName;
 		try {
-			xdfFile = configuration.getAttribute(XDF_FILE, "");
+			xdfFileName = configuration.getAttribute(XDF_FILE, "");
 			mapping = new HashMap<String, String>(configuration.getAttribute(
 					MAPPING, Collections.EMPTY_MAP));
 		} catch (CoreException e) {
-			xdfFile = "";
+			xdfFileName = "";
 			mapping = new HashMap<String, String>(0);
 			e.printStackTrace();
 		}
 
-		if (!xdfFile.isEmpty()) {
+		if (!xdfFileName.isEmpty()) {
 			try {
+				IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+				IFile xdfFile = root.getFile(new Path(xdfFileName));
+
 				network = new XDFParser(xdfFile).parseNetwork();
 				network.updateIdentifiers();
 
