@@ -33,7 +33,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Var;
 
 /**
@@ -46,12 +48,34 @@ public class XlimActorTemplateData {
 
 	private Map<Action, Map<Port, Map<Integer, Var>>> customPeekedMapPerAction;
 
+	private Map<State, Integer> stateToIndexMap;
+
+	public XlimActorTemplateData() {
+		customPeekedMapPerAction = new HashMap<Action, Map<Port, Map<Integer, Var>>>();
+	}
+
+	private void computeStateToIndexMap(Actor actor) {
+		if (actor.hasFsm()) {
+			int i = 0;
+			for (State state : actor.getFsm().getStates()) {
+				stateToIndexMap.put(state, i);
+				i++;
+			}
+		}
+	}
+
+	public void computeTemplateMaps(Actor actor) {
+		stateToIndexMap = new HashMap<State, Integer>();
+
+		computeStateToIndexMap(actor);
+	}
+
 	public Map<Action, Map<Port, Map<Integer, Var>>> getCustomPeekedMapPerAction() {
 		return customPeekedMapPerAction;
 	}
 
-	public XlimActorTemplateData() {
-		customPeekedMapPerAction = new HashMap<Action, Map<Port, Map<Integer, Var>>>();
+	public Map<State, Integer> getStateToIndexMap() {
+		return stateToIndexMap;
 	}
 
 }

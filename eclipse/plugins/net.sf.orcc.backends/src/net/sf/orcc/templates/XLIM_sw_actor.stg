@@ -707,16 +707,16 @@ Transitions(actions, transitions) ::= <<
 >>
 
 enumStates(transition)::= <<
-\<operation kind="$literal_Integer" value="<transition.sourceState.index>"\>
-	\<port dir="out" size="32" source="s_<transition.sourceState>" typeName="int"/\>
+\<operation kind="$literal_Integer" value="<instance.actor.templateData.stateToIndexMap.(transition.sourceState)>"\>
+	\<port dir="out" size="32" source="s_<transition.sourceState.name>" typeName="int"/\>
 \</operation\>
 >>
 
 schedulerFSM(actions, fsm) ::= <<
 
-\<!-- Initializing with the initial state "s_<fsm.initialState>" --\>
+\<!-- Initializing with the initial state "s_<fsm.initialState.name>" --\>
 \<stateVar name="currentState"\>
-	\<initValue size="32" typeName="int" value="<fsm.initialState.index>"/\>
+	\<initValue size="32" typeName="int" value="<instance.actor.templateData.stateToIndexMap.(fsm.initialState)>"/\>
 \</stateVar\>
 \<module autostart="true" kind="action-scheduler" name="<instance.id>_scheduler" sourcename="<instance.id>_scheduler"\>
 	\<operation kind="$literal_Integer" value="1"\>

@@ -40,22 +40,10 @@ import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.transformations.CastAdderTransformation;
-import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
-import net.sf.orcc.backends.xlim.transformations.ArrayInitializeTransformation;
-import net.sf.orcc.backends.xlim.transformations.ConstantPhiValuesTransformation;
-import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
-import net.sf.orcc.backends.xlim.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
-import net.sf.orcc.backends.xlim.transformations.TernaryOperationAdder;
-import net.sf.orcc.backends.xlim.transformations.UnaryListToScalarTransformation;
-import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
-import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BuildCFG;
-import net.sf.orcc.ir.transformations.DeadCodeElimination;
-import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.network.Instance;
@@ -115,25 +103,28 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		actor.setTemplateData(new XlimActorTemplateData());
+		XlimActorTemplateData data = new XlimActorTemplateData();
+		data.computeTemplateMaps(actor);
+		actor.setTemplateData(data);
 
 		ActorVisitor<?>[] transformations = {
-				//new ArrayInitializeTransformation(),
-				//new TernaryOperationAdder(),
-				//new InlineTransformation(true, true),
-				//new UnaryListToScalarTransformation(), new CustomPeekAdder(),
-				//new DeadGlobalElimination(), new DeadCodeElimination(),
-				//new XlimDeadVariableRemoval(), 
-				//new ListFlattenTransformation(),
+				// new ArrayInitializeTransformation(),
+				// new TernaryOperationAdder(),
+				// new InlineTransformation(true, true),
+				// new UnaryListToScalarTransformation(), new CustomPeekAdder(),
+				// new DeadGlobalElimination(), new DeadCodeElimination(),
+				// new XlimDeadVariableRemoval(),
+				// new ListFlattenTransformation(),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
-				//new CastAdderTransformation(),
-				//new ConstantPhiValuesTransformation(),
-				new MoveLiteralIntegers()//, new XlimVariableRenamer()
-				};
+				// new CastAdderTransformation(),
+				// new ConstantPhiValuesTransformation(),
+				new MoveLiteralIntegers() // , new XlimVariableRenamer()
+		};
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
-			System.out.println(transformation.getClass().getCanonicalName() + " => " + actor.getName());
+			System.out.println(transformation.getClass().getCanonicalName()
+					+ " => " + actor.getName());
 			if (debugMode && !EcoreHelper.serializeActor(path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
@@ -173,10 +164,10 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected boolean printInstance(Instance instance) {
 		InstancePrinter printer;
 		if (hardwareGen) {
-			printer = new InstancePrinter("XLIM_hw_actor", true);
+			printer = new InstancePrinter("XLIM_hw_actor", !debugMode);
 			printer.getOptions().put("fpgaType", fpgaType);
 		} else {
-			printer = new InstancePrinter("XLIM_sw_actor", true);
+			printer = new InstancePrinter("XLIM_sw_actor", !debugMode);
 		}
 
 		printer.setExpressionPrinter(new XlimExprPrinter());
