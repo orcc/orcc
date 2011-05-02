@@ -161,19 +161,19 @@ public class ExpressionSplitter extends
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
-		SplitExpressionList(call.getParameters());
+		splitExpressionList(call.getParameters());
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
-		SplitExpressionList(load.getIndexes());
+		splitExpressionList(load.getIndexes());
 		return null;
 	}
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
-		SplitExpressionList(phi.getValues());
+		splitExpressionList(phi.getValues());
 		return null;
 	}
 
@@ -188,7 +188,7 @@ public class ExpressionSplitter extends
 
 	@Override
 	public Expression caseInstStore(InstStore store) {
-		SplitExpressionList(store.getIndexes());
+		splitExpressionList(store.getIndexes());
 		return null;
 	}
 
@@ -209,7 +209,7 @@ public class ExpressionSplitter extends
 		return null;
 	}
 
-	private void SplitExpressionList(EList<Expression> expressions) {
+	private void splitExpressionList(EList<Expression> expressions) {
 		EList<Expression> newExpressions = new BasicEList<Expression>();
 		for (int i = 0; i < expressions.size();) {
 			Expression expression = expressions.get(i);

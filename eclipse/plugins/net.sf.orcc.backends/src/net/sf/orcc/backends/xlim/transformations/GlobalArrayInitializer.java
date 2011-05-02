@@ -50,7 +50,7 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Herve Yviquel
  * 
  */
-public class ArrayInitializeTransformation extends AbstractActorVisitor<Object> {
+public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 
 	private class SpecialActorInterpreter extends ActorInterpreter {
 

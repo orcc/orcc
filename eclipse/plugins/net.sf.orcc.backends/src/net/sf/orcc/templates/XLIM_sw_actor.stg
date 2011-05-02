@@ -316,7 +316,7 @@ sizeDeclare(target,type) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printNodes(nodes) ::= <<
-<nodes: {node|<printNode(node)>}>
+<nodes: printNode(); separator="\n">
 >>
 
 printNode(node) ::= <<

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -47,12 +46,11 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -123,35 +121,26 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
-		EList<Expression> parameters = call.getParameters();
-		for (Expression expr : parameters) {
-			parameters.set(parameters.indexOf(expr), doSwitch(expr));
-		}
+		transformExpressionList(call.getParameters());
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
-		EList<Expression> indexes = load.getIndexes();
-		for (Expression expr : indexes) {
-			indexes.set(indexes.indexOf(expr), doSwitch(expr));
-		}
+		transformExpressionList(load.getIndexes());
 		return null;
 	}
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
-		EList<Expression> values = phi.getValues();
-		for (Expression expr : values) {
-			values.set(values.indexOf(expr), doSwitch(expr));
-		}
+		transformExpressionList(phi.getValues());
 		return null;
 	}
 
 	@Override
 	public Expression caseInstReturn(InstReturn returnInstr) {
-		Expression expr = returnInstr.getValue();
-		if (expr != null) {
+		if (!procedure.getReturnType().isVoid()) {
+			Expression expr = returnInstr.getValue();
 			returnInstr.setValue(doSwitch(expr));
 		}
 		return null;
@@ -159,10 +148,8 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstStore(InstStore store) {
-		EList<Expression> indexes = store.getIndexes();
-		for (Expression expr : indexes) {
-			indexes.set(indexes.indexOf(expr), doSwitch(expr));
-		}
+		store.setValue(doSwitch(store.getValue()));
+		transformExpressionList(store.getIndexes());
 		return null;
 	}
 
@@ -188,31 +175,24 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
 						+ "expr");
 
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, EcoreHelper.copy(expr));
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
+				EcoreHelper.copy(expr));
 		EcoreHelper.addInstBeforeExpr(expr, assign);
 
 		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
-	public ExprBinary transformUnaryExpr(ExprUnary expr) {
-		Expression constExpr;
-		Type type = expr.getType();
-
-		switch (expr.getOp()) {
-		case MINUS:
-			constExpr = IrFactory.eINSTANCE.createExprInt(0);
-			return IrFactory.eINSTANCE.createExprBinary(constExpr,
-					OpBinary.MINUS, expr, type);
-		case LOGIC_NOT:
-			constExpr = IrFactory.eINSTANCE.createExprBool(false);
-			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
-					constExpr, type);
-		case BITNOT:
-			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.BITXOR,
-					expr, type);
-		default:
-			throw new OrccRuntimeException("unsupported operator");
+	private void transformExpressionList(EList<Expression> expressions) {
+		EList<Expression> newExpressions = new BasicEList<Expression>();
+		for (int i = 0; i < expressions.size();) {
+			Expression expression = expressions.get(i);
+			newExpressions.add(doSwitch(expression));
+			if (expression != null) {
+				i++;
+			}
 		}
+		expressions.clear();
+		expressions.addAll(newExpressions);
 	}
 
 }

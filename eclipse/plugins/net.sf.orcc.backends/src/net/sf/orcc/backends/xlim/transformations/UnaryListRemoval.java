@@ -56,13 +56,13 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Herve Yviquel
  * 
  */
-public class UnaryListToScalarTransformation extends
+public class UnaryListRemoval extends
 		AbstractActorVisitor<Object> {
 
 	private Map<Instruction, InstAssign> toBeAdded;
 	private List<Instruction> toBeRemoved;
 
-	public UnaryListToScalarTransformation() {
+	public UnaryListRemoval() {
 		toBeRemoved = new ArrayList<Instruction>();
 		toBeAdded = new HashMap<Instruction, InstAssign>();
 	}
