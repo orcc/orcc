@@ -201,7 +201,7 @@ printAssign(op) ::= <<
 printPhiAssignment(op) ::= <<
 \<PHI\>
 	<untypedPort(dir="in", source=first(op.values).use.variable)>
-	<untypedPort(dir="in", source=rest(op.values).use.variable)>
+	<untypedPort(dir="in", source=last(op.values).use.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</PHI\>
 >>
