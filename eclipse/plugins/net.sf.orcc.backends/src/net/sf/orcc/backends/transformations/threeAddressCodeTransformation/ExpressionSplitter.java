@@ -26,10 +26,9 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations;
+package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
-import net.sf.orcc.backends.instructions.InstCast;
-import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -45,70 +44,113 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * Add cast in IR in the form of assign instruction where target's type differs
- * from source type.
+ * Split expression and effective node that contains more than one fundamental
+ * operation into a series of simple expressions.
  * 
- * @author Jerome Goring
- * @author Herve Yviquel
+ * @author Jerome GORIN
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
-public class CastAdderTransformation extends AbstractActorVisitor<Expression> {
+public class ExpressionSplitter extends
+		AbstractActorVisitor<Expression> {
+
+	public ExpressionSplitter() {
+		super(true);
+	}
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
 		expr.setE1(doSwitch(expr.getE1()));
 		expr.setE2(doSwitch(expr.getE2()));
-		return castExpression(expr);
+
+		// Make a new assignment to the binary expression
+		Var target = procedure.newTempLocalVariable(
+				EcoreHelper.copy(expr.getType()), procedure.getName() + "_"
+						+ "expr");
+
+		// Add assignment to instruction's list
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
+				EcoreHelper.copy(expr));
+		if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
+			indexInst++;
+		}
+
+		EcoreHelper.delete(expr);
+
+		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
 	@Override
 	public Expression caseExprBool(ExprBool expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprFloat(ExprFloat expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprInt(ExprInt expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprList(ExprList expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprString(ExprString expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprUnary(ExprUnary expr) {
 		expr.setExpr(doSwitch(expr.getExpr()));
-		return castExpression(expr);
+		Expression newExpr;
+
+		switch (expr.getOp()) {
+		case MINUS:
+			newExpr = IrFactory.eINSTANCE.createExprBinary(
+					IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
+					expr.getExpr(), expr.getType());
+			break;
+		case LOGIC_NOT:
+			newExpr = IrFactory.eINSTANCE.createExprBinary(expr.getExpr(),
+					OpBinary.EQ, IrFactory.eINSTANCE.createExprBool(false),
+					expr.getType());
+			break;
+		case BITNOT:
+			newExpr = IrFactory.eINSTANCE.createExprBinary(expr.getExpr(),
+					OpBinary.BITXOR, EcoreHelper.copy(expr.getExpr()),
+					expr.getType());
+			break;
+		default:
+			throw new OrccRuntimeException("unsupported operator");
+		}
+
+		EcoreHelper.delete(expr);
+
+		return newExpr;
 	}
 
 	@Override
 	public Expression caseExprVar(ExprVar expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
@@ -119,52 +161,26 @@ public class CastAdderTransformation extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
-		EList<Expression> parameters = call.getParameters();
-		for (Expression expr : parameters) {
-			parameters.set(parameters.indexOf(expr), doSwitch(expr));
-		}
+		SplitExpressionList(call.getParameters());
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
-		EList<Expression> indexes = load.getIndexes();
-		for (Expression expr : indexes) {
-			indexes.set(indexes.indexOf(expr), doSwitch(expr));
-		}
-
-		Var source = load.getSource().getVariable();
-		Var target = load.getTarget().getVariable();
-
-		if (needCast(target.getType(), source.getType())) {
-			Var newTarget = procedure.newTempLocalVariable(
-					EcoreUtil.copy(source.getType()),
-					"casted_" + target.getName());
-			newTarget.setIndex(1);
-
-			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
-					newTarget, target);
-
-			load.getBlock().add(indexInst, cast);
-			load.setTarget(IrFactory.eINSTANCE.createDef(newTarget));
-		}
-
+		SplitExpressionList(load.getIndexes());
 		return null;
 	}
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
-		EList<Expression> values = phi.getValues();
-		for (Expression expr : values) {
-			values.set(values.indexOf(expr), doSwitch(expr));
-		}
+		SplitExpressionList(phi.getValues());
 		return null;
 	}
 
 	@Override
 	public Expression caseInstReturn(InstReturn returnInstr) {
-		Expression expr = returnInstr.getValue();
-		if (expr != null) {
+		if (!procedure.getReturnType().isVoid()) {
+			Expression expr = returnInstr.getValue();
 			returnInstr.setValue(doSwitch(expr));
 		}
 		return null;
@@ -172,11 +188,7 @@ public class CastAdderTransformation extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstStore(InstStore store) {
-		EList<Expression> indexes = store.getIndexes();
-		for (Expression expr : indexes) {
-			indexes.set(indexes.indexOf(expr), doSwitch(expr));
-		}
-		doSwitch(store.getValue());
+		SplitExpressionList(store.getIndexes());
 		return null;
 	}
 
@@ -197,62 +209,16 @@ public class CastAdderTransformation extends AbstractActorVisitor<Expression> {
 		return null;
 	}
 
-	private Expression castExpression(Expression expr) {
-		Type parentType = getParentType(expr);
-
-		if (needCast(expr.getType(), parentType)) {
-			Var oldVar;
-			if (expr.isVarExpr()) {
-				oldVar = ((ExprVar) expr).getUse().getVariable();
-			} else {
-				oldVar = procedure.newTempLocalVariable(
-						EcoreUtil.copy(expr.getType()),
-						"expr_" + procedure.getName());
-				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						oldVar, EcoreHelper.copy(expr));
-				EcoreHelper.addInstBeforeExpr(expr, assign);
-			}
-
-			Var newVar = procedure.newTempLocalVariable(
-					EcoreUtil.copy(parentType),
-					"castedExpr_" + procedure.getName());
-			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
-					oldVar, newVar);
-			EcoreHelper.addInstBeforeExpr(expr, cast);
-			return IrFactory.eINSTANCE.createExprVar(newVar);
-		}
-
-		return expr;
-	}
-
-	private Type getParentType(Expression expr) {
-		Expression parentExpr = EcoreHelper.getContainerOfType(expr,
-				Expression.class);
-		if (parentExpr != null) {
-			return parentExpr.getType();
-		} else {
-			Instruction parentInst = EcoreHelper.getContainerOfType(expr,
-					Instruction.class);
-			if (parentInst.isStore()) {
-				return ((InstStore) parentInst).getTarget().getVariable()
-						.getType();
-			} else if (parentInst.isPhi()) {
-				return ((InstPhi) parentInst).getTarget().getVariable()
-						.getType();
-			} else if (parentInst.isReturn()) {
-				return procedure.getReturnType();
-			} else if (parentInst.isCall()) {
-				int index = EcoreHelper.getContainingList(expr).indexOf(expr);
-				return ((InstCall) parentInst).getProcedure().getParameters()
-						.get(index).getType();
+	private void SplitExpressionList(EList<Expression> expressions) {
+		EList<Expression> newExpressions = new BasicEList<Expression>();
+		for (int i = 0; i < expressions.size();) {
+			Expression expression = expressions.get(i);
+			newExpressions.add(doSwitch(expression));
+			if (expression != null) {
+				i++;
 			}
 		}
-		return null;
+		expressions.clear();
+		expressions.addAll(newExpressions);
 	}
-
-	private boolean needCast(Type type1, Type type2) {
-		return (type1.getClass() != type2.getClass())
-				|| (type1.getSizeInBits() != type2.getSizeInBits());
-	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
+package net.sf.orcc.backends.xlim.transformations;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
@@ -48,26 +48,27 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
-import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * Split expression and effective node that contains more than one fundamental
- * operation into a series of simple expressions.
  * 
- * @author Jerome GORIN
- * @author Matthieu Wipliez
+ * This class defines a transformation that transforms literals used in
+ * instructions into variables. This transformation is needed since XLIM ports
+ * cannot contain literals.
+ * 
+ * @author Ghislain Roquier
  * @author Herve Yviquel
  * 
  */
-public class ExpressionSplitterTransformation extends
-		AbstractActorVisitor<Expression> {
+public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
-	public ExpressionSplitterTransformation() {
+	public LiteralIntegersAdder() {
 		super(true);
 	}
 
@@ -75,77 +76,38 @@ public class ExpressionSplitterTransformation extends
 	public Expression caseExprBinary(ExprBinary expr) {
 		expr.setE1(doSwitch(expr.getE1()));
 		expr.setE2(doSwitch(expr.getE2()));
-
-		// Make a new assignment to the binary expression
-		Var target = procedure.newTempLocalVariable(
-				EcoreHelper.copy(expr.getType()), procedure.getName() + "_"
-						+ "expr");
-
-		// Add assignment to instruction's list
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
-				EcoreHelper.copy(expr));
-		if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
-			indexInst++;
-		}
-
-		EcoreHelper.delete(expr);
-
-		return IrFactory.eINSTANCE.createExprVar(target);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprBool(ExprBool expr) {
-		return expr;
+		return createExprVarAndAssign(expr);
 	}
 
 	@Override
 	public Expression caseExprFloat(ExprFloat expr) {
-		return expr;
+		return createExprVarAndAssign(expr);
 	}
 
 	@Override
 	public Expression caseExprInt(ExprInt expr) {
-		return expr;
+		return createExprVarAndAssign(expr);
 	}
 
 	@Override
 	public Expression caseExprList(ExprList expr) {
-		return expr;
+		return createExprVarAndAssign(expr);
 	}
 
 	@Override
 	public Expression caseExprString(ExprString expr) {
-		return expr;
+		return createExprVarAndAssign(expr);
 	}
 
 	@Override
 	public Expression caseExprUnary(ExprUnary expr) {
 		expr.setExpr(doSwitch(expr.getExpr()));
-		Expression newExpr;
-
-		switch (expr.getOp()) {
-		case MINUS:
-			newExpr = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
-					expr.getExpr(), expr.getType());
-			break;
-		case LOGIC_NOT:
-			newExpr = IrFactory.eINSTANCE.createExprBinary(expr.getExpr(),
-					OpBinary.EQ, IrFactory.eINSTANCE.createExprBool(false),
-					expr.getType());
-			break;
-		case BITNOT:
-			newExpr = IrFactory.eINSTANCE.createExprBinary(expr.getExpr(),
-					OpBinary.BITXOR, EcoreHelper.copy(expr.getExpr()),
-					expr.getType());
-			break;
-		default:
-			throw new OrccRuntimeException("unsupported operator");
-		}
-
-		EcoreHelper.delete(expr);
-
-		return newExpr;
+		return expr;
 	}
 
 	@Override
@@ -161,26 +123,35 @@ public class ExpressionSplitterTransformation extends
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
-		SplitExpressionList(call.getParameters());
+		EList<Expression> parameters = call.getParameters();
+		for (Expression expr : parameters) {
+			parameters.set(parameters.indexOf(expr), doSwitch(expr));
+		}
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
-		SplitExpressionList(load.getIndexes());
+		EList<Expression> indexes = load.getIndexes();
+		for (Expression expr : indexes) {
+			indexes.set(indexes.indexOf(expr), doSwitch(expr));
+		}
 		return null;
 	}
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
-		SplitExpressionList(phi.getValues());
+		EList<Expression> values = phi.getValues();
+		for (Expression expr : values) {
+			values.set(values.indexOf(expr), doSwitch(expr));
+		}
 		return null;
 	}
 
 	@Override
 	public Expression caseInstReturn(InstReturn returnInstr) {
-		if (!procedure.getReturnType().isVoid()) {
-			Expression expr = returnInstr.getValue();
+		Expression expr = returnInstr.getValue();
+		if (expr != null) {
 			returnInstr.setValue(doSwitch(expr));
 		}
 		return null;
@@ -188,7 +159,10 @@ public class ExpressionSplitterTransformation extends
 
 	@Override
 	public Expression caseInstStore(InstStore store) {
-		SplitExpressionList(store.getIndexes());
+		EList<Expression> indexes = store.getIndexes();
+		for (Expression expr : indexes) {
+			indexes.set(indexes.indexOf(expr), doSwitch(expr));
+		}
 		return null;
 	}
 
@@ -209,16 +183,36 @@ public class ExpressionSplitterTransformation extends
 		return null;
 	}
 
-	private void SplitExpressionList(EList<Expression> expressions) {
-		EList<Expression> newExpressions = new BasicEList<Expression>();
-		for (int i = 0; i < expressions.size();) {
-			Expression expression = expressions.get(i);
-			newExpressions.add(doSwitch(expression));
-			if (expression != null) {
-				i++;
-			}
-		}
-		expressions.clear();
-		expressions.addAll(newExpressions);
+	private Expression createExprVarAndAssign(Expression expr) {
+		Var target = procedure.newTempLocalVariable(
+				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
+						+ "expr");
+
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, EcoreHelper.copy(expr));
+		EcoreHelper.addInstBeforeExpr(expr, assign);
+
+		return IrFactory.eINSTANCE.createExprVar(target);
 	}
+
+	public ExprBinary transformUnaryExpr(ExprUnary expr) {
+		Expression constExpr;
+		Type type = expr.getType();
+
+		switch (expr.getOp()) {
+		case MINUS:
+			constExpr = IrFactory.eINSTANCE.createExprInt(0);
+			return IrFactory.eINSTANCE.createExprBinary(constExpr,
+					OpBinary.MINUS, expr, type);
+		case LOGIC_NOT:
+			constExpr = IrFactory.eINSTANCE.createExprBool(false);
+			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
+					constExpr, type);
+		case BITNOT:
+			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.BITXOR,
+					expr, type);
+		default:
+			throw new OrccRuntimeException("unsupported operator");
+		}
+	}
+
 }

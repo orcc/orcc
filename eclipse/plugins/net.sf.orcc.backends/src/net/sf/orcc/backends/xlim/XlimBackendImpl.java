@@ -40,9 +40,9 @@ import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.transformations.InlineTransformation;
-import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
-import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
+import net.sf.orcc.backends.transformations.Inliner;
+import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitter;
+import net.sf.orcc.backends.xlim.transformations.LiteralIntegersAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.util.ActorVisitor;
@@ -111,15 +111,15 @@ public class XlimBackendImpl extends AbstractBackend {
 		ActorVisitor<?>[] transformations = {
 				// new ArrayInitializeTransformation(),
 				// new TernaryOperationAdder(),
-				new InlineTransformation(true, true),
+				new Inliner(true, true),
 				// new UnaryListToScalarTransformation(), new CustomPeekAdder(),
 				// new DeadGlobalElimination(), new DeadCodeElimination(),
 				// new XlimDeadVariableRemoval(),
 				// new ListFlattenTransformation(),
-				new ExpressionSplitterTransformation(), new BuildCFG(),
+				new ExpressionSplitter(), new BuildCFG(),
 				// new CastAdderTransformation(),
 				// new ConstantPhiValuesTransformation(),
-				new MoveLiteralIntegers() // , new XlimVariableRenamer()
+				new LiteralIntegersAdder() // , new XlimVariableRenamer()
 		};
 
 		for (ActorVisitor<?> transformation : transformations) {

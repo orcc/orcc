@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
-import net.sf.orcc.backends.transformations.CastAdderTransformation;
+import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -58,9 +58,9 @@ public class ThreeAddressCodeTransformation extends
 	@Override
 	public Object caseActor(Actor actor) {
 		ActorVisitor<?>[] transformations = {
-				new CopyPropagationTransformation(),
-				new ExpressionSplitterTransformation(), new BuildCFG(),
-				new CastAdderTransformation() };
+				new CopyPropagator(),
+				new ExpressionSplitter(), new BuildCFG(),
+				new CastAdder() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);

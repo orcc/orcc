@@ -62,7 +62,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Matthieu Wipliez
  * 
  */
-public class InlineTransformation extends AbstractActorVisitor<Object> {
+public class Inliner extends AbstractActorVisitor<Object> {
 
 	private boolean inlineFunction;
 
@@ -70,7 +70,7 @@ public class InlineTransformation extends AbstractActorVisitor<Object> {
 
 	protected Map<Var, Var> variableToLocalVariableMap;
 
-	public InlineTransformation(boolean inlineProcedure, boolean inlineFunction) {
+	public Inliner(boolean inlineProcedure, boolean inlineFunction) {
 		this.inlineProcedure = inlineProcedure;
 		this.inlineFunction = inlineFunction;
 	}

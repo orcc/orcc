@@ -65,14 +65,14 @@ import org.eclipse.emf.common.util.EList;
  * @author Jerome GORIN
  * 
  */
-public class CopyPropagationTransformation extends
+public class CopyPropagator extends
 		AbstractActorVisitor<Expression> {
 
 	private Map<Var, Expression> copyVars;
 
 	private List<Instruction> removedInstrs;
 
-	public CopyPropagationTransformation() {
+	public CopyPropagator() {
 		copyVars = new HashMap<Var, Expression>();
 		removedInstrs = new ArrayList<Instruction>();
 

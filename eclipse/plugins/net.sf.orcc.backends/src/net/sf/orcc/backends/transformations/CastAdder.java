@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,9 +26,10 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.xlim.transformations;
+package net.sf.orcc.backends.transformations;
 
-import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.backends.instructions.InstCast;
+import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -44,10 +45,10 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -57,62 +58,57 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
+ * Add cast in IR in the form of assign instruction where target's type differs
+ * from source type.
  * 
- * This class defines a transformation that transforms literals used in
- * instructions into variables. This transformation is needed since XLIM ports
- * cannot contain literals.
- * 
- * @author Ghislain Roquier
+ * @author Jerome Goring
  * @author Herve Yviquel
+ * @author Matthieu Wipliez
  * 
  */
-public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
-
-	public MoveLiteralIntegers() {
-		super(true);
-	}
+public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
 		expr.setE1(doSwitch(expr.getE1()));
 		expr.setE2(doSwitch(expr.getE2()));
-		return expr;
+		return castExpression(expr);
 	}
 
 	@Override
 	public Expression caseExprBool(ExprBool expr) {
-		return createExprVarAndAssign(expr);
+		return castExpression(expr);
 	}
 
 	@Override
 	public Expression caseExprFloat(ExprFloat expr) {
-		return createExprVarAndAssign(expr);
+		return castExpression(expr);
 	}
 
 	@Override
 	public Expression caseExprInt(ExprInt expr) {
-		return createExprVarAndAssign(expr);
+		return castExpression(expr);
 	}
 
 	@Override
 	public Expression caseExprList(ExprList expr) {
-		return createExprVarAndAssign(expr);
+		return castExpression(expr);
 	}
 
 	@Override
 	public Expression caseExprString(ExprString expr) {
-		return createExprVarAndAssign(expr);
+		return castExpression(expr);
 	}
 
 	@Override
 	public Expression caseExprUnary(ExprUnary expr) {
 		expr.setExpr(doSwitch(expr.getExpr()));
-		return expr;
+		return castExpression(expr);
 	}
 
 	@Override
 	public Expression caseExprVar(ExprVar expr) {
-		return expr;
+		return castExpression(expr);
 	}
 
 	@Override
@@ -136,6 +132,23 @@ public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
 		for (Expression expr : indexes) {
 			indexes.set(indexes.indexOf(expr), doSwitch(expr));
 		}
+
+		Var source = load.getSource().getVariable();
+		Var target = load.getTarget().getVariable();
+
+		if (needCast(target.getType(), source.getType())) {
+			Var newTarget = procedure.newTempLocalVariable(
+					EcoreUtil.copy(source.getType()),
+					"casted_" + target.getName());
+			newTarget.setIndex(1);
+
+			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+					newTarget, target);
+
+			load.getBlock().add(indexInst, cast);
+			load.setTarget(IrFactory.eINSTANCE.createDef(newTarget));
+		}
+
 		return null;
 	}
 
@@ -163,6 +176,7 @@ public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
 		for (Expression expr : indexes) {
 			indexes.set(indexes.indexOf(expr), doSwitch(expr));
 		}
+		doSwitch(store.getValue());
 		return null;
 	}
 
@@ -183,36 +197,62 @@ public class MoveLiteralIntegers extends AbstractActorVisitor<Expression> {
 		return null;
 	}
 
-	private Expression createExprVarAndAssign(Expression expr) {
-		Var target = procedure.newTempLocalVariable(
-				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
-						+ "expr");
+	private Expression castExpression(Expression expr) {
+		Type parentType = getParentType(expr);
 
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target, EcoreHelper.copy(expr));
-		EcoreHelper.addInstBeforeExpr(expr, assign);
+		if (needCast(expr.getType(), parentType)) {
+			Var oldVar;
+			if (expr.isVarExpr()) {
+				oldVar = ((ExprVar) expr).getUse().getVariable();
+			} else {
+				oldVar = procedure.newTempLocalVariable(
+						EcoreUtil.copy(expr.getType()),
+						"expr_" + procedure.getName());
+				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
+						oldVar, EcoreHelper.copy(expr));
+				EcoreHelper.addInstBeforeExpr(expr, assign);
+			}
 
-		return IrFactory.eINSTANCE.createExprVar(target);
+			Var newVar = procedure.newTempLocalVariable(
+					EcoreUtil.copy(parentType),
+					"castedExpr_" + procedure.getName());
+			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+					oldVar, newVar);
+			EcoreHelper.addInstBeforeExpr(expr, cast);
+			return IrFactory.eINSTANCE.createExprVar(newVar);
+		}
+
+		return expr;
 	}
 
-	public ExprBinary transformUnaryExpr(ExprUnary expr) {
-		Expression constExpr;
-		Type type = expr.getType();
-
-		switch (expr.getOp()) {
-		case MINUS:
-			constExpr = IrFactory.eINSTANCE.createExprInt(0);
-			return IrFactory.eINSTANCE.createExprBinary(constExpr,
-					OpBinary.MINUS, expr, type);
-		case LOGIC_NOT:
-			constExpr = IrFactory.eINSTANCE.createExprBool(false);
-			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.EQ,
-					constExpr, type);
-		case BITNOT:
-			return IrFactory.eINSTANCE.createExprBinary(expr, OpBinary.BITXOR,
-					expr, type);
-		default:
-			throw new OrccRuntimeException("unsupported operator");
+	private Type getParentType(Expression expr) {
+		Expression parentExpr = EcoreHelper.getContainerOfType(expr,
+				Expression.class);
+		if (parentExpr != null) {
+			return parentExpr.getType();
+		} else {
+			Instruction parentInst = EcoreHelper.getContainerOfType(expr,
+					Instruction.class);
+			if (parentInst.isStore()) {
+				return ((InstStore) parentInst).getTarget().getVariable()
+						.getType();
+			} else if (parentInst.isPhi()) {
+				return ((InstPhi) parentInst).getTarget().getVariable()
+						.getType();
+			} else if (parentInst.isReturn()) {
+				return procedure.getReturnType();
+			} else if (parentInst.isCall()) {
+				int index = EcoreHelper.getContainingList(expr).indexOf(expr);
+				return ((InstCall) parentInst).getProcedure().getParameters()
+						.get(index).getType();
+			}
 		}
+		return null;
+	}
+
+	private boolean needCast(Type type1, Type type2) {
+		return (type1.getClass() != type2.getClass())
+				|| (type1.getSizeInBits() != type2.getSizeInBits());
 	}
 
 }

@@ -53,7 +53,7 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Herve Yviquel
  * 
  */
-public class ListFlattenTransformation extends AbstractActorVisitor<Object> {
+public class ListFlattener extends AbstractActorVisitor<Object> {
 
 	/**
 	 * Prints the indexes of an NDim array.
