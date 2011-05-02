@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class Display
+@brief Implementation of class Source
 @author Jerome Gorin
-@file Source.cpp
+@file FileSrc.cpp
 @version 1.0
 @date 03/02/2011
 */

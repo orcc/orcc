@@ -49,6 +49,7 @@ namespace llvm{
 #include <pthread.h>
 
 #include "llvm/LLVMContext.h"
+#include "Jade/Actor/GpacSrc.h"
 
 class AbstractFifo;
 class Procedure;
@@ -113,11 +114,11 @@ public:
      *
 	 *	@param stopCond : the stop condition of the scheduler
 	 *
-	 *	@param input : the input of the network
+	 *	@param source : the input of the network
 	 *
 	 *  @param output : the output of the network
      */
-	void initialize(void* stopCond, void* input, void* output);
+	void initialize(void* stopCond, GpacSrc* gpacSrc, void* output);
 
 	/**
      *  @brief Start an execution of the decoder

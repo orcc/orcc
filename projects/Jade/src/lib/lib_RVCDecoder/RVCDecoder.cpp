@@ -64,7 +64,7 @@ cl::opt<FifoTy> Fifo(values(clEnumVal(trace,   "trace"),
 					 init(circular));
 
 // Jade options
-cl::opt<std::string> XDFFile(init("D:\Users\olabois\orcc\trunk\projects\Jade\VTL\Top_RVC.xdf"));
+cl::opt<std::string> XDFFile(init("D:\\Users\\olabois\\orcc\\trunk\\projects\\Jade\\VTL\\Top_RVC.xdf"));
 
 cl::opt<std::string> VTLDir(init("D:\Users\olabois\orcc\trunk\projects\Jade\VTL"));
 
@@ -137,9 +137,9 @@ void rvc_init(char *XDF){
 	//Loading decoderEngine
 	engine = new RVCEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose);
 
-	//Parsing XDF file
-	XDFParser xdfParser(XDFFile);
-	network = xdfParser.parseXDF(Context);
+	//Parsing XDF
+	XDFParser xdfParser("");
+	network = xdfParser.parseXDF(XDF, Context);
 
 	//Load network
 	engine->load(network, 3);
@@ -152,9 +152,17 @@ void rvc_init(char *XDF){
 
 int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME *Frame, int *LayerCommand){
 
-	//Run network
-	engine->run(network, VidFile);
+	//Prepare network
+	engine->prepare(network, nal, nal_length, Frame);
+	
+	//Start network
+	engine->start(network);
 
+
+	return 0;
+}
+
+int rvc_close(void *PlayerStruct){
 
 	return 0;
 }

@@ -98,11 +98,13 @@ public:
 	 *   
 	 *  @param network : the Network to prepare
      *
-	 *  @param input : the input of the network
+	 *  @param nal : the input of the network
+	 *
+	 *  @param nal_length : the length of the input nal
 	 *
 	 *  @param output : the output of the network
      */
-	void prepare(Network* network, void* input, void* output);
+	void prepare(Network* network, unsigned char* nal, int nal_length, void* output);
 
 	/*!
      *  @brief Start the given network

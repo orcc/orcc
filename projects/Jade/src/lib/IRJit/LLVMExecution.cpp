@@ -58,6 +58,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Actor/Display.h"
 #include "Jade/Actor/FileSrc.h"
+#include "Jade/Actor/GpacSrc.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/AbstractFifo.h"
@@ -240,8 +241,29 @@ void LLVMExecution::setIO(){
 	}
 }
 
-void LLVMExecution::initialize(void* stopCond, void* input, void* output){
-	//TODO : define input and output of the scheduler
+void LLVMExecution::initialize(void* stopCond, GpacSrc* gpacSrc, void* output){
+	Configuration* configuration = decoder->getConfiguration();
+
+	//Set input of the decoder
+	Instance* instance = configuration->getInstance("source");
+
+	//Set var gpac source
+	StateVar* stateVar = instance->getStateVar("source");
+	Source** ptrSource = (Source**)getGVPtr(stateVar->getGlobalVariable());
+	*ptrSource = gpacSrc;
+
+	//Set setvideo procedure
+	Procedure* getSrcProc = instance->getProcedure("get_src");
+	if (getSrcProc != NULL){
+		mapProcedure(getSrcProc, (void*)get_src);
+	}
+
+	//Set output of the decoder
+	Instance* out = configuration->getInstance("display");
+
+	if (out != NULL){
+		setOut(out);
+	}
 	
 	Module* module = decoder->getModule();
 	
@@ -254,7 +276,7 @@ void LLVMExecution::initialize(void* stopCond, void* input, void* output){
     EE->runStaticConstructorsDestructors(false);
 
 	// In case of no lazy compilation, compile all
-   if (NoLazyCompilation) {
+	if (NoLazyCompilation) {
 		for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
 			Function *Fn = &*I;
 			if (!Fn->isDeclaration())

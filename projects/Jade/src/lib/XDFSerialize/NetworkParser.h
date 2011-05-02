@@ -103,6 +103,16 @@ public:
      */
 	Network* parseNetwork ();
 
+	/*!
+     *  @brief Parses an XDF network.
+	 *
+	 *  @param XDF : a char which contains an XDF network
+	 *
+     *  @return a network class that describe the network of the dataflow, NULL if parsing failed
+     *  
+     */
+	Network* parseNetwork (char* XDF);
+
 private:
 
 	/* TinyXml document container */
@@ -128,6 +138,16 @@ private:
 
 	/** Verboses actions taken */
 	bool verbose;
+
+	/*!
+     *  @brief Parses an XDF network.
+     *
+     *  Parses the xdfDoc loaded by the parseNetwork
+	 *
+     *  @return a network class that describe the network of the dataflow, NULL if parsing failed
+     *  
+     */
+	Network* parseXDFDoc();
 
 	/*!
      *  @brief Parses the body of the XDF document.

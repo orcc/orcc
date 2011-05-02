@@ -24,4 +24,5 @@ add_library (IRActor
   BroadcastAdder.cpp
   Display.cpp
   FileSrc.cpp
+  GpacSrc.cpp
  )

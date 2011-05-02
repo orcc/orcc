@@ -29,59 +29,55 @@
 
 /**
 @brief Description of the Source class interface
-@author Jerome Gorin
-@file FileSrc.h
+@author Olivier Labois
+@file GpacSrc.h
 @version 1.0
-@date 15/11/2010
+@date 02/05/2011
 */
 
 //------------------------------
-#ifndef FILESRC_H
-#define FILESRC_H
+#ifndef GPACSRC_H
+#define GPACSRC_H
 #include "Jade/Actor/Source.h"
 
 //------------------------------
 
 
 /**
- * @class FileSrc
+ * @class GpacSrc
  *
- * @brief  This class represents a source that open and read a file.
+ * @brief  This class represents a source that read a gpac nal.
  * 
- * @author Jerome Gorin
+ * @author Olivier labois
  * 
  */
-class FileSrc : public Source {
+class GpacSrc : public Source {
 public:
 	/**
-     *  @brief Create a new file reader for the decoder 
+     *  @brief Create a new gpac nal reader for the decoder 
 	 *   
 	 *  @param id : the id of the decoder
      */
-	FileSrc(int id);
+	GpacSrc(int id);
+
+	~GpacSrc();
+
+	void setNal(unsigned char* nal, int nal_length);
 
 	/**
-     *  @brief Injecteur in the decoder of data from input file 
-	 *   
-	 *  @param tokens : the adress where data must be injected
-     */
-	void setStimulus(std::string stimulus);
-
-	~FileSrc();
-
-	/**
-     *  @brief Injecteur in the decoder of data from input file 
+     *  @brief Injecteur in the decoder of data from input gpac nal 
 	 *   
 	 *  @param tokens : the adress where data must be injected
      */
 	void source_get_src(unsigned char* tokens);
 
 protected:
-	/** input stimulus */
-	std::string stimulus;
 
-	/** input file */
-	FILE* file;
+	/** input gpac nal */
+	unsigned char* nal;
+
+	/** nal length */
+	int nal_length;
 
 	/** byte read counter */
 	int cnt;

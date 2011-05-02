@@ -59,7 +59,7 @@ void rvc_init(char *XDF);
 
 int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME *Frame, int *LayerCommand);
 
-
+int rvc_close(void *PlayerStruct);
 
 #ifdef __cplusplus
 }

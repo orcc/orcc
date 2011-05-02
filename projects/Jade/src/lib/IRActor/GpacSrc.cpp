@@ -28,63 +28,43 @@
  */
 
 /**
-@brief Description of the Source class interface
-@author Jerome Gorin
-@file FileSrc.h
+@brief Implementation of class Source
+@author Olivier Labois
+@file Source.cpp
 @version 1.0
-@date 15/11/2010
+@date 03/02/2011
 */
 
 //------------------------------
-#ifndef FILESRC_H
-#define FILESRC_H
-#include "Jade/Actor/Source.h"
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
 
+#include "Jade/Actor/GpacSrc.h"
 //------------------------------
 
+using namespace std;
 
-/**
- * @class FileSrc
- *
- * @brief  This class represents a source that open and read a file.
- * 
- * @author Jerome Gorin
- * 
- */
-class FileSrc : public Source {
-public:
-	/**
-     *  @brief Create a new file reader for the decoder 
-	 *   
-	 *  @param id : the id of the decoder
-     */
-	FileSrc(int id);
+GpacSrc::GpacSrc(int id) : Source(id) {
+	this->id = id;
+	this->cnt = 0;
+	this->nal = NULL;
+	this->nal_length = 0;
+}
 
-	/**
-     *  @brief Injecteur in the decoder of data from input file 
-	 *   
-	 *  @param tokens : the adress where data must be injected
-     */
-	void setStimulus(std::string stimulus);
+GpacSrc::~GpacSrc(){
+}
 
-	~FileSrc();
+void GpacSrc::setNal(unsigned char* nal, int nal_length){
+	this->nal = nal;
+	this->nal_length = nal_length;
+}
 
-	/**
-     *  @brief Injecteur in the decoder of data from input file 
-	 *   
-	 *  @param tokens : the adress where data must be injected
-     */
-	void source_get_src(unsigned char* tokens);
-
-protected:
-	/** input stimulus */
-	std::string stimulus;
-
-	/** input file */
-	FILE* file;
-
-	/** byte read counter */
-	int cnt;
-};
-
-#endif
+void GpacSrc::source_get_src(unsigned char* tokens){
+	if(cnt < nal_length){
+		tokens = &nal[cnt];
+		cnt++;
+	} else {
+		//TODO
+	}
+}

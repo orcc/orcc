@@ -80,6 +80,20 @@ public:
      */
 	Network* parseXDF (llvm::LLVMContext& C);
 
+	/**
+     *  @brief Start Parsing XDF char
+     *
+     *  @return a network class that describe the network of the dataflow, NULL if parsing failed
+     */
+	Network* parseXDF (char* XDF, llvm::LLVMContext& C);
+
+	/**
+     *  @brief Start Parsing XDF string
+     *
+     *  @return a network class that describe the network of the dataflow, NULL if parsing failed
+     */
+	Network* parseXDF (std::string* XDF, llvm::LLVMContext& C);
+
 private:
 
 	/** Verbose actions taken */

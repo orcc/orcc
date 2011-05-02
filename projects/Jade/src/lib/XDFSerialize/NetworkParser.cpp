@@ -80,6 +80,18 @@ Network* NetworkParser::parseNetwork (){
 		return NULL;
     }
 
+	return parseXDFDoc();
+}
+
+Network* NetworkParser::parseNetwork (char* XML){
+
+	xdfDoc->Parse(XML);
+
+	return parseXDFDoc();
+}
+
+Network* NetworkParser::parseXDFDoc(){
+
 	// Get the root element node
 	TiXmlElement* root_element = xdfDoc->RootElement();
 	
