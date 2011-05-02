@@ -133,14 +133,14 @@ printVarExpr(expr) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 untypedPort(dir, source, extension="") ::= <<
-\<port dir="<dir>" source="<source.name><extension>"/\>
+\<port dir="<dir>" source="<source.indexedName><extension>"/\>
 >>
 
 typedPort(dir, type, source, extension="") ::= <<
 <if(!type.list || source.global)
->\<port dir="<dir>" size="<if(type.bool)>1<else><type.size><endif>" source="<source.name><extension>" typeName="<type>"/\><
+>\<port dir="<dir>" size="<if(type.bool)>1<else><type.size><endif>" source="<source.indexedName><extension>" typeName="<type>"/\><
 else
->\<port dir="<dir>" source="<source.name><extension>" typeName="<source.name><extension>_typedef"/\><
+>\<port dir="<dir>" source="<source.name><extension>" typeName="<source.indexedName><extension>_typedef"/\><
 endif>
 >>
 
@@ -785,7 +785,8 @@ design(instance) ::= <<
 	<parameters(instance.parameters)>
 	<stateVars()>
 	<instance.actor.actions: typeDef()>
-	<instance.actor.actions: action(); separator="\n">
+	
+	<instance.actor.actions: action(); separator="\n\n">
 	
 	\<!-- ACTION SCHEDULER --\>
 	<if(instance.actor.fsm)>

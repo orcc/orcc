@@ -40,16 +40,16 @@ import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitter;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
+import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
 import net.sf.orcc.backends.xlim.transformations.ListFlattener;
 import net.sf.orcc.backends.xlim.transformations.LiteralIntegersAdder;
-import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
@@ -123,14 +123,13 @@ public class XlimBackendImpl extends AbstractBackend {
 				// new UnaryListToScalarTransformation(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
-				new ExpressionSplitter(), new BuildCFG(), new CastAdder(),
-				new InstPhiTransformation(),
-				new LiteralIntegersAdder(), new XlimVariableRenamer() };
+				new ExpressionSplitter(),
+				new BuildCFG(), // new CastAdder(),
+				new InstPhiTransformation(), new LiteralIntegersAdder(),
+				new XlimVariableRenamer(), new BlockCombine() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
-			System.out.println(transformation.getClass().getCanonicalName()
-					+ " => " + actor.getName());
 			if (debugMode && !EcoreHelper.serializeActor(path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());

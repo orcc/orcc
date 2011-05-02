@@ -64,8 +64,7 @@ import org.eclipse.emf.common.util.EList;
  * @author Herve Yviquel
  * 
  */
-public class ExpressionSplitter extends
-		AbstractActorVisitor<Expression> {
+public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
 	public ExpressionSplitter() {
 		super(true);
@@ -80,10 +79,10 @@ public class ExpressionSplitter extends
 		Var target = procedure.newTempLocalVariable(
 				EcoreHelper.copy(expr.getType()), procedure.getName() + "_"
 						+ "expr");
-
-		// Add assignment to instruction's list
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 				EcoreHelper.copy(expr));
+
+		// Add assignment to instruction's list
 		if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
 			indexInst++;
 		}
@@ -121,6 +120,8 @@ public class ExpressionSplitter extends
 	@Override
 	public Expression caseExprUnary(ExprUnary expr) {
 		expr.setExpr(doSwitch(expr.getExpr()));
+
+		// Transform unary expression to binary one
 		Expression newExpr;
 
 		switch (expr.getOp()) {
@@ -143,9 +144,21 @@ public class ExpressionSplitter extends
 			throw new OrccRuntimeException("unsupported operator");
 		}
 
+		// Make a new assignment to the binary expression
+		Var target = procedure.newTempLocalVariable(
+				EcoreHelper.copy(expr.getType()), procedure.getName() + "_"
+						+ "expr");
+		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
+				newExpr);
+
+		// Add assignment to instruction's list
+		if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
+			indexInst++;
+		}
+
 		EcoreHelper.delete(expr);
 
-		return newExpr;
+		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
 	@Override
