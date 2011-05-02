@@ -86,7 +86,6 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder, bool verbose): Co
   std::string ErrorMsg;
 
   this->decoder = decoder;
-  this->source = new Source(1);
   this->verbose = verbose;
 
   Module* module = decoder->getModule();
@@ -277,6 +276,7 @@ void LLVMExecution::start(){
 }
 
 void LLVMExecution::setIn(Instance* instance){
+	source = new Source(1);
 	source->setStimulus(stimulus);
 
 	//Set var source
