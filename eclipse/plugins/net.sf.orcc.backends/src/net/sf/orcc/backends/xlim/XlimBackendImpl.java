@@ -117,7 +117,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		actor.setTemplateData(data);
 
 		ActorVisitor<?>[] transformations = {
-				// new ArrayInitializeTransformation(),
+				// new GlobalArrayInitializer(),
 				new InstTernaryAdder(),
 				new Inliner(true, true),
 				// new UnaryListToScalarTransformation(), new CustomPeekAdder(),

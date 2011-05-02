@@ -372,7 +372,6 @@ printIfNode(ifNode) ::= <<
 \<!-- end joinnode --\>
 >>
 
-// while node
 printWhileNode(whileNode) ::= <<
 \<module kind="loop"\>
 	\<!-- joinnode --\>
@@ -552,7 +551,7 @@ declarePinAvailableVariable(port) ::= <<
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-\<operation kind="taskCall" target="<action.body>"/\>
+\<operation kind="taskCall" target="<action.name>"/\>
 >>
 
 actionTest(action) ::= <<
