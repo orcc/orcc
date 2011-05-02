@@ -51,9 +51,9 @@ endif>
 actorPorts() ::= <<
 \<!-- Ports --\>
 \<!-- Input Ports --\>
-<instance.actor.inputs.list: {port|<actorPort(port=port, dir="in")>}; separator="\n">
+<instance.actor.inputs: {port|<actorPort(port=port, dir="in")>}; separator="\n">
 \<!-- Output Ports --\>
-<instance.actor.outputs.list: {port|<actorPort(port=port, dir="out")>}; separator="\n">
+<instance.actor.outputs: {port|<actorPort(port=port, dir="out")>}; separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ stateVar(var) ::= <<
 >>
 
 stateVars() ::= <<
-<instance.actor.stateVars.list: stateVar(); separator="\n">
+<instance.actor.stateVars: stateVar(); separator="\n">
 >>
 
 
@@ -409,7 +409,7 @@ procedure(procedure) ::= <<
 typeDef(action) ::= <<
 <action.inputPattern.variableMap.values: typeDefLocal()>
 <action.outputPattern.variableMap.values: typeDefLocal()>
-<action.body.locals.list: typeDefLocal()>
+<action.body.locals: typeDefLocal()>
 >>
 
 typeDefLocal(local) ::= <<
@@ -462,10 +462,10 @@ action(action) ::= <<
 \<!-- Action: "<action.name>" --\>
 \<module autostart="false" kind="action" name="<action.name>"\>
 	<action.outputPattern.variableMap.values: localInitialize()>
-	<action.body.locals.list: localInitialize()>
-	<action.inputPattern.variableMap.keys : { port | <printRead(port, action.inputPattern.variableMap.(port), action.inputPattern.numTokensMap.(port))> }; separator="\n">
+	<action.body.locals: localInitialize()>
+	<action.inputPattern.ports : { port | <printRead(port, action.inputPattern.portToVarMap.(port), action.inputPattern.numTokensMap.(port))> }; separator="\n">
 	<procedure(procedure=action.body)>
-	<action.outputPattern.variableMap.keys : { port | <printWrite(port, action.outputPattern.variableMap.(port), action.outputPattern.numTokensMap.(port))> }; separator="\n">
+	<action.outputPattern.ports : { port | <printWrite(port, action.outputPattern.portToVarMap.(port), action.outputPattern.numTokensMap.(port))> }; separator="\n">
 \</module\>
 >>
 
@@ -597,8 +597,8 @@ scheduler(actions) ::= <<
 		\</module\>
 		\<module kind="body"\>
 			\<!-- PinAvail call --\>
-			<instance.actor.inputs.list: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
-			<instance.actor.outputs.list: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
+			<instance.actor.inputs: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
+			<instance.actor.outputs: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
     
     		\<!-- All Schedulable expressions --\>
 			<instance.actor.actions: isSchedulableTest(); separator="\n">
@@ -734,8 +734,8 @@ schedulerFSM(actions, fsm) ::= <<
 		\</module\>
 		\<module kind="body"\>
 			\<!-- PinAvail call --\>
-			<instance.actor.inputs.list: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
-			<instance.actor.outputs.list: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
+			<instance.actor.inputs: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
+			<instance.actor.outputs: {port | <declarePinAvailableVariable(port=port)>}; separator="\n">
     
 			\<!-- All Schedulable expressions --\>
 			<instance.actor.actions: isSchedulableTest()>
