@@ -88,6 +88,8 @@ public class ExpressionSplitterTransformation extends
 			indexInst++;
 		}
 
+		EcoreHelper.delete(expr);
+
 		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
@@ -140,6 +142,9 @@ public class ExpressionSplitterTransformation extends
 		default:
 			throw new OrccRuntimeException("unsupported operator");
 		}
+
+		EcoreHelper.delete(expr);
+
 		return newExpr;
 	}
 
@@ -174,8 +179,8 @@ public class ExpressionSplitterTransformation extends
 
 	@Override
 	public Expression caseInstReturn(InstReturn returnInstr) {
-		Expression expr = returnInstr.getValue();
-		if (expr != null) {
+		if (!procedure.getReturnType().isVoid()) {
+			Expression expr = returnInstr.getValue();
 			returnInstr.setValue(doSwitch(expr));
 		}
 		return null;

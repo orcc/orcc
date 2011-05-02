@@ -112,14 +112,10 @@ public class TernaryOperationAdder extends AbstractActorVisitor<Object> {
 
 		// clean uses
 		nodeIf.setCondition(null);
-		// Use.removeUses(nodeIf, condExpr);
 
-		// add uses
-		// Use.addUses(assignCond, condExpr);
-
-		visit(nodeIf.getThenNodes());
-		visit(nodeIf.getElseNodes());
-		visit(nodeIf.getJoinNode());
+		doSwitch(nodeIf.getThenNodes());
+		doSwitch(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getJoinNode());
 		condVar = oldCondVar;
 		
 		return null;

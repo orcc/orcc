@@ -40,6 +40,7 @@ import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
@@ -110,7 +111,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		ActorVisitor<?>[] transformations = {
 				// new ArrayInitializeTransformation(),
 				// new TernaryOperationAdder(),
-				// new InlineTransformation(true, true),
+				new InlineTransformation(true, true),
 				// new UnaryListToScalarTransformation(), new CustomPeekAdder(),
 				// new DeadGlobalElimination(), new DeadCodeElimination(),
 				// new XlimDeadVariableRemoval(),

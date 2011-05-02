@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IRISA
+ * Copyright (c) 2010-2011, IRISA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.ir.Def;
@@ -40,16 +39,15 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
-import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -61,6 +59,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * the procedures
  * 
  * @author Herve Yviquel
+ * @author Matthieu Wipliez
  * 
  */
 public class InlineTransformation extends AbstractActorVisitor<Object> {
@@ -69,15 +68,25 @@ public class InlineTransformation extends AbstractActorVisitor<Object> {
 
 	private boolean inlineProcedure;
 
-	private boolean needToSkipThisNode;
-
-	// private Var returnVariableOfCurrentFunction;
-
 	protected Map<Var, Var> variableToLocalVariableMap;
 
 	public InlineTransformation(boolean inlineProcedure, boolean inlineFunction) {
 		this.inlineProcedure = inlineProcedure;
 		this.inlineFunction = inlineFunction;
+	}
+
+	@Override
+	public Object caseInstCall(InstCall call) {
+		// Function case
+		if (!call.getProcedure().getReturnType().isVoid() && inlineFunction) {
+			inline(call);
+		}
+
+		// Procedure case
+		if (call.getProcedure().getReturnType().isVoid() && inlineProcedure) {
+			inline(call);
+		}
+		return null;
 	}
 
 	/**
@@ -100,19 +109,30 @@ public class InlineTransformation extends AbstractActorVisitor<Object> {
 			if (object instanceof Def) {
 				Def def = (Def) object;
 				Def copyDef = (Def) copier.get(def);
-				copyDef.setVariable(variableToLocalVariableMap.get(def
-						.getVariable()));
+				Var oldVar = def.getVariable();
+				Var newVar = oldVar.isLocal() ? variableToLocalVariableMap
+						.get(oldVar) : oldVar;
+				copyDef.setVariable(newVar);
 			} else if (object instanceof Use) {
 				Use use = (Use) object;
 				Use copyUse = (Use) copier.get(use);
-				copyUse.setVariable(variableToLocalVariableMap.get(use
-						.getVariable()));
+				Var oldVar = use.getVariable();
+				Var newVar = oldVar.isLocal() ? variableToLocalVariableMap
+						.get(oldVar) : oldVar;
+				copyUse.setVariable(newVar);
 			}
 		}
 
 		return clonedNodes;
 	}
 
+	/**
+	 * Inline the called function at call location. All variables of the inlined
+	 * function are copied in the local procedure.
+	 * 
+	 * @param call
+	 *            a call instruction to inline
+	 */
 	private void inline(InstCall call) {
 		// The function or the procedure
 		Procedure function = call.getProcedure();
@@ -134,22 +154,23 @@ public class InlineTransformation extends AbstractActorVisitor<Object> {
 			variableToLocalVariableMap.put(var, newVar);
 		}
 		for (Var var : function.getParameters()) {
+			Var newVar;
 			if (var.getType().isList()) {
 				// In case of list, the parameter could be a global variable
-				Var newVar = ((ExprVar) call.getParameters().get(
+				newVar = ((ExprVar) call.getParameters().get(
 						function.getParameters().indexOf(var))).getUse()
 						.getVariable();
-				variableToLocalVariableMap.put(var, newVar);
 			} else {
-				Var newVar = procedure.newTempLocalVariable(var.getType(),
+				newVar = procedure.newTempLocalVariable(var.getType(),
 						procedure.getName() + "_" + var.getName() + "_"
 								+ call.getLocation().getStartLine() + "_"
 								+ call.getLocation().getStartColumn());
 				newVar.setIndex(var.getIndex());
 				newVar.setLocation(var.getLocation());
 				newVar.setAssignable(var.isAssignable());
-				variableToLocalVariableMap.put(var, newVar);
+
 			}
+			variableToLocalVariableMap.put(var, newVar);
 		}
 
 		List<Node> nodes = new ArrayList<Node>();
@@ -161,7 +182,8 @@ public class InlineTransformation extends AbstractActorVisitor<Object> {
 			if (!parameter.getType().isList()) {
 				Expression expr = call.getParameters().get(i);
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						variableToLocalVariableMap.get(parameter), expr);
+						variableToLocalVariableMap.get(parameter),
+						EcoreHelper.copy(expr));
 				newBlockNode.add(assign);
 			}
 		}
@@ -170,86 +192,54 @@ public class InlineTransformation extends AbstractActorVisitor<Object> {
 		}
 
 		// Clone function/procedure body
-		nodes.addAll(cloneNodes(function.getNodes()));
+		Collection<Node> clonedNodes = cloneNodes(function.getNodes());
+		if (!function.getReturnType().isVoid()) {
+			transformInstReturn(clonedNodes, call.getTarget().getVariable());
+		}
+		nodes.addAll(clonedNodes);
 
 		// Remove old block and add the new ones
+		NodeBlock currentNodeBlock = EcoreHelper.getContainerOfType(call,
+				NodeBlock.class);
+		currentNodeBlock.getInstructions().remove(indexInst);
+
 		NodeBlock secondBlockNodePart = IrFactory.eINSTANCE.createNodeBlock();
-
-		itInstruction.remove();
-		while (itInstruction.hasNext()) {
-			secondBlockNodePart.add(itInstruction.next());
-			itInstruction.remove();
+		while (indexInst < currentNodeBlock.getInstructions().size()) {
+			secondBlockNodePart.add(currentNodeBlock.getInstructions().get(
+					indexInst));
 		}
-
 		nodes.add(secondBlockNodePart);
 
+		List<Node> currentNodes = EcoreHelper
+				.getContainingList(currentNodeBlock);
 		for (Node node : nodes) {
-			itNode.add(node);
+			currentNodes.add(indexNode + 1, node);
 		}
-
-		needToSkipThisNode = true;
+		
+		EcoreHelper.delete(call);
 	}
 
-	public boolean isInlineFunction() {
-		return inlineFunction;
-	}
+	/**
+	 * Replace the return instruction by an assignment to the given variable
+	 * 
+	 * @param nodes
+	 *            a collection of Nodes
+	 * @param callTarget
+	 *            a variable
+	 */
+	private void transformInstReturn(Collection<Node> nodes, Var callTarget) {
+		TreeIterator<EObject> it = EcoreUtil.getAllContents(nodes);
+		while (it.hasNext()) {
+			EObject object = it.next();
 
-	public boolean isInlineProcedure() {
-		return inlineProcedure;
-	}
-
-	public void setInlineFunction(boolean inlineFunction) {
-		this.inlineFunction = inlineFunction;
-	}
-
-	public void setInlineProcedure(boolean inlineProcedure) {
-		this.inlineProcedure = inlineProcedure;
-	}
-
-	@Override
-	public void visit(InstCall call) {
-		// Function case
-		if (!call.getProcedure().getReturnType().isVoid() && inlineFunction) {
-			//returnVariableOfCurrentFunction = call.getTarget().getVariable();
-			inline(call);
-			//returnVariableOfCurrentFunction = null;
+			if (object instanceof InstReturn) {
+				InstReturn instReturn = (InstReturn) object;
+				InstAssign instAssign = IrFactory.eINSTANCE.createInstAssign(
+						callTarget, EcoreHelper.copy(instReturn.getValue()));
+				EcoreUtil.replace(instReturn, instAssign);
+				EcoreHelper.delete(instReturn);
+			}
 		}
-
-		// Procedure case
-		if (call.getProcedure().getReturnType().isVoid() && inlineProcedure) {
-			inline(call);
-		}
-	}
-
-	@Override
-	public void visit(NodeBlock nodeBlock) {
-		ListIterator<Instruction> it = nodeBlock.listIterator();
-		needToSkipThisNode = false;
-		while (it.hasNext() && !needToSkipThisNode) {
-			Instruction instruction = it.next();
-			itInstruction = it;
-			instruction.accept(this);
-		}
-		if (needToSkipThisNode) {
-			itNode.previous();
-		}
-	}
-
-	@Override
-	public void visit(NodeIf nodeIf) {
-		ListIterator<Node> oldNodeIterator = itNode;
-		visit(nodeIf.getThenNodes());
-		visit(nodeIf.getElseNodes());
-		itNode = oldNodeIterator;
-		visit(nodeIf.getJoinNode());
-	}
-
-	@Override
-	public void visit(NodeWhile nodeWhile) {
-		ListIterator<Node> oldNodeIterator = itNode;
-		visit(nodeWhile.getNodes());
-		itNode = oldNodeIterator;
-		visit(nodeWhile.getJoinNode());
 	}
 
 }
