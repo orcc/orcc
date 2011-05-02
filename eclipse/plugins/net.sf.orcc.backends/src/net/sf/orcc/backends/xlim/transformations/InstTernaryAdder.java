@@ -63,7 +63,7 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 		for (Procedure proc : actor.getProcs()) {
 			if (!proc.getReturnType().isVoid()) {
 				newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
-				visit(proc);
+				doSwitch(proc);
 				proc.getNodes().clear();
 				proc.getNodes().add(newBlockNode);
 			}
@@ -117,7 +117,7 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 		doSwitch(nodeIf.getElseNodes());
 		doSwitch(nodeIf.getJoinNode());
 		condVar = oldCondVar;
-		
+
 		return null;
 	}
 }

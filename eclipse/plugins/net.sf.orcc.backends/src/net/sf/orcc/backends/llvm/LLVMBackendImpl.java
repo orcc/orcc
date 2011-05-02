@@ -138,7 +138,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new ThreeAddressCodeTransformation(), new GetElementPtrAdder() };
 
 		for (ActorVisitor<?> transformation : transformations) {
-			transformation.visit(actor);
+			transformation.doSwitch(actor);
 		}
 
 		// Organize medata information for the current actor
