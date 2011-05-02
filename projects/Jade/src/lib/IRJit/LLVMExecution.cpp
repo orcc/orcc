@@ -57,7 +57,7 @@
 
 #include "Jade/Decoder.h"
 #include "Jade/Actor/Display.h"
-#include "Jade/Actor/Source.h"
+#include "Jade/Actor/FileSrc.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/AbstractFifo.h"
@@ -276,8 +276,11 @@ void LLVMExecution::start(){
 }
 
 void LLVMExecution::setIn(Instance* instance){
-	source = new Source(1);
-	source->setStimulus(stimulus);
+	// Create a specific source for the decoder made to read files
+	FileSrc* fileSrc = new FileSrc(1);
+	fileSrc->setStimulus(stimulus);	
+	
+	source = fileSrc;
 
 	//Set var source
 	StateVar* stateVar = instance->getStateVar("source");

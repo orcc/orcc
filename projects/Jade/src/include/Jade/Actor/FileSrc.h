@@ -36,50 +36,55 @@
 */
 
 //------------------------------
-#ifndef SOURCE_H
-#define SOURCE_H
-#include <string>
+#ifndef FILESRC_H
+#define FILESRC_H
+#include "Jade/Actor/Source.h"
 
 //------------------------------
 
 
 /**
- * @class Source
+ * @class FileSrc
  *
- * @brief  This class represents a generic source for the decoder
+ * @brief  This class represents a source that open and read a file.
  * 
  * @author Jerome Gorin
  * 
  */
-class Source {
+class FileSrc : public Source {
 public:
-
 	/**
-     *  @brief Create a new generic source for the decoder 
+     *  @brief Create a new file reader for the decoder 
 	 *   
 	 *  @param id : the id of the decoder
      */
-	Source(int id){
-		this->id = id;	
-	};
-
-	~Source(){};
+	FileSrc(int id);
 
 	/**
-     *  @brief Generic injecteur of data in the decoder
+     *  @brief Injecteur in the decoder of data from input file 
 	 *   
 	 *  @param tokens : the adress where data must be injected
      */
-	virtual void source_get_src(unsigned char* tokens){};
+	void setStimulus(std::string stimulus);
+
+	~FileSrc();
+
+	/**
+     *  @brief Injecteur in the decoder of data from input file 
+	 *   
+	 *  @param tokens : the adress where data must be injected
+     */
+	void source_get_src(unsigned char* tokens);
 
 protected:
-	/** id of the decoder */
-	int id;
-};
+	/** input stimulus */
+	std::string stimulus;
 
-static void get_src(void* ptrSource, unsigned char* tokens) {
-	Source* source = (Source*) ptrSource;
-	source->source_get_src(tokens);
-}
+	/** input file */
+	FILE* file;
+
+	/** byte read counter */
+	int cnt;
+};
 
 #endif

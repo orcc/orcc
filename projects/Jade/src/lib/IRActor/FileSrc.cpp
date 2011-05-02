@@ -40,25 +40,25 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "Jade/Actor/Source.h"
+#include "Jade/Actor/FileSrc.h"
 //------------------------------
 
 using namespace std;
 
-Source::Source(int id){
+FileSrc::FileSrc(int id) : Source(id) {
 	this->id = id;
 	this->cnt = 0;
 	this->file = NULL;
 
 }
 
-Source::~Source(){
+FileSrc::~FileSrc(){
 	if (file != NULL){
 		fclose(file);
 	}
 }
 
-void Source::setStimulus(std::string stimulus){
+void FileSrc::setStimulus(std::string stimulus){
 		this->stimulus = stimulus;
 
 		if (file != NULL){
@@ -72,7 +72,7 @@ void Source::setStimulus(std::string stimulus){
 		}
 }
 
-void Source::source_get_src(unsigned char* tokens){
+void FileSrc::source_get_src(unsigned char* tokens){
 	int n;
 	
 	if (feof(file)) {
