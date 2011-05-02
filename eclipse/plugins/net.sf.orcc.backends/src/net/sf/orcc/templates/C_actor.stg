@@ -188,7 +188,7 @@ printReadEnd(port, numTokens) ::= <<
 {
 	int i;
 	for (i = 0; i \< <numTokens>; i++) {
-		fprintf(file_<port.name>, "%<printFormatType(port.type)>\n", tokens_<port.name>[index_<port.name> + i]);
+		fprintf(file_<port.name>, "%<printFormatType(port.type)>\n", tokens_<port.name>[(index_<port.name> + i) % SIZE_<port.name>]);
 	}
 }
 
@@ -217,7 +217,7 @@ printWriteEnd(port, numTokens) ::= <<
 {
 	int i;
 	for (i = 0; i \< <numTokens>; i++) {
-		fprintf(file_<port.name>, "%<printFormatType(port.type)>\n", tokens_<port.name>[index_<port.name> + i]);
+		fprintf(file_<port.name>, "%<printFormatType(port.type)>\n", tokens_<port.name>[(index_<port.name> + i) % SIZE_<port.name>]);
 	}
 }
 <endif>
