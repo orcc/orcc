@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
-import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
