@@ -77,8 +77,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
 		// Make a new assignment to the binary expression
 		Var target = procedure.newTempLocalVariable(
-				EcoreHelper.copy(expr.getType()), procedure.getName() + "_"
-						+ "expr");
+				EcoreHelper.copy(expr.getType()), "expr");
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 				EcoreHelper.copy(expr));
 
@@ -128,17 +127,20 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		case MINUS:
 			newExpr = IrFactory.eINSTANCE.createExprBinary(
 					IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
-					expr.getExpr(), expr.getType());
+					EcoreHelper.copy(expr.getExpr()),
+					EcoreHelper.copy(expr.getType()));
 			break;
 		case LOGIC_NOT:
-			newExpr = IrFactory.eINSTANCE.createExprBinary(expr.getExpr(),
-					OpBinary.EQ, IrFactory.eINSTANCE.createExprBool(false),
-					expr.getType());
+			newExpr = IrFactory.eINSTANCE.createExprBinary(
+					EcoreHelper.copy(expr.getExpr()), OpBinary.EQ,
+					IrFactory.eINSTANCE.createExprBool(false),
+					EcoreHelper.copy(expr.getType()));
 			break;
 		case BITNOT:
-			newExpr = IrFactory.eINSTANCE.createExprBinary(expr.getExpr(),
-					OpBinary.BITXOR, EcoreHelper.copy(expr.getExpr()),
-					expr.getType());
+			newExpr = IrFactory.eINSTANCE.createExprBinary(
+					EcoreHelper.copy(expr.getExpr()), OpBinary.BITXOR,
+					EcoreHelper.copy(expr.getExpr()),
+					EcoreHelper.copy(expr.getType()));
 			break;
 		default:
 			throw new OrccRuntimeException("unsupported operator");
@@ -146,8 +148,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
 		// Make a new assignment to the binary expression
 		Var target = procedure.newTempLocalVariable(
-				EcoreHelper.copy(expr.getType()), procedure.getName() + "_"
-						+ "expr");
+				EcoreHelper.copy(expr.getType()), "expr");
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 				newExpr);
 

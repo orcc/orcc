@@ -375,6 +375,14 @@ public interface IrPackage extends EPackage {
 		EAttribute EXPR_UNARY__OP = eINSTANCE.getExprUnary_Op();
 
 		/**
+		 * The meta object literal for the '<em><b>Type</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_UNARY__TYPE = eINSTANCE.getExprUnary_Type();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExprVarImpl <em>Expr Var</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.ExprVarImpl
@@ -2819,12 +2827,21 @@ public interface IrPackage extends EPackage {
 	int EXPR_UNARY__OP = EXPRESSION_FEATURE_COUNT + 1;
 
 	/**
+	 * The feature id for the '<em><b>Type</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_UNARY__TYPE = EXPRESSION_FEATURE_COUNT + 2;
+
+	/**
 	 * The number of structural features of the '<em>Expr Unary</em>' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int EXPR_UNARY_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 2;
+	int EXPR_UNARY_FEATURE_COUNT = EXPRESSION_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Use</b></em>' containment reference. <!--
@@ -3841,6 +3858,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getExprUnary_Op();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.ExprUnary#getType <em>Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Type</em>'.
+	 * @see net.sf.orcc.ir.ExprUnary#getType()
+	 * @see #getExprUnary()
+	 * @generated
+	 */
+	EReference getExprUnary_Type();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.ExprVar <em>Expr Var</em>}'.

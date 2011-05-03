@@ -271,6 +271,7 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 			Expression trueValue, Expression falseValue) {
 		InstTernaryImpl instTernary = new InstTernaryImpl();
 		instTernary.setTarget(IrFactory.eINSTANCE.createDef(target));
+		instTernary.setConditionValue(condition);
 		instTernary.setTrueValue(trueValue);
 		instTernary.setFalseValue(falseValue);
 		return instTernary;

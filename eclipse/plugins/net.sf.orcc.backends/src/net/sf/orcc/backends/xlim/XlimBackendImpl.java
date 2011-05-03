@@ -42,6 +42,7 @@ import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitter;
+import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
 import net.sf.orcc.backends.xlim.transformations.ListFlattener;
@@ -117,7 +118,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		actor.setTemplateData(data);
 
 		ActorVisitor<?>[] transformations = {
-				// new GlobalArrayInitializer(),
+				new GlobalArrayInitializer(),
 				new InstTernaryAdder(),
 				new Inliner(true, true),
 				// new UnaryListToScalarTransformation(), new CustomPeekAdder(),

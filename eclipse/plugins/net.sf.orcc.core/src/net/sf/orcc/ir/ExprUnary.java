@@ -53,10 +53,24 @@ public interface ExprUnary extends Expression {
 	 */
 	OpUnary getOp();
 
+	/**
+	 * Returns the type of this expression.
+	 * 
+	 * @return the type of this expression
+	 * @model containment="true"
+	 */
+	Type getType();
+
 	void setExpr(Expression expr);
 
 	void setOp(OpUnary op);
 
+	/**
+	 * Sets the type of this expression.
+	 * 
+	 * @param type
+	 *            the type of this expression
+	 */
 	void setType(Type type);
 
 }

@@ -207,6 +207,8 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="expr" eType="#//Expression"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" eType="#//OpUnary"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type" containment="true"
+        resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ExprVar" eSuperTypes="#//Expression">
     <eStructuralFeatures xsi:type="ecore:EReference" name="use" eType="#//Use" containment="true"

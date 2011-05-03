@@ -28,6 +28,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.ExprUnaryImpl#getExpr <em>Expr</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ExprUnaryImpl#getOp <em>Op</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ExprUnaryImpl#getType <em>Type</em>}</li>
  * </ul>
  * </p>
  *
@@ -63,7 +64,10 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	 */
 	protected OpUnary op = OP_EDEFAULT;
 
-	private Type type;
+	/**
+	 * @generated
+	 */
+	protected Type type;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -113,6 +117,8 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 				return getExpr();
 			case IrPackage.EXPR_UNARY__OP:
 				return getOp();
+			case IrPackage.EXPR_UNARY__TYPE:
+				return getType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -127,6 +133,8 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 		switch (featureID) {
 			case IrPackage.EXPR_UNARY__EXPR:
 				return basicSetExpr(null, msgs);
+			case IrPackage.EXPR_UNARY__TYPE:
+				return basicSetType(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -143,6 +151,8 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 				return expr != null;
 			case IrPackage.EXPR_UNARY__OP:
 				return op != OP_EDEFAULT;
+			case IrPackage.EXPR_UNARY__TYPE:
+				return type != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -160,6 +170,9 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 				return;
 			case IrPackage.EXPR_UNARY__OP:
 				setOp((OpUnary)newValue);
+				return;
+			case IrPackage.EXPR_UNARY__TYPE:
+				setType((Type)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -189,6 +202,9 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 			case IrPackage.EXPR_UNARY__OP:
 				setOp(OP_EDEFAULT);
 				return;
+			case IrPackage.EXPR_UNARY__TYPE:
+				setType((Type)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -214,6 +230,21 @@ public class ExprUnaryImpl extends ExpressionImpl implements ExprUnary {
 	@Override
 	public Type getType() {
 		return type;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetType(Type newType, NotificationChain msgs) {
+		Type oldType = type;
+		type = newType;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.EXPR_UNARY__TYPE, oldType, newType);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	@Override

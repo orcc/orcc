@@ -1438,6 +1438,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getExprUnary_Type() {
+		return (EReference)exprUnaryEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getExprVar() {
 		return exprVarEClass;
 	}
@@ -2100,6 +2109,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		exprUnaryEClass = createEClass(EXPR_UNARY);
 		createEReference(exprUnaryEClass, EXPR_UNARY__EXPR);
 		createEAttribute(exprUnaryEClass, EXPR_UNARY__OP);
+		createEReference(exprUnaryEClass, EXPR_UNARY__TYPE);
 
 		exprVarEClass = createEClass(EXPR_VAR);
 		createEReference(exprVarEClass, EXPR_VAR__USE);
@@ -2370,6 +2380,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(exprUnaryEClass, ExprUnary.class, "ExprUnary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getExprUnary_Expr(), this.getExpression(), null, "expr", null, 0, 1, ExprUnary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getExprUnary_Op(), this.getOpUnary(), "op", null, 0, 1, ExprUnary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getExprUnary_Type(), this.getType(), null, "type", null, 0, 1, ExprUnary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(exprVarEClass, ExprVar.class, "ExprVar", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getExprVar_Use(), this.getUse(), null, "use", null, 0, 1, ExprVar.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

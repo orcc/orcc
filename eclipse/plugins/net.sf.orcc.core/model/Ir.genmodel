@@ -176,6 +176,7 @@
     <genClasses ecoreClass="Ir.ecore#//ExprUnary">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprUnary/expr"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//ExprUnary/op"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprUnary/type"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//ExprVar">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//ExprVar/use"/>
