@@ -69,13 +69,20 @@ public interface InstAssignIndex extends InstSpecific {
 	Def getTarget();
 
 	/**
+	 * Return <code>true</code> if the instruction is an assign index instruction
+	 * 
+	 * @return <code>true</code> if the instruction is an assign index instruction
+	 */
+	public boolean isInstAssignIndex();
+
+	/**
 	 * Sets the type of the list targeted by this instruction.
 	 * 
 	 * @param value
 	 *            the new type of the list targeted by this instruction
 	 */
 	void setListType(Type value);
-
+	
 	/**
 	 * Sets the target of this instruction.
 	 * 

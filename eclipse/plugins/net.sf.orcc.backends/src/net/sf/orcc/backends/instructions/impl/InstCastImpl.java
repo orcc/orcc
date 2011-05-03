@@ -242,6 +242,11 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 		return target;
 	}
 
+	@Override
+	public boolean isInstCast() {
+		return true;
+	}
+
 	/**
 	 * Return true if the target type is different from the source type.
 	 * 

@@ -40,6 +40,7 @@ import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitter;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
@@ -124,8 +125,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				// new UnaryListToScalarTransformation(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
-				new ExpressionSplitter(),
-				new BuildCFG(), // new CastAdder(),
+				new ExpressionSplitter(), new BuildCFG(), new CastAdder(),
 				new InstPhiTransformation(), new LiteralIntegersAdder(),
 				new XlimVariableRenamer(), new BlockCombine() };
 

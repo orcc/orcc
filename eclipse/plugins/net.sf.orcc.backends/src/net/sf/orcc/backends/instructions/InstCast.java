@@ -75,33 +75,41 @@ public interface InstCast extends InstSpecific {
 	Def getTarget();
 
 	/**
-	 * Return true if the target type is different from the source type.
+	 * Return <code>true</code> if the instruction is a cast
 	 * 
-	 * @return a boolean indicating if target type is different from the source
+	 * @return <code>true</code> if the instruction is a cast
+	 */
+	public boolean isInstCast();
+
+	/**
+	 * Return <code>true</code> if the target type is different from the source
+	 * type.
+	 * 
+	 * @return <code>true</code> if target type is different from the source
 	 *         type
 	 */
 	public boolean isDifferent();
 
 	/**
-	 * Return true if the target type is extended from the source type.
+	 * Return <code>true</code> if the target type is extended from the source
+	 * type.
 	 * 
-	 * @return a boolean indicating if target type is extended from the source
-	 *         type
+	 * @return <code>true</code> if target type is extended from the source type
 	 */
 	public boolean isExtended();
 
 	/**
-	 * Return true if the source type is signed
+	 * Return <code>true</code> if the source type is signed
 	 * 
-	 * @return a boolean indicating if source is signed type
+	 * @return <code>true</code> if source is signed type
 	 */
 	public boolean isSigned();
 
 	/**
-	 * Return true if the target type is trunced from the source type.
+	 * Return <code>true</code> if the target type is trunced from the source
+	 * type.
 	 * 
-	 * @return a boolean indicating if target type is trunced from the source
-	 *         type
+	 * @return <code>true</code> if target type is trunced from the source type
 	 */
 	public boolean isTrunced();
 

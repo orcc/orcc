@@ -50,10 +50,12 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -92,6 +94,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprList(ExprList expr) {
+		castExpressionList(expr.getValue());
 		return castExpression(expr);
 	}
 
@@ -119,45 +122,50 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
-		EList<Expression> parameters = call.getParameters();
-		for (Expression expr : parameters) {
-			parameters.set(parameters.indexOf(expr), doSwitch(expr));
-		}
+		castExpressionList(call.getParameters());
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
-		EList<Expression> indexes = load.getIndexes();
-		for (Expression expr : indexes) {
-			indexes.set(indexes.indexOf(expr), doSwitch(expr));
-		}
+		castExpressionList(load.getIndexes());
 
 		Var source = load.getSource().getVariable();
 		Var target = load.getTarget().getVariable();
 
-		if (needCast(target.getType(), source.getType())) {
-			Var newTarget = procedure.newTempLocalVariable(
-					EcoreUtil.copy(source.getType()),
-					"casted_" + target.getName());
-			newTarget.setIndex(1);
+		if (load.getIndexes().isEmpty()) {
+			// Load from a scalar variable
+			if (needCast(target.getType(), source.getType())) {
+				Var newTarget = procedure.newTempLocalVariable(
+						EcoreUtil.copy(source.getType()),
+						"casted_" + target.getName());
+				newTarget.setIndex(1);
 
-			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
-					newTarget, target);
+				InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+						target, newTarget);
 
-			load.getBlock().add(indexInst, cast);
-			load.setTarget(IrFactory.eINSTANCE.createDef(newTarget));
+				load.getBlock().add(indexInst + 1, cast);
+			}
+		} else {
+			// Load from an array variable
+			Type subtype = ((TypeList) source.getType()).getElementType();
+			if (needCast(target.getType(), subtype)) {
+				Var newTarget = procedure.newTempLocalVariable(
+						EcoreUtil.copy(subtype), "casted_" + target.getName());
+				newTarget.setIndex(1);
+
+				InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+						target, newTarget);
+
+				load.getBlock().add(indexInst + 1, cast);
+			}
 		}
-
 		return null;
 	}
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
-		EList<Expression> values = phi.getValues();
-		for (Expression expr : values) {
-			values.set(values.indexOf(expr), doSwitch(expr));
-		}
+		castExpressionList(phi.getValues());
 		return null;
 	}
 
@@ -172,11 +180,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstStore(InstStore store) {
-		EList<Expression> indexes = store.getIndexes();
-		for (Expression expr : indexes) {
-			indexes.set(indexes.indexOf(expr), doSwitch(expr));
-		}
-		doSwitch(store.getValue());
+		store.setValue(doSwitch(store.getValue()));
+		castExpressionList(store.getIndexes());
 		return null;
 	}
 
@@ -223,6 +228,19 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		}
 
 		return expr;
+	}
+
+	private void castExpressionList(EList<Expression> expressions) {
+		EList<Expression> newExpressions = new BasicEList<Expression>();
+		for (int i = 0; i < expressions.size();) {
+			Expression expression = expressions.get(i);
+			newExpressions.add(doSwitch(expression));
+			if (expression != null) {
+				i++;
+			}
+		}
+		expressions.clear();
+		expressions.addAll(newExpressions);
 	}
 
 	private Type getParentType(Expression expr) {

@@ -158,9 +158,9 @@ elseif(op.store)><printStore(op)><
 elseif(op.assign)><printAssign(op)><
 elseif(op.phi)><printPhiAssignment(op)><
 elseif(op.return)><printReturn(op)><
-elseif(op.assignIndex)><printAssignIndex(op)><
-elseif(op.cast)><printCast(op)><
-elseif(op.ternaryOperation)><printTernaryOperation(op)><endif>
+elseif(op.instAssignIndex)><printAssignIndex(op)><
+elseif(op.instCast)><printCast(op)><
+elseif(op.instTernary)><printTernaryOperation(op)><endif>
 >>
 
 printCall(op) ::= <<
