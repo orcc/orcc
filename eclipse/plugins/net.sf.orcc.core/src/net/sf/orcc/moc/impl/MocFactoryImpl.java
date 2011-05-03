@@ -28,12 +28,14 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
+ * 
  * @generated
  */
 public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -43,28 +45,28 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	}
 
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public static MocFactory init() {
 		try {
-			MocFactory theMocFactory = (MocFactory)EPackage.Registry.INSTANCE.getEFactory("http:///net/sf/orcc/moc.ecore"); 
+			MocFactory theMocFactory = (MocFactory) EPackage.Registry.INSTANCE
+					.getEFactory("http:///net/sf/orcc/moc.ecore");
 			if (theMocFactory != null) {
 				return theMocFactory;
 			}
-		}
-		catch (Exception exception) {
+		} catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new MocFactoryImpl();
 	}
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public MocFactoryImpl() {
@@ -73,6 +75,7 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertEMapToString(EDataType eDataType, Object instanceValue) {
@@ -81,38 +84,49 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
-			case MocPackage.EMAP:
-				return convertEMapToString(eDataType, instanceValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		case MocPackage.EMAP:
+			return convertEMapToString(eDataType, instanceValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case MocPackage.CSDF_MO_C: return createCSDFMoC();
-			case MocPackage.DPN_MO_C: return createDPNMoC();
-			case MocPackage.KPN_MO_C: return createKPNMoC();
-			case MocPackage.QSDF_MO_C: return createQSDFMoC();
-			case MocPackage.SDF_MO_C: return createSDFMoC();
-			case MocPackage.ACTION_TO_SDF_MO_CMAP_ENTRY: return (EObject)createActionToSDFMoCMapEntry();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		case MocPackage.CSDF_MO_C:
+			return createCSDFMoC();
+		case MocPackage.DPN_MO_C:
+			return createDPNMoC();
+		case MocPackage.KPN_MO_C:
+			return createKPNMoC();
+		case MocPackage.QSDF_MO_C:
+			return createQSDFMoC();
+		case MocPackage.SDF_MO_C:
+			return createSDFMoC();
+		case MocPackage.ACTION_TO_SDF_MO_CMAP_ENTRY:
+			return (EObject) createActionToSDFMoCMapEntry();
+		default:
+			throw new IllegalArgumentException("The class '" + eClass.getName()
+					+ "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public CSDFMoC createCSDFMoC() {
@@ -122,6 +136,7 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public DPNMoC createDPNMoC() {
@@ -131,29 +146,33 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public EMap<?, ?> createEMapFromString(EDataType eDataType,
 			String initialValue) {
-		return (EMap<?, ?>)super.createFromString(initialValue);
+		return (EMap<?, ?>) super.createFromString(initialValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
-			case MocPackage.EMAP:
-				return createEMapFromString(eDataType, initialValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		case MocPackage.EMAP:
+			return createEMapFromString(eDataType, initialValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public KPNMoC createKPNMoC() {
@@ -163,6 +182,7 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public QSDFMoC createQSDFMoC() {
@@ -180,8 +200,8 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Map.Entry<Action, SDFMoC> createActionToSDFMoCMapEntry() {
@@ -191,10 +211,11 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public MocPackage getMocPackage() {
-		return (MocPackage)getEPackage();
+		return (MocPackage) getEPackage();
 	}
 
 } // MocFactoryImpl
