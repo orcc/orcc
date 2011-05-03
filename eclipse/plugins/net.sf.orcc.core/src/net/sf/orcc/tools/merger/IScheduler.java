@@ -43,5 +43,5 @@ public interface IScheduler {
 	 * @param network
 	 *            a network
 	 */
-	public Schedule schedule();
+	public void schedule();
 }

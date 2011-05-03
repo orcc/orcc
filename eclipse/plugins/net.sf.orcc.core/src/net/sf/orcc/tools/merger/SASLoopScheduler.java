@@ -29,7 +29,6 @@
 
 package net.sf.orcc.tools.merger;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Vertex;
 
@@ -45,16 +44,15 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
  */
 public class SASLoopScheduler extends AbstractScheduler {
 
-	public SASLoopScheduler(DirectedGraph<Vertex, Connection> graph)
-			throws OrccException {
+	public SASLoopScheduler(DirectedGraph<Vertex, Connection> graph) {
 		super(graph);
 	}
 
 	@Override
-	public Schedule schedule() {
-		Schedule schedule = new Schedule();
-		schedule.setIterationCount(1);
+	public void schedule() {
+		schedule = new Schedule();
 
+		schedule.setIterationCount(1);
 		TopologicalOrderIterator<Vertex, Connection> it = new TopologicalOrderIterator<Vertex, Connection>(
 				graph);
 
@@ -75,7 +73,6 @@ public class SASLoopScheduler extends AbstractScheduler {
 				schedule.add(iterand);
 			}
 		}
-		return schedule;
 	}
 
 }

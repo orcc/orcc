@@ -33,8 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.moc.SDFMoC;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
@@ -44,8 +43,8 @@ import org.jgrapht.DirectedGraph;
 
 /**
  * This class computes the repetition vector of the graph. All instances of the
- * network are assumed to be static (SDF/CSDF). The network classifier is
- * assumed to be computed first.
+ * network are assumed to be SDF. The network classifier is assumed to be
+ * computed first.
  * 
  * @author Ghislain Roquier
  * 
@@ -60,38 +59,60 @@ public class RepetitionVectorAnalyzer {
 
 	public RepetitionVectorAnalyzer(DirectedGraph<Vertex, Connection> graph) {
 		this.graph = graph;
+
+		analyze();
+	}
+
+	/**
+	 * Computes the repetition vector of the given SDF graph
+	 * 
+	 */
+	private void analyze() {
+		// must be an instance's vertex
+		Vertex vertex = graph.vertexSet().iterator().next();
+
+		calculateRate(vertex, new Rational(1, 1));
+
+		Iterator<Rational> it = rationals.values().iterator();
+		int lcm = it.next().getDenominator();
+		while (it.hasNext()) {
+			lcm = Rational.lcm(lcm, it.next().getDenominator());
+		}
+
+		for (Map.Entry<Vertex, Rational> entry : rationals.entrySet()) {
+
+			int rep = entry.getValue().getNumerator() * lcm
+					/ entry.getValue().getDenominator();
+
+			repetitionVector.put(entry.getKey(), rep);
+		}
+
+		checkConsistency();
 	}
 
 	/**
 	 * Calculates the rate of each instance of the graph
 	 * 
-	 * @throws OrccException
+	 * @param vertex
+	 * @param rate
 	 * 
 	 */
-	private void calculateRate(Vertex vertex, Rational rate)
-			throws OrccException {
+	private void calculateRate(Vertex vertex, Rational rate) {
 		Instance instance = vertex.getInstance();
 		if (!instance.getMoC().isSDF()) {
-			throw new OrccException("class" + instance.getClasz()
-					+ "is not static!");
+			throw new OrccRuntimeException("actor" + instance.getClasz()
+					+ "is not SDF!");
 		}
-		SDFMoC moc = (SDFMoC) instance.getMoC();
 
 		rationals.put(vertex, rate);
 
-		for (Connection connection : graph.outgoingEdgesOf(vertex)) {
-			Vertex tgt = graph.getEdgeTarget(connection);
+		for (Connection conn : graph.outgoingEdgesOf(vertex)) {
+			Vertex tgt = graph.getEdgeTarget(conn);
 			if (tgt.isInstance()) {
 				if (!rationals.containsKey(tgt)) {
-
-					int produced = moc.getNumTokensProduced(connection
-							.getSource());
-					int consumed = ((SDFMoC) tgt.getInstance().getMoC())
-							.getNumTokensConsumed(connection.getTarget());
-
-					Rational outgoingRate = rate.mul(new Rational(produced,
-							consumed));
-					calculateRate(tgt, outgoingRate);
+					int prd = conn.getSource().getNumTokensProduced();
+					int cns = conn.getTarget().getNumTokensConsumed();
+					calculateRate(tgt, rate.mul(new Rational(prd, cns)));
 				}
 			}
 		}
@@ -100,15 +121,9 @@ public class RepetitionVectorAnalyzer {
 			Vertex src = graph.getEdgeSource(connection);
 			if (src.isInstance()) {
 				if (!rationals.containsKey(src)) {
-
-					int produced = ((SDFMoC) src.getInstance().getMoC())
-							.getNumTokensProduced(connection.getSource());
-					int consumed = moc.getNumTokensConsumed(connection
-							.getTarget());
-
-					Rational incomingRate = rate.mul(new Rational(consumed,
-							produced));
-					calculateRate(src, incomingRate);
+					int prd = connection.getSource().getNumTokensProduced();
+					int cns = connection.getTarget().getNumTokensConsumed();
+					calculateRate(src, rate.mul(new Rational(cns, prd)));
 				}
 			}
 		}
@@ -116,77 +131,25 @@ public class RepetitionVectorAnalyzer {
 	}
 
 	/**
-	 * Checks the graph consistency
+	 * Checks the consistency of the given SDF graph
 	 * 
-	 * @throws OrccException
-	 *             if the graph is inconsistent
 	 */
-	private void checkConsistency() throws OrccException {
+	private void checkConsistency() {
 		for (Connection connection : graph.edgeSet()) {
-			Vertex src = graph.getEdgeSource(connection);
-			Vertex tgt = graph.getEdgeTarget(connection);
+			int srcRate = repetitionVector.get(graph.getEdgeSource(connection));
+			int tgtRate = repetitionVector.get(graph.getEdgeTarget(connection));
 
-			if (src.isInstance() && tgt.isInstance()) {
-				int produced = ((SDFMoC) src.getInstance().getMoC())
-						.getNumTokensProduced(connection.getSource());
-				int consumed = ((SDFMoC) tgt.getInstance().getMoC())
-						.getNumTokensConsumed(connection.getTarget());
+			int prd = connection.getSource().getNumTokensProduced();
+			int cns = connection.getTarget().getNumTokensConsumed();
 
-				int srcRate = repetitionVector.get(src);
-				int tgtRate = repetitionVector.get(tgt);
-
-				if (srcRate * produced != tgtRate * consumed) {
-					throw new OrccException(
-							"the given network is inconsistent!");
-				}
+			if (srcRate * prd != tgtRate * cns) {
+				throw new OrccRuntimeException(
+						"the given network is inconsistent!");
 			}
 		}
 	}
 
-	/**
-	 * Computes the repetition vector
-	 * 
-	 * @return
-	 * 
-	 * @throws OrccException
-	 *             if an actor is not static
-	 */
-	public Map<Vertex, Integer> getRepetitionVector() throws OrccException {
-		if (repetitionVector != null) {
-			Vertex vertex = null;
-
-			for (Vertex v : graph.vertexSet()) {
-				if (v.isInstance()) {
-					vertex = v;
-					break;
-				}
-			}
-
-			calculateRate(vertex, new Rational(1, 1));
-
-			Iterator<Rational> it = rationals.values().iterator();
-			int lcm = it.next().getDenominator();
-			while (it.hasNext()) {
-				lcm = Rational.lcm(lcm, it.next().getDenominator());
-			}
-
-			for (Map.Entry<Vertex, Rational> entry : rationals.entrySet()) {
-
-				int rep = entry.getValue().getNumerator() * lcm
-						/ entry.getValue().getDenominator();
-
-				repetitionVector.put(entry.getKey(), rep);
-			}
-
-			checkConsistency();
-
-			for (Map.Entry<Vertex, Integer> entry : repetitionVector.entrySet()) {
-				Integer val = entry.getValue();
-				SDFMoC moc = (SDFMoC) entry.getKey().getInstance().getMoC();
-				int nbPhases = moc.getNumberOfPhases();
-				entry.setValue(val * nbPhases);
-			}
-		}
+	public Map<Vertex, Integer> getRepetitionVector() {
 		return repetitionVector;
 	}
 

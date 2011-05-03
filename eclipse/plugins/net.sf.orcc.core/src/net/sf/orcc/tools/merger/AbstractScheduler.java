@@ -35,7 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Vertex;
 
@@ -63,14 +62,11 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	private int maxDepth;
 
-	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph)
-			throws OrccException {
+	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph) {
 		this.graph = graph;
 
 		repetitionVector = new RepetitionVectorAnalyzer(graph)
 				.getRepetitionVector();
-
-		schedule = schedule();
 	}
 
 	private void depth(Schedule schedule) {

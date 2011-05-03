@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -85,7 +84,7 @@ public class ActorMerger implements INetworkTransformation {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
-	private SASLoopScheduler scheduler;
+	private AbstractScheduler scheduler;
 
 	private int index;
 
@@ -119,23 +118,45 @@ public class ActorMerger implements INetworkTransformation {
 		superActor.getStateVars().add(varCount);
 	}
 
+	/**
+	 * 
+	 * @param ip
+	 * @param op
+	 * @return
+	 */
 	private Procedure createBody(Pattern ip, Pattern op) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
 		Procedure procedure = factory.createProcedure("staticSchedule",
 				factory.createLocation(), IrFactory.eINSTANCE.createTypeVoid());
 
-		// Add loop counters
-		Var loop = factory.createVar(factory.createLocation(),
-				factory.createTypeInt(32), "i", false, true);
-		procedure.getLocals().add(loop);
+		// Add loop counter(s)
+		int i = 0;
+		do { // one loop var is required even if the schedule as a depth of 0
+			Var counter = factory.createVar(factory.createLocation(),
+					factory.createTypeInt(32), "idx_" + i, false, true);
+			procedure.getLocals().add(counter);
+			i++;
+		} while (i < scheduler.getDepth());
+
 		Var tmp = factory.createVar(factory.createLocation(),
 				factory.createTypeInt(32), "tmp", false, true);
 		procedure.getLocals().add(tmp);
-		for (int depth = 0; depth < scheduler.getDepth(); depth++) {
-			Var counter = factory.createVar(factory.createLocation(),
-					factory.createTypeInt(32), "idx_" + depth, false, true);
-			procedure.getLocals().add(counter);
+
+		// Initialize read/write counters
+		for (Var var : buffersMap.values()) {
+			Var read = superActor.getStateVar(var.getName() + "_r");
+			Var write = superActor.getStateVar(var.getName() + "_w");
+
+			NodeBlock block = procedure.getLast();
+			if (read != null) {
+				block.add(factory.createInstStore(read,
+						factory.createExprInt(0)));
+			}
+			if (write != null) {
+				block.add(factory.createInstStore(write,
+						factory.createExprInt(0)));
+			}
 		}
 
 		createCopiesFromInputs(procedure, ip);
@@ -148,11 +169,18 @@ public class ActorMerger implements INetworkTransformation {
 		return procedure;
 	}
 
+	/**
+	 * copies the value of source into target
+	 * 
+	 * @param procedure
+	 * @param source
+	 * @param target
+	 */
 	private void createCopies(Procedure procedure, Var source, Var target) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
 		List<Node> nodes = procedure.getNodes();
-		Var loop = procedure.getLocal("i");
+		Var loop = procedure.getLocal("idx_0");
 		NodeBlock block = procedure.getLast(nodes);
 		block.add(factory.createInstAssign(loop, factory.createExprInt(0)));
 
@@ -183,7 +211,7 @@ public class ActorMerger implements INetworkTransformation {
 	private void createCopiesFromInputs(Procedure procedure, Pattern ip) {
 		for (Port port : superActor.getInputs()) {
 			Var input = ip.getVariable(port);
-			Var buffer = procedure.getLocal("i");
+			Var buffer = inputToVarMap.get(port);
 
 			createCopies(procedure, input, buffer);
 		}
@@ -304,10 +332,10 @@ public class ActorMerger implements INetworkTransformation {
 			}
 		}
 
-		SDFMoC sdfMoc = (SDFMoC) superActor.getMoC();
-		sdfMoc.setInputPattern(inputPattern);
-		sdfMoc.setOutputPattern(outputPattern);
-
+		SDFMoC sdfMoC = MocFactory.eINSTANCE.createSDFMoC();
+		sdfMoC.setInputPattern(inputPattern);
+		sdfMoC.setOutputPattern(outputPattern);
+		superActor.setMoC(sdfMoC);
 	}
 
 	/**
@@ -344,7 +372,6 @@ public class ActorMerger implements INetworkTransformation {
 	 * Creates the scheduler of the static action.
 	 * 
 	 * @return the scheduler of the static action
-	 * @throws OrccException
 	 */
 	private Procedure createScheduler() {
 		IrFactory factory = IrFactory.eINSTANCE;
@@ -403,8 +430,6 @@ public class ActorMerger implements INetworkTransformation {
 	/**
 	 * Creates the static action for this actor.
 	 * 
-	 * @return a static action
-	 * @throws OrccException
 	 */
 	private void createStaticAction() {
 		IrFactory factory = IrFactory.eINSTANCE;
@@ -485,8 +510,7 @@ public class ActorMerger implements INetworkTransformation {
 	private void mergeActors() {
 		superActor = IrFactory.eINSTANCE.createActor();
 
-		superActor.setName("SuperActor");
-		superActor.setMoC(MocFactory.eINSTANCE.createSDFMoC());
+		superActor.setName("SuperActor_" + index);
 
 		createPorts();
 
@@ -498,28 +522,27 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	@Override
-	public void transform(Network network) throws OrccException {
+	public void transform(Network network) {
 		graph = network.getGraph();
-
-		DirectedGraph<Vertex, Connection> subgraph;
-
-		// make unique instances
 
 		// static region detections
 		StaticSubsetDetector detector = new StaticSubsetDetector(network);
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
 			this.vertices = vertices;
 
-			subgraph = new DirectedSubgraph<Vertex, Connection>(graph,
-					vertices, null);
+			DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
+					graph, vertices, null);
+
+			// create the static schedule of vertices
 			scheduler = new SASLoopScheduler(subgraph);
+			scheduler.schedule();
 
 			// merge vertices inside a single actor
 			mergeActors();
 
 			// update the graph
-			Instance instance = new Instance("superActor " + index++,
-					"SuperActor");
+			Instance instance = new Instance("superActor_" + index,
+					"SuperActor_" + index++);
 			instance.setContents(superActor);
 
 			Vertex mergeVertex = new Vertex(instance);

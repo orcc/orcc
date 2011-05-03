@@ -16,7 +16,6 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -71,9 +70,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 
 		if (var.isLocal() && port != null) {
 			var = buffersMap.get(port);
-			int cns = ((TypeList) var.getType()).getSize();
-			loads.put(var, cns);
-
+			loads.put(var, port.getNumTokensConsumed());
 			use.setVariable(var);
 
 			List<Expression> indexes = load.getIndexes();
@@ -99,11 +96,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 
 		if (var.isLocal() && port != null) {
 			var = buffersMap.get(port);
-
-			int prd = ((TypeList) var.getType()).getSize();
-
-			stores.put(var, prd);
-
+			stores.put(var, port.getNumTokensProduced());
 			def.setVariable(var);
 
 			Expression e1 = factory.createExprVar(factory.createUse(superActor

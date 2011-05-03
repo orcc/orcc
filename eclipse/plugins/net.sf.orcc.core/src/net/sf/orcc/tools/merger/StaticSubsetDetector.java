@@ -75,7 +75,7 @@ public class StaticSubsetDetector {
 	}
 
 	private boolean checkCycles(DirectedGraph<Vertex, Connection> graph,
-			List<Vertex> vertices) throws OrccException {
+			List<Vertex> vertices) {
 
 		boolean ret = true;
 
@@ -153,7 +153,7 @@ public class StaticSubsetDetector {
 	 * 
 	 */
 	private void staticRegionAnalysis(DirectedGraph<Vertex, Connection> graph,
-			Vertex vertex, List<Vertex> vertices) throws OrccException {
+			Vertex vertex, List<Vertex> vertices) {
 
 		LinkedList<Vertex> stack = new LinkedList<Vertex>(Arrays.asList(vertex));
 
@@ -193,7 +193,7 @@ public class StaticSubsetDetector {
 	 * 
 	 * 
 	 */
-	public Set<Set<Vertex>> staticRegionSets() throws OrccException {
+	public Set<Set<Vertex>> staticRegionSets() {
 
 		staticRegionSet = new HashSet<Set<Vertex>>();
 		List<List<Vertex>> staticRegionList = new ArrayList<List<Vertex>>();

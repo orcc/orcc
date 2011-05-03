@@ -1,4 +1,5 @@
 import "net/sf/orcc/templates/C_actor.stg"
+import "net/sf/orcc/templates/C_actor.stg"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
@@ -90,10 +91,12 @@ printLoad(load) ::= <<
 >>
 
 printPeek(port, variable, numTokens) ::= <<
+
 m_poTabIn[<actor.simpleName>_<port.name>]-\>peek(<variable.name>, <numTokens>);<\n>
 >>
 
 printRead(port, variable, numTokens) ::= <<
+
 <if(variable)>
 m_poTabIn[<actor.simpleName>_<port.name>]-\>get(<variable.name>, <numTokens>);
 m_avails[<actor.simpleName>_<port.name>] -= <numTokens>;
@@ -172,17 +175,19 @@ while (<whileNode.condition>) {
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-<if(!procedure.native)
-><procedure.returnType> <actor.simpleName>::<procedure.name>(<procedure.parameters: varDecl(); wrap, anchor, separator=", ">)
+<if(!procedure.native)>
+<procedure.returnType> <actor.simpleName>::<procedure.name>(<procedure.parameters: varDecl(); wrap, anchor, separator=", ">)
 {
 <if(procedure.locals)>
 	<procedure.locals: {local | <varDecl(local)>;<\n>}>
 
 <endif>
-	<printNodes(procedure.nodes)>}<
-else
-	>extern <procedure.returnType> <procedure.name>(<procedure.parameters: varDecl(); wrap, anchor, separator=", ">);
+	<printNodes(procedure.nodes)>
+}
+<else>
+extern <procedure.returnType> <procedure.name>(<procedure.parameters: varDecl(); wrap, anchor, separator=", ">);
 <endif>
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
