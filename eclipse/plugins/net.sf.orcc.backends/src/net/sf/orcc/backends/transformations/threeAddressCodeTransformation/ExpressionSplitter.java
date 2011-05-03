@@ -75,20 +75,24 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		expr.setE1(doSwitch(expr.getE1()));
 		expr.setE2(doSwitch(expr.getE2()));
 
-		// Make a new assignment to the binary expression
-		Var target = procedure.newTempLocalVariable(
-				EcoreHelper.copy(expr.getType()), "expr");
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
-				EcoreHelper.copy(expr));
+		if (EcoreHelper.getContainerOfType(expr, Expression.class) != null) {
+			// Make a new assignment to the binary expression
+			Var target = procedure.newTempLocalVariable(
+					EcoreHelper.copy(expr.getType()), "expr");
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
+					EcoreHelper.copy(expr));
 
-		// Add assignment to instruction's list
-		if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
-			indexInst++;
+			// Add assignment to instruction's list
+			if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
+				indexInst++;
+			}
+
+			EcoreHelper.delete(expr);
+
+			return IrFactory.eINSTANCE.createExprVar(target);
+		} else {
+			return expr;
 		}
-
-		EcoreHelper.delete(expr);
-
-		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
 	@Override
@@ -146,20 +150,25 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 			throw new OrccRuntimeException("unsupported operator");
 		}
 
-		// Make a new assignment to the binary expression
-		Var target = procedure.newTempLocalVariable(
-				EcoreHelper.copy(expr.getType()), "expr");
-		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
-				newExpr);
+		if (EcoreHelper.getContainerOfType(expr, Expression.class) != null) {
+			// Make a new assignment to the binary expression
+			Var target = procedure.newTempLocalVariable(
+					EcoreHelper.copy(expr.getType()), "expr");
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
+					newExpr);
 
-		// Add assignment to instruction's list
-		if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
-			indexInst++;
+			// Add assignment to instruction's list
+			if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
+				indexInst++;
+			}
+
+			EcoreHelper.delete(expr);
+
+			return IrFactory.eINSTANCE.createExprVar(target);
+		} else {
+			EcoreHelper.delete(expr);
+			return newExpr;
 		}
-
-		EcoreHelper.delete(expr);
-
-		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
 	@Override
