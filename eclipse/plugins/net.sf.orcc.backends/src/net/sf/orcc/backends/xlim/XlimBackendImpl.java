@@ -56,6 +56,7 @@ import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
+import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.network.Instance;
@@ -120,6 +121,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		actor.setTemplateData(data);
 
 		ActorVisitor<?>[] transformations = {
+				new SSATransformation(),
 				new GlobalArrayInitializer(),
 				new InstTernaryAdder(),
 				new Inliner(true, true),

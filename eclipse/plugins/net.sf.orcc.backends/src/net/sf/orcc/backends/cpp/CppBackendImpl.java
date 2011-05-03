@@ -42,11 +42,6 @@ import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.transformations.DeadCodeElimination;
-import net.sf.orcc.ir.transformations.DeadGlobalElimination;
-import net.sf.orcc.ir.transformations.DeadVariableRemoval;
-import net.sf.orcc.ir.transformations.PhiRemoval;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -135,14 +130,6 @@ public class CppBackendImpl extends AbstractBackend {
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
 			new ActorClassifier().doSwitch(actor);
-		}
-
-		ActorVisitor<?>[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new PhiRemoval() };
-
-		for (ActorVisitor<?> transformation : transformations) {
-			transformation.doSwitch(actor);
 		}
 	}
 

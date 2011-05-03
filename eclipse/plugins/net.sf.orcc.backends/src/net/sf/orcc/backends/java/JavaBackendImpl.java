@@ -39,12 +39,7 @@ import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.transformations.DeadCodeElimination;
-import net.sf.orcc.ir.transformations.DeadGlobalElimination;
-import net.sf.orcc.ir.transformations.DeadVariableRemoval;
-import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
-import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.util.OrccUtil;
@@ -76,15 +71,7 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorVisitor<?>[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new RenameTransformation(this.transformations),
-				new PhiRemoval() };
-
-		for (ActorVisitor<?> transformation : transformations) {
-			transformation.doSwitch(actor);
-		}
-
+		new RenameTransformation(this.transformations).doSwitch(actor);
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {

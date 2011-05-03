@@ -45,10 +45,6 @@ import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.c.transformations.CBroadcastAdder;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.transformations.DeadCodeElimination;
-import net.sf.orcc.ir.transformations.DeadGlobalElimination;
-import net.sf.orcc.ir.transformations.DeadVariableRemoval;
-import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
@@ -217,7 +213,6 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-
 		Map<String, String> replacementMap = new HashMap<String, String>();
 		replacementMap.put("abs", "abs_my_precious");
 		replacementMap.put("getw", "getw_my_precious");
@@ -233,9 +228,7 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		ActorVisitor<?>[] transformations = { new TypeSizeTransformation(),
-				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new DeadVariableRemoval(),
-				new RenameTransformation(replacementMap), new PhiRemoval() };
+				new RenameTransformation(replacementMap) };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);

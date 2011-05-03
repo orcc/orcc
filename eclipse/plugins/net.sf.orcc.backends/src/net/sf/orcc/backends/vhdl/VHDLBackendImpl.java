@@ -59,6 +59,7 @@ import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
+import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.network.Instance;
@@ -128,6 +129,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		ActorVisitor<?>[] transformationsCodegen = {
 				// cleanup code
+				new SSATransformation(),
 				new DeadGlobalElimination(),
 				new DeadCodeElimination(),
 				new DeadVariableRemoval(),

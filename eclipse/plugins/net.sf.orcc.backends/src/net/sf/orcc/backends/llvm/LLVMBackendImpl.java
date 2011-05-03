@@ -49,6 +49,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
@@ -127,11 +128,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 			}
 		}
 
-		ActorVisitor<?>[] transformations = { //new TypeSizeTransformation(),
-				//new BoolToIntTransformation(), 
-				//new PrintlnTransformation(),
-				//new RenameTransformation(this.transformations),
-				new ThreeAddressCodeTransformation()//, new GetElementPtrAdder() 
+		ActorVisitor<?>[] transformations = { new SSATransformation(),
+				// new TypeSizeTransformation(),
+				// new BoolToIntTransformation(),
+				// new PrintlnTransformation(),
+				// new RenameTransformation(this.transformations),
+				new ThreeAddressCodeTransformation() // , new
+														// GetElementPtrAdder()
 		};
 
 		for (ActorVisitor<?> transformation : transformations) {

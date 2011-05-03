@@ -33,7 +33,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
-import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.EcoreHelper;
 
 import org.eclipse.core.resources.IFile;
@@ -82,7 +81,6 @@ public class Frontend {
 	public void compile(IFile file, AstActor astActor) throws OrccException {
 		try {
 			Actor actor = actorTransformer.transform(file, astActor);
-			new SSATransformation().doSwitch(actor);
 			new IRWriter(actor).write(outputFolder, prettyPrint);
 			EcoreHelper.serializeActor(outputFolder.getLocation().toOSString(),
 					actor);
