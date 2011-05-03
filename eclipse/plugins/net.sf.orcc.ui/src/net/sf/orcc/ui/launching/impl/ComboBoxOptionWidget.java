@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.plugins.ComboBoxItem;
-import net.sf.orcc.plugins.ComboBoxOption;
+import net.sf.orcc.plugins.OptionComboBox;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 
@@ -69,7 +69,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 
 	private OrccAbstractSettingsTab launchConfigurationTab;
 
-	private ComboBoxOption option;
+	private OptionComboBox option;
 	
 	private Label lbl;
 
@@ -84,7 +84,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 	 * Creates a new combo box option.
 	 */
 	public ComboBoxOptionWidget(OrccAbstractSettingsTab tab,
-			ComboBoxOption option, Composite parent) {
+			OptionComboBox option, Composite parent) {
 		this.launchConfigurationTab = tab;
 		this.option = option;
 		this.value = -1;

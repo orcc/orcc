@@ -149,6 +149,6 @@ public interface OrccLaunchConstants {
 	 * Input file associated with an Orcc configuration. Must be kept in sync
 	 * with options in the back-ends plug-in.
 	 */
-	public static final String XDF_FILE = "net.sf.orcc.plugins.xdfFile";
+	public static final String XDF_FILE = "net.sf.orcc.core.xdfFile";
 
 }

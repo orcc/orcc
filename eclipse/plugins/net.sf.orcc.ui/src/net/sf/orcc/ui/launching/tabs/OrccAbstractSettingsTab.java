@@ -276,7 +276,7 @@ public abstract class OrccAbstractSettingsTab extends
 		return BACKEND;
 	}
 
-	private IProject getProjectFromText() {
+	public IProject getProjectFromText() {
 		String value = textProject.getText();
 		if (value.isEmpty()) {
 			return null;

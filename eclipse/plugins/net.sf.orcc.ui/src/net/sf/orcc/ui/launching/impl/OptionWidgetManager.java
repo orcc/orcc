@@ -31,11 +31,12 @@ package net.sf.orcc.ui.launching.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.plugins.BrowseFileOption;
-import net.sf.orcc.plugins.CheckboxOption;
-import net.sf.orcc.plugins.ComboBoxOption;
-import net.sf.orcc.plugins.PluginOption;
-import net.sf.orcc.plugins.TextBoxOption;
+import net.sf.orcc.plugins.OptionBrowseFile;
+import net.sf.orcc.plugins.OptionCheckbox;
+import net.sf.orcc.plugins.OptionComboBox;
+import net.sf.orcc.plugins.Option;
+import net.sf.orcc.plugins.OptionSelectNetwork;
+import net.sf.orcc.plugins.OptionTextBox;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 
@@ -54,28 +55,30 @@ import org.eclipse.swt.widgets.Composite;
 public class OptionWidgetManager {
 
 	private static OptionWidget createOption(OrccAbstractSettingsTab tab,
-			PluginOption option, Composite parent) {
-		if (option instanceof CheckboxOption) {
-			return new CheckBoxOptionWidget(tab, (CheckboxOption) option,
+			Option option, Composite parent) {
+		if (option instanceof OptionCheckbox) {
+			return new CheckBoxOptionWidget(tab, (OptionCheckbox) option,
 					parent);
-		} else if (option instanceof BrowseFileOption) {
-			return new BrowseFileOptionWidget(tab, (BrowseFileOption) option,
+		} else if (option instanceof OptionBrowseFile) {
+			return new BrowseFileOptionWidget(tab, (OptionBrowseFile) option,
 					parent);
-		} else if (option instanceof ComboBoxOption) {
-			return new ComboBoxOptionWidget(tab, (ComboBoxOption) option,
+		} else if (option instanceof OptionComboBox) {
+			return new ComboBoxOptionWidget(tab, (OptionComboBox) option,
 					parent);
-		} else if (option instanceof TextBoxOption) {
-			return new TextBoxOptionWidget(tab, (TextBoxOption) option,
-					parent);
+		} else if (option instanceof OptionTextBox) {
+			return new TextBoxOptionWidget(tab, (OptionTextBox) option, parent);
+		} else if (option instanceof OptionSelectNetwork) {
+			return new SelectNetworkOptionWidget(tab,
+					(OptionSelectNetwork) option, parent);
 		} else {
 			return null;
 		}
 	}
 
 	public static List<OptionWidget> createOptions(OrccAbstractSettingsTab tab,
-			List<PluginOption> options, Composite parent) {
+			List<Option> options, Composite parent) {
 		List<OptionWidget> widgets = new ArrayList<OptionWidget>();
-		for (PluginOption option : options) {
+		for (Option option : options) {
 			OptionWidget widget = createOption(tab, option, parent);
 			if (widget != null) {
 				widgets.add(widget);

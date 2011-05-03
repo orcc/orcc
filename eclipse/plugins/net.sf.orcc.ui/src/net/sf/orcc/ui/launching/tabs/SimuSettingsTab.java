@@ -33,7 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import java.util.HashMap;
 import java.util.List;
 
-import net.sf.orcc.plugins.PluginOption;
+import net.sf.orcc.plugins.Option;
 import net.sf.orcc.simulators.SimulatorFactory;
 import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.ui.launching.OptionWidget;
@@ -107,7 +107,7 @@ public class SimuSettingsTab extends OrccAbstractSettingsTab {
 	protected void createOptions() {
 		SimulatorFactory factory = SimulatorFactory.getInstance();
 		for (String simulator : factory.listPlugins()) {
-			List<PluginOption> options = factory.getOptions(simulator);
+			List<Option> options = factory.getOptions(simulator);
 			List<OptionWidget> widgets = OptionWidgetManager.createOptions(
 					this, options, groupOptions);
 			optionWidgets.put(simulator, widgets);

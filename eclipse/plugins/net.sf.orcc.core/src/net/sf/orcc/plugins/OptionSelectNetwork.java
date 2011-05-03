@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,55 +26,14 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins.impl;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.orcc.plugins.ComboBoxItem;
-import net.sf.orcc.plugins.ComboBoxOption;
-import net.sf.orcc.plugins.PluginOption;
+package net.sf.orcc.plugins;
 
 /**
- * This class defines the implementation of a combox option.
+ * This interface defines the option "selectNetwork".
  * 
- * @author Jerome Gorin
+ * @author Matthieu Wipliez
  * 
  */
-
-public class ComboboxOptionImpl extends PluginOptionImpl implements
-		ComboBoxOption {
-
-	private List<ComboBoxItem> comboboxItems;
-	private List<PluginOption> options;
-
-	public ComboboxOptionImpl() {
-		this.comboboxItems = new ArrayList<ComboBoxItem>();
-	}
-
-	@Override
-	public List<ComboBoxItem> getComboBoxItems() {
-		return this.comboboxItems;
-	}
-
-	@Override
-	public List<PluginOption> getOptions() {
-		return options;
-	}
-
-	@Override
-	public void setComboBoxItems(List<ComboBoxItem> comboboxItems) {
-		this.comboboxItems = comboboxItems;
-	}
-
-	@Override
-	public void setOptions(List<PluginOption> options) {
-		this.options = options;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", options: " + getOptions();
-	}
+public interface OptionSelectNetwork extends Option {
 
 }

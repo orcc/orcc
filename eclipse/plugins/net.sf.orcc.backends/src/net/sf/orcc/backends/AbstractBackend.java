@@ -61,7 +61,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 
@@ -484,7 +483,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		IProject project = root.getProject(name);
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
-		inputFile = root.getFile(new Path(getAttribute(XDF_FILE, "")));
+		inputFile = OrccUtil.getNetwork(project, getAttribute(XDF_FILE, ""));
 
 		String outputFolder;
 		Object obj = options.get(OUTPUT_FOLDER);
@@ -523,13 +522,13 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		String[] args = (String[]) map
 				.get(IApplicationContext.APPLICATION_ARGS);
 		if (args.length == 3) {
-			String project = args[0];
-			String inputFile = args[1];
+			String projectName = args[0];
+			String networkName = args[1];
 			String outputFolder = args[2];
 
 			Map<String, Object> options = new HashMap<String, Object>();
-			options.put(PROJECT, project);
-			options.put(XDF_FILE, inputFile);
+			options.put(PROJECT, projectName);
+			options.put(XDF_FILE, networkName);
 			options.put(OUTPUT_FOLDER, outputFolder);
 
 			try {
@@ -543,7 +542,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 			}
 		} else {
 			System.err.println("Usage: " + getClass().getSimpleName()
-					+ " <project> <input XDF network> <output folder>");
+					+ " <project> <qualified.name.of.Network> <output folder>");
 		}
 		return IApplication.EXIT_OK;
 	}

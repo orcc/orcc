@@ -23,5 +23,15 @@
             type="ir">
       </parser>
    </extension>
+   <extension
+         point="net.sf.orcc.core.options">
+      <option
+            description="Qualified name of top XDF network"
+            id="net.sf.orcc.core.xdfFile"
+            name="XDF name">
+         <selectNetwork>
+         </selectNetwork>
+      </option>
+   </extension>
 
 </plugin>

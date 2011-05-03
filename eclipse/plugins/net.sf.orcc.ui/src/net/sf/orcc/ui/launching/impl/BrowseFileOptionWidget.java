@@ -31,7 +31,7 @@ package net.sf.orcc.ui.launching.impl;
 import java.io.File;
 
 import net.sf.orcc.OrccActivator;
-import net.sf.orcc.plugins.BrowseFileOption;
+import net.sf.orcc.plugins.OptionBrowseFile;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 
@@ -85,7 +85,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 
 	private OrccAbstractSettingsTab launchConfigurationTab;
 
-	private BrowseFileOption option;
+	private OptionBrowseFile option;
 
 	/**
 	 * Text connected with the option
@@ -103,7 +103,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 * Creates a new input file option.
 	 */
 	public BrowseFileOptionWidget(OrccAbstractSettingsTab tab,
-			BrowseFileOption option, Composite parent) {
+			OptionBrowseFile option, Composite parent) {
 		this.launchConfigurationTab = tab;
 		this.option = option;
 		this.value = "";

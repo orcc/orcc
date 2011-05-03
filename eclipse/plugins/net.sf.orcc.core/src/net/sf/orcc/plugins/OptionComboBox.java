@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,59 +26,31 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins.impl;
+package net.sf.orcc.plugins;
 
-import net.sf.orcc.plugins.BrowseFileOption;
+import java.util.List;
 
 /**
- * This class defines the implementation of a plugin option.
+ * This interface defines the option "comboBox".
  * 
+ * @author Jerome Gorin
  * @author Matthieu Wipliez
  * 
  */
-public class BrowseFileOptionImpl extends PluginOptionImpl implements
-		BrowseFileOption {
+public interface OptionComboBox extends Option {
 
-	private String extension;
+	/**
+	 * Returns all the possible selections ComboBoxItem.
+	 * 
+	 * @return a list of all the possible selections ComboBoxItem
+	 */
+	List<ComboBoxItem> getComboBoxItems();
 
-	private boolean folder;
-
-	private boolean workspace;
-
-	@Override
-	public String getExtension() {
-		return extension;
-	}
-
-	@Override
-	public boolean isFolder() {
-		return folder;
-	}
-
-	@Override
-	public boolean isWorkspace() {
-		return workspace;
-	}
-
-	@Override
-	public void setExtension(String extension) {
-		this.extension = extension;
-	}
-
-	@Override
-	public void setFolder(boolean folder) {
-		this.folder = folder;
-	}
-
-	@Override
-	public void setWorkspace(boolean workspace) {
-		this.workspace = workspace;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", extension: " + getExtension()
-				+ ", isWorkspace: " + isWorkspace();
-	}
+	/**
+	 * Returns the options that are required with the current choice.
+	 * 
+	 * @return the options that are required with the current choice
+	 */
+	List<Option> getOptions();
 
 }

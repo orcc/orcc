@@ -45,6 +45,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
@@ -193,6 +194,29 @@ public class OrccUtil {
 	 */
 	public static String getFolder(Actor actor) {
 		return actor.getPackage().replace('.', '/');
+	}
+
+	/**
+	 * Returns the network in the given project that has the given qualified
+	 * name.
+	 * 
+	 * @param project
+	 *            project
+	 * @param networkName
+	 *            qualified name of a network
+	 * @return if there is such a network, a file, otherwise <code>null</code>
+	 */
+	public static IFile getNetwork(IProject project, String networkName) {
+		String name = networkName.replace('.', '/');
+		IPath path = new Path(name).addFileExtension("xdf");
+		for (IFolder folder : OrccUtil.getSourceFolders(project)) {
+			IFile inputFile = folder.getFile(path);
+			if (inputFile != null && inputFile.exists()) {
+				return inputFile;
+			}
+		}
+
+		return null;
 	}
 
 	/**

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.plugins.impl;
 
-import net.sf.orcc.plugins.Option;
+import net.sf.orcc.plugins.OptionBrowseFile;
 
 /**
  * This class defines the implementation of a plugin option.
@@ -36,60 +36,49 @@ import net.sf.orcc.plugins.Option;
  * @author Matthieu Wipliez
  * 
  */
-public class PluginOptionImpl implements Option {
+public class OptionBrowseFileImpl extends PluginOptionImpl implements
+		OptionBrowseFile {
 
-	private String defaultValue;
+	private String extension;
 
-	private String description;
+	private boolean folder;
 
-	private String identifier;
-
-	private String name;
+	private boolean workspace;
 
 	@Override
-	public String getDefaultValue() {
-		return defaultValue;
+	public String getExtension() {
+		return extension;
 	}
 
 	@Override
-	public String getDescription() {
-		return description;
+	public boolean isFolder() {
+		return folder;
 	}
 
 	@Override
-	public String getIdentifier() {
-		return identifier;
+	public boolean isWorkspace() {
+		return workspace;
 	}
 
 	@Override
-	public String getName() {
-		return name;
+	public void setExtension(String extension) {
+		this.extension = extension;
 	}
 
 	@Override
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
+	public void setFolder(boolean folder) {
+		this.folder = folder;
 	}
 
 	@Override
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	@Override
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
-
-	@Override
-	public void setName(String name) {
-		this.name = name;
+	public void setWorkspace(boolean workspace) {
+		this.workspace = workspace;
 	}
 
 	@Override
 	public String toString() {
-		return "identifier: " + getIdentifier() + ", name: " + getName()
-				+ ", default: " + getDefaultValue();
+		return super.toString() + ", extension: " + getExtension()
+				+ ", isWorkspace: " + isWorkspace();
 	}
 
 }

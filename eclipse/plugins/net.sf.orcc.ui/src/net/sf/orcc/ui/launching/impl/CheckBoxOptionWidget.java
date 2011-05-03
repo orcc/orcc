@@ -30,7 +30,7 @@ package net.sf.orcc.ui.launching.impl;
 
 import java.util.List;
 
-import net.sf.orcc.plugins.CheckboxOption;
+import net.sf.orcc.plugins.OptionCheckbox;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 
@@ -65,7 +65,7 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 
 	private OrccAbstractSettingsTab launchConfigurationTab;
 
-	private CheckboxOption option;
+	private OptionCheckbox option;
 
 	/**
 	 * Value of the option
@@ -77,7 +77,7 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	/**
 	 * Creates a new input file option.
 	 */
-	public CheckBoxOptionWidget(OrccAbstractSettingsTab tab, CheckboxOption option,
+	public CheckBoxOptionWidget(OrccAbstractSettingsTab tab, OptionCheckbox option,
 			Composite parent) {
 		this.launchConfigurationTab = tab;
 		this.option = option;

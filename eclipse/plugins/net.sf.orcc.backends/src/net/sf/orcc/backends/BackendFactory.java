@@ -31,13 +31,9 @@ package net.sf.orcc.backends;
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccActivator;
 import net.sf.orcc.plugins.PluginFactory;
-import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -72,17 +68,9 @@ public class BackendFactory extends PluginFactory {
 	 * initialized
 	 */
 	private BackendFactory() {
-		pluginOptions = new HashMap<String, List<PluginOption>>();
-		options = new HashMap<String, PluginOption>();
-
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IConfigurationElement[] elements = registry
-				.getConfigurationElementsFor(OrccActivator.PLUGIN_ID
-						+ ".options");
-
-		parseOptions(elements);
-		elements = registry.getConfigurationElementsFor(Activator.PLUGIN_ID
-				+ ".backends");
+				.getConfigurationElementsFor(Activator.PLUGIN_ID + ".backends");
 
 		parsePlugins(elements);
 	}

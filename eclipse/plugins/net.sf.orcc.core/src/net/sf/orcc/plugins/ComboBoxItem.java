@@ -30,7 +30,7 @@ package net.sf.orcc.plugins;
 
 import java.util.List;
 
-public interface ComboBoxItem extends PluginOption {
+public interface ComboBoxItem extends Option {
 
 	/**
 	 * Returns the id of the item.
@@ -44,7 +44,7 @@ public interface ComboBoxItem extends PluginOption {
 	 * 
 	 * @return the options that are enabled when this item is
 	 */
-	List<PluginOption> getOptions();
+	List<Option> getOptions();
 
 	/**
 	 * Set the id of the item.
@@ -54,11 +54,4 @@ public interface ComboBoxItem extends PluginOption {
 	 */
 	void setId(String id);
 
-	/**
-	 * Sets the options that are enabled when this item is.
-	 * 
-	 * @param options
-	 *            the options that are enabled when this item is
-	 */
-	void setOptions(List<PluginOption> options);
 }

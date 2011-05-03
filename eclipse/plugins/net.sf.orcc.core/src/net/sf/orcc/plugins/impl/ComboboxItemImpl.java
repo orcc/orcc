@@ -28,15 +28,21 @@
  */
 package net.sf.orcc.plugins.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.plugins.ComboBoxItem;
-import net.sf.orcc.plugins.PluginOption;
+import net.sf.orcc.plugins.Option;
 
 public class ComboboxItemImpl extends PluginOptionImpl implements ComboBoxItem {
 
 	private String id;
-	private List<PluginOption> options;
+
+	private List<Option> options;
+	
+	public ComboboxItemImpl() {
+		options = new ArrayList<Option>(0);
+	}
 
 	@Override
 	public String getId() {
@@ -44,7 +50,7 @@ public class ComboboxItemImpl extends PluginOptionImpl implements ComboBoxItem {
 	}
 
 	@Override
-	public List<PluginOption> getOptions() {
+	public List<Option> getOptions() {
 		return options;
 	}
 
@@ -54,12 +60,8 @@ public class ComboboxItemImpl extends PluginOptionImpl implements ComboBoxItem {
 	}
 
 	@Override
-	public void setOptions(List<PluginOption> options) {
-		this.options = options;
-	}
-
-	@Override
 	public String toString() {
 		return super.toString() + ", options: " + getOptions();
 	}
+
 }

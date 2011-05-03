@@ -54,6 +54,7 @@
             <element ref="checkBox"/>
             <element ref="comboBox"/>
             <element ref="textBox"/>
+            <element ref="selectNetwork"/>
          </choice>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -114,8 +115,11 @@
 
    <element name="checkBox">
       <complexType>
-         <sequence>
-            <element ref="option" minOccurs="0" maxOccurs="unbounded"/>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <choice>
+               <element ref="optionRef"/>
+               <element ref="option"/>
+            </choice>
          </sequence>
       </complexType>
    </element>
@@ -131,7 +135,10 @@
    <element name="comboBoxItem">
       <complexType>
          <sequence minOccurs="0" maxOccurs="unbounded">
-            <element ref="option"/>
+            <choice>
+               <element ref="optionRef"/>
+               <element ref="option"/>
+            </choice>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -143,10 +150,24 @@
       </complexType>
    </element>
 
-   <element name="textBox">
+   <element name="textBox" type="string">
+   </element>
+
+   <element name="selectNetwork" type="string">
+   </element>
+
+   <element name="optionRef">
       <complexType>
-         <sequence minOccurs="0" maxOccurs="unbounded">
-         </sequence>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="net.sf.orcc.core.options/option/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

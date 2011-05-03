@@ -22,29 +22,11 @@
          </checkBox>
       </option>
       <option
-            description="XDF description of the CAL actors network"
-            id="net.sf.orcc.plugins.xdfFile"
-            name="XDF file">
-         <browseFile
-               folder="false"
-               workspace="true">
-         </browseFile>
-      </option>
-      <option
             description="Input data to be pushed to the CAL network we want to simulate"
             id="net.sf.orcc.simulators.inputStimulus"
             name="Input stimulus">
          <browseFile
                folder="false"
-               workspace="false">
-         </browseFile>
-      </option>
-      <option
-            description="Folder where the simulator can find FU from the VTL "
-            id="net.sf.orcc.simulators.VTLFolder"
-            name="VTL Folder">
-         <browseFile
-               folder="true"
                workspace="false">
          </browseFile>
       </option>
@@ -123,7 +105,7 @@
                id="net.sf.orcc.simulators.enableTraces">
          </option>
          <option
-               id="net.sf.orcc.plugins.xdfFile">
+               id="net.sf.orcc.core.xdfFile">
          </option>
          <option
                id="net.sf.orcc.simulators.inputStimulus">
@@ -136,13 +118,10 @@
                id="net.sf.orcc.simulators.enableTraces">
          </option>
          <option
-               id="net.sf.orcc.plugins.xdfFile">
+               id="net.sf.orcc.core.xdfFile">
          </option>
          <option
                id="net.sf.orcc.simulators.inputStimulus">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.VTLFolder">
          </option>
          <option
                id="net.sf.orcc.simulators.enableComparison">

@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.plugins.PluginOption;
+import net.sf.orcc.plugins.Option;
 import net.sf.orcc.ui.OrccUiActivator;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
@@ -159,7 +159,7 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 	protected void createOptions() {
 		BackendFactory factory = BackendFactory.getInstance();
 		for (String backend : factory.listPlugins()) {
-			List<PluginOption> options = factory.getOptions(backend);
+			List<Option> options = factory.getOptions(backend);
 			List<OptionWidget> widgets = OptionWidgetManager.createOptions(
 					this, options, groupOptions);
 			optionWidgets.put(backend, widgets);

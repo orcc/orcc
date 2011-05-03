@@ -30,13 +30,9 @@ package net.sf.orcc.simulators;
 
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccActivator;
 import net.sf.orcc.plugins.PluginFactory;
-import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -72,17 +68,10 @@ public class SimulatorFactory extends PluginFactory {
 	 * initialized
 	 */
 	private SimulatorFactory() {
-		pluginOptions = new HashMap<String, List<PluginOption>>();
-		options = new HashMap<String, PluginOption>();
-
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IConfigurationElement[] elements = registry
-				.getConfigurationElementsFor(OrccActivator.PLUGIN_ID
-						+ ".options");
-
-		parseOptions(elements);
-		elements = registry.getConfigurationElementsFor(Activator.PLUGIN_ID
-				+ ".simulators");
+				.getConfigurationElementsFor(Activator.PLUGIN_ID
+						+ ".simulators");
 
 		parsePlugins(elements);
 	}

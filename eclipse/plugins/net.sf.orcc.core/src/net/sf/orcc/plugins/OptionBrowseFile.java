@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,22 +28,57 @@
  */
 package net.sf.orcc.plugins;
 
-import java.util.List;
-
-public interface CheckboxOption extends PluginOption {
-
-	/**
-	 * Returns the options that are enabled when this checkbox is.
-	 * 
-	 * @return the options that are enabled when this checkbox is
-	 */
-	List<PluginOption> getOptions();
+/**
+ * This interface defines the option "browseFile".
+ * 
+ * @author Jerome Gorin
+ * @author Matthieu Wipliez
+ * 
+ */
+public interface OptionBrowseFile extends Option {
 
 	/**
-	 * Sets the options that are enabled when this checkbox is.
+	 * Returns the extension that this "input file" should have.
 	 * 
-	 * @param options
-	 *            the options that are enabled when this checkbox is
+	 * @return the extension that this "input file" should have
 	 */
-	void setOptions(List<PluginOption> options);
+	String getExtension();
+
+	/**
+	 * Returns whether we should select a folder or a regular file.
+	 * 
+	 * @return whether we should select a folder or a regular file
+	 */
+	boolean isFolder();
+
+	/**
+	 * Returns whether we should browse the workspace or the file system.
+	 * 
+	 * @return whether we should browse the workspace or the file system
+	 */
+	boolean isWorkspace();
+
+	/**
+	 * Sets the extension that this "input file" should have.
+	 * 
+	 * @param extension
+	 *            the extension that this "input file" should have
+	 */
+	void setExtension(String extension);
+
+	/**
+	 * Sets whether we should select a folder or a regular file.
+	 * 
+	 * @param folder
+	 *            whether we should select a folder or a regular file
+	 */
+	void setFolder(boolean folder);
+
+	/**
+	 * Sets whether we should browse the workspace or the file system.
+	 * 
+	 * @param workspace
+	 *            whether we should browse the workspace or the file system
+	 */
+	void setWorkspace(boolean workspace);
 }

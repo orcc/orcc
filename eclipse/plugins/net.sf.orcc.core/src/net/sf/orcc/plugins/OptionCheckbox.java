@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IRISA
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IRISA nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -31,26 +31,19 @@ package net.sf.orcc.plugins;
 import java.util.List;
 
 /**
- * This interface defines an option of a TextBox.
+ * This interface defines the option "checkbox".
  * 
- * @author Jerome Gorin
  * @author Matthieu Wipliez
+ * @author Jerome Gorin
  * 
  */
-public interface TextBoxOption extends PluginOption {
+public interface OptionCheckbox extends Option {
 
 	/**
-	 * Returns the options that are enabled when this textbox is.
+	 * Returns the options that are enabled when this checkbox is.
 	 * 
-	 * @return the options that are enabled when this textbox is
+	 * @return the options that are enabled when this checkbox is
 	 */
-	List<PluginOption> getOptions();
+	List<Option> getOptions();
 
-	/**
-	 * Sets the options that are enabled when this textbox is.
-	 * 
-	 * @param options
-	 *            the options that are enabled when this textbox is
-	 */
-	void setOptions(List<PluginOption> options);
 }

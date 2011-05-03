@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,35 +28,15 @@
  */
 package net.sf.orcc.plugins.impl;
 
-import java.util.List;
-
-import net.sf.orcc.plugins.CheckboxOption;
-import net.sf.orcc.plugins.PluginOption;
+import net.sf.orcc.plugins.OptionSelectNetwork;
 
 /**
- * This class defines the implementation of a plugin option.
+ * This interface defines the option "selectNetwork".
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CheckboxOptionImpl extends PluginOptionImpl implements
-		CheckboxOption {
-
-	private List<PluginOption> options;
-
-	@Override
-	public List<PluginOption> getOptions() {
-		return options;
-	}
-
-	@Override
-	public void setOptions(List<PluginOption> options) {
-		this.options = options;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", options: " + getOptions();
-	}
+public class OptionSelectNetworkImpl extends PluginOptionImpl implements
+		OptionSelectNetwork {
 
 }

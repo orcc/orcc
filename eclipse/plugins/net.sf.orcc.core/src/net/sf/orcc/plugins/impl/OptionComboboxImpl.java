@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,39 +26,46 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins;
+package net.sf.orcc.plugins.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface ComboBoxOption extends PluginOption {
+import net.sf.orcc.plugins.ComboBoxItem;
+import net.sf.orcc.plugins.OptionComboBox;
+import net.sf.orcc.plugins.Option;
 
-	/**
-	 * Returns all the possible selections ComboBoxItem.
-	 * 
-	 * @return a list of all the possible selections ComboBoxItem
-	 */
-	List<ComboBoxItem> getComboBoxItems();
+/**
+ * This class defines the implementation of a combox option.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+public class OptionComboboxImpl extends PluginOptionImpl implements
+		OptionComboBox {
 
-	/**
-	 * Returns the options that are required with the current choice.
-	 * 
-	 * @return the options that are required with the current choice
-	 */
-	List<PluginOption> getOptions();
+	private List<ComboBoxItem> comboboxItems;
 
-	/**
-	 * Set ComboBoxItems possible selection.
-	 * 
-	 * @param item
-	 *            a list of ComboBoxItem possible selection
-	 */
-	void setComboBoxItems(List<ComboBoxItem> comboboxItems);
+	private List<Option> options;
 
-	/**
-	 * Sets the options that are required with the current choice.
-	 * 
-	 * @param options
-	 *            the options that are required with the current choice
-	 */
-	void setOptions(List<PluginOption> options);
+	public OptionComboboxImpl() {
+		comboboxItems = new ArrayList<ComboBoxItem>(0);
+		options = new ArrayList<Option>(0);
+	}
+
+	@Override
+	public List<ComboBoxItem> getComboBoxItems() {
+		return this.comboboxItems;
+	}
+
+	@Override
+	public List<Option> getOptions() {
+		return options;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", options: " + getOptions();
+	}
+
 }

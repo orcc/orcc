@@ -26,70 +26,75 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins.impl;
-
-import net.sf.orcc.plugins.Option;
+package net.sf.orcc.plugins;
 
 /**
- * This class defines the implementation of a plugin option.
+ * This interface defines an option of a plugin.
  * 
+ * @author Jerome Gorin
  * @author Matthieu Wipliez
  * 
  */
-public class PluginOptionImpl implements Option {
+public interface Option {
 
-	private String defaultValue;
+	/**
+	 * Returns the option's default value.
+	 * 
+	 * @return the option's default value
+	 */
+	String getDefaultValue();
 
-	private String description;
+	/**
+	 * Returns the description of the option.
+	 * 
+	 * @return the description of the option
+	 */
+	String getDescription();
 
-	private String identifier;
+	/**
+	 * Returns the option's identifier.
+	 * 
+	 * @return the option's identifier
+	 */
+	String getIdentifier();
 
-	private String name;
+	/**
+	 * Returns the option's name.
+	 * 
+	 * @return the option's name
+	 */
+	String getName();
 
-	@Override
-	public String getDefaultValue() {
-		return defaultValue;
-	}
+	/**
+	 * Sets the default value of this option.
+	 * 
+	 * @param defaultValue
+	 *            the default value of this option
+	 */
+	void setDefaultValue(String defaultValue);
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
+	/**
+	 * Sets the description of the option.
+	 * 
+	 * @param description
+	 *            the description of the option
+	 */
+	void setDescription(String description);
 
-	@Override
-	public String getIdentifier() {
-		return identifier;
-	}
+	/**
+	 * Sets the option's identifier.
+	 * 
+	 * @param identifier
+	 *            the option's identifier
+	 */
+	void setIdentifier(String identifier);
 
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public void setDefaultValue(String defaultValue) {
-		this.defaultValue = defaultValue;
-	}
-
-	@Override
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	@Override
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
-
-	@Override
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public String toString() {
-		return "identifier: " + getIdentifier() + ", name: " + getName()
-				+ ", default: " + getDefaultValue();
-	}
+	/**
+	 * Sets the option name.
+	 * 
+	 * @param name
+	 *            the option name
+	 */
+	void setName(String name);
 
 }

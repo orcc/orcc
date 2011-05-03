@@ -72,7 +72,6 @@ import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.w3c.dom.Document;
@@ -770,17 +769,15 @@ public class XDFParser {
 		newInst.getAttributes().putAll(attributes);
 		newInst.getParameters().putAll(parameters);
 
-		String fileName = clasz.replace('.', '/') + ".xdf";
+		// try to find network with the given name
 		IProject project = file.getProject();
-		List<IFolder> folders = OrccUtil.getSourceFolders(project);
-		for (IFolder folder : folders) {
-			IFile refinement = folder.getFile(fileName);
-			if (refinement != null && refinement.exists()) {
-				// parse and set contents
-				XDFParser parser = new XDFParser(refinement, newInst);
-				Network network = parser.parseNetwork();
-				newInst.setContents(network);
-			}
+		IFile networkFile = OrccUtil.getNetwork(project, clasz);
+
+		// if found, parse and set contents
+		if (networkFile != null) {
+			XDFParser parser = new XDFParser(networkFile, newInst);
+			Network network = parser.parseNetwork();
+			newInst.setContents(network);
 		}
 
 		return newInst;

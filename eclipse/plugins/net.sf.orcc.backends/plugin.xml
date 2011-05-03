@@ -159,16 +159,9 @@
                id="net.sf.orcc.plugins.compileXDF"
                name="Compile XDF Network">
             <checkBox>
-               <option
-                     description="Specify the top-level file to compile"
-                     id="net.sf.orcc.plugins.xdfFile"
-                     name="XDF file">
-                  <browseFile
-                        extension="xdf"
-                        folder="false"
-                        workspace="true">
-                  </browseFile>
-               </option>
+               <optionRef
+                     id="net.sf.orcc.core.xdfFile">
+               </optionRef>
             </checkBox>
          </option>
          <option

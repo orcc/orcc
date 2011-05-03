@@ -28,20 +28,26 @@
  */
 package net.sf.orcc.plugins;
 
+import static net.sf.orcc.OrccActivator.PLUGIN_ID;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.orcc.plugins.impl.BrowseFileOptionImpl;
-import net.sf.orcc.plugins.impl.CheckboxOptionImpl;
 import net.sf.orcc.plugins.impl.ComboboxItemImpl;
-import net.sf.orcc.plugins.impl.ComboboxOptionImpl;
+import net.sf.orcc.plugins.impl.OptionBrowseFileImpl;
+import net.sf.orcc.plugins.impl.OptionCheckboxImpl;
+import net.sf.orcc.plugins.impl.OptionComboboxImpl;
+import net.sf.orcc.plugins.impl.OptionSelectNetworkImpl;
+import net.sf.orcc.plugins.impl.OptionTextBoxImpl;
 import net.sf.orcc.plugins.impl.PluginOptionImpl;
-import net.sf.orcc.plugins.impl.TextBoxOptionImpl;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 
 /**
  * A factory class that contains a list of plugins and their options. The
@@ -60,20 +66,30 @@ public class PluginFactory {
 	/**
 	 * list of options.
 	 */
-	protected Map<String, PluginOption> options;
+	protected Map<String, Option> options;
 
 	/**
 	 * list of options of a plugin.
 	 */
-	protected Map<String, List<PluginOption>> pluginOptions;
+	protected Map<String, List<Option>> pluginOptions;
 
 	/**
 	 * list of plugins.
 	 */
 	protected final Map<String, Object> plugins;
 
+	private IConfigurationElement[] elements;
+
 	protected PluginFactory() {
 		plugins = new TreeMap<String, Object>();
+
+		pluginOptions = new HashMap<String, List<Option>>();
+		options = new HashMap<String, Option>();
+
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		elements = registry.getConfigurationElementsFor(PLUGIN_ID + ".options");
+
+		parseOptions(elements);
 	}
 
 	/**
@@ -81,7 +97,7 @@ public class PluginFactory {
 	 * 
 	 * @return associated to the plugin
 	 */
-	public List<PluginOption> getOptions(String name) {
+	public List<Option> getOptions(String name) {
 		return pluginOptions.get(name);
 	}
 
@@ -101,9 +117,9 @@ public class PluginFactory {
 	 *            a configuration element
 	 * @return an "input file" option
 	 */
-	protected BrowseFileOption parseBrowseFile(IConfigurationElement element) {
+	private OptionBrowseFile parseBrowseFile(IConfigurationElement element) {
 		String extension = element.getAttribute("extension");
-		BrowseFileOption option = new BrowseFileOptionImpl();
+		OptionBrowseFile option = new OptionBrowseFileImpl();
 		option.setExtension(extension);
 
 		String folder = element.getAttribute("folder");
@@ -121,10 +137,10 @@ public class PluginFactory {
 	 *            a configuration element
 	 * @return a "checkbox" option
 	 */
-	protected CheckboxOption parseCheckbox(IConfigurationElement element) {
-		CheckboxOption option = new CheckboxOptionImpl();
-		List<PluginOption> options = parseOptions(element.getChildren());
-		option.setOptions(options);
+	private OptionCheckbox parseCheckbox(IConfigurationElement element) {
+		OptionCheckbox option = new OptionCheckboxImpl();
+		List<Option> options = parseOptions(element.getChildren());
+		option.getOptions().addAll(options);
 		return option;
 	}
 
@@ -135,14 +151,14 @@ public class PluginFactory {
 	 *            a configuration element
 	 * @return a "combobox" option
 	 */
-	protected ComboBoxOption parseCombobox(IConfigurationElement element) {
-		ComboBoxOption option = new ComboboxOptionImpl();
+	private OptionComboBox parseCombobox(IConfigurationElement element) {
+		OptionComboBox option = new OptionComboboxImpl();
 		List<ComboBoxItem> items = parseItems(element.getChildren());
-		option.setComboBoxItems(items);
+		option.getComboBoxItems().addAll(items);
 		return option;
 	}
 
-	protected List<ComboBoxItem> parseItems(IConfigurationElement[] elements) {
+	private List<ComboBoxItem> parseItems(IConfigurationElement[] elements) {
 		List<ComboBoxItem> items = new ArrayList<ComboBoxItem>();
 		for (IConfigurationElement element : elements) {
 			ComboboxItemImpl comboBoxItem = new ComboboxItemImpl();
@@ -152,8 +168,8 @@ public class PluginFactory {
 			comboBoxItem.setId(id);
 
 			// Parse children options of comboBox
-			List<PluginOption> options = parseOptions(element.getChildren());
-			comboBoxItem.setOptions(options);
+			List<Option> options = parseOptions(element.getChildren());
+			comboBoxItem.getOptions().addAll(options);
 
 			items.add(comboBoxItem);
 		}
@@ -163,66 +179,96 @@ public class PluginFactory {
 
 	/**
 	 * Parses the given configuration elements as a list of options. The options
-	 * are added to the option map of this factory, and also returned as a list.
-	 * This allows checkbox options to have sub-options.
+	 * are added to the option map of this factory.
 	 * 
 	 * @param elements
 	 *            a list of configuration elements
-	 * @return a list of options
 	 */
-	protected List<PluginOption> parseOptions(IConfigurationElement[] elements) {
-		List<PluginOption> options = new ArrayList<PluginOption>();
+	protected List<Option> parseOptions(IConfigurationElement[] elements) {
+		List<Option> optionList = new ArrayList<Option>();
 		for (IConfigurationElement element : elements) {
-			PluginOption option;
-
-			String id = element.getAttribute("id");
-			String name = element.getAttribute("name");
-
-			IConfigurationElement[] children = element.getChildren();
-			if (children.length > 0) {
-				IConfigurationElement child = children[0];
-				String type = child.getName();
-				if (type.equals("browseFile")) {
-					option = parseBrowseFile(child);
-				} else if (type.equals("checkBox")) {
-					option = parseCheckbox(child);
-				} else if (type.equals("comboBox")) {
-					option = parseCombobox(child);
-				} else if (type.equals("textBox")) {
-					option = parseTexbox(child);
+			if ("option".equals(element.getName())) {
+				Option option = parseOption(element);
+				optionList.add(option);
+			} else if ("optionRef".equals(element.getName())) {
+				String id = element.getAttribute("id");
+				Option option = options.get(id);
+				if (option == null) {
+					option = parseOption(id);
 				}
-
-				else {
-					continue;
-				}
-			} else {
-				if ((id.equals("net.sf.orcc.plugins.backends.deactivateFE"))
-						|| (id.equals("net.sf.orcc.plugins.simulators.deactivateFE"))) {
-					option = new PluginOptionImpl();
-				} else {
-					continue;
-				}
+				optionList.add(option);
 			}
-			option.setIdentifier(id);
-			option.setName(name);
-
-			String defaultValue = element.getAttribute("defaultValue");
-			if (defaultValue == null) {
-				defaultValue = "";
-			}
-			option.setDefaultValue(defaultValue);
-
-			String description = element.getAttribute("description");
-			if (description == null) {
-				description = "";
-			}
-			option.setDescription(description);
-
-			this.options.put(id, option);
-			options.add(option);
 		}
 
-		return options;
+		return optionList;
+	}
+
+	/**
+	 * Parses an option with the given id. I know that this is a horrible way of
+	 * handling cross-referencing options, hopefully at some point someone will
+	 * do better.
+	 * 
+	 * @param id
+	 * @return
+	 */
+	private Option parseOption(String id) {
+		for (IConfigurationElement element : elements) {
+			if (id.equals(element.getAttribute("id"))) {
+				return parseOption(element);
+			}
+		}
+
+		return null;
+	}
+
+	private Option parseOption(IConfigurationElement element) {
+		Option option;
+		String id = element.getAttribute("id");
+		String name = element.getAttribute("name");
+
+		IConfigurationElement[] children = element.getChildren();
+		if (children.length > 0) {
+			IConfigurationElement child = children[0];
+			String type = child.getName();
+			if (type.equals("browseFile")) {
+				option = parseBrowseFile(child);
+			} else if (type.equals("checkBox")) {
+				option = parseCheckbox(child);
+			} else if (type.equals("comboBox")) {
+				option = parseCombobox(child);
+			} else if (type.equals("selectNetwork")) {
+				option = parseSelectNetwork(child);
+			} else if (type.equals("textBox")) {
+				option = parseTexbox(child);
+			} else {
+				return null;
+			}
+		} else {
+			if ((id.equals("net.sf.orcc.plugins.backends.deactivateFE"))
+					|| (id.equals("net.sf.orcc.plugins.simulators.deactivateFE"))) {
+				option = new PluginOptionImpl();
+			} else {
+				return null;
+			}
+		}
+		option.setIdentifier(id);
+		option.setName(name);
+
+		String defaultValue = element.getAttribute("defaultValue");
+		if (defaultValue == null) {
+			defaultValue = "";
+		}
+		option.setDefaultValue(defaultValue);
+
+		String description = element.getAttribute("description");
+		if (description == null) {
+			description = "";
+		}
+		option.setDescription(description);
+
+		options.put(option.getIdentifier(), option);
+
+		return option;
 	}
 
 	/**
@@ -232,12 +278,11 @@ public class PluginFactory {
 	 *            a list of "option" elements
 	 * @return a list of options
 	 */
-	protected List<PluginOption> parsePluginOptions(
-			IConfigurationElement[] elements) {
-		List<PluginOption> pluginOptions = new ArrayList<PluginOption>();
+	private List<Option> parsePluginOptions(IConfigurationElement[] elements) {
+		List<Option> pluginOptions = new ArrayList<Option>();
 		for (IConfigurationElement element : elements) {
 			String id = element.getAttribute("id");
-			PluginOption option = options.get(id);
+			Option option = options.get(id);
 			pluginOptions.add(option);
 		}
 
@@ -254,7 +299,7 @@ public class PluginFactory {
 		for (IConfigurationElement element : elements) {
 			String name = element.getAttribute("name");
 			IConfigurationElement[] optionLists = element.getChildren();
-			List<PluginOption> options = parsePluginOptions(optionLists);
+			List<Option> options = parsePluginOptions(optionLists);
 			this.pluginOptions.put(name, options);
 
 			try {
@@ -266,6 +311,10 @@ public class PluginFactory {
 		}
 	}
 
+	private Option parseSelectNetwork(IConfigurationElement child) {
+		return new OptionSelectNetworkImpl();
+	}
+
 	/**
 	 * Parses the given configuration element as a "textbox" option.
 	 * 
@@ -273,10 +322,11 @@ public class PluginFactory {
 	 *            a configuration element
 	 * @return a "textbox" option
 	 */
-	protected TextBoxOption parseTexbox(IConfigurationElement element) {
-		TextBoxOption option = new TextBoxOptionImpl();
-		List<PluginOption> options = parseOptions(element.getChildren());
-		option.setOptions(options);
+	private OptionTextBox parseTexbox(IConfigurationElement element) {
+		OptionTextBox option = new OptionTextBoxImpl();
+		List<Option> options = parseOptions(element.getChildren());
+		option.getOptions().addAll(options);
 		return option;
 	}
+
 }
