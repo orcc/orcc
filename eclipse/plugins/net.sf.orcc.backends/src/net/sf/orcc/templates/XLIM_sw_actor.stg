@@ -500,10 +500,10 @@ patternPort(dir, port, index, index0) ::= <<
 
 outputPatternDecisionState(index, action, state)::=<<
 \<module kind="if"\>
-	\<module decision="outputPattern_<instance.id>_<action.name>_decision_s_<state>_<index>" kind="test"\>
+	\<module decision="outputPattern_<instance.id>_<action.name>_decision_s_<state.name>_<index>" kind="test"\>
 		\<operation kind="noop"\>
 			\<port dir="in" source="outputPattern_<instance.id>_<action.name>_res_<index>"/\>
-			\<port dir="out" size="1" source="outputPattern_<instance.id>_<action.name>_decision_s_<state>_<index>" typeName="bool"/\>
+			\<port dir="out" size="1" source="outputPattern_<instance.id>_<action.name>_decision_s_<state.name>_<index>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 >>
