@@ -18,7 +18,7 @@ endif>
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-@<variable> = <if(variable.assignable)> global <
+@<variable.name> = <if(variable.assignable)> global <
 else> constant <endif> <variable.type> <
 if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.initialValue)> 
 <else> zeroinitializer, align 32 
@@ -111,14 +111,14 @@ CastParameter(casts, args, params, location )::= <<
 >>
 
 IfWithThenElseNodes(ifNode) ::= <<
-	<BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.elseNodes)>}, dest="")>
+	<BrOp(cond=Expr(expr=ifNode.condition, type=ifNode.condition.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.elseNodes)>}, dest="")>
 
 b<label(ifNode.thenNodes)>: 
-<Nodes_cond(first(ifNode.thenNodes))> <Nodes(rest(ifNode.thenNodes))>
+<printNodes_cond(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
 	br label %b<label(ifNode.joinNode)>
 
 b<label(ifNode.elseNodes)>:
-<Nodes_cond(first(ifNode.elseNodes))> <Nodes(rest(ifNode.elseNodes))>
+<printNodes_cond(first(ifNode.elseNodes))> <printNodes(rest(ifNode.elseNodes))>
 	br label %b<label(ifNode.joinNode)>
 
 b<label(ifNode.joinNode)>:
@@ -126,10 +126,10 @@ b<label(ifNode.joinNode)>:
 >>
 
 IfWithThenNode(ifNode) ::= <<
-	<BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.joinNode)>}, dest="")>
+	<BrOp(cond=Expr(expr=ifNode.condition, type=ifNode.condition.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.joinNode)>}, dest="")>
 
 b<label(ifNode.thenNodes)>: 
-<Nodes_cond(first(ifNode.thenNodes))> <Nodes(rest(ifNode.thenNodes))>
+<printNodes_cond(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
 	br label %b<label(ifNode.joinNode)>
 
 b<label(ifNode.joinNode)>:
@@ -152,7 +152,7 @@ phiExpr(expr, type, node) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 
-Call(call) ::= <<
+printCall(call) ::= <<
 <if(call.print)> 
 <PrintInstr(call.parameters)> 
 <else>
@@ -179,20 +179,20 @@ endif>
 <endif>
 >>
 
-Assign(assign) ::= <<
+printAssign(assign) ::= <<
 <if(assign.cast)>
 <Cast(target = assign.target, value = assign.value, cast = assign.cast)>
 <else> 
-%<assign.target> = <assign.value>
+%<assign.target.variable.indexedName> = <assign.value>
 <endif>
 >>
 
-PhiAssignment(phi) ::= <<
+printPhiAssignment(phi) ::= <<
 
-%<phi.target> = phi <phi.target.type> <phiPairs(phi)>
+<Var(phi.target.variable)> = phi <phi.target.type> <phiPairs(phi)>
 >>
 
-Return(return) ::= <<
+printReturn(return) ::= <<
 
 <if(return.value)><
 RetOp(type=return.value.type, value=Expr(expr=return.value, type=return.value.type))><
@@ -201,14 +201,13 @@ else
 endif>
 >>
 
-Store(store) ::= <<
-
-<StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target), ptr=Var(store.target))>
+printStore(store) ::= <<
+<StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target.variable), ptr=Var(store.target.variable))>
 
 >>
 
-Load(load) ::= <<
-<Var(load.target)> = <LoadOp(ty=VarType(load.source.variable), pointer=Var(load.source.variable))>
+printLoad(load) ::= <<
+<Var(load.target.variable)> = <LoadOp(ty=VarType(load.source.variable), pointer=Var(load.source.variable))>
 
 >>
 
@@ -222,7 +221,7 @@ GEP(gep) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 // if node
-IfNode(ifNode) ::= <<
+printIfNode(ifNode) ::= <<
 <if(ifNode.thenNodes)>
 <if(ifNode.elseNodes)>
 <IfWithThenElseNodes(ifNode)>
@@ -230,19 +229,19 @@ IfNode(ifNode) ::= <<
 <IfWithThenNode(ifNode)>	
 <endif>
 <endif>
-<Nodes_cond(first(ifNode.joinNode))>
-<Nodes(rest(ifNode.joinNode))>
+<printNodes_cond(first(ifNode.joinNode))>
+<printNodes(rest(ifNode.joinNode))>
 
 >>
 
 // while node
-WhileNode(whileNode) ::= <<
-<BlockNode(whileNode.joinNode)>
-	<BrOp(cond=Expr(expr=whileNode.value, type=whileNode.value.type), iftrue={%b<label(whileNode.Nodes)>}, iffalse={%b<label(whileNode.joinNode.successors)>}, dest="")>
+printWhileNode(whileNode) ::= <<
+<printBlockNode(whileNode.joinNode)>
+	<BrOp(cond=Expr(expr=whileNode.condition, type=whileNode.condition.type), iftrue={%b<label(whileNode.Nodes)>}, iffalse={%b<label(whileNode.joinNode.successors)>}, dest="")>
 
 b<label(whileNode.nodes)>:
-<Nodes_cond(first(whileNode.nodes))>
-<Nodes(rest(whileNode.nodes))>
+<printNodes_cond(first(whileNode.nodes))>
+<printNodes(rest(whileNode.nodes))>
 	br label %b<label(whileNode.joinNode)>
 
 b<label(whileNode.joinNode.successors)>:
@@ -253,48 +252,62 @@ b<label(whileNode.joinNode.successors)>:
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-Instruction(instruction) ::= <<
-<(instruction.class.simpleName)(instruction)>
+Instruction(instr) ::= <<
+<
+if (instr.assign)><printAssign(instr)><
+elseif(instr.phi)><printPhiAssignment(instr)><
+elseif (instr.call)><printCall(instr)><
+elseif (instr.load)><printLoad(instr)><
+elseif (instr.return)><printReturn(instr)><
+elseif (instr.store)><printStore(instr)><
+endif>
 >>
 
-Instructions(instructions) ::= <<
+printInstructions(instructions) ::= <<
 <instructions: Instruction()>
 >>
 
-Node(node) ::= <<
-<(node.class.simpleName)(node)>
+printNode(node) ::= <<
+<if (node.blockNode)><printBlockNode(node)><
+elseif (node.ifNode)><printIfNode(node)><
+elseif (node.whileNode)><printWhileNode(node)><
+endif>
 >>
 
-Nodes(nodes) ::= <<
-<nodes: Node()>
+printNodes(nodes) ::= <<
+<nodes:printNode()>
 >>
+
 
 Node_cond(node) ::= <<
-<({<node.class.simpleName>_cond})(node)>
+<if (node.blockNode)><printBlockNode_cond(node)><
+elseif (node.ifNode)><printIfNode_cond(node)><
+elseif (node.whileNode)><printWhileNode_cond(node)><
+endif>
 >>
 
-Nodes_cond(nodes) ::= <<
+printNodes_cond(nodes) ::= <<
 <nodes: Node_cond()>
 >>
 
-WhileNode_cond(nodes) ::= <<
-<WhileNode(nodes)>
+printWhileNode_cond(nodes) ::= <<
+<printWhileNode(nodes)>
 >>
 
-IfNode_cond(nodes) ::= <<
-<IfNode(nodes)>
+printIfNode_cond(nodes) ::= <<
+<printIfNode(nodes)>
 >>
 
-BlockNode_cond(blockNode) ::= <<
-	<Instructions(blockNode.instructions)> 
+printBlockNode_cond(blockNode) ::= <<
+	<printInstructions(blockNode.instructions)> 
 >>
 
 // if node
-BlockNode(blockNode) ::= <<
+printBlockNode(blockNode) ::= <<
 	br label %b<label(blockNode)>
 
 b<label(blockNode)>:
-	<Instructions(blockNode.instructions)>
+	<printInstructions(blockNode.instructions)>
 	
 >>
 
@@ -305,21 +318,21 @@ printProcedure(proc) ::= <<
 <procedure(procedure = proc)>
 >>
 
-procedure(procedure, inputPattern = false, outputPattern = false) ::= <<
+procedure(procedure, action = false) ::= <<
 <if(!procedure.native)>
-define <procedure.returnType> @<procedure>(<procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+define <procedure.returnType> @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
-<if(procedure.locals.list)>
-	<procedure.locals.list: variableDeclaration()>
+<if(procedure.locals)>
+	<procedure.locals: variableDeclaration()>
 <endif>
-<if(inputPattern)>
-	<inputPattern.keys: { port | <fifoVar(port=port, var=inputPattern.(port))>}>
+<if(action.inputPattern.ports)>
+	<action.inputPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}>
 <endif>
-<if(outputPattern)>
-	<outputPattern.keys: { port | <fifoVar(port=port, var=outputPattern.(port))>}>
+<if(action.outputPattern.ports)>
+	<action.outputPattern.ports: { port | <fifoVar(port=port, var=action.outputPattern.portToVarMap.(port))>}>
 <endif>
-<Nodes(trunc(procedure.nodes))>
-<Node(last(procedure.nodes))>
+<printNodes(trunc(procedure.nodes))>
+<printNode(last(procedure.nodes))>
 }
 <endif>
 >>
@@ -329,7 +342,7 @@ entry:
 ///////////////////////////////////////////////////////////////////////////////
 
 actorParameter(parameter) ::= <<
-@<parameter> = global <parameter.type> undef
+@<parameter.name> = global <parameter.type> undef
 
 >>
 
@@ -337,8 +350,8 @@ actorParameter(parameter) ::= <<
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 printAction(action) ::= <<
-<procedure(procedure = action.scheduler, inputPattern = action.inputPattern.peekedMap)>
-<procedure(procedure = action.body, inputPattern = action.inputPattern.variableMap, outputPattern = action.outputPattern.variableMap)>
+<procedure(procedure = action.scheduler, action=action)>
+<procedure(procedure = action.body, action=action)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -353,20 +366,21 @@ declare i32 @printf(i8* noalias , ...) nounwind
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-<actor.inputs.list: fifo()>
+<actor.inputs: fifo()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<actor.outputs.list: fifo()>
+<actor.outputs: fifo()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<actor.parameters.list: actorParameter()>
+<actor.parameters: actorParameter()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
-<actor.stateVars.list: stateVar()>
+<actor.stateVars: stateVar()>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-<actor.procs.list: {proc | <procedure(procedure = proc)>}>
+<actor.procs: {proc | <procedure(procedure = proc)>}>
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
 <actor.actions: printAction()>

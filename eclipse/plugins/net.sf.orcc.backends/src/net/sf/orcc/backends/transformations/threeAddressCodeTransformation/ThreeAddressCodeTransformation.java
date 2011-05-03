@@ -58,9 +58,10 @@ public class ThreeAddressCodeTransformation extends
 	@Override
 	public Object caseActor(Actor actor) {
 		ActorVisitor<?>[] transformations = {
-				new CopyPropagator(),
+				//new CopyPropagator(),
 				new ExpressionSplitter(), new BuildCFG(),
-				new CastAdder() };
+				//new CastAdder() 
+				};
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);

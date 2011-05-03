@@ -7,8 +7,9 @@ i<port.type.size>
 >>
 
 fifoVar(port, var) ::= <<
-%<var>_ptr = load <fifoType(port)>** <fifoVarName(port)>
-%<var> = bitcast <fifoType(port)>* %<var>_ptr to <VarType(var)>*
+%<var.name>_ptr = load <fifoType(port)>** <fifoVarName(port)>
+%<var.name> = bitcast <fifoType(port)>* %<var.name>_ptr to <VarType(var)>*
+
 >>
 
 fifoVarName(port) ::= <<
@@ -29,27 +30,27 @@ ConstantValue(type, const) ::= <<
 >>
 
 Constant(constant, type, iterator) ::= <<
-<if(constant.listExpr)
-> <ListExpr(constant = constant, type = type, iterator = iterator)> <
-else
-> <(constant.class.simpleName)(constant)> <
+<if (constant.booleanExpr)><printBool(constant)><
+elseif (constant.intExpr)><printInt(constant)><
+elseif (constant.listExpr)><printList(constant = constant, type = type, iterator = iterator)><
+elseif (constant.stringExpr)><printString(constant)><
 endif>
 >>
 
-BoolExpr(constant) ::= <<
+printBool(constant) ::= <<
 <if (constant.value)>1<else>0<endif>
 >>
 
-IntExpr(constant) ::= <<
+printInt(constant) ::= <<
 <constant>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
-ListExpr(constant, type, iterator) ::= <<
+printList(constant, type, iterator) ::= <<
 [<iterator, constant.value: {iterator, value | <type.type> <if(value)> <Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)> <else> zeroinitializer <endif> }; wrap, separator=", ">]
 >>
 
-StringExpr(constant) ::= <<
+printString(constant) ::= <<
 c"<constant>"
 >>
 
@@ -70,11 +71,11 @@ endif>
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 Var(var) ::= <<
-<if(var.global)>@<else>%<endif><var>
+<if(var.global)>@<else>%<endif><var.indexedName>
 >>
 
 Expr(expr, type) ::= <<
-<if(expr.varExpr)><Var(expr.var.variable)><else><ConstantValue(const=expr, type=type)><endif>
+<if(expr.varExpr)><Var(expr.use.variable)><else><ConstantValue(const=expr, type=type)><endif>
 >>
 
 ExprType(expr) ::= <<
@@ -131,20 +132,20 @@ decl_MD(actor) ::= <<
 !source = !{<source_decl_MD(actor)>}
 !name = !{<name_decl_MD(actor)>}
 !action_scheduler = !{<actionScheduler_decl_MD(actor)>}
-<if(actor.inputs.list)>
-!inputs = !{<actor.inputs.list: {port | <port_decl_MD(actor=actor, port=port)>}; separator=", ">}
+<if(actor.inputs)>
+!inputs = !{<actor.inputs: {port | <port_decl_MD(actor=actor, port=port)>}; separator=", ">}
 <endif>
 <if(actor.outputs.list)>
-!outputs = !{<actor.outputs.list: {port | <port_decl_MD(actor=actor, port=port)>}; separator=", ">}
+!outputs = !{<actor.outputs: {port | <port_decl_MD(actor=actor, port=port)>}; separator=", ">}
 <endif>
 <if(actor.parameters.list)>
-!parameters = !{<actor.parameters.list: {port | <var_decl_MD(actor=actor, var=port)>}; separator=", ">}
+!parameters = !{<actor.parameters: {port | <var_decl_MD(actor=actor, var=port)>}; separator=", ">}
 <endif>
 <if(actor.stateVars.list)>
-!state_variables = !{<actor.stateVars.list: {var | <var_decl_MD(actor=actor, var=var)>}; separator=", ">}
+!state_variables = !{<actor.stateVars: {var | <var_decl_MD(actor=actor, var=var)>}; separator=", ">}
 <endif>
 <if(actor.procs.list)> 
-!procedures = !{<actor.procs.list: {proc | <proc_decl_MD(actor=actor, proc=proc)>}; separator=", ">}
+!procedures = !{<actor.procs: {proc | <proc_decl_MD(actor=actor, proc=proc)>}; separator=", ">}
 <endif>
 <if(actor.initializes)>
 !initializes = !{<actor.initializes: {init | <action_decl_MD(actor=actor, action=init)>}; separator=", ">}
@@ -159,11 +160,11 @@ decl_MD(actor) ::= <<
 <source_MD(actor)>
 <name_MD(actor)>
 <actionScheduler_MD(actor)>
-<actor.inputs.list: {port | <port_MD(actor= actor, port=port)>}>
-<actor.outputs.list: {port | <port_MD(actor= actor, port=port)>}>
-<actor.parameters.list: {param | <var_MD(actor=actor, var=param)>}>
-<actor.stateVars.list: {var | <statevar_MD(actor=actor, var=var)>}>
-<actor.procs.list: {proc | <proc_MD(actor=actor, proc=proc)>}>
+<actor.inputs: {port | <port_MD(actor= actor, port=port)>}>
+<actor.outputs: {port | <port_MD(actor= actor, port=port)>}>
+<actor.parameters: {param | <var_MD(actor=actor, var=param)>}>
+<actor.stateVars: {var | <statevar_MD(actor=actor, var=var)>}>
+<actor.procs: {proc | <proc_MD(actor=actor, proc=proc)>}>
 <actor.initializes: {action | <action_MD(actor=actor, action=action)>}>
 <actor.actions: {action | <action_MD(actor=actor, action=action)>}>
 <actor.templateData.patterns.keys: {pattern | <patterns_MD(actor=actor, patterns=pattern)>}>

@@ -132,10 +132,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 			}
 		}
 
-		ActorVisitor<?>[] transformations = { new TypeSizeTransformation(),
-				new BoolToIntTransformation(), new PrintlnTransformation(),
-				new RenameTransformation(this.transformations),
-				new ThreeAddressCodeTransformation(), new GetElementPtrAdder() };
+		ActorVisitor<?>[] transformations = { //new TypeSizeTransformation(),
+				//new BoolToIntTransformation(), 
+				//new PrintlnTransformation(),
+				//new RenameTransformation(this.transformations),
+				new ThreeAddressCodeTransformation()//, new GetElementPtrAdder() 
+		};
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
