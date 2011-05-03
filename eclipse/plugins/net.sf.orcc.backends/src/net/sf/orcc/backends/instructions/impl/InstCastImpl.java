@@ -373,4 +373,11 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 			eNotify(new ENotificationImpl(this, Notification.SET,
 					InstructionsPackage.INST_CAST__TARGET, newTarget, newTarget));
 	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "Cast("
+				+ target.getVariable().getIndexedName() + ", "
+				+ source.getVariable().getIndexedName() + ")";
+	}
 } // InstCastImpl
