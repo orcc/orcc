@@ -88,8 +88,8 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 
 		for (Action action : actor.getInitializes()) {
 			for (Node node : action.getBody().getNodes()) {
-				node.accept(actorInterpreter);
-				node.accept(this);
+				actorInterpreter.doSwitch(node);
+				this.doSwitch(node);
 
 			}
 		}

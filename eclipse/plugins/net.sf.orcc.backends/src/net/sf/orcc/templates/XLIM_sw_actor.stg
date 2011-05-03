@@ -61,15 +61,17 @@ actorPorts() ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 initVariable(type, value) ::= <<
-<if(value.listExpr)>\<initValue typeName="List"\> 
-<value.value: {value | <initVariable(type=type.type, value=value)>}; separator="">\</initValue\>
-<else>\<initValue size="<if (type.bool)>1<else><type.size><endif>" typeName="<type>" value="<value>"/\>
+<if(value.listExpr)
+>\<initValue typeName="List"\> 
+	<value.value: {value | <initVariable(type=type.type, value=value)>}; separator="">\</initValue\>
+<else
+>\<initValue size="<if (type.bool)>1<else><type.size><endif>" typeName="<type>" value="<value>"/\>
 <endif>
 >>
 
 stateVar(var) ::= <<
 <if(var.initialized)>\<stateVar name="<var.name>" sourceName="<var.name>"\>
-<initVariable(type=var.type, value=var.initialValue)>\</stateVar\>
+	<initVariable(type=var.type, value=var.initialValue)>\</stateVar\>
 <else>
 <typeDefLocal(var)>
 \<stateVar name="<var.name>" sourceName="<var.name>" typeName="<if(var.type.list)><var.name>_typedef<else><var.type><endif>"<if(!var.type.list)> size="<if (var.type.bool)>1<else><var.type.size><endif>"<endif>/\>
@@ -77,7 +79,8 @@ stateVar(var) ::= <<
 >>
 
 stateVars() ::= <<
-<instance.actor.stateVars: stateVar(); separator="\n">
+\<!-- State Variables --\>
+<instance.actor.stateVars: stateVar()>
 >>
 
 
@@ -781,8 +784,11 @@ design(instance) ::= <<
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
 	<actorPorts()>
+	
 	<parameters(instance.parameters)>
+	
 	<stateVars()>
+	
 	<instance.actor.actions: typeDef()>
 	
 	<instance.actor.actions: action(); separator="\n\n">
