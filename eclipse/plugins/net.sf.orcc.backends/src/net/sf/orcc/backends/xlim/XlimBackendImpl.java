@@ -48,6 +48,7 @@ import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
 import net.sf.orcc.backends.xlim.transformations.ListFlattener;
 import net.sf.orcc.backends.xlim.transformations.LiteralIntegersAdder;
+import net.sf.orcc.backends.xlim.transformations.UnaryListRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
 import net.sf.orcc.backends.xlim.transformations.XlimVariableRenamer;
 import net.sf.orcc.ir.Actor;
@@ -122,7 +123,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new GlobalArrayInitializer(),
 				new InstTernaryAdder(),
 				new Inliner(true, true),
-				// new UnaryListToScalarTransformation(), new CustomPeekAdder(),
+				new UnaryListRemoval(), // new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
 				new ExpressionSplitter(), new BuildCFG(), new CastAdder(),

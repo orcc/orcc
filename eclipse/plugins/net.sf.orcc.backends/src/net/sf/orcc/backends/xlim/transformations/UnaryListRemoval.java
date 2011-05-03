@@ -29,10 +29,7 @@
 package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -41,13 +38,15 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines an actor transformation that replace list of one element
@@ -56,28 +55,7 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * @author Herve Yviquel
  * 
  */
-public class UnaryListRemoval extends
-		AbstractActorVisitor<Object> {
-
-	private Map<Instruction, InstAssign> toBeAdded;
-	private List<Instruction> toBeRemoved;
-
-	public UnaryListRemoval() {
-		toBeRemoved = new ArrayList<Instruction>();
-		toBeAdded = new HashMap<Instruction, InstAssign>();
-	}
-
-	@Override
-	public Object caseNodeBlock(NodeBlock nodeBlock) {
-		ListIterator<Instruction> it = nodeBlock.listIterator();
-		while (it.hasNext()) {
-			Instruction instruction = it.next();
-			if (toBeRemoved.remove(instruction)) {
-				it.remove();
-			}
-		}
-		return null;
-	}
+public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object casePattern(Pattern pattern) {
@@ -85,87 +63,54 @@ public class UnaryListRemoval extends
 		for (Port port : ports) {
 			if (pattern.getNumTokens(port) == 1) {
 				Var oldTarget = pattern.getVariable(port);
-				if (!oldTarget.getUses().isEmpty()
-						&& oldTarget.getUses().get(0).eContainer() != null) {
-					Instruction instruction = EcoreHelper.getContainerOfType(
-							oldTarget.getUses().get(0), Instruction.class);
+				Var newTarget;
 
-					if (instruction.isLoad()) {
-						InstLoad load = (InstLoad) instruction;
-						Var newTarget = load.getTarget().getVariable();
+				if (!oldTarget.getUses().isEmpty()) {
+					// First case: an input variable
+					InstLoad load = EcoreHelper.getContainerOfType(oldTarget
+							.getUses().get(0), InstLoad.class);
+					newTarget = load.getTarget().getVariable();
 
-						pattern.setVariable(port, newTarget);
+					EcoreHelper.delete(load);
+				} else if (!oldTarget.getDefs().isEmpty()) {
+					// Second case: an output variable
+					InstStore store = EcoreHelper.getContainerOfType(oldTarget
+							.getDefs().get(0), InstStore.class);
 
-						// clean up uses
-						load.setTarget(null);
-						load.setSource(null);
-
-						// remove instruction
-						toBeRemoved.add(instruction);
-						action.getBody().getLocals()
-								.remove(oldTarget.getName());
-					}
-				} else {
-					if (!oldTarget.getDefs().isEmpty()) {
-						Instruction instruction = EcoreHelper
-								.getContainerOfType(oldTarget.getDefs().get(0),
-										Instruction.class);
-						if (instruction.isStore()) {
-							InstStore store = (InstStore) instruction;
-							Expression expr = store.getValue();
-
-							Var newTarget;
-
-							if (expr.isVarExpr()) {
-								ExprVar var = (ExprVar) expr;
-								newTarget = var.getUse().getVariable();
-
-							} else {
-								Var localNewTarget = action
-										.getBody()
-										.newTempLocalVariable(expr.getType(),
-												"scalar_" + oldTarget.getName());
-								localNewTarget.setAssignable(true);
-								localNewTarget.setIndex(1);
-
-								InstAssign assign = IrFactory.eINSTANCE
-										.createInstAssign(localNewTarget, expr);
-
-								newTarget = localNewTarget;
-
-								toBeAdded.put(instruction, assign);
-							}
-
-							pattern.setVariable(port, newTarget);
-
-							// remove instruction
-							toBeRemoved.add(instruction);
-							action.getBody().getLocals()
-									.remove(oldTarget.getName());
-
-							// clean up uses
-							store.setTarget(null);
-							store.setValue(null);
-						}
+					Expression expr = store.getValue();
+					if (expr.isVarExpr()) {
+						newTarget = ((ExprVar) expr).getUse().getVariable();
+						newTarget.setName("scalar_" + newTarget.getName());
 					} else {
-						Var localNewTarget = action
-								.getBody()
-								.newTempLocalVariable(
-										((TypeList) oldTarget.getType())
-												.getElementType(),
-										"scalar_" + oldTarget.getName());
-						localNewTarget.setAssignable(true);
-						localNewTarget.setIndex(1);
-
-						pattern.setVariable(port, localNewTarget);
-
-						// remove instruction
-						action.getBody().getLocals()
-								.remove(oldTarget.getName());
+						newTarget = createScalarVariable(oldTarget);
+						InstAssign assign = IrFactory.eINSTANCE
+								.createInstAssign(newTarget, expr);
+						EList<Instruction> instructions = store.getBlock()
+								.getInstructions();
+						instructions.add(instructions.indexOf(store), assign);
 					}
+
+					EcoreHelper.delete(store);
+				} else {
+					// Third case: an input swallower
+					// i.e. an input variable which just consumes tokens
+					newTarget = createScalarVariable(oldTarget);
 				}
+				// Replace variable in pattern
+				pattern.setVariable(port, newTarget);
+				// Remove useless variable
+				EcoreUtil.remove(oldTarget);
 			}
 		}
 		return null;
+	}
+
+	private Var createScalarVariable(Var listVar) {
+		Var scalarVar = procedure.newTempLocalVariable(
+				((TypeList) listVar.getType()).getElementType(), "scalar_"
+						+ listVar.getName());
+		scalarVar.setAssignable(true);
+		scalarVar.setIndex(1);
+		return scalarVar;
 	}
 }
