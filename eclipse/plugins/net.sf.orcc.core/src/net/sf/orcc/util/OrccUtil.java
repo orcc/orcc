@@ -220,6 +220,31 @@ public class OrccUtil {
 	}
 
 	/**
+	 * Returns the qualified name of the given file, i.e. qualified.name.of.File
+	 * for <code>/project/sourceFolder/qualified/name/of/File.fileExt</code>
+	 * 
+	 * @param file
+	 *            a file
+	 * @return a qualified name, or <code>null</code> if the file is not in a
+	 *         source folder
+	 */
+	public static String getQualifiedName(IFile file) {
+		IProject project = file.getProject();
+		IPath filePath = file.getFullPath();
+		for (IFolder folder : getSourceFolders(project)) {
+			IPath folderPath = folder.getFullPath();
+			if (folderPath.isPrefixOf(filePath)) {
+				// yay we found the folder!
+				IPath qualifiedPath = filePath.removeFirstSegments(
+						folderPath.segmentCount()).removeFileExtension();
+				return qualifiedPath.toString().replace('/', '.');
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns the output folder of the given project.
 	 * 
 	 * @param project

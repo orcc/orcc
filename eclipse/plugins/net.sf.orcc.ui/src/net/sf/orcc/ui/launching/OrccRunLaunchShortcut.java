@@ -34,12 +34,14 @@ import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.RUN_CONFIG_TYPE;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.util.OrccUtil.getQualifiedName;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -201,7 +203,6 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 
 		ILaunchConfiguration config = null;
 		try {
-			String inputFile = resource.getLocation().toOSString();
 			String folder = browseOutputFolder(getShell(), resource);
 			if (folder == null) {
 				return null;
@@ -213,7 +214,7 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 			}
 
 			// generate configuration name
-			String name = resource.getName() + " - " + backend;
+			String name = getConfigurationName(resource, backend);
 			name = manager.generateLaunchConfigurationName(name);
 
 			// create configuration
@@ -222,7 +223,9 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 			wc.setAttribute(BACKEND, backend);
 
 			wc.setAttribute(COMPILE_XDF, true);
-			wc.setAttribute(XDF_FILE, inputFile);
+			if (resource.getType() == IResource.FILE) {
+				wc.setAttribute(XDF_FILE, getQualifiedName((IFile) resource));
+			}
 			wc.setAttribute(OUTPUT_FOLDER, folder);
 
 			config = wc.doSave();
@@ -233,15 +236,26 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 		return config;
 	}
 
+	private String getConfigurationName(IResource resource, String backend) {
+		String name;
+		if (resource.getType() == IResource.FILE) {
+			name = getQualifiedName((IFile) resource);
+		} else {
+			name = resource.getName();
+		}
+
+		return name + " - " + backend;
+	}
+
 	/**
 	 * Returns the configurations associated with the given input file.
 	 * 
-	 * @param file
+	 * @param resource
 	 *            an input file
 	 * @return a possibly empty, possibly <code>null</code> array of
 	 *         configurations
 	 */
-	private ILaunchConfiguration[] getConfigurations(IResource file) {
+	private ILaunchConfiguration[] getConfigurations(IResource resource) {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		String id = RUN_CONFIG_TYPE;
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(id);
@@ -252,9 +266,13 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 			// candidates
 			ILaunchConfiguration[] candidates = manager
 					.getLaunchConfigurations(type);
+			String name = null;
+			if (resource.getType() == IResource.FILE) {
+				name = getQualifiedName((IFile) resource);
+			}
 			for (ILaunchConfiguration config : candidates) {
 				String fileName = config.getAttribute(XDF_FILE, "");
-				if (file.getLocation().toOSString().equals(fileName)) {
+				if (fileName.equals(name)) {
 					configs.add(config);
 				}
 			}

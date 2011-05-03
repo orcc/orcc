@@ -33,6 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.SIMU_CONFIG_TYPE;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.util.OrccUtil.getQualifiedName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +97,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 		} else {
 			config = chooseConfiguration(configs);
 		}
-		
+
 		Shell shell = getShell();
 
 		if (config != null) {
@@ -155,13 +156,12 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 
 		ILaunchConfiguration config = null;
 		try {
-
 			String simulator = chooseSimulator();
 			if (simulator == null) {
 				return null;
 			}
 			// generate configuration name
-			String name = file.getName();
+			String name = getQualifiedName(file) + " - Simulation";
 			name = manager.generateLaunchConfigurationName(name);
 
 			// create configuration
@@ -170,8 +170,8 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			wc.setAttribute(PROJECT, file.getProject().getName());
 
 			// source XDF file
-			wc.setAttribute(XDF_FILE, file.getLocation().toOSString());
-			
+			wc.setAttribute(XDF_FILE, name);
+
 			// stimulus file
 			String stimulus = browseStimulusFiles(getShell(), file);
 			if (stimulus == null) {
@@ -200,9 +200,10 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			// candidates
 			ILaunchConfiguration[] candidates = manager
 					.getLaunchConfigurations(type);
+			String name = getQualifiedName(file);
 			for (ILaunchConfiguration config : candidates) {
 				String fileName = config.getAttribute(XDF_FILE, "");
-				if (fileName.equals(file.getLocation().toOSString())) {
+				if (fileName.equals(name)) {
 					configs.add(config);
 				}
 			}
