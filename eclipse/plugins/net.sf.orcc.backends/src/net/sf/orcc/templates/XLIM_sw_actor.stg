@@ -409,8 +409,8 @@ procedure(procedure) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 typeDef(action) ::= <<
-<action.inputPattern.variableMap.values: typeDefLocal()>
-<action.outputPattern.variableMap.values: typeDefLocal()>
+<action.inputPattern.variables: typeDefLocal()>
+<action.outputPattern.variables: typeDefLocal()>
 <action.body.locals: typeDefLocal()>
 >>
 
@@ -452,7 +452,7 @@ endif>
 
 localInitialize(local) ::= <<
 <if(local.type.list)
-><if(!local.instruction || local.instruction.write)>
+><if(local.defs.empty)>
 \<operation kind="$valloc"\>
 	<typedPort(dir="out", type=local.type, source=local)>
 \</operation\>
