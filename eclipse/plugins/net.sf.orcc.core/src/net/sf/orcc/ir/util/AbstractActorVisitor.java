@@ -120,6 +120,7 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	public T caseAction(Action action) {
 		doSwitch(action.getInputPattern());
 		doSwitch(action.getOutputPattern());
+		doSwitch(action.getPeekPattern());
 		doSwitch(action.getScheduler());
 		doSwitch(action.getBody());
 
