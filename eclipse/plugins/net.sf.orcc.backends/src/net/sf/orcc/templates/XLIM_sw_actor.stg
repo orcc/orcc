@@ -143,7 +143,7 @@ typedPort(dir, type, source, extension="") ::= <<
 <if(!type.list || source.global)
 >\<port dir="<dir>" size="<if(type.bool)>1<else><type.size><endif>" source="<source.indexedName><extension>" typeName="<type>"/\><
 else
->\<port dir="<dir>" source="<source.name><extension>" typeName="<source.indexedName><extension>_typedef"/\><
+>\<port dir="<dir>" source="<source.indexedName><extension>" typeName="<source.indexedName><extension>_typedef"/\><
 endif>
 >>
 
@@ -213,7 +213,7 @@ printReturn(return) ::= <<
 <if(return.value)>
 \<operation kind="noop"\>
 	<untypedPort(dir="in", source=return.value.use.variable)>
-	<typedPort(dir="out", type=return.value.use.variable.type, source=procedure, extension="_go")>
+	\<port dir="out" source="<procedure.name>_go"/\>
 \</operation\>
 <endif>
 >>
