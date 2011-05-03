@@ -35,6 +35,7 @@ import java.util.Map;
 
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.Pattern;
@@ -43,6 +44,8 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * 
@@ -56,20 +59,13 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 
 	private Map<Port, Map<Integer, Var>> customPeekedMap;
 
-	private List<InstLoad> toBeRemoved;
-
-	public CustomPeekAdder() {
-		toBeRemoved = new ArrayList<InstLoad>();
-	}
-
 	@Override
 	public Object caseAction(Action action) {
 		customPeekedMap = new HashMap<Port, Map<Integer, Var>>();
-
-		super.caseAction(action);
-		((XlimActorTemplateData) actor.getTemplateData())
-				.getCustomPeekedMapPerAction().put(action, customPeekedMap);
-
+		doSwitch(action.getPeekPattern());
+		((XlimActorTemplateData) EcoreHelper.getContainerOfType(action,
+				Actor.class).getTemplateData()).getCustomPeekedMapPerAction()
+				.put(action, customPeekedMap);
 		return null;
 	}
 
@@ -81,35 +77,19 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 
 			List<Use> uses = new ArrayList<Use>(oldTarget.getUses());
 			for (Use use : uses) {
-				if (!use.getVariable().getDefs().isEmpty()) {
-					InstLoad load = EcoreHelper.getContainerOfType(use
-							.getVariable().getDefs().get(0), InstLoad.class);
+				// Create a custom peek for each load of this variable
+				InstLoad load = EcoreHelper.getContainerOfType(use,
+						InstLoad.class);
+				Var newTarget = load.getTarget().getVariable();
 
-					int index = ((ExprInt) load.getIndexes().get(0))
-							.getIntValue();
-					indexToVariableMap.put(index, load.getTarget()
-							.getVariable());
+				int index = ((ExprInt) load.getIndexes().get(0)).getIntValue();
+				indexToVariableMap.put(index, load.getTarget().getVariable());
 
-					// clean up uses
-					load.setTarget(null);
-					load.setSource(null);
-
-					// remove instruction
-					toBeRemoved.add(load);
-					action.getScheduler().getLocals()
-							.remove(oldTarget.getName());
-				}
+				EcoreHelper.delete(load);
+				pattern.setVariable(port, newTarget);
 			}
-
+			EcoreUtil.remove(oldTarget);
 			customPeekedMap.put(port, indexToVariableMap);
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstLoad(InstLoad load) {
-		if (toBeRemoved.remove(load)) {
-			itInstruction.remove();
 		}
 		return null;
 	}

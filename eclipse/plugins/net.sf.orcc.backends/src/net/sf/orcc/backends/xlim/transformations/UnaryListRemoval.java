@@ -31,6 +31,7 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -40,6 +41,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -58,12 +60,23 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 
 	@Override
+	public Object caseAction(Action action) {
+		doSwitch(action.getInputPattern());
+		doSwitch(action.getOutputPattern());
+
+		return null;
+	}
+
+	@Override
 	public Object casePattern(Pattern pattern) {
 		List<Port> ports = new ArrayList<Port>(pattern.getPorts());
 		for (Port port : ports) {
 			if (pattern.getNumTokens(port) == 1) {
 				Var oldTarget = pattern.getVariable(port);
 				Var newTarget;
+
+				Procedure procedure = EcoreHelper.getContainerOfType(pattern,
+						Action.class).getBody();
 
 				if (!oldTarget.getUses().isEmpty()) {
 					// First case: an input variable
@@ -82,7 +95,7 @@ public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 						newTarget = ((ExprVar) expr).getUse().getVariable();
 						newTarget.setName("scalar_" + newTarget.getName());
 					} else {
-						newTarget = createScalarVariable(oldTarget);
+						newTarget = createScalarVariable(oldTarget, procedure);
 						InstAssign assign = IrFactory.eINSTANCE
 								.createInstAssign(newTarget, expr);
 						EList<Instruction> instructions = store.getBlock()
@@ -94,7 +107,7 @@ public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 				} else {
 					// Third case: an input swallower
 					// i.e. an input variable which just consumes tokens
-					newTarget = createScalarVariable(oldTarget);
+					newTarget = createScalarVariable(oldTarget, procedure);
 				}
 				// Replace variable in pattern
 				pattern.setVariable(port, newTarget);
@@ -105,7 +118,7 @@ public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 		return null;
 	}
 
-	private Var createScalarVariable(Var listVar) {
+	private Var createScalarVariable(Var listVar, Procedure procedure) {
 		Var scalarVar = procedure.newTempLocalVariable(
 				((TypeList) listVar.getType()).getElementType(), "scalar_"
 						+ listVar.getName());

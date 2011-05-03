@@ -43,6 +43,7 @@ import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.Inliner;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitter;
+import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.backends.xlim.transformations.InstTernaryAdder;
@@ -120,17 +121,15 @@ public class XlimBackendImpl extends AbstractBackend {
 		data.computeTemplateMaps(actor);
 		actor.setTemplateData(data);
 
-		ActorVisitor<?>[] transformations = {
-				new SSATransformation(),
-				new GlobalArrayInitializer(),
-				new InstTernaryAdder(),
-				new Inliner(true, true),
-				new UnaryListRemoval(), // new CustomPeekAdder(),
-				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new XlimDeadVariableRemoval(), new ListFlattener(),
-				new ExpressionSplitter(), new BuildCFG(), new CastAdder(),
-				new InstPhiTransformation(), new LiteralIntegersAdder(),
-				new XlimVariableRenamer(), new BlockCombine() };
+		ActorVisitor<?>[] transformations = { new SSATransformation(),
+				new GlobalArrayInitializer(), new InstTernaryAdder(),
+				new Inliner(true, true), new UnaryListRemoval(),
+				new CustomPeekAdder(), new DeadGlobalElimination(),
+				new DeadCodeElimination(), new XlimDeadVariableRemoval(),
+				new ListFlattener(), new ExpressionSplitter(), new BuildCFG(),
+				new CastAdder(), new InstPhiTransformation(),
+				new LiteralIntegersAdder(), new XlimVariableRenamer(),
+				new BlockCombine() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
