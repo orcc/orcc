@@ -2,219 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.ui.ide.projectNatureImages">
-      <image
-            icon="icons/orcc.png"
-            id="net.sf.orcc.ui.OrccNatureImage"
-            natureId="net.sf.orcc.ui.OrccNature">
-      </image>
-   </extension>
-   <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="net.sf.orcc.ui.OrccPropertyTester"
-            id="net.sf.orcc.propertyTester"
-            namespace="net.sf.orcc"
-            properties="isVTL,isXDF,isOrccProject"
-            type="org.eclipse.core.runtime.IAdaptable">
-      </propertyTester>
-   </extension>
-   <extension
-         id="OrccNature"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="net.sf.orcc.ui.OrccProjectNature">
-         </run>
-      </runtime>
-   </extension>
-   <extension
-         point="org.eclipse.ui.newWizards">
-      <category
-            id="net.sf.orcc.ui.OrccCategory"
-            name="Orcc">
-      </category>
-      <wizard
-            canFinishEarly="false"
-            category="net.sf.orcc.ui.OrccCategory"
-            class="net.sf.orcc.ui.OrccProjectWizard"
-            hasPages="true"
-            icon="icons/orcc.png"
-            id="net.sf.orcc.ui.newOrccProject"
-            name="Project"
-            project="true">
-      </wizard>
-      <wizard
-            canFinishEarly="false"
-            category="net.sf.orcc.ui.OrccCategory"
-            class="net.sf.orcc.ui.NewNetworkWizard"
-            hasPages="true"
-            icon="icons/network.gif"
-            id="net.sf.orcc.ui.wizards.newNetworkWizard"
-            name="Network (XDF)"
-            project="false">
-         <description>
-            Create a new FU network.
-         </description>
-      </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            class="net.sf.orcc.ui.properties.ProjectPropertyPage"
-            icon="icons/orcc.png"
-            id="net.sf.orcc.ui.properties.ProjectPropertyPage"
-            name="Orcc Settings">
-         <enabledWhen>
-            <and>
-               <adapt
-                     type="org.eclipse.core.resources.IProject">
-               </adapt>
-               <test
-                     forcePluginActivation="true"
-                     property="net.sf.orcc.isOrccProject">
-               </test>
-            </and>
-         </enabledWhen>
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.debug.core.launchConfigurationTypes">
-      <launchConfigurationType
-            delegate="net.sf.orcc.ui.launching.OrccRunLaunchDelegate"
-            id="net.sf.orcc.runLaunchConfigurationType"
-            modes="run"
-            name="Orcc compilation"
-            public="true">
-      </launchConfigurationType>
-      <launchConfigurationType
-            delegate="net.sf.orcc.ui.launching.OrccSimuLaunchDelegate"
-            id="net.sf.orcc.simuLaunchConfigurationType"
-            modes="debug, run"
-            name="Orcc simulation"
-            public="true">
-      </launchConfigurationType>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchShortcuts">
-      <shortcut
-            class="net.sf.orcc.ui.launching.OrccRunLaunchShortcut"
-            icon="icons/orcc.png"
-            id="net.sf.orcc.runLaunchShortcut"
-            label="Orcc compilation"
-            modes="run">
-         <configurationType
-               id="net.sf.orcc.runLaunchConfigurationType">
-         </configurationType>
-         <description
-               description="Compiles a dataflow program with Orcc"
-               mode="run">
-         </description>
-         <contextualLaunch>
-            <enablement>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <or>
-                        <test
-                              forcePluginActivation="true"
-                              property="net.sf.orcc.isVTL">
-                        </test>
-                        <test
-                              forcePluginActivation="true"
-                              property="net.sf.orcc.isXDF">
-                        </test>
-                     </or>
-                  </iterate>
-               </with>
-            </enablement>
-         </contextualLaunch>
-      </shortcut>
-      <shortcut
-            class="net.sf.orcc.ui.launching.OrccSimuLaunchShortcut"
-            icon="icons/orcc.png"
-            id="net.sf.orcc.simuLaunchShortcut"
-            label="Orcc simulation"
-            modes="run">
-         <configurationType
-               id="net.sf.orcc.simuLaunchConfigurationType">
-         </configurationType>
-         <description
-               description="Simulates a dataflow program with Orcc"
-               mode="debug, run">
-         </description>
-         <contextualLaunch>
-            <enablement>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <test
-                           property="net.sf.orcc.isXDF">
-                     </test>
-                  </iterate>
-               </with>
-            </enablement>
-         </contextualLaunch>
-      </shortcut>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
-      <launchConfigurationTabGroup
-            class="net.sf.orcc.ui.launching.OrccRunLaunchConfigurationTabGroup"
-            description="Compiles a dataflow program with Orcc."
-            id="net.sf.orcc.runLaunchConfigurationTabGroup"
-            type="net.sf.orcc.runLaunchConfigurationType">
-         <launchMode
-               mode="run">
-         </launchMode>
-      </launchConfigurationTabGroup>
-      <launchConfigurationTabGroup
-            class="net.sf.orcc.ui.launching.OrccSimuLaunchConfigurationTabGroup"
-            description="Simulates a dataflow program with Orcc."
-            id="net.sf.orcc.simuLaunchConfigurationTabGroup"
-            type="net.sf.orcc.simuLaunchConfigurationType">
-         <launchMode
-               mode="run">
-         </launchMode>
-         <launchMode
-               mode="debug">
-         </launchMode>
-      </launchConfigurationTabGroup>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
-      <launchConfigurationTypeImage
-            configTypeID="net.sf.orcc.runLaunchConfigurationType"
-            icon="icons/orcc.png"
-            id="net.sf.orcc.runLaunchConfigurationTypeImage">
-      </launchConfigurationTypeImage>
-      <launchConfigurationTypeImage
-            configTypeID="net.sf.orcc.simuLaunchConfigurationType"
-            icon="icons/orcc.png"
-            id="orcc plugin.simuLaunchConfigurationTypeImage">
-      </launchConfigurationTypeImage>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="net.sf.orcc.preferences.PreferenceInitializer">
-      </initializer>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="net.sf.orcc.ui.preferences.OrccPreferencePage"
-            id="net.sf.orcc.ui.preferences.OrccPreferencePage"
-            name="Orcc">
-      </page>
-   </extension>
-   <extension
          point="net.sf.graphiti.model.definition">
       <configuration
             extension="xdf"
@@ -563,6 +350,161 @@
             id="net.sf.orcc.ui.grammar.cal">
       </definition>
    </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="net.sf.orcc.ui.OrccPropertyTester"
+            id="net.sf.orcc.propertyTester"
+            namespace="net.sf.orcc"
+            properties="isVTL,isXDF,isOrccProject"
+            type="org.eclipse.core.runtime.IAdaptable">
+      </propertyTester>
+   </extension>
+   <extension
+         id="OrccNature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="net.sf.orcc.ui.OrccProjectNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.sf.orcc.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="net.sf.orcc.ui.launching.OrccRunLaunchDelegate"
+            id="net.sf.orcc.runLaunchConfigurationType"
+            modes="run"
+            name="Orcc compilation"
+            public="true">
+      </launchConfigurationType>
+      <launchConfigurationType
+            delegate="net.sf.orcc.ui.launching.OrccSimuLaunchDelegate"
+            id="net.sf.orcc.simuLaunchConfigurationType"
+            modes="debug, run"
+            name="Orcc simulation"
+            public="true">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="net.sf.orcc.ui.launching.OrccRunLaunchShortcut"
+            icon="icons/orcc.png"
+            id="net.sf.orcc.runLaunchShortcut"
+            label="Orcc compilation"
+            modes="run">
+         <configurationType
+               id="net.sf.orcc.runLaunchConfigurationType">
+         </configurationType>
+         <description
+               description="Compiles a dataflow program with Orcc"
+               mode="run">
+         </description>
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <or>
+                        <test
+                              forcePluginActivation="true"
+                              property="net.sf.orcc.isVTL">
+                        </test>
+                        <test
+                              forcePluginActivation="true"
+                              property="net.sf.orcc.isXDF">
+                        </test>
+                     </or>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+      <shortcut
+            class="net.sf.orcc.ui.launching.OrccSimuLaunchShortcut"
+            icon="icons/orcc.png"
+            id="net.sf.orcc.simuLaunchShortcut"
+            label="Orcc simulation"
+            modes="run">
+         <configurationType
+               id="net.sf.orcc.simuLaunchConfigurationType">
+         </configurationType>
+         <description
+               description="Simulates a dataflow program with Orcc"
+               mode="debug, run">
+         </description>
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <test
+                           property="net.sf.orcc.isXDF">
+                     </test>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="net.sf.orcc.ui.launching.OrccRunLaunchConfigurationTabGroup"
+            description="Compiles a dataflow program with Orcc."
+            id="net.sf.orcc.runLaunchConfigurationTabGroup"
+            type="net.sf.orcc.runLaunchConfigurationType">
+         <launchMode
+               mode="run">
+         </launchMode>
+      </launchConfigurationTabGroup>
+      <launchConfigurationTabGroup
+            class="net.sf.orcc.ui.launching.OrccSimuLaunchConfigurationTabGroup"
+            description="Simulates a dataflow program with Orcc."
+            id="net.sf.orcc.simuLaunchConfigurationTabGroup"
+            type="net.sf.orcc.simuLaunchConfigurationType">
+         <launchMode
+               mode="run">
+         </launchMode>
+         <launchMode
+               mode="debug">
+         </launchMode>
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="net.sf.orcc.runLaunchConfigurationType"
+            icon="icons/orcc.png"
+            id="net.sf.orcc.runLaunchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+      <launchConfigurationTypeImage
+            configTypeID="net.sf.orcc.simuLaunchConfigurationType"
+            icon="icons/orcc.png"
+            id="orcc plugin.simuLaunchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/orcc.png"
+            id="net.sf.orcc.ui.OrccNatureImage"
+            natureId="net.sf.orcc.ui.OrccNature">
+      </image>
+   </extension>
    <extension point="org.eclipse.ui.editors">
       <editor
             class="net.sf.graphiti.ui.editors.GraphEditor"
@@ -573,6 +515,77 @@
             id="net.sf.orcc.ui.editors.GraphEditor"
             name="Orcc Network Editor">
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="net.sf.orcc.CalEditor.BreakpointRulerActions"
+            targetID="net.sf.orcc.cal.Cal">
+         <action
+               actionID="RulerDoubleClick"
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+               id="net.sf.orcc.ui.actions.ManageBreakpointRulerAction"
+               label="Add breakpoint">
+         </action>
+      </editorContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="net.sf.orcc.ui.OrccCategory"
+            name="Orcc">
+      </category>
+      <wizard
+            canFinishEarly="false"
+            category="net.sf.orcc.ui.OrccCategory"
+            class="net.sf.orcc.ui.OrccProjectWizard"
+            hasPages="true"
+            icon="icons/orcc.png"
+            id="net.sf.orcc.ui.newOrccProject"
+            name="Project"
+            project="true">
+      </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="net.sf.orcc.ui.OrccCategory"
+            class="net.sf.orcc.ui.NewNetworkWizard"
+            hasPages="true"
+            icon="icons/network.gif"
+            id="net.sf.orcc.ui.wizards.newNetworkWizard"
+            name="Network (XDF)"
+            project="false">
+         <description>
+            Create a new FU network.
+         </description>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="net.sf.orcc.ui.properties.ProjectPropertyPage"
+            icon="icons/orcc.png"
+            id="net.sf.orcc.ui.properties.ProjectPropertyPage"
+            name="Orcc Settings">
+         <enabledWhen>
+            <and>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+               </adapt>
+               <test
+                     forcePluginActivation="true"
+                     property="net.sf.orcc.isOrccProject">
+               </test>
+            </and>
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.sf.orcc.ui.preferences.OrccPreferencePage"
+            id="net.sf.orcc.ui.preferences.OrccPreferencePage"
+            name="Orcc">
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
@@ -618,18 +631,5 @@
                tab="net.sf.orcc.ui.properties.tab.graph.variables">
          </propertySection>
       </propertySections>
-   </extension>
-   <extension
-         point="org.eclipse.ui.editorActions">
-      <editorContribution
-            id="net.sf.orcc.CalEditor.BreakpointRulerActions"
-            targetID="net.sf.orcc.cal.Cal">
-         <action
-               actionID="RulerDoubleClick"
-               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
-               id="net.sf.orcc.ui.actions.ManageBreakpointRulerAction"
-               label="Add breakpoint">
-         </action>
-      </editorContribution>
    </extension>
 </plugin>
