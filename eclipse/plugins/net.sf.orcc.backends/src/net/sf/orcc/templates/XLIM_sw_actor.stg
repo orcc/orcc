@@ -660,13 +660,13 @@ schedulingTestState(nextStates) ::= <<
 >>
 
 Transition(transition) ::= <<
-\<!-- State s_<transition.sourceState> --\>
+\<!-- State s_<transition.sourceState.name> --\>
 \<module kind="if"\>
-	\<module decision="s_<transition.sourceState>_enabled" kind="test"\>
+	\<module decision="s_<transition.sourceState.name>_enabled" kind="test"\>
 		\<operation kind="$eq"\>
-			\<port dir="in" source="s_<transition.sourceState>"/\>
+			\<port dir="in" source="s_<transition.sourceState.name>"/\>
 			\<port dir="in" source="currentState"/\>
-			\<port dir="out" size="1" source="s_<transition.sourceState>_enabled" typeName="bool"/\>
+			\<port dir="out" size="1" source="s_<transition.sourceState.name>_enabled" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="then"\>
