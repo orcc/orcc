@@ -110,13 +110,13 @@ printUnaryExpr(expr) ::= <<
 >>
 
 printIntExpr(expr) ::= <<
-\<operation kind="$literal_Integer" value="<expr.value>"\>
+\<operation kind="$literal_Integer" value="<expr>"\>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
 
 printBoolExpr(expr) ::= <<
-\<operation kind="$literal_Integer" value="<expr.value>"\>
+\<operation kind="$literal_Integer" value="<expr>"\>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
 \</operation\>
 >>
@@ -617,55 +617,55 @@ scheduler(actions) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
 
-actionCallState(nextState) ::= <<
+actionCallState(targetState) ::= <<
 \<operation kind="assign" target="currentState"\>
-	\<port dir="in" source="s_<nextState.targetState>"/\>
+	\<port dir="in" source="s_<targetState.name>"/\>
 \</operation\>
 >>
 
-actionTestState(nextState) ::= <<
+actionTestState(sourceState, transition) ::= <<
 \<module kind="if"\>
-	\<module decision="isSchedulable_<nextState.action>_<transition.sourceState>" kind="test"\>
+	\<module decision="isSchedulable_<transition.action.name>_<sourceState>" kind="test"\>
 		\<operation kind="noop"\>
-			\<port dir="in" source="isSchedulable_<nextState.action.name>_goWithToken"/\>
-			\<port dir="out" size="1" source="isSchedulable_<nextState.action.name>_<transition.sourceState>" typeName="bool"/\>
+			\<port dir="in" source="isSchedulable_<transition.action.name>_goWithToken"/\>
+			\<port dir="out" size="1" source="isSchedulable_<transition.action.name>_<sourceState>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="then"\>
-		<if(nextState.action.outputPattern)>
+		<if(transition.action.outputPattern)>
 		\<!-- Last outputPattern --\>
-		<outputPatternDecisionState(index=length(nextState.action.outputPattern.numTokensMap.keys),action=nextState.action,state=transition.sourceState); separator="\n">
+		<outputPatternDecisionState(length(transition.action.outputPattern.numTokensMap.keys), transition.action, sourceState); separator="\n">
 			\<module kind="then"\>
-				<actionCall(nextState.action)>
-				<actionCallState(nextState)>
+				<actionCall(transition.action)>
+				<actionCallState(transition.state)>
 			\</module\>
 		\</module\>
 		<else>
 		\<!-- no ouput pattern--\>
-		<actionCall(nextState.action)>
-		<actionCallState(nextState)>
+		<actionCall(transition.action)>
+		<actionCallState(transition.state)>
 		<endif>
 	\</module\>
 	\<module kind="else"\>
 >>
 
-schedulingTestState(nextStates) ::= <<
-<nextStates: actionTestState(); separator="\n">
-<nextStates: {nextState|\</module\>\</module\>}; separator="\n">
+schedulingTestState(sourceState, transitionsList) ::= <<
+<transitionsList: {transition| <actionTestState(sourceState, transition)> }; separator="\n">
+<transitionsList: {transition| \</module\>\</module\> }; separator="\n">
 >>
 
-Transition(transition) ::= <<
-\<!-- State s_<transition.sourceState.name> --\>
+printTransition(transitions) ::= <<
+\<!-- State s_<transitions.sourceState.name> --\>
 \<module kind="if"\>
-	\<module decision="s_<transition.sourceState.name>_enabled" kind="test"\>
+	\<module decision="s_<transitions.sourceState.name>_enabled" kind="test"\>
 		\<operation kind="$eq"\>
-			\<port dir="in" source="s_<transition.sourceState.name>"/\>
+			\<port dir="in" source="s_<transitions.sourceState.name>"/\>
 			\<port dir="in" source="currentState"/\>
-			\<port dir="out" size="1" source="s_<transition.sourceState.name>_enabled" typeName="bool"/\>
+			\<port dir="out" size="1" source="s_<transitions.sourceState.name>_enabled" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="then"\>
-		<schedulingTestState(nextStates=transition.nextStateInfo)>
+		<schedulingTestState(transitions.sourceState, transitions.list)>
 	\</module\>
 	\<module kind="else"\>
 	<closeHwTransition()>
@@ -700,10 +700,10 @@ inputPatternTest(action) ::= <<
 <endif>
 >>
 
-Transitions(actions, transitions) ::= <<
+printTransitions(actions, transitionsList) ::= <<
 \<!-- All transitions --\>
-<transitions:{transition|<Transition(transition=transition)>}; separator="\n">
-<transitions:{transition|\</module\>\</module\>}; separator="\n">
+<transitionsList: {transitions| <printTransition(transitions)> }; separator="\n">
+<transitionsList: {transitions| \</module\>\</module\> }; separator="\n">
 >>
 
 enumStates(transition)::= <<
@@ -747,7 +747,7 @@ schedulerFSM(actions, fsm) ::= <<
 			<schedulingTest(actions)>  	 	 
 			<endif> 
 			\<!-- FSM transitions --\>
-			<Transitions(actions=actions, transitions=fsm.transitions)>
+			<printTransitions(actions, fsm.transitions)>
 			\<!--Close modules for untagged actions --\>
 			<if(actions)>  	 	 
 			<actions:{action|\</module\>\</module\>}; separator="\n">
