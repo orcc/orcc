@@ -182,8 +182,7 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	private Expression createExprVarAndAssign(Expression expr) {
 		Var target = procedure.newTempLocalVariable(
-				EcoreUtil.copy(expr.getType()), procedure.getName() + "_"
-						+ "expr");
+				EcoreUtil.copy(expr.getType()), "literal");
 
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 				EcoreHelper.copy(expr));
