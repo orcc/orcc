@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -360,7 +361,6 @@ public class ActorMerger implements INetworkTransformation {
 				proc.getNodes().addAll(nodes);
 				proc.getLast(nodes).add(factory.createInstReturn());
 				superActor.getProcs().add(proc);
-
 				new ChangeFifoArrayAccess(action.getInputPattern(),
 						action.getOutputPattern(), buffersMap)
 						.doSwitch(superActor);
@@ -522,8 +522,11 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	@Override
-	public void transform(Network network) {
+	public void transform(Network network) throws OrccException {
 		graph = network.getGraph();
+
+		// make unique instance
+		new UniqueInstantiator().transform(network);
 
 		// static region detections
 		StaticSubsetDetector detector = new StaticSubsetDetector(network);
@@ -532,7 +535,7 @@ public class ActorMerger implements INetworkTransformation {
 
 			DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
 					graph, vertices, null);
-
+			
 			// create the static schedule of vertices
 			scheduler = new SASLoopScheduler(subgraph);
 			scheduler.schedule();
