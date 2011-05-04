@@ -193,9 +193,8 @@ public class Inliner extends AbstractActorVisitor<Object> {
 
 		// Clone function/procedure body
 		Collection<Node> clonedNodes = cloneNodes(function.getNodes());
-		if (!function.getReturnType().isVoid()) {
-			transformInstReturn(clonedNodes, call.getTarget().getVariable());
-		}
+		transformInstReturn(clonedNodes, call.getTarget());
+
 		nodes.addAll(clonedNodes);
 
 		// Remove old block and add the new ones
@@ -215,7 +214,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		for (Node node : nodes) {
 			currentNodes.add(indexNode + 1, node);
 		}
-		
+
 		EcoreHelper.delete(call);
 	}
 
@@ -227,16 +226,19 @@ public class Inliner extends AbstractActorVisitor<Object> {
 	 * @param callTarget
 	 *            a variable
 	 */
-	private void transformInstReturn(Collection<Node> nodes, Var callTarget) {
+	private void transformInstReturn(Collection<Node> nodes, Def callTarget) {
 		TreeIterator<EObject> it = EcoreUtil.getAllContents(nodes);
 		while (it.hasNext()) {
 			EObject object = it.next();
 
 			if (object instanceof InstReturn) {
 				InstReturn instReturn = (InstReturn) object;
-				InstAssign instAssign = IrFactory.eINSTANCE.createInstAssign(
-						callTarget, EcoreHelper.copy(instReturn.getValue()));
-				EcoreUtil.replace(instReturn, instAssign);
+				if (callTarget != null) {
+					InstAssign instAssign = IrFactory.eINSTANCE
+							.createInstAssign(callTarget.getVariable(),
+									EcoreHelper.copy(instReturn.getValue()));
+					EcoreUtil.replace(instReturn, instAssign);
+				}
 				EcoreHelper.delete(instReturn);
 			}
 		}
