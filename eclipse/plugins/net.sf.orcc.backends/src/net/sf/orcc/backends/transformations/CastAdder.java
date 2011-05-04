@@ -45,7 +45,6 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -71,6 +70,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	private boolean usePreviousJoinNode;
+	private Type parentType;
 
 	/**
 	 * Creates a new cast transformation
@@ -85,8 +85,21 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
+		Type oldParentType = parentType;
+		if (expr.getOp().isComparison()) {
+			Type type1 = expr.getE1().getType();
+			Type type2 = expr.getE2().getType();
+			if (type1.getSizeInBits() < type2.getSizeInBits()) {
+				parentType = type2;
+			} else {
+				parentType = type1;
+			}
+		} else {
+			parentType = expr.getType();
+		}
 		expr.setE1(doSwitch(expr.getE1()));
 		expr.setE2(doSwitch(expr.getE2()));
+		parentType = oldParentType;
 		return castExpression(expr);
 	}
 
@@ -118,7 +131,10 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprUnary(ExprUnary expr) {
+		Type oldParentType = parentType;
+		parentType = expr.getType();
 		expr.setExpr(doSwitch(expr.getExpr()));
+		parentType = oldParentType;
 		return castExpression(expr);
 	}
 
@@ -129,19 +145,35 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstAssign(InstAssign assign) {
+		Type oldParentType = parentType;
+		parentType = assign.getTarget().getVariable().getType();
 		assign.setValue(doSwitch(assign.getValue()));
+		parentType = oldParentType;
 		return null;
 	}
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
-		castExpressionList(call.getParameters());
+		Type oldParentType = parentType;
+		EList<Expression> expressions = call.getParameters();
+		EList<Expression> newExpressions = new BasicEList<Expression>();
+		for (int i = 0; i < expressions.size();) {
+			Expression expression = expressions.get(i);
+			parentType = call.getProcedure().getParameters().get(i).getType();
+			newExpressions.add(doSwitch(expression));
+			if (expression != null) {
+				i++;
+			}
+		}
+		expressions.clear();
+		expressions.addAll(newExpressions);
+		parentType = oldParentType;
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
-		castExpressionList(load.getIndexes());
+		// Don't cast indexes ...
 
 		Var source = load.getSource().getVariable();
 		Var target = load.getTarget().getVariable();
@@ -174,7 +206,10 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
+		Type oldParentType = parentType;
+		parentType = phi.getTarget().getVariable().getType();
 		castExpressionList(phi.getValues());
+		parentType = oldParentType;
 		return null;
 	}
 
@@ -182,38 +217,55 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	public Expression caseInstReturn(InstReturn returnInstr) {
 		Expression expr = returnInstr.getValue();
 		if (expr != null) {
+			Type oldParentType = parentType;
+			parentType = procedure.getReturnType();
 			returnInstr.setValue(doSwitch(expr));
+			parentType = oldParentType;
 		}
 		return null;
 	}
 
 	@Override
 	public Expression caseInstStore(InstStore store) {
+		// Don't cast indexes ...
+		Type oldParentType = parentType;
+		if (store.getIndexes().isEmpty()) {
+			// Store to a scalar variable
+			parentType = store.getTarget().getVariable().getType();
+		} else {
+			// Store to an array variable
+			parentType = ((TypeList) store.getTarget().getVariable().getType())
+					.getElementType();
+		}
 		store.setValue(doSwitch(store.getValue()));
-		castExpressionList(store.getIndexes());
+		parentType = oldParentType;
 		return null;
 	}
 
 	@Override
 	public Expression caseNodeIf(NodeIf nodeIf) {
+		Type oldParentType = parentType;
+		parentType = IrFactory.eINSTANCE.createTypeBool();
 		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
 		doSwitch(nodeIf.getThenNodes());
 		doSwitch(nodeIf.getElseNodes());
 		doSwitch(nodeIf.getJoinNode());
+		parentType = oldParentType;
 		return null;
 	}
 
 	@Override
 	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+		Type oldParentType = parentType;
+		parentType = IrFactory.eINSTANCE.createTypeBool();
 		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
 		doSwitch(nodeWhile.getNodes());
 		doSwitch(nodeWhile.getJoinNode());
+		parentType = oldParentType;
 		return null;
 	}
 
 	private Expression castExpression(Expression expr) {
-		Type parentType = getParentType(expr);
-
 		if (needCast(expr.getType(), parentType)) {
 			Var oldVar;
 			if (expr.isVarExpr()) {
@@ -251,31 +303,6 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		}
 		expressions.clear();
 		expressions.addAll(newExpressions);
-	}
-
-	private Type getParentType(Expression expr) {
-		Expression parentExpr = EcoreHelper.getContainerOfType(expr,
-				Expression.class);
-		if (parentExpr != null) {
-			return parentExpr.getType();
-		} else {
-			Instruction parentInst = EcoreHelper.getContainerOfType(expr,
-					Instruction.class);
-			if (parentInst.isStore()) {
-				return ((InstStore) parentInst).getTarget().getVariable()
-						.getType();
-			} else if (parentInst.isPhi()) {
-				return ((InstPhi) parentInst).getTarget().getVariable()
-						.getType();
-			} else if (parentInst.isReturn()) {
-				return procedure.getReturnType();
-			} else if (parentInst.isCall()) {
-				int index = EcoreHelper.getContainingList(expr).indexOf(expr);
-				return ((InstCall) parentInst).getProcedure().getParameters()
-						.get(index).getType();
-			}
-		}
-		return null;
 	}
 
 	private boolean needCast(Type type1, Type type2) {
