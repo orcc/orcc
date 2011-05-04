@@ -126,10 +126,10 @@ public class XlimBackendImpl extends AbstractBackend {
 				new Inliner(true, true), new UnaryListRemoval(),
 				new CustomPeekAdder(), new DeadGlobalElimination(),
 				new DeadCodeElimination(), new XlimDeadVariableRemoval(),
-				new ListFlattener(), new ExpressionSplitter(), new BuildCFG(),
-				new CastAdder(), new InstPhiTransformation(),
-				new LiteralIntegersAdder(), new XlimVariableRenamer(),
-				new BlockCombine() };
+				new ListFlattener(), new ExpressionSplitter(true),
+				new BuildCFG(), new CastAdder(true),
+				new InstPhiTransformation(), new LiteralIntegersAdder(true),
+				new XlimVariableRenamer(), new BlockCombine() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);

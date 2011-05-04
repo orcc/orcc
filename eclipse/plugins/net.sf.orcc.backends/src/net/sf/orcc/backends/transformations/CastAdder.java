@@ -70,6 +70,19 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class CastAdder extends AbstractActorVisitor<Expression> {
 
+	private boolean usePreviousJoinNode;
+
+	/**
+	 * Creates a new cast transformation
+	 * 
+	 * @param usePreviousJoinNode
+	 *            <code>true</code> if the current IR form has join node before
+	 *            while node
+	 */
+	public CastAdder(boolean usePreviousJoinNode) {
+		this.usePreviousJoinNode = usePreviousJoinNode;
+	}
+
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
 		expr.setE1(doSwitch(expr.getE1()));
@@ -215,7 +228,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 						"expr_" + procedure.getName());
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 						oldVar, EcoreHelper.copy(expr));
-				EcoreHelper.addInstBeforeExpr(expr, assign);
+				EcoreHelper
+						.addInstBeforeExpr(expr, assign, usePreviousJoinNode);
 			}
 
 			Var newVar = procedure.newTempLocalVariable(
@@ -223,7 +237,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 					"castedExpr_" + procedure.getName());
 			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
 					oldVar, newVar);
-			EcoreHelper.addInstBeforeExpr(expr, cast);
+			EcoreHelper.addInstBeforeExpr(expr, cast, usePreviousJoinNode);
 			return IrFactory.eINSTANCE.createExprVar(newVar);
 		}
 

@@ -42,6 +42,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
 import net.sf.orcc.util.OrccUtil;
@@ -69,15 +70,21 @@ public class EcoreHelper {
 	 * Add the given instruction before the given expression. If the expression
 	 * is contained by an instruction then the instruction to add is put
 	 * directly before, else the instruction is put to the previous nodeblock
-	 * which is created if needed.
+	 * which is created if needed. Return <code>true</code> if the given
+	 * instruction is added in the current block.
 	 * 
 	 * @param expression
 	 *            an expression
 	 * @param instruction
 	 *            the instruction to add before the given expression
+	 * @param usePreviousJoinNode
+	 *            <code>true</code> if the current IR form has join node before
+	 *            while node
+	 * @return <code>true</code> if the given instruction is added in the
+	 *         current block
 	 */
 	public static boolean addInstBeforeExpr(Expression expression,
-			Instruction instruction) {
+			Instruction instruction, boolean usePreviousJoinNode) {
 		Instruction instContainer = EcoreHelper.getContainerOfType(expression,
 				Instruction.class);
 		if (instContainer != null) {
@@ -88,19 +95,25 @@ public class EcoreHelper {
 		} else {
 			Node nodeContainer = EcoreHelper.getContainerOfType(expression,
 					Node.class);
-			List<Node> nodes = EcoreHelper.getContainingList(nodeContainer);
-			int index = nodes.indexOf(nodeContainer);
-			if (index > 0) {
-				Node previousNode = nodes.get(index - 1);
-				if (previousNode.isBlockNode()) {
-					((NodeBlock) previousNode).add(instruction);
-					return false;
+			if (usePreviousJoinNode && nodeContainer.isWhileNode()) {
+				NodeBlock joinNode = ((NodeWhile) nodeContainer).getJoinNode();
+				joinNode.add(instruction);
+				return false;
+			} else {
+				List<Node> nodes = EcoreHelper.getContainingList(nodeContainer);
+				int index = nodes.indexOf(nodeContainer);
+				if (index > 0) {
+					Node previousNode = nodes.get(index - 1);
+					if (previousNode.isBlockNode()) {
+						((NodeBlock) previousNode).add(instruction);
+						return false;
+					}
 				}
+				NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
+				nodeBlock.add(instruction);
+				nodes.add(index, nodeBlock);
+				return false;
 			}
-			NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
-			nodeBlock.add(instruction);
-			nodes.add(index, nodeBlock);
-			return false;
 		}
 	}
 

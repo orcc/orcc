@@ -66,8 +66,18 @@ import org.eclipse.emf.common.util.EList;
  */
 public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
-	public ExpressionSplitter() {
+	private boolean usePreviousJoinNode;
+
+	/**
+	 * Creates a new transformation which splits complex expressions
+	 * 
+	 * @param usePreviousJoinNode
+	 *            <code>true</code> if the current IR form has join node before
+	 *            while node
+	 */
+	public ExpressionSplitter(boolean usePreviousJoinNode) {
 		super(true);
+		this.usePreviousJoinNode = usePreviousJoinNode;
 	}
 
 	@Override
@@ -83,7 +93,8 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 					EcoreHelper.copy(expr));
 
 			// Add assignment to instruction's list
-			if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
+			if (EcoreHelper
+					.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
 				indexInst++;
 			}
 
@@ -158,7 +169,8 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 					newExpr);
 
 			// Add assignment to instruction's list
-			if (EcoreHelper.addInstBeforeExpr(expr, assign)) {
+			if (EcoreHelper
+					.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
 				indexInst++;
 			}
 

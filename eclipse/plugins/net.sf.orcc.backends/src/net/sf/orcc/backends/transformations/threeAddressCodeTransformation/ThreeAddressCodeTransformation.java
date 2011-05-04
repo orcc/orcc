@@ -54,13 +54,24 @@ import net.sf.orcc.ir.util.ActorVisitor;
  */
 public class ThreeAddressCodeTransformation extends
 		AbstractActorVisitor<Object> {
+
+	private boolean usePreviousJoinNode;
+
+	/**
+	 * Creates a new three address code transformation
+	 * 
+	 * @param usePreviousJoinNode
+	 *            <code>true</code> if the current IR form has join node before
+	 *            while node
+	 */
+	public ThreeAddressCodeTransformation(boolean usePreviousJoinNode) {
+		this.usePreviousJoinNode = usePreviousJoinNode;
+	}
+
 	@Override
 	public Object caseActor(Actor actor) {
-		ActorVisitor<?>[] transformations = {
-				//new CopyPropagator(),
-				new ExpressionSplitter(), new BuildCFG(),
-				//new CastAdder() 
-				};
+		ActorVisitor<?>[] transformations = { new CopyPropagator(),
+				new ExpressionSplitter(usePreviousJoinNode), new BuildCFG() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
