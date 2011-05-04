@@ -145,9 +145,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		variableToLocalVariableMap = new HashMap<Var, Var>();
 		for (Var var : function.getLocals()) {
 			Var newVar = procedure.newTempLocalVariable(var.getType(),
-					procedure.getName() + "_" + var.getName() + "_"
-							+ call.getLocation().getStartLine() + "_"
-							+ call.getLocation().getStartColumn());
+					"inlined_" + var.getName());
 			newVar.setIndex(var.getIndex());
 			newVar.setLocation(var.getLocation());
 			newVar.setAssignable(var.isAssignable());
@@ -162,9 +160,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 						.getVariable();
 			} else {
 				newVar = procedure.newTempLocalVariable(var.getType(),
-						procedure.getName() + "_" + var.getName() + "_"
-								+ call.getLocation().getStartLine() + "_"
-								+ call.getLocation().getStartColumn());
+						"inlined_" + var.getName());
 				newVar.setIndex(var.getIndex());
 				newVar.setLocation(var.getLocation());
 				newVar.setAssignable(var.isAssignable());
