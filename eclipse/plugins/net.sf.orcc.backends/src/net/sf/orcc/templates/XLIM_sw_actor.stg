@@ -254,16 +254,20 @@ printCast(op) ::= <<
 // FIFO Operations
 ///////////////////////////////////////////////////////////////////////////////
 
-printPeeks(port, indexToTargetMap) ::= <<
+printPeeks(peekedMap) ::= <<
+<peekedMap.keys: { port | <printPeeksPerPort(port, peekedMap.(port))> }; separator="\n">
+>>
+
+printPeeksPerPort(port, indexToTargetMap) ::= <<
 <indexToTargetMap.keys : { index | <printPeek(port, indexToTargetMap.(index), index)> }; separator="\n">
 >>
 
 printPeek(port, target, tokenIndex) ::= <<
 \<operation kind="$literal_Integer" value="<tokenIndex>"\>
-	\<port dir="out" size="32" source="peek_<instance.id>_<action.scheduler>_<tokenIndex>_<target>" typeName="int"/\>
+	\<port dir="out" size="32" source="peek_<action.scheduler.name>_<target.name>_<tokenIndex>" typeName="int"/\>
 \</operation\>
 \<operation kind="pinPeek" portName="<port.name>" removable="no"\>
-	\<port dir="in" source="peek_<instance.id>_<action.scheduler>_<tokenIndex>_<target>"/\>
+	\<port dir="in" source="peek_<action.scheduler.name>_<target.name>_<tokenIndex>"/\>
 	<typedPort(dir="out", type=port.type, source=target)>
 \</operation\>
 >>
@@ -675,7 +679,7 @@ closeHwTransition() ::=<<
 >>
 
 isSchedulableTest(action) ::= <<
-<instance.actor.templateData.customPeekedMapPerAction.(action).keys: { port | <printPeeks(port, instance.actor.templateData.customPeekedMapPerAction.(action).(port))> }; separator="\n">
+<printPeeks(instance.actor.templateData.customPeekedMapPerAction.(action))>
 <procedure(action.scheduler)>
 >>
 
@@ -741,15 +745,17 @@ schedulerFSM(actions, fsm) ::= <<
 			<instance.actor.actions: isSchedulableTest()>
 			<instance.actor.actions: inputPatternTest()>
 			<instance.actor.actions: outputPatternTest()>
+			<if(actions)>
 			
-			\<!-- Untagged actions --\>
-			<if(actions)>  	 	 
-			<schedulingTest(actions)>  	 	 
-			<endif> 
+			\<!-- Untagged actions --\>  	 	 
+			<schedulingTest(actions)>  	 
+				 
+			<endif>
 			\<!-- FSM transitions --\>
 			<printTransitions(actions, fsm.transitions)>
+			<if(actions)>
+			
 			\<!--Close modules for untagged actions --\>
-			<if(actions)>  	 	 
 			<actions:{action|\</module\>\</module\>}; separator="\n">
 			<endif>
 		\</module\>

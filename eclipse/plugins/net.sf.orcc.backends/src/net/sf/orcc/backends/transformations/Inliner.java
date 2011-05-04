@@ -169,10 +169,8 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			variableToLocalVariableMap.put(var, newVar);
 		}
 
-		List<Node> nodes = new ArrayList<Node>();
-
 		// Assign all parameters except for list
-		NodeBlock newBlockNode = IrFactory.eINSTANCE.createNodeBlock();
+		NodeBlock parametersBlock = IrFactory.eINSTANCE.createNodeBlock();
 		for (int i = 0; i < function.getParameters().size(); i++) {
 			Var parameter = function.getParameters().get(i);
 			if (!parameter.getType().isList()) {
@@ -180,37 +178,33 @@ public class Inliner extends AbstractActorVisitor<Object> {
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 						variableToLocalVariableMap.get(parameter),
 						EcoreHelper.copy(expr));
-				newBlockNode.add(assign);
+				parametersBlock.add(assign);
 			}
-		}
-		if (newBlockNode.getInstructions().size() > 0) {
-			nodes.add(newBlockNode);
 		}
 
 		// Clone function/procedure body
 		Collection<Node> clonedNodes = cloneNodes(function.getNodes());
 		transformInstReturn(clonedNodes, call.getTarget());
 
-		nodes.addAll(clonedNodes);
-
-		// Remove old block and add the new ones
-		NodeBlock currentNodeBlock = EcoreHelper.getContainerOfType(call,
+		// Cut the block containing call instruction in two parts to put
+		// inlined nodes between them
+		NodeBlock currentBlock = EcoreHelper.getContainerOfType(call,
 				NodeBlock.class);
-		currentNodeBlock.getInstructions().remove(indexInst);
-
-		NodeBlock secondBlockNodePart = IrFactory.eINSTANCE.createNodeBlock();
-		while (indexInst < currentNodeBlock.getInstructions().size()) {
-			secondBlockNodePart.add(currentNodeBlock.getInstructions().get(
-					indexInst));
-		}
-		nodes.add(secondBlockNodePart);
-
-		List<Node> currentNodes = EcoreHelper
-				.getContainingList(currentNodeBlock);
-		for (Node node : nodes) {
-			currentNodes.add(indexNode + 1, node);
+		NodeBlock followingBlock = IrFactory.eINSTANCE.createNodeBlock();
+		while (indexInst < currentBlock.getInstructions().size()) {
+			followingBlock.add(currentBlock.getInstructions().get(indexInst));
 		}
 
+		// Add all inlined blocks
+		Collection<Node> inlinedNodes = new ArrayList<Node>();
+		inlinedNodes.add(parametersBlock);
+		inlinedNodes.addAll(clonedNodes);
+		inlinedNodes.add(followingBlock);
+
+		List<Node> currentNodes = EcoreHelper.getContainingList(currentBlock);
+		currentNodes.addAll(indexNode + 1, inlinedNodes);
+
+		// Remove useless call instruction
 		EcoreHelper.delete(call);
 	}
 
