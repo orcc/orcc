@@ -168,7 +168,7 @@ printCall(op) ::= <<
 >>
 
 printLoad(op) ::= <<
-\<!-- Load <op> --\>
+\<!-- <op> --\>
 <if(op.source.variable.type.list)
 >\<operation kind="var_ref" name="<op.source.variable.name>"\>
 	<op.indexes: { index | <untypedPort(dir="in", source=index.use.variable)> }; separator="\n">
@@ -182,7 +182,7 @@ else
 >>
 
 printStore(op) ::= <<
-\<!-- Store <op> --\>
+\<!-- <op> --\>
 <if (op.target.variable.global || op.target.variable.type.list)
 >\<operation kind="assign" target="<op.target.variable.name>"\>
 	<op.indexes: { index | <untypedPort(dir="in", source=index.use.variable)> }; separator="\n">
@@ -211,6 +211,7 @@ printPhiAssignment(op) ::= <<
 
 printReturn(return) ::= <<
 <if(return.value)>
+\<!-- <op> --\>
 \<operation kind="noop"\>
 	<untypedPort(dir="in", source=return.value.use.variable)>
 	\<port dir="out" source="<procedure.name>_go"/\>
@@ -235,6 +236,7 @@ printAssignIndex(op) ::= <<
 >>
 
 printTernaryOperation(op) ::= <<
+\<!-- <op> --\>
 \<operation kind="$selector"\>
 	<untypedPort(dir="in", source=op.conditionValue.use.variable)>
 	<untypedPort(dir="in", source=op.trueValue.use.variable)>
@@ -244,6 +246,7 @@ printTernaryOperation(op) ::= <<
 >>
 
 printCast(op) ::= << 
+\<!-- <op> --\>
 \<operation kind="cast"\> 
 	<untypedPort(dir="in", source=op.source.variable)> 
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)> 
