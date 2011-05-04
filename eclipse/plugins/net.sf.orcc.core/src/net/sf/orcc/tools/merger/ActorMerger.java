@@ -119,6 +119,30 @@ public class ActorMerger implements INetworkTransformation {
 		superActor.getStateVars().add(varCount);
 	}
 
+	private void copyProcedures() {
+		for (Vertex vertex : vertices) {
+			String id = vertex.getInstance().getId();
+			Actor actor = vertex.getInstance().getActor();
+			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
+				String name = proc.getName();
+				actor.getProcedure(name).setName(id + "_" + name);
+				superActor.getProcs().add(proc);
+			}
+		}
+	}
+
+	private void copyStateVariables() {
+		for (Vertex vertex : vertices) {
+			String id = vertex.getInstance().getId();
+			Actor actor = vertex.getInstance().getActor();
+			for (Var var : new ArrayList<Var>(actor.getStateVars())) {
+				String name = var.getName();
+				actor.getStateVar(name).setName(id + "_" + name);
+				superActor.getStateVars().add(var);
+			}
+		}
+	}
+
 	/**
 	 * 
 	 * @param ip
@@ -514,6 +538,10 @@ public class ActorMerger implements INetworkTransformation {
 
 		createPorts();
 
+		copyStateVariables();
+
+		copyProcedures();
+
 		createStateVariables();
 
 		createProcedures();
@@ -535,7 +563,7 @@ public class ActorMerger implements INetworkTransformation {
 
 			DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
 					graph, vertices, null);
-			
+
 			// create the static schedule of vertices
 			scheduler = new SASLoopScheduler(subgraph);
 			scheduler.schedule();
