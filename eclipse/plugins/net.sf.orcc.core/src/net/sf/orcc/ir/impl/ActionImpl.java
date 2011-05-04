@@ -15,10 +15,8 @@ import net.sf.orcc.ir.Tag;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
@@ -564,6 +562,15 @@ public class ActionImpl extends EObjectImpl implements Action {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__TAG, newTag, newTag));
+	}
+	
+	@Override
+	public String toString() {
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (name: ");
+		result.append(getName());
+		result.append(')');
+		return result.toString();
 	}
 
 } // ActionImpl
