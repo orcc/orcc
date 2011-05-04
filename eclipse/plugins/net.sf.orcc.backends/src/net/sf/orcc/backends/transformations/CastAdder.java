@@ -146,32 +146,28 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Var source = load.getSource().getVariable();
 		Var target = load.getTarget().getVariable();
 
+		Type uncastedType;
+
 		if (load.getIndexes().isEmpty()) {
 			// Load from a scalar variable
-			if (needCast(target.getType(), source.getType())) {
-				Var newTarget = procedure.newTempLocalVariable(
-						EcoreUtil.copy(source.getType()),
-						"casted_" + target.getName());
-				newTarget.setIndex(1);
-
-				InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
-						target, newTarget);
-
-				load.getBlock().add(indexInst + 1, cast);
-			}
+			uncastedType = EcoreHelper.copy(source.getType());
 		} else {
 			// Load from an array variable
-			Type subtype = ((TypeList) source.getType()).getElementType();
-			if (needCast(target.getType(), subtype)) {
-				Var newTarget = procedure.newTempLocalVariable(
-						EcoreUtil.copy(subtype), "casted_" + target.getName());
-				newTarget.setIndex(1);
+			uncastedType = EcoreHelper.copy(((TypeList) source.getType())
+					.getElementType());
+		}
 
-				InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
-						target, newTarget);
+		if (needCast(target.getType(), uncastedType)) {
+			Var castedTarget = procedure.newTempLocalVariable(target.getType(),
+					"casted_" + target.getName());
+			castedTarget.setIndex(1);
 
-				load.getBlock().add(indexInst + 1, cast);
-			}
+			target.setType(uncastedType);
+
+			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+					target, castedTarget);
+
+			load.getBlock().add(indexInst + 1, cast);
 		}
 		return null;
 	}
