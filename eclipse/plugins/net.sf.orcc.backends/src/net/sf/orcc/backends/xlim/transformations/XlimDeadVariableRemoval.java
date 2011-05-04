@@ -28,15 +28,8 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import net.sf.orcc.backends.instructions.InstTernary;
-import net.sf.orcc.backends.xlim.XlimActorTemplateData;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.InstSpecific;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 
@@ -63,25 +56,4 @@ public class XlimDeadVariableRemoval extends DeadVariableRemoval {
 		return super.caseInstSpecific(specific);
 	}
 
-	@Override
-	public Object caseActor(Actor actor) {
-		super.caseActor(actor);
-		Map<Action, Map<Port, Map<Integer, Var>>> customPeekedMapPerAction = ((XlimActorTemplateData) actor
-				.getTemplateData()).getCustomPeekedMapPerAction();
-		for (Action action : new ArrayList<Action>(
-				customPeekedMapPerAction.keySet())) {
-			Map<Port, Map<Integer, Var>> peekedMapPerPort = customPeekedMapPerAction
-					.get(action);
-			for (Port port : new ArrayList<Port>(peekedMapPerPort.keySet())) {
-				Map<Integer, Var> peekedMap = peekedMapPerPort.get(port);
-				for (Integer num : new ArrayList<Integer>(peekedMap.keySet())) {
-					if (!action.getScheduler().getLocals()
-							.contains(peekedMap.get(num))) {
-						peekedMap.remove(num);
-					}
-				}
-			}
-		}
-		return null;
-	}
 }
