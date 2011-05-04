@@ -45,6 +45,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -105,28 +106,28 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprBool(ExprBool expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprFloat(ExprFloat expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprInt(ExprInt expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprList(ExprList expr) {
 		castExpressionList(expr.getValue());
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseExprString(ExprString expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
@@ -140,15 +141,22 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprVar(ExprVar expr) {
-		return castExpression(expr);
+		return expr;
 	}
 
 	@Override
 	public Expression caseInstAssign(InstAssign assign) {
 		Type oldParentType = parentType;
 		parentType = assign.getTarget().getVariable().getType();
-		assign.setValue(doSwitch(assign.getValue()));
+		Expression newValue = doSwitch(assign.getValue());
 		parentType = oldParentType;
+		if(newValue != assign.getValue()){
+			// Cast is useless anymore
+			EList<Instruction> instructions = assign.getBlock().getInstructions();
+			InstCast cast = (InstCast) instructions.get(instructions.indexOf(assign) - 1);
+			cast.setTarget(IrFactory.eINSTANCE.createDef(assign.getTarget().getVariable()));
+			EcoreHelper.delete(assign);
+		}
 		return null;
 	}
 
