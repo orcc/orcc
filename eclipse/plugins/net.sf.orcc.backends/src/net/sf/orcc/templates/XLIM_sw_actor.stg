@@ -106,10 +106,7 @@ printBinaryExpr(expr) ::= <<
 >>
 
 printUnaryExpr(expr) ::= <<
-\<operation kind="<UnaryOp.(expr.op)>"\>
-	<untypedPort(dir="in", source=expr.expr.use.variable)>
-	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
-\</operation\>
+\<!-- Unary expression is unsupported --\>
 >>
 
 printIntExpr(expr) ::= <<
@@ -164,7 +161,7 @@ elseif(op.instTernary)><printTernaryOperation(op)><endif>
 >>
 
 printCall(op) ::= <<
-\<!-- No calls in XLIM --\>
+\<!-- Call is unsupported --\>
 >>
 
 printLoad(op) ::= <<
@@ -214,7 +211,7 @@ printReturn(return) ::= <<
 \<!-- <op> --\>
 \<operation kind="noop"\>
 	<untypedPort(dir="in", source=return.value.use.variable)>
-	\<port dir="out" source="<procedure.name>_go"/\>
+	\<port dir="out" size="1" source="<procedure.name>_go" typeName="bool"/\>
 \</operation\>
 <endif>
 >>
@@ -258,7 +255,7 @@ printCast(op) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printPeeks(port, indexToTargetMap) ::= <<
-	<indexToTargetMap.keys : { index | <printPeek(port, indexToTargetMap.(index), index)> }; separator="\n">
+<indexToTargetMap.keys : { index | <printPeek(port, indexToTargetMap.(index), index)> }; separator="\n">
 >>
 
 printPeek(port, target, tokenIndex) ::= <<
