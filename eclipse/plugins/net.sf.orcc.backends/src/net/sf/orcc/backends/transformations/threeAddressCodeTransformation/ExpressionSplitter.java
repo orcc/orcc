@@ -67,6 +67,7 @@ import org.eclipse.emf.common.util.EList;
 public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
 	private boolean usePreviousJoinNode;
+	private int complexityLevel = 0;
 
 	/**
 	 * Creates a new transformation which splits complex expressions
@@ -82,13 +83,15 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
+		complexityLevel++;
 		expr.setE1(doSwitch(expr.getE1()));
 		expr.setE2(doSwitch(expr.getE2()));
+		complexityLevel--;
 
-		if (EcoreHelper.getContainerOfType(expr, Expression.class) != null) {
+		if (complexityLevel > 0) {
 			// Make a new assignment to the binary expression
 			Var target = procedure.newTempLocalVariable(
-					EcoreHelper.copy(expr.getType()), "expr");
+					EcoreHelper.copy(expr.getType()), "slittedExpr");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 					EcoreHelper.copy(expr));
 
@@ -99,7 +102,6 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 			}
 
 			EcoreHelper.delete(expr);
-
 			return IrFactory.eINSTANCE.createExprVar(target);
 		} else {
 			return expr;
@@ -133,7 +135,9 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprUnary(ExprUnary expr) {
+		complexityLevel++;
 		expr.setExpr(doSwitch(expr.getExpr()));
+		complexityLevel--;
 
 		// Transform unary expression to binary one
 		Expression newExpr;
@@ -161,10 +165,10 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 			throw new OrccRuntimeException("unsupported operator");
 		}
 
-		if (EcoreHelper.getContainerOfType(expr, Expression.class) != null) {
+		if (complexityLevel > 0) {
 			// Make a new assignment to the binary expression
 			Var target = procedure.newTempLocalVariable(
-					EcoreHelper.copy(expr.getType()), "expr");
+					EcoreHelper.copy(expr.getType()), "slittedExpr");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 					newExpr);
 
@@ -175,7 +179,6 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 			}
 
 			EcoreHelper.delete(expr);
-
 			return IrFactory.eINSTANCE.createExprVar(target);
 		} else {
 			EcoreHelper.delete(expr);
@@ -196,19 +199,25 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
+		complexityLevel++;
 		splitExpressionList(call.getParameters());
+		complexityLevel--;
 		return null;
 	}
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
+		complexityLevel++;
 		splitExpressionList(load.getIndexes());
+		complexityLevel--;
 		return null;
 	}
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
+		complexityLevel++;
 		splitExpressionList(phi.getValues());
+		complexityLevel--;
 		return null;
 	}
 
@@ -216,20 +225,27 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 	public Expression caseInstReturn(InstReturn returnInstr) {
 		if (!procedure.getReturnType().isVoid()) {
 			Expression expr = returnInstr.getValue();
+			complexityLevel++;
 			returnInstr.setValue(doSwitch(expr));
+			complexityLevel--;
 		}
 		return null;
 	}
 
 	@Override
 	public Expression caseInstStore(InstStore store) {
+		complexityLevel++;
 		splitExpressionList(store.getIndexes());
+		store.setValue(doSwitch(store.getValue()));
+		complexityLevel--;
 		return null;
 	}
 
 	@Override
 	public Expression caseNodeIf(NodeIf nodeIf) {
+		complexityLevel++;
 		nodeIf.setCondition(doSwitch(nodeIf.getCondition()));
+		complexityLevel--;
 		doSwitch(nodeIf.getThenNodes());
 		doSwitch(nodeIf.getElseNodes());
 		doSwitch(nodeIf.getJoinNode());
@@ -238,7 +254,9 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseNodeWhile(NodeWhile nodeWhile) {
+		complexityLevel++;
 		nodeWhile.setCondition(doSwitch(nodeWhile.getCondition()));
+		complexityLevel--;
 		doSwitch(nodeWhile.getNodes());
 		doSwitch(nodeWhile.getJoinNode());
 		return null;
