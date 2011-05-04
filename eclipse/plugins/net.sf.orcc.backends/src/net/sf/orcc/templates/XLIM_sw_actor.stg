@@ -454,19 +454,17 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 localInitialize(local) ::= <<
-<if(local.type.list)
-><if(local.defs.empty)>
+<if(local.type.list)>
 \<operation kind="$valloc"\>
 	<typedPort(dir="out", type=local.type, source=local)>
 \</operation\>
-<endif
-><endif> 
+<endif> 
 >>
 
 action(action) ::= <<
 \<!-- Action: "<action.name>" --\>
 \<module autostart="false" kind="action" name="<action.name>"\>
-	<action.outputPattern.variableMap.values: localInitialize()>
+	<action.outputPattern.variables: localInitialize()>
 	<action.body.locals: localInitialize()>
 	<action.inputPattern.ports : { port | <printRead(port, action.inputPattern.portToVarMap.(port), action.inputPattern.numTokensMap.(port))> }; separator="\n">
 	<procedure(procedure=action.body)>
