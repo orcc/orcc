@@ -64,7 +64,6 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
@@ -84,7 +83,6 @@ import net.sf.orcc.util.OrccUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import com.google.inject.Inject;
 
@@ -136,10 +134,10 @@ public class ActorTransformer {
 			for (AstVariable token : tokens) {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
-				Location location = portVariable.getLocation();
+				int lineNumber = portVariable.getLineNumber();
 
 				Var irToken = context.getVariable(token);
-				InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
+				InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
 						irToken, portVariable, indexes);
 				addInstruction(load);
 
@@ -161,7 +159,7 @@ public class ActorTransformer {
 			int numTokens = tokens.size();
 			Type type = ((TypeList) portVariable.getType()).getType();
 			for (AstVariable token : tokens) {
-				Location location = portVariable.getLocation();
+				int lineNumber = portVariable.getLineNumber();
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprBinary(
 						IrFactory.eINSTANCE.createExprBinary(
@@ -173,7 +171,7 @@ public class ActorTransformer {
 						IrFactory.eINSTANCE.createTypeInt(32)));
 
 				Var tmpVar = procedure.newTempLocalVariable(type, "token");
-				InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
+				InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
 						tmpVar, portVariable, indexes);
 				block.add(load);
 
@@ -181,8 +179,8 @@ public class ActorTransformer {
 
 				indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprVar(loopVar));
-				InstStore store = IrFactory.eINSTANCE.createInstStore(location,
-						irToken, indexes,
+				InstStore store = IrFactory.eINSTANCE.createInstStore(
+						lineNumber, irToken, indexes,
 						IrFactory.eINSTANCE.createExprVar(tmpVar));
 				block.add(store);
 
@@ -232,14 +230,14 @@ public class ActorTransformer {
 			int i = 0;
 
 			for (AstExpression expression : values) {
-				Location location = portVariable.getLocation();
+				int lineNumber = portVariable.getLineNumber();
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 
 				Expression value = astTransformer
 						.transformExpression(expression);
-				InstStore store = IrFactory.eINSTANCE.createInstStore(location,
-						portVariable, indexes, value);
+				InstStore store = IrFactory.eINSTANCE.createInstStore(
+						lineNumber, portVariable, indexes, value);
 				addInstruction(store);
 
 				i++;
@@ -261,7 +259,7 @@ public class ActorTransformer {
 			int numTokens = values.size();
 			Type type = ((TypeList) portVariable.getType()).getType();
 			for (AstExpression value : values) {
-				Location location = portVariable.getLocation();
+				int lineNumber = portVariable.getLineNumber();
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(IrFactory.eINSTANCE.createExprVar(loopVar));
 
@@ -285,8 +283,8 @@ public class ActorTransformer {
 								IrFactory.eINSTANCE.createTypeInt(32)),
 						OpBinary.PLUS, IrFactory.eINSTANCE.createExprInt(i),
 						IrFactory.eINSTANCE.createTypeInt(32)));
-				InstStore store = IrFactory.eINSTANCE.createInstStore(location,
-						portVariable, indexes,
+				InstStore store = IrFactory.eINSTANCE.createInstStore(
+						lineNumber, portVariable, indexes,
 						IrFactory.eINSTANCE.createExprVar(tmpVar));
 				block.add(store);
 
@@ -364,8 +362,6 @@ public class ActorTransformer {
 	 * @return an initialize action
 	 */
 	private Action createInitialize() {
-		Location location = IrFactory.eINSTANCE.createLocation();
-
 		// transform tag
 		Tag tag = IrFactory.eINSTANCE.createTag();
 
@@ -374,10 +370,10 @@ public class ActorTransformer {
 		Pattern peekPattern = IrFactory.eINSTANCE.createPattern();
 
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
-				"isSchedulable_init_actor", location,
+				"isSchedulable_init_actor", 0,
 				IrFactory.eINSTANCE.createTypeBool());
-		Procedure body = IrFactory.eINSTANCE.createProcedure("init_actor",
-				location, IrFactory.eINSTANCE.createTypeVoid());
+		Procedure body = IrFactory.eINSTANCE.createProcedure("init_actor", 0,
+				IrFactory.eINSTANCE.createTypeVoid());
 
 		// add return instructions
 		astTransformer.addReturn(scheduler,
@@ -385,8 +381,8 @@ public class ActorTransformer {
 		astTransformer.addReturn(body, null);
 
 		// creates action
-		Action action = IrFactory.eINSTANCE.createAction(location, tag,
-				inputPattern, outputPattern, peekPattern, scheduler, body);
+		Action action = IrFactory.eINSTANCE.createAction(tag, inputPattern,
+				outputPattern, peekPattern, scheduler, body);
 		return action;
 	}
 
@@ -401,9 +397,9 @@ public class ActorTransformer {
 	 */
 	private Var createPortVariable(Port port, int numTokens) {
 		// create the variable to hold the tokens
-		Location location = astTransformer.getContext().getProcedure()
-				.getLocation();
-		return IrFactory.eINSTANCE.createVar(location,
+		int lineNumber = astTransformer.getContext().getProcedure()
+				.getLineNumber();
+		return IrFactory.eINSTANCE.createVar(lineNumber,
 				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()),
 				port.getName(), true, 0);
 	}
@@ -421,8 +417,8 @@ public class ActorTransformer {
 		actor = IrFactory.eINSTANCE.createActor();
 		actor.setFile(file.getFullPath().toOSString());
 
-		Location location = Util.getLocation(astActor);
-		actor.setLocation(location);
+		int lineNumber = Util.getLocation(astActor);
+		actor.setLineNumber(lineNumber);
 
 		astTransformer.setIrActor(actor);
 
@@ -464,8 +460,8 @@ public class ActorTransformer {
 				for (Action action : initializes) {
 					NodeBlock block = action.getBody().getFirst();
 					List<Expression> params = new ArrayList<Expression>(0);
-					block.add(0, IrFactory.eINSTANCE.createInstCall(
-							EcoreUtil.copy(location), null, initialize, params));
+					block.add(0, IrFactory.eINSTANCE.createInstCall(lineNumber,
+							null, initialize, params));
 				}
 			}
 
@@ -525,7 +521,7 @@ public class ActorTransformer {
 	 *            an AST action
 	 */
 	private void transformAction(AstAction astAction, ActionList actionList) {
-		Location location = Util.getLocation(astAction);
+		int lineNumber = Util.getLocation(astAction);
 
 		// transform tag
 		AstTag astTag = astAction.getTag();
@@ -546,18 +542,18 @@ public class ActorTransformer {
 
 		// creates scheduler and body
 		Procedure scheduler = IrFactory.eINSTANCE.createProcedure(
-				"isSchedulable_" + name, EcoreUtil.copy(location),
+				"isSchedulable_" + name, lineNumber,
 				IrFactory.eINSTANCE.createTypeBool());
-		Procedure body = IrFactory.eINSTANCE.createProcedure(name,
-				EcoreUtil.copy(location), IrFactory.eINSTANCE.createTypeVoid());
+		Procedure body = IrFactory.eINSTANCE.createProcedure(name, lineNumber,
+				IrFactory.eINSTANCE.createTypeVoid());
 
 		// transforms action body and scheduler
 		transformActionBody(astAction, body, inputPattern, outputPattern);
 		transformActionScheduler(astAction, scheduler, peekPattern);
 
 		// creates IR action and add it to action list
-		Action action = IrFactory.eINSTANCE.createAction(location, tag,
-				inputPattern, outputPattern, peekPattern, scheduler, body);
+		Action action = IrFactory.eINSTANCE.createAction(tag, inputPattern,
+				outputPattern, peekPattern, scheduler, body);
 		actionList.add(action);
 	}
 
@@ -781,10 +777,8 @@ public class ActorTransformer {
 	private void transformPorts(EStructuralFeature feature,
 			List<AstPort> portList) {
 		for (AstPort astPort : portList) {
-			Location location = Util.getLocation(astPort);
 			Type type = astPort.getIrType();
-			Port port = IrFactory.eINSTANCE.createPort(location, type,
-					astPort.getName());
+			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName());
 			mapPorts.put(astPort, port);
 			((List<Port>) actor.eGet(feature)).add(port);
 		}

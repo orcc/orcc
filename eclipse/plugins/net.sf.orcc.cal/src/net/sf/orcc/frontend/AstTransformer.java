@@ -72,7 +72,6 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -135,7 +134,7 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionCall(AstExpressionCall astCall) {
-			Location location = Util.getLocation(astCall);
+			int lineNumber = Util.getLocation(astCall);
 			Procedure procedure = context.getProcedure();
 
 			// retrieve IR procedure
@@ -151,7 +150,7 @@ public class AstTransformer {
 					"call_" + calledProcedure.getName());
 
 			// creates call with spilling code around it
-			createCall(location, target, calledProcedure,
+			createCall(lineNumber, target, calledProcedure,
 					astCall.getParameters());
 
 			// return local variable
@@ -161,7 +160,7 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionIf(AstExpressionIf expression) {
-			Location location = Util.getLocation(expression);
+			int lineNumber = Util.getLocation(expression);
 
 			Expression condition = transformExpression(expression
 					.getCondition());
@@ -194,7 +193,7 @@ public class AstTransformer {
 
 			NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
 			node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-			node.setLocation(location);
+			node.setLineNumber(lineNumber);
 			node.setCondition(condition);
 			node.getThenNodes().addAll(thenNodes);
 			node.getElseNodes().addAll(elseNodes);
@@ -213,8 +212,7 @@ public class AstTransformer {
 		@Override
 		public Expression caseAstExpressionIndex(AstExpressionIndex expression) {
 			// we always load in this case
-
-			Location location = Util.getLocation(expression);
+			int lineNumber = Util.getLocation(expression);
 			AstVariable astVariable = expression.getSource().getVariable();
 			Var var = context.getVariable(astVariable);
 			if (var == null) {
@@ -227,7 +225,7 @@ public class AstTransformer {
 			Var target = context.getProcedure().newTempLocalVariable(
 					expression.getIrType(), "local_" + var.getName());
 
-			InstLoad load = IrFactory.eINSTANCE.createInstLoad(location,
+			InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
 					target, var, indexes);
 			addInstruction(load);
 
@@ -379,14 +377,14 @@ public class AstTransformer {
 		 * @return a list of CFG nodes
 		 */
 		private List<Node> getNodes(AstExpression astExpression) {
-			Location location = Util.getLocation(astExpression);
+			int lineNumber = Util.getLocation(astExpression);
 			List<Node> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
 
 			Expression value = transformExpression(astExpression);
-			createAssignOrStore(location, target, indexes, value);
+			createAssignOrStore(lineNumber, target, indexes, value);
 
 			int last = nodes.size();
 
@@ -415,9 +413,9 @@ public class AstTransformer {
 			nodes.add(IrFactoryImpl.eINSTANCE.createNodeBlock());
 
 			for (AstExpression astExpression : astExpressions) {
-				Location location = Util.getLocation(astExpression);
+				int lineNumber = Util.getLocation(astExpression);
 				Expression value = transformExpression(astExpression);
-				createAssignOrStore(location, target, indexes, value);
+				createAssignOrStore(lineNumber, target, indexes, value);
 			}
 
 			int last = nodes.size();
@@ -507,7 +505,7 @@ public class AstTransformer {
 					.size());
 			while (it.hasPrevious()) {
 				AstGenerator generator = it.previous();
-				Location location = Util.getLocation(generator);
+				int lineNumber = Util.getLocation(generator);
 
 				// assigns the loop variable its initial value
 				AstVariable astVariable = generator.getVariable();
@@ -524,7 +522,7 @@ public class AstTransformer {
 				// add increment to body
 				NodeBlock block = procedure.getLast(nodes);
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						location, loopVar, IrFactory.eINSTANCE
+						lineNumber, loopVar, IrFactory.eINSTANCE
 								.createExprBinary(IrFactory.eINSTANCE
 										.createExprVar(loopVar), OpBinary.PLUS,
 										IrFactory.eINSTANCE.createExprInt(1),
@@ -543,7 +541,7 @@ public class AstTransformer {
 				AstExpression astLower = generator.getLower();
 				Expression lower = transformExpression(astLower);
 				InstAssign assignInit = IrFactory.eINSTANCE.createInstAssign(
-						location, loopVar, lower);
+						lineNumber, loopVar, lower);
 				block.add(assignInit);
 
 				// nodes
@@ -573,7 +571,7 @@ public class AstTransformer {
 
 			int i = 0;
 			for (AstExpression expression : expressions) {
-				Location location = Util.getLocation(expression);
+				int lineNumber = Util.getLocation(expression);
 
 				indexes = new ArrayList<Expression>(
 						EcoreHelper.copy(currentIndexes));
@@ -582,7 +580,7 @@ public class AstTransformer {
 
 				Expression value = transformExpression(expression);
 
-				createAssignOrStore(location, target, indexes, value);
+				createAssignOrStore(lineNumber, target, indexes, value);
 			}
 
 			// restores target and indexes
@@ -651,7 +649,7 @@ public class AstTransformer {
 
 		@Override
 		public Object caseAstStatementAssign(AstStatementAssign astAssign) {
-			Location location = Util.getLocation(astAssign);
+			int lineNumber = Util.getLocation(astAssign);
 
 			// get target
 			AstVariable astTarget = astAssign.getTarget().getVariable();
@@ -667,14 +665,14 @@ public class AstTransformer {
 			exprTransformer.setTarget(target, indexes);
 			Expression value = transformExpression(astAssign.getValue());
 			exprTransformer.clearTarget();
-			createAssignOrStore(location, target, indexes, value);
+			createAssignOrStore(lineNumber, target, indexes, value);
 
 			return object;
 		}
 
 		@Override
 		public Object caseAstStatementCall(AstStatementCall astCall) {
-			Location location = Util.getLocation(astCall);
+			int lineNumber = Util.getLocation(astCall);
 
 			// retrieve IR procedure
 			AstProcedure astProcedure = astCall.getProcedure();
@@ -690,14 +688,14 @@ public class AstTransformer {
 			Procedure procedure = mapProcedures.get(astProcedure);
 
 			// creates call with spilling code around it
-			createCall(location, null, procedure, astCall.getParameters());
+			createCall(lineNumber, null, procedure, astCall.getParameters());
 
 			return object;
 		}
 
 		@Override
 		public Object caseAstStatementForeach(AstStatementForeach foreach) {
-			Location location = Util.getLocation(foreach);
+			int lineNumber = Util.getLocation(foreach);
 			Procedure procedure = context.getProcedure();
 
 			// creates loop variable and assigns it
@@ -707,8 +705,8 @@ public class AstTransformer {
 
 			AstExpression astLower = foreach.getLower();
 			Expression lower = transformExpression(astLower);
-			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(location,
-					loopVar, lower);
+			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
+					lineNumber, loopVar, lower);
 			addInstruction(assign);
 
 			// condition
@@ -721,7 +719,7 @@ public class AstTransformer {
 			// body
 			List<Node> nodes = getNodes(foreach.getStatements());
 			NodeBlock block = procedure.getLast(nodes);
-			assign = IrFactory.eINSTANCE.createInstAssign(location, loopVar,
+			assign = IrFactory.eINSTANCE.createInstAssign(lineNumber, loopVar,
 					IrFactory.eINSTANCE.createExprBinary(
 							IrFactory.eINSTANCE.createExprVar(loopVar),
 							OpBinary.PLUS,
@@ -732,7 +730,7 @@ public class AstTransformer {
 			// create while
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-			nodeWhile.setLocation(location);
+			nodeWhile.setLineNumber(lineNumber);
 			nodeWhile.setCondition(condition);
 			nodeWhile.getNodes().addAll(nodes);
 
@@ -743,7 +741,7 @@ public class AstTransformer {
 
 		@Override
 		public Object caseAstStatementIf(AstStatementIf stmtIf) {
-			Location location = Util.getLocation(stmtIf);
+			int lineNumber = Util.getLocation(stmtIf);
 			Procedure procedure = context.getProcedure();
 
 			Expression condition = transformExpression(stmtIf.getCondition());
@@ -754,7 +752,7 @@ public class AstTransformer {
 
 			NodeIf node = IrFactoryImpl.eINSTANCE.createNodeIf();
 			node.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-			node.setLocation(location);
+			node.setLineNumber(lineNumber);
 			node.setCondition(condition);
 			node.getThenNodes().addAll(thenNodes);
 			node.getElseNodes().addAll(elseNodes);
@@ -766,7 +764,7 @@ public class AstTransformer {
 
 		@Override
 		public Object caseAstStatementWhile(AstStatementWhile stmtWhile) {
-			Location location = Util.getLocation(stmtWhile);
+			int lineNumber = Util.getLocation(stmtWhile);
 			Procedure procedure = context.getProcedure();
 
 			Expression condition = transformExpression(stmtWhile.getCondition());
@@ -775,7 +773,7 @@ public class AstTransformer {
 
 			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
 			nodeWhile.setJoinNode(IrFactoryImpl.eINSTANCE.createNodeBlock());
-			nodeWhile.setLocation(location);
+			nodeWhile.setLineNumber(lineNumber);
 			nodeWhile.setCondition(condition);
 			nodeWhile.getNodes().addAll(nodes);
 
@@ -819,13 +817,13 @@ public class AstTransformer {
 		 *            an AST call statement
 		 */
 		private void transformBuiltinProcedure(AstStatementCall astCall) {
-			Location location = Util.getLocation(astCall);
+			int lineNumber = Util.getLocation(astCall);
 			String name = astCall.getProcedure().getName();
 			if ("print".equals(name) || "println".equals(name)) {
 				Procedure procedure = actor.getProcedure("print");
 				if (procedure == null) {
 					procedure = IrFactory.eINSTANCE.createProcedure("print",
-							location, IrFactory.eINSTANCE.createTypeVoid());
+							lineNumber, IrFactory.eINSTANCE.createTypeVoid());
 					procedure.setNative(true);
 					actor.getProcs().add(procedure);
 				}
@@ -841,7 +839,7 @@ public class AstTransformer {
 					parameters.add(IrFactory.eINSTANCE.createExprString("\\n"));
 				}
 
-				addInstruction(IrFactory.eINSTANCE.createInstCall(location,
+				addInstruction(IrFactory.eINSTANCE.createInstCall(lineNumber,
 						(Var) null, procedure, parameters));
 			}
 		}
@@ -936,7 +934,7 @@ public class AstTransformer {
 		initialize = null;
 	}
 
-	private void createAssignOrStore(Location location, Var target,
+	private void createAssignOrStore(int lineNumber, Var target,
 			List<Expression> indexes, Expression value) {
 		// special case for list expressions
 		if (value.isVarExpr()) {
@@ -949,11 +947,11 @@ public class AstTransformer {
 		Instruction instruction;
 		if (indexes == null || indexes.isEmpty()) {
 			Var local = getLocalVariable(target, true);
-			instruction = IrFactory.eINSTANCE.createInstAssign(location, local,
-					value);
+			instruction = IrFactory.eINSTANCE.createInstAssign(lineNumber,
+					local, value);
 		} else {
-			instruction = IrFactory.eINSTANCE.createInstStore(location, target,
-					indexes, value);
+			instruction = IrFactory.eINSTANCE.createInstStore(lineNumber,
+					target, indexes, value);
 		}
 		addInstruction(instruction);
 	}
@@ -961,8 +959,8 @@ public class AstTransformer {
 	/**
 	 * Creates a call with the given arguments, and adds spilling code.
 	 * 
-	 * @param location
-	 *            location of the call
+	 * @param lineNumber
+	 *            line number of the call
 	 * @param target
 	 *            target (or <code>null</code>)
 	 * @param procedure
@@ -970,7 +968,7 @@ public class AstTransformer {
 	 * @param expressions
 	 *            arguments
 	 */
-	private void createCall(Location location, Var target, Procedure procedure,
+	private void createCall(int lineNumber, Var target, Procedure procedure,
 			List<AstExpression> expressions) {
 		// transform parameters
 		List<Expression> parameters = transformExpressions(expressions);
@@ -985,14 +983,14 @@ public class AstTransformer {
 				ExprVar value = IrFactory.eINSTANCE.createExprVar(local);
 
 				List<Expression> indexes = new ArrayList<Expression>(0);
-				InstStore store = IrFactory.eINSTANCE.createInstStore(location,
-						global, indexes, value);
+				InstStore store = IrFactory.eINSTANCE.createInstStore(
+						lineNumber, global, indexes, value);
 				addInstruction(store);
 			}
 		}
 
 		// add call
-		InstCall call = IrFactory.eINSTANCE.createInstCall(location, target,
+		InstCall call = IrFactory.eINSTANCE.createInstCall(lineNumber, target,
 				procedure, parameters);
 		addInstruction(call);
 
@@ -1205,11 +1203,11 @@ public class AstTransformer {
 		for (Var global : context.getSetGlobalsToStore()) {
 			Var local = context.getMapGlobals().get(global);
 			ExprVar value = IrFactory.eINSTANCE.createExprVar(local);
-			Location location = global.getLocation();
+			int lineNumber = global.getLineNumber();
 
 			List<Expression> indexes = new ArrayList<Expression>(0);
-			InstStore store = IrFactory.eINSTANCE.createInstStore(
-					EcoreUtil.copy(location), global, indexes, value);
+			InstStore store = IrFactory.eINSTANCE.createInstStore(lineNumber,
+					global, indexes, value);
 			addInstruction(store);
 		}
 
@@ -1262,11 +1260,11 @@ public class AstTransformer {
 	 */
 	private void transformFunction(AstFunction astFunction) {
 		String name = astFunction.getName();
-		Location location = Util.getLocation(astFunction);
+		int lineNumber = Util.getLocation(astFunction);
 		Type type = astFunction.getIrType();
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
-				location, type);
+				lineNumber, type);
 		Context oldContext = newContext(procedure);
 
 		transformParameters(astFunction.getParameters());
@@ -1320,7 +1318,7 @@ public class AstTransformer {
 	@SuppressWarnings("unchecked")
 	public Var transformGlobalVariable(EStructuralFeature feature,
 			AstVariable astVariable) {
-		Location location = Util.getLocation(astVariable);
+		int lineNumber = Util.getLocation(astVariable);
 		AstType astType = astVariable.getType();
 		Type type = EcoreUtil.copy(astVariable.getIrType());
 		if (type.isList()) {
@@ -1350,7 +1348,7 @@ public class AstTransformer {
 		}
 
 		// create state variable
-		Var variable = IrFactory.eINSTANCE.createVar(location, type, name,
+		Var variable = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
 				assignable, initialValue);
 
 		// registers the global variable in the outermost scope
@@ -1364,8 +1362,7 @@ public class AstTransformer {
 		if (mustInitialize) {
 			if (initialize == null) {
 				initialize = IrFactory.eINSTANCE.createProcedure("_initialize",
-						EcoreUtil.copy(location),
-						IrFactory.eINSTANCE.createTypeVoid());
+						lineNumber, IrFactory.eINSTANCE.createTypeVoid());
 			}
 
 			Context oldContext = newContext(initialize);
@@ -1373,8 +1370,7 @@ public class AstTransformer {
 
 			exprTransformer.setTarget(variable, new ArrayList<Expression>(0));
 			Expression expression = transformExpression(astVariable.getValue());
-			createAssignOrStore(EcoreUtil.copy(location), variable, null,
-					expression);
+			createAssignOrStore(lineNumber, variable, null, expression);
 			exprTransformer.clearTarget();
 
 			context.restoreScope();
@@ -1396,7 +1392,7 @@ public class AstTransformer {
 	 * @return the IR local variable created
 	 */
 	public Var transformLocalVariable(AstVariable astVariable) {
-		Location location = Util.getLocation(astVariable);
+		int lineNumber = Util.getLocation(astVariable);
 
 		String name = getQualifiedName(astVariable);
 
@@ -1404,15 +1400,14 @@ public class AstTransformer {
 		Type type = astVariable.getIrType();
 
 		// create local variable with the given name
-		Var local = IrFactory.eINSTANCE.createVar(location, type, name,
+		Var local = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
 				assignable, 0);
 
 		AstExpression value = astVariable.getValue();
 		if (value != null) {
 			exprTransformer.setTarget(local, new ArrayList<Expression>(0));
 			Expression expression = transformExpression(value);
-			createAssignOrStore(EcoreUtil.copy(location), local, null,
-					expression);
+			createAssignOrStore(lineNumber, local, null, expression);
 			exprTransformer.clearTarget();
 		}
 
@@ -1458,10 +1453,10 @@ public class AstTransformer {
 	 */
 	private void transformProcedure(AstProcedure astProcedure) {
 		String name = astProcedure.getName();
-		Location location = Util.getLocation(astProcedure);
+		int lineNumber = Util.getLocation(astProcedure);
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
-				location, IrFactory.eINSTANCE.createTypeVoid());
+				lineNumber, IrFactory.eINSTANCE.createTypeVoid());
 		Context oldContext = newContext(procedure);
 
 		transformParameters(astProcedure.getParameters());

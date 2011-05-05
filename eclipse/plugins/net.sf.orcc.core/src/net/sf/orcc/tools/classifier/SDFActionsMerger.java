@@ -88,8 +88,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		List<Node> thenNodes = nodeIf.getThenNodes();
 		NodeBlock node = IrFactoryImpl.eINSTANCE.createNodeBlock();
 
-		node.add(IrFactory.eINSTANCE.createInstCall(
-				IrFactory.eINSTANCE.createLocation(), null, body, callExprs));
+		node.add(IrFactory.eINSTANCE.createInstCall(0, null, body, callExprs));
 
 		thenNodes.add(node);
 
@@ -105,8 +104,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		actor.getProcs().add(scheduler);
 		Var returnVar = target.newTempLocalVariable(scheduler.getReturnType(),
 				scheduler.getName() + "_ret");
-		node.add(IrFactory.eINSTANCE.createInstCall(
-				IrFactory.eINSTANCE.createLocation(), returnVar, scheduler,
+		node.add(IrFactory.eINSTANCE.createInstCall(0, returnVar, scheduler,
 				callExprs));
 
 		return IrFactory.eINSTANCE.createExprVar(returnVar);
@@ -121,8 +119,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 	 */
 	private Procedure createIsSchedulable(Pattern input) {
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
-				"isSchedulable_SDF", IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeBool());
+				"isSchedulable_SDF", 0, IrFactory.eINSTANCE.createTypeBool());
 
 		Var result = procedure.newTempLocalVariable(
 				IrFactory.eINSTANCE.createTypeBool(), "result");
@@ -221,7 +218,6 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 		Procedure body = mergeSDFBodies(actions);
 
 		Action action = IrFactory.eINSTANCE.createAction(
-				IrFactory.eINSTANCE.createLocation(),
 				IrFactory.eINSTANCE.createTag(), input, output, peek,
 				scheduler, body);
 
@@ -236,8 +232,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 	}
 
 	private Procedure mergeSDFBodies(List<Action> actions) {
-		target = IrFactory.eINSTANCE.createProcedure("SDF",
-				IrFactory.eINSTANCE.createLocation(),
+		target = IrFactory.eINSTANCE.createProcedure("SDF", 0,
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		// Launch action

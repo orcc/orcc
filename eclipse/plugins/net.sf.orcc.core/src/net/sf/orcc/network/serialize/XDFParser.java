@@ -38,7 +38,6 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Port;
@@ -535,8 +534,7 @@ public class XDFParser {
 		if (vertexName.isEmpty()) {
 			return null;
 		} else {
-			return IrFactory.eINSTANCE.createPort(
-					IrFactory.eINSTANCE.createLocation(), null, portName);
+			return IrFactory.eINSTANCE.createPort(null, portName);
 		}
 	}
 
@@ -695,24 +693,19 @@ public class XDFParser {
 			throw new OrccException("Decl has an empty name");
 		}
 
-		Location location = IrFactory.eINSTANCE.createLocation();
 		if (kind.equals("Param")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
-			Var var = IrFactory.eINSTANCE.createVar(location, type, name, true,
-					false);
-			network.getParameters().put(file.getFullPath().toString(),
-					location, name, var);
+			Var var = IrFactory.eINSTANCE.createVar(0, type, name, true, false);
+			network.getParameters().put(name, var);
 		} else if (kind.equals("Variable")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
 			Expression expr = exprParser.parseExpr(cont.getNode());
-			Var var = IrFactory.eINSTANCE.createVar(location, type, name,
-					false, expr);
-			network.getVariables().put(file.getFullPath().toString(), location,
-					name, var);
+			Var var = IrFactory.eINSTANCE.createVar(0, type, name, false, expr);
+			network.getVariables().put(name, var);
 		} else {
 			throw new OrccException("unsupported Decl kind: \"" + kind + "\"");
 		}
@@ -845,7 +838,6 @@ public class XDFParser {
 	 * @throws OrccException
 	 */
 	private void parsePort(Element eltPort) throws OrccException {
-		Location location = IrFactory.eINSTANCE.createLocation();
 		Type type = typeParser.parseType(eltPort.getFirstChild()).getResult();
 		String name = eltPort.getAttribute("name");
 		if (name.isEmpty()) {
@@ -853,14 +845,14 @@ public class XDFParser {
 		}
 
 		// creates a port
-		Port port = IrFactory.eINSTANCE.createPort(location, type, name);
+		Port port = IrFactory.eINSTANCE.createPort(type, name);
 
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");
 		if (kind.equals("Input")) {
-			network.getInputs().put(file.toString(), location, name, port);
+			network.getInputs().put(name, port);
 		} else if (kind.equals("Output")) {
-			network.getOutputs().put(file.toString(), location, name, port);
+			network.getOutputs().put(name, port);
 		} else {
 			throw new OrccException("Port \"" + name + "\", invalid kind: \""
 					+ kind + "\"");

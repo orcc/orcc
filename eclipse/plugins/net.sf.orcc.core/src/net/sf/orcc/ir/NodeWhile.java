@@ -57,6 +57,14 @@ public interface NodeWhile extends Node {
 	NodeBlock getJoinNode();
 
 	/**
+	 * Returns the line number on which this "while" starts.
+	 * 
+	 * @return the line number on which this "while" starts
+	 * @model
+	 */
+	public int getLineNumber();
+
+	/**
 	 * Returns the nodes of this NodeWhile.
 	 * 
 	 * @return the nodes of this NodeWhile
@@ -79,5 +87,13 @@ public interface NodeWhile extends Node {
 	 *            the join node of this NodeWhile
 	 */
 	void setJoinNode(NodeBlock joinNode);
+
+	/**
+	 * Sets the line number on which this "while" starts.
+	 * 
+	 * @param newLineNumber
+	 *            the line number on which this "while" starts
+	 */
+	public void setLineNumber(int newLineNumber);
 
 }

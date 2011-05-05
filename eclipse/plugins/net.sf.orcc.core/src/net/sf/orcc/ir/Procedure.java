@@ -122,12 +122,12 @@ public interface Procedure extends EObject {
 	EList<Var> getLocals();
 
 	/**
-	 * Returns the location of this procedure.
+	 * Returns the line number on which this procedure starts.
 	 * 
-	 * @return the location of this procedure
-	 * @model containment="true"
+	 * @return the line number on which this procedure starts
+	 * @model
 	 */
-	Location getLocation();
+	public int getLineNumber();
 
 	/**
 	 * Returns the name of this procedure.
@@ -214,7 +214,13 @@ public interface Procedure extends EObject {
 	 */
 	void setGraph(CFG graph);
 
-	void setLocation(Location location);
+	/**
+	 * Sets the line number on which this procedure starts.
+	 * 
+	 * @param newLineNumber
+	 *            the line number on which this procedure starts
+	 */
+	public void setLineNumber(int newLineNumber);
 
 	/**
 	 * Sets the name of this procedure.

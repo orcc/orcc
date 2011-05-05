@@ -33,6 +33,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getJoinNode <em>Join Node</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getNodes <em>Nodes</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getCondition <em>Condition</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.NodeWhileImpl#getLineNumber <em>Line Number</em>}</li>
  * </ul>
  * </p>
  *
@@ -66,6 +67,26 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 	 * @ordered
 	 */
 	protected Expression condition;
+
+	/**
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int LINE_NUMBER_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -124,6 +145,8 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 				return getNodes();
 			case IrPackage.NODE_WHILE__CONDITION:
 				return getCondition();
+			case IrPackage.NODE_WHILE__LINE_NUMBER:
+				return getLineNumber();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -159,8 +182,26 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 				return nodes != null && !nodes.isEmpty();
 			case IrPackage.NODE_WHILE__CONDITION:
 				return condition != null;
+			case IrPackage.NODE_WHILE__LINE_NUMBER:
+				return lineNumber != LINE_NUMBER_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (lineNumber: ");
+		result.append(lineNumber);
+		result.append(')');
+		return result.toString();
 	}
 
 	/**
@@ -180,6 +221,9 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 				return;
 			case IrPackage.NODE_WHILE__CONDITION:
 				setCondition((Expression)newValue);
+				return;
+			case IrPackage.NODE_WHILE__LINE_NUMBER:
+				setLineNumber((Integer)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -209,6 +253,9 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 				return;
 			case IrPackage.NODE_WHILE__CONDITION:
 				setCondition((Expression)null);
+				return;
+			case IrPackage.NODE_WHILE__LINE_NUMBER:
+				setLineNumber(LINE_NUMBER_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -264,6 +311,27 @@ public class NodeWhileImpl extends NodeImpl implements NodeWhile {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__CONDITION, newCondition, newCondition));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getLineNumber() {
+		return lineNumber;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setLineNumber(int newLineNumber) {
+		int oldLineNumber = lineNumber;
+		lineNumber = newLineNumber;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_WHILE__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	/**

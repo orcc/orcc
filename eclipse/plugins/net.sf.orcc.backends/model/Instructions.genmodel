@@ -32,5 +32,14 @@
     <genClasses ecoreClass="Instructions.ecore#//InstRamWrite">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstRamWrite/value"/>
     </genClasses>
+    <genClasses ecoreClass="Instructions.ecore#//InstGetElementPtr">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstGetElementPtr/indexes"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstGetElementPtr/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstGetElementPtr/source"/>
+    </genClasses>
+    <genClasses ecoreClass="Instructions.ecore#//InstCast">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstCast/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Instructions.ecore#//InstCast/source"/>
+    </genClasses>
   </genPackages>
 </genmodel:GenModel>

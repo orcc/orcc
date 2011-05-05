@@ -31,7 +31,6 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -509,21 +508,6 @@ public class IrSwitch<T> {
 	 * @generated
 	 */
 	public T caseInstStore(InstStore object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Location</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Location</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseLocation(Location object) {
 		return null;
 	}
 
@@ -1108,12 +1092,6 @@ public class IrSwitch<T> {
 				TypeVoid typeVoid = (TypeVoid)theEObject;
 				T result = caseTypeVoid(typeVoid);
 				if (result == null) result = caseType(typeVoid);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case IrPackage.LOCATION: {
-				Location location = (Location)theEObject;
-				T result = caseLocation(location);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

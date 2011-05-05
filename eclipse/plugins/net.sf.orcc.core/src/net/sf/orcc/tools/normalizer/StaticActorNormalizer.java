@@ -92,8 +92,8 @@ public class StaticActorNormalizer {
 
 			depth++;
 			if (indexes.size() < depth) {
-				Var varDef = factory.createVar(factory.createLocation(),
-						factory.createTypeBool(), "loop", true, depth - 1);
+				Var varDef = factory.createVar(0, factory.createTypeBool(),
+						"loop", true, depth - 1);
 				variables.add(varDef);
 				indexes.add(varDef);
 			}
@@ -222,13 +222,11 @@ public class StaticActorNormalizer {
 			int numTokens = pattern.getNumTokens(port);
 
 			Type type = factory.createTypeList(numTokens, port.getType());
-			Var var = factory.createVar(factory.createLocation(), type,
-					port.getName(), true, true);
+			Var var = factory.createVar(0, type, port.getName(), true, true);
 			actor.getStateVars().add(var);
 
-			Var varCount = factory.createVar(factory.createLocation(),
-					factory.createTypeInt(32), port.getName() + "_count", true,
-					factory.createExprInt(0));
+			Var varCount = factory.createVar(0, factory.createTypeInt(32),
+					port.getName() + "_count", true, factory.createExprInt(0));
 			actor.getStateVars().add(varCount);
 
 			InstStore store = factory.createInstStore(varCount,
@@ -286,8 +284,7 @@ public class StaticActorNormalizer {
 		Pattern output = staticCls.getOutputPattern();
 		Tag tag = IrFactory.eINSTANCE.createTag(ACTION_NAME);
 
-		return IrFactory.eINSTANCE.createAction(
-				IrFactory.eINSTANCE.createLocation(), tag, input, output,
+		return IrFactory.eINSTANCE.createAction(tag, input, output,
 				IrFactory.eINSTANCE.createPattern(), scheduler, body);
 	}
 
@@ -298,8 +295,7 @@ public class StaticActorNormalizer {
 	 */
 	private Procedure createBody() {
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(ACTION_NAME,
-				IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeVoid());
+				0, IrFactory.eINSTANCE.createTypeVoid());
 
 		variables = procedure.getLocals();
 
@@ -379,8 +375,7 @@ public class StaticActorNormalizer {
 	 */
 	private Procedure createScheduler() {
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
-				SCHEDULER_NAME, IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createTypeBool());
+				SCHEDULER_NAME, 0, IrFactory.eINSTANCE.createTypeBool());
 
 		variables = procedure.getLocals();
 

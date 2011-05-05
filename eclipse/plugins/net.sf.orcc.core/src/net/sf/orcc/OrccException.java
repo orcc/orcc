@@ -28,7 +28,6 @@
  */
 package net.sf.orcc;
 
-import net.sf.orcc.ir.Location;
 
 /**
  * An exception raised in Orcc.
@@ -54,17 +53,18 @@ public class OrccException extends Exception {
 	 * Creates a new OrccException with the given message, identified to have
 	 * occurred in the given file at the given location.
 	 */
-	public OrccException(String fileName, Location location, String message) {
-		this(fileName, location, message, null);
+	public OrccException(String fileName, int lineNumber, String message) {
+		this(fileName, lineNumber, message, null);
 	}
 
 	/**
 	 * Creates a new OrccException with the given message and cause, identified
 	 * to have occurred in the given file at the given location.
 	 */
-	public OrccException(String fileName, Location location, String message,
+	public OrccException(String fileName, int lineNumber, String message,
 			Throwable cause) {
-		super("File \"" + fileName + "\", " + location + "\n" + message, cause);
+		super("File \"" + fileName + "\", " + lineNumber + "\n" + message,
+				cause);
 	}
 
 	/**

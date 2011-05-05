@@ -30,7 +30,6 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -239,10 +238,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseTypeVoid(TypeVoid object) {
 				return createTypeVoidAdapter();
-			}
-			@Override
-			public Adapter caseLocation(Location object) {
-				return createLocationAdapter();
 			}
 			@Override
 			public Adapter caseDef(Def object) {
@@ -704,20 +699,6 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createInstStoreAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.Location <em>Location</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.Location
-	 * @generated
-	 */
-	public Adapter createLocationAdapter() {
 		return null;
 	}
 

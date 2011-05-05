@@ -182,7 +182,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 						&& (condition == null || !condition.isBooleanExpr())) {
 					throw new OrccRuntimeException(
 							"Condition not boolean at line "
-									+ node.getLocation().getStartLine() + "\n");
+									+ node.getLineNumber() + "\n");
 				}
 			}
 		} else if (schedulableMode) {

@@ -225,26 +225,24 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		IrFactory fac = IrFactory.eINSTANCE;
 
 		// scheduler
-		Procedure scheduler = fac.createProcedure("isSchedulable_" + name,
-				fac.createLocation(), fac.createTypeBool());
+		Procedure scheduler = fac.createProcedure("isSchedulable_" + name, 0,
+				fac.createTypeBool());
 		NodeBlock block = scheduler.getFirst();
 		Instruction inst = fac.createInstReturn(fac.createExprBool(true));
 		inst.setPredicate(fac.createPredicate());
 		block.add(inst);
 
 		// body
-		Procedure body = fac.createProcedure(name, fac.createLocation(),
-				fac.createTypeVoid());
+		Procedure body = fac.createProcedure(name, 0, fac.createTypeVoid());
 		block = body.getFirst();
 		inst = fac.createInstReturn();
 		inst.setPredicate(fac.createPredicate());
 		block.add(inst);
 
 		// create action
-		Action action = fac.createAction(fac.createLocation(),
-				fac.createTag(name), fac.createPattern(),
-				currentAction.getOutputPattern(), fac.createPattern(),
-				scheduler, body);
+		Action action = fac.createAction(fac.createTag(name),
+				fac.createPattern(), currentAction.getOutputPattern(),
+				fac.createPattern(), scheduler, body);
 		currentAction.setOutputPattern(fac.createPattern());
 
 		// add action to actor's actions
@@ -267,7 +265,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 
 		Var global = mapGlobals.get(local);
 		if (global == null) {
-			global = fac.createVar(fac.createLocation(), copy(local.getType()),
+			global = fac.createVar(0, copy(local.getType()),
 					"sg_" + local.getName(), true, null);
 			actor.getStateVars().add(global);
 			mapGlobals.put(local, global);

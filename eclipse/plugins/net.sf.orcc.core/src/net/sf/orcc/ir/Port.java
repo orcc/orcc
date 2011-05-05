@@ -40,24 +40,6 @@ import org.eclipse.emf.ecore.EObject;
 public interface Port extends EObject {
 
 	/**
-	 * Returns the location of this port.
-	 * 
-	 * @return the location of this port
-	 * @model containment="true"
-	 */
-	Location getLocation();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getLocation <em>Location</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Location</em>' containment reference.
-	 * @see #getLocation()
-	 * @generated
-	 */
-	void setLocation(Location value);
-
-	/**
 	 * Returns the name of this port.
 	 * 
 	 * @return the name of this port
@@ -74,32 +56,12 @@ public interface Port extends EObject {
 	int getNumTokensConsumed();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Num Tokens Consumed</em>' attribute.
-	 * @see #getNumTokensConsumed()
-	 * @generated
-	 */
-	void setNumTokensConsumed(int value);
-
-	/**
 	 * Returns the number of tokens produced by this port.
 	 * 
 	 * @return the number of tokens produced by this port
 	 * @model
 	 */
 	int getNumTokensProduced();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensProduced <em>Num Tokens Produced</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Num Tokens Produced</em>' attribute.
-	 * @see #getNumTokensProduced()
-	 * @generated
-	 */
-	void setNumTokensProduced(int value);
 
 	/**
 	 * Returns the type of this port.
@@ -148,6 +110,26 @@ public interface Port extends EObject {
 	 *            the new name of this port
 	 */
 	void setName(String name);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Num Tokens Consumed</em>' attribute.
+	 * @see #getNumTokensConsumed()
+	 * @generated
+	 */
+	void setNumTokensConsumed(int value);
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensProduced <em>Num Tokens Produced</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Num Tokens Produced</em>' attribute.
+	 * @see #getNumTokensProduced()
+	 * @generated
+	 */
+	void setNumTokensProduced(int value);
 
 	/**
 	 * Sets the type of this port.

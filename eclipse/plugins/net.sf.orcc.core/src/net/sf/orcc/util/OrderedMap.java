@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Location;
 
 /**
  * This class defines an ordered map of nameable objects. It is backed by a
@@ -184,40 +183,13 @@ public class OrderedMap<K, V> implements Iterable<V> {
 	 * @param object
 	 *            an object
 	 */
-	public final void put(K name, V object) {
+	public void put(K name, V object) {
 		if (map.containsKey(name)) {
 			throw new OrccRuntimeException("\"" + name
 					+ "\" already defined in this scope");
 		}
 
 		putNoCheck(name, object);
-	}
-
-	/**
-	 * Adds an object to this ordered map with the given name. The file and
-	 * location information are only used for error reporting if the object is
-	 * already present in the map.
-	 * 
-	 * @param file
-	 *            the file where the object located
-	 * @param location
-	 *            the location of the object
-	 * @param name
-	 *            the name of an object
-	 * @param object
-	 *            an object
-	 * @throws OrccRuntimeException
-	 *             if the object is already defined
-	 */
-	public void put(String file, Location location, K name, V object)
-			throws OrccRuntimeException {
-		if (map.containsKey(name)) {
-			throw new OrccRuntimeException(file, location, "\"" + name
-					+ "\" already defined in this scope");
-		}
-
-		map.put(name, object);
-		modified = true;
 	}
 
 	/**

@@ -29,7 +29,6 @@
 package net.sf.orcc.util;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Location;
 
 /**
  * This class defines a scope as an ordered map extended with the notion of
@@ -149,12 +148,11 @@ public class Scope<K, V> extends OrderedMap<K, V> {
 	 *             if the object is already defined
 	 */
 	@Override
-	public void put(String file, Location location, K name, V object)
-			throws OrccRuntimeException {
+	public void put(K name, V object) throws OrccRuntimeException {
 		if (allowOverride) {
 			// a variable is allowed to override a variable defined in a
 			// different scope
-			super.put(file, location, name, object);
+			super.put(name, object);
 		} else {
 			// check if there already is a variable with the same name in this
 			// scope or parent scopes
@@ -164,12 +162,12 @@ public class Scope<K, V> extends OrderedMap<K, V> {
 				if (parent != null) {
 					existingObject = parent.get(name, false);
 					if (existingObject != null) {
-						throw new OrccRuntimeException(file, location, "\""
-								+ name + "\" already defined in parent scope");
+						throw new OrccRuntimeException("\"" + name
+								+ "\" already defined in parent scope");
 					}
 				}
 			} else {
-				throw new OrccRuntimeException(file, location, "\"" + name
+				throw new OrccRuntimeException("\"" + name
 						+ "\" already defined in this scope");
 			}
 

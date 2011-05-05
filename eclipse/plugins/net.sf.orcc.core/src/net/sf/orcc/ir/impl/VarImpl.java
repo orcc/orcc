@@ -6,13 +6,11 @@
  */
 package net.sf.orcc.ir.impl;
 
-import java.lang.String;
 import java.util.Collection;
 
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
@@ -35,7 +33,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getIndex <em>Index</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getInitialValue <em>Initial Value</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getLocation <em>Location</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getType <em>Type</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getValue <em>Value</em>}</li>
@@ -43,6 +40,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#isGlobal <em>Global</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getUses <em>Uses</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getDefs <em>Defs</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.VarImpl#getLineNumber <em>Line Number</em>}</li>
  * </ul>
  * </p>
  *
@@ -76,15 +74,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	 * @ordered
 	 */
 	protected Expression initialValue;
-
-	/**
-	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLocation()
-	 * @generated
-	 * @ordered
-	 */
-	protected Location location;
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -179,6 +168,26 @@ public class VarImpl extends EObjectImpl implements Var {
 	protected EList<Def> defs;
 
 	/**
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int LINE_NUMBER_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected int lineNumber = LINE_NUMBER_EDEFAULT;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -196,21 +205,6 @@ public class VarImpl extends EObjectImpl implements Var {
 		initialValue = newInitialValue;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.VAR__INITIAL_VALUE, oldInitialValue, newInitialValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetLocation(Location newLocation,
-			NotificationChain msgs) {
-		Location oldLocation = location;
-		location = newLocation;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.VAR__LOCATION, oldLocation, newLocation);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -256,8 +250,6 @@ public class VarImpl extends EObjectImpl implements Var {
 				return getIndex();
 			case IrPackage.VAR__INITIAL_VALUE:
 				return getInitialValue();
-			case IrPackage.VAR__LOCATION:
-				return getLocation();
 			case IrPackage.VAR__NAME:
 				return getName();
 			case IrPackage.VAR__TYPE:
@@ -272,6 +264,8 @@ public class VarImpl extends EObjectImpl implements Var {
 				return getUses();
 			case IrPackage.VAR__DEFS:
 				return getDefs();
+			case IrPackage.VAR__LINE_NUMBER:
+				return getLineNumber();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -303,8 +297,6 @@ public class VarImpl extends EObjectImpl implements Var {
 		switch (featureID) {
 			case IrPackage.VAR__INITIAL_VALUE:
 				return basicSetInitialValue(null, msgs);
-			case IrPackage.VAR__LOCATION:
-				return basicSetLocation(null, msgs);
 			case IrPackage.VAR__TYPE:
 				return basicSetType(null, msgs);
 			case IrPackage.VAR__VALUE:
@@ -328,8 +320,6 @@ public class VarImpl extends EObjectImpl implements Var {
 				return index != INDEX_EDEFAULT;
 			case IrPackage.VAR__INITIAL_VALUE:
 				return initialValue != null;
-			case IrPackage.VAR__LOCATION:
-				return location != null;
 			case IrPackage.VAR__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case IrPackage.VAR__TYPE:
@@ -344,6 +334,8 @@ public class VarImpl extends EObjectImpl implements Var {
 				return uses != null && !uses.isEmpty();
 			case IrPackage.VAR__DEFS:
 				return defs != null && !defs.isEmpty();
+			case IrPackage.VAR__LINE_NUMBER:
+				return lineNumber != LINE_NUMBER_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -361,9 +353,6 @@ public class VarImpl extends EObjectImpl implements Var {
 				return;
 			case IrPackage.VAR__INITIAL_VALUE:
 				setInitialValue((Expression)newValue);
-				return;
-			case IrPackage.VAR__LOCATION:
-				setLocation((Location)newValue);
 				return;
 			case IrPackage.VAR__NAME:
 				setName((String)newValue);
@@ -387,6 +376,9 @@ public class VarImpl extends EObjectImpl implements Var {
 			case IrPackage.VAR__DEFS:
 				getDefs().clear();
 				getDefs().addAll((Collection<? extends Def>)newValue);
+				return;
+			case IrPackage.VAR__LINE_NUMBER:
+				setLineNumber((Integer)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -414,9 +406,6 @@ public class VarImpl extends EObjectImpl implements Var {
 			case IrPackage.VAR__INITIAL_VALUE:
 				setInitialValue((Expression)null);
 				return;
-			case IrPackage.VAR__LOCATION:
-				setLocation((Location)null);
-				return;
 			case IrPackage.VAR__NAME:
 				setName(NAME_EDEFAULT);
 				return;
@@ -438,6 +427,9 @@ public class VarImpl extends EObjectImpl implements Var {
 			case IrPackage.VAR__DEFS:
 				getDefs().clear();
 				return;
+			case IrPackage.VAR__LINE_NUMBER:
+				setLineNumber(LINE_NUMBER_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -452,6 +444,27 @@ public class VarImpl extends EObjectImpl implements Var {
 			defs = new EObjectWithInverseResolvingEList<Def>(Def.class, this, IrPackage.VAR__DEFS, IrPackage.DEF__VARIABLE);
 		}
 		return defs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getLineNumber() {
+		return lineNumber;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setLineNumber(int newLineNumber) {
+		int oldLineNumber = lineNumber;
+		lineNumber = newLineNumber;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	/**
@@ -477,14 +490,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	 */
 	public Expression getInitialValue() {
 		return initialValue;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Location getLocation() {
-		return location;
 	}
 
 	/**
@@ -618,24 +623,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setLocation(Location newLocation) {
-		if (newLocation != location) {
-			NotificationChain msgs = null;
-			if (location != null)
-				msgs = ((InternalEObject)location).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.VAR__LOCATION, null, msgs);
-			if (newLocation != null)
-				msgs = ((InternalEObject)newLocation).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.VAR__LOCATION, null, msgs);
-			msgs = basicSetLocation(newLocation, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__LOCATION, newLocation, newLocation));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public void setName(String newName) {
 		String oldName = name;
 		name = newName;
@@ -696,6 +683,8 @@ public class VarImpl extends EObjectImpl implements Var {
 		result.append(assignable);
 		result.append(", global: ");
 		result.append(global);
+		result.append(", lineNumber: ");
+		result.append(lineNumber);
 		result.append(')');
 		return result.toString();
 	}

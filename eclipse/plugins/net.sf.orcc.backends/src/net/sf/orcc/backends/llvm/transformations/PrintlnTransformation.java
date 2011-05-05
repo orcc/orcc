@@ -181,7 +181,7 @@ public class PrintlnTransformation extends AbstractActorVisitor<Object> {
 			TypeString type = IrFactory.eINSTANCE.createTypeString();
 			type.setSize(llvmStr.getSize());
 
-			Var variable = IrFactory.eINSTANCE.createVar(call.getLocation(),
+			Var variable = IrFactory.eINSTANCE.createVar(call.getLineNumber(),
 					type, name, true, false);
 			variable.setInitialValue(IrFactory.eINSTANCE
 					.createExprString(llvmStr.getStr()));

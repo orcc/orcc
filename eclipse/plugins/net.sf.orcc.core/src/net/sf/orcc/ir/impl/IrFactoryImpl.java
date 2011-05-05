@@ -32,7 +32,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -227,8 +226,6 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 			return createTypeUint();
 		case IrPackage.TYPE_VOID:
 			return createTypeVoid();
-		case IrPackage.LOCATION:
-			return createLocation();
 		case IrPackage.DEF:
 			return createDef();
 		case IrPackage.VAR:
@@ -260,13 +257,12 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Action createAction(Location location, Tag tag,
-			Pattern inputPattern, Pattern outputPattern, Pattern peekedPattern,
-			Procedure scheduler, Procedure body) {
+	public Action createAction(Tag tag, Pattern inputPattern,
+			Pattern outputPattern, Pattern peekedPattern, Procedure scheduler,
+			Procedure body) {
 		ActionImpl action = new ActionImpl();
 		action.setBody(body);
 		action.setInputPattern(inputPattern);
-		action.setLocation(location);
 		action.setOutputPattern(outputPattern);
 		action.setPeekPattern(peekedPattern);
 		action.setScheduler(scheduler);
@@ -512,10 +508,10 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstAssign createInstAssign(Location location, Var target,
+	public InstAssign createInstAssign(int lineNumber, Var target,
 			Expression value) {
 		InstAssignImpl instAssign = new InstAssignImpl();
-		instAssign.setLocation(location);
+		instAssign.setLineNumber(lineNumber);
 		instAssign.setTarget(IrFactory.eINSTANCE.createDef(target));
 		instAssign.setValue(value);
 		return instAssign;
@@ -523,8 +519,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	@Override
 	public InstAssign createInstAssign(Var target, Expression value) {
-		return createInstAssign(IrFactory.eINSTANCE.createLocation(), target,
-				value);
+		return createInstAssign(0, target, value);
 	}
 
 	/**
@@ -538,10 +533,10 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstCall createInstCall(Location location, Var target,
+	public InstCall createInstCall(int lineNumber, Var target,
 			Procedure procedure, List<Expression> parameters) {
 		InstCallImpl instCall = new InstCallImpl();
-		instCall.setLocation(location);
+		instCall.setLineNumber(lineNumber);
 		if (target != null) {
 			instCall.setTarget(IrFactory.eINSTANCE.createDef(target));
 		}
@@ -555,8 +550,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public InstCall createInstCall(Var target, Procedure procedure,
 			List<Expression> parameters) {
-		return createInstCall(IrFactory.eINSTANCE.createLocation(), target,
-				procedure, parameters);
+		return createInstCall(0, target, procedure, parameters);
 	}
 
 	/**
@@ -570,10 +564,10 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstLoad createInstLoad(Location location, Def target, Use source,
+	public InstLoad createInstLoad(int lineNumber, Def target, Use source,
 			List<Expression> indexes) {
 		InstLoadImpl instLoad = new InstLoadImpl();
-		instLoad.setLocation(location);
+		instLoad.setLineNumber(lineNumber);
 		instLoad.setTarget(target);
 		instLoad.setSource(source);
 		instLoad.getIndexes().addAll(indexes);
@@ -581,16 +575,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstLoad createInstLoad(Location location, Var target, Var source,
+	public InstLoad createInstLoad(int lineNumber, Var target, Var source,
 			List<Expression> indexes) {
-		return createInstLoad(location, IrFactory.eINSTANCE.createDef(target),
+		return createInstLoad(lineNumber,
+				IrFactory.eINSTANCE.createDef(target),
 				IrFactory.eINSTANCE.createUse(source), indexes);
 	}
 
 	@Override
 	public InstLoad createInstLoad(Var target, Var source) {
 		InstLoadImpl instLoad = new InstLoadImpl();
-		instLoad.setLocation(IrFactory.eINSTANCE.createLocation());
 		instLoad.setTarget(IrFactory.eINSTANCE.createDef(target));
 		instLoad.setSource(IrFactory.eINSTANCE.createUse(source));
 		return instLoad;
@@ -599,8 +593,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public InstLoad createInstLoad(Var target, Var source,
 			List<Expression> indexes) {
-		return createInstLoad(IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createDef(target),
+		return createInstLoad(0, IrFactory.eINSTANCE.createDef(target),
 				IrFactory.eINSTANCE.createUse(source), indexes);
 	}
 
@@ -615,26 +608,25 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstPhi createInstPhi(Location location, Def target,
+	public InstPhi createInstPhi(int lineNumber, Def target,
 			List<Expression> values) {
 		InstPhiImpl instPhi = new InstPhiImpl();
-		instPhi.setLocation(location);
+		instPhi.setLineNumber(lineNumber);
 		instPhi.setTarget(target);
 		instPhi.getValues().addAll(values);
 		return instPhi;
 	}
 
 	@Override
-	public InstPhi createInstPhi(Location location, Var target,
+	public InstPhi createInstPhi(int lineNumber, Var target,
 			List<Expression> values) {
-		return createInstPhi(location, IrFactory.eINSTANCE.createDef(target),
+		return createInstPhi(lineNumber, IrFactory.eINSTANCE.createDef(target),
 				values);
 	}
 
 	@Override
 	public InstPhi createInstPhi(Var target, List<Expression> values) {
-		return createInstPhi(IrFactory.eINSTANCE.createLocation(),
-				IrFactory.eINSTANCE.createDef(target), values);
+		return createInstPhi(0, IrFactory.eINSTANCE.createDef(target), values);
 	}
 
 	/**
@@ -650,15 +642,14 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public InstReturn createInstReturn(Expression value) {
 		InstReturnImpl instReturn = new InstReturnImpl();
-		instReturn.setLocation(IrFactory.eINSTANCE.createLocation());
 		instReturn.setValue(value);
 		return instReturn;
 	}
 
 	@Override
-	public InstReturn createInstReturn(Location location, Expression value) {
+	public InstReturn createInstReturn(int lineNumber, Expression value) {
 		InstReturnImpl instReturn = new InstReturnImpl();
-		instReturn.setLocation(location);
+		instReturn.setLineNumber(lineNumber);
 		instReturn.setValue(value);
 		return instReturn;
 	}
@@ -674,10 +665,10 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstStore createInstStore(Location location, Def target,
+	public InstStore createInstStore(int lineNumber, Def target,
 			List<Expression> indexes, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();
-		instStore.setLocation(location);
+		instStore.setLineNumber(lineNumber);
 		instStore.setTarget(target);
 		instStore.setValue(value);
 		instStore.getIndexes().addAll(indexes);
@@ -685,38 +676,18 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public InstStore createInstStore(Location location, Var target,
+	public InstStore createInstStore(int lineNumber, Var target,
 			List<Expression> indexes, Expression value) {
-		return createInstStore(location, IrFactory.eINSTANCE.createDef(target),
-				indexes, value);
+		return createInstStore(lineNumber,
+				IrFactory.eINSTANCE.createDef(target), indexes, value);
 	}
 
 	@Override
 	public InstStore createInstStore(Var target, Expression value) {
 		InstStoreImpl instStore = new InstStoreImpl();
-		instStore.setLocation(IrFactory.eINSTANCE.createLocation());
 		instStore.setTarget(IrFactory.eINSTANCE.createDef(target));
 		instStore.setValue(value);
 		return instStore;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public Location createLocation() {
-		LocationImpl location = new LocationImpl();
-		return location;
-	}
-
-	@Override
-	public Location createLocation(int startLine, int startColumn, int endColumn) {
-		LocationImpl location = new LocationImpl();
-		location.setStartLine(startLine);
-		location.setStartColumn(startColumn);
-		location.setEndColumn(endColumn);
-		return location;
 	}
 
 	/**
@@ -800,9 +771,8 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Port createPort(Location location, Type type, String name) {
+	public Port createPort(Type type, String name) {
 		PortImpl port = new PortImpl();
-		port.setLocation(location);
 		port.setName(name);
 		port.setType(type);
 		return port;
@@ -864,11 +834,11 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Procedure createProcedure(String name, Location location,
+	public Procedure createProcedure(String name, int lineNumber,
 			Type returnType) {
 		ProcedureImpl procedure = new ProcedureImpl();
 
-		procedure.setLocation(location);
+		procedure.setLineNumber(lineNumber);
 		procedure.setName(name);
 		procedure.setReturnType(EcoreUtil.copy(returnType));
 
@@ -1077,38 +1047,38 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Var createVar(Location location, Type type, String name,
+	public Var createVar(int lineNumber, Type type, String name,
 			boolean global, boolean assignable) {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
 		var.setGlobal(global);
-		var.setLocation(location);
+		var.setLineNumber(lineNumber);
 		var.setName(name);
 		var.setType(EcoreUtil.copy(type));
 		return var;
 	}
 
 	@Override
-	public Var createVar(Location location, Type type, String name,
+	public Var createVar(int lineNumber, Type type, String name,
 			boolean assignable, Expression initialValue) {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
 		var.setGlobal(true);
 		var.setInitialValue(initialValue);
-		var.setLocation(location);
+		var.setLineNumber(lineNumber);
 		var.setName(name);
 		var.setType(type);
 		return var;
 	}
 
 	@Override
-	public Var createVar(Location location, Type type, String name,
+	public Var createVar(int lineNumber, Type type, String name,
 			boolean assignable, int index) {
 		VarImpl var = new VarImpl();
 		var.setAssignable(assignable);
 		var.setGlobal(false);
 		var.setIndex(index);
-		var.setLocation(location);
+		var.setLineNumber(lineNumber);
 		var.setName(name);
 		var.setType(EcoreUtil.copy(type));
 		return var;
@@ -1116,8 +1086,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 
 	@Override
 	public Var createVar(Type type, String name, boolean assignable, int index) {
-		return createVar(IrFactory.eINSTANCE.createLocation(), type, name,
-				assignable, index);
+		return createVar(0, type, name, assignable, index);
 	}
 
 	/**

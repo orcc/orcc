@@ -53,21 +53,6 @@ public interface Node extends EObject {
 	public void accept(NodeVisitor visitor);
 
 	/**
-	 * Returns the label of this node as an integer.
-	 * 
-	 * @return the label of this node as an integer
-	 */
-	public int getLabel();
-
-	/**
-	 * Returns the location of this node.
-	 * 
-	 * @return the location of this node
-	 * @model containment="true"
-	 */
-	public Location getLocation();
-
-	/**
 	 * Returns the predecessors of this node in the CFG.
 	 * 
 	 * @return the predecessors of this node in the CFG
@@ -108,13 +93,5 @@ public interface Node extends EObject {
 	 * @return <code>true</code> if this node is a NodeWhile
 	 */
 	boolean isWhileNode();
-
-	/**
-	 * Sets the location of this node.
-	 * 
-	 * @param location
-	 *            the location of this node
-	 */
-	void setLocation(Location location);
 
 }

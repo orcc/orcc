@@ -28,7 +28,6 @@
  */
 package net.sf.orcc;
 
-import net.sf.orcc.ir.Location;
 
 /**
  * This class defines a runtime exception that can be raised in Orcc.
@@ -54,26 +53,26 @@ public class OrccRuntimeException extends RuntimeException {
 	 * Creates a new exception with the given message, identified to have
 	 * occurred in the given file at the given location.
 	 */
-	public OrccRuntimeException(Location location, String message) {
-		super(location + "\n" + message);
+	public OrccRuntimeException(int lineNumber, String message) {
+		super(lineNumber + "\n" + message);
 	}
 
 	/**
 	 * Creates a new exception with the given message, identified to have
 	 * occurred in the given file at the given location.
 	 */
-	public OrccRuntimeException(String fileName, Location location,
-			String message) {
-		super("File \"" + fileName + "\", " + location + "\n" + message);
+	public OrccRuntimeException(String fileName, int lineNumber, String message) {
+		super("File \"" + fileName + "\", " + lineNumber + "\n" + message);
 	}
 
 	/**
 	 * Creates a new exception with the given message and cause, identified to
 	 * have occurred in the given file at the given location.
 	 */
-	public OrccRuntimeException(String fileName, Location location,
+	public OrccRuntimeException(String fileName, int lineNumber,
 			String message, Throwable cause) {
-		super("File \"" + fileName + "\", " + location + "\n" + message, cause);
+		super("File \"" + fileName + "\", " + lineNumber + "\n" + message,
+				cause);
 	}
 
 	/**

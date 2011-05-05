@@ -34,6 +34,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getJoinNode <em>Join Node</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getThenNodes <em>Then Nodes</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getCondition <em>Condition</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.NodeIfImpl#getLineNumber <em>Line Number</em>}</li>
  * </ul>
  * </p>
  *
@@ -76,6 +77,26 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 * @ordered
 	 */
 	protected Expression condition;
+
+	/**
+	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int LINE_NUMBER_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getLineNumber()
+	 * @generated
+	 * @ordered
+	 */
+	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -136,6 +157,8 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 				return getThenNodes();
 			case IrPackage.NODE_IF__CONDITION:
 				return getCondition();
+			case IrPackage.NODE_IF__LINE_NUMBER:
+				return getLineNumber();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -175,8 +198,26 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 				return thenNodes != null && !thenNodes.isEmpty();
 			case IrPackage.NODE_IF__CONDITION:
 				return condition != null;
+			case IrPackage.NODE_IF__LINE_NUMBER:
+				return lineNumber != LINE_NUMBER_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (lineNumber: ");
+		result.append(lineNumber);
+		result.append(')');
+		return result.toString();
 	}
 
 	/**
@@ -200,6 +241,9 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 				return;
 			case IrPackage.NODE_IF__CONDITION:
 				setCondition((Expression)newValue);
+				return;
+			case IrPackage.NODE_IF__LINE_NUMBER:
+				setLineNumber((Integer)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -232,6 +276,9 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 				return;
 			case IrPackage.NODE_IF__CONDITION:
 				setCondition((Expression)null);
+				return;
+			case IrPackage.NODE_IF__LINE_NUMBER:
+				setLineNumber(LINE_NUMBER_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -298,6 +345,27 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__CONDITION, newCondition, newCondition));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getLineNumber() {
+		return lineNumber;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setLineNumber(int newLineNumber) {
+		int oldLineNumber = lineNumber;
+		lineNumber = newLineNumber;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.NODE_IF__LINE_NUMBER, oldLineNumber, lineNumber));
 	}
 
 	/**

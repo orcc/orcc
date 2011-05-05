@@ -8,7 +8,6 @@ package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
@@ -28,7 +27,6 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getBody <em>Body</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getInputPattern <em>Input Pattern</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getLocation <em>Location</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getOutputPattern <em>Output Pattern</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getScheduler <em>Scheduler</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActionImpl#getTag <em>Tag</em>}</li>
@@ -60,15 +58,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 	protected Pattern inputPattern;
 
 	/**
-	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getLocation()
-	 * @generated
-	 * @ordered
-	 */
-	protected Location location;
-
-	/**
 	 * The cached value of the '{@link #getOutputPattern() <em>Output Pattern</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -77,6 +66,16 @@ public class ActionImpl extends EObjectImpl implements Action {
 	 * @ordered
 	 */
 	protected Pattern outputPattern;
+
+	/**
+	 * The cached value of the '{@link #getPeekPattern() <em>Peek Pattern</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPeekPattern()
+	 * @generated
+	 * @ordered
+	 */
+	protected Pattern peekPattern;
 
 	/**
 	 * The cached value of the '{@link #getScheduler() <em>Scheduler</em>}' containment reference.
@@ -95,16 +94,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 	 * @ordered
 	 */
 	protected Tag tag;
-
-	/**
-	 * The cached value of the '{@link #getPeekPattern() <em>Peek Pattern</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getPeekPattern()
-	 * @generated
-	 * @ordered
-	 */
-	protected Pattern peekPattern;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -139,21 +128,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 		inputPattern = newInputPattern;
 		if (eNotificationRequired()) {
 			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__INPUT_PATTERN, oldInputPattern, newInputPattern);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public NotificationChain basicSetLocation(Location newLocation,
-			NotificationChain msgs) {
-		Location oldLocation = location;
-		location = newLocation;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__LOCATION, oldLocation, newLocation);
 			if (msgs == null) msgs = notification; else msgs.add(notification);
 		}
 		return msgs;
@@ -229,8 +203,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return getBody();
 			case IrPackage.ACTION__INPUT_PATTERN:
 				return getInputPattern();
-			case IrPackage.ACTION__LOCATION:
-				return getLocation();
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				return getOutputPattern();
 			case IrPackage.ACTION__SCHEDULER:
@@ -255,8 +227,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return basicSetBody(null, msgs);
 			case IrPackage.ACTION__INPUT_PATTERN:
 				return basicSetInputPattern(null, msgs);
-			case IrPackage.ACTION__LOCATION:
-				return basicSetLocation(null, msgs);
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				return basicSetOutputPattern(null, msgs);
 			case IrPackage.ACTION__SCHEDULER:
@@ -280,8 +250,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return body != null;
 			case IrPackage.ACTION__INPUT_PATTERN:
 				return inputPattern != null;
-			case IrPackage.ACTION__LOCATION:
-				return location != null;
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				return outputPattern != null;
 			case IrPackage.ACTION__SCHEDULER:
@@ -306,9 +274,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 				return;
 			case IrPackage.ACTION__INPUT_PATTERN:
 				setInputPattern((Pattern)newValue);
-				return;
-			case IrPackage.ACTION__LOCATION:
-				setLocation((Location)newValue);
 				return;
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				setOutputPattern((Pattern)newValue);
@@ -348,9 +313,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 			case IrPackage.ACTION__INPUT_PATTERN:
 				setInputPattern((Pattern)null);
 				return;
-			case IrPackage.ACTION__LOCATION:
-				setLocation((Location)null);
-				return;
 			case IrPackage.ACTION__OUTPUT_PATTERN:
 				setOutputPattern((Pattern)null);
 				return;
@@ -381,14 +343,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 	 */
 	public Pattern getInputPattern() {
 		return inputPattern;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Location getLocation() {
-		return location;
 	}
 
 	@Override
@@ -472,24 +426,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__INPUT_PATTERN, newInputPattern, newInputPattern));
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setLocation(Location newLocation) {
-		if (newLocation != location) {
-			NotificationChain msgs = null;
-			if (location != null)
-				msgs = ((InternalEObject)location).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__LOCATION, null, msgs);
-			if (newLocation != null)
-				msgs = ((InternalEObject)newLocation).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.ACTION__LOCATION, null, msgs);
-			msgs = basicSetLocation(newLocation, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTION__LOCATION, newLocation, newLocation));
 	}
 
 	/**

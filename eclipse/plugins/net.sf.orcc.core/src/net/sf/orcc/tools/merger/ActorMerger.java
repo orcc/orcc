@@ -106,16 +106,14 @@ public class ActorMerger implements INetworkTransformation {
 	private void addBuffer(String name, int size, Type eltType) {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Type type = factory.createTypeList(size, eltType);
-		Var var = factory.createVar(factory.createLocation(), type, name, true,
-				true);
+		Var var = factory.createVar(0, type, name, true, true);
 		superActor.getStateVars().add(var);
 	}
 
 	private void addCounter(String name) {
 		IrFactory factory = IrFactory.eINSTANCE;
-		Var varCount = factory
-				.createVar(factory.createLocation(), factory.createTypeInt(32),
-						name, true, factory.createExprInt(0));
+		Var varCount = factory.createVar(0, factory.createTypeInt(32), name,
+				true, factory.createExprInt(0));
 		superActor.getStateVars().add(varCount);
 	}
 
@@ -152,20 +150,20 @@ public class ActorMerger implements INetworkTransformation {
 	private Procedure createBody(Pattern ip, Pattern op) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
-		Procedure procedure = factory.createProcedure("staticSchedule",
-				factory.createLocation(), IrFactory.eINSTANCE.createTypeVoid());
+		Procedure procedure = factory.createProcedure("staticSchedule", 0,
+				IrFactory.eINSTANCE.createTypeVoid());
 
 		// Add loop counter(s)
 		int i = 0;
 		do { // one loop var is required even if the schedule as a depth of 0
-			Var counter = factory.createVar(factory.createLocation(),
-					factory.createTypeInt(32), "idx_" + i, false, true);
+			Var counter = factory.createVar(0, factory.createTypeInt(32),
+					"idx_" + i, false, true);
 			procedure.getLocals().add(counter);
 			i++;
 		} while (i < scheduler.getDepth());
 
-		Var tmp = factory.createVar(factory.createLocation(),
-				factory.createTypeInt(32), "tmp", false, true);
+		Var tmp = factory.createVar(0, factory.createTypeInt(32), "tmp", false,
+				true);
 		procedure.getLocals().add(tmp);
 
 		// Initialize read/write counters
@@ -226,8 +224,8 @@ public class ActorMerger implements INetworkTransformation {
 
 		indexes = new ArrayList<Expression>();
 		indexes.add(factory.createExprVar(loop));
-		InstStore store = factory.createInstStore(factory.createLocation(),
-				target, indexes, factory.createExprVar(tmpVar));
+		InstStore store = factory.createInstStore(0, target, indexes,
+				factory.createExprVar(tmpVar));
 		NodeBlock childBlock = procedure.getLast(nodeWhile.getNodes());
 		childBlock.add(load);
 		childBlock.add(store);
@@ -277,8 +275,7 @@ public class ActorMerger implements INetworkTransformation {
 			int numTokens = port.getNumTokensConsumed();
 			Type type = factory.createTypeList(numTokens,
 					EcoreUtil.copy(port.getType()));
-			Var var = factory.createVar(factory.createLocation(), type,
-					port.getName(), false, true);
+			Var var = factory.createVar(0, type, port.getName(), false, true);
 			ip.setNumTokens(port, numTokens);
 			ip.setVariable(port, var);
 		}
@@ -297,8 +294,7 @@ public class ActorMerger implements INetworkTransformation {
 			int numTokens = port.getNumTokensProduced();
 			Type type = factory.createTypeList(numTokens,
 					EcoreUtil.copy(port.getType()));
-			Var var = factory.createVar(factory.createLocation(), type,
-					port.getName(), false, true);
+			Var var = factory.createVar(0, type, port.getName(), false, true);
 			op.setNumTokens(port, numTokens);
 			op.setVariable(port, var);
 		}
@@ -327,9 +323,8 @@ public class ActorMerger implements INetworkTransformation {
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Port tgtPort = connection.getTarget();
 				Port port = factory
-						.createPort(factory.createLocation(),
-								EcoreUtil.copy(tgtPort.getType()), "input_"
-										+ inIndex++);
+						.createPort(EcoreUtil.copy(tgtPort.getType()), "input_"
+								+ inIndex++);
 
 				int cns = scheduler.getRepetitionVector().get(tgt)
 						* tgtPort.getNumTokensConsumed();
@@ -342,7 +337,7 @@ public class ActorMerger implements INetworkTransformation {
 
 			} else if (vertices.contains(src) && !vertices.contains(tgt)) {
 				Port srcPort = connection.getSource();
-				Port port = factory.createPort(factory.createLocation(),
+				Port port = factory.createPort(
 						EcoreUtil.copy(srcPort.getType()), "output_"
 								+ outIndex++);
 
@@ -377,8 +372,8 @@ public class ActorMerger implements INetworkTransformation {
 			if (it.hasNext()) {
 				Action action = it.next();
 				String name = instance.getId() + "_" + action.getName();
-				Procedure proc = factory.createProcedure(name,
-						factory.createLocation(), factory.createTypeVoid());
+				Procedure proc = factory.createProcedure(name, 0,
+						factory.createTypeVoid());
 
 				Procedure body = action.getBody();
 				List<Node> nodes = body.getNodes();
@@ -400,8 +395,7 @@ public class ActorMerger implements INetworkTransformation {
 	private Procedure createScheduler() {
 		IrFactory factory = IrFactory.eINSTANCE;
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(
-				SCHEDULER_NAME, factory.createLocation(),
-				IrFactory.eINSTANCE.createTypeBool());
+				SCHEDULER_NAME, 0, IrFactory.eINSTANCE.createTypeBool());
 
 		NodeBlock block = factory.createNodeBlock();
 		procedure.getNodes().add(block);
@@ -463,9 +457,8 @@ public class ActorMerger implements INetworkTransformation {
 		Procedure scheduler = createScheduler();
 		Procedure body = createBody(ip, op);
 
-		Action action = factory.createAction(factory.createLocation(),
-				factory.createTag(), ip, op, factory.createPattern(),
-				scheduler, body);
+		Action action = factory.createAction(factory.createTag(), ip, op,
+				factory.createPattern(), scheduler, body);
 
 		superActor.getActions().add(action);
 		superActor.getActionsOutsideFsm().add(action);
@@ -489,8 +482,8 @@ public class ActorMerger implements INetworkTransformation {
 						+ action.getName());
 
 				NodeBlock block = procedure.getLast(nodes);
-				block.add(factory.createInstCall(factory.createLocation(),
-						null, proc, new ArrayList<Expression>()));
+				block.add(factory.createInstCall(0, null, proc,
+						new ArrayList<Expression>()));
 			} else {
 				Schedule sched = iterand.getSchedule();
 				Var loopVar = procedure.getLocal("idx_" + depth);

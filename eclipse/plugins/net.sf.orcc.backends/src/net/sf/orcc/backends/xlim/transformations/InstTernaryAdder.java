@@ -77,8 +77,8 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 
 		Expression condExpr = nodeIf.getCondition();
 		condVar = procedure.newTempLocalVariable(
-				IrFactory.eINSTANCE.createTypeBool(), "ifCondition_"
-						+ nodeIf.getLocation().getStartLine());
+				IrFactory.eINSTANCE.createTypeBool(),
+				"ifCondition_" + nodeIf.getLineNumber());
 		condVar.setIndex(1);
 		InstAssign assignCond = IrFactory.eINSTANCE.createInstAssign(condVar,
 				condExpr);

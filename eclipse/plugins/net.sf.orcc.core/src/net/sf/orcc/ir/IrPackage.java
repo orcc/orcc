@@ -67,14 +67,6 @@ public interface IrPackage extends EPackage {
 		EReference ACTION__INPUT_PATTERN = eINSTANCE.getAction_InputPattern();
 
 		/**
-		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference ACTION__LOCATION = eINSTANCE.getAction_Location();
-
-		/**
 		 * The meta object literal for the '<em><b>Output Pattern</b></em>' containment reference feature.
 		 * <!-- begin-user-doc --> <!--
 		 * end-user-doc -->
@@ -167,12 +159,12 @@ public interface IrPackage extends EPackage {
 		EReference ACTOR__MO_C = eINSTANCE.getActor_MoC();
 
 		/**
-		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference ACTOR__LOCATION = eINSTANCE.getActor_Location();
+		EAttribute ACTOR__LINE_NUMBER = eINSTANCE.getActor_LineNumber();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
@@ -617,20 +609,20 @@ public interface IrPackage extends EPackage {
 		EClass INSTRUCTION = eINSTANCE.getInstruction();
 
 		/**
-		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference INSTRUCTION__LOCATION = eINSTANCE.getInstruction_Location();
-
-		/**
 		 * The meta object literal for the '<em><b>Predicate</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference INSTRUCTION__PREDICATE = eINSTANCE.getInstruction_Predicate();
+
+		/**
+		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute INSTRUCTION__LINE_NUMBER = eINSTANCE.getInstruction_LineNumber();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.PredicateImpl <em>Predicate</em>}' class.
@@ -729,36 +721,6 @@ public interface IrPackage extends EPackage {
 		EReference VAR_TO_PORT_MAP_ENTRY__VALUE = eINSTANCE.getVarToPortMapEntry_Value();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.LocationImpl <em>Location</em>}' class.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.impl.LocationImpl
-		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getLocation()
-		 * @generated
-		 */
-		EClass LOCATION = eINSTANCE.getLocation();
-
-		/**
-		 * The meta object literal for the '<em><b>End Column</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute LOCATION__END_COLUMN = eINSTANCE.getLocation_EndColumn();
-
-		/**
-		 * The meta object literal for the '<em><b>Start Column</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute LOCATION__START_COLUMN = eINSTANCE.getLocation_StartColumn();
-
-		/**
-		 * The meta object literal for the '<em><b>Start Line</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute LOCATION__START_LINE = eINSTANCE.getLocation_StartLine();
-
-		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.NodeImpl
@@ -766,14 +728,6 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EClass NODE = eINSTANCE.getNode();
-
-		/**
-		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference NODE__LOCATION = eINSTANCE.getNode_Location();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.NodeBlockImpl <em>Node Block</em>}' class.
@@ -810,6 +764,14 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference NODE_IF__CONDITION = eINSTANCE.getNodeIf_Condition();
+
+		/**
+		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute NODE_IF__LINE_NUMBER = eINSTANCE.getNodeIf_LineNumber();
 
 		/**
 		 * The meta object literal for the '<em><b>Else Nodes</b></em>' containment reference list feature.
@@ -851,6 +813,14 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference NODE_WHILE__CONDITION = eINSTANCE.getNodeWhile_Condition();
+
+		/**
+		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute NODE_WHILE__LINE_NUMBER = eINSTANCE.getNodeWhile_LineNumber();
 
 		/**
 		 * The meta object literal for the '<em><b>Join Node</b></em>' containment reference feature.
@@ -949,14 +919,6 @@ public interface IrPackage extends EPackage {
 		EClass PORT = eINSTANCE.getPort();
 
 		/**
-		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference PORT__LOCATION = eINSTANCE.getPort_Location();
-
-		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -1001,14 +963,6 @@ public interface IrPackage extends EPackage {
 		EReference PROCEDURE__LOCALS = eINSTANCE.getProcedure_Locals();
 
 		/**
-		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference PROCEDURE__LOCATION = eINSTANCE.getProcedure_Location();
-
-		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -1036,6 +990,14 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference PROCEDURE__PARAMETERS = eINSTANCE.getProcedure_Parameters();
+
+		/**
+		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PROCEDURE__LINE_NUMBER = eINSTANCE.getProcedure_LineNumber();
 
 		/**
 		 * The meta object literal for the '<em><b>Return Type</b></em>' containment reference feature.
@@ -1278,6 +1240,14 @@ public interface IrPackage extends EPackage {
 		EReference VAR__DEFS = eINSTANCE.getVar_Defs();
 
 		/**
+		 * The meta object literal for the '<em><b>Line Number</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute VAR__LINE_NUMBER = eINSTANCE.getVar_LineNumber();
+
+		/**
 		 * The meta object literal for the '<em><b>Global</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -1298,14 +1268,6 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EReference VAR__INITIAL_VALUE = eINSTANCE.getVar_InitialValue();
-
-		/**
-		 * The meta object literal for the '<em><b>Location</b></em>' containment reference feature.
-		 * <!-- begin-user-doc --> <!--
-		 * end-user-doc -->
-		 * @generated
-		 */
-		EReference VAR__LOCATION = eINSTANCE.getVar_Location();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
@@ -1465,13 +1427,13 @@ public interface IrPackage extends EPackage {
 	int ACTOR__MO_C = 12;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__LOCATION = 13;
+	int ACTOR__LINE_NUMBER = 13;
 
 	/**
 	 * The number of structural features of the '<em>Actor</em>' class. <!--
@@ -1489,7 +1451,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getDef()
 	 * @generated
 	 */
-	int DEF = 40;
+	int DEF = 39;
 
 	/**
 	 * The singleton instance of the package.
@@ -1703,15 +1665,6 @@ public interface IrPackage extends EPackage {
 	int INST_STORE = 21;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.impl.LocationImpl <em>Location</em>}' class.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.impl.LocationImpl
-	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getLocation()
-	 * @generated
-	 */
-	int LOCATION = 39;
-
-	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.NodeImpl <em>Node</em>}' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see net.sf.orcc.ir.impl.NodeImpl
@@ -1758,7 +1711,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 47;
+	int OP_BINARY = 46;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.OpUnary <em>Op Unary</em>}' enum.
@@ -1767,7 +1720,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 48;
+	int OP_UNARY = 47;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.PatternImpl <em>Pattern</em>}' class.
@@ -1788,21 +1741,13 @@ public interface IrPackage extends EPackage {
 	int PORT = 1;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT__LOCATION = 0;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NAME = 1;
+	int PORT__NAME = 0;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Consumed</b></em>' attribute.
@@ -1810,7 +1755,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_CONSUMED = 2;
+	int PORT__NUM_TOKENS_CONSUMED = 1;
 
 	/**
 	 * The feature id for the '<em><b>Num Tokens Produced</b></em>' attribute.
@@ -1818,7 +1763,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__NUM_TOKENS_PRODUCED = 3;
+	int PORT__NUM_TOKENS_PRODUCED = 2;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
@@ -1827,7 +1772,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__TYPE = 4;
+	int PORT__TYPE = 3;
 
 	/**
 	 * The number of structural features of the '<em>Port</em>' class. <!--
@@ -1836,7 +1781,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_FEATURE_COUNT = 5;
+	int PORT_FEATURE_COUNT = 4;
 
 	/**
 	 * The feature id for the '<em><b>Initial State</b></em>' reference. <!--
@@ -2010,20 +1955,12 @@ public interface IrPackage extends EPackage {
 	int ACTION__INPUT_PATTERN = 1;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ACTION__LOCATION = 2;
-
-	/**
 	 * The feature id for the '<em><b>Output Pattern</b></em>' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__OUTPUT_PATTERN = 3;
+	int ACTION__OUTPUT_PATTERN = 2;
 
 	/**
 	 * The feature id for the '<em><b>Scheduler</b></em>' containment reference.
@@ -2031,7 +1968,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__SCHEDULER = 4;
+	int ACTION__SCHEDULER = 3;
 
 	/**
 	 * The feature id for the '<em><b>Tag</b></em>' containment reference. <!--
@@ -2040,7 +1977,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__TAG = 5;
+	int ACTION__TAG = 4;
 
 	/**
 	 * The feature id for the '<em><b>Peek Pattern</b></em>' containment reference.
@@ -2048,7 +1985,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION__PEEK_PATTERN = 6;
+	int ACTION__PEEK_PATTERN = 5;
 
 	/**
 	 * The number of structural features of the '<em>Action</em>' class. <!--
@@ -2057,7 +1994,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTION_FEATURE_COUNT = 7;
+	int ACTION_FEATURE_COUNT = 6;
 
 	/**
 	 * The feature id for the '<em><b>Identifiers</b></em>' attribute list. <!--
@@ -2132,21 +2069,13 @@ public interface IrPackage extends EPackage {
 	int PATTERN_FEATURE_COUNT = 5;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PROCEDURE__LOCATION = 0;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__NAME = 1;
+	int PROCEDURE__NAME = 0;
 
 	/**
 	 * The feature id for the '<em><b>Nodes</b></em>' containment reference list.
@@ -2154,7 +2083,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__NODES = 2;
+	int PROCEDURE__NODES = 1;
 
 	/**
 	 * The feature id for the '<em><b>Return Type</b></em>' containment reference.
@@ -2162,7 +2091,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__RETURN_TYPE = 3;
+	int PROCEDURE__RETURN_TYPE = 2;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
@@ -2171,7 +2100,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__NATIVE = 4;
+	int PROCEDURE__NATIVE = 3;
 
 	/**
 	 * The feature id for the '<em><b>Locals</b></em>' containment reference list.
@@ -2179,7 +2108,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__LOCALS = 5;
+	int PROCEDURE__LOCALS = 4;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -2187,7 +2116,16 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PROCEDURE__PARAMETERS = 6;
+	int PROCEDURE__PARAMETERS = 5;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROCEDURE__LINE_NUMBER = 6;
 
 	/**
 	 * The number of structural features of the '<em>Procedure</em>' class. <!--
@@ -2199,29 +2137,13 @@ public interface IrPackage extends EPackage {
 	int PROCEDURE_FEATURE_COUNT = 7;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE__LOCATION = 0;
-
-	/**
 	 * The number of structural features of the '<em>Node</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FEATURE_COUNT = 1;
-
-	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_BLOCK__LOCATION = NODE__LOCATION;
+	int NODE_FEATURE_COUNT = 0;
 
 	/**
 	 * The feature id for the '<em><b>Instructions</b></em>' containment reference list.
@@ -2238,14 +2160,6 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int NODE_BLOCK_FEATURE_COUNT = NODE_FEATURE_COUNT + 1;
-
-	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_IF__LOCATION = NODE__LOCATION;
 
 	/**
 	 * The feature id for the '<em><b>Else Nodes</b></em>' containment reference list.
@@ -2280,21 +2194,22 @@ public interface IrPackage extends EPackage {
 	int NODE_IF__CONDITION = NODE_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_IF__LINE_NUMBER = NODE_FEATURE_COUNT + 4;
+
+	/**
 	 * The number of structural features of the '<em>Node If</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 4;
-
-	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE_WHILE__LOCATION = NODE__LOCATION;
+	int NODE_IF_FEATURE_COUNT = NODE_FEATURE_COUNT + 5;
 
 	/**
 	 * The feature id for the '<em><b>Join Node</b></em>' containment reference.
@@ -2321,20 +2236,21 @@ public interface IrPackage extends EPackage {
 	int NODE_WHILE__CONDITION = NODE_FEATURE_COUNT + 2;
 
 	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE_WHILE__LINE_NUMBER = NODE_FEATURE_COUNT + 3;
+
+	/**
 	 * The number of structural features of the '<em>Node While</em>' class.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_WHILE_FEATURE_COUNT = NODE_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INSTRUCTION__LOCATION = 0;
+	int NODE_WHILE_FEATURE_COUNT = NODE_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
@@ -2343,7 +2259,16 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int INSTRUCTION__PREDICATE = 1;
+	int INSTRUCTION__PREDICATE = 0;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INSTRUCTION__LINE_NUMBER = 1;
 
 	/**
 	 * The number of structural features of the '<em>Instruction</em>' class.
@@ -2361,15 +2286,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPredicate()
 	 * @generated
 	 */
-	int PREDICATE = 43;
-
-	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_ASSIGN__LOCATION = INSTRUCTION__LOCATION;
+	int PREDICATE = 42;
 
 	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
@@ -2379,6 +2296,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_ASSIGN__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_ASSIGN__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' reference. <!--
@@ -2406,14 +2332,6 @@ public interface IrPackage extends EPackage {
 	int INST_ASSIGN_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_CALL__LOCATION = INSTRUCTION__LOCATION;
-
-	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2421,6 +2339,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_CALL__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CALL__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -2458,14 +2385,6 @@ public interface IrPackage extends EPackage {
 	int INST_CALL_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_LOAD__LOCATION = INSTRUCTION__LOCATION;
-
-	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2473,6 +2392,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_LOAD__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_LOAD__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -2510,14 +2438,6 @@ public interface IrPackage extends EPackage {
 	int INST_LOAD_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_PHI__LOCATION = INSTRUCTION__LOCATION;
-
-	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2525,6 +2445,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_PHI__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_PHI__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Old Variable</b></em>' reference. <!--
@@ -2562,14 +2491,6 @@ public interface IrPackage extends EPackage {
 	int INST_PHI_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 3;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RETURN__LOCATION = INSTRUCTION__LOCATION;
-
-	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2577,6 +2498,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_RETURN__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RETURN__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
@@ -2595,14 +2525,6 @@ public interface IrPackage extends EPackage {
 	int INST_RETURN_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_SPECIFIC__LOCATION = INSTRUCTION__LOCATION;
-
-	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2610,6 +2532,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_SPECIFIC__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_SPECIFIC__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
 
 	/**
 	 * The number of structural features of the '<em>Inst Specific</em>' class.
@@ -2620,14 +2551,6 @@ public interface IrPackage extends EPackage {
 	int INST_SPECIFIC_FEATURE_COUNT = INSTRUCTION_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_STORE__LOCATION = INSTRUCTION__LOCATION;
-
-	/**
 	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2635,6 +2558,15 @@ public interface IrPackage extends EPackage {
 	 * @ordered
 	 */
 	int INST_STORE__PREDICATE = INSTRUCTION__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_STORE__LINE_NUMBER = INSTRUCTION__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -3052,42 +2984,6 @@ public interface IrPackage extends EPackage {
 	int TYPE_VOID_FEATURE_COUNT = TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>End Column</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int LOCATION__END_COLUMN = 0;
-
-	/**
-	 * The feature id for the '<em><b>Start Column</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int LOCATION__START_COLUMN = 1;
-
-	/**
-	 * The feature id for the '<em><b>Start Line</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int LOCATION__START_LINE = 2;
-
-	/**
-	 * The number of structural features of the '<em>Location</em>' class. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int LOCATION_FEATURE_COUNT = 3;
-
-	/**
 	 * The feature id for the '<em><b>Variable</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -3112,7 +3008,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getUse()
 	 * @generated
 	 */
-	int USE = 42;
+	int USE = 41;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.VarImpl <em>Var</em>}' class.
@@ -3121,7 +3017,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVar()
 	 * @generated
 	 */
-	int VAR = 41;
+	int VAR = 40;
 
 	/**
 	 * The feature id for the '<em><b>Index</b></em>' attribute. <!--
@@ -3141,21 +3037,13 @@ public interface IrPackage extends EPackage {
 	int VAR__INITIAL_VALUE = 1;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int VAR__LOCATION = 2;
-
-	/**
 	 * The feature id for the '<em><b>Name</b></em>' reference. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__NAME = 3;
+	int VAR__NAME = 2;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' containment reference. <!--
@@ -3164,7 +3052,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__TYPE = 4;
+	int VAR__TYPE = 3;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' containment reference.
@@ -3172,7 +3060,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__VALUE = 5;
+	int VAR__VALUE = 4;
 
 	/**
 	 * The feature id for the '<em><b>Assignable</b></em>' attribute. <!--
@@ -3181,7 +3069,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__ASSIGNABLE = 6;
+	int VAR__ASSIGNABLE = 5;
 
 	/**
 	 * The feature id for the '<em><b>Global</b></em>' attribute. <!--
@@ -3190,7 +3078,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__GLOBAL = 7;
+	int VAR__GLOBAL = 6;
 
 	/**
 	 * The feature id for the '<em><b>Uses</b></em>' reference list. <!--
@@ -3199,7 +3087,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__USES = 8;
+	int VAR__USES = 7;
 
 	/**
 	 * The feature id for the '<em><b>Defs</b></em>' reference list. <!--
@@ -3208,7 +3096,16 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int VAR__DEFS = 9;
+	int VAR__DEFS = 8;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int VAR__LINE_NUMBER = 9;
 
 	/**
 	 * The number of structural features of the '<em>Var</em>' class. <!--
@@ -3263,7 +3160,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToEIntegerObjectMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 44;
+	int PORT_TO_EINTEGER_OBJECT_MAP_ENTRY = 43;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3300,7 +3197,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getPortToVarMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_VAR_MAP_ENTRY = 45;
+	int PORT_TO_VAR_MAP_ENTRY = 44;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3337,7 +3234,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getVarToPortMapEntry()
 	 * @generated
 	 */
-	int VAR_TO_PORT_MAP_ENTRY = 46;
+	int VAR_TO_PORT_MAP_ENTRY = 45;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -3395,19 +3292,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getAction_InputPattern();
-
-	/**
-	 * Returns the meta object for the containment reference '
-	 * {@link net.sf.orcc.ir.Action#getLocation <em>Location</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference '<em>Location</em>
-	 *         '.
-	 * @see net.sf.orcc.ir.Action#getLocation()
-	 * @see #getAction()
-	 * @generated
-	 */
-	EReference getAction_Location();
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Action#getOutputPattern <em>Output Pattern</em>}'.
@@ -3552,15 +3436,15 @@ public interface IrPackage extends EPackage {
 	EReference getActor_MoC();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Actor#getLocation <em>Location</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Actor#getLineNumber <em>Line Number</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Location</em>'.
-	 * @see net.sf.orcc.ir.Actor#getLocation()
+	 * @return the meta object for the attribute '<em>Line Number</em>'.
+	 * @see net.sf.orcc.ir.Actor#getLineNumber()
 	 * @see #getActor()
 	 * @generated
 	 */
-	EReference getActor_Location();
+	EAttribute getActor_LineNumber();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Actor#getName <em>Name</em>}'.
@@ -4135,19 +4019,6 @@ public interface IrPackage extends EPackage {
 	EClass getInstruction();
 
 	/**
-	 * Returns the meta object for the containment reference '
-	 * {@link net.sf.orcc.ir.Instruction#getLocation <em>Location</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference '<em>Location</em>
-	 *         '.
-	 * @see net.sf.orcc.ir.Instruction#getLocation()
-	 * @see #getInstruction()
-	 * @generated
-	 */
-	EReference getInstruction_Location();
-
-	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Instruction#getPredicate <em>Predicate</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4157,6 +4028,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getInstruction_Predicate();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Instruction#getLineNumber <em>Line Number</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Line Number</em>'.
+	 * @see net.sf.orcc.ir.Instruction#getLineNumber()
+	 * @see #getInstruction()
+	 * @generated
+	 */
+	EAttribute getInstruction_LineNumber();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Predicate <em>Predicate</em>}'.
@@ -4346,49 +4228,6 @@ public interface IrPackage extends EPackage {
 	IrFactory getIrFactory();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.Location <em>Location</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Location</em>'.
-	 * @see net.sf.orcc.ir.Location
-	 * @generated
-	 */
-	EClass getLocation();
-
-	/**
-	 * Returns the meta object for the attribute '
-	 * {@link net.sf.orcc.ir.Location#getEndColumn <em>End Column</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the attribute '<em>End Column</em>'.
-	 * @see net.sf.orcc.ir.Location#getEndColumn()
-	 * @see #getLocation()
-	 * @generated
-	 */
-	EAttribute getLocation_EndColumn();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Location#getStartColumn <em>Start Column</em>}'.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Start Column</em>'.
-	 * @see net.sf.orcc.ir.Location#getStartColumn()
-	 * @see #getLocation()
-	 * @generated
-	 */
-	EAttribute getLocation_StartColumn();
-
-	/**
-	 * Returns the meta object for the attribute '
-	 * {@link net.sf.orcc.ir.Location#getStartLine <em>Start Line</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the attribute '<em>Start Line</em>'.
-	 * @see net.sf.orcc.ir.Location#getStartLine()
-	 * @see #getLocation()
-	 * @generated
-	 */
-	EAttribute getLocation_StartLine();
-
-	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Node <em>Node</em>}'.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Node</em>'.
@@ -4396,19 +4235,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getNode();
-
-	/**
-	 * Returns the meta object for the containment reference '
-	 * {@link net.sf.orcc.ir.Node#getLocation <em>Location</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference '<em>Location</em>
-	 *         '.
-	 * @see net.sf.orcc.ir.Node#getLocation()
-	 * @see #getNode()
-	 * @generated
-	 */
-	EReference getNode_Location();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.NodeBlock <em>Node Block</em>}'.
@@ -4450,6 +4276,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getNodeIf_Condition();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.NodeIf#getLineNumber <em>Line Number</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Line Number</em>'.
+	 * @see net.sf.orcc.ir.NodeIf#getLineNumber()
+	 * @see #getNodeIf()
+	 * @generated
+	 */
+	EAttribute getNodeIf_LineNumber();
 
 	/**
 	 * Returns the meta object for the containment reference list '
@@ -4511,6 +4348,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getNodeWhile_Condition();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.NodeWhile#getLineNumber <em>Line Number</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Line Number</em>'.
+	 * @see net.sf.orcc.ir.NodeWhile#getLineNumber()
+	 * @see #getNodeWhile()
+	 * @generated
+	 */
+	EAttribute getNodeWhile_LineNumber();
 
 	/**
 	 * Returns the meta object for the containment reference '
@@ -4631,19 +4479,6 @@ public interface IrPackage extends EPackage {
 	EClass getPort();
 
 	/**
-	 * Returns the meta object for the containment reference '
-	 * {@link net.sf.orcc.ir.Port#getLocation <em>Location</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference '<em>Location</em>
-	 *         '.
-	 * @see net.sf.orcc.ir.Port#getLocation()
-	 * @see #getPort()
-	 * @generated
-	 */
-	EReference getPort_Location();
-
-	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Port#getName <em>Name</em>}'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -4714,19 +4549,6 @@ public interface IrPackage extends EPackage {
 	EReference getProcedure_Locals();
 
 	/**
-	 * Returns the meta object for the containment reference '
-	 * {@link net.sf.orcc.ir.Procedure#getLocation <em>Location</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference '<em>Location</em>
-	 *         '.
-	 * @see net.sf.orcc.ir.Procedure#getLocation()
-	 * @see #getProcedure()
-	 * @generated
-	 */
-	EReference getProcedure_Location();
-
-	/**
 	 * Returns the meta object for the reference '
 	 * {@link net.sf.orcc.ir.Procedure#getName <em>Name</em>}'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
@@ -4775,6 +4597,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getProcedure_Parameters();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Procedure#getLineNumber <em>Line Number</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Line Number</em>'.
+	 * @see net.sf.orcc.ir.Procedure#getLineNumber()
+	 * @see #getProcedure()
+	 * @generated
+	 */
+	EAttribute getProcedure_LineNumber();
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Procedure#getReturnType <em>Return Type</em>}'.
@@ -5077,6 +4910,17 @@ public interface IrPackage extends EPackage {
 	EReference getVar_Defs();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#getLineNumber <em>Line Number</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Line Number</em>'.
+	 * @see net.sf.orcc.ir.Var#getLineNumber()
+	 * @see #getVar()
+	 * @generated
+	 */
+	EAttribute getVar_LineNumber();
+
+	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#isGlobal <em>Global</em>}'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -5110,19 +4954,6 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getVar_InitialValue();
-
-	/**
-	 * Returns the meta object for the containment reference '
-	 * {@link net.sf.orcc.ir.Var#getLocation <em>Location</em>}'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return the meta object for the containment reference '<em>Location</em>
-	 *         '.
-	 * @see net.sf.orcc.ir.Var#getLocation()
-	 * @see #getVar()
-	 * @generated
-	 */
-	EReference getVar_Location();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#getName <em>Name</em>}'.

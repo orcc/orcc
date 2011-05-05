@@ -30,7 +30,6 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -220,13 +219,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	private EClass instStoreEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass locationEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -619,7 +611,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstruction_Location() {
+	public EReference getInstruction_Predicate() {
 		return (EReference)instructionEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -628,8 +620,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getInstruction_Predicate() {
-		return (EReference)instructionEClass.getEStructuralFeatures().get(1);
+	public EAttribute getInstruction_LineNumber() {
+		return (EAttribute)instructionEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -799,6 +791,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getNodeIf_LineNumber() {
+		return (EAttribute)nodeIfEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getNodeWhile() {
 		return nodeWhileEClass;
 	}
@@ -835,8 +836,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getNode() {
-		return nodeEClass;
+	public EAttribute getNodeWhile_LineNumber() {
+		return (EAttribute)nodeWhileEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -844,8 +845,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getNode_Location() {
-		return (EReference)nodeEClass.getEStructuralFeatures().get(0);
+	public EClass getNode() {
+		return nodeEClass;
 	}
 
 	/**
@@ -862,17 +863,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getProcedure_Location() {
-		return (EReference)procedureEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getProcedure_Name() {
-		return (EAttribute)procedureEClass.getEStructuralFeatures().get(1);
+		return (EAttribute)procedureEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -881,7 +873,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getProcedure_Nodes() {
-		return (EReference)procedureEClass.getEStructuralFeatures().get(2);
+		return (EReference)procedureEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -890,7 +882,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getProcedure_ReturnType() {
-		return (EReference)procedureEClass.getEStructuralFeatures().get(3);
+		return (EReference)procedureEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -899,7 +891,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getProcedure_Native() {
-		return (EAttribute)procedureEClass.getEStructuralFeatures().get(4);
+		return (EAttribute)procedureEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -908,7 +900,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getProcedure_Locals() {
-		return (EReference)procedureEClass.getEStructuralFeatures().get(5);
+		return (EReference)procedureEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -917,7 +909,16 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getProcedure_Parameters() {
-		return (EReference)procedureEClass.getEStructuralFeatures().get(6);
+		return (EReference)procedureEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getProcedure_LineNumber() {
+		return (EAttribute)procedureEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -1123,42 +1124,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getLocation() {
-		return locationEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getLocation_EndColumn() {
-		return (EAttribute)locationEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getLocation_StartColumn() {
-		return (EAttribute)locationEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getLocation_StartLine() {
-		return (EAttribute)locationEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getVar() {
 		return varEClass;
 	}
@@ -1186,17 +1151,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVar_Location() {
-		return (EReference)varEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getVar_Name() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(3);
+		return (EAttribute)varEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1205,7 +1161,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getVar_Type() {
-		return (EReference)varEClass.getEStructuralFeatures().get(4);
+		return (EReference)varEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1214,7 +1170,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getVar_Value() {
-		return (EReference)varEClass.getEStructuralFeatures().get(5);
+		return (EReference)varEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -1223,7 +1179,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getVar_Assignable() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(6);
+		return (EAttribute)varEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -1232,7 +1188,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getVar_Global() {
-		return (EAttribute)varEClass.getEStructuralFeatures().get(7);
+		return (EAttribute)varEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -1241,7 +1197,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getVar_Uses() {
-		return (EReference)varEClass.getEStructuralFeatures().get(8);
+		return (EReference)varEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -1250,7 +1206,16 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getVar_Defs() {
-		return (EReference)varEClass.getEStructuralFeatures().get(9);
+		return (EReference)varEClass.getEStructuralFeatures().get(8);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getVar_LineNumber() {
+		return (EAttribute)varEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -1510,7 +1475,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAction_Location() {
+	public EReference getAction_OutputPattern() {
 		return (EReference)actionEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -1519,7 +1484,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAction_OutputPattern() {
+	public EReference getAction_Scheduler() {
 		return (EReference)actionEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -1528,7 +1493,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAction_Scheduler() {
+	public EReference getAction_Tag() {
 		return (EReference)actionEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -1537,17 +1502,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getAction_Tag() {
-		return (EReference)actionEClass.getEStructuralFeatures().get(5);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getAction_PeekPattern() {
-		return (EReference)actionEClass.getEStructuralFeatures().get(6);
+		return (EReference)actionEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -1681,8 +1637,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getActor_Location() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(13);
+	public EAttribute getActor_LineNumber() {
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(13);
 	}
 
 	/**
@@ -1753,17 +1709,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getPort_Location() {
-		return (EReference)portEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getPort_Name() {
-		return (EAttribute)portEClass.getEStructuralFeatures().get(1);
+		return (EAttribute)portEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1772,7 +1719,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getPort_NumTokensConsumed() {
-		return (EAttribute)portEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)portEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1781,7 +1728,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getPort_NumTokensProduced() {
-		return (EAttribute)portEClass.getEStructuralFeatures().get(3);
+		return (EAttribute)portEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1790,7 +1737,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getPort_Type() {
-		return (EReference)portEClass.getEStructuralFeatures().get(4);
+		return (EReference)portEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1980,10 +1927,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(actorEClass, ACTOR__ACTIONS_OUTSIDE_FSM);
 		createEReference(actorEClass, ACTOR__FSM);
 		createEReference(actorEClass, ACTOR__MO_C);
-		createEReference(actorEClass, ACTOR__LOCATION);
+		createEAttribute(actorEClass, ACTOR__LINE_NUMBER);
 
 		portEClass = createEClass(PORT);
-		createEReference(portEClass, PORT__LOCATION);
 		createEAttribute(portEClass, PORT__NAME);
 		createEAttribute(portEClass, PORT__NUM_TOKENS_CONSUMED);
 		createEAttribute(portEClass, PORT__NUM_TOKENS_PRODUCED);
@@ -2008,7 +1954,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		actionEClass = createEClass(ACTION);
 		createEReference(actionEClass, ACTION__BODY);
 		createEReference(actionEClass, ACTION__INPUT_PATTERN);
-		createEReference(actionEClass, ACTION__LOCATION);
 		createEReference(actionEClass, ACTION__OUTPUT_PATTERN);
 		createEReference(actionEClass, ACTION__SCHEDULER);
 		createEReference(actionEClass, ACTION__TAG);
@@ -2025,16 +1970,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(patternEClass, PATTERN__VAR_TO_PORT_MAP);
 
 		procedureEClass = createEClass(PROCEDURE);
-		createEReference(procedureEClass, PROCEDURE__LOCATION);
 		createEAttribute(procedureEClass, PROCEDURE__NAME);
 		createEReference(procedureEClass, PROCEDURE__NODES);
 		createEReference(procedureEClass, PROCEDURE__RETURN_TYPE);
 		createEAttribute(procedureEClass, PROCEDURE__NATIVE);
 		createEReference(procedureEClass, PROCEDURE__LOCALS);
 		createEReference(procedureEClass, PROCEDURE__PARAMETERS);
+		createEAttribute(procedureEClass, PROCEDURE__LINE_NUMBER);
 
 		nodeEClass = createEClass(NODE);
-		createEReference(nodeEClass, NODE__LOCATION);
 
 		nodeBlockEClass = createEClass(NODE_BLOCK);
 		createEReference(nodeBlockEClass, NODE_BLOCK__INSTRUCTIONS);
@@ -2044,15 +1988,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(nodeIfEClass, NODE_IF__JOIN_NODE);
 		createEReference(nodeIfEClass, NODE_IF__THEN_NODES);
 		createEReference(nodeIfEClass, NODE_IF__CONDITION);
+		createEAttribute(nodeIfEClass, NODE_IF__LINE_NUMBER);
 
 		nodeWhileEClass = createEClass(NODE_WHILE);
 		createEReference(nodeWhileEClass, NODE_WHILE__JOIN_NODE);
 		createEReference(nodeWhileEClass, NODE_WHILE__NODES);
 		createEReference(nodeWhileEClass, NODE_WHILE__CONDITION);
+		createEAttribute(nodeWhileEClass, NODE_WHILE__LINE_NUMBER);
 
 		instructionEClass = createEClass(INSTRUCTION);
-		createEReference(instructionEClass, INSTRUCTION__LOCATION);
 		createEReference(instructionEClass, INSTRUCTION__PREDICATE);
+		createEAttribute(instructionEClass, INSTRUCTION__LINE_NUMBER);
 
 		instAssignEClass = createEClass(INST_ASSIGN);
 		createEReference(instAssignEClass, INST_ASSIGN__TARGET);
@@ -2135,18 +2081,12 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		typeVoidEClass = createEClass(TYPE_VOID);
 
-		locationEClass = createEClass(LOCATION);
-		createEAttribute(locationEClass, LOCATION__END_COLUMN);
-		createEAttribute(locationEClass, LOCATION__START_COLUMN);
-		createEAttribute(locationEClass, LOCATION__START_LINE);
-
 		defEClass = createEClass(DEF);
 		createEReference(defEClass, DEF__VARIABLE);
 
 		varEClass = createEClass(VAR);
 		createEAttribute(varEClass, VAR__INDEX);
 		createEReference(varEClass, VAR__INITIAL_VALUE);
-		createEReference(varEClass, VAR__LOCATION);
 		createEAttribute(varEClass, VAR__NAME);
 		createEReference(varEClass, VAR__TYPE);
 		createEReference(varEClass, VAR__VALUE);
@@ -2154,6 +2094,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEAttribute(varEClass, VAR__GLOBAL);
 		createEReference(varEClass, VAR__USES);
 		createEReference(varEClass, VAR__DEFS);
+		createEAttribute(varEClass, VAR__LINE_NUMBER);
 
 		useEClass = createEClass(USE);
 		createEReference(useEClass, USE__VARIABLE);
@@ -2251,10 +2192,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getActor_ActionsOutsideFsm(), this.getAction(), null, "actionsOutsideFsm", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Fsm(), this.getFSM(), null, "fsm", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_MoC(), theMocPackage.getMoC(), null, "moC", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getActor_Location(), this.getLocation(), null, "location", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActor_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getPort_Location(), this.getLocation(), null, "location", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_NumTokensConsumed(), ecorePackage.getEInt(), "numTokensConsumed", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_NumTokensProduced(), ecorePackage.getEInt(), "numTokensProduced", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2279,7 +2219,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEClass(actionEClass, Action.class, "Action", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getAction_Body(), this.getProcedure(), null, "body", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_InputPattern(), this.getPattern(), null, "inputPattern", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getAction_Location(), this.getLocation(), null, "location", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_OutputPattern(), this.getPattern(), null, "outputPattern", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_Scheduler(), this.getProcedure(), null, "scheduler", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAction_Tag(), this.getTag(), null, "tag", null, 0, 1, Action.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2296,16 +2235,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getPattern_VarToPortMap(), this.getVarToPortMapEntry(), null, "varToPortMap", null, 0, -1, Pattern.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(procedureEClass, Procedure.class, "Procedure", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getProcedure_Location(), this.getLocation(), null, "location", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getProcedure_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcedure_Nodes(), this.getNode(), null, "nodes", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcedure_ReturnType(), this.getType(), null, "returnType", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getProcedure_Native(), ecorePackage.getEBoolean(), "native", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcedure_Locals(), this.getVar(), null, "locals", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcedure_Parameters(), this.getVar(), null, "parameters", null, 0, -1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcedure_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Procedure.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeEClass, Node.class, "Node", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getNode_Location(), this.getLocation(), null, "location", null, 0, 1, Node.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeBlockEClass, NodeBlock.class, "NodeBlock", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getNodeBlock_Instructions(), this.getInstruction(), null, "instructions", null, 0, -1, NodeBlock.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2315,15 +2253,17 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getNodeIf_JoinNode(), this.getNodeBlock(), null, "joinNode", null, 0, 1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeIf_ThenNodes(), this.getNode(), null, "thenNodes", null, 0, -1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeIf_Condition(), this.getExpression(), null, "condition", null, 0, 1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getNodeIf_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, NodeIf.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeWhileEClass, NodeWhile.class, "NodeWhile", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getNodeWhile_JoinNode(), this.getNodeBlock(), null, "joinNode", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeWhile_Nodes(), this.getNode(), null, "nodes", null, 0, -1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getNodeWhile_Condition(), this.getExpression(), null, "condition", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getNodeWhile_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, NodeWhile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(instructionEClass, Instruction.class, "Instruction", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getInstruction_Location(), this.getLocation(), null, "location", null, 0, 1, Instruction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInstruction_Predicate(), this.getPredicate(), null, "predicate", null, 0, 1, Instruction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getInstruction_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Instruction.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(instAssignEClass, InstAssign.class, "InstAssign", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getInstAssign_Target(), this.getDef(), null, "target", null, 0, 1, InstAssign.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2406,18 +2346,12 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(typeVoidEClass, TypeVoid.class, "TypeVoid", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
-		initEClass(locationEClass, Location.class, "Location", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getLocation_EndColumn(), ecorePackage.getEInt(), "endColumn", null, 0, 1, Location.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getLocation_StartColumn(), ecorePackage.getEInt(), "startColumn", null, 0, 1, Location.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getLocation_StartLine(), ecorePackage.getEInt(), "startLine", null, 0, 1, Location.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
 		initEClass(defEClass, Def.class, "Def", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getDef_Variable(), this.getVar(), this.getVar_Defs(), "variable", null, 0, 1, Def.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(varEClass, Var.class, "Var", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getVar_Index(), ecorePackage.getEInt(), "index", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_InitialValue(), this.getExpression(), null, "initialValue", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getVar_Location(), this.getLocation(), null, "location", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Type(), this.getType(), null, "type", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Value(), this.getExpression(), null, "value", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2425,6 +2359,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEAttribute(getVar_Global(), ecorePackage.getEBoolean(), "global", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Uses(), this.getUse(), this.getUse_Variable(), "uses", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Defs(), this.getDef(), this.getDef_Variable(), "defs", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVar_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(useEClass, Use.class, "Use", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getUse_Variable(), this.getVar(), this.getVar_Uses(), "variable", null, 0, 1, Use.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

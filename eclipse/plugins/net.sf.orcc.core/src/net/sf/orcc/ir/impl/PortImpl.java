@@ -6,19 +6,14 @@
  */
 package net.sf.orcc.ir.impl;
 
-import java.lang.String;
-
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
@@ -29,7 +24,6 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getLocation <em>Location</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getNumTokensConsumed <em>Num Tokens Consumed</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.PortImpl#getNumTokensProduced <em>Num Tokens Produced</em>}</li>
@@ -40,16 +34,6 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * @generated
  */
 public class PortImpl extends EObjectImpl implements Port {
-	/**
-	 * The cached value of the '{@link #getLocation() <em>Location</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getLocation()
-	 * @generated
-	 * @ordered
-	 */
-	protected Location location;
-
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -134,21 +118,6 @@ public class PortImpl extends EObjectImpl implements Port {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetLocation(Location newLocation, NotificationChain msgs) {
-		Location oldLocation = location;
-		location = newLocation;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.PORT__LOCATION, oldLocation, newLocation);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public NotificationChain basicSetType(Type newType, NotificationChain msgs) {
 		Type oldType = type;
 		type = newType;
@@ -167,8 +136,6 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.PORT__LOCATION:
-				return getLocation();
 			case IrPackage.PORT__NAME:
 				return getName();
 			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
@@ -189,8 +156,6 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case IrPackage.PORT__LOCATION:
-				return basicSetLocation(null, msgs);
 			case IrPackage.PORT__TYPE:
 				return basicSetType(null, msgs);
 		}
@@ -205,8 +170,6 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.PORT__LOCATION:
-				return location != null;
 			case IrPackage.PORT__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case IrPackage.PORT__NUM_TOKENS_CONSUMED:
@@ -227,9 +190,6 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.PORT__LOCATION:
-				setLocation((Location)newValue);
-				return;
 			case IrPackage.PORT__NAME:
 				setName((String)newValue);
 				return;
@@ -264,9 +224,6 @@ public class PortImpl extends EObjectImpl implements Port {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.PORT__LOCATION:
-				setLocation((Location)null);
-				return;
 			case IrPackage.PORT__NAME:
 				setName(NAME_EDEFAULT);
 				return;
@@ -281,15 +238,6 @@ public class PortImpl extends EObjectImpl implements Port {
 				return;
 		}
 		super.eUnset(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Location getLocation() {
-		return location;
 	}
 
 	/**
@@ -356,25 +304,6 @@ public class PortImpl extends EObjectImpl implements Port {
 		numTokensProduced = 0;
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setLocation(Location newLocation) {
-		if (newLocation != location) {
-			NotificationChain msgs = null;
-			if (location != null)
-				msgs = ((InternalEObject)location).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.PORT__LOCATION, null, msgs);
-			if (newLocation != null)
-				msgs = ((InternalEObject)newLocation).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.PORT__LOCATION, null, msgs);
-			msgs = basicSetLocation(newLocation, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.PORT__LOCATION, newLocation, newLocation));
-	}
-	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

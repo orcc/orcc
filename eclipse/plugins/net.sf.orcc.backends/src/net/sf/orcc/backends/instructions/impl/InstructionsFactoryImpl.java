@@ -54,14 +54,12 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
- * 
  * @generated
  */
 public class InstructionsFactoryImpl extends EFactoryImpl implements
 		InstructionsFactory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -71,28 +69,28 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public static InstructionsFactory init() {
 		try {
-			InstructionsFactory theInstructionsFactory = (InstructionsFactory) EPackage.Registry.INSTANCE
-					.getEFactory("http://orcc.sf.net/backends/instructions/Instructions");
+			InstructionsFactory theInstructionsFactory = (InstructionsFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/backends/instructions/Instructions"); 
 			if (theInstructionsFactory != null) {
 				return theInstructionsFactory;
 			}
-		} catch (Exception exception) {
+		}
+		catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new InstructionsFactoryImpl();
 	}
 
 	/**
-	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstructionsFactoryImpl() {
@@ -101,37 +99,26 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-		case InstructionsPackage.INST_TERNARY:
-			return createInstTernary();
-		case InstructionsPackage.INST_ASSIGN_INDEX:
-			return createInstAssignIndex();
-		case InstructionsPackage.INST_SPLIT:
-			return createInstSplit();
-		case InstructionsPackage.INST_RAM_READ:
-			return createInstRamRead();
-		case InstructionsPackage.INST_RAM_SET_ADDRESS:
-			return createInstRamSetAddress();
-		case InstructionsPackage.INST_RAM_WRITE:
-			return createInstRamWrite();
-		case InstructionsPackage.INST_GET_ELEMENT_PTR:
-			return createInstGetElementPtr();
-		case InstructionsPackage.INST_CAST:
-			return createInstCast();
-		default:
-			throw new IllegalArgumentException("The class '" + eClass.getName()
-					+ "' is not a valid classifier");
+			case InstructionsPackage.INST_TERNARY: return createInstTernary();
+			case InstructionsPackage.INST_ASSIGN_INDEX: return createInstAssignIndex();
+			case InstructionsPackage.INST_SPLIT: return createInstSplit();
+			case InstructionsPackage.INST_RAM_READ: return createInstRamRead();
+			case InstructionsPackage.INST_RAM_SET_ADDRESS: return createInstRamSetAddress();
+			case InstructionsPackage.INST_RAM_WRITE: return createInstRamWrite();
+			case InstructionsPackage.INST_GET_ELEMENT_PTR: return createInstGetElementPtr();
+			case InstructionsPackage.INST_CAST: return createInstCast();
+			default:
+				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstAssignIndex createInstAssignIndex() {
@@ -151,7 +138,6 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstCast createInstCast() {
@@ -169,7 +155,6 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstGetElementPtr createInstGetElementPtr() {
@@ -189,7 +174,6 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstRamRead createInstRamRead() {
@@ -208,7 +192,6 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstRamSetAddress createInstRamSetAddress() {
@@ -228,7 +211,6 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstRamWrite createInstRamWrite() {
@@ -248,7 +230,6 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstSplit createInstSplit() {
@@ -258,7 +239,6 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstTernary createInstTernary() {
@@ -279,11 +259,10 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public InstructionsPackage getInstructionsPackage() {
-		return (InstructionsPackage) getEPackage();
+		return (InstructionsPackage)getEPackage();
 	}
 
 } // InstructionsFactoryImpl

@@ -97,8 +97,8 @@ public class SerDesAdder implements INetworkTransformation {
 			// new connection
 			Vertex target = graph.getEdgeTarget(connection);
 			Port srcPort = connection.getSource();
-			Port outputPort = IrFactory.eINSTANCE.createPort(
-					srcPort.getLocation(), srcPort.getType(), "output_" + i);
+			Port outputPort = IrFactory.eINSTANCE.createPort(srcPort.getType(),
+					"output_" + i);
 			i++;
 
 			Map<String, IAttribute> attributes = connection.getAttributes();

@@ -81,12 +81,12 @@ public interface Var extends EObject {
 	Expression getInitialValue();
 
 	/**
-	 * Returns the location of this variable.
+	 * Returns the line number of this variable.
 	 * 
-	 * @return the location of this variable
-	 * @model containment="true"
+	 * @return the line number of this variable
+	 * @model
 	 */
-	Location getLocation();
+	public int getLineNumber();
 
 	/**
 	 * Returns the name of this variable.
@@ -206,12 +206,12 @@ public interface Var extends EObject {
 	void setInitialValue(Expression expression);
 
 	/**
-	 * Sets the location of this variable.
+	 * Sets the line number of this variable.
 	 * 
-	 * @param location
-	 *            the new location of this variable
+	 * @param newLineNumber
+	 *            the line number of this variable
 	 */
-	void setLocation(Location location);
+	public void setLineNumber(int newLineNumber);
 
 	/**
 	 * Sets the name of this variable.

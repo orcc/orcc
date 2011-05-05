@@ -58,12 +58,12 @@ public interface Instruction extends EObject {
 	NodeBlock getBlock();
 
 	/**
-	 * Returns the location of this instruction.
+	 * Returns the line number of this instruction.
 	 * 
-	 * @return the location of this instruction
-	 * @model containment="true"
+	 * @return the line number of this instruction
+	 * @model
 	 */
-	public Location getLocation();
+	public int getLineNumber();
 
 	/**
 	 * Returns the predicate associated with this instruction. This is used by
@@ -117,12 +117,12 @@ public interface Instruction extends EObject {
 	boolean isStore();
 
 	/**
-	 * Sets the location of this instruction.
+	 * Sets the line number of this instruction.
 	 * 
-	 * @param location
-	 *            the location of this instruction
+	 * @param newLineNumber
+	 *            the line number of this instruction
 	 */
-	void setLocation(Location location);
+	void setLineNumber(int newLineNumber);
 
 	/**
 	 * Sets the predicate associated with this instruction. This is used by

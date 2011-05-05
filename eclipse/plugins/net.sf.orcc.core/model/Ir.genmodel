@@ -49,10 +49,9 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/actionsOutsideFsm"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/fsm"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/moC"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/location"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/lineNumber"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Port">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Port/location"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/numTokensConsumed"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/numTokensProduced"/>
@@ -77,7 +76,6 @@
     <genClasses ecoreClass="Ir.ecore#//Action">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/body"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/inputPattern"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/location"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/outputPattern"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/scheduler"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Action/tag"/>
@@ -94,17 +92,15 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Pattern/varToPortMap"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Procedure">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/location"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Procedure/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/nodes"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/returnType"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Procedure/native"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/locals"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Procedure/parameters"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Procedure/lineNumber"/>
     </genClasses>
-    <genClasses image="false" ecoreClass="Ir.ecore#//Node">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Node/location"/>
-    </genClasses>
+    <genClasses image="false" ecoreClass="Ir.ecore#//Node"/>
     <genClasses ecoreClass="Ir.ecore#//NodeBlock">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeBlock/instructions"/>
     </genClasses>
@@ -113,15 +109,17 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeIf/joinNode"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeIf/thenNodes"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeIf/condition"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//NodeIf/lineNumber"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//NodeWhile">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeWhile/joinNode"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeWhile/nodes"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//NodeWhile/condition"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//NodeWhile/lineNumber"/>
     </genClasses>
     <genClasses image="false" ecoreClass="Ir.ecore#//Instruction">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Instruction/location"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Instruction/predicate"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Instruction/lineNumber"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//InstAssign">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//InstAssign/target"/>
@@ -198,18 +196,12 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//TypeUint/size"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//TypeVoid"/>
-    <genClasses ecoreClass="Ir.ecore#//Location">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Location/endColumn"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Location/startColumn"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Location/startLine"/>
-    </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Def">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Def/variable"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Var">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/index"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/initialValue"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/location"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/name"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/type"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/value"/>
@@ -217,6 +209,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/global"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/uses"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Var/defs"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Var/lineNumber"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Use">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//Use/variable"/>

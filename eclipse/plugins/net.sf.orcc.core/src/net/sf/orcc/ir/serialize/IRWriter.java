@@ -84,8 +84,6 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -128,19 +126,6 @@ import com.google.gson.JsonPrimitive;
  * 
  */
 public class IRWriter extends IrSwitch<JsonElement> {
-
-	private static JsonArray writeLocation(Location location) {
-		if (location == null) {
-			location = IrFactory.eINSTANCE.createLocation();
-		}
-
-		JsonArray array = new JsonArray();
-		array.add(new JsonPrimitive(location.getStartLine()));
-		array.add(new JsonPrimitive(location.getStartColumn()));
-		array.add(new JsonPrimitive(location.getEndColumn()));
-
-		return array;
-	}
 
 	/**
 	 * Serializes the given variable to JSON.
@@ -232,7 +217,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(INSTR_ASSIGN));
-		array.add(writeLocation(assign.getLocation()));
+		array.add(new JsonPrimitive(assign.getLineNumber()));
 
 		array.add(writeVariable(assign.getTarget().getVariable()));
 		array.add(doSwitch(assign.getValue()));
@@ -245,7 +230,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(INSTR_CALL));
-		array.add(writeLocation(call.getLocation()));
+		array.add(new JsonPrimitive(call.getLineNumber()));
 
 		array.add(new JsonPrimitive(call.getProcedure().getName()));
 		array.add(writeExpressions(call.getParameters()));
@@ -261,7 +246,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(INSTR_LOAD));
-		array.add(writeLocation(load.getLocation()));
+		array.add(new JsonPrimitive(load.getLineNumber()));
 
 		array.add(writeVariable(load.getTarget().getVariable()));
 		array.add(writeVariable(load.getSource().getVariable()));
@@ -275,7 +260,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(INSTR_PHI));
-		array.add(writeLocation(phi.getLocation()));
+		array.add(new JsonPrimitive(phi.getLineNumber()));
 
 		array.add(writeVariable(phi.getTarget().getVariable()));
 		array.add(writeExpressions(phi.getValues()));
@@ -288,7 +273,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(INSTR_RETURN));
-		array.add(writeLocation(returnInst.getLocation()));
+		array.add(new JsonPrimitive(returnInst.getLineNumber()));
 
 		Expression value = returnInst.getValue();
 		if (value == null) {
@@ -311,7 +296,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(INSTR_STORE));
-		array.add(writeLocation(store.getLocation()));
+		array.add(new JsonPrimitive(store.getLineNumber()));
 
 		array.add(writeVariable(store.getTarget().getVariable()));
 		array.add(writeExpressions(store.getIndexes()));
@@ -325,8 +310,6 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(NODE_BLOCK));
-		array.add(writeLocation(node.getLocation()));
-
 		array.add(writeIntructions(node.getInstructions()));
 
 		return array;
@@ -337,7 +320,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(NODE_IF));
-		array.add(writeLocation(node.getLocation()));
+		array.add(new JsonPrimitive(node.getLineNumber()));
 
 		array.add(doSwitch(node.getCondition()));
 		array.add(writeNodes(node.getThenNodes()));
@@ -353,7 +336,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 
 		array.add(new JsonPrimitive(NODE_WHILE));
-		array.add(writeLocation(node.getLocation()));
+		array.add(new JsonPrimitive(node.getLineNumber()));
 
 		array.add(doSwitch(node.getCondition()));
 		array.add(writeNodes(node.getNodes()));
@@ -571,7 +554,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array;
 
 		obj.addProperty(KEY_SOURCE_FILE, actor.getFile());
-		obj.add(KEY_LOCATION, writeLocation(actor.getLocation()));
+		obj.add(KEY_LOCATION, new JsonPrimitive(actor.getLineNumber()));
 		obj.addProperty(KEY_NAME, actor.getName());
 		obj.add(KEY_PARAMETERS, writeGlobalVariables(actor.getParameters()));
 		obj.add(KEY_INPUTS, writePorts(actor.getInputs()));
@@ -660,7 +643,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 
 		array.add(new JsonPrimitive(variable.getName()));
 		array.add(new JsonPrimitive(variable.isAssignable()));
-		array.add(writeLocation(variable.getLocation()));
+		array.add(new JsonPrimitive(variable.getLineNumber()));
 		array.add(doSwitch(variable.getType()));
 
 		Expression constant = variable.getInitialValue();
@@ -709,7 +692,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		array.add(new JsonPrimitive(variable.getName()));
 		array.add(new JsonPrimitive(variable.isAssignable()));
 		array.add(new JsonPrimitive(variable.getIndex()));
-		array.add(writeLocation(variable.getLocation()));
+		array.add(new JsonPrimitive(variable.getLineNumber()));
 		array.add(doSwitch(variable.getType()));
 
 		return array;
@@ -755,7 +738,6 @@ public class IRWriter extends IrSwitch<JsonElement> {
 	 */
 	private JsonArray writePort(Port port) {
 		JsonArray array = new JsonArray();
-		array.add(writeLocation(port.getLocation()));
 		array.add(doSwitch(port.getType()));
 		array.add(new JsonPrimitive(port.getName()));
 		return array;
@@ -781,7 +763,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonArray array = new JsonArray();
 		array.add(new JsonPrimitive(procedure.getName()));
 		array.add(new JsonPrimitive(procedure.isNative()));
-		array.add(writeLocation(procedure.getLocation()));
+		array.add(new JsonPrimitive(procedure.getLineNumber()));
 		array.add(doSwitch(procedure.getReturnType()));
 
 		array.add(writeLocalVariables(procedure.getParameters()));

@@ -48,7 +48,6 @@ public interface InstCast extends InstSpecific {
 	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Source</em>' containment reference.
 	 * @see #setSource(Use)
 	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstCast_Source()
@@ -65,7 +64,6 @@ public interface InstCast extends InstSpecific {
 	 * clear, there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * 
 	 * @return the value of the '<em>Target</em>' containment reference.
 	 * @see #setTarget(Def)
 	 * @see net.sf.orcc.backends.instructions.InstructionsPackage#getInstCast_Target()
@@ -114,26 +112,20 @@ public interface InstCast extends InstSpecific {
 	public boolean isTrunced();
 
 	/**
-	 * Sets the value of the '
-	 * {@link net.sf.orcc.backends.instructions.InstCast#getSource
-	 * <em>Source</em>}' containment reference. <!-- begin-user-doc --> <!--
+	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstCast#getSource <em>Source</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Source</em>' containment reference.
+	 * @param value the new value of the '<em>Source</em>' containment reference.
 	 * @see #getSource()
 	 * @generated
 	 */
 	void setSource(Use value);
 
 	/**
-	 * Sets the value of the '
-	 * {@link net.sf.orcc.backends.instructions.InstCast#getTarget
-	 * <em>Target</em>}' containment reference. <!-- begin-user-doc --> <!--
+	 * Sets the value of the '{@link net.sf.orcc.backends.instructions.InstCast#getTarget <em>Target</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
-	 * @param value
-	 *            the new value of the '<em>Target</em>' containment reference.
+	 * @param value the new value of the '<em>Target</em>' containment reference.
 	 * @see #getTarget()
 	 * @generated
 	 */

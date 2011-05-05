@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.frontend;
 
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Location;
-
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.parsetree.CompositeNode;
 import org.eclipse.xtext.parsetree.NodeUtil;
@@ -44,19 +41,18 @@ import org.eclipse.xtext.parsetree.NodeUtil;
 public class Util {
 
 	/**
-	 * Returns the location of the given object as a {@link Location} object.
+	 * Returns the line on which the given object is defined.
 	 * 
 	 * @param object
 	 *            an AST object
-	 * @return a location
+	 * @return the line on which the given object is defined
 	 */
-	public static Location getLocation(EObject object) {
+	public static int getLocation(EObject object) {
 		CompositeNode node = NodeUtil.getNode(object);
 		if (node == null) {
-			return IrFactory.eINSTANCE.createLocation();
+			return 0;
 		} else {
-			return IrFactory.eINSTANCE.createLocation(node.getLine(), 0,
-					node.getLength());
+			return node.getLine();
 		}
 	}
 

@@ -147,7 +147,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 			Var newVar = procedure.newTempLocalVariable(var.getType(),
 					"inlined_" + var.getName());
 			newVar.setIndex(var.getIndex());
-			newVar.setLocation(var.getLocation());
+			newVar.setLineNumber(var.getLineNumber());
 			newVar.setAssignable(var.isAssignable());
 			variableToLocalVariableMap.put(var, newVar);
 		}
@@ -162,7 +162,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 				newVar = procedure.newTempLocalVariable(var.getType(),
 						"inlined_" + var.getName());
 				newVar.setIndex(var.getIndex());
-				newVar.setLocation(var.getLocation());
+				newVar.setLineNumber(var.getLineNumber());
 				newVar.setAssignable(var.isAssignable());
 
 			}

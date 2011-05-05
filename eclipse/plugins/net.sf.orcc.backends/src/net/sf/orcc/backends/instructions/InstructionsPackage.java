@@ -72,22 +72,22 @@ public interface InstructionsPackage extends EPackage {
 	int INST_TERNARY = 0;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_TERNARY__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_TERNARY__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_TERNARY__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Condition Value</b></em>' containment reference.
@@ -145,22 +145,22 @@ public interface InstructionsPackage extends EPackage {
 	int INST_ASSIGN_INDEX = 1;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_ASSIGN_INDEX__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_ASSIGN_INDEX__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_ASSIGN_INDEX__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -209,22 +209,22 @@ public interface InstructionsPackage extends EPackage {
 	int INST_SPLIT = 2;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_SPLIT__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_SPLIT__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_SPLIT__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The number of structural features of the '<em>Inst Split</em>' class.
@@ -247,22 +247,22 @@ public interface InstructionsPackage extends EPackage {
 	int INST_RAM = 3;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_RAM__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Port</b></em>' attribute.
@@ -302,22 +302,22 @@ public interface InstructionsPackage extends EPackage {
 	int INST_RAM_READ = 4;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_READ__LOCATION = INST_RAM__LOCATION;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_RAM_READ__PREDICATE = INST_RAM__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_READ__LINE_NUMBER = INST_RAM__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Port</b></em>' attribute.
@@ -366,22 +366,22 @@ public interface InstructionsPackage extends EPackage {
 	int INST_RAM_SET_ADDRESS = 5;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_SET_ADDRESS__LOCATION = INST_RAM__LOCATION;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_RAM_SET_ADDRESS__PREDICATE = INST_RAM__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_SET_ADDRESS__LINE_NUMBER = INST_RAM__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Port</b></em>' attribute.
@@ -430,22 +430,22 @@ public interface InstructionsPackage extends EPackage {
 	int INST_RAM_WRITE = 6;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_RAM_WRITE__LOCATION = INST_RAM__LOCATION;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_RAM_WRITE__PREDICATE = INST_RAM__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_RAM_WRITE__LINE_NUMBER = INST_RAM__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Port</b></em>' attribute.
@@ -495,22 +495,22 @@ public interface InstructionsPackage extends EPackage {
 	int INST_GET_ELEMENT_PTR = 7;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_GET_ELEMENT_PTR__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_GET_ELEMENT_PTR__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_GET_ELEMENT_PTR__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Indexes</b></em>' containment reference list.
@@ -560,22 +560,22 @@ public interface InstructionsPackage extends EPackage {
 	int INST_CAST = 8;
 
 	/**
-	 * The feature id for the '<em><b>Location</b></em>' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int INST_CAST__LOCATION = IrPackage.INST_SPECIFIC__LOCATION;
-
-	/**
-	 * The feature id for the '<em><b>Predicate</b></em>' reference.
+	 * The feature id for the '<em><b>Predicate</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
 	int INST_CAST__PREDICATE = IrPackage.INST_SPECIFIC__PREDICATE;
+
+	/**
+	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INST_CAST__LINE_NUMBER = IrPackage.INST_SPECIFIC__LINE_NUMBER;
 
 	/**
 	 * The feature id for the '<em><b>Target</b></em>' containment reference.

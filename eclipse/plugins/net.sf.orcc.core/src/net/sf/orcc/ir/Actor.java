@@ -107,12 +107,12 @@ public interface Actor extends EObject {
 	EList<Port> getInputs();
 
 	/**
-	 * Returns the location of this actor.
+	 * Returns the line number on which this actor starts.
 	 * 
-	 * @return the location of this actor
-	 * @model containment="true"
+	 * @return the line number on which this actor starts
+	 * @model
 	 */
-	Location getLocation();
+	public int getLineNumber();
 
 	/**
 	 * Returns the MoC of this actor.
@@ -289,12 +289,12 @@ public interface Actor extends EObject {
 	void setFsm(FSM fsm);
 
 	/**
-	 * Sets the location of this actor.
+	 * Sets the line number on which this actor starts.
 	 * 
-	 * @param location
-	 *            a location
+	 * @param newLineNumber
+	 *            the line number on which this actor starts
 	 */
-	void setLocation(Location location);
+	public void setLineNumber(int newLineNumber);
 
 	/**
 	 * Sets the MoC of this actor.

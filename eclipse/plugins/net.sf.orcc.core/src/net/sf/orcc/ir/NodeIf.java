@@ -65,6 +65,14 @@ public interface NodeIf extends Node {
 	NodeBlock getJoinNode();
 
 	/**
+	 * Returns the line number on which this "if" starts.
+	 * 
+	 * @return the line number on which this "if" starts
+	 * @model
+	 */
+	public int getLineNumber();
+
+	/**
 	 * Returns the nodes in the "then" branch of this NodeIf.
 	 * 
 	 * @return the nodes in the "then" branch of this NodeIf
@@ -87,5 +95,13 @@ public interface NodeIf extends Node {
 	 *            the join node of this NodeIf
 	 */
 	void setJoinNode(NodeBlock joinNode);
+
+	/**
+	 * Sets the line number on which this "if" starts.
+	 * 
+	 * @param newLineNumber
+	 *            the line number on which this "if" starts
+	 */
+	public void setLineNumber(int newLineNumber);
 
 }

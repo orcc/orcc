@@ -59,14 +59,6 @@ public interface Action extends EObject {
 	Pattern getInputPattern();
 
 	/**
-	 * Returns the location of this action.
-	 * 
-	 * @return the location of this action
-	 * @model containment="true"
-	 */
-	Location getLocation();
-
-	/**
 	 * Returns action name (tag or body name)
 	 * 
 	 * @return action name
@@ -124,14 +116,6 @@ public interface Action extends EObject {
 	 *            a pattern
 	 */
 	void setInputPattern(Pattern pattern);
-
-	/**
-	 * Sets the location of this action.
-	 * 
-	 * @param location
-	 *            a location
-	 */
-	void setLocation(Location location);
 
 	/**
 	 * Sets the output pattern of this action to the given pattern.

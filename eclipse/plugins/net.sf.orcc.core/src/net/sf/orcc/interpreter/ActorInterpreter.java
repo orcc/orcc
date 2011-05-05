@@ -215,7 +215,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				file = actor.getFile();
 			}
 
-			throw new OrccRuntimeException(file, instr.getLocation(), "", e);
+			throw new OrccRuntimeException(file, instr.getLineNumber(), "", e);
 		}
 		return null;
 	}
@@ -278,7 +278,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
 						"Array index out of bounds at line "
-								+ instr.getLocation().getStartLine());
+								+ instr.getLineNumber());
 			}
 		}
 		return null;
@@ -329,7 +329,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
 						"Array index out of bounds at line "
-								+ instr.getLocation().getStartLine());
+								+ instr.getLineNumber());
 			}
 		}
 		return null;
@@ -355,7 +355,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			branch = oldBranch;
 		} else {
 			throw new OrccRuntimeException("Condition not boolean at line "
-					+ node.getLocation().getStartLine() + "\n");
+					+ node.getLineNumber() + "\n");
 		}
 		return null;
 	}
@@ -381,12 +381,12 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				if (condition == null || !condition.isBooleanExpr()) {
 					throw new OrccRuntimeException(
 							"Condition not boolean at line "
-									+ node.getLocation().getStartLine() + "\n");
+									+ node.getLineNumber() + "\n");
 				}
 			}
 		} else {
 			throw new OrccRuntimeException("Condition not boolean at line "
-					+ node.getLocation().getStartLine() + "\n");
+					+ node.getLineNumber() + "\n");
 		}
 
 		branch = oldBranch;
