@@ -91,7 +91,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		if (complexityLevel > 0) {
 			// Make a new assignment to the binary expression
 			Var target = procedure.newTempLocalVariable(
-					EcoreHelper.copy(expr.getType()), "slittedExpr");
+					EcoreHelper.copy(expr.getType()), "splittedExpr");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 					EcoreHelper.copy(expr));
 
@@ -168,7 +168,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		if (complexityLevel > 0) {
 			// Make a new assignment to the binary expression
 			Var target = procedure.newTempLocalVariable(
-					EcoreHelper.copy(expr.getType()), "slittedExpr");
+					EcoreHelper.copy(expr.getType()), "splittedExpr");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 					newExpr);
 
@@ -235,7 +235,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstStore(InstStore store) {
 		complexityLevel++;
-		splitExpressionList(store.getIndexes());
+		splitExpressionList(store.getIndexes());)
 		store.setValue(doSwitch(store.getValue()));
 		complexityLevel--;
 		return null;
