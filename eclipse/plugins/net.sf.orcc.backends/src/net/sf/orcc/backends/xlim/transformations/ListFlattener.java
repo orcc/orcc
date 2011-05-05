@@ -39,6 +39,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
@@ -59,7 +60,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 	 * Prints the indexes of an NDim array.
 	 */
 	private void printAssignment(NodeBlock currentBlock,
-			List<Expression> indexes) {
+			List<Expression> indexes, Type listType) {
 		List<Expression> listIndex = new ArrayList<Expression>(indexes.size());
 
 		for (Expression expr : new ArrayList<Expression>(indexes)) {
@@ -85,8 +86,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 		// add a special assign instruction that assigns the index variable the
 		// concatenation of index expressions
 		InstAssignIndex assignIndex = InstructionsFactory.eINSTANCE
-				.createInstAssignIndex(indexVar, listIndex,
-						IrFactory.eINSTANCE.createTypeInt());
+				.createInstAssignIndex(indexVar, listIndex, listType);
 		currentBlock.add(indexInst, assignIndex);
 		indexInst++;
 	}
@@ -98,7 +98,8 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 		if (!indexes.isEmpty()) {
 			printAssignment(
 					EcoreHelper.getContainerOfType(load, NodeBlock.class),
-					indexes);
+					indexes,
+					EcoreHelper.copy(load.getSource().getVariable().getType()));
 		}
 
 		return null;
@@ -111,7 +112,8 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 		if (!indexes.isEmpty()) {
 			printAssignment(
 					EcoreHelper.getContainerOfType(store, NodeBlock.class),
-					indexes);
+					indexes,
+					EcoreHelper.copy(store.getTarget().getVariable().getType()));
 		}
 
 		return null;

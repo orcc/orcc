@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.instructions;
 
+import java.util.Map;
+
 import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstSpecific;
@@ -43,6 +45,13 @@ import org.eclipse.emf.common.util.EList;
  * @model extends="net.sf.orcc.ir.InstSpecific"
  */
 public interface InstAssignIndex extends InstSpecific {
+
+	/**
+	 * Returns the map of index expression to index number computed on the fly.
+	 * 
+	 * @return the map of index expression to index number
+	 */
+	Map<Expression, Integer> getExpressionToIndexMap();
 
 	/**
 	 * Returns the indexes of this instruction.
@@ -69,9 +78,11 @@ public interface InstAssignIndex extends InstSpecific {
 	Def getTarget();
 
 	/**
-	 * Return <code>true</code> if the instruction is an assign index instruction
+	 * Return <code>true</code> if the instruction is an assign index
+	 * instruction
 	 * 
-	 * @return <code>true</code> if the instruction is an assign index instruction
+	 * @return <code>true</code> if the instruction is an assign index
+	 *         instruction
 	 */
 	public boolean isInstAssignIndex();
 
@@ -82,7 +93,7 @@ public interface InstAssignIndex extends InstSpecific {
 	 *            the new type of the list targeted by this instruction
 	 */
 	void setListType(Type value);
-	
+
 	/**
 	 * Sets the target of this instruction.
 	 * 

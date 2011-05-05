@@ -128,11 +128,11 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 
 	@Override
 	public InstAssignIndex createInstAssignIndex(Var indexVar,
-			List<Expression> indexes, Type type) {
+			List<Expression> indexes, Type listType) {
 		InstAssignIndexImpl instAssignIndex = new InstAssignIndexImpl();
 		instAssignIndex.setTarget(IrFactory.eINSTANCE.createDef(indexVar));
 		instAssignIndex.getIndexes().addAll(indexes);
-		instAssignIndex.setListType(type);
+		instAssignIndex.setListType(listType);
 		return instAssignIndex;
 	}
 

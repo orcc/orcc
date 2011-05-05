@@ -39,7 +39,7 @@ public interface InstructionsFactory extends EFactory {
 	InstAssignIndex createInstAssignIndex();
 
 	InstAssignIndex createInstAssignIndex(Var indexVar,
-			List<Expression> listIndex, Type type);
+			List<Expression> listIndex, Type listType);
 
 	/**
 	 * Returns a new object of class '<em>Inst Cast</em>'.

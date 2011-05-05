@@ -175,7 +175,8 @@ else
 >\<operation kind="noop"\>
 	<untypedPort(dir="in", source=op.source.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
-\</operation\><endif>
+\</operation\><
+endif>
 >>
 
 printStore(op) ::= <<
@@ -189,7 +190,8 @@ else
 >\<operation kind="noop"\>
 	<untypedPort(dir="in", source=op.value.use.variable)>
 	<typedPort(dir="out", type=op.value.type, source=op.target.variable)>
-\</operation\><endif>
+\</operation\><
+endif>
 >>
 
 printAssign(op) ::= <<
@@ -207,29 +209,30 @@ printPhiAssignment(op) ::= <<
 >>
 
 printReturn(return) ::= <<
-<if(return.value)>
-\<!-- <op> --\>
+<if(return.value)
+>\<!-- <op> --\>
 \<operation kind="noop"\>
 	<untypedPort(dir="in", source=return.value.use.variable)>
 	\<port dir="out" size="1" source="<procedure.name>_go" typeName="bool"/\>
-\</operation\>
-<endif>
+\</operation\><
+endif>
 >>
 
 printAssignIndex(op) ::= <<
-<if(rest(op.indexes))>
+<if(rest(op.indexes))
+>\<!-- <op> --\>
 <sizeDeclare(target=op.target.variable, type=op.listType)>
 \<operation kind="noop"\>
 	<untypedPort(dir="in", source=first(op.indexes).use.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable, extension="_tmp_0")>
 \</operation\>
-<flatIndexes(indexes=rest(op.indexes), target=op.target.variable, lastIndex="0", indexMap=op.expressionToIndexMap)>
-<else>
-\<operation kind="noop"\>
+<flatIndexes(indexes=rest(op.indexes), target=op.target.variable, lastIndex="0", indexMap=op.expressionToIndexMap)><
+else
+>\<operation kind="noop"\>
 	<untypedPort(dir="in", source=first(op.indexes).use.variable)>
 	<typedPort(dir="out", type=op.target.variable.type, source=op.target.variable)>
-\</operation\>
-<endif>
+\</operation\><
+endif>
 >>
 
 printTernaryOperation(op) ::= <<
@@ -298,24 +301,24 @@ flatIndexes(indexes,target,lastIndex,indexMap) ::= <<
 \</operation\>
 \<operation kind="$add"\>
 	\<port dir="in" source="<target.name>_tmpMul_<indexMap.(first(indexes))>"/\>
-	<untypedPort(dir="in", source=first(indexes))>
+	\<port dir="in" source="<first(indexes)>"/\>
 	\<port dir="out" size="32" source="<target.name>_tmp_<indexMap.(first(indexes))>" typeName="int"/\>
 \</operation\>
-<if(rest(indexes))>
-<flatIndexes(indexes=rest(indexes), target=target, lastIndex=indexMap.(first(indexes)), indexMap=indexMap)>
-<else>
-\<operation kind="noop"\>
+<if(rest(indexes))
+><flatIndexes(indexes=rest(indexes), target=target, lastIndex=indexMap.(first(indexes)), indexMap=indexMap)><
+else
+>\<operation kind="noop"\>
 	\<port dir="in" source="<target.name>_tmp_<indexMap.(first(indexes))>"/\>
 	<typedPort(dir="out", type=target.type, source=target)>
-\</operation\>
-<endif>
+\</operation\><
+endif>
 >>
 
 sizeDeclare(target,type) ::= <<
 <type.dimensions:{dimension|
 \<operation kind="$literal_Integer" value="<dimension>"\>
 	\<port dir="out" size="32" source="<target.name>_size_<i0>" typeName="int"/\>
-\</operation\>}>
+\</operation\>}; separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -337,42 +340,42 @@ printBlockNode(blkNode) ::= <<
 >>
 
 printPhi(instruction) ::= <<
-<if(instruction.phi)>
-<instruction(instruction)>
-<endif>
+<if(instruction.phi)
+><instruction(instruction)><
+endif>
 >>
 
 printNotPhi(instruction) ::= <<
-<if(!instruction.phi)>
-<instruction(instruction)>
-<endif>
+<if(!instruction.phi)
+><instruction(instruction)><
+endif>
 >>
 
 printPhiNodes(phiNodes) ::= <<
-<phiNodes.instructions: printPhi()>
+<phiNodes.instructions: printPhi(); separator="\n">
 >>
 
 printNotPhiNodes(NotphiNodes) ::= <<
-<NotphiNodes.instructions: printNotPhi()>
+<NotphiNodes.instructions: printNotPhi(); separator="\n">
 >>
 
 printIfNode(ifNode) ::= <<
 \<module kind="if"\>
-	\<module decision="decision_<ifNode.condition>_<ifNode.location.startLine>_<ifNode.location.startColumn>" kind="test"\>
+	\<module decision="decision_<ifNode.condition>_<ifNode.lineNumber>" kind="test"\>
 		\<operation kind="noop"\>
 			<untypedPort(dir="in", source=ifNode.condition.use.variable)>
-			\<port dir="out" size="1" source="decision_<ifNode.condition>_<ifNode.location.startLine>_<ifNode.location.startColumn>" typeName="bool"/\>
+			\<port dir="out" size="1" source="decision_<ifNode.condition>_<ifNode.lineNumber>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="then"\>
 		<printNodes(ifNode.thenNodes)>
-	\</module\>
-<if(ifNode.elseNodes)>
-	\<module kind="else"\>
+	\</module\><
+if(ifNode.elseNodes)
+>	\<module kind="else"\>
 		<printNodes(ifNode.elseNodes)>
-	\</module\>
-<endif>
-	\<!-- joinnode --\>
+	\</module\><
+endif
+>	\<!-- joinnode --\>
 	<printPhiNodes(ifNode.joinNode)>
 \</module\>
 <printNotPhiNodes(ifNode.joinNode)>
@@ -383,13 +386,13 @@ printWhileNode(whileNode) ::= <<
 \<module kind="loop"\>
 	\<!-- joinnode --\>
 	<printPhiNodes(whileNode.joinNode)>
-	\<module decision="decision_<whileNode.condition>" kind="test"\>
+	\<module decision="decision_<whileNode.condition>_<whileNode.lineNumber>" kind="test"\>
 		\<!-- Begin joinnode --\>
 		<printNotPhiNodes(whileNode.joinNode)>
 		\<!-- End joinnode --\>
 		\<operation kind="noop"\>
 			<untypedPort(dir="in", source=whileNode.condition.use.variable)>
-			\<port dir="out" size="1" source="decision_<whileNode.condition>" typeName="bool"/\>
+			\<port dir="out" size="1" source="decision_<whileNode.condition>_<whileNode.lineNumber>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="body"\>
@@ -403,9 +406,9 @@ printWhileNode(whileNode) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-<if(!procedure.native)>
-<printNodes(procedure.nodes)>
-<endif>
+<if(!procedure.native)
+><printNodes(procedure.nodes)><
+endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -419,30 +422,30 @@ typeDef(action) ::= <<
 >>
 
 typeDefLocal(local) ::= <<
-<if(local.type.list)>
-\<typeDef name="<local.name>_typedef"\>
+<if(local.type.list)
+>\<typeDef name="<local.name>_typedef"\>
 	\<type name="List"\>
 		\<valuePar name="size" value="<local.type.size>"/\>
 		\<typePar name="type"\>
 			<typeDefListElements(local.type.type)>
 		\</typePar\>
 	\</type\>
-\</typeDef\>
-<endif>
+\</typeDef\><
+endif>
 >>
 
 typeDefListElements(type) ::= <<
-<if(type.list)>
-\<type name="List"\>
+<if(type.list)
+>\<type name="List"\>
 	\<valuePar name="size" value="<type.size>"/\>
 	\<typePar name="type"\>
 		<typeDefListElements(type.type)>
 	\</typePar\>
-\</type\>
-<else
-><if(type.bool)
->\<type name="<type>"/\>
-<else
+\</type\><
+else><
+if(type.bool)
+>\<type name="<type>"/\><
+else
 >\<type name="<type>"\>
 	\<valuePar name="size" value="<type.size>"/\>
 \</type\><
@@ -455,11 +458,11 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 localInitialize(local) ::= <<
-<if(local.type.list)>
-\<operation kind="$valloc"\>
+<if(local.type.list)
+>\<operation kind="$valloc"\>
 	<typedPort(dir="out", type=local.type, source=local)>
-\</operation\>
-<endif> 
+\</operation\><
+endif> 
 >>
 
 action(action) ::= <<
@@ -502,20 +505,20 @@ patternPort(dir, port, index, index0) ::= <<
 
 outputPatternDecisionState(index, action, state)::=<<
 \<module kind="if"\>
-	\<module decision="outputPattern_<instance.id>_<action.name>_decision_s_<state.name>_<index>" kind="test"\>
+	\<module decision="decision_outputPattern_<instance.id>_<action.name>_s_<state.name>_<index>" kind="test"\>
 		\<operation kind="noop"\>
 			\<port dir="in" source="outputPattern_<instance.id>_<action.name>_res_<index>"/\>
-			\<port dir="out" size="1" source="outputPattern_<instance.id>_<action.name>_decision_s_<state.name>_<index>" typeName="bool"/\>
+			\<port dir="out" size="1" source="decision_outputPattern_<instance.id>_<action.name>_s_<state.name>_<index>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 >>
 
 outputPatternDecision(index, action)::=<<
 \<module kind="if"\>
-	\<module decision="outputPattern_<instance.id>_<action.name>_decision_s__<index>" kind="test"\>
+	\<module decision="decision_outputPattern_<instance.id>_<action.name>_s__<index>" kind="test"\>
 		\<operation kind="noop"\>
 			\<port dir="in" source="outputPattern_<instance.id>_<action.name>_res_<index>"/\>
-			\<port dir="out" size="1" source="outputPattern_<instance.id>_<action.name>_decision_s__<index>" typeName="bool"/\>
+			\<port dir="out" size="1" source="decision_outputPattern_<instance.id>_<action.name>_s__<index>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 >>
@@ -561,24 +564,25 @@ actionCall(action) ::= <<
 
 actionTest(action) ::= <<
 \<module kind="if"\>
-	\<module decision="isSchedulable_<action.name>" kind="test"\>
+	\<module decision="decision_isSchedulable_<action.name>" kind="test"\>
 		\<operation kind="noop"\>
 			\<port dir="in" source="isSchedulable_<action.name>_goWithToken"/\>
-			\<port dir="out" size="1" source="isSchedulable_<action.name>" typeName="bool"/\>
+			\<port dir="out" size="1" source="decision_isSchedulable_<action.name>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
 	\<module kind="then"\>
-		<if(action.outputPattern)>
-		\<!-- Last outputPattern --\>
+
+		<if(action.outputPattern)
+		>\<!-- Last outputPattern --\>
 		<outputPatternDecision(index=length(action.outputPattern.ports),action=action); separator="\n">
 			\<module kind="then"\>
 				<actionCall(action)>
 			\</module\>
-		\</module\>
-		<else>
-		<actionCall(action)>
-		<endif>
-	\</module\>
+		\</module\><
+		else
+		><actionCall(action)><
+		endif
+	>\</module\>
 	\<module kind="else"\>
 >>
 
@@ -589,11 +593,11 @@ schedulingTest(actions) ::= <<
 
 scheduler(actions) ::= <<
 \<module autostart="true" kind="action-scheduler" name="<instance.id>_scheduler" sourcename="<instance.id>_scheduler"\>
-	\<operation kind="$literal_Integer" value="1"\>
-		\<port dir="out" size="1" source="var_<instance.id>_sched" typeName="bool"/\>
-	\</operation\>
 	\<module kind="loop"\>
 		\<module decision="var_<instance.id>_loop" kind="test"\>
+			\<operation kind="$literal_Integer" value="1"\>
+				\<port dir="out" size="1" source="var_<instance.id>_sched" typeName="bool"/\>
+			\</operation\>
 			\<operation kind="noop"\>
 				\<port dir="in" source="var_<instance.id>_sched"/\>
 				\<port dir="out" size="1" source="var_<instance.id>_loop" typeName="bool"/\>
@@ -610,9 +614,7 @@ scheduler(actions) ::= <<
 			<instance.actor.actions: outputPatternTest()>
 			<if(actions)><schedulingTest(actions)><endif>
 			\<!--Close modules --\>
-			<if(actions)>  	 	 
-			<actions:{action|\</module\>\</module\>}; separator="\n">
-			<endif>
+			<if(actions)><actions:{action|\</module\>\</module\>}; separator="\n"><endif>
 		\</module\>
 	\</module\>
 \</module\>
@@ -689,19 +691,19 @@ outputPatternTest(action) ::= <<
 >>
 
 inputPatternTest(action) ::= <<
-<if(action.inputPattern)>
-<inputPattern(pattern=action.inputPattern, action=action)>
+<if(action.inputPattern)
+><inputPattern(pattern=action.inputPattern, action=action)>
 \<operation kind="$and"\>
 	\<port dir="in" source="inputPattern_<instance.id>_<action.name>_decision"/\>
 	\<port dir="in" source="isSchedulable_<action.name>_go"/\>
 	\<port dir="out" size="1" source="isSchedulable_<action.name>_goWithToken" typeName="bool"/\>
-\</operation\>
-<else>
-\<operation kind="noop"\>
+\</operation\><
+else
+>\<operation kind="noop"\>
 	\<port dir="in" source="isSchedulable_<action.name>_go"/\>
 	\<port dir="out" size="1" source="isSchedulable_<action.name>_goWithToken" typeName="bool"/\>
-\</operation\>
-<endif>
+\</operation\><
+endif>
 >>
 
 printTransitions(actions, transitionsList) ::= <<
@@ -745,16 +747,13 @@ schedulerFSM(actions, fsm) ::= <<
 			<instance.actor.actions: isSchedulableTest()>
 			<instance.actor.actions: inputPatternTest()>
 			<instance.actor.actions: outputPatternTest()>
-			<if(actions)>
-			
+			<if(actions)>			
 			\<!-- Untagged actions --\>  	 	 
 			<schedulingTest(actions)>  	 
-				 
 			<endif>
 			\<!-- FSM transitions --\>
 			<printTransitions(actions, fsm.transitions)>
 			<if(actions)>
-			
 			\<!--Close modules for untagged actions --\>
 			<actions:{action|\</module\>\</module\>}; separator="\n">
 			<endif>
@@ -788,15 +787,10 @@ design(instance) ::= <<
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
 	<actorPorts()>
-	
 	<parameters(instance.parameters)>
-	
 	<stateVars()>
-	
 	<instance.actor.actions: typeDef()>
-	
 	<instance.actor.actions: action(); separator="\n\n">
-	
 	\<!-- ACTION SCHEDULER --\>
 	<if(instance.actor.fsm)>
 	<schedulerFSM(actions=instance.actor.actionsOutsideFsm, fsm=instance.actor.fsm)>

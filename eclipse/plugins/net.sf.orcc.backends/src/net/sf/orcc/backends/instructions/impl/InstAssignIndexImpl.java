@@ -29,6 +29,8 @@
 package net.sf.orcc.backends.instructions.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.orcc.backends.instructions.InstAssignIndex;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
@@ -229,6 +231,15 @@ public class InstAssignIndexImpl extends InstSpecificImpl implements
 				return;
 		}
 		super.eUnset(featureID);
+	}
+
+	@Override
+	public Map<Expression, Integer> getExpressionToIndexMap() {
+		Map<Expression, Integer> expressionToIndexMap = new HashMap<Expression, Integer>();
+		for (int i = 0; i < getIndexes().size(); i++) {
+			expressionToIndexMap.put(getIndexes().get(i), i);
+		}
+		return expressionToIndexMap;
 	}
 
 	/**
