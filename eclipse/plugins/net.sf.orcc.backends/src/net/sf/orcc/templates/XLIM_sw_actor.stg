@@ -541,7 +541,7 @@ outputPattern(pattern, action) ::= <<
 inputPattern(pattern, action) ::= <<
 <pattern(dir="in", pattern=pattern, action=action)>
 \<!-- Last inputPattern --\>
-<inputPatternDecision(index=length(pattern.keys)); separator="\n">
+<inputPatternDecision(index=length(pattern.ports)); separator="\n">
 >>
 
 // Pin Available declaration
