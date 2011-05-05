@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,30 +62,31 @@ import org.stringtemplate.v4.STGroupFile;
  */
 public class OrccUtil {
 
-	private static void findFiles(List<IFile> vtlFiles, IFolder vtl)
-			throws CoreException {
+	private static void findFiles(String fileExt, List<IFile> vtlFiles,
+			IFolder vtl) throws CoreException {
 		for (IResource resource : vtl.members()) {
 			if (resource.getType() == IResource.FOLDER) {
-				findFiles(vtlFiles, (IFolder) resource);
+				findFiles(fileExt, vtlFiles, (IFolder) resource);
 			} else if (resource.getType() == IResource.FILE
-					&& resource.getFileExtension().equals("json")) {
+					&& resource.getFileExtension().equals(fileExt)) {
 				vtlFiles.add((IFile) resource);
 			}
 		}
 	}
 
 	/**
-	 * Returns all the IR files in the given folders.
+	 * Returns all the files with the given extension in the given folders.
 	 * 
 	 * @param srcFolders
 	 *            a list of folders
 	 * @return a list of files
 	 */
-	public static List<IFile> getAllFiles(List<IFolder> srcFolders) {
+	public static List<IFile> getAllFiles(String fileExt,
+			List<IFolder> srcFolders) {
 		List<IFile> vtlFiles = new ArrayList<IFile>();
 		try {
 			for (IFolder folder : srcFolders) {
-				findFiles(vtlFiles, folder);
+				findFiles(fileExt, vtlFiles, folder);
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -133,6 +135,21 @@ public class OrccUtil {
 		srcFolders.addAll(getSourceFolders(project));
 
 		return srcFolders;
+	}
+
+	public static String getContents(InputStream in) throws IOException {
+		StringBuilder builder = new StringBuilder();
+		int n = in.available();
+		n = in.available();
+		while (n > 0) {
+			byte[] bytes = new byte[n];
+			in.read(bytes);
+			String str = new String(bytes);
+			builder.append(str);
+			n = in.available();
+		}
+
+		return builder.toString();
 	}
 
 	/**
@@ -220,31 +237,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Returns the qualified name of the given file, i.e. qualified.name.of.File
-	 * for <code>/project/sourceFolder/qualified/name/of/File.fileExt</code>
-	 * 
-	 * @param file
-	 *            a file
-	 * @return a qualified name, or <code>null</code> if the file is not in a
-	 *         source folder
-	 */
-	public static String getQualifiedName(IFile file) {
-		IProject project = file.getProject();
-		IPath filePath = file.getFullPath();
-		for (IFolder folder : getSourceFolders(project)) {
-			IPath folderPath = folder.getFullPath();
-			if (folderPath.isPrefixOf(filePath)) {
-				// yay we found the folder!
-				IPath qualifiedPath = filePath.removeFirstSegments(
-						folderPath.segmentCount()).removeFileExtension();
-				return qualifiedPath.toString().replace('/', '.');
-			}
-		}
-
-		return null;
-	}
-
-	/**
 	 * Returns the output folder of the given project.
 	 * 
 	 * @param project
@@ -305,6 +297,31 @@ public class OrccUtil {
 		}
 
 		return vtlFolders;
+	}
+
+	/**
+	 * Returns the qualified name of the given file, i.e. qualified.name.of.File
+	 * for <code>/project/sourceFolder/qualified/name/of/File.fileExt</code>
+	 * 
+	 * @param file
+	 *            a file
+	 * @return a qualified name, or <code>null</code> if the file is not in a
+	 *         source folder
+	 */
+	public static String getQualifiedName(IFile file) {
+		IProject project = file.getProject();
+		IPath filePath = file.getFullPath();
+		for (IFolder folder : getSourceFolders(project)) {
+			IPath folderPath = folder.getFullPath();
+			if (folderPath.isPrefixOf(filePath)) {
+				// yay we found the folder!
+				IPath qualifiedPath = filePath.removeFirstSegments(
+						folderPath.segmentCount()).removeFileExtension();
+				return qualifiedPath.toString().replace('/', '.');
+			}
+		}
+
+		return null;
 	}
 
 	/**

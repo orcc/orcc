@@ -632,4 +632,30 @@
          </propertySection>
       </propertySections>
    </extension>
+   <extension
+         point="org.eclipse.ltk.core.refactoring.renameParticipants">
+      <renameParticipant
+            class="net.sf.orcc.ui.refactoring.XdfRenameParticipant"
+            id="net.sf.orcc.ui.xdfRenameParticipant"
+            name="XDF rename participant">
+         <enablement>
+            <instanceof
+                  value="org.eclipse.core.resources.IFile">
+            </instanceof>
+         </enablement>
+      </renameParticipant>
+   </extension>
+   <extension
+         point="org.eclipse.ltk.core.refactoring.moveParticipants">
+      <moveParticipant
+            class="net.sf.orcc.ui.refactoring.XdfMoveParticipant"
+            id="net.sf.orcc.ui.xdfMoveParticipant"
+            name="XDF move participant">
+         <enablement>
+            <instanceof
+                  value="org.eclipse.core.resources.IFile">
+            </instanceof>
+         </enablement>
+      </moveParticipant>
+   </extension>
 </plugin>

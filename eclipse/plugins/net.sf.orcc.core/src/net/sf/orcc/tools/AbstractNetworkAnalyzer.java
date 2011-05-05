@@ -74,14 +74,15 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 			String inputFile = args[0];
 			List<String> vtlFolderNames = Arrays.asList(args[1]
 					.split(File.pathSeparator));
-			List<IFolder> vtlFolders = new ArrayList<IFolder>(vtlFolderNames.size());
+			List<IFolder> vtlFolders = new ArrayList<IFolder>(
+					vtlFolderNames.size());
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			for (String folderName : vtlFolderNames) {
 				IFile file = root.getFileForLocation(new Path(folderName));
 				IFolder folder = (IFolder) file.getParent();
 				vtlFolders.add(folder);
 			}
-			
+
 			String outputFolder = args[2];
 
 			try {
@@ -159,7 +160,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 
 		// lists actors
 		listener.writeText("Lists actors...\n");
-		List<IFile> vtlFiles = OrccUtil.getAllFiles(vtlFolders);
+		List<IFile> vtlFiles = OrccUtil.getAllFiles("json", vtlFolders);
 		doVtlAnalyzer(vtlFiles);
 	}
 
@@ -167,10 +168,10 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 	final public void analyzeXDF(String inputFile) throws OrccException {
 		// parses top network
 		listener.writeText("Parsing XDF network...\n");
-		
+
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IFile xdfFile = root.getFile(new Path(inputFile));
-		
+
 		Network network = new XDFParser(xdfFile).parseNetwork();
 		network.updateIdentifiers();
 		if (isCanceled()) {

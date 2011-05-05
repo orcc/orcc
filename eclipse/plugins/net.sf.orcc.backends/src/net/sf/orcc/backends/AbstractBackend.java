@@ -127,7 +127,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	final public void compileVTL() throws OrccException {
 		// lists actors
 		write("Lists actors...\n");
-		List<IFile> vtlFiles = OrccUtil.getAllFiles(vtlFolders);
+		List<IFile> vtlFiles = OrccUtil.getAllFiles("json", vtlFolders);
 		doVtlCodeGeneration(vtlFiles);
 	}
 
