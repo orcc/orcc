@@ -41,6 +41,7 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * 
@@ -82,7 +83,7 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 		for (Var stateVar : actor.getStateVars()) {
 			Expression initConst = stateVar.getInitialValue();
 			if (initConst != null) {
-				stateVar.setValue(initConst);
+				stateVar.setValue(EcoreHelper.copy(initConst));
 			}
 		}
 
@@ -99,9 +100,8 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 			Type type = stateVar.getType();
 			if (type.isList() && stateVar.getInitialValue() == null
 					&& stateVar.getValue() != null) {
-				stateVar.setInitialValue(stateVar.getValue());
+				stateVar.setInitialValue(EcoreHelper.copy(stateVar.getValue()));
 			}
-			stateVar.setValue(null);
 		}
 
 		return null;
