@@ -570,7 +570,7 @@ actionTest(action) ::= <<
 	\<module kind="then"\>
 		<if(action.outputPattern)>
 		\<!-- Last outputPattern --\>
-		<outputPatternDecision(index=length(action.outputPattern.numTokensMap.keys),action=action); separator="\n">
+		<outputPatternDecision(index=length(action.outputPattern.ports),action=action); separator="\n">
 			\<module kind="then"\>
 				<actionCall(action)>
 			\</module\>
@@ -638,7 +638,7 @@ actionTestState(sourceState, transition) ::= <<
 	\<module kind="then"\>
 		<if(transition.action.outputPattern)>
 		\<!-- Last outputPattern --\>
-		<outputPatternDecisionState(length(transition.action.outputPattern.numTokensMap.keys), transition.action, sourceState); separator="\n">
+		<outputPatternDecisionState(length(transition.action.outputPattern.ports), transition.action, sourceState); separator="\n">
 			\<module kind="then"\>
 				<actionCall(transition.action)>
 				<actionCallState(transition.state)>
