@@ -235,7 +235,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstStore(InstStore store) {
 		complexityLevel++;
-		splitExpressionList(store.getIndexes());)
+		splitExpressionList(store.getIndexes());
 		store.setValue(doSwitch(store.getValue()));
 		complexityLevel--;
 		return null;
