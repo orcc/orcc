@@ -40,6 +40,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Var;
@@ -196,19 +197,25 @@ public class VHDLTemplateData {
 		customInitMap = new HashMap<Var, Boolean>();
 		initValueMap = new HashMap<Var, Expression>();
 		for (Var variable : actor.getStateVars()) {
-			Expression initialValue = variable.getValue();
-			if (variable.getType().isList() && variable.isAssignable()
-					&& initialValue != null) {
-				initValue = null;
+			if (variable.getType().isList() && variable.isAssignable()) {
+				boolean customInit;
+				if (variable.getInitialValue() == null) {
+					// arrays not initialized => initialize to zero
+					customInit = false;
+					initValue = IrFactory.eINSTANCE.createExprInt(0);
+				} else {
+					initValue = null;
 
-				// compute custom init
-				boolean customInit = getCustomInitFlag(variable, initialValue);
-				customInitMap.put(variable, customInit);
+					// compute custom init
+					Expression initialValue = variable.getValue();
+					customInit = getCustomInitFlag(variable, initialValue);
+				}
 
 				// if not custom init, save initValue
 				if (!customInit) {
 					initValueMap.put(variable, initValue);
 				}
+				customInitMap.put(variable, customInit);
 			}
 		}
 	}
