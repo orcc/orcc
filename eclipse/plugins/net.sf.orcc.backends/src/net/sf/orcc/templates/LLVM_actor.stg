@@ -167,24 +167,20 @@ function_args=parametersDeclaration(arguments=call.procedure.parameters, paramet
 <endif>
 >>
 
-Cast(target, value, cast)::= <<
+printCast(cast)::= <<
 <if(cast.extended)>
 <if(cast.signed)
->%<target> = sext <value.type> %<value> to <target.type><
+>%<cast.target.variable.name> = sext <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type><
 else
->%<target> = zext <value.type> %<value> to <target.type><
+>%<cast.target.variable.name> = zext <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type><
 endif>
 <else>
-%<target> = trunc <value.type> %<value> to <target.type>
+%<cast.target.variable.name> = trunc <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type>
 <endif>
 >>
 
 printAssign(assign) ::= <<
-<if(assign.cast)>
-<Cast(target = assign.target, value = assign.value, cast = assign.cast)>
-<else> 
 %<assign.target.variable.indexedName> = <assign.value>
-<endif>
 >>
 
 printPhiAssignment(phi) ::= <<
@@ -260,6 +256,7 @@ elseif (instr.call)><printCall(instr)><
 elseif (instr.load)><printLoad(instr)><
 elseif (instr.return)><printReturn(instr)><
 elseif (instr.store)><printStore(instr)><
+elseif (instr.cast)><printCast(instr)><
 endif>
 >>
 
