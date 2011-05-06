@@ -16,10 +16,10 @@ vcom -93 -reportprogress 30 -work work $SRC/DP_genericRam.vhd
 # Compile FIFO and broadcast
 vcom -93 -reportprogress 30 -work work $SRC/broadcast.vhd
 vcom -93 -reportprogress 30 -work work $SRC/comArbiter.vhd
-vcom -93 -reportprogress 30 -work work $SRC/FIFO/ram_generic.vhd
-vcom -93 -reportprogress 30 -work work $SRC/FIFO/counter.vhd
-vcom -93 -reportprogress 30 -work work $SRC/FIFO/control.vhd
-vcom -93 -reportprogress 30 -work work $SRC/FIFO/fifo_generic.vhd
+vcom -93 -reportprogress 30 -work work $SRC/FIFO/FIFO_ram.vhd
+vcom -93 -reportprogress 30 -work work $SRC/FIFO/FIFO_counter.vhd
+vcom -93 -reportprogress 30 -work work $SRC/FIFO/FIFO_controler.vhd
+vcom -93 -reportprogress 30 -work work $SRC/FIFO/FIFO_generic.vhd
 # Compile actors and networks
 <entities: printEntity(); separator="\n">
 vcom -93 -reportprogress 30 -work work $Testbench/<name>_tb.vhd

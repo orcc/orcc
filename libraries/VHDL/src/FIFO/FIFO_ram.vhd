@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
--- Title      : Generic dual port RAM
+-- Title      : Generic RAM
 -- Project    : Orcc
 -------------------------------------------------------------------------------
--- File       : ram_generic.vhd
+-- File       : FIFO_ram.vhd
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-03-04
+-- Last update: 2011-05-06
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ use work.orcc_package.all;
 -------------------------------------------------------------------------------
 
 
-entity ram_generic is
+entity FIFO_ram is
   generic (
     depth : integer := 32;
     width : integer := 32);
@@ -66,12 +66,12 @@ entity ram_generic is
     wrclock    : in  std_logic;
     wren       : in  std_logic
     );
-end ram_generic;
+end FIFO_ram;
 
 -------------------------------------------------------------------------------
 
 
-architecture arch_RAM_generic of RAM_generic is
+architecture arch_FIFO_ram of FIFO_ram is
 
 
   -----------------------------------------------------------------------------
@@ -109,5 +109,5 @@ begin
 -- purpose: to read the data
   q <= ram(adress_rd);
 
-end arch_RAM_generic;
+end arch_FIFO_ram;
 

@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
--- Title      : FIFO controler
+-- Title      : FIFO counter
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : control.vhd
+-- File       : FIFO_counter.vhd
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : INSA - Rennes
 -- Created    : 
--- Last update: 2011-03-04
+-- Last update: 2011-05-06
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -52,89 +52,61 @@ library work;
 use work.orcc_package.all;
 -------------------------------------------------------------------------------
 
-entity controler is
+entity FIFO_counter is
   generic (
-    depth : integer := 32;
-    width : integer := 32);
+    depth : integer := 32);
   port (
     reset_n : in  std_logic;
-    --
     wr_clk  : in  std_logic;
     wr_data : in  std_logic;
-    wr_ack  : out std_logic;
-    wr_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
-    --
+    wr_add  : out std_logic_vector(bit_width(depth) -1 downto 0);
     rd_clk  : in  std_logic;
-    send    : out std_logic;
-    rd_ack  : in  std_logic;
-    rd_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
-    --
-    empty   : out std_logic;
-    full    : out std_logic);
-end controler;
+    rd_data : in  std_logic;
+    rd_add  : out std_logic_vector(bit_width(depth) -1 downto 0));
+end FIFO_counter;
 
 -------------------------------------------------------------------------------
 
-architecture archcontroler of controler is
+architecture archFIFO_counter of FIFO_counter is
 
   -----------------------------------------------------------------------------
   -- Constants and signals declaration
   -----------------------------------------------------------------------------
-  constant zero    : std_logic_vector(bit_width(depth)-1 downto 0) := (others => '0');
-  constant one     : std_logic_vector(bit_width(depth)-1 downto 0) := (others => '0');
-  constant pfull   : std_logic_vector(bit_width(depth)-1 downto 0) := '0' & one(bit_width(depth)-2 downto 0);
-  constant nfull   : std_logic_vector(bit_width(depth)-1 downto 0) := '1' & zero(bit_width(depth)-2 downto 0);
-  --
-  signal   ird_add : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal   iwr_add : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal   iempty  : std_logic;
-  signal   ifull   : std_logic;
-  signal   iwr_ack : std_logic;
-  signal   level   : std_logic_vector(bit_width(depth)-1 downto 0);
-  ------------------------------------------------------------------------------
+  constant depth_std : std_logic_vector(bit_width(depth)-1 downto 0)
+ := std_logic_vector(to_unsigned(depth -1, bit_width(depth)));
+  signal iwr_add : std_logic_vector(bit_width(depth) -1 downto 0);
+  signal ird_add : std_logic_vector(bit_width(depth) -1 downto 0);
+  -------------------------------------------------------------------------------
   
 begin
-  
-  empty   <= iempty;
-  full    <= ifull;
-  iwr_ack <= wr_data and not ifull;
-  wr_ack  <= iwr_ack;
-  send    <= not iempty;
-  rd_add  <= ird_add;
-  wr_add  <= iwr_add;
-  --
-  level <= iwr_add - ird_add;
+  wr_add <= iwr_add;
+  rd_add <= ird_add;
 
--- A counter
-  counter_1 : entity work.counter
-    generic map (
-      depth => depth)
-    port map (
-      reset_n => reset_n,
-      wr_clk  => wr_clk,
-      wr_data => iwr_ack,
-      wr_add  => iwr_add,
-      rd_clk  => rd_clk,
-      rd_data => rd_ack,
-      rd_add  => ird_add);
-
-  -- Management of the flags
-  Flags : process (level) is
+  rd_count : process (rd_clk, reset_n) is
   begin
-    if(level = zero) then
-      iempty <= '1';
-      ifull  <= '0';
-    elsif(level = pfull) then           -- positive full
-      iempty <= '0';
-      ifull  <= '1';
-    elsif(level = nfull) then           -- negative full
-      iempty <= '0';
-      ifull  <= '1';
-    else
-      iempty <= '0';
-      ifull  <= '0';
+    if reset_n = '0' then
+      ird_add <= (others => '0');
+    elsif rising_edge(rd_clk) then
+      if (ird_add = depth_std) and rd_data = '1' then
+        ird_add <= (others => '0');
+      elsif rd_data = '1' then
+        ird_add <= ird_add +'1';
+      end if;
     end if;
-  end process Flags;
+  end process rd_count;
 
-end archcontroler;
+  wr_count : process (wr_clk, reset_n) is
+  begin
+    if reset_n = '0' then
+      iwr_add <= (others => '0');
+    elsif rising_edge(wr_clk) then
+      if (iwr_add = depth_std) and wr_data = '1' then
+        iwr_add <= (others => '0');
+      elsif wr_data = '1' then
+        iwr_add <= iwr_add +'1';
+      end if;
+    end if;
+  end process wr_count;
+
+end archFIFO_counter;
 
