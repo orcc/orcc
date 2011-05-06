@@ -47,8 +47,13 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.ActorPrinter;
+import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
+import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
+import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
+import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Network;
@@ -129,13 +134,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 
 		ActorVisitor<?>[] transformations = { new SSATransformation(),
-				// new TypeSizeTransformation(),
-				// new BoolToIntTransformation(),
-				// new PrintlnTransformation(),
-				// new RenameTransformation(this.transformations),
-				new ThreeAddressCodeTransformation(true), // new
-															// GetElementPtrAdder()
-		};
+				new TypeSizeTransformation(), new BoolToIntTransformation(),
+				new PrintlnTransformation(),
+				new RenameTransformation(this.transformations),
+				new ThreeAddressCodeTransformation(true),
+				new GetElementPtrAdder() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);

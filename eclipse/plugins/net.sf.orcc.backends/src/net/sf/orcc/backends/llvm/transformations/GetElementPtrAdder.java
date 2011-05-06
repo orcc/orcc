@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.transformations;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.instructions.InstGetElementPtr;
@@ -44,7 +43,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.common.util.EList;
 
 /**
  * Add GetElementPtr instructions in actor IR.
@@ -56,16 +55,14 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 
 	private Var addGEP(Var array, Type type, List<Expression> indexes,
-			NodeBlock node) {
-		List<Expression> GepIndexes = new ArrayList<Expression>(indexes);
-
+			NodeBlock currentNode) {
 		// Make a new localVariable that will contains the elt to access
-		Var eltVar = procedure.newTempLocalVariable(EcoreUtil.copy(type),
+		Var eltVar = procedure.newTempLocalVariable(EcoreHelper.copy(type),
 				array.getName() + "_" + "elt");
 
 		InstGetElementPtr gep = InstructionsFactory.eINSTANCE
-				.createInstGetElementPtr(eltVar, array, GepIndexes);
-		node.add(indexInst, gep);
+				.createInstGetElementPtr(eltVar, array, indexes);
+		currentNode.add(indexInst + 1, gep);
 
 		return eltVar;
 	}
@@ -74,18 +71,14 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 	public Object caseInstLoad(InstLoad load) {
 		Var source = load.getSource().getVariable();
 		Var target = load.getTarget().getVariable();
-		List<Expression> indexes = load.getIndexes();
+		EList<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			itInstruction.previous();
-
 			Var newSource = addGEP(source, target.getType(), indexes,
 					load.getBlock());
 
 			load.setSource(IrFactory.eINSTANCE.createUse(newSource));
 			EcoreHelper.delete(indexes);
-
-			itInstruction.next();
 		}
 		return null;
 	}
@@ -93,19 +86,15 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstStore(InstStore store) {
 		Var target = store.getTarget().getVariable();
-		List<Expression> indexes = store.getIndexes();
+		EList<Expression> indexes = store.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			itInstruction.previous();
 			TypeList typeList = (TypeList) target.getType();
 
 			Var newTarget = addGEP(target, typeList.getElementType(), indexes,
 					store.getBlock());
 
 			store.setTarget(IrFactory.eINSTANCE.createDef(newTarget));
-			EcoreHelper.delete(indexes);
-
-			itInstruction.next();
 		}
 		return null;
 	}

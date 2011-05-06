@@ -31,13 +31,11 @@ package net.sf.orcc.backends.llvm.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeString;
@@ -115,20 +113,7 @@ public class PrintlnTransformation extends AbstractActorVisitor<Object> {
 
 		actor.getProcs().remove(actor.getProcedure("print"));
 
-		for (Procedure proc : actor.getProcs()) {
-			visit(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visit(action.getBody());
-			visit(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visit(action.getBody());
-			visit(action.getScheduler());
-		}
-		return null;
+		return super.caseActor(actor);
 	}
 
 	@Override
