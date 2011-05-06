@@ -1,5 +1,8 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
+add wave -noupdate -divider <NULL>
+add wave -noupdate -divider {Just had your waves here :)}
+add wave -noupdate -divider <NULL>
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {100 ns} 0}
 configure wave -namecolwidth 222
@@ -16,4 +19,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {1000 ns}
+WaveRestoreZoom {9050 ns} {30610 ns}
