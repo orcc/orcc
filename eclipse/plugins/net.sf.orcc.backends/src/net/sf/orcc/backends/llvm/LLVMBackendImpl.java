@@ -50,6 +50,7 @@ import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
+import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
@@ -137,7 +138,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new TypeSizeTransformation(), new BoolToIntTransformation(),
 				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
-				new ThreeAddressCodeTransformation(true),
+				new CastAdder(true), new ThreeAddressCodeTransformation(true),
 				new GetElementPtrAdder() };
 
 		for (ActorVisitor<?> transformation : transformations) {

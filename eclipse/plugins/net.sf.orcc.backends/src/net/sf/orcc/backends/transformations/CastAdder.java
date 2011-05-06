@@ -163,6 +163,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
+		/*
 		Type oldParentType = parentType;
 		EList<Expression> expressions = call.getParameters();
 		EList<Expression> newExpressions = new BasicEList<Expression>();
@@ -177,6 +178,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		expressions.clear();
 		expressions.addAll(newExpressions);
 		parentType = oldParentType;
+		*/
 		return null;
 	}
 
