@@ -11,11 +11,6 @@ listSize(values) ::= <<
 <values : {value | [<value>]} >
 >>
 
-// the values of a list: {val1, val2, ..., valn}
-listValue(values) ::= <<
-{<values; wrap, separator=", ">}
->>
-
 varDecl(variable) ::= <<
 <variable.type> <variable.indexedName><listSize(variable.type.dimensions)>
 >>
@@ -23,7 +18,8 @@ varDecl(variable) ::= <<
 varDef(variable) ::= <<
 <if (variable.initialized)>
 <if (variable.type.dimensions)>
-<variable.initialValue.value : {value | <variable.indexedName>[<i0>] = <value>;}; separator="\n">
+<variable.type> <variable.indexedName>_tmp<listSize(variable.type.dimensions)> = <Constant(variable.initialValue)>;
+memcpy(<variable.indexedName>, <variable.indexedName>_tmp, <variable.type.dimensions; separator=" * "> * sizeof(<variable.type>));
 <else>
 <variable.indexedName> = <Constant(variable.initialValue)>;
 <endif>
@@ -425,7 +421,7 @@ ActorAKA("<actor.simpleName>", instanceName, <length(actor.inputs)>, <length(act
 
 	<stateVars : varDef()>
 <if(actor.fsm)>
-	_FSM_state = states::state_<actor.fsm.initialState.name>;
+	_FSM_state = state_<actor.fsm.initialState.name>;
 <endif>
 }
 

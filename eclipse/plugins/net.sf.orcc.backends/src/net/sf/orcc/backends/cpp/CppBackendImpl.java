@@ -39,9 +39,11 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
+import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -131,6 +133,12 @@ public class CppBackendImpl extends AbstractBackend {
 		if (classify) {
 			new ActorClassifier().doSwitch(actor);
 		}
+
+		ActorVisitor<?>[] transformations = { new TypeSizeTransformation() };
+
+		for (ActorVisitor<?> transformation : transformations) {
+			transformation.doSwitch(actor);
+		}
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {
@@ -146,7 +154,6 @@ public class CppBackendImpl extends AbstractBackend {
 
 		// add wrapper if needed
 		new SerDesAdder().transform(network);
-
 	}
 
 	@Override
@@ -232,4 +239,5 @@ public class CppBackendImpl extends AbstractBackend {
 
 		printCMake(network);
 	}
+	
 }
