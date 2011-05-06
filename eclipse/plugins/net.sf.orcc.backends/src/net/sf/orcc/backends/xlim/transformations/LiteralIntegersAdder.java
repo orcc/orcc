@@ -104,12 +104,13 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprList(ExprList expr) {
-		return createExprVarAndAssign(expr);
+		transformExpressionList(expr.getValue());
+		return null;
 	}
 
 	@Override
 	public Expression caseExprString(ExprString expr) {
-		return createExprVarAndAssign(expr);
+		return expr;
 	}
 
 	@Override
@@ -125,7 +126,10 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstAssign(InstAssign assign) {
-		assign.setValue(doSwitch(assign.getValue()));
+		Expression value = assign.getValue();
+		if (value.isBinaryExpr() || value.isUnaryExpr()) {
+			assign.setValue(doSwitch(value));
+		}
 		return null;
 	}
 
