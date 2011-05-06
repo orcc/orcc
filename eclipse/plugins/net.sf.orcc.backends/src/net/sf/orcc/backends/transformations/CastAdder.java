@@ -151,10 +151,11 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Expression newValue = doSwitch(assign.getValue());
 		parentType = oldParentType;
 		if(newValue != assign.getValue()){
-			// Cast is useless anymore
+			// Assign is useless anymore
 			EList<Instruction> instructions = assign.getBlock().getInstructions();
 			InstCast cast = (InstCast) instructions.get(instructions.indexOf(assign) - 1);
 			cast.setTarget(IrFactory.eINSTANCE.createDef(assign.getTarget().getVariable()));
+			
 			EcoreHelper.delete(assign);
 		}
 		return null;
@@ -181,8 +182,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstLoad(InstLoad load) {
-		// Don't cast indexes ...
-
+		// Indexes are not casted...
 		Var source = load.getSource().getVariable();
 		Var target = load.getTarget().getVariable();
 
@@ -235,7 +235,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstStore(InstStore store) {
-		// Don't cast indexes ...
+		// Indexes are not casted...
 		Type oldParentType = parentType;
 		if (store.getIndexes().isEmpty()) {
 			// Store to a scalar variable
@@ -294,6 +294,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
 					oldVar, newVar);
 			EcoreHelper.addInstBeforeExpr(expr, cast, usePreviousJoinNode);
+			EcoreHelper.delete(expr);
 			return IrFactory.eINSTANCE.createExprVar(newVar);
 		}
 

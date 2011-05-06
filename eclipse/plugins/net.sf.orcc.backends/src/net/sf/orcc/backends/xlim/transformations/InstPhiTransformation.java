@@ -64,8 +64,7 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 				Var source = ((ExprVar) value).getUse().getVariable();
 
 				// Local variable must not be a parameter of the procedure
-				if (source.getIndex() == 0
-						&& !parameters.contains(source.getName())) {
+				if (source.getIndex() == 0 && !parameters.contains(source)) {
 					Expression expr;
 					if (target.getType().isBool()) {
 						expr = IrFactory.eINSTANCE.createExprBool(false);
@@ -82,9 +81,9 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseInstSpecific(InstSpecific node) {
-		if (node instanceof InstTernary) {
-			InstTernary ternaryOperation = (InstTernary) node;
+	public Object caseInstSpecific(InstSpecific instSpecific) {
+		if (instSpecific instanceof InstTernary) {
+			InstTernary ternaryOperation = (InstTernary) instSpecific;
 			ternaryOperation.setConditionValue(clean(ternaryOperation
 					.getConditionValue()));
 			ternaryOperation
@@ -100,8 +99,7 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 			Var var = ((ExprVar) oldExpr).getUse().getVariable();
 
 			// Local variable must not be a parameter of the procedure
-			if (var.getIndex() == 0
-					&& !procedure.getParameters().contains(var.getName())) {
+			if (var.getIndex() == 0 && !procedure.getParameters().contains(var)) {
 				Expression expr;
 				if (var.getType().isBool()) {
 					expr = IrFactory.eINSTANCE.createExprBool(false);
