@@ -134,7 +134,7 @@ public class CppBackendImpl extends AbstractBackend {
 			new ActorClassifier().doSwitch(actor);
 		}
 
-		ActorVisitor<?>[] transformations = { new TypeSizeTransformation() };
+		ActorVisitor<?>[] transformations = {};
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -239,5 +239,5 @@ public class CppBackendImpl extends AbstractBackend {
 
 		printCMake(network);
 	}
-	
+
 }
