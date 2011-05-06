@@ -25,9 +25,9 @@ printActorsPortsInstantiation(actorInstance) ::=<<
 i_<actorInstance.id> : component <actorInstance.id>
 port map(
 	-- <instance.id> Input(s)
-	<actorInstance.actor.inputs.list: printActorsPortsInstantiationInputs(); separator="\n">
+	<actorInstance.actor.inputs: printActorsPortsInstantiationInputs(); separator="\n">
 	-- <actorInstance.id> Ouput(s)
-	<actorInstance.actor.outputs.list: printActorsPortsInstantiationOutputs(); separator="\n">
+	<actorInstance.actor.outputs: printActorsPortsInstantiationOutputs(); separator="\n">
 	
 	CLK	=\> clocks(0),
 	RESET	=\> resets(0)   
@@ -62,7 +62,7 @@ printActorsPortsInstantiationOutputs(port) ::=<<
 
 
 OutputPortFanOut(numberOfReaders) ::=<<
-<actorInstance.actor.outputs.list : {port | <printActorsFanOutOutput(port=port, numberOfReaders=numberOfReaders)>}; separator="\n">
+<actorInstance.actor.outputs : {port | <printActorsFanOutOutput(port=port, numberOfReaders=numberOfReaders)>}; separator="\n">
 >>
 
 printActorsFanOutOutput(port, numberOfReaders) ::=<<
@@ -155,7 +155,7 @@ tryAssignFifo(edge, src, tgt) ::= <<
 >>
 
 printAssignOut(name,type,target,port) ::= <<
-Out_<name> =\> <type>_<target.id>_<port>_<name>,
+Out_<name> =\> <type>_<target.id>_<port.name>_<name>,
 >>
 
 printAssignIn(name,type,source,port) ::= <<
@@ -164,9 +164,9 @@ In_<name> =\> <type>_<source.id>_<port.name>_<name>( <if(network.templateData.co
 
 printAssignInstatiationIn(type,target,port) ::= <<
 <if(port.type.bool)>
-	Out_DATA(0) =\> <type>_<target.id>_<port>_DATA,
+	Out_DATA(0) =\> <type>_<target.id>_<port.name>_DATA,
 <else>
-	Out_DATA =\> <type>_<target.id>_<port>_DATA,
+	Out_DATA =\> <type>_<target.id>_<port.name>_DATA,
 <endif>
 	<printAssignOut("SEND",type,target,port)>
 	<printAssignOut("ACK",type,target,port)>
@@ -200,17 +200,17 @@ port map (
 >>
 
 assignIn(source, sourcePort) ::= <<
-q_no_<tgt.port> : entity SystemBuilder.Queue( behavioral )
+q_no_<tgt.port.name> : entity SystemBuilder.Queue( behavioral )
 generic map( length =\> <if(edge.size)><edge.size><else>1<endif>, width =\> <if(sourcePort.type.size)><sourcePort.type.size><else>1<endif> )
 port map (
 <if(sourcePort.type.bool)>
- 	Out_DATA(0) =\> no_<tgt.port>_DATA,
+ 	Out_DATA(0) =\> no_<tgt.port.name>_DATA,
 <else>
-	Out_DATA =\> no_<tgt.port>_DATA,
+	Out_DATA =\> no_<tgt.port.name>_DATA,
 <endif>
-	Out_SEND =\> no_<tgt.port>_SEND,
-	Out_ACK =\> no_<tgt.port>_ACK,
-	Out_COUNT =\> no_<tgt.port>_COUNT,
+	Out_SEND =\> no_<tgt.port.name>_SEND,
+	Out_ACK =\> no_<tgt.port.name>_ACK,
+	Out_COUNT =\> no_<tgt.port.name>_COUNT,
 	
 <if(sourcePort.type.bool)>
 	In_DATA(0) =\> aof_<source.id>_<sourcePort.name>_DATA,
@@ -243,14 +243,14 @@ port map (
 	Out_COUNT =\> ai_<target.id>_<targetPort.name>_COUNT,
 	
 <if(targetPort.type.bool)>
-	In_DATA(0) =\> nif_<src.port>_DATA,
+	In_DATA(0) =\> nif_<src.port.name>_DATA,
 <else>
-	In_DATA =\> nif_<src.port>_DATA,
+	In_DATA =\> nif_<src.port.name>_DATA,
 <endif>
-	In_SEND =\> nif_<src.port>_SEND( <if(network.templateData.countBroadcastConnectionsMap.(edge))><network.templateData.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
-	In_ACK =\> nif_<src.port>_ACK( <if(network.templateData.countBroadcastConnectionsMap.(edge))><network.templateData.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
-	In_COUNT =\> nif_<src.port>_COUNT,
-	In_RDY =\> nif_<src.port>_RDY( <if(network.templateData.countBroadcastConnectionsMap.(edge))><network.templateData.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
+	In_SEND =\> nif_<src.port.name>_SEND( <if(network.templateData.countBroadcastConnectionsMap.(edge))><network.templateData.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
+	In_ACK =\> nif_<src.port.name>_ACK( <if(network.templateData.countBroadcastConnectionsMap.(edge))><network.templateData.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
+	In_COUNT =\> nif_<src.port.name>_COUNT,
+	In_RDY =\> nif_<src.port.name>_RDY( <if(network.templateData.countBroadcastConnectionsMap.(edge))><network.templateData.countBroadcastConnectionsMap.(edge)><else>0<endif> ),
 
 
 	clk =\> clocks(0),

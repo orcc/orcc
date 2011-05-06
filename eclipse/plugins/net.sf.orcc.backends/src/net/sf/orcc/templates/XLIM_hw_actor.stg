@@ -19,24 +19,24 @@ stateVar(var) ::= <<
 patternPortPinAvail(dir, port)::= <<
 \<!--  <dir>putPattern --\>
 \<operation kind="noop"\>
-	\<port dir="in" source="<port>_pinStatus"/\>
-	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_<port>" typeName="bool"/\>
+	\<port dir="in" source="<port.name>_pinStatus"/\>
+	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_<port.name>" typeName="bool"/\>
 \</operation\>
 >>
 
 
 declarePinAvailableVariable(port) ::= <<
 \<operation kind="pinStatus" portName="<port>"\>
-  \<port dir="out" source="<port>_pinStatus" typeName="bool"/\>
+  \<port dir="out" source="<port.name>_pinStatus" typeName="bool"/\>
 \</operation\>
 >>
 
 // For the switch structure of Openforge BE
 
-Transitions(actions, transitions) ::= <<
+printTransitions(actions, transitionsList) ::= <<
 \<!-- All transitions --\>
 \<module kind="block" mutex="true"\>
-	<transitions:{transition | <Transition(transition=transition)>}; separator="\n">
+	<transitionsList:{transitions | <printTransition(transitions)>}; separator="\n">
 \</module\>
 >>
 
@@ -53,7 +53,7 @@ fpgaType() ::=<<
 
 // Adding the fpgaType ST to the design
 design(instance) ::= <<
-\<!-- /<first(instance.hierarchicalClass)>/<PrintHierarchicalPath(instance.hierarchicalId)> --\>
+\<!-- /<first(instance.hierarchicalClass)>/<printHierarchicalPath(instance.hierarchicalId)> --\>
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
 	<actorPorts()>
@@ -62,10 +62,10 @@ design(instance) ::= <<
 	<instance.actor.actions: typeDef()>
 	<instance.actor.actions: action(); separator="\n">
 	<fpgaType()>
-	<if(instance.actor.actionScheduler.fsm)>
-	<schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)>
+	<if(instance.actor.fsm)>
+	<schedulerFSM(actions=instance.actor.actionsOutsideFsm, fsm=instance.actor.fsm)>
 	<else>
-	<scheduler(actions=instance.actor.actionScheduler.actions)>
+	<scheduler(actions=instance.actor.actionsOutsideFsm)>
 	<endif>
 \</design\>
 >>

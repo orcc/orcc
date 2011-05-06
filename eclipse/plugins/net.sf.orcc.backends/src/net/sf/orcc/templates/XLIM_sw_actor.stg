@@ -778,12 +778,12 @@ parameters(parameters) ::= <<
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-PrintHierarchicalPath(path) ::= <<
+printHierarchicalPath(path) ::= <<
 <path; separator="/">
 >>
 
 design(instance) ::= <<
-\<!-- /<first(instance.hierarchicalClass)>/<PrintHierarchicalPath(instance.hierarchicalId)> --\>
+\<!-- /<first(instance.hierarchicalClass)>/<printHierarchicalPath(instance.hierarchicalId)> --\>
 \<!-- Source file is "<instance.actor.file>" --\>
 \<design name="<instance.id>"\>
 	<actorPorts()>
