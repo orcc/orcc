@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.xlim;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.MAPPING;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
@@ -110,8 +110,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
 		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
 				"xc2vp30-7-ff1152");
-		mapping = getAttribute(OrccLaunchConstants.MAPPING,
-				new HashMap<String, String>());
+		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
