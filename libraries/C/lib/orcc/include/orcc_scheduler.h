@@ -142,4 +142,10 @@ struct mappings_set_s* compute_mappings_from_file(char *xcf_file,
  */
 struct mapping_s* map_actors(struct actor_s **actors, int actors_size);
 
+/**
+ * Find actor by its name in the given table.
+ */
+struct actor_s * find_actor(char *name, struct actor_s **actors,
+		int actors_size);
+
 #endif

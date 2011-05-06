@@ -134,7 +134,7 @@ void sched_reinit(struct scheduler_s *sched, int num_actors,
 /**
  * Find actor by its name in the given table.
  */
-static struct actor_s * find_actor(char *name, struct actor_s **actors,
+struct actor_s * find_actor(char *name, struct actor_s **actors,
 		int actors_size) {
 	int i;
 	for (i = 0; i < actors_size; i++) {
