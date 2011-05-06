@@ -2,19 +2,19 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RVC-CAL Xtext model plug-in
 Bundle-Vendor: IETR/INSA Rennes
-Bundle-Version: 0.9.4.v20110506
+Bundle-Version: 0.9.4.v201105061619
 Bundle-SymbolicName: net.sf.orcc.cal; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: net.sf.orcc.core;bundle-version="0.9.4",
- org.eclipse.xtext;bundle-version="1.0.1",
- org.eclipse.xtext.generator;resolution:=optional,
+ org.eclipse.xtext;bundle-version="1.0.2",
+ org.eclipse.xtext.generator;bundle-version="1.0.2";resolution:=optional,
  org.apache.commons.logging;resolution:=optional,
  org.eclipse.emf.codegen.ecore;resolution:=optional,
  org.eclipse.emf.mwe.utils;resolution:=optional,
  org.eclipse.emf.mwe2.launch;resolution:=optional,
  com.ibm.icu;resolution:=optional,
  org.eclipse.xtext.xtend;resolution:=optional,
- org.eclipse.xtext.util,
+ org.eclipse.xtext.util;bundle-version="1.0.2",
  org.eclipse.emf.ecore,
  org.eclipse.emf.common,
  org.antlr.runtime,

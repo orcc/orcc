@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Orcc back-ends plug-in
 Bundle-SymbolicName: net.sf.orcc.backends;singleton:=true
-Bundle-Version: 0.9.4.v20110506
+Bundle-Version: 0.9.4.v201105061619
 Bundle-Vendor: IETR/INSA Rennes
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.6.0",

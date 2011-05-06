@@ -6,7 +6,7 @@
    <feature url="features/net.sf.orcc_0.9.3.v20110215.jar" id="net.sf.orcc" version="0.9.3.v20110215">
       <category name="Open RVC-CAL Compiler"/>
    </feature>
-   <feature url="features/net.sf.orcc_0.9.4.v20110506.jar" id="net.sf.orcc" version="0.9.4.v20110506">
+   <feature url="features/net.sf.orcc_0.9.4.v201105061619.jar" id="net.sf.orcc" version="0.9.4.v201105061619">
       <category name="Open RVC-CAL Compiler"/>
    </feature>
    <category-def name="Open RVC-CAL Compiler" label="Open RVC-CAL Compiler">
