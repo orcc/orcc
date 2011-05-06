@@ -253,7 +253,7 @@
       </package>
    </extension>
    <extension
-         id="net.sf.orcc.backends.c"
+         id="c"
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="singleton-global"
@@ -265,7 +265,7 @@
       </application>
    </extension>
    <extension
-         id="net.sf.orcc.backends.vhdl"
+         id="vhdl"
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="singleton-global"
@@ -273,6 +273,18 @@
             visible="true">
          <run
                class="net.sf.orcc.backends.vhdl.VHDLBackendImpl">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="xlim"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.orcc.backends.xlim.XlimBackendImpl">
          </run>
       </application>
    </extension>
