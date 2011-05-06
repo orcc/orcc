@@ -84,6 +84,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 		// adds target to list of to-be-removed variables
 		unusedLocals.add(target);
 		changed = true;
+		indexInst--;
 	}
 
 	@Override
