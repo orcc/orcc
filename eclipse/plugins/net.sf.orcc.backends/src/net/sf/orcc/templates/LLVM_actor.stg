@@ -156,13 +156,13 @@ printCall(call) ::= <<
 <if(call.print)> 
 <PrintInstr(call.parameters)> 
 <else>
-<CastParameter(casts=call.paramCast, args=call.procedure.parameters.list, params=call.parameters, location=Location(call.location))>
+<CastParameter(casts=call.paramCast, args=call.procedure.parameters, params=call.parameters, location=Location(call.location))>
 <if(call.target)>
 %<call.target> = <CallOp(ty=call.procedure.returnType,
-fnptrval=call.procedure,
-function_args=parametersDeclaration(arguments=call.procedure.parameters.list, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
+fnptrval=call.procedure.name,
+function_args=parametersDeclaration(arguments=call.procedure.parameters, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
 <else>
-<CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
+<CallOp(ty=call.procedure.returnType, fnptrval=call.procedure.name, function_args=parametersDeclaration(arguments=call.procedure.parameters ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
 <endif>
 <endif>
 >>

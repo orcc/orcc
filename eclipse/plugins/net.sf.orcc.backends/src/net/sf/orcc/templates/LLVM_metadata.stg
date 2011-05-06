@@ -135,16 +135,16 @@ decl_MD(actor) ::= <<
 <if(actor.inputs)>
 !inputs = !{<actor.inputs: {port | <port_decl_MD(actor=actor, port=port)>}; separator=", ">}
 <endif>
-<if(actor.outputs.list)>
+<if(actor.outputs)>
 !outputs = !{<actor.outputs: {port | <port_decl_MD(actor=actor, port=port)>}; separator=", ">}
 <endif>
-<if(actor.parameters.list)>
+<if(actor.parameters)>
 !parameters = !{<actor.parameters: {port | <var_decl_MD(actor=actor, var=port)>}; separator=", ">}
 <endif>
-<if(actor.stateVars.list)>
+<if(actor.stateVars)>
 !state_variables = !{<actor.stateVars: {var | <var_decl_MD(actor=actor, var=var)>}; separator=", ">}
 <endif>
-<if(actor.procs.list)> 
+<if(actor.procs)> 
 !procedures = !{<actor.procs: {proc | <proc_decl_MD(actor=actor, proc=proc)>}; separator=", ">}
 <endif>
 <if(actor.initializes)>
@@ -383,12 +383,12 @@ port_MD(actor, port) ::= <<
 >>
 
 proc_MD(actor, proc) ::= <<
-<proc_decl_MD(actor=actor, proc=proc)> = metadata !{<varName_MD(proc)>, <procNative_MD(proc)>, <proc.returnType>(<proc.parameters.list: argumentTypeDeclaration(); wrap, anchor, separator=", ">)* @<proc>}
+<proc_decl_MD(actor=actor, proc=proc)> = metadata !{<varName_MD(proc)>, <procNative_MD(proc)>, <proc.returnType>(<proc.parameters: argumentTypeDeclaration(); wrap, anchor, separator=", ">)* @<proc.name>}
 
 >>
 
 var_MD(actor, var) ::= <<
-<var_decl_MD(actor=actor, var=var)> = metadata !{metadata <VarDef_decl_MD(actor=actor, var=var)>, metadata <Type_decl_MD(actor=actor, var=var)>, <var.type>* @<var>}
+<var_decl_MD(actor=actor, var=var)> = metadata !{metadata <VarDef_decl_MD(actor=actor, var=var)>, metadata <Type_decl_MD(actor=actor, var=var)>, <var.type>* @<var.name>}
 <VarDef_MD(actor=actor, var=var)>
 <Type_MD(actor=actor, var=var)>
 >>
@@ -396,7 +396,7 @@ var_MD(actor, var) ::= <<
 
 statevar_MD(actor, var) ::= <<
 <var_decl_MD(actor=actor, var=var)> = metadata !{metadata <VarDef_decl_MD(actor=actor, var=var)>, metadata <Type_decl_MD(actor=actor, var=var)>, <if(var.Initialized)
-	> metadata <Initializer_decl_MD(actor = actor, var = var)> <else> null <endif>,	<var.type>* @<var>}
+	> metadata <Initializer_decl_MD(actor = actor, var = var)> <else> null <endif>,	<var.type>* @<var.name>}
 <VarDef_MD(actor=actor, var=var)>
 <Type_MD(actor=actor, var=var)>
 <if(var.Initialized)>
