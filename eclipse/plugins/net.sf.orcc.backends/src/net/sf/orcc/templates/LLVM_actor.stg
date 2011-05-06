@@ -158,7 +158,7 @@ printCall(call) ::= <<
 <else>
 <CastParameter(casts=call.paramCast, args=call.procedure.parameters, params=call.parameters, location=Location(call.location))>
 <if(call.target)>
-%<call.target> = <CallOp(ty=call.procedure.returnType,
+%<call.target.variable.name> = <CallOp(ty=call.procedure.returnType,
 fnptrval=call.procedure.name,
 function_args=parametersDeclaration(arguments=call.procedure.parameters, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
 <else>
