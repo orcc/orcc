@@ -117,6 +117,9 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 			if (join != null) {
 				insertPhi(oldVar, newVar);
 			}
+
+			// remove reference to old variable in phi
+			phi.setOldVariable(null);
 		}
 	}
 
