@@ -241,19 +241,24 @@ void LLVMExecution::setIO(){
 	}
 }
 
-void LLVMExecution::initialize(void* stopCond, GpacSrc* gpacSrc, void* output){
+void LLVMExecution::initialize(){
+	GpacSrc* gpacSrc = new GpacSrc(1);
+	Display* gpacDisp = new Display(1);
+
 	Configuration* configuration = decoder->getConfiguration();
 
 	//Set input of the decoder
-	Instance* instance = configuration->getInstance("source");
+	Instance* in = configuration->getInstance("source");
+
+	source = gpacSrc;
 
 	//Set var gpac source
-	StateVar* stateVar = instance->getStateVar("source");
+	StateVar* stateVar = in->getStateVar("source");
 	Source** ptrSource = (Source**)getGVPtr(stateVar->getGlobalVariable());
 	*ptrSource = gpacSrc;
 
 	//Set setvideo procedure
-	Procedure* getSrcProc = instance->getProcedure("get_src");
+	Procedure* getSrcProc = in->getProcedure("get_src");
 	if (getSrcProc != NULL){
 		mapProcedure(getSrcProc, (void*)get_src);
 	}
@@ -261,16 +266,34 @@ void LLVMExecution::initialize(void* stopCond, GpacSrc* gpacSrc, void* output){
 	//Set output of the decoder
 	Instance* out = configuration->getInstance("display");
 
+	display = gpacDisp;
+
 	if (out != NULL){
-		setOut(out);
+		//Set var display
+		StateVar* stateVar = out->getStateVar("display");
+		Display** ptrDisplay = (Display**)getGVPtr(stateVar->getGlobalVariable());
+		*ptrDisplay = gpacDisp;
+
+		//Set setvideo procedure
+		Procedure* setVideoProc = out->getProcedure("set_video");
+		if (setVideoProc != NULL){
+			mapProcedure(setVideoProc, (void*)set_video);
+		}
+
+		//Set writemb procedure
+		Procedure* writeMbProc = out->getProcedure("write_mb");
+		if (writeMbProc != NULL){
+			mapProcedure(writeMbProc, (void*)write_mb);
+		}
 	}
+
 	
 	Module* module = decoder->getModule();
 	
 	// Set stop condition of the scheduler
 	Scheduler* scheduler = decoder->getScheduler();
 	GlobalVariable* stopGV = scheduler->getStopGV();
-	EE->addGlobalMapping(stopGV, stopCond);
+	EE->addGlobalMapping(stopGV, gpacSrc->getStopValPtr());
 
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
@@ -290,7 +313,11 @@ void LLVMExecution::initialize(void* stopCond, GpacSrc* gpacSrc, void* output){
 	EE->runFunction(init, noargs);
 }
 
-void LLVMExecution::start(){
+void LLVMExecution::start(unsigned char* nal, int nal_length){
+	GpacSrc* gpacSrc = (GpacSrc*)source;
+	gpacSrc->startScheduler();
+	gpacSrc->setNal(nal, nal_length);
+
 	Scheduler* scheduler = decoder->getScheduler();
 	Function* main = scheduler->getMainFunction();
 	std::vector<GenericValue> noargs;

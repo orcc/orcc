@@ -45,12 +45,10 @@
 #include "llvm/PassSupport.h"
 
 #include "Jade/XDFSerialize/XDFParser.h"
+#include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Util/FifoMng.h"
 #include "Jade/RVCEngine.h"
 #include "Jade/Actor/Display.h"
-
-#include "Jade/lib_RVCDecoder/RVCDecoder.h"
-
 
 using namespace std;
 using namespace llvm;
@@ -66,11 +64,11 @@ cl::opt<FifoTy> Fifo(values(clEnumVal(trace,   "trace"),
 // Jade options
 cl::opt<std::string> XDFFile(init("D:\\Users\\olabois\\orcc\\trunk\\projects\\Jade\\VTL\\Top_RVC.xdf"));
 
-cl::opt<std::string> VTLDir(init("D:\Users\olabois\orcc\trunk\projects\Jade\VTL"));
+cl::opt<std::string> VTLDir(init("D:\\Users\\olabois\\orcc\\trunk\\projects\\Jade\\VTL\\"));
 
 cl::opt<std::string> BSDLFile("");
 
-cl::opt<std::string> VidFile(init(""));
+cl::opt<std::string> VidFile(init("D:\\Users\\olabois\\sequences\\MPEG4\\SIMPLE\\P-VOP\\hit001.m4v"));
 
 cl::opt<std::string> InputDir(init(""));
 
@@ -124,8 +122,13 @@ cl::list<const PassInfo*, bool, PassNameParser> PassList("");
 int Display::stopAfter = StopAt;
 
 RVCEngine* engine;
-Network* network;
+Decoder* decoder;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "Jade/lib_RVCDecoder/RVCDecoder.h"
 
 void rvc_init(char *XDF){
 
@@ -133,16 +136,22 @@ void rvc_init(char *XDF){
 	LLVMContext &Context = getGlobalContext();
 	InitializeNativeTarget();
 	//setOptions();
-	
+
 	//Loading decoderEngine
 	engine = new RVCEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose);
 
 	//Parsing XDF
-	XDFParser xdfParser("");
-	network = xdfParser.parseXDF(XDF, Context);
+	XDFParser xdfParser(false);
+	Network* network = xdfParser.parseChar(XDF, Context);
 
 	//Load network
 	engine->load(network, 3);
+
+	//Prepare network
+	decoder = engine->prepare(network);
+		//TODO : Prepare output of the network
+	
+
 
 	// Optimizing decoder
 	/*if (optLevel > 0){
@@ -151,14 +160,11 @@ void rvc_init(char *XDF){
 }
 
 int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME *Frame, int *LayerCommand){
-
-	//Prepare network
-	engine->prepare(network, nal, nal_length, Frame);
 	
-	//Start network
-	engine->start(network);
+	//Start decoder
+	decoder->getEE()->start(nal, nal_length);
 
-
+//engine->run(network, VidFile);
 	return 0;
 }
 
@@ -166,3 +172,7 @@ int rvc_close(void *PlayerStruct){
 
 	return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif

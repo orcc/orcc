@@ -76,14 +76,12 @@ public:
      *  @brief Constructor
      *
      *  Constructor of the class NetworkParser
-     *
-     *  @param filename : name of the network file to parse
 	 *
 	 *  @param verbose : verbose actions taken
 	 *
 	 *  @param FifoSize : default size of fifo
      */
-	NetworkParser (llvm::LLVMContext& C, std::string filename, bool verbose = false);
+	NetworkParser (llvm::LLVMContext& C, bool verbose = false);
 
 	/*!
      *  @brief Destructor
@@ -97,21 +95,22 @@ public:
      *
      *  Parses the document given in constructor as an XDF network.
 	 *
+     *  @param filename : name of the network file to parse
 	 *
      *  @return a network class that describe the network of the dataflow, NULL if parsing failed
      *  
      */
-	Network* parseNetwork ();
+	Network* parseNetworkFile (std::string filename);
 
 	/*!
      *  @brief Parses an XDF network.
 	 *
-	 *  @param XDF : a char which contains an XDF network
+	 *  @param XML : a char which contains an XDF network
 	 *
      *  @return a network class that describe the network of the dataflow, NULL if parsing failed
      *  
      */
-	Network* parseNetwork (char* XDF);
+	Network* parseXML(char* XML);
 
 private:
 

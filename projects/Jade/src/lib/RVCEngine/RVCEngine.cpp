@@ -42,7 +42,6 @@
 //#include "llvm/Constants.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/StandardPasses.h"
-#include "Jade/Actor/GpacSrc.h"
 #include "Jade/Util/FifoMng.h"
 #include "Jade/Decoder.h"
 #include "Jade/RVCEngine.h"
@@ -53,6 +52,7 @@
 #include "Jade/Jit/LLVMUtility.h"
 #include "Jade/Jit/LLVMOptimizer.h"
 #include "Jade/Jit/LLVMExecution.h"
+#include "Jade/lib_RVCDecoder/RVCDecoder.h" 
 #include "Jade/Optimize/FifoFnRemoval.h"
 #include "Jade/Optimize/InstanceInternalize.h"
 #include "llvm/Support/PassNameParser.h"
@@ -158,7 +158,7 @@ int RVCEngine::stop(Network* network){
 	return 0;
 }
 
-void RVCEngine::prepare(Network* network, unsigned char* nal, int nal_length, void* output){
+Decoder* RVCEngine::prepare(Network* network){
 	map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(network);
@@ -170,24 +170,13 @@ void RVCEngine::prepare(Network* network, unsigned char* nal, int nal_length, vo
 	
 	Decoder* decoder = it->second;
 
-	//Initialize input of the network
-	GpacSrc* gpacSrc = new GpacSrc(1);
-	gpacSrc->setNal(nal, nal_length);
-
-	//TODO : Initialize output of the network
-
-	/* This is the value which can stop the scheduler
-	      This value is continiously tested by the scheduler, it MUST be an int.
-		  The scheduler only stop when this value is set to 1, otherwise the scheduler
-		   continuously test firing rules of actors
-	*/
-	int stopVal = 0;
-
 	LLVMExecution* llvmEE = decoder->getEE();
-	llvmEE->initialize(&stopVal, gpacSrc, output);
+	llvmEE->initialize();
+
+	return decoder;
 }
 
-void RVCEngine::start(Network* network){
+void RVCEngine::start(Network* network, unsigned char* nal, int nal_length){
 	map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(network);
@@ -200,7 +189,7 @@ void RVCEngine::start(Network* network){
 	Decoder* decoder = it->second;
 
 	LLVMExecution* llvmEE = decoder->getEE();
-	llvmEE->start();
+	llvmEE->start(nal, nal_length);
 }
 
 

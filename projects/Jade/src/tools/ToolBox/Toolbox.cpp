@@ -155,8 +155,8 @@ int main(int argc, char **argv) {
 	if(XDFFile != ""){
 		//Parse XDF
 		LLVMContext &Context = getGlobalContext();
-		XDFParser xdfParser(XDFFile);
-		Network* network = xdfParser.parseXDF(Context);
+		XDFParser xdfParser(false);
+		Network* network = xdfParser.parseFile(XDFFile, Context);
 
 		//Remove all instance id
 		InstanceIdRemoveAll instanceIdRemoveAll(network);

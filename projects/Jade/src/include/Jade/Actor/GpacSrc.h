@@ -71,6 +71,26 @@ public:
      */
 	void source_get_src(unsigned char* tokens);
 
+	/**
+     *  @brief Get value which can stop the scheduler
+	 *
+	 *  This value is continiously tested by the scheduler, it MUST be an int.
+	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
+	 *	continuously test firing rules of actors
+	 *   
+	 *  @return value of the stopVal
+     */
+	int* getStopValPtr() {return &stopVal;}
+
+	/**
+     *  @brief Set to 0 the value which can stop the scheduler
+	 *
+	 *  This value is continiously tested by the scheduler, it MUST be an int.
+	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
+	 *	continuously test firing rules of actors
+     */
+	void startScheduler() {stopVal = 0;}
+
 protected:
 
 	/** input gpac nal */
@@ -81,6 +101,9 @@ protected:
 
 	/** byte read counter */
 	int cnt;
+
+	/** This is the value which can stop the scheduler */
+	int stopVal;
 };
 
 #endif

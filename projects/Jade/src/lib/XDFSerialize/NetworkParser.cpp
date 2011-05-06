@@ -51,9 +51,8 @@
 using namespace std;
 using namespace llvm;
 
-NetworkParser::NetworkParser (llvm::LLVMContext& C, string filename, bool verbose){
+NetworkParser::NetworkParser (llvm::LLVMContext& C, bool verbose){
 	// Initialize attributes
-	this->xdfDoc = new TiXmlDocument (filename.c_str());
     this->network = NULL;
 	this->verbose = verbose;
 	
@@ -72,7 +71,9 @@ NetworkParser::~NetworkParser (){
 
 
 
-Network* NetworkParser::parseNetwork (){
+Network* NetworkParser::parseNetworkFile (string filename){
+	// Initialize XDF document
+	this->xdfDoc = new TiXmlDocument (filename.c_str());
 
 	/* Parsing XML file error */
 	if (!xdfDoc->LoadFile()) {
@@ -83,7 +84,9 @@ Network* NetworkParser::parseNetwork (){
 	return parseXDFDoc();
 }
 
-Network* NetworkParser::parseNetwork (char* XML){
+Network* NetworkParser::parseXML (char* XML){
+	// Initialize XDF document
+	this->xdfDoc = new TiXmlDocument ();
 
 	xdfDoc->Parse(XML);
 

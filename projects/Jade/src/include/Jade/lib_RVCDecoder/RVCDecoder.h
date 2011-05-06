@@ -44,8 +44,6 @@
 extern "C" {
 #endif
 
-
-
 typedef struct{
 	int Width;
 	int Height;

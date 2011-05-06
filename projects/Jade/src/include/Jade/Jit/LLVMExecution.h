@@ -50,6 +50,7 @@ namespace llvm{
 
 #include "llvm/LLVMContext.h"
 #include "Jade/Actor/GpacSrc.h"
+#include "Jade/Decoder.h"
 
 class AbstractFifo;
 class Procedure;
@@ -111,14 +112,9 @@ public:
 
 	/**
      *  @brief Initialize the decoder before the execution
-     *
-	 *	@param stopCond : the stop condition of the scheduler
 	 *
-	 *	@param source : the input of the network
-	 *
-	 *  @param output : the output of the network
      */
-	void initialize(void* stopCond, GpacSrc* gpacSrc, void* output);
+	void initialize();
 
 	/**
      *  @brief Start an execution of the decoder
@@ -126,7 +122,7 @@ public:
 	 *  Start the execution of the decoder until condition is reached. 
 	 *		Condition MUST be set first with the initialize function.
 	 */
-	void start();
+	void start(unsigned char* nal, int nal_length);
 
 	/**
      *  @brief run a specific function of the current decoder

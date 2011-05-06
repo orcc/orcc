@@ -58,6 +58,8 @@ class Configuration;
 #include <pthread.h>
 
 #include "Jade/Fifo/FifoSelection.h"
+#include "Jade/Actor/GpacSrc.h"
+#include "Jade/Actor/Display.h"
 //------------------------------
 
 /**
@@ -98,20 +100,18 @@ public:
 	 *   
 	 *  @param network : the Network to prepare
      *
-	 *  @param nal : the input of the network
+	 *  @param gpacSrc : the gapc source to prepare
 	 *
-	 *  @param nal_length : the length of the input nal
-	 *
-	 *  @param output : the output of the network
+	 *  @param gpacDisp : the gapc display to prepare
      */
-	void prepare(Network* network, unsigned char* nal, int nal_length, void* output);
+	Decoder* prepare(Network* network);
 
 	/*!
      *  @brief Start the given network
      *
      *  Start the given network until a condition is reached
      */
-	void start(Network* network);
+	void start(Network* network, unsigned char* nal, int nal_length);
 
 
 	/*!

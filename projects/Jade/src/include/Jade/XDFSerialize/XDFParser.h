@@ -63,10 +63,8 @@ class XDFParser {
 public:
 	/**
      *  @brief Constructor of the class XDFParser
-     *
-     *  @param	filename : name of the XDF file to parse
      */
-	XDFParser (std::string filename, bool verbose = false);
+	XDFParser (bool verbose = false);
 
 	 /**
      *  @brief Destructor of the class XDFParser
@@ -75,32 +73,26 @@ public:
 
    /**
      *  @brief Start Parsing XDF file
+	 *
+	 *  @param	filename : name of the XDF file to parse
      *
      *  @return a network class that describe the network of the dataflow, NULL if parsing failed
      */
-	Network* parseXDF (llvm::LLVMContext& C);
+	Network* parseFile (std::string XDF, llvm::LLVMContext& C);
 
 	/**
      *  @brief Start Parsing XDF char
      *
+	 *  @param	XML : XML text to parse
+	 *
      *  @return a network class that describe the network of the dataflow, NULL if parsing failed
      */
-	Network* parseXDF (char* XDF, llvm::LLVMContext& C);
-
-	/**
-     *  @brief Start Parsing XDF string
-     *
-     *  @return a network class that describe the network of the dataflow, NULL if parsing failed
-     */
-	Network* parseXDF (std::string* XDF, llvm::LLVMContext& C);
+	Network* parseChar (char* XML, llvm::LLVMContext& C);
 
 private:
 
 	/** Verbose actions taken */
 	bool verbose;
-
-	/** Name of XDF file to parse*/
-	std::string xdfFile;
 };
 
 #endif

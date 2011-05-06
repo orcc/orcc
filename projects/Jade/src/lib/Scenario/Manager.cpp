@@ -135,8 +135,8 @@ bool Manager::runLoadEvent(LoadEvent* loadEvent){
 	}
 	//Load network
 	LLVMContext &Context = getGlobalContext();
-	XDFParser xdfParser(loadEvent->getFile(), verbose);
-	Network* network = xdfParser.parseXDF(Context);
+	XDFParser xdfParser(verbose);
+	Network* network = xdfParser.parseFile(loadEvent->getFile(), Context);
 
 	if (network == NULL){
 		cerr << "Event error ! No network load. \n";
@@ -318,8 +318,8 @@ bool Manager::runSetEvent(SetEvent* setEvent){
 
 	//Load network
 	LLVMContext &Context = getGlobalContext();
-	XDFParser xdfParser(setEvent->getFile(), verbose);
-	Network* network = xdfParser.parseXDF(Context);
+	XDFParser xdfParser(verbose);
+	Network* network = xdfParser.parseFile(setEvent->getFile(), Context);
 
 	if (network == NULL){
 		cout << "No network load. \n";

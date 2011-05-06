@@ -44,30 +44,23 @@
 using namespace std;
 
 
-XDFParser::XDFParser (string filename, bool verbose){
+XDFParser::XDFParser (bool verbose){
 	this->verbose = verbose;
-	
+}
+
+Network* XDFParser::parseFile (string filename, llvm::LLVMContext& C){
 	//Uncompress XDF if it is compressed
 	if(CompressionMng::IsGZipName(filename)){
-		xdfFile = CompressionMng::uncompressGZip(filename);
-	}else{
-		xdfFile = filename;
+		filename = CompressionMng::uncompressGZip(filename);
 	}
+
+	NetworkParser networkParser(C);
+	return networkParser.parseNetworkFile(filename);
 }
 
-Network* XDFParser::parseXDF (llvm::LLVMContext& C){
-	NetworkParser networkParser(C, xdfFile);
-	return networkParser.parseNetwork();
-}
-
-Network* XDFParser::parseXDF (char* XDF, llvm::LLVMContext& C){
-	NetworkParser networkParser(C, xdfFile);
-	return networkParser.parseNetwork(XDF);
-}
-
-Network* XDFParser::parseXDF (string* XDF, llvm::LLVMContext& C){
-	NetworkParser networkParser(C, xdfFile);
-	return networkParser.parseNetwork((char*)XDF->c_str());
+Network* XDFParser::parseChar (char* XML, llvm::LLVMContext& C){
+	NetworkParser networkParser(C);
+	return networkParser.parseXML(XML);
 }
 
 XDFParser::~XDFParser (){
