@@ -8,7 +8,7 @@ variableDeclaration(variable) ::= <<
 <if(!variable.port)
 ><if(variable.type.list)
 ><if(variable.instruction.store || !variable.instruction)>
-<AllocaOp(result={%<variable>}, type=variable.type)>
+<AllocaOp(result={%<variable.name>}, type=variable.type)>
 <endif>
 <endif><
 endif>

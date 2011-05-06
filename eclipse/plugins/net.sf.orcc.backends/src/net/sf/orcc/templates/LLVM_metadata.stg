@@ -449,7 +449,7 @@ Type_MD(actor, var) ::= <<
 >>
 
 Sched_MD(actor, action) ::= <<
-<Sched_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.scheduler)>, <procNative_MD(action.scheduler)>, i1()* @<action.scheduler>}
+<Sched_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.scheduler)>, <procNative_MD(action.scheduler)>, i1()* @<action.scheduler.name>}
 
 >>
 
@@ -465,7 +465,7 @@ VarDef_MD(actor, var) ::= <<
 
 
 Body_MD(actor, action) ::= <<
-<Body_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.body)>, <procNative_MD(action.body)>, void()* @<action.body>}
+<Body_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.body)>, <procNative_MD(action.body)>, void()* @<action.body.name>}
 
 >>
 
