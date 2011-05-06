@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -49,7 +46,6 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
@@ -72,9 +68,6 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	private boolean usePreviousJoinNode;
 
-	private Map<Integer, Var> literalIntegersMap;
-	private Map<Boolean, Var> literalBooleansMap;
-
 	/**
 	 * Creates a new transformation which put literals into variables
 	 * 
@@ -96,31 +89,17 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprBool(ExprBool expr) {
-		Var existingLiteral = literalBooleansMap.get(expr.isValue());
-		if (existingLiteral != null) {
-			return IrFactory.eINSTANCE.createExprVar(existingLiteral);
-		} else {
-			Var newLiteral = createVarAndAssign(expr);
-			literalBooleansMap.put(expr.isValue(), newLiteral);
-			return IrFactory.eINSTANCE.createExprVar(newLiteral);
-		}
+		return createExprVarAndAssign(expr);
 	}
 
 	@Override
 	public Expression caseExprFloat(ExprFloat expr) {
-		return IrFactory.eINSTANCE.createExprVar(createVarAndAssign(expr));
+		return createExprVarAndAssign(expr);
 	}
 
 	@Override
 	public Expression caseExprInt(ExprInt expr) {
-		Var existingLiteral = literalIntegersMap.get(expr.getIntValue());
-		if (existingLiteral != null) {
-			return IrFactory.eINSTANCE.createExprVar(existingLiteral);
-		} else {
-			Var newLiteral = createVarAndAssign(expr);
-			literalIntegersMap.put(expr.getIntValue(), newLiteral);
-			return IrFactory.eINSTANCE.createExprVar(newLiteral);
-		}
+		return createExprVarAndAssign(expr);
 	}
 
 	@Override
@@ -205,7 +184,7 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 		return null;
 	}
 
-	private Var createVarAndAssign(Expression expr) {
+	private Expression createExprVarAndAssign(Expression expr) {
 		Var target = procedure.newTempLocalVariable(
 				EcoreUtil.copy(expr.getType()), "literal");
 
@@ -213,7 +192,7 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 				EcoreHelper.copy(expr));
 		EcoreHelper.addInstBeforeExpr(expr, assign, usePreviousJoinNode);
 
-		return target;
+		return IrFactory.eINSTANCE.createExprVar(target);
 	}
 
 	private void transformExpressionList(EList<Expression> expressions) {
@@ -227,13 +206,6 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 		}
 		expressions.clear();
 		expressions.addAll(newExpressions);
-	}
-
-	@Override
-	public Expression caseProcedure(Procedure procedure) {
-		literalBooleansMap = new HashMap<Boolean, Var>(1);
-		literalIntegersMap = new HashMap<Integer, Var>(1);
-		return super.caseProcedure(procedure);
 	}
 
 }
