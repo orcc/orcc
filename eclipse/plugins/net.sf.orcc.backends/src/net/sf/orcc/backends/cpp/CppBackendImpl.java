@@ -39,7 +39,6 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.ActorPrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
-import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
