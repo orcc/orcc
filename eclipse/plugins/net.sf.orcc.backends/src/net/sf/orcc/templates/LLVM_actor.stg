@@ -168,6 +168,7 @@ function_args=parametersDeclaration(arguments=call.procedure.parameters, paramet
 >>
 
 printCast(cast)::= <<
+;;<cast>
 <if(cast.extended)>
 <if(cast.signed)
 >%<cast.target.variable.name> = sext <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type><
@@ -180,7 +181,9 @@ endif>
 >>
 
 printAssign(assign) ::= <<
+
 %<assign.target.variable.indexedName> = <assign.value>
+
 >>
 
 printPhiAssignment(phi) ::= <<
@@ -207,8 +210,8 @@ printLoad(load) ::= <<
 
 >>
 
-GEP(gep) ::= <<
-<Var(gep.target)> = <GetElementPtrOp(idx0="0",  pty=VarType(gep.source.variable), ptrval=Var(gep.source.variable), idx=gep.indexes)>
+printGEP(gep) ::= <<
+<Var(gep.target.variable)> = <GetElementPtrOp(idx0="0",  pty=VarType(gep.source.variable), ptrval=Var(gep.source.variable), idx=gep.indexes)>
 
 >>
 
@@ -251,6 +254,7 @@ b<label(whileNode.joinNode.successors)>:
 Instruction(instr) ::= <<
 <
 if (instr.assign)><printAssign(instr)><
+elseif(instr.gep)><printGEP(instr)><
 elseif(instr.phi)><printPhiAssignment(instr)><
 elseif (instr.call)><printCall(instr)><
 elseif (instr.load)><printLoad(instr)><
