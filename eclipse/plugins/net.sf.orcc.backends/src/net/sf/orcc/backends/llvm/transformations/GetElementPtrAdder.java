@@ -61,7 +61,7 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 				array.getName() + "_" + "elt");
 
 		InstGetElementPtr gep = InstructionsFactory.eINSTANCE
-				.createInstGetElementPtr(eltVar, array, indexes);
+				.createInstGetElementPtr(array, eltVar, indexes);
 		currentNode.add(indexInst, gep);
 
 		return eltVar;

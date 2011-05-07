@@ -167,7 +167,7 @@ public class InstructionsFactoryImpl extends EFactoryImpl implements
 			List<Expression> indexes) {
 		InstGetElementPtrImpl instGetElementPtr = new InstGetElementPtrImpl();
 		instGetElementPtr.setSource(IrFactory.eINSTANCE.createUse(source));
-		instGetElementPtr.setTarget(IrFactory.eINSTANCE.createDef(source));
+		instGetElementPtr.setTarget(IrFactory.eINSTANCE.createDef(target));
 		instGetElementPtr.getIndexes().addAll(indexes);
 		return instGetElementPtr;
 	}
