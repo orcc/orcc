@@ -266,25 +266,21 @@ public class InstCastImpl extends InstSpecificImpl implements InstCast {
 		if (sourceType.isUint() || targetType.isUint()) {
 			return false;
 		}
-
 		if (sourceType.isBool() || targetType.isBool()) {
 			return false;
 		}
-
 		if (sourceType.isList()) {
 			Type elementType = ((TypeList) source).getElementType();
 			if (elementType.isUint() || elementType.isBool()) {
 				return false;
 			}
 		}
-
 		if (targetType.isList()) {
 			Type elementType = ((TypeList) targetType).getElementType();
 			if (elementType.isUint() || elementType.isBool()) {
 				return false;
 			}
 		}
-
 		return true;
 	}
 

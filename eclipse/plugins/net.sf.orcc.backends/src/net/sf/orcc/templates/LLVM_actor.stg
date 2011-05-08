@@ -125,15 +125,15 @@ printInstructions(instructions) ::= <<
 <instructions: printInstruction(); separator="\n">
 >>
 
-printInstruction(instr) ::= <<
-<if(instr.assign)><printAssign(instr)><
-elseif(instr.gep)><printGEP(instr)><
-elseif(instr.phi)><printPhiAssignment(instr)><
-elseif(instr.call)><printCall(instr)><
-elseif(instr.load)><printLoad(instr)><
-elseif(instr.return)><printReturn(instr)><
-elseif(instr.store)><printStore(instr)><
-elseif(instr.cast)><printCast(instr)><
+printInstruction(inst) ::= <<
+<if(inst.assign)><printAssign(inst)><
+elseif(inst.gep)><printGEP(inst)><
+elseif(inst.phi)><printPhiAssignment(inst)><
+elseif(inst.call)><printCall(inst)><
+elseif(inst.load)><printLoad(inst)><
+elseif(inst.return)><printReturn(inst)><
+elseif(inst.store)><printStore(inst)><
+elseif(inst.instCast)><printCast(inst)><
 endif>
 >>
 
@@ -153,7 +153,6 @@ function_args=parametersDeclaration(arguments=call.procedure.parameters, paramet
 >>
 
 printCast(cast)::= <<
-;;<cast>
 %<cast.target.variable.name> = <printCastOp(cast)> <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type>
 >>
 
