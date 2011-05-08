@@ -9,7 +9,6 @@ i<port.type.size>
 fifoVar(port, var) ::= <<
 %<var.name>_ptr = load <fifoType(port)>** <fifoVarName(port)>
 %<var.name> = bitcast <fifoType(port)>* %<var.name>_ptr to <VarType(var)>*
-
 >>
 
 fifoVarName(port) ::= <<
@@ -18,7 +17,6 @@ fifoVarName(port) ::= <<
 
 fifo(port) ::= <<
 <fifoVarName(port)> = global <fifoType(port)>* null
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,11 +57,7 @@ c"<constant>"
 ///////////////////////////////////////////////////////////////////////////////
 
 argumentTypeDeclaration(variable) ::= <<
-<if(variable.type.list)
-><variable.type>*<
-else
-><variable.type><
-endif>
+<variable.type><if(variable.type.list)>*<endif>
 >>
 
 
@@ -107,11 +101,7 @@ parameters(type, variable, cast, location) ::= <<
 >>
 
 argumentDeclaration(variable) ::= <<
-<if(variable.type.list)
-><variable.type>* %<variable><
-else
-><variable.type> %<variable><
-endif>
+<variable.type><if(variable.type.list)>*<endif> %<variable>
 >>
 
 Location(location) ::= <<

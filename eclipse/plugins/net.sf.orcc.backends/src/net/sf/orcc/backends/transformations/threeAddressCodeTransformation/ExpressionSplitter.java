@@ -91,7 +91,7 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		if (complexityLevel > 0) {
 			// Make a new assignment to the binary expression
 			Var target = procedure.newTempLocalVariable(
-					EcoreHelper.copy(expr.getType()), "splittedExpr");
+					EcoreHelper.copy(expr.getType()), "splitted_expr");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 					EcoreHelper.copy(expr));
 

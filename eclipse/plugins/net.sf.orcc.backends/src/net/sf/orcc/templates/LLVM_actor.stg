@@ -88,7 +88,6 @@ endif>
 
 PrintInstr(parameters) ::= <<
 call i32 (i8*, ...)* @printf(<parameters: PrintParameter(); separator=", ">)
-
 >>
 
 PrintParameter(parameter) ::= <<
@@ -97,7 +96,6 @@ PrintParameter(parameter) ::= <<
 else
 ><parameter.type> <Expr(expr=parameter, type=parameter.type)><
 endif>
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,6 +149,21 @@ phiExpr(expr, type, node) ::= <<
 // ORCC IR Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
+printInstructions(instructions) ::= <<
+<instructions: printInstruction()>
+>>
+
+printInstruction(instr) ::= <<
+<if(instr.assign)><printAssign(instr)><
+elseif(instr.gep)><printGEP(instr)><
+elseif(instr.phi)><printPhiAssignment(instr)><
+elseif(instr.call)><printCall(instr)><
+elseif(instr.load)><printLoad(instr)><
+elseif(instr.return)><printReturn(instr)><
+elseif(instr.store)><printStore(instr)><
+elseif(instr.cast)><printCast(instr)><
+endif>
+>>
 
 printCall(call) ::= <<
 <if(call.print)> 
@@ -169,30 +182,22 @@ function_args=parametersDeclaration(arguments=call.procedure.parameters, paramet
 
 printCast(cast)::= <<
 ;;<cast>
-<if(cast.extended)>
-<if(cast.signed)
->%<cast.target.variable.name> = sext <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type><
-else
->%<cast.target.variable.name> = zext <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type><
-endif>
-<else>
-%<cast.target.variable.name> = trunc <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type>
-<endif>
+%<cast.target.variable.name> = <printCastOp(cast)> <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type>
+>>
+
+printCastOp(cast) ::= <<
+<if(cast.extended)><if(cast.signed)>sext<else>zext<endif><else>trunc<endif>
 >>
 
 printAssign(assign) ::= <<
-
 %<assign.target.variable.indexedName> = <assign.value>
-
 >>
 
 printPhiAssignment(phi) ::= <<
-
 <Var(phi.target.variable)> = phi <phi.target.type> <phiPairs(phi)>
 >>
 
 printReturn(return) ::= <<
-
 <if(return.value)><
 RetOp(type=return.value.type, value=Expr(expr=return.value, type=return.value.type))><
 else
@@ -207,17 +212,26 @@ printStore(store) ::= <<
 
 printLoad(load) ::= <<
 <Var(load.target.variable)> = <LoadOp(ty=VarType(load.source.variable), pointer=Var(load.source.variable))>
-
 >>
 
 printGEP(gep) ::= <<
 <Var(gep.target.variable)> = <GetElementPtrOp(idx0="0",  pty=VarType(gep.source.variable), ptrval=Var(gep.source.variable), idx=gep.indexes)>
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // ORCC IR Nodes
 ///////////////////////////////////////////////////////////////////////////////
+
+printNodes(nodes) ::= <<
+<nodes:printNode()>
+>>
+
+printNode(node) ::= <<
+<if(node.blockNode)><printBlockNode(node)><
+elseif(node.ifNode)><printIfNode(node)><
+elseif(node.whileNode)><printWhileNode(node)><
+endif>
+>>
 
 // if node
 printIfNode(ifNode) ::= <<
@@ -230,7 +244,6 @@ printIfNode(ifNode) ::= <<
 <endif>
 <printNodes_cond(first(ifNode.joinNode))>
 <printNodes(rest(ifNode.joinNode))>
-
 >>
 
 // while node
@@ -251,39 +264,10 @@ b<label(whileNode.joinNode.successors)>:
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-Instruction(instr) ::= <<
-<
-if (instr.assign)><printAssign(instr)><
-elseif(instr.gep)><printGEP(instr)><
-elseif(instr.phi)><printPhiAssignment(instr)><
-elseif (instr.call)><printCall(instr)><
-elseif (instr.load)><printLoad(instr)><
-elseif (instr.return)><printReturn(instr)><
-elseif (instr.store)><printStore(instr)><
-elseif (instr.cast)><printCast(instr)><
-endif>
->>
-
-printInstructions(instructions) ::= <<
-<instructions: Instruction()>
->>
-
-printNode(node) ::= <<
-<if (node.blockNode)><printBlockNode(node)><
-elseif (node.ifNode)><printIfNode(node)><
-elseif (node.whileNode)><printWhileNode(node)><
-endif>
->>
-
-printNodes(nodes) ::= <<
-<nodes:printNode()>
->>
-
-
 Node_cond(node) ::= <<
-<if (node.blockNode)><printBlockNode_cond(node)><
-elseif (node.ifNode)><printIfNode_cond(node)><
-elseif (node.whileNode)><printWhileNode_cond(node)><
+<if(node.blockNode)><printBlockNode_cond(node)><
+elseif(node.ifNode)><printIfNode_cond(node)><
+elseif(node.whileNode)><printWhileNode_cond(node)><
 endif>
 >>
 
@@ -386,8 +370,8 @@ declare i32 @printf(i8* noalias , ...) nounwind
 ; Actions
 <actor.actions: printAction()>
 
-; Initializes
 <if(actor.initializes)>
+; Initializes
 <actor.initializes: printAction()>
 <endif>
 
