@@ -197,9 +197,9 @@ public interface Actor extends EObject {
 	Procedure getProcedure(String string);
 
 	/**
-	 * Returns the ordered map of procedures.
+	 * Returns a list of all procedures contained in this actor.
 	 * 
-	 * @return the ordered map of procedures
+	 * @return a list of all procedures contained in this actor
 	 * @model containment="true"
 	 */
 	EList<Procedure> getProcs();
