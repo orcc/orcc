@@ -31,7 +31,7 @@ package net.sf.orcc.util;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
@@ -62,10 +62,8 @@ public class DomUtil {
 	 * @param docElt
 	 *            name of the document element
 	 * @return a new DOM document
-	 * @throws OrccException
-	 *             if something goes wrong
 	 */
-	public static Document createDocument(String docElt) throws OrccException {
+	public static Document createDocument(String docElt) {
 		getImplementation();
 		return impl.createDocument("", docElt, null);
 	}
@@ -73,10 +71,8 @@ public class DomUtil {
 	/**
 	 * Creates a new instance of the DOM registry and get an implementation of
 	 * DOM 3 with Load Save objects.
-	 * 
-	 * @throws OrccException
 	 */
-	private static void getImplementation() throws OrccException {
+	private static void getImplementation() {
 		try {
 			if (registry == null) {
 				registry = DOMImplementationRegistry.newInstance();
@@ -85,15 +81,16 @@ public class DomUtil {
 			if (impl == null) {
 				impl = registry.getDOMImplementation("Core 3.0 XML 3.0 LS");
 				if (impl == null) {
-					throw new OrccException("no DOM 3 implementation found");
+					throw new OrccRuntimeException(
+							"no DOM 3 implementation found");
 				}
 			}
 		} catch (ClassNotFoundException e) {
-			throw new OrccException("DOM error", e);
+			throw new OrccRuntimeException("DOM error", e);
 		} catch (InstantiationException e) {
-			throw new OrccException("DOM error", e);
+			throw new OrccRuntimeException("DOM error", e);
 		} catch (IllegalAccessException e) {
-			throw new OrccException("DOM error", e);
+			throw new OrccRuntimeException("DOM error", e);
 		}
 	}
 
@@ -104,10 +101,8 @@ public class DomUtil {
 	 * @param is
 	 *            an input stream
 	 * @return a DOM document
-	 * @throws OrccException
-	 *             if something goes wrong
 	 */
-	public static Document parseDocument(InputStream is) throws OrccException {
+	public static Document parseDocument(InputStream is) {
 		getImplementation();
 		DOMImplementationLS implLS = (DOMImplementationLS) impl;
 
@@ -133,11 +128,8 @@ public class DomUtil {
 	 * @param document
 	 *            a DOM document created by
 	 *            {@link #writeDocument(OutputStream, Document)}
-	 * @throws OrccException
-	 *             if something goes wrong
 	 */
-	public static void writeDocument(OutputStream os, Document document)
-			throws OrccException {
+	public static void writeDocument(OutputStream os, Document document) {
 		getImplementation();
 		DOMImplementationLS implLS = (DOMImplementationLS) impl;
 

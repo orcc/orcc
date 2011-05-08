@@ -35,12 +35,12 @@ import java.io.IOException;
 import java.net.URL;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
-import net.sf.orcc.ui.OrccProjectNature;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,29 +26,41 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui.editor;
+package net.sf.orcc;
 
-import net.sf.graphiti.io.IAntlrProxy;
-
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.Lexer;
-import org.antlr.runtime.Parser;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.runtime.CoreException;
 
 /**
- * This class implements {@link IAntlrProxy} to give access to ANTLR lexer and
- * parser.
+ * This class describes the "Orcc" project nature.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CalAntlrProxy implements IAntlrProxy {
+public class OrccProjectNature implements IProjectNature {
+
+	public static final String NATURE_ID = "net.sf.orcc.ui.OrccNature";
+
+	private IProject project;
 
 	@Override
-	public Parser createParser(CharStream stream) {
-		Lexer lexer = new CalLexer(stream);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		return new CalParser(tokens);
+	public void configure() throws CoreException {
+
+	}
+
+	@Override
+	public void deconfigure() throws CoreException {
+	}
+
+	@Override
+	public IProject getProject() {
+		return project;
+	}
+
+	@Override
+	public void setProject(IProject project) {
+		this.project = project;
 	}
 
 }

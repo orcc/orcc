@@ -154,7 +154,7 @@ public class OrccUtil {
 
 	/**
 	 * Returns a new string that is an escaped version of the given string.
-	 * Espaced means that '\\', '\n', '\r', '\t' are replaced by "\\\\, "\\n",
+	 * Espaced means that '\\', '\n', '\r', '\t' are replaced by "\\\\", "\\n",
 	 * "\\r", "\\t" respectively.
 	 * 
 	 * @param string

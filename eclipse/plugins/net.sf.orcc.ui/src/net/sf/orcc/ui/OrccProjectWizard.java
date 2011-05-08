@@ -31,6 +31,8 @@ package net.sf.orcc.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.OrccProjectNature;
+
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;

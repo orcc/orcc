@@ -129,9 +129,9 @@
             </xslt>
          </import>
          <export>
-            <xslt
-                  name="xslt/net/sf/graphiti/xdf/output_XDF.xslt">
-            </xslt>
+            <transformation
+                  class="net.sf.orcc.ui.editor.XdfExporter">
+            </transformation>
          </export>
       </configuration>
       <configuration
@@ -155,16 +155,9 @@
             </parameter>
          </graphType>
          <import>
-            <grammar
-                  definition="net.sf.orcc.ui.grammar.cal"
-                  startRule="actor">
-            </grammar>
-            <xslt
-                  name="xslt/net/sf/graphiti/xdf/calToCalML.xslt">
-            </xslt>
-            <xslt
-                  name="xslt/net/sf/graphiti/xdf/input_CalML.xslt">
-            </xslt>
+            <transformation
+                  class="net.sf.orcc.ui.editor.CalTransformation">
+            </transformation>
          </import>
          <vertexType
                name="Input port">
@@ -319,36 +312,16 @@
             </parameter>
          </edgeType>
          <import>
-            <grammar
-                  definition="net.sf.orcc.ui.grammar.cal"
-                  startRule="network">
-            </grammar>
-            <xslt
-                  name="xslt/net/sf/graphiti/xdf/nlToXDF.xslt">
-            </xslt>
-            <xslt
-                  name="xslt/net/sf/graphiti/xdf/input_XDF.xslt">
-            </xslt>
-            <xslt
-                  name="xslt/net/sf/graphiti/xdf/ToXDFGraphType.xslt">
-            </xslt>
+            <transformation
+                  class="net.sf.orcc.ui.editor.NlTransformation">
+            </transformation>
          </import>
          <export>
-            <xslt
-                  name="xslt/net/sf/graphiti/xdf/output_XDF.xslt">
-            </xslt>
             <xslt
                   name="xslt/net/sf/graphiti/xdf/output_NL.xslt">
             </xslt>
          </export>
       </configuration>
-   </extension>
-   <extension
-         point="net.sf.graphiti.model.grammar">
-      <definition
-            class="net.sf.orcc.ui.editor.CalAntlrProxy"
-            id="net.sf.orcc.ui.grammar.cal">
-      </definition>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -365,7 +338,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="net.sf.orcc.ui.OrccProjectNature">
+               class="net.sf.orcc.OrccProjectNature">
          </run>
       </runtime>
    </extension>

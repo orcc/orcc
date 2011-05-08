@@ -7,7 +7,6 @@ Bundle-SymbolicName: net.sf.orcc.cal.ui;singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: net.sf.orcc.cal;bundle-version="0.9.4";visibility:=reexport,
  net.sf.orcc.core;bundle-version="0.9.4",
- net.sf.orcc.ui;bundle-version="0.9.4",
  org.antlr.runtime,
  org.eclipse.jdt.core,
  org.eclipse.ui,
@@ -19,4 +18,6 @@ Require-Bundle: net.sf.orcc.cal;bundle-version="0.9.4";visibility:=reexport,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: net.sf.orcc.cal.ui.internal.CalActivator
 Import-Package: org.apache.log4j
-Export-Package: net.sf.orcc.cal.ui.contentassist.antlr
+Export-Package: net.sf.orcc.cal.ui,
+ net.sf.orcc.cal.ui.contentassist.antlr,
+ net.sf.orcc.cal.ui.internal

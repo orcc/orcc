@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,41 +26,27 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui;
+package net.sf.orcc.ui.editor;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.runtime.CoreException;
+import java.io.OutputStream;
 
-/**
- * This class describes the "Orcc" project nature.
- * 
- * @author Matthieu Wipliez
- * 
- */
-public class OrccProjectNature implements IProjectNature {
+import org.eclipse.core.resources.IFile;
 
-	public static final String NATURE_ID = "net.sf.orcc.ui.OrccNature";
+import net.sf.graphiti.io.ITransformation;
+import net.sf.graphiti.model.Graph;
 
-	private IProject project;
+public class NlTransformation implements ITransformation {
 
 	@Override
-	public void configure() throws CoreException {
-
+	public Graph transform(IFile file) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public void deconfigure() throws CoreException {
-	}
+	public void transform(Graph graph, OutputStream out) {
+		// TODO Auto-generated method stub
 
-	@Override
-	public IProject getProject() {
-		return project;
-	}
-
-	@Override
-	public void setProject(IProject project) {
-		this.project = project;
 	}
 
 }

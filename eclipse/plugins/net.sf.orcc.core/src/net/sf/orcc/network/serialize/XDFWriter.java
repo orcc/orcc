@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprFloat;
@@ -143,7 +143,7 @@ public class XDFWriter {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Boolean");
-			exprElt.setAttribute("value", expr.toString());
+			exprElt.setAttribute("value", String.valueOf(expr.isValue()));
 			parentElt.appendChild(exprElt);
 
 			return null;
@@ -240,44 +240,34 @@ public class XDFWriter {
 	/**
 	 * the document being created by this writer.
 	 */
-	private final Document document;
-
-	/**
-	 * The writer's output file.
-	 */
-	private File file;
+	private Document document;
 
 	/**
 	 * the graph of the network being written.
 	 */
-	private final DirectedGraph<Vertex, Connection> graph;
+	private DirectedGraph<Vertex, Connection> graph;
 
 	/**
-	 * Creates a new network writer with the given output directory and writes
-	 * the given network to the directory this network writer was built with.
-	 * This method recursively writes the networks that are children of the
-	 * given network.
+	 * Writes the XDF representation of the given network and its descendants in
+	 * the given path.
 	 * 
 	 * @param path
-	 *            a file that represents the absolute path of the output
-	 *            directory
+	 *            path in which XDF files should be written
 	 * @param network
 	 *            a network
-	 * @throws OrccException
-	 *             if the network could not be written
+	 * @return the file to which the network was written
 	 */
-	public XDFWriter(File path, Network network) throws OrccException {
+	public File write(File path, Network network) {
 		graph = network.getGraph();
-
 		document = DomUtil.createDocument("XDF");
 		writeXDF(document.getDocumentElement(), network);
 
-		file = new File(path, network.getName() + ".xdf");
+		File file = new File(path, network.getName() + ".xdf");
 		OutputStream os;
 		try {
 			os = new FileOutputStream(file);
 		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
+			throw new OrccRuntimeException("I/O error", e);
 		}
 
 		try {
@@ -286,20 +276,38 @@ public class XDFWriter {
 			try {
 				os.close();
 			} catch (IOException e) {
-				throw new OrccException("I/O error", e);
+				throw new OrccRuntimeException("I/O error", e);
 			}
 		}
 
 		writeChildren(path);
+
+		return file;
 	}
 
 	/**
-	 * Return resulting file of XDFWriter
+	 * Writes the XDF representation of the given network to the given output
+	 * stream.
 	 * 
-	 * @return the File where network is written
+	 * @param network
+	 *            a network
+	 * @param os
+	 *            an output stream
 	 */
-	public File getFile() {
-		return file;
+	public void write(Network network, OutputStream os) {
+		graph = network.getGraph();
+		document = DomUtil.createDocument("XDF");
+		writeXDF(document.getDocumentElement(), network);
+
+		try {
+			DomUtil.writeDocument(os, document);
+		} finally {
+			try {
+				os.close();
+			} catch (IOException e) {
+				throw new OrccRuntimeException("I/O error", e);
+			}
+		}
 	}
 
 	/**
@@ -310,10 +318,9 @@ public class XDFWriter {
 	 *            the parent parent
 	 * @param attributes
 	 *            a map of attributes
-	 * @throws OrccException
 	 */
 	private void writeAttributes(Element parent,
-			Map<String, IAttribute> attributes) throws OrccException {
+			Map<String, IAttribute> attributes) {
 		// sort attributes by alphabetical order
 		attributes = new TreeMap<String, IAttribute>(attributes);
 
@@ -355,7 +362,7 @@ public class XDFWriter {
 				break;
 			}
 			default:
-				throw new OrccException("unknown attribute type");
+				throw new OrccRuntimeException("unknown attribute type");
 			}
 
 			attributeElt.setAttribute("kind", kind);
@@ -368,16 +375,15 @@ public class XDFWriter {
 	 * 
 	 * @param path
 	 *            output path
-	 * @throws OrccException
 	 */
-	private void writeChildren(File path) throws OrccException {
+	private void writeChildren(File path) {
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
 				if (instance.isNetwork()) {
 					// writes the network
 					Network child = instance.getNetwork();
-					new XDFWriter(path, child);
+					new XDFWriter().write(path, child);
 				}
 			}
 		}
@@ -389,10 +395,8 @@ public class XDFWriter {
 	 * @param connection
 	 *            a connection
 	 * @return a Connection DOM parent
-	 * @throws OrccException
-	 *             if the connection could not be written
 	 */
-	private Element writeConnection(Connection connection) throws OrccException {
+	private Element writeConnection(Connection connection) {
 		Element connectionElt = document.createElement("Connection");
 		Vertex source = graph.getEdgeSource(connection);
 		Vertex target = graph.getEdgeTarget(connection);
@@ -415,11 +419,9 @@ public class XDFWriter {
 	 * @param connection
 	 *            a connection
 	 * @return a Connection DOM parent
-	 * @throws OrccException
-	 *             if the connection could not be written
 	 */
 	private void writeConnectionEndpoint(Element connectionElt, String name,
-			Vertex vertex, Port port) throws OrccException {
+			Vertex vertex, Port port) {
 		String portAttr;
 		String vertexAttr;
 
@@ -446,10 +448,9 @@ public class XDFWriter {
 	 *            the kind of declarations
 	 * @param variables
 	 *            an ordered map of global variables
-	 * @throws OrccException
 	 */
 	private void writeDecls(Element parent, String kind,
-			OrderedMap<String, Var> variables) throws OrccException {
+			OrderedMap<String, Var> variables) {
 		for (Var variable : variables) {
 			Element decl = document.createElement("Decl");
 			parent.appendChild(decl);
@@ -472,10 +473,8 @@ public class XDFWriter {
 	 * @param expr
 	 *            the entry value as an expression
 	 * @return an Entry DOM parent
-	 * @throws OrccException
 	 */
-	private Element writeEntry(String name, Expression expr)
-			throws OrccException {
+	private Element writeEntry(String name, Expression expr) {
 		Element entry = document.createElement("Entry");
 		entry.setAttribute("kind", "Expr");
 		entry.setAttribute("name", name);
@@ -491,9 +490,8 @@ public class XDFWriter {
 	 * @param type
 	 *            the entry value as a type
 	 * @return an Entry DOM parent
-	 * @throws OrccException
 	 */
-	private Element writeEntry(String name, Type type) throws OrccException {
+	private Element writeEntry(String name, Type type) {
 		Element entry = document.createElement("Entry");
 		entry.setAttribute("kind", "Type");
 		entry.setAttribute("name", name);
@@ -510,10 +508,8 @@ public class XDFWriter {
 	 *            the parent parent to which an Expr parent should be added
 	 * @param expr
 	 *            an expression
-	 * @throws OrccException
 	 */
-	private void writeExpr(Element parent, Expression expr)
-			throws OrccException {
+	private void writeExpr(Element parent, Expression expr) {
 		new BinOpSeqWriter(parent, Integer.MIN_VALUE).doSwitch(expr);
 	}
 
@@ -523,9 +519,8 @@ public class XDFWriter {
 	 * @param instance
 	 *            an instance
 	 * @return an Instance DOM parent
-	 * @throws OrccException
 	 */
-	private Element writeInstance(Instance instance) throws OrccException {
+	private Element writeInstance(Instance instance) {
 		Element instanceElt = document.createElement("Instance");
 		instanceElt.setAttribute("id", instance.getId());
 
@@ -559,10 +554,9 @@ public class XDFWriter {
 	 *            the kind of ports
 	 * @param ports
 	 *            an ordered map of ports
-	 * @throws OrccException
 	 */
 	private void writePorts(Element parent, String kind,
-			OrderedMap<String, Port> ports) throws OrccException {
+			OrderedMap<String, Port> ports) {
 		for (Port port : ports) {
 			Element portElt = document.createElement("Port");
 			parent.appendChild(portElt);
@@ -579,9 +573,8 @@ public class XDFWriter {
 	 * @param type
 	 *            a type
 	 * @return a Type DOM parent
-	 * @throws OrccException
 	 */
-	private Element writeType(Type type) throws OrccException {
+	private Element writeType(Type type) {
 		Element typeElt = document.createElement("Type");
 
 		String name;
@@ -609,9 +602,9 @@ public class XDFWriter {
 			typeElt.appendChild(writeEntry("size",
 					IrFactory.eINSTANCE.createExprInt(size)));
 		} else if (type.isVoid()) {
-			throw new OrccException("void type is invalid in XDF");
+			throw new OrccRuntimeException("void type is invalid in XDF");
 		} else {
-			throw new OrccException("unknown type");
+			throw new OrccRuntimeException("unknown type");
 		}
 
 		typeElt.setAttribute("name", name);
@@ -625,14 +618,13 @@ public class XDFWriter {
 	 *            the XDF parent
 	 * @param network
 	 *            the network
-	 * @throws OrccException
 	 */
-	private void writeXDF(Element xdf, Network network) throws OrccException {
+	private void writeXDF(Element xdf, Network network) {
 		xdf.setAttribute("name", network.getName());
 		writePorts(xdf, "Input", network.getInputs());
 		writePorts(xdf, "Output", network.getOutputs());
 		writeDecls(xdf, "Param", network.getParameters());
-		writeDecls(xdf, "Var", network.getVariables());
+		writeDecls(xdf, "Variable", network.getVariables());
 
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {

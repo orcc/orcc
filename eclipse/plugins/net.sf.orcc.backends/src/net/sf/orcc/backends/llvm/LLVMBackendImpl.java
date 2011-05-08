@@ -176,7 +176,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// print network
 		write("Printing network...\n");
-		new XDFWriter(new File(path), network);
+		XDFWriter writer = new XDFWriter();
+		writer.write(new File(path), network);
 	}
 
 	private void finalizeActors(List<Actor> actors) throws OrccException {

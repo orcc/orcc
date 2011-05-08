@@ -109,12 +109,12 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 		try {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IFile file = root.getFile(new Path(xdfFile));
-			
+
 			Network network = new XDFParser(file).parseNetwork();
 			network.flatten();
 
-			XDFWriter writer = new XDFWriter(new File(vtlFolder), network);
-			xdfFlattenFile = writer.getFile();
+			XDFWriter writer = new XDFWriter();
+			xdfFlattenFile = writer.write(new File(vtlFolder), network);
 		} catch (OrccException e) {
 			e.printStackTrace();
 		}

@@ -30,9 +30,9 @@ package net.sf.orcc.network;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
@@ -127,8 +127,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		this.id = id;
 		this.clasz = clasz;
 
-		this.parameters = new HashMap<String, Expression>();
-		this.attributes = new HashMap<String, IAttribute>();
+		this.parameters = new TreeMap<String, Expression>();
+		this.attributes = new TreeMap<String, IAttribute>();
 
 		this.hierarchicalId = new ArrayList<String>(1);
 		this.hierarchicalId.add(id);

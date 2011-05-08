@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui;
 
+import net.sf.orcc.OrccProjectNature;
+
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
