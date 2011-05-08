@@ -101,7 +101,7 @@ parameters(type, variable, cast, location) ::= <<
 >>
 
 argumentDeclaration(variable) ::= <<
-<variable.type><if(variable.type.list)>*<endif> %<variable>
+<variable.type><if(variable.type.list)>*<endif> %<variable.name>
 >>
 
 Location(location) ::= <<

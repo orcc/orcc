@@ -18,12 +18,10 @@ endif>
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-@<variable.name> = <if(variable.assignable)> global <
-else> constant <endif> <variable.type> <
+@<variable.name> = <if(variable.assignable)>global<else>constant<endif> <variable.type> <
 if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.initialValue)> 
 <else> zeroinitializer, align 32 
 <endif>
-
 >>
 
 
@@ -311,7 +309,6 @@ entry:
 
 actorParameter(parameter) ::= <<
 @<parameter.name> = global <parameter.type> undef
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -332,31 +329,45 @@ actor(actor, options) ::= <<
 ; Generated from "<actor.name>"
 declare i32 @printf(i8* noalias , ...) nounwind 
 
+<if(actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-<actor.inputs: fifo()>
+<actor.inputs: fifo(); separator="\n">
+<endif>
+
+<if(actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<actor.outputs: fifo()>
+<actor.outputs: fifo(); separator="\n">
+<endif>
+
+<if(actor.parameters)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<actor.parameters: actorParameter()>
+<actor.parameters: actorParameter(); separator="\n">
+<endif>
+
+<if(actor.stateVars)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
-<actor.stateVars: stateVar()>
+<actor.stateVars: stateVar(); separator="\n">
+<endif>
 
+<if(actor.procs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
 <actor.procs: {proc | <procedure(procedure = proc)>}>
+<endif>
+
+<if(actor.initializes)>
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Initializes
+<actor.initializes: printAction()>
+<endif>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
 <actor.actions: printAction()>
-
-<if(actor.initializes)>
-; Initializes
-<actor.initializes: printAction()>
-<endif>
 
 <decl_MD(actor)>
 
