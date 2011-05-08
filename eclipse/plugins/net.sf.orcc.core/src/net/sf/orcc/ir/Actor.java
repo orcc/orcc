@@ -197,9 +197,9 @@ public interface Actor extends EObject {
 	Procedure getProcedure(String string);
 
 	/**
-	 * Returns a list of all procedures contained in this actor.
+	 * Returns the list of functions and procedures defined in this actor.
 	 * 
-	 * @return a list of all procedures contained in this actor
+	 * @return the list of functions and procedures defined in this actor
 	 * @model containment="true"
 	 */
 	EList<Procedure> getProcs();
