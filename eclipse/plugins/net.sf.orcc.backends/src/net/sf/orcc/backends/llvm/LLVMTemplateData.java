@@ -35,11 +35,13 @@ import java.util.Map;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MoC;
@@ -47,15 +49,23 @@ import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
 
 import org.eclipse.emf.common.util.EMap;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class computes a map for inserting metadata information into LLVM
  * template.
  * 
  * @author Jerome GORIN
+ * @author Herve Yviquel
  * 
  */
 public class LLVMTemplateData {
+
+	/**
+	 * Medata container of actions of MoCs
+	 */
+	private Map<Object, Integer> actionMoC;
 
 	/**
 	 * Medata container of actions
@@ -68,14 +78,14 @@ public class LLVMTemplateData {
 	private Map<Object, Integer> actionScheduler;
 
 	/**
-	 * Actor to compute
+	 * Medata container of configurations
 	 */
-	private Actor actor;
+	private Map<Object, Integer> configurations;
 
 	/**
 	 * Medata container of expressions
 	 */
-	private Map<Object, Integer> exprs;
+	private Map<String, Integer> exprs;
 
 	/**
 	 * Medata identifier counter
@@ -88,49 +98,49 @@ public class LLVMTemplateData {
 	private Map<Object, Integer> mocs;
 
 	/**
-	 * Medata container of actions of MoCs
-	 */
-	private Map<Object, Integer> actionMoC;
-
-	/**
 	 * Medata container of names
 	 */
-	private Map<Object, Integer> names;
+	private Map<String, Integer> names;
+
+	/**
+	 * Label of all nodes
+	 */
+	private Map<Node, Integer> nodeToLabelMap;
 
 	private Map<Object, Integer> numTokenPattern;
+
 	/**
 	 * Medata container of patterns
 	 */
 	private Map<Object, Integer> patterns;
+
 	/**
 	 * Medata container of ports
 	 */
-	private Map<Object, Integer> ports;
-
-	/**
-	 * Medata container of configurations
-	 */
-	private Map<Object, Integer> configurations;
+	private Map<Port, Integer> ports;
 
 	/**
 	 * Medata container of procedures
 	 */
-	private Map<Object, Integer> procs;
+	private Map<Procedure, Integer> procs;
 
 	/**
 	 * Medata container of types
 	 */
-	private Map<Object, Integer> types;
+	private Map<Type, Integer> types;
 
 	private Map<Object, Integer> varPattern;
 
 	/**
 	 * Medata container of variables
 	 */
-	private Map<Object, Integer> vars;
+	private Map<Var, Integer> vars;
 
 	public LLVMTemplateData(Actor actor) {
-		ports = new HashMap<Object, Integer>();
+		nodeToLabelMap = new HashMap<Node, Integer>();
+
+		// Initialize metadata maps
+		ports = new HashMap<Port, Integer>();
 		actions = new HashMap<Object, Integer>();
 		actionScheduler = new HashMap<Object, Integer>();
 		actionMoC = new HashMap<Object, Integer>();
@@ -138,16 +148,15 @@ public class LLVMTemplateData {
 		patterns = new HashMap<Object, Integer>();
 		varPattern = new HashMap<Object, Integer>();
 		numTokenPattern = new HashMap<Object, Integer>();
-		procs = new HashMap<Object, Integer>();
-		vars = new HashMap<Object, Integer>();
-		types = new HashMap<Object, Integer>();
-		names = new HashMap<Object, Integer>();
+		procs = new HashMap<Procedure, Integer>();
+		vars = new HashMap<Var, Integer>();
+		types = new HashMap<Type, Integer>();
+		names = new HashMap<String, Integer>();
 		mocs = new HashMap<Object, Integer>();
-		exprs = new HashMap<Object, Integer>();
-		this.actor = actor;
-		this.id = 0;
+		exprs = new HashMap<String, Integer>();
+		id = 0;
 
-		computeActor();
+		computeTemplateMaps(actor);
 	}
 
 	private void computeAction(Action action) {
@@ -166,7 +175,7 @@ public class LLVMTemplateData {
 		actions.put(action.getBody(), id++);
 	}
 
-	private void computeActionScheduler() {
+	private void computeActionScheduler(Actor actor) {
 		if (!actor.getActionsOutsideFsm().isEmpty()) {
 			actionScheduler.put(actor.getActionsOutsideFsm(), id++);
 		}
@@ -187,11 +196,19 @@ public class LLVMTemplateData {
 		}
 	}
 
-	/**
-	 * Computes metadata of actors.
-	 * 
-	 */
-	private void computeActor() {
+	private void computeConfiguration(Action action, SDFMoC sdfMoC) {
+		configurations.put(action, id++);
+		computeCSDFMoC(sdfMoC);
+	}
+
+	private void computeCSDFMoC(CSDFMoC sdfmoc) {
+		actionMoC.put(sdfmoc, id++);
+		actionMoC.put(sdfmoc.getActions(), id++);
+		computePattern(sdfmoc.getInputPattern());
+		computePattern(sdfmoc.getOutputPattern());
+	}
+
+	private void computeMetadataMaps(Actor actor) {
 		// Insert source file info
 		names.put(actor.getFile(), id++);
 
@@ -199,7 +216,7 @@ public class LLVMTemplateData {
 		names.put(actor.getName(), id++);
 
 		// Insert action scheduler
-		computeActionScheduler();
+		computeActionScheduler(actor);
 
 		// Insert inputs
 		for (Port input : actor.getInputs()) {
@@ -241,24 +258,6 @@ public class LLVMTemplateData {
 		}
 	}
 
-	private void computeCSDFMoC(CSDFMoC sdfmoc) {
-		actionMoC.put(sdfmoc, id++);
-		actionMoC.put(sdfmoc.getActions(), id++);
-		computePattern(sdfmoc.getInputPattern());
-		computePattern(sdfmoc.getOutputPattern());
-	}
-
-	private void computeQSDFMoC(QSDFMoC qsdfMoc) {
-		for (Action action : qsdfMoc.getActions()) {
-			computeConfiguration(action, qsdfMoc.getStaticClass(action));
-		}
-	}
-
-	private void computeConfiguration(Action action, SDFMoC sdfMoC) {
-		configurations.put(action, id++);
-		computeCSDFMoC(sdfMoC);
-	}
-
 	private void computeMoC(MoC moc) {
 		mocs.put(moc, id++);
 		if (moc.isSDF() || moc.isCSDF()) {
@@ -266,6 +265,20 @@ public class LLVMTemplateData {
 		} else if (moc.isQuasiStatic()) {
 			mocs.put(moc, id++);
 			computeQSDFMoC((QSDFMoC) moc);
+		}
+	}
+
+	private void computeNodeToLabelMap(Actor actor) {
+		TreeIterator<EObject> it = actor.eAllContents();
+		int label = 0;
+		while (it.hasNext()) {
+			EObject object = it.next();
+
+			if (object instanceof Node) {
+				Node node = (Node) object;
+				nodeToLabelMap.put(node, label);
+				label++;
+			}
 		}
 	}
 
@@ -292,11 +305,22 @@ public class LLVMTemplateData {
 		procs.put(proc, id++);
 	}
 
+	private void computeQSDFMoC(QSDFMoC qsdfMoc) {
+		for (Action action : qsdfMoc.getActions()) {
+			computeConfiguration(action, qsdfMoc.getStaticClass(action));
+		}
+	}
+
 	private void computeStateVar(Var var) {
 		computeVar(var);
 		if (var.isInitialized()) {
 			exprs.put(var.getName(), id++);
 		}
+	}
+
+	public void computeTemplateMaps(Actor actor) {
+		computeMetadataMaps(actor);
+		computeNodeToLabelMap(actor);
 	}
 
 	private void computeVar(Var var) {
@@ -312,21 +336,21 @@ public class LLVMTemplateData {
 	}
 
 	/**
+	 * get the actions of a MoC
+	 * 
+	 * @return a map of actions of MoC information.
+	 */
+	public Map<Object, Integer> getActionMoC() {
+		return actionMoC;
+	}
+
+	/**
 	 * get actions map
 	 * 
 	 * @return a map of action information.
 	 */
 	public Map<Object, Integer> getActions() {
 		return actions;
-	}
-
-	/**
-	 * get configurations map
-	 * 
-	 * @return a map of configuration information.
-	 */
-	public Map<Object, Integer> getConfigurations() {
-		return configurations;
 	}
 
 	/**
@@ -339,12 +363,12 @@ public class LLVMTemplateData {
 	}
 
 	/**
-	 * get the actions of a MoC
+	 * get configurations map
 	 * 
-	 * @return a map of actions of MoC information.
+	 * @return a map of configuration information.
 	 */
-	public Map<Object, Integer> getActionMoC() {
-		return actionMoC;
+	public Map<Object, Integer> getConfigurations() {
+		return configurations;
 	}
 
 	/**
@@ -352,7 +376,7 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of expression information.
 	 */
-	public Map<Object, Integer> getExprs() {
+	public Map<String, Integer> getExprs() {
 		return exprs;
 	}
 
@@ -370,8 +394,12 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of variable information.
 	 */
-	public Map<Object, Integer> getNames() {
+	public Map<String, Integer> getNames() {
 		return names;
+	}
+
+	public Map<Node, Integer> getNodeToLabelMap() {
+		return nodeToLabelMap;
 	}
 
 	/**
@@ -397,7 +425,7 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of port information.
 	 */
-	public Map<Object, Integer> getPorts() {
+	public Map<Port, Integer> getPorts() {
 		return ports;
 	}
 
@@ -406,7 +434,7 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of procedure information.
 	 */
-	public Map<Object, Integer> getProcs() {
+	public Map<Procedure, Integer> getProcs() {
 		return procs;
 	}
 
@@ -415,7 +443,7 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of type information.
 	 */
-	public Map<Object, Integer> getTypes() {
+	public Map<Type, Integer> getTypes() {
 		return types;
 	}
 
@@ -433,7 +461,7 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of variable information.
 	 */
-	public Map<Object, Integer> getVars() {
+	public Map<Var, Integer> getVars() {
 		return vars;
 	}
 
