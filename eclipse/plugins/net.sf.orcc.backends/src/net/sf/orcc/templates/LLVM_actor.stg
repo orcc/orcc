@@ -5,13 +5,9 @@ import "net/sf/orcc/templates/LLVM_metadata.stg"
 ///////////////////////////////////////////////////////////////////////////////
 
 variableDeclaration(variable) ::= <<
-<if(!variable.port)
-><if(variable.type.list)
-><if(variable.instruction.store || !variable.instruction)>
+<if(variable.type.list)>
 <AllocaOp(result={%<variable.name>}, type=variable.type)>
 <endif>
-<endif><
-endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -178,7 +174,6 @@ endif>
 
 printStore(store) ::= <<
 <StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target.variable), ptr=Var(store.target.variable))>
-
 >>
 
 printLoad(load) ::= <<
@@ -237,7 +232,6 @@ b<label(first(whileNode.nodes))>:
 	br label %b<label(whileNode.joinNode)>
 
 b<label(first(whileNode.joinNode.successors))>:
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -291,10 +285,10 @@ entry:
 	<procedure.locals: variableDeclaration()>
 <endif>
 <if(action.inputPattern.ports)>
-	<action.inputPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}>
+	<action.inputPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}; separator="\n">
 <endif>
 <if(action.outputPattern.ports)>
-	<action.outputPattern.ports: { port | <fifoVar(port=port, var=action.outputPattern.portToVarMap.(port))>}>
+	<action.outputPattern.ports: { port | <fifoVar(port=port, var=action.outputPattern.portToVarMap.(port))>}; separator="\n">
 <endif>
 <printNodes(trunc(procedure.nodes))>
 <printNode(last(procedure.nodes))>

@@ -53,7 +53,9 @@ import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
+import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
@@ -138,8 +140,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new TypeSizeTransformation(), new BoolToIntTransformation(),
 				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
+				new InstPhiTransformation(),
 				new ThreeAddressCodeTransformation(true), new CastAdder(true),
-				new GetElementPtrAdder() };
+				new GetElementPtrAdder(), new BlockCombine() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
