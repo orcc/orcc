@@ -182,11 +182,11 @@ name_decl_MD(actor) ::= <<
 
 
 actionScheduler_decl_MD(actor) ::= <<
-!<actor.templateData.actionScheduler.(actor.actionScheduler)>
+!<actor.templateData.actionScheduler.(actor)>
 >>
 
 FSM_decl_MD(actor) ::= <<
-!<actor.templateData.actionScheduler.(actor.actionScheduler.fsm)>
+!<actor.templateData.actionScheduler.(actor.fsm)>
 >>
 
 var_decl_MD(actor, var) ::= <<
@@ -206,15 +206,15 @@ proc_decl_MD(actor, proc) ::= <<
 >>
 
 actions_decl_MD(actor) ::= <<
-!<actor.templateData.actionScheduler.(actor.actionScheduler.actions)>
+!<actor.templateData.actionScheduler.(actor.actions)>
 >>
 
 State_decl_MD(actor) ::= <<
-!<actor.templateData.actionScheduler.(actor.actionScheduler.fsm.states)>
+!<actor.templateData.actionScheduler.(actor.fsm.states)>
 >>
 
 Transitions_decl_MD(actor) ::= <<
-!<actor.templateData.actionScheduler.(actor.actionScheduler.fsm.transitions)>
+!<actor.templateData.actionScheduler.(actor.fsm.transitions)>
 >>
 
 Transition_decl_MD(actor, transition) ::= <<
@@ -297,10 +297,10 @@ name_MD(actor) ::= <<
 
 actionScheduler_MD(actor) ::= <<
 <actionScheduler_decl_MD(actor)> = metadata !{<
-if(!actor.actionScheduler.actions.empty)> metadata <actions_decl_MD(actor)> <else> null <endif>, <
-if(actor.actionScheduler.fsm)> metadata <FSM_decl_MD(actor)> <else> null <endif>}
+if(!actor.actions.empty)> metadata <actions_decl_MD(actor)> <else> null <endif>, <
+if(actor.fsm)> metadata <FSM_decl_MD(actor)> <else> null <endif>}
 
-<if(!actor.actionScheduler.actions.empty)>
+<if(!actor.actions.empty)>
 <actions_MD(actor)>
 <endif>
 
@@ -310,7 +310,7 @@ if(actor.actionScheduler.fsm)> metadata <FSM_decl_MD(actor)> <else> null <endif>
 >>
 
 actions_MD(actor) ::= <<
-<actions_decl_MD(actor)> = metadata !{<actor.actionScheduler.actions: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">}
+<actions_decl_MD(actor)> = metadata !{<actor.actions: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">}
 >>
 
 patterns_MD(actor, patterns) ::= <<

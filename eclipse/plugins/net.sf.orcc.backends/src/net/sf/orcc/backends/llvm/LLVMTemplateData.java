@@ -176,6 +176,7 @@ public class LLVMTemplateData {
 	}
 
 	private void computeActionScheduler(Actor actor) {
+		actionScheduler.put(actor, id++);
 		if (!actor.getActionsOutsideFsm().isEmpty()) {
 			actionScheduler.put(actor.getActionsOutsideFsm(), id++);
 		}
