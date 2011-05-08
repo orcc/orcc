@@ -108,32 +108,6 @@ CastParameter(casts, args, params, location )::= <<
 <endif>}>
 >>
 
-IfWithThenElseNodes(ifNode) ::= <<
-	<BrOp(cond=Expr(expr=ifNode.condition, type=ifNode.condition.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.elseNodes)>}, dest="")>
-
-b<label(ifNode.thenNodes)>: 
-<printNodes_cond(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
-	br label %b<label(ifNode.joinNode)>
-
-b<label(ifNode.elseNodes)>:
-<printNodes_cond(first(ifNode.elseNodes))> <printNodes(rest(ifNode.elseNodes))>
-	br label %b<label(ifNode.joinNode)>
-
-b<label(ifNode.joinNode)>:
-
->>
-
-IfWithThenNode(ifNode) ::= <<
-	<BrOp(cond=Expr(expr=ifNode.condition, type=ifNode.condition.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.joinNode)>}, dest="")>
-
-b<label(ifNode.thenNodes)>: 
-<printNodes_cond(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
-	br label %b<label(ifNode.joinNode)>
-
-b<label(ifNode.joinNode)>:
-
->>
-
 label(nodes) ::= "b<first(nodes):{ x | <x.label>}>"
 
 phiPairs(phi) ::= <<
@@ -233,20 +207,29 @@ elseif(node.whileNode)><printWhileNode(node)><
 endif>
 >>
 
-// if node
+
 printIfNode(ifNode) ::= <<
-<if(ifNode.thenNodes)>
 <if(ifNode.elseNodes)>
-<IfWithThenElseNodes(ifNode)>
+	<BrOp(cond=Expr(expr=ifNode.condition, type=ifNode.condition.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.elseNodes)>}, dest="")>
 <else>
-<IfWithThenNode(ifNode)>	
+	<BrOp(cond=Expr(expr=ifNode.condition, type=ifNode.condition.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.joinNode)>}, dest="")>
 <endif>
+
+b<label(ifNode.thenNodes)>: 
+<printNodes_cond(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
+	br label %b<label(ifNode.joinNode)>
+
+<if(ifNode.elseNodes)>
+b<label(ifNode.elseNodes)>:
+<printNodes_cond(first(ifNode.elseNodes))> <printNodes(rest(ifNode.elseNodes))>
+	br label %b<label(ifNode.joinNode)>
 <endif>
+
+b<label(ifNode.joinNode)>:
 <printNodes_cond(first(ifNode.joinNode))>
 <printNodes(rest(ifNode.joinNode))>
 >>
 
-// while node
 printWhileNode(whileNode) ::= <<
 <printBlockNode(whileNode.joinNode)>
 	<BrOp(cond=Expr(expr=whileNode.condition, type=whileNode.condition.type), iftrue={%b<label(whileNode.Nodes)>}, iffalse={%b<label(whileNode.joinNode.successors)>}, dest="")>
