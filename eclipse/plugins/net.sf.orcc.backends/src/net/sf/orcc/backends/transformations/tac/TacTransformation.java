@@ -52,7 +52,7 @@ import net.sf.orcc.ir.util.ActorVisitor;
  * @author Jerome GORIN
  * 
  */
-public class ThreeAddressCodeTransformation extends
+public class TacTransformation extends
 		AbstractActorVisitor<Object> {
 
 	private boolean usePreviousJoinNode;
@@ -64,7 +64,7 @@ public class ThreeAddressCodeTransformation extends
 	 *            <code>true</code> if the current IR form has join node before
 	 *            while node
 	 */
-	public ThreeAddressCodeTransformation(boolean usePreviousJoinNode) {
+	public TacTransformation(boolean usePreviousJoinNode) {
 		this.usePreviousJoinNode = usePreviousJoinNode;
 	}
 
