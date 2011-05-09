@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,56 +26,56 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
+package net.sf.orcc.backends.transformations.tac;
 
-import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
-
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import net.sf.orcc.ir.util.ActorVisitor;
 
 /**
- * Replace occurrences with direct assignments to their corresponding values. A
- * direct assignment is an assign instruction of form x = y, which simply
- * assigns the value of y to x.
+ * Main transformation for applying three-address code form to actor IR.
+ * <p>
+ * This transformation is composed of 4 atomic transformations :
+ * <ul>
+ * 
+ * <li>{@link #CopyPropagationTransformation()} that propagates copy of
+ * variables.</li>
+ * <li>{@link #ExpressionSplitterTransformation()} that splits complex
+ * expressions into fundamental operations.</li>
+ * <li>{@link #BuildCFG()} that builds a CFG of the actor IR.</li>
+ * <li>
+ * {@link #CastAdderTransformation()} that add cast in the IR when necessary.</li>
+ * </ul>
+ * </p>
  * 
  * @author Jerome GORIN
- * @author Herve Yviquel
  * 
  */
-public class CopyPropagator extends AbstractActorVisitor<Object> {
+public class ThreeAddressCodeTransformation extends
+		AbstractActorVisitor<Object> {
 
-	protected boolean changed;
+	private boolean usePreviousJoinNode;
 
-	@Override
-	public Object caseProcedure(Procedure procedure) {
-		do {
-			changed = false;
-			super.caseProcedure(procedure);
-		} while (changed);
-		return null;
+	/**
+	 * Creates a new three address code transformation
+	 * 
+	 * @param usePreviousJoinNode
+	 *            <code>true</code> if the current IR form has join node before
+	 *            while node
+	 */
+	public ThreeAddressCodeTransformation(boolean usePreviousJoinNode) {
+		this.usePreviousJoinNode = usePreviousJoinNode;
 	}
 
 	@Override
-	public Object caseInstAssign(InstAssign assign) {
-		if (assign.getValue().isVarExpr()) {
-			Var source = ((ExprVar) assign.getValue()).getUse().getVariable();
-			Var target = assign.getTarget().getVariable();
-			EList<Use> targetUses = target.getUses();
-			if (!targetUses.isEmpty()) {
-				changed = true;
-				while (!targetUses.isEmpty()) {
-					targetUses.get(0).setVariable(source);
-				}
-				EcoreUtil.remove(target);
-				EcoreHelper.delete(assign);
-				indexInst--;
-			}
+	public Object caseActor(Actor actor) {
+		ActorVisitor<?>[] transformations = {
+				new ExpressionSplitter(usePreviousJoinNode), new BuildCFG(),
+				new CopyPropagator(), new ConstantPropagator() };
+
+		for (ActorVisitor<?> transformation : transformations) {
+			transformation.doSwitch(actor);
 		}
 		return null;
 	}

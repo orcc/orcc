@@ -42,7 +42,7 @@ import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.Inliner;
-import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitter;
+import net.sf.orcc.backends.transformations.tac.ExpressionSplitter;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;

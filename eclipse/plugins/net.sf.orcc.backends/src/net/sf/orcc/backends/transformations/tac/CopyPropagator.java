@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, IRISA
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IRISA nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,12 +26,13 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
+package net.sf.orcc.backends.transformations.tac;
 
 import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
@@ -39,29 +40,44 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
- * Replace variables with constant value by their value.
+ * Replace occurrences with direct assignments to their corresponding values. A
+ * direct assignment is an assign instruction of form x = y, which simply
+ * assigns the value of y to x.
  * 
+ * @author Jerome GORIN
  * @author Herve Yviquel
  * 
  */
-public class ConstantPropagator extends AbstractActorVisitor<Object> {
+public class CopyPropagator extends AbstractActorVisitor<Object> {
+
+	protected boolean changed;
+
+	@Override
+	public Object caseProcedure(Procedure procedure) {
+		do {
+			changed = false;
+			super.caseProcedure(procedure);
+		} while (changed);
+		return null;
+	}
 
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
-		Expression value = assign.getValue();
-		if (value.isBooleanExpr() || value.isFloatExpr() || value.isIntExpr()
-				|| value.isStringExpr()) {
-			EList<Use> targetUses = assign.getTarget().getVariable().getUses();
-			while (!targetUses.isEmpty()) {
-				ExprVar expr = EcoreHelper.getContainerOfType(
-						targetUses.get(0), ExprVar.class);
-				EcoreUtil.replace(expr, EcoreHelper.copy(value));
-				EcoreHelper.delete(expr);
+		if (assign.getValue().isVarExpr()) {
+			Var source = ((ExprVar) assign.getValue()).getUse().getVariable();
+			Var target = assign.getTarget().getVariable();
+			EList<Use> targetUses = target.getUses();
+			if (!targetUses.isEmpty()) {
+				changed = true;
+				while (!targetUses.isEmpty()) {
+					targetUses.get(0).setVariable(source);
+				}
+				EcoreUtil.remove(target);
+				EcoreHelper.delete(assign);
+				indexInst--;
 			}
-			EcoreUtil.remove(assign.getTarget());
-			EcoreHelper.delete(assign);
-			indexInst--;
 		}
 		return null;
 	}
+
 }
