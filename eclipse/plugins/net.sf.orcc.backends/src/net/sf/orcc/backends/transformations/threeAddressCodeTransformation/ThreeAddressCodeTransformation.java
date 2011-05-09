@@ -70,8 +70,9 @@ public class ThreeAddressCodeTransformation extends
 
 	@Override
 	public Object caseActor(Actor actor) {
-		ActorVisitor<?>[] transformations = { new CopyPropagator(),
-				new ExpressionSplitter(usePreviousJoinNode), new BuildCFG() };
+		ActorVisitor<?>[] transformations = {
+				new ExpressionSplitter(usePreviousJoinNode), new BuildCFG(),
+				new CopyPropagator(), new ConstantPropagator() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
