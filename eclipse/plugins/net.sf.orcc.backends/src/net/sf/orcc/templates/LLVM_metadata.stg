@@ -24,14 +24,18 @@ fifo(port) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 ConstantValue(type, const) ::= <<
-<if(type.list)> <Constant(constant = const, type = type, iterator = type.sizeIterator)> <else> <Constant(constant = const, type="", iterator="")> <endif>
+<if(type.list)
+><Constant(constant=const, type=type, iterator=type.sizeIterator)><
+else
+><Constant(constant=const, type="", iterator="")><
+endif>
 >>
 
 Constant(constant, type, iterator) ::= <<
 <if (constant.booleanExpr)><printBool(constant)><
-elseif (constant.intExpr)><printInt(constant)><
-elseif (constant.listExpr)><printList(constant = constant, type = type, iterator = iterator)><
-elseif (constant.stringExpr)><printString(constant)><
+elseif(constant.intExpr)><printInt(constant)><
+elseif(constant.listExpr)><printList(constant=constant, type=type, iterator=iterator)><
+elseif(constant.stringExpr)><printString(constant)><
 endif>
 >>
 
@@ -45,7 +49,7 @@ printInt(constant) ::= <<
 
 // the values of a list: {val1, val2, ..., valn}
 printList(constant, type, iterator) ::= <<
-[<iterator, constant.value: {iterator, value | <type.type> <if(value)> <Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)> <else> zeroinitializer <endif> }; wrap, separator=", ">]
+[<iterator, constant.value: {iterator, value | <type.type> <if(value)><Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)><else>zeroinitializer<endif>}; wrap, separator=", ">]
 >>
 
 printString(constant) ::= <<

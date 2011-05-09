@@ -105,11 +105,11 @@ CastParameter(casts, args, params, location )::= <<
 label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 
 phiPairs(phi) ::= <<
-<phiExpr(expr=first(phi.values), type=phi.target.type , node = first(phi.block.predecessors))>, <phiExpr(expr=first(rest(phi.values)), type=phi.target.type, node = rest(phi.block.predecessors))>
+<phiExpr(first(phi.values), phi.target.variable.type, first(phi.block.predecessors))>, <phiExpr(first(rest(phi.values)), phi.target.variable.type, rest(phi.block.predecessors))>
 >>
 
 phiExpr(expr, type, node) ::= <<
-[<Expr(expr=expr, type=type)> , %b<label(node)> ]
+[<Expr(expr=expr, type=type)>, %b<label(node)>]
 >>
 
 
@@ -161,7 +161,7 @@ printAssign(assign) ::= <<
 >>
 
 printPhiAssignment(phi) ::= <<
-<Var(phi.target.variable)> = phi <phi.target.type> <phiPairs(phi)>
+<Var(phi.target.variable)> = phi <phi.target.variable.type> <phiPairs(phi)>
 >>
 
 printReturn(return) ::= <<
