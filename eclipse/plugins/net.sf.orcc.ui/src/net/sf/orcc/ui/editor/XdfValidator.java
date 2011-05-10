@@ -54,39 +54,46 @@ public class XdfValidator extends DataflowValidator {
 			fileName = fileName.substring(0, index);
 		}
 
-		if (!fileName.equals(name)) {
-			String message = "Invalid network " + name + ", expected "
-					+ fileName;
+		if (fileName.equals(name)) {
+			return true;
+		} else {
+			String message = "Invalid name of network: '" + name
+					+ "', expected '" + fileName + "'";
 			createMarker(file, message);
 			return false;
 		}
-
-		return true;
 	}
 
 	private boolean checkRefinements(Graph graph, IFile file) {
 		IRefinementPolicy policy = graph.getConfiguration()
 				.getRefinementPolicy();
+		boolean res = true;
 
 		Set<Vertex> vertices = graph.vertexSet();
 		for (Vertex vertex : vertices) {
 			if ("Instance".equals(vertex.getType().getName())) {
 				if (policy.getRefinementFile(vertex) == null) {
-					String message = "Invalid refinement of vertex "
-							+ vertex.getValue(ObjectType.PARAMETER_ID) + ": "
-							+ policy.getRefinement(vertex);
+					String message = "Invalid refinement of vertex '"
+							+ vertex.getValue(ObjectType.PARAMETER_ID) + "': '"
+							+ policy.getRefinement(vertex) + "'";
 					createMarker(file, message);
+					res = false;
 				}
 			}
 		}
 
-		return true;
+		return res;
 	}
 
 	@Override
 	public boolean validate(Graph graph, IFile file) {
-		return checkName(graph, file) && checkRefinements(graph, file)
-				&& super.validate(graph, file);
+		boolean res = true;
+
+		res &= checkName(graph, file);
+		res &= checkRefinements(graph, file);
+		res &= super.validate(graph, file);
+
+		return res;
 	}
 
 }
