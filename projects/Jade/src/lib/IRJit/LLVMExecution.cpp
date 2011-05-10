@@ -56,7 +56,8 @@
 #include "llvm/Target/TargetSelect.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/Actor/Display.h"
+#include "Jade/Actor/FileDisp.h"
+#include "Jade/Actor/GpacDisp.h"
 #include "Jade/Actor/FileSrc.h"
 #include "Jade/Actor/GpacSrc.h"
 #include "Jade/Core/Port.h"
@@ -88,6 +89,8 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder, bool verbose): Co
 
   this->decoder = decoder;
   this->verbose = verbose;
+
+  this->stopSchVal = 0;
 
   Module* module = decoder->getModule();
 
@@ -243,18 +246,17 @@ void LLVMExecution::setIO(){
 
 void LLVMExecution::initialize(){
 	GpacSrc* gpacSrc = new GpacSrc(1);
-	Display* gpacDisp = new Display(1);
+	GpacDisp* gpacDisp = new GpacDisp(1);
 
 	Configuration* configuration = decoder->getConfiguration();
 
 	//Set input of the decoder
 	Instance* in = configuration->getInstance("source");
-
 	source = gpacSrc;
 
 	//Set var gpac source
-	StateVar* stateVar = in->getStateVar("source");
-	Source** ptrSource = (Source**)getGVPtr(stateVar->getGlobalVariable());
+	StateVar* stateVarIn = in->getStateVar("source");
+	Source** ptrSource = (Source**)getGVPtr(stateVarIn->getGlobalVariable());
 	*ptrSource = gpacSrc;
 
 	//Set setvideo procedure
@@ -263,28 +265,26 @@ void LLVMExecution::initialize(){
 		mapProcedure(getSrcProc, (void*)get_src);
 	}
 
+
 	//Set output of the decoder
 	Instance* out = configuration->getInstance("display");
-
 	display = gpacDisp;
 
-	if (out != NULL){
-		//Set var display
-		StateVar* stateVar = out->getStateVar("display");
-		Display** ptrDisplay = (Display**)getGVPtr(stateVar->getGlobalVariable());
-		*ptrDisplay = gpacDisp;
+	//Set var gpac display
+	StateVar* stateVarOut = out->getStateVar("display");
+	Display** ptrDisplay = (Display**)getGVPtr(stateVarOut->getGlobalVariable());
+	*ptrDisplay = gpacDisp;
 
-		//Set setvideo procedure
-		Procedure* setVideoProc = out->getProcedure("set_video");
-		if (setVideoProc != NULL){
-			mapProcedure(setVideoProc, (void*)set_video);
-		}
+	//Set setvideo procedure
+	Procedure* setVideoProc = out->getProcedure("set_video");
+	if (setVideoProc != NULL){
+		mapProcedure(setVideoProc, (void*)set_video);
+	}
 
-		//Set writemb procedure
-		Procedure* writeMbProc = out->getProcedure("write_mb");
-		if (writeMbProc != NULL){
-			mapProcedure(writeMbProc, (void*)write_mb);
-		}
+	//Set writemb procedure
+	Procedure* writeMbProc = out->getProcedure("write_mb");
+	if (writeMbProc != NULL){
+		mapProcedure(writeMbProc, (void*)write_mb);
 	}
 
 	
@@ -293,7 +293,10 @@ void LLVMExecution::initialize(){
 	// Set stop condition of the scheduler
 	Scheduler* scheduler = decoder->getScheduler();
 	GlobalVariable* stopGV = scheduler->getStopGV();
-	EE->addGlobalMapping(stopGV, gpacSrc->getStopValPtr());
+	EE->addGlobalMapping(stopGV, getStopSchPtr());
+
+	gpacSrc->setStopSchPtr(getStopSchPtr());
+	gpacDisp->setStopSchPtr(getStopSchPtr());
 
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
@@ -313,10 +316,14 @@ void LLVMExecution::initialize(){
 	EE->runFunction(init, noargs);
 }
 
-void LLVMExecution::start(unsigned char* nal, int nal_length){
+void LLVMExecution::start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame){
 	GpacSrc* gpacSrc = (GpacSrc*)source;
-	gpacSrc->startScheduler();
 	gpacSrc->setNal(nal, nal_length);
+
+	GpacDisp* gpacDisp = (GpacDisp*)display;
+	gpacDisp->setFramePtr(rvcFrame);
+
+	startScheduler();
 
 	Scheduler* scheduler = decoder->getScheduler();
 	Function* main = scheduler->getMainFunction();
@@ -344,7 +351,9 @@ void LLVMExecution::setIn(Instance* instance){
 }
 
 void  LLVMExecution::setOut(Instance* instance){
-	 display = new Display(1, verbose);
+	FileDisp* fileDisp = new FileDisp(1, verbose);
+
+	display = fileDisp;
 
 	//Set var display
 	StateVar* stateVar = instance->getStateVar("display");
@@ -366,7 +375,8 @@ void  LLVMExecution::setOut(Instance* instance){
 }
 
 bool LLVMExecution::waitForFirstFrame(){
-	display->waitForFirstFrame();
+	FileDisp* fileDisp = (FileDisp*)display;
+	fileDisp->waitForFirstFrame();
 	return true;
 }
 
@@ -377,7 +387,8 @@ void LLVMExecution::runFunction(Function* function) {
 
 void LLVMExecution::stop(pthread_t* thread) {
 	if (thread != NULL){
-		display->forceStop(thread);
+		FileDisp* fileDisp = (FileDisp*)display;
+		fileDisp->forceStop(thread);
 	}
 }
 

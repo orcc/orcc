@@ -50,7 +50,6 @@ GpacSrc::GpacSrc(int id) : Source(id) {
 	this->cnt = 0;
 	this->nal = NULL;
 	this->nal_length = 0;
-	this->stopVal = 0;
 }
 
 GpacSrc::~GpacSrc(){
@@ -64,9 +63,9 @@ void GpacSrc::setNal(unsigned char* nal, int nal_length){
 
 void GpacSrc::source_get_src(unsigned char* tokens){
 	if(cnt < nal_length){
-		tokens = &nal[cnt];
+		*tokens = nal[cnt];
 		cnt++;
 	} else {
-		stopVal = 1;
+		*stopSchVal = 1;
 	}
 }

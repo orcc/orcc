@@ -176,7 +176,7 @@ Decoder* RVCEngine::prepare(Network* network){
 	return decoder;
 }
 
-void RVCEngine::start(Network* network, unsigned char* nal, int nal_length){
+void RVCEngine::start(Network* network, unsigned char* nal, int nal_length, RVCFRAME* rvcFrame){
 	map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(network);
@@ -189,7 +189,7 @@ void RVCEngine::start(Network* network, unsigned char* nal, int nal_length){
 	Decoder* decoder = it->second;
 
 	LLVMExecution* llvmEE = decoder->getEE();
-	llvmEE->start(nal, nal_length);
+	llvmEE->start(nal, nal_length, rvcFrame);
 }
 
 

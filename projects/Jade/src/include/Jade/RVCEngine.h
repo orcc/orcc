@@ -60,6 +60,7 @@ class Configuration;
 #include "Jade/Fifo/FifoSelection.h"
 #include "Jade/Actor/GpacSrc.h"
 #include "Jade/Actor/Display.h"
+#include "Jade/lib_RVCDecoder/RVCDecoder.h"
 //------------------------------
 
 /**
@@ -111,7 +112,7 @@ public:
      *
      *  Start the given network until a condition is reached
      */
-	void start(Network* network, unsigned char* nal, int nal_length);
+	void start(Network* network, unsigned char* nal, int nal_length, RVCFRAME* rvcFrame);
 
 
 	/*!

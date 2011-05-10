@@ -28,22 +28,23 @@
  */
 
 /**
-@brief Description of the Display class interface
+@brief Description of the FileDisp class interface
 @author Jerome Gorin
-@file Display.h
+@file FileDisp.h
 @version 1.0
 @date 03/02/2011
 */
 
 //------------------------------
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef FileDisp_H
+#define FileDisp_H
 
+#include "Jade/Actor/Display.h"
+
+struct SDL_Surface;
+struct SDL_Overlay;
 //------------------------------
 
-//Max SDL windows size
-#define MAX_WIDTH 720
-#define MAX_HEIGHT 576
 
 /**
  * @brief  This class represents a reconfiguration of a decoder
@@ -51,101 +52,59 @@
  * @author Jerome Gorin
  * 
  */
-class Display {
+class FileDisp : public Display {
 public:
-	Display(int id){
-		this->id = id;
-	}
-	~Display(){};
+	FileDisp(int id, bool outputFps = false);
+	~FileDisp();
 
+	
 	/**
-     *  @brief Return the width of the current display
-	 *
-	 * @return the display width
-	 *
-     */
-	int getWidth(){return width;};
-
-	/**
-     *  @brief Return the height of the current display
-	 *
-	 * @return the display height
-	 *
-     */
-	int getHeight(){return height;};
-
-	/**
-     *  @brief Set the size of the current display
+     *  @brief Set the size of the current FileDisp
 	 *
 	 * @param width : the new width
 	 *
 	 * @param height : the new height
      */
-	virtual void setSize(int width, int height){};
+	void setSize(int width, int height);	
 
 	/**
-     *  @brief Return the Y buffer of the current display
-	 *
-	 * @return the Y buffer
-	 *
-     */
-	void* getBuf_Y(){return img_buf_y;};
-
-	/**
-     *  @brief Return the Y buffer of the current display
-	 *
-	 * @return the Y buffer
-	 *
-     */
-	void* getBuf_U(){return img_buf_u;};
-
-	/**
-     *  @brief Return the Y buffer of the current display
-	 *
-	 * @return the Y buffer
-	 *
-     */
-	void* getBuf_V(){return img_buf_v;};
-
-	/**
-     *  @brief Write YUV value in the current display
+     *  @brief Write YUV value in the current FileDisp
 	 *
 	 * @param tokens : an array represention of YUV values
      */
-	virtual void display_write_mb(unsigned char tokens[384]){};
+	void display_write_mb(unsigned char tokens[384]);
 
+	void forceStop(pthread_t* thread);
 
-protected:
+	bool printFpsEnable(){return outputFps;};
+
+	static void waitForFirstFrame();
+private:
+	void printFps();
+	FILE* bench;
+
+	/** Fps information */
+	int frameDecoded;
+	int frameStart;
+	bool outputFps;
+	int t;
 	
-	/** Buffers of display */
-	unsigned char img_buf_y[MAX_WIDTH * MAX_HEIGHT];
-	unsigned char img_buf_u[MAX_WIDTH * MAX_HEIGHT / 4];
-	unsigned char img_buf_v[MAX_WIDTH * MAX_HEIGHT / 4];
+	/** Thread mutex */
+	static pthread_mutex_t mutex;
+	static pthread_cond_t cond_mutex;
 
-	/** Display id */
-	int id;
+	/** Static functions of FileDisp */
+	static void display_init();
+	static void display_show_image(FileDisp* FileDisp);
+	static void display_set_video(FileDisp* FileDisp);
+	static void press_a_key(int code);
+	static void sendFirstFrameEvent();
 
-	/** Display size */
-	int width;
-	int height;
-
-	/** Current pointer position */
-	int x;
-	int y;
-	
-	/** Static member of Display */
-	static int stopAfter;
-	static int m_width;
-	static int m_height;
+	/** Static member of FileDisp */
+	static SDL_Surface *m_screen;
+	static SDL_Overlay *m_overlay;
+	static bool init;
+	static int boundedDisplays;
 };
 
-static void set_video(void* ptrDisplay, int width, int height){
-	Display* display = (Display*) ptrDisplay;
-	display->setSize(width, height);
-}
-
-static void write_mb(void* ptrDisplay, unsigned char* tokens) {
-	Display* display = (Display*) ptrDisplay;
-	display->display_write_mb(tokens);
-}
 #endif

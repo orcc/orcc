@@ -51,6 +51,7 @@ namespace llvm{
 #include "llvm/LLVMContext.h"
 #include "Jade/Actor/GpacSrc.h"
 #include "Jade/Decoder.h"
+#include "Jade/lib_RVCDecoder/RVCDecoder.h"
 
 class AbstractFifo;
 class Procedure;
@@ -122,7 +123,7 @@ public:
 	 *  Start the execution of the decoder until condition is reached. 
 	 *		Condition MUST be set first with the initialize function.
 	 */
-	void start(unsigned char* nal, int nal_length);
+	void start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame);
 
 	/**
      *  @brief run a specific function of the current decoder
@@ -182,6 +183,27 @@ public:
      */
 	bool waitForFirstFrame();
 
+	/**
+     *  @brief Get value which can stop the scheduler
+	 *
+	 *  This value is continiously tested by the scheduler, it MUST be an int.
+	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
+	 *	continuously test firing rules of actors
+	 *   
+	 *  @return value of the stopVal
+     */
+	int* getStopSchPtr() {return &stopSchVal;}
+
+	/**
+     *  @brief Set to 0 the value which can stop the scheduler
+	 *
+	 *  This value is continiously tested by the scheduler, it MUST be an int.
+	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
+	 *	continuously test firing rules of actors
+     */
+	void startScheduler() {stopSchVal = 0;}
+
+
 	void* getExit(); 
 	void recompile(llvm::Function* function);
 	
@@ -216,6 +238,9 @@ private:
 
 	/** verbose */
 	bool verbose;
+
+	/** This is the value which can stop the scheduler */
+	int stopSchVal;
 };
 
 #endif

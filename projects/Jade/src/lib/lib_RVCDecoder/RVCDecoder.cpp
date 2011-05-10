@@ -78,7 +78,7 @@ cl::opt<std::string> YuvFile(init(""));
 
 cl::opt<std::string> ScFile(init(""));
 
-cl::opt<std::string> OutputDir(init(""));
+cl::opt<std::string> OutputDir(init("c://trace//"));
 
 cl::opt<bool> ForceInterpreter(init(false));
 
@@ -162,7 +162,8 @@ void rvc_init(char *XDF){
 int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME *Frame, int *LayerCommand){
 	
 	//Start decoder
-	decoder->getEE()->start(nal, nal_length);
+	decoder->getEE()->start(nal, nal_length, Frame);
+	
 
 //engine->run(network, VidFile);
 	return 0;

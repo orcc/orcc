@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class Display
+@brief Implementation of class FileDisp
 @author Jerome Gorin
-@file Display.cpp
+@file FileDisp.cpp
 @version 1.0
 @date 15/11/2010
 */
@@ -40,31 +40,33 @@
 #include "SDL.h"
 
 #include <pthread.h>
-#include "Jade/Actor/Display.h"
+#include "Jade/Actor/FileDisp.h"
 
 #include "llvm/Support/CommandLine.h"
 //------------------------------
 
 using namespace std;
 
-//Initialize static member of display
-SDL_Surface* Display::m_screen = NULL;
-SDL_Overlay* Display::m_overlay = NULL;
+//Initialize static member of Display
 int Display::m_width = 0;
 int Display::m_height = 0;
-bool Display::init = false;
-int Display::boundedDisplays = 0;
-pthread_mutex_t Display::mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t Display::cond_mutex = PTHREAD_COND_INITIALIZER;
 
-void Display::press_a_key(int code) {
+//Initialize static member of FileDisp
+SDL_Surface* FileDisp::m_screen = NULL;
+SDL_Overlay* FileDisp::m_overlay = NULL;
+bool FileDisp::init = false;
+int FileDisp::boundedDisplays = 0;
+pthread_mutex_t FileDisp::mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t FileDisp::cond_mutex = PTHREAD_COND_INITIALIZER;
+
+void FileDisp::press_a_key(int code) {
 	char buf[2];
 	printf("Press enter to continue\n");
 	fgets(buf, 2, stdin);
 	exit(code);
 }
 
-Display::Display(int id, bool printFps){
+FileDisp::FileDisp(int id, bool printFps) : Display(id){
 	this->id = id;
 	this->outputFps = outputFps;
 	this->frameDecoded = 0;
@@ -80,7 +82,7 @@ Display::Display(int id, bool printFps){
 	}
 }
 
-Display::~Display(){
+FileDisp::~FileDisp(){
 	boundedDisplays--;
 	fclose(bench);
 	if (boundedDisplays == 0){
@@ -88,7 +90,7 @@ Display::~Display(){
 	}
 }
 
-void Display::forceStop(pthread_t* thread){
+void FileDisp::forceStop(pthread_t* thread){
 	SDL_Event sdlEvent;
 	sdlEvent.type = SDL_QUIT;
 	SDL_PushEvent(&sdlEvent);
@@ -96,10 +98,10 @@ void Display::forceStop(pthread_t* thread){
 	SDL_Quit();
 }
 
-void Display::waitForFirstFrame(){
+void FileDisp::waitForFirstFrame(){
 	clock_t start = clock ();
 	
-	//Wait for the first image to be display
+	//Wait for the first image to be FileDisp
 	pthread_mutex_lock( &mutex );
 	pthread_cond_wait( &cond_mutex, &mutex );
 	pthread_mutex_unlock( &mutex );
@@ -107,14 +109,14 @@ void Display::waitForFirstFrame(){
 	cout << "---> First image arrived after " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
 }
 
-void Display::sendFirstFrameEvent(){
+void FileDisp::sendFirstFrameEvent(){
 	pthread_mutex_lock( &mutex );
 	pthread_cond_signal( &cond_mutex);
 	pthread_mutex_unlock( &mutex );
 }
 
 
-void Display::display_write_mb(unsigned char tokens[384]) {
+void FileDisp::display_write_mb(unsigned char tokens[384]) {
 	int i, j, cnt, base;
 
 	if (t == 0){
@@ -185,7 +187,7 @@ void print_fps_avg(void) {
 		1000.0f * (float)firstFrame / (float)t);*/
 }
 
-void Display::printFps(){
+void FileDisp::printFps(){
 	int t2 = SDL_GetTicks();
 
 	if (t2 - t > 3000) {
@@ -200,7 +202,7 @@ void Display::printFps(){
 
 }
 
-void Display::display_show_image(Display* display) {
+void FileDisp::display_show_image(FileDisp* FileDisp) {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	if (SDL_LockYUVOverlay(m_overlay) < 0) {
@@ -208,12 +210,12 @@ void Display::display_show_image(Display* display) {
 		press_a_key(-1);
 	}
 
-	//Get display information
-	int width = display->getWidth();
-	int height = display->getHeight();
-	void* img_buf_y = display->getBuf_Y();
-	void* img_buf_u = display->getBuf_U();
-	void* img_buf_v = display->getBuf_V();
+	//Get FileDisp information
+	int width = FileDisp->getWidth();
+	int height = FileDisp->getHeight();
+	void* img_buf_y = FileDisp->getBuf_Y();
+	void* img_buf_u = FileDisp->getBuf_U();
+	void* img_buf_v = FileDisp->getBuf_V();
 
 	//Preparing surface
 	SDL_Rect rect = { 0, 0, m_width, m_height };
@@ -250,8 +252,8 @@ void stop(pthread_t* thread){
 	SDL_Quit();
 }
 
-void Display::display_init() {
-	//Display is initialized
+void FileDisp::display_init() {
+	//FileDisp is initialized
 	init = true;
 
 	// First, initialize SDL's video subsystem.
@@ -260,7 +262,7 @@ void Display::display_init() {
 		press_a_key(-1);
 	}
 
-	SDL_WM_SetCaption("display", NULL);
+	SDL_WM_SetCaption("FileDisp", NULL);
 /*
 	start_time = SDL_GetTicks();
 	t = start_time;
@@ -268,16 +270,16 @@ void Display::display_init() {
 	atexit(print_fps_avg);*/
 }
 
-void Display::setSize(int width, int height){
+void FileDisp::setSize(int width, int height){
 	this->width = width * 16;
 	this->height = height * 16;
 
 	display_set_video(this);
 }
 
-void Display::display_set_video(Display* display) {
-	int width = display->getWidth();
-	int height = display->getHeight();
+void FileDisp::display_set_video(FileDisp* FileDisp) {
+	int width = FileDisp->getWidth();
+	int height = FileDisp->getHeight();
 
 	if (width <= m_width && height <= m_height) {
 		// video mode is already good
@@ -287,8 +289,8 @@ void Display::display_set_video(Display* display) {
 	m_width = width;
 	m_height = height;
 
-	if (display->printFpsEnable()){
-		printf("set display to %ix%i\n", width, height);
+	if (FileDisp->printFpsEnable()){
+		printf("set FileDisp to %ix%i\n", width, height);
 	}
 
 	m_screen = SDL_SetVideoMode(m_width, m_height, 24, SDL_HWSURFACE | SDL_DOUBLEBUF);

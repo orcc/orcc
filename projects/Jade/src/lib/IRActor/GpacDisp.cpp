@@ -28,71 +28,93 @@
  */
 
 /**
-@brief Description of the Source class interface
+@brief Implementation of class GpacDisp
 @author Olivier Labois
-@file GpacSrc.h
+@file GpacDisp.cpp
 @version 1.0
-@date 02/05/2011
+@date 06/05/2011
 */
 
 //------------------------------
-#ifndef GPACSRC_H
-#define GPACSRC_H
-#include "Jade/Actor/Source.h"
+#include <iostream>
+#include "SDL.h"
 
+#include <pthread.h>
+#include "Jade/Actor/GpacDisp.h"
+
+#include "llvm/Support/CommandLine.h"
 //------------------------------
 
+using namespace std;
 
-/**
- * @class GpacSrc
- *
- * @brief  This class represents a source that read a gpac nal.
- * 
- * @author Olivier labois
- * 
- */
-class GpacSrc : public Source {
-public:
-	/**
-     *  @brief Create a new gpac nal reader for the decoder 
-	 *   
-	 *  @param id : the id of the decoder
-     */
-	GpacSrc(int id);
+//int GpacDisp::m_width = 0;
+//int GpacDisp::m_height = 0;
 
-	~GpacSrc();
+GpacDisp::GpacDisp(int id) : Display(id){
+	this->id = id;
 
-	void setNal(unsigned char* nal, int nal_length);
+	width = 0;
+	height = 0;
+	x = 0;
+	y = 0;
+}
 
-	/**
-     *  @brief Injecteur in the decoder of data from input gpac nal 
-	 *   
-	 *  @param tokens : the adress where data must be injected
-     */
-	void source_get_src(unsigned char* tokens);
+GpacDisp::~GpacDisp(){
+}
 
-	/**
-     *  @brief Set pointer of value which can stop the scheduler
-	 *
-	 *  This value is continiously tested by the scheduler, it MUST be an int.
-	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
-	 *	continuously test firing rules of actors
-     */
-	void setStopSchPtr(int* stopSchVal) {this->stopSchVal = stopSchVal;}
 
-protected:
+void GpacDisp::display_write_mb(unsigned char tokens[384]) {
+	int i, j, cnt, base;
 
-	/** input gpac nal */
-	unsigned char* nal;
+	cnt = 0;
+	base = y * m_width + x;
 
-	/** nal length */
-	int nal_length;
+	for (i = 0; i < 16; i++) {
+		for (j = 0; j < 16; j++) {
+			int tok = tokens[cnt];
+			int idx = base + i * m_width + j;
+			cnt++;
+			img_buf_y[idx] = tok;
+		}
+	}
 
-	/** byte read counter */
-	int cnt;
+	base = y / 2 * m_width / 2 + x / 2;
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < 8; j++) {
+			int tok = tokens[cnt];
+			int idx = base + i * m_width / 2 + j;
+			cnt++;
+			img_buf_u[idx] = tok;
+		}
+	}
 
-	/** This is the value which can stop the scheduler */
-	int* stopSchVal;
-};
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < 8; j++) {
+			int tok = tokens[cnt];
+			int idx = base + i * m_width / 2 + j;
+			cnt++;
+			img_buf_v[idx] = tok;
+		}
+	}
 
-#endif
+	*stopSchVal = 1;
+}
+
+
+void GpacDisp::setSize(int width, int height){
+	this->width = width * 16;
+	this->height = height * 16;
+
+	this->m_width = width;
+	this->m_height = height;
+}
+
+
+void GpacDisp::setFramePtr(RVCFRAME *frame){
+	*frame->pY = img_buf_y;
+	*frame->pU = img_buf_u;
+	*frame->pV = img_buf_v;
+
+	frame->Width = width;
+	frame->Height = height;
+}

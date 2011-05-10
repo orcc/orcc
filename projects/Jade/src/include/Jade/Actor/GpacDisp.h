@@ -28,48 +28,52 @@
  */
 
 /**
-@brief Description of the Source class interface
+@brief Description of the GpacDisp class interface
 @author Olivier Labois
-@file GpacSrc.h
+@file GpacDisp.h
 @version 1.0
-@date 02/05/2011
+@date 06/05/2011
 */
 
 //------------------------------
-#ifndef GPACSRC_H
-#define GPACSRC_H
-#include "Jade/Actor/Source.h"
+#ifndef GpacDisp_H
+#define GpacDisp_H
 
+#include "Jade/Actor/Display.h"
+#include "Jade/lib_RVCDecoder/RVCDecoder.h"
+
+struct SDL_Surface;
+struct SDL_Overlay;
 //------------------------------
 
 
 /**
- * @class GpacSrc
- *
- * @brief  This class represents a source that read a gpac nal.
+ * @brief  This class represents a reconfiguration of a decoder
  * 
- * @author Olivier labois
+ * @author Olivier Labois
  * 
  */
-class GpacSrc : public Source {
+class GpacDisp : public Display {
 public:
+	GpacDisp(int id);
+	~GpacDisp();
+
+	
 	/**
-     *  @brief Create a new gpac nal reader for the decoder 
-	 *   
-	 *  @param id : the id of the decoder
+     *  @brief Set the size of the current GpacDisp
+	 *
+	 * @param width : the new width
+	 *
+	 * @param height : the new height
      */
-	GpacSrc(int id);
-
-	~GpacSrc();
-
-	void setNal(unsigned char* nal, int nal_length);
+	void setSize(int width, int height);	
 
 	/**
-     *  @brief Injecteur in the decoder of data from input gpac nal 
-	 *   
-	 *  @param tokens : the adress where data must be injected
+     *  @brief Write YUV value in the current GpacDisp
+	 *
+	 * @param tokens : an array represention of YUV values
      */
-	void source_get_src(unsigned char* tokens);
+	void display_write_mb(unsigned char tokens[384]);
 
 	/**
      *  @brief Set pointer of value which can stop the scheduler
@@ -80,16 +84,10 @@ public:
      */
 	void setStopSchPtr(int* stopSchVal) {this->stopSchVal = stopSchVal;}
 
-protected:
+	void setFramePtr(RVCFRAME* frame);
 
-	/** input gpac nal */
-	unsigned char* nal;
 
-	/** nal length */
-	int nal_length;
-
-	/** byte read counter */
-	int cnt;
+private:
 
 	/** This is the value which can stop the scheduler */
 	int* stopSchVal;
