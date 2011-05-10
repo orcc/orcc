@@ -121,11 +121,12 @@ public class XlimBackendImpl extends AbstractBackend {
 		actor.setTemplateData(data);
 
 		ActorVisitor<?>[] transformations = { new SSATransformation(),
-				new GlobalArrayInitializer(), new InstTernaryAdder(),
-				new Inliner(true, true), new UnaryListRemoval(),
-				new CustomPeekAdder(), new DeadGlobalElimination(),
-				new DeadCodeElimination(), new XlimDeadVariableRemoval(),
-				new ListFlattener(), new ExpressionSplitter(true),
+				new GlobalArrayInitializer(hardwareGen),
+				new InstTernaryAdder(), new Inliner(true, true),
+				new UnaryListRemoval(), new CustomPeekAdder(),
+				new DeadGlobalElimination(), new DeadCodeElimination(),
+				new XlimDeadVariableRemoval(), new ListFlattener(),
+				new ExpressionSplitter(true),
 				/* new CopyPropagator(), */new BuildCFG(), new CastAdder(true),
 				new InstPhiTransformation(), new LiteralIntegersAdder(true),
 				new XlimVariableRenamer(), new BlockCombine() };

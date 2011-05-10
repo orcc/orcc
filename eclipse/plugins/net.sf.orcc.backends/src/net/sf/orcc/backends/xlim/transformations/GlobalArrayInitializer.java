@@ -28,20 +28,29 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.interpreter.ActorInterpreter;
+import net.sf.orcc.interpreter.ListAllocator;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * 
@@ -70,9 +79,18 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 			}
 			return super.caseInstStore(instr);
 		}
+
 	}
 
 	private ActorInterpreter actorInterpreter;
+
+	private boolean initToZero;
+	private ListAllocator listAllocator;
+
+	public GlobalArrayInitializer(boolean initToZero) {
+		this.initToZero = initToZero;
+		listAllocator = new ListAllocator();
+	}
 
 	@Override
 	public Object caseActor(Actor actor) {
@@ -101,6 +119,9 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 			if (type.isList() && stateVar.getInitialValue() == null
 					&& stateVar.getValue() != null) {
 				stateVar.setInitialValue(EcoreHelper.copy(stateVar.getValue()));
+			} else if (stateVar.getInitialValue() == null && initToZero) {
+				stateVar.setInitialValue(listAllocator.doSwitch(stateVar.getType()));
+				initializeExpression(stateVar.getInitialValue());
 			}
 		}
 
@@ -112,6 +133,21 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 		// Set initialize to native so it will not be printed
 		call.getProcedure().setNative(true);
 		return null;
+	}
+
+	private void initializeExpression(Expression expr) {
+		TreeIterator<EObject> it = EcoreUtil.getAllContents(expr, true);
+		while (it.hasNext()) {
+			EObject object = it.next();
+
+			if (object instanceof ExprInt) {
+				ExprInt exprInt = (ExprInt) object;
+				exprInt.setValue(BigInteger.ZERO);
+			} else if (object instanceof Use) {
+				ExprBool exprBool = (ExprBool) object;
+				exprBool.setValue(false);
+			}
+		}
 	}
 
 }
