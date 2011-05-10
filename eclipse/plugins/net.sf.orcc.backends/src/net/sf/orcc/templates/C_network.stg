@@ -540,7 +540,7 @@ extern int clean_cache(int size);
 <printInitializes(network.instances)>
 
 static void launcher() {
-	int i, display_scheduler;
+	int i, display_scheduler = -1;
 	
 	cpu_set_t cpuset;
 	<if(!options.useGeneticAlgorithm)>
@@ -594,7 +594,9 @@ static void launcher() {
 	thread_create(thread_monitor, monitor, monitoring, thread_monitor_id);
 	<endif>
 	
-	(*scheduler)((void*) &schedulers[display_scheduler]);
+	if(display_scheduler != -1){
+		(*scheduler)((void*) &schedulers[display_scheduler]);
+	}
 	
 	for(i=0; i \< <if(options.useGeneticAlgorithm)>THREAD_NB<else>mapping-\>number_of_threads<endif>; i++){
 		if(i != display_scheduler){
