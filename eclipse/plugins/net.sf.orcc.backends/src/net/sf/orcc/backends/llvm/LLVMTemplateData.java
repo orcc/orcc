@@ -169,6 +169,7 @@ public class LLVMTemplateData {
 		// Write port pattern
 		computePattern(action.getInputPattern());
 		computePattern(action.getOutputPattern());
+		computePattern(action.getPeekPattern());
 
 		// Write action elements
 		actions.put(action.getScheduler(), id++);
