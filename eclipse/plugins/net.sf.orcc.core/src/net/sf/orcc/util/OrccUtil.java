@@ -62,6 +62,42 @@ import org.stringtemplate.v4.STGroupFile;
  */
 public class OrccUtil {
 
+	/**
+	 * If it does not exist, creates the given folder. If the parent folders do
+	 * not exist either, create them.
+	 * 
+	 * @param folder
+	 *            a folder
+	 * @throws CoreException
+	 */
+	public static void createFolder(IFolder folder) throws CoreException {
+		IPath path = folder.getFullPath();
+		if (folder.exists()) {
+			return;
+		}
+
+		int n = path.segmentCount();
+		if (n < 2) {
+			throw new IllegalArgumentException("the path of the given folder "
+					+ "must have at least two segments");
+		}
+
+		// check the first folder
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		folder = root.getFolder(path.uptoSegment(2));
+		if (!folder.exists()) {
+			folder.create(true, false, null);
+		}
+
+		// and then check all the descendants
+		for (int i = 2; i < n; i++) {
+			folder = folder.getFolder(new Path(path.segment(i)));
+			if (!folder.exists()) {
+				folder.create(true, false, null);
+			}
+		}
+	}
+
 	private static void findFiles(String fileExt, List<IFile> vtlFiles,
 			IFolder vtl) throws CoreException {
 		for (IResource resource : vtl.members()) {

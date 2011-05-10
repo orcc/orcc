@@ -58,6 +58,7 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
@@ -106,10 +107,11 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.google.gson.Gson;
@@ -394,29 +396,6 @@ public class IRWriter extends IrSwitch<JsonElement> {
 			throws OrccException {
 		Writer writer;
 		try {
-			if (!outputDir.exists()) {
-				outputDir.create(true, false, null);
-			}
-
-			String folderName = OrccUtil.getFolder(actor);
-			IPath path = new Path(folderName);
-			IFolder folder = outputDir.getFolder(path);
-			if (!folder.exists()) {
-				folder = outputDir;
-				for (int i = 0; i < path.segmentCount(); i++) {
-					folder = folder.getFolder(path.segment(i));
-					if (!folder.exists()) {
-						folder.create(true, false, null);
-					}
-				}
-			}
-
-			IFile file = outputDir.getFile(new Path(OrccUtil.getFile(actor)
-					+ ".json"));
-			if (file.exists()) {
-				file.delete(true, null);
-			}
-
 			// write output as UTF-8
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			writer = new BufferedWriter(new OutputStreamWriter(os));
@@ -432,7 +411,16 @@ public class IRWriter extends IrSwitch<JsonElement> {
 				Gson gson = builder.create();
 				gson.toJson(obj, writer);
 				writer.flush();
-				file.create(new ByteArrayInputStream(os.toByteArray()), 0, null);
+
+				IFile file = outputDir.getFile(new Path(OrccUtil.getFile(actor)
+						+ ".json"));
+				IContainer cter = file.getParent();
+				if (cter.getType() == IResource.FOLDER) {
+					OrccUtil.createFolder((IFolder) cter);
+				}
+
+				InputStream source = new ByteArrayInputStream(os.toByteArray());
+				OrccUtil.setFileContents(file, source);
 			} finally {
 				// because some GSON methods may throw a RuntimeException
 				try {
