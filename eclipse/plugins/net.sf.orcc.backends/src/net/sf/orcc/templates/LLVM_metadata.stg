@@ -153,18 +153,43 @@ decl_MD(actor) ::= <<
 
 <source_MD(actor)>
 <name_MD(actor)>
+
+; Action-scheduler
 <actionScheduler_MD(actor)>
+<if(actor.inputs)>
+; Input ports
 <actor.inputs: {port | <port_MD(actor, port)>}>
+<endif>
+<if(actor.outputs)>
+; Output ports
 <actor.outputs: {port | <port_MD(actor, port)>}>
+<endif>
+<if(actor.parameters)>
+; Parameters
 <actor.parameters: {param | <var_MD(actor, param)>}>
+<endif>
+<if(actor.stateVars)>
+; State Variables
 <actor.stateVars: {var | <statevar_MD(actor, var)>}>
-<actor.procs: {proc | <proc_MD(actor, proc)>}>
-<actor.initializes: {action | <action_MD(actor, action)>}>
-<actor.actions: {action | <action_MD(actor, action)>}>
-<actor.templateData.patterns.keys: {pattern | <pattern_MD(actor, pattern)>}>
-<actor.templateData.varPattern.keys: {varPattern | <pattern_vars_MD(actor, varPattern)>}>
-<actor.templateData.numTokenPattern.keys: {numToken | <pattern_numTokens_MD(actor, numToken)>}>
+<endif>
+<if(actor.procs)>
+; Functions and procedures
+<actor.procs: {proc | <proc_MD(actor, proc)>}; separator="\n">
+<endif>
+<if(actor.initializes)>
+; Initializes
+<actor.initializes: {action | <action_MD(actor, action)>}; separator="\n">
+<endif>
+; Actions
+<actor.actions: {action | <action_MD(actor, action)>}; separator="\n">
+; Patterns
+<actor.templateData.patterns.keys: {pattern | <pattern_MD(actor, pattern)>}; separator="\n">
+; Variables of patterns
+<actor.templateData.patterns.keys: {pattern | <pattern_vars_MD(actor, pattern, pattern.portToVarMap)>}; separator="\n">
+; Number of tokens of patterns
+<actor.templateData.patterns.keys: {pattern | <pattern_numTokens_MD(actor, pattern, pattern.numTokensMap)>}; separator="\n">
 <if(actor.MoC)>
+; MoC
 <MoC_MD(actor)>
 <endif>
 
@@ -303,14 +328,8 @@ actionScheduler_MD(actor) ::= <<
 <actionScheduler_decl_MD(actor)> = metadata !{<
 if(!actor.actions.empty)> metadata <actions_decl_MD(actor)> <else> null <endif>, <
 if(actor.fsm)> metadata <FSM_decl_MD(actor)> <else> null <endif>}
-
-<if(!actor.actions.empty)>
-<actions_MD(actor)>
-<endif>
-
-<if(actor.actionScheduler.fsm)>
-<FSM_MD(actor)>
-<endif>
+<if(!actor.actions.empty)><actions_MD(actor)><endif>
+<if(actor.actionScheduler.fsm)><FSM_MD(actor)><endif>
 >>
 
 actions_MD(actor) ::= <<
@@ -322,26 +341,21 @@ pattern_MD(actor, patterns) ::= <<
 	if(patterns.numTokensMap)
 	> metadata <pattern_numTokens_decl_MD(actor=actor, numTokens=patterns.numTokensMap)><
 	else > null <endif>, <
-	if(patterns.variableMap)
-	> metadata <pattern_vars_decl_MD(actor=actor, vars=patterns.variableMap)><
-	else > null <endif>, <
-	if(patterns.peekedMap)
-	> metadata <pattern_vars_decl_MD(actor=actor, vars=patterns.peekedMap)><
+	if(patterns.variables)
+	> metadata <pattern_vars_decl_MD(actor=actor, vars=patterns.portToVarMap)><
 	else > null <endif>}
-
 >>
 
-pattern_vars_MD(actor, vars) ::= <<
-<pattern_vars_decl_MD(actor=actor, vars=vars)> = metadata !{<vars.keys: {key | metadata <port_decl_MD(actor=actor, port=key)>}; separator=", ">} 
-
+pattern_vars_MD(actor, pattern, portToVarMap) ::= <<
+<pattern_vars_decl_MD(actor, portToVarMap)> = metadata !{<pattern.ports: {port | metadata <port_decl_MD(actor, port)>}; separator=", ">} 
 >>
 
-pattern_numTokens_MD(actor, numTokens) ::= <<
-<pattern_numTokens_decl_MD(actor=actor, numTokens=numTokens)> =  metadata !{<numTokens.keys: {key | metadata <port_decl_MD(actor=actor, port=key)>, i32 <numTokens.(key)>}; separator=", ">}
-
+pattern_numTokens_MD(actor, pattern, numTokens) ::= <<
+<pattern_numTokens_decl_MD(actor, numTokens)> test =  metadata !{<pattern.ports: {port | metadata <port_decl_MD(actor, port)>, i32 <numTokens.(port)>}; separator=", ">}
 >>
 
 action_MD(actor, action) ::= <<
+;; <action.name>
 <action_decl_MD(actor=actor, action=action)> = metadata !{<
 	if(action.tag.identifiers.empty)
 		> null <
@@ -357,14 +371,17 @@ action_MD(actor, action) ::= <<
 		> metadata <pattern_decl_MD(actor, action.outputPattern)><
 	else
 		> null<
+	endif>,<
+	if(!action.peekPattern.empty)
+		> metadata <pattern_decl_MD(actor, action.peekPattern)><
+	else
+		> null<
 	endif
 	>, metadata <Sched_decl_MD(actor, action)
 	>, metadata <Body_decl_MD(actor, action)>}
-
 <if(!action.tag.identifiers.empty)>
 <Tag_MD(actor, action.tag)>
 <endif>
-
 <Sched_MD(actor=actor, action=action)>
 <Body_MD(actor=actor, action=action)>
 >>
@@ -373,12 +390,10 @@ action_MD(actor, action) ::= <<
 port_MD(actor, port) ::= <<
 <port_decl_MD(actor=actor, port=port)> = metadata !{metadata <Type_decl_MD(actor=actor, var=port)>, <varName_MD(port)>, <fifoType(port)>** <fifoVarName(port)>}
 <Type_MD(actor=actor, var=port)>
-
 >>
 
 proc_MD(actor, proc) ::= <<
 <proc_decl_MD(actor=actor, proc=proc)> = metadata !{<varName_MD(proc)>, <procNative_MD(proc)>, <proc.returnType>(<proc.parameters: argumentTypeDeclaration(); wrap, anchor, separator=", ">)* @<proc.name>}
-
 >>
 
 var_MD(actor, var) ::= <<
@@ -400,7 +415,6 @@ statevar_MD(actor, var) ::= <<
 
 Initializer_MD(actor, var) ::= <<
 <Initializer_decl_MD(actor = actor, var = var)> = metadata !{<var.type> <ConstantValue(type=var.type, const=var.initialValue)>}
-
 >>
 
 FSM_MD(actor) ::= <<
@@ -434,17 +448,14 @@ NextStates_MD(actor, nextStates) ::= <<
 
 NextState_MD(actor, nextState) ::= <<
 <NextState_decl_MD(actor = actor, nextState = nextState)> = metadata !{metadata <action_decl_MD(actor=actor, action=nextState.action)>, <varState_MD(nextState.targetState)>}
-
 >>
 
 Type_MD(actor, var) ::= <<
 <Type_decl_MD(actor=actor, var=var)> = metadata  !{<varType_MD(var.type)>, <varSize_MD(var.type)>}
-
 >>
 
 Sched_MD(actor, action) ::= <<
 <Sched_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.scheduler)>, <procNative_MD(action.scheduler)>, i1()* @<action.scheduler.name>}
-
 >>
 
 Tag_MD(actor, tag)::=<<
@@ -454,13 +465,11 @@ Tag_MD(actor, tag)::=<<
 
 VarDef_MD(actor, var) ::= <<
 <VarDef_decl_MD(actor=actor, var=var)> = metadata !{<varName_MD(var)>, <varAssignable_MD(var)>, <varSuffix_MD(var)>,  <varIndex_MD(var)>}
-
 >>
 
 
 Body_MD(actor, action) ::= <<
 <Body_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.body)>, <procNative_MD(action.body)>, void()* @<action.body.name>}
-
 >>
 
 MoC_Actions_MD(actor, actions) ::= <<
@@ -470,18 +479,24 @@ MoC_Actions_MD(actor, actions) ::= <<
 MoC_CSDF_MD(actor, csdf) ::= <<
 <MoC_CSDF_decl_MD(actor = actor, csdf = csdf)> = metadata !{i32 <csdf.numberOfPhases> ,<
 		if(!csdf.inputPattern.empty)
-			> metadata <patterns_decl_MD(actor=actor, patterns=csdf.inputPattern)><
+			> metadata <pattern_decl_MD(actor, csdf.inputPattern)><
 		else
 			> null <
 		endif>,<
 		if(!csdf.outputPattern.empty)
-			> metadata <patterns_decl_MD(actor=actor, patterns=csdf.outputPattern)><
+			> metadata <pattern_decl_MD(actor, csdf.outputPattern)><
 		else
 			> null <
 		endif
-			>, metadata <MoC_Actions_decl_MD(actor = actor, actions = csdf.actions)>}
+			>,<
+		if(!csdf.peekPattern.empty)
+			> metadata <pattern_decl_MD(actor, csdf.peekPattern)><
+		else
+			> null <
+		endif
+			>, metadata <MoC_Actions_decl_MD(actor, csdf.actions)>}
 			
-<MoC_Actions_MD(actor= actor, actions= csdf.actions)>
+<MoC_Actions_MD(actor, csdf.actions)>
 >>
 
 MoC_Configuration_MD(actor, configuration) ::= <<
@@ -510,7 +525,6 @@ MoC_MD(actor)::= <<
 <MoC_Configuration_MD(actor = actor, configuration = key)>
 }>
 <endif>
-
 >>
 
 MoCName_MD(MoC)::= <<

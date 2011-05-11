@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.llvm;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.ir.Action;
@@ -107,12 +106,12 @@ public class LLVMTemplateData {
 	 */
 	private Map<Node, Integer> nodeToLabelMap;
 
-	private Map<Object, Integer> numTokenPattern;
+	private Map<EMap<Port, Integer>, Integer> numTokenPattern;
 
 	/**
 	 * Medata container of patterns
 	 */
-	private Map<Object, Integer> patterns;
+	private Map<Pattern, Integer> patterns;
 
 	/**
 	 * Medata container of ports
@@ -129,7 +128,7 @@ public class LLVMTemplateData {
 	 */
 	private Map<Type, Integer> types;
 
-	private Map<Object, Integer> varPattern;
+	private Map<EMap<Port, Var>, Integer> varPattern;
 
 	/**
 	 * Medata container of variables
@@ -145,9 +144,9 @@ public class LLVMTemplateData {
 		actionScheduler = new HashMap<Object, Integer>();
 		actionMoC = new HashMap<Object, Integer>();
 		configurations = new HashMap<Object, Integer>();
-		patterns = new HashMap<Object, Integer>();
-		varPattern = new HashMap<Object, Integer>();
-		numTokenPattern = new HashMap<Object, Integer>();
+		patterns = new HashMap<Pattern, Integer>();
+		varPattern = new HashMap<EMap<Port, Var>, Integer>();
+		numTokenPattern = new HashMap<EMap<Port, Integer>, Integer>();
 		procs = new HashMap<Procedure, Integer>();
 		vars = new HashMap<Var, Integer>();
 		types = new HashMap<Type, Integer>();
@@ -284,17 +283,15 @@ public class LLVMTemplateData {
 		}
 	}
 
-	private void computeNumTokens(EMap<Port, Integer> numTokens) {
-		if (!numTokens.isEmpty()) {
-			numTokenPattern.put(numTokens, id++);
-		}
-	}
-
 	private void computePattern(Pattern pattern) {
 		if (!pattern.isEmpty()) {
 			patterns.put(pattern, id++);
-			computeNumTokens(pattern.getNumTokensMap());
-			computeVars(pattern.getVariables());
+			if (!pattern.getNumTokensMap().isEmpty()) {
+				numTokenPattern.put(pattern.getNumTokensMap(), id++);
+			}
+			if (!pattern.getPortToVarMap().isEmpty()) {
+				varPattern.put(pattern.getPortToVarMap(), id++);
+			}
 		}
 	}
 
@@ -329,12 +326,6 @@ public class LLVMTemplateData {
 		vars.put(var, id++);
 		names.put(var.getName(), id++);
 		types.put(var.getType(), id++);
-	}
-
-	private void computeVars(List<Var> vars) {
-		if (!vars.isEmpty()) {
-			varPattern.put(vars, id++);
-		}
 	}
 
 	/**
@@ -409,7 +400,7 @@ public class LLVMTemplateData {
 	 * 
 	 * @return the number of tokens map of patterns.
 	 */
-	public Map<Object, Integer> getNumTokenPattern() {
+	public Map<EMap<Port, Integer>, Integer> getNumTokenPattern() {
 		return numTokenPattern;
 	}
 
@@ -418,7 +409,7 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of pattern information.
 	 */
-	public Map<Object, Integer> getPatterns() {
+	public Map<Pattern, Integer> getPatterns() {
 		return patterns;
 	}
 
@@ -454,7 +445,7 @@ public class LLVMTemplateData {
 	 * 
 	 * @return the var map of patterns.
 	 */
-	public Map<Object, Integer> getVarPattern() {
+	public Map<EMap<Port, Var>, Integer> getVarPattern() {
 		return varPattern;
 	}
 
