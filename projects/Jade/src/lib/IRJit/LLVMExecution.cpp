@@ -56,7 +56,7 @@
 #include "llvm/Target/TargetSelect.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/Actor/FileDisp.h"
+#include "Jade/Actor/JadeDisp.h"
 #include "Jade/Actor/GpacDisp.h"
 #include "Jade/Actor/FileSrc.h"
 #include "Jade/Actor/GpacSrc.h"
@@ -293,6 +293,8 @@ void LLVMExecution::initialize(){
 	// Set stop condition of the scheduler
 	Scheduler* scheduler = decoder->getScheduler();
 	GlobalVariable* stopGV = scheduler->getStopGV();
+
+	//int* test = getStopSchPtr();
 	EE->addGlobalMapping(stopGV, getStopSchPtr());
 
 	gpacSrc->setStopSchPtr(getStopSchPtr());
@@ -351,9 +353,9 @@ void LLVMExecution::setIn(Instance* instance){
 }
 
 void  LLVMExecution::setOut(Instance* instance){
-	FileDisp* fileDisp = new FileDisp(1, verbose);
+	JadeDisp* jadeDisp = new JadeDisp(1, verbose);
 
-	display = fileDisp;
+	display = jadeDisp;
 
 	//Set var display
 	StateVar* stateVar = instance->getStateVar("display");
@@ -375,8 +377,8 @@ void  LLVMExecution::setOut(Instance* instance){
 }
 
 bool LLVMExecution::waitForFirstFrame(){
-	FileDisp* fileDisp = (FileDisp*)display;
-	fileDisp->waitForFirstFrame();
+	JadeDisp* jadeDisp = (JadeDisp*)display;
+	jadeDisp->waitForFirstFrame();
 	return true;
 }
 
@@ -387,8 +389,8 @@ void LLVMExecution::runFunction(Function* function) {
 
 void LLVMExecution::stop(pthread_t* thread) {
 	if (thread != NULL){
-		FileDisp* fileDisp = (FileDisp*)display;
-		fileDisp->forceStop(thread);
+		JadeDisp* jadeDisp = (JadeDisp*)display;
+		jadeDisp->forceStop(thread);
 	}
 }
 

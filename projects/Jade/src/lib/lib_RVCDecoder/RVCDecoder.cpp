@@ -149,9 +149,7 @@ void rvc_init(char *XDF){
 
 	//Prepare network
 	decoder = engine->prepare(network);
-		//TODO : Prepare output of the network
 	
-
 
 	// Optimizing decoder
 	/*if (optLevel > 0){
@@ -160,12 +158,14 @@ void rvc_init(char *XDF){
 }
 
 int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME *Frame, int *LayerCommand){
-	
+	Frame->Height =0;
+	Frame->Width = 0;
+
 	//Start decoder
 	decoder->getEE()->start(nal, nal_length, Frame);
-	
 
 //engine->run(network, VidFile);
+	if(Frame->Height || Frame->Width) return 1;
 	return 0;
 }
 

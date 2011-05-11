@@ -22,7 +22,7 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 add_library (IRActor
   BroadcastActor.cpp
   BroadcastAdder.cpp
-  FileDisp.cpp
+  JadeDisp.cpp
   GpacDisp.cpp
   FileSrc.cpp
   GpacSrc.cpp

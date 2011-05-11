@@ -132,11 +132,9 @@ protected:
 	/** Current pointer position */
 	int x;
 	int y;
-	
+
 	/** Static member of Display */
 	static int stopAfter;
-	static int m_width;
-	static int m_height;
 };
 
 static void set_video(void* ptrDisplay, int width, int height){

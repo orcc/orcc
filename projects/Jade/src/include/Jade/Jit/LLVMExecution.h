@@ -195,7 +195,7 @@ public:
 	int* getStopSchPtr() {return &stopSchVal;}
 
 	/**
-     *  @brief Set to 0 the value which can stop the scheduler
+     *  @brief Set to 0 the value which can start the scheduler
 	 *
 	 *  This value is continiously tested by the scheduler, it MUST be an int.
 	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler

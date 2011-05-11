@@ -36,8 +36,8 @@
 */
 
 //------------------------------
-#ifndef GpacDisp_H
-#define GpacDisp_H
+#ifndef GPACDISP_H
+#define GPACDISP_H
 
 #include "Jade/Actor/Display.h"
 #include "Jade/lib_RVCDecoder/RVCDecoder.h"
@@ -84,13 +84,17 @@ public:
      */
 	void setStopSchPtr(int* stopSchVal) {this->stopSchVal = stopSchVal;}
 
-	void setFramePtr(RVCFRAME* frame);
+	void setFramePtr(RVCFRAME* frame){this->rvcFrame = frame;}
 
 
 private:
 
 	/** This is the value which can stop the scheduler */
 	int* stopSchVal;
+
+	/** The ouput frame */
+	RVCFRAME* rvcFrame;
+
 };
 
 #endif

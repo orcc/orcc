@@ -47,8 +47,6 @@
 
 using namespace std;
 
-//int GpacDisp::m_width = 0;
-//int GpacDisp::m_height = 0;
 
 GpacDisp::GpacDisp(int id) : Display(id){
 	this->id = id;
@@ -67,22 +65,22 @@ void GpacDisp::display_write_mb(unsigned char tokens[384]) {
 	int i, j, cnt, base;
 
 	cnt = 0;
-	base = y * m_width + x;
+	base = y * width + x;
 
 	for (i = 0; i < 16; i++) {
 		for (j = 0; j < 16; j++) {
 			int tok = tokens[cnt];
-			int idx = base + i * m_width + j;
+			int idx = base + i * width + j;
 			cnt++;
 			img_buf_y[idx] = tok;
 		}
 	}
 
-	base = y / 2 * m_width / 2 + x / 2;
+	base = y / 2 * width / 2 + x / 2;
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
 			int tok = tokens[cnt];
-			int idx = base + i * m_width / 2 + j;
+			int idx = base + i * width / 2 + j;
 			cnt++;
 			img_buf_u[idx] = tok;
 		}
@@ -91,30 +89,38 @@ void GpacDisp::display_write_mb(unsigned char tokens[384]) {
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
 			int tok = tokens[cnt];
-			int idx = base + i * m_width / 2 + j;
+			int idx = base + i * width / 2 + j;
 			cnt++;
 			img_buf_v[idx] = tok;
 		}
 	}
 
-	*stopSchVal = 1;
+	x += 16;
+	if (x == width) {
+		x = 0;
+		y += 16;
+	}
+
+	if (y == height) {
+		// image received
+		x = 0;
+		y = 0;
+		
+		//Write resulting image
+		*rvcFrame->pY = img_buf_y;
+		*rvcFrame->pU = img_buf_u;
+		*rvcFrame->pV = img_buf_v;
+
+		rvcFrame->Width = width;
+		rvcFrame->Height = height;
+
+		*stopSchVal = 1;
+
+	}
 }
 
 
 void GpacDisp::setSize(int width, int height){
 	this->width = width * 16;
 	this->height = height * 16;
-
-	this->m_width = width;
-	this->m_height = height;
-}
-
-
-void GpacDisp::setFramePtr(RVCFRAME *frame){
-	*frame->pY = img_buf_y;
-	*frame->pU = img_buf_u;
-	*frame->pV = img_buf_v;
-
-	frame->Width = width;
-	frame->Height = height;
 }

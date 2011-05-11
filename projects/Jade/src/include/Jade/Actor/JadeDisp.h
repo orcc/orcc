@@ -28,16 +28,16 @@
  */
 
 /**
-@brief Description of the FileDisp class interface
+@brief Description of the JadeDisp class interface
 @author Jerome Gorin
-@file FileDisp.h
+@file JadeDisp.h
 @version 1.0
 @date 03/02/2011
 */
 
 //------------------------------
-#ifndef FileDisp_H
-#define FileDisp_H
+#ifndef JADEDISP_H
+#define JADEDISP_H
 
 #include "Jade/Actor/Display.h"
 
@@ -52,14 +52,14 @@ struct SDL_Overlay;
  * @author Jerome Gorin
  * 
  */
-class FileDisp : public Display {
+class JadeDisp : public Display {
 public:
-	FileDisp(int id, bool outputFps = false);
-	~FileDisp();
+	JadeDisp(int id, bool outputFps = false);
+	~JadeDisp();
 
 	
 	/**
-     *  @brief Set the size of the current FileDisp
+     *  @brief Set the size of the current JadeDisp
 	 *
 	 * @param width : the new width
 	 *
@@ -68,7 +68,7 @@ public:
 	void setSize(int width, int height);	
 
 	/**
-     *  @brief Write YUV value in the current FileDisp
+     *  @brief Write YUV value in the current JadeDisp
 	 *
 	 * @param tokens : an array represention of YUV values
      */
@@ -79,6 +79,8 @@ public:
 	bool printFpsEnable(){return outputFps;};
 
 	static void waitForFirstFrame();
+
+
 private:
 	void printFps();
 	FILE* bench;
@@ -93,18 +95,20 @@ private:
 	static pthread_mutex_t mutex;
 	static pthread_cond_t cond_mutex;
 
-	/** Static functions of FileDisp */
+	/** Static functions of JadeDisp */
 	static void display_init();
-	static void display_show_image(FileDisp* FileDisp);
-	static void display_set_video(FileDisp* FileDisp);
+	static void display_show_image(JadeDisp* jadeDisp);
+	static void display_set_video(JadeDisp* jadeDisp);
 	static void press_a_key(int code);
 	static void sendFirstFrameEvent();
 
-	/** Static member of FileDisp */
+	/** Static member of JadeDisp */
 	static SDL_Surface *m_screen;
 	static SDL_Overlay *m_overlay;
 	static bool init;
 	static int boundedDisplays;
+	static int m_width;
+	static int m_height;
 };
 
 #endif

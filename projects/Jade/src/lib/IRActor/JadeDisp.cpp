@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class FileDisp
+@brief Implementation of class JadeDisp
 @author Jerome Gorin
-@file FileDisp.cpp
+@file JadeDisp.cpp
 @version 1.0
 @date 15/11/2010
 */
@@ -40,33 +40,32 @@
 #include "SDL.h"
 
 #include <pthread.h>
-#include "Jade/Actor/FileDisp.h"
+#include "Jade/Actor/JadeDisp.h"
 
 #include "llvm/Support/CommandLine.h"
 //------------------------------
 
 using namespace std;
 
-//Initialize static member of Display
-int Display::m_width = 0;
-int Display::m_height = 0;
 
-//Initialize static member of FileDisp
-SDL_Surface* FileDisp::m_screen = NULL;
-SDL_Overlay* FileDisp::m_overlay = NULL;
-bool FileDisp::init = false;
-int FileDisp::boundedDisplays = 0;
-pthread_mutex_t FileDisp::mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t FileDisp::cond_mutex = PTHREAD_COND_INITIALIZER;
+//Initialize static member of JadeDisp
+SDL_Surface* JadeDisp::m_screen = NULL;
+SDL_Overlay* JadeDisp::m_overlay = NULL;
+int JadeDisp::m_width = 0;
+int JadeDisp::m_height = 0;
+bool JadeDisp::init = false;
+int JadeDisp::boundedDisplays = 0;
+pthread_mutex_t JadeDisp::mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t JadeDisp::cond_mutex = PTHREAD_COND_INITIALIZER;
 
-void FileDisp::press_a_key(int code) {
+void JadeDisp::press_a_key(int code) {
 	char buf[2];
 	printf("Press enter to continue\n");
 	fgets(buf, 2, stdin);
 	exit(code);
 }
 
-FileDisp::FileDisp(int id, bool printFps) : Display(id){
+JadeDisp::JadeDisp(int id, bool printFps) : Display(id){
 	this->id = id;
 	this->outputFps = outputFps;
 	this->frameDecoded = 0;
@@ -82,7 +81,7 @@ FileDisp::FileDisp(int id, bool printFps) : Display(id){
 	}
 }
 
-FileDisp::~FileDisp(){
+JadeDisp::~JadeDisp(){
 	boundedDisplays--;
 	fclose(bench);
 	if (boundedDisplays == 0){
@@ -90,7 +89,7 @@ FileDisp::~FileDisp(){
 	}
 }
 
-void FileDisp::forceStop(pthread_t* thread){
+void JadeDisp::forceStop(pthread_t* thread){
 	SDL_Event sdlEvent;
 	sdlEvent.type = SDL_QUIT;
 	SDL_PushEvent(&sdlEvent);
@@ -98,10 +97,10 @@ void FileDisp::forceStop(pthread_t* thread){
 	SDL_Quit();
 }
 
-void FileDisp::waitForFirstFrame(){
+void JadeDisp::waitForFirstFrame(){
 	clock_t start = clock ();
 	
-	//Wait for the first image to be FileDisp
+	//Wait for the first image to be JadeDisp
 	pthread_mutex_lock( &mutex );
 	pthread_cond_wait( &cond_mutex, &mutex );
 	pthread_mutex_unlock( &mutex );
@@ -109,14 +108,14 @@ void FileDisp::waitForFirstFrame(){
 	cout << "---> First image arrived after " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
 }
 
-void FileDisp::sendFirstFrameEvent(){
+void JadeDisp::sendFirstFrameEvent(){
 	pthread_mutex_lock( &mutex );
 	pthread_cond_signal( &cond_mutex);
 	pthread_mutex_unlock( &mutex );
 }
 
 
-void FileDisp::display_write_mb(unsigned char tokens[384]) {
+void JadeDisp::display_write_mb(unsigned char tokens[384]) {
 	int i, j, cnt, base;
 
 	if (t == 0){
@@ -187,7 +186,7 @@ void print_fps_avg(void) {
 		1000.0f * (float)firstFrame / (float)t);*/
 }
 
-void FileDisp::printFps(){
+void JadeDisp::printFps(){
 	int t2 = SDL_GetTicks();
 
 	if (t2 - t > 3000) {
@@ -202,7 +201,7 @@ void FileDisp::printFps(){
 
 }
 
-void FileDisp::display_show_image(FileDisp* FileDisp) {
+void JadeDisp::display_show_image(JadeDisp* jadeDisp) {
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	if (SDL_LockYUVOverlay(m_overlay) < 0) {
@@ -210,12 +209,12 @@ void FileDisp::display_show_image(FileDisp* FileDisp) {
 		press_a_key(-1);
 	}
 
-	//Get FileDisp information
-	int width = FileDisp->getWidth();
-	int height = FileDisp->getHeight();
-	void* img_buf_y = FileDisp->getBuf_Y();
-	void* img_buf_u = FileDisp->getBuf_U();
-	void* img_buf_v = FileDisp->getBuf_V();
+	//Get JadeDisp information
+	int width = jadeDisp->getWidth();
+	int height = jadeDisp->getHeight();
+	void* img_buf_y = jadeDisp->getBuf_Y();
+	void* img_buf_u = jadeDisp->getBuf_U();
+	void* img_buf_v = jadeDisp->getBuf_V();
 
 	//Preparing surface
 	SDL_Rect rect = { 0, 0, m_width, m_height };
@@ -252,8 +251,8 @@ void stop(pthread_t* thread){
 	SDL_Quit();
 }
 
-void FileDisp::display_init() {
-	//FileDisp is initialized
+void JadeDisp::display_init() {
+	//JadeDisp is initialized
 	init = true;
 
 	// First, initialize SDL's video subsystem.
@@ -262,7 +261,7 @@ void FileDisp::display_init() {
 		press_a_key(-1);
 	}
 
-	SDL_WM_SetCaption("FileDisp", NULL);
+	SDL_WM_SetCaption("JadeDisp", NULL);
 /*
 	start_time = SDL_GetTicks();
 	t = start_time;
@@ -270,16 +269,16 @@ void FileDisp::display_init() {
 	atexit(print_fps_avg);*/
 }
 
-void FileDisp::setSize(int width, int height){
+void JadeDisp::setSize(int width, int height){
 	this->width = width * 16;
 	this->height = height * 16;
 
 	display_set_video(this);
 }
 
-void FileDisp::display_set_video(FileDisp* FileDisp) {
-	int width = FileDisp->getWidth();
-	int height = FileDisp->getHeight();
+void JadeDisp::display_set_video(JadeDisp* jadeDisp) {
+	int width = jadeDisp->getWidth();
+	int height = jadeDisp->getHeight();
 
 	if (width <= m_width && height <= m_height) {
 		// video mode is already good
@@ -289,8 +288,8 @@ void FileDisp::display_set_video(FileDisp* FileDisp) {
 	m_width = width;
 	m_height = height;
 
-	if (FileDisp->printFpsEnable()){
-		printf("set FileDisp to %ix%i\n", width, height);
+	if (jadeDisp->printFpsEnable()){
+		printf("set jadeDisp to %ix%i\n", width, height);
 	}
 
 	m_screen = SDL_SetVideoMode(m_width, m_height, 24, SDL_HWSURFACE | SDL_DOUBLEBUF);
