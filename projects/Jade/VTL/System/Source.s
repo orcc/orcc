@@ -38,8 +38,8 @@ declare void @get_src(i8*, i8*)
 !7 = metadata !{metadata !"source", i1 0, i32 0,  i32 0}
 !8 = metadata  !{ i32 8 ,  null }
 
-!9 = metadata !{ null, null , metadata !10, metadata !11, metadata !12}
-!10 = metadata !{metadata !14, metadata !15, null}
+!9 = metadata !{ null, null , metadata !10, null, metadata !11, metadata !12}
+!10 = metadata !{metadata !14, metadata !15}
 !11 = metadata  !{metadata !"isSchedulable_send_data", i1 0, i1()* @isSchedulable_send_data}
 !12 = metadata  !{metadata !"send_data", i1 0, i32()* @send_data}
 !13 = metadata !{metadata !9}

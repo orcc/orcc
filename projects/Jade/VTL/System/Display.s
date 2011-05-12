@@ -65,15 +65,15 @@ declare void @write_mb(i8*, i8*)
 !11 = metadata  !{ i32 8 ,  null }
 !12 = metadata !{metadata !"set_video", i1 1 , void(i8*, i32, i32)* @set_video}
 !14 = metadata !{metadata !"write_mb", i1 1 , void(i8*, i8*)* @write_mb}
-!15 = metadata !{ null, metadata !16, null, metadata !17, metadata !18}
-!16 = metadata !{metadata !19, metadata !20, null}
+!15 = metadata !{ null, metadata !16, null, null, metadata !17, metadata !18}
+!16 = metadata !{metadata !19, metadata !20}
 !17 = metadata  !{metadata !"isSchedulable_get_data", i1 0, i1()* @isSchedulable_get_data}
 !18 = metadata  !{metadata !"get_data", i1 0, void()* @get_data}
 !19 = metadata !{metadata !3, i32 384}
 !20 = metadata !{metadata !3}
 
-!21 = metadata !{ null, metadata !22, null, metadata !23, metadata !24}
-!22 = metadata !{metadata !25, metadata !26, null}
+!21 = metadata !{ null, metadata !22, null, null, metadata !23, metadata !24}
+!22 = metadata !{metadata !25, metadata !26}
 !23 = metadata  !{metadata !"isSchedulable_get_size", i1 0, i1()* @isSchedulable_get_size}
 !24 = metadata  !{metadata !"get_size", i1 0, void()* @get_size}
 !25 = metadata !{metadata !5, i32 1, metadata !7, i32 1}
