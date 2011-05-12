@@ -49,6 +49,8 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Use;
@@ -97,6 +99,8 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	 */
 	private Action nextAction;
 
+	private List<Port> portWrittenList;
+
 	/**
 	 * name of the source state
 	 */
@@ -144,6 +148,11 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 			nextAction = null;
 
 			index = 0;
+
+			// reset the list of ports written to by currentAction
+			portWrittenList = new ArrayList<Port>();
+
+			// visit current action
 			doSwitch(currentAction.getBody());
 		}
 		return null;
@@ -214,6 +223,16 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		return null;
 	}
 
+	@Override
+	public Object caseInstStore(InstStore store) {
+		Var var = store.getTarget().getVariable();
+		Pattern pattern = currentAction.getOutputPattern();
+		if (var.eContainer() == pattern) {
+			portWrittenList.add(pattern.getPort(var));
+		}
+		return null;
+	}
+
 	/**
 	 * Creates a new empty action with the given name.
 	 * 
@@ -244,6 +263,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 				fac.createPattern(), currentAction.getOutputPattern(),
 				fac.createPattern(), scheduler, body);
 		currentAction.setOutputPattern(fac.createPattern());
+		movePatternVariables(action.getOutputPattern());
 
 		// add action to actor's actions
 		actor.getActions().add(action);
@@ -298,6 +318,24 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		stateNames.put(stateName, count + 1);
 
 		return stateName + "_" + count;
+	}
+
+	/**
+	 * Moves the variables that are in the output pattern of the current action
+	 * and have not yet been stored.
+	 * 
+	 * @param nextOutput
+	 *            output pattern of the next action
+	 */
+	private void movePatternVariables(Pattern nextOutput) {
+		// move ports and variables back in the current output if they have
+		// already been written
+		Pattern currentOutput = currentAction.getOutputPattern();
+		for (Port port : portWrittenList) {
+			Var var = nextOutput.getVariable(port);
+			currentOutput.setVariable(port, var);
+			nextOutput.remove(port);
+		}
 	}
 
 	/**
