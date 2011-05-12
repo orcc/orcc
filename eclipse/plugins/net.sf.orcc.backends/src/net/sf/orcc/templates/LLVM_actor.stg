@@ -365,3 +365,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <decl_MD(actor)>
 
 >>
+
+instance(instance, options) ::= <<
+<actor(instance.actor, options)>
+>>
