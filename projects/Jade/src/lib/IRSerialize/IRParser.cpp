@@ -193,12 +193,13 @@ CSDFMoC* IRParser::parseCSDF(MDNode* csdfNode){
 	// Parse patterns
 	Pattern* ip = parsePattern(inputs, csdfNode->getOperand(1));
 	Pattern* op = parsePattern(outputs, csdfNode->getOperand(2));
+	//Pattern* pp = parsePattern(inputs, csdfNode->getOperand(3));
 	csfMoC->setInputPattern(ip);
 	csfMoC->setOutputPattern(op);
 	csfMoC->setNumberOfPhases(value->getLimitedValue());
 	
 	// Parse actions
-	parseCSDFActions(cast<MDNode>(csdfNode->getOperand(3)), csfMoC);
+	parseCSDFActions(cast<MDNode>(csdfNode->getOperand(4)), csfMoC);
 
 	return csfMoC;
 }
@@ -240,9 +241,8 @@ Pattern* IRParser::parsePattern(map<std::string, Port*>* ports, Value* value){
 	// Parse pattern property
 	map<Port*, ConstantInt*>* numTokens = parserNumTokens(ports, patternNode->getOperand(0));
 	map<Port*, Variable*>* varMap = parserVarMap(ports, patternNode->getOperand(1));
-	map<Port*, Variable*>* peekedMap = parserVarMap(ports, patternNode->getOperand(2));
 
-	return new Pattern(numTokens, varMap, peekedMap);
+	return new Pattern(numTokens, varMap);
 }
 
 map<Port*, Variable*>* IRParser::parserVarMap(map<std::string, Port*>* ports, Value* value){
@@ -474,10 +474,11 @@ Action* IRParser::parseAction(MDNode* node){
 
 	Pattern* ip = parsePattern(inputs, node->getOperand(1));
 	Pattern* op = parsePattern(outputs, node->getOperand(2));
+	Pattern* pp = parsePattern(inputs, node->getOperand(3));
 
-	Procedure* scheduler = parseProc(cast<MDNode>(node->getOperand(3)));
-	Procedure* body = parseProc(cast<MDNode>(node->getOperand(4)));
-	Action* action = new Action(tag, ip, op, scheduler, body, actor);
+	Procedure* scheduler = parseProc(cast<MDNode>(node->getOperand(4)));
+	Procedure* body = parseProc(cast<MDNode>(node->getOperand(5)));
+	Action* action = new Action(tag, ip, op, pp, scheduler, body, actor);
 
 	putAction(tag, action);
 

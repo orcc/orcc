@@ -236,9 +236,10 @@ Action* IRWriter::writeAction(Action* action){
 		//Write patterns
 		Pattern* inputPattern = writePattern(action->getInputPattern(), inputs);
 		Pattern* outputPattern = writePattern(action->getOutputPattern(), outputs);
+		Pattern* peekPattern = writePattern(action->getPeekPattern(), inputs);
 
 		//Create the action
-		return new Action(action->getTag(), inputPattern, outputPattern, newScheduler, newBody, instance);
+		return new Action(action->getTag(), inputPattern, outputPattern, peekPattern, newScheduler, newBody, instance);
 }
 
 Procedure* IRWriter::writeProcedure(Procedure* procedure){
@@ -295,30 +296,6 @@ Pattern* IRWriter::writePattern(Pattern* pattern, map<string, Port*>* ports){
 
 		// Add variable to pattern
 		newPattern->setVariable(dst, dst->getPtrVar());
-	}
-
-	//Add peek map for each ports
-	map<Port*, Variable*>* peekMap = pattern->getPeekedMap();
-
-	for (itVar = peekMap->begin(); itVar != peekMap->end(); itVar++) {
-		Variable* var = itVar->second;
-
-		//Get corresponding port in instance
-		Port* src = itVar->first;
-		itPort = ports->find(src->getName());
-
-			// Find destination port
-		Port* dst;
-		itPort = ports->find(src->getName());
-		if (itPort == ports->end()){
-			dst = new Port(src->getName(), src->getType());
-			ports->insert(pair<string, Port*>(src->getName(), dst));
-		}else{
-			dst = itPort->second;
-		}
-
-		// Add variable to pattern
-		newPattern->setPeeked(dst, dst->getPtrVar());
 	}
 
 	return newPattern;

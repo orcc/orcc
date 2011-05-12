@@ -172,7 +172,7 @@ BasicBlock* DPNScheduler::createActionTest(Action* action, BasicBlock* BB, Basic
 	BB = checkInputPattern(action->getInputPattern(), function, skipBB, BB);
 	
 	//Test firing condition of an action
-	checkPeekPattern(action->getInputPattern(), function, BB);
+	checkPeekPattern(action->getPeekPattern(), function, BB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* schedInst = CallInst::Create(scheduler->getFunction(), "",  BB);
 	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, schedInst, BB);
@@ -295,7 +295,7 @@ BasicBlock* DPNScheduler::createActionTestState(FSM::NextStateInfo* nextStateInf
 	stateBB = checkInputPattern(action->getInputPattern(), function, skipStateBB, stateBB);
 	
 	//Test firing condition of an action
-	checkPeekPattern(action->getInputPattern(), function, stateBB);
+	checkPeekPattern(action->getPeekPattern(), function, stateBB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  stateBB);
 	BranchInst* branchInst	= BranchInst::Create(fireStateBB, skipStateBB, callInst, stateBB);

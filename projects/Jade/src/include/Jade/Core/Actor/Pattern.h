@@ -71,7 +71,7 @@ public:
 	 *
 	 * @param peekedMap : a Map of Peeked port and  their associated variables
 	 */
-	Pattern(std::map<Port*, llvm::ConstantInt*>* numTokensMap, std::map<Port*, Variable*>* variableMap, std::map<Port*, Variable*>* peekedMap);
+	Pattern(std::map<Port*, llvm::ConstantInt*>* numTokensMap, std::map<Port*, Variable*>* variableMap);
 
 	/**
 	 *
@@ -107,15 +107,6 @@ public:
 	}
 
 	/**
-	 * @brief Returns the peeked map.
-	 * 
-	 * @return the peeked map
-	 */
-	std::map<Port*, Variable*>* getPeekedMap() {
-		return peekedMap;
-	}
-
-	/**
 	 * @brief Returns the variable map.
 	 * 
 	 * @return the variable map
@@ -141,15 +132,6 @@ public:
 	void setNumTokens(Port* port, llvm::ConstantInt* numTokens);
 
 	/**
-	 * @brief Sets the variable in which tokens are peeked from the given port.
-	 * 
-	 * @param port : a port
-	 *
-	 * @param peeked : a variable that contains tokens peeked by the given port
-	 */
-	void setPeeked(Port* port, Variable* peeked);
-
-	/**
 	 * @brief Sets the variable that contains tokens produced (or consumed) by the
 	 * given port.
 	 * 
@@ -165,16 +147,6 @@ public:
 	 * @return the number of tokens produced (or consumed) by the given port
 	 */
 	llvm::ConstantInt* getNumTokens(Port* port);
-
-	/**
-	 *  @brief Returns the variable that contains the tokens peeked
-	 *
-	 * Returns the variable that contains the tokens peeked by the given port.
-	 * May be NULL if the port is not peeked.
-	 * 
-	 * @return the variable that contains the tokens peeked by the given port
-	 */
-	Variable* getPeeked(Port* port);
 
 	/**
 	 *  @brief Returns the variable that contains tokens produced (or consumed)
@@ -209,9 +181,6 @@ private:
 
 	/** Num tokens map */
 	std::map<Port*, llvm::ConstantInt*>* numTokensMap;
-	
-	/** Peeked map */
-	std::map<Port*, Variable*>* peekedMap;
 
 	/** Variable map */
 	std::map<Port*, Variable*>* variableMap;

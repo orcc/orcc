@@ -140,9 +140,10 @@ void BroadcastActor::createAction(){
 	Procedure* body = createBody();
 	Pattern* inputPattern = createPattern(inputs);
 	Pattern* outputPattern = createPattern(outputs);
+	Pattern* peekPattern = createPattern(inputs);
 	
 	//Add action to the actor
-	Action* action = new Action(actionTag, inputPattern, outputPattern, scheduler, body, this);
+	Action* action = new Action(actionTag, inputPattern, outputPattern, peekPattern, scheduler, body, this);
 
 	actions->push_back(action);
 }

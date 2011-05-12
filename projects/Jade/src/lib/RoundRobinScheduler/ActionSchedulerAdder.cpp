@@ -253,7 +253,7 @@ BasicBlock* ActionSchedulerAdder::checkOutputPattern(Pattern* pattern, llvm::Fun
 void ActionSchedulerAdder::checkPeekPattern(Pattern* pattern, Function* function, BasicBlock* BB){
 	//Test if rooms are available on output
 	map<Port*, Variable*>::iterator it;
-	map<Port*, Variable*>* peeked = pattern->getPeekedMap();
+	map<Port*, Variable*>* peeked = pattern->getVariableMap();
 	map<Port*, ConstantInt*>* numTokensMap = pattern->getNumTokensMap();
 
 	for ( it=peeked->begin() ; it != peeked->end(); it++ ){

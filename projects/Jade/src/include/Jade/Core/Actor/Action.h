@@ -80,12 +80,13 @@ public:
 	 *
 	 * @param parent : Parent of the action
 	 */
-	Action(ActionTag* tag, Pattern* inputPattern, Pattern* outputPattern, Procedure* scheduler, Procedure* body, Parent* parent = NULL) {
+	Action(ActionTag* tag, Pattern* inputPattern, Pattern* outputPattern, Pattern* peekPattern, Procedure* scheduler, Procedure* body, Parent* parent = NULL) {
 		this->tag = tag;
 		this->body = body;
 		this->scheduler = scheduler;
 		this->inputPattern = inputPattern;
 		this->outputPattern = outputPattern;
+		this->peekPattern = peekPattern;
 		this->parent = parent;
 	}
 
@@ -141,11 +142,18 @@ public:
 	Pattern* getInputPattern(){return inputPattern;};
 
 	/**
-     *  @brief return outpur pattern of the action
+     *  @brief return output pattern of the action
    	 *
 	 *  @param a map of output pattern
      */
 	Pattern* getOutputPattern(){return outputPattern;};
+
+	/**
+     *  @brief return peek pattern of the action
+   	 *
+	 *  @param a map of peek pattern
+     */
+	Pattern* getPeekPattern(){return peekPattern;};
 
 	/**
 	 * @brief Returns action name (tag or body name)
@@ -160,6 +168,7 @@ private:
 	Procedure* scheduler;
 	Pattern* inputPattern;
 	Pattern* outputPattern;
+	Pattern* peekPattern;
 	Parent* parent;
 };
 

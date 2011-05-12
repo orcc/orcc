@@ -42,10 +42,9 @@
 using namespace std;
 using namespace llvm;
 
-Pattern::Pattern(map<Port*, ConstantInt*>* numTokensMap, map<Port*, Variable*>* variableMap, map<Port*, Variable*>* peekedMap){
+Pattern::Pattern(map<Port*, ConstantInt*>* numTokensMap, map<Port*, Variable*>* variableMap){
 	this->numTokensMap = numTokensMap;
 	this->variableMap = variableMap;
-	this->peekedMap = peekedMap;
 
 	//Fill ports with num tokens
 	map<Port*, ConstantInt*>::iterator itTokens;
@@ -58,17 +57,11 @@ Pattern::Pattern(map<Port*, ConstantInt*>* numTokensMap, map<Port*, Variable*>* 
 	for (itVar = variableMap->begin(); itVar != variableMap->end(); itVar++){
 		checkPortPresence(itVar->first);
 	}
-	
-	//Fill ports with peeked map
-	for (itVar = peekedMap->begin(); itVar != peekedMap->end(); itVar++){
-		checkPortPresence(itVar->first);
-	}
 }
 
 Pattern::Pattern(){
 	this->numTokensMap = new map<Port*, ConstantInt*>();
 	this->variableMap = new map<Port*, Variable*>();
-	this->peekedMap = new map<Port*, Variable*>();
 }
 
 void Pattern::checkPortPresence(Port* port) {
@@ -78,18 +71,12 @@ void Pattern::checkPortPresence(Port* port) {
 void Pattern::clear(){
 	ports.clear();
 	numTokensMap->clear();
-	peekedMap->clear();
 	variableMap->clear();
 }
 
 void Pattern::setNumTokens(Port* port, llvm::ConstantInt* numTokens) {
 	checkPortPresence(port);
 	numTokensMap->insert(pair<Port*, ConstantInt*>(port, numTokens));
-}
-
-void Pattern::setPeeked(Port* port, Variable* peeked) {
-	checkPortPresence(port);
-	peekedMap->insert(pair<Port*, Variable*>(port, peeked));
 }
 
 void Pattern::setVariable(Port* port, Variable* variable) {
@@ -100,7 +87,6 @@ void Pattern::setVariable(Port* port, Variable* variable) {
 void Pattern::remove(Port* port) {
 	ports.erase(port);
 	numTokensMap->erase(port);
-	peekedMap->erase(port);
 	variableMap->erase(port);
 }
 
@@ -111,18 +97,6 @@ ConstantInt* Pattern::getNumTokens(Port* port) {
 	it = numTokensMap->find(port);
 	
 	if (it == numTokensMap->end()){
-		return NULL;
-	}
-
-	return it->second;
-}
-
-Variable* Pattern::getPeeked(Port* port) {
-	map<Port*, Variable*>::iterator it;
-
-	it = peekedMap->find(port);
-
-	if (it == peekedMap->end()){
 		return NULL;
 	}
 
