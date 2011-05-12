@@ -33,7 +33,10 @@ import java.io.File;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.stringtemplate.v4.ST;
 
 /**
@@ -46,14 +49,16 @@ public class InstancePrinter extends Printer {
 
 	private boolean keepUnchangedFiles = false;
 
+	private IProject project;
+
 	/**
 	 * Creates a new instance printer.
 	 * 
 	 * @param templateName
 	 *            the name of the template
 	 */
-	public InstancePrinter(String templateName) {
-		this(templateName, false);
+	public InstancePrinter(IProject project, String templateName) {
+		this(project, templateName, false);
 	}
 
 	/**
@@ -65,9 +70,11 @@ public class InstancePrinter extends Printer {
 	 *            if the printer must keep printing files from unchanged
 	 *            instances
 	 */
-	public InstancePrinter(String templateName, boolean keepUnchangedFiles) {
+	public InstancePrinter(IProject project, String templateName,
+			boolean keepUnchangedFiles) {
 		super(templateName);
 		this.keepUnchangedFiles = keepUnchangedFiles;
+		this.project = project;
 	}
 
 	/**
@@ -81,12 +88,12 @@ public class InstancePrinter extends Printer {
 		long instanceModified = 0;
 		if (instance.isActor()) {
 			Actor actor = instance.getActor();
-			File actorFile = new File(actor.getFile());
-			instanceModified = actorFile.lastModified();
+			IFile file = OrccUtil.getActor(project, actor);
+			instanceModified = file.getModificationStamp();
 		} else if (instance.isNetwork()) {
 			Network network = instance.getNetwork();
-			File networkFile = new File(network.getFile());
-			instanceModified = networkFile.lastModified();
+			IFile file = OrccUtil.getNetwork(project, network.getName());
+			instanceModified = file.getModificationStamp();
 		}
 
 		Instance parent = instance.getParent();
@@ -111,8 +118,8 @@ public class InstancePrinter extends Printer {
 	 *            name of the root ST rule
 	 * @return <code>true</code> if the instance was cached
 	 */
-	public boolean print(String fileName, String path,
-			Instance instance, String instanceName) {
+	public boolean print(String fileName, String path, Instance instance,
+			String instanceName) {
 		String file = path + File.separator + fileName;
 		if (instance.isNetwork()
 				|| (instance.isActor() && !instance.getActor().isNative())) {

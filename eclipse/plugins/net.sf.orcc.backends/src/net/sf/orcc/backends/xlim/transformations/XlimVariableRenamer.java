@@ -47,7 +47,7 @@ public class XlimVariableRenamer extends VariableRenamer {
 	public Object casePattern(Pattern pattern) {
 		Action action = EcoreHelper.getContainerOfType(pattern, Action.class);
 		String actionName = action.getName();
-		for (Var var : pattern.getPortToVarMap().values()) {
+		for (Var var : pattern.getVariables()) {
 			if (!action.getBody().getLocals().contains(var)) {
 				var.setName(actionName + "_" + var.getName());
 			}

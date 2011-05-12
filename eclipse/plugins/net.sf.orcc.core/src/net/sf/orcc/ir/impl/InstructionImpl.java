@@ -35,6 +35,15 @@ public abstract class InstructionImpl extends EObjectImpl implements
 		Instruction {
 
 	/**
+	 * The cached value of the '{@link #getPredicate() <em>Predicate</em>}' containment reference.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getPredicate()
+	 * @generated
+	 * @ordered
+	 */
+	protected Predicate predicate;
+
+	/**
 	 * The default value of the '{@link #getLineNumber() <em>Line Number</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -53,15 +62,6 @@ public abstract class InstructionImpl extends EObjectImpl implements
 	 * @ordered
 	 */
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getPredicate() <em>Predicate</em>}' containment reference.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getPredicate()
-	 * @generated
-	 * @ordered
-	 */
-	protected Predicate predicate;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

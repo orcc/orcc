@@ -118,6 +118,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	 */
 	protected String path;
 
+	protected IProject project;
+
 	/**
 	 * Path of the folder that contains VTL under IR form.
 	 */
@@ -480,7 +482,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		String name = getAttribute(PROJECT, "");
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
-		IProject project = root.getProject(name);
+		project = root.getProject(name);
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
 		inputFile = OrccUtil.getNetwork(project, getAttribute(XDF_FILE, ""));

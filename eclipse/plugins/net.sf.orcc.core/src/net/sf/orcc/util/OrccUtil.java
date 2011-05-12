@@ -143,6 +143,30 @@ public class OrccUtil {
 	}
 
 	/**
+	 * Returns the .cal file in the given project that corresponds to the given
+	 * actor.
+	 * 
+	 * @param project
+	 *            project
+	 * @param actor
+	 *            an actor
+	 * @return the .cal file in the given project that corresponds to the given
+	 *         actor, or if none exists, <code>null</code>
+	 */
+	public static IFile getActor(IProject project, Actor actor) {
+		String file = actor.getFile();
+		IPath path = new Path(file).addFileExtension("cal");
+		for (IFolder folder : OrccUtil.getSourceFolders(project)) {
+			IFile inputFile = folder.getFile(path);
+			if (inputFile != null && inputFile.exists()) {
+				return inputFile;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns the list of ALL source folders of the required projects as well
 	 * as of the given project as a list of absolute workspace paths.
 	 * 

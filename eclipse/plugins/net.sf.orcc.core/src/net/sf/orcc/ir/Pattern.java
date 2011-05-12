@@ -82,6 +82,15 @@ public interface Pattern extends EObject {
 	EMap<Port, Integer> getNumTokensMap();
 
 	/**
+	 * Returns the port that corresponds to the given variable.
+	 * 
+	 * @param variable
+	 *            a variable that contains tokens produced (or consumed)
+	 * @return the port that corresponds to the given variable
+	 */
+	Port getPort(Var variable);
+
+	/**
 	 * Returns the ports of this pattern.
 	 * 
 	 * @return the ports of this pattern

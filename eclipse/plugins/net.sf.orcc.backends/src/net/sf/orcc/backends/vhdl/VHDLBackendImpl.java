@@ -248,7 +248,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 			folder.mkdir();
 		}
 
-		InstancePrinter instancePrinter = new InstancePrinter("VHDL_testbench");
+		InstancePrinter instancePrinter = new InstancePrinter(project,
+				"VHDL_testbench");
 		Instance instance = new Instance(network.getName(), network.getName());
 		instance.setContents(network);
 		printTestbench(instancePrinter, instance);

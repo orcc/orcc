@@ -55,6 +55,7 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 * @ordered
 	 */
 	protected EList<Port> ports;
+
 	/**
 	 * The cached value of the '{@link #getVariables() <em>Variables</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -63,7 +64,6 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 * @ordered
 	 */
 	protected EList<Var> variables;
-
 	/**
 	 * The cached value of the '{@link #getNumTokensMap()
 	 * <em>Num Tokens Map</em>}' map. <!-- begin-user-doc --> <!-- end-user-doc
@@ -284,11 +284,38 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EMap<Port, Integer> getNumTokensMap() {
+		if (numTokensMap == null) {
+			numTokensMap = new EcoreEMap<Port,Integer>(IrPackage.Literals.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY, PortToEIntegerObjectMapEntryImpl.class, this, IrPackage.PATTERN__NUM_TOKENS_MAP);
+		}
+		return numTokensMap;
+	}
+
+	@Override
+	public Port getPort(Var variable) {
+		return getVarToPortMap().get(variable);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EList<Port> getPorts() {
 		if (ports == null) {
 			ports = new EObjectResolvingEList<Port>(Port.class, this, IrPackage.PATTERN__PORTS);
 		}
 		return ports;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EMap<Port, Var> getPortToVarMap() {
+		if (portToVarMap == null) {
+			portToVarMap = new EcoreEMap<Port,Var>(IrPackage.Literals.PORT_TO_VAR_MAP_ENTRY, PortToVarMapEntryImpl.class, this, IrPackage.PATTERN__PORT_TO_VAR_MAP);
+		}
+		return portToVarMap;
 	}
 
 	@Override
@@ -305,28 +332,6 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 			variables = new EObjectContainmentEList<Var>(Var.class, this, IrPackage.PATTERN__VARIABLES);
 		}
 		return variables;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EMap<Port, Integer> getNumTokensMap() {
-		if (numTokensMap == null) {
-			numTokensMap = new EcoreEMap<Port,Integer>(IrPackage.Literals.PORT_TO_EINTEGER_OBJECT_MAP_ENTRY, PortToEIntegerObjectMapEntryImpl.class, this, IrPackage.PATTERN__NUM_TOKENS_MAP);
-		}
-		return numTokensMap;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EMap<Port, Var> getPortToVarMap() {
-		if (portToVarMap == null) {
-			portToVarMap = new EcoreEMap<Port,Var>(IrPackage.Literals.PORT_TO_VAR_MAP_ENTRY, PortToVarMapEntryImpl.class, this, IrPackage.PATTERN__PORT_TO_VAR_MAP);
-		}
-		return portToVarMap;
 	}
 
 	/**

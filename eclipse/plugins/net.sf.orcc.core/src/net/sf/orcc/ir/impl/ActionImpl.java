@@ -68,16 +68,6 @@ public class ActionImpl extends EObjectImpl implements Action {
 	protected Pattern outputPattern;
 
 	/**
-	 * The cached value of the '{@link #getPeekPattern() <em>Peek Pattern</em>}' containment reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getPeekPattern()
-	 * @generated
-	 * @ordered
-	 */
-	protected Pattern peekPattern;
-
-	/**
 	 * The cached value of the '{@link #getScheduler() <em>Scheduler</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getScheduler()
@@ -94,6 +84,16 @@ public class ActionImpl extends EObjectImpl implements Action {
 	 * @ordered
 	 */
 	protected Tag tag;
+
+	/**
+	 * The cached value of the '{@link #getPeekPattern() <em>Peek Pattern</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPeekPattern()
+	 * @generated
+	 * @ordered
+	 */
+	protected Pattern peekPattern;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
