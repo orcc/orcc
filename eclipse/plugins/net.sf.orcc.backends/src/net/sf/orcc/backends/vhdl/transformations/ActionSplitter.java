@@ -366,6 +366,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		if (!isAncestor(procedure, local)) {
 			local = procedure.newTempLocalVariable(copy(var.getType()),
 					var.getName());
+			local.setIndex(1);
 			mapLocals.put(var, local);
 
 			// add a load at the beginning of the block

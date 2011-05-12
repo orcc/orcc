@@ -82,7 +82,7 @@ public class RenameTransformation extends AbstractActorVisitor<Object> {
 
 	private void checkVariables(List<Var> variables) {
 		for (Var var : variables) {
-			String name = var.getIndexedName();
+			String name = var.getName();
 			if (transformations != null && transformations.containsKey(name)) {
 				var.setName(transformations.get(name));
 			} else if (pattern != null) {
