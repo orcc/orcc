@@ -48,7 +48,7 @@ import net.sf.orcc.ir.util.ExpressionPrinter;
  * @author Matthieu Wipliez
  * 
  */
-public class LLVMExprPrinter extends ExpressionPrinter {
+public class LLVMExpressionPrinter extends ExpressionPrinter {
 
 	private boolean signed;
 

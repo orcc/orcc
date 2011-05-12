@@ -157,7 +157,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		List<Actor> actors = parseActors(files);
 
 		printer = new ActorPrinter("LLVM_actor", !debugMode);
-		printer.setExpressionPrinter(new LLVMExprPrinter());
+		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 
 		// transforms and prints actors

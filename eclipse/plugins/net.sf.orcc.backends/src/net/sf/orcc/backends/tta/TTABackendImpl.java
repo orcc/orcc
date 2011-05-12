@@ -37,8 +37,8 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.ActorPrinter;
-import net.sf.orcc.backends.llvm.LLVMExprPrinter;
+import net.sf.orcc.backends.InstancePrinter;
+import net.sf.orcc.backends.llvm.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.LLVMTemplateData;
 import net.sf.orcc.backends.llvm.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
@@ -53,11 +53,12 @@ import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
+import net.sf.orcc.network.transformations.NetworkClassifier;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
-import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 
@@ -77,8 +78,6 @@ public class TTABackendImpl extends AbstractBackend {
 	private boolean debugMode;
 
 	private boolean normalize;
-
-	private ActorPrinter printer;
 
 	private final Map<String, String> transformations;
 
@@ -132,26 +131,24 @@ public class TTABackendImpl extends AbstractBackend {
 		actor.setTemplateData(new LLVMTemplateData(actor));
 	}
 
-	@Override
-	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
-		List<Actor> actors = parseActors(files);
+	private void doTransformNetwork(Network network) throws OrccException {
+		network.flatten();
 
-		printer = new ActorPrinter("LLVM_actor", !debugMode);
-		printer.setExpressionPrinter(new LLVMExprPrinter());
-		printer.setTypePrinter(new LLVMTypePrinter());
-
-		// transforms and prints actors
-		transformActors(actors);
-		printActors(actors);
-
-		if (isCanceled()) {
-			return;
+		if (classify) {
+			new NetworkClassifier().transform(network);
 		}
 	}
 
 	@Override
+	protected void doVtlCodeGeneration(List<IFile> files) throws OrccException {
+		// do not generate a VTL
+	}
+
+	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		network.flatten();
+		doTransformNetwork(network);
+
+		printInstances(network);
 
 		// print network
 		write("Printing network...\n");
@@ -160,17 +157,12 @@ public class TTABackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) {
-		if (actor.isNative()) {
-			// Do not generate native actor
-			return true;
-		}
-
-		// Create folder if necessary
-		String folder = path + File.separator + OrccUtil.getFolder(actor);
-		new File(folder).mkdirs();
-
-		return printer.print(actor.getSimpleName(), folder, actor, "actor");
+	protected boolean printInstance(Instance instance) throws OrccException {
+		InstancePrinter printer = new InstancePrinter("LLVM_actor", !debugMode);
+		printer.setExpressionPrinter(new LLVMExpressionPrinter());
+		printer.setTypePrinter(new LLVMTypePrinter());
+		return printer.print(instance.getId() + ".bc", path, instance,
+				"instance");
 	}
 
 }
