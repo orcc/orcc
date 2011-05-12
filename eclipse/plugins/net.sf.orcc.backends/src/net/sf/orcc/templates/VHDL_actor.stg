@@ -424,7 +424,7 @@ VarInFctDeclaration(variable) ::= <<
 <if(variable.type.list)
 >-- error !!!!! type memory_type<
 else
->variable <variable.name> : <typeFunction(variable.type)><
+>variable <variable.indexedName> : <typeFunction(variable.type)><
 endif>
 >>
 
