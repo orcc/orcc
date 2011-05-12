@@ -90,7 +90,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 
 	private int index;
 
-	private Map<Var, Var> mapGlobals;
+	private Map<String, Var> mapGlobals;
 
 	private Map<Var, Var> mapLocals;
 
@@ -164,7 +164,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		stateNames = new HashMap<String, Integer>();
 		statesMap = new HashMap<String, State>();
 		mapLocals = new HashMap<Var, Var>();
-		mapGlobals = new HashMap<Var, Var>();
+		mapGlobals = new HashMap<String, Var>();
 
 		visitAllActions();
 
@@ -283,12 +283,12 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 	private Var getGlobal(Var local) {
 		IrFactory fac = IrFactory.eINSTANCE;
 
-		Var global = mapGlobals.get(local);
+		Var global = mapGlobals.get(local.getName());
 		if (global == null) {
 			global = fac.createVar(0, copy(local.getType()),
 					"sg_" + local.getName(), true, null);
 			actor.getStateVars().add(global);
-			mapGlobals.put(local, global);
+			mapGlobals.put(local.getName(), global);
 
 			InstStore store = fac.createInstStore(global,
 					fac.createExprVar(local));
