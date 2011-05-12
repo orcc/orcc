@@ -6,7 +6,7 @@ import "net/sf/orcc/templates/LLVM_metadata.stg"
 
 variableDeclaration(variable) ::= <<
 <if(variable.type.list)>
-<AllocaOp(result={%<variable.name>}, type=variable.type)>
+<AllocaOp(result={%<variable.indexedName>}, type=variable.type)>
 <endif>
 >>
 
@@ -139,7 +139,7 @@ printCall(call) ::= <<
 <else>
 <CastParameter(casts=call.paramCast, args=call.procedure.parameters, params=call.parameters, location=Location(call.location))>
 <if(call.target)>
-%<call.target.variable.name> = <CallOp(ty=call.procedure.returnType,
+%<call.target.variable.indexedName> = <CallOp(ty=call.procedure.returnType,
 fnptrval=call.procedure.name,
 function_args=parametersDeclaration(arguments=call.procedure.parameters, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
 <else>
@@ -149,7 +149,7 @@ function_args=parametersDeclaration(arguments=call.procedure.parameters, paramet
 >>
 
 printCast(cast)::= <<
-%<cast.target.variable.name> = <printCastOp(cast)> <cast.source.variable.type> %<cast.source.variable.indexedName> to <cast.target.variable.type>
+%<cast.target.variable.indexedName> = <printCastOp(cast)> <cast.source.variable.type> %<cast.source.variable.indexedName> to <cast.target.variable.type>
 >>
 
 printCastOp(cast) ::= <<

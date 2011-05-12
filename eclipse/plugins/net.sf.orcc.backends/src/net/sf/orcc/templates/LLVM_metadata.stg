@@ -351,7 +351,7 @@ pattern_vars_MD(actor, pattern, portToVarMap) ::= <<
 >>
 
 pattern_numTokens_MD(actor, pattern, numTokens) ::= <<
-<pattern_numTokens_decl_MD(actor, numTokens)> test =  metadata !{<pattern.ports: {port | metadata <port_decl_MD(actor, port)>, i32 <numTokens.(port)>}; separator=", ">}
+<pattern_numTokens_decl_MD(actor, numTokens)> =  metadata !{<pattern.ports: {port | metadata <port_decl_MD(actor, port)>, i32 <numTokens.(port)>}; separator=", ">}
 >>
 
 action_MD(actor, action) ::= <<

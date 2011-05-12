@@ -56,6 +56,7 @@ import net.sf.orcc.backends.transformations.tac.TacTransformation;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BlockCombine;
+import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
@@ -141,7 +142,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new InstPhiTransformation(),
 				new GetElementPtrAdder(), new BlockCombine(),
-				new TypeSizeTransformation(), new CastAdder(true) };
+				new TypeSizeTransformation(), new CastAdder(true),
+				new BuildCFG() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
