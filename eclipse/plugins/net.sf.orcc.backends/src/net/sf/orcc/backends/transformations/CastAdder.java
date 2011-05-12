@@ -141,7 +141,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseExprVar(ExprVar expr) {
-		return expr;
+		return castExpression(expr);
 	}
 
 	@Override
