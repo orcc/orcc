@@ -492,6 +492,10 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private Var createTab(String name, Type entryType, int size) {
 		Type type = IrFactory.eINSTANCE.createTypeList(size, entryType);
 		Var newList = IrFactory.eINSTANCE.createVar(0, type, name, true, true);
+		for (int i = 0; i < size; i++) {
+			newList.setValue(IrFactory.eINSTANCE.createExprInt(0));
+		    }
+		
 		if (!actor.getStateVars().contains(newList.getName())) {
 			actor.getStateVars().add(newList);
 		}
@@ -839,8 +843,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						+ "_" + inputIndex, true, inputIndex);
 		locals.add(diff);
 		Expression value = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(readIndex), OpBinary.MINUS,
-				IrFactory.eINSTANCE.createExprVar(writeIndex),
+				IrFactory.eINSTANCE.createExprVar(localRead), OpBinary.MINUS,
+				IrFactory.eINSTANCE.createExprVar(localWrite),
 				IrFactory.eINSTANCE.createTypeInt(32));
 		Instruction assign = IrFactory.eINSTANCE.createInstAssign(diff, value);
 		bodyNode.add(index, assign);
