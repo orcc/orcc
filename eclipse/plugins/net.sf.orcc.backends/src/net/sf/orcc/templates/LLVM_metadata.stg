@@ -158,19 +158,19 @@ decl_MD(actor) ::= <<
 <actionScheduler_MD(actor)>
 <if(actor.inputs)>
 ; Input ports
-<actor.inputs: {port | <port_MD(actor, port)>}>
+<actor.inputs: {port | <port_MD(actor, port)>}; separator="\n">
 <endif>
 <if(actor.outputs)>
 ; Output ports
-<actor.outputs: {port | <port_MD(actor, port)>}>
+<actor.outputs: {port | <port_MD(actor, port)>}; separator="\n">
 <endif>
 <if(actor.parameters)>
 ; Parameters
-<actor.parameters: {param | <var_MD(actor, param)>}>
+<actor.parameters: {param | <var_MD(actor, param)>}; separator="\n">
 <endif>
 <if(actor.stateVars)>
 ; State Variables
-<actor.stateVars: {var | <statevar_MD(actor, var)>}>
+<actor.stateVars: {var | <statevar_MD(actor, var)>}; separator="\n">
 <endif>
 <if(actor.procs)>
 ; Functions and procedures
