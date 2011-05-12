@@ -31,6 +31,9 @@ package net.sf.orcc.backends.transformations;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprBinary;
+import net.sf.orcc.ir.ExprUnary;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -45,9 +48,50 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * types of general-purpose programming language such as C, C++ or Java.
  * 
  * @author Jerome Gorin
+ * @author Herve Yviquel
  * 
  */
 public class TypeSizeTransformation extends AbstractActorVisitor<Object> {
+
+	public TypeSizeTransformation() {
+		super(true);
+	}
+
+	@Override
+	public Object caseActor(Actor actor) {
+		checkVariables(actor.getParameters());
+		checkVariables(actor.getStateVars());
+		checkPorts(actor.getInputs());
+		checkPorts(actor.getOutputs());
+
+		return super.caseActor(actor);
+	}
+
+	@Override
+	public Object caseExprBinary(ExprBinary expr) {
+		checkType(expr.getType());
+		return super.caseExprBinary(expr);
+	}
+
+	@Override
+	public Object caseExprUnary(ExprUnary expr) {
+		checkType(expr.getType());
+		return super.caseExprUnary(expr);
+	}
+
+	@Override
+	public Object casePattern(Pattern pattern) {
+		checkVariables(pattern.getVariables());
+		return null;
+	}
+
+	@Override
+	public Object caseProcedure(Procedure procedure) {
+		checkVariables(procedure.getParameters());
+		checkVariables(procedure.getLocals());
+		checkType(procedure.getReturnType());
+		return super.caseProcedure(procedure);
+	}
 
 	private void checkPorts(List<Port> ports) {
 		for (Port port : ports) {
@@ -89,23 +133,4 @@ public class TypeSizeTransformation extends AbstractActorVisitor<Object> {
 			return 64;
 		}
 	}
-
-	@Override
-	public Object caseActor(Actor actor) {
-		checkVariables(actor.getParameters());
-		checkVariables(actor.getStateVars());
-		checkPorts(actor.getInputs());
-		checkPorts(actor.getOutputs());
-
-		return super.caseActor(actor);
-	}
-
-	@Override
-	public Object caseProcedure(Procedure procedure) {
-		checkVariables(procedure.getParameters());
-		checkVariables(procedure.getLocals());
-		checkType(procedure.getReturnType());
-		return null;
-	}
-
 }
