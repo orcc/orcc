@@ -27,6 +27,8 @@
 #include "roxml_win32_native.h"
 #endif
 
+#include <pthread.h>
+
 /** \typedef roxml_parse_func 
  *
  * \brief parser callback functions
