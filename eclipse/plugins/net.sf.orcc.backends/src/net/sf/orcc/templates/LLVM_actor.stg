@@ -149,7 +149,7 @@ function_args=parametersDeclaration(arguments=call.procedure.parameters, paramet
 >>
 
 printCast(cast)::= <<
-%<cast.target.variable.name> = <printCastOp(cast)> <cast.source.variable.type> %<cast.source.variable.name> to <cast.target.variable.type>
+%<cast.target.variable.name> = <printCastOp(cast)> <cast.source.variable.type> %<cast.source.variable.indexedName> to <cast.target.variable.type>
 >>
 
 printCastOp(cast) ::= <<
