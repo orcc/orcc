@@ -271,14 +271,20 @@ public class LLVMTemplateData {
 
 	private void computeNodeToLabelMap(Actor actor) {
 		TreeIterator<EObject> it = actor.eAllContents();
-		int label = 0;
 		while (it.hasNext()) {
 			EObject object = it.next();
-
-			if (object instanceof Node) {
-				Node node = (Node) object;
-				nodeToLabelMap.put(node, label);
-				label++;
+			if (object instanceof Procedure) {
+				Procedure proc = (Procedure) object;
+				int label = 1;
+				TreeIterator<EObject> it2 = proc.eAllContents();
+				while (it2.hasNext()) {
+					EObject object2 = it2.next();
+					if (object2 instanceof Node) {
+						Node node = (Node) object2;
+						nodeToLabelMap.put(node, label);
+						label++;
+					}
+				}
 			}
 		}
 	}
