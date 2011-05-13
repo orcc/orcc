@@ -150,12 +150,15 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		parentType = assign.getTarget().getVariable().getType();
 		Expression newValue = doSwitch(assign.getValue());
 		parentType = oldParentType;
-		if(newValue != assign.getValue()){
+		if (newValue != assign.getValue()) {
 			// Assign is useless anymore
-			EList<Instruction> instructions = assign.getBlock().getInstructions();
-			InstCast cast = (InstCast) instructions.get(instructions.indexOf(assign) - 1);
-			cast.setTarget(IrFactory.eINSTANCE.createDef(assign.getTarget().getVariable()));
-			
+			EList<Instruction> instructions = assign.getBlock()
+					.getInstructions();
+			InstCast cast = (InstCast) instructions.get(instructions
+					.indexOf(assign) - 1);
+			cast.setTarget(IrFactory.eINSTANCE.createDef(assign.getTarget()
+					.getVariable()));
+
 			EcoreHelper.delete(assign);
 		}
 		return null;
@@ -164,21 +167,15 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseInstCall(InstCall call) {
 		/*
-		Type oldParentType = parentType;
-		EList<Expression> expressions = call.getParameters();
-		EList<Expression> newExpressions = new BasicEList<Expression>();
-		for (int i = 0; i < expressions.size();) {
-			Expression expression = expressions.get(i);
-			parentType = call.getProcedure().getParameters().get(i).getType();
-			newExpressions.add(doSwitch(expression));
-			if (expression != null) {
-				i++;
-			}
-		}
-		expressions.clear();
-		expressions.addAll(newExpressions);
-		parentType = oldParentType;
-		*/
+		 * Type oldParentType = parentType; EList<Expression> expressions =
+		 * call.getParameters(); EList<Expression> newExpressions = new
+		 * BasicEList<Expression>(); for (int i = 0; i < expressions.size();) {
+		 * Expression expression = expressions.get(i); parentType =
+		 * call.getProcedure().getParameters().get(i).getType();
+		 * newExpressions.add(doSwitch(expression)); if (expression != null) {
+		 * i++; } } expressions.clear(); expressions.addAll(newExpressions);
+		 * parentType = oldParentType;
+		 */
 		return null;
 	}
 
@@ -304,13 +301,11 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	}
 
 	private void castExpressionList(EList<Expression> expressions) {
+		EList<Expression> oldExpression = new BasicEList<Expression>(
+				expressions);
 		EList<Expression> newExpressions = new BasicEList<Expression>();
-		for (int i = 0; i < expressions.size();) {
-			Expression expression = expressions.get(i);
+		for (Expression expression : oldExpression) {
 			newExpressions.add(doSwitch(expression));
-			if (expression != null) {
-				i++;
-			}
 		}
 		expressions.clear();
 		expressions.addAll(newExpressions);
