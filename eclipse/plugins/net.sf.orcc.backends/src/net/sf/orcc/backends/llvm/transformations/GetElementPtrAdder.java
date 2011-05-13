@@ -70,15 +70,15 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstLoad(InstLoad load) {
 		Var source = load.getSource().getVariable();
-		Var target = load.getTarget().getVariable();
 		EList<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			Var newSource = addGEP(source, target.getType(), indexes,
+			TypeList typeList = (TypeList) source.getType();
+			
+			Var newSource = addGEP(source, typeList.getElementType(), indexes,
 					load.getBlock());
 
 			load.setSource(IrFactory.eINSTANCE.createUse(newSource));
-			EcoreHelper.delete(indexes);
 		}
 		return null;
 	}
