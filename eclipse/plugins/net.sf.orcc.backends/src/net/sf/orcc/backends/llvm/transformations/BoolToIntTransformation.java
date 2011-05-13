@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.transformations;
 
-import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
@@ -40,32 +39,23 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 import org.eclipse.emf.common.util.EList;
 
 /**
- * Change port of type bool declaration into port of type i32.
+ * Change port of type bool declaration into port of type i8.
  * 
- * @author Jerome GORIN
+ * @author Jerome Gorin
+ * @author Herve Yviquel
  */
 public class BoolToIntTransformation extends AbstractActorVisitor<Object> {
 
 	private void changeType(Var var) {
 		TypeList listType = (TypeList) var.getType();
 		if (listType.getElementType().isBool()) {
-			listType.setType(IrFactory.eINSTANCE.createTypeInt(32));
+			listType.setType(IrFactory.eINSTANCE.createTypeInt(8));
 		}
 	}
 
 	@Override
-	public Object caseAction(Action action) {
-		// input pattern
-		Pattern pattern = action.getInputPattern();
-		for (Port port : pattern.getPorts()) {
-			Var var = pattern.getVariable(port);
-			changeType(var);
-		}
-
-		// output pattern
-		pattern = action.getOutputPattern();
-		for (Port port : pattern.getPorts()) {
-			Var var = pattern.getVariable(port);
+	public Object casePattern(Pattern pattern) {
+		for (Var var : pattern.getVariables()) {
 			changeType(var);
 		}
 		return null;
@@ -73,18 +63,15 @@ public class BoolToIntTransformation extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseActor(Actor actor) {
-		// Set port to i32
 		visitPort(actor.getInputs());
 		visitPort(actor.getOutputs());
-
 		return super.caseActor(actor);
 	}
 
 	public void visitPort(EList<Port> ports) {
-		// Transform Port into int Var
 		for (Port port : ports) {
 			if (port.getType().isBool()) {
-				port.setType(IrFactory.eINSTANCE.createTypeInt(32));
+				port.setType(IrFactory.eINSTANCE.createTypeInt(8));
 			}
 		}
 	}
