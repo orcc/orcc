@@ -41,6 +41,7 @@ import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -120,7 +121,12 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 					&& stateVar.getValue() != null) {
 				stateVar.setInitialValue(EcoreHelper.copy(stateVar.getValue()));
 			} else if (stateVar.getInitialValue() == null && initToZero) {
-				stateVar.setInitialValue(listAllocator.doSwitch(stateVar.getType()));
+				if (type.isList()) {
+					stateVar.setInitialValue(listAllocator.doSwitch(stateVar.getType()));
+				}
+				else {
+					stateVar.setInitialValue(IrFactory.eINSTANCE.createExprInt(0));
+				}
 				initializeExpression(stateVar.getInitialValue());
 			}
 		}
