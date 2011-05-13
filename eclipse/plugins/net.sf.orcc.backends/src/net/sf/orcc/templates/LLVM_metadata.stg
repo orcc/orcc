@@ -328,7 +328,10 @@ actionScheduler_MD(actor) ::= <<
 <actionScheduler_decl_MD(actor)> = metadata !{<
 if(!actor.actionsOutsideFsm.empty)>metadata <actions_decl_MD(actor)><else>null<endif>, <
 if(actor.fsm)>metadata<FSM_decl_MD(actor)><else>null<endif>}
-<if(!actor.actions.empty)><actions_MD(actor)><endif>
+<if(!actor.actionsOutsideFsm.empty)>
+;; Actions outside FSM
+<actions_MD(actor)>
+<endif>
 <if(actor.fsm)>
 ;; FSM
 <FSM_MD(actor)>
@@ -336,7 +339,7 @@ if(actor.fsm)>metadata<FSM_decl_MD(actor)><else>null<endif>}
 >>
 
 actions_MD(actor) ::= <<
-<actions_decl_MD(actor)> = metadata !{<actor.actions: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">}
+<actions_decl_MD(actor)> = metadata !{<actor.actionsOutsideFsm: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">}
 >>
 
 pattern_MD(actor, patterns) ::= <<
