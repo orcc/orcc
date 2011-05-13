@@ -263,13 +263,10 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 	}
 
 	private void splitExpressionList(EList<Expression> expressions) {
+		EList<Expression> oldExpressions = new BasicEList<Expression>(expressions);
 		EList<Expression> newExpressions = new BasicEList<Expression>();
-		for (int i = 0; i < expressions.size();) {
-			Expression expression = expressions.get(i);
+		for (Expression expression : oldExpressions) {
 			newExpressions.add(doSwitch(expression));
-			if (expression != null) {
-				i++;
-			}
 		}
 		expressions.clear();
 		expressions.addAll(newExpressions);
