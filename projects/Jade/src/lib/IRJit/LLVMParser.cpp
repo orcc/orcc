@@ -77,7 +77,9 @@ Module* LLVMParser::loadModule(Package* package, string file) {
 
 	if (!Mod) {
 		//Error when parsing module
-		cerr << "Error opening bitcode file: '" << file.c_str() << "\n";
+		cerr << "Error parsing bitcode file '" << file.c_str() << "' at line " << Err.getLineNo() << "\n";
+		cerr << Err.getMessage() << "\n";
+		cerr << Err.getFilename() << "\n";
 		exit(1);
 	}
 
