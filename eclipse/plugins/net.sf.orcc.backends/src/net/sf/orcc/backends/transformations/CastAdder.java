@@ -166,16 +166,21 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstCall(InstCall call) {
-		/*
-		 * Type oldParentType = parentType; EList<Expression> expressions =
-		 * call.getParameters(); EList<Expression> newExpressions = new
-		 * BasicEList<Expression>(); for (int i = 0; i < expressions.size();) {
-		 * Expression expression = expressions.get(i); parentType =
-		 * call.getProcedure().getParameters().get(i).getType();
-		 * newExpressions.add(doSwitch(expression)); if (expression != null) {
-		 * i++; } } expressions.clear(); expressions.addAll(newExpressions);
-		 * parentType = oldParentType;
-		 */
+		if (!call.isPrint()) {
+			Type oldParentType = parentType;
+			EList<Expression> expressions = call.getParameters();
+			EList<Expression> oldExpression = new BasicEList<Expression>(
+					expressions);
+			EList<Expression> newExpressions = new BasicEList<Expression>();
+			for (int i = 0; i < oldExpression.size(); i++) {
+				parentType = call.getProcedure().getParameters().get(i)
+						.getType();
+				newExpressions.add(doSwitch(oldExpression.get(i)));
+			}
+			expressions.clear();
+			expressions.addAll(newExpressions);
+			parentType = oldParentType;
+		}
 		return null;
 	}
 
