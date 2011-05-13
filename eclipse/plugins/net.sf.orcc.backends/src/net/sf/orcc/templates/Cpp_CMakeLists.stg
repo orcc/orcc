@@ -33,7 +33,6 @@ find_path(CAL_INCLUDE_DIR actoraka.h HINTS $ENV{CALDIR} PATH_SUFFIXES include in
 
 
 <if(options.needSerDes)>
-find_path(CAL_SOURCE_DIR wrapperaka.cpp HINTS $ENV{CALDIR} PATH_SUFFIXES src src/CAL)
 find_library(AdaptorFactory_LIBRARY AdaptorFactory HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 find_library(Wrapper_LIBRARY Wrapper HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 <endif>
@@ -70,10 +69,6 @@ add_executable (<network.name>
 <network.name>.cpp
 <network.actors : addActor()>
 )
-
-<if(options.needSerDes)>
-add_dependencies(<network.name> Wrapper)
-<endif>
 
 target_link_libraries(<network.name>
 ${libraries}
