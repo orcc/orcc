@@ -126,8 +126,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new UnaryListRemoval(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
-				new ExpressionSplitter(true),
-				/* new CopyPropagator(), */new BuildCFG(), new CastAdder(true),
+				new ExpressionSplitter(true), /*new CopyPropagator(),*/
+				new BuildCFG(), new CastAdder(true),
 				new InstPhiTransformation(), new LiteralIntegersAdder(true),
 				new XlimVariableRenamer(), new BlockCombine() };
 

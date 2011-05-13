@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.transformations.tac;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.ActorVisitor;
 
@@ -52,8 +51,7 @@ import net.sf.orcc.ir.util.ActorVisitor;
  * @author Jerome GORIN
  * 
  */
-public class TacTransformation extends
-		AbstractActorVisitor<Object> {
+public class TacTransformation extends AbstractActorVisitor<Object> {
 
 	private boolean usePreviousJoinNode;
 
@@ -71,7 +69,7 @@ public class TacTransformation extends
 	@Override
 	public Object caseActor(Actor actor) {
 		ActorVisitor<?>[] transformations = {
-				new ExpressionSplitter(usePreviousJoinNode), new BuildCFG(),
+				new ExpressionSplitter(usePreviousJoinNode),
 				new CopyPropagator(), new ConstantPropagator() };
 
 		for (ActorVisitor<?> transformation : transformations) {

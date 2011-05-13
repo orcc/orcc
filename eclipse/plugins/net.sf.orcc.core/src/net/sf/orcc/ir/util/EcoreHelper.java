@@ -87,34 +87,37 @@ public class EcoreHelper {
 			Instruction instruction, boolean usePreviousJoinNode) {
 		Instruction instContainer = EcoreHelper.getContainerOfType(expression,
 				Instruction.class);
+		Node nodeContainer = EcoreHelper.getContainerOfType(expression,
+				Node.class);
 		if (instContainer != null) {
+			if (usePreviousJoinNode && isWhileJoinNode(nodeContainer)) {
+				NodeWhile nodeWhile = EcoreHelper.getContainerOfType(
+						nodeContainer, NodeWhile.class);
+				addToPreviousNodeBlock(nodeWhile, instruction);
+				return false;
+			}
 			List<Instruction> instructions = EcoreHelper
 					.getContainingList(instContainer);
 			instructions.add(instructions.indexOf(instContainer), instruction);
 			return true;
 		} else {
-			Node nodeContainer = EcoreHelper.getContainerOfType(expression,
-					Node.class);
 			if (usePreviousJoinNode && nodeContainer.isWhileNode()) {
 				NodeBlock joinNode = ((NodeWhile) nodeContainer).getJoinNode();
 				joinNode.add(instruction);
 				return false;
 			} else {
-				List<Node> nodes = EcoreHelper.getContainingList(nodeContainer);
-				int index = nodes.indexOf(nodeContainer);
-				if (index > 0) {
-					Node previousNode = nodes.get(index - 1);
-					if (previousNode.isBlockNode()) {
-						((NodeBlock) previousNode).add(instruction);
-						return false;
-					}
-				}
-				NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
-				nodeBlock.add(instruction);
-				nodes.add(index, nodeBlock);
+				addToPreviousNodeBlock(nodeContainer, instruction);
 				return false;
 			}
 		}
+	}
+
+	private static void addToPreviousNodeBlock(Node node,
+			Instruction instruction) {
+		List<Node> nodes = EcoreHelper.getContainingList(node);
+		NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
+		nodeBlock.add(instruction);
+		nodes.add(nodes.indexOf(node), nodeBlock);
 	}
 
 	/**
@@ -267,6 +270,15 @@ public class EcoreHelper {
 		}
 
 		return uses;
+	}
+
+	private static boolean isWhileJoinNode(Node node) {
+		if (node.isBlockNode()) {
+			NodeWhile nodeWhile = EcoreHelper.getContainerOfType(node,
+					NodeWhile.class);
+			return (nodeWhile != null && nodeWhile.getJoinNode() == node);
+		}
+		return false;
 	}
 
 	/**

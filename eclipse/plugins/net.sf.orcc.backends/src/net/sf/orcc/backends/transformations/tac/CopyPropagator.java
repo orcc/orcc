@@ -79,5 +79,4 @@ public class CopyPropagator extends AbstractActorVisitor<Object> {
 		}
 		return null;
 	}
-
 }
