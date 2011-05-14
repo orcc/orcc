@@ -495,7 +495,7 @@ Procedure* IRParser::parseProc(MDNode* node){
 }
 
 Function* IRParser::getBodyFunction(llvm::MDNode* actionNode){
-	MDNode* body = cast<MDNode>(actionNode->getOperand(4));
+	MDNode* body = cast<MDNode>(actionNode->getOperand(5));
 	return cast<Function>(body->getOperand(2));
 }
 
