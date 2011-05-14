@@ -494,8 +494,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		Var newList = IrFactory.eINSTANCE.createVar(0, type, name, true, true);
 		for (int i = 0; i < size; i++) {
 			newList.setValue(IrFactory.eINSTANCE.createExprInt(0));
-		    }
-		
+		}
+
 		if (!actor.getStateVars().contains(newList.getName())) {
 			actor.getStateVars().add(newList);
 		}
@@ -984,14 +984,38 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		if (fsm == null) {
 			List<Action> actions = new ArrayList<Action>(
 					actor.getActionsOutsideFsm());
-			State initState = IrFactory.eINSTANCE.createState("init");
-			statesMap.put("init", initState);
-			// statesMap.put("init", initState);
-			// no FSM: simply visit all the actions
-			addFsm();
-			for (Action action : actions) {
-				visitTransition(initState, initState, action);
+			boolean transform = false;
+			for (Action verifAction : actions) {
+				for (Entry<Port, Integer> verifEntry : verifAction
+						.getInputPattern().getNumTokensMap().entrySet()) {
+					int verifNumTokens = verifEntry.getValue();
+					if (verifNumTokens > 1) {
+						transform = true;
+						break;
+					}
+				}
+				for (Entry<Port, Integer> verifEntry : verifAction
+						.getOutputPattern().getNumTokensMap().entrySet()) {
+					int verifNumTokens = verifEntry.getValue();
+					if (verifNumTokens > 1) {
+						transform = true;
+						break;
+					}
+				}
 			}
+			if (transform == true) {
+				// ////////
+				State initState = IrFactory.eINSTANCE.createState("init");
+				statesMap.put("init", initState);
+				// statesMap.put("init", initState);
+				// no FSM: simply visit all the actions
+				addFsm();
+				for (Action action : actions) {
+					visitTransition(initState, initState, action);
+				}
+				transform = false;
+			}
+			// //////
 		} else {
 			// with an FSM: visits all transitions
 			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
@@ -1002,7 +1026,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				Action action = (Action) edge.getObject();
 				visitTransition(source, target, action);
 			}
+			modifyNoRepeatActionsInFSM();
 		}
+		
 	}
 
 	/**
@@ -1164,7 +1190,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					inputIndex = inputIndex + 1;
 					port = entry.getKey();
 					bufferSize = 512;// OptimalBufferSize(action, port);
-					entryType = entry.getKey().getType();
+					entryType = port.getType();
 
 					if (inputPorts.contains(port)) {
 						int position = portPosition(inputPorts, port);
@@ -1277,7 +1303,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					numTokens = entry.getValue();
 					outputIndex = outputIndex + 1;
 					port = entry.getKey();
-					entryType = entry.getKey().getType();
+					entryType = port.getType();
 					String counterName = action.getName() + "NewWriteCounter"
 							+ outputIndex;
 					Var counter = createCounter(counterName);
@@ -1321,6 +1347,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				.getNumTokensMap().entrySet()) {
 			int verifNumTokens = verifEntry.getValue();
 			Port verifPort = verifEntry.getKey();
+			entryType = verifPort.getType();
 			bufferSize = 512;// OptimalBufferSize(action, verifPort);
 			if (inputPorts.contains(verifPort)) {
 				int position = portPosition(inputPorts, verifPort);
@@ -1389,6 +1416,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						.getNumTokensMap().entrySet()) {
 					numTokens = entry.getValue();
 					port = entry.getKey();
+					entryType = port.getType();
 					String name = "TokensToSend" + port.getName();
 					Var tokensToSend = createCounter(name);
 					Expression condition = IrFactory.eINSTANCE
@@ -1492,7 +1520,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		statesMap = new HashMap<String, State>();
 		writeIndexes = new ArrayList<Var>();
 		modifyRepeatActionsInFSM();
-		modifyNoRepeatActionsInFSM();
 		modifyUntaggedActions(actor);
 		return null;
 	}
