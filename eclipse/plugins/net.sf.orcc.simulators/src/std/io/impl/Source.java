@@ -40,7 +40,7 @@ import java.io.RandomAccessFile;
  */
 public class Source {
 
-	public static String fileName;
+	private static String fileName;
 
 	private static RandomAccessFile in;
 
@@ -82,6 +82,16 @@ public class Source {
 					+ "\"";
 			throw new RuntimeException(msg, e);
 		}
+	}
+
+	/**
+	 * Sets the file name used by this Source class.
+	 * 
+	 * @param fileName
+	 *            name of a file to read
+	 */
+	public void setFileName(String fileName) {
+		Source.fileName = fileName;
 	}
 
 }
