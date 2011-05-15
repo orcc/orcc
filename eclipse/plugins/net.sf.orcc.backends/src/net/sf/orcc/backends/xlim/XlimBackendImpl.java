@@ -42,7 +42,6 @@ import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.Inliner;
-import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.tac.ExpressionSplitter;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
@@ -121,8 +120,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		XlimActorTemplateData data = new XlimActorTemplateData();
 		data.computeTemplateMaps(actor);
 		actor.setTemplateData(data);
-		ActorVisitor<?>[] transformations = { new Multi2MonoToken(),
-				new SSATransformation(),
+		ActorVisitor<?>[] transformations = { new SSATransformation(),
 				new GlobalArrayInitializer(hardwareGen),
 				new InstTernaryAdder(), new Inliner(true, true),
 				new UnaryListRemoval(), new CustomPeekAdder(),
