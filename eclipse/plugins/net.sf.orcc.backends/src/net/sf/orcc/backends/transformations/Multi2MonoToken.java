@@ -1010,6 +1010,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				for (Action action : actions) {
 					visitTransition(initState, initState, action);
 				}
+				modifyNoRepeatActionsInFSM();
 				transform = false;
 			}
 			// //////
