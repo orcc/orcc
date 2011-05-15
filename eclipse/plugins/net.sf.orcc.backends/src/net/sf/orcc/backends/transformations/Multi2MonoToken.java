@@ -387,7 +387,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		scheduler.getLocals().add(temp);
 		result = IrFactory.eINSTANCE.createVar(0,
-				IrFactory.eINSTANCE.createTypeBool(), "result", true, 0);
+				IrFactory.eINSTANCE.createTypeBool(), "res", true, 0);
 
 		scheduler.getLocals().add(result);
 		Var localCounter = IrFactory.eINSTANCE.createVar(0, counter.getType(),
@@ -492,9 +492,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private Var createTab(String name, Type entryType, int size) {
 		Type type = IrFactory.eINSTANCE.createTypeList(size, entryType);
 		Var newList = IrFactory.eINSTANCE.createVar(0, type, name, true, true);
-		for (int i = 0; i < size; i++) {
-			newList.setValue(IrFactory.eINSTANCE.createExprInt(0));
-		}
 
 		if (!actor.getStateVars().contains(newList.getName())) {
 			actor.getStateVars().add(newList);

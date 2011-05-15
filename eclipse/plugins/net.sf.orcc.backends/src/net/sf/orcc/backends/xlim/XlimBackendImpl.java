@@ -42,6 +42,7 @@ import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.transformations.CastAdder;
 import net.sf.orcc.backends.transformations.Inliner;
+import net.sf.orcc.backends.transformations.Multi2MonoToken;
 import net.sf.orcc.backends.transformations.tac.ExpressionSplitter;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.GlobalArrayInitializer;
@@ -116,17 +117,18 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
+
 		XlimActorTemplateData data = new XlimActorTemplateData();
 		data.computeTemplateMaps(actor);
 		actor.setTemplateData(data);
-
-		ActorVisitor<?>[] transformations = { new SSATransformation(),
+		ActorVisitor<?>[] transformations = { new Multi2MonoToken(),
+				new SSATransformation(),
 				new GlobalArrayInitializer(hardwareGen),
 				new InstTernaryAdder(), new Inliner(true, true),
 				new UnaryListRemoval(), new CustomPeekAdder(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new XlimDeadVariableRemoval(), new ListFlattener(),
-				new ExpressionSplitter(true), /*new CopyPropagator(),*/
+				new ExpressionSplitter(true), /* new CopyPropagator(), */
 				new BuildCFG(), new CastAdder(true),
 				new InstPhiTransformation(), new LiteralIntegersAdder(true),
 				new XlimVariableRenamer(), new BlockCombine() };
@@ -139,6 +141,8 @@ public class XlimBackendImpl extends AbstractBackend {
 			}
 		}
 
+		data.computeTemplateMaps(actor);
+		actor.setTemplateData(data);
 	}
 
 	@Override
