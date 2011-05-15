@@ -44,6 +44,16 @@ public class Source {
 
 	private static RandomAccessFile in;
 
+	/**
+	 * Sets the file name used by this Source class.
+	 * 
+	 * @param fileName
+	 *            name of a file to read
+	 */
+	public static void setFileName(String fileName) {
+		Source.fileName = fileName;
+	}
+
 	public static void source_init() {
 		try {
 			in = new RandomAccessFile(fileName, "r");
@@ -82,16 +92,6 @@ public class Source {
 					+ "\"";
 			throw new RuntimeException(msg, e);
 		}
-	}
-
-	/**
-	 * Sets the file name used by this Source class.
-	 * 
-	 * @param fileName
-	 *            name of a file to read
-	 */
-	public void setFileName(String fileName) {
-		Source.fileName = fileName;
 	}
 
 }
