@@ -107,10 +107,8 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.util.OrccUtil;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
@@ -414,11 +412,6 @@ public class IRWriter extends IrSwitch<JsonElement> {
 
 				IFile file = outputDir.getFile(new Path(OrccUtil.getFile(actor)
 						+ ".json"));
-				IContainer cter = file.getParent();
-				if (cter.getType() == IResource.FOLDER) {
-					OrccUtil.createFolder((IFolder) cter);
-				}
-
 				InputStream source = new ByteArrayInputStream(os.toByteArray());
 				OrccUtil.setFileContents(file, source);
 			} finally {

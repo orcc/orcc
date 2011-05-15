@@ -38,6 +38,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.Actor;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -499,6 +500,10 @@ public class OrccUtil {
 		if (file.exists()) {
 			file.setContents(source, true, false, null);
 		} else {
+			IContainer container = file.getParent();
+			if (container.getType() == IResource.FOLDER) {
+				createFolder((IFolder) container);
+			}
 			file.create(source, true, null);
 		}
 	}
