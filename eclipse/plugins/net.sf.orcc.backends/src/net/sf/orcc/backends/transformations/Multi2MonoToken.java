@@ -102,6 +102,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					.equals(currentPort.getName())) {
 				// change tab Name
 				Use useArray = IrFactory.eINSTANCE.createUse(buffer);
+				load.getSource().getVariable().getUses().remove(0);
 				load.setSource(useArray);
 				// change index --> writeIndex+index
 				Expression maskValue = IrFactory.eINSTANCE
