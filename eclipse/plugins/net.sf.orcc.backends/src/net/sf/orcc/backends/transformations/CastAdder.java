@@ -47,6 +47,8 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Type;
@@ -220,10 +222,38 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	@Override
 	public Expression caseInstPhi(InstPhi phi) {
-		Type oldParentType = parentType;
-		parentType = phi.getTarget().getVariable().getType();
-		castExpressionList(phi.getValues());
-		parentType = oldParentType;
+		if (phi.getValues().size() == 2) {
+			Type oldParentType = parentType;
+			parentType = phi.getTarget().getVariable().getType();
+			EList<Expression> values = phi.getValues();
+			Node containingNode = (Node) phi.eContainer().eContainer();
+			Expression value0 = phi.getValues().get(0);
+			Expression value1 = phi.getValues().get(1);
+			if (containingNode.isIfNode()) {
+				NodeIf nodeIf = (NodeIf) containingNode;
+				if (value0.isVarExpr()) {
+					NodeBlock block0 = IrFactory.eINSTANCE.createNodeBlock();
+					nodeIf.getThenNodes().add(block0);
+					values.set(0, castExpression(value0, block0, 0));
+				}
+				if (value1.isVarExpr()) {
+					NodeBlock block1 = IrFactory.eINSTANCE.createNodeBlock();
+					nodeIf.getElseNodes().add(block1);
+					values.set(1, castExpression(value1, block1, 0));
+				}
+			} else {
+				NodeWhile nodeWhile = (NodeWhile) containingNode;
+				NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
+				nodeWhile.getNodes().add(block);
+				if (value0.isVarExpr()) {
+					values.set(0, castExpression(value0, block, 0));
+				}
+				if (value1.isVarExpr()) {
+					values.set(1, castExpression(value1, block, 0));
+				}
+			}
+			parentType = oldParentType;
+		}
 		return null;
 	}
 
@@ -307,6 +337,33 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		return expr;
 	}
 
+	private Expression castExpression(Expression expr, NodeBlock node, int index) {
+		if (needCast(expr.getType(), parentType)) {
+			Var oldVar;
+			if (expr.isVarExpr()) {
+				oldVar = ((ExprVar) expr).getUse().getVariable();
+			} else {
+				oldVar = procedure.newTempLocalVariable(
+						EcoreUtil.copy(expr.getType()),
+						"expr_" + procedure.getName());
+				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
+						oldVar, EcoreHelper.copy(expr));
+				node.add(index, assign);
+				index++;
+			}
+
+			Var newVar = procedure.newTempLocalVariable(
+					EcoreUtil.copy(parentType),
+					"castedExpr_" + procedure.getName());
+			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
+					oldVar, newVar);
+			node.add(index, cast);
+			return IrFactory.eINSTANCE.createExprVar(newVar);
+		}
+
+		return expr;
+	}
+
 	private void castExpressionList(EList<Expression> expressions) {
 		EList<Expression> oldExpression = new BasicEList<Expression>(
 				expressions);
@@ -319,12 +376,13 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	}
 
 	private boolean needCast(Type type1, Type type2) {
-		if(type1.getSizeInBits() != type2.getSizeInBits()){
+		if (type1.getSizeInBits() != type2.getSizeInBits()) {
 			return true;
-		} else if(castToUnsigned && type1.getClass() != type2.getClass()){
+		} else if (castToUnsigned && type1.getClass() != type2.getClass()) {
 			return true;
 		} else {
-			return !((type1.isInt() && type2.isUint()) || (type1.isUint() && type2.isInt())) && (type1.getClass() != type2.getClass());
+			return !((type1.isInt() && type2.isUint()) || (type1.isUint() && type2
+					.isInt())) && (type1.getClass() != type2.getClass());
 		}
 	}
 
