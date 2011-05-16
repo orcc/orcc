@@ -72,7 +72,7 @@ public class SmtSolver {
 
 				ps.close();
 
-				IFile file = output.getFile(prefix + "_" + i + ".smt2");
+				IFile file = output.getFile(prefix + "_" + i++ + ".smt2");
 				InputStream source = new ByteArrayInputStream(bos.toByteArray());
 				OrccUtil.setFileContents(file, source);
 			}
