@@ -415,7 +415,7 @@ public class ActorTransformer {
 	 */
 	public Actor transform(IFile file, AstActor astActor) {
 		actor = IrFactory.eINSTANCE.createActor();
-		actor.setFile(file.getFullPath().toOSString());
+		actor.setFile(file.getFullPath().toString());
 
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);
