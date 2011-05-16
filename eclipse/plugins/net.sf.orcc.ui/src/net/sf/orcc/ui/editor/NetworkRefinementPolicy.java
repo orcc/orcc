@@ -28,17 +28,12 @@
  */
 package net.sf.orcc.ui.editor;
 
-import java.util.List;
-
 import net.sf.graphiti.model.DefaultRefinementPolicy;
 import net.sf.graphiti.model.Vertex;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
@@ -96,24 +91,18 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 		}
 
 		IProject project = getProject(vertex);
-		try {
-			List<IFolder> folders = OrccUtil.getAllSourceFolders(project);
-			for (IFolder folder : folders) {
-				String path = refinement.replace('.', '/');
-				// first try network
-				IFile file = folder.getFile(new Path(path + ".xdf"));
-				if (file != null && file.exists()) {
-					return file;
-				}
+		String qualifiedName = refinement.replace('.', '/');
 
-				// then actor
-				file = folder.getFile(new Path(path + ".cal"));
-				if (file != null && file.exists()) {
-					return file;
-				}
-			}
-		} catch (CoreException e) {
-			return null;
+		// first try networks
+		IFile file = OrccUtil.getFile(project, qualifiedName, "xdf");
+		if (file != null) {
+			return file;
+		}
+
+		// then actors
+		file = OrccUtil.getFile(project, qualifiedName, "cal");
+		if (file != null) {
+			return file;
 		}
 
 		return null;

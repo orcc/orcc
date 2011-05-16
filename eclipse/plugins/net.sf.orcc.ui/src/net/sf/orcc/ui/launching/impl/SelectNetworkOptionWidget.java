@@ -179,7 +179,7 @@ public class SelectNetworkOptionWidget implements ModifyListener, OptionWidget {
 		}
 
 		IProject project = launchConfigurationTab.getProjectFromText();
-		IResource file = OrccUtil.getNetwork(project, text.getText());
+		IResource file = OrccUtil.getFile(project, text.getText(), "xdf");
 		if (file == null || !file.exists()) {
 			launchConfigurationTab.setErrorMessage(option.getName()
 					+ " refers to a non-existent network");

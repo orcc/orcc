@@ -33,6 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.util.OrccUtil.getFile;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -485,7 +486,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		project = root.getProject(name);
 		vtlFolders = OrccUtil.getOutputFolders(project);
 
-		inputFile = OrccUtil.getNetwork(project, getAttribute(XDF_FILE, ""));
+		inputFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
 
 		String outputFolder;
 		Object obj = options.get(OUTPUT_FOLDER);

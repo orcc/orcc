@@ -764,7 +764,7 @@ public class XDFParser {
 
 		// try to find network with the given name
 		IProject project = file.getProject();
-		IFile networkFile = OrccUtil.getNetwork(project, clasz);
+		IFile networkFile = OrccUtil.getFile(project, clasz, "xdf");
 
 		// if found, parse and set contents
 		if (networkFile != null) {

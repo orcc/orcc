@@ -144,30 +144,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Returns the .cal file in the given project that corresponds to the given
-	 * actor.
-	 * 
-	 * @param project
-	 *            project
-	 * @param actor
-	 *            an actor
-	 * @return the .cal file in the given project that corresponds to the given
-	 *         actor, or if none exists, <code>null</code>
-	 */
-	public static IFile getActor(IProject project, Actor actor) {
-		String file = actor.getFile();
-		IPath path = new Path(file).addFileExtension("cal");
-		for (IFolder folder : OrccUtil.getSourceFolders(project)) {
-			IFile inputFile = folder.getFile(path);
-			if (inputFile != null && inputFile.exists()) {
-				return inputFile;
-			}
-		}
-
-		return null;
-	}
-
-	/**
 	 * Returns the list of ALL source folders of the required projects as well
 	 * as of the given project as a list of absolute workspace paths.
 	 * 
@@ -176,8 +152,7 @@ public class OrccUtil {
 	 * @return a list of absolute workspace paths
 	 * @throws CoreException
 	 */
-	public static List<IFolder> getAllSourceFolders(IProject project)
-			throws CoreException {
+	public static List<IFolder> getAllSourceFolders(IProject project) {
 		List<IFolder> srcFolders = new ArrayList<IFolder>();
 
 		IJavaProject javaProject = JavaCore.create(project);
@@ -185,15 +160,19 @@ public class OrccUtil {
 			return srcFolders;
 		}
 
-		// add source folders of required projects
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		for (String name : javaProject.getRequiredProjectNames()) {
-			IProject refProject = root.getProject(name);
-			srcFolders.addAll(getAllSourceFolders(refProject));
-		}
-
 		// add source folders of this project
 		srcFolders.addAll(getSourceFolders(project));
+
+		// add source folders of required projects
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		try {
+			for (String name : javaProject.getRequiredProjectNames()) {
+				IProject refProject = root.getProject(name);
+				srcFolders.addAll(getAllSourceFolders(refProject));
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 
 		return srcFolders;
 	}
@@ -264,6 +243,30 @@ public class OrccUtil {
 	}
 
 	/**
+	 * Returns the network in the given project that has the given qualified
+	 * name.
+	 * 
+	 * @param project
+	 *            project
+	 * @param qualifiedName
+	 *            qualified name of a network
+	 * @return if there is such a network, a file, otherwise <code>null</code>
+	 */
+	public static IFile getFile(IProject project, String qualifiedName,
+			String extension) {
+		String name = qualifiedName.replace('.', '/');
+		IPath path = new Path(name).addFileExtension(extension);
+		for (IFolder folder : getAllSourceFolders(project)) {
+			IFile inputFile = folder.getFile(path);
+			if (inputFile != null && inputFile.exists()) {
+				return inputFile;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns the folder that corresponds to the package of the given actor.
 	 * 
 	 * @param actor
@@ -272,29 +275,6 @@ public class OrccUtil {
 	 */
 	public static String getFolder(Actor actor) {
 		return actor.getPackage().replace('.', '/');
-	}
-
-	/**
-	 * Returns the network in the given project that has the given qualified
-	 * name.
-	 * 
-	 * @param project
-	 *            project
-	 * @param networkName
-	 *            qualified name of a network
-	 * @return if there is such a network, a file, otherwise <code>null</code>
-	 */
-	public static IFile getNetwork(IProject project, String networkName) {
-		String name = networkName.replace('.', '/');
-		IPath path = new Path(name).addFileExtension("xdf");
-		for (IFolder folder : OrccUtil.getSourceFolders(project)) {
-			IFile inputFile = folder.getFile(path);
-			if (inputFile != null && inputFile.exists()) {
-				return inputFile;
-			}
-		}
-
-		return null;
 	}
 
 	/**
