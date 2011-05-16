@@ -62,6 +62,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
 import org.eclipse.emf.common.util.EList;
 import org.jgrapht.DirectedGraph;
@@ -102,7 +103,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					.equals(currentPort.getName())) {
 				// change tab Name
 				Use useArray = IrFactory.eINSTANCE.createUse(buffer);
-				load.getSource().getVariable().getUses().remove(0);
+				EcoreHelper.removeUses(load.getSource().getVariable());
+				EcoreHelper.delete(load.getSource().getVariable());
 				load.setSource(useArray);
 				// change index --> writeIndex+index
 				Expression maskValue = IrFactory.eINSTANCE
@@ -147,6 +149,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		public Object caseInstLoad(InstLoad load) {
 			if (load.getSource().getVariable().getName().equals(port.getName())) {
 				Use useArray = IrFactory.eINSTANCE.createUse(tab);
+				EcoreHelper.removeUses(load.getSource().getVariable());
+				EcoreHelper.delete(load.getSource().getVariable());
 				load.setSource(useArray);
 			}
 			return null;
@@ -173,6 +177,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			if (store.getTarget().getVariable().getName()
 					.equals(port.getName())) {
 				Def target = IrFactory.eINSTANCE.createDef(tab);
+				EcoreHelper.removeUses(store.getTarget().getVariable());
+				EcoreHelper.delete(store.getTarget().getVariable());
 				store.setTarget(target);
 			}
 			return null;
@@ -249,7 +255,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            position of the buffer in inputBuffers list
 	 */
 	private void consumeToken(Procedure body, int position, Port port) {
-
 		NodeBlock bodyNode = body.getFirst();
 		EList<Var> locals = body.getLocals();
 		Var index = IrFactory.eINSTANCE.createVar(0,
@@ -349,9 +354,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		Expression expression = IrFactory.eINSTANCE.createExprInt(0);
 		newCounter.setInitialValue(expression);
-		if (!actor.getStateVars().contains(newCounter.getName())) {
-			actor.getStateVars().add(newCounter);
-		}
+		actor.getStateVars().add(newCounter);
+		
 		return newCounter;
 	}
 
@@ -493,10 +497,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private Var createTab(String name, Type entryType, int size) {
 		Type type = IrFactory.eINSTANCE.createTypeList(size, entryType);
 		Var newList = IrFactory.eINSTANCE.createVar(0, type, name, true, true);
-
-		if (!actor.getStateVars().contains(newList.getName())) {
-			actor.getStateVars().add(newList);
-		}
+		actor.getStateVars().add(newList);
+		
 		return newList;
 	}
 
@@ -1542,6 +1544,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			action.getOutputPattern().clear();
 		}
 		if (repeatOutput && !repeatInput) {
+			// input pattern already copied in process action
 			action.getInputPattern().clear();
 		}
 		if (!repeatInput && !noRepeatActions.contains(action)) {
