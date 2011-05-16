@@ -155,7 +155,7 @@ decl_MD(actor) ::= <<
 <name_MD(actor)>
 
 ; Action-scheduler
-<actionScheduler_MD(actor)>
+<actionScheduler_MD(actor)>g
 <if(actor.inputs)>
 ; Input ports
 <actor.inputs: {port | <port_MD(actor, port)>}; separator="\n">
@@ -201,7 +201,7 @@ decl_MD(actor) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 source_decl_MD(actor) ::= <<
-!<actor.templateData.names.(actor.file)>
+!<actor.templateData.names.(actor.file.fullPath)>
 >>
 
 
@@ -597,7 +597,7 @@ metadata !"<var.name>"
 
 
 file_MD(actor) ::= <<
-metadata !"<actor.file>"
+metadata !"<actor.file.fullPath>"
 >>
 
 varState_MD(state) ::= <<

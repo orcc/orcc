@@ -99,7 +99,7 @@ public class LLVMTemplateData {
 	/**
 	 * Medata container of names
 	 */
-	private Map<String, Integer> names;
+	private Map<Object, Integer> names;
 
 	/**
 	 * Label of all nodes
@@ -150,7 +150,7 @@ public class LLVMTemplateData {
 		procs = new HashMap<Procedure, Integer>();
 		vars = new HashMap<Var, Integer>();
 		types = new HashMap<Type, Integer>();
-		names = new HashMap<String, Integer>();
+		names = new HashMap<Object, Integer>();
 		mocs = new HashMap<Object, Integer>();
 		exprs = new HashMap<String, Integer>();
 		id = 0;
@@ -211,7 +211,7 @@ public class LLVMTemplateData {
 
 	private void computeMetadataMaps(Actor actor) {
 		// Insert source file info
-		names.put(actor.getFileName(), id++);
+		names.put(actor.getFile().getFullPath(), id++);
 
 		// Insert name
 		names.put(actor.getName(), id++);
@@ -393,7 +393,7 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of variable information.
 	 */
-	public Map<String, Integer> getNames() {
+	public Map<Object, Integer> getNames() {
 		return names;
 	}
 
