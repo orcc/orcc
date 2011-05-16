@@ -71,6 +71,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class CastAdder extends AbstractActorVisitor<Expression> {
 
 	private boolean usePreviousJoinNode;
+	private boolean castToUnsigned;
 	private Type parentType;
 
 	/**
@@ -80,8 +81,9 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	 *            <code>true</code> if the current IR form has join node before
 	 *            while node
 	 */
-	public CastAdder(boolean usePreviousJoinNode) {
+	public CastAdder(boolean usePreviousJoinNode, boolean castToUnsigned) {
 		this.usePreviousJoinNode = usePreviousJoinNode;
+		this.castToUnsigned = castToUnsigned;
 	}
 
 	@Override
@@ -317,8 +319,13 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	}
 
 	private boolean needCast(Type type1, Type type2) {
-		return (type1.getClass() != type2.getClass())
-				|| (type1.getSizeInBits() != type2.getSizeInBits());
+		if(type1.getSizeInBits() != type2.getSizeInBits()){
+			return true;
+		} else if(castToUnsigned && type1.getClass() != type2.getClass()){
+			return true;
+		} else {
+			return !((type1.isInt() && type2.isUint()) || (type1.isUint() && type2.isInt())) && (type1.getClass() != type2.getClass());
+		}
 	}
 
 }

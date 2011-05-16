@@ -119,7 +119,7 @@ public class TTABackendImpl extends AbstractBackend {
 				new TypeSizeTransformation(), new BoolToIntTransformation(),
 				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
-				new TacTransformation(true), new CastAdder(true),
+				new TacTransformation(true), new CastAdder(true, false),
 				new InstPhiTransformation(), new GetElementPtrAdder(),
 				new BlockCombine() };
 
