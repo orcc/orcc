@@ -308,9 +308,9 @@ printActorsComponents(instance) ::=<<
 component <instance.id> is
 port(
 	-- <instance.id> Input(s)
-	<instance.actor.inputs.list: printActorsComponentsInputs(); separator="\n">
+	<instance.actor.inputs: printActorsComponentsInputs(); separator="\n">
 	-- <instance.id> Ouput(s)
-	<instance.actor.outputs.list: printActorsComponentsOutputs(); separator="\n">
+	<instance.actor.outputs: printActorsComponentsOutputs(); separator="\n">
 	
 	CLK: in std_logic;
 	RESET: in std_logic );
@@ -405,8 +405,8 @@ signal no_<port.name>_RDY : std_logic;<\n>
 // Actors Input / Output Signals
 
 printActorsSignals(instance,numberOfReaders) ::=<<
-<instance.actor.outputs.list: {port | <printActorSigOutput(port=port,numberOfReaders=numberOfReaders)>};  separator="\n">
-<instance.actor.inputs.list: printActorSigInput()>
+<instance.actor.outputs: {port | <printActorSigOutput(port=port,numberOfReaders=numberOfReaders)>};  separator="\n">
+<instance.actor.inputs: printActorSigInput()>
 >> 
 
 ///////////////////////////////////////////////////////////////////////////////
