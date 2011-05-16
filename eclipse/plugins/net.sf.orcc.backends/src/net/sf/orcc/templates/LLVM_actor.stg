@@ -277,21 +277,14 @@ printProcedure(proc) ::= <<
 <procedure(procedure = proc)>
 >>
 
-procedure(procedure, action = false) ::= <<
+procedure(procedure) ::= <<
 <if(!procedure.native)>
 define <procedure.returnType> @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 <if(procedure.locals)>
 	<procedure.locals: variableDeclaration()>
 <endif>
-<if(action.inputPattern.ports)>
-	<action.inputPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}; separator="\n">
-<endif>
-<if(action.outputPattern.ports)>
-	<action.outputPattern.ports: { port | <fifoVar(port=port, var=action.outputPattern.portToVarMap.(port))>}; separator="\n">
-<endif>
-<printNodes(trunc(procedure.nodes))>
-<printNode(last(procedure.nodes))>
+<printNodes(procedure.nodes)>
 }
 <endif>
 >>
@@ -308,8 +301,30 @@ actorParameter(parameter) ::= <<
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 printAction(action) ::= <<
-<procedure(procedure = action.scheduler, action=action)>
-<procedure(procedure = action.body, action=action)>
+define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+entry:
+<if(action.scheduler.locals)>
+	<action.scheduler.locals: variableDeclaration()>
+<endif>
+<if(action.peekPattern.ports)>
+	<action.peekPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}; separator="\n">
+<endif>
+<printNodes(action.scheduler.nodes)>
+}
+
+define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+entry:
+<if(action.body.locals)>
+	<action.body.locals: variableDeclaration()>
+<endif>
+<if(action.inputPattern.ports)>
+	<action.inputPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}; separator="\n">
+<endif>
+<if(action.outputPattern.ports)>
+	<action.outputPattern.ports: { port | <fifoVar(port=port, var=action.outputPattern.portToVarMap.(port))>}; separator="\n">
+<endif>
+<printNodes(action.body.nodes)>
+}
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
