@@ -32,6 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.moc.MoC;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
@@ -65,12 +66,19 @@ public interface Actor extends EObject {
 	EList<Action> getActionsOutsideFsm();
 
 	/**
-	 * Returns the RVC-CAL file this actor was declared in.
+	 * Returns the file this actor is defined in.
 	 * 
-	 * @return the RVC-CAL file this actor was declared in
+	 * @return the file this actor is defined in
+	 */
+	IFile getFile();
+
+	/**
+	 * Returns the name of the file this actor is defined in.
+	 * 
+	 * @return the name of the file this actor is defined in
 	 * @model dataType="org.eclipse.emf.ecore.EString"
 	 */
-	String getFile();
+	String getFileName();
 
 	/**
 	 * Returns the FSM of this actor, or <code>null</code> if it does not have
@@ -272,13 +280,12 @@ public interface Actor extends EObject {
 	void resetTokenProduction();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.ir.Actor#getFile <em>File</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @param value the new value of the '<em>File</em>' attribute.
-	 * @see #getFile()
-	 * @generated
+	 * Sets the name of the file in which this actor is defined.
+	 * 
+	 * @param fileName
+	 *            name of the file in which this actor is defined
 	 */
-	void setFile(String value);
+	void setFileName(String fileName);
 
 	/**
 	 * Sets the FSM of this actor to the given FSM.

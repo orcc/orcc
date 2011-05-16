@@ -85,13 +85,13 @@ public class ActorPrinter extends Printer {
 	 */
 	public boolean print(String fileName, String path, Actor actor,
 			String instanceName) {
-		if(!actor.isNative()) {
+		if (!actor.isNative()) {
 			String file = path + File.separator + fileName;
 			if (keepUnchangedFiles) {
 				// if source file is older than target file, do not generate
-				File sourceFile = new File(actor.getFile());
+				long sourceTimeStamp = actor.getFile().getLocalTimeStamp();
 				File targetFile = new File(file);
-				if (sourceFile.lastModified() < targetFile.lastModified()) {
+				if (sourceTimeStamp < targetFile.lastModified()) {
 					return true;
 				}
 			}
@@ -99,7 +99,7 @@ public class ActorPrinter extends Printer {
 			template.add("actor", actor);
 			printTemplate(template, file);
 		}
-		return false;			
+		return false;
 	}
 
 }

@@ -158,7 +158,7 @@ public class NetworkSplitter implements INetworkTransformation {
 	 */
 	private void addNewNetwork(Network oldNetwork, String target) {
 		DirectedGraph<Vertex, Connection> oldGraph = oldNetwork.getGraph();
-		Network newNetwork = new Network(oldNetwork.getFile());
+		Network newNetwork = new Network(oldNetwork.getFileName());
 		newNetwork.setName(oldNetwork.getName());
 		mapTargetsNetworks.put(target, newNetwork);
 

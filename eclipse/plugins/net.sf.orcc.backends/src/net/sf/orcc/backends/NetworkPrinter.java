@@ -89,9 +89,9 @@ public class NetworkPrinter extends Printer {
 		String file = path + File.separator + fileName;
 		if (keepUnchangedFiles) {
 			// if source file is older than target file, do not generate
-			File sourceFile = new File(network.getFile());
+			long sourceTimeStamp = network.getFile().getLocalTimeStamp();
 			File targetFile = new File(file);
-			if (sourceFile.lastModified() < targetFile.lastModified()) {
+			if (sourceTimeStamp < targetFile.lastModified()) {
 				return true;
 			}
 		}

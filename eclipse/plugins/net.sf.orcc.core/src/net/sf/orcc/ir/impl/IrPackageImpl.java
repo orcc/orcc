@@ -1529,17 +1529,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getActor_File() {
-		return (EAttribute)actorEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EReference getActor_Initializes() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(2);
+		return (EReference)actorEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1548,7 +1539,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Inputs() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(3);
+		return (EReference)actorEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1557,7 +1548,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getActor_Name() {
-		return (EAttribute)actorEClass.getEStructuralFeatures().get(4);
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -1566,7 +1557,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Outputs() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(5);
+		return (EReference)actorEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -1575,7 +1566,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Parameters() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(6);
+		return (EReference)actorEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -1584,7 +1575,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Procs() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(7);
+		return (EReference)actorEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -1593,7 +1584,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_StateVars() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(8);
+		return (EReference)actorEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -1602,7 +1593,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getActor_Native() {
-		return (EAttribute)actorEClass.getEStructuralFeatures().get(9);
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
@@ -1611,7 +1602,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_ActionsOutsideFsm() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(10);
+		return (EReference)actorEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -1620,7 +1611,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_Fsm() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(11);
+		return (EReference)actorEClass.getEStructuralFeatures().get(10);
 	}
 
 	/**
@@ -1629,7 +1620,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getActor_MoC() {
-		return (EReference)actorEClass.getEStructuralFeatures().get(12);
+		return (EReference)actorEClass.getEStructuralFeatures().get(11);
 	}
 
 	/**
@@ -1638,6 +1629,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EAttribute getActor_LineNumber() {
+		return (EAttribute)actorEClass.getEStructuralFeatures().get(12);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActor_FileName() {
 		return (EAttribute)actorEClass.getEStructuralFeatures().get(13);
 	}
 
@@ -1915,7 +1915,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		// Create classes and their features
 		actorEClass = createEClass(ACTOR);
 		createEReference(actorEClass, ACTOR__ACTIONS);
-		createEAttribute(actorEClass, ACTOR__FILE);
 		createEReference(actorEClass, ACTOR__INITIALIZES);
 		createEReference(actorEClass, ACTOR__INPUTS);
 		createEAttribute(actorEClass, ACTOR__NAME);
@@ -1928,6 +1927,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(actorEClass, ACTOR__FSM);
 		createEReference(actorEClass, ACTOR__MO_C);
 		createEAttribute(actorEClass, ACTOR__LINE_NUMBER);
+		createEAttribute(actorEClass, ACTOR__FILE_NAME);
 
 		portEClass = createEClass(PORT);
 		createEAttribute(portEClass, PORT__NAME);
@@ -2180,7 +2180,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		// Initialize classes and features; add operations and parameters
 		initEClass(actorEClass, Actor.class, "Actor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getActor_Actions(), this.getAction(), null, "actions", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActor_File(), theEcorePackage.getEString(), "file", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Initializes(), this.getAction(), null, "initializes", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_Inputs(), this.getPort(), null, "inputs", null, 0, -1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getActor_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2193,6 +2192,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getActor_Fsm(), this.getFSM(), null, "fsm", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActor_MoC(), theMocPackage.getMoC(), null, "moC", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getActor_LineNumber(), ecorePackage.getEInt(), "lineNumber", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActor_FileName(), theEcorePackage.getEString(), "fileName", null, 0, 1, Actor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPort_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

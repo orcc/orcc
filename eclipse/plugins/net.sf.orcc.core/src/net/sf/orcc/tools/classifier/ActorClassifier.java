@@ -47,13 +47,9 @@ import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.util.UniqueEdge;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -81,12 +77,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 * @return the class of the actor
 	 */
 	public void classify() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IFile file = workspace.getRoot().getFile(new Path(actor.getFile()));
-
 		try {
-			IMarker[] markers = file.findMarkers(IMarker.PROBLEM, true,
-					IResource.DEPTH_INFINITE);
+			IMarker[] markers = actor.getFile().findMarkers(IMarker.PROBLEM,
+					true, IResource.DEPTH_INFINITE);
 			for (IMarker marker : markers) {
 				if (marker.getAttribute(IMarker.SEVERITY,
 						IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_INFO) {
@@ -395,11 +388,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 
 	private void showMarker() {
 		try {
-			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			IFile file = (IFile) workspace.getRoot().getFile(
-					new Path(actor.getFile()));
-
-			IMarker marker = file.createMarker(IMarker.PROBLEM);
+			IMarker marker = actor.getFile().createMarker(IMarker.PROBLEM);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
 			marker.setAttribute(IMarker.MESSAGE,
 					"Actor " + actor.getSimpleName() + " is time-dependent");

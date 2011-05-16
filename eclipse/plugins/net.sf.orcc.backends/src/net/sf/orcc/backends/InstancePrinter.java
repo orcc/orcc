@@ -33,13 +33,7 @@ import java.io.File;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.util.OrccUtil;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.stringtemplate.v4.ST;
 
 /**
@@ -52,16 +46,14 @@ public class InstancePrinter extends Printer {
 
 	private boolean keepUnchangedFiles = false;
 
-	private IProject project;
-
 	/**
 	 * Creates a new instance printer.
 	 * 
 	 * @param templateName
 	 *            the name of the template
 	 */
-	public InstancePrinter(IProject project, String templateName) {
-		this(project, templateName, false);
+	public InstancePrinter(String templateName) {
+		this(templateName, false);
 	}
 
 	/**
@@ -73,11 +65,9 @@ public class InstancePrinter extends Printer {
 	 *            if the printer must keep printing files from unchanged
 	 *            instances
 	 */
-	public InstancePrinter(IProject project, String templateName,
-			boolean keepUnchangedFiles) {
+	public InstancePrinter(String templateName, boolean keepUnchangedFiles) {
 		super(templateName);
 		this.keepUnchangedFiles = keepUnchangedFiles;
-		this.project = project;
 	}
 
 	/**
@@ -91,16 +81,10 @@ public class InstancePrinter extends Printer {
 		long instanceModified = 0;
 		if (instance.isActor()) {
 			Actor actor = instance.getActor();
-			IFile file = OrccUtil.getFile(project, actor.getName(), "cal");
-			instanceModified = file.getLocalTimeStamp();
+			instanceModified = actor.getFile().getLocalTimeStamp();
 		} else if (instance.isNetwork()) {
 			Network network = instance.getNetwork();
-
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			IFile file = root.getFile(new Path(network.getFile()));
-			String qualifiedName = OrccUtil.getQualifiedName(file);
-			file = OrccUtil.getFile(project, qualifiedName, "xdf");
-			instanceModified = file.getLocalTimeStamp();
+			instanceModified = network.getFile().getLocalTimeStamp();
 		}
 
 		Instance parent = instance.getParent();

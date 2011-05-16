@@ -534,7 +534,7 @@ public class IRWriter extends IrSwitch<JsonElement> {
 		JsonObject obj = new JsonObject();
 		JsonArray array;
 
-		obj.addProperty(KEY_SOURCE_FILE, actor.getFile());
+		obj.addProperty(KEY_SOURCE_FILE, actor.getFileName());
 		obj.add(KEY_LOCATION, new JsonPrimitive(actor.getLineNumber()));
 		obj.addProperty(KEY_NAME, actor.getName());
 		obj.add(KEY_PARAMETERS, writeGlobalVariables(actor.getParameters()));

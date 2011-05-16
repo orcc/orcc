@@ -105,7 +105,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		instancePrinter = new InstancePrinter(project, "PROMELA_actor");
+		instancePrinter = new InstancePrinter("PROMELA_actor");
 		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
 		instancePrinter.setTypePrinter(new PromelaTypePrinter());
 		instancePrinter.getOptions().put("guards", guards);

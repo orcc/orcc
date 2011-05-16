@@ -73,7 +73,7 @@ public class ActorTransformer2 {
 	 */
 	public Actor transform(IFile file, AstActor astActor) {
 		Actor actor = IrFactory.eINSTANCE.createActor();
-		actor.setFile(file.getFullPath().toOSString());
+		actor.setFileName(file.getFullPath().toString());
 
 		int lineNumber = Util.getLocation(astActor);
 		actor.setLineNumber(lineNumber);

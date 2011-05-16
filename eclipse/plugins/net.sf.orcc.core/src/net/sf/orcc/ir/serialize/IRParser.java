@@ -303,7 +303,7 @@ public class IRParser {
 			actor.setLineNumber(lineNumber);
 
 			file = obj.get(KEY_SOURCE_FILE).getAsString();
-			actor.setFile(file);
+			actor.setFileName(file);
 			String name = obj.get(KEY_NAME).getAsString();
 			actor.setName(name);
 

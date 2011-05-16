@@ -53,7 +53,11 @@ import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
@@ -106,7 +110,7 @@ public class Network {
 
 	private Map<Connection, Integer> connectionMapWithoutBroadcast;
 
-	private String file;
+	private String fileName;
 
 	private DirectedGraph<Vertex, Connection> graph;
 
@@ -146,7 +150,7 @@ public class Network {
 	 * Creates a new network.
 	 */
 	public Network(String file) {
-		this.file = file;
+		this.fileName = file;
 		graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
 		inputs = new OrderedMap<String, Port>();
 		outputs = new OrderedMap<String, Port>();
@@ -374,12 +378,22 @@ public class Network {
 	}
 
 	/**
-	 * Returns the XDF file this network was declared in.
+	 * Returns the file in which this network is defined.
 	 * 
-	 * @return the XDF file this network was declared in
+	 * @return the file in which this network is defined
 	 */
-	public String getFile() {
-		return file;
+	public IFile getFile() {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		return root.getFile(new Path(getFileName()));
+	}
+
+	/**
+	 * Returns the name of the XDF file in which this network is defined.
+	 * 
+	 * @return the name of the XDF file in which this network is defined
+	 */
+	public String getFileName() {
+		return fileName;
 	}
 
 	/**

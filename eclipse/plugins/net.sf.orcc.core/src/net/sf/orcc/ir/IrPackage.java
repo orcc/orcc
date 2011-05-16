@@ -123,13 +123,6 @@ public interface IrPackage extends EPackage {
 		EReference ACTOR__ACTIONS_OUTSIDE_FSM = eINSTANCE.getActor_ActionsOutsideFsm();
 
 		/**
-		 * The meta object literal for the '<em><b>File</b></em>' attribute feature.
-		 * <!-- begin-user-doc --> <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute ACTOR__FILE = eINSTANCE.getActor_File();
-
-		/**
 		 * The meta object literal for the '<em><b>Fsm</b></em>' containment reference feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
@@ -165,6 +158,14 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute ACTOR__LINE_NUMBER = eINSTANCE.getActor_LineNumber();
+
+		/**
+		 * The meta object literal for the '<em><b>File Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ACTOR__FILE_NAME = eINSTANCE.getActor_FileName();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
@@ -1326,21 +1327,12 @@ public interface IrPackage extends EPackage {
 	int ACTOR__ACTIONS = 0;
 
 	/**
-	 * The feature id for the '<em><b>File</b></em>' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 * @ordered
-	 */
-	int ACTOR__FILE = 1;
-
-	/**
 	 * The feature id for the '<em><b>Initializes</b></em>' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INITIALIZES = 2;
+	int ACTOR__INITIALIZES = 1;
 
 	/**
 	 * The feature id for the '<em><b>Inputs</b></em>' containment reference list.
@@ -1348,7 +1340,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__INPUTS = 3;
+	int ACTOR__INPUTS = 2;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute. <!--
@@ -1357,7 +1349,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NAME = 4;
+	int ACTOR__NAME = 3;
 
 	/**
 	 * The feature id for the '<em><b>Outputs</b></em>' containment reference list.
@@ -1365,7 +1357,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__OUTPUTS = 5;
+	int ACTOR__OUTPUTS = 4;
 
 	/**
 	 * The feature id for the '<em><b>Parameters</b></em>' containment reference list.
@@ -1373,7 +1365,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PARAMETERS = 6;
+	int ACTOR__PARAMETERS = 5;
 
 	/**
 	 * The feature id for the '<em><b>Procs</b></em>' containment reference list.
@@ -1381,7 +1373,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__PROCS = 7;
+	int ACTOR__PROCS = 6;
 
 	/**
 	 * The feature id for the '<em><b>State Vars</b></em>' containment reference list.
@@ -1389,7 +1381,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__STATE_VARS = 8;
+	int ACTOR__STATE_VARS = 7;
 
 	/**
 	 * The feature id for the '<em><b>Native</b></em>' attribute. <!--
@@ -1398,7 +1390,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__NATIVE = 9;
+	int ACTOR__NATIVE = 8;
 
 	/**
 	 * The feature id for the '<em><b>Actions Outside Fsm</b></em>' reference list.
@@ -1406,7 +1398,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__ACTIONS_OUTSIDE_FSM = 10;
+	int ACTOR__ACTIONS_OUTSIDE_FSM = 9;
 
 	/**
 	 * The feature id for the '<em><b>Fsm</b></em>' containment reference. <!--
@@ -1415,7 +1407,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__FSM = 11;
+	int ACTOR__FSM = 10;
 
 	/**
 	 * The feature id for the '<em><b>Mo C</b></em>' containment reference. <!--
@@ -1424,7 +1416,7 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__MO_C = 12;
+	int ACTOR__MO_C = 11;
 
 	/**
 	 * The feature id for the '<em><b>Line Number</b></em>' attribute.
@@ -1433,7 +1425,16 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ACTOR__LINE_NUMBER = 13;
+	int ACTOR__LINE_NUMBER = 12;
+
+	/**
+	 * The feature id for the '<em><b>File Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ACTOR__FILE_NAME = 13;
 
 	/**
 	 * The number of structural features of the '<em>Actor</em>' class. <!--
@@ -3377,17 +3378,6 @@ public interface IrPackage extends EPackage {
 	EReference getActor_ActionsOutsideFsm();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Actor#getFile <em>File</em>}'.
-	 * <!-- begin-user-doc
-	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>File</em>'.
-	 * @see net.sf.orcc.ir.Actor#getFile()
-	 * @see #getActor()
-	 * @generated
-	 */
-	EAttribute getActor_File();
-
-	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Actor#getFsm <em>Fsm</em>}'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -3445,6 +3435,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getActor_LineNumber();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Actor#getFileName <em>File Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>File Name</em>'.
+	 * @see net.sf.orcc.ir.Actor#getFileName()
+	 * @see #getActor()
+	 * @generated
+	 */
+	EAttribute getActor_FileName();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Actor#getName <em>Name</em>}'.

@@ -212,7 +212,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			if (actor == null) {
 				file = "";
 			} else {
-				file = actor.getFile();
+				file = actor.getFileName();
 			}
 
 			throw new OrccRuntimeException(file, instr.getLineNumber(), "", e);

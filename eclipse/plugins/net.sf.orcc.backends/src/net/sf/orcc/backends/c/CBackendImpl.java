@@ -343,8 +343,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		InstancePrinter printer = new InstancePrinter(project, "C_actor",
-				!debugMode);
+		InstancePrinter printer = new InstancePrinter("C_actor", !debugMode);
 		printer.setExpressionPrinter(new CExpressionPrinter());
 		printer.setTypePrinter(new CTypePrinter());
 		printer.getOptions().put("network", workingNetwork);

@@ -37,7 +37,6 @@
     </genEnums>
     <genClasses ecoreClass="Ir.ecore#//Actor">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/actions"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/file"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/initializes"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/inputs"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/name"/>
@@ -50,6 +49,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/fsm"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Actor/moC"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/lineNumber"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Actor/fileName"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//Port">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/name"/>

@@ -174,10 +174,10 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected boolean printInstance(Instance instance) {
 		InstancePrinter printer;
 		if (hardwareGen) {
-			printer = new InstancePrinter(project, "XLIM_hw_actor", !debugMode);
+			printer = new InstancePrinter("XLIM_hw_actor", !debugMode);
 			printer.getOptions().put("fpgaType", fpgaType);
 		} else {
-			printer = new InstancePrinter(project, "XLIM_sw_actor", !debugMode);
+			printer = new InstancePrinter("XLIM_sw_actor", !debugMode);
 		}
 
 		printer.setExpressionPrinter(new XlimExprPrinter());

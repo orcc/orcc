@@ -211,7 +211,7 @@ public class LLVMTemplateData {
 
 	private void computeMetadataMaps(Actor actor) {
 		// Insert source file info
-		names.put(actor.getFile(), id++);
+		names.put(actor.getFileName(), id++);
 
 		// Insert name
 		names.put(actor.getName(), id++);

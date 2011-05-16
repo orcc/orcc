@@ -22,6 +22,10 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.MapAdapter;
 import net.sf.orcc.moc.MoC;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -40,7 +44,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getActions <em>Actions</em>}</li>
- *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFile <em>File</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInitializes <em>Initializes</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getInputs <em>Inputs</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getName <em>Name</em>}</li>
@@ -53,6 +56,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFsm <em>Fsm</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getMoC <em>Mo C</em>}</li>
  *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getLineNumber <em>Line Number</em>}</li>
+ *   <li>{@link net.sf.orcc.ir.impl.ActorImpl#getFileName <em>File Name</em>}</li>
  * </ul>
  * </p>
  *
@@ -67,24 +71,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	 * @ordered
 	 */
 	protected EList<Action> actions;
-
-	/**
-	 * The default value of the '{@link #getFile() <em>File</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFile()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String FILE_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getFile() <em>File</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getFile()
-	 * @generated
-	 * @ordered
-	 */
-	protected String file = FILE_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getInitializes() <em>Initializes</em>}' containment reference list.
@@ -236,6 +222,26 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	protected int lineNumber = LINE_NUMBER_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FILE_NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getFileName() <em>File Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFileName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String fileName = FILE_NAME_EDEFAULT;
+
+	/**
 	 * holds template-specific data.
 	 */
 	private Object templateData;
@@ -293,8 +299,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		switch (featureID) {
 			case IrPackage.ACTOR__ACTIONS:
 				return getActions();
-			case IrPackage.ACTOR__FILE:
-				return getFile();
 			case IrPackage.ACTOR__INITIALIZES:
 				return getInitializes();
 			case IrPackage.ACTOR__INPUTS:
@@ -319,6 +323,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return getMoC();
 			case IrPackage.ACTOR__LINE_NUMBER:
 				return getLineNumber();
+			case IrPackage.ACTOR__FILE_NAME:
+				return getFileName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -362,8 +368,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		switch (featureID) {
 			case IrPackage.ACTOR__ACTIONS:
 				return actions != null && !actions.isEmpty();
-			case IrPackage.ACTOR__FILE:
-				return FILE_EDEFAULT == null ? file != null : !FILE_EDEFAULT.equals(file);
 			case IrPackage.ACTOR__INITIALIZES:
 				return initializes != null && !initializes.isEmpty();
 			case IrPackage.ACTOR__INPUTS:
@@ -388,6 +392,8 @@ public class ActorImpl extends EObjectImpl implements Actor {
 				return moC != null;
 			case IrPackage.ACTOR__LINE_NUMBER:
 				return lineNumber != LINE_NUMBER_EDEFAULT;
+			case IrPackage.ACTOR__FILE_NAME:
+				return FILE_NAME_EDEFAULT == null ? fileName != null : !FILE_NAME_EDEFAULT.equals(fileName);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -403,9 +409,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 			case IrPackage.ACTOR__ACTIONS:
 				getActions().clear();
 				getActions().addAll((Collection<? extends Action>)newValue);
-				return;
-			case IrPackage.ACTOR__FILE:
-				setFile((String)newValue);
 				return;
 			case IrPackage.ACTOR__INITIALIZES:
 				getInitializes().clear();
@@ -450,6 +453,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 			case IrPackage.ACTOR__LINE_NUMBER:
 				setLineNumber((Integer)newValue);
 				return;
+			case IrPackage.ACTOR__FILE_NAME:
+				setFileName((String)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -472,9 +478,6 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		switch (featureID) {
 			case IrPackage.ACTOR__ACTIONS:
 				getActions().clear();
-				return;
-			case IrPackage.ACTOR__FILE:
-				setFile(FILE_EDEFAULT);
 				return;
 			case IrPackage.ACTOR__INITIALIZES:
 				getInitializes().clear();
@@ -512,6 +515,9 @@ public class ActorImpl extends EObjectImpl implements Actor {
 			case IrPackage.ACTOR__LINE_NUMBER:
 				setLineNumber(LINE_NUMBER_EDEFAULT);
 				return;
+			case IrPackage.ACTOR__FILE_NAME:
+				setFileName(FILE_NAME_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -538,12 +544,18 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		return actionsOutsideFsm;
 	}
 
+	@Override
+	public IFile getFile() {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		return root.getFile(new Path(getFileName()));
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getFile() {
-		return file;
+	public String getFileName() {
+		return fileName;
 	}
 
 	/**
@@ -773,14 +785,15 @@ public class ActorImpl extends EObjectImpl implements Actor {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setFile(String newFile) {
-		String oldFile = file;
-		file = newFile;
+	public void setFileName(String newFileName) {
+		String oldFileName = fileName;
+		fileName = newFileName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__FILE, oldFile, file));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.ACTOR__FILE_NAME, oldFileName, fileName));
 	}
 
 	/**
@@ -868,14 +881,14 @@ public class ActorImpl extends EObjectImpl implements Actor {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (file: ");
-		result.append(file);
-		result.append(", name: ");
+		result.append(" (name: ");
 		result.append(name);
 		result.append(", native: ");
 		result.append(native_);
 		result.append(", lineNumber: ");
 		result.append(lineNumber);
+		result.append(", fileName: ");
+		result.append(fileName);
 		result.append(')');
 		return result.toString();
 	}
