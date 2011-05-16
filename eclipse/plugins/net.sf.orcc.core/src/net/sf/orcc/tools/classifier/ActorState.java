@@ -37,6 +37,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -70,11 +71,10 @@ public class ActorState {
 				// we might consider this constant if it is used by guards
 				boolean usedByGuard = false;
 				for (Use use : variable.getUses()) {
-					// TODO remove this hackish thingy when actions are
-					// meta-modeled
 					Procedure proc = EcoreHelper.getContainerOfType(use,
 							Procedure.class);
-					if (proc.getName().startsWith("isSchedulable_")) {
+					if (proc.eContainingFeature() == IrPackage.eINSTANCE
+							.getAction_Scheduler()) {
 						usedByGuard = true;
 						break;
 					}
