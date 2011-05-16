@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,30 +28,16 @@
  */
 package net.sf.orcc.tools.classifier;
 
-import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import jp.ac.kobe_u.cs.cream.IntDomain;
-import jp.ac.kobe_u.cs.cream.IntVariable;
-import jp.ac.kobe_u.cs.cream.Network;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.ExprUnary;
-import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstAssign;
-import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
@@ -59,10 +45,10 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.IrSwitch;
+import net.sf.orcc.network.Network;
 
-public class ConstraintBuilder extends ActorInterpreter {
+public class ConstraintBuilder {
 
 	/**
 	 * This class defines a visitor that examines expressions that depend on a
@@ -80,159 +66,6 @@ public class ConstraintBuilder extends ActorInterpreter {
 		public ConstraintExpressionVisitor() {
 		}
 
-		/**
-		 * Adds a constraint between an integer variable and either another
-		 * integer variable or an integer value.
-		 * 
-		 * @param v1
-		 *            an integer variable
-		 * @param op
-		 *            a binary operator
-		 * @param o2
-		 *            an integer variable or an integer value
-		 */
-		private Object addConstraint(IntVariable v1, OpBinary op, Object o2) {
-			switch (op) {
-			case BITAND:
-				if (o2 instanceof ExprInt) {
-					return v1.bitand(((ExprInt) o2).getIntValue());
-				}
-				break;
-			case EQ:
-				if (o2 instanceof IntVariable) {
-					v1.equals((IntVariable) o2);
-				} else if (o2 instanceof ExprInt) {
-					v1.equals(((ExprInt) o2).getIntValue());
-				}
-				break;
-			case GE:
-				if (o2 instanceof IntVariable) {
-					v1.ge((IntVariable) o2);
-				} else if (o2 instanceof ExprInt) {
-					v1.ge(((ExprInt) o2).getIntValue());
-				}
-				break;
-			case GT:
-				if (o2 instanceof IntVariable) {
-					v1.gt((IntVariable) o2);
-				} else if (o2 instanceof ExprInt) {
-					v1.gt(((ExprInt) o2).getIntValue());
-				}
-				break;
-			case LE:
-				if (o2 instanceof IntVariable) {
-					v1.le((IntVariable) o2);
-				} else if (o2 instanceof ExprInt) {
-					v1.le(((ExprInt) o2).getIntValue());
-				}
-				break;
-			case LT:
-				if (o2 instanceof IntVariable) {
-					v1.lt((IntVariable) o2);
-				} else if (o2 instanceof ExprInt) {
-					v1.lt(((ExprInt) o2).getIntValue());
-				}
-				break;
-			case NE:
-				if (o2 instanceof IntVariable) {
-					v1.notEquals((IntVariable) o2);
-				} else if (o2 instanceof ExprInt) {
-					v1.notEquals(((ExprInt) o2).getIntValue());
-				}
-				break;
-			default:
-				throw new OrccRuntimeException("unsupported binary operator");
-			}
-
-			return null;
-		}
-
-		@Override
-		public Object caseExprBinary(ExprBinary expr) {
-			Object o1 = doSwitch(expr.getE1());
-			Object o2 = doSwitch(expr.getE2());
-
-			OpBinary op = expr.getOp();
-			if (negateConstraints && op.isComparison()) {
-				op = op.getInverse();
-			}
-
-			if (o1 instanceof IntVariable) {
-				IntVariable v1 = (IntVariable) o1;
-				return addConstraint(v1, op, o2);
-			} else {
-				if (o2 instanceof IntVariable) {
-					IntVariable v2 = (IntVariable) o2;
-					return addConstraint(v2, op.getReversedInequality(), o1);
-				} else {
-					switch (op) {
-					case LOGIC_AND:
-						return null;
-					default:
-						return new ExpressionEvaluator().interpretBinaryExpr(
-								(Expression) o1, op, (Expression) o2);
-					}
-				}
-			}
-		}
-
-		@Override
-		public Object caseExprList(ExprList expr) {
-			throw new OrccRuntimeException("unsupported list expression");
-		}
-
-		@Override
-		public Object caseExprString(ExprString expr) {
-			throw new OrccRuntimeException("unsupported string expression");
-		}
-
-		@Override
-		public Object caseExprUnary(ExprUnary expr) {
-			switch (expr.getOp()) {
-			case LOGIC_NOT: {
-				Object obj = doSwitch(expr.getExpr());
-				if (obj instanceof IntVariable) {
-					return addConstraint((IntVariable) obj, OpBinary.EQ,
-							IrFactory.eINSTANCE.createExprInt(0));
-				}
-				break;
-			}
-
-			case MINUS:
-				Object obj = doSwitch(expr.getExpr());
-				if (obj instanceof IntVariable) {
-					return ((IntVariable) obj).negate();
-				} else if (obj instanceof ExprInt) {
-					return ((ExprInt) obj).negate();
-				}
-			}
-
-			throw new OrccRuntimeException("unsupported unary operation");
-		}
-
-		@Override
-		public Object caseExprVar(ExprVar expr) {
-			Var var = expr.getUse().getVariable();
-			if (var == null) {
-				throw new OrccRuntimeException("unknown variable");
-			}
-
-			Var source = vars.get(var);
-			if (source == null) {
-				source = var;
-			}
-
-			// if the source is a constant retrieve its value
-			if (source.isGlobal() && !source.isAssignable()) {
-				Expression value = source.getInitialValue();
-				if (value != null && value.isIntExpr()) {
-					return value;
-				}
-			}
-
-			return getIntVariable(var);
-		}
-
 	}
 
 	private boolean negateConstraints;
@@ -243,21 +76,11 @@ public class ConstraintBuilder extends ActorInterpreter {
 	private Network network;
 
 	/**
-	 * a map of name to constraint vars
-	 */
-	private Map<String, IntVariable> variableConstraints;
-
-	/**
 	 * a map of IR vars to constraint vars
 	 */
 	private Map<Var, Var> vars;
 
-	private boolean initializeMode;
-
 	public ConstraintBuilder(Actor actor) {
-		super(new HashMap<String, Expression>(0), actor);
-		network = new Network();
-		variableConstraints = new HashMap<String, IntVariable>();
 		vars = new HashMap<Var, Var>();
 	}
 
@@ -283,7 +106,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 	 *            a variable
 	 * @return the domain of the given variable
 	 */
-	private IntDomain getDomain(Var var) {
+	private void getDomain(Var var) {
 		int lo;
 		int hi;
 
@@ -323,25 +146,7 @@ public class ConstraintBuilder extends ActorInterpreter {
 			throw new OrccRuntimeException("type of variable not supported");
 		}
 
-		return new IntDomain(lo, hi);
-	}
-
-	private IntVariable getIntVariable(Var var) {
-		Var source = vars.get(var);
-		if (source == null) {
-			source = var;
-		}
-
-		IntVariable intVar = variableConstraints.get(source.getName());
-		if (intVar == null) {
-			// create int variable associated with given variable
-			// variable may be a state variable or a port
-			intVar = new IntVariable(network, getDomain(source),
-					source.getName());
-			variableConstraints.put(intVar.getName(), intVar);
-		}
-
-		return intVar;
+		//return new IntDomain(lo, hi);
 	}
 
 	/**
@@ -355,22 +160,6 @@ public class ConstraintBuilder extends ActorInterpreter {
 		return network;
 	}
 
-	@Override
-	public void initialize() {
-		initializeMode = true;
-		super.initialize();
-		initializeMode = false;
-	}
-
-	/**
-	 * Returns the constraint variable with the given name.
-	 * 
-	 * @return the constraint variable with the given name
-	 */
-	public IntVariable getVariable(String name) {
-		return variableConstraints.get(name);
-	}
-
 	/**
 	 * Sets the negateConstraints flag.
 	 * 
@@ -379,44 +168,6 @@ public class ConstraintBuilder extends ActorInterpreter {
 	 */
 	public void setNegateConstraints(boolean negateConstraints) {
 		this.negateConstraints = negateConstraints;
-	}
-
-	@Override
-	public Object caseInstAssign(InstAssign assign) {
-		if (initializeMode) {
-			super.caseInstAssign(assign);
-		} else {
-			ConstraintExpressionVisitor visitor = new ConstraintExpressionVisitor();
-			visitor.doSwitch(assign.getValue());
-		}
-		return null;
-	}
-
-	@Override
-	public Object caseInstLoad(InstLoad load) {
-		// execute the load
-		super.caseInstLoad(load);
-
-		if (!initializeMode) {
-			Var source = load.getSource().getVariable();
-			List<Expression> indexes = load.getIndexes();
-			if (!indexes.isEmpty()) {
-				if (indexes.size() != 1) {
-					throw new OrccRuntimeException("loading multi-dimensional "
-							+ "arrays not supported by constraint builder");
-				}
-
-				Expression index0 = indexes.get(0);
-				if (!(index0.isIntExpr() && ((ExprInt) index0).getValue()
-						.equals(BigInteger.ZERO))) {
-					throw new OrccRuntimeException("loading arrays "
-							+ "with index != 0 not supported");
-				}
-			}
-
-			associateVariable(load.getTarget().getVariable(), source);
-		}
-		return null;
 	}
 
 	/**
@@ -428,19 +179,10 @@ public class ConstraintBuilder extends ActorInterpreter {
 	 *            a node visitor
 	 */
 	public void visitAction(Action action) {
-		// allocate patterns
-		Pattern inputPattern = action.getInputPattern();
-		Pattern outputPattern = action.getOutputPattern();
-		allocatePattern(inputPattern);
-		allocatePattern(outputPattern);
-
 		Pattern pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				// allocate list for peeked
-				peeked.setValue(listAllocator.doSwitch(peeked.getType()));
-
 				// associate variable
 				Var source = vars.get(peeked);
 				if (source == null) {
@@ -450,8 +192,20 @@ public class ConstraintBuilder extends ActorInterpreter {
 				}
 			}
 		}
+	}
 
-		doSwitch(action.getScheduler());
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean checkSat() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public Map<Port, Expression> getConfiguration() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -35,14 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jp.ac.kobe_u.cs.cream.DefaultSolver;
-import jp.ac.kobe_u.cs.cream.IntVariable;
-import jp.ac.kobe_u.cs.cream.Solution;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.State;
@@ -110,37 +106,6 @@ public class ConfigurationAnalyzer {
 	}
 
 	/**
-	 * Creates the configuration for the given action using the constraints set
-	 * by the given constraint builder.
-	 * 
-	 * @param action
-	 *            an action
-	 * @param visitor
-	 *            a constraint builder
-	 */
-	private void createConfiguration(Action action, ConstraintBuilder visitor) {
-		// solve all ports
-		Map<Port, Expression> configuration = new HashMap<Port, Expression>();
-		for (Port port : ports) {
-			IntVariable variable = visitor.getVariable(port.getName());
-			if (variable == null) {
-				System.out.println("no constraint on " + port);
-			} else {
-				DefaultSolver solver = new DefaultSolver(variable.getNetwork());
-				Solution solution = solver.findFirst();
-				if (solution != null) {
-					int value = solution.getIntValue(variable);
-					configuration.put(port,
-							IrFactory.eINSTANCE.createExprInt(value));
-				}
-			}
-		}
-
-		// add the configuration
-		configurations.put(action, configuration);
-	}
-
-	/**
 	 * For each action departing from the initial state, visits its guards and
 	 * stores a constrained variable that will contain the value to read from
 	 * the configuration port when solved.
@@ -168,7 +133,10 @@ public class ConfigurationAnalyzer {
 			previous.add(targetAction);
 
 			// create the configuration for this action based on the constraints
-			createConfiguration(targetAction, visitor);
+			Map<Port, Expression> configuration = visitor.getConfiguration();
+
+			// add the configuration
+			configurations.put(targetAction, configuration);
 		}
 	}
 

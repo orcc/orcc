@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import jp.ac.kobe_u.cs.cream.DefaultSolver;
-import jp.ac.kobe_u.cs.cream.Solution;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -71,7 +69,6 @@ public class TimeDependencyAnalyzer {
 	 */
 	private boolean areGuardsCompatible(Action previous, Action action) {
 		ConstraintBuilder builder = new ConstraintBuilder(actor);
-		builder.initialize();
 		try {
 			builder.visitAction(previous);
 			builder.visitAction(action);
@@ -80,9 +77,7 @@ public class TimeDependencyAnalyzer {
 			return true;
 		}
 
-		DefaultSolver solver = new DefaultSolver(builder.getNetwork());
-		Solution solution = solver.findFirst(2000);
-		if (solution != null) {
+		if (builder.checkSat()) {
 			System.out.println(actor + ": guards of actions " + previous
 					+ " and " + action + " are compatible");
 			return true;
