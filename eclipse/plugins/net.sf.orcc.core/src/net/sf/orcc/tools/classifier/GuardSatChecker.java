@@ -40,6 +40,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
@@ -180,6 +181,38 @@ public class GuardSatChecker {
 		}
 
 		@Override
+		public Object caseExprUnary(ExprUnary expr) {
+			StringBuilder builder = new StringBuilder();
+			builder.append('(');
+			switch (expr.getOp()) {
+			case BITNOT:
+				builder.append("TODO");
+				break;
+			case LOGIC_NOT:
+				builder.append("not");
+				break;
+			case MINUS:
+				builder.append('-');
+				break;
+			case NUM_ELTS: {
+				Type type = expr.getExpr().getType();
+				if (type.isList()) {
+					builder.append(((TypeList) type).getSize());
+				} else {
+					builder.append(0);
+				}
+				break;
+			}
+			}
+
+			builder.append(' ');
+			builder.append(doSwitch(expr.getExpr()));
+			builder.append(')');
+
+			return builder.toString();
+		}
+
+		@Override
 		public Object caseExprVar(ExprVar expr) {
 			Var variable = expr.getUse().getVariable();
 			if (!script.getVariables().contains(variable)) {
@@ -192,6 +225,19 @@ public class GuardSatChecker {
 		@Override
 		public Object caseInstAssign(InstAssign assign) {
 			addAssertion(assign.getTarget().getVariable(), assign.getValue());
+			return null;
+		}
+
+		@Override
+		public Object caseInstLoad(InstLoad load) {
+			if (load.getIndexes().isEmpty()) {
+				Use source = load.getSource();
+				ExprVar expr = IrFactory.eINSTANCE.createExprVar(source);
+				addAssertion(load.getTarget().getVariable(), expr);
+
+				// set container back
+				load.setSource(source);
+			}
 			return null;
 		}
 
@@ -210,24 +256,17 @@ public class GuardSatChecker {
 		}
 
 		@Override
-		public Object caseInstLoad(InstLoad load) {
-			if (load.getIndexes().isEmpty()) {
-				Use source = load.getSource();
-				ExprVar expr = IrFactory.eINSTANCE.createExprVar(source);
-				addAssertion(load.getTarget().getVariable(), expr);
-
-				// set container back
-				load.setSource(source);
-			}
-			return null;
-		}
-
-		@Override
 		public Object caseInstStore(InstStore store) {
 			if (store.getIndexes().isEmpty()) {
 				addAssertion(store.getTarget().getVariable(), store.getValue());
 			}
 			return null;
+		}
+
+		@Override
+		public Object caseProcedure(Procedure procedure) {
+			script.addCommand("; procedure " + procedure.getName());
+			return super.caseProcedure(procedure);
 		}
 
 		/**
