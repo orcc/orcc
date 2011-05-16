@@ -68,22 +68,19 @@ public class TimeDependencyAnalyzer {
 	 *         compatible
 	 */
 	private boolean areGuardsCompatible(Action previous, Action action) {
-		ConstraintBuilder builder = new ConstraintBuilder(actor);
+		GuardSatChecker checker = new GuardSatChecker(actor);
 		try {
-			builder.visitAction(previous);
-			builder.visitAction(action);
+			if (checker.checkSat(previous, action)) {
+				System.out.println(actor + ": guards of actions " + previous
+						+ " and " + action + " are compatible");
+				return true;
+			}
+
+			return false;
 		} catch (OrccRuntimeException e) {
 			System.out.println(actor + ": could not evaluate guards");
 			return true;
 		}
-
-		if (builder.checkSat()) {
-			System.out.println(actor + ": guards of actions " + previous
-					+ " and " + action + " are compatible");
-			return true;
-		}
-
-		return false;
 	}
 
 	/**

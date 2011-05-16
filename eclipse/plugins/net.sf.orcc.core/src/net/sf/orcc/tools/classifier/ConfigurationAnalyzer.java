@@ -39,10 +39,8 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
 
 /**
  * This class defines a configuration analyzer.
@@ -51,28 +49,6 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * 
  */
 public class ConfigurationAnalyzer {
-
-	/**
-	 * This class defines a visitor that finds a set of ports peeked.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class PeekVisitor extends AbstractActorVisitor<Set<Port>> {
-
-		@Override
-		public Set<Port> caseAction(Action action) {
-			Set<Port> candidates = new HashSet<Port>();
-			Pattern pattern = action.getPeekPattern();
-			for (Port port : pattern.getPorts()) {
-				if (pattern.getVariable(port) != null) {
-					candidates.add(port);
-				}
-			}
-			return candidates;
-		}
-
-	}
 
 	private Actor actor;
 
@@ -117,26 +93,16 @@ public class ConfigurationAnalyzer {
 		FSM fsm = actor.getFsm();
 		State initialState = fsm.getInitialState();
 		for (Action targetAction : fsm.getTargetActions(initialState)) {
-			ConstraintBuilder visitor = new ConstraintBuilder(actor);
-
-			// add negated constraints of previous actions
-			visitor.setNegateConstraints(true);
-			for (Action action : previous) {
-				visitor.visitAction(action);
-			}
-
-			// add constraint of current action
-			visitor.setNegateConstraints(false);
-			visitor.visitAction(targetAction);
-
-			// add current action to "previous" list
-			previous.add(targetAction);
-
-			// create the configuration for this action based on the constraints
-			Map<Port, Expression> configuration = visitor.getConfiguration();
+			// create the configuration for this action
+			GuardSatChecker checker = new GuardSatChecker(actor);
+			Map<Port, Expression> configuration = checker.getConfiguration(
+					previous, targetAction);
 
 			// add the configuration
 			configurations.put(targetAction, configuration);
+
+			// add current action to "previous" list
+			previous.add(targetAction);
 		}
 	}
 
@@ -144,23 +110,26 @@ public class ConfigurationAnalyzer {
 	 * Finds the configuration ports of this actor, if any.
 	 */
 	private void findConfigurationPorts() {
-		// visits the scheduler of each action departing from the initial state
-		List<Set<Port>> ports = new ArrayList<Set<Port>>();
+		List<Set<Port>> actionPorts = new ArrayList<Set<Port>>();
 
 		FSM fsm = actor.getFsm();
 		State initialState = fsm.getInitialState();
+
+		// visits the scheduler of each action departing from the initial state
 		for (Action action : fsm.getTargetActions(initialState)) {
-			ports.add(new PeekVisitor().doSwitch(action));
+			Set<Port> candidates = new HashSet<Port>();
+			candidates.addAll(action.getPeekPattern().getPorts());
+			actionPorts.add(candidates);
 		}
 
 		// add all ports peeked
 		Set<Port> candidates = new HashSet<Port>();
-		for (Set<Port> set : ports) {
+		for (Set<Port> set : actionPorts) {
 			candidates.addAll(set);
 		}
 
 		// and then only retains the ones that are common to every action
-		for (Set<Port> set : ports) {
+		for (Set<Port> set : actionPorts) {
 			if (!set.isEmpty()) {
 				candidates.retainAll(set);
 			}
@@ -180,4 +149,5 @@ public class ConfigurationAnalyzer {
 	public Map<Port, Expression> getConfiguration(Action action) {
 		return configurations.get(action);
 	}
+
 }
