@@ -155,7 +155,7 @@ decl_MD(actor) ::= <<
 <name_MD(actor)>
 
 ; Action-scheduler
-<actionScheduler_MD(actor)>g
+<actionScheduler_MD(actor)>
 <if(actor.inputs)>
 ; Input ports
 <actor.inputs: {port | <port_MD(actor, port)>}; separator="\n">
@@ -368,17 +368,17 @@ action_MD(actor, action) ::= <<
 	else
 		> metadata <Tag_decl_MD(actor, action.tag)
 	><endif
-	>,<if(!action.inputPattern)
+	>,<if(!action.inputPattern.empty)
 		> metadata <pattern_decl_MD(actor, action.inputPattern)><
 	else
 		> null <
 	endif>,<
-	if(!action.outputPattern)
+	if(!action.outputPattern.empty)
 		> metadata <pattern_decl_MD(actor, action.outputPattern)><
 	else
 		> null<
 	endif>,<
-	if(!action.peekPattern)
+	if(!action.peekPattern.empty)
 		> metadata <pattern_decl_MD(actor, action.peekPattern)><
 	else
 		> null<
