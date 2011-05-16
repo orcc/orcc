@@ -52,14 +52,14 @@ public class SmtSolver {
 
 	private String prefix;
 
+	private static int i;
+
 	public SmtSolver(IFile file) {
 		output = OrccUtil.getOutputFolder(file.getProject());
 		prefix = file.getFullPath().removeFileExtension().lastSegment();
 	}
 
 	public boolean checkSat(List<SmtScript> scripts) {
-		int i = 0;
-
 		try {
 			for (SmtScript script : scripts) {
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();

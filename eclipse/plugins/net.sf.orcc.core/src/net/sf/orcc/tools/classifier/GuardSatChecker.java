@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.tools.classifier;
 
+import static net.sf.orcc.ir.util.EcoreHelper.getContainerOfType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,7 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
+import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -189,6 +192,20 @@ public class GuardSatChecker {
 		@Override
 		public Object caseInstAssign(InstAssign assign) {
 			addAssertion(assign.getTarget().getVariable(), assign.getValue());
+			return null;
+		}
+
+		@Override
+		public Object caseInstReturn(InstReturn instReturn) {
+			// a return becomes an assertion that a variable with the same name
+			// as the procedure equals the returned value
+
+			Expression value = instReturn.getValue();
+			Procedure procedure = getContainerOfType(value, Procedure.class);
+			Var variable = IrFactory.eINSTANCE.createVar(
+					IrFactory.eINSTANCE.createTypeBool(), procedure.getName(),
+					true, 0);
+			addAssertion(variable, value);
 			return null;
 		}
 
@@ -364,6 +381,10 @@ public class GuardSatChecker {
 
 		List<SmtScript> scripts = translator.getScripts();
 		SmtScript script = scripts.get(scripts.size() - 1);
+
+		// check whether the guards are compatible or not
+		script.addCommand("(assert (and " + action1.getScheduler().getName()
+				+ " " + action2.getScheduler().getName() + "))");
 		script.addCommand("(check-sat)");
 
 		return new SmtSolver(actor.getFile()).checkSat(translator.getScripts());
