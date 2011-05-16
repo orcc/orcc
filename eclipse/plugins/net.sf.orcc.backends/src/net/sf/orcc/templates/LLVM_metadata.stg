@@ -368,17 +368,17 @@ action_MD(actor, action) ::= <<
 	else
 		> metadata <Tag_decl_MD(actor, action.tag)
 	><endif
-	>,<if(!action.inputPattern.empty)
+	>,<if(!action.inputPattern)
 		> metadata <pattern_decl_MD(actor, action.inputPattern)><
 	else
 		> null <
 	endif>,<
-	if(!action.outputPattern.empty)
+	if(!action.outputPattern)
 		> metadata <pattern_decl_MD(actor, action.outputPattern)><
 	else
 		> null<
 	endif>,<
-	if(!action.peekPattern.empty)
+	if(!action.peekPattern)
 		> metadata <pattern_decl_MD(actor, action.peekPattern)><
 	else
 		> null<
