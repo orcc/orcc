@@ -47,6 +47,7 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
 /**
@@ -58,140 +59,13 @@ import net.sf.orcc.ir.Var;
  */
 public class AbstractInterpreter extends ActorInterpreter {
 
-	private Action scheduledAction;
-
 	private Map<Port, Expression> configuration;
 
 	private Map<Port, Boolean> portRead;
 
 	private boolean schedulableMode;
 
-	/**
-	 * Sets schedulable mode. When in schedulable mode, evaluations of null
-	 * expressions is forbidden.
-	 * 
-	 * @param schedulableMode
-	 */
-	public void setSchedulableMode(boolean schedulableMode) {
-		this.schedulableMode = schedulableMode;
-		((AbstractExpressionEvaluator) exprInterpreter)
-				.setSchedulableMode(schedulableMode);
-	}
-
-	@Override
-	public void visit(NodeIf node) {
-		// Interpret first expression ("if" condition)
-		Expression condition = exprInterpreter.doSwitch(node.getCondition());
-
-		int oldBranch = branch;
-		if (condition != null && condition.isBooleanExpr()) {
-			if (((ExprBool) condition).isValue()) {
-				visit(node.getThenNodes());
-				branch = 0;
-			} else {
-				visit(node.getElseNodes());
-				branch = 1;
-			}
-
-		} else {
-			if (schedulableMode) {
-				// only throw exception in schedulable mode
-				throw new OrccRuntimeException("null condition");
-			}
-
-			branch = -1;
-		}
-
-		visit(node.getJoinNode());
-		branch = oldBranch;
-	}
-
-	@Override
-	public void visit(InstLoad instr) {
-		Var target = instr.getTarget().getVariable();
-		Var source = instr.getSource().getVariable();
-		if (instr.getIndexes().isEmpty()) {
-			target.setValue(source.getValue());
-		} else {
-			Expression value = source.getValue();
-			for (Expression index : instr.getIndexes()) {
-				if (value != null && value.isListExpr()) {
-					index = exprInterpreter.doSwitch(index);
-					if (index == null) {
-						value = null;
-						break;
-					} else {
-						value = ((ExprList) value).get((ExprInt) index);
-					}
-				}
-			}
-			target.setValue(value);
-		}
-	}
-
-	@Override
-	public void visit(InstPhi phi) {
-		if (branch != -1) {
-			super.visit(phi);
-		}
-	}
-
-	@Override
-	public void visit(InstStore instr) {
-		Var var = instr.getTarget().getVariable();
-		if (instr.getIndexes().isEmpty()) {
-			var.setValue(exprInterpreter.doSwitch(instr.getValue()));
-		} else {
-			Expression target = var.getValue();
-			Iterator<Expression> it = instr.getIndexes().iterator();
-			ExprInt index = (ExprInt) exprInterpreter.doSwitch(it.next());
-
-			while (it.hasNext()) {
-				if (target != null && target.isListExpr() && index != null) {
-					target = ((ExprList) target).get(index);
-				}
-				index = (ExprInt) exprInterpreter.doSwitch(it.next());
-			}
-
-			Expression value = (Expression) exprInterpreter.doSwitch(instr
-					.getValue());
-			if (target != null && target.isListExpr() && index != null) {
-				((ExprList) target).set(index, value);
-			}
-		}
-	}
-
-	@Override
-	public void visit(NodeWhile node) {
-		int oldBranch = branch;
-		branch = 0;
-		visit(node.getJoinNode());
-
-		// Interpret first expression ("while" condition)
-		Expression condition = exprInterpreter.doSwitch(node.getCondition());
-
-		if (condition != null && condition.isBooleanExpr()) {
-			branch = 1;
-			while (((ExprBool) condition).isValue()) {
-				visit(node.getNodes());
-				visit(node.getJoinNode());
-
-				// Interpret next value of "while" condition
-				condition = exprInterpreter.doSwitch(node.getCondition());
-				if (schedulableMode
-						&& (condition == null || !condition.isBooleanExpr())) {
-					throw new OrccRuntimeException(
-							"Condition not boolean at line "
-									+ node.getLineNumber() + "\n");
-				}
-			}
-		} else if (schedulableMode) {
-			// only throw exception in schedulable mode
-			throw new OrccRuntimeException("condition is data-dependent");
-		}
-
-		branch = oldBranch;
-	}
+	private Action scheduledAction;
 
 	/**
 	 * Creates a new abstract interpreter.
@@ -208,7 +82,14 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
+	protected Object callNativeProcedure(Procedure procedure) {
+		// the abstract interpreter doesn't care about native procedures
+		return null;
+	}
+
+	@Override
 	protected boolean checkOutputPattern(Pattern outputPattern) {
+		// the abstract interpreter doesn't need to check output patterns
 		return true;
 	}
 
@@ -299,6 +180,133 @@ public class AbstractInterpreter extends ActorInterpreter {
 		for (Port port : configuration.keySet()) {
 			portRead.put(port, false);
 		}
+	}
+
+	/**
+	 * Sets schedulable mode. When in schedulable mode, evaluations of null
+	 * expressions is forbidden.
+	 * 
+	 * @param schedulableMode
+	 */
+	public void setSchedulableMode(boolean schedulableMode) {
+		this.schedulableMode = schedulableMode;
+		((AbstractExpressionEvaluator) exprInterpreter)
+				.setSchedulableMode(schedulableMode);
+	}
+
+	@Override
+	public void visit(InstLoad instr) {
+		Var target = instr.getTarget().getVariable();
+		Var source = instr.getSource().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			target.setValue(source.getValue());
+		} else {
+			Expression value = source.getValue();
+			for (Expression index : instr.getIndexes()) {
+				if (value != null && value.isListExpr()) {
+					index = exprInterpreter.doSwitch(index);
+					if (index == null) {
+						value = null;
+						break;
+					} else {
+						value = ((ExprList) value).get((ExprInt) index);
+					}
+				}
+			}
+			target.setValue(value);
+		}
+	}
+
+	@Override
+	public void visit(InstPhi phi) {
+		if (branch != -1) {
+			super.visit(phi);
+		}
+	}
+
+	@Override
+	public void visit(InstStore instr) {
+		Var var = instr.getTarget().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			var.setValue(exprInterpreter.doSwitch(instr.getValue()));
+		} else {
+			Expression target = var.getValue();
+			Iterator<Expression> it = instr.getIndexes().iterator();
+			ExprInt index = (ExprInt) exprInterpreter.doSwitch(it.next());
+
+			while (it.hasNext()) {
+				if (target != null && target.isListExpr() && index != null) {
+					target = ((ExprList) target).get(index);
+				}
+				index = (ExprInt) exprInterpreter.doSwitch(it.next());
+			}
+
+			Expression value = (Expression) exprInterpreter.doSwitch(instr
+					.getValue());
+			if (target != null && target.isListExpr() && index != null) {
+				((ExprList) target).set(index, value);
+			}
+		}
+	}
+
+	@Override
+	public void visit(NodeIf node) {
+		// Interpret first expression ("if" condition)
+		Expression condition = exprInterpreter.doSwitch(node.getCondition());
+
+		int oldBranch = branch;
+		if (condition != null && condition.isBooleanExpr()) {
+			if (((ExprBool) condition).isValue()) {
+				visit(node.getThenNodes());
+				branch = 0;
+			} else {
+				visit(node.getElseNodes());
+				branch = 1;
+			}
+
+		} else {
+			if (schedulableMode) {
+				// only throw exception in schedulable mode
+				throw new OrccRuntimeException("null condition");
+			}
+
+			branch = -1;
+		}
+
+		visit(node.getJoinNode());
+		branch = oldBranch;
+	}
+
+	@Override
+	public void visit(NodeWhile node) {
+		int oldBranch = branch;
+		branch = 0;
+		visit(node.getJoinNode());
+
+		// Interpret first expression ("while" condition)
+		Expression condition = exprInterpreter.doSwitch(node.getCondition());
+
+		if (condition != null && condition.isBooleanExpr()) {
+			branch = 1;
+			while (((ExprBool) condition).isValue()) {
+				visit(node.getNodes());
+				visit(node.getJoinNode());
+
+				// Interpret next value of "while" condition
+				condition = exprInterpreter.doSwitch(node.getCondition());
+				if (schedulableMode
+						&& (condition == null || !condition.isBooleanExpr())) {
+					throw new OrccRuntimeException(
+							"Condition not boolean at line "
+									+ node.getLineNumber() + "\n");
+				}
+			}
+		} else if (schedulableMode) {
+			// only throw exception in schedulable mode
+			throw new OrccRuntimeException("condition is data-dependent");
+		}
+
+		branch = oldBranch;
 	}
 
 }

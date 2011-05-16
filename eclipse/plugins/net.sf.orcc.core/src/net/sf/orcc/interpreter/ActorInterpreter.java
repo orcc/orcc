@@ -154,6 +154,45 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		}
 	}
 
+	/**
+	 * Calls the given native procedure. This method may be overridden if one
+	 * wishes not to call native procedures (e.g. abstract interpreter).
+	 * 
+	 * @param procedure
+	 *            a native procedure
+	 * @return the result of calling the given procedure
+	 */
+	protected Object callNativeProcedure(Procedure procedure) {
+		int numParams = procedure.getParameters().size();
+		Class<?>[] parameterTypes = new Class<?>[numParams];
+		Object[] args = new Object[numParams];
+		int i = 0;
+		for (Var parameter : procedure.getParameters()) {
+			args[i] = doSwitch(parameter.getValue());
+			parameterTypes[i] = args[i].getClass();
+
+			i++;
+		}
+
+		String methodName = procedure.getName();
+		try {
+			Class<?> clasz = Class.forName(actor.getName());
+			Method method = clasz
+					.getMethod(procedure.getName(), parameterTypes);
+			Object res = method.invoke(null, args);
+			if (res instanceof Boolean) {
+				return IrFactory.eINSTANCE.createExprBool((Boolean) res);
+			} else if (res instanceof Integer) {
+				return IrFactory.eINSTANCE.createExprInt((Integer) res);
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			throw new OrccRuntimeException(
+					"exception during native procedure call to " + methodName);
+		}
+	}
+
 	@Override
 	public Object caseExprBinary(ExprBinary expr) {
 		return null;
@@ -396,35 +435,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseProcedure(Procedure procedure) {
 		if (procedure.isNative()) {
-			int numParams = procedure.getParameters().size();
-			Class<?>[] parameterTypes = new Class<?>[numParams];
-			Object[] args = new Object[numParams];
-			int i = 0;
-			for (Var parameter : procedure.getParameters()) {
-				args[i] = doSwitch(parameter.getValue());
-				parameterTypes[i] = args[i].getClass();
-
-				i++;
-			}
-
-			String methodName = procedure.getName();
-			try {
-				Class<?> clasz = Class.forName(actor.getName());
-				Method method = clasz.getMethod(procedure.getName(),
-						parameterTypes);
-				Object res = method.invoke(null, args);
-				if (res instanceof Boolean) {
-					return IrFactory.eINSTANCE.createExprBool((Boolean) res);
-				} else if (res instanceof Integer) {
-					return IrFactory.eINSTANCE.createExprInt((Integer) res);
-				} else {
-					return null;
-				}
-			} catch (Exception e) {
-				throw new OrccRuntimeException(
-						"exception during native procedure call to "
-								+ methodName);
-			}
+			return callNativeProcedure(procedure);
 		} else {
 			// Allocate local List variables
 			for (Var local : procedure.getLocals()) {
