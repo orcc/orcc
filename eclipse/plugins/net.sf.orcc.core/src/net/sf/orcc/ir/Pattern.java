@@ -69,7 +69,7 @@ public interface Pattern extends EObject {
 	 * 
 	 * @return the number of tokens produced (or consumed) by the given port
 	 */
-	Integer getNumTokens(Port port);
+	int getNumTokens(Port port);
 
 	/**
 	 * Returns the number of tokens map. To be used in templates. Use

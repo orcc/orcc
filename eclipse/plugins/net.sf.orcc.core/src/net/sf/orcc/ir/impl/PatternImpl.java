@@ -7,7 +7,6 @@
 package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Pattern;
@@ -55,7 +54,6 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	 * @ordered
 	 */
 	protected EList<Port> ports;
-
 	/**
 	 * The cached value of the '{@link #getVariables() <em>Variables</em>}' containment reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -276,8 +274,12 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 	}
 
 	@Override
-	public Integer getNumTokens(Port port) {
-		return getNumTokensMap().get(port);
+	public int getNumTokens(Port port) {
+		Integer numTokens = getNumTokensMap().get(port);
+		if (numTokens == null) {
+			return 0;
+		}
+		return numTokens;
 	}
 
 	/**
@@ -352,16 +354,14 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public boolean isSupersetOf(Pattern other) {
-		if (this.getNumTokensMap().keySet()
-				.containsAll(other.getNumTokensMap().keySet())) {
+		if (this.getPorts().containsAll(other.getPorts())) {
 			// OK we read from at least the same ports as the other pattern
 
 			// let's check the consumption
-			for (Entry<Port, Integer> entry : other.getNumTokensMap()
-					.entrySet()) {
-				// if this pattern consumes less than the other pattern then
-				// this pattern is not a superset
-				if (this.getNumTokens(entry.getKey()) < entry.getValue()) {
+			for (Port port : getPorts()) {
+				if (this.getNumTokens(port) < other.getNumTokens(port)) {
+					// if this pattern consumes less it is not a superset of the
+					// other pattern
 					return false;
 				}
 			}
@@ -409,21 +409,15 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public void updatePattern(Pattern pattern) {
-		for (Entry<Port, Integer> entry : pattern.getNumTokensMap().entrySet()) {
-			// Get number of tokens comsuption/production
-			Port port = entry.getKey();
-			Integer numTokens = entry.getValue();
-
-			if (contains(port)) {
-				if (numTokens < getNumTokens(port)) {
-					// Don't update pattern
-					continue;
-				}
+		for (Port port : pattern.getPorts()) {
+			// Get production/consumption rate
+			int numTokens = pattern.getNumTokens(port);
+			if (!contains(port) || numTokens > getNumTokens(port)) {
+				// Sets the production/consumption to the maximum number of
+				// tokens
+				setNumTokens(port, numTokens);
 			}
-
-			// Update the pattern
-			setNumTokens(port, numTokens);
 		}
 	}
 
-} // PatternImpl
+}
