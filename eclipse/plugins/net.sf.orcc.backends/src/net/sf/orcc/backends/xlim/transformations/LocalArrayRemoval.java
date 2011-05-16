@@ -55,9 +55,10 @@ public class LocalArrayRemoval extends AbstractActorVisitor<Object> {
 		for (Var var : new ArrayList<Var>(procedure.getLocals())) {
 			if (var.getType().isList()) {
 				Var newVar = IrFactory.eINSTANCE.createVar(var.getType(),
-						var.getName(), true, var.getIndex());
+						var.getName() + procedure.getName(), true, var.getIndex());
 				newVar.setInitialValue(var.getInitialValue());
 				newVar.setGlobal(true);
+				var.setName(var.getName() + procedure.getName());
 				EList<Use> uses = var.getUses();
 				while (!uses.isEmpty()) {
 					uses.get(0).setVariable(newVar);
