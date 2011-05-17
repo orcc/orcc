@@ -6,51 +6,19 @@ import "net/sf/orcc/templates/LLVM_metadata.stg"
 
 variableDeclaration(variable) ::= <<
 <if(variable.type.list && !actor.templateData.castedListReferences.(variable))>
-<AllocaOp(result={%<variable.indexedName>}, type=variable.type)>
+%<variable.indexedName> = alloca <variable.type>
 <endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
+
 stateVar(variable) ::= <<
 @<variable.name> = <if(variable.assignable)>global<else>constant<endif> <variable.type> <
 if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.initialValue)> 
 <else> zeroinitializer, align 32 
 <endif>
->>
-
-
-///////////////////////////////////////////////////////////////////////////////
-// LLVM Operations
-///////////////////////////////////////////////////////////////////////////////
-
-AndOp(result, ty, op1, op2) ::= <<
-<result> = and <ty> <op1>, <op2>
->>
-
-IcmpOp(result, cond, ty, op1, op2) ::= <<
-<result> = icmp <cond> <ty> <op1>, <op2>
->>
- 
-GetElementPtrOp(pty, ptrval, idx0, idx) ::= <<
-getelementptr <pty>* <ptrval><if(idx0)>, i32 <idx0><endif> <if(idx)>, <indexes(idx)><endif>
->>
-
-AllocaOp(result, type) ::= <<
-<result> = alloca <type>
->>
-
-BrOp(cond, iftrue, iffalse, dest) ::= <<
-<if(cond)
->br i1 <cond>, label <iftrue>, label <iffalse><
-else
->br label <dest><
-endif>
->>
-
-CallOp(ty, fnptrval, function_args) ::= <<
-call <ty> @<fnptrval> (<function_args>)
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,14 +36,6 @@ else
 ><parameter.type> <Expr(expr=parameter, type=parameter.type)><
 endif>
 >>
-
-///////////////////////////////////////////////////////////////////////////////
-// Conversion instructions
-///////////////////////////////////////////////////////////////////////////////
-
-label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
-
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,13 +62,10 @@ printCall(call) ::= <<
 <if(call.print)> 
 <PrintInstr(call.parameters)> 
 <else>
-<if(call.target)>
-%<call.target.variable.indexedName> = <CallOp(ty=call.procedure.returnType,
-fnptrval=call.procedure.name,
-function_args=parametersDeclaration(call.procedure.parameters, call.parameters))>
-<else>
-<CallOp(ty=call.procedure.returnType, fnptrval=call.procedure.name, function_args=parametersDeclaration(call.procedure.parameters, call.parameters))>
-<endif>
+<if(call.target)
+>%<call.target.variable.indexedName> = <
+endif
+>call <call.procedure.returnType> @<call.procedure.name> (<parametersDeclaration(call.procedure.parameters, call.parameters)>)
 <endif>
 >>
 
@@ -161,7 +118,7 @@ printLoad(load) ::= <<
 >>
 
 printGEP(gep) ::= <<
-<Var(gep.target.variable)> = <GetElementPtrOp(idx0="0",  pty=VarType(gep.source.variable), ptrval=Var(gep.source.variable), idx=gep.indexes)>
+<Var(gep.target.variable)> = getelementptr <VarType(gep.source.variable)>* <Var(gep.source.variable)>, i32 0 <if(gep.indexes)>, <indexes(gep.indexes)><endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -213,6 +170,16 @@ b<label(first(whileNode.nodes))>:
 
 b<label(first(whileNode.joinNode.successors))>:
 >>
+
+BrOp(cond, iftrue, iffalse, dest) ::= <<
+<if(cond)
+>br i1 <cond>, label <iftrue>, label <iffalse><
+else
+>br label <dest><
+endif>
+>>
+
+label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
