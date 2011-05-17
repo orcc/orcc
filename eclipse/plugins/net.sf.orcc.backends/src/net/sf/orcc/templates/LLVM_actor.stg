@@ -24,9 +24,6 @@ if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.ini
 ///////////////////////////////////////////////////////////////////////////////
 // LLVM Operations
 ///////////////////////////////////////////////////////////////////////////////
-LoadOp(ty, pointer) ::= <<
-load <ty>* <pointer>
->>
 
 AndOp(result, ty, op1, op2) ::= <<
 <result> = and <ty> <op1>, <op2>
@@ -38,10 +35,6 @@ IcmpOp(result, cond, ty, op1, op2) ::= <<
  
 GetElementPtrOp(pty, ptrval, idx0, idx) ::= <<
 getelementptr <pty>* <ptrval><if(idx0)>, i32 <idx0><endif> <if(idx)>, <indexes(idx)><endif>
->>
-
-BitcastOp(result, ty, value, ty2) ::= <<
-<result> = bitcast <ty> <value> to <ty2>
 >>
 
 AllocaOp(result, type) ::= <<
@@ -56,14 +49,6 @@ else
 endif>
 >>
 
-RetOp(type, value) ::= <<
-<if(value)
->ret <type> <value><
-else
->ret void<
-endif>
->>
-
 CallOp(ty, fnptrval, function_args) ::= <<
 call <ty> @<fnptrval> (<function_args>)
 >>
@@ -71,14 +56,6 @@ call <ty> @<fnptrval> (<function_args>)
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
-
-StoreInstr(ty, value, pty, ptr) ::= <<
-<if(value.intExpr || value.booleanExpr)
->store <pty> <value>, <pty>* <ptr><
-else
->store <ty> <Expr(expr=value, type=ty)>, <pty>* <ptr><
-endif>
->>
 
 PrintInstr(parameters) ::= <<
 call i32 (i8*, ...)* @printf(<parameters: PrintParameter(); separator=", ">)
@@ -98,13 +75,7 @@ endif>
 
 label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 
-phiPairs(phi) ::= <<
-<phiExpr(first(phi.values), phi.target.variable.type, first(phi.block.predecessors))>, <phiExpr(first(rest(phi.values)), phi.target.variable.type, first(rest(phi.block.predecessors)))>
->>
 
-phiExpr(expr, type, node) ::= <<
-[<Expr(expr=expr, type=type)>, %b<label(node)>]
->>
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,23 +129,35 @@ printAssign(assign) ::= <<
 >>
 
 printPhiAssignment(phi) ::= <<
-<Var(phi.target.variable)> = phi <phi.target.variable.type> <phiPairs(phi)>
+<Var(phi.target.variable)> = phi <phi.target.variable.type> <printPhiPairs(phi)>
+>>
+
+printPhiPairs(phi) ::= <<
+<printPhiExpr(first(phi.values), phi.target.variable.type, first(phi.block.predecessors))>, <printPhiExpr(first(rest(phi.values)), phi.target.variable.type, first(rest(phi.block.predecessors)))>
+>>
+
+printPhiExpr(expr, type, node) ::= <<
+[<Expr(expr=expr, type=type)>, %b<label(node)>]
 >>
 
 printReturn(return) ::= <<
-<if(return.value)><
-RetOp(type=return.value.type, value=Expr(expr=return.value, type=return.value.type))><
+<if(return.value)
+>ret <return.value.type> <Expr(expr=return.value, type=return.value.type)><
 else
-><RetOp(type="void", value="")><
+>ret void<
 endif>
 >>
 
 printStore(store) ::= <<
-<StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target.variable), ptr=Var(store.target.variable))>
+<if(store.value.intExpr || store.value.booleanExpr)
+>store <VarType(store.target.variable)> <store.value>, <VarType(store.target.variable)>* <Var(store.target.variable)><
+else
+>store <store.value.type> <Expr(expr=store.value, type=store.value.type)>, <VarType(store.target.variable)>* <Var(store.target.variable)><
+endif>
 >>
 
 printLoad(load) ::= <<
-<Var(load.target.variable)> = <LoadOp(ty=VarType(load.source.variable), pointer=Var(load.source.variable))>
+<Var(load.target.variable)> = load <VarType(load.source.variable)>* <Var(load.source.variable)>
 >>
 
 printGEP(gep) ::= <<
