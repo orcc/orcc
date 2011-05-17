@@ -29,11 +29,13 @@
 package net.sf.orcc.simulators;
 
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
+import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.REFERENCE_FILE;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE;
+import static net.sf.orcc.util.OrccUtil.getFile;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,9 +52,9 @@ import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.serialize.XDFWriter;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
@@ -74,6 +76,11 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 	 * Master caller associated process for jade I/O access.
 	 */
 	private Process jadeProcess;
+
+	/**
+	 * Project simulated
+	 */
+	protected IProject project;
 
 	/**
 	 * Reference video file
@@ -98,8 +105,8 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 	/**
 	 * input XDF network file name
 	 */
-	private String xdfFile;
-
+	private IFile xdfFile;
+	
 	/**
 	 * XDF network flatten file
 	 */
@@ -107,10 +114,7 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 
 	private void flatten() {
 		try {
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			IFile file = root.getFile(new Path(xdfFile));
-
-			Network network = new XDFParser(file).parseNetwork();
+			Network network = new XDFParser(xdfFile).parseNetwork();
 			network.flatten();
 
 			XDFWriter writer = new XDFWriter();
@@ -122,10 +126,16 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 
 	@Override
 	public void initializeOptions() {
+		
+		//Get project
+		String name = getAttribute(PROJECT, "");
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		project = root.getProject(name);
+		
 		// Get configuration attributes
 		stimulusFile = getAttribute(INPUT_STIMULUS, "");
 		vtlFolder = getAttribute(VTL_FOLDER, "");
-		xdfFile = getAttribute(XDF_FILE, "");
+		xdfFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
 		tracesFolder = getAttribute(TRACES_FOLDER, "");
 		refVideo = getAttribute(REFERENCE_FILE, "");
 		execJade = new InstanceScope().getNode(OrccActivator.PLUGIN_ID).get(

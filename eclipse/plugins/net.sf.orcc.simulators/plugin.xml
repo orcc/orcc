@@ -95,6 +95,15 @@
             name="Allow merging of actors">
          <checkBox></checkBox>
       </option>
+      <option
+            description="Path of the LLVM representation of the VTL"
+            id="net.sf.orcc.simulators.VTLFolder"
+            name="VTL Folder">
+         <browseFile
+               folder="true"
+               workspace="false">
+         </browseFile>
+      </option>
    </extension>
    <extension
          point="net.sf.orcc.simulators.simulators">
@@ -115,7 +124,7 @@
             class="net.sf.orcc.simulators.JadeSimulatorImpl"
             name="Jade">
          <option
-               id="net.sf.orcc.simulators.enableTraces">
+               id="net.sf.orcc.simulators.VTLFolder">
          </option>
          <option
                id="net.sf.orcc.core.xdfFile">
@@ -124,13 +133,16 @@
                id="net.sf.orcc.simulators.inputStimulus">
          </option>
          <option
-               id="net.sf.orcc.simulators.enableComparison">
+               id="net.sf.orcc.simulators.enableTraces">
          </option>
          <option
                id="net.sf.orcc.simulators.scheduler">
          </option>
          <option
                id="net.sf.orcc.simulators.optLevel">
+         </option>
+         <option
+               id="net.sf.orcc.simulators.enableComparison">
          </option>
          <option
                id="net.sf.orcc.simulators.normalize">
