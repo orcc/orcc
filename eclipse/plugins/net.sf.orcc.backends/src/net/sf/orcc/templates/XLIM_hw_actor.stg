@@ -2,11 +2,6 @@ import "net/sf/orcc/templates/XLIM_sw_actor.stg"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Override XLIM Templates For XLIM Hardware Generation
-typeDef(action) ::= <<
->>
-
-localInitialize(local) ::= <<
->>
 
 // Input and output pattern
 patternPortPinAvail(dir, port)::= <<
