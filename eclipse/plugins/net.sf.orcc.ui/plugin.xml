@@ -317,9 +317,9 @@
             </transformation>
          </import>
          <export>
-            <xslt
-                  name="xslt/net/sf/graphiti/xdf/output_NL.xslt">
-            </xslt>
+            <transformation
+                  class="net.sf.orcc.ui.editor.NlTransformation">
+            </transformation>
          </export>
       </configuration>
    </extension>

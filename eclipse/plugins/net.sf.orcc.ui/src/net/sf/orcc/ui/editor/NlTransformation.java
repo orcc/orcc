@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011, IETR/INSA of Rennes
+
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,25 +29,98 @@
  */
 package net.sf.orcc.ui.editor;
 
+import java.io.IOException;
 import java.io.OutputStream;
-
-import org.eclipse.core.resources.IFile;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.graphiti.io.ITransformation;
+import net.sf.graphiti.model.AbstractObject;
+import net.sf.graphiti.model.Edge;
 import net.sf.graphiti.model.Graph;
+import net.sf.graphiti.model.ObjectType;
+import net.sf.graphiti.model.Vertex;
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFile;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.misc.ObjectModelAdaptor;
+import org.stringtemplate.v4.misc.STNoSuchPropertyException;
+
+/**
+ * This class defines a writer of .nl files.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
 public class NlTransformation implements ITransformation {
+
+	private STGroup group;
 
 	@Override
 	public Graph transform(IFile file) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void transform(Graph graph, OutputStream out) {
-		// TODO Auto-generated method stub
+		// reload group
+		group = OrccUtil.loadGroup("NL", "net/sf/orcc/ui/editor/",
+				NlTransformation.class.getClassLoader());
 
+		// register model adaptor for AbstractObject
+		group.registerModelAdaptor(AbstractObject.class,
+				new ObjectModelAdaptor() {
+
+					@Override
+					public Object getProperty(ST self, Object o,
+							Object property, String propertyName)
+							throws STNoSuchPropertyException {
+						try {
+							// first try standard object adaptor
+							return super.getProperty(self, o, property,
+									propertyName);
+						} catch (STNoSuchPropertyException e) {
+							// if not found, try in the properties
+							return ((AbstractObject) o).getValue(String
+									.valueOf(property));
+						}
+					}
+				});
+
+		// instantiate template
+		ST template = group.getInstanceOf("printNetwork");
+		template.add("id", graph.getValue(ObjectType.PARAMETER_ID));
+
+		List<Vertex> inputs = new ArrayList<Vertex>();
+		template.add("inputs", inputs);
+		List<Vertex> outputs = new ArrayList<Vertex>();
+		template.add("outputs", outputs);
+		List<Vertex> instances = new ArrayList<Vertex>();
+		template.add("instances", instances);
+
+		for (Vertex vertex : graph.vertexSet()) {
+			if ("Input port".equals(vertex.getType().getName())) {
+				inputs.add(vertex);
+			} else if ("Output port".equals(vertex.getType().getName())) {
+				outputs.add(vertex);
+			} else {
+				instances.add(vertex);
+			}
+		}
+
+		List<Edge> connections = new ArrayList<Edge>(graph.edgeSet());
+		template.add("connections", connections);
+
+		byte[] b = template.render(80).getBytes();
+		try {
+			out.write(b);
+			out.close();
+		} catch (IOException e) {
+			throw new OrccRuntimeException("I/O error", e);
+		}
 	}
 
 }
