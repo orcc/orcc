@@ -90,8 +90,6 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder, bool verbose): Co
   this->decoder = decoder;
   this->verbose = verbose;
 
-  this->stopSchVal = 0;
-
   Module* module = decoder->getModule();
 
   // If the user doesn't want core files, disable them.
@@ -293,12 +291,12 @@ void LLVMExecution::initialize(){
 	// Set stop condition of the scheduler
 	Scheduler* scheduler = decoder->getScheduler();
 	GlobalVariable* stopGV = scheduler->getStopGV();
+	GlobalVariable* stopGV_src = in->getStateVar("stop")->getGlobalVariable();
+	GlobalVariable* stopGV_out = out->getStateVar("stop")->getGlobalVariable();
 
-	//int* test = getStopSchPtr();
-	EE->addGlobalMapping(stopGV, getStopSchPtr());
-
-	gpacSrc->setStopSchPtr(getStopSchPtr());
-	gpacDisp->setStopSchPtr(getStopSchPtr());
+	EE->addGlobalMapping(stopGV, gpacSrc->getStopSchPtr());
+	EE->addGlobalMapping(stopGV_src, gpacSrc->getStopSchPtr());
+	EE->addGlobalMapping(stopGV_out, gpacDisp->getStopSchPtr());
 
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
@@ -325,7 +323,8 @@ void LLVMExecution::start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame
 	GpacDisp* gpacDisp = (GpacDisp*)display;
 	gpacDisp->setFramePtr(rvcFrame);
 
-	startScheduler();
+	gpacSrc->start();
+	gpacDisp->start();
 
 	Scheduler* scheduler = decoder->getScheduler();
 	Function* main = scheduler->getMainFunction();
@@ -345,6 +344,12 @@ void LLVMExecution::setIn(Instance* instance){
 	Source** ptrSource = (Source**)getGVPtr(stateVar->getGlobalVariable());
 	*ptrSource = source;
 
+	//Force stop variable to 0
+	StateVar* srcStop = instance->getStateVar("stop");
+	GlobalVariable* stopVar = srcStop->getGlobalVariable();
+	Constant* Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
+	stopVar->setInitializer(Zero);
+
 	//Set setvideo procedure
 	Procedure* getSrcProc = instance->getProcedure("get_src");
 	if (getSrcProc != NULL){
@@ -354,13 +359,18 @@ void LLVMExecution::setIn(Instance* instance){
 
 void  LLVMExecution::setOut(Instance* instance){
 	JadeDisp* jadeDisp = new JadeDisp(1, verbose);
-
 	display = jadeDisp;
 
 	//Set var display
 	StateVar* stateVar = instance->getStateVar("display");
 	Display** ptrDisplay = (Display**)getGVPtr(stateVar->getGlobalVariable());
 	*ptrDisplay = display;
+
+	//Force stop variable to 0
+	StateVar* srcStop = instance->getStateVar("stop");
+	GlobalVariable* stopVar = srcStop->getGlobalVariable();
+	Constant* Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
+	stopVar->setInitializer(Zero);
 
 	//Set setvideo procedure
 	Procedure* setVideoProc = instance->getProcedure("set_video");

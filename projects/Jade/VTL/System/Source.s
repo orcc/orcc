@@ -1,8 +1,11 @@
 @O_ptr = global i8* null
 @source = global i8* null
+@stop = external global i32
 
 define i1 @isSchedulable_send_data() nounwind {
-	ret i1 1
+	%1 = load i32* @stop
+	%2 = icmp eq i32 %1, 0
+	ret i1 %2
 }
 
 define i32 @send_data() nounwind {
@@ -26,7 +29,7 @@ declare void @get_src(i8*, i8*)
 !outputs = !{!3}
 !actions = !{!9}
 !procedures = !{!5}
-!state_variables = !{!6}
+!state_variables = !{!6, !16}
 
 !0 = metadata !{metadata !"System/Source"}
 !1 = metadata !{metadata !"System.Source"}
@@ -45,4 +48,7 @@ declare void @get_src(i8*, i8*)
 !13 = metadata !{metadata !9}
 !14 = metadata !{metadata !3, i32 1}
 !15 = metadata !{metadata !3}
+!16 = metadata !{metadata !17, metadata !18, null, i32* @stop}
+!17 = metadata !{metadata !"stop", i1 1, i32 0,  i32 0}
+!18 = metadata  !{ i32 32 ,  null }
 

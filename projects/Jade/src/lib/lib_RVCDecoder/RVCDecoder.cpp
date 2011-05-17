@@ -170,7 +170,7 @@ int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME 
 }
 
 int rvc_close(void *PlayerStruct){
-
+	delete decoder;
 	return 0;
 }
 

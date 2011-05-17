@@ -2,10 +2,13 @@
 @WIDTH_ptr = global i16* null
 @HEIGHT_ptr =global i16* null
 @B_ptr = global i8* null
+@stop = external global i32
 
 define i1 @isSchedulable_get_size() nounwind {
 entry:
-	ret i1 1
+	%0 = load i32* @stop
+	%1 = icmp eq i32 %0, 0
+	ret i1 %1
 }
 
 define void @get_size() nounwind {
@@ -46,7 +49,7 @@ declare void @write_mb(i8*, i8*)
 !name = !{!1}
 !action_scheduler = !{!2}
 !inputs = !{!3, !5, !7}
-!state_variables = !{!9}
+!state_variables = !{!9, !28}
 !procedures = !{!12, !14}
 !actions = !{!15, !21}
 
@@ -79,3 +82,6 @@ declare void @write_mb(i8*, i8*)
 !25 = metadata !{metadata !5, i32 1, metadata !7, i32 1}
 !26 = metadata !{metadata !5, metadata !7}
 !27 = metadata !{metadata !21, metadata !15}
+!28 = metadata !{metadata !29, metadata !30, null, i32* @stop}
+!29 = metadata !{metadata !"stop", i1 1, i32 0,  i32 0}
+!30 = metadata  !{ i32 32 ,  null }

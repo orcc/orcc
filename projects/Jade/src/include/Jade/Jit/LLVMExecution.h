@@ -183,27 +183,6 @@ public:
      */
 	bool waitForFirstFrame();
 
-	/**
-     *  @brief Get value which can stop the scheduler
-	 *
-	 *  This value is continiously tested by the scheduler, it MUST be an int.
-	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
-	 *	continuously test firing rules of actors
-	 *   
-	 *  @return value of the stopVal
-     */
-	int* getStopSchPtr() {return &stopSchVal;}
-
-	/**
-     *  @brief Set to 0 the value which can start the scheduler
-	 *
-	 *  This value is continiously tested by the scheduler, it MUST be an int.
-	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
-	 *	continuously test firing rules of actors
-     */
-	void startScheduler() {stopSchVal = 0;}
-
-
 	void* getExit(); 
 	void recompile(llvm::Function* function);
 	
@@ -239,8 +218,6 @@ private:
 	/** verbose */
 	bool verbose;
 
-	/** This is the value which can stop the scheduler */
-	int stopSchVal;
 };
 
 #endif
