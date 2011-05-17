@@ -108,10 +108,6 @@ argumentDeclaration(variable) ::= <<
 <variable.type><if(variable.type.list)>*<endif> %<variable.name>
 >>
 
-Location(location) ::= <<
-<location.startLine><location.startColumn><location.endColumn>
->>
-
 // phi definition
 phiPair(value, label) ::= <<
 [<value>, %<label>]
