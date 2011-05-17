@@ -282,12 +282,12 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <if(actor.initializes)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Initializes
-<actor.initializes: printAction()>
+<actor.initializes: printAction(); separator="\n\n">
 <endif>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
-<actor.actions: printAction()>
+<actor.actions: printAction(); separator="\n\n">
 
 <decl_MD(actor)>
 
