@@ -1,5 +1,6 @@
 import "net/sf/orcc/templates/LLVM_metadata.stg"
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Local variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -9,6 +10,7 @@ variableDeclaration(variable) ::= <<
 %<variable.indexedName> = alloca <variable.type>
 <endif>
 >>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // State variables
@@ -20,6 +22,7 @@ if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.ini
 <else> zeroinitializer, align 32 
 <endif>
 >>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
@@ -156,11 +159,7 @@ printFirstBlockNode(blockNode) ::= <<
 >>
 
 printIfNode(ifNode) ::= <<
-<if(ifNode.elseNodes)>
-	<BrOp(cond=Expr(expr=ifNode.condition, type=ifNode.condition.type), iftrue={%b<label(first(ifNode.thenNodes))>}, iffalse={%b<label(first(ifNode.elseNodes))>}, dest="")>
-<else>
-	<BrOp(cond=Expr(expr=ifNode.condition, type=ifNode.condition.type), iftrue={%b<label(first(ifNode.thenNodes))>}, iffalse={%b<label(ifNode.joinNode)>}, dest="")>
-<endif>
+	br i1 <Expr(expr=ifNode.condition, type=ifNode.condition.type)>, label %b<label(first(ifNode.thenNodes))>, label %b<if(ifNode.elseNodes)><label(first(ifNode.elseNodes))><else><label(ifNode.joinNode)><endif>
 
 b<label(first(ifNode.thenNodes))>: 
 <printFirstNode(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
@@ -179,7 +178,7 @@ b<label(ifNode.joinNode)>:
 
 printWhileNode(whileNode) ::= <<
 <printBlockNode(whileNode.joinNode)>
-	<BrOp(cond=Expr(expr=whileNode.condition, type=whileNode.condition.type), iftrue={%b<label(first(whileNode.Nodes))>}, iffalse={%b<label(first(whileNode.joinNode.successors))>}, dest="")>
+	br i1 <Expr(expr=whileNode.condition, type=whileNode.condition.type)>, label %b<label(first(whileNode.Nodes))>, label %b<label(first(whileNode.joinNode.successors))>
 
 b<label(first(whileNode.nodes))>:
 <printFirstNode(first(whileNode.nodes))>
@@ -189,24 +188,12 @@ b<label(first(whileNode.nodes))>:
 b<label(first(whileNode.joinNode.successors))>:
 >>
 
-BrOp(cond, iftrue, iffalse, dest) ::= <<
-<if(cond)
->br i1 <cond>, label <iftrue>, label <iffalse><
-else
->br label <dest><
-endif>
->>
-
 label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
-
-printProcedure(proc) ::= <<
-<procedure(procedure = proc)>
->>
 
 procedure(procedure) ::= <<
 <if(!procedure.native)>
@@ -220,17 +207,11 @@ entry:
 <endif>
 >>
 
-///////////////////////////////////////////////////////////////////////////////
-// Parameters
-///////////////////////////////////////////////////////////////////////////////
-
-actorParameter(parameter) ::= <<
-@<parameter.name> = global <parameter.type> undef
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
+
 printAction(action) ::= <<
 define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
@@ -248,9 +229,14 @@ entry:
 }
 >>
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
+
+actorParameter(parameter) ::= <<
+@<parameter.name> = global <parameter.type> undef
+>>
 
 actor(actor, options) ::= <<
 
