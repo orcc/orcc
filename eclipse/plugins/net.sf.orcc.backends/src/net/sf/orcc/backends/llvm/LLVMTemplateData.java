@@ -31,6 +31,7 @@ package net.sf.orcc.backends.llvm;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
@@ -75,6 +76,8 @@ public class LLVMTemplateData {
 	 * Medata container of action scheduler
 	 */
 	private Map<Object, Integer> actionScheduler;
+
+	private Map<Var, Var> castedListReferences;
 
 	/**
 	 * Medata container of configurations
@@ -137,6 +140,7 @@ public class LLVMTemplateData {
 
 	public LLVMTemplateData(Actor actor) {
 		nodeToLabelMap = new HashMap<Node, Integer>();
+		castedListReferences = new HashMap<Var, Var>();
 
 		// Initialize metadata maps
 		ports = new HashMap<Port, Integer>();
@@ -192,6 +196,21 @@ public class LLVMTemplateData {
 				actionScheduler.put(transitions.getList(), id++);
 				for (Transition transition : transitions.getList()) {
 					actionScheduler.put(transition, id++);
+				}
+			}
+		}
+	}
+
+	private void computeCastedListReferences(Actor actor) {
+		TreeIterator<EObject> it = actor.eAllContents();
+		while (it.hasNext()) {
+			EObject object = it.next();
+			if (object instanceof Var) {
+				Var var = (Var) object;
+				if (var.getType().isList()
+						&& !var.getDefs().isEmpty()
+						&& (var.getDefs().get(0).eContainer() instanceof InstCast)) {
+					castedListReferences.put(var, var);
 				}
 			}
 		}
@@ -326,6 +345,7 @@ public class LLVMTemplateData {
 	public void computeTemplateMaps(Actor actor) {
 		computeMetadataMaps(actor);
 		computeNodeToLabelMap(actor);
+		computeCastedListReferences(actor);
 	}
 
 	private void computeVar(Var var) {
@@ -359,6 +379,10 @@ public class LLVMTemplateData {
 	 */
 	public Map<Object, Integer> getActionScheduler() {
 		return actionScheduler;
+	}
+
+	public Map<Var, Var> getCastedListReferences() {
+		return castedListReferences;
 	}
 
 	/**

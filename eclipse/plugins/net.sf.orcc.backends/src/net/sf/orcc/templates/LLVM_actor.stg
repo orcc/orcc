@@ -5,7 +5,7 @@ import "net/sf/orcc/templates/LLVM_metadata.stg"
 ///////////////////////////////////////////////////////////////////////////////
 
 variableDeclaration(variable) ::= <<
-<if(variable.type.list)>
+<if(variable.type.list && !actor.templateData.castedListReferences.(variable))>
 <AllocaOp(result={%<variable.indexedName>}, type=variable.type)>
 <endif>
 >>
@@ -149,11 +149,15 @@ function_args=parametersDeclaration(arguments=call.procedure.parameters, paramet
 >>
 
 printCast(cast)::= <<
-%<cast.target.variable.indexedName> = <printCastOp(cast)> <cast.source.variable.type> %<cast.source.variable.indexedName> to <cast.target.variable.type>
+%<cast.target.variable.indexedName> = <printCastOp(cast)> <printCastType(cast.source.variable)> %<cast.source.variable.indexedName> to <printCastType(cast.target.variable)>
 >>
 
 printCastOp(cast) ::= <<
-<if(cast.extended)><if(cast.signed)>sext<else>zext<endif><else>trunc<endif>
+<if(cast.source.variable.type.list)>bitcast<else><if(cast.extended)><if(cast.signed)>sext<else>zext<endif><else>trunc<endif><endif>
+>>
+
+printCastType(var) ::= <<
+<var.type><if(var.type.list)>*<endif>
 >>
 
 printAssign(assign) ::= <<

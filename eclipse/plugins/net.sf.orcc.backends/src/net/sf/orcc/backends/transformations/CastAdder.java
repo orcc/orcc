@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.transformations;
 
+import java.util.List;
+
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
 import net.sf.orcc.ir.ExprBinary;
@@ -329,7 +331,9 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 					"castedExpr_" + procedure.getName());
 			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
 					oldVar, newVar);
-			EcoreHelper.addInstBeforeExpr(expr, cast, usePreviousJoinNode);
+			if (EcoreHelper.addInstBeforeExpr(expr, cast, usePreviousJoinNode)) {
+				indexInst++;
+			}
 			EcoreHelper.delete(expr);
 			return IrFactory.eINSTANCE.createExprVar(newVar);
 		}
@@ -376,13 +380,23 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	}
 
 	private boolean needCast(Type type1, Type type2) {
-		if (type1.getSizeInBits() != type2.getSizeInBits()) {
-			return true;
-		} else if (castToUnsigned && type1.getClass() != type2.getClass()) {
-			return true;
+		if (type1.isList() && type2.isList()) {
+			TypeList typeList1 = (TypeList) type1;
+			TypeList typeList2 = (TypeList) type2;
+			List<Integer> dim1 = typeList1.getDimensions();
+			List<Integer> dim2 = typeList2.getDimensions();
+			for (int i = 0; i < dim1.size() && i < dim2.size(); i++) {
+				if (dim1.get(i) != dim2.get(i)) {
+					return true;
+				}
+			}
+			return needCast(typeList1.getElementType(),
+					typeList2.getElementType());
 		} else {
-			return !((type1.isInt() && type2.isUint()) || (type1.isUint() && type2
-					.isInt())) && (type1.getClass() != type2.getClass());
+			return (type1.getSizeInBits() != type2.getSizeInBits())
+					|| (castToUnsigned && type1.getClass() != type2.getClass())
+					|| (!((type1.isInt() && type2.isUint()) || (type1.isUint() && type2
+							.isInt())) && (type1.getClass() != type2.getClass()));
 		}
 	}
 
