@@ -121,8 +121,9 @@ printGEP(gep) ::= <<
 <Var(gep.target.variable)> = getelementptr <VarType(gep.source.variable)>* <Var(gep.source.variable)>, i32 0 <if(gep.indexes)>, <indexes(gep.indexes)><endif>
 >>
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// ORCC IR Nodes
+// Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
 printNodes(nodes) ::= <<
@@ -136,6 +137,23 @@ elseif(node.whileNode)><printWhileNode(node)><
 endif>
 >>
 
+printFirstNode(node) ::= <<
+<if(node.blockNode)><printFirstBlockNode(node)><
+else>printNode(node)<
+endif>
+>>
+
+printBlockNode(blockNode) ::= <<
+	br label %b<label(blockNode)>
+
+b<label(blockNode)>:
+	<printInstructions(blockNode.instructions)>
+	
+>>
+
+printFirstBlockNode(blockNode) ::= <<
+	<printInstructions(blockNode.instructions)> 
+>>
 
 printIfNode(ifNode) ::= <<
 <if(ifNode.elseNodes)>
@@ -145,17 +163,17 @@ printIfNode(ifNode) ::= <<
 <endif>
 
 b<label(first(ifNode.thenNodes))>: 
-<printNodes_cond(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
+<printFirstNode(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
 	br label %b<label(ifNode.joinNode)>
 
 <if(ifNode.elseNodes)>
 b<label(first(ifNode.elseNodes))>:
-<printNodes_cond(first(ifNode.elseNodes))> <printNodes(rest(ifNode.elseNodes))>
+<printFirstNode(first(ifNode.elseNodes))> <printNodes(rest(ifNode.elseNodes))>
 	br label %b<label(ifNode.joinNode)>
 <endif>
 
 b<label(ifNode.joinNode)>:
-<printNodes_cond(first(ifNode.joinNode))>
+<printFirstNode(first(ifNode.joinNode))>
 <printNodes(rest(ifNode.joinNode))>
 >>
 
@@ -164,7 +182,7 @@ printWhileNode(whileNode) ::= <<
 	<BrOp(cond=Expr(expr=whileNode.condition, type=whileNode.condition.type), iftrue={%b<label(first(whileNode.Nodes))>}, iffalse={%b<label(first(whileNode.joinNode.successors))>}, dest="")>
 
 b<label(first(whileNode.nodes))>:
-<printNodes_cond(first(whileNode.nodes))>
+<printFirstNode(first(whileNode.nodes))>
 <printNodes(rest(whileNode.nodes))>
 	br label %b<label(whileNode.joinNode)>
 
@@ -181,45 +199,11 @@ endif>
 
 label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 
-///////////////////////////////////////////////////////////////////////////////
-// Nodes
-///////////////////////////////////////////////////////////////////////////////
-
-Node_cond(node) ::= <<
-<if(node.blockNode)><printBlockNode_cond(node)><
-elseif(node.ifNode)><printIfNode_cond(node)><
-elseif(node.whileNode)><printWhileNode_cond(node)><
-endif>
->>
-
-printNodes_cond(nodes) ::= <<
-<nodes: Node_cond()>
->>
-
-printWhileNode_cond(nodes) ::= <<
-<printWhileNode(nodes)>
->>
-
-printIfNode_cond(nodes) ::= <<
-<printIfNode(nodes)>
->>
-
-printBlockNode_cond(blockNode) ::= <<
-	<printInstructions(blockNode.instructions)> 
->>
-
-// if node
-printBlockNode(blockNode) ::= <<
-	br label %b<label(blockNode)>
-
-b<label(blockNode)>:
-	<printInstructions(blockNode.instructions)>
-	
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
+
 printProcedure(proc) ::= <<
 <procedure(procedure = proc)>
 >>
