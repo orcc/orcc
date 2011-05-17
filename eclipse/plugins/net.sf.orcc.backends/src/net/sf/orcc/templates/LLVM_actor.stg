@@ -236,6 +236,22 @@ entry:
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Scheduler
+
+schedulerWithoutFSM(actions) ::= <<
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler with FSM
+
+schedulerWithFSM(actions, fsm) ::= <<
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -295,4 +311,14 @@ declare i32 @printf(i8* noalias , ...) nounwind
 
 instance(instance, options) ::= <<
 <actor(instance.actor, options)>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Action-scheduler
+define void @<instance.id>_scheduler() nounwind {
+	<if(instance.actor.fsm)
+	><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
+	else
+	><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
+	endif>
+}
 >>
