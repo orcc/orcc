@@ -96,12 +96,6 @@ endif>
 // Conversion instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-CastParameter(casts, args, params, location )::= <<
-<casts, args, params: { cast, arg, param | <if(cast)> 
-<BitcastOp(result={%<param><location>_cast}, ty={<param.type>*}, value=Expr(expr=param, type=param.type), ty2={<arg.type>*})>
-<endif>}>
->>
-
 label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 
 phiPairs(phi) ::= <<
@@ -137,13 +131,12 @@ printCall(call) ::= <<
 <if(call.print)> 
 <PrintInstr(call.parameters)> 
 <else>
-<CastParameter(casts=call.paramCast, args=call.procedure.parameters, params=call.parameters, location=Location(call.location))>
 <if(call.target)>
 %<call.target.variable.indexedName> = <CallOp(ty=call.procedure.returnType,
 fnptrval=call.procedure.name,
-function_args=parametersDeclaration(arguments=call.procedure.parameters, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
+function_args=parametersDeclaration(call.procedure.parameters, call.parameters))>
 <else>
-<CallOp(ty=call.procedure.returnType, fnptrval=call.procedure.name, function_args=parametersDeclaration(arguments=call.procedure.parameters ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
+<CallOp(ty=call.procedure.returnType, fnptrval=call.procedure.name, function_args=parametersDeclaration(call.procedure.parameters, call.parameters))>
 <endif>
 <endif>
 >>

@@ -96,12 +96,12 @@ indexesName(indexes) ::= <<
 <indexes: {index |<index>}; separator="_">
 >>
 
-parametersDeclaration(arguments, parameters, casts, location) ::= <<
-<arguments, parameters, casts: { arg, param, cast | <parameters(type = arg.type, variable= param, cast =cast, location=location)>}; separator=", ">
+parametersDeclaration(arguments, parameters) ::= <<
+<arguments, parameters: { arg, param | <parameters(arg.type, param)>}; separator=", ">
 >>
 
-parameters(type, variable, cast, location) ::= <<
-<if(variable.intExpr)><type> <elseif(type.list)><type>* <elseif(variable.booleanExpr)>i1 <else><variable.type> <endif><if(cast)>%<variable><location>_cast<else><Expr(expr=variable, type=variable.type)><endif>
+parameters(type, variable) ::= <<
+<if(variable.intExpr)><type><elseif(type.list)><type>*<elseif(variable.booleanExpr)>i1<else><variable.type><endif> <Expr(variable, variable.type)>
 >>
 
 argumentDeclaration(variable) ::= <<
