@@ -17,10 +17,15 @@ variableDeclaration(variable) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 stateVar(variable) ::= <<
-@<variable.name> = <if(variable.assignable)>global<else>constant<endif> <variable.type> <
-if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.initialValue)> 
-<else> zeroinitializer, align 32 
-<endif>
+@<variable.name> = <printStateVarNature(variable)> <variable.type> <initializeStateVar(variable)>
+>>
+
+printStateVarNature(variable) ::= <<
+<if(variable.assignable)>global<else>constant<endif>
+>>
+
+initializeStateVar(variable) ::= <<
+<if(variable.initialValue)><ConstantValue(type=variable.type, const=variable.initialValue)><else>zeroinitializer, align 32<endif>
 >>
 
 
@@ -62,14 +67,14 @@ endif>
 >>
 
 printCall(call) ::= <<
-<if(call.print)> 
-<PrintInstr(call.parameters)> 
-<else>
-<if(call.target)
+<if(call.print)
+><PrintInstr(call.parameters)><
+else
+><if(call.target)
 >%<call.target.variable.indexedName> = <
 endif
->call <call.procedure.returnType> @<call.procedure.name> (<parametersDeclaration(call.procedure.parameters, call.parameters)>)
-<endif>
+>call <call.procedure.returnType> @<call.procedure.name> (<parametersDeclaration(call.procedure.parameters, call.parameters)>)<
+endif>
 >>
 
 printCast(cast)::= <<
