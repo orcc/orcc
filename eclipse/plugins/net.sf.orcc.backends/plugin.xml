@@ -89,6 +89,13 @@
          </option>
       </backend>
       <backend
+            class="net.sf.orcc.backends.tta.TTABackendImpl"
+            name="TTA">
+         <option
+               id="net.sf.orcc.plugins.compileXDF">
+         </option>
+      </backend>
+      <backend
             class="net.sf.orcc.backends.promela.PromelaBackendImpl"
             name="PROMELA">
          <option

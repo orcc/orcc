@@ -208,6 +208,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		// Create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
+		printer.getOptions().put("printMetadata", true);
 
 		return printer.print(actor.getSimpleName(), folder, actor, "actor");
 	}

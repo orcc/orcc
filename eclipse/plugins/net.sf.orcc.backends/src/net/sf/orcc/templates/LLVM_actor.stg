@@ -305,7 +305,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 ; Actions
 <actor.actions: printAction(); separator="\n\n">
 
-<decl_MD(actor)>
+<if(options.printMetadata)><decl_MD(actor)><endif>
 
 >>
 
@@ -314,11 +314,20 @@ instance(instance, options) ::= <<
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Action-scheduler
+<if(instance.actor.fsm)>
+@_FSM_state = global i32 <instance.actor.templateData.stateToIntegerMap.(instance.actor.fsm.initialState)>
+<endif>
+
 define void @<instance.id>_scheduler() nounwind {
+entry:
+	br label %bb1
+bb1:
 	<if(instance.actor.fsm)
 	><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
 	else
 	><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
 	endif>
+
+	br label %bb1
 }
 >>

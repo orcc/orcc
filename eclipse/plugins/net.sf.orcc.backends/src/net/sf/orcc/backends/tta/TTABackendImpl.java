@@ -39,7 +39,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
 import net.sf.orcc.backends.llvm.LLVMExpressionPrinter;
-import net.sf.orcc.backends.llvm.LLVMTemplateData;
 import net.sf.orcc.backends.llvm.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
@@ -56,9 +55,6 @@ import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
-import net.sf.orcc.network.transformations.NetworkClassifier;
-import net.sf.orcc.tools.classifier.ActorClassifier;
-import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
 import org.eclipse.core.resources.IFile;
 
@@ -73,11 +69,7 @@ public class TTABackendImpl extends AbstractBackend {
 	/**
 	 * Backend options
 	 */
-	private boolean classify;
-
 	private boolean debugMode;
-
-	private boolean normalize;
 
 	private final Map<String, String> transformations;
 
@@ -97,23 +89,11 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	public void doInitializeOptions() {
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		debugMode = getAttribute(DEBUG_MODE, false);
 	}
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		if (classify) {
-			if (!actor.getSimpleName().equals("BufferCurrPic")
-					&& !actor.getSimpleName().equals("SplitSpsInfo")) {
-				new ActorClassifier().doSwitch(actor);
-
-				if (normalize) {
-					new ActorNormalizer().visit(actor);
-				}
-			}
-		}
 
 		ActorVisitor<?>[] transformations = { new SSATransformation(),
 				new TypeSizeTransformation(), new BoolToIntTransformation(),
@@ -127,16 +107,11 @@ public class TTABackendImpl extends AbstractBackend {
 			transformation.doSwitch(actor);
 		}
 
-		// Organize medata information for the current actor
-		actor.setTemplateData(new LLVMTemplateData(actor));
+		actor.setTemplateData(new TTAActorTemplateData(actor));
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {
 		network.flatten();
-
-		if (classify) {
-			new NetworkClassifier().transform(network);
-		}
 	}
 
 	@Override
@@ -148,6 +123,7 @@ public class TTABackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		doTransformNetwork(network);
 
+		transformActors(network.getActors());
 		printInstances(network);
 
 		// print network
@@ -161,6 +137,7 @@ public class TTABackendImpl extends AbstractBackend {
 		InstancePrinter printer = new InstancePrinter("LLVM_actor", !debugMode);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
+		printer.getOptions().put("printMetadata", false);
 		return printer.print(instance.getId() + ".bc", path, instance,
 				"instance");
 	}
