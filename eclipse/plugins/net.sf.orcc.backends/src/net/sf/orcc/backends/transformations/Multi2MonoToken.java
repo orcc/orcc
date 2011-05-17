@@ -86,23 +86,24 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private class ModifyActionScheduler extends AbstractActorVisitor<Object> {
 		private Var buffer;
 		private int bufferSize;
+		private Port currentPort;
 		private Var writeIndex;
 
-		public ModifyActionScheduler(Var buffer, Var writeIndex, int bufferSize) {
+		public ModifyActionScheduler(Var buffer, Var writeIndex,
+				Port currentPort, int bufferSize) {
 			this.buffer = buffer;
 			this.writeIndex = writeIndex;
+			this.currentPort = currentPort;
 			this.bufferSize = bufferSize;
 		}
 
 		@Override
 		public Object caseInstLoad(InstLoad load) {
 			if (load.getSource().getVariable().getName()
-					.equals(port.getName())) {
+					.equals(currentPort.getName())) {
 				// change tab Name
 				Use useArray = IrFactory.eINSTANCE.createUse(buffer);
 				load.getSource().getVariable().getUses().remove(0);
-				//EcoreHelper.removeUses(load.getSource().getVariable());
-				//EcoreHelper.delete(load.getSource().getVariable());
 				load.setSource(useArray);
 				// change index --> writeIndex+index
 				Expression maskValue = IrFactory.eINSTANCE
@@ -112,7 +113,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				if (!load.getIndexes().isEmpty()) {
 					Expression expression1 = load.getIndexes().get(0);
 					Expression sum = IrFactory.eINSTANCE.createExprBinary(
-							expression1, OpBinary.PLUS, index, port.getType());
+							expression1, OpBinary.PLUS, index,
+							IrFactory.eINSTANCE.createTypeInt(32));
 					Expression mask = IrFactory.eINSTANCE.createExprBinary(sum,
 							OpBinary.BITAND, maskValue,
 							IrFactory.eINSTANCE.createTypeInt(32));
@@ -220,7 +222,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private void actionToTransition(Action action, Var buffer, Var writeIndex,
 			Var readIndex) {
 		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-				buffer, writeIndex, bufferSize);
+				buffer, writeIndex, port, bufferSize);
 		modifyActionScheduler.doSwitch(action.getScheduler());
 		modifyActionSchedulability(action, writeIndex, readIndex, OpBinary.GE,
 				IrFactory.eINSTANCE.createExprInt(numTokens), port);
@@ -352,8 +354,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		Expression expression = IrFactory.eINSTANCE.createExprInt(0);
 		newCounter.setInitialValue(expression);
-		actor.getStateVars().add(newCounter);
-		
+		if (!actor.getStateVars().contains(newCounter.getName())) {
+			actor.getStateVars().add(newCounter);
+		}
 		return newCounter;
 	}
 
@@ -495,8 +498,10 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	private Var createTab(String name, Type entryType, int size) {
 		Type type = IrFactory.eINSTANCE.createTypeList(size, entryType);
 		Var newList = IrFactory.eINSTANCE.createVar(0, type, name, true, true);
-		actor.getStateVars().add(newList);
-		
+		if (!actor.getStateVars().contains(newList.getName())) {
+			actor.getStateVars().add(newList);
+		}
+
 		return newList;
 	}
 
@@ -943,26 +948,23 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				ListIterator<Port> it = action.getInputPattern().getPorts()
 						.listIterator();
 				while (it.hasNext()) {
-					port = it.next();
+					Port port = it.next();
 					if (inputPorts.contains(port)) {
-						
 						int position = portPosition(inputPorts, port);
 						Procedure body = action.getBody();
 						Var buffer = inputBuffers.get(position);
 						Var writeIndex = writeIndexes.get(position);
 						Var readIndex = readIndexes.get(position);
-		
+
 						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-								buffer, writeIndex, bufferSize);
+								buffer, writeIndex, port, bufferSize);
 						modifyActionScheduler.doSwitch(action);
-	
 						modifyActionSchedulability(action, writeIndex,
 								readIndex, OpBinary.NE,
 								IrFactory.eINSTANCE.createExprInt(0), port);
-								
 						consumeToken(body, position, port);
 						noRepeatActions.remove(action);
-						
+
 						int index = it.previousIndex();
 						action.getInputPattern().remove(port);
 						it = action.getInputPattern().getPorts()
@@ -1030,7 +1032,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			}
 			modifyNoRepeatActionsInFSM();
 		}
-		
+
 	}
 
 	/**
@@ -1348,22 +1350,22 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		for (Entry<Port, Integer> verifEntry : action.getInputPattern()
 				.getNumTokensMap().entrySet()) {
 			int verifNumTokens = verifEntry.getValue();
-			port = verifEntry.getKey();
-			entryType = port.getType();
+			Port verifPort = verifEntry.getKey();
+			entryType = verifPort.getType();
 			bufferSize = 512;// OptimalBufferSize(action, verifPort);
-			if (inputPorts.contains(port)) {
-				int position = portPosition(inputPorts, port);
+			if (inputPorts.contains(verifPort)) {
+				int position = portPosition(inputPorts, verifPort);
 				Var buffer = inputBuffers.get(position);
 				Var writeIndex = writeIndexes.get(position);
 				Var readIndex = readIndexes.get(position);
-				action.getInputPattern().remove(port);
+				action.getInputPattern().remove(verifPort);
 				ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-						buffer, writeIndex, bufferSize);
+						buffer, writeIndex, verifPort, bufferSize);
 				modifyActionScheduler.doSwitch(action);
 				modifyActionSchedulability(action, writeIndex, readIndex,
 						OpBinary.GE,
 						IrFactory.eINSTANCE.createExprInt(verifNumTokens),
-						port);
+						verifPort);
 				updateUntagIndex(action, writeIndex, verifNumTokens);
 			} else {
 				if (verifNumTokens > 1) {
@@ -1377,26 +1379,26 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 							IrFactory.eINSTANCE.createTypeInt(32),
 							"UntagWriteIndex", true,
 							IrFactory.eINSTANCE.createExprInt(0));
-					inputPorts.add(port);
-					untagBuffer = createTab(port.getName() + "_buffer",
+					inputPorts.add(verifPort);
+					untagBuffer = createTab(verifPort.getName() + "_buffer",
 							entryType, bufferSize);
 					inputBuffers.add(untagBuffer);
 					untagReadIndex = createCounter("readIndex_"
-							+ port.getName());
+							+ verifPort.getName());
 					readIndexes.add(untagReadIndex);
 					untagWriteIndex = createCounter("writeIndex_"
-							+ port.getName());
+							+ verifPort.getName());
 					writeIndexes.add(untagWriteIndex);
 					createUntaggedAction(untagReadIndex, untagWriteIndex,
-							untagBuffer, port, false);
-					action.getInputPattern().remove(port);
+							untagBuffer, verifPort, false);
+					action.getInputPattern().remove(verifPort);
 					ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
-							untagBuffer, untagWriteIndex, bufferSize);
+							untagBuffer, untagWriteIndex, verifPort, bufferSize);
 					modifyActionScheduler.doSwitch(action);
 					modifyActionSchedulability(action, untagWriteIndex,
 							untagReadIndex, OpBinary.GE,
 							IrFactory.eINSTANCE.createExprInt(verifNumTokens),
-							port);
+							verifPort);
 					updateUntagIndex(action, untagWriteIndex, verifNumTokens);
 				}
 			}
@@ -1417,22 +1419,22 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				for (Entry<Port, Integer> entry : action.getInputPattern()
 						.getNumTokensMap().entrySet()) {
 					numTokens = entry.getValue();
-					port = entry.getKey();
-					entryType = port.getType();
-					String name = "TokensToSend" + port.getName();
+					Port verifPort = entry.getKey();
+					String name = "TokensToSend" + verifPort.getName();
 					Var tokensToSend = createCounter(name);
 					Expression condition = IrFactory.eINSTANCE
 							.createExprBinary(IrFactory.eINSTANCE
 									.createExprVar(tokensToSend), OpBinary.GT,
 									IrFactory.eINSTANCE.createExprInt(0),
 									IrFactory.eINSTANCE.createTypeBool());
-					String actionName = "untaggedWrite_" + port.getName();
+					String actionName = "untaggedWrite_" + verifPort.getName();
 					Action untaggedWrite = createAction(condition, actionName);
 					Pattern pattern = untaggedWrite.getOutputPattern();
-					pattern.setNumTokens(port, 1);
+					pattern.setNumTokens(verifPort, 1);
 					Var OUTPUT = IrFactory.eINSTANCE.createVar(0,
-							port.getType(), port.getName() + "OUTPUT", true, 0);
-					pattern.setVariable(port, OUTPUT);
+							verifPort.getType(),
+							verifPort.getName() + "OUTPUT", true, 0);
+					pattern.setVariable(verifPort, OUTPUT);
 					// add instruction: tokensToSend = tokensToSend - 1 ;
 					Var numTokenToSend = IrFactory.eINSTANCE.createVar(0,
 							IrFactory.eINSTANCE.createTypeInt(32),
