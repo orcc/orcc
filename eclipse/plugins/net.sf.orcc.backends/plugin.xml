@@ -84,6 +84,9 @@
          <option
                id="net.sf.orcc.backends.xlimHard">
          </option>
+         <option
+               id="net.sf.orcc.backends.multi2mono">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.promela.PromelaBackendImpl"
@@ -185,6 +188,13 @@
                      name="FPGA Type">
                   <textBox></textBox>
                </option></checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Transform the actions with multi-tokens access to mono-token ones"
+               id="net.sf.orcc.backends.multi2mono"
+               name="Multi-tokens to mono-token transformation">
+            <checkBox></checkBox>
          </option>
          <option
                defaultValue="Assembly"

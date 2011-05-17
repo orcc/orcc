@@ -85,6 +85,8 @@ public class XlimBackendImpl extends AbstractBackend {
 	private boolean hardwareGen;
 
 	private Map<String, String> mapping;
+	
+	private boolean multi2mono;
 
 	private Map<Integer, List<Instance>> computeMapping(Network network,
 			Map<String, String> mapping) {
@@ -112,23 +114,23 @@ public class XlimBackendImpl extends AbstractBackend {
 		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
 		fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType",
 				"xc2vp30-7-ff1152");
+		multi2mono = getAttribute("net.sf.orcc.backends.multi2mono", false);
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
 		debugMode = getAttribute(DEBUG_MODE, true);
 	}
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
+		
+		XlimActorTemplateData data = new XlimActorTemplateData();
+		actor.setTemplateData(data);
 
-		if (hardwareGen) {
-			ActorVisitor<?> transfo = new Multi2MonoToken();
-			transfo.doSwitch(actor);
+		if (multi2mono) {
+			new Multi2MonoToken().doSwitch(actor);
+			new LocalArrayRemoval().doSwitch(actor);
 		}
 
-		XlimActorTemplateData data = new XlimActorTemplateData();
-		data.computeTemplateMaps(actor);
-		actor.setTemplateData(data);
 		ActorVisitor<?>[] transformations = { new SSATransformation(),
-				new LocalArrayRemoval(),
 				new GlobalArrayInitializer(hardwareGen),
 				new InstTernaryAdder(), new Inliner(true, true),
 				new UnaryListRemoval(), new CustomPeekAdder(),
@@ -146,6 +148,8 @@ public class XlimBackendImpl extends AbstractBackend {
 						+ actor.getName());
 			}
 		}
+		
+		data.computeTemplateMaps(actor);
 	}
 
 	@Override
