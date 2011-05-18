@@ -326,24 +326,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @param target
 	 *            target action
 	 */
-	private void copyInputPattern(Action source, Action target) {
-		Pattern targetPattern = target.getInputPattern();
-		Pattern sourcePattern = source.getInputPattern();
-		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
-		targetPattern.getPorts().addAll(sourcePattern.getPorts());
-		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
-		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
-	}
-
-	/**
-	 * This method copies the output patterns from a source action to a target
-	 * one
-	 * 
-	 * @param source
-	 *            source action
-	 * @param target
-	 *            target action
-	 */
 	private void copyOutputPattern(Action source, Action target) {
 		Pattern targetPattern = target.getOutputPattern();
 		Pattern sourcePattern = source.getOutputPattern();
@@ -519,6 +501,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		moveNodes(listIt, body);
 		Iterator<Var> it = action.getBody().getLocals().iterator();
 		moveLocals(it, body);
+		
 		return newProcessAction;
 	}
 
@@ -960,7 +943,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @param counter
 	 *            Global Var counter
 	 */
-	private void modifyDoneAction(Var counter, int portIndex) {
+	private void modifyDoneAction(Var counter, int portIndex, String portName) {
 
 		NodeBlock blkNode = done.getBody().getFirst();
 		Expression storeValue = IrFactory.eINSTANCE.createExprInt(0);
@@ -971,7 +954,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		blkNode = done.getScheduler().getFirst();
 		EList<Var> schedulerLocals = done.getScheduler().getLocals();
 		Var localCounter = IrFactory.eINSTANCE.createVar(0, counter.getType(),
-				"localCounterModif", true, portIndex);
+				"localCounterModif" + portName, true, portIndex);
 		schedulerLocals.add(localCounter);
 
 		Instruction load = IrFactory.eINSTANCE.createInstLoad(localCounter,
@@ -979,7 +962,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		blkNode.add(1, load);
 
 		Var temp = IrFactory.eINSTANCE.createVar(0,
-				IrFactory.eINSTANCE.createTypeBool(), "temp", true, portIndex);
+				IrFactory.eINSTANCE.createTypeBool(), "temp" + portName, true, portIndex);
 		schedulerLocals.add(temp);
 		Expression guardValue = IrFactory.eINSTANCE.createExprInt(numTokens);
 		Expression counterExpression = IrFactory.eINSTANCE
@@ -1198,6 +1181,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				repeatInput = true;
 				// create new process action
 				process = createProcessAction(action);
+				copyOutputPattern(action, process);
+				//process.setOutputPattern(EcoreHelper.copy(action.getOutputPattern()));
+				
 				String storeName = "newStateStore" + action.getName();
 				State storeState = IrFactory.eINSTANCE.createState(storeName);
 				fsm.getStates().add(storeState);
@@ -1209,7 +1195,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				fsm.addTransition(processState, process, targetState);
 
 				// move action's Output pattern to new process action
-				copyOutputPattern(action, process);
+				
 
 				Var untagBuffer = IrFactory.eINSTANCE.createVar(0, entryType,
 						"buffer", true, true);
@@ -1226,7 +1212,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				for (Entry<Port, Integer> entry : action.getInputPattern()
 						.getNumTokensMap().entrySet()) {
 					numTokens = entry.getValue();
-					inputIndex = inputIndex + 1;
+					inputIndex = inputIndex + 100;
 					port = entry.getKey();
 					bufferSize = 512;// OptimalBufferSize(action, port);
 					entryType = port.getType();
@@ -1266,28 +1252,28 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					modifyProcessAction.doSwitch(process.getBody());
 					fsm.addTransition(storeState, store, storeState);
 					// create a new store done action once
-					if (inputIndex == 1) {
+					if (inputIndex == 100) {
 						done = createDoneAction(action.getName()
 								+ "newStoreDone", counter, numTokens);
 						fsm.addTransition(storeState, done, processState);
 					} else {
 						// the new done action already exists --> modify
 						// schedulability
-						modifyDoneAction(counter, inputIndex);
+						modifyDoneAction(counter, inputIndex, port.getName());
 					}
 					actionToTransition(action, untagBuffer, untagWriteIndex,
 							untagReadIndex);
 					// action.getInputPattern().remove(port);
 				}
 
-				action.getInputPattern().clear();
+				
 				action.getBody().getNodes().clear();
 				NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				block.add(IrFactory.eINSTANCE.createInstReturn());
 				action.getBody().getNodes().add(block);
 				fsm.replaceTarget(sourceState, action, storeState);
-
+				action.getInputPattern().clear();
 				break;
 
 			}
@@ -1320,7 +1306,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				// inputs
 				if (!repeatInput) {
 					process = createProcessAction(action);
-					copyInputPattern(action, process);
+					process.setInputPattern(EcoreHelper.copy(action.getInputPattern()));
+					
 					State processState = IrFactory.eINSTANCE
 							.createState(processName);
 					action.getBody().getNodes().clear();
@@ -1340,7 +1327,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				for (Entry<Port, Integer> entry : action.getOutputPattern()
 						.getNumTokensMap().entrySet()) {
 					numTokens = entry.getValue();
-					outputIndex = outputIndex + 1;
+					outputIndex = outputIndex + 100;
 					port = entry.getKey();
 					entryType = port.getType();
 					String counterName = action.getName() + "NewWriteCounter"
@@ -1358,13 +1345,13 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					fsm.addTransition(writeState, write, writeState);
 
 					// create a new write done action once
-					if (outputIndex == 1) {
+					if (outputIndex == 100) {
 						done = createDoneAction(action.getName()
 								+ "newWriteDone", counter, numTokens);
 						fsm.addTransition(writeState, done, targetState);
 
 					} else {
-						modifyDoneAction(counter, outputIndex);
+						modifyDoneAction(counter, outputIndex, port.getName());
 					}
 				}
 				// remove outputPattern from transition action
