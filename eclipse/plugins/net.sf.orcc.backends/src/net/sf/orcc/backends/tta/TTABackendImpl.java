@@ -134,10 +134,9 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		InstancePrinter printer = new InstancePrinter("LLVM_actor", !debugMode);
+		InstancePrinter printer = new InstancePrinter("TTA_actor", !debugMode);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
-		printer.getOptions().put("printMetadata", false);
 		return printer.print(instance.getId() + ".bc", path, instance,
 				"instance");
 	}

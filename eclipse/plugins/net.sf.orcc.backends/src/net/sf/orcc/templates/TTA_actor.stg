@@ -1,0 +1,94 @@
+import "net/sf/orcc/templates/LLVM_actor.stg"
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Hardware FIFO instruction
+///////////////////////////////////////////////////////////////////////////////
+
+printWrite(port, source, numberOfTokens) ::= <<
+tail call void asm sideeffect "STREAM_OUT_V1", "ir"(i32 %<source>) nounwind
+>>
+
+printRead(port, target, numberOfTokens) ::= <<
+%<target> = tail call i32 asm sideeffect "STREAM_IN_V1", "=r,ir"(i32 0) nounwind
+>>
+
+printPeek(port, target, numberOfTokens) ::= <<
+%<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V1", "=r,ir"(i32 0) nounwind
+>>
+
+printStatus(port, target, dir) ::= <<
+%<target> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V1", "=r,ir"(i32 0) nounwind
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler
+///////////////////////////////////////////////////////////////////////////////
+
+schedulerWithoutFSM(actions) ::= <<
+
+>>
+
+schedulerWithFSM(actions, fsm) ::= <<
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Instance
+///////////////////////////////////////////////////////////////////////////////
+
+instance(instance, options) ::= <<
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Source file is "<instance.actor.file>"
+
+declare i32 @printf(i8* noalias , ...) nounwind 
+
+<if(instance.actor.parameters)>
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Parameter values of the instance
+<instance.actor.parameters: actorParameter(); separator="\n">
+<endif>
+
+<if(instance.actor.stateVars)>
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; State variables of the actor
+<instance.actor.stateVars: stateVar(); separator="\n">
+<endif>
+
+<if(instance.actor.procs)>
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Functions/procedures
+<instance.actor.procs: {proc | <procedure(procedure = proc)>}>
+<endif>
+
+<if(instance.actor.initializes)>
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Initializes
+<instance.actor.initializes: printAction(); separator="\n\n">
+<endif>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Actions
+<instance.actor.actions: printAction(); separator="\n\n">
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Action-scheduler
+<if(instance.actor.fsm)>
+@_FSM_state = global i32 <instance.actor.templateData.stateToIntegerMap.(instance.actor.fsm.initialState)>
+<endif>
+
+define void @<instance.id>_scheduler() nounwind {
+entry:
+	br label %bb1
+bb1:
+	<if(instance.actor.fsm)
+	><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
+	else
+	><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
+	endif>
+
+	br label %bb1
+}
+>>
