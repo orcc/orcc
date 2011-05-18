@@ -28,17 +28,25 @@
  */
 package net.sf.orcc.tools.classifier.smt;
 
+import static net.sf.orcc.OrccActivator.getDefault;
+import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.List;
 
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.runtime.CoreException;
 
 /**
  * This class defines an interface to an SMT solver compatible with SMT-LIB v2.
@@ -48,15 +56,33 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class SmtSolver {
 
+	private Actor actor;
+
 	private IFolder output;
 
-	private String prefix;
+	private String solver;
 
-	private static int i;
-
-	public SmtSolver(IFile file) {
+	/**
+	 * Creates a new solver. The solver writes SMT-LIB files that are given the
+	 * name of the actor.
+	 * 
+	 * @param actor
+	 *            the actor
+	 */
+	public SmtSolver(Actor actor) {
+		this.actor = actor;
+		IFile file = actor.getFile();
 		output = OrccUtil.getOutputFolder(file.getProject());
-		prefix = file.getFullPath().removeFileExtension().lastSegment();
+
+		String solverPath = getDefault().getPreference(P_SOLVER, "");
+		if (!solverPath.isEmpty()) {
+			File solverFile = new File(solverPath);
+			if (solverFile.exists()) {
+				solver = solverPath;
+				return;
+			}
+		}
+		throw new OrccRuntimeException("incorrect path of solver executable!");
 	}
 
 	public boolean checkSat(List<SmtScript> scripts) {
@@ -72,15 +98,51 @@ public class SmtSolver {
 
 				ps.close();
 
-				IFile file = output.getFile(prefix + "_" + i++ + ".smt2");
+				IFile file = output.getFile(actor.getSimpleName() + ".smt2");
 				InputStream source = new ByteArrayInputStream(bos.toByteArray());
 				OrccUtil.setFileContents(file, source);
+
+				launchSolver(file);
 			}
-		} catch (CoreException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new OrccRuntimeException("could not execute solver", e);
 		}
 
 		return false;
 	}
 
+	private void launchSolver(IFile file) throws IOException {
+		ProcessBuilder pb = new ProcessBuilder(solver, "+model", "+lang",
+				"smt2", file.getLocation().toOSString());
+		final Process process = pb.start();
+
+		// Output error message
+		new Thread() {
+			@Override
+			public void run() {
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(process.getInputStream()));
+				try {
+					String line = reader.readLine();
+					while (line != null) {
+						System.out.println(line);
+						line = reader.readLine();
+					}
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				} finally {
+					try {
+						reader.close();
+					} catch (IOException e) {
+					}
+				}
+			}
+		}.start();
+
+		try {
+			process.waitFor();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }

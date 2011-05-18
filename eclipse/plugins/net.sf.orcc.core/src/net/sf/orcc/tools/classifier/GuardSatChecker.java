@@ -426,7 +426,7 @@ public class GuardSatChecker {
 				+ " " + action2.getScheduler().getName() + "))");
 		script.addCommand("(check-sat)");
 
-		return new SmtSolver(actor.getFile()).checkSat(translator.getScripts());
+		return new SmtSolver(actor).checkSat(translator.getScripts());
 	}
 
 	public Map<Port, Expression> getConfiguration(List<Action> previous,
