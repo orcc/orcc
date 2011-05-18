@@ -37,33 +37,35 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Def;
+import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.State;
-import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
-import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.OpBinary;
-import net.sf.orcc.ir.ExprVar;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.NodeBlock;
+import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.State;
+import net.sf.orcc.ir.Tag;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
+
 import org.eclipse.emf.common.util.EList;
 import org.jgrapht.DirectedGraph;
 
@@ -99,32 +101,36 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		@Override
 		public Object caseInstLoad(InstLoad load) {
-			if (load.getSource().getVariable().getName()
-					.equals(currentPort.getName())) {
-				// change tab Name
-				Use useArray = IrFactory.eINSTANCE.createUse(buffer);
-				load.getSource().getVariable().getUses().remove(0);
-				load.setSource(useArray);
-				// change index --> writeIndex+index
-				Expression maskValue = IrFactory.eINSTANCE
-						.createExprInt(bufferSize - 1);
-				Expression index = IrFactory.eINSTANCE
-						.createExprVar(writeIndex);
-				if (!load.getIndexes().isEmpty()) {
-					Expression expression1 = load.getIndexes().get(0);
-					Expression sum = IrFactory.eINSTANCE.createExprBinary(
-							expression1, OpBinary.PLUS, index,
-							IrFactory.eINSTANCE.createTypeInt(32));
-					Expression mask = IrFactory.eINSTANCE.createExprBinary(sum,
-							OpBinary.BITAND, maskValue,
-							IrFactory.eINSTANCE.createTypeInt(32));
+			Var varSource = load.getSource().getVariable();
+			Pattern pattern = EcoreHelper.getContainerOfType(varSource,
+					Pattern.class);
+			if (pattern != null) {
+				Port testPort = pattern.getPort(varSource);
+				if (currentPort.equals(testPort)) {
+					// change tab Name
+					load.getSource().setVariable(buffer);
+					// change index --> writeIndex+index
+					Expression maskValue = IrFactory.eINSTANCE
+							.createExprInt(bufferSize - 1);
+					Expression index = IrFactory.eINSTANCE
+							.createExprVar(writeIndex);
+					if (!load.getIndexes().isEmpty()) {
+						Expression expression1 = load.getIndexes().get(0);
+						Expression sum = IrFactory.eINSTANCE.createExprBinary(
+								expression1, OpBinary.PLUS, index,
+								IrFactory.eINSTANCE.createTypeInt(32));
+						Expression mask = IrFactory.eINSTANCE.createExprBinary(
+								sum, OpBinary.BITAND, maskValue,
+								IrFactory.eINSTANCE.createTypeInt(32));
 
-					load.getIndexes().add(mask);
-				} else {
-					Expression mask2 = IrFactory.eINSTANCE.createExprBinary(
-							index, OpBinary.BITAND, maskValue,
-							IrFactory.eINSTANCE.createTypeInt(32));
-					load.getIndexes().add(mask2);
+						load.getIndexes().add(mask);
+					} else {
+						Expression mask2 = IrFactory.eINSTANCE
+								.createExprBinary(index, OpBinary.BITAND,
+										maskValue,
+										IrFactory.eINSTANCE.createTypeInt(32));
+						load.getIndexes().add(mask2);
+					}
 				}
 			}
 			return null;
@@ -149,7 +155,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		public Object caseInstLoad(InstLoad load) {
 			if (load.getSource().getVariable().getName().equals(port.getName())) {
 				Use useArray = IrFactory.eINSTANCE.createUse(tab);
-				EcoreHelper.removeUses(load.getSource().getVariable());
 				EcoreHelper.delete(load.getSource().getVariable());
 				load.setSource(useArray);
 			}
@@ -177,7 +182,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			if (store.getTarget().getVariable().getName()
 					.equals(port.getName())) {
 				Def target = IrFactory.eINSTANCE.createDef(tab);
-				EcoreHelper.removeUses(store.getTarget().getVariable());
 				EcoreHelper.delete(store.getTarget().getVariable());
 				store.setTarget(target);
 			}
@@ -245,6 +249,26 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		actor.setFsm(fsm);
 	}
 
+	@Override
+	public Object caseActor(Actor actor) {
+		this.actor = actor;
+		inputIndex = 0;
+		outputIndex = 0;
+		repeatInput = false;
+		repeatOutput = false;
+		bufferSize = 0;
+		AddedUntaggedActions = new ArrayList<Action>();
+		inputBuffers = new ArrayList<Var>();
+		inputPorts = new ArrayList<Port>();
+		noRepeatActions = new ArrayList<Action>();
+		readIndexes = new ArrayList<Var>();
+		statesMap = new HashMap<String, State>();
+		writeIndexes = new ArrayList<Var>();
+		modifyRepeatActionsInFSM();
+		modifyUntaggedActions(actor);
+		return null;
+	}
+
 	/**
 	 * This method adds instructions for an action to read from a specific
 	 * buffer at a specific index
@@ -281,6 +305,42 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		Instruction store = IrFactory.eINSTANCE.createInstStore(writeIndex,
 				IrFactory.eINSTANCE.createExprVar(indexInc));
 		bodyNode.add(store);
+	}
+
+	/**
+	 * This method copies the output patterns from a source action to a target
+	 * one
+	 * 
+	 * @param source
+	 *            source action
+	 * @param target
+	 *            target action
+	 */
+	private void copyInputPattern(Action source, Action target) {
+		Pattern targetPattern = target.getInputPattern();
+		Pattern sourcePattern = source.getInputPattern();
+		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
+		targetPattern.getPorts().addAll(sourcePattern.getPorts());
+		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
+		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
+	}
+
+	/**
+	 * This method copies the output patterns from a source action to a target
+	 * one
+	 * 
+	 * @param source
+	 *            source action
+	 * @param target
+	 *            target action
+	 */
+	private void copyOutputPattern(Action source, Action target) {
+		Pattern targetPattern = target.getOutputPattern();
+		Pattern sourcePattern = source.getOutputPattern();
+		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
+		targetPattern.getPorts().addAll(sourcePattern.getPorts());
+		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
+		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
 	}
 
 	/**
@@ -958,7 +1018,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 						ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 								buffer, writeIndex, port, bufferSize);
-						modifyActionScheduler.doSwitch(action);
+						modifyActionScheduler.doSwitch(action.getBody());
+						modifyActionScheduler.doSwitch(action.getScheduler());
 						modifyActionSchedulability(action, writeIndex,
 								readIndex, OpBinary.NE,
 								IrFactory.eINSTANCE.createExprInt(0), port);
@@ -1085,42 +1146,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 			itNode.remove();
 			newProc.getNodes().add(node);
 		}
-	}
-
-	/**
-	 * This method copies the output patterns from a source action to a target
-	 * one
-	 * 
-	 * @param source
-	 *            source action
-	 * @param target
-	 *            target action
-	 */
-	private void copyOutputPattern(Action source, Action target) {
-		Pattern targetPattern = target.getOutputPattern();
-		Pattern sourcePattern = source.getOutputPattern();
-		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
-		targetPattern.getPorts().addAll(sourcePattern.getPorts());
-		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
-		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
-	}
-
-	/**
-	 * This method copies the output patterns from a source action to a target
-	 * one
-	 * 
-	 * @param source
-	 *            source action
-	 * @param target
-	 *            target action
-	 */
-	private void copyInputPattern(Action source, Action target) {
-		Pattern targetPattern = target.getInputPattern();
-		Pattern sourcePattern = source.getInputPattern();
-		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
-		targetPattern.getPorts().addAll(sourcePattern.getPorts());
-		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
-		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
 	}
 
 	/**
@@ -1361,7 +1386,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				action.getInputPattern().remove(verifPort);
 				ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 						buffer, writeIndex, verifPort, bufferSize);
-				modifyActionScheduler.doSwitch(action);
+				modifyActionScheduler.doSwitch(action.getBody());
+				modifyActionScheduler.doSwitch(action.getScheduler());
 				modifyActionSchedulability(action, writeIndex, readIndex,
 						OpBinary.GE,
 						IrFactory.eINSTANCE.createExprInt(verifNumTokens),
@@ -1391,15 +1417,17 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					writeIndexes.add(untagWriteIndex);
 					createUntaggedAction(untagReadIndex, untagWriteIndex,
 							untagBuffer, verifPort, false);
-					action.getInputPattern().remove(verifPort);
+
 					ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 							untagBuffer, untagWriteIndex, verifPort, bufferSize);
-					modifyActionScheduler.doSwitch(action);
+					modifyActionScheduler.doSwitch(action.getBody());
+					modifyActionScheduler.doSwitch(action.getScheduler());
 					modifyActionSchedulability(action, untagWriteIndex,
 							untagReadIndex, OpBinary.GE,
 							IrFactory.eINSTANCE.createExprInt(verifNumTokens),
 							verifPort);
 					updateUntagIndex(action, untagWriteIndex, verifNumTokens);
+					action.getInputPattern().remove(verifPort);
 				}
 			}
 		}
@@ -1506,26 +1534,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		Instruction store = IrFactory.eINSTANCE.createInstStore(writeIndex,
 				IrFactory.eINSTANCE.createExprVar(updatedIndex));
 		blkNode.add(store);
-	}
-
-	@Override
-	public Object caseActor(Actor actor) {
-		this.actor = actor;
-		inputIndex = 0;
-		outputIndex = 0;
-		repeatInput = false;
-		repeatOutput = false;
-		bufferSize = 0;
-		AddedUntaggedActions = new ArrayList<Action>();
-		inputBuffers = new ArrayList<Var>();
-		inputPorts = new ArrayList<Port>();
-		noRepeatActions = new ArrayList<Action>();
-		readIndexes = new ArrayList<Var>();
-		statesMap = new HashMap<String, State>();
-		writeIndexes = new ArrayList<Var>();
-		modifyRepeatActionsInFSM();
-		modifyUntaggedActions(actor);
-		return null;
 	}
 
 	/**
