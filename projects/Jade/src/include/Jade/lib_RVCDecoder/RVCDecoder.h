@@ -44,6 +44,12 @@
 extern "C" {
 #endif
 
+#ifdef WIN32
+#define Exported __declspec(dllexport)
+#else
+#define Exported
+#endif
+
 typedef struct{
 	int Width;
 	int Height;
@@ -53,11 +59,11 @@ typedef struct{
 } RVCFRAME;
 
 
-void rvc_init(char *XDF);
+Exported void rvc_init(char *XDF);
 
-int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME *Frame, int *LayerCommand);
+Exported int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME *Frame, int *LayerCommand);
 
-int rvc_close(void *PlayerStruct);
+Exported void rvc_close();
 
 #ifdef __cplusplus
 }

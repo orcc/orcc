@@ -169,9 +169,10 @@ int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME 
 	return 0;
 }
 
-int rvc_close(void *PlayerStruct){
+
+void rvc_close(){
 	delete decoder;
-	return 0;
+	delete engine;
 }
 
 #ifdef __cplusplus

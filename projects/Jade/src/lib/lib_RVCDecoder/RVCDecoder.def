@@ -1,8 +1,0 @@
-LIBRARY "lib_RVCDecoder.dll"
-
-EXPORTS
-rvc_init
-rvc_decode
-rvc_close
- 
- 
