@@ -31,13 +31,11 @@ package net.sf.orcc.tools.classifier.smt;
 import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -59,6 +57,8 @@ public class SmtSolver {
 	private Actor actor;
 
 	private IFolder output;
+
+	private boolean satisfied;
 
 	private String solver;
 
@@ -102,47 +102,36 @@ public class SmtSolver {
 				InputStream source = new ByteArrayInputStream(bos.toByteArray());
 				OrccUtil.setFileContents(file, source);
 
-				launchSolver(file);
+				satisfied = launchSolver(file);
 			}
 		} catch (Exception e) {
 			throw new OrccRuntimeException("could not execute solver", e);
 		}
 
-		return false;
+		return satisfied;
 	}
 
-	private void launchSolver(IFile file) throws IOException {
+	private boolean launchSolver(IFile file) throws IOException {
 		ProcessBuilder pb = new ProcessBuilder(solver, "+model", "+lang",
 				"smt2", file.getLocation().toOSString());
 		final Process process = pb.start();
 
 		// Output error message
-		new Thread() {
-			@Override
-			public void run() {
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(process.getInputStream()));
-				try {
-					String line = reader.readLine();
-					while (line != null) {
-						System.out.println(line);
-						line = reader.readLine();
-					}
-				} catch (IOException ioe) {
-					ioe.printStackTrace();
-				} finally {
-					try {
-						reader.close();
-					} catch (IOException e) {
-					}
-				}
-			}
-		}.start();
+		SmtSolverOutputProcessor processor = new SmtSolverOutputProcessor(
+				process.getInputStream());
+		Thread thread = new Thread(processor);
+		thread.start();
 
 		try {
 			process.waitFor();
+
+			// wait for all output to be processed
+			thread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+
+		return processor.isSatisfied();
 	}
+
 }
