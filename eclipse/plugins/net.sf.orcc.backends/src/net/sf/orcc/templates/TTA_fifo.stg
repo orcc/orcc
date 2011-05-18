@@ -1,0 +1,21 @@
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Hardware FIFO instruction
+///////////////////////////////////////////////////////////////////////////////
+
+printWrite(port, source, numberOfTokens) ::= <<
+tail call void asm sideeffect "STREAM_OUT_V1", "ir"(i32 %<source>) nounwind, !srcloc !3
+>>
+
+printRead(port, target, numberOfTokens) ::= <<
+%<target> = tail call i32 asm sideeffect "STREAM_IN_V1", "=r,ir"(i32 0) nounwind, !srcloc !2
+>>
+
+printPeek(port, target, numberOfTokens) ::= <<
+%<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V1", "=r,ir"(i32 0) nounwind, !srcloc !1
+>>
+
+printStatus(port, target, dir) ::= <<
+%<target> = tail call i32 asm sideeffect "STREAM_IN_STATUS_V1", "=r,ir"(i32 0) nounwind, !srcloc !0
+>>
