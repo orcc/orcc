@@ -195,7 +195,7 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	public void doInitializeOptions() {
 		mapping = getAttribute(MAPPING, new HashMap<String, String>());
-		classify = getAttribute("net.sf.orcc.backends.classify", true);
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 		merge = getAttribute("net.sf.orcc.backends.merge", false);
 		codesign = getAttribute("net.sf.orcc.backends.coDesign", false);
