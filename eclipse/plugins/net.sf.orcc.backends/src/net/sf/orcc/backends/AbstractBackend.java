@@ -540,7 +540,8 @@ public abstract class AbstractBackend implements Backend, IApplication {
 				compileXDF();
 				return IApplication.EXIT_OK;
 			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
+				System.err.println("Could not run the back-end with \""
+						+ args[1] + "\"");
 				e.printStackTrace();
 			}
 		} else {

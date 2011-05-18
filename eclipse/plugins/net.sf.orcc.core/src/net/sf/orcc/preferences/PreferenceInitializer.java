@@ -28,10 +28,7 @@
  */
 package net.sf.orcc.preferences;
 
-import net.sf.orcc.OrccActivator;
-
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 
 /**
  * This class initializes default preference values.
@@ -42,8 +39,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	@Override
 	public void initializeDefaultPreferences() {
-		new DefaultScope().getNode(OrccActivator.PLUGIN_ID).put(
-				PreferenceConstants.P_JADE, "");
+		// no default
 	}
 
 }

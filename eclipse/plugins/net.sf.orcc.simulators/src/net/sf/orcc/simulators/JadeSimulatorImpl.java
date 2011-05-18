@@ -55,7 +55,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
  * This class implements a simulator with the Just-In-Time Adaptive Decoder
@@ -106,7 +105,7 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 	 * input XDF network file name
 	 */
 	private IFile xdfFile;
-	
+
 	/**
 	 * XDF network flatten file
 	 */
@@ -126,20 +125,19 @@ public class JadeSimulatorImpl extends AbstractSimulator {
 
 	@Override
 	public void initializeOptions() {
-		
-		//Get project
+
+		// Get project
 		String name = getAttribute(PROJECT, "");
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		project = root.getProject(name);
-		
+
 		// Get configuration attributes
 		stimulusFile = getAttribute(INPUT_STIMULUS, "");
 		vtlFolder = getAttribute(VTL_FOLDER, "");
 		xdfFile = getFile(project, getAttribute(XDF_FILE, ""), "xdf");
 		tracesFolder = getAttribute(TRACES_FOLDER, "");
 		refVideo = getAttribute(REFERENCE_FILE, "");
-		execJade = new InstanceScope().getNode(OrccActivator.PLUGIN_ID).get(
-				P_JADE, "");
+		execJade = OrccActivator.getDefault().getPreference(P_JADE, "");
 
 		// Jade location has not been set
 		if (execJade.equals("")) {

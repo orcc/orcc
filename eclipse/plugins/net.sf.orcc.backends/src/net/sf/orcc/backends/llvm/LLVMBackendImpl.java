@@ -28,8 +28,9 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.preferences.PreferenceConstants.P_JADETOOLBOX;
+import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.OrccActivator;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -67,7 +67,6 @@ import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
 
 /**
  * LLVM back-end.
@@ -119,8 +118,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-		jadeToolbox = new ConfigurationScope().getNode(OrccActivator.PLUGIN_ID)
-				.get(P_JADETOOLBOX, "");
+		jadeToolbox = getDefault().getPreference(P_JADE_TOOLBOX, "");
 		debugMode = getAttribute(DEBUG_MODE, false);
 	}
 

@@ -37,6 +37,8 @@ public class PreferenceConstants {
 
 	public static final String P_JADE = "jadePath";
 
-	public static final String P_JADETOOLBOX = "jadeToolboxPath";
+	public static final String P_JADE_TOOLBOX = "jadeToolboxPath";
+
+	public static final String P_SOLVER = "solver";
 
 }
