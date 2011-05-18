@@ -369,9 +369,13 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			String name = configuration.getAttribute(PROJECT, "");
-			IProject project = root.getProject(name);
-			xdfFile = OrccUtil.getFile(project,
-					configuration.getAttribute(XDF_FILE, ""), "xdf");
+			if (!name.isEmpty()) {
+				IProject project = root.getProject(name);
+				if (project.exists()) {
+					xdfFile = OrccUtil.getFile(project,
+							configuration.getAttribute(XDF_FILE, ""), "xdf");
+				}
+			}
 		} catch (CoreException e) {
 			mapping = new HashMap<String, String>(0);
 			e.printStackTrace();
