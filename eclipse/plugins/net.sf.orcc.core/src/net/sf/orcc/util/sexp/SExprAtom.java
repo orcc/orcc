@@ -36,7 +36,17 @@ package net.sf.orcc.util.sexp;
  */
 public class SExprAtom extends SExpr {
 
-	private String atom;
+	private String contents;
+
+	/**
+	 * Creates a new atom with the given contents.
+	 * 
+	 * @param contents
+	 *            contents of the atom
+	 */
+	public SExprAtom(String contents) {
+		this.contents = contents;
+	}
 
 	/**
 	 * Returns the contents of this atom.
@@ -44,7 +54,7 @@ public class SExprAtom extends SExpr {
 	 * @return the contents of this atom
 	 */
 	public String getContents() {
-		return atom;
+		return contents;
 	}
 
 	@Override
@@ -59,7 +69,7 @@ public class SExprAtom extends SExpr {
 	 *            contents
 	 */
 	public void setContents(String contents) {
-		this.atom = contents;
+		this.contents = contents;
 	}
 
 }

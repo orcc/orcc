@@ -45,22 +45,74 @@ public class SExprParser {
 	}
 
 	public SExpr parse() {
-		if (pos >= stream.length) {
-			return null;
-		}
+		while (pos >= stream.length) {
+			char c = stream[pos++];
+			switch (c) {
+			case ' ':
+			case '\t':
+			case '\r':
+			case '\n':
+				// ignore whitespace
+				continue;
 
-		char c = stream[pos++];
-		switch (c) {
-		case ' ':
-		case '\t':
-		case '\r':
-		case '\n':
-			return parse();
-		
-		case '(':
-			
+			case ';':
+				// comment
+				c = stream[pos++];
+				while (pos < stream.length && !Character.isWhitespace(c)) {
+					c = stream[pos++];
+				}
+				break;
+
+			case '(':
+				// list
+				return parseList();
+
+			case '"':
+				// string
+				return parseString();
+			}
 		}
 		return null;
+	}
+
+	/**
+	 * Parses a list of s-expressions.
+	 * 
+	 * @return an SExprList
+	 */
+	private SExprList parseList() {
+		SExprList list = new SExprList();
+		SExpr expr = parse();
+		while (expr != null) {
+			list.getExpressions().add(expr);
+			expr = parse();
+		}
+		return list;
+	}
+
+	/**
+	 * Parses a string.
+	 * 
+	 * @return a SExprAtom
+	 */
+	private SExprAtom parseString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append('"');
+		while (pos < stream.length) {
+			char c = stream[pos++];
+			if (c == '\\') {
+				if (pos < stream.length) {
+					c = stream[pos++];
+				} else {
+					throw new IllegalStateException(
+							"unexpected back-slash at the end of file");
+				}
+			}
+			builder.append(c);
+		}
+		builder.append('"');
+
+		return new SExprAtom(builder.toString());
 	}
 
 }
