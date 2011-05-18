@@ -153,10 +153,15 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 
 		@Override
 		public Object caseInstLoad(InstLoad load) {
-			if (load.getSource().getVariable().getName().equals(port.getName())) {
-				Use useArray = IrFactory.eINSTANCE.createUse(tab);
-				EcoreHelper.delete(load.getSource().getVariable());
-				load.setSource(useArray);
+			Var varSource = load.getSource().getVariable();
+			Pattern pattern = EcoreHelper.getContainerOfType(varSource,
+					Pattern.class);
+			if (pattern != null) {
+				Port testPort = pattern.getPort(varSource);
+				if (port.equals(testPort)) {
+					// change tab Name
+					load.getSource().setVariable(tab);
+				}
 			}
 			return null;
 		}
@@ -178,15 +183,21 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		}
 
 		@Override
+		
 		public Object caseInstStore(InstStore store) {
-			if (store.getTarget().getVariable().getName()
-					.equals(port.getName())) {
-				Def target = IrFactory.eINSTANCE.createDef(tab);
-				EcoreHelper.delete(store.getTarget().getVariable());
-				store.setTarget(target);
+			Var varTarget = store.getTarget().getVariable();
+			Pattern pattern = EcoreHelper.getContainerOfType(varTarget,
+					Pattern.class);
+			if (pattern != null) {
+				Port testPort = pattern.getPort(varTarget);
+				if (port.equals(testPort)) {
+					// change tab Name
+					store.getTarget().setVariable(tab);
+				}
 			}
 			return null;
 		}
+		
 	}
 
 	private List<Action> AddedUntaggedActions;
