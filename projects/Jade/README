@@ -4,7 +4,11 @@ The JadeToolBox is an executable allowing an optimized generation of a proprieta
 
 Reader is invited to go to : http://orcc.sourceforge.net for finding more information about Jade.
 
+Input stimulus of decoders are available at : https://sourceforge.net/projects/orcc/files/Sequences/
 
+************************************************************************************************
+                                       Structure of the project
+************************************************************************************************
 The Jade project is structured as follow :
 - src contains the source of the Jade project
 - build the compiled tools for several operating systems (Windows, Linux and Mac Os)
@@ -13,19 +17,28 @@ The Jade project is structured as follow :
 
 The use of Jade is detailled in the enclosed COMMAND file.
 
+************************************************************************************************
+                                         Quick start
+************************************************************************************************
+Launch the following command line :
+./Jade -xdf ($XDF_FILE).xdf -i ($INPUT_SEQ).m4v -L ($VTL_FOLDER) -O3
+
+where :
+	XDF_FILE : The location of a network (for i. : Top_RVC.xdf for MPEG-4 SP)
+	INPUT_SEQ : The location of the input stimulus (for i. : hit001.m4v for MPEG-4 SP)
+	VTL_FOLDER :  The path of the VTL (for i. : ($home)/Jade/VTL/)
+
+************************************************************************************************
+										Compile Jade
+************************************************************************************************
+
 The compilation of this project requires the following libraries:
 - SDL-1.2.14 (http://www.libsdl.org)
 - LLVM 2.9 (http://llvm.org)
 
 The project is based on the Cross-platform Make CMake (at least 2.6), which can be found at http://www.cmake.org.
 
-If you are using Visual Studio 2010, 2008 or 2005, the two first libraries can be found in runtime folder. Simply run cmake.bat to automatically set environment variables.
+If you are using Visual Studio 2010, 2008 or 2005, the two first libraries can be found in runtime zip file. Simply run cmake.bat to automatically set environment variables.
 
 More information about Jade compilation can be found at http://orcc.sourceforge.net/drupal/?q=CompileJade.
 
-
-
-
-
-
-Documentation is already available at http://orcc.sourceforge.net/.
