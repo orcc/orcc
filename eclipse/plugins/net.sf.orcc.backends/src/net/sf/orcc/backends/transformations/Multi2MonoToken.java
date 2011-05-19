@@ -233,7 +233,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @param readIndex
 	 *            read index of the buffer
 	 */
-	private void actionToTransition(Action action, Var buffer, Var writeIndex,
+	private void actionToTransition(Port port, Action action, Var buffer, Var writeIndex,
 			Var readIndex) {
 		ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 				buffer, writeIndex, port, bufferSize);
@@ -580,7 +580,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				port.getName(), true, 0);
 
 		defineUntaggedBody(readIndex, storeList, newUntaggedAction.getBody(),
-				localINPUT);
+				localINPUT, port);
 		modifyActionSchedulability(newUntaggedAction, writeIndex, readIndex,
 				OpBinary.LT, IrFactory.eINSTANCE.createExprInt(bufferSize),
 				port);
@@ -733,7 +733,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 *            new untagged action body
 	 */
 	private void defineUntaggedBody(Var readCounter, Var storeList,
-			Procedure body, Var localINPUT) {
+			Procedure body, Var localINPUT, Port port) {
 		NodeBlock bodyNode = body.getFirst();
 
 		EList<Var> locals = body.getLocals();
@@ -1261,12 +1261,11 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						// schedulability
 						modifyDoneAction(counter, inputIndex, port.getName());
 					}
-					actionToTransition(action, untagBuffer, untagWriteIndex,
+					actionToTransition(port, action, untagBuffer, untagWriteIndex,
 							untagReadIndex);
 					// action.getInputPattern().remove(port);
 				}
 
-				
 				action.getBody().getNodes().clear();
 				NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
 				block = IrFactoryImpl.eINSTANCE.createNodeBlock();
@@ -1373,14 +1372,13 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				.getNumTokensMap().entrySet()) {
 			int verifNumTokens = verifEntry.getValue();
 			Port verifPort = verifEntry.getKey();
-			entryType = verifPort.getType();
+			Type entryType = verifPort.getType();
 			bufferSize = 512;// OptimalBufferSize(action, verifPort);
 			if (inputPorts.contains(verifPort)) {
 				int position = portPosition(inputPorts, verifPort);
 				Var buffer = inputBuffers.get(position);
 				Var writeIndex = writeIndexes.get(position);
 				Var readIndex = readIndexes.get(position);
-				action.getInputPattern().remove(verifPort);
 				ModifyActionScheduler modifyActionScheduler = new ModifyActionScheduler(
 						buffer, writeIndex, verifPort, bufferSize);
 				modifyActionScheduler.doSwitch(action.getBody());
@@ -1390,6 +1388,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 						IrFactory.eINSTANCE.createExprInt(verifNumTokens),
 						verifPort);
 				updateUntagIndex(action, writeIndex, verifNumTokens);
+				action.getInputPattern().remove(verifPort);
 			} else {
 				if (verifNumTokens > 1) {
 					Var untagBuffer = IrFactory.eINSTANCE.createVar(0,
@@ -1428,6 +1427,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				}
 			}
 		}
+		AddedUntaggedActions.add(action);
 	}
 
 	/**
@@ -1495,6 +1495,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				}
 			}
 		}
+		AddedUntaggedActions.add(action);
 	}
 
 	/**
