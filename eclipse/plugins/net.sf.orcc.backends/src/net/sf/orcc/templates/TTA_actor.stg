@@ -17,8 +17,8 @@ printPeek(port, target, numberOfTokens) ::= <<
 %<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V1", "=r,ir"(i32 0) nounwind
 >>
 
-printStatus(port, target, dir) ::= <<
-%<target> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V1", "=r,ir"(i32 0) nounwind
+printStatus(port, dir) ::= <<
+%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V1", "=r,ir"(i32 0) nounwind
 >>
 
 
@@ -26,11 +26,58 @@ printStatus(port, target, dir) ::= <<
 // Scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-schedulerWithoutFSM(actions) ::= <<
+printPortsStatus(dir, ports) ::= <<
+<ports: { port | <printStatus(port, dir)> }; separator="\n">
+>>
 
+checkPort(dir, port, numTokens, index, index0) ::= <<
+%available_<dir>_<port.name> = icmp sge i32 %status_<port.name> <numTokens>
+%has_valid_<dir>s_<action.name>_<index> = and i1 %has_valid_<dir>s_<action.name>_<index0> %available_<dir>_<port.name>
+>>
+
+checkPattern(dir, pattern) ::= <<
+%has_valid_<dir>s_<action.name>_0 = true
+<pattern.ports: { port | <checkPort(dir, port, pattern.numTokensMap.(port), i, i0)> }; separator="\n">
+>>
+
+actionTest(action, restActions) ::= <<
+	; Action <action.name>
+	;; Input pattern
+	<checkPattern("input", action.inputPattern)>
+	%is_schedulable_<action.name> = call i1 @isSchedulable_<action.name> ()
+	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name> %has_valid_inputs_<action.name>_<length(action.inputPattern.ports)>
+	
+br i1 %is_fireable_<action.name>, label %bbXXX, label %bbZZZ
+
+bbXXX:
+	;; Output pattern
+	<checkPattern("output", action.outputPattern)>
+	
+br i1 %has_valid_outputs_<action.name>_<length(action.outputPattern.ports)>, label %bbYYY, label %bbZZZ
+	
+bbYYY:
+	call void @isSchedulable_<action.name> ()
+
+bbZZZ:
+	
+<printActions(restActions)>
+>>
+
+printActions(actions) ::= <<
+<if(first(actions))
+><actionTest(action=first(actions), restActions=rest(actions))><
+else
+>	; ---- End of untagged actions ----<
+endif>
+>>
+
+schedulerWithoutFSM(actions) ::= <<
+	; ---- Untagged actions ----
+<printActions(actions)>
 >>
 
 schedulerWithFSM(actions, fsm) ::= <<
+<printActions(actions)>
 
 >>
 
@@ -39,39 +86,44 @@ schedulerWithFSM(actions, fsm) ::= <<
 // Instance
 ///////////////////////////////////////////////////////////////////////////////
 
-instance(instance, options) ::= <<
+actor(actor, options) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Source file is "<instance.actor.file>"
+; Source file is "<actor.file>"
 
 declare i32 @printf(i8* noalias , ...) nounwind 
 
-<if(instance.actor.parameters)>
+<if(actor.parameters)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<instance.actor.parameters: actorParameter(); separator="\n">
+<actor.parameters: actorParameter(); separator="\n">
 <endif>
 
-<if(instance.actor.stateVars)>
+<if(actor.stateVars)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
-<instance.actor.stateVars: stateVar(); separator="\n">
+<actor.stateVars: stateVar(); separator="\n">
 <endif>
 
-<if(instance.actor.procs)>
+<if(actor.procs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-<instance.actor.procs: {proc | <procedure(procedure = proc)>}>
+<actor.procs: {proc | <procedure(procedure = proc)>}>
 <endif>
 
-<if(instance.actor.initializes)>
+<if(actor.initializes)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Initializes
-<instance.actor.initializes: printAction(); separator="\n\n">
+<actor.initializes: printAction(); separator="\n\n">
 <endif>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
-<instance.actor.actions: printAction(); separator="\n\n">
+<actor.actions: printAction(); separator="\n\n">
+
+>>
+
+instance(instance, options) ::= <<
+<actor(instance.actor, options)>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Action-scheduler
@@ -81,13 +133,16 @@ declare i32 @printf(i8* noalias , ...) nounwind
 
 define void @<instance.id>_scheduler() nounwind {
 entry:
+
 	br label %bb1
 bb1:
-	<if(instance.actor.fsm)
-	><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
-	else
-	><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
-	endif>
+	<printPortsStatus("input", instance.actor.inputs)>
+	<printPortsStatus("output", instance.actor.outputs)>
+<if(instance.actor.fsm)
+><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
+else
+><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
+endif>
 
 	br label %bb1
 }
