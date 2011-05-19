@@ -83,7 +83,7 @@ set(JADE_VTL_DIR ${JADE_MAIN_SRC_DIR}/vtl)
 option(GENERATE_DOCS "Generate documentation using doxygen.")
 
 if( GENERATE_DOCS)
-	add_subdirectory(../doc)
+	add_subdirectory(./doc)
 endif()
 
 
