@@ -1,12 +1,16 @@
 package net.sf.orcc.tools.classifier.smt;
 
+import static net.sf.orcc.ir.IrFactory.eINSTANCE;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.util.sexp.SExp;
-import net.sf.orcc.util.sexp.SExpAtom;
 import net.sf.orcc.util.sexp.SExpList;
 import net.sf.orcc.util.sexp.SExpParser;
 import net.sf.orcc.util.sexp.SExpSymbol;
@@ -19,12 +23,26 @@ import net.sf.orcc.util.sexp.SExpSymbol;
  */
 public class SmtSolverOutputProcessor implements Runnable {
 
-	private InputStream in;
+	private Map<String, Expression> assertions;
+
+	private BufferedReader reader;
 
 	private boolean satisfied;
 
 	public SmtSolverOutputProcessor(InputStream in) {
-		this.in = in;
+		assertions = new HashMap<String, Expression>();
+		reader = new BufferedReader(new InputStreamReader(in));
+	}
+
+	/**
+	 * Returns the assertions as a map between variable names and associated
+	 * values.
+	 * 
+	 * @return the assertions as a map between variable names and associated
+	 *         values
+	 */
+	public Map<String, Expression> getAssertions() {
+		return assertions;
 	}
 
 	/**
@@ -37,20 +55,51 @@ public class SmtSolverOutputProcessor implements Runnable {
 	}
 
 	/**
+	 * Parse the assertion encoded as the given list s-expression.
+	 * 
+	 * @param list
+	 *            a list s-expression
+	 */
+	private void parseAssertion(SExpList list) {
+		if (list.size() == 2) {
+			SExp exp = list.get(1);
+			if (exp.isSymbol()) {
+				// a single value => associate a symbol with "true"
+				String name = ((SExpSymbol) exp).getContents();
+				assertions.put(name, eINSTANCE.createExprBool(true));
+			} else if (exp.isList()) {
+				SExpList expList = (SExpList) exp;
+				if (expList.size() == 2
+						&& expList.startsWith(new SExpSymbol("not"))) {
+					// unary not
+					String name = expList.getSymbol(1).getContents();
+					assertions.put(name, eINSTANCE.createExprBool(false));
+				} else if (expList.size() == 3
+						&& expList.startsWith(new SExpSymbol("="))) {
+					// binary equals
+					String name = expList.getSymbol(1).getContents();
+					String value = expList.getSymbol(2).getContents();
+					assertions.put(name,
+							eINSTANCE.createExprInt(Integer.parseInt(value)));
+				}
+			}
+		}
+	}
+
+	/**
 	 * Parses expressions with the form <code>(assert expr)</code>
 	 * 
-	 * @param reader
 	 * @throws IOException
 	 */
-	private void parseAssertions(BufferedReader reader) throws IOException {
+	private void parseAssertions() throws IOException {
 		String line = reader.readLine();
 		while (line != null) {
 			SExpParser parser = new SExpParser(line);
 			SExp exp = parser.read();
 			if (exp != null && exp.isList()) {
 				SExpList list = (SExpList) exp;
-				if (!list.getExpressions().isEmpty()) {
-					SExp first = list.getExpressions().get(0);
+				if (list.startsWith(new SExpSymbol("assert"))) {
+					parseAssertion(list);
 				}
 			}
 
@@ -60,19 +109,19 @@ public class SmtSolverOutputProcessor implements Runnable {
 
 	@Override
 	public void run() {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		try {
 			String line = reader.readLine();
 			while (line != null) {
 				SExpParser parser = new SExpParser(line);
 				SExp exp = parser.read();
-				if (exp != null && exp.isAtom() && ((SExpAtom) exp).isSymbol()) {
+				if (exp != null && exp.isSymbol()) {
 					SExpSymbol symbol = (SExpSymbol) exp;
 					satisfied = "sat".equals(symbol.getContents());
 
 					// parse assertions (if there are any)
 					if (satisfied) {
-						parseAssertions(reader);
+						parseAssertions();
+						return;
 					}
 				}
 

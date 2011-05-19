@@ -37,10 +37,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -56,6 +59,8 @@ public class SmtSolver {
 
 	private Actor actor;
 
+	private Map<String, Expression> assertions;
+
 	private IFolder output;
 
 	private boolean satisfied;
@@ -70,6 +75,8 @@ public class SmtSolver {
 	 *            the actor
 	 */
 	public SmtSolver(Actor actor) {
+		assertions = new HashMap<String, Expression>();
+
 		this.actor = actor;
 		IFile file = actor.getFile();
 		output = OrccUtil.getOutputFolder(file.getProject());
@@ -85,6 +92,12 @@ public class SmtSolver {
 		throw new OrccRuntimeException("incorrect path of solver executable!");
 	}
 
+	/**
+	 * Checks if the given scripts are satisfiable.
+	 * 
+	 * @param scripts
+	 * @return
+	 */
 	public boolean checkSat(List<SmtScript> scripts) {
 		try {
 			for (SmtScript script : scripts) {
@@ -102,7 +115,7 @@ public class SmtSolver {
 				InputStream source = new ByteArrayInputStream(bos.toByteArray());
 				OrccUtil.setFileContents(file, source);
 
-				satisfied = launchSolver(file);
+				launchSolver(file);
 			}
 		} catch (Exception e) {
 			throw new OrccRuntimeException("could not execute solver", e);
@@ -111,7 +124,25 @@ public class SmtSolver {
 		return satisfied;
 	}
 
-	private boolean launchSolver(IFile file) throws IOException {
+	/**
+	 * Returns the assertions as a map between variable names and associated
+	 * values.
+	 * 
+	 * @return the assertions as a map between variable names and associated
+	 *         values
+	 */
+	public Map<String, Expression> getAssertions() {
+		return assertions;
+	}
+
+	/**
+	 * Launch the solver on the given file.
+	 * 
+	 * @param file
+	 *            a file
+	 * @throws IOException
+	 */
+	private void launchSolver(IFile file) throws IOException {
 		ProcessBuilder pb = new ProcessBuilder(solver, "+model", "+lang",
 				"smt2", file.getLocation().toOSString());
 		final Process process = pb.start();
@@ -131,7 +162,11 @@ public class SmtSolver {
 			e.printStackTrace();
 		}
 
-		return processor.isSatisfied();
+		// update satisfied and assertions fields
+		satisfied = processor.isSatisfied();
+		if (satisfied) {
+			assertions.putAll(processor.getAssertions());
+		}
 	}
 
 }
