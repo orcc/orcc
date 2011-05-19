@@ -37,20 +37,8 @@ package net.sf.orcc.util.sexp;
 public abstract class SExpAtom extends SExp {
 
 	@Override
-	public boolean isAtom() {
+	public boolean isAtomic() {
 		return true;
-	}
-
-	public boolean isNumber() {
-		return false;
-	}
-
-	public boolean isSymbol() {
-		return false;
-	}
-
-	public boolean isString() {
-		return false;
 	}
 
 }

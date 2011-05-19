@@ -48,6 +48,15 @@ public class SExpNumber extends SExpAtom {
 		this.contents = contents;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SExpNumber) {
+			SExpNumber other = (SExpNumber) obj;
+			return getContents() == other.getContents();
+		}
+		return false;
+	}
+
 	/**
 	 * Returns the contents of this atom.
 	 * 

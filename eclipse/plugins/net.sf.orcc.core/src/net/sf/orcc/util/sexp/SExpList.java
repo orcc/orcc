@@ -29,6 +29,7 @@
 package net.sf.orcc.util.sexp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -42,6 +43,42 @@ public class SExpList extends SExp {
 
 	private List<SExp> expressions;
 
+	/**
+	 * Creates a new s-expression list with the given expressions as initial
+	 * contents.
+	 * 
+	 * @param exps
+	 *            a list of s-expressions
+	 */
+	public SExpList(SExp... exps) {
+		getExpressions().addAll(Arrays.asList(exps));
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SExpList) {
+			SExpList other = (SExpList) obj;
+			return getExpressions().equals(other.getExpressions());
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the expression at the specified position in this list.
+	 * 
+	 * @param index
+	 *            position of the expression to return
+	 * @return the expression at the specified position in this list
+	 */
+	public SExp get(int index) {
+		return getExpressions().get(index);
+	}
+
+	/**
+	 * Returns the s-expressions in this s-expression.
+	 * 
+	 * @return the s-expressions in this s-expression
+	 */
 	public List<SExp> getExpressions() {
 		if (expressions == null) {
 			expressions = new ArrayList<SExp>();
@@ -50,9 +87,53 @@ public class SExpList extends SExp {
 		return expressions;
 	}
 
+	/**
+	 * Returns the symbol s-expression at the specified position in this list.
+	 * 
+	 * @param index
+	 *            position of the expression to return
+	 * @return the symbol s-expression at the specified position in this list
+	 * @throws IllegalStateException
+	 *             if the expression at the given index is not a symbol
+	 */
+	public SExpSymbol getSymbol(int index) {
+		SExp sexp = get(index);
+		if (!sexp.isSymbol()) {
+			throw new IllegalStateException(
+					"expression at the given index is not a symbol");
+		}
+		return (SExpSymbol) sexp;
+	}
+
 	@Override
 	public boolean isList() {
 		return true;
+	}
+
+	/**
+	 * Returns the number of expressions in this s-expression.
+	 * 
+	 * @return the number of expressions in this s-expression
+	 */
+	public int size() {
+		return getExpressions().size();
+	}
+
+	/**
+	 * Returns <code>true</code> if this s-expression starts with the given
+	 * expression.
+	 * 
+	 * @param sexp
+	 *            a s-expression
+	 * @return <code>true</code> if this s-expression starts with the given
+	 *         expression
+	 */
+	public boolean startsWith(SExp sexp) {
+		Iterator<SExp> it = getExpressions().iterator();
+		if (it.hasNext()) {
+			return it.next().equals(sexp);
+		}
+		return false;
 	}
 
 	@Override
@@ -70,6 +151,16 @@ public class SExpList extends SExp {
 		builder.append(')');
 
 		return builder.toString();
+	}
+
+	/**
+	 * Adds the given expression to this list of s-expressions.
+	 * 
+	 * @param sexp
+	 *            a s-expression
+	 */
+	public void add(SExp sexp) {
+		getExpressions().add(sexp);
 	}
 
 }

@@ -48,6 +48,15 @@ public class SExpString extends SExpAtom {
 		this.contents = contents;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SExpString) {
+			SExpString other = (SExpString) obj;
+			return getContents().equals(other.getContents());
+		}
+		return false;
+	}
+
 	/**
 	 * Returns the contents of this atomic string s-expression.
 	 * 

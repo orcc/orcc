@@ -46,7 +46,16 @@ public class SExpSymbol extends SExpAtom {
 	 */
 	public SExpSymbol(String contents) {
 		this.contents = contents;
-	} 
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SExpSymbol) {
+			SExpSymbol other = (SExpSymbol) obj;
+			return getContents().equals(other.getContents());
+		}
+		return false;
+	}
 
 	/**
 	 * Returns the contents of this symbol.

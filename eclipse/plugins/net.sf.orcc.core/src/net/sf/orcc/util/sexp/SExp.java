@@ -28,13 +28,56 @@
  */
 package net.sf.orcc.util.sexp;
 
+/**
+ * This class defines a s-expression.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
 public abstract class SExp {
-	
-	public boolean isAtom() {
+
+	/**
+	 * Returns <code>true</code> if this s-expression is atomic.
+	 * 
+	 * @return <code>true</code> if this s-expression is atomic
+	 */
+	public boolean isAtomic() {
 		return false;
 	}
-	
+
+	/**
+	 * Returns <code>true</code> if this s-expression is a list.
+	 * 
+	 * @return <code>true</code> if this s-expression is a list
+	 */
 	public boolean isList() {
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if this s-expression is a number.
+	 * 
+	 * @return <code>true</code> if this s-expression is a number
+	 */
+	public boolean isNumber() {
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if this s-expression is a string.
+	 * 
+	 * @return <code>true</code> if this s-expression is a string
+	 */
+	public boolean isString() {
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if this s-expression is a symbol.
+	 * 
+	 * @return <code>true</code> if this s-expression is a symbol
+	 */
+	public boolean isSymbol() {
 		return false;
 	}
 
