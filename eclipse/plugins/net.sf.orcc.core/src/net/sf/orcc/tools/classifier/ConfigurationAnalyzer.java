@@ -95,8 +95,8 @@ public class ConfigurationAnalyzer {
 		for (Action targetAction : fsm.getTargetActions(initialState)) {
 			// create the configuration for this action
 			GuardSatChecker checker = new GuardSatChecker(actor);
-			Map<Port, Expression> configuration = checker.getConfiguration(
-					previous, targetAction);
+			Map<Port, Expression> configuration = checker.computeTokenValues(
+					ports, previous, targetAction);
 
 			// add the configuration
 			configurations.put(targetAction, configuration);

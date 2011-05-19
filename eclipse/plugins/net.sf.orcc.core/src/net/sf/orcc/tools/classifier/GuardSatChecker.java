@@ -31,12 +31,15 @@ package net.sf.orcc.tools.classifier;
 import static net.sf.orcc.ir.util.EcoreHelper.getContainerOfType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
@@ -49,6 +52,7 @@ import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -59,11 +63,14 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.tools.classifier.smt.SmtLogic;
 import net.sf.orcc.tools.classifier.smt.SmtScript;
 import net.sf.orcc.tools.classifier.smt.SmtSolver;
+import net.sf.orcc.util.sexp.SExpList;
+import net.sf.orcc.util.sexp.SExpSymbol;
 
 /**
  * This class defines a satisfiability checker for guards of actions. The
@@ -429,10 +436,85 @@ public class GuardSatChecker {
 		return new SmtSolver(actor).checkSat(translator.getScripts());
 	}
 
-	public Map<Port, Expression> getConfiguration(List<Action> previous,
-			Action action) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Computes a map from ports to token values so that the given action will
+	 * be fireable, based on the given assertions.
+	 * 
+	 * @param action
+	 *            an action
+	 * @param assertions
+	 *            a list of assertions as a map between variable names and
+	 *            values
+	 * @return a map from ports to token values
+	 */
+	private Map<Port, Expression> computePortTokenMap(Action action,
+			Map<String, Expression> assertions) {
+		Pattern pattern = action.getPeekPattern();
+		Map<Port, Expression> portMap = new HashMap<Port, Expression>();
+		for (Entry<String, Expression> entry : assertions.entrySet()) {
+			String name = entry.getKey();
+			Var var = action.getScheduler().getLocal(name);
+			if (var != null) {
+				for (Def def : var.getDefs()) {
+					for (Use use : EcoreHelper.getUses(def.eContainer())) {
+						Port port = pattern.getPort(use.getVariable());
+						if (port != null) {
+							Expression value = entry.getValue();
+							portMap.put(port, value);
+						}
+					}
+				}
+			}
+		}
+
+		return portMap;
+	}
+
+	/**
+	 * Computes the values of tokens that when present on the given ports
+	 * satisfy the following two conditions:
+	 * <ol>
+	 * <li>no action in <code>others</code> can be fired</li>
+	 * <li>the given action can be fired</li>
+	 * </ol>
+	 * 
+	 * @param ports
+	 *            a list of ports
+	 * @param others
+	 *            a list of actions
+	 * @param action
+	 *            an action
+	 * @return a map that associate ports with values so that when token are
+	 *         peeked on ports in the map, values associated with them are given
+	 *         to the interpreter, which allows <code>action</code> to fire
+	 */
+	public Map<Port, Expression> computeTokenValues(List<Port> ports,
+			List<Action> others, Action action) {
+		SmtTranslator translator = new SmtTranslator();
+		SExpList assertion = new SExpList(new SExpSymbol("and"));
+
+		for (Action previous : others) {
+			translator.doSwitch(previous.getScheduler());
+			assertion.add(new SExpList(new SExpSymbol("not"), new SExpSymbol(
+					previous.getScheduler().getName())));
+		}
+
+		translator.doSwitch(action.getScheduler());
+		assertion.add(new SExpSymbol(action.getScheduler().getName()));
+
+		List<SmtScript> scripts = translator.getScripts();
+		SmtScript script = scripts.get(scripts.size() - 1);
+
+		// check whether the guards are compatible or not
+		SExpList sexpAssert = new SExpList(new SExpSymbol("assert"), assertion);
+		script.addCommand(sexpAssert.toString());
+		script.addCommand("(check-sat)");
+
+		SmtSolver solver = new SmtSolver(actor);
+		solver.checkSat(translator.getScripts());
+
+		// fills the map
+		return computePortTokenMap(action, solver.getAssertions());
 	}
 
 }
