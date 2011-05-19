@@ -40,7 +40,7 @@ checkPattern(dir, pattern) ::= <<
 <pattern.ports: { port | <checkPort(dir, port, pattern.numTokensMap.(port), i, i0)> }; separator="\n">
 >>
 
-actionTest(action, restActions) ::= <<
+actionTest(action) ::= <<
 	; Action <action.name>
 	;; Input pattern
 	<checkPattern("input", action.inputPattern)>
@@ -59,25 +59,20 @@ bbYYY:
 	call void @isSchedulable_<action.name> ()
 
 bbZZZ:
-	
-<printActions(restActions)>
 >>
 
-printActions(actions) ::= <<
-<if(first(actions))
-><actionTest(action=first(actions), restActions=rest(actions))><
-else
->	; ---- End of untagged actions ----<
-endif>
+printUntaggedActions(actions) ::= <<
+	; ---- Untagged actions ----
+<actions: actionTest(); separator="\n">
+	; ---- End of untagged actions ----
 >>
 
 schedulerWithoutFSM(actions) ::= <<
-	; ---- Untagged actions ----
-<printActions(actions)>
+<printUntaggedActions(actions)>
 >>
 
 schedulerWithFSM(actions, fsm) ::= <<
-<printActions(actions)>
+<printUntaggedActions(actions)>
 
 >>
 
