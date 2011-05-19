@@ -46,7 +46,7 @@ public class SExpSymbol extends SExpAtom {
 	 */
 	public SExpSymbol(String contents) {
 		this.contents = contents;
-	}
+	} 
 
 	/**
 	 * Returns the contents of this symbol.
@@ -70,6 +70,11 @@ public class SExpSymbol extends SExpAtom {
 	 */
 	public void setContents(String contents) {
 		this.contents = contents;
+	}
+
+	@Override
+	public String toString() {
+		return contents;
 	}
 
 }

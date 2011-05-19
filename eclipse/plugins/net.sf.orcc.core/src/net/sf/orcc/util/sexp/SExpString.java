@@ -72,4 +72,9 @@ public class SExpString extends SExpAtom {
 		this.contents = contents;
 	}
 
+	@Override
+	public String toString() {
+		return '"' + contents + '"';
+	}
+
 }

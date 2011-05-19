@@ -212,6 +212,7 @@ public class SExpParser {
 			if (x == ')') {
 				return list;
 			} else {
+				pos--;
 				list.getExpressions().add(read());
 			}
 		}

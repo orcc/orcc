@@ -29,6 +29,7 @@
 package net.sf.orcc.util.sexp;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ import java.util.List;
  * 
  */
 public class SExpList extends SExp {
-	
+
 	private List<SExp> expressions;
 
 	public List<SExp> getExpressions() {
@@ -52,6 +53,23 @@ public class SExpList extends SExp {
 	@Override
 	public boolean isList() {
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append('(');
+		Iterator<SExp> it = getExpressions().iterator();
+		if (it.hasNext()) {
+			builder.append(it.next().toString());
+			while (it.hasNext()) {
+				builder.append(' ');
+				builder.append(it.next().toString());
+			}
+		}
+		builder.append(')');
+
+		return builder.toString();
 	}
 
 }
