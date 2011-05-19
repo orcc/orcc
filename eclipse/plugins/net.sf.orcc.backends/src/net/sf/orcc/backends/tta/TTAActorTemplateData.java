@@ -105,7 +105,7 @@ public class TTAActorTemplateData {
 	private void computeStateToLabelMap(Actor actor) {
 		if (actor.hasFsm()) {
 			for (int i = 0; i < actor.getFsm().getStates().size(); i++) {
-				stateToLabelMap.put(actor.getFsm().getStates().get(i), i + 1);
+				stateToLabelMap.put(actor.getFsm().getStates().get(i), i);
 			}
 		}
 	}
@@ -122,6 +122,10 @@ public class TTAActorTemplateData {
 
 	public Map<Node, Integer> getNodeToLabelMap() {
 		return nodeToLabelMap;
+	}
+
+	public Map<State, Integer> getStateToLabelMap() {
+		return stateToLabelMap;
 	}
 
 }

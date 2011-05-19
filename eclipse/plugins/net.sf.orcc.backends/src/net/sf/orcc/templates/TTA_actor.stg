@@ -71,9 +71,18 @@ schedulerWithoutFSM(actions) ::= <<
 <printUntaggedActions(actions)>
 >>
 
+printFsmState(state) ::= <<
+i32 <instance.actor.templateData.stateToLabelMap.(state)>, label %s_<state.name>
+>>
+
+printFsmSwitch(fsm) ::= <<
+switch i32 @_FSM_state, label %default
+					<fsm.states: printFsmState(); separator="\n">
+>>
+
 schedulerWithFSM(actions, fsm) ::= <<
 <printUntaggedActions(actions)>
-
+	<printFsmSwitch(fsm)>
 >>
 
 
@@ -123,7 +132,7 @@ instance(instance, options) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Action-scheduler
 <if(instance.actor.fsm)>
-@_FSM_state = global i32 <instance.actor.templateData.stateToIntegerMap.(instance.actor.fsm.initialState)>
+@_FSM_state = global i32 <instance.actor.templateData.stateToLabelMap.(instance.actor.fsm.initialState)>
 <endif>
 
 define void @<instance.id>_scheduler() nounwind {
