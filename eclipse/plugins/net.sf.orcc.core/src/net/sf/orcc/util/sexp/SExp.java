@@ -28,30 +28,14 @@
  */
 package net.sf.orcc.util.sexp;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * This class defines a list s-expression.
- * 
- * @author Matthieu Wipliez
- * 
- */
-public class SExprList extends SExpr {
+public abstract class SExp {
 	
-	private List<SExpr> expressions;
-
-	public List<SExpr> getExpressions() {
-		if (expressions == null) {
-			expressions = new ArrayList<SExpr>();
-		}
-
-		return expressions;
+	public boolean isAtom() {
+		return false;
 	}
-
-	@Override
+	
 	public boolean isList() {
-		return true;
+		return false;
 	}
 
 }

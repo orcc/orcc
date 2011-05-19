@@ -28,14 +28,48 @@
  */
 package net.sf.orcc.util.sexp;
 
-public abstract class SExpr {
-	
-	public boolean isAtom() {
-		return false;
+/**
+ * This class defines an s-expression that is a quoted string.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
+public class SExpString extends SExpAtom {
+
+	private String contents;
+
+	/**
+	 * Creates a new atomic string s-expression with the given contents.
+	 * 
+	 * @param contents
+	 *            contents of this atomic string s-expression
+	 */
+	public SExpString(String contents) {
+		this.contents = contents;
 	}
-	
-	public boolean isList() {
-		return false;
+
+	/**
+	 * Returns the contents of this atomic string s-expression.
+	 * 
+	 * @return the contents of this atomic string s-expression
+	 */
+	public String getContents() {
+		return contents;
+	}
+
+	@Override
+	public boolean isString() {
+		return true;
+	}
+
+	/**
+	 * Sets the contents of this atomic string s-expression.
+	 * 
+	 * @param contents
+	 *            contents
+	 */
+	public void setContents(String contents) {
+		this.contents = contents;
 	}
 
 }

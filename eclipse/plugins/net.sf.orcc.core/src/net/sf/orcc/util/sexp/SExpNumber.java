@@ -29,90 +29,47 @@
 package net.sf.orcc.util.sexp;
 
 /**
- * This class defines a parser of S-Expressions.
+ * This class defines an s-expression that is a number.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class SExprParser {
+public class SExpNumber extends SExpAtom {
 
-	private int pos;
+	private int contents;
 
-	private char[] stream;
-
-	public SExprParser(String contents) {
-		this.stream = contents.toCharArray();
-	}
-
-	public SExpr parse() {
-		while (pos >= stream.length) {
-			char c = stream[pos++];
-			switch (c) {
-			case ' ':
-			case '\t':
-			case '\r':
-			case '\n':
-				// ignore whitespace
-				continue;
-
-			case ';':
-				// comment
-				c = stream[pos++];
-				while (pos < stream.length && !Character.isWhitespace(c)) {
-					c = stream[pos++];
-				}
-				break;
-
-			case '(':
-				// list
-				return parseList();
-
-			case '"':
-				// string
-				return parseString();
-			}
-		}
-		return null;
+	/**
+	 * Creates a new atom with the given contents.
+	 * 
+	 * @param contents
+	 *            contents of the atom
+	 */
+	public SExpNumber(int contents) {
+		this.contents = contents;
 	}
 
 	/**
-	 * Parses a list of s-expressions.
+	 * Returns the contents of this atom.
 	 * 
-	 * @return an SExprList
+	 * @return the contents of this atom
 	 */
-	private SExprList parseList() {
-		SExprList list = new SExprList();
-		SExpr expr = parse();
-		while (expr != null) {
-			list.getExpressions().add(expr);
-			expr = parse();
-		}
-		return list;
+	public int getContents() {
+		return contents;
+	}
+
+	@Override
+	public boolean isNumber() {
+		return true;
 	}
 
 	/**
-	 * Parses a string.
+	 * Sets the contents of this atom.
 	 * 
-	 * @return a SExprAtom
+	 * @param contents
+	 *            contents
 	 */
-	private SExprAtom parseString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append('"');
-		while (pos < stream.length) {
-			char c = stream[pos++];
-			if (c == '\\') {
-				if (pos < stream.length) {
-					c = stream[pos++];
-				} else {
-					throw new IllegalStateException(
-							"unexpected back-slash at the end of file");
-				}
-			}
-			builder.append(c);
-		}
-		builder.append('"');
-
-		return new SExprAtom(builder.toString());
+	public void setContents(int contents) {
+		this.contents = contents;
 	}
 
 }

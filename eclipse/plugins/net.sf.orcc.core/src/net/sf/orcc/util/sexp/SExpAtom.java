@@ -29,47 +29,28 @@
 package net.sf.orcc.util.sexp;
 
 /**
- * This class defines an atom s-expression.
+ * This class defines an atomic s-expression.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class SExprAtom extends SExpr {
-
-	private String contents;
-
-	/**
-	 * Creates a new atom with the given contents.
-	 * 
-	 * @param contents
-	 *            contents of the atom
-	 */
-	public SExprAtom(String contents) {
-		this.contents = contents;
-	}
-
-	/**
-	 * Returns the contents of this atom.
-	 * 
-	 * @return the contents of this atom
-	 */
-	public String getContents() {
-		return contents;
-	}
+public abstract class SExpAtom extends SExp {
 
 	@Override
 	public boolean isAtom() {
 		return true;
 	}
 
-	/**
-	 * Sets the contents of this atom.
-	 * 
-	 * @param contents
-	 *            contents
-	 */
-	public void setContents(String contents) {
-		this.contents = contents;
+	public boolean isNumber() {
+		return false;
+	}
+
+	public boolean isSymbol() {
+		return false;
+	}
+
+	public boolean isString() {
+		return false;
 	}
 
 }

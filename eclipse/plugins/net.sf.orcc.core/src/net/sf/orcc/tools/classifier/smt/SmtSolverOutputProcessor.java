@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import net.sf.orcc.util.sexp.SExprParser;
+import net.sf.orcc.util.sexp.SExp;
+import net.sf.orcc.util.sexp.SExpAtom;
+import net.sf.orcc.util.sexp.SExpList;
+import net.sf.orcc.util.sexp.SExpParser;
+import net.sf.orcc.util.sexp.SExpSymbol;
 
 /**
  * This class implements a runnable that processes the output of the SMT solver.
@@ -32,34 +36,47 @@ public class SmtSolverOutputProcessor implements Runnable {
 		return satisfied;
 	}
 
-	private void parseLine(String line) {
-		SExprParser parser = new SExprParser(line);
-		parser.parse();
+	/**
+	 * Parses expressions with the form <code>(assert expr)</code>
+	 * 
+	 * @param reader
+	 * @throws IOException
+	 */
+	private void parseAssertions(BufferedReader reader) throws IOException {
+		String line = reader.readLine();
+		while (line != null) {
+			SExpParser parser = new SExpParser(line);
+			SExp exp = parser.read();
+			if (exp != null && exp.isList()) {
+				SExpList list = (SExpList) exp;
+				if (!list.getExpressions().isEmpty()) {
+					SExp first = list.getExpressions().get(0);
+				}
+			}
+
+			line = reader.readLine();
+		}
 	}
 
 	@Override
 	public void run() {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		try {
-			// first find out if the answer is sat or unsat
 			String line = reader.readLine();
 			while (line != null) {
-				if ("sat".equals(line)) {
-					satisfied = true;
+				SExpParser parser = new SExpParser(line);
+				SExp exp = parser.read();
+				if (exp != null && exp.isAtom() && ((SExpAtom) exp).isSymbol()) {
+					SExpSymbol symbol = (SExpSymbol) exp;
+					satisfied = "sat".equals(symbol.getContents());
 
 					// parse assertions (if there are any)
-					line = reader.readLine();
-					while (line != null) {
-						System.out.println(line);
-						parseLine(line);
-						line = reader.readLine();
+					if (satisfied) {
+						parseAssertions(reader);
 					}
-					break;
-				} else if ("unsat".equals(line)) {
-					return;
-				} else {
-					line = reader.readLine();
 				}
+
+				line = reader.readLine();
 			}
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
