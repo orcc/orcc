@@ -1,12 +1,31 @@
-The Just-In-Time Adaptive Decoder Engine (Jade) is a new RVC decoder, based on the Low Level Virtual Machine (LLVM), that dynamically instantiates several RVC decoder descriptions produce by the LLVM back-end.
+The Just-In-Time Adaptive Decoder Engine (Jade) project as developped a new dynamic decoder, fully compliant with MPEG RVC paradigm and based on the Low Level Virtual Machine (LLVM).
+The Jade executable can dynamically instantiate several RVC decoder descriptions produced by the LLVM back-end of Orcc.
+The JadeToolBox is an executable allowing an optimized generation of a proprietary Video Tool Library.
 
-This project requires the following libraries:
+Reader is invited to go to : http://orcc.sourceforge.net for finding more information about Jade.
+
+
+The Jade project is structured as follow :
+- src contains the source of the Jade project
+- build the compiled tools for several operating systems (Windows, Linux and Mac Os)
+- doc contains all the documentation of the src project
+- VTL is the folder where the Video Tool Library as normalized in MPEG-C must be set.
+
+The use of Jade is detailled in the enclosed COMMAND file.
+
+The compilation of this project requires the following libraries:
 - SDL-1.2.14 (http://www.libsdl.org)
 - LLVM 2.9 (http://llvm.org)
 
 The project is based on the Cross-platform Make CMake (at least 2.6), which can be found at http://www.cmake.org.
 
 If you are using Visual Studio 2010, 2008 or 2005, the two first libraries can be found in runtime folder. Simply run cmake.bat to automatically set environment variables.
+
+More information about Jade compilation can be found at http://orcc.sourceforge.net/drupal/?q=CompileJade.
+
+
+
+
 
 
 Documentation is already available at http://orcc.sourceforge.net/.
