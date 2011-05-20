@@ -30,20 +30,20 @@ printPortsStatus(dir, ports) ::= <<
 <ports: { port | <printStatus(port, dir)> }; separator="\n">
 >>
 
-checkPort(dir, port, numTokens, index, index0) ::= <<
+checkPort(action, dir, port, numTokens, index, index0, state) ::= <<
 %available_<dir>_<port.name> = icmp sge i32 %status_<port.name> <numTokens>
 %has_valid_<dir>s_<action.name>_<index> = and i1 %has_valid_<dir>s_<action.name>_<index0> %available_<dir>_<port.name>
 >>
 
-checkPattern(dir, pattern) ::= <<
+checkPattern(action, dir, pattern, state=false) ::= <<
 %has_valid_<dir>s_<action.name>_0 = true
-<pattern.ports: { port | <checkPort(dir, port, pattern.numTokensMap.(port), i, i0)> }; separator="\n">
+<pattern.ports: { port | <checkPort(action, dir, port, pattern.numTokensMap.(port), i, i0, state)> }; separator="\n">
 >>
 
 actionTest(action) ::= <<
 	; Action <action.name>
 	;; Input pattern
-	<checkPattern("input", action.inputPattern)>
+	<checkPattern(action, "input", action.inputPattern)>
 	%is_schedulable_<action.name> = call i1 @isSchedulable_<action.name> ()
 	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name> %has_valid_inputs_<action.name>_<length(action.inputPattern.ports)>
 	
@@ -51,24 +51,57 @@ br i1 %is_fireable_<action.name>, label %bbXXX, label %bbZZZ
 
 bbXXX:
 	;; Output pattern
-	<checkPattern("output", action.outputPattern)>
+	<checkPattern(action, "output", action.outputPattern)>
 	
 br i1 %has_valid_outputs_<action.name>_<length(action.outputPattern.ports)>, label %bbYYY, label %bbZZZ
 	
 bbYYY:
 	call void @isSchedulable_<action.name> ()
+	br label %bb1
 
 bbZZZ:
 >>
 
-printUntaggedActions(actions) ::= <<
-	; ---- Untagged actions ----
+printActions(actions) ::= <<
+	; ------- Actions outside the FSM --------
 <actions: actionTest(); separator="\n">
-	; ---- End of untagged actions ----
+	; ---- End of actions outside the FSM ----
 >>
 
 schedulerWithoutFSM(actions) ::= <<
-<printUntaggedActions(actions)>
+<printActions(actions)>
+>>
+
+actionTestState(sourceState, transition) ::= <<
+	; Action <transition.action.name>
+	;; Input pattern
+	<checkPattern(transition.action, "input", transition.action.inputPattern, transition.state)>
+	%is_schedulable_<transition.action.name> = call i1 @isSchedulable_<transition.action.name> ()
+	%is_fireable_<transition.action.name> = and i1 %is_schedulable_<transition.action.name> %has_valid_inputs_<transition.action.name>_<length(transition.action.inputPattern.ports)>
+	
+br i1 %is_fireable_<transition.action.name>, label %bbXXX, label %bbZZZ
+
+bbXXX:
+	;; Output pattern
+	<checkPattern(transition.action, "output", transition.action.outputPattern, transition.state)>
+	
+br i1 %has_valid_outputs_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bbYYY, label %bbZZZ
+	
+bbYYY:
+	call void @isSchedulable_<transition.action.name> ()
+	store @_FSM_state, i32* <instance.actor.templateData.stateToLabelMap.(transition.state)>
+	br label %bb1
+	
+bbZZZ:
+>>
+
+schedulingStates(sourceState, transitionsList) ::= <<
+<transitionsList: { transition | <actionTestState(sourceState, transition)> }; separator="\n">
+>>
+
+printTransition(transitions) ::= <<
+s_<transitions.sourceState.name> :
+<schedulingStates(transitions.sourceState, transitions.list)>
 >>
 
 printFsmState(state) ::= <<
@@ -76,13 +109,16 @@ i32 <instance.actor.templateData.stateToLabelMap.(state)>, label %s_<state.name>
 >>
 
 printFsmSwitch(fsm) ::= <<
-switch i32 @_FSM_state, label %default
+%local_FSM_state = load i32* @_FSM_state
+switch i32 %local_FSM_state, label %default
 					<fsm.states: printFsmState(); separator="\n">
 >>
 
 schedulerWithFSM(actions, fsm) ::= <<
-<printUntaggedActions(actions)>
+<printActions(actions)>
 	<printFsmSwitch(fsm)>
+
+<fsm.transitions: printTransition(); separator="\n">
 >>
 
 
