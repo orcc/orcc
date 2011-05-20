@@ -31,25 +31,27 @@ printPortsStatus(dir, ports) ::= <<
 >>
 
 checkPort(action, dir, port, numTokens, index, index0, state) ::= <<
-%available_<dir>_<action.name>_<state.name>_<port.name> = icmp sge i32 %status_<port.name> <numTokens>
-%has_valid_<dir>s_<action.name>_<state.name>_<index> = and i1 %has_valid_<dir>s_<action.name>_<state.name>_<index0> %available_<dir>_<action.name>_<state.name>_<port.name>
+%available_<dir>_<state.name>_<action.name>_<port.name> = icmp sge i32 %status_<port.name> <numTokens>
+%has_valid_<dir>s_<state.name>_<action.name>_<index> = and i1 %has_valid_<dir>s_<state.name>_<action.name>_<index0> %available_<dir>_<state.name>_<action.name>_<port.name>
 >>
 
 checkPattern(action, dir, pattern, state=false) ::= <<
-%has_valid_<dir>s_<action.name>_<state.name>_0 = true
+%has_valid_<dir>s_<state.name>_<action.name>_0 = true
 <pattern.ports: { port | <checkPort(action, dir, port, pattern.numTokensMap.(port), i, i0, state)> }; separator="\n">
 >>
 
 actionTest(action) ::= <<
 	; Action <action.name>
+<if(!action.inputPattern.empty)>
 	;; Input pattern
 	<checkPattern(action, "input", action.inputPattern)>
 	%is_schedulable_<action.name> = call i1 @isSchedulable_<action.name> ()
-	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name> %has_valid_inputs_<action.name>_<length(action.inputPattern.ports)>
+	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name> %has_valid_inputs__<action.name>_<length(action.inputPattern.ports)>
 	
-br i1 %is_fireable_<action.name>, label %bb<action.name>_check_outputs, label %bb_<action.name>_unschedulable
+br i1 %is_fireable_<action.name>, label %bb_<action.name>_check_outputs, label %bb_<action.name>_unschedulable
+<endif>
 
-bb<action.name>_check_outputs:
+bb_<action.name>_check_outputs:
 	;; Output pattern
 	<checkPattern(action, "output", action.outputPattern)>
 	
@@ -59,7 +61,7 @@ bb_<action.name>_fire:
 	call void @isSchedulable_<action.name> ()
 	br label %bb1
 
-bb_<action.name>_unfireable:
+bb_<action.name>_unschedulable:
 >>
 
 printActions(actions) ::= <<
@@ -75,24 +77,24 @@ schedulerWithoutFSM(actions) ::= <<
 actionTestState(sourceState, transition) ::= <<
 	; Action <transition.action.name>
 	;; Input pattern
-	<checkPattern(transition.action, "input", transition.action.inputPattern, transition.state)>
-	%is_schedulable_<transition.action.name> = call i1 @isSchedulable_<transition.action.name> ()
-	%is_fireable_<transition.action.name> = and i1 %is_schedulable_<transition.action.name> %has_valid_inputs_<transition.action.name>_<length(transition.action.inputPattern.ports)>
+	<checkPattern(transition.action, "input", transition.action.inputPattern, sourceState)>
+	%is_schedulable_<sourceState.name>_<transition.action.name> = call i1 @isSchedulable_<transition.action.name> ()
+	%is_fireable_<sourceState.name>_<transition.action.name> = and i1 %is_schedulable_<sourceState.name>_<transition.action.name> %has_valid_inputs_<sourceState.name>_<transition.action.name>_<length(transition.action.inputPattern.ports)>
 	
-br i1 %is_fireable_<transition.action.name>, label %bbXXX, label %bbZZZ
+br i1 %is_fireable_<sourceState.name>_<transition.action.name>, label %bb_<sourceState.name>_<transition.action.name>_check_outputs, label %bb_<sourceState.name>_<transition.action.name>_unschedulable
 
-bbXXX:
+bb_<sourceState.name>_<transition.action.name>_check_outputs:
 	;; Output pattern
-	<checkPattern(transition.action, "output", transition.action.outputPattern, transition.state)>
+	<checkPattern(transition.action, "output", transition.action.outputPattern, sourceState)>
 	
-br i1 %has_valid_outputs_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bbYYY, label %bbZZZ
+br i1 %has_valid_outputs_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_<sourceState.name>_<transition.action.name>_unschedulable
 	
-bbYYY:
+bb_<sourceState.name>_<transition.action.name>_fire:
 	call void @isSchedulable_<transition.action.name> ()
 	store @_FSM_state, i32* <instance.actor.templateData.stateToLabelMap.(transition.state)>
 	br label %bb1
 	
-bbZZZ:
+bb_<sourceState.name>_<transition.action.name>_unschedulable:
 >>
 
 schedulingStates(sourceState, transitionsList) ::= <<
