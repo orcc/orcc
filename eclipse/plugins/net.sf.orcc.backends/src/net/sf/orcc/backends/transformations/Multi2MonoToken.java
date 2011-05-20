@@ -334,6 +334,24 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
 		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
 	}
+	
+	/**
+	 * This method copies the input patterns from a source action to a target
+	 * one
+	 * 
+	 * @param source
+	 *            source action
+	 * @param target
+	 *            target action
+	 */
+	private void copyInputPattern(Action source, Action target) {
+		Pattern targetPattern = target.getInputPattern();
+		Pattern sourcePattern = source.getInputPattern();
+		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
+		targetPattern.getPorts().addAll(sourcePattern.getPorts());
+		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
+		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
+	}
 
 	/**
 	 * This method creates an action with the given name.
@@ -1304,20 +1322,21 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				// create new process action if not created while treating
 				// inputs
 				if (!repeatInput) {
-					process = createProcessAction(action);
-					process.setInputPattern(EcoreHelper.copy(action.getInputPattern()));
+					//process = createProcessAction(action);
+					//process.setInputPattern(EcoreHelper.copy(action.getInputPattern()));
+					//copyInputPattern(action, process);
 					
-					State processState = IrFactory.eINSTANCE
-							.createState(processName);
-					action.getBody().getNodes().clear();
-					NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-					block = IrFactoryImpl.eINSTANCE.createNodeBlock();
-					block.add(IrFactory.eINSTANCE.createInstReturn());
-					action.getBody().getNodes().add(block);
+					//State processState = IrFactory.eINSTANCE
+						//	.createState(processName);
+					//action.getBody().getNodes().clear();
+					//NodeBlock block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+					//block = IrFactoryImpl.eINSTANCE.createNodeBlock();
+					//block.add(IrFactory.eINSTANCE.createInstReturn());
+					//action.getBody().getNodes().add(block);
 
-					fsm.getStates().add(processState);
-					fsm.replaceTarget(sourceState, action, processState);
-					fsm.addTransition(processState, process, writeState);
+					//fsm.getStates().add(processState);
+					fsm.replaceTarget(sourceState, action, writeState);
+					//fsm.addTransition(processState, process, writeState);
 				} else {
 					State processState = statesMap.get(processName);
 					fsm.replaceTarget(processState, process, writeState);
@@ -1337,10 +1356,15 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 					Var tab = createTab(listName, entryType, numTokens);
 					write = createWriteAction(action.getName(), counter, tab);
 					write.getOutputPattern().setNumTokens(port, 1);
-
+					if (!repeatInput) {
+						ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
+								tab);
+						modifyProcessActionWrite.doSwitch(action.getBody());
+					}else{
 					ModifyProcessActionWrite modifyProcessActionWrite = new ModifyProcessActionWrite(
 							tab);
 					modifyProcessActionWrite.doSwitch(process.getBody());
+					}
 					fsm.addTransition(writeState, write, writeState);
 
 					// create a new write done action once
@@ -1554,7 +1578,8 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		}
 		if (repeatOutput && !repeatInput) {
 			// input pattern already copied in process action
-			action.getInputPattern().clear();
+			//action.getInputPattern().getNumTokensMap().clear();
+			//action.getInputPattern().getPorts().clear();
 		}
 		if (!repeatInput && !noRepeatActions.contains(action)) {
 			noRepeatActions.add(action);
