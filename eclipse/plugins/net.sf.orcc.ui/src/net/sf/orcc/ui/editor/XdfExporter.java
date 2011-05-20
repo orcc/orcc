@@ -118,18 +118,22 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 		net.sf.orcc.network.Vertex source = vertexMap.get(edge.getSource());
 		net.sf.orcc.network.Vertex target = vertexMap.get(edge.getTarget());
 
-		String sourceName = (String) edge
-				.getValue(ObjectType.PARAMETER_SOURCE_PORT);
 		Port sourcePort = null;
-		if (sourceName != null) {
-			sourcePort = IrFactory.eINSTANCE.createPort(null, sourceName);
+		if ("Instance".equals(edge.getSource().getType().getName())) {
+			String sourceName = (String) edge
+					.getValue(ObjectType.PARAMETER_SOURCE_PORT);
+			if (sourceName != null) {
+				sourcePort = IrFactory.eINSTANCE.createPort(null, sourceName);
+			}
 		}
 
-		String targetName = (String) edge
-				.getValue(ObjectType.PARAMETER_TARGET_PORT);
 		Port targetPort = null;
-		if (targetName != null) {
-			targetPort = IrFactory.eINSTANCE.createPort(null, targetName);
+		if ("Instance".equals(edge.getTarget().getType().getName())) {
+			String targetName = (String) edge
+					.getValue(ObjectType.PARAMETER_TARGET_PORT);
+			if (targetName != null) {
+				targetPort = IrFactory.eINSTANCE.createPort(null, targetName);
+			}
 		}
 
 		// buffer size
