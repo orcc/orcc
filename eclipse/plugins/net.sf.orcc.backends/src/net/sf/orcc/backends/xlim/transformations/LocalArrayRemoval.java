@@ -31,6 +31,7 @@ package net.sf.orcc.backends.xlim.transformations;
 import java.util.ArrayList;
 
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
@@ -55,14 +56,19 @@ public class LocalArrayRemoval extends AbstractActorVisitor<Object> {
 		for (Var var : new ArrayList<Var>(procedure.getLocals())) {
 			if (var.getType().isList()) {
 				Var newVar = IrFactory.eINSTANCE.createVar(var.getType(),
-						var.getName() + procedure.getName(), true, var.getIndex());
+						var.getName()+"_"+procedure.getName(), true, var.getIndex());
 				newVar.setInitialValue(var.getInitialValue());
 				newVar.setGlobal(true);
-				var.setName(var.getName() + procedure.getName());
+
 				EList<Use> uses = var.getUses();
 				while (!uses.isEmpty()) {
 					uses.get(0).setVariable(newVar);
 				}
+				EList<Def> defs = var.getDefs();
+				while (!defs.isEmpty()){
+					defs.get(0).setVariable(newVar);
+				}
+				
 				EcoreHelper.delete(var);
 				stateVars.add(newVar);
 			}
