@@ -55,6 +55,13 @@ import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.WriteListener;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -520,30 +527,59 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		Map<?, ?> map = context.getArguments();
 		String[] args = (String[]) map
 				.get(IApplicationContext.APPLICATION_ARGS);
-		if (args.length == 3) {
-			String projectName = args[0];
-			String networkName = args[1];
-			String outputFolder = args[2];
 
-			Map<String, Object> options = new HashMap<String, Object>();
-			options.put(PROJECT, projectName);
-			options.put(XDF_FILE, networkName);
-			options.put(OUTPUT_FOLDER, outputFolder);
+		// create the command line parser
+		CommandLineParser parser = new PosixParser();
+
+		// configure the required options
+		Options options = new Options();
+		Option opt = new Option("p", "project", true, "project name");
+		opt.setRequired(true);
+		options.addOption(opt);
+
+		opt = new Option("o", "output", true, "output folder");
+		opt.setRequired(true);
+		options.addOption(opt);
+
+		// add optional options
+		options.addOption("c", "classify", false, "classify the given network");
+
+		try {
+			// parse the command line arguments
+			CommandLine line = parser.parse(options, args);
+
+			String projectName = line.getOptionValue('p');
+			String outputFolder = line.getOptionValue('o');
+			if (line.getArgs().length != 1) {
+				throw new ParseException("expected network name");
+			}
+			String networkName = line.getArgs()[0];
+
+			Map<String, Object> optionMap = new HashMap<String, Object>();
+			optionMap.put(PROJECT, projectName);
+			optionMap.put(XDF_FILE, networkName);
+			optionMap.put(OUTPUT_FOLDER, outputFolder);
+			if (line.hasOption('c')) {
+				optionMap.put("net.sf.orcc.backends.classify", true);
+			}
 
 			try {
-				setOptions(options);
+				setOptions(optionMap);
 				compileVTL();
 				compileXDF();
 				return IApplication.EXIT_OK;
 			} catch (Exception e) {
 				System.err.println("Could not run the back-end with \""
-						+ args[1] + "\"");
+						+ networkName + "\"");
 				e.printStackTrace();
 			}
-		} else {
-			System.err.println("Usage: " + getClass().getSimpleName()
-					+ " <project> <qualified.name.of.Network> <output folder>");
+		} catch (ParseException exp) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp(getClass().getSimpleName() + " [options] "
+					+ "-p project -o \"output folder\" "
+					+ "qualified.name.of.network", options);
 		}
+
 		return IApplication.EXIT_OK;
 	}
 
