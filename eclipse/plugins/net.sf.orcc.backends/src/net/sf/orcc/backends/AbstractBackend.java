@@ -48,7 +48,7 @@ import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.serialize.IRParser;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
@@ -60,7 +60,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -130,7 +129,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 	final public void compileVTL() throws OrccException {
 		// lists actors
 		write("Lists actors...\n");
-		List<IFile> vtlFiles = OrccUtil.getAllFiles("json", vtlFolders);
+		List<IFile> vtlFiles = OrccUtil.getAllFiles("ir", vtlFolders);
 		doVtlCodeGeneration(vtlFiles);
 	}
 
@@ -358,18 +357,15 @@ public abstract class AbstractBackend implements Backend, IApplication {
 
 		write("Parsing " + files.size() + " actors...\n");
 		List<Actor> actors = new ArrayList<Actor>();
-		try {
-			for (IFile file : files) {
-				Actor actor = new IRParser().parseActor(file.getContents());
-				actors.add(actor);
+		for (IFile file : files) {
+			Actor actor = EcoreHelper.deserializeActor(file);
+			actors.add(actor);
 
-				if (isCanceled()) {
-					break;
-				}
+			if (isCanceled()) {
+				break;
 			}
-		} catch (CoreException e) {
-			throw new OrccException("I/O error", e);
 		}
+
 		return actors;
 	}
 
