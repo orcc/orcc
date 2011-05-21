@@ -28,8 +28,6 @@
  */
 package net.sf.orcc;
 
-import org.eclipse.core.runtime.QualifiedName;
-
 /**
  * Constants associated with an Orcc project.
  * 
@@ -37,21 +35,10 @@ import org.eclipse.core.runtime.QualifiedName;
  * 
  */
 public interface OrccProperties {
-	
-	/**
-	 * Default value for {@value #COMPACTJSON}.
-	 */
-	public static final boolean DEFAULT_PRETTYPRINT = false;
 
 	/**
 	 * Prefix for Orcc properties
 	 */
 	public static final String PREFIX = "net.sf.orcc";
-	
-	/**
-	 * Property for producing compact json for Xtext front-end.
-	 */
-	public static final QualifiedName PRETTYPRINT_JSON = new QualifiedName(
-			PREFIX, "compactJson");
 
 }

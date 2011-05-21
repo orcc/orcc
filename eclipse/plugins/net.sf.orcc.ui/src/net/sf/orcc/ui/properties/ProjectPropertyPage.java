@@ -28,17 +28,11 @@
  */
 package net.sf.orcc.ui.properties;
 
-import static net.sf.orcc.OrccProperties.DEFAULT_PRETTYPRINT;
-import static net.sf.orcc.OrccProperties.PRETTYPRINT_JSON;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.PropertyPage;
@@ -51,8 +45,6 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * 
  */
 public class ProjectPropertyPage extends PropertyPage {
-
-	private Button prettyPrintIR;
 
 	private IProject project;
 
@@ -77,30 +69,12 @@ public class ProjectPropertyPage extends PropertyPage {
 		initialize();
 		createDescriptionLabel(composite);
 
-		Composite container = createTopLevelComposite(composite);
-
-		createControlPrettyPrint(container);
+		createTopLevelComposite(composite);
 
 		// apply dialog font to the whole composite
 		applyDialogFont(composite);
 
 		return composite;
-	}
-
-	private void createControlPrettyPrint(Composite parent) {
-		GridData data;
-
-		prettyPrintIR = new Button(parent, SWT.CHECK);
-		prettyPrintIR.setText("Pretty-print the IR");
-		prettyPrintIR.setToolTipText("Generate readable JSON files.");
-		data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		data.horizontalSpan = 3;
-		prettyPrintIR.setLayoutData(data);
-		try {
-			String selection = project.getPersistentProperty(PRETTYPRINT_JSON);
-			prettyPrintIR.setSelection(Boolean.valueOf(selection));
-		} catch (CoreException e) {
-		}
 	}
 
 	/**
@@ -135,43 +109,15 @@ public class ProjectPropertyPage extends PropertyPage {
 				+ project.getName()
 				+ ".\n"
 				+ "Please read tooltips for more information on configuration properties.");
-
-		try {
-			String prettyPrint = project
-					.getPersistentProperty(PRETTYPRINT_JSON);
-
-			if (prettyPrint == null) {
-				project.setPersistentProperty(PRETTYPRINT_JSON,
-						Boolean.toString(DEFAULT_PRETTYPRINT));
-
-			}
-		} catch (CoreException e) {
-		}
 	}
 
 	@Override
 	protected void performDefaults() {
 		super.performDefaults();
-		// Populate the owner text field with the default value
-		prettyPrintIR.setSelection(DEFAULT_PRETTYPRINT);
 	}
 
 	@Override
 	public boolean performOk() {
-		try {
-			String oldPrettyPrint = project
-					.getPersistentProperty(PRETTYPRINT_JSON);
-			String newPrettyPrint = Boolean.toString(prettyPrintIR
-					.getSelection());
-			project.setPersistentProperty(PRETTYPRINT_JSON, newPrettyPrint);
-			if (!oldPrettyPrint.equals(newPrettyPrint)) {
-				// build if new value is different from old value
-				project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
-			}
-		} catch (CoreException e) {
-			return false;
-		}
-
 		updateApplyButton();
 		return true;
 	}

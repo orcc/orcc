@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.cal.ui.builder;
 
-import static net.sf.orcc.OrccProperties.PRETTYPRINT_JSON;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -115,10 +113,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 
 		// set output folder
 		frontend.setOutputFolder(outputFolder);
-
-		// whether IR is to be pretty-printed or not
-		String compactIR = project.getPersistentProperty(PRETTYPRINT_JSON);
-		frontend.setPrettyPrint(Boolean.parseBoolean(compactIR));
 
 		ResourceSet set = context.getResourceSet();
 		monitor.beginTask("Building actors", context.getDeltas().size());
