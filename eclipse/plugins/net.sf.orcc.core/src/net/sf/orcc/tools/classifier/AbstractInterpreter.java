@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
@@ -89,8 +91,6 @@ public class AbstractInterpreter extends ActorInterpreter {
 		allocatePattern(outputPattern);
 
 		scheduledAction = action;
-		setSchedulableMode(false);
-
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
 			if (configuration != null && configuration.containsKey(port)
@@ -144,15 +144,20 @@ public class AbstractInterpreter extends ActorInterpreter {
 			}
 		}
 
-		// check isSchedulable procedure
+		// enable schedulable mode
 		setSchedulableMode(true);
-
-		Object result = doSwitch(action.getScheduler());
-		if (result == null) {
-			throw new OrccRuntimeException("could not determine if action "
-					+ action.toString() + " is schedulable");
+		try {
+			Object result = doSwitch(action.getScheduler());
+			if (result == null) {
+				throw new OrccRuntimeException("could not determine if action "
+						+ action.toString() + " is schedulable");
+			}
+			return (result instanceof ExprBool)
+					&& ((ExprBool) result).isValue();
+		} finally {
+			// disable schedulable mode
+			setSchedulableMode(false);
 		}
-		return (result instanceof ExprBool) && ((ExprBool) result).isValue();
 	}
 
 	/**
@@ -182,11 +187,11 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	public void visit(InstLoad instr) {
+	public Object caseInstLoad(InstLoad instr) {
 		Var target = instr.getTarget().getVariable();
 		Var source = instr.getSource().getVariable();
 		if (instr.getIndexes().isEmpty()) {
-			target.setValue(source.getValue());
+			target.setValue(EcoreUtil.copy(source.getValue()));
 		} else {
 			Expression value = source.getValue();
 			for (Expression index : instr.getIndexes()) {
@@ -200,19 +205,21 @@ public class AbstractInterpreter extends ActorInterpreter {
 					}
 				}
 			}
-			target.setValue(value);
+			target.setValue(EcoreUtil.copy(value));
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstPhi phi) {
+	public Object caseInstPhi(InstPhi phi) {
 		if (branch != -1) {
-			super.visit(phi);
+			return super.caseInstPhi(phi);
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstStore instr) {
+	public Object caseInstStore(InstStore instr) {
 		Var var = instr.getTarget().getVariable();
 		if (instr.getIndexes().isEmpty()) {
 			var.setValue(exprInterpreter.doSwitch(instr.getValue()));
@@ -234,20 +241,21 @@ public class AbstractInterpreter extends ActorInterpreter {
 				((ExprList) target).set(index, value);
 			}
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(NodeIf node) {
+	public Object caseNodeIf(NodeIf node) {
 		// Interpret first expression ("if" condition)
 		Expression condition = exprInterpreter.doSwitch(node.getCondition());
 
 		int oldBranch = branch;
 		if (condition != null && condition.isBooleanExpr()) {
 			if (((ExprBool) condition).isValue()) {
-				visit(node.getThenNodes());
+				doSwitch(node.getThenNodes());
 				branch = 0;
 			} else {
-				visit(node.getElseNodes());
+				doSwitch(node.getElseNodes());
 				branch = 1;
 			}
 
@@ -260,15 +268,16 @@ public class AbstractInterpreter extends ActorInterpreter {
 			branch = -1;
 		}
 
-		visit(node.getJoinNode());
+		doSwitch(node.getJoinNode());
 		branch = oldBranch;
+		return null;
 	}
 
 	@Override
-	public void visit(NodeWhile node) {
+	public Object caseNodeWhile(NodeWhile node) {
 		int oldBranch = branch;
 		branch = 0;
-		visit(node.getJoinNode());
+		doSwitch(node.getJoinNode());
 
 		// Interpret first expression ("while" condition)
 		Expression condition = exprInterpreter.doSwitch(node.getCondition());
@@ -276,8 +285,8 @@ public class AbstractInterpreter extends ActorInterpreter {
 		if (condition != null && condition.isBooleanExpr()) {
 			branch = 1;
 			while (((ExprBool) condition).isValue()) {
-				visit(node.getNodes());
-				visit(node.getJoinNode());
+				doSwitch(node.getNodes());
+				doSwitch(node.getJoinNode());
 
 				// Interpret next value of "while" condition
 				condition = exprInterpreter.doSwitch(node.getCondition());
@@ -294,6 +303,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 		}
 
 		branch = oldBranch;
+		return null;
 	}
 
 }
