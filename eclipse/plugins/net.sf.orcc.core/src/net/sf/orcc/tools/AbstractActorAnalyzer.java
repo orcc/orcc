@@ -28,16 +28,12 @@
  */
 package net.sf.orcc.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.serialize.IRParser;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.util.WriteListener;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -45,7 +41,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * 
  * @author Herve Yviquel
  * @author Matthieu Wipliez
- *
+ * 
  */
 public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 
@@ -96,22 +92,8 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 
 		Actor actor;
 
-		File file = new File(vtlFolder + inputFile);
-		if (!file.exists()) {
-			throw new OrccException("Actor \"" + inputFile
-					+ "\" not found! Did you compile the VTL?");
-		}
-
-		try {
-			InputStream in = new FileInputStream(file);
-			actor = new IRParser().parseActor(in);
-		} catch (OrccException e) {
-			throw new OrccException("Could not parse instance \"" + inputFile
-					+ "\" because: " + e.getLocalizedMessage(), e);
-		} catch (FileNotFoundException e) {
-			throw new OrccException("Actor \"" + inputFile
-					+ "\" not found! Did you compile the VTL?", e);
-		}
+		IFile file = null;
+		actor = EcoreHelper.deserializeActor(file);
 
 		if (isCanceled()) {
 			return;

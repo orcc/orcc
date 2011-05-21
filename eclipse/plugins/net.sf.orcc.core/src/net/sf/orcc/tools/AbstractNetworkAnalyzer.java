@@ -160,7 +160,7 @@ public abstract class AbstractNetworkAnalyzer implements NetworkAnalyzer {
 
 		// lists actors
 		listener.writeText("Lists actors...\n");
-		List<IFile> vtlFiles = OrccUtil.getAllFiles("json", vtlFolders);
+		List<IFile> vtlFiles = OrccUtil.getAllFiles("ir", vtlFolders);
 		doVtlAnalyzer(vtlFiles);
 	}
 
