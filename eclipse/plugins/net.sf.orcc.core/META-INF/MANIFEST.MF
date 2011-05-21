@@ -13,8 +13,7 @@ Require-Bundle: org.eclipse.core.resources;bundle-version="3.6.1",
  org.ietr.libs;bundle-version="1.2.8"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: .,
- lib/net.sf.orcc.runtime.jar
+Bundle-ClassPath: .
 Bundle-Vendor: IETR/INSA Rennes
 Export-Package: net.sf.orcc,
  net.sf.orcc.interpreter,
@@ -30,12 +29,8 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.network.transformations,
  net.sf.orcc.plugins,
  net.sf.orcc.preferences,
- net.sf.orcc.runtime,
- net.sf.orcc.runtime.actors,
  net.sf.orcc.tools.classifier,
  net.sf.orcc.tools.merger,
  net.sf.orcc.tools.normalizer,
  net.sf.orcc.tools.statistics,
- net.sf.orcc.util,
- std.io,
- std.video
+ net.sf.orcc.util

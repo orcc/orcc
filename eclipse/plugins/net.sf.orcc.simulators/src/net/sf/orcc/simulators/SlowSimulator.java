@@ -72,7 +72,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
-import std.io.Source;
+import std.io.impl.Source;
 
 /**
  * This class implements a simulator using a slow, visitor-based approach.
@@ -150,7 +150,7 @@ public class SlowSimulator extends AbstractSimulator {
 	}
 
 	protected void initializeNetwork(Network network) {
-		Source.fileName = stimulusFile;
+		Source.setFileName(stimulusFile);
 
 		for (Instance instance : network.getInstances()) {
 			ActorInterpreter interpreter = interpreters.get(instance);
