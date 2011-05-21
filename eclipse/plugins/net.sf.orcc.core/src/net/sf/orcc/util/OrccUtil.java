@@ -87,14 +87,14 @@ public class OrccUtil {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		folder = root.getFolder(path.uptoSegment(2));
 		if (!folder.exists()) {
-			folder.create(true, false, null);
+			folder.create(true, true, null);
 		}
 
 		// and then check all the descendants
 		for (int i = 2; i < n; i++) {
 			folder = folder.getFolder(new Path(path.segment(i)));
 			if (!folder.exists()) {
-				folder.create(true, false, null);
+				folder.create(true, true, null);
 			}
 		}
 	}
