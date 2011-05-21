@@ -136,15 +136,6 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 		return super.eIsSet(featureID);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof ExprInt) {
-			return getValue().equals(((ExprInt) obj).getValue());
-		} else {
-			return false;
-		}
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

@@ -43,4 +43,9 @@ public class DPNMoCImpl extends MoCImpl implements DPNMoC {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "DPN";
+	}
+
 } // DPNMoCImpl

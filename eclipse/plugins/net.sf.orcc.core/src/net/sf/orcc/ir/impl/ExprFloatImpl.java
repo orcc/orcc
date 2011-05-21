@@ -109,15 +109,6 @@ public class ExprFloatImpl extends ExpressionImpl implements ExprFloat {
 		return super.eIsSet(featureID);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof ExprFloat) {
-			return getValue().equals(((ExprFloat) obj).getValue());
-		} else {
-			return false;
-		}
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated

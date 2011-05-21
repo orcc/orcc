@@ -71,14 +71,17 @@ public class TimeDependencyAnalyzer {
 		GuardSatChecker checker = new GuardSatChecker(actor);
 		try {
 			if (checker.checkSat(previous, action)) {
-				System.out.println(actor + ": guards of actions " + previous
-						+ " and " + action + " are compatible");
+				System.out.println(actor.getName() + ": guards of actions "
+						+ previous.getName() + " and " + action.getName()
+						+ " are compatible");
 				return true;
 			}
 
 			return false;
 		} catch (OrccRuntimeException e) {
-			System.out.println(actor + ": could not evaluate guards");
+			System.err.println(actor.getName()
+					+ ": could not check time-dependency");
+			e.printStackTrace();
 			return true;
 		}
 	}

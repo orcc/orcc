@@ -133,9 +133,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 
 		// set and print MoC
 		actor.setMoC(moc);
-		System.out.println("MoC of " + actor.getName() + ":");
-		System.out.println(moc);
-		System.out.println();
+		System.out.println("MoC of " + actor.getName() + ": " + moc);
 	}
 
 	/**
@@ -170,8 +168,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 			interpreter.schedule();
 			csdfMoc.getActions().add(interpreter.getScheduledAction());
 			nbPhases++;
-		} while ((!state.isInitialState() || !interpreter.getFsmState().equals(
-				initialState))
+		} while ((!state.isInitialState() || interpreter.getFsmState() != initialState)
 				&& nbPhases < MAX_PHASES);
 
 		if (nbPhases == MAX_PHASES) {

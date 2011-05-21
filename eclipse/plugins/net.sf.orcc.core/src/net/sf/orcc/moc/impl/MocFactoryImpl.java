@@ -114,10 +114,11 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
 	 */
 	public CSDFMoC createCSDFMoC() {
 		CSDFMoCImpl csdfMoC = new CSDFMoCImpl();
+		csdfMoC.setInputPattern(IrFactory.eINSTANCE.createPattern());
+		csdfMoC.setOutputPattern(IrFactory.eINSTANCE.createPattern());
 		return csdfMoC;
 	}
 

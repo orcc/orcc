@@ -157,4 +157,12 @@ public class QSDFMoCImpl extends MoCImpl implements QSDFMoC {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("QSDF configurations: ");
+		builder.append(getConfigurations());
+		return builder.toString();
+	}
+
 } // QSDFMoCImpl

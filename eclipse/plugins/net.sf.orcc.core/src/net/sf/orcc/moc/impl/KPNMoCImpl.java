@@ -43,4 +43,9 @@ public class KPNMoCImpl extends MoCImpl implements KPNMoC {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "KPN";
+	}
+
 } // KPNMoCImpl
