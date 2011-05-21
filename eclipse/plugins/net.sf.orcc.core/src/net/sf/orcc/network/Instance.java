@@ -37,14 +37,13 @@ import java.util.TreeMap;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.serialize.IRParser;
+import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.runtime.CoreException;
 
 /**
  * This class defines an instance. An instance has an id, a class, parameters
@@ -307,7 +306,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	public void instantiate(List<IFolder> vtlFolders) throws OrccException {
 		String className = new File(clasz).getName();
 		for (IFolder path : vtlFolders) {
-			file = path.getFile(className.replace('.', '/') + ".json");
+			file = path.getFile(className.replace('.', '/') + ".ir");
 			if (file.exists()) {
 				break;
 			} else {
@@ -322,19 +321,14 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		}
 		actor = Network.getActorFromPool(className);
 		if (actor == null) {
-			// try and load the actor
-			try {
-				actor = new IRParser().parseActor(file.getContents());
-				Network.putActorInPool(className, actor);
-			} catch (OrccException e) {
-				throw new OrccException("Could not parse instance \"" + id
-						+ "\" because: " + e.getLocalizedMessage(), e);
-			} catch (CoreException e) {
+			actor = EcoreHelper.deserializeActor(file);
+			if (actor == null) {
 				throw new OrccException("Actor \"" + className
 						+ "\" not found!\nIf this actor has errors, please "
 						+ "correct them and try again; otherwise, try to "
-						+ "refresh/clean projects.", e);
+						+ "refresh/clean projects.");
 			}
+			Network.putActorInPool(className, actor);
 		}
 
 		// replace path-based class by actor class
