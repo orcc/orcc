@@ -334,24 +334,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
 		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
 	}
-	
-	/**
-	 * This method copies the input patterns from a source action to a target
-	 * one
-	 * 
-	 * @param source
-	 *            source action
-	 * @param target
-	 *            target action
-	 */
-	private void copyInputPattern(Action source, Action target) {
-		Pattern targetPattern = target.getInputPattern();
-		Pattern sourcePattern = source.getInputPattern();
-		targetPattern.getNumTokensMap().putAll(sourcePattern.getNumTokensMap());
-		targetPattern.getPorts().addAll(sourcePattern.getPorts());
-		targetPattern.getPortToVarMap().putAll(sourcePattern.getPortToVarMap());
-		targetPattern.getVarToPortMap().putAll(sourcePattern.getVarToPortMap());
-	}
 
 	/**
 	 * This method creates an action with the given name.
