@@ -150,7 +150,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 *            a native procedure
 	 * @return the result of calling the given procedure
 	 */
-	protected Object callNativeProcedure(Procedure procedure) {
+	protected Object callNativeProcedure(Procedure procedure,
+			List<Expression> parameters) {
 		return null;
 	}
 
@@ -243,6 +244,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 					System.out.print(String.valueOf(value));
 				}
 			}
+		} else if (proc.isNative()) {
+			callNativeProcedure(proc, callParams);
 		} else {
 			List<Var> procParams = proc.getParameters();
 			for (int i = 0; i < callParams.size(); i++) {
@@ -395,19 +398,15 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		if (procedure.isNative()) {
-			return callNativeProcedure(procedure);
-		} else {
-			// Allocate local List variables
-			for (Var local : procedure.getLocals()) {
-				Type type = local.getType();
-				if (type.isList()) {
-					local.setValue(listAllocator.doSwitch(type));
-				}
+		// Allocate local List variables
+		for (Var local : procedure.getLocals()) {
+			Type type = local.getType();
+			if (type.isList()) {
+				local.setValue(listAllocator.doSwitch(type));
 			}
-
-			return super.caseProcedure(procedure);
 		}
+
+		return super.caseProcedure(procedure);
 	}
 
 	/**
@@ -509,7 +508,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			// Get initializing procedure if any
 			for (Action action : actor.getInitializes()) {
 				if (isSchedulable(action)) {
-					doSwitch(action.getBody());
+					execute(action);
 					continue;
 				}
 			}

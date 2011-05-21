@@ -29,6 +29,7 @@
 package net.sf.orcc.simulators;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -78,13 +79,14 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 *            a native procedure
 	 * @return the result of calling the given procedure
 	 */
-	protected Object callNativeProcedure(Procedure procedure) {
-		int numParams = procedure.getParameters().size();
+	@Override
+	protected Object callNativeProcedure(Procedure procedure, List<Expression> parameters) {
+		int numParams = parameters.size();
 		Class<?>[] parameterTypes = new Class<?>[numParams];
 		Object[] args = new Object[numParams];
 		int i = 0;
-		for (Var parameter : procedure.getParameters()) {
-			args[i] = doSwitch(parameter.getValue());
+		for (Expression parameter : parameters) {
+			args[i] = doSwitch(parameter);
 			parameterTypes[i] = args[i].getClass();
 
 			i++;
