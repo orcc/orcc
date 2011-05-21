@@ -51,17 +51,17 @@ public class ListAllocator extends IrSwitch<Expression> {
 
 	@Override
 	public Expression caseTypeBool(TypeBool type) {
-		return IrFactory.eINSTANCE.createExprBool();
+		return IrFactory.eINSTANCE.createExprBool(false);
 	}
 
 	@Override
 	public Expression caseTypeFloat(TypeFloat type) {
-		return IrFactory.eINSTANCE.createExprFloat();
+		return IrFactory.eINSTANCE.createExprFloat(0.0f);
 	}
 
 	@Override
 	public Expression caseTypeInt(TypeInt type) {
-		return IrFactory.eINSTANCE.createExprInt();
+		return IrFactory.eINSTANCE.createExprInt(0);
 	}
 
 	@Override
@@ -77,12 +77,12 @@ public class ListAllocator extends IrSwitch<Expression> {
 
 	@Override
 	public Expression caseTypeString(TypeString type) {
-		return IrFactory.eINSTANCE.createExprString();
+		return IrFactory.eINSTANCE.createExprString("");
 	}
 
 	@Override
 	public Expression caseTypeUint(TypeUint type) {
-		return IrFactory.eINSTANCE.createExprInt();
+		return IrFactory.eINSTANCE.createExprInt(0);
 	}
 
 	@Override
