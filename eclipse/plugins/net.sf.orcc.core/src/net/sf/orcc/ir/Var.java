@@ -116,7 +116,7 @@ public interface Var extends EObject {
 	 * Returns the current value of this variable. Used by the interpreter.
 	 * 
 	 * @return the current value of this variable
-	 * @model containment="true"
+	 * @model containment="true" transient="true"
 	 */
 	Expression getValue();
 

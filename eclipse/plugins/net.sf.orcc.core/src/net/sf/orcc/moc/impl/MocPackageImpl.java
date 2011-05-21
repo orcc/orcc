@@ -367,9 +367,9 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 
 		initEClass(csdfMoCEClass, CSDFMoC.class, "CSDFMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getCSDFMoC_Actions(), theIrPackage.getAction(), null, "actions", null, 0, -1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getCSDFMoC_InputPattern(), theIrPackage.getPattern(), null, "inputPattern", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCSDFMoC_InputPattern(), theIrPackage.getPattern(), null, "inputPattern", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getCSDFMoC_NumberOfPhases(), ecorePackage.getEInt(), "numberOfPhases", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getCSDFMoC_OutputPattern(), theIrPackage.getPattern(), null, "outputPattern", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCSDFMoC_OutputPattern(), theIrPackage.getPattern(), null, "outputPattern", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(dpnMoCEClass, DPNMoC.class, "DPNMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 

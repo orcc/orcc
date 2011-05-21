@@ -237,7 +237,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Type" containment="true"
         resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Expression"
-        containment="true" resolveProxies="false"/>
+        transient="true" containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="assignable" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="global" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="uses" upperBound="-1" eType="#//Use"

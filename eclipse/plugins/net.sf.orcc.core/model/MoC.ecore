@@ -7,9 +7,11 @@
   <eClassifiers xsi:type="ecore:EClass" name="CSDFMoC" eSuperTypes="#//MoC">
     <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
         eType="ecore:EClass Ir.ecore#//Action"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="inputPattern" eType="ecore:EClass Ir.ecore#//Pattern"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputPattern" eType="ecore:EClass Ir.ecore#//Pattern"
+        containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="numberOfPhases" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="outputPattern" eType="ecore:EClass Ir.ecore#//Pattern"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputPattern" eType="ecore:EClass Ir.ecore#//Pattern"
+        containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DPNMoC" eSuperTypes="#//MoC"/>
   <eClassifiers xsi:type="ecore:EClass" name="KPNMoC" eSuperTypes="#//MoC"/>

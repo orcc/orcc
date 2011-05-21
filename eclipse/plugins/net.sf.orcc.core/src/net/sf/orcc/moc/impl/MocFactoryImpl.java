@@ -9,6 +9,7 @@ package net.sf.orcc.moc.impl;
 import java.util.Map;
 
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
 import net.sf.orcc.moc.KPNMoC;
@@ -175,6 +176,8 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	 */
 	public SDFMoC createSDFMoC() {
 		SDFMoCImpl sdfMoC = new SDFMoCImpl();
+		sdfMoC.setInputPattern(IrFactory.eINSTANCE.createPattern());
+		sdfMoC.setOutputPattern(IrFactory.eINSTANCE.createPattern());
 		sdfMoC.setNumberOfPhases(1);
 		return sdfMoC;
 	}

@@ -56,7 +56,7 @@ public interface CSDFMoC extends MoC {
 	 * Returns the input pattern of this CSDF MoC.
 	 * 
 	 * @return the input pattern of this CSDF MoC
-	 * @model
+	 * @model containment="true"
 	 */
 	Pattern getInputPattern();
 
@@ -90,7 +90,7 @@ public interface CSDFMoC extends MoC {
 	 * Returns the output pattern of this CSDF MoC.
 	 * 
 	 * @return the output pattern of this CSDF MoC
-	 * @model
+	 * @model containment="true"
 	 */
 	Pattern getOutputPattern();
 

@@ -100,7 +100,7 @@ public interface MocPackage extends EPackage {
 	int CSDF_MO_C__ACTIONS = MO_C_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Input Pattern</b></em>' reference.
+	 * The feature id for the '<em><b>Input Pattern</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -118,7 +118,7 @@ public interface MocPackage extends EPackage {
 	int CSDF_MO_C__NUMBER_OF_PHASES = MO_C_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Output Pattern</b></em>' reference.
+	 * The feature id for the '<em><b>Output Pattern</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -221,7 +221,7 @@ public interface MocPackage extends EPackage {
 	int SDF_MO_C__ACTIONS = CSDF_MO_C__ACTIONS;
 
 	/**
-	 * The feature id for the '<em><b>Input Pattern</b></em>' reference.
+	 * The feature id for the '<em><b>Input Pattern</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -239,7 +239,7 @@ public interface MocPackage extends EPackage {
 	int SDF_MO_C__NUMBER_OF_PHASES = CSDF_MO_C__NUMBER_OF_PHASES;
 
 	/**
-	 * The feature id for the '<em><b>Output Pattern</b></em>' reference.
+	 * The feature id for the '<em><b>Output Pattern</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -335,10 +335,10 @@ public interface MocPackage extends EPackage {
 	EReference getCSDFMoC_Actions();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.moc.CSDFMoC#getInputPattern <em>Input Pattern</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.moc.CSDFMoC#getInputPattern <em>Input Pattern</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Input Pattern</em>'.
+	 * @return the meta object for the containment reference '<em>Input Pattern</em>'.
 	 * @see net.sf.orcc.moc.CSDFMoC#getInputPattern()
 	 * @see #getCSDFMoC()
 	 * @generated
@@ -357,10 +357,10 @@ public interface MocPackage extends EPackage {
 	EAttribute getCSDFMoC_NumberOfPhases();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.moc.CSDFMoC#getOutputPattern <em>Output Pattern</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.moc.CSDFMoC#getOutputPattern <em>Output Pattern</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Output Pattern</em>'.
+	 * @return the meta object for the containment reference '<em>Output Pattern</em>'.
 	 * @see net.sf.orcc.moc.CSDFMoC#getOutputPattern()
 	 * @see #getCSDFMoC()
 	 * @generated
@@ -511,7 +511,7 @@ public interface MocPackage extends EPackage {
 		 */
 		EReference CSDF_MO_C__ACTIONS = eINSTANCE.getCSDFMoC_Actions();
 		/**
-		 * The meta object literal for the '<em><b>Input Pattern</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Input Pattern</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -525,7 +525,7 @@ public interface MocPackage extends EPackage {
 		 */
 		EAttribute CSDF_MO_C__NUMBER_OF_PHASES = eINSTANCE.getCSDFMoC_NumberOfPhases();
 		/**
-		 * The meta object literal for the '<em><b>Output Pattern</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Output Pattern</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

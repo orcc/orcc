@@ -76,7 +76,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 * 
 	 * @return the class of the actor
 	 */
-	public void classify() {
+	private void classify() {
 		try {
 			IMarker[] markers = actor.getFile().findMarkers(IMarker.PROBLEM,
 					true, IResource.DEPTH_INFINITE);
@@ -92,7 +92,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		// checks for empty actors
 		List<Action> actions = actor.getActions();
 		if (actions.isEmpty()) {
-			System.out.println("actor " + actor
+			System.out.println("actor " + actor.getName()
 					+ " does not contain any actions, defaults to dynamic");
 			actor.setMoC(MocFactory.eINSTANCE.createKPNMoC());
 			return;
@@ -303,10 +303,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 			classify();
 			actor = null;
 		} catch (Exception e) {
-			System.out.println("Error of classification for actor " + actor
-					+ ":" + e);
-			System.out.println("Set actor moc of " + actor.getName()
-					+ " to default");
+			System.out.println("An exception occurred when classifying actor "
+					+ actor.getName() + ": " + e);
+			System.out.println("MoC set to DPN");
 			System.out.println();
 			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
 		}

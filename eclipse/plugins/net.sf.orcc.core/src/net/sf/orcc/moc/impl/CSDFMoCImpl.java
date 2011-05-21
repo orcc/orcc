@@ -11,13 +11,13 @@ import java.util.List;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MocPackage;
 
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
@@ -50,7 +50,7 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	protected EList<Action> actions;
 
 	/**
-	 * The cached value of the '{@link #getInputPattern() <em>Input Pattern</em>}' reference.
+	 * The cached value of the '{@link #getInputPattern() <em>Input Pattern</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
 	 * @see #getInputPattern()
@@ -80,7 +80,7 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	protected int numberOfPhases = NUMBER_OF_PHASES_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getOutputPattern() <em>Output Pattern</em>}' reference.
+	 * The cached value of the '{@link #getOutputPattern() <em>Output Pattern</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
 	 * @see #getOutputPattern()
@@ -89,13 +89,14 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 */
 	protected Pattern outputPattern;
 
+
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
 	 */
 	protected CSDFMoCImpl() {
 		super();
-		inputPattern = IrFactory.eINSTANCE.createPattern();
-		outputPattern = IrFactory.eINSTANCE.createPattern();
 	}
 
 	/**
@@ -106,7 +107,7 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 *            an action
 	 */
 	public void addAction(Action action) {
-		actions.add(action);
+		getActions().add(action);
 	}
 
 	/**
@@ -117,23 +118,7 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 *            an action
 	 */
 	public void addActions(List<Action> actions) {
-		this.actions.addAll(actions);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Pattern basicGetInputPattern() {
-		return inputPattern;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Pattern basicGetOutputPattern() {
-		return outputPattern;
+		getActions().addAll(actions);
 	}
 
 	/**
@@ -146,13 +131,11 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 			case MocPackage.CSDF_MO_C__ACTIONS:
 				return getActions();
 			case MocPackage.CSDF_MO_C__INPUT_PATTERN:
-				if (resolve) return getInputPattern();
-				return basicGetInputPattern();
+				return getInputPattern();
 			case MocPackage.CSDF_MO_C__NUMBER_OF_PHASES:
 				return getNumberOfPhases();
 			case MocPackage.CSDF_MO_C__OUTPUT_PATTERN:
-				if (resolve) return getOutputPattern();
-				return basicGetOutputPattern();
+				return getOutputPattern();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -249,15 +232,22 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * @generated
 	 */
 	public Pattern getInputPattern() {
-		if (inputPattern != null && inputPattern.eIsProxy()) {
-			InternalEObject oldInputPattern = (InternalEObject)inputPattern;
-			inputPattern = (Pattern)eResolveProxy(oldInputPattern);
-			if (inputPattern != oldInputPattern) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, MocPackage.CSDF_MO_C__INPUT_PATTERN, oldInputPattern, inputPattern));
-			}
-		}
 		return inputPattern;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetInputPattern(Pattern newInputPattern, NotificationChain msgs) {
+		Pattern oldInputPattern = inputPattern;
+		inputPattern = newInputPattern;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__INPUT_PATTERN, oldInputPattern, newInputPattern);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -276,11 +266,7 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * @return the number of tokens consumed by this port.
 	 */
 	public int getNumTokensConsumed(Port port) {
-		Integer numTokens = inputPattern.getNumTokens(port);
-		if (numTokens == null) {
-			return 0;
-		}
-		return numTokens;
+		return inputPattern.getNumTokens(port);
 	}
 
 	/**
@@ -291,11 +277,7 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * @return the number of tokens written to this port.
 	 */
 	public int getNumTokensProduced(Port port) {
-		Integer numTokens = outputPattern.getNumTokens(port);
-		if (numTokens == null) {
-			return 0;
-		}
-		return numTokens;
+		return outputPattern.getNumTokens(port);
 	}
 
 	/**
@@ -303,15 +285,22 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * @generated
 	 */
 	public Pattern getOutputPattern() {
-		if (outputPattern != null && outputPattern.eIsProxy()) {
-			InternalEObject oldOutputPattern = (InternalEObject)outputPattern;
-			outputPattern = (Pattern)eResolveProxy(oldOutputPattern);
-			if (outputPattern != oldOutputPattern) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, MocPackage.CSDF_MO_C__OUTPUT_PATTERN, oldOutputPattern, outputPattern));
-			}
-		}
 		return outputPattern;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetOutputPattern(Pattern newOutputPattern, NotificationChain msgs) {
+		Pattern oldOutputPattern = outputPattern;
+		outputPattern = newOutputPattern;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__OUTPUT_PATTERN, oldOutputPattern, newOutputPattern);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	@Override
@@ -324,10 +313,17 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * @generated
 	 */
 	public void setInputPattern(Pattern newInputPattern) {
-		Pattern oldInputPattern = inputPattern;
-		inputPattern = newInputPattern;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__INPUT_PATTERN, oldInputPattern, inputPattern));
+		if (newInputPattern != inputPattern) {
+			NotificationChain msgs = null;
+			if (inputPattern != null)
+				msgs = ((InternalEObject)inputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__INPUT_PATTERN, null, msgs);
+			if (newInputPattern != null)
+				msgs = ((InternalEObject)newInputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__INPUT_PATTERN, null, msgs);
+			msgs = basicSetInputPattern(newInputPattern, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__INPUT_PATTERN, newInputPattern, newInputPattern));
 	}
 
 	/**
@@ -360,10 +356,33 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	 * @generated
 	 */
 	public void setOutputPattern(Pattern newOutputPattern) {
-		Pattern oldOutputPattern = outputPattern;
-		outputPattern = newOutputPattern;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__OUTPUT_PATTERN, oldOutputPattern, outputPattern));
+		if (newOutputPattern != outputPattern) {
+			NotificationChain msgs = null;
+			if (outputPattern != null)
+				msgs = ((InternalEObject)outputPattern).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__OUTPUT_PATTERN, null, msgs);
+			if (newOutputPattern != null)
+				msgs = ((InternalEObject)newOutputPattern).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - MocPackage.CSDF_MO_C__OUTPUT_PATTERN, null, msgs);
+			msgs = basicSetOutputPattern(newOutputPattern, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, MocPackage.CSDF_MO_C__OUTPUT_PATTERN, newOutputPattern, newOutputPattern));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case MocPackage.CSDF_MO_C__INPUT_PATTERN:
+				return basicSetInputPattern(null, msgs);
+			case MocPackage.CSDF_MO_C__OUTPUT_PATTERN:
+				return basicSetOutputPattern(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	@Override
