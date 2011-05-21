@@ -47,6 +47,8 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
 import net.sf.orcc.util.OrccUtil;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -208,6 +210,22 @@ public class EcoreHelper {
 	}
 
 	/**
+	 * Deserializes the XMI representation of an actor stored in the given file,
+	 * and returns this actor.
+	 * 
+	 * @param file
+	 *            a .ir file
+	 * @return the actor serialized with XMI in the given file
+	 */
+	public static Actor deserializeActor(IFile file) {
+		ResourceSet set = new ResourceSetImpl();
+		Resource resource = set.getResource(URI.createPlatformResourceURI(file
+				.getFullPath().toString(), true), true);
+		Actor actor = (Actor) resource.getContents().get(0);
+		return actor;
+	}
+
+	/**
 	 * Returns the container of <code>ele</code> with the given type, or
 	 * <code>null</code> if no such container exists. This method has been
 	 * copied from the EcoreUtil2 class of Xtext.
@@ -319,12 +337,44 @@ public class EcoreHelper {
 	 * Serializes the given actor to the given output folder.
 	 * 
 	 * @param outputFolder
+	 *            an IFolder of the workspace
+	 * @param actor
+	 *            an actor
+	 * @return <code>true</code> if the serialization succeeded
+	 */
+	public static boolean serializeActor(IFolder outputFolder, Actor actor) {
+		URI uri = URI.createPlatformResourceURI(outputFolder.getFullPath()
+				.append(OrccUtil.getFile(actor)).addFileExtension("ir")
+				.toString(), true);
+		return serializeActor(uri, actor);
+	}
+
+	/**
+	 * Serializes the given actor to the given output folder.
+	 * 
+	 * @param outputFolder
 	 *            output folder
 	 * @param actor
 	 *            an actor
 	 * @return <code>true</code> if the serialization succeeded
 	 */
 	public static boolean serializeActor(String outputFolder, Actor actor) {
+		String pathName = outputFolder + File.separator
+				+ OrccUtil.getFile(actor) + ".ir";
+		URI uri = URI.createFileURI(pathName);
+		return serializeActor(uri, actor);
+	}
+
+	/**
+	 * Serializes the given actor to the given URI.
+	 * 
+	 * @param uri
+	 *            URI
+	 * @param actor
+	 *            an actor
+	 * @return <code>true</code> if the serialization succeeded
+	 */
+	private static boolean serializeActor(URI uri, Actor actor) {
 		// check that the factory is registered
 		// (only happens in command-line mode)
 		// ...
@@ -339,9 +389,7 @@ public class EcoreHelper {
 
 		// serialization
 		ResourceSet set = new ResourceSetImpl();
-		String pathName = outputFolder + File.separator
-				+ OrccUtil.getFile(actor) + ".ir";
-		Resource resource = set.createResource(URI.createFileURI(pathName));
+		Resource resource = set.createResource(uri);
 		resource.getContents().add(actor);
 		try {
 			resource.save(null);
