@@ -47,7 +47,6 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 
 /**
@@ -76,21 +75,9 @@ public class AbstractInterpreter extends ActorInterpreter {
 	 *            a configuration analyzer
 	 */
 	public AbstractInterpreter(Actor actor) {
-		super(new HashMap<String, Expression>(), actor);
+		super(actor, new HashMap<String, Expression>(0));
 
 		exprInterpreter = new AbstractExpressionEvaluator();
-	}
-
-	@Override
-	protected Object callNativeProcedure(Procedure procedure) {
-		// the abstract interpreter doesn't care about native procedures
-		return null;
-	}
-
-	@Override
-	protected boolean checkOutputPattern(Pattern outputPattern) {
-		// the abstract interpreter doesn't need to check output patterns
-		return true;
 	}
 
 	@Override
@@ -140,7 +127,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	@Override
 	protected boolean isSchedulable(Action action) {
-		// unlike parent, do not check the number of tokens present on FIFOs
+		// do not check the number of tokens present on FIFOs
 
 		// allocates peeked variables
 		Pattern pattern = action.getPeekPattern();

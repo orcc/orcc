@@ -65,9 +65,9 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 
 	private class SpecialActorInterpreter extends ActorInterpreter {
 
-		public SpecialActorInterpreter(Map<String, Expression> parameters,
-				Actor actor) {
-			super(parameters, actor);
+		public SpecialActorInterpreter(Actor actor,
+				Map<String, Expression> parameters) {
+			super(actor, parameters);
 		}
 
 		@Override
@@ -95,8 +95,8 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseActor(Actor actor) {
-		actorInterpreter = new SpecialActorInterpreter(
-				new HashMap<String, Expression>(0), actor);
+		actorInterpreter = new SpecialActorInterpreter(actor,
+				new HashMap<String, Expression>(0));
 
 		// Initialize value field if there is an initial value
 		for (Var stateVar : actor.getStateVars()) {
@@ -122,10 +122,11 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 				stateVar.setInitialValue(EcoreHelper.copy(stateVar.getValue()));
 			} else if (stateVar.getInitialValue() == null && initToZero) {
 				if (type.isList()) {
-					stateVar.setInitialValue(listAllocator.doSwitch(stateVar.getType()));
-				}
-				else {
-					stateVar.setInitialValue(IrFactory.eINSTANCE.createExprInt(0));
+					stateVar.setInitialValue(listAllocator.doSwitch(stateVar
+							.getType()));
+				} else {
+					stateVar.setInitialValue(IrFactory.eINSTANCE
+							.createExprInt(0));
 				}
 				initializeExpression(stateVar.getInitialValue());
 			}

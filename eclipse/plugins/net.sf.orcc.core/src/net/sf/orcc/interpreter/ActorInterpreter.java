@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.interpreter;
 
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,6 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
@@ -65,10 +63,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
-import net.sf.orcc.runtime.Fifo;
-import net.sf.orcc.runtime.Fifo_String;
-import net.sf.orcc.runtime.Fifo_boolean;
-import net.sf.orcc.runtime.Fifo_int;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -86,7 +80,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	/**
 	 * actor being interpreted
 	 */
-	private Actor actor;
+	protected Actor actor;
 
 	/**
 	 * branch being visited
@@ -94,12 +88,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	protected int branch;
 
 	protected ExpressionEvaluator exprInterpreter;
-
-	/**
-	 * Communication fifos map : key = related I/O port name; value =
-	 * Fifo_int/boolean/String
-	 */
-	private Map<String, Fifo> fifos;
 
 	/**
 	 * Actor's FSM current state
@@ -123,7 +111,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * @param actor
 	 *            actor class definition
 	 */
-	public ActorInterpreter(Map<String, Expression> parameters, Actor actor) {
+	public ActorInterpreter(Actor actor, Map<String, Expression> parameters) {
 		// Set instance name and actor class definition at parent level
 		this.actor = actor;
 
@@ -147,7 +135,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * @param pattern
 	 *            a pattern
 	 */
-	protected void allocatePattern(Pattern pattern) {
+	final protected void allocatePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Var var = pattern.getVariable(port);
 			var.setValue(listAllocator.doSwitch(var.getType()));
@@ -155,42 +143,15 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	}
 
 	/**
-	 * Calls the given native procedure. This method may be overridden if one
-	 * wishes not to call native procedures (e.g. abstract interpreter).
+	 * Calls the given native procedure. Does nothing by default. This method
+	 * may be overridden if one wishes to call native procedures.
 	 * 
 	 * @param procedure
 	 *            a native procedure
 	 * @return the result of calling the given procedure
 	 */
 	protected Object callNativeProcedure(Procedure procedure) {
-		int numParams = procedure.getParameters().size();
-		Class<?>[] parameterTypes = new Class<?>[numParams];
-		Object[] args = new Object[numParams];
-		int i = 0;
-		for (Var parameter : procedure.getParameters()) {
-			args[i] = doSwitch(parameter.getValue());
-			parameterTypes[i] = args[i].getClass();
-
-			i++;
-		}
-
-		String methodName = procedure.getName();
-		try {
-			Class<?> clasz = Class.forName(actor.getName());
-			Method method = clasz
-					.getMethod(procedure.getName(), parameterTypes);
-			Object res = method.invoke(null, args);
-			if (res instanceof Boolean) {
-				return IrFactory.eINSTANCE.createExprBool((Boolean) res);
-			} else if (res instanceof Integer) {
-				return IrFactory.eINSTANCE.createExprInt((Integer) res);
-			} else {
-				return null;
-			}
-		} catch (Exception e) {
-			throw new OrccRuntimeException(
-					"exception during native procedure call to " + methodName);
-		}
+		return null;
 	}
 
 	@Override
@@ -458,50 +419,17 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * @return true if the pattern is empty or satisfiable
 	 */
 	protected boolean checkOutputPattern(Pattern outputPattern) {
-		if (outputPattern != null) {
-			for (Port port : outputPattern.getPorts()) {
-				Integer nbOfTokens = outputPattern.getNumTokens(port);
-				if (!fifos.get(port.getName()).hasRoom(nbOfTokens)) {
-					return false;
-				}
-			}
-		}
 		return true;
 	}
 
 	/**
-	 * Executes the given action.
+	 * Executes the given action. Does nothing by default. May be overriden by
+	 * implementations.
 	 * 
 	 * @param action
+	 *            an action
 	 */
-	public void execute(Action action) {
-		// allocate patterns
-		Pattern inputPattern = action.getInputPattern();
-		Pattern outputPattern = action.getOutputPattern();
-		allocatePattern(inputPattern);
-		allocatePattern(outputPattern);
-
-		for (Port port : inputPattern.getPorts()) {
-			int numTokens = inputPattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port.getName());
-			peekFifo(inputPattern.getVariable(port).getValue(), fifo, numTokens);
-		}
-
-		// Interpret the whole action
-		doSwitch(action.getBody());
-
-		for (Port port : inputPattern.getPorts()) {
-			int numTokens = inputPattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port.getName());
-			fifo.readEnd(numTokens);
-		}
-
-		for (Port port : outputPattern.getPorts()) {
-			int numTokens = outputPattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port.getName());
-			writeFifo(outputPattern.getVariable(port).getValue(), fifo,
-					numTokens);
-		}
+	protected void execute(Action action) {
 	}
 
 	/**
@@ -509,7 +437,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * 
 	 * @return the current FSM state
 	 */
-	public State getFsmState() {
+	public final State getFsmState() {
 		return fsmState;
 	}
 
@@ -518,7 +446,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 * 
 	 * @return the schedulable action or null
 	 */
-	public Action getNextAction() {
+	public final Action getNextAction() {
 		// Check next schedulable action in respect of the priority order
 		for (Action action : actor.getActionsOutsideFsm()) {
 			if (isSchedulable(action)) {
@@ -592,70 +520,16 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	}
 
 	/**
-	 * Returns true if the given action is schedulable.
+	 * Returns true if the given action is schedulable. Always returns
+	 * <code>true</code> by default. This method should be overridden to define
+	 * how to test the schedulability of an action.
 	 * 
 	 * @param action
 	 *            an action
 	 * @return true if the given action is schedulable
 	 */
 	protected boolean isSchedulable(Action action) {
-		Pattern pattern = action.getInputPattern();
-		// check tokens
-		for (Port port : pattern.getPorts()) {
-			Fifo fifo = fifos.get(port.getName());
-			boolean hasTok = fifo.hasTokens(pattern.getNumTokens(port));
-			if (!hasTok) {
-				return false;
-			}
-		}
-
-		// allocates peeked variables
-		pattern = action.getPeekPattern();
-		for (Port port : pattern.getPorts()) {
-			Var peeked = pattern.getVariable(port);
-			if (peeked != null) {
-				peeked.setValue(listAllocator.doSwitch(peeked.getType()));
-				int numTokens = pattern.getNumTokens(port);
-				Fifo fifo = fifos.get(port.getName());
-				peekFifo(peeked.getValue(), fifo, numTokens);
-			}
-		}
-
-		Object result = doSwitch(action.getScheduler());
-		if (result instanceof ExprBool) {
-			return ((ExprBool) result).isValue();
-		} else {
-			return false;
-		}
-	}
-
-	private void peekFifo(Expression value, Fifo fifo, int numTokens) {
-		if (fifo instanceof Fifo_int) {
-			ExprList target = (ExprList) value;
-			int[] intTarget = new int[target.getSize()];
-			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
-					fifo.getReadIndex(numTokens), intTarget, 0, numTokens);
-			for (int i = 0; i < intTarget.length; i++) {
-				target.set(i, IrFactory.eINSTANCE.createExprInt(intTarget[i]));
-			}
-		} else if (fifo instanceof Fifo_boolean) {
-			ExprList target = (ExprList) value;
-			boolean[] boolTarget = new boolean[target.getSize()];
-			System.arraycopy(((Fifo_boolean) fifo).getReadArray(numTokens),
-					fifo.getReadIndex(numTokens), boolTarget, 0, numTokens);
-			for (int i = 0; i < boolTarget.length; i++) {
-				target.set(i, IrFactory.eINSTANCE.createExprBool(boolTarget[i]));
-			}
-		} else if (fifo instanceof Fifo_String) {
-			ExprList target = (ExprList) value;
-			String[] stringTarget = new String[target.getSize()];
-			System.arraycopy(((Fifo_String) fifo).getReadArray(numTokens),
-					fifo.getReadIndex(numTokens), stringTarget, 0, numTokens);
-			for (int i = 0; i < stringTarget.length; i++) {
-				target.set(i,
-						IrFactory.eINSTANCE.createExprString(stringTarget[i]));
-			}
-		}
+		return true;
 	}
 
 	/**
@@ -689,43 +563,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 */
 	public void setActor(Actor actor) {
 		this.actor = actor;
-	}
-
-	/**
-	 * Set the communication FIFOs map for interpreter to be able to execute
-	 * read/write accesses.
-	 * 
-	 * @param fifos
-	 */
-	public void setFifos(Map<String, Fifo> fifos) {
-		this.fifos = fifos;
-	}
-
-	private void writeFifo(Expression value, Fifo fifo, int numTokens) {
-		ExprList target = (ExprList) value;
-		if (fifo instanceof Fifo_int) {
-			int[] fifoArray = ((Fifo_int) fifo).getWriteArray(numTokens);
-			int index = fifo.getWriteIndex(numTokens);
-			for (Expression obj_elem : target.getValue()) {
-				fifoArray[index++] = ((ExprInt) obj_elem).getIntValue();
-			}
-			((Fifo_int) fifo).writeEnd(numTokens, fifoArray);
-		} else if (fifo instanceof Fifo_boolean) {
-			boolean[] fifoArray = ((Fifo_boolean) fifo)
-					.getWriteArray(numTokens);
-			int index = fifo.getWriteIndex(numTokens);
-			for (Expression obj_elem : target.getValue()) {
-				fifoArray[index++] = ((ExprBool) obj_elem).isValue();
-			}
-			((Fifo_boolean) fifo).writeEnd(numTokens, fifoArray);
-		} else if (fifo instanceof Fifo_String) {
-			String[] fifoArray = ((Fifo_String) fifo).getWriteArray(numTokens);
-			int index = fifo.getWriteIndex(numTokens);
-			for (Expression obj_elem : target.getValue()) {
-				fifoArray[index++] = ((ExprString) obj_elem).getValue();
-			}
-			((Fifo_String) fifo).writeEnd(numTokens, fifoArray);
-		}
 	}
 
 }

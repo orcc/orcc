@@ -81,7 +81,7 @@ import std.io.Source;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class SlowInterpreter extends AbstractSimulator {
+public class SlowSimulator extends AbstractSimulator {
 
 	protected List<Fifo> fifoList;
 
@@ -197,13 +197,13 @@ public class SlowInterpreter extends AbstractSimulator {
 						transformation.doSwitch(clonedActor);
 					}
 
-					ActorInterpreter interpreter = new ActorInterpreter(
-							instance.getParameters(), clonedActor);
+					ActorInterpreter interpreter = new ConnectedActorInterpreter(
+							clonedActor, instance.getParameters());
 					interpreters.put(instance, interpreter);
 				} else if (instance.isBroadcast()) {
 					Actor actor = IrFactory.eINSTANCE.createActor();
-					ActorInterpreter interpreter = new ActorInterpreter(
-							instance.getParameters(), actor);
+					ActorInterpreter interpreter = new ConnectedActorInterpreter(
+							actor, instance.getParameters());
 					interpreters.put(instance, interpreter);
 				}
 			}
@@ -214,10 +214,10 @@ public class SlowInterpreter extends AbstractSimulator {
 	public void start(String mode) {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
-			
+
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IFile file = root.getFile(new Path(xdfFile));
-			
+
 			Network network = new XDFParser(file).parseNetwork();
 
 			// Instantiate the network
