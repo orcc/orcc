@@ -42,10 +42,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * @generated
  */
 public class PatternImpl extends EObjectImpl implements Pattern {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' reference list.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

@@ -80,7 +80,6 @@ public class ActionList implements Iterable<Action> {
 			// we add the action to the tagMap for entries:
 			// [a]; [a, b]; [a, b, c]
 
-			int tagLength = 1;
 			Tag currentTag = IrFactory.eINSTANCE.createTag();
 			for (String id : tag.getIdentifiers()) {
 				currentTag.add(id);
@@ -96,7 +95,6 @@ public class ActionList implements Iterable<Action> {
 				actions.add(action);
 
 				// creates a new list and copies the tag in it
-				tagLength++;
 				currentTag = IrFactory.eINSTANCE.createTag(currentTag);
 			}
 		}
