@@ -49,7 +49,6 @@ import net.sf.orcc.network.Vertex;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.StrongConnectivityInspector;
 import org.jgrapht.graph.DirectedMultigraph;
-import org.jgrapht.traverse.TopologicalOrderIterator;
 
 /**
  * This class detects statically schedulable regions of the graph. A region
@@ -202,10 +201,8 @@ public class StaticSubsetDetector {
 		discovered = new HashSet<Vertex>();
 		finished = new HashSet<Vertex>();
 
-		TopologicalOrderIterator<Vertex, Connection> it = new TopologicalOrderIterator<Vertex, Connection>(
-				graph);
-		while (it.hasNext()) {
-			Vertex vertex = it.next();
+		List<Vertex> vertices = new TopologicalSorter(graph).topologicalSort();
+		for (Vertex vertex : vertices) {
 			MoC clasz = vertex.getInstance().getMoC();
 			if (!discovered.contains(vertex) && clasz.isSDF()) {
 				List<Vertex> set = new LinkedList<Vertex>();
