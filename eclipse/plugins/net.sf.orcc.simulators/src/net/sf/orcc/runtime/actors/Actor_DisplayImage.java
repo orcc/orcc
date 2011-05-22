@@ -63,11 +63,6 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 
 	private static Actor_DisplayImage instance;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	public static void closeDisplay() {
 		if (instance != null) {
 			instance.timer.stop();
