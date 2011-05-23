@@ -386,7 +386,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			List<Integer> dim1 = typeList1.getDimensions();
 			List<Integer> dim2 = typeList2.getDimensions();
 			for (int i = 0; i < dim1.size() && i < dim2.size(); i++) {
-				if (dim1.get(i) != dim2.get(i)) {
+				if (!dim1.get(i).equals(dim2.get(i))) {
 					return true;
 				}
 			}
