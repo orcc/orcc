@@ -59,19 +59,18 @@ public class TTAActorTemplateData {
 	 */
 	private Map<Node, Integer> nodeToLabelMap;
 
-	private Map<State, Integer> stateToLabelMap;
-
 	private Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap;
 
-	public Map<Pattern, Map<Port, Integer>> getPortToIndexByPatternMap() {
-		return portToIndexByPatternMap;
-	}
+	private Map<Port, Integer> portToIndexMap;
+
+	private Map<State, Integer> stateToLabelMap;
 
 	public TTAActorTemplateData(Actor actor) {
 		nodeToLabelMap = new HashMap<Node, Integer>();
 		castedListReferences = new HashMap<Var, Var>();
 		stateToLabelMap = new HashMap<State, Integer>();
 		portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>();
+		portToIndexMap = new HashMap<Port, Integer>();
 
 		computeTemplateMaps(actor);
 	}
@@ -87,21 +86,6 @@ public class TTAActorTemplateData {
 						&& (var.getDefs().get(0).eContainer() instanceof InstCast)) {
 					castedListReferences.put(var, var);
 				}
-			}
-		}
-	}
-
-	private void computePortToIndexByPatternMap(Actor actor) {
-		TreeIterator<EObject> it = actor.eAllContents();
-		while (it.hasNext()) {
-			EObject object = it.next();
-			if (object instanceof Pattern) {
-				Pattern pattern = (Pattern) object;
-				Map<Port, Integer> portToIndexMap = new HashMap<Port, Integer>();
-				for (int i = 0; i < pattern.getPorts().size(); i++) {
-					portToIndexMap.put(pattern.getPorts().get(i), i + 1);
-				}
-				portToIndexByPatternMap.put(pattern, portToIndexMap);
 			}
 		}
 	}
@@ -126,6 +110,30 @@ public class TTAActorTemplateData {
 		}
 	}
 
+	private void computePortToIndexByPatternMap(Actor actor) {
+		TreeIterator<EObject> it = actor.eAllContents();
+		while (it.hasNext()) {
+			EObject object = it.next();
+			if (object instanceof Pattern) {
+				Pattern pattern = (Pattern) object;
+				Map<Port, Integer> portToIndexMap = new HashMap<Port, Integer>();
+				for (int i = 0; i < pattern.getPorts().size(); i++) {
+					portToIndexMap.put(pattern.getPorts().get(i), i + 1);
+				}
+				portToIndexByPatternMap.put(pattern, portToIndexMap);
+			}
+		}
+	}
+
+	private void computePortToIndexMap(Actor actor) {
+		for (int i = 0; i < actor.getInputs().size(); i++) {
+			portToIndexMap.put(actor.getInputs().get(i), i + 1);
+		}
+		for (int i = 0; i < actor.getOutputs().size(); i++) {
+			portToIndexMap.put(actor.getOutputs().get(i), i + 1);
+		}
+	}
+
 	private void computeStateToLabelMap(Actor actor) {
 		if (actor.hasFsm()) {
 			for (int i = 0; i < actor.getFsm().getStates().size(); i++) {
@@ -139,6 +147,7 @@ public class TTAActorTemplateData {
 		computeCastedListReferences(actor);
 		computeStateToLabelMap(actor);
 		computePortToIndexByPatternMap(actor);
+		computePortToIndexMap(actor);
 	}
 
 	public Map<Var, Var> getCastedListReferences() {
@@ -147,6 +156,14 @@ public class TTAActorTemplateData {
 
 	public Map<Node, Integer> getNodeToLabelMap() {
 		return nodeToLabelMap;
+	}
+
+	public Map<Pattern, Map<Port, Integer>> getPortToIndexByPatternMap() {
+		return portToIndexByPatternMap;
+	}
+
+	public Map<Port, Integer> getPortToIndexMap() {
+		return portToIndexMap;
 	}
 
 	public Map<State, Integer> getStateToLabelMap() {

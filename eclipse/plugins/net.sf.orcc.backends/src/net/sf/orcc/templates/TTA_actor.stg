@@ -6,19 +6,19 @@ import "net/sf/orcc/templates/LLVM_actor.stg"
 ///////////////////////////////////////////////////////////////////////////////
 
 printWrite(port, source, numberOfTokens) ::= <<
-tail call void asm sideeffect "STREAM_OUT_V1", "ir"(i32 %<source>) nounwind
+tail call void asm sideeffect "STREAM_OUT_V<instance.actor.templateData.portToIndexMap.(port)>"", "ir"(i32 %<source>) nounwind
 >>
 
 printRead(port, target, numberOfTokens) ::= <<
-%<target> = tail call i32 asm sideeffect "STREAM_IN_V1", "=r,ir"(i32 0) nounwind
+%<target> = tail call i32 asm sideeffect "STREAM_IN_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
 >>
 
 printPeek(port, target, numberOfTokens) ::= <<
-%<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V1", "=r,ir"(i32 0) nounwind
+%<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
 >>
 
 printStatus(port, dir) ::= <<
-%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V1", "=r,ir"(i32 0) nounwind
+%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V<instance.actor.templateData.portToIndexMap.(port)>", "=r,ir"(i32 0) nounwind
 >>
 
 
