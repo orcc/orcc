@@ -485,7 +485,9 @@ public class ActorMerger implements INetworkTransformation {
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
 				Instance instance = iterand.getVertex().getInstance();
-				Action action = instance.getActor().getActions().get(0);
+				CSDFMoC moc = (CSDFMoC) instance.getMoC();
+				Action action = moc.getActions().get(0);
+
 				Procedure proc = superActor.getProcedure(instance.getId() + "_"
 						+ action.getName());
 
@@ -523,7 +525,6 @@ public class ActorMerger implements INetworkTransformation {
 						factory.createExprInt(1), loopVar.getType());
 				InstAssign assign = factory.createInstAssign(loopVar, expr);
 				procedure.getLast(nodeWhile.getNodes()).add(assign);
-
 			}
 		}
 	}

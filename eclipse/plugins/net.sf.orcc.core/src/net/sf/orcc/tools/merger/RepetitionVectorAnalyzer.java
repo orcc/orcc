@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
@@ -84,8 +83,7 @@ public class RepetitionVectorAnalyzer {
 			Vertex vertex = entry.getKey();
 			Rational rat = entry.getValue();
 			int rep = rat.getNumerator() * lcm / rat.getDenominator();
-			CSDFMoC moc = (CSDFMoC) vertex.getInstance().getMoC();
-			repetitionVector.put(vertex, rep * moc.getNumberOfPhases());
+			repetitionVector.put(vertex, rep);
 		}
 
 		checkConsistency();
