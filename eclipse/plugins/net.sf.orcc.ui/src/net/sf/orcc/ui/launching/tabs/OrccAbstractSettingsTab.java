@@ -277,13 +277,12 @@ public abstract class OrccAbstractSettingsTab extends
 	}
 
 	public IProject getProjectFromText() {
-		String value = textProject.getText();
-		if (value.isEmpty()) {
-			return null;
-		}
-
+		String projectName = textProject.getText();
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		return root.getProject(value);
+		if (root.getFullPath().isValidSegment(projectName)) {
+			return root.getProject(projectName);
+		}
+		return null;
 	}
 
 	@Override
@@ -332,9 +331,15 @@ public abstract class OrccAbstractSettingsTab extends
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		String value = textProject.getText();
-		if (value.isEmpty()) {
+		String projectName = textProject.getText();
+		if (projectName.isEmpty()) {
 			setErrorMessage("Project not specified");
+			return false;
+		}
+
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		if (!root.getFullPath().isValidSegment(projectName)) {
+			setErrorMessage("Project name is not valid");
 			return false;
 		}
 
@@ -422,7 +427,8 @@ public abstract class OrccAbstractSettingsTab extends
 	 * necessary.
 	 */
 	public void updateSize() {
-		groupOptions.setSize(groupOptions.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		groupOptions
+				.setSize(groupOptions.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		composite.setSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 

@@ -369,7 +369,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			String name = configuration.getAttribute(PROJECT, "");
-			if (!name.isEmpty()) {
+			if (root.getFullPath().isValidSegment(name)) {
 				IProject project = root.getProject(name);
 				if (project.exists()) {
 					xdfFile = OrccUtil.getFile(project,
