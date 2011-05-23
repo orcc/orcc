@@ -34,6 +34,8 @@ import java.util.Map;
 import net.sf.orcc.backends.instructions.InstCast;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Node;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Var;
@@ -59,10 +61,17 @@ public class TTAActorTemplateData {
 
 	private Map<State, Integer> stateToLabelMap;
 
+	private Map<Pattern, Map<Port, Integer>> portToIndexByPatternMap;
+
+	public Map<Pattern, Map<Port, Integer>> getPortToIndexByPatternMap() {
+		return portToIndexByPatternMap;
+	}
+
 	public TTAActorTemplateData(Actor actor) {
 		nodeToLabelMap = new HashMap<Node, Integer>();
 		castedListReferences = new HashMap<Var, Var>();
 		stateToLabelMap = new HashMap<State, Integer>();
+		portToIndexByPatternMap = new HashMap<Pattern, Map<Port, Integer>>();
 
 		computeTemplateMaps(actor);
 	}
@@ -78,6 +87,21 @@ public class TTAActorTemplateData {
 						&& (var.getDefs().get(0).eContainer() instanceof InstCast)) {
 					castedListReferences.put(var, var);
 				}
+			}
+		}
+	}
+
+	private void computePortToIndexByPatternMap(Actor actor) {
+		TreeIterator<EObject> it = actor.eAllContents();
+		while (it.hasNext()) {
+			EObject object = it.next();
+			if (object instanceof Pattern) {
+				Pattern pattern = (Pattern) object;
+				Map<Port, Integer> portToIndexMap = new HashMap<Port, Integer>();
+				for (int i = 0; i < pattern.getPorts().size(); i++) {
+					portToIndexMap.put(pattern.getPorts().get(i), i + 1);
+				}
+				portToIndexByPatternMap.put(pattern, portToIndexMap);
 			}
 		}
 	}
@@ -114,6 +138,7 @@ public class TTAActorTemplateData {
 		computeNodeToLabelMap(actor);
 		computeCastedListReferences(actor);
 		computeStateToLabelMap(actor);
+		computePortToIndexByPatternMap(actor);
 	}
 
 	public Map<Var, Var> getCastedListReferences() {
