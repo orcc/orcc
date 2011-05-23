@@ -32,10 +32,10 @@ printPortsStatus(dir, ports) ::= <<
 
 checkPorts(action, dir, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
 <if(!lastPort)
->%has_valid_<dir>s_<state.name>_<action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name> <pattern.numTokensMap.(port)><
+>%has_valid_<dir>s_<state.name>_<action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)><
 else
->%available_<dir>_<state.name>_<action.name>_<port.name> = icmp sge i32 %status_<port.name> <pattern.numTokensMap.(port)>
-%has_valid_<dir>s_<state.name>_<action.name>_<portToIndexMap.(port)> = and i1 %has_valid_<dir>s_<state.name>_<action.name>_<portToIndexMap.(lastPort)> %available_<dir>_<state.name>_<action.name>_<port.name><
+>%available_<dir>_<state.name>_<action.name>_<port.name> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
+%has_valid_<dir>s_<state.name>_<action.name>_<portToIndexMap.(port)> = and i1 %has_valid_<dir>s_<state.name>_<action.name>_<portToIndexMap.(lastPort)>, %available_<dir>_<state.name>_<action.name>_<port.name><
 endif><
 if(restPorts)>
 <checkPorts(action, dir, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
@@ -52,7 +52,7 @@ actionTest(action) ::= <<
 >	;; Input pattern
 	<checkPattern(action, "input", action.inputPattern)>
 	%is_schedulable_<action.name> = call i1 @isSchedulable_<action.name> ()
-	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name> %has_valid_inputs__<action.name>_<length(action.inputPattern.ports)>
+	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name>, %has_valid_inputs__<action.name>_<length(action.inputPattern.ports)>
 	
 	br i1 %is_fireable_<action.name>, label %bb_<action.name>_check_outputs, label %bb_<action.name>_unschedulable<
 else
@@ -101,7 +101,7 @@ actionTestState(sourceState, transition, restTransitionsList) ::= <<
 >	;; Input pattern
 	<checkPattern(transition.action, "input", transition.action.inputPattern, sourceState)>
 	%is_schedulable_<sourceState.name>_<transition.action.name> = call i1 @isSchedulable_<transition.action.name> ()
-	%is_fireable_<sourceState.name>_<transition.action.name> = and i1 %is_schedulable_<sourceState.name>_<transition.action.name> %has_valid_inputs_<sourceState.name>_<transition.action.name>_<length(transition.action.inputPattern.ports)>
+	%is_fireable_<sourceState.name>_<transition.action.name> = and i1 %is_schedulable_<sourceState.name>_<transition.action.name>, %has_valid_inputs_<sourceState.name>_<transition.action.name>_<length(transition.action.inputPattern.ports)>
 	
 	br i1 %is_fireable_<sourceState.name>_<transition.action.name>, label %bb_<sourceState.name>_<transition.action.name>_check_outputs, label %bb_<sourceState.name>_<transition.action.name>_unschedulable<
 else
@@ -145,7 +145,7 @@ schedulingStates(sourceState, transitionsList) ::= <<
 
 printTransition(transitions) ::= <<
 ; STATE <transitions.sourceState.name>
-bb_s_<transitions.sourceState.name> :
+bb_s_<transitions.sourceState.name>:
 <schedulingStates(transitions.sourceState, transitions.list)>
 >>
 
@@ -155,19 +155,25 @@ i32 <instance.actor.templateData.stateToLabelMap.(state)>, label %bb_s_<state.na
 
 printFsmSwitch(fsm) ::= <<
 %local_FSM_state = load i32* @_FSM_state
-switch i32 %local_FSM_state, label %default
-					<fsm.states: printFsmState(); separator="\n">
+switch i32 %local_FSM_state, label %default [
+					<fsm.states: printFsmState(); separator="\n"> ]
 >>
 
 schedulerWithFSM(actions, fsm) ::= <<
 <if(actions)>
 <printActions(actions)>
-	br %bb_fsm_start
+	br label %bb_fsm_start
 
 bb_fsm_start:
 <endif>
 
 	<printFsmSwitch(fsm)>
+	
+	br label %bb_scheduler_start
+
+default:
+	; TODO: print error
+	br label %bb_scheduler_start
 
 <fsm.transitions: printTransition(); separator="\n">
 >>
