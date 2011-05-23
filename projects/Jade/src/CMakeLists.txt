@@ -77,7 +77,7 @@ set(JADE_MAIN_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(JADE_MAIN_INCLUDE_DIR ${JADE_MAIN_SRC_DIR}/include)
 set(JADE_TOOLS_DIR ${JADE_MAIN_SRC_DIR}/tools)
 set(JADE_VTL_DIR ${JADE_MAIN_SRC_DIR}/vtl)
-
+set(orcc_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Generate documentation option
 option(GENERATE_DOCS "Generate documentation using doxygen.")
@@ -115,6 +115,9 @@ endif(WIN32)
 include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS} ${SDL_INCLUDE_DIR})
  
 add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
- 
+
+# Orcc
+add_subdirectory(Orcc)
+
 # Tools
 add_subdirectory(tools)
