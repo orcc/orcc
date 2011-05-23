@@ -150,7 +150,7 @@ public class ActorMerger implements INetworkTransformation {
 	private Procedure createBody(Pattern ip, Pattern op) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
-		Procedure procedure = factory.createProcedure("staticSchedule", 0,
+		Procedure procedure = factory.createProcedure(ACTION_NAME, 0,
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		// Add loop counter(s)
@@ -229,6 +229,13 @@ public class ActorMerger implements INetworkTransformation {
 		NodeBlock childBlock = procedure.getLast(nodeWhile.getNodes());
 		childBlock.add(load);
 		childBlock.add(store);
+		
+		// increment loop counter
+		Expression expr = factory.createExprBinary(
+				factory.createExprVar(loop), OpBinary.PLUS,
+				factory.createExprInt(1), loop.getType());
+		InstAssign assign = factory.createInstAssign(loop, expr);
+		childBlock.add(assign);
 	}
 
 	private void createCopiesFromInputs(Procedure procedure, Pattern ip) {
@@ -377,6 +384,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				Procedure body = action.getBody();
 				List<Node> nodes = body.getNodes();
+				proc.getLocals().addAll(body.getLocals());
 				proc.getNodes().addAll(nodes);
 				proc.getLast(nodes).add(factory.createInstReturn());
 				superActor.getProcs().add(proc);
