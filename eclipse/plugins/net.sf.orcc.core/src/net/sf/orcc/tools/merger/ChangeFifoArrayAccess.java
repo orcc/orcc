@@ -21,8 +21,6 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 
 	private Map<Var, Integer> loads;
@@ -77,7 +75,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 
 			Expression e1 = factory.createExprVar(factory.createUse(superActor
 					.getStateVar(var.getName() + "_r")));
-			Expression e2 = EcoreUtil.copy(indexes.get(0));
+			Expression e2 = EcoreHelper.copy(indexes.get(0));
 			Expression bop = factory.createExprBinary(e1, OpBinary.PLUS, e2,
 					null);
 			indexes.set(0, bop);
