@@ -116,7 +116,7 @@ bb_<sourceState.name>_<transition.action.name>_check_outputs:
 >	;; Output pattern
 	<checkPattern(transition.action, "output", transition.action.outputPattern, sourceState)>
 	
-	br i1 %has_valid_outputs_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_<sourceState.name>_<transition.action.name>_unschedulable<
+	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_<sourceState.name>_<transition.action.name>_unschedulable<
 else
 >	;; Empty output pattern
 	
