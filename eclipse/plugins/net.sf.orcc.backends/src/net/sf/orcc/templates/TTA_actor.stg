@@ -76,7 +76,7 @@ endif>
 
 
 bb_<action.name>_fire:
-	call void @isSchedulable_<action.name> ()
+	call void @<action.name> ()
 
 	br label %bb_scheduler_start
 
@@ -125,7 +125,7 @@ endif>
 
 
 bb_<sourceState.name>_<transition.action.name>_fire:
-	call void @isSchedulable_<transition.action.name> ()
+	call void @<transition.action.name> ()
 	store @_FSM_state, i32* <instance.actor.templateData.stateToLabelMap.(transition.state)>
 	
 	br label %bb_scheduler_start
