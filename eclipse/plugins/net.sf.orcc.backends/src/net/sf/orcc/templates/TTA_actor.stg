@@ -5,20 +5,51 @@ import "net/sf/orcc/templates/LLVM_actor.stg"
 // Hardware FIFO instruction
 ///////////////////////////////////////////////////////////////////////////////
 
-printWrite(port, source, numberOfTokens) ::= <<
+printWrite(port, source) ::= <<
 tail call void asm sideeffect "STREAM_OUT_V<instance.actor.templateData.portToIndexMap.(port)>"", "ir"(i32 %<source>) nounwind
 >>
 
-printRead(port, target, numberOfTokens) ::= <<
+printRead(port, target) ::= <<
 %<target> = tail call i32 asm sideeffect "STREAM_IN_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
 >>
 
-printPeek(port, target, numberOfTokens) ::= <<
+printPeek(port, target) ::= <<
 %<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
 >>
 
 printStatus(port, dir) ::= <<
 %status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V<instance.actor.templateData.portToIndexMap.(port)>", "=r,ir"(i32 0) nounwind
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// FIFO functions
+///////////////////////////////////////////////////////////////////////////////
+
+printInputFifoFunction(port) ::= <<
+define noalias <port.type>* @read(i32 %numTokens) nounwind {
+entry:
+	%<port.name>_ptr = tail call noalias <port.type>* @malloc(i32 %numTokens) nounwind
+	%cond = icmp sgt i32 %numTokens, 0
+  
+	br i1 %cond, label %bb0, label %bb2
+
+bb0:
+
+	br label %bb1
+	
+bb1:
+	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
+	%data = tail call i32 asm sideeffect "STREAM_IN_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
+	%scevgep = getelementptr <port.type>* %<port.name>_ptr, i32 %indvar
+	store <port.type> %data, <port.type>* %scevgep6, align 4
+	%indvar.next = add i32 %indvar, 1
+	%exitcond = icmp eq i32 %indvar.next, %numTokens
+
+	br i1 %exitcond, label %bb2, label %bb
+
+bb2:
+	ret <port.type>* %<port.name>_ptr
+}
 >>
 
 
@@ -178,6 +209,24 @@ default:
 <fsm.transitions: printTransition(); separator="\n">
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// Action
+///////////////////////////////////////////////////////////////////////////////
+
+printAction(action) ::= <<
+define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+entry:
+	<action.scheduler.locals: variableDeclaration()>
+	<action.peekPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}; separator="\n">
+<printNodes(action.scheduler.nodes)>
+}
+
+define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+entry:
+	<action.body.locals: variableDeclaration()>
+<printNodes(action.body.nodes)>
+}
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instance
