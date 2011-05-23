@@ -32,8 +32,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
@@ -45,11 +43,16 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.InstStore;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines an abstract interpreter of an actor. It refines the
@@ -134,7 +137,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				peeked.setValue(listAllocator.doSwitch(peeked.getType()));
+				peeked.setValue(tokenAllocator.doSwitch(peeked.getType()));
 
 				if (configuration != null && configuration.containsKey(port)
 						&& !portRead.get(port)) {
@@ -238,6 +241,22 @@ public class AbstractInterpreter extends ActorInterpreter {
 			Expression value = (Expression) exprInterpreter.doSwitch(instr
 					.getValue());
 			if (target != null && target.isListExpr() && index != null) {
+				if (value == null) {
+					// create new expression with null value
+					Type type = ((TypeList) var.getType()).getElementType();
+					if (type.isBool()) {
+						value = IrFactory.eINSTANCE.createExprBool();
+					} else if (type.isFloat()) {
+						value = IrFactory.eINSTANCE.createExprFloat();
+					} else if (type.isInt() || type.isUint()) {
+						value = IrFactory.eINSTANCE.createExprInt();
+					} else if (type.isString()) {
+						value = IrFactory.eINSTANCE.createExprString();
+					} else {
+						// else do not set value
+						return null;
+					}
+				}
 				((ExprList) target).set(index, value);
 			}
 		}
