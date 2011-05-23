@@ -125,13 +125,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		if (classify) {
-			if (!actor.getSimpleName().equals("BufferCurrPic")
-					&& !actor.getSimpleName().equals("SplitSpsInfo")) {
-				new ActorClassifier().doSwitch(actor);
+			new ActorClassifier().doSwitch(actor);
 
-				if (normalize) {
-					new ActorNormalizer().visit(actor);
-				}
+			if (normalize) {
+				new ActorNormalizer().visit(actor);
 			}
 		}
 
@@ -198,11 +195,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) {
-		if (actor.isNative()) {
-			// Do not generate native actor
-			return true;
-		}
-
 		// Create folder if necessary
 		String folder = path + File.separator + OrccUtil.getFolder(actor);
 		new File(folder).mkdirs();
@@ -229,10 +221,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		// Add list of package requiered
 		Set<String> packages = new HashSet<String>();
 		for (Actor actor : actors) {
-			if (!actor.isNative()) {
-				String firstPackage = actor.getPackageAsList().get(0);
-				packages.add(firstPackage);
-			}
+			String firstPackage = actor.getPackageAsList().get(0);
+			packages.add(firstPackage);
 		}
 		cmdList.addAll(packages);
 
