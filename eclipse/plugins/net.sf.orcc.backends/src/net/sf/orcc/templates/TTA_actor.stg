@@ -66,7 +66,7 @@ bb_<action.name>_check_outputs:
 <endif>
 bb_<action.name>_fire:
 	call void @isSchedulable_<action.name> ()
-	br label %bb1
+	br label %bb_fsm_start
 
 bb_<action.name>_unschedulable:
 >>
@@ -81,7 +81,7 @@ schedulerWithoutFSM(actions) ::= <<
 <printActions(actions)>
 >>
 
-actionTestState(sourceState, transition) ::= <<
+actionTestState(sourceState, transition, restTransitionsList) ::= <<
 	; Action <transition.action.name>
 <if(!transition.action.inputPattern.empty)>
 	;; Input pattern
@@ -108,13 +108,18 @@ bb_<sourceState.name>_<transition.action.name>_check_outputs:
 bb_<sourceState.name>_<transition.action.name>_fire:
 	call void @isSchedulable_<transition.action.name> ()
 	store @_FSM_state, i32* <instance.actor.templateData.stateToLabelMap.(transition.state)>
-	br label %bb1
-	
+	br label %bb_fsm_startfsm_start
+
+<if(restTransitionsList)>
 bb_<sourceState.name>_<transition.action.name>_unschedulable:
+<actionTestState(sourceState, first(restTransitionsList), rest(restTransitionsList))>
+<else>
+	br label %bb_fsm_start
+<endif>
 >>
 
 schedulingStates(sourceState, transitionsList) ::= <<
-<transitionsList: { transition | <actionTestState(sourceState, transition)> }; separator="\n">
+<actionTestState(sourceState, first(transitionsList), rest(transitionsList))>
 >>
 
 printTransition(transitions) ::= <<
@@ -196,8 +201,8 @@ instance(instance, options) ::= <<
 define void @<instance.id>_scheduler() nounwind {
 entry:
 
-	br label %bb1
-bb1:
+	br label %bb_fsm_start
+bb_fsm_start:
 	<printPortsStatus("input", instance.actor.inputs)>
 	<printPortsStatus("output", instance.actor.outputs)>
 <if(instance.actor.fsm)
@@ -206,6 +211,6 @@ else
 ><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
 endif>
 
-	br label %bb1
+	br label %bb_fsm_start
 }
 >>
