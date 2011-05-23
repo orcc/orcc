@@ -46,11 +46,10 @@ public class SDFMoCImpl extends CSDFMoCImpl implements SDFMoC {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("SDF input ports: ");
-		builder.append(inputPattern);
-		builder.append('\n');
-		builder.append("SDF output ports: ");
-		builder.append(outputPattern);
+		builder.append("SDF => ");
+		builder.append(getInputPattern());
+		builder.append(", ");
+		builder.append(getOutputPattern());
 		return builder.toString();
 	}
 

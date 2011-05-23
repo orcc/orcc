@@ -7,6 +7,7 @@
 package net.sf.orcc.ir.impl;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Pattern;
@@ -401,7 +402,25 @@ public class PatternImpl extends EObjectImpl implements Pattern {
 
 	@Override
 	public String toString() {
-		return getNumTokensMap().toString();
+		StringBuilder builder = new StringBuilder();
+		Iterator<Port> it = getPorts().iterator();
+		builder.append('[');
+		if (it.hasNext()) {
+			Port port = it.next();
+			builder.append(port.getName());
+			builder.append(": ");
+			builder.append(getNumTokens(port));
+			while (it.hasNext()) {
+				port = it.next();
+				builder.append(", ");
+				builder.append(port.getName());
+				builder.append(": ");
+				builder.append(getNumTokens(port));
+			}
+		}
+		builder.append(']');
+
+		return builder.toString();
 	}
 
 	@Override

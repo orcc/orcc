@@ -388,11 +388,10 @@ public class CSDFMoCImpl extends MoCImpl implements CSDFMoC {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("CSDF input ports: ");
-		builder.append(inputPattern);
-		builder.append('\n');
-		builder.append("CSDF output ports: ");
-		builder.append(outputPattern);
+		builder.append("CSDF => ");
+		builder.append(getInputPattern());
+		builder.append(", ");
+		builder.append(getOutputPattern());
 		return builder.toString();
 	}
 
