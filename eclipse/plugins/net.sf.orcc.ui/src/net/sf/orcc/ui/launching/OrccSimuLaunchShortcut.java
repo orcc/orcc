@@ -161,11 +161,13 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 				return null;
 			}
 			// generate configuration name
-			String name = getQualifiedName(file) + " - Simulation";
-			name = manager.generateLaunchConfigurationName(name);
+			String name = getQualifiedName(file);
+			String configName = manager.generateLaunchConfigurationName(name
+					+ " - Simulation");
 
 			// create configuration
-			ILaunchConfigurationWorkingCopy wc = type.newInstance(null, name);
+			ILaunchConfigurationWorkingCopy wc = type.newInstance(null,
+					configName);
 			wc.setAttribute(SIMULATOR, simulator);
 			wc.setAttribute(PROJECT, file.getProject().getName());
 
