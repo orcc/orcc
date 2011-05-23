@@ -798,7 +798,9 @@ label(node) ::= "b<actor.templateData.nodeToLabelMap.(node)>"
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-<if(!procedure.native)>
+<if(procedure.native)>
+declare <procedure.returnType> @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind
+<else>
 define <procedure.returnType> @<procedure.name>(<procedure.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 <if(procedure.locals)>
