@@ -92,16 +92,19 @@ public class EcoreHelper {
 		Node nodeContainer = EcoreHelper.getContainerOfType(expression,
 				Node.class);
 		if (instContainer != null) {
-			if (usePreviousJoinNode && isWhileJoinNode(nodeContainer)) {
+			if (usePreviousJoinNode && instContainer.isPhi()
+					&& isWhileJoinNode(nodeContainer)) {
 				NodeWhile nodeWhile = EcoreHelper.getContainerOfType(
 						nodeContainer, NodeWhile.class);
 				addToPreviousNodeBlock(nodeWhile, instruction);
 				return false;
+			} else {
+				List<Instruction> instructions = EcoreHelper
+						.getContainingList(instContainer);
+				instructions.add(instructions.indexOf(instContainer),
+						instruction);
+				return true;
 			}
-			List<Instruction> instructions = EcoreHelper
-					.getContainingList(instContainer);
-			instructions.add(instructions.indexOf(instContainer), instruction);
-			return true;
 		} else {
 			if (usePreviousJoinNode && nodeContainer.isWhileNode()) {
 				NodeBlock joinNode = ((NodeWhile) nodeContainer).getJoinNode();
