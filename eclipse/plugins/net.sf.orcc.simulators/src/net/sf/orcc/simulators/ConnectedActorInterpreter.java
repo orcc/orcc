@@ -189,7 +189,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				peeked.setValue(listAllocator.doSwitch(peeked.getType()));
+				peeked.setValue(tokenAllocator.doSwitch(peeked.getType()));
 				int numTokens = pattern.getNumTokens(port);
 				Fifo fifo = fifos.get(port.getName());
 				peekFifo(peeked.getValue(), fifo, numTokens);

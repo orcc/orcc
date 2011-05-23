@@ -86,11 +86,12 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 	private ActorInterpreter actorInterpreter;
 
 	private boolean initToZero;
+
 	private ListAllocator listAllocator;
 
 	public GlobalArrayInitializer(boolean initToZero) {
 		this.initToZero = initToZero;
-		listAllocator = new ListAllocator();
+		listAllocator = new ListAllocator(initToZero);
 	}
 
 	@Override

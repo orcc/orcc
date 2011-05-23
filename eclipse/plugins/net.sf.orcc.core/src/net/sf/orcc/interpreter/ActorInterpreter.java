@@ -94,7 +94,9 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 */
 	private State fsmState;
 
-	protected ListAllocator listAllocator;
+	final private ListAllocator listAllocator;
+
+	final protected ListAllocator tokenAllocator;
 
 	/**
 	 * Actor's constant parameters to be set at initialization time
@@ -115,7 +117,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		// Set instance name and actor class definition at parent level
 		this.actor = actor;
 
-		listAllocator = new ListAllocator();
+		listAllocator = new ListAllocator(true);
+		tokenAllocator = new ListAllocator(false);
 		exprInterpreter = new ExpressionEvaluator();
 
 		// Get actor FSM properties
@@ -138,7 +141,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	final protected void allocatePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Var var = pattern.getVariable(port);
-			var.setValue(listAllocator.doSwitch(var.getType()));
+			var.setValue(tokenAllocator.doSwitch(var.getType()));
 		}
 	}
 

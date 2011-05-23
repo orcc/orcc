@@ -49,19 +49,47 @@ import net.sf.orcc.ir.util.IrSwitch;
  */
 public class ListAllocator extends IrSwitch<Expression> {
 
+	private boolean initializeToZero;
+
+	/**
+	 * Creates a new list allocator. If <code>initializeToZero</code> is
+	 * <code>true</code>, each atomic element is initialized to the default
+	 * value of its type (i.e. <code>false</code> for booleans, 0 for integers,
+	 * 0.0f for floats).
+	 * 
+	 * @param initializeToZero
+	 *            <code>true</code> if atomic elements should be initialized to
+	 *            a default value
+	 */
+	public ListAllocator(boolean initializeToZero) {
+		this.initializeToZero = initializeToZero;
+	}
+
 	@Override
 	public Expression caseTypeBool(TypeBool type) {
-		return IrFactory.eINSTANCE.createExprBool(false);
+		if (initializeToZero) {
+			return IrFactory.eINSTANCE.createExprBool(false);
+		} else {
+			return IrFactory.eINSTANCE.createExprBool();
+		}
 	}
 
 	@Override
 	public Expression caseTypeFloat(TypeFloat type) {
-		return IrFactory.eINSTANCE.createExprFloat(0.0f);
+		if (initializeToZero) {
+			return IrFactory.eINSTANCE.createExprFloat(0.0f);
+		} else {
+			return IrFactory.eINSTANCE.createExprFloat();
+		}
 	}
 
 	@Override
 	public Expression caseTypeInt(TypeInt type) {
-		return IrFactory.eINSTANCE.createExprInt(0);
+		if (initializeToZero) {
+			return IrFactory.eINSTANCE.createExprInt(0);
+		} else {
+			return IrFactory.eINSTANCE.createExprInt();
+		}
 	}
 
 	@Override
@@ -77,12 +105,20 @@ public class ListAllocator extends IrSwitch<Expression> {
 
 	@Override
 	public Expression caseTypeString(TypeString type) {
-		return IrFactory.eINSTANCE.createExprString("");
+		if (initializeToZero) {
+			return IrFactory.eINSTANCE.createExprString("");
+		} else {
+			return IrFactory.eINSTANCE.createExprString();
+		}
 	}
 
 	@Override
 	public Expression caseTypeUint(TypeUint type) {
-		return IrFactory.eINSTANCE.createExprInt(0);
+		if (initializeToZero) {
+			return IrFactory.eINSTANCE.createExprInt(0);
+		} else {
+			return IrFactory.eINSTANCE.createExprInt();
+		}
 	}
 
 	@Override
