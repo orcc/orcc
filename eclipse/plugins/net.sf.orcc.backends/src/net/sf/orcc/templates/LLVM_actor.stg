@@ -675,7 +675,7 @@ endif>
 >>
 
 printCast(cast)::= <<
-%<cast.target.variable.indexedName> = <printCastOp(cast)> <printCastType(cast.source.variable)> %<cast.source.variable.indexedName> to <printCastType(cast.target.variable)>
+%<cast.target.variable.indexedName> = <printCastOp(cast)> <printCastType(cast.source.variable)> <Var(cast.source.variable)> to <printCastType(cast.target.variable)>
 >>
 
 printCastOp(cast) ::= <<
