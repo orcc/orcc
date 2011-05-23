@@ -126,7 +126,7 @@ endif>
 
 bb_<sourceState.name>_<transition.action.name>_fire:
 	call void @<transition.action.name> ()
-	store @_FSM_state, i32* <instance.actor.templateData.stateToLabelMap.(transition.state)>
+	store i32 <instance.actor.templateData.stateToLabelMap.(transition.state)>, i32* @_FSM_state
 	
 	br label %bb_scheduler_start
 
