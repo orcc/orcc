@@ -51,6 +51,7 @@ using namespace std;
 GpacDisp::GpacDisp(int id) : Display(id){
 	this->id = id;
 	this->stopSchVal = 0;
+	this->picReady = false;
 
 	width = 0;
 	height = 0;
@@ -115,7 +116,7 @@ void GpacDisp::display_write_mb(unsigned char tokens[384]) {
 		rvcFrame->Width = width;
 		rvcFrame->Height = height;
 
-		stopSchVal = 1;
+		picReady = true;
 
 	}
 }

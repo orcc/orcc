@@ -51,6 +51,7 @@ GpacSrc::GpacSrc(int id) : Source(id) {
 	this->nal = NULL;
 	this->nal_length = 0;
 	this->stopSchVal = 0;
+	this->saveNal = NULL;
 }
 
 GpacSrc::~GpacSrc(){
@@ -63,10 +64,30 @@ void GpacSrc::setNal(unsigned char* nal, int nal_length){
 }
 
 void GpacSrc::source_get_src(unsigned char* tokens){
-	if(cnt < nal_length){
+	if(saveNal && *saveNal){
+		setNalFifo();
+		*tokens = getNalFifo();
+		stopSchVal = 1;
+	}else if(!inFifo.empty()){
+		*tokens = getNalFifo();
+	}else if(cnt < nal_length){
 		*tokens = nal[cnt];
 		cnt++;
 	} else {
 		stopSchVal = 1;
 	}
+}
+
+void GpacSrc::setNalFifo(){
+	for(int i = cnt ; i < nal_length; i++){
+		inFifo.push_back(nal[i]);
+	}
+}
+
+unsigned char GpacSrc::getNalFifo(){
+	unsigned char tmp = inFifo.front();
+	
+	inFifo.pop_front();
+
+	return tmp;
 }

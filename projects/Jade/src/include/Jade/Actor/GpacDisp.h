@@ -91,15 +91,32 @@ public:
 	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
 	 *	continuously test firing rules of actors
      */
-	void start() {stopSchVal = 0;}
+	void start() {picReady = false;}
 
+	/**
+     *  @brief Set address of the ouput display frame
+	 *
+	 *  @param frame : address of the output frame
+     */
 	void setFramePtr(RVCFRAME* frame){this->rvcFrame = frame;}
+
+	/**
+     *  @brief Get address of picReady
+	 *
+	 *	This value indicates if one frame is decoded (picture is ready)
+	 *
+	 *  return address of picready
+     */
+	bool* getPicReadyAdr() {return &picReady;}
 
 
 private:
 
 	/** This is the value which can stop the scheduler */
 	int stopSchVal;
+
+	/** This value indicates whether one picture is decoded */
+	bool picReady;
 
 	/** The ouput frame */
 	RVCFRAME* rvcFrame;

@@ -298,6 +298,8 @@ void LLVMExecution::initialize(){
 	EE->addGlobalMapping(stopGV_src, gpacSrc->getStopSchPtr());
 	EE->addGlobalMapping(stopGV_out, gpacDisp->getStopSchPtr());
 
+	gpacSrc->setSaveNalAdr(gpacDisp->getPicReadyAdr());
+
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
 

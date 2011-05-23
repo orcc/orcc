@@ -38,8 +38,10 @@
 //------------------------------
 #ifndef GPACSRC_H
 #define GPACSRC_H
-#include "Jade/Actor/Source.h"
 
+#include <list>
+
+#include "Jade/Actor/Source.h"
 //------------------------------
 
 
@@ -89,7 +91,28 @@ public:
      */
 	void start() {stopSchVal = 0;}
 
+	/**
+     *  @brief Set address of saveNal
+	 *
+	 *	When saveNal is true, the no parsing informations NAL are saved in input fifo
+	 *	and the decoder is stopped
+	 *
+	 *	@param Adr : address of saveNal
+     */
+	void setSaveNalAdr(bool* Adr) {this->saveNal = Adr;}
+
+
 protected:
+
+	/**
+     *  @brief Save no parsing informations NAL in input fifo
+     */
+	void setNalFifo();
+
+	/**
+     *  @brief Get the first octet in input fifo and remove this
+     */
+	unsigned char getNalFifo();
 
 	/** input gpac nal */
 	unsigned char* nal;
@@ -102,6 +125,13 @@ protected:
 
 	/** This is the value which can stop the scheduler */
 	int stopSchVal;
+
+	/** This value controls the nal saving in fifo */
+	bool* saveNal;
+
+	/** input fifo */
+	std::list<unsigned char> inFifo;
+
 };
 
 #endif
