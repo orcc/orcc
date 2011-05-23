@@ -122,7 +122,7 @@
                      defaultValue="false"
                      description="When activated, static actors will be merged together"
                      id="net.sf.orcc.backends.merge"
-                     name="Merge static actors together (unique instantiation of actors is required).">
+                     name="Merge static actors together">
                   <checkBox></checkBox>
                </option>
             </checkBox>

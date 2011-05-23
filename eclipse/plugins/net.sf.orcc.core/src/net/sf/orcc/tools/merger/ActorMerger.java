@@ -55,6 +55,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.network.Connection;
@@ -229,11 +230,10 @@ public class ActorMerger implements INetworkTransformation {
 		NodeBlock childBlock = procedure.getLast(nodeWhile.getNodes());
 		childBlock.add(load);
 		childBlock.add(store);
-		
+
 		// increment loop counter
-		Expression expr = factory.createExprBinary(
-				factory.createExprVar(loop), OpBinary.PLUS,
-				factory.createExprInt(1), loop.getType());
+		Expression expr = factory.createExprBinary(factory.createExprVar(loop),
+				OpBinary.PLUS, factory.createExprInt(1), loop.getType());
 		InstAssign assign = factory.createInstAssign(loop, expr);
 		childBlock.add(assign);
 	}
@@ -366,7 +366,7 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	/**
-	 * Turns actions of SDF actors into procedures
+	 * Turns actions of CSDF actors into procedures
 	 * 
 	 */
 	private void createProcedures() {
@@ -374,9 +374,9 @@ public class ActorMerger implements INetworkTransformation {
 		for (Vertex vertex : scheduler.getSchedule().getActors()) {
 			Instance instance = vertex.getInstance();
 
-			Iterator<Action> it = instance.getActor().getActions().iterator();
-			// at this stage, SDF actor should have only one action
-			if (it.hasNext()) {
+			CSDFMoC moc = (CSDFMoC) instance.getMoC();
+			Iterator<Action> it = moc.getActions().iterator();
+			while (it.hasNext()) {
 				Action action = it.next();
 				String name = instance.getId() + "_" + action.getName();
 				Procedure proc = factory.createProcedure(name, 0,

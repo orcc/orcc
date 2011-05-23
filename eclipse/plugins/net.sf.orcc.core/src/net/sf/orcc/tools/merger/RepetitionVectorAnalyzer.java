@@ -34,6 +34,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
@@ -69,9 +70,9 @@ public class RepetitionVectorAnalyzer {
 	 */
 	private void analyze() {
 		// must be an instance's vertex
-		Vertex vertex = graph.vertexSet().iterator().next();
+		Vertex initialVertex = graph.vertexSet().iterator().next();
 
-		calculateRate(vertex, new Rational(1, 1));
+		calculateRate(initialVertex, new Rational(1, 1));
 
 		Iterator<Rational> it = rationals.values().iterator();
 		int lcm = it.next().getDenominator();
@@ -80,11 +81,11 @@ public class RepetitionVectorAnalyzer {
 		}
 
 		for (Map.Entry<Vertex, Rational> entry : rationals.entrySet()) {
-
-			int rep = entry.getValue().getNumerator() * lcm
-					/ entry.getValue().getDenominator();
-
-			repetitionVector.put(entry.getKey(), rep);
+			Vertex vertex = entry.getKey();
+			Rational rat = entry.getValue();
+			int rep = rat.getNumerator() * lcm / rat.getDenominator();
+			CSDFMoC moc = (CSDFMoC) vertex.getInstance().getMoC();
+			repetitionVector.put(vertex, rep * moc.getNumberOfPhases());
 		}
 
 		checkConsistency();
@@ -99,9 +100,9 @@ public class RepetitionVectorAnalyzer {
 	 */
 	private void calculateRate(Vertex vertex, Rational rate) {
 		Instance instance = vertex.getInstance();
-		if (!instance.getMoC().isSDF()) {
+		if (!instance.getMoC().isCSDF()) {
 			throw new OrccRuntimeException("actor" + instance.getClasz()
-					+ "is not SDF!");
+					+ "is not SDF or CSDF!");
 		}
 
 		rationals.put(vertex, rate);
