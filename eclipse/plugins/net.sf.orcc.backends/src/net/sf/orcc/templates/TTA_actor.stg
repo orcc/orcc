@@ -5,14 +5,6 @@ import "net/sf/orcc/templates/LLVM_actor.stg"
 // Hardware FIFO instruction
 ///////////////////////////////////////////////////////////////////////////////
 
-printWrite(port, source) ::= <<
-tail call void asm sideeffect "STREAM_OUT_V<instance.actor.templateData.portToIndexMap.(port)>"", "ir"(i32 %<source>) nounwind
->>
-
-printRead(port, target) ::= <<
-%<target> = tail call i32 asm sideeffect "STREAM_IN_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
->>
-
 printPeek(port, target) ::= <<
 %<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
 >>
@@ -26,7 +18,7 @@ printStatus(port, dir) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printInputFifoFunction(port) ::= <<
-define noalias <port.type>* @read(i32 %numTokens) nounwind {
+define noalias <port.type>* @read_<port.name>(i32 %numTokens) nounwind {
 entry:
 	%<port.name>_ptr = tail call noalias <port.type>* @malloc(i32 %numTokens) nounwind
 	%cond = icmp sgt i32 %numTokens, 0
@@ -41,7 +33,7 @@ bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
 	%data = tail call i32 asm sideeffect "STREAM_IN_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
 	%scevgep = getelementptr <port.type>* %<port.name>_ptr, i32 %indvar
-	store <port.type> %data, <port.type>* %scevgep6, align 4
+	store <port.type> %data, <port.type>* %scevgep
 	%indvar.next = add i32 %indvar, 1
 	%exitcond = icmp eq i32 %indvar.next, %numTokens
 
@@ -49,6 +41,33 @@ bb1:
 
 bb2:
 	ret <port.type>* %<port.name>_ptr
+}
+>>
+
+printOutputFifoFunction(port) ::= <<
+define i32 @write_<port.name>(i32* %X, i32 %numTokens) nounwind {
+entry:
+  %0 = icmp sgt i32 %numTokens, 0
+  
+  br i1 %0, label %bb0, label %bb2
+
+bb0:
+
+  br label %bb1
+
+bb1: 
+  %indvar = phi i64 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
+  %j.05 = phi i32 [ undef, %bb.nph ], [ %2, %bb ]
+  %scevgep = getelementptr i32* %X, i64 %indvar
+  %data = load i32* %scevgep
+  tail call void asm sideeffect "STREAM_OUT_V<instance.actor.templateData.portToIndexMap.(port)>"", "ir"(i32 %data) nounwind
+  %indvar.next = add i64 %indvar, 1
+  %exitcond = icmp eq i64 %indvar.next, %numTokens
+  
+  br i1 %exitcond, label %bb2, label %bb1
+
+bb2:
+  ret void
 }
 >>
 
@@ -237,6 +256,18 @@ actor(actor, options) ::= <<
 ; Source file is "<actor.file>"
 
 declare i32 @printf(i8* noalias , ...) nounwind 
+
+<if(actor.inputs)>
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Input FIFOs
+<actor.inputs: printInputFifoFunction(); separator="\n\n">
+<endif>
+
+<if(actor.outputs)>
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Output FIFOs
+<actor.outputs: printOutputFifoFunction(); separator="\n\n">
+<endif>
 
 <if(actor.parameters)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
