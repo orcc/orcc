@@ -405,10 +405,4 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		return actor.toString();
 	}
 
-	@Override
-	public void visit(Actor actor) {
-		throw new OrccRuntimeException(
-				"ActorNormalizer.visit(Actor): please use doSwitch");
-	}
-
 }

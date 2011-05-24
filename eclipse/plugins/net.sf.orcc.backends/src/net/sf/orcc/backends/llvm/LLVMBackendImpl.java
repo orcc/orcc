@@ -128,7 +128,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 			new ActorClassifier().doSwitch(actor);
 
 			if (normalize) {
-				new ActorNormalizer().visit(actor);
+				new ActorNormalizer().doSwitch(actor);
 			}
 		}
 

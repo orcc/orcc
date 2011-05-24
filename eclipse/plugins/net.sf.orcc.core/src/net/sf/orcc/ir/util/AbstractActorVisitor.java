@@ -378,27 +378,6 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 	}
 
 	@Override
-	public void visit(Actor actor) {
-		this.actor = actor;
-
-		for (Procedure proc : actor.getProcs()) {
-			visit(proc);
-		}
-
-		itAction = actor.getActions().listIterator();
-		while (itAction.hasNext()) {
-			Action action = itAction.next();
-			visit(action);
-		}
-
-		itAction = actor.getInitializes().listIterator();
-		while (itAction.hasNext()) {
-			Action action = itAction.next();
-			visit(action);
-		}
-	}
-
-	@Override
 	public void visit(ExprBinary expr, Object... args) {
 		expr.getE1().accept(this, args);
 		expr.getE2().accept(this, args);

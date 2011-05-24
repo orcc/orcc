@@ -61,7 +61,7 @@ public class InstructionStats {
 		public void buildInstructionStats(Actor actor,
 				InstructionStatsElement statsElement) {
 			this.statsElement = statsElement;
-			visit(actor);
+			doSwitch(actor);
 		}
 
 		@Override

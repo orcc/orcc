@@ -46,12 +46,4 @@ public interface ActorVisitor<T> {
 	 */
 	public T doSwitch(Actor actor);
 
-	/**
-	 * Visits the given actor.
-	 * 
-	 * @param actor
-	 *            an actor
-	 */
-	public void visit(Actor actor);
-
 }

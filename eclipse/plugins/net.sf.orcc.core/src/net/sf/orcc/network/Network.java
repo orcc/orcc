@@ -665,7 +665,7 @@ public class Network {
 	 */
 	public void normalizeActors() throws OrccException {
 		for (Actor actor : getActors()) {
-			new ActorNormalizer().visit(actor);
+			new ActorNormalizer().doSwitch(actor);
 		}
 	}
 

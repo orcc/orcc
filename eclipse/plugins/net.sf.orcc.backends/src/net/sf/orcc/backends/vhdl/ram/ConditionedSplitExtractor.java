@@ -45,9 +45,4 @@ public class ConditionedSplitExtractor implements ActorVisitor<Object> {
 		return null;
 	}
 
-	@Override
-	public void visit(Actor actor) {
-		// to be removed eventually
-	}
-
 }

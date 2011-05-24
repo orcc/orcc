@@ -224,7 +224,7 @@ public class CBackendImpl extends AbstractBackend {
 		replacementMap.put("IN", "IN_my_precious");
 
 		if (normalize) {
-			new ActorNormalizer().visit(actor);
+			new ActorNormalizer().doSwitch(actor);
 		}
 
 		ActorVisitor<?>[] transformations = { new TypeSizeTransformation(),

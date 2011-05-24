@@ -92,7 +92,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 				new DeadCodeElimination(), new DeadVariableRemoval() };
 
 		for (ActorVisitor<?> transformation : transformations) {
-			transformation.visit(actor);
+			transformation.doSwitch(actor);
 		}
 	}
 

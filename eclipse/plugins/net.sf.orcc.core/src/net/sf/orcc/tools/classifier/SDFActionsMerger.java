@@ -335,7 +335,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		this.actor = actor;
 
 		FSM fsm = actor.getFsm();
@@ -353,6 +353,7 @@ public class SDFActionsMerger extends AbstractActorVisitor<Object> {
 			// Update the fsm
 			actor.setFsm(updateFSM(fsm.getInitialState(), graph));
 		}
+		return null;
 	}
 
 }

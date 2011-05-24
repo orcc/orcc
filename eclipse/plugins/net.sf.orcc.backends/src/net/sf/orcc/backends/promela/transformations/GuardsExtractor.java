@@ -114,7 +114,7 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public void visit(Actor actor) {
+	public Object caseActor(Actor actor) {
 		for (Action action : actor.getActions()) {
 			currAction = action;
 			guardList = new ArrayList<Expression>();
@@ -150,6 +150,8 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 				}
 			}
 		}
+		
+		return null;
 	}
 
 	@Override

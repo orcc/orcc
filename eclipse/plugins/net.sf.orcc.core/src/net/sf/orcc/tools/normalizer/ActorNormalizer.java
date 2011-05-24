@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.tools.normalizer;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.moc.MoC;
@@ -52,22 +51,17 @@ public class ActorNormalizer implements ActorVisitor<Object> {
 
 	@Override
 	public Object doSwitch(Actor actor) {
-		if (!actor.hasMoC()){
-			//Actor has not been classified
+		if (!actor.hasMoC()) {
+			// Actor has not been classified
 			new ActorClassifier().doSwitch(actor);
 		}
-		
+
 		MoC clasz = actor.getMoC();
 		if (clasz.isCSDF()) {
 			new StaticActorNormalizer(actor).normalize();
 		}
-		
-		return null;
-	}
 
-	@Override
-	public void visit(Actor actor) {
-		throw new OrccRuntimeException("ActorNormalizer.visit(Actor): please use doSwitch");
+		return null;
 	}
 
 }
