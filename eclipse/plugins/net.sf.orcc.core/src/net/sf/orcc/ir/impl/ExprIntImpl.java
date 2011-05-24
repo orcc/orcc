@@ -13,7 +13,6 @@ import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
@@ -87,12 +86,6 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	public ExprIntImpl(BigInteger value) {
 		super();
 		setValue(value);
-	}
-
-	@Override
-	public void accept(ExpressionVisitor visitor, Object... args) {
-		System.err.println("ExprIntImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this, args);
 	}
 
 	@Override

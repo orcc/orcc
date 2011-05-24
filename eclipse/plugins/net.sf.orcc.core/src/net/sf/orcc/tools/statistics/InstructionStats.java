@@ -65,29 +65,29 @@ public class InstructionStats {
 		}
 
 		@Override
-		public void visit(ExprBinary expr, Object... args) {
+		public Object caseExprBinary(ExprBinary expr) {
 			int count = statsElement.binaryOpNbMap.get(expr.getOp()) + 1;
 			statsElement.binaryOpNbMap.put(expr.getOp(), count);
-			super.visit(expr, args);
+			return super.caseExprBinary(expr);
 		}
 
 		@Override
-		public void visit(NodeIf nodeIf) {
+		public Object caseNodeIf(NodeIf nodeIf) {
 			statsElement.ifNb++;
-			super.visit(nodeIf);
+			return super.caseNodeIf(nodeIf);
 		}
 
 		@Override
-		public void visit(ExprUnary expr, Object... args) {
+		public Object caseExprUnary(ExprUnary expr) {
 			int count = statsElement.unaryOpNbMap.get(expr.getOp()) + 1;
 			statsElement.unaryOpNbMap.put(expr.getOp(), count);
-			super.visit(expr, args);
+			return super.caseExprUnary(expr);
 		}
 
 		@Override
-		public void visit(NodeWhile nodeWhile) {
+		public Object caseNodeWhile(NodeWhile nodeWhile) {
 			statsElement.whileNb++;
-			super.visit(nodeWhile);
+			return super.caseNodeWhile(nodeWhile);
 		}
 	}
 

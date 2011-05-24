@@ -13,7 +13,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -72,13 +71,6 @@ public class InstStoreImpl extends InstructionImpl implements InstStore {
 	 */
 	protected InstStoreImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		System.err
-				.println("InstStoreImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	/**

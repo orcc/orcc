@@ -10,7 +10,6 @@ import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -47,12 +46,6 @@ public class ExprVarImpl extends ExpressionImpl implements ExprVar {
 	 */
 	protected ExprVarImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(ExpressionVisitor visitor, Object... args) {
-		System.err.println("ExprVarImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this, args);
 	}
 
 	/**

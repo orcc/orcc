@@ -14,7 +14,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.AbstractEList;
@@ -53,12 +52,6 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 	 */
 	protected ExprListImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(ExpressionVisitor visitor, Object... args) {
-		System.err.println("ExprListImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this, args);
 	}
 
 	/**

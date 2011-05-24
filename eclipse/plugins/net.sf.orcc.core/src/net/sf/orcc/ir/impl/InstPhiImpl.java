@@ -14,7 +14,6 @@ import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -76,12 +75,6 @@ public class InstPhiImpl extends InstructionImpl implements InstPhi {
 	 */
 	protected InstPhiImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		System.err.println("InstPhiImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	/**

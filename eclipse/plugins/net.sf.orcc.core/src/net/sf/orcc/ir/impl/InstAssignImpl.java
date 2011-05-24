@@ -11,7 +11,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -57,13 +56,6 @@ public class InstAssignImpl extends InstructionImpl implements InstAssign {
 	 */
 	protected InstAssignImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		System.err
-				.println("InstAssignImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	/**

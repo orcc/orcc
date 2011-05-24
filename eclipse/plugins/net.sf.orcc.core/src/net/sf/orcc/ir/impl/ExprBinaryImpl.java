@@ -11,7 +11,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.util.ExpressionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -89,12 +88,6 @@ public class ExprBinaryImpl extends ExpressionImpl implements ExprBinary {
 	 */
 	protected ExprBinaryImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(ExpressionVisitor visitor, Object... args) {
-		System.err.println("ExprBinaryImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this, args);
 	}
 
 	/**

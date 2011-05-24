@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.util;
 
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -68,24 +67,13 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
-		ActorVisitor<T>, ExpressionVisitor, InstructionVisitor, NodeVisitor {
-
-	/**
-	 * current action being visited (if any).
-	 */
-	protected Action action;
+		ActorVisitor<T> {
 
 	protected Actor actor;
 
 	protected int indexInst;
 
 	protected int indexNode;
-
-	protected ListIterator<Action> itAction;
-
-	protected ListIterator<Instruction> itInstruction;
-
-	protected ListIterator<Node> itNode;
 
 	/**
 	 * current procedure being visited
@@ -338,213 +326,6 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 
 		indexNode = oldIndexNode;
 		return result;
-	}
-
-	/**
-	 * Returns <code>true</code> if the variable is not in the locals nor
-	 * parameters of the current procedure.
-	 * 
-	 * @param variable
-	 * @return <code>true</code> if the variable is not in the locals nor
-	 *         parameters of the current procedure
-	 */
-	final public boolean isPort(Var variable) {
-		System.err
-				.println("isPort(variable): Please switch to the EMF-based API");
-		if (action != null) {
-			return action.getInputPattern().contains(variable)
-					|| action.getOutputPattern().contains(variable)
-					|| action.getPeekPattern().contains(variable);
-		}
-
-		return false;
-	}
-
-	/**
-	 * Visits the given action.
-	 * 
-	 * @param action
-	 *            an action
-	 */
-	public void visit(Action action) {
-		System.err.println("visit(Action): Please switch to the EMF-based API");
-		this.action = action;
-		visit(action.getInputPattern());
-		visit(action.getOutputPattern());
-		visit(action.getPeekPattern());
-		visit(action.getScheduler());
-		visit(action.getBody());
-		this.action = null;
-	}
-
-	@Override
-	public void visit(ExprBinary expr, Object... args) {
-		expr.getE1().accept(this, args);
-		expr.getE2().accept(this, args);
-	}
-
-	@Override
-	public void visit(ExprBool expr, Object... args) {
-	}
-
-	@Override
-	public void visit(ExprFloat expr, Object... args) {
-	}
-
-	@Override
-	public void visit(ExprInt expr, Object... args) {
-	}
-
-	@Override
-	public void visit(ExprList expr, Object... args) {
-	}
-
-	@Override
-	public void visit(ExprString expr, Object... args) {
-	}
-
-	@Override
-	public void visit(ExprUnary expr, Object... args) {
-		expr.getExpr().accept(this, args);
-	}
-
-	@Override
-	public void visit(ExprVar expr, Object... args) {
-	}
-
-	@Override
-	public void visit(InstAssign assign) {
-		if (visitFull) {
-			assign.getValue().accept(this);
-		}
-	}
-
-	@Override
-	public void visit(InstCall call) {
-		if (visitFull) {
-			for (Expression expr : call.getParameters()) {
-				expr.accept(this);
-			}
-		}
-	}
-
-	@Override
-	public void visit(InstLoad load) {
-		if (visitFull) {
-			for (Expression expr : load.getIndexes()) {
-				expr.accept(this);
-			}
-		}
-	}
-
-	@Override
-	public void visit(InstPhi phi) {
-		if (visitFull) {
-			for (Expression expr : phi.getValues()) {
-				expr.accept(this);
-			}
-		}
-	}
-
-	@Override
-	public void visit(InstReturn returnInstr) {
-		if (visitFull) {
-			Expression expr = returnInstr.getValue();
-			if (expr != null) {
-				expr.accept(this);
-			}
-		}
-	}
-
-	@Override
-	public void visit(InstSpecific inst) {
-		// default implementation does nothing
-	}
-
-	@Override
-	public void visit(InstStore store) {
-		if (visitFull) {
-			for (Expression expr : store.getIndexes()) {
-				expr.accept(this);
-			}
-
-			store.getValue().accept(this);
-		}
-	}
-
-	/**
-	 * Visits the nodes of the given node list.
-	 * 
-	 * @param nodes
-	 *            a list of nodes that belong to a procedure
-	 */
-	public void visit(List<Node> nodes) {
-		System.err
-				.println("visit(List<Node>): Please switch to the EMF-based API");
-		ListIterator<Node> oldItNode = itNode;
-		itNode = nodes.listIterator();
-		while (itNode.hasNext()) {
-			Node node = itNode.next();
-			node.accept(this);
-		}
-
-		// restore old iterator
-		itNode = oldItNode;
-	}
-
-	@Override
-	public void visit(NodeBlock nodeBlock) {
-		itInstruction = nodeBlock.listIterator();
-		while (itInstruction.hasNext()) {
-			Instruction instruction = itInstruction.next();
-			instruction.accept(this);
-		}
-	}
-
-	@Override
-	public void visit(NodeIf nodeIf) {
-		if (visitFull) {
-			nodeIf.getCondition().accept(this);
-		}
-
-		visit(nodeIf.getThenNodes());
-		visit(nodeIf.getElseNodes());
-		visit(nodeIf.getJoinNode());
-	}
-
-	@Override
-	public void visit(NodeWhile nodeWhile) {
-		if (visitFull) {
-			nodeWhile.getCondition().accept(this);
-		}
-
-		visit(nodeWhile.getNodes());
-		visit(nodeWhile.getJoinNode());
-	}
-
-	/**
-	 * Visits the given pattern.
-	 * 
-	 * @param pattern
-	 *            an pattern
-	 */
-	public void visit(Pattern pattern) {
-		System.err
-				.println("visit(Pattern): Please switch to the EMF-based API");
-	}
-
-	/**
-	 * Visits the given procedure.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 */
-	public void visit(Procedure procedure) {
-		System.err
-				.println("visit(Procedure): Please switch to the EMF-based API");
-		this.procedure = procedure;
-		List<Node> nodes = procedure.getNodes();
-		visit(nodes);
 	}
 
 }

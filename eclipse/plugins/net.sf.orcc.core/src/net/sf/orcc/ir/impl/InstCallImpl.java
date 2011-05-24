@@ -14,7 +14,6 @@ import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -73,13 +72,6 @@ public class InstCallImpl extends InstructionImpl implements InstCall {
 	 */
 	protected InstCallImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		System.err
-				.println("InstCallImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	/**

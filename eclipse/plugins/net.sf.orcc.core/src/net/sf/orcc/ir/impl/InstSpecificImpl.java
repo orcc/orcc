@@ -8,7 +8,6 @@ package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.IrPackage;
-import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.ecore.EClass;
 
@@ -27,12 +26,6 @@ public abstract class InstSpecificImpl extends InstructionImpl implements InstSp
 	 */
 	protected InstSpecificImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		System.err.println("InstSpecificImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	/**

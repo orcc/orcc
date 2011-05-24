@@ -30,8 +30,6 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
-import net.sf.orcc.ir.util.NodeVisitor;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -41,16 +39,6 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  */
 public interface Node extends EObject {
-
-	/**
-	 * Accepts the given node visitor.
-	 * 
-	 * @param visitor
-	 *            a visitor
-	 * @param args
-	 *            arguments
-	 */
-	public void accept(NodeVisitor visitor);
 
 	/**
 	 * Returns the predecessors of this node in the CFG.

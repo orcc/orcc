@@ -120,7 +120,7 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 			guardList = new ArrayList<Expression>();
 			loadList = new ArrayList<InstLoad>();
 			guards.put(currAction, guardList);
-			visit(action.getScheduler());
+			doSwitch(action.getScheduler());
 			removeLoads();
 		}
 		// Get the priorities. The list of actions are in decreasing priority
@@ -155,16 +155,18 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public void visit(InstAssign assign) {
+	public Object caseInstAssign(InstAssign assign) {
 		// we should also consider other cases but this is enough for now
 		if (!assign.getValue().isBooleanExpr()) {
 			guardList.add(assign.getValue());
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(InstLoad load) {
+	public Object caseInstLoad(InstLoad load) {
 		loadList.add(load);
+		return null;
 	}
 
 }

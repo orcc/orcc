@@ -13,7 +13,6 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.NodeBlock;
-import net.sf.orcc.ir.util.NodeVisitor;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -52,12 +51,6 @@ public class NodeBlockImpl extends NodeImpl implements NodeBlock {
 	 */
 	protected NodeBlockImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(NodeVisitor visitor) {
-		System.err.println("NodeBlockImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	@Override

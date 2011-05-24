@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.util.ExpressionVisitor;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -41,16 +39,6 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public interface Expression extends EObject {
-
-	/**
-	 * Accepts a visitor.
-	 * 
-	 * @param visitor
-	 *            an expression visitor
-	 * @param args
-	 *            arguments
-	 */
-	public void accept(ExpressionVisitor visitor, Object... args);
 
 	/**
 	 * Returns the type of this expression.

@@ -13,7 +13,6 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
-import net.sf.orcc.ir.util.NodeVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -104,12 +103,6 @@ public class NodeIfImpl extends NodeImpl implements NodeIf {
 	 */
 	protected NodeIfImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(NodeVisitor visitor) {
-		System.err.println("NodeIfImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	/**

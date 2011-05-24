@@ -44,6 +44,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines a very simple Dead Code Elimination.
@@ -54,14 +55,14 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 public class DeadCodeElimination extends AbstractActorVisitor<Object> {
 
 	private void addNodes(List<Node> nodes, NodeBlock join, int index) {
-		itNode.previous();
-		itNode.remove();
+		indexNode--;
+		List<Node> parentNodes = EcoreHelper.getContainingList(join);
+		parentNodes.remove(indexNode);
 
-		for (Node node : nodes) {
-			itNode.add(node);
-		}
+		int size = nodes.size();
+		parentNodes.addAll(indexNode, nodes);
 
-		itNode.add(join);
+		parentNodes.add(indexNode + size, join);
 		replacePhis(join, index);
 	}
 

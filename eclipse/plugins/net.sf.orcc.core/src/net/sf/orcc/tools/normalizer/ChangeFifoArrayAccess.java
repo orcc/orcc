@@ -37,6 +37,7 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -68,7 +69,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 	public Object caseInstLoad(InstLoad load) {
 		Use use = load.getSource();
 		Var var = use.getVariable();
-		if (var.isLocal() && isPort(var)) {
+		if (var.isLocal() && var.eContainer() instanceof Pattern) {
 			use.setVariable(actor.getStateVar(var.getName()));
 			updateIndex(var, load.getIndexes());
 		}
@@ -79,7 +80,7 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 	public Object caseInstStore(InstStore store) {
 		Def def = store.getTarget();
 		Var var = def.getVariable();
-		if (var.isLocal() && isPort(var)) {
+		if (var.isLocal() && var.eContainer() instanceof Pattern) {
 			def.setVariable(actor.getStateVar(var.getName()));
 			updateIndex(var, store.getIndexes());
 		}

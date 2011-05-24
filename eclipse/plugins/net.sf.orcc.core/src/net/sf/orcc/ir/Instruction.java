@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.util.InstructionVisitor;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -39,16 +37,6 @@ import org.eclipse.emf.ecore.EObject;
  * @model abstract="true"
  */
 public interface Instruction extends EObject {
-
-	/**
-	 * Accepts the given instruction visitor.
-	 * 
-	 * @param visitor
-	 *            a visitor
-	 * @param args
-	 *            arguments
-	 */
-	void accept(InstructionVisitor visitor);
 
 	/**
 	 * Returns the block that contains this instruction.

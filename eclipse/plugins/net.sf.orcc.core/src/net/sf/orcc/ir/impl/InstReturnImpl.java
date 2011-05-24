@@ -10,7 +10,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.util.ExpressionPrinter;
-import net.sf.orcc.ir.util.InstructionVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -46,13 +45,6 @@ public class InstReturnImpl extends InstructionImpl implements InstReturn {
 	 */
 	protected InstReturnImpl() {
 		super();
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor) {
-		System.err
-				.println("InstReturnImpl.accept(visitor): Please switch to the EMF-based API");
-		visitor.visit(this);
 	}
 
 	/**
