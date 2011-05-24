@@ -238,10 +238,10 @@
     </genDataTypes>
     <genClasses image="false" ecoreClass="MoC.ecore#//MoC"/>
     <genClasses ecoreClass="MoC.ecore#//CSDFMoC">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//CSDFMoC/actions"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//CSDFMoC/inputPattern"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MoC.ecore#//CSDFMoC/numberOfPhases"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//CSDFMoC/outputPattern"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MoC.ecore#//CSDFMoC/invocations"/>
     </genClasses>
     <genClasses ecoreClass="MoC.ecore#//DPNMoC"/>
     <genClasses ecoreClass="MoC.ecore#//KPNMoC"/>
@@ -252,6 +252,9 @@
     <genClasses ecoreClass="MoC.ecore#//ActionToSDFMoCMapEntry">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//ActionToSDFMoCMapEntry/key"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//ActionToSDFMoCMapEntry/value"/>
+    </genClasses>
+    <genClasses ecoreClass="MoC.ecore#//Invocation">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//Invocation/action"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

@@ -311,7 +311,7 @@ public class StaticActorNormalizer {
 
 		// finds a pattern in the actions and visit it
 		LoopPatternRecognizer r = new LoopPatternRecognizer();
-		ExecutionPattern pattern = r.getPattern(staticCls.getActions());
+		ExecutionPattern pattern = r.getPattern(staticCls.getInvocations());
 		System.out.println(pattern);
 		pattern.accept(new MyPatternVisitor(procedure));
 

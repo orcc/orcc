@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.tools.classifier;
 
+import static net.sf.orcc.moc.MocFactory.eINSTANCE;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +43,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.QSDFMoC;
@@ -166,7 +169,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		State initialState = interpreter.getFsmState();
 		do {
 			interpreter.schedule();
-			csdfMoc.getActions().add(interpreter.getScheduledAction());
+			Action latest = interpreter.getScheduledAction();
+			Invocation invocation = eINSTANCE.createInvocation(latest);
+			csdfMoc.getInvocations().add(invocation);
 			nbPhases++;
 		} while ((!state.isInitialState() || interpreter.getFsmState() != initialState)
 				&& nbPhases < MAX_PHASES);
@@ -206,7 +211,8 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		do {
 			interpretedActor.schedule();
 			Action latest = interpretedActor.getScheduledAction();
-			sdfMoc.getActions().add(latest);
+			Invocation invocation = eINSTANCE.createInvocation(latest);
+			sdfMoc.getInvocations().add(invocation);
 			nbPhases++;
 		} while (!interpretedActor.getFsmState().equals(initialState)
 				&& nbPhases < MAX_PHASES);
@@ -284,7 +290,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
 		AbstractInterpreter interpretedActor = newInterpreter();
 		interpretedActor.schedule();
-		sdfMoc.getActions().add(interpretedActor.getScheduledAction());
+		Action action = interpretedActor.getScheduledAction();
+		Invocation invocation = eINSTANCE.createInvocation(action);
+		sdfMoc.getInvocations().add(invocation);
 
 		// set token rates
 		sdfMoc.setNumTokensConsumed(actor);

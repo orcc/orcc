@@ -12,6 +12,7 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.impl.IrPackageImpl;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
+import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.KPNMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.MocFactory;
@@ -72,6 +73,13 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	 * @generated
 	 */
 	private EClass actionToSDFMoCMapEntryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass invocationEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -170,7 +178,7 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getCSDFMoC_Actions() {
+	public EReference getCSDFMoC_InputPattern() {
 		return (EReference)csdfMoCEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -178,16 +186,8 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getCSDFMoC_InputPattern() {
-		return (EReference)csdfMoCEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getCSDFMoC_NumberOfPhases() {
-		return (EAttribute)csdfMoCEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)csdfMoCEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -195,6 +195,15 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	 * @generated
 	 */
 	public EReference getCSDFMoC_OutputPattern() {
+		return (EReference)csdfMoCEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getCSDFMoC_Invocations() {
 		return (EReference)csdfMoCEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -266,6 +275,24 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getInvocation() {
+		return invocationEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getInvocation_Action() {
+		return (EReference)invocationEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -302,10 +329,10 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		moCEClass = createEClass(MO_C);
 
 		csdfMoCEClass = createEClass(CSDF_MO_C);
-		createEReference(csdfMoCEClass, CSDF_MO_C__ACTIONS);
 		createEReference(csdfMoCEClass, CSDF_MO_C__INPUT_PATTERN);
 		createEAttribute(csdfMoCEClass, CSDF_MO_C__NUMBER_OF_PHASES);
 		createEReference(csdfMoCEClass, CSDF_MO_C__OUTPUT_PATTERN);
+		createEReference(csdfMoCEClass, CSDF_MO_C__INVOCATIONS);
 
 		dpnMoCEClass = createEClass(DPN_MO_C);
 
@@ -319,6 +346,9 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		actionToSDFMoCMapEntryEClass = createEClass(ACTION_TO_SDF_MO_CMAP_ENTRY);
 		createEReference(actionToSDFMoCMapEntryEClass, ACTION_TO_SDF_MO_CMAP_ENTRY__KEY);
 		createEReference(actionToSDFMoCMapEntryEClass, ACTION_TO_SDF_MO_CMAP_ENTRY__VALUE);
+
+		invocationEClass = createEClass(INVOCATION);
+		createEReference(invocationEClass, INVOCATION__ACTION);
 
 		// Create data types
 		eMapEDataType = createEDataType(EMAP);
@@ -366,10 +396,10 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		initEClass(moCEClass, MoC.class, "MoC", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(csdfMoCEClass, CSDFMoC.class, "CSDFMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getCSDFMoC_Actions(), theIrPackage.getAction(), null, "actions", null, 0, -1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getCSDFMoC_InputPattern(), theIrPackage.getPattern(), null, "inputPattern", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getCSDFMoC_NumberOfPhases(), ecorePackage.getEInt(), "numberOfPhases", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getCSDFMoC_OutputPattern(), theIrPackage.getPattern(), null, "outputPattern", null, 0, 1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getCSDFMoC_Invocations(), this.getInvocation(), null, "invocations", null, 0, -1, CSDFMoC.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(dpnMoCEClass, DPNMoC.class, "DPNMoC", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -383,6 +413,9 @@ public class MocPackageImpl extends EPackageImpl implements MocPackage {
 		initEClass(actionToSDFMoCMapEntryEClass, Map.Entry.class, "ActionToSDFMoCMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getActionToSDFMoCMapEntry_Key(), theIrPackage.getAction(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActionToSDFMoCMapEntry_Value(), this.getSDFMoC(), null, "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(invocationEClass, Invocation.class, "Invocation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getInvocation_Action(), theIrPackage.getAction(), null, "action", null, 0, 1, Invocation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize data types
 		initEDataType(eMapEDataType, EMap.class, "EMap", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);

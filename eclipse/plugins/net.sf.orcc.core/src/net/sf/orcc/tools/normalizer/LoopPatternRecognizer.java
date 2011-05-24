@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.moc.Invocation;
 
 /**
  * This class defines a pattern. A pattern is the invocation of one or more
@@ -67,9 +68,10 @@ public class LoopPatternRecognizer {
 		}
 	}
 
-	private SequentialPattern createSequential(List<Action> actions) {
+	private SequentialPattern createSequential(List<Invocation> invocations) {
 		SequentialPattern pattern = new SequentialPattern();
-		for (Action action : actions) {
+		for (Invocation invocation : invocations) {
+			Action action = invocation.getAction();
 			SimplePattern simple = new SimplePattern(action);
 			pattern.add(simple);
 		}
@@ -232,9 +234,9 @@ public class LoopPatternRecognizer {
 	 *            a list of actions
 	 * @return an execution pattern that matches the given list of actions
 	 */
-	public ExecutionPattern getPattern(List<Action> actions) {
+	public ExecutionPattern getPattern(List<Invocation> invocations) {
 		SequentialPattern oldPattern;
-		SequentialPattern newPattern = createSequential(actions);
+		SequentialPattern newPattern = createSequential(invocations);
 		do {
 			oldPattern = newPattern;
 			newPattern = findPattern(oldPattern);

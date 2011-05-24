@@ -12,6 +12,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
+import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.KPNMoC;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.MocPackage;
@@ -107,9 +108,19 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 			case MocPackage.QSDF_MO_C: return createQSDFMoC();
 			case MocPackage.SDF_MO_C: return createSDFMoC();
 			case MocPackage.ACTION_TO_SDF_MO_CMAP_ENTRY: return (EObject)createActionToSDFMoCMapEntry();
+			case MocPackage.INVOCATION: return createInvocation();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Action, SDFMoC> createActionToSDFMoCMapEntry() {
+		ActionToSDFMoCMapEntryImpl actionToSDFMoCMapEntry = new ActionToSDFMoCMapEntryImpl();
+		return actionToSDFMoCMapEntry;
 	}
 
 	/**
@@ -158,6 +169,22 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Invocation createInvocation() {
+		InvocationImpl invocation = new InvocationImpl();
+		return invocation;
+	}
+
+	@Override
+	public Invocation createInvocation(Action action) {
+		InvocationImpl invocation = new InvocationImpl();
+		invocation.setAction(action);
+		return invocation;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
 	public KPNMoC createKPNMoC() {
 		KPNMoCImpl kpnMoC = new KPNMoCImpl();
 		return kpnMoC;
@@ -181,15 +208,6 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 		sdfMoC.setOutputPattern(IrFactory.eINSTANCE.createPattern());
 		sdfMoC.setNumberOfPhases(1);
 		return sdfMoC;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Action, SDFMoC> createActionToSDFMoCMapEntry() {
-		ActionToSDFMoCMapEntryImpl actionToSDFMoCMapEntry = new ActionToSDFMoCMapEntryImpl();
-		return actionToSDFMoCMapEntry;
 	}
 
 	/**

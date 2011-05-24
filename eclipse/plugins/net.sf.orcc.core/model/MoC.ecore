@@ -5,13 +5,13 @@
     nsURI="http:///net/sf/orcc/moc.ecore" nsPrefix="net.sf.orcc.moc">
   <eClassifiers xsi:type="ecore:EClass" name="MoC" abstract="true"/>
   <eClassifiers xsi:type="ecore:EClass" name="CSDFMoC" eSuperTypes="#//MoC">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
-        eType="ecore:EClass Ir.ecore#//Action"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="inputPattern" eType="ecore:EClass Ir.ecore#//Pattern"
         containment="true" resolveProxies="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="numberOfPhases" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="outputPattern" eType="ecore:EClass Ir.ecore#//Pattern"
         containment="true" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="invocations" upperBound="-1"
+        eType="#//Invocation" containment="true" resolveProxies="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DPNMoC" eSuperTypes="#//MoC"/>
   <eClassifiers xsi:type="ecore:EClass" name="KPNMoC" eSuperTypes="#//MoC"/>
@@ -23,6 +23,9 @@
   <eClassifiers xsi:type="ecore:EClass" name="ActionToSDFMoCMapEntry" instanceClassName="java.util.Map$Entry">
     <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="ecore:EClass Ir.ecore#//Action"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//SDFMoC"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Invocation">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="action" eType="ecore:EClass Ir.ecore#//Action"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EDataType" name="EMap" instanceClassName="org.eclipse.emf.common.util.EMap">
     <eTypeParameters name="T"/>

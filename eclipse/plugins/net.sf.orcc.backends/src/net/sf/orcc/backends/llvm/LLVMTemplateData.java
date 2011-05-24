@@ -223,7 +223,7 @@ public class LLVMTemplateData {
 
 	private void computeCSDFMoC(CSDFMoC sdfmoc) {
 		actionMoC.put(sdfmoc, id++);
-		actionMoC.put(sdfmoc.getActions(), id++);
+		actionMoC.put(sdfmoc.getInvocations(), id++);
 		computePattern(sdfmoc.getInputPattern());
 		computePattern(sdfmoc.getOutputPattern());
 	}

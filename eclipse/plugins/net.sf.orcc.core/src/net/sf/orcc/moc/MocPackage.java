@@ -91,22 +91,13 @@ public interface MocPackage extends EPackage {
 	int CSDF_MO_C = 1;
 
 	/**
-	 * The feature id for the '<em><b>Actions</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int CSDF_MO_C__ACTIONS = MO_C_FEATURE_COUNT + 0;
-
-	/**
 	 * The feature id for the '<em><b>Input Pattern</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CSDF_MO_C__INPUT_PATTERN = MO_C_FEATURE_COUNT + 1;
+	int CSDF_MO_C__INPUT_PATTERN = MO_C_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Number Of Phases</b></em>' attribute.
@@ -115,7 +106,7 @@ public interface MocPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CSDF_MO_C__NUMBER_OF_PHASES = MO_C_FEATURE_COUNT + 2;
+	int CSDF_MO_C__NUMBER_OF_PHASES = MO_C_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Output Pattern</b></em>' containment reference.
@@ -124,7 +115,16 @@ public interface MocPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CSDF_MO_C__OUTPUT_PATTERN = MO_C_FEATURE_COUNT + 3;
+	int CSDF_MO_C__OUTPUT_PATTERN = MO_C_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Invocations</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CSDF_MO_C__INVOCATIONS = MO_C_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>CSDF Mo C</em>' class.
@@ -212,15 +212,6 @@ public interface MocPackage extends EPackage {
 	int SDF_MO_C = 5;
 
 	/**
-	 * The feature id for the '<em><b>Actions</b></em>' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int SDF_MO_C__ACTIONS = CSDF_MO_C__ACTIONS;
-
-	/**
 	 * The feature id for the '<em><b>Input Pattern</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -246,6 +237,15 @@ public interface MocPackage extends EPackage {
 	 * @ordered
 	 */
 	int SDF_MO_C__OUTPUT_PATTERN = CSDF_MO_C__OUTPUT_PATTERN;
+
+	/**
+	 * The feature id for the '<em><b>Invocations</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SDF_MO_C__INVOCATIONS = CSDF_MO_C__INVOCATIONS;
 
 	/**
 	 * The number of structural features of the '<em>SDF Mo C</em>' class.
@@ -294,6 +294,34 @@ public interface MocPackage extends EPackage {
 	int ACTION_TO_SDF_MO_CMAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.moc.impl.InvocationImpl <em>Invocation</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.moc.impl.InvocationImpl
+	 * @see net.sf.orcc.moc.impl.MocPackageImpl#getInvocation()
+	 * @generated
+	 */
+	int INVOCATION = 7;
+
+	/**
+	 * The feature id for the '<em><b>Action</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INVOCATION__ACTION = 0;
+
+	/**
+	 * The number of structural features of the '<em>Invocation</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int INVOCATION_FEATURE_COUNT = 1;
+
+	/**
 	 * The meta object id for the '<em>EMap</em>' data type.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -301,7 +329,7 @@ public interface MocPackage extends EPackage {
 	 * @see net.sf.orcc.moc.impl.MocPackageImpl#getEMap()
 	 * @generated
 	 */
-	int EMAP = 7;
+	int EMAP = 8;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.moc.MoC <em>Mo C</em>}'.
@@ -322,17 +350,6 @@ public interface MocPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getCSDFMoC();
-
-	/**
-	 * Returns the meta object for the reference list '{@link net.sf.orcc.moc.CSDFMoC#getActions <em>Actions</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference list '<em>Actions</em>'.
-	 * @see net.sf.orcc.moc.CSDFMoC#getActions()
-	 * @see #getCSDFMoC()
-	 * @generated
-	 */
-	EReference getCSDFMoC_Actions();
 
 	/**
 	 * Returns the meta object for the containment reference '{@link net.sf.orcc.moc.CSDFMoC#getInputPattern <em>Input Pattern</em>}'.
@@ -366,6 +383,17 @@ public interface MocPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getCSDFMoC_OutputPattern();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.moc.CSDFMoC#getInvocations <em>Invocations</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Invocations</em>'.
+	 * @see net.sf.orcc.moc.CSDFMoC#getInvocations()
+	 * @see #getCSDFMoC()
+	 * @generated
+	 */
+	EReference getCSDFMoC_Invocations();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.moc.DPNMoC <em>DPN Mo C</em>}'.
@@ -453,6 +481,27 @@ public interface MocPackage extends EPackage {
 	EReference getActionToSDFMoCMapEntry_Value();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.moc.Invocation <em>Invocation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Invocation</em>'.
+	 * @see net.sf.orcc.moc.Invocation
+	 * @generated
+	 */
+	EClass getInvocation();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.moc.Invocation#getAction <em>Action</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Action</em>'.
+	 * @see net.sf.orcc.moc.Invocation#getAction()
+	 * @see #getInvocation()
+	 * @generated
+	 */
+	EReference getInvocation_Action();
+
+	/**
 	 * Returns the meta object for data type '{@link org.eclipse.emf.common.util.EMap <em>EMap</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -504,13 +553,6 @@ public interface MocPackage extends EPackage {
 		 */
 		EClass CSDF_MO_C = eINSTANCE.getCSDFMoC();
 		/**
-		 * The meta object literal for the '<em><b>Actions</b></em>' reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference CSDF_MO_C__ACTIONS = eINSTANCE.getCSDFMoC_Actions();
-		/**
 		 * The meta object literal for the '<em><b>Input Pattern</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -531,6 +573,13 @@ public interface MocPackage extends EPackage {
 		 * @generated
 		 */
 		EReference CSDF_MO_C__OUTPUT_PATTERN = eINSTANCE.getCSDFMoC_OutputPattern();
+		/**
+		 * The meta object literal for the '<em><b>Invocations</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference CSDF_MO_C__INVOCATIONS = eINSTANCE.getCSDFMoC_Invocations();
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.moc.impl.DPNMoCImpl <em>DPN Mo C</em>}' class.
 		 * <!-- begin-user-doc -->
@@ -597,6 +646,22 @@ public interface MocPackage extends EPackage {
 		 * @generated
 		 */
 		EReference ACTION_TO_SDF_MO_CMAP_ENTRY__VALUE = eINSTANCE.getActionToSDFMoCMapEntry_Value();
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.moc.impl.InvocationImpl <em>Invocation</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.moc.impl.InvocationImpl
+		 * @see net.sf.orcc.moc.impl.MocPackageImpl#getInvocation()
+		 * @generated
+		 */
+		EClass INVOCATION = eINSTANCE.getInvocation();
+		/**
+		 * The meta object literal for the '<em><b>Action</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference INVOCATION__ACTION = eINSTANCE.getInvocation_Action();
 		/**
 		 * The meta object literal for the '<em>EMap</em>' data type.
 		 * <!-- begin-user-doc -->

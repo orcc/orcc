@@ -56,6 +56,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.Invocation;
 import net.sf.orcc.moc.MocFactory;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.network.Connection;
@@ -375,9 +376,9 @@ public class ActorMerger implements INetworkTransformation {
 			Instance instance = vertex.getInstance();
 
 			CSDFMoC moc = (CSDFMoC) instance.getMoC();
-			Iterator<Action> it = moc.getActions().iterator();
+			Iterator<Invocation> it = moc.getInvocations().iterator();
 			while (it.hasNext()) {
-				Action action = it.next();
+				Action action = it.next().getAction();
 				String name = instance.getId() + "_" + action.getName();
 				Procedure proc = factory.createProcedure(name, 0,
 						factory.createTypeVoid());
@@ -486,7 +487,7 @@ public class ActorMerger implements INetworkTransformation {
 			if (iterand.isVertex()) {
 				Instance instance = iterand.getVertex().getInstance();
 				CSDFMoC moc = (CSDFMoC) instance.getMoC();
-				Action action = moc.getActions().get(0);
+				Action action = moc.getInvocations().get(0).getAction();
 
 				Procedure proc = superActor.getProcedure(instance.getId() + "_"
 						+ action.getName());

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.moc;
 
-import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
@@ -45,20 +44,20 @@ import org.eclipse.emf.common.util.EList;
 public interface CSDFMoC extends MoC {
 
 	/**
-	 * Returns the list of actions that can be scheduled statically.
-	 * 
-	 * @return the list of actions that can be scheduled statically
-	 * @model
-	 */
-	EList<Action> getActions();
-
-	/**
 	 * Returns the input pattern of this CSDF MoC.
 	 * 
 	 * @return the input pattern of this CSDF MoC
 	 * @model containment="true"
 	 */
 	Pattern getInputPattern();
+
+	/**
+	 * Returns the list of actions invoked that can be scheduled statically.
+	 * 
+	 * @return the list of actions invoked that can be scheduled statically
+	 * @model containment="true"
+	 */
+	EList<Invocation> getInvocations();
 
 	/**
 	 * Returns the number of phases of this MoC.
@@ -105,14 +104,6 @@ public interface CSDFMoC extends MoC {
 	void setNumberOfPhases(int numberOfPhases);
 
 	/**
-	 * Set the output pattern of this CSDF MoC.
-	 * 
-	 * @param pattern
-	 *            set the output pattern
-	 */
-	void setOutputPattern(Pattern pattern);
-
-	/**
 	 * Saves the number of tokens consumed by input ports of the given actor.
 	 * 
 	 * @param actor
@@ -127,5 +118,13 @@ public interface CSDFMoC extends MoC {
 	 *            an actor
 	 */
 	void setNumTokensProduced(Actor actor);
+
+	/**
+	 * Set the output pattern of this CSDF MoC.
+	 * 
+	 * @param pattern
+	 *            set the output pattern
+	 */
+	void setOutputPattern(Pattern pattern);
 
 }
