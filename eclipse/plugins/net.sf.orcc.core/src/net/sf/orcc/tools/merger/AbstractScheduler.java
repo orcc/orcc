@@ -30,9 +30,6 @@
 package net.sf.orcc.tools.merger;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.network.Connection;
@@ -52,15 +49,15 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	protected Schedule schedule;
 
-	protected Map<Connection, Integer> bufferCapacities;
+	protected Map<Connection, Integer> maxTokens;
 
 	protected Map<Vertex, Integer> repetitionVector;
-
-	private boolean stop = false;
 
 	private int depth;
 
 	private int maxDepth;
+
+	Map<Connection, Integer> tokens;
 
 	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph) {
 		this.graph = graph;
@@ -69,11 +66,40 @@ public abstract class AbstractScheduler implements IScheduler {
 				.getRepetitionVector();
 	}
 
-	private void depth(Schedule schedule) {
+	private void computeMemoryBound(Schedule schedule) {
+		for (Iterand iterand : schedule.getIterands()) {
+			if (iterand.isVertex()) {
+				Vertex vertex = iterand.getVertex();
+				for (Connection connection : graph.incomingEdgesOf(vertex)) {
+					int cns = connection.getTarget().getNumTokensConsumed();
+					tokens.put(connection, tokens.get(connection) - cns);
+				}
+				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
+					int current = tokens.get(connection);
+					int max = maxTokens.get(connection);
+					int prd = connection.getSource().getNumTokensProduced();
+					tokens.put(connection, current + prd);
+					if (max < current + prd) {
+						maxTokens.put(connection, current + prd);
+					}
+				}
+			} else {
+				Schedule sched = iterand.getSchedule();
+				int count = sched.getIterationCount();
+				while (count != 0) {
+					computeMemoryBound(iterand.getSchedule());
+					count--;
+				}
+			}
+		}
+
+	}
+
+	private void computeDepth(Schedule schedule) {
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isSchedule()) {
 				depth++;
-				depth(iterand.getSchedule());
+				computeDepth(iterand.getSchedule());
 				depth--;
 			} else {
 				if (depth > maxDepth)
@@ -82,64 +108,42 @@ public abstract class AbstractScheduler implements IScheduler {
 		}
 	}
 
-	public Map<Connection, Integer> getBufferCapacities() {
-		if (bufferCapacities == null) {
-			bufferCapacities = new HashMap<Connection, Integer>();
+	public Map<Connection, Integer> getMaxTokens() {
+		if (maxTokens == null) {
+			maxTokens = new HashMap<Connection, Integer>();
+			tokens = new HashMap<Connection, Integer>();
 
-			for (Connection edge : graph.edgeSet()) {
-				Vertex src = graph.getEdgeSource(edge);
-				Vertex tgt = graph.getEdgeTarget(edge);
-
-				List<Schedule> schedules = getHierarchy(schedule, src);
-				schedules.removeAll(getHierarchy(schedule, tgt));
-
-				int q = 1;
-				for (Schedule schedule : schedules) {
-					q *= schedule.getIterationCount();
-				}
-
-				int p = edge.getSource().getNumTokensProduced();
-				bufferCapacities.put(edge, p * q);
+			for (Connection connection : graph.edgeSet()) {
+				maxTokens.put(connection, 0);
+				tokens.put(connection, 0);
 			}
+			computeMemoryBound(schedule);
 		}
-		return bufferCapacities;
+		return maxTokens;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public int getDepth() {
 		depth = maxDepth = 0;
-		depth(schedule);
+		computeDepth(schedule);
 		return maxDepth;
 	}
 
-	private List<Schedule> getHierarchy(Schedule schedule, Vertex vertex) {
-		List<Schedule> schedules = new LinkedList<Schedule>();
-
-		stop = false;
-
-		Iterator<Iterand> it = schedule.getIterands().iterator();
-		while (it.hasNext()) {
-			Iterand iterand = it.next();
-			if (iterand.isVertex()) {
-				if (iterand.getVertex().equals(vertex)) {
-					stop = true;
-				}
-			} else {
-				Schedule sched = iterand.getSchedule();
-				((LinkedList<Schedule>) schedules).addLast(sched);
-				schedules.addAll(getHierarchy(sched, vertex));
-				if (stop == true)
-					break;
-				((LinkedList<Schedule>) schedules).removeLast();
-			}
-		}
-
-		return schedules;
-	}
-
+	/**
+	 * 
+	 * @return
+	 */
 	public Map<Vertex, Integer> getRepetitionVector() {
 		return repetitionVector;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Schedule getSchedule() {
 		return schedule;
 	}

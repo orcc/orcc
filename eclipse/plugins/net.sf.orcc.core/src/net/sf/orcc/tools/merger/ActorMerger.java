@@ -169,7 +169,7 @@ public class ActorMerger implements INetworkTransformation {
 		procedure.getLocals().add(tmp);
 
 		// Initialize read/write counters
-		for (Var var : buffersMap.values()) {
+		for (Var var : new HashSet<Var>(buffersMap.values())) {
 			Var read = superActor.getStateVar(var.getName() + "_r");
 			Var write = superActor.getStateVar(var.getName() + "_w");
 
@@ -443,7 +443,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		// Create buffers for connections inside the sub-graph
 		for (Map.Entry<Connection, Integer> entry : scheduler
-				.getBufferCapacities().entrySet()) {
+				.getMaxTokens().entrySet()) {
 			String name = "buffer_" + index++;
 			Connection conn = entry.getKey();
 			addBuffer(name, entry.getValue(), conn.getSource().getType());
