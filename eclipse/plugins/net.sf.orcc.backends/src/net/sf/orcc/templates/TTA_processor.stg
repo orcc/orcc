@@ -1,7 +1,201 @@
 
 
-processor(processor, options) ::= <<
+processor(instance, options) ::= <<
+-------------------------------------------------------------------------------
+-- Title      : Instance: <instance.id>
+-- Project    : 
+-------------------------------------------------------------------------------
+-- File       : processor_<instance.id>.vhd
+-- Author     : Orcc - TTA
+-- Company    : 
+-- Created    : 
+-- Standard   : VHDL'93
+-------------------------------------------------------------------------------
+-- Copyright (c)  
+-------------------------------------------------------------------------------
+-- Revisions  :
+-- Date        Version  Author  Description
+-- 
+-------------------------------------------------------------------------------
 
-// Print a processor
 
+------------------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+
+library work;
+
+
+------------------------------------------------------------------------------
+entity processor_decoder_motion_add is
+  port
+    (
+      clk          : in  std_logic;
+      data_1_in    : in  std_logic_vector(31 downto 0);
+      status_1_in  : in  std_logic_vector(8 downto 0);
+      ack_1_in     : out std_logic;
+      data_2_in    : in  std_logic_vector(31 downto 0);
+      status_2_in  : in  std_logic_vector(8 downto 0);
+      ack_2_in     : out std_logic;
+      data_3_in    : in  std_logic_vector(31 downto 0);
+      status_3_in  : in  std_logic_vector(8 downto 0);
+      ack_3_in     : out std_logic;
+      data_1_out   : out std_logic_vector(31 downto 0);
+      status_1_out : in  std_logic_vector(8 downto 0);
+      dv_1_out     : out std_logic;
+      reset_n      : in  std_logic
+      );
+end processor_decoder_motion_add;
+
+
+------------------------------------------------------------------------------
+architecture bdf_type of processor_<instance.id> is
+
+  ---------------------------------------------------------------------------
+  -- Components declaration
+  ---------------------------------------------------------------------------
+  component dram_<instance.id>
+    port(clock   : in  std_logic;
+         wren    : in  std_logic;
+         address : in  std_logic_vector(-1 downto 0);
+         byteena : in  std_logic_vector(3 downto 0);
+         data    : in  std_logic_vector(31 downto 0);
+         q       : out std_logic_vector(31 downto 0)
+         );
+  end component;
+
+  component allzero_9
+    port(allzero : out std_logic_vector(8 downto 0)
+         );
+  end component;
+
+  component allzero_8
+    port(allzero : out std_logic_vector(7 downto 0)
+         );
+  end component;
+
+  component allzero_13
+    port(allzero : out std_logic_vector(12 downto 0)
+         );
+  end component;
+
+  component allzero_32
+    port(allzero : out std_logic_vector(31 downto 0)
+         );
+  end component;
+
+  component irom_<instance.id>
+    port(clock   : in  std_logic;
+         address : in  std_logic_vector(-1 downto 0);
+         q       : out std_logic_vector(-1 downto 0)
+         );
+  end component;
+
+  component processor_<instance.id>_tl
+    port(clk                        : in  std_logic;
+         rstx                       : in  std_logic;
+         busy                       : in  std_logic;
+         fu_LSU_dmem_data_in        : in  std_logic_vector(31 downto 0);
+         fu_STREAM_IN_1_ext_data    : in  std_logic_vector(31 downto 0);
+         fu_STREAM_IN_1_ext_status  : in  std_logic_vector(8 downto 0);
+         fu_STREAM_IN_1_ext_ack     : out std_logic_vector(0 to 0);
+         fu_STREAM_IN_2_ext_data    : in  std_logic_vector(31 downto 0);
+         fu_STREAM_IN_2_ext_status  : in  std_logic_vector(8 downto 0);
+         fu_STREAM_IN_2_ext_ack     : out std_logic_vector(0 to 0);
+         fu_STREAM_IN_3_ext_data    : in  std_logic_vector(31 downto 0);
+         fu_STREAM_IN_3_ext_status  : in  std_logic_vector(8 downto 0);
+         fu_STREAM_IN_3_ext_ack     : out std_logic_vector(0 to 0);
+         fu_STREAM_OUT_1_ext_status : in  std_logic_vector(8 downto 0);
+         fu_STREAM_OUT_1_ext_data   : out std_logic_vector(31 downto 0);
+         fu_STREAM_OUT_1_ext_dv     : out std_logic_vector(0 to 0);
+         imem_addr                  : out std_logic_vector(12 downto 0);
+         imem_data                  : in  std_logic_vector(-1 downto 0);
+         imem_en_x                  : out std_logic;
+         fu_LSU_dmem_addr           : out std_logic_vector(14 downto 0);
+         fu_LSU_dmem_bytemask       : out std_logic_vector(3 downto 0);
+         fu_LSU_dmem_data_out       : out std_logic_vector(31 downto 0);
+         fu_LSU_dmem_mem_en_x       : out std_logic_vector(0 to 0);
+         fu_LSU_dmem_wr_en_x        : out std_logic_vector(0 to 0);
+         pc_init                    : in  std_logic_vector(12 downto 0)
+         );
+  end component;
+  ---------------------------------------------------------------------------
+  
+
+  ---------------------------------------------------------------------------
+  -- Signals declaration
+  ---------------------------------------------------------------------------
+  signal dram_addr          : std_logic_vector(14 downto 0);
+  signal imem_addr          : std_logic_vector(12 downto 0);
+  signal wren_wire          : std_logic;
+  signal zero_wire_2        : std_logic;
+  signal zero_wire_3        : std_logic;
+  signal bytemask_wire      : std_logic_vector(3 downto 0);
+  signal dram_data_in_wire  : std_logic_vector(31 downto 0);
+  signal wren_x_wire        : std_logic;
+  signal dram_data_out_wire : std_logic_vector(31 downto 0);
+  signal allzero_32_wire    : std_logic_vector(31 downto 0);
+  signal allzero_9_wire     : std_logic_vector(8 downto 0);
+  signal allzero_8_wire     : std_logic_vector(7 downto 0);
+  signal idata_wire         : std_logic_vector(-1 downto 0);
+  signal iaddr_init_wire    : std_logic_vector(12 downto 0);
+  ---------------------------------------------------------------------------
+
+begin
+  zero_wire_2 \<= '0';
+  zero_wire_3 \<= '0';
+
+  inst_dram_decoder_motion_add : dram_<instance.id>
+    port map(clock   =\> clk,
+             wren    =\> wren_wire,
+             address =\> dram_addr(-1 downto 0),
+             byteena =\> bytemask_wire,
+             data    =\> dram_data_in_wire,
+             q       =\> dram_data_out_wire);
+
+  inst4_<instance.id> : allzero_8
+    port map(allzero =\> allzero_8_wire);
+
+  inst1_<instance.id> : allzero_9
+    port map(allzero =\> allzero_9_wire);
+
+  inst2_<instance.id> : allzero_13
+    port map(allzero =\> iaddr_init_wire);
+
+  wren_wire \<= not(wren_x_wire);
+
+  inst3_<instance.id> : allzero_32
+    port map(allzero =\> allzero_32_wire);
+
+  inst_irom_<instance.id> : irom_<instance.id>
+    port map(clock   =\> clk,
+             address =\> imem_addr(-1 downto 0),
+             q       =\> idata_wire);
+
+  processor_<instance.id> : processor_<instance.id>_tl
+    port map(clk                        =\> clk,
+             rstx                       =\> reset_n,
+             busy                       =\> zero_wire_3,
+             fu_LSU_dmem_data_in        =\> dram_data_out_wire,
+             fu_STREAM_IN_1_ext_data    =\> data_1_in,
+             fu_STREAM_IN_1_ext_status  =\> status_1_in,
+             fu_STREAM_IN_1_ext_ack(0)  =\> ack_1_in,
+             fu_STREAM_IN_2_ext_data    =\> data_2_in,
+             fu_STREAM_IN_2_ext_status  =\> status_2_in,
+             fu_STREAM_IN_2_ext_ack(0)  =\> ack_2_in,
+             fu_STREAM_IN_3_ext_data    =\> data_3_in,
+             fu_STREAM_IN_3_ext_status  =\> status_3_in,
+             fu_STREAM_IN_3_ext_ack(0)  =\> ack_3_in,
+             fu_STREAM_OUT_1_ext_data   =\> data_1_out,
+             fu_STREAM_OUT_1_ext_status =\> status_1_out,
+             fu_STREAM_OUT_1_ext_dv(0)  =\> dv_1_out,
+             imem_data                  =\> idata_wire,
+             pc_init                    =\> iaddr_init_wire,
+             fu_LSU_dmem_addr           =\> dram_addr,
+             fu_LSU_dmem_bytemask       =\> bytemask_wire,
+             fu_LSU_dmem_data_out       =\> dram_data_in_wire,
+             fu_LSU_dmem_wr_en_x(0)     =\> wren_x_wire,
+             imem_addr                  =\> imem_addr);
+
+end bdf_type;
 >>
