@@ -384,6 +384,7 @@ public class InstTernaryImpl extends InstSpecificImpl implements InstTernary {
 			eNotify(new ENotificationImpl(this, Notification.SET, InstructionsPackage.INST_TERNARY__TRUE_VALUE, newTrueValue, newTrueValue));
 	}
 
+	@Override
 	public String toString() {
 		return super.toString() + "Ternary("
 				+ target.getVariable().getIndexedName() + ", "
