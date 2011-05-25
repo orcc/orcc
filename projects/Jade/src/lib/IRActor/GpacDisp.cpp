@@ -37,12 +37,8 @@
 
 //------------------------------
 #include <iostream>
-#include "SDL.h"
 
-#include <pthread.h>
 #include "Jade/Actor/GpacDisp.h"
-
-#include "llvm/Support/CommandLine.h"
 //------------------------------
 
 using namespace std;

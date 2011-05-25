@@ -176,22 +176,6 @@ Decoder* RVCEngine::prepare(Network* network){
 	return decoder;
 }
 
-void RVCEngine::start(Network* network, unsigned char* nal, int nal_length, RVCFRAME* rvcFrame){
-	map<Network*, Decoder*>::iterator it;
-
-	it = decoders.find(network);
-
-	if (it == decoders.end()){
-		cout << "No decoders found for this network.\n";
-		exit(1);
-	}
-	
-	Decoder* decoder = it->second;
-
-	LLVMExecution* llvmEE = decoder->getEE();
-	llvmEE->start(nal, nal_length, rvcFrame);
-}
-
 
 int RVCEngine::verify(Network* network, std::string errorFile){
 	map<Network*, Decoder*>::iterator it;

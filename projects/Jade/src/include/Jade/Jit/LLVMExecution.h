@@ -123,7 +123,7 @@ public:
 	 *  Start the execution of the decoder until condition is reached. 
 	 *		Condition MUST be set first with the initialize function.
 	 */
-	void start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame);
+	void start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame, bool AVCFile = false);
 
 	/**
      *  @brief run a specific function of the current decoder

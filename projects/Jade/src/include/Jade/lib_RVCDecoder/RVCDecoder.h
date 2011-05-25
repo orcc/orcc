@@ -61,7 +61,7 @@ typedef struct{
 
 Exported void rvc_init(char *XDF);
 
-Exported int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME *Frame, int *LayerCommand);
+Exported int rvc_decode(unsigned char* nal, int nal_length, RVCFRAME *Frame, int AVCFile);
 
 Exported void rvc_close();
 

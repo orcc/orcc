@@ -61,16 +61,16 @@ public:
 	FileSrc(int id);
 
 	/**
-     *  @brief Injecteur in the decoder of data from input file 
+     *  @brief Set the name of stimulus (input file)
 	 *   
-	 *  @param tokens : the adress where data must be injected
+	 *  @param tokens : the name of stimulus
      */
 	void setStimulus(std::string stimulus);
 
 	~FileSrc();
 
 	/**
-     *  @brief Injecteur in the decoder of data from input file 
+     *  @brief Make an injection in the decoder of data from input file 
 	 *   
 	 *  @param tokens : the adress where data must be injected
      */

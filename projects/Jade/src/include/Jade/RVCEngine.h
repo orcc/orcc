@@ -108,14 +108,6 @@ public:
 	Decoder* prepare(Network* network);
 
 	/*!
-     *  @brief Start the given network
-     *
-     *  Start the given network until a condition is reached
-     */
-	void start(Network* network, unsigned char* nal, int nal_length, RVCFRAME* rvcFrame);
-
-
-	/*!
      *  @brief Unload the given network
      *
      *  Unload and clear the given network.

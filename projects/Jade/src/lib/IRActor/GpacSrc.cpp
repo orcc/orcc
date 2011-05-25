@@ -36,10 +36,6 @@
 */
 
 //------------------------------
-#include <iostream>
-#include <cstdio>
-#include <cstdlib>
-
 #include "Jade/Actor/GpacSrc.h"
 //------------------------------
 
@@ -57,23 +53,30 @@ GpacSrc::GpacSrc(int id) : Source(id) {
 GpacSrc::~GpacSrc(){
 }
 
-void GpacSrc::setNal(unsigned char* nal, int nal_length){
+void GpacSrc::setNal(unsigned char* nal, int nal_length, bool AVCFile){
 	this->nal = nal;
 	this->nal_length = nal_length;
-	cnt = 0;
+	this->cnt = 0;
+
+	if(AVCFile){
+		setAVCStartCode();
+	}
 }
 
 void GpacSrc::source_get_src(unsigned char* tokens){
-	if(saveNal && *saveNal){
+	if(*saveNal){
 		setNalFifo();
-		*tokens = getNalFifo();
-		stopSchVal = 1;
-	}else if(!inFifo.empty()){
+	}
+	
+	if(!inFifo.empty()){
 		*tokens = getNalFifo();
 	}else if(cnt < nal_length){
 		*tokens = nal[cnt];
 		cnt++;
-	} else {
+	} 
+	
+	//Stop scheduler
+	if(cnt == nal_length || *saveNal) {
 		stopSchVal = 1;
 	}
 }
@@ -90,4 +93,11 @@ unsigned char GpacSrc::getNalFifo(){
 	inFifo.pop_front();
 
 	return tmp;
+}
+
+void GpacSrc::setAVCStartCode(){
+	inFifo.push_back(0x00);
+	inFifo.push_back(0x00);
+	inFifo.push_back(0x00);
+	inFifo.push_back(0x01);
 }

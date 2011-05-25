@@ -130,6 +130,7 @@ extern "C" {
 
 #include "Jade/lib_RVCDecoder/RVCDecoder.h"
 
+
 void rvc_init(char *XDF){
 
 	//Initialize context
@@ -157,14 +158,13 @@ void rvc_init(char *XDF){
 	}*/
 }
 
-int rvc_decode(void *PlayerStruct, unsigned char* nal, int nal_length, RVCFRAME *Frame, int *LayerCommand){
+int rvc_decode(unsigned char* nal, int nal_length, RVCFRAME *Frame, int AVCFile){
 	Frame->Height =0;
 	Frame->Width = 0;
 
 	//Start decoder
-	decoder->getEE()->start(nal, nal_length, Frame);
+	decoder->getEE()->start(nal, nal_length, Frame, AVCFile);
 
-//engine->run(network, VidFile);
 	if(Frame->Height || Frame->Width) return 1;
 	return 0;
 }

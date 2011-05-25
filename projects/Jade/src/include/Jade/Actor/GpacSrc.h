@@ -64,10 +64,19 @@ public:
 
 	~GpacSrc();
 
-	void setNal(unsigned char* nal, int nal_length);
+	/**
+	 *	@brief Initialize the gpac nal reader
+	 *
+	 *	@param nal : input nal
+	 *
+	 *	@param nal_length : length of the input nal
+	 *
+	 *	@param AVCFile : true if the nal is encoded in AVC
+	 */
+	void setNal(unsigned char* nal, int nal_length, bool AVCFile = false);
 
 	/**
-     *  @brief Injecteur in the decoder of data from input gpac nal 
+     *  @brief Make an injection in the decoder of data from input gpac nal 
 	 *   
 	 *  @param tokens : the adress where data must be injected
      */
@@ -114,6 +123,11 @@ protected:
      */
 	unsigned char getNalFifo();
 
+	/**
+	 *	@brief Inject the AVC start code in the input fifo
+	 */
+	void setAVCStartCode();
+
 	/** input gpac nal */
 	unsigned char* nal;
 
@@ -129,7 +143,7 @@ protected:
 	/** This value controls the nal saving in fifo */
 	bool* saveNal;
 
-	/** input fifo */
+	/** Input fifo */
 	std::list<unsigned char> inFifo;
 
 };

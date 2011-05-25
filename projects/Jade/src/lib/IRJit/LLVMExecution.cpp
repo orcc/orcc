@@ -318,9 +318,9 @@ void LLVMExecution::initialize(){
 	EE->runFunction(init, noargs);
 }
 
-void LLVMExecution::start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame){
+void LLVMExecution::start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame, bool AVCFile){
 	GpacSrc* gpacSrc = (GpacSrc*)source;
-	gpacSrc->setNal(nal, nal_length);
+	gpacSrc->setNal(nal, nal_length, AVCFile);
 
 	GpacDisp* gpacDisp = (GpacDisp*)display;
 	gpacDisp->setFramePtr(rvcFrame);
