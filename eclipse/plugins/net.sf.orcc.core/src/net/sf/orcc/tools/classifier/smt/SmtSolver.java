@@ -31,14 +31,15 @@ package net.sf.orcc.tools.classifier.smt;
 import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -98,25 +99,22 @@ public class SmtSolver {
 	 * @param scripts
 	 * @return
 	 */
-	public boolean checkSat(List<SmtScript> scripts) {
+	public boolean checkSat(SmtScript script) {
 		try {
-			for (SmtScript script : scripts) {
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				PrintStream ps = new PrintStream(bos);
-				ps.println("(set-logic " + String.valueOf(script.getLogic())
-						+ ")");
-				for (String command : script.getCommands()) {
-					ps.println(command);
-				}
-
-				ps.close();
-
-				IFile file = output.getFile(actor.getSimpleName() + ".smt2");
-				InputStream source = new ByteArrayInputStream(bos.toByteArray());
-				OrccUtil.setFileContents(file, source);
-
-				launchSolver(file);
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			PrintStream ps = new PrintStream(bos);
+			ps.println("(set-logic QF_AUFBV)");
+			for (String command : script.getCommands()) {
+				ps.println(command);
 			}
+
+			ps.close();
+
+			IFile file = output.getFile(actor.getSimpleName() + ".smt2");
+			InputStream source = new ByteArrayInputStream(bos.toByteArray());
+			OrccUtil.setFileContents(file, source);
+
+			launchSolver(file);
 		} catch (Exception e) {
 			throw new OrccRuntimeException("could not execute solver", e);
 		}
@@ -150,6 +148,24 @@ public class SmtSolver {
 		// Output error message
 		SmtSolverOutputProcessor processor = new SmtSolverOutputProcessor(
 				process.getInputStream());
+
+		Thread thErr = new Thread() {
+			public void run() {
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(process.getErrorStream()));
+				try {
+					String line = reader.readLine();
+					while (line != null) {
+						System.err.println(line);
+						line = reader.readLine();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		thErr.start();
+
 		Thread thread = new Thread(processor);
 		thread.start();
 
@@ -158,6 +174,7 @@ public class SmtSolver {
 
 			// wait for all output to be processed
 			thread.join();
+			thErr.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -168,5 +185,4 @@ public class SmtSolver {
 			assertions.putAll(processor.getAssertions());
 		}
 	}
-
 }

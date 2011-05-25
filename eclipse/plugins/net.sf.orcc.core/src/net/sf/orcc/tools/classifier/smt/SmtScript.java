@@ -34,7 +34,7 @@ import java.util.List;
 import net.sf.orcc.ir.Var;
 
 /**
- * This class defines a SMT-LIB script.
+ * This class defines a SMT-LIB script expressed using .
  * 
  * @author Matthieu Wipliez
  * 
@@ -42,8 +42,6 @@ import net.sf.orcc.ir.Var;
 public class SmtScript {
 
 	private List<String> commands;
-
-	private SmtLogic logic;
 
 	private List<Var> variables;
 
@@ -74,15 +72,6 @@ public class SmtScript {
 	}
 
 	/**
-	 * Returns the logic of this script.
-	 * 
-	 * @return the logic of this script
-	 */
-	public SmtLogic getLogic() {
-		return logic;
-	}
-
-	/**
 	 * Returns the list of variables defined by this script.
 	 * 
 	 * @return the list of variables defined by this script
@@ -93,16 +82,6 @@ public class SmtScript {
 		}
 
 		return variables;
-	}
-
-	/**
-	 * Sets the logic of this script.
-	 * 
-	 * @param logic
-	 *            the logic to set
-	 */
-	public void setLogic(SmtLogic logic) {
-		this.logic = logic;
 	}
 
 }

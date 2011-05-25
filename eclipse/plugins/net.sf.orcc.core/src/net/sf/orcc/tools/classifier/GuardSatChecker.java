@@ -30,7 +30,7 @@ package net.sf.orcc.tools.classifier;
 
 import static net.sf.orcc.ir.util.EcoreHelper.getContainerOfType;
 
-import java.util.ArrayList;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,6 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -66,9 +65,9 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.ir.util.TypePrinter;
-import net.sf.orcc.tools.classifier.smt.SmtLogic;
 import net.sf.orcc.tools.classifier.smt.SmtScript;
 import net.sf.orcc.tools.classifier.smt.SmtSolver;
+import net.sf.orcc.util.sexp.SExp;
 import net.sf.orcc.util.sexp.SExpList;
 import net.sf.orcc.util.sexp.SExpSymbol;
 
@@ -93,18 +92,12 @@ public class GuardSatChecker {
 
 		private SmtScript script;
 
-		private List<SmtScript> scripts;
-
 		/**
 		 * Creates a new constraint expression visitor.
 		 * 
 		 */
 		public SmtTranslator() {
 			script = new SmtScript();
-			script.setLogic(SmtLogic.QF_LIA);
-
-			scripts = new ArrayList<SmtScript>();
-			scripts.add(script);
 		}
 
 		/**
@@ -127,54 +120,53 @@ public class GuardSatChecker {
 
 		@Override
 		public Object caseExprBinary(ExprBinary expr) {
-			StringBuilder builder = new StringBuilder();
-			builder.append('(');
+			String e1 = (String) doSwitch(expr.getE1());
+			String e2 = (String) doSwitch(expr.getE2());
+
 			switch (expr.getOp()) {
+			case BITAND:
+				return "(bvand " + e1 + " " + e2 + ")";
+			case BITOR:
+				return "(bvor " + e1 + " " + e2 + ")";
+			case BITXOR:
+				return "(bvand (bvnot (bvand " + e1 + " " + e2 + ")) (bvor "
+						+ e1 + " " + e2 + "))";
+			case DIV:
+			case DIV_INT:
+				return "(bvudiv " + e1 + " " + e2 + ")";
 			case EQ:
-				builder.append('=');
-				break;
+				return "(= " + e1 + " " + e2 + ")";
 			case GE:
-				builder.append(">=");
-				break;
+				return "(not (bvult " + e1 + " " + e2 + "))";
 			case GT:
-				builder.append('>');
-				break;
+				return "(and (not (= " + e1 + " " + e2 + ")) (not (bvult " + e1
+						+ " " + e2 + ")))";
 			case LE:
-				builder.append("<=");
-				break;
+				return "(or (= " + e1 + " " + e2 + ") (bvult " + e1 + " " + e2
+						+ "))";
 			case LOGIC_AND:
-				builder.append("and");
-				break;
+				return "(and " + e1 + " " + e2 + ")";
 			case LOGIC_OR:
-				builder.append("or");
-				break;
+				return "(or " + e1 + " " + e2 + ")";
 			case LT:
-				builder.append('<');
-				break;
+				return "(bvult " + e1 + " " + e2 + ")";
 			case MINUS:
-				builder.append('-');
-				break;
+				return "(bvadd " + e1 + " (bvneg " + e2 + "))";
+			case MOD:
+				return "(bvurm " + e1 + " " + e2 + ")";
 			case NE:
-				builder.append("not (=");
-				break;
+				return "(not (= " + e1 + " " + e2 + "))";
 			case PLUS:
-				builder.append('+');
-				break;
+				return "(bvadd " + e1 + " " + e2 + ")";
+			case SHIFT_LEFT:
+				return "(bvshl " + e1 + " " + e2 + ")";
+			case SHIFT_RIGHT:
+				return "(bvlshr " + e1 + " " + e2 + ")";
+			case TIMES:
+				return "(bvmul " + e1 + " " + e2 + ")";
 			default:
-				builder.append("TODO");
+				return "TODO";
 			}
-
-			builder.append(' ');
-			builder.append(doSwitch(expr.getE1()));
-			builder.append(' ');
-			builder.append(doSwitch(expr.getE2()));
-			builder.append(')');
-
-			if (expr.getOp() == OpBinary.NE) {
-				builder.append(')');
-			}
-
-			return builder.toString();
 		}
 
 		@Override
@@ -184,39 +176,32 @@ public class GuardSatChecker {
 
 		@Override
 		public Object caseExprInt(ExprInt expr) {
-			return String.valueOf(expr.getValue());
+			return getStringOfInt(expr.getValue());
 		}
 
 		@Override
 		public Object caseExprUnary(ExprUnary expr) {
-			StringBuilder builder = new StringBuilder();
-			builder.append('(');
+			String e1 = (String) doSwitch(expr.getExpr());
 			switch (expr.getOp()) {
 			case BITNOT:
-				builder.append("TODO");
-				break;
+				return "(bvnot " + e1 + ")";
 			case LOGIC_NOT:
-				builder.append("not");
-				break;
+				return "(not " + e1 + ")";
 			case MINUS:
-				builder.append('-');
-				break;
+				return "(bvneg " + e1 + ")";
 			case NUM_ELTS: {
 				Type type = expr.getExpr().getType();
+				int size;
 				if (type.isList()) {
-					builder.append(((TypeList) type).getSize());
+					size = ((TypeList) type).getSize();
 				} else {
-					builder.append(0);
+					size = 0;
 				}
-				break;
+				return getStringOfInt(BigInteger.valueOf(size));
 			}
+			default:
+				return null;
 			}
-
-			builder.append(' ');
-			builder.append(doSwitch(expr.getExpr()));
-			builder.append(')');
-
-			return builder.toString();
 		}
 
 		@Override
@@ -283,12 +268,7 @@ public class GuardSatChecker {
 		 *            a variable
 		 */
 		private void declareVar(Var variable) {
-			String type;
-			if (script.getLogic() == SmtLogic.QF_BV) {
-				type = new TypeSwitchBitVec().doSwitch(variable.getType());
-			} else {
-				type = new TypeSwitchInt().doSwitch(variable.getType());
-			}
+			String type = new TypeSwitchBitVec().doSwitch(variable.getType());
 
 			String name = getUniqueName(variable);
 			script.addCommand("(declare-fun " + name + " () " + type + ")");
@@ -302,12 +282,29 @@ public class GuardSatChecker {
 		}
 
 		/**
-		 * Returns the list of scripts created by this translator.
+		 * Returns the script created by this translator.
 		 * 
-		 * @return the list of scripts created by this translator
+		 * @return the script created by this translator
 		 */
-		public List<SmtScript> getScripts() {
-			return scripts;
+		public SmtScript getScript() {
+			return script;
+		}
+
+		/**
+		 * Returns the 32-bit BitVec representation of the given BigInteger.
+		 * 
+		 * @param integer
+		 *            a BigInteger
+		 * @return the 32-bit BitVec representation
+		 */
+		private String getStringOfInt(BigInteger integer) {
+			StringBuilder builder = new StringBuilder("#b");
+			String str = integer.toString(2);
+			for (int i = 0; i < 32 - str.length(); i++) {
+				builder.append('0');
+			}
+			builder.append(str);
+			return builder.toString();
 		}
 
 		/**
@@ -351,54 +348,20 @@ public class GuardSatChecker {
 
 		@Override
 		public String caseTypeInt(TypeInt type) {
-			return "_ BitVec " + type.getSizeInBits();
+			int size = 32; // type.getSizeInBits()
+			return "(_ BitVec " + size + ")";
 		}
 
 		@Override
 		public String caseTypeList(TypeList type) {
-			return "(Array Int " + doSwitch(type.getType()) + ")";
+			// (Array indexType valueType)
+			return "(Array (_ BitVec 32) " + doSwitch(type.getType()) + ")";
 		}
 
 		@Override
 		public String caseTypeUint(TypeUint type) {
-			return "_ BitVec " + type.getSizeInBits();
-		}
-
-	}
-
-	/**
-	 * This class defines a switch that returns the SMT-LIB type using Int for
-	 * integers.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private static class TypeSwitchInt extends IrSwitch<String> {
-
-		@Override
-		public String caseType(Type type) {
-			throw new OrccRuntimeException("unexpected type "
-					+ new TypePrinter().doSwitch(type));
-		}
-
-		@Override
-		public String caseTypeBool(TypeBool type) {
-			return "Bool";
-		}
-
-		@Override
-		public String caseTypeInt(TypeInt type) {
-			return "Int";
-		}
-
-		@Override
-		public String caseTypeList(TypeList type) {
-			return "(Array Int " + doSwitch(type.getType()) + ")";
-		}
-
-		@Override
-		public String caseTypeUint(TypeUint type) {
-			return "Int";
+			int size = 32; // type.getSizeInBits()
+			return "(_ BitVec " + size + ")";
 		}
 
 	}
@@ -425,15 +388,14 @@ public class GuardSatChecker {
 		translator.doSwitch(action1.getScheduler());
 		translator.doSwitch(action2.getScheduler());
 
-		List<SmtScript> scripts = translator.getScripts();
-		SmtScript script = scripts.get(scripts.size() - 1);
+		SmtScript script = translator.getScript();
 
 		// check whether the guards are compatible or not
 		script.addCommand("(assert (and " + action1.getScheduler().getName()
 				+ " " + action2.getScheduler().getName() + "))");
 		script.addCommand("(check-sat)");
 
-		return new SmtSolver(actor).checkSat(translator.getScripts());
+		return new SmtSolver(actor).checkSat(script);
 	}
 
 	/**
@@ -449,10 +411,15 @@ public class GuardSatChecker {
 	 */
 	private Map<Port, Expression> computePortTokenMap(Action action,
 			Map<String, Expression> assertions) {
+		String schedulerName = action.getScheduler().getName() + "_";
 		Pattern pattern = action.getPeekPattern();
 		Map<Port, Expression> portMap = new HashMap<Port, Expression>();
 		for (Entry<String, Expression> entry : assertions.entrySet()) {
 			String name = entry.getKey();
+			int index = name.indexOf(schedulerName);
+			if (index != -1) {
+				name = name.substring(index + schedulerName.length());
+			}
 			Var var = action.getScheduler().getLocal(name);
 			if (var != null) {
 				for (Def def : var.getDefs()) {
@@ -491,19 +458,25 @@ public class GuardSatChecker {
 	public Map<Port, Expression> computeTokenValues(List<Port> ports,
 			List<Action> others, Action action) {
 		SmtTranslator translator = new SmtTranslator();
-		SExpList assertion = new SExpList(new SExpSymbol("and"));
+		translator.doSwitch(action.getScheduler());
+		
+		SExp assertion;
 
-		for (Action previous : others) {
-			translator.doSwitch(previous.getScheduler());
-			assertion.add(new SExpList(new SExpSymbol("not"), new SExpSymbol(
-					previous.getScheduler().getName())));
+		if (others.isEmpty()) {
+			assertion = new SExpSymbol(action.getScheduler().getName());
+		} else {
+			SExpList list = new SExpList(new SExpSymbol("and"));
+			assertion = list;
+			
+			for (Action previous : others) {
+				translator.doSwitch(previous.getScheduler());
+				list.add(new SExpList(new SExpSymbol("not"),
+						new SExpSymbol(previous.getScheduler().getName())));
+			}
+			list.add(new SExpSymbol(action.getScheduler().getName()));
 		}
 
-		translator.doSwitch(action.getScheduler());
-		assertion.add(new SExpSymbol(action.getScheduler().getName()));
-
-		List<SmtScript> scripts = translator.getScripts();
-		SmtScript script = scripts.get(scripts.size() - 1);
+		SmtScript script = translator.getScript();
 
 		// check whether the guards are compatible or not
 		SExpList sexpAssert = new SExpList(new SExpSymbol("assert"), assertion);
@@ -511,7 +484,7 @@ public class GuardSatChecker {
 		script.addCommand("(check-sat)");
 
 		SmtSolver solver = new SmtSolver(actor);
-		solver.checkSat(translator.getScripts());
+		solver.checkSat(script);
 
 		// fills the map
 		return computePortTokenMap(action, solver.getAssertions());

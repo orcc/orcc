@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,12 +79,32 @@ public class SmtSolverOutputProcessor implements Runnable {
 						&& expList.startsWith(new SExpSymbol("="))) {
 					// binary equals
 					String name = expList.getSymbol(1).getContents();
-					String value = expList.getSymbol(2).getContents();
-					assertions.put(name,
-							eINSTANCE.createExprInt(Integer.parseInt(value)));
+					int value = parseValue(expList.get(2));
+					assertions.put(name, eINSTANCE.createExprInt(value));
 				}
 			}
 		}
+	}
+
+	private int parseValue(SExp sexp) {
+		if (sexp.isSymbol()) {
+			String contents = ((SExpSymbol) sexp).getContents();
+			return Integer.parseInt(contents);
+		} else if (sexp.isList()) {
+			SExpList list = (SExpList) sexp;
+			if (list.startsWith(new SExpSymbol("_"))) {
+				SExpSymbol bv = list.getSymbol(1);
+				String contents = bv.getContents().substring(2);
+				BigInteger value = new BigInteger(contents);
+				if (value.compareTo(BigInteger.valueOf(2147483647)) > 0) {
+					value = value.subtract(BigInteger.valueOf(4294967296L));
+				}
+				
+				return value.intValue();
+			}
+		}
+
+		return 0;
 	}
 
 	/**
