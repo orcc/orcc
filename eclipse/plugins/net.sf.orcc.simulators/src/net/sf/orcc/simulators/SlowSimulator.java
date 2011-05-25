@@ -68,7 +68,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 
@@ -94,6 +93,8 @@ public class SlowSimulator extends AbstractSimulator {
 	private List<IFolder> vtlFolders;
 
 	private String xdfFile;
+
+	private IProject project;
 
 	protected void connectActors(Actor source, Port srcPort, Actor target,
 			Port tgtPort, int fifoSize) {
@@ -166,7 +167,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 		String name = getAttribute(PROJECT, "");
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IProject project = root.getProject(name);
+		project = root.getProject(name);
 
 		vtlFolders = OrccUtil.getOutputFolders(project);
 	}
@@ -215,8 +216,7 @@ public class SlowSimulator extends AbstractSimulator {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
 
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			IFile file = root.getFile(new Path(xdfFile));
+			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 
 			Network network = new XDFParser(file).parseNetwork();
 
