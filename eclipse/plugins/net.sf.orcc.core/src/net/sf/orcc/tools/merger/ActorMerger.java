@@ -124,8 +124,7 @@ public class ActorMerger implements INetworkTransformation {
 			String id = vertex.getInstance().getId();
 			Actor actor = vertex.getInstance().getActor();
 			for (Procedure proc : new ArrayList<Procedure>(actor.getProcs())) {
-				String name = proc.getName();
-				actor.getProcedure(name).setName(id + "_" + name);
+				proc.setName(id + "_" + proc.getName());
 				superActor.getProcs().add(proc);
 			}
 		}
@@ -442,8 +441,8 @@ public class ActorMerger implements INetworkTransformation {
 		}
 
 		// Create buffers for connections inside the sub-graph
-		for (Map.Entry<Connection, Integer> entry : scheduler
-				.getMaxTokens().entrySet()) {
+		for (Map.Entry<Connection, Integer> entry : scheduler.getMaxTokens()
+				.entrySet()) {
 			String name = "buffer_" + index++;
 			Connection conn = entry.getKey();
 			addBuffer(name, entry.getValue(), conn.getSource().getType());
@@ -537,7 +536,9 @@ public class ActorMerger implements INetworkTransformation {
 	private void mergeActors() {
 		superActor = IrFactory.eINSTANCE.createActor();
 
-		superActor.setName("SuperActor_" + index);
+		String name = "SuperActor_" + index;
+		superActor.setName(name);
+		superActor.setFileName(name);
 
 		createPorts();
 
