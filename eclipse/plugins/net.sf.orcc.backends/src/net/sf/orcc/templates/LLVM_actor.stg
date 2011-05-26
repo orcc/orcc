@@ -573,7 +573,7 @@ parametersDeclaration(arguments, parameters) ::= <<
 >>
 
 parameters(type, variable) ::= <<
-<if(variable.intExpr)><type><elseif(type.list)><type>*<elseif(variable.booleanExpr)>i1<else><variable.type><endif> <Expr(variable)>
+<type><if(type.list)>*<endif> <Expr(variable)>
 >>
 
 argumentDeclaration(variable) ::= <<
