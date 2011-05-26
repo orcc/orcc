@@ -564,12 +564,12 @@ Var(var) ::= <<
 <if(var.global)>@<else>%<endif><var.indexedName>
 >>
 
-Expr(expr, type) ::= <<
-<if(expr.varExpr)><Var(expr.use.variable)><else><ConstantValue(const=expr, type=type)><endif>
+Expr(expr) ::= <<
+<if(expr.varExpr)><Var(expr.use.variable)><else><ConstantValue(expr, expr.type)><endif>
 >>
 
 indexes(indexes) ::= <<
-<indexes: { index | <if(index.type)><index.type><else>i32<endif> <Expr(expr=index, type=index.type)> }; separator=", ">
+<indexes: { index | <if(index.type)><index.type><else>i32<endif> <Expr(index)> }; separator=", ">
 >>
 
 indexesName(indexes) ::= <<
@@ -581,7 +581,7 @@ parametersDeclaration(arguments, parameters) ::= <<
 >>
 
 parameters(type, variable) ::= <<
-<if(variable.intExpr)><type><elseif(type.list)><type>*<elseif(variable.booleanExpr)>i1<else><variable.type><endif> <Expr(variable, variable.type)>
+<if(variable.intExpr)><type><elseif(type.list)><type>*<elseif(variable.booleanExpr)>i1<else><variable.type><endif> <Expr(variable)>
 >>
 
 argumentDeclaration(variable) ::= <<
@@ -618,7 +618,7 @@ PrintParameter(parameter) ::= <<
 <if (parameter.type.string)
 > i8* noalias getelementptr inbounds (<parameter.type>* @<parameter>, i64 0, i64 0) <
 else
-><parameter.type> <Expr(expr=parameter, type=parameter.type)><
+><parameter.type> <Expr(parameter)><
 endif>
 >>
 
@@ -679,13 +679,13 @@ printPhiPairs(phi) ::= <<
 >>
 
 printPhiExpr(expr, type, node) ::= <<
-[<Expr(expr=expr, type=type)>, %b<label(node)>]
+[<Expr(expr)>, %b<label(node)>]
 >>
 
 printReturn(return) ::= <<
 <if(printReturn)
 ><if(return.value)
->ret <return.value.type> <Expr(expr=return.value, type=return.value.type)><
+>ret <return.value.type> <Expr(return.value)><
 else
 >ret void<
 endif><
@@ -696,7 +696,7 @@ printStore(store) ::= <<
 <if(store.value.intExpr || store.value.booleanExpr)
 >store <store.target.variable.type> <store.value>, <store.target.variable.type>* <Var(store.target.variable)><
 else
->store <store.value.type> <Expr(expr=store.value, type=store.value.type)>, <store.target.variable.type>* <Var(store.target.variable)><
+>store <store.value.type> <Expr(store.value)>, <store.target.variable.type>* <Var(store.target.variable)><
 endif>
 >>
 
@@ -745,7 +745,7 @@ printFirstBlockNode(blockNode) ::= <<
 >>
 
 printIfNode(ifNode) ::= <<
-	br i1 <Expr(expr=ifNode.condition, type=ifNode.condition.type)>, label %b<label(first(ifNode.thenNodes))>, label %b<if(ifNode.elseNodes)><label(first(ifNode.elseNodes))><else><label(ifNode.joinNode)><endif>
+	br i1 <Expr(ifNode.condition)>, label %b<label(first(ifNode.thenNodes))>, label %b<if(ifNode.elseNodes)><label(first(ifNode.elseNodes))><else><label(ifNode.joinNode)><endif>
 
 b<label(first(ifNode.thenNodes))>: 
 <printFirstNode(first(ifNode.thenNodes))> <printNodes(rest(ifNode.thenNodes))>
@@ -764,7 +764,7 @@ b<label(ifNode.joinNode)>:
 
 printWhileNode(whileNode) ::= <<
 <printBlockNode(whileNode.joinNode)>
-	br i1 <Expr(expr=whileNode.condition, type=whileNode.condition.type)>, label %b<label(first(whileNode.Nodes))>, label %b<label(first(whileNode.joinNode.successors))>
+	br i1 <Expr(whileNode.condition)>, label %b<label(first(whileNode.Nodes))>, label %b<label(first(whileNode.joinNode.successors))>
 
 b<label(first(whileNode.nodes))>:
 <printFirstNode(first(whileNode.nodes))>
@@ -804,15 +804,15 @@ printAction(action) ::= <<
 define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.scheduler.locals: variableDeclaration()>
-	<action.peekPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}; separator="\n">
+	<action.peekPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
 <printNodes(action.scheduler.nodes)>
 }
 
 define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.body.locals: variableDeclaration()>
-	<action.inputPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}; separator="\n">
-	<action.outputPattern.ports: { port | <fifoVar(port=port, var=action.outputPattern.portToVarMap.(port))>}; separator="\n">
+	<action.inputPattern.ports: { port | <fifoVar(port, action.inputPattern.portToVarMap.(port))>}; separator="\n">
+	<action.outputPattern.ports: { port | <fifoVar(port, action.outputPattern.portToVarMap.(port))>}; separator="\n">
 <printNodes(action.body.nodes)>
 }
 >>
@@ -859,7 +859,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <if(actor.procs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-<actor.procs: {proc | <procedure(procedure = proc)>}>
+<actor.procs: {proc | <procedure(proc)>}>
 <endif>
 
 <if(actor.initializes)>
