@@ -288,7 +288,7 @@ elseif (instance.broadcast)><instance.broadcast.numOutputs><else>0<endif>
 
 fillActorStruct(instance) ::= <<
 <if(instance.actor || instance.broadcast)>
-struct actor_s <GetInstanceId(instance)> = {"<GetInstanceId(instance)>", <network.templateData.instanceNameToGroupIdMap.(instance.id)>, <GetInstanceId(instance)>_scheduler, <
+struct actor_s <GetInstanceId(instance)> = {"<GetInstanceId(instance)>", <if(network.templateData.instanceNameToGroupIdMap.(instance.id))> <network.templateData.instanceNameToGroupIdMap.(instance.id)> <else>0<endif>, <GetInstanceId(instance)>_scheduler, <
 NumInputs(instance)>, <NumOutputs(instance)>, NULL, NULL, NULL};
 <endif>
 >>
