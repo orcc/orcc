@@ -568,12 +568,12 @@ indexesName(indexes) ::= <<
 <indexes: {index |<index>}; separator="_">
 >>
 
-parametersDeclaration(arguments, parameters) ::= <<
-<arguments, parameters: { arg, param | <parameters(arg.type, param)>}; separator=", ">
+parameters(arguments, parameters) ::= <<
+<arguments, parameters: { arg, param | <parameter(arg.type, param)>}; separator=", ">
 >>
 
-parameters(type, variable) ::= <<
-<type><if(type.list)>*<endif> <Expr(variable)>
+parameter(type, expr) ::= <<
+<type><if(type.list)>*<endif> <Expr(expr)>
 >>
 
 argumentDeclaration(variable) ::= <<
@@ -642,7 +642,7 @@ else
 ><if(call.target)
 >%<call.target.variable.indexedName> = <
 endif
->call <call.procedure.returnType> @<call.procedure.name> (<parametersDeclaration(call.procedure.parameters, call.parameters)>)<
+>call <call.procedure.returnType> @<call.procedure.name> (<parameters(call.procedure.parameters, call.parameters)>)<
 endif>
 >>
 
