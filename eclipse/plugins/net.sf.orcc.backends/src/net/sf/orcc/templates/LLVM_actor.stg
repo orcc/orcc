@@ -588,10 +588,6 @@ argumentDeclaration(variable) ::= <<
 <variable.type><if(variable.type.list)>*<endif> %<variable.name>
 >>
 
-phiPair(value, label) ::= <<
-[<value>, %<label>]
->>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // State variables
