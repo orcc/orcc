@@ -497,7 +497,7 @@ variableDeclaration(variable) ::= <<
 
 fifoVar(port, var) ::= <<
 %<var.name>_ptr = load <port.type>** <fifoVarName(port)>
-%<var.name> = bitcast <port.type>* %<var.name>_ptr to <VarType(var)>*
+%<var.name> = bitcast <port.type>* %<var.name>_ptr to <var.type>*
 >>
 
 fifoVarName(port) ::= <<
@@ -530,7 +530,7 @@ endif>
 >>
 
 printBool(constant) ::= <<
-<if (constant.value)>1<else>0<endif>
+<if(constant.value)>1<else>0<endif>
 >>
 
 printInt(constant) ::= <<
@@ -566,18 +566,6 @@ Var(var) ::= <<
 
 Expr(expr, type) ::= <<
 <if(expr.varExpr)><Var(expr.use.variable)><else><ConstantValue(const=expr, type=type)><endif>
->>
-
-ExprType(expr) ::= <<
-<expr.type>
->>
-
-VarType(var) ::= <<
-<var.type>
->>
-
-ListType(list) ::= <<
-<list.type.elementType>
 >>
 
 indexes(indexes) ::= <<
@@ -710,18 +698,18 @@ endif>
 
 printStore(store) ::= <<
 <if(store.value.intExpr || store.value.booleanExpr)
->store <VarType(store.target.variable)> <store.value>, <VarType(store.target.variable)>* <Var(store.target.variable)><
+>store <store.target.variable.type> <store.value>, <store.target.variable.type>* <Var(store.target.variable)><
 else
->store <store.value.type> <Expr(expr=store.value, type=store.value.type)>, <VarType(store.target.variable)>* <Var(store.target.variable)><
+>store <store.value.type> <Expr(expr=store.value, type=store.value.type)>, <store.target.variable.type>* <Var(store.target.variable)><
 endif>
 >>
 
 printLoad(load) ::= <<
-<Var(load.target.variable)> = load <VarType(load.source.variable)>* <Var(load.source.variable)>
+<Var(load.target.variable)> = load <load.source.variable.type>* <Var(load.source.variable)>
 >>
 
 printGEP(gep) ::= <<
-<Var(gep.target.variable)> = getelementptr <VarType(gep.source.variable)>* <Var(gep.source.variable)>, i32 0 <if(gep.indexes)>, <indexes(gep.indexes)><endif>
+<Var(gep.target.variable)> = getelementptr <gep.source.variable.type>* <Var(gep.source.variable)>, i32 0 <if(gep.indexes)>, <indexes(gep.indexes)><endif>
 >>
 
 
