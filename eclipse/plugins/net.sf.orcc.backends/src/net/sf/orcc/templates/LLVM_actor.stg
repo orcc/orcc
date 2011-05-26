@@ -268,7 +268,7 @@ action_MD(actor, action) ::= <<
 >>
 
 port_MD(actor, port) ::= <<
-<port_decl_MD(actor=actor, port=port)> = metadata !{metadata <Type_decl_MD(actor=actor, var=port)>, <varName_MD(port)>, <fifoType(port)>** <fifoVarName(port)>}
+<port_decl_MD(actor=actor, port=port)> = metadata !{metadata <Type_decl_MD(actor=actor, var=port)>, <varName_MD(port)>, <port.type>** <fifoVarName(port)>}
 <Type_MD(actor=actor, var=port)>
 >>
 
@@ -495,13 +495,9 @@ variableDeclaration(variable) ::= <<
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-fifoType(port) ::= <<
-i<port.type.size>
->>
-
 fifoVar(port, var) ::= <<
-%<var.name>_ptr = load <fifoType(port)>** <fifoVarName(port)>
-%<var.name> = bitcast <fifoType(port)>* %<var.name>_ptr to <VarType(var)>*
+%<var.name>_ptr = load <port.type>** <fifoVarName(port)>
+%<var.name> = bitcast <port.type>* %<var.name>_ptr to <VarType(var)>*
 >>
 
 fifoVarName(port) ::= <<
@@ -509,7 +505,7 @@ fifoVarName(port) ::= <<
 >>
 
 fifo(port) ::= <<
-<fifoVarName(port)> = global <fifoType(port)>* null
+<fifoVarName(port)> = global <port.type>* null
 >>
 
 
@@ -703,10 +699,12 @@ printPhiExpr(expr, type, node) ::= <<
 >>
 
 printReturn(return) ::= <<
-<if(return.value)
+<if(printReturn)
+><if(return.value)
 >ret <return.value.type> <Expr(expr=return.value, type=return.value.type)><
 else
 >ret void<
+endif><
 endif>
 >>
 
@@ -731,7 +729,7 @@ printGEP(gep) ::= <<
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-printNodes(nodes) ::= <<
+printNodes(nodes, printReturn=true) ::= <<
 <nodes:printNode()>
 >>
 
@@ -743,8 +741,10 @@ endif>
 >>
 
 printFirstNode(node) ::= <<
-<if(node.blockNode)><printFirstBlockNode(node)><
-else>printNode(node)<
+<if(node.blockNode)
+><printFirstBlockNode(node)><
+else
+>printNode(node)<
 endif>
 >>
 
