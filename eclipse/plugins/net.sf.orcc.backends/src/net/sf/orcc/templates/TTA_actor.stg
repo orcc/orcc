@@ -6,7 +6,7 @@ import "net/sf/orcc/templates/LLVM_actor.stg"
 ///////////////////////////////////////////////////////////////////////////////
 
 printPeek(port, target) ::= <<
-%<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
+%<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V<instance.actor.templateData.portToIndexMap.(port)>", "=r,ir"(i32 0) nounwind
 >>
 
 printStatus(port, dir) ::= <<
@@ -17,10 +17,10 @@ printStatus(port, dir) ::= <<
 // FIFO functions
 ///////////////////////////////////////////////////////////////////////////////
 
-printInputFifoFunction(port) ::= <<
-define noalias <port.type>* @read_<port.name>(i32 %numTokens) nounwind {
+printReadFunction(port) ::= <<
+define <port.type>* @_read_<port.name>(i32 %numTokens) nounwind {
 entry:
-	%<port.name>_ptr = tail call noalias <port.type>* @malloc(i32 %numTokens) nounwind
+	%data = tail call noalias <port.type>* @malloc(i32 %numTokens) nounwind
 	%cond = icmp sgt i32 %numTokens, 0
   
 	br i1 %cond, label %bb0, label %bb2
@@ -31,44 +31,61 @@ bb0:
 	
 bb1:
 	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-	%data = tail call i32 asm sideeffect "STREAM_IN_V<instance.actor.templateData.portToIndexMap.(port)>"", "=r,ir"(i32 0) nounwind
-	%scevgep = getelementptr <port.type>* %<port.name>_ptr, i32 %indvar
-	store <port.type> %data, <port.type>* %scevgep
+	%value = tail call <port.type> asm sideeffect "STREAM_IN_V<instance.actor.templateData.portToIndexMap.(port)>", "=r,ir"(i32 0) nounwind
+	%scevgep = getelementptr <port.type>* %data, i32 %indvar
+	store <port.type> %value, <port.type>* %scevgep
 	%indvar.next = add i32 %indvar, 1
 	%exitcond = icmp eq i32 %indvar.next, %numTokens
 
-	br i1 %exitcond, label %bb2, label %bb
+	br i1 %exitcond, label %bb2, label %bb1
 
 bb2:
-	ret <port.type>* %<port.name>_ptr
+	ret <port.type>* %data
 }
 >>
 
-printOutputFifoFunction(port) ::= <<
-define i32 @write_<port.name>(i32* %X, i32 %numTokens) nounwind {
+printWriteFunction(port) ::= <<
+define void @_write_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
-  %0 = icmp sgt i32 %numTokens, 0
+  %cond = icmp sgt i32 %numTokens, 0
   
-  br i1 %0, label %bb0, label %bb2
+  br i1 %cond, label %bb0, label %bb2
 
 bb0:
 
   br label %bb1
 
 bb1: 
-  %indvar = phi i64 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
-  %j.05 = phi i32 [ undef, %bb.nph ], [ %2, %bb ]
-  %scevgep = getelementptr i32* %X, i64 %indvar
-  %data = load i32* %scevgep
-  tail call void asm sideeffect "STREAM_OUT_V<instance.actor.templateData.portToIndexMap.(port)>"", "ir"(i32 %data) nounwind
-  %indvar.next = add i64 %indvar, 1
-  %exitcond = icmp eq i64 %indvar.next, %numTokens
+  %indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
+  %scevgep = getelementptr <port.type>* %data, i32 %indvar
+  %value = load <port.type>* %scevgep
+  tail call void asm sideeffect "STREAM_OUT_V<instance.actor.templateData.portToIndexMap.(port)>", "ir"(<port.type> %value) nounwind
+  %indvar.next = add i32 %indvar, 1
+  %exitcond = icmp eq i32 %indvar.next, %numTokens
   
   br i1 %exitcond, label %bb2, label %bb1
 
 bb2:
   ret void
 }
+>>
+
+printReadCall(port, var, numTokens) ::= <<
+%<var.name>_ptr = call <port.type>* @_read_<port.name>(i32 <numTokens>)
+%<var.name> = bitcast <port.type>* %<var.name>_ptr to <var.type>*
+>>
+
+printReadCalls(inputPattern) ::= <<
+<inputPattern.ports: { port | <printReadCall(port, inputPattern.portToVarMap.(port), inputPattern.numTokensMap.(port))> }; separator="\n">
+>>
+
+printWriteCall(port, var, numTokens) ::= <<
+%<var.name>_ptr = bitcast <var.type>* %<var.name> to <port.type>*
+call void @_write_<port.name>(<port.type>* %<var.name>_ptr, i32 <numTokens>)
+>>
+
+printWriteCalls(outputPattern) ::= <<
+<outputPattern.ports: { port | <printWriteCall(port, outputPattern.portToVarMap.(port), outputPattern.numTokensMap.(port))> }; separator="\n">
 >>
 
 
@@ -243,7 +260,10 @@ entry:
 define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.body.locals: variableDeclaration()>
-<printNodes(action.body.nodes)>
+	<if(action.inputPattern)><printReadCalls(action.inputPattern)><endif>
+<printNodes(action.body.nodes, [])>
+	<if(action.outputPattern)><printWriteCalls(action.outputPattern)><endif>
+	ret void
 }
 >>
 
@@ -260,13 +280,13 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <if(actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-<actor.inputs: printInputFifoFunction(); separator="\n\n">
+<actor.inputs: printReadFunction(); separator="\n\n">
 <endif>
 
 <if(actor.outputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-<actor.outputs: printOutputFifoFunction(); separator="\n\n">
+<actor.outputs: printWriteFunction(); separator="\n\n">
 <endif>
 
 <if(actor.parameters)>
