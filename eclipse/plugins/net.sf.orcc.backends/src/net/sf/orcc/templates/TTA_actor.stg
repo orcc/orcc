@@ -18,9 +18,8 @@ printStatus(port, dir) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 printReadFunction(port) ::= <<
-define <port.type>* @_read_<port.name>(i32 %numTokens) nounwind {
+define void @_read_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
-	%data = tail call noalias <port.type>* @malloc(i32 %numTokens) nounwind
 	%cond = icmp sgt i32 %numTokens, 0
   
 	br i1 %cond, label %bb0, label %bb2
@@ -40,7 +39,7 @@ bb1:
 	br i1 %exitcond, label %bb2, label %bb1
 
 bb2:
-	ret <port.type>* %data
+	ret void
 }
 >>
 
@@ -71,8 +70,8 @@ bb2:
 >>
 
 printReadCall(port, var, numTokens) ::= <<
-%<var.name>_ptr = call <port.type>* @_read_<port.name>(i32 <numTokens>)
-%<var.name> = bitcast <port.type>* %<var.name>_ptr to <var.type>*
+%<var.name>_ptr = bitcast <var.type>* %<var.name> to <port.type>*
+call void @_read_<port.name>(<port.type>* %<var.name>_ptr, i32 <numTokens>)
 >>
 
 printReadCalls(inputPattern) ::= <<
@@ -260,9 +259,18 @@ entry:
 define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.body.locals: variableDeclaration()>
-	<if(action.inputPattern)><printReadCalls(action.inputPattern)><endif>
+	
+<if(action.inputPattern)>
+	<action.inputPattern.variables: variableDeclaration()>
+	<printReadCalls(action.inputPattern)>
+<endif>
+<if(action.outputPattern)>
+	<action.outputPattern.variables: variableDeclaration()>
+<endif>
 <printNodes(action.body.nodes, [])>
-	<if(action.outputPattern)><printWriteCalls(action.outputPattern)><endif>
+<if(action.outputPattern)>
+	<printWriteCalls(action.outputPattern)>
+<endif>
 	ret void
 }
 >>
