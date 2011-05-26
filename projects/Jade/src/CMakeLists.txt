@@ -117,7 +117,7 @@ include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS} ${SDL_INCLUDE_
 add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 
 # Orcc
-add_subdirectory(Orcc)
+add_subdirectory(orcc)
 
 # Tools
 add_subdirectory(tools)
