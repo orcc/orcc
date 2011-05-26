@@ -126,6 +126,14 @@ public:
 	void start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame, bool AVCFile = false);
 
 	/**
+	 *	@brief Make a backup of nal
+	 *
+	 *		This function should be use when we can not use the start function.
+	 *		For exemple when the frame pointer is already use.
+	 */
+	void saveNal(unsigned char* nal, int nal_length, bool AVCFile);
+
+	/**
      *  @brief run a specific function of the current decoder
      *
 	 *	@param function : the llvm::Function to run

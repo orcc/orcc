@@ -72,6 +72,9 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 	/*initialize RVC*/
 	if (!esd->decoderConfig->rvc_config) return GF_NOT_SUPPORTED;
 	rvc_init(esd->decoderConfig->rvc_config->data); //->data contains the uncompressed XDF
+
+	/*initialize picture size*/
+	Picture.Height = Picture.Width = 0;
 	
 	/*decoder config not known, output buffers will be reconfigured at run-time*/
 	if (!esd->decoderConfig->decoderSpecificInfo || !esd->decoderConfig->decoderSpecificInfo->data) 
@@ -240,6 +243,8 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 
 
 	got_pic = 0;
+	pic.Height = pic.Width = 0;
+
 	if (ctx->nalu_size_length) {
 		u32 i, nalu_size = 0;
 		u8 *ptr = inBuffer;
@@ -252,6 +257,7 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 			ptr += ctx->nalu_size_length;
 
 			//same remark as above regardin start codes
+			
 			got_pic = rvc_decode(ptr, nalu_size, &pic, 1);
 
 			ptr += nalu_size;
@@ -267,7 +273,8 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 		got_pic = rvc_decode(ptr, inBufferLength, &pic, 0);
 	}
 
-	if (got_pic!=1) return GF_OK;
+	if (got_pic!=1) 
+		return GF_OK;
 
 	/*if size changed during the decoding, resize the composition buffer*/
 	if ((pic.Width != ctx->width) || (pic.Height!=ctx->height)) 

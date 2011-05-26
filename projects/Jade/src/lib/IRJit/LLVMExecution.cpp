@@ -334,6 +334,12 @@ void LLVMExecution::start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame
 	EE->runFunction(main, noargs);
 }
 
+void LLVMExecution::saveNal(unsigned char* nal, int nal_length, bool AVCFile){
+	GpacSrc* gpacSrc = (GpacSrc*)source;
+	gpacSrc->setNal(nal, nal_length, AVCFile);
+	gpacSrc->setNalFifo();
+}
+
 void LLVMExecution::setIn(Instance* instance){
 	// Create a specific source for the decoder made to read files
 	FileSrc* fileSrc = new FileSrc(1);

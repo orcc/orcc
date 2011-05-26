@@ -110,13 +110,12 @@ public:
      */
 	void setSaveNalAdr(bool* Adr) {this->saveNal = Adr;}
 
-
-protected:
-
 	/**
      *  @brief Save no parsing informations NAL in input fifo
      */
 	void setNalFifo();
+
+protected:
 
 	/**
      *  @brief Get the first octet in input fifo and remove this

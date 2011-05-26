@@ -159,8 +159,11 @@ void rvc_init(char *XDF){
 }
 
 int rvc_decode(unsigned char* nal, int nal_length, RVCFRAME *Frame, int AVCFile){
-	Frame->Height =0;
-	Frame->Width = 0;
+	//Save nal, when the frame pointer is already use
+	if(Frame->Height || Frame->Width){
+		decoder->getEE()->saveNal(nal, nal_length, AVCFile);
+		return 1;
+	}
 
 	//Start decoder
 	decoder->getEE()->start(nal, nal_length, Frame, AVCFile);
