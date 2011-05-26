@@ -294,7 +294,7 @@ endif>
 >>
 
 Initializer_MD(actor, var) ::= <<
-<Initializer_decl_MD(actor = actor, var = var)> = metadata !{<var.type> <ConstantValue(type=var.type, const=var.initialValue)>}
+<Initializer_decl_MD(actor = actor, var = var)> = metadata !{<var.type> <Constant(var.initialValue, var.type)>}
 >>
 
 FSM_MD(actor) ::= <<
@@ -513,18 +513,10 @@ fifo(port) ::= <<
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
 
-ConstantValue(type, const) ::= <<
-<if(type.list)
-><Constant(constant=const, type=type, iterator=type.sizeIterator)><
-else
-><Constant(constant=const, type="", iterator="")><
-endif>
->>
-
-Constant(constant, type, iterator) ::= <<
+Constant(constant, type) ::= <<
 <if (constant.booleanExpr)><printBool(constant)><
 elseif(constant.intExpr)><printInt(constant)><
-elseif(constant.listExpr)><printList(constant=constant, type=type, iterator=iterator)><
+elseif(constant.listExpr)><printList(constant, type)><
 elseif(constant.stringExpr)><printString(constant)><
 endif>
 >>
@@ -538,8 +530,8 @@ printInt(constant) ::= <<
 >>
 
 // the values of a list: {val1, val2, ..., valn}
-printList(constant, type, iterator) ::= <<
-[<iterator, constant.value: {iterator, value | <type.type> <if(value)><Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)><else>zeroinitializer<endif>}; wrap, separator=", ">]
+printList(constant, type) ::= <<
+[<constant.value: { elementValue |<type.type> <Constant(elementValue, type)>}; wrap, separator=", ">]
 >>
 
 printString(constant) ::= <<
@@ -565,7 +557,7 @@ Var(var) ::= <<
 >>
 
 Expr(expr) ::= <<
-<if(expr.varExpr)><Var(expr.use.variable)><else><ConstantValue(expr, expr.type)><endif>
+<if(expr.varExpr)><Var(expr.use.variable)><else><Constant(expr, expr.type)><endif>
 >>
 
 indexes(indexes) ::= <<
@@ -602,7 +594,7 @@ printStateVarNature(variable) ::= <<
 >>
 
 initializeStateVar(variable) ::= <<
-<if(variable.initialValue)><ConstantValue(type=variable.type, const=variable.initialValue)><else>zeroinitializer, align 32<endif>
+<if(variable.initialValue)><Constant(variable.initialValue, variable.type)><else>zeroinitializer, align 32<endif>
 >>
 
 
