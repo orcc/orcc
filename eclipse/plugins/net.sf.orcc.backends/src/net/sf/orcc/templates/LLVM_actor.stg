@@ -531,7 +531,7 @@ printInt(constant) ::= <<
 
 // the values of a list: {val1, val2, ..., valn}
 printList(constant, type) ::= <<
-[<constant.value: { elementValue |<type.type> <Constant(elementValue, type)>}; wrap, separator=", ">]
+[<constant.value: { elementValue |<type.type> <Constant(elementValue, type.type)>}; wrap, separator=", ">]
 >>
 
 printString(constant) ::= <<
