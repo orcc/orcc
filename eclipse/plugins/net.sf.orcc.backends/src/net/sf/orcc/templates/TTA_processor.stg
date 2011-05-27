@@ -85,7 +85,7 @@ architecture bdf_type of processor_<instance.id> is
          rstx                       : in  std_logic;
          busy                       : in  std_logic;
          fu_LSU_dmem_data_in        : in  std_logic_vector(31 downto 0);
-         <internalFifoInterfaces()>
+         <internalFifoInterfaces(instance.actor)>
          imem_addr                  : out std_logic_vector(<iromAdressMax()> downto 0);
          imem_data                  : in  std_logic_vector(-1 downto 0);
          imem_en_x                  : out std_logic;
