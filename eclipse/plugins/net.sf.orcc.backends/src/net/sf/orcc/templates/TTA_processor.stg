@@ -64,7 +64,7 @@ architecture bdf_type of processor_<instance.id> is
   end component;
 
   component allzero_13
-    port(allzero : out std_logic_vector(12 downto 0)
+    port(allzero : out std_logic_vector(<iromAdressMax()> downto 0)
          );
   end component;
 
@@ -86,10 +86,10 @@ architecture bdf_type of processor_<instance.id> is
          busy                       : in  std_logic;
          fu_LSU_dmem_data_in        : in  std_logic_vector(31 downto 0);
          <internalFifoInterfaces()>
-         imem_addr                  : out std_logic_vector(12 downto 0);
+         imem_addr                  : out std_logic_vector(<iromAdressMax()> downto 0);
          imem_data                  : in  std_logic_vector(-1 downto 0);
          imem_en_x                  : out std_logic;
-         fu_LSU_dmem_addr           : out std_logic_vector(14 downto 0);
+         fu_LSU_dmem_addr           : out std_logic_vector(<dramAdressMax()> downto 0);
          fu_LSU_dmem_bytemask       : out std_logic_vector(3 downto 0);
          fu_LSU_dmem_data_out       : out std_logic_vector(31 downto 0);
          fu_LSU_dmem_mem_en_x       : out std_logic_vector(0 to 0);
@@ -103,8 +103,8 @@ architecture bdf_type of processor_<instance.id> is
   ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------
-  signal dram_addr          : std_logic_vector(14 downto 0);
-  signal imem_addr          : std_logic_vector(12 downto 0);
+  signal dram_addr          : std_logic_vector(<dramAdressMax()> downto 0);
+  signal imem_addr          : std_logic_vector(<iromAdressMax()> downto 0);
   signal wren_wire          : std_logic;
   signal zero_wire_2        : std_logic;
   signal zero_wire_3        : std_logic;
@@ -116,7 +116,7 @@ architecture bdf_type of processor_<instance.id> is
   signal allzero_9_wire     : std_logic_vector(8 downto 0);
   signal allzero_8_wire     : std_logic_vector(7 downto 0);
   signal idata_wire         : std_logic_vector(-1 downto 0);
-  signal iaddr_init_wire    : std_logic_vector(12 downto 0);
+  signal iaddr_init_wire    : std_logic_vector(<iromAdressMax()> downto 0);
   ---------------------------------------------------------------------------
 
 begin
@@ -222,3 +222,6 @@ fu_STREAM_OUT_<indexPort(port)>_ext_dv(0)  =\> dv_<indexPort(port)>_out,
 indexPort(port) ::= <<
 <actor.templateData.portToIndexMap.(port)>
 >>
+
+dramAdressMax() ::= "14"
+iromAdressMax() ::= "12"
