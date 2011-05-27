@@ -27,25 +27,14 @@ library work;
 
 
 ------------------------------------------------------------------------------
-entity processor_decoder_motion_add is
+entity processor_<instance.id> is
   port
     (
       clk          : in  std_logic;
-      data_1_in    : in  std_logic_vector(31 downto 0);
-      status_1_in  : in  std_logic_vector(8 downto 0);
-      ack_1_in     : out std_logic;
-      data_2_in    : in  std_logic_vector(31 downto 0);
-      status_2_in  : in  std_logic_vector(8 downto 0);
-      ack_2_in     : out std_logic;
-      data_3_in    : in  std_logic_vector(31 downto 0);
-      status_3_in  : in  std_logic_vector(8 downto 0);
-      ack_3_in     : out std_logic;
-      data_1_out   : out std_logic_vector(31 downto 0);
-      status_1_out : in  std_logic_vector(8 downto 0);
-      dv_1_out     : out std_logic;
+      <externalFifoInterfaces(instance.actor)>
       reset_n      : in  std_logic
       );
-end processor_decoder_motion_add;
+end processor_<instance.id>;
 
 
 ------------------------------------------------------------------------------
@@ -96,18 +85,7 @@ architecture bdf_type of processor_<instance.id> is
          rstx                       : in  std_logic;
          busy                       : in  std_logic;
          fu_LSU_dmem_data_in        : in  std_logic_vector(31 downto 0);
-         fu_STREAM_IN_1_ext_data    : in  std_logic_vector(31 downto 0);
-         fu_STREAM_IN_1_ext_status  : in  std_logic_vector(8 downto 0);
-         fu_STREAM_IN_1_ext_ack     : out std_logic_vector(0 to 0);
-         fu_STREAM_IN_2_ext_data    : in  std_logic_vector(31 downto 0);
-         fu_STREAM_IN_2_ext_status  : in  std_logic_vector(8 downto 0);
-         fu_STREAM_IN_2_ext_ack     : out std_logic_vector(0 to 0);
-         fu_STREAM_IN_3_ext_data    : in  std_logic_vector(31 downto 0);
-         fu_STREAM_IN_3_ext_status  : in  std_logic_vector(8 downto 0);
-         fu_STREAM_IN_3_ext_ack     : out std_logic_vector(0 to 0);
-         fu_STREAM_OUT_1_ext_status : in  std_logic_vector(8 downto 0);
-         fu_STREAM_OUT_1_ext_data   : out std_logic_vector(31 downto 0);
-         fu_STREAM_OUT_1_ext_dv     : out std_logic_vector(0 to 0);
+         <internalFifoInterfaces()>
          imem_addr                  : out std_logic_vector(12 downto 0);
          imem_data                  : in  std_logic_vector(-1 downto 0);
          imem_en_x                  : out std_logic;
@@ -177,18 +155,7 @@ begin
              rstx                       =\> reset_n,
              busy                       =\> zero_wire_3,
              fu_LSU_dmem_data_in        =\> dram_data_out_wire,
-             fu_STREAM_IN_1_ext_data    =\> data_1_in,
-             fu_STREAM_IN_1_ext_status  =\> status_1_in,
-             fu_STREAM_IN_1_ext_ack(0)  =\> ack_1_in,
-             fu_STREAM_IN_2_ext_data    =\> data_2_in,
-             fu_STREAM_IN_2_ext_status  =\> status_2_in,
-             fu_STREAM_IN_2_ext_ack(0)  =\> ack_2_in,
-             fu_STREAM_IN_3_ext_data    =\> data_3_in,
-             fu_STREAM_IN_3_ext_status  =\> status_3_in,
-             fu_STREAM_IN_3_ext_ack(0)  =\> ack_3_in,
-             fu_STREAM_OUT_1_ext_data   =\> data_1_out,
-             fu_STREAM_OUT_1_ext_status =\> status_1_out,
-             fu_STREAM_OUT_1_ext_dv(0)  =\> dv_1_out,
+             <mapFifoInterfaces(instance.actor)>
              imem_data                  =\> idata_wire,
              pc_init                    =\> iaddr_init_wire,
              fu_LSU_dmem_addr           =\> dram_addr,
@@ -198,4 +165,60 @@ begin
              imem_addr                  =\> imem_addr);
 
 end bdf_type;
+>>
+
+
+externalFifoInterfaces(actor) ::= <<
+<actor.inputs: externalInputFifoInterfaces(); separator="\n">
+<actor.outputs: externalOutputFifoInterfaces(); separator="\n">
+>>
+
+externalInputFifoInterfaces(port) ::= <<
+data_<indexPort(port)>_in    : in  std_logic_vector(31 downto 0);
+status_<indexPort(port)>_in  : in  std_logic_vector(8 downto 0);
+ack_<indexPort(port)>_in     : out std_logic;
+>>
+
+externalOutputFifoInterfaces(port) ::= <<
+data_<indexPort(port)>_out   : out std_logic_vector(31 downto 0);
+status_<indexPort(port)>_out : in  std_logic_vector(8 downto 0);
+dv_<indexPort(port)>_out     : out std_logic;
+>>
+
+internalFifoInterfaces(actor) ::= <<
+<actor.inputs: internalInputFifoInterfaces(); separator="\n">
+<actor.outputs: internalOutputFifoInterfaces(); separator="\n">
+>>
+
+internalInputFifoInterfaces(port) ::= <<
+fu_STREAM_IN_<indexPort(port)>_ext_data    : in  std_logic_vector(31 downto 0);
+fu_STREAM_IN_<indexPort(port)>_ext_status  : in  std_logic_vector(8 downto 0);
+fu_STREAM_IN_<indexPort(port)>_ext_ack     : out std_logic_vector(0 to 0);
+>>
+
+internalOutputFifoInterfaces(port) ::= <<
+fu_STREAM_OUT_<indexPort(port)>_ext_status : in  std_logic_vector(8 downto 0);
+fu_STREAM_OUT_<indexPort(port)>_ext_data   : out std_logic_vector(31 downto 0);
+fu_STREAM_OUT_<indexPort(port)>_ext_dv     : out std_logic_vector(0 to 0);
+>>
+
+mapFifoInterfaces(actor) ::= <<
+<actor.inputs: mapInputFifoInterfaces(); separator="\n">
+<actor.outputs: mapOutputFifoInterfaces(); separator="\n">
+>>
+
+mapInputFifoInterfaces(port) ::= <<
+fu_STREAM_IN_<indexPort(port)>_ext_data    =\> data_<indexPort(port)>_in,
+fu_STREAM_IN_<indexPort(port)>_ext_status  =\> status_<indexPort(port)>_in,
+fu_STREAM_IN_<indexPort(port)>_ext_ack(0)  =\> ack_<indexPort(port)>_in,
+>>
+
+mapOutputFifoInterfaces(port) ::= <<
+fu_STREAM_OUT_<indexPort(port)>_ext_data   =\> data_<indexPort(port)>_out,
+fu_STREAM_OUT_<indexPort(port)>_ext_status =\> status_<indexPort(port)>_out,
+fu_STREAM_OUT_<indexPort(port)>_ext_dv(0)  =\> dv_<indexPort(port)>_out,
+>>
+
+indexPort(port) ::= <<
+<actor.templateData.portToIndexMap.(port)>
 >>
