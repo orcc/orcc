@@ -486,14 +486,16 @@ public class ActorMerger implements INetworkTransformation {
 			if (iterand.isVertex()) {
 				Instance instance = iterand.getVertex().getInstance();
 				CSDFMoC moc = (CSDFMoC) instance.getMoC();
-				Action action = moc.getInvocations().get(0).getAction();
-
-				Procedure proc = superActor.getProcedure(instance.getId() + "_"
-						+ action.getName());
-
 				NodeBlock block = procedure.getLast(nodes);
-				block.add(factory.createInstCall(0, null, proc,
-						new ArrayList<Expression>()));
+				for (Invocation invocation : moc.getInvocations()) {
+					Action action = invocation.getAction();
+					Procedure proc = superActor.getProcedure(instance.getId()
+							+ "_" + action.getName());
+					block.add(factory.createInstCall(0, null, proc,
+							new ArrayList<Expression>()));
+
+				}
+
 			} else {
 				Schedule sched = iterand.getSchedule();
 				Var loopVar = procedure.getLocal("idx_" + depth);
@@ -561,7 +563,7 @@ public class ActorMerger implements INetworkTransformation {
 		new UniqueInstantiator().transform(network);
 
 		// static region detections
-		StaticSubsetDetector detector = new StaticSubsetDetector(network);
+		StaticRegionDetector detector = new StaticRegionDetector(network);
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
 			this.vertices = vertices;
 

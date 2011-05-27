@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
@@ -88,14 +87,6 @@ public class RepetitionVectorAnalyzer {
 		}
 
 		checkConsistency();
-
-		// multiply with the number of phases (CSDF requirement)
-		for (Map.Entry<Vertex, Integer> entry : repetitionVector.entrySet()) {
-			Vertex vertex = entry.getKey();
-			CSDFMoC moc = (CSDFMoC) vertex.getInstance().getMoC();
-			int rep = entry.getValue() * moc.getNumberOfPhases();
-			repetitionVector.put(vertex, rep);
-		}
 	}
 
 	/**

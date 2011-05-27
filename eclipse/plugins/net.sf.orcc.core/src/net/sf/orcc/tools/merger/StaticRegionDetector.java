@@ -59,7 +59,7 @@ import org.jgrapht.graph.DirectedMultigraph;
  * @author Ghislain Roquier
  * 
  */
-public class StaticSubsetDetector {
+public class StaticRegionDetector {
 
 	private Set<Vertex> discovered = new HashSet<Vertex>();
 	private Set<Vertex> finished = new HashSet<Vertex>();
@@ -68,7 +68,7 @@ public class StaticSubsetDetector {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
-	public StaticSubsetDetector(Network network) {
+	public StaticRegionDetector(Network network) {
 
 		graph = network.getGraph();
 	}
@@ -135,7 +135,7 @@ public class StaticSubsetDetector {
 				if (scc.remove(clusterVertex)) {
 					for (Vertex v : scc) {
 						MoC clasz = v.getInstance().getMoC();
-						if (!clasz.isSDF()) {
+						if (!clasz.isCSDF()) {
 							ret = false;
 						}
 					}
@@ -159,7 +159,7 @@ public class StaticSubsetDetector {
 		while (!stack.isEmpty()) {
 			Vertex v = stack.pop();
 			MoC clasz = v.getInstance().getMoC();
-			if (clasz.isSDF()) {
+			if (clasz.isCSDF()) {
 				if (!discovered.contains(v)) {
 					discovered.add(v);
 					if (vertices != null) {
@@ -170,7 +170,7 @@ public class StaticSubsetDetector {
 					for (Connection edge : graph.outgoingEdgesOf(v)) {
 						Vertex tgtVertex = graph.getEdgeTarget(edge);
 						clasz = tgtVertex.getInstance().getMoC();
-						if (!discovered.contains(tgtVertex) && clasz.isSDF()) {
+						if (!discovered.contains(tgtVertex) && clasz.isCSDF()) {
 							if (vertices != null) {
 								List<Vertex> l = new LinkedList<Vertex>(
 										vertices);
@@ -204,7 +204,7 @@ public class StaticSubsetDetector {
 		List<Vertex> vertices = new TopologicalSorter(graph).topologicalSort();
 		for (Vertex vertex : vertices) {
 			MoC clasz = vertex.getInstance().getMoC();
-			if (!discovered.contains(vertex) && clasz.isSDF()) {
+			if (!discovered.contains(vertex) && clasz.isCSDF()) {
 				List<Vertex> set = new LinkedList<Vertex>();
 				staticRegionList.add(set);
 				staticRegionAnalysis(graph, vertex, set);

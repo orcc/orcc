@@ -338,12 +338,18 @@ else
 
 >>
 
-stateScheduler(transition) ::= <<
-bool <actor.simpleName>::<transition.sourceState.name>_state_scheduler()
+stateScheduler(transitions) ::= <<
+bool <actor.simpleName>::<transitions.sourceState.name>_state_scheduler()
 {
+<if(transitions.list.empty)>
+	std::cout \<\< "stuck in dead end state! <transitions.sourceState.name> in the actor <actor.name>" \<\< std::endl;
+	return false;
+<else>
+
 	bool res = false;
-	<schedulingTestState(nextStates=transition.list)>
+	<schedulingTestState(nextStates=transitions.list)>
 	return res;
+<endif>
 }
 
 >>
