@@ -138,8 +138,28 @@ public class TTABackendImpl extends AbstractBackend {
 		InstancePrinter printer = new InstancePrinter("TTA_actor", !debugMode);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
+		printProcessor(instance);
+		printMemory(instance);
 		return printer.print(instance.getId() + ".bc", path, instance,
 				"instance");
+	}
+
+	private void printMemory(Instance instance) {
+		InstancePrinter dramPrinter = new InstancePrinter("TTA_dram",
+				!debugMode);
+		InstancePrinter iromPrinter = new InstancePrinter("TTA_irom",
+				!debugMode);
+		dramPrinter.print("dram_" + instance.getId() + ".vhd", path, instance,
+				"dram");
+		iromPrinter.print("irom_" + instance.getId() + ".vhd", path, instance,
+				"irom");
+	}
+
+	private void printProcessor(Instance instance) {
+		InstancePrinter printer = new InstancePrinter("TTA_processor",
+				!debugMode);
+		printer.print("processor_" + instance.getId() + ".vhd", path, instance,
+				"processor");
 	}
 
 }
