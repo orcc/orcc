@@ -246,7 +246,12 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			} else {
 				NodeWhile nodeWhile = (NodeWhile) containingNode;
 				NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
-				nodeWhile.getNodes().add(block);
+				if(usePreviousJoinNode){
+					EcoreHelper.getContainingList(containingNode).add(indexNode, block);
+					indexNode++;
+				} else {
+					nodeWhile.getNodes().add(block);
+				}
 				if (value0.isVarExpr()) {
 					values.set(0, castExpression(value0, block, 0));
 				}
