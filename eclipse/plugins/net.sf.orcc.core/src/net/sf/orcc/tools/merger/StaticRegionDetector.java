@@ -135,7 +135,7 @@ public class StaticRegionDetector {
 				if (scc.remove(clusterVertex)) {
 					for (Vertex v : scc) {
 						MoC clasz = v.getInstance().getMoC();
-						if (!clasz.isCSDF()) {
+						if (!clasz.isSDF()) {
 							ret = false;
 						}
 					}
@@ -159,7 +159,7 @@ public class StaticRegionDetector {
 		while (!stack.isEmpty()) {
 			Vertex v = stack.pop();
 			MoC clasz = v.getInstance().getMoC();
-			if (clasz.isCSDF()) {
+			if (clasz.isSDF()) {
 				if (!discovered.contains(v)) {
 					discovered.add(v);
 					if (vertices != null) {
@@ -170,7 +170,7 @@ public class StaticRegionDetector {
 					for (Connection edge : graph.outgoingEdgesOf(v)) {
 						Vertex tgtVertex = graph.getEdgeTarget(edge);
 						clasz = tgtVertex.getInstance().getMoC();
-						if (!discovered.contains(tgtVertex) && clasz.isCSDF()) {
+						if (!discovered.contains(tgtVertex) && clasz.isSDF()) {
 							if (vertices != null) {
 								List<Vertex> l = new LinkedList<Vertex>(
 										vertices);
@@ -204,7 +204,7 @@ public class StaticRegionDetector {
 		List<Vertex> vertices = new TopologicalSorter(graph).topologicalSort();
 		for (Vertex vertex : vertices) {
 			MoC clasz = vertex.getInstance().getMoC();
-			if (!discovered.contains(vertex) && clasz.isCSDF()) {
+			if (!discovered.contains(vertex) && clasz.isSDF()) {
 				List<Vertex> set = new LinkedList<Vertex>();
 				staticRegionList.add(set);
 				staticRegionAnalysis(graph, vertex, set);
