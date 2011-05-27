@@ -50,10 +50,10 @@ entity dram_<instance.id> is
       wren    : in  std_logic;
       q       : out std_logic_vector (31 downto 0)
       );
-end dram_decoder_motion_add;
+end dram_<instance.id>;
 
 
-architecture SYN of dram_decoder_motion_add is
+architecture SYN of dram_<instance.id> is
 
   signal sub_wire0 : std_logic_vector (31 downto 0);
 
@@ -191,10 +191,10 @@ end SYN;
 -- Retrieval info: CONNECT: @data_a 0 0 32 0 data 0 0 32 0
 -- Retrieval info: CONNECT: @wren_a 0 0 0 0 wren 0 0 0 0
 -- Retrieval info: CONNECT: q 0 0 32 0 @q_a 0 0 32 0
--- Retrieval info: GEN_FILE: TYPE_NORMAL dram_decoder_motion_add.vhd TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL dram_decoder_motion_add.inc FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL dram_decoder_motion_add.cmp FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL dram_decoder_motion_add.bsf FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL dram_decoder_motion_add_inst.vhd FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL dram_<instance.id>.vhd TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL dram_<instance.id>.inc FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL dram_<instance.id>.cmp FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL dram_<instance.id>.bsf FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL dram_<instance.id>_inst.vhd FALSE
 -- Retrieval info: LIB_FILE: altera_mf
 >>
