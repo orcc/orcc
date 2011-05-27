@@ -1,21 +1,14 @@
 import "net/sf/orcc/templates/LLVM_actor.stg"
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Hardware FIFO instruction
-///////////////////////////////////////////////////////////////////////////////
-
-printPeek(port, target) ::= <<
-%<target> = tail call i32 asm sideeffect "STREAM_IN_PEEK_V<instance.actor.templateData.portToIndexMap.(port)>", "=r,ir"(i32 0) nounwind
->>
-
-printStatus(port, dir) ::= <<
-%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V<instance.actor.templateData.portToIndexMap.(port)>", "=r,ir"(i32 0) nounwind
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO functions
 ///////////////////////////////////////////////////////////////////////////////
+
+printStatus(port, dir) ::= <<
+%status_<port.name> = tail call i32 asm sideeffect "STREAM_<dir>_STATUS_V<instance.actor.templateData.portToIndexMap.(port)>", "=r,ir"(i32 0) nounwind
+>>
 
 printReadFunction(port) ::= <<
 define void @_read_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
@@ -69,6 +62,32 @@ bb2:
 }
 >>
 
+printPeekFunction(port) ::= <<
+define void @_peek_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
+entry:
+	%cond = icmp sgt i32 %numTokens, 0
+  
+	br i1 %cond, label %bb0, label %bb2
+
+bb0:
+
+	br label %bb1
+	
+bb1:
+	%indvar = phi i32 [ 0, %bb0 ], [ %indvar.next, %bb1 ]
+	%value = tail call <port.type> asm sideeffect "STREAM_IN_PEEK_V<instance.actor.templateData.portToIndexMap.(port)>", "=r,ir"(i32 0) nounwind
+	%scevgep = getelementptr <port.type>* %data, i32 %indvar
+	store <port.type> %value, <port.type>* %scevgep
+	%indvar.next = add i32 %indvar, 1
+	%exitcond = icmp eq i32 %indvar.next, %numTokens
+
+	br i1 %exitcond, label %bb2, label %bb1
+
+bb2:
+	ret void
+}
+>>
+
 printReadCall(port, var, numTokens) ::= <<
 %<var.name>_ptr = bitcast <var.type>* %<var.name> to <port.type>*
 call void @_read_<port.name>(<port.type>* %<var.name>_ptr, i32 <numTokens>)
@@ -85,6 +104,15 @@ call void @_write_<port.name>(<port.type>* %<var.name>_ptr, i32 <numTokens>)
 
 printWriteCalls(outputPattern) ::= <<
 <outputPattern.ports: { port | <printWriteCall(port, outputPattern.portToVarMap.(port), outputPattern.numTokensMap.(port))> }; separator="\n">
+>>
+
+printPeekCall(port, var, numTokens) ::= <<
+%<var.name>_ptr = bitcast <var.type>* %<var.name> to <port.type>*
+call void @_peek_<port.name>(<port.type>* %<var.name>_ptr, i32 <numTokens>)
+>>
+
+printPeekCalls(peekPattern) ::= <<
+<peekPattern.ports: { port | <printPeekCall(port, peekPattern.portToVarMap.(port), peekPattern.numTokensMap.(port))> }; separator="\n">
 >>
 
 
@@ -244,6 +272,7 @@ default:
 <fsm.transitions: printTransition(); separator="\n">
 >>
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,14 +281,16 @@ printAction(action) ::= <<
 define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.scheduler.locals: variableDeclaration()>
-	<action.peekPattern.ports: { port | <fifoVar(port=port, var=action.inputPattern.portToVarMap.(port))>}; separator="\n">
+<if(action.inputPattern)>
+	<action.peekPattern.variables: variableDeclaration()>
+	<printPeekCalls(action.peekPattern)>
+<endif>
 <printNodes(action.scheduler.nodes)>
 }
 
 define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.body.locals: variableDeclaration()>
-	
 <if(action.inputPattern)>
 	<action.inputPattern.variables: variableDeclaration()>
 	<printReadCalls(action.inputPattern)>
@@ -275,6 +306,7 @@ entry:
 }
 >>
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Instance
 ///////////////////////////////////////////////////////////////////////////////
@@ -289,6 +321,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
 <actor.inputs: printReadFunction(); separator="\n\n">
+<actor.inputs: printPeekFunction(); separator="\n\n">
 <endif>
 
 <if(actor.outputs)>
