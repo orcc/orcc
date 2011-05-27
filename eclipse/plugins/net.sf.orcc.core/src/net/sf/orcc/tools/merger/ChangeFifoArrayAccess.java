@@ -68,7 +68,8 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 
 		if (var.isLocal() && port != null) {
 			var = buffersMap.get(port);
-			loads.put(var, port.getNumTokensConsumed());
+			int cns = inputPattern.getNumTokens(port);
+			loads.put(var, cns);
 			use.setVariable(var);
 
 			List<Expression> indexes = load.getIndexes();
@@ -91,10 +92,10 @@ public class ChangeFifoArrayAccess extends AbstractActorVisitor<Object> {
 		Def def = store.getTarget();
 		Var var = def.getVariable();
 		Port port = outputPattern.getVarToPortMap().get(var);
-
 		if (var.isLocal() && port != null) {
 			var = buffersMap.get(port);
-			stores.put(var, port.getNumTokensProduced());
+			int prd = outputPattern.getNumTokens(port);
+			stores.put(var, prd);
 			def.setVariable(var);
 
 			Expression e1 = factory.createExprVar(factory.createUse(superActor

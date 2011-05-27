@@ -163,9 +163,19 @@ public class ActorMerger implements INetworkTransformation {
 			i++;
 		} while (i < scheduler.getDepth());
 
-		Var tmp = factory.createVar(0, factory.createTypeInt(32), "tmp", false,
-				true);
-		procedure.getLocals().add(tmp);
+		for (Port port : ip.getPorts()) {
+			Type type = port.getType();
+			String name = port.getName();
+			Var tmp = factory.createVar(0, type, "tmp_" + name, false, true);
+			procedure.getLocals().add(tmp);
+		}
+
+		for (Port port : op.getPorts()) {
+			Type type = port.getType();
+			String name = port.getName();
+			Var tmp = factory.createVar(0, type, "tmp_" + name, false, true);
+			procedure.getLocals().add(tmp);
+		}
 
 		// Initialize read/write counters
 		for (Var var : new HashSet<Var>(buffersMap.values())) {
@@ -200,7 +210,8 @@ public class ActorMerger implements INetworkTransformation {
 	 * @param source
 	 * @param target
 	 */
-	private void createCopies(Procedure procedure, Var source, Var target) {
+	private void createCopies(Procedure procedure, String name, Var source,
+			Var target) {
 		IrFactory factory = IrFactory.eINSTANCE;
 
 		List<Node> nodes = procedure.getNodes();
@@ -218,7 +229,7 @@ public class ActorMerger implements INetworkTransformation {
 		nodeWhile.setCondition(condition);
 		nodes.add(nodeWhile);
 
-		Var tmpVar = procedure.getLocal("tmp");
+		Var tmpVar = procedure.getLocal("tmp_" + name);
 		List<Expression> indexes = new ArrayList<Expression>();
 		indexes.add(factory.createExprVar(loop));
 		InstLoad load = factory.createInstLoad(tmpVar, source, indexes);
@@ -243,7 +254,7 @@ public class ActorMerger implements INetworkTransformation {
 			Var input = ip.getVariable(port);
 			Var buffer = inputToVarMap.get(port);
 
-			createCopies(procedure, input, buffer);
+			createCopies(procedure, port.getName(), input, buffer);
 		}
 	}
 
@@ -252,7 +263,7 @@ public class ActorMerger implements INetworkTransformation {
 			Var output = op.getVariable(port);
 			Var buffer = inputToVarMap.get(port);
 
-			createCopies(procedure, buffer, output);
+			createCopies(procedure, port.getName(), buffer, output);
 		}
 	}
 
@@ -376,21 +387,27 @@ public class ActorMerger implements INetworkTransformation {
 
 			CSDFMoC moc = (CSDFMoC) instance.getMoC();
 			Iterator<Invocation> it = moc.getInvocations().iterator();
+
+			Set<Action> alreadyExists = new HashSet<Action>();
 			while (it.hasNext()) {
 				Action action = it.next().getAction();
-				String name = instance.getId() + "_" + action.getName();
-				Procedure proc = factory.createProcedure(name, 0,
-						factory.createTypeVoid());
+				if (!alreadyExists.contains(action)) {
+					alreadyExists.add(action);
+					String name = instance.getId() + "_" + action.getName();
+					Procedure proc = factory.createProcedure(name, 0,
+							factory.createTypeVoid());
 
-				Procedure body = action.getBody();
-				List<Node> nodes = body.getNodes();
-				proc.getLocals().addAll(body.getLocals());
-				proc.getNodes().addAll(nodes);
-				proc.getLast(nodes).add(factory.createInstReturn());
-				superActor.getProcs().add(proc);
-				new ChangeFifoArrayAccess(action.getInputPattern(),
-						action.getOutputPattern(), buffersMap)
-						.doSwitch(superActor);
+					Procedure body = action.getBody();
+					List<Node> nodes = body.getNodes();
+					proc.getLocals().addAll(body.getLocals());
+					proc.getNodes().addAll(nodes);
+					proc.getLast(nodes).add(factory.createInstReturn());
+					superActor.getProcs().add(proc);
+					new ChangeFifoArrayAccess(action.getInputPattern(),
+							action.getOutputPattern(), buffersMap)
+							.doSwitch(superActor);
+
+				}
 			}
 		}
 	}
