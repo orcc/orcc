@@ -67,15 +67,13 @@ public class CopyPropagator extends AbstractActorVisitor<Object> {
 			Var source = ((ExprVar) assign.getValue()).getUse().getVariable();
 			Var target = assign.getTarget().getVariable();
 			EList<Use> targetUses = target.getUses();
-			if (!targetUses.isEmpty()) {
-				changed = true;
-				while (!targetUses.isEmpty()) {
-					targetUses.get(0).setVariable(source);
-				}
-				EcoreUtil.remove(target);
-				EcoreHelper.delete(assign);
-				indexInst--;
+			changed = true;
+			while (!targetUses.isEmpty()) {
+				targetUses.get(0).setVariable(source);
 			}
+			EcoreUtil.remove(target);
+			EcoreHelper.delete(assign);
+			indexInst--;
 		}
 		return null;
 	}
