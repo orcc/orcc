@@ -2,6 +2,51 @@
 
 network(network, options) ::= <<
 
-// Print the network
+library ieee;
+use ieee.std_logic_1164.all;
 
+library work;
+
+entity top is
+  port
+    (
+      hw_clk : in  std_logic;
+      button : in  std_logic_vector(1 to 1);
+      st2clk : out std_logic;
+      leds   : out std_logic_vector(8 downto 0)
+      );
+end top;
+
+architecture bdf_type of top is
+
+  <network.instances: component()>
+
+end bdf_type;
+
+>>
+
+component(instance) ::= <<
+component processor_display
+  port(clk         : in  std_logic;
+       <instance.actor.inputs: inputPort(); separator="\n">
+       <instance.actor.outputs: outputPort(); separator="\n">
+       reset_n     : in  std_logic
+       );
+end component;
+>>
+
+inputPort(port) ::= <<
+data_<indexPort(port)>_in   : in  std_logic_vector(31 downto 0);
+status_<indexPort(port)>_in : in  std_logic_vector(8 downto 0);
+ack_<indexPort(port)>_in    : out std_logic;
+>>
+
+outputPort(port) ::= <<
+data_<indexPort(port)>_out   : out std_logic_vector(31 downto 0);
+status_<indexPort(port)>_out : in  std_logic_vector(8 downto 0);
+dv_<indexPort(port)>_out     : out std_logic;
+>>
+
+indexPort(port) ::= <<
+<instance.actor.templateData.portToIndexMap.(port)>
 >>
