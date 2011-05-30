@@ -98,7 +98,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Expression e2 = expr.getE2();
 		if (isTypeReducer(expr.getOp())) {
 			// TOFIX: Probably a better solution
-			expr.setType(getBigger(e1.getType(), e2.getType()));
+			expr.setType(EcoreHelper.copy(getBigger(e1.getType(), e2.getType())));
 		}
 		if (expr.getOp().isComparison()) {
 			parentType = getBigger(e1.getType(), e2.getType());
