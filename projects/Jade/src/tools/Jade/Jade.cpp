@@ -193,9 +193,11 @@ void clean_exit(int sig){
 
 int Display::stopAfter = StopAt;
 
+// Variable from native functions
 extern "C" {
 	char* input_file;
 	char* yuv_file;
+	char* write_file;
 }
 
 //Verify if directory is well formed
@@ -269,9 +271,11 @@ void startCmdLine(){
 	}
 
 
-	//Set input file
+	//Set native variables
+	string writer_file = OutputDir + "writer.txt";
 	input_file = (char*)VidFile.c_str();
 	YuvFile = (char*)YuvFile.c_str();
+	write_file = (char*)writer_file.c_str();
 
 	//Run network
 	engine->run(network);
