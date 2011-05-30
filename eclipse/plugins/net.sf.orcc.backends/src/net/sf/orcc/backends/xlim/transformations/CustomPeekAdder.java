@@ -80,13 +80,13 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 				// Create a custom peek for each load of this variable
 				InstLoad load = EcoreHelper.getContainerOfType(use,
 						InstLoad.class);
-				Var newTarget = load.getTarget().getVariable();
+
+				Var newVar = load.getTarget().getVariable();
 
 				int index = ((ExprInt) load.getIndexes().get(0)).getIntValue();
-				indexToVariableMap.put(index, load.getTarget().getVariable());
+				indexToVariableMap.put(index, newVar);
 
 				EcoreHelper.delete(load);
-				pattern.setVariable(port, newTarget);
 			}
 			EcoreUtil.remove(oldTarget);
 			customPeekedMap.put(port, indexToVariableMap);

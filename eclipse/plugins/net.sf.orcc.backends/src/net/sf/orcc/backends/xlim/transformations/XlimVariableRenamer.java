@@ -28,11 +28,15 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
+import java.util.Map;
+
 import net.sf.orcc.backends.transformations.VariableRenamer;
+import net.sf.orcc.backends.xlim.XlimActorTemplateData;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines an extension of VariableRenamer to do specified treatment
@@ -43,16 +47,42 @@ import net.sf.orcc.ir.util.EcoreHelper;
  */
 public class XlimVariableRenamer extends VariableRenamer {
 
+	private Action action;
+
 	@Override
 	public Object casePattern(Pattern pattern) {
-		Action action = EcoreHelper.getContainerOfType(pattern, Action.class);
-		String actionName = action.getName();
 		for (Var var : pattern.getVariables()) {
 			if (!action.getBody().getLocals().contains(var)) {
-				var.setName(actionName + "_" + var.getName());
+				var.setName(action.getName() + "_" + var.getName());
 			}
 		}
 		return super.casePattern(pattern);
+	}
+
+	@Override
+	public Object caseAction(Action action) {
+		this.action = action;
+		doSwitch(action.getInputPattern());
+		doSwitch(action.getOutputPattern());
+		doSwitch(action.getScheduler());
+		doSwitch(action.getBody());
+		return null;
+	}
+
+	@Override
+	public Object caseActor(Actor actor) {
+		XlimActorTemplateData data = (XlimActorTemplateData) actor
+				.getTemplateData();
+		for (Action action : data.getCustomPeekedMapPerAction().keySet()) {
+			Map<Port, Map<Integer, Var>> customPeekedMap = data
+					.getCustomPeekedMapPerAction().get(action);
+			for (Map<Integer, Var> indexToVarMap : customPeekedMap.values()) {
+				for (Var var : indexToVarMap.values()) {
+					var.setName(action.getName() + "_" + var.getName());
+				}
+			}
+		}
+		return super.caseActor(actor);
 	}
 
 }
