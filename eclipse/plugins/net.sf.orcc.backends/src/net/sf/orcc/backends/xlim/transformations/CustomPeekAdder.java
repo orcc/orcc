@@ -33,10 +33,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.xlim.XlimActorTemplateData;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
@@ -83,9 +85,21 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 
 				Var newVar = load.getTarget().getVariable();
 
-				int index = ((ExprInt) load.getIndexes().get(0)).getIntValue();
-				indexToVariableMap.put(index, newVar);
-
+				Expression indexExpr = load.getIndexes().get(0);
+				if (indexExpr.isIntExpr()) {
+					indexToVariableMap.put(((ExprInt) indexExpr).getIntValue(),
+							newVar);
+				} else {
+					Actor actor = EcoreHelper.getContainerOfType(pattern,
+							Actor.class);
+					Action action = EcoreHelper.getContainerOfType(pattern,
+							Action.class);
+					throw new OrccRuntimeException(
+							"One repeat and one guard on the same input port are forbidden with XLIM backend. \nActor: "
+									+ actor.getName()
+									+ " - Action: "
+									+ action.getName());
+				}
 				EcoreHelper.delete(load);
 			}
 			EcoreUtil.remove(oldTarget);

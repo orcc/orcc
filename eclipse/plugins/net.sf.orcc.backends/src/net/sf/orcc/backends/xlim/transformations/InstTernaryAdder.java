@@ -30,6 +30,7 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import net.sf.orcc.backends.instructions.InstTernary;
 import net.sf.orcc.backends.instructions.InstructionsFactory;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -57,38 +58,14 @@ import net.sf.orcc.ir.util.EcoreHelper;
  */
 public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 
-	private NodeBlock newBlockNode;
 	private Var condVar;
+	private NodeBlock newBlockNode;
 
 	@Override
-	public Object caseProcedure(Procedure procedure) {
-		if (!procedure.getReturnType().isVoid()) {
-			newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			super.caseProcedure(procedure);
-			EcoreHelper.delete(procedure.getNodes());
-			procedure.getNodes().add(newBlockNode);
+	public Object caseActor(Actor actor){
+		for (Procedure procedure : actor.getProcs()) {
+			doSwitch(procedure);
 		}
-		return null;
-	}
-
-	@Override
-	public Object caseNodeIf(NodeIf nodeIf) {
-		Var oldCondVar = condVar;
-
-		Expression condExpr = nodeIf.getCondition();
-		condVar = procedure.newTempLocalVariable(
-				IrFactory.eINSTANCE.createTypeBool(),
-				"ifCondition_" + nodeIf.getLineNumber());
-		condVar.setIndex(1);
-		InstAssign assignCond = IrFactory.eINSTANCE.createInstAssign(condVar,
-				condExpr);
-		newBlockNode.add(assignCond);
-
-		doSwitch(nodeIf.getThenNodes());
-		doSwitch(nodeIf.getElseNodes());
-		doSwitch(nodeIf.getJoinNode());
-		condVar = oldCondVar;
-
 		return null;
 	}
 
@@ -137,6 +114,38 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseInstStore(InstStore store) {
 		newBlockNode.add(EcoreHelper.copy(store));
+		return null;
+	}
+
+	@Override
+	public Object caseNodeIf(NodeIf nodeIf) {
+		Var oldCondVar = condVar;
+
+		Expression condExpr = nodeIf.getCondition();
+		condVar = procedure.newTempLocalVariable(
+				IrFactory.eINSTANCE.createTypeBool(),
+				"ifCondition_" + nodeIf.getLineNumber());
+		condVar.setIndex(1);
+		InstAssign assignCond = IrFactory.eINSTANCE.createInstAssign(condVar,
+				condExpr);
+		newBlockNode.add(assignCond);
+
+		doSwitch(nodeIf.getThenNodes());
+		doSwitch(nodeIf.getElseNodes());
+		doSwitch(nodeIf.getJoinNode());
+		condVar = oldCondVar;
+
+		return null;
+	}
+	
+	@Override
+	public Object caseProcedure(Procedure procedure) {
+		if (!procedure.getReturnType().isVoid()) {
+			newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			super.caseProcedure(procedure);
+			EcoreHelper.delete(procedure.getNodes());
+			procedure.getNodes().add(newBlockNode);
+		}
 		return null;
 	}
 }
