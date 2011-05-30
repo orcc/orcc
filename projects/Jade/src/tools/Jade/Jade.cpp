@@ -54,7 +54,6 @@
 
 #include "Jade/XDFSerialize/XDFParser.h"
 #include "Jade/RVCEngine.h"
-#include "Jade/Actor/Display.h"
 #include "Jade/Fifo/FifoSelection.h"
 #include "Jade/Scenario/Manager.h"
 #include "Jade/Util/OptionMng.h"
@@ -153,8 +152,6 @@ MAttrs("mattr", CommaSeparated,
          desc("Target specific IRAttributes (-mattr=help for details)"),
          value_desc("a1,+a2,-a3,..."));
 
-cl::opt<std::string>
-  TargetTriple("mtriple", cl::desc("Override target triple for module"));
 
 cl::opt<std::string> 
 MCPU("mcpu", desc("Target a specific cpu type (-mcpu=help for details)"),
@@ -190,8 +187,6 @@ cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations
 void clean_exit(int sig){
 	exit(0);
 }
-
-int Display::stopAfter = StopAt;
 
 // Variable from native functions
 extern "C" {
@@ -307,7 +302,9 @@ int main(int argc, char **argv) {
 
 	//Set native variables
 	string writer_file = OutputDir + "writer.txt";
-	yuv_file = (char*)YuvFile.c_str();
+	if (YuvFile != ""){
+		yuv_file = (char*)YuvFile.c_str();
+	}
 	write_file = (char*)writer_file.c_str();
 
 	if (Console){

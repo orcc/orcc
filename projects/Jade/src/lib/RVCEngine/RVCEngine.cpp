@@ -233,7 +233,7 @@ int RVCEngine::optimize(Network* network, int optLevel){
 	cout << "-> Start optimization of : " << network->getName().c_str() << "\n";
 
 	LLVMOptimizer opt(it->second);
-	opt.optimize();
+	opt.optimize(optLevel);
 	
 	cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 }

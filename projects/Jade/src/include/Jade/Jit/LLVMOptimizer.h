@@ -76,7 +76,12 @@ public:
      */
 	~LLVMOptimizer(){};
 
-	void optimize();
+	/**
+     *  @brief Launch optimization
+     *
+	 *	@param optLevel : optimization level
+     */
+	void optimize(int optLevel);
 private:
 
 	void AddOptimizationPasses(llvm::PassManagerBase &MPM, llvm::PassManagerBase &FPM, unsigned OptLevel);
@@ -85,7 +90,6 @@ private:
 	void addPass(llvm::PassManagerBase &PM, llvm::Pass *P);
 
 	Decoder* decoder;
-
 };
 
 #endif

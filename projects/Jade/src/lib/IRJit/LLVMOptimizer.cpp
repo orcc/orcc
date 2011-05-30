@@ -48,55 +48,27 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Target/TargetData.h"
 #include "llvm/Target/TargetLibraryInfo.h"
+#include "llvm/Target/TargetMachine.h"
 //------------------------------
-
 using namespace llvm;
 using namespace std;
 
-extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
-extern cl::opt<bool> OptLevelO1;
-extern cl::opt<bool> OptLevelO2;
-extern cl::opt<bool> OptLevelO3;
+//Optimization flag
+bool VerifyEach = false;
+string DefaultDataLayout("");
+bool StandardCompileOpts = false;
+bool StandardLinkOpts = true;
+bool DisableInline = false;
+bool UnitAtATime = false;
+bool DisableSimplifyLibCalls = false;
+bool DisableInternalize = false;
 
-   static cl::opt<bool>
-StandardCompileOpts("std-compile-opts",
-                   cl::desc("Include the standard compile time optimizations"));
+cl::opt<std::string>
+  TargetTriple("mtriple", cl::desc("Override target triple for module"));
 
-  static cl::opt<bool>
-StandardLinkOpts("std-link-opts",
-                 cl::desc("Include the standard link time optimizations"));
+void LLVMOptimizer::optimize(int optLevel){
 
-  static cl::opt<bool>
-UnitAtATime("funit-at-a-time",
-            cl::desc("Enable IPO. This is same as llvm-gcc's -funit-at-a-time"),
-	    cl::init(true));
-
-  static cl::opt<bool>
-DisableSimplifyLibCalls("disable-simplify-libcalls",
-                        cl::desc("Disable simplify-libcalls"));
-
-  static cl::opt<bool>
-DisableInternalize("disable-internalize",
-                   cl::desc("Do not mark all symbols as internal"));
-
-static cl::opt<bool>
-DisableInline("disable-inlining", cl::desc("Do not run the inliner pass"));
-
-static cl::opt<std::string>
-DefaultDataLayout("default-data-layout", 
-          cl::desc("data layout string to use if not specified by module"),
-          cl::value_desc("layout-string"), cl::init(""));
-
-static cl::opt<bool>
-AnalyzeOnly("analyze", cl::desc("Only perform analysis, no optimization"));
-
-static cl::opt<bool>
-VerifyEach("verify-each", cl::desc("Verify after each transform"));
-
-
-void LLVMOptimizer::optimize(){
-
-   // Initialize passes
+  // Initialize passes
   PassRegistry &Registry = *PassRegistry::getPassRegistry();
   initializeCore(Registry);
   initializeScalarOpts(Registry);
@@ -112,14 +84,28 @@ void LLVMOptimizer::optimize(){
 
   Module* module = decoder->getModule();
 
+   // Allocate a full target machine description only if necessary.
+  // FIXME: The choice of target should be controllable on the command line.
+  std::auto_ptr<TargetMachine> target;
+
    // Create a PassManager to hold and optimize the collection of passes we are
   // about to build...
   //
   PassManager Passes;
 
   // Add an appropriate TargetLibraryInfo pass for the module's triple.
-  TargetLibraryInfo *TLI = new TargetLibraryInfo(Triple(module->getTargetTriple()));
+  TargetLibraryInfo *TLI;
+  if (TargetTriple != ""){
+	TLI = new TargetLibraryInfo(Triple(TargetTriple));
+  }else{
+	TLI = new TargetLibraryInfo(Triple(module->getTargetTriple()));
+  }
+
+    // The -disable-simplify-libcalls flag actually disables all builtin optzns.
+  if (DisableSimplifyLibCalls)
+    TLI->disableAllFunctions();
   Passes.add(TLI);
+
 
   // Add an appropriate TargetData instance for this module.
   TargetData *TD = 0;
@@ -133,12 +119,16 @@ void LLVMOptimizer::optimize(){
     Passes.add(TD);
 
    OwningPtr<PassManager> FPasses;
-  if (OptLevelO1 || OptLevelO2 || OptLevelO3) {
+  if (optLevel > 0) {
     FPasses.reset(new PassManager());
     if (TD)
       FPasses->add(new TargetData(*TD));
   }
 
+   AddOptimizationPasses(Passes, *FPasses, optLevel);
+
+  // TODO: Enhance
+  /*
   // Create a new optimization pass for each one specified on the command line
   for (unsigned i = 0; i < PassList.size(); ++i) {
      // Check to see if -std-compile-opts was specified before this option.  If
@@ -170,6 +160,7 @@ void LLVMOptimizer::optimize(){
       OptLevelO3 = false;
     }
   }
+  
 
   // If -std-compile-opts was specified at the end of the pass list, add them.
   if (StandardCompileOpts) {
@@ -181,17 +172,10 @@ void LLVMOptimizer::optimize(){
     AddStandardLinkPasses(Passes);
     StandardLinkOpts = false;
   }
+  */
+ 
 
-  if (OptLevelO1)
-    AddOptimizationPasses(Passes, *FPasses, 1);
-
-  if (OptLevelO2)
-    AddOptimizationPasses(Passes, *FPasses, 2);
-
-  if (OptLevelO3)
-    AddOptimizationPasses(Passes, *FPasses, 3);
-
-  if (OptLevelO1 || OptLevelO2 || OptLevelO3)
+  if (optLevel > 0)
     FPasses->run(*module);
 
 
@@ -239,9 +223,9 @@ void LLVMOptimizer::AddOptimizationPasses(PassManagerBase &MPM, PassManagerBase 
   if (DisableInline) {
     // No inlining pass
   } else if (OptLevel) {
-    unsigned Threshold = 200;
+    unsigned Threshold = 225;
     if (OptLevel > 2)
-      Threshold = 250;
+      Threshold = 275;
     InliningPass = createFunctionInliningPass(Threshold);
   } else {
     InliningPass = createAlwaysInlinerPass();

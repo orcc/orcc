@@ -58,10 +58,6 @@
 #include "llvm/Target/TargetSelect.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/Actor/JadeDisp.h"
-#include "Jade/Actor/GpacDisp.h"
-#include "Jade/Actor/FileSrc.h"
-#include "Jade/Actor/GpacSrc.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/AbstractFifo.h"
@@ -248,81 +244,24 @@ void LLVMExecution::run() {
 	GenericValue Result = EE->runFunction(func, noargs);
 }
 
-void LLVMExecution::setIO(){
-	Configuration* configuration = decoder->getConfiguration();
-	
-	//Set input of the decoder
-	Instance* in = configuration->getInstance("source");
-	
-	if (in != NULL){
-		setIn(in);
-	}
-
-	//Set output of the decoder
-	Instance* out = configuration->getInstance("display");
-
-	if (out != NULL){
-		setOut(out);
-	}
-}
-
 void LLVMExecution::initialize(){
-	GpacSrc* gpacSrc = new GpacSrc(1);
-	GpacDisp* gpacDisp = new GpacDisp(1);
+	
+	// TODO: add this declaration in RVCDECODER.cpp
+	//GpacSrc* gpacSrc = new GpacSrc(1);
+	//GpacDisp* gpacDisp = new GpacDisp(1);
 
 	Configuration* configuration = decoder->getConfiguration();
-
-	//Set input of the decoder
-	Instance* in = configuration->getInstance("source");
-	source = gpacSrc;
-
-	//Set var gpac source
-	StateVar* stateVarIn = in->getStateVar("source");
-	Source** ptrSource = (Source**)getGVPtr(stateVarIn->getGlobalVariable());
-	*ptrSource = gpacSrc;
-
-	//Set setvideo procedure
-	Procedure* getSrcProc = in->getProcedure("get_src");
-	if (getSrcProc != NULL){
-		mapProcedure(getSrcProc, (void*)get_src);
-	}
-
-
-	//Set output of the decoder
-	Instance* out = configuration->getInstance("display");
-	display = gpacDisp;
-
-	//Set var gpac display
-	StateVar* stateVarOut = out->getStateVar("display");
-	Display** ptrDisplay = (Display**)getGVPtr(stateVarOut->getGlobalVariable());
-	*ptrDisplay = gpacDisp;
-
-	//Set setvideo procedure
-	Procedure* setVideoProc = out->getProcedure("set_video");
-	if (setVideoProc != NULL){
-		mapProcedure(setVideoProc, (void*)set_video);
-	}
-
-	//Set writemb procedure
-	Procedure* writeMbProc = out->getProcedure("write_mb");
-	if (writeMbProc != NULL){
-		mapProcedure(writeMbProc, (void*)write_mb);
-	}
-
-	
 	Module* module = decoder->getModule();
 	
 	// Set stop condition of the scheduler
 	Scheduler* scheduler = decoder->getScheduler();
 	GlobalVariable* stopGV = scheduler->getStopGV();
-	GlobalVariable* stopGV_src = in->getStateVar("stop")->getGlobalVariable();
-	GlobalVariable* stopGV_out = out->getStateVar("stop")->getGlobalVariable();
 
-	EE->addGlobalMapping(stopGV, gpacSrc->getStopSchPtr());
-	EE->addGlobalMapping(stopGV_src, gpacSrc->getStopSchPtr());
-	EE->addGlobalMapping(stopGV_out, gpacDisp->getStopSchPtr());
+//	EE->addGlobalMapping(stopGV, gpacSrc->getStopSchPtr());
+//	EE->addGlobalMapping(stopGV_src, gpacSrc->getStopSchPtr());
+//	EE->addGlobalMapping(stopGV_out, gpacDisp->getStopSchPtr());
 
-	gpacSrc->setSaveNalAdr(gpacDisp->getPicReadyAdr());
+//	gpacSrc->setSaveNalAdr(gpacDisp->getPicReadyAdr());
 
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
@@ -343,14 +282,16 @@ void LLVMExecution::initialize(){
 }
 
 void LLVMExecution::start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame, bool AVCFile){
-	GpacSrc* gpacSrc = (GpacSrc*)source;
-	gpacSrc->setNal(nal, nal_length, AVCFile);
+	
+	// TODO: This must be done in RVCDecoder
+	//GpacSrc* gpacSrc = (GpacSrc*)source;
+	//gpacSrc->setNal(nal, nal_length, AVCFile);
 
-	GpacDisp* gpacDisp = (GpacDisp*)display;
-	gpacDisp->setFramePtr(rvcFrame);
+	//GpacDisp* gpacDisp = (GpacDisp*)display;
+	//gpacDisp->setFramePtr(rvcFrame);
 
-	gpacSrc->start();
-	gpacDisp->start();
+	//gpacSrc->start();
+	//gpacDisp->start();
 
 	Scheduler* scheduler = decoder->getScheduler();
 	Function* main = scheduler->getMainFunction();
@@ -359,68 +300,10 @@ void LLVMExecution::start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame
 }
 
 void LLVMExecution::saveNal(unsigned char* nal, int nal_length, bool AVCFile){
-	GpacSrc* gpacSrc = (GpacSrc*)source;
-	gpacSrc->setNal(nal, nal_length, AVCFile);
-	gpacSrc->setNalFifo();
-}
-
-void LLVMExecution::setIn(Instance* instance){
-	// Create a specific source for the decoder made to read files
-	FileSrc* fileSrc = new FileSrc(1);
-	
-	source = fileSrc;
-
-	//Set var source
-	StateVar* stateVar = instance->getStateVar("source");
-	Source** ptrSource = (Source**)getGVPtr(stateVar->getGlobalVariable());
-	*ptrSource = source;
-
-	//Force stop variable to 0
-	StateVar* srcStop = instance->getStateVar("stop");
-	GlobalVariable* stopVar = srcStop->getGlobalVariable();
-	Constant* Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
-	stopVar->setInitializer(Zero);
-
-	//Set setvideo procedure
-	Procedure* getSrcProc = instance->getProcedure("get_src");
-	if (getSrcProc != NULL){
-		mapProcedure(getSrcProc, (void*)get_src);
-	}
-}
-
-void  LLVMExecution::setOut(Instance* instance){
-	JadeDisp* jadeDisp = new JadeDisp(1, verbose);
-	display = jadeDisp;
-
-	//Set var display
-	StateVar* stateVar = instance->getStateVar("display");
-	Display** ptrDisplay = (Display**)getGVPtr(stateVar->getGlobalVariable());
-	*ptrDisplay = display;
-
-	//Force stop variable to 0
-	StateVar* srcStop = instance->getStateVar("stop");
-	GlobalVariable* stopVar = srcStop->getGlobalVariable();
-	Constant* Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
-	stopVar->setInitializer(Zero);
-
-	//Set setvideo procedure
-	Procedure* setVideoProc = instance->getProcedure("set_video");
-	if (setVideoProc != NULL){
-		mapProcedure(setVideoProc, (void*)set_video);
-	}
-
-	//Set writemb procedure
-	Procedure* writeMbProc = instance->getProcedure("write_mb");
-	if (writeMbProc != NULL){
-		mapProcedure(writeMbProc, (void*)write_mb);
-	}
-
-}
-
-bool LLVMExecution::waitForFirstFrame(){
-	JadeDisp* jadeDisp = (JadeDisp*)display;
-	jadeDisp->waitForFirstFrame();
-	return true;
+	// TODO: This must be done in RVCDecoder, no saveNal anymore in LLVMExecution
+	//GpacSrc* gpacSrc = (GpacSrc*)source;
+	//gpacSrc->setNal(nal, nal_length, AVCFile);
+	//gpacSrc->setNalFifo();
 }
 
 void LLVMExecution::runFunction(Function* function) {
@@ -429,10 +312,9 @@ void LLVMExecution::runFunction(Function* function) {
 }
 
 void LLVMExecution::stop(pthread_t* thread) {
-	if (thread != NULL){
-		JadeDisp* jadeDisp = (JadeDisp*)display;
-		jadeDisp->forceStop(thread);
-	}
+	Scheduler* scheduler = decoder->getScheduler();
+	int* stop = (int*)EE->getPointerToGlobalIfAvailable(scheduler->getStopGV());
+	*stop = 1;
 }
 
 void LLVMExecution::recompile(Function* function) {

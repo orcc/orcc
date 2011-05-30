@@ -58,8 +58,6 @@ class Configuration;
 #include <pthread.h>
 
 #include "Jade/Fifo/FifoSelection.h"
-#include "Jade/Actor/GpacSrc.h"
-#include "Jade/Actor/Display.h"
 #include "Jade/lib_RVCDecoder/RVCDecoder.h"
 //------------------------------
 

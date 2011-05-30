@@ -28,58 +28,97 @@
  */
 
 /**
-@brief Description of the Source class interface
-@author Jerome Gorin
-@file Source.h
+@brief Implementation of class GpacDisp
+@author Olivier Labois
+@file GpacDisp.cpp
 @version 1.0
-@date 15/11/2010
+@date 06/05/2011
 */
 
 //------------------------------
-#ifndef SOURCE_H
-#define SOURCE_H
-#include <string>
+#include <iostream>
 
+#include "Jade/Actor/GpacDisp.h"
 //------------------------------
 
+using namespace std;
 
-/**
- * @class Source
- *
- * @brief  This class represents a generic source for the decoder
- * 
- * @author Jerome Gorin
- * 
- */
-class Source {
-public:
 
-	/**
-     *  @brief Create a new generic source for the decoder 
-	 *   
-	 *  @param id : the id of the decoder
-     */
-	Source(int id){
-		this->id = id;	
-	};
+GpacDisp::GpacDisp(int id){
+	this->id = id;
+	this->stopSchVal = 0;
+	this->picReady = false;
 
-	~Source(){};
-
-	/**
-     *  @brief Generic injecteur of data in the decoder
-	 *   
-	 *  @param tokens : the adress where data must be injected
-     */
-	virtual void source_get_src(unsigned char* tokens){};
-
-protected:
-	/** id of the decoder */
-	int id;
-};
-
-static void get_src(void* ptrSource, unsigned char* tokens) {
-	Source* source = (Source*) ptrSource;
-	source->source_get_src(tokens);
+	width = 0;
+	height = 0;
+	x = 0;
+	y = 0;
 }
 
-#endif
+GpacDisp::~GpacDisp(){
+}
+
+
+void GpacDisp::display_write_mb(unsigned char tokens[384]) {
+	int i, j, cnt, base;
+
+	cnt = 0;
+	base = y * width + x;
+
+	for (i = 0; i < 16; i++) {
+		for (j = 0; j < 16; j++) {
+			int tok = tokens[cnt];
+			int idx = base + i * width + j;
+			cnt++;
+			img_buf_y[idx] = tok;
+		}
+	}
+
+	base = y / 2 * width / 2 + x / 2;
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < 8; j++) {
+			int tok = tokens[cnt];
+			int idx = base + i * width / 2 + j;
+			cnt++;
+			img_buf_u[idx] = tok;
+		}
+	}
+
+	for (i = 0; i < 8; i++) {
+		for (j = 0; j < 8; j++) {
+			int tok = tokens[cnt];
+			int idx = base + i * width / 2 + j;
+			cnt++;
+			img_buf_v[idx] = tok;
+		}
+	}
+
+	x += 16;
+	if (x == width) {
+		x = 0;
+		y += 16;
+	}
+
+	if (y == height) {
+		// image received
+		x = 0;
+		y = 0;
+		
+		//Write resulting image
+		*rvcFrame->pY = img_buf_y;
+		*rvcFrame->pU = img_buf_u;
+		*rvcFrame->pV = img_buf_v;
+
+		rvcFrame->Width = width;
+		rvcFrame->Height = height;
+
+		picReady = true;
+
+	}
+}
+
+
+void GpacDisp::setSize(int width, int height){
+	this->width = width * 16;
+	this->height = height * 16;
+}

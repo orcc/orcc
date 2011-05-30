@@ -49,7 +49,6 @@ namespace llvm{
 #include <pthread.h>
 
 #include "llvm/LLVMContext.h"
-#include "Jade/Actor/GpacSrc.h"
 #include "Jade/Decoder.h"
 #include "Jade/lib_RVCDecoder/RVCDecoder.h"
 
@@ -184,11 +183,6 @@ public:
      */
 	bool mapFifo(Port* port, AbstractFifo* fifo);
 
-	/**
-     *  @brief Wait for the actual execution of the decoder
-     */
-	bool waitForFirstFrame();
-
 	void* getExit(); 
 	void recompile(llvm::Function* function);
 	
@@ -199,15 +193,6 @@ public:
      */
 	void linkExternalProc(std::list<Procedure*> externs);
 private:
-
-	void setIO();
-
-	void setIn(Instance* intance);
-	void setOut(Instance* intance);
-
-	Source* source;
-	Display* display;
-
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 

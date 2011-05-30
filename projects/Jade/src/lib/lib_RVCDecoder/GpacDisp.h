@@ -28,38 +28,35 @@
  */
 
 /**
-@brief Description of the JadeDisp class interface
-@author Jerome Gorin
-@file JadeDisp.h
+@brief Description of the GpacDisp class interface
+@author Olivier Labois
+@file GpacDisp.h
 @version 1.0
-@date 03/02/2011
+@date 06/05/2011
 */
 
 //------------------------------
-#ifndef JADEDISP_H
-#define JADEDISP_H
+#ifndef GPACDISP_H
+#define GPACDISP_H
 
-#include "Jade/Actor/Display.h"
-
-struct SDL_Surface;
-struct SDL_Overlay;
+#include "Jade/lib_RVCDecoder/RVCDecoder.h"
 //------------------------------
 
 
 /**
  * @brief  This class represents a reconfiguration of a decoder
  * 
- * @author Jerome Gorin
+ * @author Olivier Labois
  * 
  */
-class JadeDisp : public Display {
+class GpacDisp {
 public:
-	JadeDisp(int id, bool outputFps = false);
-	~JadeDisp();
+	GpacDisp(int id);
+	~GpacDisp();
 
 	
 	/**
-     *  @brief Set the size of the current JadeDisp
+     *  @brief Set the size of the current GpacDisp
 	 *
 	 * @param width : the new width
 	 *
@@ -68,47 +65,58 @@ public:
 	void setSize(int width, int height);	
 
 	/**
-     *  @brief Write YUV value in the current JadeDisp
+     *  @brief Write YUV value in the current GpacDisp
 	 *
 	 * @param tokens : an array represention of YUV values
      */
 	void display_write_mb(unsigned char tokens[384]);
 
-	void forceStop(pthread_t* thread);
+	/**
+     *  @brief Get value which can stop the scheduler
+	 *
+	 *  This value is continiously tested by the scheduler, it MUST be an int.
+	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
+	 *	continuously test firing rules of actors
+     */
+	int* getStopSchPtr() {return &stopSchVal;}
 
-	bool printFpsEnable(){return outputFps;};
+	/**
+     *  @brief Set to 0 the value which can start the scheduler
+	 *
+	 *  This value is continiously tested by the scheduler, it MUST be an int.
+	 *	The scheduler only stop when this value is set to 1, otherwise the scheduler
+	 *	continuously test firing rules of actors
+     */
+	void start() {picReady = false;}
 
-	static void waitForFirstFrame();
+	/**
+     *  @brief Set address of the ouput display frame
+	 *
+	 *  @param frame : address of the output frame
+     */
+	void setFramePtr(RVCFRAME* frame){this->rvcFrame = frame;}
+
+	/**
+     *  @brief Get address of picReady
+	 *
+	 *	This value indicates if one frame is decoded (picture is ready)
+	 *
+	 *  return address of picready
+     */
+	bool* getPicReadyAdr() {return &picReady;}
 
 
 private:
-	void printFps();
-	FILE* bench;
 
-	/** Fps information */
-	int frameDecoded;
-	int frameStart;
-	bool outputFps;
-	int t;
-	
-	/** Thread mutex */
-	static pthread_mutex_t mutex;
-	static pthread_cond_t cond_mutex;
+	/** This is the value which can stop the scheduler */
+	int stopSchVal;
 
-	/** Static functions of JadeDisp */
-	static void display_init();
-	static void display_show_image(JadeDisp* jadeDisp);
-	static void display_set_video(JadeDisp* jadeDisp);
-	static void press_a_key(int code);
-	static void sendFirstFrameEvent();
+	/** This value indicates whether one picture is decoded */
+	bool picReady;
 
-	/** Static member of JadeDisp */
-	static SDL_Surface *m_screen;
-	static SDL_Overlay *m_overlay;
-	static bool init;
-	static int boundedDisplays;
-	static int m_width;
-	static int m_height;
+	/** The ouput frame */
+	RVCFRAME* rvcFrame;
+
 };
 
 #endif

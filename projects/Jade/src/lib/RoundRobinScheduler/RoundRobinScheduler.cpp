@@ -63,8 +63,6 @@
 #include "Jade/Core/Variable.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/RoundRobinScheduler/RoundRobinScheduler.h"
-
-#include "Jade/Actor/Display.h"
 //------------------------------
 
 using namespace std;

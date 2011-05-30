@@ -40,8 +40,6 @@
 #define GPACSRC_H
 
 #include <list>
-
-#include "Jade/Actor/Source.h"
 //------------------------------
 
 
@@ -53,7 +51,7 @@
  * @author Olivier labois
  * 
  */
-class GpacSrc : public Source {
+class GpacSrc {
 public:
 	/**
      *  @brief Create a new gpac nal reader for the decoder 

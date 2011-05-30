@@ -48,7 +48,6 @@
 #include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Util/FifoMng.h"
 #include "Jade/RVCEngine.h"
-#include "Jade/Actor/Display.h"
 
 using namespace std;
 using namespace llvm;
@@ -62,64 +61,25 @@ cl::opt<FifoTy> Fifo(values(clEnumVal(trace,   "trace"),
 					 init(circular));
 
 // Jade options
-cl::opt<std::string> XDFFile(init("D:\\Users\\olabois\\orcc\\trunk\\projects\\Jade\\VTL\\Top_RVC.xdf"));
-
 cl::opt<std::string> VTLDir(init("D:\\Users\\olabois\\orcc\\trunk\\projects\\Jade\\VTL\\"));
 
-cl::opt<std::string> BSDLFile("");
-
-cl::opt<std::string> VidFile(init("D:\\Users\\olabois\\sequences\\MPEG4\\SIMPLE\\P-VOP\\hit001.m4v"));
-
-cl::opt<std::string> InputDir(init(""));
-
 cl::opt<std::string> SystemDir(init(""));
-
-cl::opt<std::string> YuvFile(init(""));
-
-cl::opt<std::string> ScFile(init(""));
 
 cl::opt<std::string> OutputDir(init("c://trace//"));
 
 cl::opt<bool> ForceInterpreter(init(false));
 
-cl::opt<bool> nodisplay(init(false));
-
 cl::opt<std::string> MArch("");
 
 cl::opt<bool> DisableCoreFiles("");
-
-cl::opt<bool> disableMultiCore(init(false));
 
 cl::opt<bool> NoLazyCompilation(init(false));
 
 cl::list<std::string> MAttrs("");
 
-cl::opt<std::string> TargetTriple("");
-
 cl::opt<std::string> MCPU(init(""));
 
-cl::opt<bool> OptLevelO1("");
-
-cl::opt<bool> OptLevelO2("");
-
-cl::opt<bool> OptLevelO3("");
-
 cl::opt<int> FifoSize(init(10000));
-
-cl::opt<int> StopAt(init(0));
-
-static cl::opt<bool> Verbose(init(false));
-
-static cl::opt<bool> Verify(init(false));
-
-static cl::opt<bool> Console(init(false));
-
-static cl::opt<bool> noMerging(init(false));
-
-cl::list<const PassInfo*, bool, PassNameParser> PassList("");
-
-
-int Display::stopAfter = StopAt;
 
 RVCEngine* engine;
 Decoder* decoder;
@@ -139,7 +99,7 @@ void rvc_init(char *XDF){
 	//setOptions();
 
 	//Loading decoderEngine
-	engine = new RVCEngine(Context, VTLDir, Fifo, FifoSize, SystemDir, OutputDir, noMerging, disableMultiCore, Verbose);
+	engine = new RVCEngine(Context, VTLDir, Fifo, FifoSize);
 
 	//Parsing XDF
 	XDFParser xdfParser(false);
