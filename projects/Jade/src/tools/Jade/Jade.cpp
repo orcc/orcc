@@ -271,11 +271,8 @@ void startCmdLine(){
 	}
 
 
-	//Set native variables
-	string writer_file = OutputDir + "writer.txt";
+	// Set input file
 	input_file = (char*)VidFile.c_str();
-	YuvFile = (char*)YuvFile.c_str();
-	write_file = (char*)writer_file.c_str();
 
 	//Run network
 	engine->run(network);
@@ -307,6 +304,11 @@ int main(int argc, char **argv) {
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	}
+
+	//Set native variables
+	string writer_file = OutputDir + "writer.txt";
+	YuvFile = (char*)YuvFile.c_str();
+	write_file = (char*)writer_file.c_str();
 
 	if (Console){
 
