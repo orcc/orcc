@@ -307,7 +307,7 @@ int main(int argc, char **argv) {
 
 	//Set native variables
 	string writer_file = OutputDir + "writer.txt";
-	YuvFile = (char*)YuvFile.c_str();
+	yuv_file = (char*)YuvFile.c_str();
 	write_file = (char*)writer_file.c_str();
 
 	if (Console){
