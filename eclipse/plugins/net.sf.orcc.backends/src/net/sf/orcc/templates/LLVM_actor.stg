@@ -175,7 +175,7 @@ MoC_decl_MD(actor) ::= <<
 !<actor.templateData.mocs.(actor.MoC)>
 >>
 
-MoC_Actions_decl_MD(actor, actions) ::= <<
+MoC_Invocations_decl_MD(actor, actions) ::= <<
 !<actor.templateData.actionMoC.(actions)>
 >>
 
@@ -228,7 +228,9 @@ pattern_MD(actor, patterns) ::= <<
 >>
 
 pattern_vars_MD(actor, pattern, portToVarMap) ::= <<
-<pattern_vars_decl_MD(actor, portToVarMap)> = metadata !{<pattern.ports: {port | metadata <port_decl_MD(actor, port)>}; separator=", ">} 
+<if(portToVarMap)>
+<pattern_vars_decl_MD(actor, portToVarMap)> = metadata !{<pattern.ports: {port | metadata <port_decl_MD(actor, port)>}; separator=", ">}
+<endif> 
 >>
 
 pattern_numTokens_MD(actor, pattern, numTokens) ::= <<
@@ -355,8 +357,8 @@ Body_MD(actor, action) ::= <<
 <Body_decl_MD(actor, action)> = metadata  !{<varName_MD(action.body)>, <procNative_MD(action.body)>, void()* @<action.body.name>}
 >>
 
-MoC_Actions_MD(actor, actions) ::= <<
-<MoC_Actions_decl_MD(actor, actions)> = metadata !{<actions: {action | metadata <action_decl_MD(actor, action)>}; separator=", ">} 
+MoC_Invocations_MD(actor, invocations) ::= <<
+<MoC_Invocations_decl_MD(actor, invocations)> = metadata !{<invocations: {invocation | metadata <action_decl_MD(actor, invocation.action)>}; separator=", ">} 
 >>
 
 MoC_CSDF_MD(actor, csdf) ::= <<
@@ -371,15 +373,9 @@ MoC_CSDF_MD(actor, csdf) ::= <<
 		else
 			> null <
 		endif
-			>,<
-		if(!csdf.peekPattern.empty)
-			> metadata <pattern_decl_MD(actor, csdf.peekPattern)><
-		else
-			> null <
-		endif
-			>, metadata <MoC_Actions_decl_MD(actor, csdf.actions)>}
+			>, metadata <MoC_Invocations_decl_MD(actor, csdf.invocations)>}
 			
-<MoC_Actions_MD(actor, csdf.actions)>
+<MoC_Invocations_MD(actor, csdf.invocations)>
 >>
 
 MoC_Configuration_MD(actor, configuration) ::= <<

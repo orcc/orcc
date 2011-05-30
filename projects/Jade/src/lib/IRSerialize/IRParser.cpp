@@ -193,13 +193,13 @@ CSDFMoC* IRParser::parseCSDF(MDNode* csdfNode){
 	// Parse patterns
 	Pattern* ip = parsePattern(inputs, csdfNode->getOperand(1));
 	Pattern* op = parsePattern(outputs, csdfNode->getOperand(2));
-	//Pattern* pp = parsePattern(inputs, csdfNode->getOperand(3));
+
 	csfMoC->setInputPattern(ip);
 	csfMoC->setOutputPattern(op);
 	csfMoC->setNumberOfPhases(value->getLimitedValue());
 	
 	// Parse actions
-	parseCSDFActions(cast<MDNode>(csdfNode->getOperand(4)), csfMoC);
+	parseCSDFActions(cast<MDNode>(csdfNode->getOperand(3)), csfMoC);
 
 	return csfMoC;
 }
