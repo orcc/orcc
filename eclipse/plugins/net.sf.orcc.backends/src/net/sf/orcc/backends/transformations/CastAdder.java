@@ -53,6 +53,7 @@ import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
+import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
@@ -74,9 +75,9 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class CastAdder extends AbstractActorVisitor<Expression> {
 
-	private boolean usePreviousJoinNode;
 	private boolean castToUnsigned;
 	private Type parentType;
+	private boolean usePreviousJoinNode;
 
 	/**
 	 * Creates a new cast transformation
@@ -93,19 +94,19 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 	@Override
 	public Expression caseExprBinary(ExprBinary expr) {
 		Type oldParentType = parentType;
+		Expression e1 = expr.getE1();
+		Expression e2 = expr.getE2();
+		if (isTypeReducer(expr.getOp())) {
+			// TOFIX: Probably a better solution
+			expr.setType(getBigger(e1.getType(), e2.getType()));
+		}
 		if (expr.getOp().isComparison()) {
-			Type type1 = expr.getE1().getType();
-			Type type2 = expr.getE2().getType();
-			if (type1.getSizeInBits() < type2.getSizeInBits()) {
-				parentType = type2;
-			} else {
-				parentType = type1;
-			}
+			parentType = getBigger(e1.getType(), e2.getType());
 		} else {
 			parentType = expr.getType();
 		}
-		expr.setE1(doSwitch(expr.getE1()));
-		expr.setE2(doSwitch(expr.getE2()));
+		expr.setE1(doSwitch(e1));
+		expr.setE2(doSwitch(e2));
 		parentType = oldParentType;
 		return castExpression(expr);
 	}
@@ -379,6 +380,23 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		}
 		expressions.clear();
 		expressions.addAll(newExpressions);
+	}
+
+	private Type getBigger(Type type1, Type type2) {
+		if (type1.getSizeInBits() < type2.getSizeInBits()) {
+			return type2;
+		} else {
+			return type1;
+		}
+	}
+
+	private boolean isTypeReducer(OpBinary op) {
+		switch (op) {
+		case MOD:
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	private boolean needCast(Type type1, Type type2) {
