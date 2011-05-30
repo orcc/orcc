@@ -64,13 +64,15 @@ public class LLVMExpressionPrinter extends ExpressionPrinter {
 		case DIV:
 			if (signed) {
 				return "sdiv";
+			} else {
+				return "udiv";
 			}
-			return "udiv";
 		case DIV_INT:
 			if (signed) {
 				return "sdiv";
+			} else {
+				return "udiv";
 			}
-			return "udiv";
 		case EQ:
 			return "icmp eq";
 		case EXP:
@@ -78,35 +80,40 @@ public class LLVMExpressionPrinter extends ExpressionPrinter {
 		case GE:
 			if (signed) {
 				return "icmp sge";
+			} else {
+				return "icmp uge";
 			}
-			return "icmp uge";
 
 		case GT:
 			if (signed) {
 				return "icmp sgt";
+			} else {
+				return "icmp ugt";
 			}
-			return "icmp ugt";
 		case LOGIC_AND:
 			return "and";
 		case LE:
 			if (signed) {
 				return "icmp sle";
+			} else {
+				return "icmp ule";
 			}
-			return "icmp ule";
 		case LOGIC_OR:
 			return "or";
 		case LT:
 			if (signed) {
 				return "icmp slt";
+			} else {
+				return "icmp ult";
 			}
-			return "icmp ult";
 		case MINUS:
 			return "sub";
 		case MOD:
 			if (signed) {
 				return "srem";
+			} else {
+				return "urem";
 			}
-			return "urem";
 		case NE:
 			return "icmp ne";
 		case PLUS:
@@ -116,8 +123,9 @@ public class LLVMExpressionPrinter extends ExpressionPrinter {
 		case SHIFT_RIGHT:
 			if (signed) {
 				return "ashr";
+			} else {
+				return "lshr";
 			}
-			return "lshr";
 		case TIMES:
 			return "mul";
 		default:
