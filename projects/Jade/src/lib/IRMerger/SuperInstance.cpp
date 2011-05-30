@@ -58,6 +58,7 @@ SuperInstance::SuperInstance(LLVMContext& C, std::string id, Instance* srcInstan
 	this->actor = createCompositeActor(internalPorts);
 	this->internalPorts = internalPorts;
 	this->moc = NULL;
+	this->procedures = new map<string, Procedure*>();
 	this->actionScheduler = new ActionScheduler(new list<Action*>(), NULL);
 
 	analyzeInstance(srcInstance, srcFactor);
@@ -265,4 +266,23 @@ Pattern* SuperInstance::createPattern(Pattern* srcPattern,  int srcFactor, Patte
 
 
 	return newPattern;
+}
+
+map<string, Procedure*>* SuperInstance::getProcs() {
+	map<string, Procedure*>::iterator it;
+	map<string, Procedure*>* underneathProcMap;
+
+	//Clear procedures map to check procedure of underneath instances
+	procedures->clear();
+
+	// Insert source procedures
+	underneathProcMap = srcInstance->getProcs();
+	procedures->insert(underneathProcMap->begin(), underneathProcMap->end());
+
+
+	// Insert destination procedures
+	underneathProcMap = dstInstance->getProcs();
+	procedures->insert(underneathProcMap->begin(), underneathProcMap->end());
+
+	return procedures;
 }

@@ -47,7 +47,9 @@
 
 #include "ScenarioParser.h"
 
-
+extern "C" {
+	extern char* input_file;
+}
 //------------------------------
 
 using namespace std;
@@ -192,8 +194,12 @@ bool Manager::runStartEvent(StartEvent* startEvent){
 		thread = new pthread_t();
 	}
 	
+	//Set input file
+	string input = startEvent->getInput();
+	input_file = (char*)input.c_str();
+
 	//Execute network
-	engine->run(netPtr->second, startEvent->getInput(), thread);
+	engine->run(netPtr->second, thread);
 	
 	if (verbose){
 		cout << "-> Decoder started in :"<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

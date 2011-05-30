@@ -40,6 +40,8 @@
 #include <errno.h>
 #include <time.h>
 
+#include "NativeDecl.h"
+
 #include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/Module.h"
@@ -187,14 +189,36 @@ bool LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
 	
 }
 
-void LLVMExecution::run(string stimulus) {
+
+void LLVMExecution::linkExternalProc(list<Procedure*> externs){
+	list<Procedure*>::iterator it;
+
+	// Loop over all native procedure to find their equivalences
+	for (it = externs.begin(); it != externs.end(); it++){
+		map<std::string,void*>::iterator itNative;
+
+		// Find native function corresponding to native procedure name
+		itNative = nativeMap.find((*it)->getName());
+
+		if (itNative == nativeMap.end()){
+			cout << "Unknown native function :"<< (*it)->getName();
+			exit(1);
+		}
+
+		// Link native procedures
+		EE->addGlobalMapping((*it)->getFunction(), itNative->second);
+	}
+
+}
+
+
+void LLVMExecution::run() {
 	std::string ErrorMsg;
 	Module* module = decoder->getModule();
 	clock_t timer = clock ();
-	this->stimulus = stimulus;
 
-	// Set IO of the network
-	setIO();
+	// Link external procedure of the decoder
+	linkExternalProc(decoder->getExternalProcs());
 	
 	// Set scheduler as an infinite loop
 	Scheduler* scheduler = decoder->getScheduler();
@@ -343,7 +367,6 @@ void LLVMExecution::saveNal(unsigned char* nal, int nal_length, bool AVCFile){
 void LLVMExecution::setIn(Instance* instance){
 	// Create a specific source for the decoder made to read files
 	FileSrc* fileSrc = new FileSrc(1);
-	fileSrc->setStimulus(stimulus);	
 	
 	source = fileSrc;
 

@@ -128,11 +128,9 @@ public:
 	 *   
 	 *  @param network : the Network to run
 	 *
-	 *  @param input : the input stimulus
-	 *
 	 *  @param thread : the thread where network is execute
      */
-	int run(Network* network, std::string input, pthread_t* thread = NULL);
+	int run(Network* network, pthread_t* thread = NULL);
 
 	/*!
      *  @brief Reconfigure a network into another network

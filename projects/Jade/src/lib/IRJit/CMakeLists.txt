@@ -8,4 +8,5 @@ add_library (IRJit
   LLVMParser.cpp 
   LLVMUtility.cpp 
   LLVMWriter.cpp 
+  NativeDecl.h
   )

@@ -116,6 +116,15 @@ public:
      */
 	MoC* getMoC();
 
+	/**
+	 * @brief Getter of procedures
+	 *
+	 * Returns a map of procedure of this superinstance.
+	 * 
+	 * @return a map of ProcedureActionScheduler of this superinstance
+	 */
+	virtual std::map<std::string, Procedure*>* getProcs();
+
 private:
 
 	/*!

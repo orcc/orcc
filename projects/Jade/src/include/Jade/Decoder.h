@@ -116,12 +116,14 @@ public:
      */
 	 void setConfiguration(Configuration* newConfiguration);
 
-	/**
-     *  @brief Getter of a stimulus file
+
+	 /**
+     *  @brief Returns the external procedures of the decoder
 	 * 
-	 *  @return the stimulus file
+	 *  @return a list of external Procedure in the decoder
+	 *
      */
-	std::string getStimulus(){return stimulus;};
+	 std::list<Procedure*> getExternalProcs();
 
 	/**
      *  @brief Return true if the decoder is currently running
@@ -145,13 +147,6 @@ public:
 	 *  @return true if the decoder has a scheduler, otherwise false
      */
 	 bool hasScheduler(){return scheduler != NULL;};
-
-	/**
-     *  @brief Setter of a stimulus file
-	 * 
-	 *  @param file : the stimulus file
-     */
-	void setStimulus(std::string file);
 
 
 	/**
@@ -192,9 +187,6 @@ private:
 
 	/** Configuration of the decoder */
 	Configuration* configuration;
-
-	/** Input stimulus */
-	std::string stimulus;
 
 	/** Scheduler of the decoder */
 	Scheduler* scheduler;

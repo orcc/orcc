@@ -307,11 +307,11 @@ public:
 	/**
 	 * @brief Getter of procedures
 	 *
-	 * Returns a map of procedure of this actor.
+	 * Returns a map of procedure of this instance.
 	 * 
-	 * @return a map of ProcedureActionScheduler of this actor
+	 * @return a map of ProcedureActionScheduler of this instance
 	 */
-	std::map<std::string, Procedure*>* getProcs() {return procedures;}
+	virtual std::map<std::string, Procedure*>* getProcs() {return procedures;}
 
 	/**
 	 * @brief Setter of procedures

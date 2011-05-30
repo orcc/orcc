@@ -154,7 +154,7 @@ Function* LLVMWriter::addFunctionProtosExternal(const Function* function){
 	
 	Function *NF =
 	Function::Create(cast<FunctionType>(SF->getType()->getElementType()),
-					 GlobalValue::ExternalLinkage,  prefix + SF->getName(), Dest);
+					 GlobalValue::ExternalLinkage, SF->getName(), Dest);
     NF->copyAttributesFrom(SF);
 	ValueMap[SF] = NF;
 	

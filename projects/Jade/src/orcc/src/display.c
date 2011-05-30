@@ -123,7 +123,7 @@ static void displayYUV_setSize(int width, int height) {
 }
 
 void displayYUV_displayPicture(unsigned char *pictureBufferY,
-		unsigned char *pictureBufferU, unsigned char *pictureBufferV,
+		unsigned char *pictureBufferU,  unsigned char *pictureBufferV,
 		unsigned short pictureWidth, unsigned short pictureHeight) {
 	static unsigned short lastWidth = 0;
 	static unsigned short lastHeight = 0;

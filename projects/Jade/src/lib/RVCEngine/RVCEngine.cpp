@@ -196,7 +196,7 @@ int RVCEngine::verify(Network* network, std::string errorFile){
 	return 0;
 }
 
-int RVCEngine::run(Network* network, string input, pthread_t* thread){	
+int RVCEngine::run(Network* network, pthread_t* thread){	
 	map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(network);
@@ -207,7 +207,6 @@ int RVCEngine::run(Network* network, string input, pthread_t* thread){
 	}
 
 	Decoder* decoder = it->second;
-	decoder->setStimulus(input);
 
 	//Start decoding
 	if (thread != NULL){

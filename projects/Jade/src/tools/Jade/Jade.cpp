@@ -193,6 +193,10 @@ void clean_exit(int sig){
 
 int Display::stopAfter = StopAt;
 
+extern "C" {
+	char* input_file;
+}
+
 //Verify if directory is well formed
 void setDirectory(std::string* dir){
 	if (dir->compare("") != 0){
@@ -263,8 +267,12 @@ void startCmdLine(){
 		engine->verify(network, "error.txt");
 	}
 
+
+	//Set input file
+	input_file = (char*)VidFile.c_str();
+
 	//Run network
-	engine->run(network, VidFile);
+	engine->run(network);
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
 }

@@ -102,14 +102,12 @@ public:
 	void mapProcedure(Procedure* procedure, void *Addr);
 
 	/**
-     *  @brief Run the current decoder with the given stimulus
+     *  @brief Run the current decoder
 	 *
 	 *  Initialize and run the decoder in an infinite loop. 
 	 *    No need to call the initialize function of LLVM execution.
-     *
-	 *	@param stimulus : the input stimulus
      */
-	void run(std::string stimulus);
+	void run();
 
 	/**
      *  @brief Initialize the decoder before the execution
@@ -194,7 +192,12 @@ public:
 	void* getExit(); 
 	void recompile(llvm::Function* function);
 	
-
+	/**
+     *  @brief Link native procedures in the decoder
+	 *
+	 *	@param externs : a list of external procedures
+     */
+	void linkExternalProc(std::list<Procedure*> externs);
 private:
 
 	void setIO();
@@ -219,9 +222,6 @@ private:
 
 	/** Result of the execution */
 	int result;
-
-	/** Input stimulus */
-	std::string stimulus;
 
 	/** verbose */
 	bool verbose;

@@ -89,6 +89,32 @@ Decoder::~Decoder (){
 	delete module;
 }
 
+list<Procedure*> Decoder::getExternalProcs(){
+	list<Procedure*> externs;
+
+	// Look across all instances for external procedures
+	map<std::string, Instance*>::iterator it;
+	map<std::string, Instance*>* instances = configuration->getInstances();
+	for (it = instances->begin(); it != instances->end(); it++){
+		Instance* instance = it->second;
+
+		// Look accross all procs for external property
+		map<string, Procedure*>::iterator itProc;
+		map<string, Procedure*>* procs = instance->getProcs();
+
+		for (itProc = procs->begin(); itProc != procs->end(); itProc++){
+			Procedure* proc = itProc->second;
+
+			if (proc->isExternal()){
+				externs.push_back(proc);
+			}
+
+		}
+	}
+
+	return externs;
+}
+
 void Decoder::setConfiguration(Configuration* newConfiguration){
 	clock_t start = clock ();
 	if (running){
@@ -119,7 +145,7 @@ void Decoder::setConfiguration(Configuration* newConfiguration){
 void Decoder::run(){
 	running = true;
 
-	executionEngine->run(stimulus);
+	executionEngine->run();
 }
 
 void Decoder::stop(){
@@ -144,8 +170,4 @@ void* Decoder::threadRun( void* args ){
 	Decoder* decoder = static_cast<Decoder*>(args);
 	decoder->run();
 	return NULL;
-}
-
-void Decoder::setStimulus(std::string file){
-	this->stimulus = file;
 }
