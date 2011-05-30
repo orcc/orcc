@@ -110,7 +110,7 @@ SystemDir("S", desc("Specifiy a specify location for package System"),
 			  init(""));
 
 cl::opt<std::string> 
-YuvFile("o", desc("Decoded YUV video file for compare mode"), 
+YuvFile("o", desc("Compare output with a decoded YUV video file"), 
 			  value_desc("YUV filename"), 
 			  init(""));
 
@@ -195,6 +195,7 @@ int Display::stopAfter = StopAt;
 
 extern "C" {
 	char* input_file;
+	char* yuv_file;
 }
 
 //Verify if directory is well formed
@@ -270,6 +271,7 @@ void startCmdLine(){
 
 	//Set input file
 	input_file = (char*)VidFile.c_str();
+	YuvFile = (char*)YuvFile.c_str();
 
 	//Run network
 	engine->run(network);
