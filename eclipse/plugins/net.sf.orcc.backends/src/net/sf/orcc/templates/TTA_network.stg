@@ -19,14 +19,27 @@ end top;
 
 architecture bdf_type of top is
 
-  <network.instances: component()>
+  <components(network)>
+  <signals(network)>
 
 end bdf_type;
 
 >>
 
+signals(network) ::= <<
+<network.connections: signal(); separator="\n">
+>>
+
+signal(connection) ::= <<
+
+>>
+
+components(network) ::= <<
+<network.instances: component(); separator="\n">
+>>
+
 component(instance) ::= <<
-component processor_display
+component processor_<instance.name>
   port(clk         : in  std_logic;
        <instance.actor.inputs: inputPort(); separator="\n">
        <instance.actor.outputs: outputPort(); separator="\n">
