@@ -248,23 +248,24 @@ assignInstance(instance) ::= <<
 
 assignPorts(instance) ::= <<
 <if(instance.actor)
-><instance.actor.inputs: assignInputPort(); separator="\n">
-<instance.actor.outputs: assignOutputPort(); separator="\n"><
+><instance.actor.inputs: { input | <assignInputPort(port=input, index={<indexPort(input)>})> }; separator="\n">
+<instance.actor.outputs: { output | <assignOutputPort(port=output, index={<indexPort(output)>})> }; separator="\n"><
 elseif(instance.broadcast)
-><
+><assignInputPort(instance.broadcast.input, "0")>
+<instance.broadcast.outputs.list: { output | <assignOutputPort(output, i0)> }; separator="\n"><
 endif>
 >>
 
-assignInputPort(port) ::= <<
-data_<indexPort(port)>_in    =\> fifo_<indexInputFifo(port)>_q,
-status_<indexPort(port)>_in  =\> fifo_<indexInputFifo(port)>_status,
-ack_<indexPort(port)>_in     =\> fifo_<indexInputFifo(port)>_rdreq,
+assignInputPort(port, index) ::= <<
+data_<index>_in    =\> fifo_<indexInputFifo(port)>_q,
+status_<index>_in  =\> fifo_<indexInputFifo(port)>_status,
+ack_<index>_in     =\> fifo_<indexInputFifo(port)>_rdreq,
 >>
 
-assignOutputPort(port) ::= <<
-data_<indexPort(port)>_out   =\> fifo_<indexOutputFifo(port)>_data,
-status_<indexPort(port)>_out =\> fifo_<indexOutputFifo(port)>_status,
-dv_<indexPort(port)>_out     =\> fifo_<indexOutputFifo(port)>_wrreq,
+assignOutputPort(port, index) ::= <<
+data_<index>_out   =\> fifo_<indexOutputFifo(port)>_data,
+status_<index>_out =\> fifo_<indexOutputFifo(port)>_status,
+dv_<index>_out     =\> fifo_<indexOutputFifo(port)>_wrreq,
 >>
 
 indexInputFifo(port) ::= <<
