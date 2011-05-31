@@ -56,50 +56,25 @@ end bdf_type;
 
 >>
 
-printSignals(network) ::= <<
-<network.instances: { instance | 
-	<printInSignals(instance, network.incomingMap.(instance))>
-	<printOutSignals(instance, network.outgoingMap.(instance))> }; separator="\n">
->>
 
-printInSignals(instance, portToConnectionMap) ::= <<
-<portToConnectionMap.values: printInSignal(); separator="\n">
->>
-
-printOutSignals(instance, portToConnectionsMap) ::= <<
-<portToConnectionsMap.values: { connections | <connections: printInSignal(); separator="\n"> }; separator="\n">
->>
-
-printInSignal(connection) ::= <<
-signal fifo_<indexConnection(connection)>_clk		: std_logic;
-signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
-signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0);
->>
-
-printOutSignal(connection) ::= <<
-signal fifo_<indexConnection(connection)>_rdreq		: std_logic;
-signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0);
-signal fifo_<indexConnection(connection)>_status	: std_logic_vector(8 downto 0);
->>
-
-indexConnection(connection) ::= <<
-<network.connectionMap.(connection)>
->>
+///////////////////////////////////////////////////////////////////////////////
+// Components
+///////////////////////////////////////////////////////////////////////////////
 
 components(network) ::= <<
 <network.instances: component(); separator="\n\n">
 >>
 
 component(instance) ::= <<
-<if(instance.actor)>
-component processor_<instance.id>
+<if(instance.actor)
+>component processor_<instance.id>
   port(clk			: in  std_logic;
        <instance.actor.inputs: inputPort(); separator="\n">
        <instance.actor.outputs: outputPort(); separator="\n">
        reset_n		: in  std_logic
        );
-end component;
-<endif>
+end component;<
+endif>
 >>
 
 inputPort(port) ::= <<
@@ -116,4 +91,39 @@ dv_<indexPort(port)>_out		: out std_logic;
 
 indexPort(port) ::= <<
 <instance.actor.templateData.portToIndexMap.(port)>
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Signals
+///////////////////////////////////////////////////////////////////////////////
+
+printSignals(network) ::= <<
+<network.instances: { instance | <printInstanceSignals(instance, network.incomingMap.(instance), network.outgoingMap.(instance))> }; separator="\n">
+>>
+
+printInstanceSignals(instance, incomingMap, outgoingMap) ::= <<
+-- Instance: <instance.id> 
+<incomingMap.keys: { port | <printInputPortSignals(port, incomingMap.(port))> }; separator="\n">
+<outgoingMap.keys: { port | <printOutputPortSignals(port, outgoingMap.(port))> }; separator="\n">
+>>
+
+printInputPortSignals(port, connection) ::= <<
+---- Input port: <port.name>
+signal fifo_<indexConnection(connection)>_clk		: std_logic;
+signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
+signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0);
+>>
+
+printOutputPortSignals(port, connections) ::= <<
+---- Output port: <port.name>
+<connections: { connection |
+signal fifo_<indexConnection(connection)>_rdreq		: std_logic;
+signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0);
+signal fifo_<indexConnection(connection)>_status		: std_logic_vector(8 downto 0);
+}>
+>>
+
+indexConnection(connection) ::= <<
+<network.connectionMap.(connection)>
 >>

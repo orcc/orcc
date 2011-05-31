@@ -128,6 +128,7 @@ public class TTABackendImpl extends AbstractBackend {
 		transformActors(network.getActors());
 		printInstances(network);
 
+		network.computeTemplateMaps();
 		printNetwork(network);
 	}
 
