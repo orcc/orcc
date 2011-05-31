@@ -93,8 +93,27 @@ architecture bdf_type of top is
   
 begin
 
+  ---------------------------------------------------------------------------
+  -- System instantiation 
+  --------------------------------------------------------------------------- 
   system_vcc \<= '1';
 
+  mainpll_inst : mainpll
+    port map(inclk0 =\> hw_clk,
+             c0     =\> system_clock);
+
+  st_clock_inst : clock_div
+    port map(inclk0 =\> system_clock,
+             c0     =\> st2clk);
+
+  reset_debouncer : button_debouncer
+    generic map(counter_max =\> 100000,
+                preset_val  =\> 0
+                )
+    port map(clk      =\> system_clock,
+             rst_n    =\> system_vcc,
+             data_in  =\> button(1),
+             data_out =\> system_reset_n);
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
   --------------------------------------------------------------------------- 
@@ -175,7 +194,7 @@ signals(network) ::= <<
 instanceSignals(instance, incomingMap, outgoingMap) ::= <<
 -- Instance: <instance.id> 
 <incomingMap.keys: { port | <inputPortSignals(port, incomingMap.(port))> }; separator="\n">
-<outgoingMap.keys: { port | <outputPortSignals(port, outgoingMap.(port))> }; separator="\n">
+<outgoingMap.keys: { port | <outputPortSignals(port, first(outgoingMap.(port)))> }; separator="\n">
 >>
 
 inputPortSignals(port, connection) ::= <<
@@ -185,12 +204,8 @@ signal fifo_<indexFifo(connection)>_wrreq		: std_logic;
 signal fifo_<indexFifo(connection)>_data		: std_logic_vector(31 downto 0);
 >>
 
-outputPortSignals(port, connections) ::= <<
+outputPortSignals(port, connection) ::= <<
 ---- Output port: <port.name>
-<connections: outputConnectionSignals(); separator="\n">
->>
-
-outputConnectionSignals(connection) ::= <<
 signal fifo_<indexFifo(connection)>_rdreq		: std_logic;
 signal fifo_<indexFifo(connection)>_q			: std_logic_vector(31 downto 0);
 signal fifo_<indexFifo(connection)>_status		: std_logic_vector(8 downto 0);
@@ -220,6 +235,42 @@ fifo_<indexFifo(connection)> : tta_fifo
            status  =\> fifo_<indexFifo(connection)>_status);
 >>
 
-assignInstance(actors) ::= <<
+assignInstances(instances) ::= <<
+<instances: assignInstance(); separator="\n\n">
+>>
 
+assignInstance(instance) ::= <<
+<instance.id>_inst : processor_<instance.id>
+  port map(clk          =\> system_clock,
+           <assignPorts(instance)>
+           reset_n      =\> system_reset_n);
+>>
+
+assignPorts(instance) ::= <<
+<if(instance.actor)
+><instance.actor.inputs: assignInputPort(); separator="\n">
+<instance.actor.outputs: assignOutputPort(); separator="\n"><
+elseif(instance.broadcast)
+><
+endif>
+>>
+
+assignInputPort(port) ::= <<
+data_<indexPort(port)>_in    =\> fifo_<indexInputFifo(port)>_q,
+status_<indexPort(port)>_in  =\> fifo_<indexInputFifo(port)>_status,
+ack_<indexPort(port)>_in     =\> fifo_<indexInputFifo(port)>_rdreq,
+>>
+
+assignOutputPort(port) ::= <<
+data_<indexPort(port)>_out   =\> fifo_<indexOutputFifo(port)>_data,
+status_<indexPort(port)>_out =\> fifo_<indexOutputFifo(port)>_status,
+dv_<indexPort(port)>_out     =\> fifo_<indexOutputFifo(port)>_wrreq,
+>>
+
+indexInputFifo(port) ::= <<
+<indexFifo(network.incomingMap.(instance).(port))>
+>>
+
+indexOutputFifo(port) ::= <<
+<indexFifo(first(network.outgoingMap.(instance).(port)))>
 >>
