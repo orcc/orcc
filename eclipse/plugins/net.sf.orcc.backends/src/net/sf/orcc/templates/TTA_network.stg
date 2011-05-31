@@ -20,44 +20,68 @@ end top;
 architecture bdf_type of top is
 
   <components(network)>
-  <signals(network)>
+  <printSignals(network)>
 
 end bdf_type;
 
 >>
 
-signals(network) ::= <<
-<network.connections: signal(); separator="\n">
+printSignals(network) ::= <<
+<network.instances: { instance | 
+	<printInSignals(instance, network.incomingMap.(instance))>
+	<printOutSignals(instance, network.outgoingMap.(instance))> }; separator="\n">
 >>
 
-signal(connection) ::= <<
+printInSignals(instance, portToConnectionMap) ::= <<
+<portToConnectionMap.values: printInSignal(); separator="\n">
+>>
 
+printOutSignals(instance, portToConnectionsMap) ::= <<
+<portToConnectionsMap.values: { connections | <connections: printInSignal(); separator="\n"> }; separator="\n">
+>>
+
+printInSignal(connection) ::= <<
+signal fifo_<indexConnection(connection)>_clk		: std_logic;
+signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
+signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0);
+>>
+
+printOutSignal(connection) ::= <<
+signal fifo_<indexConnection(connection)>_rdreq		: std_logic;
+signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0);
+signal fifo_<indexConnection(connection)>_status	: std_logic_vector(8 downto 0);
+>>
+
+indexConnection(connection) ::= <<
+<network.connectionMap.(connection)>
 >>
 
 components(network) ::= <<
-<network.instances: component(); separator="\n">
+<network.instances: component(); separator="\n\n">
 >>
 
 component(instance) ::= <<
-component processor_<instance.name>
-  port(clk         : in  std_logic;
+<if(instance.actor)>
+component processor_<instance.id>
+  port(clk			: in  std_logic;
        <instance.actor.inputs: inputPort(); separator="\n">
        <instance.actor.outputs: outputPort(); separator="\n">
-       reset_n     : in  std_logic
+       reset_n		: in  std_logic
        );
 end component;
+<endif>
 >>
 
 inputPort(port) ::= <<
-data_<indexPort(port)>_in   : in  std_logic_vector(31 downto 0);
-status_<indexPort(port)>_in : in  std_logic_vector(8 downto 0);
-ack_<indexPort(port)>_in    : out std_logic;
+data_<indexPort(port)>_in		: in  std_logic_vector(31 downto 0);
+status_<indexPort(port)>_in	: in  std_logic_vector(8 downto 0);
+ack_<indexPort(port)>_in		: out std_logic;
 >>
 
 outputPort(port) ::= <<
-data_<indexPort(port)>_out   : out std_logic_vector(31 downto 0);
-status_<indexPort(port)>_out : in  std_logic_vector(8 downto 0);
-dv_<indexPort(port)>_out     : out std_logic;
+data_<indexPort(port)>_out		: out std_logic_vector(31 downto 0);
+status_<indexPort(port)>_out	: in  std_logic_vector(8 downto 0);
+dv_<indexPort(port)>_out		: out std_logic;
 >>
 
 indexPort(port) ::= <<

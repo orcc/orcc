@@ -30,7 +30,6 @@ package net.sf.orcc.backends.tta;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +37,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.InstancePrinter;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.llvm.LLVMExpressionPrinter;
 import net.sf.orcc.backends.llvm.LLVMTypePrinter;
 import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
@@ -55,7 +55,7 @@ import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.serialize.XDFWriter;
+import net.sf.orcc.network.transformations.BroadcastAdder;
 
 import org.eclipse.core.resources.IFile;
 
@@ -113,6 +113,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 	private void doTransformNetwork(Network network) throws OrccException {
 		network.flatten();
+		new BroadcastAdder().transform(network);
 	}
 
 	@Override
@@ -127,10 +128,7 @@ public class TTABackendImpl extends AbstractBackend {
 		transformActors(network.getActors());
 		printInstances(network);
 
-		// print network
-		write("Printing network...\n");
-		XDFWriter writer = new XDFWriter();
-		writer.write(new File(path), network);
+		printNetwork(network);
 	}
 
 	@Override
@@ -153,6 +151,11 @@ public class TTABackendImpl extends AbstractBackend {
 				"dram");
 		iromPrinter.print("irom_" + instance.getId() + ".vhd", path, instance,
 				"irom");
+	}
+
+	private void printNetwork(Network network) {
+		NetworkPrinter printer = new NetworkPrinter("TTA_network");
+		printer.print(network.getName() + ".vhd", path, network, "network");
 	}
 
 	private void printProcessor(Instance instance) {
