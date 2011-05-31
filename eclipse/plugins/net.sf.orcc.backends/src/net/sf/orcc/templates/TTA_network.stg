@@ -83,8 +83,28 @@ architecture bdf_type of top is
   ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------
+  -- System
+  signal system_clock   : std_logic;
+  signal system_vcc     : std_logic;
+  signal system_reset_n : std_logic;
+  
   <signals(network)>
   ---------------------------------------------------------------------------
+  
+begin
+
+  system_vcc \<= '1';
+
+  ---------------------------------------------------------------------------
+  -- FIFOs instantiation 
+  --------------------------------------------------------------------------- 
+  <assignFifos(network.connections)>
+  ---------------------------------------------------------------------------
+  -- Actors instantiation 
+  ---------------------------------------------------------------------------
+  <assignInstances(network.instances)>
+  ---------------------------------------------------------------------------
+
 
 end bdf_type;
 
@@ -160,9 +180,9 @@ instanceSignals(instance, incomingMap, outgoingMap) ::= <<
 
 inputPortSignals(port, connection) ::= <<
 ---- Input port: <port.name>
-signal fifo_<indexConnection(connection)>_clk		: std_logic;
-signal fifo_<indexConnection(connection)>_wrreq		: std_logic;
-signal fifo_<indexConnection(connection)>_data		: std_logic_vector(31 downto 0);
+signal fifo_<indexFifo(connection)>_clk		: std_logic;
+signal fifo_<indexFifo(connection)>_wrreq		: std_logic;
+signal fifo_<indexFifo(connection)>_data		: std_logic_vector(31 downto 0);
 >>
 
 outputPortSignals(port, connections) ::= <<
@@ -171,11 +191,35 @@ outputPortSignals(port, connections) ::= <<
 >>
 
 outputConnectionSignals(connection) ::= <<
-signal fifo_<indexConnection(connection)>_rdreq		: std_logic;
-signal fifo_<indexConnection(connection)>_q			: std_logic_vector(31 downto 0);
-signal fifo_<indexConnection(connection)>_status		: std_logic_vector(8 downto 0);
+signal fifo_<indexFifo(connection)>_rdreq		: std_logic;
+signal fifo_<indexFifo(connection)>_q			: std_logic_vector(31 downto 0);
+signal fifo_<indexFifo(connection)>_status		: std_logic_vector(8 downto 0);
 >>
 
-indexConnection(connection) ::= <<
+indexFifo(connection) ::= <<
 <network.connectionMap.(connection)>
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Instantiation
+///////////////////////////////////////////////////////////////////////////////
+
+assignFifos(connections) ::= <<
+<connections: assignFifo(); separator="\n\n">
+>>
+
+assignFifo(connection) ::= <<
+fifo_<indexFifo(connection)> : tta_fifo
+  port map(wrreq   =\> fifo_<indexFifo(connection)>_wrreq,
+           reset_n =\> system_reset_n,
+           clk     =\> system_clock,
+           rdreq   =\> fifo_<indexFifo(connection)>_rdreq,
+           data    =\> fifo_<indexFifo(connection)>_data,
+           q       =\> fifo_<indexFifo(connection)>_q,
+           status  =\> fifo_<indexFifo(connection)>_status);
+>>
+
+assignInstance(actors) ::= <<
+
 >>
