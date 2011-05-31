@@ -144,7 +144,7 @@ void Decoder::setConfiguration(Configuration* newConfiguration){
 
 void Decoder::run(){
 	running = true;
-
+	executionEngine->initialize();
 	executionEngine->run();
 }
 

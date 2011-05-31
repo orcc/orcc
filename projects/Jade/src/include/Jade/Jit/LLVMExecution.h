@@ -111,24 +111,9 @@ public:
 	/**
      *  @brief Initialize the decoder before the execution
 	 *
+	 *  @return address of the stop variable
      */
-	void initialize();
-
-	/**
-     *  @brief Start an execution of the decoder
-     *
-	 *  Start the execution of the decoder until condition is reached. 
-	 *		Condition MUST be set first with the initialize function.
-	 */
-	void start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame, bool AVCFile = false);
-
-	/**
-	 *	@brief Make a backup of nal
-	 *
-	 *		This function should be use when we can not use the start function.
-	 *		For exemple when the frame pointer is already use.
-	 */
-	void saveNal(unsigned char* nal, int nal_length, bool AVCFile);
+	int* initialize();
 
 	/**
      *  @brief run a specific function of the current decoder
@@ -207,6 +192,9 @@ private:
 
 	/** Result of the execution */
 	int result;
+
+	/** Stop variable */
+	int stopVal;
 
 	/** verbose */
 	bool verbose;

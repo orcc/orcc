@@ -87,6 +87,7 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder, bool verbose): Co
 
   this->decoder = decoder;
   this->verbose = verbose;
+  this->stopVal = 0;
 
   Module* module = decoder->getModule();
 
@@ -209,6 +210,16 @@ void LLVMExecution::linkExternalProc(list<Procedure*> externs){
 
 
 void LLVMExecution::run() {
+	// Get scheduler functions
+	Scheduler* scheduler = decoder->getScheduler();
+	Function* func = scheduler->getMainFunction();
+
+	// Run scheduler
+	std::vector<GenericValue> noargs;
+	GenericValue Result = EE->runFunction(func, noargs);
+}
+
+int* LLVMExecution::initialize(){
 	std::string ErrorMsg;
 	Module* module = decoder->getModule();
 	clock_t timer = clock ();
@@ -216,10 +227,10 @@ void LLVMExecution::run() {
 	// Link external procedure of the decoder
 	linkExternalProc(decoder->getExternalProcs());
 	
-	// Set scheduler as an infinite loop
+	// Set stop condition of the scheduler
 	Scheduler* scheduler = decoder->getScheduler();
 	GlobalVariable* stopGV = scheduler->getStopGV();
-	stopGV->setInitializer(ConstantInt::get(Type::getInt32Ty(Context), 0));
+	EE->addGlobalMapping(stopGV, &stopVal);
 
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
@@ -233,77 +244,14 @@ void LLVMExecution::run() {
 		}
 		cout << "--> No lazy compilation enable, the decoder has been compiled in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms \n";
 	}
-	
-	// Get scheduler functions
-	Function* func = scheduler->getMainFunction();
-	Function* init = scheduler->getInitFunction();
-
-	// Run scheduler
-	std::vector<GenericValue> noargs;
-	EE->runFunction(init, noargs);
-	GenericValue Result = EE->runFunction(func, noargs);
-}
-
-void LLVMExecution::initialize(){
-	
-	// TODO: add this declaration in RVCDECODER.cpp
-	//GpacSrc* gpacSrc = new GpacSrc(1);
-	//GpacDisp* gpacDisp = new GpacDisp(1);
-
-	Configuration* configuration = decoder->getConfiguration();
-	Module* module = decoder->getModule();
-	
-	// Set stop condition of the scheduler
-	Scheduler* scheduler = decoder->getScheduler();
-	GlobalVariable* stopGV = scheduler->getStopGV();
-
-//	EE->addGlobalMapping(stopGV, gpacSrc->getStopSchPtr());
-//	EE->addGlobalMapping(stopGV_src, gpacSrc->getStopSchPtr());
-//	EE->addGlobalMapping(stopGV_out, gpacDisp->getStopSchPtr());
-
-//	gpacSrc->setSaveNalAdr(gpacDisp->getPicReadyAdr());
-
-	// Run static constructors.
-    EE->runStaticConstructorsDestructors(false);
-
-	// In case of no lazy compilation, compile all
-	if (NoLazyCompilation) {
-		for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
-			Function *Fn = &*I;
-			if (!Fn->isDeclaration())
-				EE->getPointerToFunction(Fn);
-		}
-	}
 
    	// Initialize the network
 	Function* init = scheduler->getInitFunction();
 	std::vector<GenericValue> noargs;
 	EE->runFunction(init, noargs);
-}
 
-void LLVMExecution::start(unsigned char* nal, int nal_length, RVCFRAME* rvcFrame, bool AVCFile){
-	
-	// TODO: This must be done in RVCDecoder
-	//GpacSrc* gpacSrc = (GpacSrc*)source;
-	//gpacSrc->setNal(nal, nal_length, AVCFile);
-
-	//GpacDisp* gpacDisp = (GpacDisp*)display;
-	//gpacDisp->setFramePtr(rvcFrame);
-
-	//gpacSrc->start();
-	//gpacDisp->start();
-
-	Scheduler* scheduler = decoder->getScheduler();
-	Function* main = scheduler->getMainFunction();
-	std::vector<GenericValue> noargs;
-	EE->runFunction(main, noargs);
-}
-
-void LLVMExecution::saveNal(unsigned char* nal, int nal_length, bool AVCFile){
-	// TODO: This must be done in RVCDecoder, no saveNal anymore in LLVMExecution
-	//GpacSrc* gpacSrc = (GpacSrc*)source;
-	//gpacSrc->setNal(nal, nal_length, AVCFile);
-	//gpacSrc->setNalFifo();
+	// Return stop variable
+	return &stopVal;
 }
 
 void LLVMExecution::runFunction(Function* function) {
