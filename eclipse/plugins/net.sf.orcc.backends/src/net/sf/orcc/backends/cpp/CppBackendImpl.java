@@ -42,14 +42,12 @@ import net.sf.orcc.backends.cpp.transformations.SerDesAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
-import net.sf.orcc.tools.classifier.ActorClassifier;
 
 import org.eclipse.core.resources.IFile;
 
@@ -129,27 +127,12 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		Map<String, String> replacementMap = new HashMap<String, String>();
-		replacementMap.put("abs", "_abs");
-		replacementMap.put("getw", "_getw");
-		replacementMap.put("index", "_index");
-		replacementMap.put("max", "_max");
-		replacementMap.put("min", "_min");
-		replacementMap.put("select", "_select");
-		replacementMap.put("OUT", "_OUT");
-		replacementMap.put("IN", "_IN");
-
-		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
-		if (classify) {
-			new ActorClassifier().doSwitch(actor);
-		}
-
-		ActorVisitor<?>[] transformations = { new RenameTransformation(
-				replacementMap) };
+		ActorVisitor<?>[] transformations = {};
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
 		}
+
 	}
 
 	private void doTransformNetwork(Network network) throws OrccException {

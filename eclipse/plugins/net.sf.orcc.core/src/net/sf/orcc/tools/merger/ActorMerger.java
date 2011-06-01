@@ -163,6 +163,7 @@ public class ActorMerger implements INetworkTransformation {
 			i++;
 		} while (i < scheduler.getDepth());
 
+		// Add temp vars to load/store data from ports to buffers
 		for (Port port : ip.getPorts()) {
 			Type type = port.getType();
 			String name = port.getName();

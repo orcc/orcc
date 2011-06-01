@@ -80,7 +80,9 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.attributes.IAttribute;
+import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.attributes.StringAttribute;
+import net.sf.orcc.network.attributes.ValueAttribute;
 import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.util.OrccUtil;
 
@@ -206,6 +208,19 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 				AstVariable variable = parseVariable(entry.getKey());
 				Expression expression = parseExpression(entry.getValue());
 				instance.getParameters().put(variable.getName(), expression);
+			}
+
+			// part name attribute
+			String partName = (String) vertex.getValue("part name");
+			if (partName != null) {
+				partName = partName.replaceAll("^\"|\"$", "");
+				if (partName.length() != 0) {
+					// remove extra quotes
+					Expression expr = IrFactory.eINSTANCE
+							.createExprString(partName);
+					IValueAttribute attr = new ValueAttribute(expr);
+					instance.getAttributes().put("partName", attr);
+				}
 			}
 		}
 
