@@ -53,7 +53,7 @@ import net.sf.orcc.ir.util.EcoreHelper;
 
 /**
  * This class defines a visitor that transforms a division into an equivalent
- * hardware compilable function
+ * hardware compilable function specified in xilinx division model
  * 
  * @author Khaled Jerbi
  * 
@@ -63,6 +63,8 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	private Procedure divProc = IrFactory.eINSTANCE.createProcedure();
 	private Type typeInt = IrFactory.eINSTANCE.createTypeInt();
 	private Type typeBool = IrFactory.eINSTANCE.createTypeBool();
+
+	private List<Expression> parameters;
 
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
@@ -87,23 +89,23 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 				// creation and addition of the new div function once per
 				// actor
-				
+
 				if (!actor.getProcs().contains(divProc)) {
 					divProc = createDivProc(varNum, varDenum);
 					actor.getProcs().add(0, divProc);
 				}
-				
+
 				parameters.add(IrFactory.eINSTANCE.createExprVar(varNum));
 				parameters.add(IrFactory.eINSTANCE.createExprVar(varDenum));
-				//IrFactory.eINSTANCE.createVar(
-					//	IrFactory.eINSTANCE.createTypeInt(), "temp", true, 0);
+				// IrFactory.eINSTANCE.createVar(
+				// IrFactory.eINSTANCE.createTypeInt(), "temp", true, 0);
 				InstCall call = IrFactory.eINSTANCE.createInstCall(assign
 						.getTarget().getVariable(), divProc, parameters);
-				//blk.getInstructions().remove(assign);
+				// blk.getInstructions().remove(assign);
 				blk.add(indexInst, call);
 				blk.add(indexInst, assign1);
 				blk.add(indexInst, assign0);
-				//EcoreHelper.delete(assign);
+				// EcoreHelper.delete(assign);
 
 			}
 		}
@@ -111,15 +113,13 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		return null;
 	}
 
-	private List<Expression> parameters;
-
 	/**
-	 * This method creates the alternative division function using the nom and
+	 * This method creates the alternative division function using the num and
 	 * the denom
 	 * 
-	 * @param varNum
-	 * @param varDenum
-	 * @return
+	 * @param varNum numerator
+	 * @param varDenum denomerator
+	 * @return division function
 	 */
 	private Procedure createDivProc(Var varNum, Var varDenum) {
 		Procedure divProc = IrFactory.eINSTANCE.createProcedure("DIV_II", 0,
@@ -181,6 +181,98 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		return divProc;
 	}
 
+	/**
+	 * creates the following if node: if (var < 0) { var = -var; flip ^= 1; }
+	 * 
+	 * @param var (see definition)
+	 * @param flip (see definition)
+	 * @return if node
+	 */
+	private NodeIf createNodeIf(Var var, Var flip) {
+		NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
+		NodeBlock blockIf_1 = IrFactoryImpl.eINSTANCE.createNodeBlock();
+		Expression conditionIf_1 = IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprVar(var), OpBinary.LT,
+				IrFactory.eINSTANCE.createExprInt(0), typeBool);
+		nodeIf.setCondition(conditionIf_1);
+		Expression oppNomerator = IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
+				IrFactory.eINSTANCE.createExprVar(var), typeInt);
+		InstAssign assign10 = IrFactory.eINSTANCE.createInstAssign(var,
+				oppNomerator);
+		blockIf_1.add(assign10);
+		Expression xorFlip = IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprVar(flip), OpBinary.BITXOR,
+				IrFactory.eINSTANCE.createExprInt(1), typeInt);
+		InstAssign assign11 = IrFactory.eINSTANCE.createInstAssign(flip,
+				xorFlip);
+		blockIf_1.add(assign11);
+		nodeIf.getThenNodes().add(blockIf_1);
+		return nodeIf;
+	}
+
+	/**
+	 * creates the required if node specified in the xilinx division model
+	 * 
+	 * @param numer
+	 * @param denom
+	 * @param result
+	 * @param mask
+	 * @param remainder
+	 * @param varDenum
+	 * @param i
+	 * @return if Node
+	 */
+	private NodeIf createNodeIfWhile(Var numer, Var denom, Var result,
+			Var mask, Var remainder, Var varDenum, Var i) {
+		NodeIf nodeIf = IrFactory.eINSTANCE.createNodeIf();
+		Expression condition = IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprVar(numer), OpBinary.GE,
+				IrFactory.eINSTANCE.createExprVar(denom),
+				IrFactory.eINSTANCE.createTypeInt());
+		nodeIf.setCondition(condition);
+
+		NodeBlock nodeBlk = IrFactory.eINSTANCE.createNodeBlock();
+		Expression orExpr = IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprVar(result), OpBinary.BITOR,
+				IrFactory.eINSTANCE.createExprVar(mask),
+				IrFactory.eINSTANCE.createTypeInt());
+		InstAssign assignBlk_0 = IrFactory.eINSTANCE.createInstAssign(result,
+				orExpr);
+		nodeBlk.add(assignBlk_0);
+
+		Expression minusExpr = IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprInt(31), OpBinary.MINUS,
+				IrFactory.eINSTANCE.createExprVar(i),
+				IrFactory.eINSTANCE.createTypeInt());
+		Expression lShiftExpr = IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprVar(varDenum),
+				OpBinary.SHIFT_LEFT, minusExpr,
+				IrFactory.eINSTANCE.createTypeInt());
+		Expression RemainderMinus = IrFactory.eINSTANCE.createExprBinary(
+				IrFactory.eINSTANCE.createExprVar(remainder), OpBinary.MINUS,
+				lShiftExpr, IrFactory.eINSTANCE.createTypeInt());
+		InstAssign assignBlk_1 = IrFactory.eINSTANCE.createInstAssign(
+				remainder, RemainderMinus);
+		nodeBlk.add(assignBlk_1);
+
+		nodeIf.getThenNodes().add(nodeBlk);
+
+		return nodeIf;
+	}
+
+	/**
+	 * returns the required while node Specified in the xilinx division model
+	 * 
+	 * @param i
+	 * @param numer
+	 * @param remainder
+	 * @param denom
+	 * @param result
+	 * @param mask
+	 * @param varDenum
+	 * @return
+	 */
 	private NodeWhile createNodeWhile(Var i, Var numer, Var remainder,
 			Var denom, Var result, Var mask, Var varDenum) {
 		NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
@@ -234,67 +326,13 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		return nodeWhile;
 	}
 
-	private NodeIf createNodeIf(Var var, Var flip) {
-		NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
-		NodeBlock blockIf_1 = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		Expression conditionIf_1 = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(var), OpBinary.LT,
-				IrFactory.eINSTANCE.createExprInt(0), typeBool);
-		nodeIf.setCondition(conditionIf_1);
-		Expression oppNomerator = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
-				IrFactory.eINSTANCE.createExprVar(var), typeInt);
-		InstAssign assign10 = IrFactory.eINSTANCE.createInstAssign(var,
-				oppNomerator);
-		blockIf_1.add(assign10);
-		Expression xorFlip = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(flip), OpBinary.BITXOR,
-				IrFactory.eINSTANCE.createExprInt(1), typeInt);
-		InstAssign assign11 = IrFactory.eINSTANCE.createInstAssign(flip,
-				xorFlip);
-		blockIf_1.add(assign11);
-		nodeIf.getThenNodes().add(blockIf_1);
-		return nodeIf;
-	}
-
-	private NodeIf createNodeIfWhile(Var numer, Var denom, Var result,
-			Var mask, Var remainder, Var varDenum, Var i) {
-		NodeIf nodeIf = IrFactory.eINSTANCE.createNodeIf();
-		Expression condition = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(numer), OpBinary.GE,
-				IrFactory.eINSTANCE.createExprVar(denom),
-				IrFactory.eINSTANCE.createTypeInt());
-		nodeIf.setCondition(condition);
-
-		NodeBlock nodeBlk = IrFactory.eINSTANCE.createNodeBlock();
-		Expression orExpr = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(result), OpBinary.BITOR,
-				IrFactory.eINSTANCE.createExprVar(mask),
-				IrFactory.eINSTANCE.createTypeInt());
-		InstAssign assignBlk_0 = IrFactory.eINSTANCE.createInstAssign(result,
-				orExpr);
-		nodeBlk.add(assignBlk_0);
-
-		Expression minusExpr = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprInt(31), OpBinary.MINUS,
-				IrFactory.eINSTANCE.createExprVar(i),
-				IrFactory.eINSTANCE.createTypeInt());
-		Expression lShiftExpr = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(varDenum),
-				OpBinary.SHIFT_LEFT, minusExpr,
-				IrFactory.eINSTANCE.createTypeInt());
-		Expression RemainderMinus = IrFactory.eINSTANCE.createExprBinary(
-				IrFactory.eINSTANCE.createExprVar(remainder), OpBinary.MINUS,
-				lShiftExpr, IrFactory.eINSTANCE.createTypeInt());
-		InstAssign assignBlk_1 = IrFactory.eINSTANCE.createInstAssign(
-				remainder, RemainderMinus);
-		nodeBlk.add(assignBlk_1);
-
-		nodeIf.getThenNodes().add(nodeBlk);
-
-		return nodeIf;
-	}
-
+	/**
+	 * returns an if node if (flipResult != 0) { result = -result; }
+	 * 
+	 * @param flipResult (see definition)
+	 * @param result (see definition)
+	 * @return If node (see definition)
+	 */
 	private NodeIf createResultNodeIf(Var flipResult, Var result) {
 		NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
 		NodeBlock blockIf_1 = IrFactoryImpl.eINSTANCE.createNodeBlock();
