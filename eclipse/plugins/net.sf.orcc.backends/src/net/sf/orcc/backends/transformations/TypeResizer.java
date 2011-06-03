@@ -51,9 +51,9 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  * @author Herve Yviquel
  * 
  */
-public class TypeSizeTransformation extends AbstractActorVisitor<Object> {
+public class TypeResizer extends AbstractActorVisitor<Object> {
 
-	public TypeSizeTransformation() {
+	public TypeResizer() {
 		super(true);
 	}
 
