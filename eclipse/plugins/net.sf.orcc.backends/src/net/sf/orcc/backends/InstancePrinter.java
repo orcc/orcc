@@ -44,7 +44,8 @@ import org.stringtemplate.v4.ST;
  */
 public class InstancePrinter extends Printer {
 
-	private boolean keepUnchangedFiles = false;
+	private boolean keepUnchangedFiles;
+	private boolean printBroadcasts;
 
 	/**
 	 * Creates a new instance printer.
@@ -53,7 +54,9 @@ public class InstancePrinter extends Printer {
 	 *            the name of the template
 	 */
 	public InstancePrinter(String templateName) {
-		this(templateName, false);
+		super(templateName);
+		this.keepUnchangedFiles = false;
+		this.printBroadcasts = false;
 	}
 
 	/**
@@ -66,8 +69,25 @@ public class InstancePrinter extends Printer {
 	 *            instances
 	 */
 	public InstancePrinter(String templateName, boolean keepUnchangedFiles) {
-		super(templateName);
+		this(templateName);
 		this.keepUnchangedFiles = keepUnchangedFiles;
+	}
+
+	/**
+	 * Creates a new instance printer.
+	 * 
+	 * @param templateName
+	 *            the name of the template
+	 * @param keepUnchangedFiles
+	 *            if the printer must keep printing files from unchanged
+	 *            instances
+	 * @param printBroadcasts
+	 *            if the printer have to print broadcast instances
+	 */
+	public InstancePrinter(String templateName, boolean keepUnchangedFiles,
+			boolean printBroadcasts) {
+		this(templateName, keepUnchangedFiles);
+		this.printBroadcasts = printBroadcasts;
 	}
 
 	/**
@@ -113,7 +133,8 @@ public class InstancePrinter extends Printer {
 			String instanceName) {
 		String file = path + File.separator + fileName;
 		if (instance.isNetwork()
-				|| (instance.isActor() && !instance.getActor().isNative())) {
+				|| (instance.isActor() && !instance.getActor().isNative())
+				|| (instance.isBroadcast() && printBroadcasts)) {
 			if (keepUnchangedFiles) {
 				// if source file is older than target file, do not generate
 				long sourceLastModified = getLastModifiedHierarchy(instance);

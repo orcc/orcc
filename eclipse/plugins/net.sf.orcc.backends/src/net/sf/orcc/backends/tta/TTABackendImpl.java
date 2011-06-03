@@ -134,7 +134,8 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printInstance(Instance instance) throws OrccException {
-		InstancePrinter printer = new InstancePrinter("TTA_actor", !debugMode);
+		InstancePrinter printer = new InstancePrinter("TTA_actor", !debugMode,
+				true);
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 		printProcessor(instance);
@@ -145,9 +146,9 @@ public class TTABackendImpl extends AbstractBackend {
 
 	private void printMemory(Instance instance) {
 		InstancePrinter dramPrinter = new InstancePrinter("TTA_dram",
-				!debugMode);
+				!debugMode, true);
 		InstancePrinter iromPrinter = new InstancePrinter("TTA_irom",
-				!debugMode);
+				!debugMode, true);
 		dramPrinter.print("dram_" + instance.getId() + ".vhd", path, instance,
 				"dram");
 		iromPrinter.print("irom_" + instance.getId() + ".vhd", path, instance,
@@ -161,7 +162,7 @@ public class TTABackendImpl extends AbstractBackend {
 
 	private void printProcessor(Instance instance) {
 		InstancePrinter printer = new InstancePrinter("TTA_processor",
-				!debugMode);
+				!debugMode, true);
 		printer.print("processor_" + instance.getId() + ".vhd", path, instance,
 				"processor");
 	}
