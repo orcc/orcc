@@ -374,8 +374,8 @@ entry:
 
 	br label %bb_scheduler_start
 bb_scheduler_start:
-	<printPortsStatus("input", instance.actor.inputs)>
-	<printPortsStatus("output", instance.actor.outputs)>
+	<printPortsStatus("IN", instance.actor.inputs)>
+	<printPortsStatus("OUT", instance.actor.outputs)>
 <if(instance.actor.fsm)
 ><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
 else
