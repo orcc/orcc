@@ -44,8 +44,8 @@ import net.sf.orcc.backends.llvm.transformations.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transformations.GetElementPtrAdder;
 import net.sf.orcc.backends.llvm.transformations.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.CastAdder;
-import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.backends.transformations.tac.TacTransformation;
+import net.sf.orcc.backends.tta.transformations.TtaTypeResizer;
 import net.sf.orcc.backends.xlim.transformations.InstPhiTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.BlockCombine;
@@ -97,7 +97,7 @@ public class TTABackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 
 		ActorVisitor<?>[] transformations = { new SSATransformation(),
-				new TypeSizeTransformation(), new BoolToIntTransformation(),
+				new TtaTypeResizer(), new BoolToIntTransformation(),
 				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
 				new TacTransformation(true), new CastAdder(true, false),
