@@ -352,9 +352,9 @@ broadcast(broadcast) ::= <<
 define void @<instance.id>_scheduler() nounwind {
 entry:
 	%token = alloca [1 x <broadcast.input.type>]
-	%token_ptr = bitcast [1 x <broadcast.input.type>]* %token to i32*
+	%token_ptr = bitcast [1 x <broadcast.input.type>]* %token to <broadcast.input.type>*
 
-	br label %bb_scheduler_start
+	br label %bb_broadcast_start
 
 bb_broadcast_start:
 	<printStatus("IN", broadcast.input)>
