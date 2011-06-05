@@ -306,12 +306,28 @@ entry:
 }
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// Broadcast
+///////////////////////////////////////////////////////////////////////////////
+
+broadcast(broadcast) ::= <<
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Broadcast file
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Input FIFO
+<printReadFunction(broadcast.input)>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Output FIFOs
+<broadcast.outputs.list: printWriteFunction(); separator="\n\n">
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Instance
+// Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actor, options) ::= <<
+actor(actor) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Source file is "<actor.file>"
 
@@ -356,15 +372,10 @@ actor(actor, options) ::= <<
 ; Actions
 <actor.actions: printAction(); separator="\n\n">
 
->>
-
-instance(instance, options) ::= <<
-<actor(instance.actor, options)>
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Action-scheduler
-<if(instance.actor.fsm)>
-@_FSM_state = global i32 <instance.actor.templateData.stateToLabelMap.(instance.actor.fsm.initialState)>
+<if(actor.fsm)>
+@_FSM_state = global i32 <actor.templateData.stateToLabelMap.(actor.fsm.initialState)>
 <endif>
 
 define void @<instance.id>_scheduler() nounwind {
@@ -372,12 +383,27 @@ entry:
 
 	br label %bb_scheduler_start
 bb_scheduler_start:
-	<printPortsStatus("IN", instance.actor.inputs)>
-	<printPortsStatus("OUT", instance.actor.outputs)>
-<if(instance.actor.fsm)
-><schedulerWithFSM(instance.actor.actionsOutsideFsm, instance.actor.fsm)><
+	<printPortsStatus("IN", actor.inputs)>
+	<printPortsStatus("OUT", actor.outputs)>
+<if(actor.fsm)
+><schedulerWithFSM(actor.actionsOutsideFsm, actor.fsm)><
 else
-><schedulerWithoutFSM(instance.actor.actionsOutsideFsm)><
+><schedulerWithoutFSM(actor.actionsOutsideFsm)><
 endif>
 }
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Instance
+///////////////////////////////////////////////////////////////////////////////
+
+instance(instance, options) ::= <<
+<if(instance.actor)
+><actor(instance.actor)><
+elseif(instance.broadcast)
+><broadcast(instance.broadcast)><
+endif>
+
+
 >>
