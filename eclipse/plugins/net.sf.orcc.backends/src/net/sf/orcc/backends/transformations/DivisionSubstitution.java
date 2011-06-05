@@ -60,56 +60,55 @@ import net.sf.orcc.ir.util.EcoreHelper;
  */
 public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
+	public DivisionSubstitution() {
+		super(true);
+	}
+
 	private Procedure divProc = IrFactory.eINSTANCE.createProcedure();
 	private Type typeInt = IrFactory.eINSTANCE.createTypeInt();
 	private Type typeBool = IrFactory.eINSTANCE.createTypeBool();
-
 	private List<Expression> parameters;
 
 	@Override
-	public Object caseInstAssign(InstAssign assign) {
+	public Object caseExprBinary(ExprBinary expr) {
 		Actor actor = EcoreHelper.getContainerOfType(procedure, Actor.class);
 		parameters = new ArrayList<Expression>();
-		if (assign.getValue().isBinaryExpr()) {
-			ExprBinary expr = (ExprBinary) assign.getValue();
-			OpBinary op = expr.getOp();
-			if (op == OpBinary.DIV) {
-				Var varNum = IrFactory.eINSTANCE.createVar(typeInt, "num",
-						true, 0);
-				Var varDenum = IrFactory.eINSTANCE.createVar(typeInt, "den",
-						true, 0);
-				procedure.getLocals().add(varNum);
-				procedure.getLocals().add(varDenum);
+		if (expr.getOp() == OpBinary.DIV) {
+			// what ever the epression type of division operands, they are put
+			// in local variables VarNum and varDenum. the result of callInst is
+			// put in tmp
+			Var varNum = IrFactory.eINSTANCE.createVar(typeInt, "num", true, 0);
+			Var varDenum = IrFactory.eINSTANCE.createVar(typeInt, "den", true,
+					0);
+			Var tmp = IrFactory.eINSTANCE.createVar(typeInt, "tmp", true, 0);
+			procedure.getLocals().add(varNum);
+			procedure.getLocals().add(varDenum);
+			procedure.getLocals().add(tmp);
 
-				InstAssign assign0 = IrFactory.eINSTANCE.createInstAssign(
-						varNum, expr.getE1());
-				InstAssign assign1 = IrFactory.eINSTANCE.createInstAssign(
-						varDenum, expr.getE2());
-				NodeBlock blk = (NodeBlock) assign.getBlock();
+			InstAssign assign0 = IrFactory.eINSTANCE.createInstAssign(varNum,
+					expr.getE1());
+			InstAssign assign1 = IrFactory.eINSTANCE.createInstAssign(varDenum,
+					expr.getE2());
+			// creation and addition of the new div function once per
+			// actor
 
-				// creation and addition of the new div function once per
-				// actor
-
-				if (!actor.getProcs().contains(divProc)) {
-					divProc = createDivProc(varNum, varDenum);
-					actor.getProcs().add(0, divProc);
-				}
-
-				parameters.add(IrFactory.eINSTANCE.createExprVar(varNum));
-				parameters.add(IrFactory.eINSTANCE.createExprVar(varDenum));
-				// IrFactory.eINSTANCE.createVar(
-				// IrFactory.eINSTANCE.createTypeInt(), "temp", true, 0);
-				InstCall call = IrFactory.eINSTANCE.createInstCall(assign
-						.getTarget().getVariable(), divProc, parameters);
-				// blk.getInstructions().remove(assign);
-				blk.add(indexInst, call);
-				blk.add(indexInst, assign1);
-				blk.add(indexInst, assign0);
-				// EcoreHelper.delete(assign);
-
+			if (!actor.getProcs().contains(divProc)) {
+				divProc = createDivProc(varNum, varDenum);
+				//actor.getProcs().add(0, divProc);
 			}
+			
+			parameters.add(IrFactory.eINSTANCE.createExprVar(varNum));
+			parameters.add(IrFactory.eINSTANCE.createExprVar(varDenum));
+
+			InstCall call = IrFactory.eINSTANCE.createInstCall(tmp, divProc,
+					parameters);
+			EcoreHelper.addInstBeforeExpr(expr, assign0, false);
+			EcoreHelper.addInstBeforeExpr(expr, assign1, false);
+			EcoreHelper.addInstBeforeExpr(expr, call, false);
+			expr.setE1(IrFactory.eINSTANCE.createExprVar(tmp));
+			expr.setE2(IrFactory.eINSTANCE.createExprInt(0));
+			expr.setOp(OpBinary.PLUS);
 		}
-		// }
 		return null;
 	}
 
@@ -117,8 +116,10 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 * This method creates the alternative division function using the num and
 	 * the denom
 	 * 
-	 * @param varNum numerator
-	 * @param varDenum denomerator
+	 * @param varNum
+	 *            numerator
+	 * @param varDenum
+	 *            denomerator
 	 * @return division function
 	 */
 	private Procedure createDivProc(Var varNum, Var varDenum) {
@@ -184,8 +185,10 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	/**
 	 * creates the following if node: if (var < 0) { var = -var; flip ^= 1; }
 	 * 
-	 * @param var (see definition)
-	 * @param flip (see definition)
+	 * @param var
+	 *            (see definition)
+	 * @param flip
+	 *            (see definition)
 	 * @return if node
 	 */
 	private NodeIf createNodeIf(Var var, Var flip) {
@@ -329,8 +332,10 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	/**
 	 * returns an if node if (flipResult != 0) { result = -result; }
 	 * 
-	 * @param flipResult (see definition)
-	 * @param result (see definition)
+	 * @param flipResult
+	 *            (see definition)
+	 * @param result
+	 *            (see definition)
 	 * @return If node (see definition)
 	 */
 	private NodeIf createResultNodeIf(Var flipResult, Var result) {
