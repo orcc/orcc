@@ -29,7 +29,9 @@
 package net.sf.orcc.network;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
@@ -55,6 +57,8 @@ public class Broadcast {
 	private List<Integer> outputList;
 
 	private OrderedMap<String, Port> outputs;
+
+	private Map<Port, Integer> portMap;
 
 	private Type type;
 
@@ -86,6 +90,12 @@ public class Broadcast {
 			name = "output_" + i;
 			outputs.put(name,
 					IrFactory.eINSTANCE.createPort(EcoreUtil.copy(type), name));
+		}
+
+		portMap = new HashMap<Port, Integer>();
+		portMap.put(getInput(), 0);
+		for (int i = 0; i < numOutputs; i++) {
+			portMap.put(getOutputs().getList().get(i), i);
 		}
 	}
 
@@ -134,6 +144,10 @@ public class Broadcast {
 	 */
 	public OrderedMap<String, Port> getOutputs() {
 		return outputs;
+	}
+
+	public Map<Port, Integer> getPortMap() {
+		return portMap;
 	}
 
 	public Type getType() {
