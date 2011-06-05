@@ -61,11 +61,12 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		super(true);
 	}
 
-	private Procedure divProc = IrFactory.eINSTANCE.createProcedure();
+	private Procedure divProc = IrFactory.eINSTANCE.createProcedure("DIV_II",
+			0, IrFactory.eINSTANCE.createTypeInt());
 
 	@Override
 	public Object caseActor(Actor actor) {
-		boolean flagAdd = false;
+		boolean flagAdd = true;
 		DivisionSearcher divisionSearcher = new DivisionSearcher(divProc,
 				flagAdd);
 		divisionSearcher.doSwitch(actor);
@@ -96,11 +97,8 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 		@Override
 		public Object caseExprBinary(ExprBinary expr) {
-			Actor actor = EcoreHelper
-					.getContainerOfType(procedure, Actor.class);
 			parameters = new ArrayList<Expression>();
 			if (expr.getOp() == OpBinary.DIV) {
-				flagAdd = true;
 				// what ever the epression type of division operands they are
 				// put in local variables VarNum and varDenum the result of
 				// callInst is put in tmp
@@ -118,8 +116,10 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 						varNum, expr.getE1());
 				InstAssign assign1 = IrFactory.eINSTANCE.createInstAssign(
 						varDenum, expr.getE2());
-
+				if (flagAdd){
 				divProc = createDivProc(varNum, varDenum);
+				flagAdd=false;
+				}
 
 				parameters.add(IrFactory.eINSTANCE.createExprVar(varNum));
 				parameters.add(IrFactory.eINSTANCE.createExprVar(varDenum));
@@ -147,8 +147,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		 * @return division function
 		 */
 		private Procedure createDivProc(Var varNum, Var varDenum) {
-			Procedure divProc = IrFactory.eINSTANCE.createProcedure("DIV_II",
-					0, IrFactory.eINSTANCE.createTypeInt());
+			
 			// counter++;
 			divProc.getParameters().add(varNum);
 			divProc.getParameters().add(varDenum);
