@@ -31,7 +31,7 @@ entity processor_<instance.id> is
   port
     (
       clk          : in  std_logic;
-      <externalFifoInterfaces(instance.actor)>
+      <externalFifoInterfaces(instance)>
       reset_n      : in  std_logic
       );
 end processor_<instance.id>;
@@ -85,7 +85,7 @@ architecture bdf_type of processor_<instance.id> is
          rstx                       : in  std_logic;
          busy                       : in  std_logic;
          fu_LSU_dmem_data_in        : in  std_logic_vector(31 downto 0);
-         <internalFifoInterfaces(instance.actor)>
+         <internalFifoInterfaces(instance)>
          imem_addr                  : out std_logic_vector(<iromAdressMax()> downto 0);
          imem_data                  : in  std_logic_vector(-1 downto 0);
          imem_en_x                  : out std_logic;
@@ -155,7 +155,7 @@ begin
              rstx                       =\> reset_n,
              busy                       =\> zero_wire_3,
              fu_LSU_dmem_data_in        =\> dram_data_out_wire,
-             <mapFifoInterfaces(instance.actor)>
+             <mapFifoInterfaces(instance)>
              imem_data                  =\> idata_wire,
              pc_init                    =\> iaddr_init_wire,
              fu_LSU_dmem_addr           =\> dram_addr,
@@ -168,9 +168,14 @@ end bdf_type;
 >>
 
 
-externalFifoInterfaces(actor) ::= <<
-<actor.inputs: externalInputFifoInterfaces(); separator="\n">
-<actor.outputs: externalOutputFifoInterfaces(); separator="\n">
+externalFifoInterfaces(instance) ::= <<
+<if(instance.actor)
+><instance.actor.inputs: externalInputFifoInterfaces(); separator="\n">
+<instance.actor.outputs: externalOutputFifoInterfaces(); separator="\n"><
+elseif(instance.broadcast)
+><externalInputFifoInterfaces(instance.broadcast.input)>
+<instance.broadcast.outputs.list: externalOutputFifoInterfaces(); separator="\n"><
+endif>
 >>
 
 externalInputFifoInterfaces(port) ::= <<
@@ -185,9 +190,14 @@ status_<indexPort(port)>_out : in  std_logic_vector(8 downto 0);
 dv_<indexPort(port)>_out     : out std_logic;
 >>
 
-internalFifoInterfaces(actor) ::= <<
-<actor.inputs: internalInputFifoInterfaces(); separator="\n">
-<actor.outputs: internalOutputFifoInterfaces(); separator="\n">
+internalFifoInterfaces(instance) ::= <<
+<if(instance.actor)
+><instance.actor.inputs: internalInputFifoInterfaces(); separator="\n">
+<instance.actor.outputs: internalOutputFifoInterfaces(); separator="\n"><
+elseif(instance.broadcast)
+><internalInputFifoInterfaces(instance.broadcast.input)>
+<instance.broadcast.outputs.list: internalOutputFifoInterfaces(); separator="\n"><
+endif>
 >>
 
 internalInputFifoInterfaces(port) ::= <<
@@ -202,9 +212,14 @@ fu_STREAM_OUT_<indexPort(port)>_ext_data   : out std_logic_vector(31 downto 0);
 fu_STREAM_OUT_<indexPort(port)>_ext_dv     : out std_logic_vector(0 to 0);
 >>
 
-mapFifoInterfaces(actor) ::= <<
-<actor.inputs: mapInputFifoInterfaces(); separator="\n">
-<actor.outputs: mapOutputFifoInterfaces(); separator="\n">
+mapFifoInterfaces(instance) ::= <<
+<if(instance.actor)
+><instance.actor.inputs: mapInputFifoInterfaces(); separator="\n">
+<instance.actor.outputs: mapOutputFifoInterfaces(); separator="\n"><
+elseif(instance.broadcast)
+><mapInputFifoInterfaces(instance.broadcast.input)>
+<instance.broadcast.outputs.list: mapOutputFifoInterfaces(); separator="\n"><
+endif>
 >>
 
 mapInputFifoInterfaces(port) ::= <<
@@ -220,7 +235,11 @@ fu_STREAM_OUT_<indexPort(port)>_ext_dv(0)  =\> dv_<indexPort(port)>_out,
 >>
 
 indexPort(port) ::= <<
-<actor.templateData.portToIndexMap.(port)>
+<if(instance.actor)
+><instance.actor.templateData.portToIndexMap.(port)><
+elseif(instance.broadcast)
+><instance.broadcast.portMap.(port)><
+endif>
 >>
 
 dramAdressMax() ::= "14"
