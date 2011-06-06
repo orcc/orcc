@@ -33,7 +33,7 @@ printf("state = state_<fsm_nsi.targetState>;\n");
 // TODO: the [1] is not OK, it did not work with the "port.type.dimensions"
 
 portDeclaration(port) ::= <<
-	<port.type> <port>[1];
+	<port.type> <port.name>[1];
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,12 +46,12 @@ listSize(values) ::= <<
 <values : { value | [<value>]} >
 >>
 
-variableDeclaration(variable) ::= <<
+varDecl(variable) ::= <<
 <
 if(variable.port)
 ><
 else
-><variable.type> <variable><listSize(variable.type.dimensions)><
+><variable.type> <variable.indexedName><listSize(variable.type.dimensions)><
 endif
 >
 >>
@@ -62,23 +62,27 @@ endif
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-<(constant.class.simpleName)(constant)>
+<if (constant.booleanExpr)><printBool(constant)><
+elseif (constant.intExpr)><printInt(constant)><
+elseif (constant.listExpr)><printList(constant)><
+elseif (constant.stringExpr)><printString(constant)><
+endif>
 >>
 
-BoolExpr(constant) ::= <<
+printBool(constant) ::= <<
 <if (constant.value)>1<else>0<endif>
 >>
 
-IntExpr(number) ::= <<
+printInt(number) ::= <<
 <number><if (number.long)>L<endif>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
-ListExpr(constant) ::= <<
-0 /* Warning: {<constant.value: Constant(); wrap, separator=", ">}*/
+printList(constant) ::= <<
+{<constant.value: Constant(); wrap, separator=", ">}
 >>
 
-StringExpr(constant) ::= <<
+printString(constant) ::= <<
 "<constant>"
 >>
 
@@ -86,12 +90,12 @@ StringExpr(constant) ::= <<
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-Assign(assign) ::= <<
+printAssign(assign) ::= <<
 
-<assign.target> = <assign.value>;
+<assign.target.variable.indexedName> = <assign.value>;
 >>
 
-PrintFormatType(type) ::= <<
+printFormatType(type) ::= <<
 <if (type.bool)
 >i<
 elseif (type.float)
@@ -109,19 +113,19 @@ elseif (type.void)
 endif>
 >>
 
-PrintFormat(parameter) ::= <<
+printFormat(parameter) ::= <<
 <if (parameter.stringExpr)
->"$parameter$"<
+>"<parameter>"<
 else
-> "%<PrintFormatType(parameter.type)>" <
+> "%<printFormatType(parameter.type)>" <
 endif>
 >>
 
-PrintParameter(parameter) ::= <<
+printParameter(parameter) ::= <<
 <if (!parameter.stringExpr)>, <parameter><endif>
 >>
 
-Call(call) ::= << 
+printCall(call) ::= << 
 //ERROR this function call must be removed, in this case we give a 1, it is OK if it is "data"
 <if(call.print)>printf(<call.parameters: PrintFormat()><call.parameters: PrintParameter()>);<
 else
@@ -129,22 +133,23 @@ else
 endif>
 >>
 
-Load(load) ::= <<
 
-<load.target> = <load.source><load.indexes : {index | [<index>]}>;
+printLoad(load) ::= <<
+
+<load.target.variable.indexedName> = <load.source.variable.indexedName><load.indexes : {index | [<index>]}>;
 >>
 
 
-Read(read) ::= <<
+printRead(read) ::= <<
 
 <if (read.target)>
 chan_<instance.id>_<read.port>?<read.target>[0];
 <endif>
 >>
 
-Store(store) ::= <<
+printStore(store) ::= <<
 
-<store.target><store.indexes : {index | [<index>]}> = <store.value>;
+<store.target.variable.name><store.indexes : {index | [<index>]}> = <store.value>;
 >>
 
 Write(write) ::= <<
@@ -152,7 +157,7 @@ Write(write) ::= <<
 chan_<instance.id>_<write.port>!<write.target>[0];
 >>
 
-Return(return) ::= <<
+printReturn(return) ::= <<
 
 >>
 
@@ -160,65 +165,93 @@ Return(return) ::= <<
 // Nodes 
 ///////////////////////////////////////////////////////////////////////////////
 
-instructions(instructions) ::= <<
-<instructions: {instr | <(instr.class.simpleName)(instr)>}>
+printInstructions(instructions) ::= <<
+<instructions: {instr | <
+if (instr.assign)><printAssign(assign=instr)><
+elseif (instr.call)><printCall(call=instr)><
+elseif (instr.load)><printLoad(load=instr)><
+elseif (instr.return)><printReturn(return=instr)><
+elseif (instr.store)><printStore(store=instr)><
+endif>}>
 >>
 
-nodes(nodes) ::= <<
-<nodes: { node | <(node.class.simpleName)(node)>}>
+printNodes(nodes) ::= <<
+<nodes: {node | <if (node.blockNode)><printBlockNode(node)><
+elseif (node.ifNode)><printIfNode(node)><
+elseif (node.whileNode)><printWhileNode(node)><
+endif>}>
+>>
+
+// block node
+printBlockNode(blockNode) ::= <<
+<printInstructions(blockNode.instructions)>
 >>
 
 // if node
-BlockNode(blockNode) ::= <<
-<instructions(blockNode.instructions)>
->>
-
-// if node
-IfNode(ifNode) ::= <<
+printIfNode(ifNode) ::= <<
 
 if 
-:: (<ifNode.value>) -\>
-	<nodes(ifNode.thenNodes)>
+:: (<ifNode.condition>) -\>
+	<printNodes(ifNode.thenNodes)>
 <if(ifNode.elseNodes)>:: else -\>
-	<nodes(ifNode.elseNodes)>
+	<printNodes(ifNode.elseNodes)>
 <endif>
 fi;
-<BlockNode(ifNode.joinNode)>
+<printBlockNode(ifNode.joinNode)>
 >>
 
 // while node
-WhileNode(whileNode) ::= <<
+printWhileNode(whileNode) ::= <<
 
 do 
-:: <whileNode.value> -\>
-	<nodes(whileNode.nodes)>
+:: <whileNode.condition> -\>
+	<printNodes(whileNode.nodes)>
 :: else -\> break;
 od
 }
-<BlockNode(whileNode.joinNode)>
+<printBlockNode(whileNode.joinNode)>
 >>
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // State variable declaration
 ///////////////////////////////////////////////////////////////////////////////
-
-stateVar(var) ::= <<
-<if (var.initialized)>
-<variableDeclaration(var)> = <Constant(var.initialValue)>;
+stateVar(variable) ::= <<
+<if(variable.initialized)>
+<if(!variable.assignable)>
+<if(!variable.type.list)>
+#define <variable.name> <Constant(variable.initialValue)>
 <else>
-<variableDeclaration(var)>;
+static const <varDecl(variable)> = <Constant(variable.initialValue)>;
+<endif>
+<else>
+<if(variable.type.list)>
+static <variable.type> <variable.name>_backup<listSize(variable.type.dimensions)> = <Constant(variable.initialValue)>;
+<endif>
+static <varDecl(variable)>;
+<endif>
+<else>
+static <varDecl(variable)>;
 <endif>
 >>
 
+initializeStateVar(variable) ::= <<
+<if(variable.assignable && variable.initialized)>
+<if(!variable.type.list)>
+<variable.name> = <Constant(variable.initialValue)>;
+<else>
+memcpy(<variable.name>, <variable.name>_backup, sizeof(<variable.name>_backup));
+<endif>
+<endif>
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with fsm
 ///////////////////////////////////////////////////////////////////////////////
 
 newState() ::= << 
-:: <instance.id>_state == state_<fsm_trans.SourceState> -\> {
-	<fsm_trans.NextStateInfo: { fsm_nsi | <fsm_nsi.action: peeks()>}>
+:: <instance.id>_state == state_<fsm_trans.SourceState.name> -\> {
+	<fsm_trans.list: { tr | <peekPattern(tr.action.peekPattern)>}>
 	if
 	<fsm_trans.NextStateInfo: {
 			fsm_nsi|
@@ -232,7 +265,7 @@ schedulerFSM(action) ::= <<
 	-\> 
 	/* Temp variables*/
 	<if(action.body.locals.list)>
-	<action.body.locals.list: { var | <if(!var.port)> <variableDeclaration(var)>;<\n><endif>}>
+	<action.body.locals.list: { var | <if(!var.port)> <varDecl(var)>;<\n><endif>}>
 	<endif> 
 	<inputPattern(action.inputPattern)>
 	<action.body.nodes: { node | <(node.class.simpleName)(node)>}>
@@ -252,10 +285,6 @@ skip
 <endif>
 >>
 
-peeks(action) ::= <<
-	<action.inputPattern.peekedMap.keys: { key | chan_<instance.id>_<key>?\<<action.inputPattern.peekedMap.(key)>[0]\>;}>
->>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without fsm
@@ -267,10 +296,10 @@ scheduler(action) ::= <<
 	-\>
 	/* Temp variables*/
 	<if(action.body.locals.list)>
-	<action.body.locals.list: {var | <if(!var.port)><variableDeclaration(var)>;<\n><endif>}>
+	<action.body.locals.list: {var | <if(!var.port)><varDecl(var)>;<\n><endif>}>
 	<endif> 
 	<inputPattern(action.inputPattern)>
-	<action.body.nodes: { node | <(node.class.simpleName)(node)>}>
+	<printNodes(action.body.nodes)>
 	<outputPattern(action.outputPattern)>
 	<printActionName()>
 	<printActionState()>
@@ -292,19 +321,27 @@ priorities() ::= <<
 >> 
 
 inputPatternPort(port) ::= <<
-/*chan_<port.name>?trash;*/
+chan_<port.name>?trash;
 >>
 
 inputPattern(pattern) ::= <<
-<pattern.keys: inputPatternPort(); separator="\n">
+<pattern.ports: inputPatternPort(); separator="\n">
 >>
 
 outputPatternPort(port) ::= <<
-/*chan_<port>!trash;*/
+chan_<port.name>!trash;
 >>
 
 outputPattern(pattern) ::= <<
-<pattern.keys: outputPatternPort(); separator="\n">
+<pattern.ports: outputPatternPort(); separator="\n">
+>>
+
+peekPatternPort(port) ::= <<
+chan_<port.name>!\<trash\>;
+>>
+
+peekPattern(pattern) ::= <<
+<pattern.ports: peekPatternPort(); separator="\n">
 >>
 
 inputChannelCheck(pattern) ::= <<
@@ -322,30 +359,31 @@ outputChannelCheck(pattern) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 proctype(instance, actor) ::= <<
-proctype <instance.id>(<actor.parameters.list: variableDeclaration(); wrap, separator=", ">) {
+proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">) {
 
 	/* State variables */
-	<actor.stateVars.list : stateVar(); separator="\n">
+	<actor.stateVars : stateVar()>
+	<actor.stateVars : initializeStateVar()>
 	
 	/* Ports */
-    < [instance.actor.inputs.list, instance.actor.outputs.list] : portDeclaration(); separator="\n">
+    < [instance.actor.inputs, instance.actor.outputs] : portDeclaration(); separator="\n">
 
-	<if (actor.actionScheduler.fsm)>
+	<if (actor.fsm)>
 	/* States of the FSM */
-	<actor.actionScheduler.fsm.states: {s | int state_<s> = <i0>;}; separator="\n">
+	<actor.fsm.states: {s | int state_<s.name> = <i0>;}; separator="\n">
 	
 	/* Initial State */
-	<instance.id>_state = state_<actor.actionScheduler.fsm.initialState>;
+	<instance.id>_state = state_<actor.fsm.initialState.name>;
 	
 	do
-	<actor.actionScheduler.fsm.transitions: { fsm_trans| <newState()> }>
+	<actor.fsm.transitions: { fsm_trans| <newState()> }>
 	od;
 	<else>
 	do
 	:: skip -\> 
-	  <actor.actionScheduler.actions: peeks()>
+	  <actor.actionsOutsideFsm: { a | <peekPattern(a.peekPattern)>}>
 	  if
-	  <actor.actionScheduler.actions: scheduler(); separator="\n">
+	  <actor.actionsOutsideFsm: scheduler(); separator="\n">
 	  fi;
 	od;
 	<endif>
