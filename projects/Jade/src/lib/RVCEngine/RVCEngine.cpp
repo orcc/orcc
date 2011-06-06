@@ -52,7 +52,6 @@
 #include "Jade/Jit/LLVMUtility.h"
 #include "Jade/Jit/LLVMOptimizer.h"
 #include "Jade/Jit/LLVMExecution.h"
-#include "Jade/lib_RVCDecoder/RVCDecoder.h" 
 #include "Jade/Optimize/FifoFnRemoval.h"
 #include "Jade/Optimize/InstanceInternalize.h"
 #include "llvm/Support/PassNameParser.h"
@@ -156,24 +155,6 @@ int RVCEngine::stop(Network* network){
 	decoder->stop();
 
 	return 0;
-}
-
-Decoder* RVCEngine::prepare(Network* network){
-	map<Network*, Decoder*>::iterator it;
-
-	it = decoders.find(network);
-
-	if (it == decoders.end()){
-		cout << "No decoders found for this network.\n";
-		exit(1);
-	}
-	
-	Decoder* decoder = it->second;
-
-	LLVMExecution* llvmEE = decoder->getEE();
-	llvmEE->initialize();
-
-	return decoder;
 }
 
 

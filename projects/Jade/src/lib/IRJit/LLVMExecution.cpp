@@ -215,6 +215,7 @@ void LLVMExecution::run() {
 	Function* func = scheduler->getMainFunction();
 
 	// Run scheduler
+	stopVal = 0;
 	std::vector<GenericValue> noargs;
 	GenericValue Result = EE->runFunction(func, noargs);
 }

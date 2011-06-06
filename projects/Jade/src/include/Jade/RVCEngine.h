@@ -93,19 +93,6 @@ public:
 	int load(Network* network, int optLevel);
 
 	/*!
-     *  @brief Prepare the given network
-     *
-     *  Connect the input and the output of the given network
-	 *   
-	 *  @param network : the Network to prepare
-     *
-	 *  @param gpacSrc : the gapc source to prepare
-	 *
-	 *  @param gpacDisp : the gapc display to prepare
-     */
-	Decoder* prepare(Network* network);
-
-	/*!
      *  @brief Unload the given network
      *
      *  Unload and clear the given network.
@@ -176,7 +163,6 @@ public:
      */
 	int optimize(Network* network, int optLevel);
 
-private:
 	/*!
      *  @brief Parse and returns actors requiered by the configuration
 	 *   
@@ -185,6 +171,8 @@ private:
 	 *  @return a map of actors requiered by the configuration
      */
 	std::map<std::string, Actor*>* parseActors(Configuration* configuration);
+
+private:
 
 	/*!
      *  @brief Optimize decoder

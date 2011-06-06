@@ -49,6 +49,10 @@
 #include "Jade/Util/FifoMng.h"
 #include "Jade/RVCEngine.h"
 
+
+#include "source.h"
+#include "display.h"
+
 using namespace std;
 using namespace llvm;
 using namespace llvm::cl;
@@ -81,7 +85,7 @@ cl::opt<std::string> MCPU(init(""));
 
 cl::opt<int> FifoSize(init(10000));
 
-RVCEngine* engine;
+
 Decoder* decoder;
 
 #ifdef __cplusplus
@@ -90,52 +94,61 @@ extern "C" {
 
 #include "Jade/lib_RVCDecoder/RVCDecoder.h"
 
+int* stopVar;
 
-void rvc_init(char *XDF){
+void rvc_init(char *XDF, int isAVCFile){
 
 	//Initialize context
 	LLVMContext &Context = getGlobalContext();
 	InitializeNativeTarget();
-	//setOptions();
-
-	//Loading decoderEngine
-	engine = new RVCEngine(Context, VTLDir, Fifo, FifoSize);
 
 	//Parsing XDF
 	XDFParser xdfParser(false);
 	Network* network = xdfParser.parseChar(XDF, Context);
 
-	//Load network
-	engine->load(network, 3);
+	//Create the Configuration from the network
+	Configuration* configuration = new Configuration(network);
 
-	//Prepare network
-	decoder = engine->prepare(network);
+	// Parsing actor and bound it to the configuration
+	RVCEngine engine(Context, VTLDir, Fifo, FifoSize);
+	map<string, Actor*>* requieredActors = engine.parseActors(configuration);
+	configuration->setActors(requieredActors);
+
+	//Create decoder
+	decoder = new Decoder(Context, configuration);
 	
+	//Initialize the execution engine
+	LLVMExecution* llvmEE = decoder->getEE();
+	stopVar = llvmEE->initialize();
 
-	// Optimizing decoder
-	/*if (optLevel > 0){
-		engine->optimize(network, optLevel);
-	}*/
+	if (isAVCFile){
+		source_isAVCFile();
+	}
 }
 
-int rvc_decode(unsigned char* nal, int nal_length, RVCFRAME *Frame, int AVCFile){
-/*	//Save nal, when the frame pointer is already use
-	if(Frame->Height || Frame->Width){
-		decoder->getEE()->saveNal(nal, nal_length, AVCFile);
-		return 1;
+int rvc_decode(unsigned char* nal, int nal_length, RVCFRAME *Frame){
+
+	if(Frame->Height > 0 || Frame->Width > 0){
+		int i = 0;		
 	}
 
-	//Start decoder
-	decoder->getEE()->start(nal, nal_length, Frame, AVCFile);
 
-	if(Frame->Height || Frame->Width) return 1;*/
+
+	source_sendNal(nal, nal_length);
+
+	displayYUV_setFrameAddr(Frame);
+
+	//Start decoder
+	decoder->getEE()->run();
+
+	if(Frame->Height || Frame->Width) 
+		return 1;
 	return 0;
 }
 
 
 void rvc_close(){
 	delete decoder;
-	delete engine;
 }
 
 #ifdef __cplusplus

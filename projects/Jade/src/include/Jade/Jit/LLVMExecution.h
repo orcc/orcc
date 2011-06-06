@@ -50,7 +50,6 @@ namespace llvm{
 
 #include "llvm/LLVMContext.h"
 #include "Jade/Decoder.h"
-#include "Jade/lib_RVCDecoder/RVCDecoder.h"
 
 class AbstractFifo;
 class Procedure;

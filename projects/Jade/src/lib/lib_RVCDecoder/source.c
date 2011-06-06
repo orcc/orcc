@@ -27,46 +27,64 @@
  * SUCH DAMAGE.
  */
 
-/**
-@brief Description of the RVCDecoder interface
-@author Olivier Labois
-@file RVCInterface.h
-@version 1.0
-@date 21/04/2011
-*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-//------------------------------
+#include "source.h"
 
-#ifndef RVCDECODER_H
-#define RVCDECODER_H
+// Start code AVC
+static unsigned char AVCStartCode[4] = {0x00,0x00,0x00, 0x01};
+static int AVCFile;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+static int data_length;
+static unsigned char* data;
+static int nb;
 
-#ifdef WIN32
-#define Exported __declspec(dllexport)
-#else
-#define Exported
-#endif
+extern int* stopVar;
 
-typedef struct{
-	int Width;
-	int Height;
-	unsigned char* pY[1];
-	unsigned char* pU[1]; 
-	unsigned char* pV[1];
-}RVCFRAME;
-
-
-Exported void rvc_init(char *XDF, int isAVCFile);
-
-Exported int rvc_decode(unsigned char* nal, int nal_length, RVCFRAME *Frame);
-
-Exported void rvc_close();
-
-#ifdef __cplusplus
+// Called before any *_scheduler function.
+void source_init() {
+	AVCFile = 0;
 }
-#endif
 
-#endif
+int source_sizeOfFile() { 
+	if(!data_length)
+		return 0;
+	else if(AVCFile){
+		return data_length + 4; 
+	}
+	else{
+		return data_length;
+	}
+}
+
+
+void source_rewind() {
+}
+
+
+void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
+	if(AVCFile && !nb){
+		memcpy(outTable, AVCStartCode, 4);
+		memcpy(outTable + 4, data, nbTokenToRead-4);
+	}
+	else{
+		memcpy(outTable, data + nb*4096, nbTokenToRead);
+	}
+
+	nb++;
+	data_length = 0;
+	*stopVar = 1;
+}
+
+
+void source_sendNal(unsigned char* nal, int nal_length){
+	nb = 0;
+	data = nal;
+	data_length = nal_length;
+}
+
+void source_isAVCFile(){
+	AVCFile = 1;
+}

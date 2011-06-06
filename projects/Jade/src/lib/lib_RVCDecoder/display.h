@@ -27,43 +27,16 @@
  * SUCH DAMAGE.
  */
 
-/**
-@brief Description of the RVCDecoder interface
-@author Olivier Labois
-@file RVCInterface.h
-@version 1.0
-@date 21/04/2011
-*/
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
-//------------------------------
-
-#ifndef RVCDECODER_H
-#define RVCDECODER_H
+#include "Jade/lib_RVCDecoder/RVCDecoder.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef WIN32
-#define Exported __declspec(dllexport)
-#else
-#define Exported
-#endif
-
-typedef struct{
-	int Width;
-	int Height;
-	unsigned char* pY[1];
-	unsigned char* pU[1]; 
-	unsigned char* pV[1];
-}RVCFRAME;
-
-
-Exported void rvc_init(char *XDF, int isAVCFile);
-
-Exported int rvc_decode(unsigned char* nal, int nal_length, RVCFRAME *Frame);
-
-Exported void rvc_close();
+void displayYUV_setFrameAddr(RVCFRAME* Address);
 
 #ifdef __cplusplus
 }

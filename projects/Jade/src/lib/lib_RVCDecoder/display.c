@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2009, IETR/INSA of Rennes
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright notice,
  *     this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
  *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,77 +27,35 @@
  * SUCH DAMAGE.
  */
 
-/**
-@brief Implementation of class Source
-@author Olivier Labois
-@file Source.cpp
-@version 1.0
-@date 03/02/2011
-*/
+#include "display.h"
 
-//------------------------------
-#include "Jade/Actor/GpacSrc.h"
-//------------------------------
+RVCFRAME* Frame;
 
-using namespace std;
-
-GpacSrc::GpacSrc(int id) : Source(id) {
-	this->id = id;
-	this->cnt = 0;
-	this->nal = NULL;
-	this->nal_length = 0;
-	this->stopSchVal = 0;
-	this->saveNal = NULL;
+void displayYUV_setFrameAddr(RVCFRAME* Address){
+	Frame = Address;
 }
 
-GpacSrc::~GpacSrc(){
+void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU,
+							   unsigned char *pictureBufferV, unsigned short pictureWidth,
+							   unsigned short pictureHeight){
+	Frame->Width = pictureWidth;
+	Frame->Height = pictureHeight;
+
+	*Frame->pY = pictureBufferY;
+	*Frame->pU = pictureBufferU;
+	*Frame->pV = pictureBufferV;
 }
 
-void GpacSrc::setNal(unsigned char* nal, int nal_length, bool AVCFile){
-	this->nal = nal;
-	this->nal_length = nal_length;
-	this->cnt = 0;
 
-	if(AVCFile){
-		setAVCStartCode();
-	}
-}
 
-void GpacSrc::source_get_src(unsigned char* tokens){
-	if(*saveNal){
-		setNalFifo();
-	}
-	
-	if(!inFifo.empty()){
-		*tokens = getNalFifo();
-	}else if(cnt < nal_length){
-		*tokens = nal[cnt];
-		cnt++;
-	} 
-	
-	//Stop scheduler
-	if(cnt == nal_length || *saveNal) {
-		stopSchVal = 1;
-	}
-}
+void displayYUV_init(){}
+void compareYUV_init(){}
 
-void GpacSrc::setNalFifo(){
-	for(int i = cnt ; i < nal_length; i++){
-		inFifo.push_back(nal[i]);
-	}
-}
 
-unsigned char GpacSrc::getNalFifo(){
-	unsigned char tmp = inFifo.front();
-	
-	inFifo.pop_front();
 
-	return tmp;
-}
-
-void GpacSrc::setAVCStartCode(){
-	inFifo.push_back(0x00);
-	inFifo.push_back(0x00);
-	inFifo.push_back(0x00);
-	inFifo.push_back(0x01);
-}
+void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU,
+                               unsigned char *pictureBufferV, unsigned short pictureWidth,
+							   unsigned short pictureHeight){}
+void Writer_init(){}
+void Writer_write(unsigned char byte){}
+void Writer_close(){}

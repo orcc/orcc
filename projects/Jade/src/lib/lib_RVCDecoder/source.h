@@ -27,98 +27,19 @@
  * SUCH DAMAGE.
  */
 
-/**
-@brief Implementation of class GpacDisp
-@author Olivier Labois
-@file GpacDisp.cpp
-@version 1.0
-@date 06/05/2011
-*/
+#ifndef SOURCE_H
+#define SOURCE_H
 
-//------------------------------
-#include <iostream>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "Jade/Actor/GpacDisp.h"
-//------------------------------
+void source_sendNal(unsigned char* nal, int nal_length);
 
-using namespace std;
+void source_isAVCFile();
 
-
-GpacDisp::GpacDisp(int id){
-	this->id = id;
-	this->stopSchVal = 0;
-	this->picReady = false;
-
-	width = 0;
-	height = 0;
-	x = 0;
-	y = 0;
+#ifdef __cplusplus
 }
+#endif
 
-GpacDisp::~GpacDisp(){
-}
-
-
-void GpacDisp::display_write_mb(unsigned char tokens[384]) {
-	int i, j, cnt, base;
-
-	cnt = 0;
-	base = y * width + x;
-
-	for (i = 0; i < 16; i++) {
-		for (j = 0; j < 16; j++) {
-			int tok = tokens[cnt];
-			int idx = base + i * width + j;
-			cnt++;
-			img_buf_y[idx] = tok;
-		}
-	}
-
-	base = y / 2 * width / 2 + x / 2;
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = tokens[cnt];
-			int idx = base + i * width / 2 + j;
-			cnt++;
-			img_buf_u[idx] = tok;
-		}
-	}
-
-	for (i = 0; i < 8; i++) {
-		for (j = 0; j < 8; j++) {
-			int tok = tokens[cnt];
-			int idx = base + i * width / 2 + j;
-			cnt++;
-			img_buf_v[idx] = tok;
-		}
-	}
-
-	x += 16;
-	if (x == width) {
-		x = 0;
-		y += 16;
-	}
-
-	if (y == height) {
-		// image received
-		x = 0;
-		y = 0;
-		
-		//Write resulting image
-		*rvcFrame->pY = img_buf_y;
-		*rvcFrame->pU = img_buf_u;
-		*rvcFrame->pV = img_buf_v;
-
-		rvcFrame->Width = width;
-		rvcFrame->Height = height;
-
-		picReady = true;
-
-	}
-}
-
-
-void GpacDisp::setSize(int width, int height){
-	this->width = width * 16;
-	this->height = height * 16;
-}
+#endif
