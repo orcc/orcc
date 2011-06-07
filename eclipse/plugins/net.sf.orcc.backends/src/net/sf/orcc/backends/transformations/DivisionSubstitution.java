@@ -72,7 +72,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				flagAdd);
 		divisionSearcher.doSwitch(actor);
 		// addition of the new div function once per actor
-		if (!actor.getProcs().contains(divProc)) {
+		if (!actor.getProcs().contains(divProc)&&(!divProc.getNodes().isEmpty())) {
 			actor.getProcs().add(divProc);
 		}
 		return null;
