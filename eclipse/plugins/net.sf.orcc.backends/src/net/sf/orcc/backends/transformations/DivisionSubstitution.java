@@ -61,6 +61,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		super(true);
 	}
 
+	private int counter;
 	private Procedure divProc = IrFactory.eINSTANCE.createProcedure("DIV_II",
 			0, IrFactory.eINSTANCE.createTypeInt());
 
@@ -78,6 +79,8 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	}
 
 	/**
+	 * This class searches the div operators and transforms them into call
+	 * instructions
 	 * 
 	 * @author Khaled Jerbi
 	 * 
@@ -103,27 +106,29 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				// put in local variables VarNum and varDenum the result of
 				// callInst is put in tmp
 				Var varNum = IrFactory.eINSTANCE.createVar(typeInt, "num",
-						true, 0);
+						true, counter);
 				Var varDenum = IrFactory.eINSTANCE.createVar(typeInt, "den",
-						true, 0);
-				Var tmp = IrFactory.eINSTANCE
-						.createVar(typeInt, "tmp", true, 0);
-				procedure.getLocals().add(varNum);
-				procedure.getLocals().add(varDenum);
-				procedure.getLocals().add(tmp);
+						true, counter);
+				Var tmp = IrFactory.eINSTANCE.createVar(typeInt, "tmpDiv", true,
+						counter);
+				counter++;
 
 				InstAssign assign0 = IrFactory.eINSTANCE.createInstAssign(
 						varNum, expr.getE1());
 				InstAssign assign1 = IrFactory.eINSTANCE.createInstAssign(
 						varDenum, expr.getE2());
-				if (flagAdd){
-				divProc = createDivProc(varNum, varDenum);
-				flagAdd=false;
+				if (flagAdd) {
+					divProc = createDivProc();
+					flagAdd = false;
 				}
-
+				
 				parameters.add(IrFactory.eINSTANCE.createExprVar(varNum));
 				parameters.add(IrFactory.eINSTANCE.createExprVar(varDenum));
-
+				
+				procedure.getLocals().add(varNum);
+				procedure.getLocals().add(varDenum);
+				procedure.getLocals().add(tmp);
+				
 				InstCall call = IrFactory.eINSTANCE.createInstCall(tmp,
 						divProc, parameters);
 				EcoreHelper.addInstBeforeExpr(expr, assign0, false);
@@ -146,8 +151,10 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		 *            denomerator
 		 * @return division function
 		 */
-		private Procedure createDivProc(Var varNum, Var varDenum) {
-			
+		private Procedure createDivProc() {
+
+			Var varNum = IrFactory.eINSTANCE.createVar(typeInt, "num", true, 0);
+			Var varDenum = IrFactory.eINSTANCE.createVar(typeInt, "den", true, 0);
 			// counter++;
 			divProc.getParameters().add(varNum);
 			divProc.getParameters().add(varDenum);
@@ -166,6 +173,9 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 					IrFactory.eINSTANCE.createTypeInt(), "mask");
 			Var remainder = divProc.newTempLocalVariable(
 					IrFactory.eINSTANCE.createTypeInt(), "remainder");
+
+			NodeBlock initBlock = createInitBlock(result, flipResult);
+			divProc.getNodes().add(initBlock);
 
 			NodeIf nodeIf_1 = createNodeIf(varNum, flipResult);
 			divProc.getNodes().add(nodeIf_1);
@@ -207,6 +217,17 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 			divProc.getNodes().add(blockReturn);
 
 			return divProc;
+		}
+
+		private NodeBlock createInitBlock(Var result, Var flipResult) {
+			NodeBlock initBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
+			InstAssign initResult = IrFactory.eINSTANCE.createInstAssign(
+					result, IrFactory.eINSTANCE.createExprInt(0));
+			InstAssign initFlip = IrFactory.eINSTANCE.createInstAssign(
+					flipResult, IrFactory.eINSTANCE.createExprInt(0));
+			initBlock.add(initResult);
+			initBlock.add(initFlip);
+			return initBlock;
 		}
 
 		/**
