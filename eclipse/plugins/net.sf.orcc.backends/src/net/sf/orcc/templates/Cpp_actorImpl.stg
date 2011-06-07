@@ -252,7 +252,7 @@ inputPattern(pattern) ::= <<
 
 actionCall(action) ::= <<
 <actionTrace(action)>
-<action.body.name>();
+this-\><action.body.name>();
 res = true;
 i++;
 >>
@@ -309,7 +309,7 @@ int <actor.simpleName>::schedule()
 
 actionCallState(nextState) ::= <<
 <actionTrace(nextState.action)>
-<nextState.action.name>();
+this-\><nextState.action.name>();
 _FSM_state = state_<nextState.state.name>;
 res = true;
 >>

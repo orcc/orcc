@@ -288,6 +288,9 @@ TraceAka g_oTracer;
 #endif
 #endif
 
+#undef min
+#undef max
+
 <includeActors(network.actors)>
 
 #define SIZE 10000
