@@ -60,6 +60,8 @@
 #include "Jade/Util/CompressionMng.h"
 //------------------------------
 
+#define DISPLAY_DISABLE 0
+
 #ifdef __APPLE__
 #include "SDL.h"
 #endif
@@ -190,9 +192,10 @@ void clean_exit(int sig){
 
 // Variable from native functions
 extern "C" {
-	char* input_file;
-	char* yuv_file;
-	char* write_file;
+	extern char* input_file;
+	extern char* yuv_file;
+	extern char* write_file;
+	extern char display_flags;
 }
 
 //Verify if directory is well formed
@@ -226,6 +229,18 @@ void setOptions(){
 	}else{
 		optLevel = 0;
 	}
+
+	//Set native variables
+	string writer_file = OutputDir + "writer.txt";
+	if (YuvFile != ""){
+		yuv_file = (char*)YuvFile.c_str();
+	}
+	write_file = (char*)writer_file.c_str();
+	
+	if (nodisplay){
+		display_flags = DISPLAY_DISABLE;
+	}
+
 }
 
 //Command line decoder control
@@ -299,13 +314,6 @@ int main(int argc, char **argv) {
 	if (Verbose){
 		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	}
-
-	//Set native variables
-	string writer_file = OutputDir + "writer.txt";
-	if (YuvFile != ""){
-		yuv_file = (char*)YuvFile.c_str();
-	}
-	write_file = (char*)writer_file.c_str();
 
 	if (Console){
 

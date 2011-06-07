@@ -45,6 +45,8 @@ extern char *mapping_file;
 // output file of genetic algorithm
 extern char *output_genetic;
 
+// display flags
+extern char display_flags;
 
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[]);
@@ -54,6 +56,11 @@ void wait_for_key();
 
 // print usage
 void print_usage();
+
+#define DISPLAY_DISABLE 0
+#define DISPLAY_READY 1
+#define DISPLAY_ENABLE 2
+
 
 // specific to Microsoft Visual Studio
 // disable warnings about fopen

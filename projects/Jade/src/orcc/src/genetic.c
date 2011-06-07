@@ -181,7 +181,7 @@ static int compare_individual_fps(void const *a, void const *b) {
  */
 static individual* build_given_individual(struct mapping_s *mapping,
 		struct genetic_s *genetic_info) {
-	int i, j;
+	int i;
 	individual* ind = (individual*) malloc(sizeof(individual));
 	ind->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
 	ind->fps = -1;
@@ -404,7 +404,7 @@ static void write_mapping_footer(population *lastpop,
  */
 static void write_mapping_population(population *pop,
 		struct genetic_s *genetic_info) {
-	int i, j, k;
+	int i;
 	FILE *mappingFile = open_mapping_file("a");
 
 	fprintf(mappingFile, "\t<!-- ///////////////////////////// -->\n");

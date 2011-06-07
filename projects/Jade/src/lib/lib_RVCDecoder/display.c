@@ -47,6 +47,9 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pic
 }
 
 
+char displayYUV_getFlags(){
+	return 3;
+}
 
 void displayYUV_init(){}
 void compareYUV_init(){}

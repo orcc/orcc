@@ -50,6 +50,7 @@ extern "C"{
 	extern void displayYUV_displayPicture(unsigned char *pictureBufferY,
 		unsigned char *pictureBufferU, unsigned char *pictureBufferV,
 		unsigned short pictureWidth, unsigned short pictureHeight);
+	extern char displayYUV_getFlags();
 	extern void compareYUV_init();
 
 	//External functions for compare
@@ -77,6 +78,7 @@ std::map<std::string, void*> createNativeMap()
 	// Link external function with their native names
 	native["displayYUV_init"] = (void*)displayYUV_init;
 	native["displayYUV_displayPicture"] = (void*)displayYUV_displayPicture;
+	native["displayYUV_getFlags"] = (void*)displayYUV_getFlags;
 	native["compareYUV_init"] = (void*)compareYUV_init;
 	native["compareYUV_comparePicture"] = (void*)compareYUV_comparePicture;
 	native["source_init"] = (void*)source_init;

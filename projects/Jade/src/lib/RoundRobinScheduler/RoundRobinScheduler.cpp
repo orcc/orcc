@@ -67,15 +67,6 @@
 
 using namespace std;
 using namespace llvm;
-extern cl::opt<bool> nodisplay;
-extern cl::opt<std::string> YuvFile;
-
-static int Filesize(){
-	FILE* f = fopen(YuvFile.c_str(), "rb");
-	struct stat st;
-	fstat(fileno(f), &st);
-	return st.st_size;
-}
 
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool noMultiCore, bool verbose): Context(C) {
 	this->decoder = decoder;

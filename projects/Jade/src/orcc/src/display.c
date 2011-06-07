@@ -27,8 +27,7 @@
  * SUCH DAMAGE.
  */
 #include "SDL.h"
-
-//#define NO_DISPLAY
+#include "orcc_util.h"
 
 #ifdef BENCHMARK
 #include <locale.h>
@@ -96,11 +95,13 @@ void active_fps_printing() {
 	show_fps = 1;
 }
 
+char displayYUV_getFlags(){
+	return display_flags + DISPLAY_READY;
+}
+
 static Uint32 t;
 
 static void displayYUV_setSize(int width, int height) {
-
-#ifndef NO_DISPLAY
 	printf("set display to %ix%i\n", width, height);
 
 	m_screen = SDL_SetVideoMode(width, height, 0, 0);
@@ -119,11 +120,10 @@ static void displayYUV_setSize(int width, int height) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 		press_a_key(-1);
 	}
-#endif
 }
 
 void displayYUV_displayPicture(unsigned char *pictureBufferY,
-		unsigned char *pictureBufferU,  unsigned char *pictureBufferV,
+		unsigned char *pictureBufferU, unsigned char *pictureBufferV,
 		unsigned short pictureWidth, unsigned short pictureHeight) {
 	static unsigned short lastWidth = 0;
 	static unsigned short lastHeight = 0;
@@ -133,7 +133,6 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY,
 	SDL_Event event;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef NO_DISPLAY
 	if ((pictureHeight != lastHeight) || (pictureWidth != lastWidth)) {
 		displayYUV_setSize(pictureWidth, pictureHeight);
 		lastHeight = pictureHeight;
@@ -152,7 +151,6 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY,
 
 	SDL_UnlockYUVOverlay(m_overlay);
 	SDL_DisplayYUVOverlay(m_overlay, &rect);
-#endif
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	num_images_end++;
@@ -190,13 +188,6 @@ void displayYUV_init() {
 	if (!init) {
 		init = 1;
 
-#ifdef NO_DISPLAY
-		// First, initialize SDL's subsystem.
-		if (SDL_Init( SDL_INIT_TIMER ) < 0) {
-			fprintf(stderr, "Timer initialization failed: %s\n", SDL_GetError());
-			press_a_key(-1);
-		}
-#else
 		// First, initialize SDL's video subsystem.
 		if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 			fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
@@ -204,7 +195,6 @@ void displayYUV_init() {
 		}
 
 		SDL_WM_SetCaption("display", NULL);
-#endif
 
 		start_time = SDL_GetTicks();
 		t = start_time;
