@@ -15,6 +15,7 @@ include_directories(${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR})
 include_directories(${orcc_SOURCE_DIR}/orcc/include)
 
 add_library (orcc
+${orcc_SOURCE_DIR}/orcc/src/compare.c
 ${orcc_SOURCE_DIR}/orcc/src/compareyuv.c
 ${orcc_SOURCE_DIR}/orcc/src/display.c
 ${orcc_SOURCE_DIR}/orcc/src/getopt.c
