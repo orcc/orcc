@@ -428,7 +428,7 @@ actor(actor) ::= <<
 @_FSM_state = global i32 <actor.templateData.stateToLabelMap.(actor.fsm.initialState)>
 <endif>
 
-define void @<instance.id>_scheduler() nounwind {
+define void @main() nounwind {
 entry:
 
 	br label %bb_scheduler_start
