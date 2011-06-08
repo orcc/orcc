@@ -45,6 +45,7 @@ import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.common.util.EMap;
 import org.stringtemplate.v4.AttributeRenderer;
+import org.stringtemplate.v4.Interpreter;
 import org.stringtemplate.v4.ModelAdaptor;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -101,8 +102,9 @@ public class Printer {
 		group.registerModelAdaptor(EMap.class, new ModelAdaptor() {
 
 			@Override
-			public Object getProperty(ST st, Object o, Object property,
-					String propertyName) throws STNoSuchPropertyException {
+			public Object getProperty(Interpreter interp, ST st, Object o,
+					Object property, String propertyName)
+					throws STNoSuchPropertyException {
 				return ((EMap<?, ?>) o).get(property);
 			}
 		});
