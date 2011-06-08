@@ -105,8 +105,7 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 			replaceVarInExpr(((ExprBinary) expr).getE1(), ld);
 			replaceVarInExpr(((ExprBinary) expr).getE2(), ld);
 		} else if (expr.isVarExpr()) {
-			if (((ExprVar) expr).getUse().getVariable() == ld.getTarget()) {
-				// Here I modify the model.. Should we work with a copy??
+			if (((ExprVar) expr).getUse().getVariable() == ld.getTarget().getVariable()) {
 				((ExprVar) expr).setUse(IrFactory.eINSTANCE.createUse(ld
 						.getSource().getVariable()));
 			}

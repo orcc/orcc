@@ -22,7 +22,7 @@ printf("<actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>
 
 printFSMState() ::= <<
 #ifdef PFSM
-printf("state = state_<fsm_nsi.targetState>;\n");
+printf("state = state_<tr.state.name>;\n");
 #endif
 >>
 
@@ -129,7 +129,7 @@ printCall(call) ::= <<
 //ERROR this function call must be removed, in this case we give a 1, it is OK if it is "data"
 <if(call.print)>printf(<call.parameters: PrintFormat()><call.parameters: PrintParameter()>);<
 else
-><if(call.target)><call.target> = <endif> 1;<
+><if(call.target)><call.target.variable.name> = <endif> 1;<
 endif>
 >>
 
@@ -253,9 +253,9 @@ newState() ::= <<
 :: <instance.id>_state == state_<fsm_trans.SourceState.name> -\> {
 	<fsm_trans.list: { tr | <peekPattern(tr.action.peekPattern)>}>
 	if
-	<fsm_trans.NextStateInfo: {
-			fsm_nsi|
-:: <fsm_nsi.action: schedulerFSM(); separator="\n"> }>
+	<fsm_trans.list: {
+			tr|
+:: <tr.action: schedulerFSM(); separator="\n"> }>
 	fi;}
 >>
 
@@ -264,13 +264,18 @@ schedulerFSM(action) ::= <<
 	<guardFSM()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
 	-\> 
 	/* Temp variables*/
-	<if(action.body.locals.list)>
-	<action.body.locals.list: { var | <if(!var.port)> <varDecl(var)>;<\n><endif>}>
-	<endif> 
+	<if(action.body.locals)>
+	<action.body.locals: { var | <if(!var.port)> <varDecl(var)>;<\n><endif>}>
+	<endif>
+	 
 	<inputPattern(action.inputPattern)>
-	<action.body.nodes: { node | <(node.class.simpleName)(node)>}>
+	
+	<printNodes(action.body.nodes)>
+	
 	<outputPattern(action.outputPattern)>
-	<instance.id>_state = state_<fsm_nsi.targetState>;
+	
+	<instance.id>_state = state_<tr.state.name>;
+	
 	<printActionName()>
 	<printFSMState()>
 	<printActionState()>
@@ -295,8 +300,8 @@ scheduler(action) ::= <<
 	<guard()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
 	-\>
 	/* Temp variables*/
-	<if(action.body.locals.list)>
-	<action.body.locals.list: {var | <if(!var.port)><varDecl(var)>;<\n><endif>}>
+	<if(action.body.locals)>
+	<action.body.locals: {var | <if(!var.port)><varDecl(var)>;<\n><endif>}>
 	<endif> 
 	<inputPattern(action.inputPattern)>
 	<printNodes(action.body.nodes)>
@@ -320,28 +325,31 @@ priorities() ::= <<
 <endif>
 >> 
 
-inputPatternPort(port) ::= <<
-chan_<port.name>?trash;
+inputPatternPort(variable) ::= <<
+chan_<pattern.varToPortMap.(variable).name>?<variable.name>[0];
+
 >>
 
 inputPattern(pattern) ::= <<
-<pattern.ports: inputPatternPort(); separator="\n">
+<pattern.variables: inputPatternPort()>
 >>
 
-outputPatternPort(port) ::= <<
-chan_<port.name>!trash;
+outputPatternPort(variable) ::= <<
+chan_<pattern.varToPortMap.(variable).name>!<variable.name>[0];
+
 >>
 
 outputPattern(pattern) ::= <<
-<pattern.ports: outputPatternPort(); separator="\n">
+<pattern.variables: outputPatternPort()>
 >>
 
-peekPatternPort(port) ::= <<
-chan_<port.name>!\<trash\>;
+peekPatternPort(variable) ::= <<
+chan_<pattern.varToPortMap.(variable).name>?\<<variable.name>[0]\>;
+
 >>
 
 peekPattern(pattern) ::= <<
-<pattern.ports: peekPatternPort(); separator="\n">
+<pattern.variables: peekPatternPort()>
 >>
 
 inputChannelCheck(pattern) ::= <<
