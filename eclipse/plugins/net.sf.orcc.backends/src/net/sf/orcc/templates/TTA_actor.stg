@@ -160,7 +160,7 @@ actionTest(action) ::= <<
 else
 >	;; Empty input pattern
 	
-	br %bb_<action.name>_check_outputs<
+	br label %bb_<action.name>_check_outputs<
 endif>
 
 
@@ -173,7 +173,7 @@ bb_<action.name>_check_outputs:
 else
 >	;; Empty output pattern
 	
-	br %bb_<action.name>_fire<
+	br label %bb_<action.name>_fire<
 endif>
 
 
@@ -209,7 +209,7 @@ actionTestState(sourceState, transition, restTransitionsList) ::= <<
 else
 >	;; Empty input pattern
 	
-	br %bb_<sourceState.name>_<transition.action.name>_check_outputs<
+	br label %bb_<sourceState.name>_<transition.action.name>_check_outputs<
 endif>
 
 
@@ -222,7 +222,7 @@ bb_<sourceState.name>_<transition.action.name>_check_outputs:
 else
 >	;; Empty output pattern
 	
-	br %bb_<sourceState.name>_<transition.action.name>_fire<
+	br label %bb_<sourceState.name>_<transition.action.name>_fire<
 endif>
 
 
