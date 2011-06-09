@@ -91,7 +91,7 @@ void compare_byte(unsigned char in){
 }
 
 void compare_NBytes(unsigned char * inTable, unsigned short nbTokenToRead){
-	unsigned char outTable[nbTokenToRead];
+	unsigned char *outTable = (unsigned char *) malloc(nbTokenToRead);
 	int n = fread(outTable, 1, nbTokenToRead, cmpFile);
 	if(n < nbTokenToRead) {
 		fprintf(stderr,"Problem when reading compare file.\n");
@@ -107,4 +107,5 @@ void compare_NBytes(unsigned char * inTable, unsigned short nbTokenToRead){
 		}
 		n--;
 	}
+	free(outTable);
 }
