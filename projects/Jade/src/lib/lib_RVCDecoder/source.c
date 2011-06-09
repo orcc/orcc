@@ -43,15 +43,17 @@ static int nb;
 
 extern int* stopVar;
 
+
+
 // Called before any *_scheduler function.
 void source_init() {
 	AVCFile = 0;
 }
 
 int source_sizeOfFile() { 
-	if(!data_length)
+	if(!data_length){
 		return 0;
-	else if(AVCFile){
+	}else if(AVCFile){
 		return data_length + 4; 
 	}
 	else{
@@ -63,19 +65,21 @@ int source_sizeOfFile() {
 void source_rewind() {
 }
 
-
 void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
 	if(AVCFile && !nb){
 		memcpy(outTable, AVCStartCode, 4);
 		memcpy(outTable + 4, data, nbTokenToRead-4);
-	}
-	else{
+		data_length = data_length - nbTokenToRead + 4;
+	}else{
 		memcpy(outTable, data + nb*4096, nbTokenToRead);
+		data_length = data_length - nbTokenToRead;
 	}
 
 	nb++;
-	data_length = 0;
-	*stopVar = 1;
+
+	if (data_length == 0){
+		*stopVar = 1;
+	}
 }
 
 

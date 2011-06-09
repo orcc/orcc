@@ -36,7 +36,15 @@
 extern "C" {
 #endif
 
-void displayYUV_setFrameAddr(RVCFRAME* Address);
+typedef struct{
+	int Width;
+	int Height;
+	unsigned char* pY[1];
+	unsigned char* pU[1]; 
+	unsigned char* pV[1];
+}RVCFRAME;
+
+void displayYUV_setOutBufferAddr(char* outBuffer, int newNalu);
 
 #ifdef __cplusplus
 }

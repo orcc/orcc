@@ -27,37 +27,17 @@
  * SUCH DAMAGE.
  */
 
-/**
-@brief Description of the RVCDecoder interface
-@author Olivier Labois
-@file RVCInterface.h
-@version 1.0
-@date 21/04/2011
-*/
+#ifndef ORCC_H
+#define ORCC_H
 
-//------------------------------
+typedef signed char i8;
+typedef short i16;
+typedef int i32;
+typedef long long int i64;
 
-#ifndef RVCDECODER_H
-#define RVCDECODER_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef WIN32
-#define Exported __declspec(dllexport)
-#else
-#define Exported
-#endif
-
-Exported void rvc_init(char *XDF, int isAVCFile);
-
-Exported void rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newNalu);
-
-Exported void rvc_close();
-
-#ifdef __cplusplus
-}
-#endif
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long int u64;
 
 #endif

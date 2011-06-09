@@ -83,7 +83,7 @@ cl::list<std::string> MAttrs("");
 
 cl::opt<std::string> MCPU(init(""));
 
-cl::opt<int> FifoSize(init(10000));
+cl::opt<int> FifoSize(init(512));
 
 
 Decoder* decoder;
@@ -95,6 +95,13 @@ extern "C" {
 #include "Jade/lib_RVCDecoder/RVCDecoder.h"
 
 int* stopVar;
+
+
+//Native elts
+char *yuv_file;
+char *write_file;
+void print_usage(){
+}
 
 void rvc_init(char *XDF, int isAVCFile){
 
@@ -126,24 +133,14 @@ void rvc_init(char *XDF, int isAVCFile){
 	}
 }
 
-int rvc_decode(unsigned char* nal, int nal_length, RVCFRAME *Frame){
-
-	if(Frame->Height > 0 || Frame->Width > 0){
-		int i = 0;		
-	}
-
-
-
+void rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newNalu){
+	
 	source_sendNal(nal, nal_length);
 
-	displayYUV_setFrameAddr(Frame);
+	displayYUV_setOutBufferAddr(outBuffer, newNalu);
 
 	//Start decoder
 	decoder->getEE()->run();
-
-	if(Frame->Height || Frame->Width) 
-		return 1;
-	return 0;
 }
 
 

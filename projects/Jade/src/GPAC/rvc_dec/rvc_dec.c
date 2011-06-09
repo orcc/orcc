@@ -39,8 +39,8 @@ typedef struct{
 } RVCFRAME;
 
 
-DllImport int rvc_init(char *XDF);
-DllImport int rvc_decode(unsigned char* nal, int nal_length, RVCFRAME *Frame, int AVCFile);
+DllImport int rvc_init(char *XDF, int isAVCFile);
+DllImport void rvc_decode(unsigned char* nal, int nal_length, char *outBuffer, int newNalu);
 DllImport void rvc_close();
 
 
@@ -60,8 +60,9 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 {
 	u32 i, count;
 	s32 res;
-	RVCFRAME Picture;
+	char Picture;
 	RVCDec *ctx = (RVCDec*) ifcg->privateStack;
+	int isAVCFile;
 
 	/*not supported in this version*/
 	if (esd->dependsOnESID) return GF_NOT_SUPPORTED;
@@ -71,11 +72,13 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 
 	/*initialize RVC*/
 	if (!esd->decoderConfig->rvc_config) return GF_NOT_SUPPORTED;
-	rvc_init(esd->decoderConfig->rvc_config->data); //->data contains the uncompressed XDF
 
-	/*initialize picture size*/
-	Picture.Height = Picture.Width = 0;
-	
+	if(esd->decoderConfig->objectTypeIndication==GPAC_OTI_VIDEO_AVC) isAVCFile = 1;
+	else isAVCFile = 0;
+
+	rvc_init(esd->decoderConfig->rvc_config->data, isAVCFile); //->data contains the uncompressed XDF
+
+		
 	/*decoder config not known, output buffers will be reconfigured at run-time*/
 	if (!esd->decoderConfig->decoderSpecificInfo || !esd->decoderConfig->decoderSpecificInfo->data) 
 		return GF_OK;
@@ -104,10 +107,10 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 			}
 			/* call decode - warning for AVC: the data blocks do not contain startcode prefixes (00000001), you may need to add them) */
 			
-			res = rvc_decode(slc->data, slc->size, &Picture, 1);
-			if (res<0) {
+			rvc_decode(slc->data, slc->size, &Picture, 1);
+			/*if (res<0) {
 				GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, ("[SVC Decoder] Error decoding SPS %d\n", res));
-			}
+			}*/
 			
 		}
 
@@ -117,10 +120,10 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 			/*same remark as above*/
 
 			
-			res = rvc_decode(slc->data, slc->size, &Picture, 1);
-			if (res<0) {
+			rvc_decode(slc->data, slc->size, &Picture, 1);
+			/*if (res<0) {
 				GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, ("[SVC Decoder] Error decoding PPS %d\n", res));
-			}
+			}*/
 			
 		}
 
@@ -137,19 +140,19 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 		ctx->pixel_ar = (dsi.par_num<<16) | dsi.par_den;
 		
 		
-		res = rvc_decode(esd->decoderConfig->decoderSpecificInfo->data, esd->decoderConfig->decoderSpecificInfo->dataLength, &Picture, 0);
-		if (res<0) {
+		rvc_decode(esd->decoderConfig->decoderSpecificInfo->data, esd->decoderConfig->decoderSpecificInfo->dataLength, &Picture, 1);
+		/*if (res<0) {
 			GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, ("[SVC Decoder] Error decoding PPS %d\n", res));
-		}
+		}*/
 		
 
 	} else {
 		/*unknown type, do what you want*/
 		
-		res = rvc_decode(esd->decoderConfig->decoderSpecificInfo->data, esd->decoderConfig->decoderSpecificInfo->dataLength, &Picture, 0);
-		if (res<0) {
+		rvc_decode(esd->decoderConfig->decoderSpecificInfo->data, esd->decoderConfig->decoderSpecificInfo->dataLength, &Picture, 1);
+		/*if (res<0) {
 			GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, ("[SVC Decoder] Error decoding PPS %d\n", res));
-		}
+		}*/
 		
 	}
 	/*adjust stride to what you decoder uses*/
@@ -225,9 +228,6 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 		char *outBuffer, u32 *outBufferLength,
 		u8 PaddingBits, u32 mmlevel)
 {
-
-	s32 got_pic;
-	RVCFRAME pic;
 	RVCDec *ctx = (RVCDec*) ifcg->privateStack;
 
 	if (!ES_ID || (ES_ID!=ctx->ES_ID) /*|| !ctx->codec*/) {
@@ -241,15 +241,12 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 
 	//if your decoder outputs directly in the memory passed, setup pointers for your decoder output picture
 
-
-	got_pic = 0;
-	pic.Height = pic.Width = 0;
-
+	
 	if (ctx->nalu_size_length) {
 		u32 i, nalu_size = 0;
 		u8 *ptr = inBuffer;
-
-
+		int newNalu = 1;
+		
 		while (inBufferLength) {
 			for (i=0; i<ctx->nalu_size_length; i++) {
 				nalu_size = (nalu_size<<8) + ptr[i];
@@ -258,10 +255,13 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 
 			//same remark as above regardin start codes
 			
-			got_pic = rvc_decode(ptr, nalu_size, &pic, 1);
+			rvc_decode(ptr, nalu_size, outBuffer, newNalu);
 
+			newNalu = 0;
+			
 			ptr += nalu_size;
-			if (inBufferLength < nalu_size + ctx->nalu_size_length) break;
+			if (inBufferLength < nalu_size + ctx->nalu_size_length) 
+				break;
 
 			inBufferLength -= nalu_size + ctx->nalu_size_length;
 		}
@@ -270,14 +270,13 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 		u8 *ptr = inBuffer;
 		
 
-		got_pic = rvc_decode(ptr, inBufferLength, &pic, 0);
+		rvc_decode(ptr, inBufferLength, outBuffer, 1);
 	}
 
-	if (got_pic!=1) 
-		return GF_OK;
+	//if (got_pic!=1) return GF_OK;
 
 	/*if size changed during the decoding, resize the composition buffer*/
-	if ((pic.Width != ctx->width) || (pic.Height!=ctx->height)) 
+	/*if ((pic.Width != ctx->width) || (pic.Height!=ctx->height)) 
 	{
 		ctx->width = pic.Width;
 		ctx->stride = pic.Width;
@@ -287,14 +286,14 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 		return GF_BUFFER_TOO_SMALL;
 	}
 	
-	*outBufferLength = ctx->out_size;
+	*outBufferLength = ctx->out_size;*/
 
 	/*if your decoder does not output directly in the memory passed, copy over the data*/
 	
-	memcpy(outBuffer, pic.pY[0], ctx->stride*ctx->height); 
+	/*memcpy(outBuffer, pic.pY[0], ctx->stride*ctx->height); 
 	memcpy(outBuffer + ctx->stride * ctx->height, pic.pU[0], ctx->stride*ctx->height/4);
-	memcpy(outBuffer + 5*ctx->stride * ctx->height/4, pic.pV[0], ctx->stride*ctx->height/4);
-	
+	memcpy(outBuffer + 5*ctx->stride * ctx->height/4, pic.pV[0], ctx->stride*ctx->height/4);*/
+
 	return GF_OK;
 }
 

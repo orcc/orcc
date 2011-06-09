@@ -27,37 +27,37 @@
  * SUCH DAMAGE.
  */
 
-/**
-@brief Description of the RVCDecoder interface
-@author Olivier Labois
-@file RVCInterface.h
-@version 1.0
-@date 21/04/2011
-*/
+#ifndef ORCC_UTIL_H
+#define ORCC_UTIL_H
 
-//------------------------------
+// input file
+extern char *input_file;
 
-#ifndef RVCDECODER_H
-#define RVCDECODER_H
+// output YUV file
+extern char *yuv_file;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+// write file
+extern char *write_file;
 
-#ifdef WIN32
-#define Exported __declspec(dllexport)
-#else
-#define Exported
-#endif
+// mapping file
+extern char *mapping_file;
 
-Exported void rvc_init(char *XDF, int isAVCFile);
+// output file of genetic algorithm
+extern char *output_genetic;
 
-Exported void rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newNalu);
 
-Exported void rvc_close();
+// initialize APR and parse command-line options
+void init_orcc(int argc, char *argv[]);
 
-#ifdef __cplusplus
-}
-#endif
+// pause function
+void wait_for_key();
+
+// print usage
+void print_usage();
+
+// specific to Microsoft Visual Studio
+// disable warnings about fopen
+#define _CRT_SECURE_NO_WARNINGS
+#pragma warning (disable:4996)
 
 #endif

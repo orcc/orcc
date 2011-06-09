@@ -29,36 +29,65 @@
 
 #include "display.h"
 
-RVCFRAME* Frame;
+#define DISPLAY_READY 1
+#define DISPLAY_ENABLE 2
 
-void displayYUV_setFrameAddr(RVCFRAME* Address){
-	Frame = Address;
+static RVCFRAME Frame;
+static int frameEmpty = 1;
+
+char* outBuffer;
+
+static int got_pic = 0;
+
+char display_flag;
+
+
+void displayYUV_setOutBufferAddr(char* Address, int newNalu){
+	outBuffer = Address;
+
+	if (newNalu){
+		got_pic = 0;
+		display_flag = DISPLAY_READY + DISPLAY_ENABLE;
+	}
+
+	if (!frameEmpty){
+		memcpy(outBuffer, Frame.pY[0], Frame.Width * Frame.Height); 
+		memcpy(outBuffer + Frame.Width * Frame.Height, Frame.pU[0], Frame.Width * Frame.Height/4);
+		memcpy(outBuffer + 5*Frame.Width * Frame.Height/4, Frame.pV[0], Frame.Width * Frame.Height/4);
+
+		frameEmpty = 1;
+		got_pic = 1;
+	}
 }
 
 void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU,
 							   unsigned char *pictureBufferV, unsigned short pictureWidth,
 							   unsigned short pictureHeight){
-	Frame->Width = pictureWidth;
-	Frame->Height = pictureHeight;
+				   
 
-	*Frame->pY = pictureBufferY;
-	*Frame->pU = pictureBufferU;
-	*Frame->pV = pictureBufferV;
+	if(!got_pic){
+		memcpy(outBuffer, pictureBufferY, pictureWidth * pictureHeight); 
+		memcpy(outBuffer + pictureWidth * pictureHeight, pictureBufferU, pictureWidth * pictureHeight/4);
+		memcpy(outBuffer + 5*pictureWidth * pictureHeight/4, pictureBufferV, pictureWidth * pictureHeight/4);
+
+		got_pic = 1;
+	}else{
+		frameEmpty = 0;
+
+		Frame.Width = pictureWidth;
+		Frame.Height = pictureHeight;
+
+		*Frame.pY = pictureBufferY;
+		*Frame.pU = pictureBufferU;
+		*Frame.pV = pictureBufferV;
+
+		display_flag = DISPLAY_ENABLE;
+	}
+	
 }
 
-
 char displayYUV_getFlags(){
-	return 3;
+	return display_flag;
 }
 
 void displayYUV_init(){}
-void compareYUV_init(){}
-
-
-
-void compareYUV_comparePicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU,
-                               unsigned char *pictureBufferV, unsigned short pictureWidth,
-							   unsigned short pictureHeight){}
-void Writer_init(){}
-void Writer_write(unsigned char byte){}
-void Writer_close(){}
