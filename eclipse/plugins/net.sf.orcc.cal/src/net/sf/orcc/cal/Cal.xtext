@@ -298,7 +298,7 @@ AstExpressionLiteral:
 
 AstExpressionBoolean: value=BOOL;
 
-terminal BOOL returns ecore::EBoolean: 'true' | 'false';
+BOOL returns ecore::EBoolean: 'true' | 'false';
 
 AstExpressionFloat: value=REAL;
 
