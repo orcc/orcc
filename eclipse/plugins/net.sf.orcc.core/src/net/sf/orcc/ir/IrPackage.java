@@ -948,6 +948,14 @@ public interface IrPackage extends EPackage {
 		EReference PORT__TYPE = eINSTANCE.getPort_Type();
 
 		/**
+		 * The meta object literal for the '<em><b>Native</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute PORT__NATIVE = eINSTANCE.getPort_Native();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ProcedureImpl <em>Procedure</em>}' class.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @see net.sf.orcc.ir.impl.ProcedureImpl
@@ -1776,13 +1784,22 @@ public interface IrPackage extends EPackage {
 	int PORT__TYPE = 3;
 
 	/**
+	 * The feature id for the '<em><b>Native</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__NATIVE = 4;
+
+	/**
 	 * The number of structural features of the '<em>Port</em>' class. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_FEATURE_COUNT = 4;
+	int PORT_FEATURE_COUNT = 5;
 
 	/**
 	 * The feature id for the '<em><b>Initial State</b></em>' reference. <!--
@@ -4526,6 +4543,17 @@ public interface IrPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getPort_Type();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Port#isNative <em>Native</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Native</em>'.
+	 * @see net.sf.orcc.ir.Port#isNative()
+	 * @see #getPort()
+	 * @generated
+	 */
+	EAttribute getPort_Native();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Procedure <em>Procedure</em>}'.

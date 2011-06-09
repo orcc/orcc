@@ -778,7 +778,8 @@ public class ActorTransformer {
 			List<AstPort> portList) {
 		for (AstPort astPort : portList) {
 			Type type = astPort.getIrType();
-			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName());
+			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
+					astPort.isNative());
 			mapPorts.put(astPort, port);
 			((List<Port>) actor.eGet(feature)).add(port);
 		}

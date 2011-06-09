@@ -689,6 +689,11 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
+	public Port createPort(Port port) {
+		return EcoreUtil.copy(port);
+	}
+
+	@Override
 	public Port createPort(Type type, String name) {
 		PortImpl port = new PortImpl();
 		port.setName(name);
@@ -697,17 +702,12 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	@Override
-	public Port createPort(Port port) {
-		return EcoreUtil.copy(port);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Predicate createPredicate() {
-		PredicateImpl predicate = new PredicateImpl();
-		return predicate;
+	public Port createPort(Type type, String name, boolean native_) {
+		PortImpl port = new PortImpl();
+		port.setName(name);
+		port.setNative(native_);
+		port.setType(type);
+		return port;
 	}
 
 	/**
@@ -732,9 +732,9 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Map.Entry<Var, Port> createVarToPortMapEntry() {
-		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
-		return varToPortMapEntry;
+	public Predicate createPredicate() {
+		PredicateImpl predicate = new PredicateImpl();
+		return predicate;
 	}
 
 	/**
@@ -989,6 +989,15 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	@Override
 	public Var createVar(Type type, String name, boolean assignable, int index) {
 		return createVar(0, type, name, assignable, index);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Map.Entry<Var, Port> createVarToPortMapEntry() {
+		VarToPortMapEntryImpl varToPortMapEntry = new VarToPortMapEntryImpl();
+		return varToPortMapEntry;
 	}
 
 	/**

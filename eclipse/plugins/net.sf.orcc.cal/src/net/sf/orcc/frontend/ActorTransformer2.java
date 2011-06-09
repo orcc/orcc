@@ -181,7 +181,8 @@ public class ActorTransformer2 {
 		// transform input ports
 		for (AstPort astPort : astActor.getInputs()) {
 			Type type = astPort.getIrType();
-			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName());
+			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
+					astPort.isNative());
 			mapAstIr.put(astPort, port);
 			actor.getInputs().add(port);
 		}
@@ -189,7 +190,8 @@ public class ActorTransformer2 {
 		// transform output ports
 		for (AstPort astPort : astActor.getOutputs()) {
 			Type type = astPort.getIrType();
-			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName());
+			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
+					astPort.isNative());
 			mapAstIr.put(astPort, port);
 			actor.getOutputs().add(port);
 		}

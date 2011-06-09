@@ -132,7 +132,7 @@ public class Instantiator implements INetworkTransformation {
 				}
 			}
 
-			if (!portUsed) {
+			if (!port.isNative() && !portUsed) {
 				throw new OrccException("In network \"" + network.getName()
 						+ "\": port \"" + port.getName() + "\" of instance \""
 						+ id + "\" is not used!");

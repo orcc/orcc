@@ -56,6 +56,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/numTokensConsumed"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/numTokensProduced"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ir.ecore#//Port/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Port/native"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//FSM">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//FSM/initialState"/>

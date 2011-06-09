@@ -476,6 +476,8 @@ public interface IrFactory extends EFactory {
 
 	Port createPort(Type type, String name);
 
+	Port createPort(Type type, String name, boolean native_);
+
 	Port createPort(Port port);
 
 	/**

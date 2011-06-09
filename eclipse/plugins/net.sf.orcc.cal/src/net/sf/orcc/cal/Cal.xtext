@@ -60,7 +60,7 @@ AstActor: {AstActor}
 
 	'end';
 
-AstPort: type=AstType name=ID;
+AstPort: (native ?= 'native')? type=AstType name=ID;
 
 AstFunction:
 	'function' name=ID

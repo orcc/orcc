@@ -94,6 +94,14 @@ public interface Port extends EObject {
 	void increaseTokenProduction(int n);
 
 	/**
+	 * Returns <code>true</code> if this port is native.
+	 * 
+	 * @return <code>true</code> if this port is native
+	 * @model
+	 */
+	boolean isNative();
+
+	/**
 	 * Resets the number of tokens consumed by this port.
 	 */
 	void resetTokenConsumption();
@@ -112,9 +120,17 @@ public interface Port extends EObject {
 	void setName(String name);
 
 	/**
+	 * Sets this port as native if <code>newNative</code> is <code>true</code>.
+	 * 
+	 * @param newNative
+	 *            <code>true</code> if this port is native
+	 */
+	void setNative(boolean newNative);
+
+	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensConsumed <em>Num Tokens Consumed</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @param value the new value of the '<em>Num Tokens Consumed</em>' attribute.
 	 * @see #getNumTokensConsumed()
 	 * @generated
@@ -123,8 +139,8 @@ public interface Port extends EObject {
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.ir.Port#getNumTokensProduced <em>Num Tokens Produced</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @param value the new value of the '<em>Num Tokens Produced</em>' attribute.
 	 * @see #getNumTokensProduced()
 	 * @generated
