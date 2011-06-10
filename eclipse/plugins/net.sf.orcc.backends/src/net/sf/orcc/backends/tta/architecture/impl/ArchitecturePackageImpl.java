@@ -36,10 +36,16 @@ import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
 import net.sf.orcc.backends.tta.architecture.Bus;
 import net.sf.orcc.backends.tta.architecture.Element;
+import net.sf.orcc.backends.tta.architecture.ExprBinary;
+import net.sf.orcc.backends.tta.architecture.ExprFalse;
+import net.sf.orcc.backends.tta.architecture.ExprTrue;
+import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.Extension;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
+import net.sf.orcc.backends.tta.architecture.OpBinary;
+import net.sf.orcc.backends.tta.architecture.OpUnary;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Reads;
@@ -49,6 +55,9 @@ import net.sf.orcc.backends.tta.architecture.Segment;
 import net.sf.orcc.backends.tta.architecture.ShortImmediate;
 import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.SocketType;
+import net.sf.orcc.backends.tta.architecture.Term;
+import net.sf.orcc.backends.tta.architecture.TermBool;
+import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -138,6 +147,55 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	private EClass guardEClass = null;
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass exprUnaryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass exprBinaryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass exprTrueEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass exprFalseEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass termEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass termBoolEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass termUnitEClass = null;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -184,6 +242,20 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EEnum extensionEEnum = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EEnum opUnaryEEnum = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EEnum opBinaryEEnum = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -737,6 +809,150 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getExprUnary() {
+		return exprUnaryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getExprUnary_Operator() {
+		return (EAttribute)exprUnaryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getExprUnary_Term() {
+		return (EReference)exprUnaryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getExprBinary() {
+		return exprBinaryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getExprBinary_Operator() {
+		return (EAttribute)exprBinaryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getExprBinary_E1() {
+		return (EReference)exprBinaryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getExprBinary_E2() {
+		return (EReference)exprBinaryEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getExprTrue() {
+		return exprTrueEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getExprFalse() {
+		return exprFalseEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getTerm() {
+		return termEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getTermBool() {
+		return termBoolEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getTermBool_Register() {
+		return (EReference)termBoolEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getTermBool_Index() {
+		return (EAttribute)termBoolEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getTermUnit() {
+		return termUnitEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getTermUnit_FunctionUnit() {
+		return (EReference)termUnitEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getTermUnit_Port() {
+		return (EReference)termUnitEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -873,6 +1089,24 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EEnum getOpUnary() {
+		return opUnaryEEnum;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EEnum getOpBinary() {
+		return opBinaryEEnum;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -969,8 +1203,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MIN_ADDRESS);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MAX_ADDRESS);
 
-		guardEClass = createEClass(GUARD);
-
 		elementEClass = createEClass(ELEMENT);
 		createEAttribute(elementEClass, ELEMENT__START_CYCLE);
 		createEAttribute(elementEClass, ELEMENT__CYCLES);
@@ -992,9 +1224,36 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(shortImmediateEClass, SHORT_IMMEDIATE__EXTENSION);
 		createEAttribute(shortImmediateEClass, SHORT_IMMEDIATE__WIDTH);
 
+		guardEClass = createEClass(GUARD);
+
+		exprUnaryEClass = createEClass(EXPR_UNARY);
+		createEAttribute(exprUnaryEClass, EXPR_UNARY__OPERATOR);
+		createEReference(exprUnaryEClass, EXPR_UNARY__TERM);
+
+		exprBinaryEClass = createEClass(EXPR_BINARY);
+		createEAttribute(exprBinaryEClass, EXPR_BINARY__OPERATOR);
+		createEReference(exprBinaryEClass, EXPR_BINARY__E1);
+		createEReference(exprBinaryEClass, EXPR_BINARY__E2);
+
+		exprTrueEClass = createEClass(EXPR_TRUE);
+
+		exprFalseEClass = createEClass(EXPR_FALSE);
+
+		termEClass = createEClass(TERM);
+
+		termBoolEClass = createEClass(TERM_BOOL);
+		createEReference(termBoolEClass, TERM_BOOL__REGISTER);
+		createEAttribute(termBoolEClass, TERM_BOOL__INDEX);
+
+		termUnitEClass = createEClass(TERM_UNIT);
+		createEReference(termUnitEClass, TERM_UNIT__FUNCTION_UNIT);
+		createEReference(termUnitEClass, TERM_UNIT__PORT);
+
 		// Create enums
 		socketTypeEEnum = createEEnum(SOCKET_TYPE);
 		extensionEEnum = createEEnum(EXTENSION);
+		opUnaryEEnum = createEEnum(OP_UNARY);
+		opBinaryEEnum = createEEnum(OP_BINARY);
 	}
 
 	/**
@@ -1027,6 +1286,12 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		readsEClass.getESuperTypes().add(this.getElement());
 		writesEClass.getESuperTypes().add(this.getElement());
 		resourceEClass.getESuperTypes().add(this.getElement());
+		exprUnaryEClass.getESuperTypes().add(this.getGuard());
+		exprBinaryEClass.getESuperTypes().add(this.getGuard());
+		exprTrueEClass.getESuperTypes().add(this.getGuard());
+		exprFalseEClass.getESuperTypes().add(this.getGuard());
+		termBoolEClass.getESuperTypes().add(this.getTerm());
+		termUnitEClass.getESuperTypes().add(this.getTerm());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(ttaEClass, net.sf.orcc.backends.tta.architecture.TTA.class, "TTA", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -1100,8 +1365,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEAttribute(getAddressSpace_MinAddress(), ecorePackage.getEInt(), "minAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAddressSpace_MaxAddress(), ecorePackage.getEInt(), "maxAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(guardEClass, Guard.class, "Guard", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-
 		initEClass(elementEClass, Element.class, "Element", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getElement_StartCycle(), ecorePackage.getEInt(), "startCycle", null, 0, 1, Element.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getElement_Cycles(), ecorePackage.getEInt(), "cycles", null, 1, 1, Element.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1129,6 +1392,31 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEAttribute(getShortImmediate_Extension(), this.getExtension(), "extension", null, 0, 1, ShortImmediate.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getShortImmediate_Width(), ecorePackage.getEInt(), "width", null, 0, 1, ShortImmediate.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+		initEClass(guardEClass, Guard.class, "Guard", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(exprUnaryEClass, ExprUnary.class, "ExprUnary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getExprUnary_Operator(), this.getOpUnary(), "operator", "", 0, 1, ExprUnary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getExprUnary_Term(), this.getTerm(), null, "term", null, 0, 1, ExprUnary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(exprBinaryEClass, ExprBinary.class, "ExprBinary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getExprBinary_Operator(), this.getOpBinary(), "operator", "", 0, 1, ExprBinary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getExprBinary_E1(), this.getExprUnary(), null, "e1", null, 0, 1, ExprBinary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getExprBinary_E2(), this.getExprUnary(), null, "e2", null, 0, 1, ExprBinary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(exprTrueEClass, ExprTrue.class, "ExprTrue", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(exprFalseEClass, ExprFalse.class, "ExprFalse", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(termEClass, Term.class, "Term", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(termBoolEClass, TermBool.class, "TermBool", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getTermBool_Register(), this.getRegisterFile(), null, "register", null, 0, 1, TermBool.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTermBool_Index(), ecorePackage.getEInt(), "index", null, 0, 1, TermBool.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(termUnitEClass, TermUnit.class, "TermUnit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getTermUnit_FunctionUnit(), this.getFunctionUnit(), null, "functionUnit", null, 0, 1, TermUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTermUnit_Port(), this.getPort(), null, "port", null, 0, 1, TermUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
 		// Initialize enums and add enum literals
 		initEEnum(socketTypeEEnum, SocketType.class, "SocketType");
 		addEEnumLiteral(socketTypeEEnum, SocketType.INPUT);
@@ -1137,6 +1425,14 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEEnum(extensionEEnum, Extension.class, "Extension");
 		addEEnumLiteral(extensionEEnum, Extension.SIGN);
 		addEEnumLiteral(extensionEEnum, Extension.ZERO);
+
+		initEEnum(opUnaryEEnum, OpUnary.class, "OpUnary");
+		addEEnumLiteral(opUnaryEEnum, OpUnary.SIMPLE);
+		addEEnumLiteral(opUnaryEEnum, OpUnary.INVERTED);
+
+		initEEnum(opBinaryEEnum, OpBinary.class, "OpBinary");
+		addEEnumLiteral(opBinaryEEnum, OpBinary.AND);
+		addEEnumLiteral(opBinaryEEnum, OpBinary.OR);
 
 		// Create resource
 		createResource(eNS_URI);

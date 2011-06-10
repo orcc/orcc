@@ -10,13 +10,13 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Guard</b></em>'.
+ * A representation of the model object '<em><b>Term</b></em>'.
  * <!-- end-user-doc -->
  *
  *
- * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGuard()
+ * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTerm()
  * @model interface="true" abstract="true"
  * @generated
  */
-public interface Guard extends EObject {
-} // Guard
+public interface Term extends EObject {
+} // Term

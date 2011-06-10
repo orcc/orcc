@@ -13,10 +13,15 @@ import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
 import net.sf.orcc.backends.tta.architecture.Bus;
+import net.sf.orcc.backends.tta.architecture.ExprBinary;
+import net.sf.orcc.backends.tta.architecture.ExprFalse;
+import net.sf.orcc.backends.tta.architecture.ExprTrue;
+import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.Extension;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
-import net.sf.orcc.backends.tta.architecture.Guard;
+import net.sf.orcc.backends.tta.architecture.OpBinary;
+import net.sf.orcc.backends.tta.architecture.OpUnary;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Reads;
@@ -27,6 +32,8 @@ import net.sf.orcc.backends.tta.architecture.ShortImmediate;
 import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.SocketType;
 import net.sf.orcc.backends.tta.architecture.TTA;
+import net.sf.orcc.backends.tta.architecture.TermBool;
+import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
 
 import org.eclipse.emf.common.util.EList;
@@ -40,14 +47,12 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
- * 
  * @generated
  */
 public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		ArchitectureFactory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -57,28 +62,28 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public static ArchitectureFactory init() {
 		try {
-			ArchitectureFactory theArchitectureFactory = (ArchitectureFactory) EPackage.Registry.INSTANCE
-					.getEFactory("http://orcc.sf.net/backends/tta/architecture/TTA_architecture");
+			ArchitectureFactory theArchitectureFactory = (ArchitectureFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/backends/tta/architecture/TTA_architecture"); 
 			if (theArchitectureFactory != null) {
 				return theArchitectureFactory;
 			}
-		} catch (Exception exception) {
+		}
+		catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new ArchitectureFactoryImpl();
 	}
 
 	/**
-	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory.
+	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ArchitectureFactoryImpl() {
@@ -87,7 +92,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertExtensionToString(EDataType eDataType,
@@ -96,8 +100,47 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public OpUnary createOpUnaryFromString(EDataType eDataType, String initialValue) {
+		OpUnary result = OpUnary.get(initialValue);
+		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertOpUnaryToString(EDataType eDataType, Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public OpBinary createOpBinaryFromString(EDataType eDataType, String initialValue) {
+		OpBinary result = OpBinary.get(initialValue);
+		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertOpBinaryToString(EDataType eDataType, Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public String convertSocketTypeToString(EDataType eDataType,
@@ -107,73 +150,60 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
-		case ArchitecturePackage.SOCKET_TYPE:
-			return convertSocketTypeToString(eDataType, instanceValue);
-		case ArchitecturePackage.EXTENSION:
-			return convertExtensionToString(eDataType, instanceValue);
-		default:
-			throw new IllegalArgumentException("The datatype '"
-					+ eDataType.getName() + "' is not a valid classifier");
+			case ArchitecturePackage.SOCKET_TYPE:
+				return convertSocketTypeToString(eDataType, instanceValue);
+			case ArchitecturePackage.EXTENSION:
+				return convertExtensionToString(eDataType, instanceValue);
+			case ArchitecturePackage.OP_UNARY:
+				return convertOpUnaryToString(eDataType, instanceValue);
+			case ArchitecturePackage.OP_BINARY:
+				return convertOpBinaryToString(eDataType, instanceValue);
+			default:
+				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-		case ArchitecturePackage.TTA:
-			return createTTA();
-		case ArchitecturePackage.BUS:
-			return createBus();
-		case ArchitecturePackage.BRIDGE:
-			return createBridge();
-		case ArchitecturePackage.SEGMENT:
-			return createSegment();
-		case ArchitecturePackage.GLOBAL_CONTROL_UNIT:
-			return createGlobalControlUnit();
-		case ArchitecturePackage.FUNCTION_UNIT:
-			return createFunctionUnit();
-		case ArchitecturePackage.REGISTER_FILE:
-			return createRegisterFile();
-		case ArchitecturePackage.PORT:
-			return createPort();
-		case ArchitecturePackage.SOCKET:
-			return createSocket();
-		case ArchitecturePackage.OPERATION:
-			return createOperation();
-		case ArchitecturePackage.ADDRESS_SPACE:
-			return createAddressSpace();
-		case ArchitecturePackage.GUARD:
-			return createGuard();
-		case ArchitecturePackage.READS:
-			return createReads();
-		case ArchitecturePackage.WRITES:
-			return createWrites();
-		case ArchitecturePackage.RESOURCE:
-			return createResource();
-		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY:
-			return (EObject) createportToIndexMapEntry();
-		case ArchitecturePackage.SHORT_IMMEDIATE:
-			return createShortImmediate();
-		default:
-			throw new IllegalArgumentException("The class '" + eClass.getName()
-					+ "' is not a valid classifier");
+			case ArchitecturePackage.TTA: return createTTA();
+			case ArchitecturePackage.BUS: return createBus();
+			case ArchitecturePackage.BRIDGE: return createBridge();
+			case ArchitecturePackage.SEGMENT: return createSegment();
+			case ArchitecturePackage.GLOBAL_CONTROL_UNIT: return createGlobalControlUnit();
+			case ArchitecturePackage.FUNCTION_UNIT: return createFunctionUnit();
+			case ArchitecturePackage.REGISTER_FILE: return createRegisterFile();
+			case ArchitecturePackage.PORT: return createPort();
+			case ArchitecturePackage.SOCKET: return createSocket();
+			case ArchitecturePackage.OPERATION: return createOperation();
+			case ArchitecturePackage.ADDRESS_SPACE: return createAddressSpace();
+			case ArchitecturePackage.READS: return createReads();
+			case ArchitecturePackage.WRITES: return createWrites();
+			case ArchitecturePackage.RESOURCE: return createResource();
+			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: return (EObject)createportToIndexMapEntry();
+			case ArchitecturePackage.SHORT_IMMEDIATE: return createShortImmediate();
+			case ArchitecturePackage.EXPR_UNARY: return createExprUnary();
+			case ArchitecturePackage.EXPR_BINARY: return createExprBinary();
+			case ArchitecturePackage.EXPR_TRUE: return createExprTrue();
+			case ArchitecturePackage.EXPR_FALSE: return createExprFalse();
+			case ArchitecturePackage.TERM_BOOL: return createTermBool();
+			case ArchitecturePackage.TERM_UNIT: return createTermUnit();
+			default:
+				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public AddressSpace createAddressSpace() {
@@ -183,7 +213,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Bridge createBridge() {
@@ -193,7 +222,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Bus createBus() {
@@ -210,40 +238,37 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Extension createExtensionFromString(EDataType eDataType,
 			String initialValue) {
 		Extension result = Extension.get(initialValue);
-		if (result == null)
-			throw new IllegalArgumentException("The value '" + initialValue
-					+ "' is not a valid enumerator of '" + eDataType.getName()
-					+ "'");
+		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 		return result;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
-		case ArchitecturePackage.SOCKET_TYPE:
-			return createSocketTypeFromString(eDataType, initialValue);
-		case ArchitecturePackage.EXTENSION:
-			return createExtensionFromString(eDataType, initialValue);
-		default:
-			throw new IllegalArgumentException("The datatype '"
-					+ eDataType.getName() + "' is not a valid classifier");
+			case ArchitecturePackage.SOCKET_TYPE:
+				return createSocketTypeFromString(eDataType, initialValue);
+			case ArchitecturePackage.EXTENSION:
+				return createExtensionFromString(eDataType, initialValue);
+			case ArchitecturePackage.OP_UNARY:
+				return createOpUnaryFromString(eDataType, initialValue);
+			case ArchitecturePackage.OP_BINARY:
+				return createOpBinaryFromString(eDataType, initialValue);
+			default:
+				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public FunctionUnit createFunctionUnit() {
@@ -262,7 +287,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public GlobalControlUnit createGlobalControlUnit() {
@@ -280,17 +304,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public Guard createGuard() {
-		GuardImpl guard = new GuardImpl();
-		return guard;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Operation createOperation() {
@@ -306,7 +319,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Port createPort() {
@@ -328,7 +340,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Map.Entry<Port, Integer> createportToIndexMapEntry() {
@@ -338,7 +349,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Reads createReads() {
@@ -348,7 +358,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public RegisterFile createRegisterFile() {
@@ -369,7 +378,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Resource createResource() {
@@ -379,7 +387,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Segment createSegment() {
@@ -389,12 +396,71 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ShortImmediate createShortImmediate() {
 		ShortImmediateImpl shortImmediate = new ShortImmediateImpl();
 		return shortImmediate;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprUnary createExprUnary() {
+		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
+		return exprUnary;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprBinary createExprBinary() {
+		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
+		return exprBinary;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprTrue createExprTrue() {
+		ExprTrueImpl exprTrue = new ExprTrueImpl();
+		return exprTrue;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public ExprFalse createExprFalse() {
+		ExprFalseImpl exprFalse = new ExprFalseImpl();
+		return exprFalse;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public TermBool createTermBool() {
+		TermBoolImpl termBool = new TermBoolImpl();
+		return termBool;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public TermUnit createTermUnit() {
+		TermUnitImpl termUnit = new TermUnitImpl();
+		return termUnit;
 	}
 
 	public GlobalControlUnit createSimpleGlobalControlUnit(
@@ -444,7 +510,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Socket createSocket() {
@@ -460,22 +525,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public SocketType createSocketTypeFromString(EDataType eDataType,
 			String initialValue) {
 		SocketType result = SocketType.get(initialValue);
-		if (result == null)
-			throw new IllegalArgumentException("The value '" + initialValue
-					+ "' is not a valid enumerator of '" + eDataType.getName()
-					+ "'");
+		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 		return result;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public TTA createTTA() {
@@ -491,7 +551,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public Writes createWrites() {
@@ -501,11 +560,10 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public ArchitecturePackage getArchitecturePackage() {
-		return (ArchitecturePackage) getEPackage();
+		return (ArchitecturePackage)getEPackage();
 	}
 
 } // ArchitectureFactoryImpl

@@ -139,10 +139,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 				return createAddressSpaceAdapter();
 			}
 			@Override
-			public Adapter caseGuard(Guard object) {
-				return createGuardAdapter();
-			}
-			@Override
 			public Adapter caseElement(Element object) {
 				return createElementAdapter();
 			}
@@ -165,6 +161,38 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseShortImmediate(ShortImmediate object) {
 				return createShortImmediateAdapter();
+			}
+			@Override
+			public Adapter caseGuard(Guard object) {
+				return createGuardAdapter();
+			}
+			@Override
+			public Adapter caseExprUnary(ExprUnary object) {
+				return createExprUnaryAdapter();
+			}
+			@Override
+			public Adapter caseExprBinary(ExprBinary object) {
+				return createExprBinaryAdapter();
+			}
+			@Override
+			public Adapter caseExprTrue(ExprTrue object) {
+				return createExprTrueAdapter();
+			}
+			@Override
+			public Adapter caseExprFalse(ExprFalse object) {
+				return createExprFalseAdapter();
+			}
+			@Override
+			public Adapter caseTerm(Term object) {
+				return createTermAdapter();
+			}
+			@Override
+			public Adapter caseTermBool(TermBool object) {
+				return createTermBoolAdapter();
+			}
+			@Override
+			public Adapter caseTermUnit(TermUnit object) {
+				return createTermUnitAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -351,6 +379,104 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createGuardAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.ExprUnary <em>Expr Unary</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprUnary
+	 * @generated
+	 */
+	public Adapter createExprUnaryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.ExprBinary <em>Expr Binary</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprBinary
+	 * @generated
+	 */
+	public Adapter createExprBinaryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.ExprTrue <em>Expr True</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprTrue
+	 * @generated
+	 */
+	public Adapter createExprTrueAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.ExprFalse <em>Expr False</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprFalse
+	 * @generated
+	 */
+	public Adapter createExprFalseAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Term
+	 * @generated
+	 */
+	public Adapter createTermAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.TermBool <em>Term Bool</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.TermBool
+	 * @generated
+	 */
+	public Adapter createTermBoolAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.TermUnit <em>Term Unit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.TermUnit
+	 * @generated
+	 */
+	public Adapter createTermUnitAdapter() {
 		return null;
 	}
 

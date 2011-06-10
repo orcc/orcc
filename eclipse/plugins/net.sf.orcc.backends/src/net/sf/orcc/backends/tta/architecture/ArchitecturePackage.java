@@ -733,23 +733,84 @@ public interface ArchitecturePackage extends EPackage {
 	int ADDRESS_SPACE_FEATURE_COUNT = 4;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.GuardImpl <em>Guard</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.impl.GuardImpl
+	 * @see net.sf.orcc.backends.tta.architecture.Guard
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGuard()
 	 * @generated
 	 */
-	int GUARD = 11;
+	int GUARD = 17;
 
 	/**
-	 * The number of structural features of the '<em>Guard</em>' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl <em>Expr Unary</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprUnary()
 	 * @generated
-	 * @ordered
 	 */
-	int GUARD_FEATURE_COUNT = 0;
+	int EXPR_UNARY = 18;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl <em>Expr Binary</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprBinary()
+	 * @generated
+	 */
+	int EXPR_BINARY = 19;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl <em>Expr True</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprTrue()
+	 * @generated
+	 */
+	int EXPR_TRUE = 20;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl <em>Expr False</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprFalse()
+	 * @generated
+	 */
+	int EXPR_FALSE = 21;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.Term
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTerm()
+	 * @generated
+	 */
+	int TERM = 22;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl <em>Term Bool</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermBool()
+	 * @generated
+	 */
+	int TERM_BOOL = 23;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl <em>Term Unit</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermUnit()
+	 * @generated
+	 */
+	int TERM_UNIT = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}' class.
@@ -759,7 +820,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getElement()
 	 * @generated
 	 */
-	int ELEMENT = 12;
+	int ELEMENT = 11;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute.
@@ -796,7 +857,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getReads()
 	 * @generated
 	 */
-	int READS = 13;
+	int READS = 12;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute.
@@ -842,7 +903,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getWrites()
 	 * @generated
 	 */
-	int WRITES = 14;
+	int WRITES = 13;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute.
@@ -888,7 +949,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getResource()
 	 * @generated
 	 */
-	int RESOURCE = 15;
+	int RESOURCE = 14;
 
 	/**
 	 * The feature id for the '<em><b>Start Cycle</b></em>' attribute.
@@ -934,7 +995,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getportToIndexMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_INDEX_MAP_ENTRY = 16;
+	int PORT_TO_INDEX_MAP_ENTRY = 15;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
@@ -971,7 +1032,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getShortImmediate()
 	 * @generated
 	 */
-	int SHORT_IMMEDIATE = 17;
+	int SHORT_IMMEDIATE = 16;
 
 	/**
 	 * The feature id for the '<em><b>Extension</b></em>' attribute.
@@ -1001,6 +1062,159 @@ public interface ArchitecturePackage extends EPackage {
 	int SHORT_IMMEDIATE_FEATURE_COUNT = 2;
 
 	/**
+	 * The number of structural features of the '<em>Guard</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GUARD_FEATURE_COUNT = 0;
+
+	/**
+	 * The feature id for the '<em><b>Operator</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_UNARY__OPERATOR = GUARD_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Term</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_UNARY__TERM = GUARD_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Expr Unary</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_UNARY_FEATURE_COUNT = GUARD_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Operator</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY__OPERATOR = GUARD_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>E1</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY__E1 = GUARD_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>E2</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY__E2 = GUARD_FEATURE_COUNT + 2;
+
+	/**
+	 * The number of structural features of the '<em>Expr Binary</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_BINARY_FEATURE_COUNT = GUARD_FEATURE_COUNT + 3;
+
+	/**
+	 * The number of structural features of the '<em>Expr True</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_TRUE_FEATURE_COUNT = GUARD_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Expr False</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPR_FALSE_FEATURE_COUNT = GUARD_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Term</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TERM_FEATURE_COUNT = 0;
+
+	/**
+	 * The feature id for the '<em><b>Register</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TERM_BOOL__REGISTER = TERM_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Index</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TERM_BOOL__INDEX = TERM_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Term Bool</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TERM_BOOL_FEATURE_COUNT = TERM_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Function Unit</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TERM_UNIT__FUNCTION_UNIT = TERM_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Port</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TERM_UNIT__PORT = TERM_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of structural features of the '<em>Term Unit</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TERM_UNIT_FEATURE_COUNT = TERM_FEATURE_COUNT + 2;
+
+	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.SocketType <em>Socket Type</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1008,7 +1222,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocketType()
 	 * @generated
 	 */
-	int SOCKET_TYPE = 18;
+	int SOCKET_TYPE = 25;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Extension <em>Extension</em>}' enum.
@@ -1018,7 +1232,27 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExtension()
 	 * @generated
 	 */
-	int EXTENSION = 19;
+	int EXTENSION = 26;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.OpUnary
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
+	 * @generated
+	 */
+	int OP_UNARY = 27;
+
+	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.OpBinary
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
+	 * @generated
+	 */
+	int OP_BINARY = 28;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TTA <em>TTA</em>}'.
@@ -1680,6 +1914,175 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getGuard();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ExprUnary <em>Expr Unary</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr Unary</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprUnary
+	 * @generated
+	 */
+	EClass getExprUnary();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.ExprUnary#getOperator <em>Operator</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Operator</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprUnary#getOperator()
+	 * @see #getExprUnary()
+	 * @generated
+	 */
+	EAttribute getExprUnary_Operator();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.ExprUnary#getTerm <em>Term</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Term</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprUnary#getTerm()
+	 * @see #getExprUnary()
+	 * @generated
+	 */
+	EReference getExprUnary_Term();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ExprBinary <em>Expr Binary</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr Binary</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprBinary
+	 * @generated
+	 */
+	EClass getExprBinary();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.ExprBinary#getOperator <em>Operator</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Operator</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprBinary#getOperator()
+	 * @see #getExprBinary()
+	 * @generated
+	 */
+	EAttribute getExprBinary_Operator();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.ExprBinary#getE1 <em>E1</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>E1</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprBinary#getE1()
+	 * @see #getExprBinary()
+	 * @generated
+	 */
+	EReference getExprBinary_E1();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.ExprBinary#getE2 <em>E2</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>E2</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprBinary#getE2()
+	 * @see #getExprBinary()
+	 * @generated
+	 */
+	EReference getExprBinary_E2();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ExprTrue <em>Expr True</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr True</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprTrue
+	 * @generated
+	 */
+	EClass getExprTrue();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ExprFalse <em>Expr False</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expr False</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.ExprFalse
+	 * @generated
+	 */
+	EClass getExprFalse();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Term</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Term
+	 * @generated
+	 */
+	EClass getTerm();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TermBool <em>Term Bool</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Term Bool</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.TermBool
+	 * @generated
+	 */
+	EClass getTermBool();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.TermBool#getRegister <em>Register</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Register</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.TermBool#getRegister()
+	 * @see #getTermBool()
+	 * @generated
+	 */
+	EReference getTermBool_Register();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.TermBool#getIndex <em>Index</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Index</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.TermBool#getIndex()
+	 * @see #getTermBool()
+	 * @generated
+	 */
+	EAttribute getTermBool_Index();
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TermUnit <em>Term Unit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Term Unit</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.TermUnit
+	 * @generated
+	 */
+	EClass getTermUnit();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.TermUnit#getFunctionUnit <em>Function Unit</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Function Unit</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.TermUnit#getFunctionUnit()
+	 * @see #getTermUnit()
+	 * @generated
+	 */
+	EReference getTermUnit_FunctionUnit();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.TermUnit#getPort <em>Port</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Port</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.TermUnit#getPort()
+	 * @see #getTermUnit()
+	 * @generated
+	 */
+	EReference getTermUnit_Port();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1859,6 +2262,26 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EEnum getExtension();
+
+	/**
+	 * Returns the meta object for enum '{@link net.sf.orcc.backends.tta.architecture.OpUnary <em>Op Unary</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for enum '<em>Op Unary</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.OpUnary
+	 * @generated
+	 */
+	EEnum getOpUnary();
+
+	/**
+	 * Returns the meta object for enum '{@link net.sf.orcc.backends.tta.architecture.OpBinary <em>Op Binary</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for enum '<em>Op Binary</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.OpBinary
+	 * @generated
+	 */
+	EEnum getOpBinary();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -2385,14 +2808,156 @@ public interface ArchitecturePackage extends EPackage {
 		EAttribute ADDRESS_SPACE__MAX_ADDRESS = eINSTANCE.getAddressSpace_MaxAddress();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.GuardImpl <em>Guard</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.tta.architecture.impl.GuardImpl
+		 * @see net.sf.orcc.backends.tta.architecture.Guard
 		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGuard()
 		 * @generated
 		 */
 		EClass GUARD = eINSTANCE.getGuard();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl <em>Expr Unary</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprUnary()
+		 * @generated
+		 */
+		EClass EXPR_UNARY = eINSTANCE.getExprUnary();
+
+		/**
+		 * The meta object literal for the '<em><b>Operator</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EXPR_UNARY__OPERATOR = eINSTANCE.getExprUnary_Operator();
+
+		/**
+		 * The meta object literal for the '<em><b>Term</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_UNARY__TERM = eINSTANCE.getExprUnary_Term();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl <em>Expr Binary</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprBinary()
+		 * @generated
+		 */
+		EClass EXPR_BINARY = eINSTANCE.getExprBinary();
+
+		/**
+		 * The meta object literal for the '<em><b>Operator</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute EXPR_BINARY__OPERATOR = eINSTANCE.getExprBinary_Operator();
+
+		/**
+		 * The meta object literal for the '<em><b>E1</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_BINARY__E1 = eINSTANCE.getExprBinary_E1();
+
+		/**
+		 * The meta object literal for the '<em><b>E2</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference EXPR_BINARY__E2 = eINSTANCE.getExprBinary_E2();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl <em>Expr True</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprTrue()
+		 * @generated
+		 */
+		EClass EXPR_TRUE = eINSTANCE.getExprTrue();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl <em>Expr False</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprFalse()
+		 * @generated
+		 */
+		EClass EXPR_FALSE = eINSTANCE.getExprFalse();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.Term
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTerm()
+		 * @generated
+		 */
+		EClass TERM = eINSTANCE.getTerm();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl <em>Term Bool</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermBool()
+		 * @generated
+		 */
+		EClass TERM_BOOL = eINSTANCE.getTermBool();
+
+		/**
+		 * The meta object literal for the '<em><b>Register</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TERM_BOOL__REGISTER = eINSTANCE.getTermBool_Register();
+
+		/**
+		 * The meta object literal for the '<em><b>Index</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute TERM_BOOL__INDEX = eINSTANCE.getTermBool_Index();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl <em>Term Unit</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermUnit()
+		 * @generated
+		 */
+		EClass TERM_UNIT = eINSTANCE.getTermUnit();
+
+		/**
+		 * The meta object literal for the '<em><b>Function Unit</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TERM_UNIT__FUNCTION_UNIT = eINSTANCE.getTermUnit_FunctionUnit();
+
+		/**
+		 * The meta object literal for the '<em><b>Port</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TERM_UNIT__PORT = eINSTANCE.getTermUnit_Port();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}' class.
@@ -2545,6 +3110,26 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EEnum EXTENSION = eINSTANCE.getExtension();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.OpUnary
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
+		 * @generated
+		 */
+		EEnum OP_UNARY = eINSTANCE.getOpUnary();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.OpBinary
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
+		 * @generated
+		 */
+		EEnum OP_BINARY = eINSTANCE.getOpBinary();
 
 	}
 

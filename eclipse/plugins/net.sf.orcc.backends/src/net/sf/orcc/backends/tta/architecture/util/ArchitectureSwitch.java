@@ -176,12 +176,6 @@ public class ArchitectureSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ArchitecturePackage.GUARD: {
-				Guard guard = (Guard)theEObject;
-				T result = caseGuard(guard);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case ArchitecturePackage.ELEMENT: {
 				Element element = (Element)theEObject;
 				T result = caseElement(element);
@@ -218,6 +212,60 @@ public class ArchitectureSwitch<T> {
 			case ArchitecturePackage.SHORT_IMMEDIATE: {
 				ShortImmediate shortImmediate = (ShortImmediate)theEObject;
 				T result = caseShortImmediate(shortImmediate);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.GUARD: {
+				Guard guard = (Guard)theEObject;
+				T result = caseGuard(guard);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.EXPR_UNARY: {
+				ExprUnary exprUnary = (ExprUnary)theEObject;
+				T result = caseExprUnary(exprUnary);
+				if (result == null) result = caseGuard(exprUnary);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.EXPR_BINARY: {
+				ExprBinary exprBinary = (ExprBinary)theEObject;
+				T result = caseExprBinary(exprBinary);
+				if (result == null) result = caseGuard(exprBinary);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.EXPR_TRUE: {
+				ExprTrue exprTrue = (ExprTrue)theEObject;
+				T result = caseExprTrue(exprTrue);
+				if (result == null) result = caseGuard(exprTrue);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.EXPR_FALSE: {
+				ExprFalse exprFalse = (ExprFalse)theEObject;
+				T result = caseExprFalse(exprFalse);
+				if (result == null) result = caseGuard(exprFalse);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.TERM: {
+				Term term = (Term)theEObject;
+				T result = caseTerm(term);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.TERM_BOOL: {
+				TermBool termBool = (TermBool)theEObject;
+				T result = caseTermBool(termBool);
+				if (result == null) result = caseTerm(termBool);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.TERM_UNIT: {
+				TermUnit termUnit = (TermUnit)theEObject;
+				T result = caseTermUnit(termUnit);
+				if (result == null) result = caseTerm(termUnit);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -402,6 +450,111 @@ public class ArchitectureSwitch<T> {
 	 * @generated
 	 */
 	public T caseGuard(Guard object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Expr Unary</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Expr Unary</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseExprUnary(ExprUnary object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Expr Binary</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Expr Binary</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseExprBinary(ExprBinary object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Expr True</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Expr True</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseExprTrue(ExprTrue object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Expr False</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Expr False</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseExprFalse(ExprFalse object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Term</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Term</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTerm(Term object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Term Bool</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Term Bool</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTermBool(TermBool object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Term Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Term Unit</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTermUnit(TermUnit object) {
 		return null;
 	}
 

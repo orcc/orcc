@@ -46,10 +46,8 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="addressSpace" eType="#//AddressSpace"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="operations" upperBound="-1"
         eType="#//Operation" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="delaySlots" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
-        defaultValueLiteral="0"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="guardLatency" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
-        defaultValueLiteral="0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="delaySlots" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="guardLatency" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="FunctionUnit">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -72,10 +70,8 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="connectedSocket" eType="#//Socket"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="trigger" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
-        defaultValueLiteral="false"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="setsOpcode" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
-        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="trigger" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="setsOpcode" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Socket">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -89,8 +85,7 @@
         eType="#//Element"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="portToIndexMap" upperBound="-1"
         eType="#//portToIndexMapEntry" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="control" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
-        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="control" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AddressSpace">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -98,7 +93,6 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="minAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Guard"/>
   <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" interface="true">
     <eOperations name="isReads" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eOperations name="isWrites" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
@@ -124,6 +118,29 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="extension" eType="#//Extension"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Guard" abstract="true" interface="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprUnary" eSuperTypes="#//Guard">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="operator" eType="#//OpUnary"
+        defaultValueLiteral=""/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="term" eType="#//Term"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprBinary" eSuperTypes="#//Guard">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="operator" eType="#//OpBinary"
+        defaultValueLiteral=""/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="e1" eType="#//ExprUnary"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="e2" eType="#//ExprUnary"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprTrue" eSuperTypes="#//Guard"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ExprFalse" eSuperTypes="#//Guard"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Term" abstract="true" interface="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TermBool" eSuperTypes="#//Term">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="register" eType="#//RegisterFile"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="index" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TermUnit" eSuperTypes="#//Term">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="functionUnit" eType="#//FunctionUnit"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="port" eType="#//Port"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="SocketType">
     <eLiterals name="input"/>
     <eLiterals name="output" value="1" literal="output"/>
@@ -131,5 +148,13 @@
   <eClassifiers xsi:type="ecore:EEnum" name="Extension">
     <eLiterals name="sign" literal="sign"/>
     <eLiterals name="zero" value="1" literal="zero"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="OpUnary">
+    <eLiterals name="simple"/>
+    <eLiterals name="inverted" value="1" literal=""/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="OpBinary">
+    <eLiterals name="and"/>
+    <eLiterals name="or" value="1"/>
   </eClassifiers>
 </ecore:EPackage>

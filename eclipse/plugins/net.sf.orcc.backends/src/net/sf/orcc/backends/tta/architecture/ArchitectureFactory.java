@@ -113,15 +113,6 @@ public interface ArchitectureFactory extends EFactory {
 	AddressSpace createAddressSpace();
 
 	/**
-	 * Returns a new object of class '<em>Guard</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Guard</em>'.
-	 * @generated
-	 */
-	Guard createGuard();
-
-	/**
 	 * Returns a new object of class '<em>Reads</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -156,6 +147,60 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	ShortImmediate createShortImmediate();
+
+	/**
+	 * Returns a new object of class '<em>Expr Unary</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Unary</em>'.
+	 * @generated
+	 */
+	ExprUnary createExprUnary();
+
+	/**
+	 * Returns a new object of class '<em>Expr Binary</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr Binary</em>'.
+	 * @generated
+	 */
+	ExprBinary createExprBinary();
+
+	/**
+	 * Returns a new object of class '<em>Expr True</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr True</em>'.
+	 * @generated
+	 */
+	ExprTrue createExprTrue();
+
+	/**
+	 * Returns a new object of class '<em>Expr False</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Expr False</em>'.
+	 * @generated
+	 */
+	ExprFalse createExprFalse();
+
+	/**
+	 * Returns a new object of class '<em>Term Bool</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Term Bool</em>'.
+	 * @generated
+	 */
+	TermBool createTermBool();
+
+	/**
+	 * Returns a new object of class '<em>Term Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Term Unit</em>'.
+	 * @generated
+	 */
+	TermUnit createTermUnit();
 
 	/**
 	 * Returns a new object of class '<em>Port</em>'.
