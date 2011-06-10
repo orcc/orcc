@@ -97,10 +97,56 @@ registerFile() ::= <<
   \</register-file\>
 >>
 
-adressSpace() ::= <<
+adressSpaces() ::= <<
+\<address-space name="data"\>
+	\<width\>8\</width\>
+	\<min-address\>0\</min-address\>
+	\<max-address\>131071\</max-address\>
+\</address-space\>
 
+\<address-space name="instructions"\>
+	\<width\>8\</width\>
+	\<min-address\>0\</min-address\>
+	\<max-address\>8191\</max-address\>
+\</address-space\>
 >>
 
 globalControlUnit() ::= <<
-
+\<global-control-unit name="gcu"\>
+	\<port name="pc"\>
+		\<connects-to\>gcu_i1\</connects-to\>
+		\<width\>13\</width\>
+		\<triggers/\>
+		\<sets-opcode/\>
+	\</port\>
+	\<special-port name="ra"\>
+		\<connects-to\>gcu_i2\</connects-to\>
+		\<connects-to\>gcu_o1\</connects-to\>
+		\<width\>13\</width\>
+	\</special-port\>
+	\<return-address\>ra\</return-address\>
+	\<ctrl-operation\>
+		\<name\>jump\</name\>
+		\<bind name="1"\>pc\</bind\>
+		\<pipeline\>
+			\<reads name="1"\>
+				\<start-cycle\>0\</start-cycle\>
+				\<cycles\>1\</cycles\>
+			\</reads\>
+		\</pipeline\>
+	\</ctrl-operation\>
+	\<ctrl-operation\>
+		\<name\>call\</name\>
+		\<bind name="1"\>pc\</bind\>
+		\<pipeline\>
+			\<reads name="1"\>
+				\<start-cycle\>0\</start-cycle\>
+				\<cycles\>1\</cycles\>
+			\</reads\>
+		\</pipeline\>
+	\</ctrl-operation\>
+	\<address-space\>instructions\</address-space\>
+	\<delay-slots\>3\</delay-slots\>
+	\<guard-latency\>1\</guard-latency\>
+\</global-control-unit\>
 >>
