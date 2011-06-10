@@ -1,0 +1,106 @@
+
+processor(instance, options) ::= <<
+\<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
+\<adf version="1.7"\>
+
+\</adf\>
+>>
+
+bus(index) ::= <<
+\<bus name="B<index>"\>
+	\<width\>32\</width\>
+	\<guard\>
+		\<always-true/\>
+	\</guard\>
+	\<guard\>
+		\<simple-expr\>
+			\<bool\>
+				\<name\>BOOL\</name\>
+				\<index\>0\</index\>
+			\</bool\>
+		\</simple-expr\>
+	\</guard\>
+	\<guard\>
+		\<inverted-expr\>
+			\<bool\>
+				\<name\>BOOL\</name\>
+				\<index\>0\</index\>
+			\</bool\>
+		\</inverted-expr\>
+	\</guard\>
+	\<guard\>
+		\<simple-expr\>
+			\<bool\>
+				\<name\>BOOL\</name\>
+				\<index\>1\</index\>
+			\</bool\>
+		\</simple-expr\>
+	\</guard\>
+	\<guard\>
+		\<inverted-expr\>
+			\<bool\>
+				\<name\>BOOL\</name\>
+				\<index\>1\</index\>
+			\</bool\>
+		\</inverted-expr\>
+	\</guard\>
+	\<segment name="seg1"\>
+		\<writes-to/\>
+	\</segment\>
+	\<short-immediate\>
+		\<extension\>zero\</extension\>
+		\<width\>32\</width\>
+	\</short-immediate\>
+\</bus\>
+>>
+
+socket(socket) ::= <<
+\<socket name="<socket.name>"\>
+	<socket.inputs: socketRead()>
+	<socket.outputs: socketWrite()>
+\</socket\>
+>>
+
+socketRead(input) ::= <<
+\<reads-from\>
+	\<bus\><input.bus.name>\</bus\>
+	\<segment\><input.segment.name>\</segment\>
+\</reads-from\>
+>>
+
+socketWrite(output) ::= <<
+\<writes-to\>
+	\<bus\><output.bus.name>\</bus\>
+	\<segment\><output.segment.name>\</segment\>
+\</writes-to\>
+>>
+
+functionUnit() ::= <<
+\<function-unit name="LSU"\>
+
+\</function-unit\>
+>>
+
+registerFile() ::= <<
+\<register-file name="RF_2"\>
+    \<type\>normal\</type\>
+    \<size\>12\</size\>
+    \<width\>32\</width\>
+    \<max-reads\>1\</max-reads\>
+    \<max-writes\>1\</max-writes\>
+    \<port name="wr"\>
+      \<connects-to\>RF_i1\</connects-to\>
+    \</port\>
+    \<port name="rd"\>
+      \<connects-to\>RF_o1\</connects-to\>
+    \</port\>
+  \</register-file\>
+>>
+
+adressSpace() ::= <<
+
+>>
+
+globalControlUnit() ::= <<
+
+>>

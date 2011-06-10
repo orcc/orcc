@@ -161,10 +161,19 @@ public class TTABackendImpl extends AbstractBackend {
 	}
 
 	private void printProcessor(Instance instance) {
-		InstancePrinter printer = new InstancePrinter("TTA_processor",
+		InstancePrinter vhdlPrinter = new InstancePrinter("TTA_processor_vhdl",
 				!debugMode, true);
-		printer.print("processor_" + instance.getId() + ".vhd", path, instance,
-				"processor");
+		InstancePrinter adfPrinter = new InstancePrinter("TTA_processor_vhdl",
+				!debugMode, true);
+		InstancePrinter idfPrinter = new InstancePrinter("TTA_processor_vhdl",
+				!debugMode, true);
+		vhdlPrinter.print("processor_" + instance.getId() + ".vhd", path,
+				instance, "processor");
+		adfPrinter.print("processor_" + instance.getId() + ".adf", path,
+				instance, "processor");
+		idfPrinter.print("processor_" + instance.getId() + ".idf", path,
+				instance, "processor");
+
 	}
 
 }

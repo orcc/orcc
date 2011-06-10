@@ -149,6 +149,10 @@ public class TTAActorTemplateData {
 		computePortToIndexByPatternMap(actor);
 		computePortToIndexMap(actor);
 	}
+	
+	public void computeRamSize(Actor actor) {
+		
+	}
 
 	public Map<Var, Var> getCastedListReferences() {
 		return castedListReferences;
