@@ -306,7 +306,7 @@ entry:
 <if(action.outputPattern)>
 	<action.outputPattern.variables: variableDeclaration()>
 <endif>
-<printNodes(action.body.nodes, [])>
+<printNodes(action.body.nodes, false)>
 <if(action.outputPattern)>
 	<printWriteCalls(action.outputPattern)>
 <endif>
