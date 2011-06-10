@@ -113,7 +113,6 @@ public interface Operation extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Control</b></em>' attribute.
-	 * The default value is <code>"false"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Control</em>' attribute isn't clear,
@@ -123,7 +122,7 @@ public interface Operation extends EObject {
 	 * @return the value of the '<em>Control</em>' attribute.
 	 * @see #setControl(boolean)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getOperation_Control()
-	 * @model default="false"
+	 * @model
 	 * @generated
 	 */
 	boolean isControl();

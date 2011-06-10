@@ -131,7 +131,6 @@ public interface Port extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Trigger</b></em>' attribute.
-	 * The default value is <code>"false"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Trigger</em>' attribute isn't clear,
@@ -141,7 +140,7 @@ public interface Port extends EObject {
 	 * @return the value of the '<em>Trigger</em>' attribute.
 	 * @see #setTrigger(boolean)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_Trigger()
-	 * @model default="false"
+	 * @model
 	 * @generated
 	 */
 	boolean isTrigger();
@@ -158,7 +157,6 @@ public interface Port extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Sets Opcode</b></em>' attribute.
-	 * The default value is <code>"false"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Sets Opcode</em>' attribute isn't clear,
@@ -168,7 +166,7 @@ public interface Port extends EObject {
 	 * @return the value of the '<em>Sets Opcode</em>' attribute.
 	 * @see #setSetsOpcode(boolean)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_SetsOpcode()
-	 * @model default="false"
+	 * @model
 	 * @generated
 	 */
 	boolean isSetsOpcode();

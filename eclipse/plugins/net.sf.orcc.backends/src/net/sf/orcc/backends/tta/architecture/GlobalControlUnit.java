@@ -140,7 +140,6 @@ public interface GlobalControlUnit extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Delay Slots</b></em>' attribute.
-	 * The default value is <code>"0"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Delay Slots</em>' attribute isn't clear,
@@ -150,7 +149,7 @@ public interface GlobalControlUnit extends EObject {
 	 * @return the value of the '<em>Delay Slots</em>' attribute.
 	 * @see #setDelaySlots(int)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_DelaySlots()
-	 * @model default="0"
+	 * @model
 	 * @generated
 	 */
 	int getDelaySlots();
@@ -167,7 +166,6 @@ public interface GlobalControlUnit extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Guard Latency</b></em>' attribute.
-	 * The default value is <code>"0"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Guard Latency</em>' attribute isn't clear,
@@ -177,7 +175,7 @@ public interface GlobalControlUnit extends EObject {
 	 * @return the value of the '<em>Guard Latency</em>' attribute.
 	 * @see #setGuardLatency(int)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_GuardLatency()
-	 * @model default="0"
+	 * @model
 	 * @generated
 	 */
 	int getGuardLatency();
