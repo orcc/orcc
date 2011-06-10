@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/net.sf.orcc.backends/src"
+    modelPluginID="net.sf.orcc.backends" modelName="TTA" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false">
+  <foreignModel>TTA.ecore</foreignModel>
+  <genPackages prefix="Architecture" basePackage="net.sf.orcc.backends.tta" disposableProviderFactory="true"
+      ecorePackage="TTA.ecore#/">
+    <genClasses ecoreClass="TTA.ecore#//TTA">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//TTA/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/buses"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/sockets"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/functionalUnits"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/registerFiles"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/program"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//TTA/data"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//Bus">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Bus/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Bus/width"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//GlobalControlUnit">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//GlobalControlUnit/ports"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//GlobalControlUnit/program"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//GlobalControlUnit/operations"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//GlobalControlUnit/delaySlots"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//GlobalControlUnit/guardLatency"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//FunctionalUnit">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//FunctionalUnit/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//FunctionalUnit/operations"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//FunctionalUnit/ports"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//RegisterFile">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//RegisterFile/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//RegisterFile/size"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//RegisterFile/width"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//RegisterFile/maxReads"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//RegisterFile/maxWrites"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference TTA.ecore#//RegisterFile/ports"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//Port">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Port/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference TTA.ecore#//Port/connectedSocket"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Port/width"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//Socket">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Socket/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//Operation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//Operation/name"/>
+    </genClasses>
+    <genClasses ecoreClass="TTA.ecore#//OperationCtrl"/>
+    <genClasses ecoreClass="TTA.ecore#//AdressSpace">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//AdressSpace/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute TTA.ecore#//AdressSpace/width"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
