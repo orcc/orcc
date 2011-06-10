@@ -58,8 +58,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getSize <em>Size</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getWidth <em>Width</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getMaxReads <em>Max Reads</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getMaxWrites <em>Max Writes</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getPorts <em>Ports</em>}</li>
  * </ul>
  * </p>
@@ -126,46 +124,6 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 * @ordered
 	 */
 	protected int width = WIDTH_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getMaxReads() <em>Max Reads</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMaxReads()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int MAX_READS_EDEFAULT = 0;
-
-	/**
-	 * The cached value of the '{@link #getMaxReads() <em>Max Reads</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMaxReads()
-	 * @generated
-	 * @ordered
-	 */
-	protected int maxReads = MAX_READS_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getMaxWrites() <em>Max Writes</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMaxWrites()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int MAX_WRITES_EDEFAULT = 0;
-
-	/**
-	 * The cached value of the '{@link #getMaxWrites() <em>Max Writes</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getMaxWrites()
-	 * @generated
-	 * @ordered
-	 */
-	protected int maxWrites = MAX_WRITES_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getPorts() <em>Ports</em>}' containment reference list.
@@ -264,48 +222,6 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getMaxReads() {
-		return maxReads;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setMaxReads(int newMaxReads) {
-		int oldMaxReads = maxReads;
-		maxReads = newMaxReads;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.REGISTER_FILE__MAX_READS, oldMaxReads, maxReads));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getMaxWrites() {
-		return maxWrites;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setMaxWrites(int newMaxWrites) {
-		int oldMaxWrites = maxWrites;
-		maxWrites = newMaxWrites;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.REGISTER_FILE__MAX_WRITES, oldMaxWrites, maxWrites));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EList<Port> getPorts() {
 		if (ports == null) {
 			ports = new EObjectContainmentEList<Port>(Port.class, this, ArchitecturePackage.REGISTER_FILE__PORTS);
@@ -341,10 +257,6 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 				return getSize();
 			case ArchitecturePackage.REGISTER_FILE__WIDTH:
 				return getWidth();
-			case ArchitecturePackage.REGISTER_FILE__MAX_READS:
-				return getMaxReads();
-			case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
-				return getMaxWrites();
 			case ArchitecturePackage.REGISTER_FILE__PORTS:
 				return getPorts();
 		}
@@ -368,12 +280,6 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 				return;
 			case ArchitecturePackage.REGISTER_FILE__WIDTH:
 				setWidth((Integer)newValue);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__MAX_READS:
-				setMaxReads((Integer)newValue);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
-				setMaxWrites((Integer)newValue);
 				return;
 			case ArchitecturePackage.REGISTER_FILE__PORTS:
 				getPorts().clear();
@@ -400,12 +306,6 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 			case ArchitecturePackage.REGISTER_FILE__WIDTH:
 				setWidth(WIDTH_EDEFAULT);
 				return;
-			case ArchitecturePackage.REGISTER_FILE__MAX_READS:
-				setMaxReads(MAX_READS_EDEFAULT);
-				return;
-			case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
-				setMaxWrites(MAX_WRITES_EDEFAULT);
-				return;
 			case ArchitecturePackage.REGISTER_FILE__PORTS:
 				getPorts().clear();
 				return;
@@ -427,10 +327,6 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 				return size != SIZE_EDEFAULT;
 			case ArchitecturePackage.REGISTER_FILE__WIDTH:
 				return width != WIDTH_EDEFAULT;
-			case ArchitecturePackage.REGISTER_FILE__MAX_READS:
-				return maxReads != MAX_READS_EDEFAULT;
-			case ArchitecturePackage.REGISTER_FILE__MAX_WRITES:
-				return maxWrites != MAX_WRITES_EDEFAULT;
 			case ArchitecturePackage.REGISTER_FILE__PORTS:
 				return ports != null && !ports.isEmpty();
 		}
@@ -453,10 +349,6 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 		result.append(size);
 		result.append(", width: ");
 		result.append(width);
-		result.append(", maxReads: ");
-		result.append(maxReads);
-		result.append(", maxWrites: ");
-		result.append(maxWrites);
 		result.append(')');
 		return result.toString();
 	}

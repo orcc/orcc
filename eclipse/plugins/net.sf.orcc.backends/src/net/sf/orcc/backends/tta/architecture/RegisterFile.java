@@ -43,8 +43,6 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getSize <em>Size</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getWidth <em>Width</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxReads <em>Max Reads</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxWrites <em>Max Writes</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getPorts <em>Ports</em>}</li>
  * </ul>
  * </p>
@@ -131,58 +129,6 @@ public interface RegisterFile extends EObject {
 	 * @generated
 	 */
 	void setWidth(int value);
-
-	/**
-	 * Returns the value of the '<em><b>Max Reads</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Max Reads</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Max Reads</em>' attribute.
-	 * @see #setMaxReads(int)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getRegisterFile_MaxReads()
-	 * @model
-	 * @generated
-	 */
-	int getMaxReads();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxReads <em>Max Reads</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Max Reads</em>' attribute.
-	 * @see #getMaxReads()
-	 * @generated
-	 */
-	void setMaxReads(int value);
-
-	/**
-	 * Returns the value of the '<em><b>Max Writes</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Max Writes</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Max Writes</em>' attribute.
-	 * @see #setMaxWrites(int)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getRegisterFile_MaxWrites()
-	 * @model
-	 * @generated
-	 */
-	int getMaxWrites();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxWrites <em>Max Writes</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Max Writes</em>' attribute.
-	 * @see #getMaxWrites()
-	 * @generated
-	 */
-	void setMaxWrites(int value);
 
 	/**
 	 * Returns the value of the '<em><b>Ports</b></em>' containment reference list.

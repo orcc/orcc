@@ -130,8 +130,8 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 				return createOperationCtrlAdapter();
 			}
 			@Override
-			public Adapter caseAdressSpace(AdressSpace object) {
-				return createAdressSpaceAdapter();
+			public Adapter caseAddressSpace(AddressSpace object) {
+				return createAddressSpaceAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -280,16 +280,16 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.AdressSpace <em>Adress Space</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.AddressSpace <em>Address Space</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.tta.architecture.AdressSpace
+	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace
 	 * @generated
 	 */
-	public Adapter createAdressSpaceAdapter() {
+	public Adapter createAddressSpaceAdapter() {
 		return null;
 	}
 

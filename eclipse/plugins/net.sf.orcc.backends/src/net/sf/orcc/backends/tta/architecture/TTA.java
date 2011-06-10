@@ -154,12 +154,12 @@ public interface TTA extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Program</em>' containment reference.
-	 * @see #setProgram(AdressSpace)
+	 * @see #setProgram(AddressSpace)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTTA_Program()
 	 * @model containment="true"
 	 * @generated
 	 */
-	AdressSpace getProgram();
+	AddressSpace getProgram();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.TTA#getProgram <em>Program</em>}' containment reference.
@@ -169,7 +169,7 @@ public interface TTA extends EObject {
 	 * @see #getProgram()
 	 * @generated
 	 */
-	void setProgram(AdressSpace value);
+	void setProgram(AddressSpace value);
 
 	/**
 	 * Returns the value of the '<em><b>Data</b></em>' containment reference.
@@ -180,12 +180,12 @@ public interface TTA extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Data</em>' containment reference.
-	 * @see #setData(AdressSpace)
+	 * @see #setData(AddressSpace)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTTA_Data()
 	 * @model containment="true"
 	 * @generated
 	 */
-	AdressSpace getData();
+	AddressSpace getData();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.TTA#getData <em>Data</em>}' containment reference.
@@ -195,6 +195,6 @@ public interface TTA extends EObject {
 	 * @see #getData()
 	 * @generated
 	 */
-	void setData(AdressSpace value);
+	void setData(AddressSpace value);
 
 } // TTA

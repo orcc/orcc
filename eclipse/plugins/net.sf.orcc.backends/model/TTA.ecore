@@ -13,9 +13,9 @@
         eType="#//FunctionalUnit" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="registerFiles" upperBound="-1"
         eType="#//RegisterFile" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="program" eType="#//AdressSpace"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="program" eType="#//AddressSpace"
         containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="data" eType="#//AdressSpace"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="data" eType="#//AddressSpace"
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Bus">
@@ -25,7 +25,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="GlobalControlUnit">
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port" transient="true" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="program" eType="#//AdressSpace"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="program" eType="#//AddressSpace"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="operations" eType="#//OperationCtrl"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="delaySlots" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="guardLatency" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
@@ -41,8 +41,6 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxReads" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxWrites" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port" transient="true" containment="true"/>
   </eClassifiers>
@@ -58,8 +56,10 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="OperationCtrl" eSuperTypes="#//Operation"/>
-  <eClassifiers xsi:type="ecore:EClass" name="AdressSpace">
+  <eClassifiers xsi:type="ecore:EClass" name="AddressSpace">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="minAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
 </ecore:EPackage>

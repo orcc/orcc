@@ -78,12 +78,12 @@ public interface GlobalControlUnit extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Program</em>' reference.
-	 * @see #setProgram(AdressSpace)
+	 * @see #setProgram(AddressSpace)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_Program()
 	 * @model
 	 * @generated
 	 */
-	AdressSpace getProgram();
+	AddressSpace getProgram();
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getProgram <em>Program</em>}' reference.
@@ -93,7 +93,7 @@ public interface GlobalControlUnit extends EObject {
 	 * @see #getProgram()
 	 * @generated
 	 */
-	void setProgram(AdressSpace value);
+	void setProgram(AddressSpace value);
 
 	/**
 	 * Returns the value of the '<em><b>Operations</b></em>' reference.

@@ -348,31 +348,13 @@ public interface ArchitecturePackage extends EPackage {
 	int REGISTER_FILE__WIDTH = 2;
 
 	/**
-	 * The feature id for the '<em><b>Max Reads</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int REGISTER_FILE__MAX_READS = 3;
-
-	/**
-	 * The feature id for the '<em><b>Max Writes</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int REGISTER_FILE__MAX_WRITES = 4;
-
-	/**
 	 * The feature id for the '<em><b>Ports</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int REGISTER_FILE__PORTS = 5;
+	int REGISTER_FILE__PORTS = 3;
 
 	/**
 	 * The number of structural features of the '<em>Register File</em>' class.
@@ -381,7 +363,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int REGISTER_FILE_FEATURE_COUNT = 6;
+	int REGISTER_FILE_FEATURE_COUNT = 4;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl <em>Port</em>}' class.
@@ -514,14 +496,14 @@ public interface ArchitecturePackage extends EPackage {
 	int OPERATION_CTRL_FEATURE_COUNT = OPERATION_FEATURE_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.AdressSpaceImpl <em>Adress Space</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl <em>Address Space</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.impl.AdressSpaceImpl
-	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getAdressSpace()
+	 * @see net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getAddressSpace()
 	 * @generated
 	 */
-	int ADRESS_SPACE = 9;
+	int ADDRESS_SPACE = 9;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -530,7 +512,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ADRESS_SPACE__NAME = 0;
+	int ADDRESS_SPACE__NAME = 0;
 
 	/**
 	 * The feature id for the '<em><b>Width</b></em>' attribute.
@@ -539,17 +521,34 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ADRESS_SPACE__WIDTH = 1;
+	int ADDRESS_SPACE__WIDTH = 1;
 
 	/**
-	 * The number of structural features of the '<em>Adress Space</em>' class.
+	 * The feature id for the '<em><b>Min Address</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ADRESS_SPACE_FEATURE_COUNT = 2;
+	int ADDRESS_SPACE__MIN_ADDRESS = 2;
 
+	/**
+	 * The feature id for the '<em><b>Max Address</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ADDRESS_SPACE__MAX_ADDRESS = 3;
+
+	/**
+	 * The number of structural features of the '<em>Address Space</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ADDRESS_SPACE_FEATURE_COUNT = 4;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TTA <em>TTA</em>}'.
@@ -822,28 +821,6 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getRegisterFile_Width();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxReads <em>Max Reads</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Max Reads</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxReads()
-	 * @see #getRegisterFile()
-	 * @generated
-	 */
-	EAttribute getRegisterFile_MaxReads();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxWrites <em>Max Writes</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Max Writes</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxWrites()
-	 * @see #getRegisterFile()
-	 * @generated
-	 */
-	EAttribute getRegisterFile_MaxWrites();
-
-	/**
 	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getPorts <em>Ports</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -950,36 +927,58 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getOperationCtrl();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.AdressSpace <em>Adress Space</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.AddressSpace <em>Address Space</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Adress Space</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.AdressSpace
+	 * @return the meta object for class '<em>Address Space</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace
 	 * @generated
 	 */
-	EClass getAdressSpace();
+	EClass getAddressSpace();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AdressSpace#getName <em>Name</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getName <em>Name</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.AdressSpace#getName()
-	 * @see #getAdressSpace()
+	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getName()
+	 * @see #getAddressSpace()
 	 * @generated
 	 */
-	EAttribute getAdressSpace_Name();
+	EAttribute getAddressSpace_Name();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AdressSpace#getWidth <em>Width</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth <em>Width</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Width</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.AdressSpace#getWidth()
-	 * @see #getAdressSpace()
+	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth()
+	 * @see #getAddressSpace()
 	 * @generated
 	 */
-	EAttribute getAdressSpace_Width();
+	EAttribute getAddressSpace_Width();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getMinAddress <em>Min Address</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Min Address</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getMinAddress()
+	 * @see #getAddressSpace()
+	 * @generated
+	 */
+	EAttribute getAddressSpace_MinAddress();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getMaxAddress <em>Max Address</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Max Address</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getMaxAddress()
+	 * @see #getAddressSpace()
+	 * @generated
+	 */
+	EAttribute getAddressSpace_MaxAddress();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -1214,22 +1213,6 @@ public interface ArchitecturePackage extends EPackage {
 		EAttribute REGISTER_FILE__WIDTH = eINSTANCE.getRegisterFile_Width();
 
 		/**
-		 * The meta object literal for the '<em><b>Max Reads</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute REGISTER_FILE__MAX_READS = eINSTANCE.getRegisterFile_MaxReads();
-
-		/**
-		 * The meta object literal for the '<em><b>Max Writes</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute REGISTER_FILE__MAX_WRITES = eINSTANCE.getRegisterFile_MaxWrites();
-
-		/**
 		 * The meta object literal for the '<em><b>Ports</b></em>' containment reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -1318,14 +1301,14 @@ public interface ArchitecturePackage extends EPackage {
 		EClass OPERATION_CTRL = eINSTANCE.getOperationCtrl();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.AdressSpaceImpl <em>Adress Space</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl <em>Address Space</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.tta.architecture.impl.AdressSpaceImpl
-		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getAdressSpace()
+		 * @see net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getAddressSpace()
 		 * @generated
 		 */
-		EClass ADRESS_SPACE = eINSTANCE.getAdressSpace();
+		EClass ADDRESS_SPACE = eINSTANCE.getAddressSpace();
 
 		/**
 		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
@@ -1333,7 +1316,7 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ADRESS_SPACE__NAME = eINSTANCE.getAdressSpace_Name();
+		EAttribute ADDRESS_SPACE__NAME = eINSTANCE.getAddressSpace_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
@@ -1341,7 +1324,23 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ADRESS_SPACE__WIDTH = eINSTANCE.getAdressSpace_Width();
+		EAttribute ADDRESS_SPACE__WIDTH = eINSTANCE.getAddressSpace_Width();
+
+		/**
+		 * The meta object literal for the '<em><b>Min Address</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ADDRESS_SPACE__MIN_ADDRESS = eINSTANCE.getAddressSpace_MinAddress();
+
+		/**
+		 * The meta object literal for the '<em><b>Max Address</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ADDRESS_SPACE__MAX_ADDRESS = eINSTANCE.getAddressSpace_MaxAddress();
 
 	}
 

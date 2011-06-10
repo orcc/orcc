@@ -164,9 +164,9 @@ public class ArchitectureSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ArchitecturePackage.ADRESS_SPACE: {
-				AdressSpace adressSpace = (AdressSpace)theEObject;
-				T result = caseAdressSpace(adressSpace);
+			case ArchitecturePackage.ADDRESS_SPACE: {
+				AddressSpace addressSpace = (AddressSpace)theEObject;
+				T result = caseAddressSpace(addressSpace);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -310,17 +310,17 @@ public class ArchitectureSwitch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Adress Space</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Address Space</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Adress Space</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Address Space</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseAdressSpace(AdressSpace object) {
+	public T caseAddressSpace(AddressSpace object) {
 		return null;
 	}
 
