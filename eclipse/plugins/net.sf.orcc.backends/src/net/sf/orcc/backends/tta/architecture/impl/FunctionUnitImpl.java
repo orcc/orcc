@@ -1,37 +1,16 @@
-/*
- * Copyright (c) 2011, IRISA
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *   * Neither the name of IRISA nor the names of its
- *     contributors may be used to endorse or promote products derived from this
- *     software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+/**
+ * <copyright>
+ * </copyright>
+ *
+ * $Id$
  */
 package net.sf.orcc.backends.tta.architecture.impl;
 
 import java.util.Collection;
 
+import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
-import net.sf.orcc.backends.tta.architecture.FunctionalUnit;
+import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
 
@@ -51,20 +30,21 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Functional Unit</b></em>'.
+ * An implementation of the model object '<em><b>Function Unit</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionalUnitImpl#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionalUnitImpl#getOperations <em>Operations</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionalUnitImpl#getPorts <em>Ports</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl#getOperations <em>Operations</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl#getPorts <em>Ports</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl#getAddressSpace <em>Address Space</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
+public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -106,11 +86,21 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 	protected EList<Port> ports;
 
 	/**
+	 * The cached value of the '{@link #getAddressSpace() <em>Address Space</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getAddressSpace()
+	 * @generated
+	 * @ordered
+	 */
+	protected AddressSpace addressSpace;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected FunctionalUnitImpl() {
+	protected FunctionUnitImpl() {
 		super();
 	}
 
@@ -121,7 +111,7 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return ArchitecturePackage.Literals.FUNCTIONAL_UNIT;
+		return ArchitecturePackage.Literals.FUNCTION_UNIT;
 	}
 
 	/**
@@ -142,7 +132,7 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.FUNCTIONAL_UNIT__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.FUNCTION_UNIT__NAME, oldName, name));
 	}
 
 	/**
@@ -152,7 +142,7 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 	 */
 	public EList<Operation> getOperations() {
 		if (operations == null) {
-			operations = new EObjectContainmentEList<Operation>(Operation.class, this, ArchitecturePackage.FUNCTIONAL_UNIT__OPERATIONS);
+			operations = new EObjectContainmentEList<Operation>(Operation.class, this, ArchitecturePackage.FUNCTION_UNIT__OPERATIONS);
 		}
 		return operations;
 	}
@@ -164,9 +154,47 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 	 */
 	public EList<Port> getPorts() {
 		if (ports == null) {
-			ports = new EObjectContainmentEList<Port>(Port.class, this, ArchitecturePackage.FUNCTIONAL_UNIT__PORTS);
+			ports = new EObjectContainmentEList<Port>(Port.class, this, ArchitecturePackage.FUNCTION_UNIT__PORTS);
 		}
 		return ports;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public AddressSpace getAddressSpace() {
+		if (addressSpace != null && addressSpace.eIsProxy()) {
+			InternalEObject oldAddressSpace = (InternalEObject)addressSpace;
+			addressSpace = (AddressSpace)eResolveProxy(oldAddressSpace);
+			if (addressSpace != oldAddressSpace) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE, oldAddressSpace, addressSpace));
+			}
+		}
+		return addressSpace;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public AddressSpace basicGetAddressSpace() {
+		return addressSpace;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setAddressSpace(AddressSpace newAddressSpace) {
+		AddressSpace oldAddressSpace = addressSpace;
+		addressSpace = newAddressSpace;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE, oldAddressSpace, addressSpace));
 	}
 
 	/**
@@ -177,9 +205,9 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case ArchitecturePackage.FUNCTIONAL_UNIT__OPERATIONS:
+			case ArchitecturePackage.FUNCTION_UNIT__OPERATIONS:
 				return ((InternalEList<?>)getOperations()).basicRemove(otherEnd, msgs);
-			case ArchitecturePackage.FUNCTIONAL_UNIT__PORTS:
+			case ArchitecturePackage.FUNCTION_UNIT__PORTS:
 				return ((InternalEList<?>)getPorts()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -193,12 +221,15 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case ArchitecturePackage.FUNCTIONAL_UNIT__NAME:
+			case ArchitecturePackage.FUNCTION_UNIT__NAME:
 				return getName();
-			case ArchitecturePackage.FUNCTIONAL_UNIT__OPERATIONS:
+			case ArchitecturePackage.FUNCTION_UNIT__OPERATIONS:
 				return getOperations();
-			case ArchitecturePackage.FUNCTIONAL_UNIT__PORTS:
+			case ArchitecturePackage.FUNCTION_UNIT__PORTS:
 				return getPorts();
+			case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
+				if (resolve) return getAddressSpace();
+				return basicGetAddressSpace();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -212,16 +243,19 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case ArchitecturePackage.FUNCTIONAL_UNIT__NAME:
+			case ArchitecturePackage.FUNCTION_UNIT__NAME:
 				setName((String)newValue);
 				return;
-			case ArchitecturePackage.FUNCTIONAL_UNIT__OPERATIONS:
+			case ArchitecturePackage.FUNCTION_UNIT__OPERATIONS:
 				getOperations().clear();
 				getOperations().addAll((Collection<? extends Operation>)newValue);
 				return;
-			case ArchitecturePackage.FUNCTIONAL_UNIT__PORTS:
+			case ArchitecturePackage.FUNCTION_UNIT__PORTS:
 				getPorts().clear();
 				getPorts().addAll((Collection<? extends Port>)newValue);
+				return;
+			case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
+				setAddressSpace((AddressSpace)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -235,14 +269,17 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.FUNCTIONAL_UNIT__NAME:
+			case ArchitecturePackage.FUNCTION_UNIT__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case ArchitecturePackage.FUNCTIONAL_UNIT__OPERATIONS:
+			case ArchitecturePackage.FUNCTION_UNIT__OPERATIONS:
 				getOperations().clear();
 				return;
-			case ArchitecturePackage.FUNCTIONAL_UNIT__PORTS:
+			case ArchitecturePackage.FUNCTION_UNIT__PORTS:
 				getPorts().clear();
+				return;
+			case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
+				setAddressSpace((AddressSpace)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -256,12 +293,14 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case ArchitecturePackage.FUNCTIONAL_UNIT__NAME:
+			case ArchitecturePackage.FUNCTION_UNIT__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case ArchitecturePackage.FUNCTIONAL_UNIT__OPERATIONS:
+			case ArchitecturePackage.FUNCTION_UNIT__OPERATIONS:
 				return operations != null && !operations.isEmpty();
-			case ArchitecturePackage.FUNCTIONAL_UNIT__PORTS:
+			case ArchitecturePackage.FUNCTION_UNIT__PORTS:
 				return ports != null && !ports.isEmpty();
+			case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
+				return addressSpace != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -282,4 +321,4 @@ public class FunctionalUnitImpl extends EObjectImpl implements FunctionalUnit {
 		return result.toString();
 	}
 
-} //FunctionalUnitImpl
+} //FunctionUnitImpl

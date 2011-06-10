@@ -28,20 +28,32 @@
  */
 package net.sf.orcc.backends.tta.architecture.impl;
 
+import java.util.Map;
+
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.Bridge;
 import net.sf.orcc.backends.tta.architecture.Bus;
-import net.sf.orcc.backends.tta.architecture.FunctionalUnit;
+import net.sf.orcc.backends.tta.architecture.Element;
+import net.sf.orcc.backends.tta.architecture.Extension;
+import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
+import net.sf.orcc.backends.tta.architecture.Guard;
 import net.sf.orcc.backends.tta.architecture.Operation;
-import net.sf.orcc.backends.tta.architecture.OperationCtrl;
 import net.sf.orcc.backends.tta.architecture.Port;
+import net.sf.orcc.backends.tta.architecture.Reads;
 import net.sf.orcc.backends.tta.architecture.RegisterFile;
+import net.sf.orcc.backends.tta.architecture.Resource;
+import net.sf.orcc.backends.tta.architecture.Segment;
+import net.sf.orcc.backends.tta.architecture.ShortImmediate;
 import net.sf.orcc.backends.tta.architecture.Socket;
+import net.sf.orcc.backends.tta.architecture.SocketType;
+import net.sf.orcc.backends.tta.architecture.Writes;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
@@ -49,80 +61,129 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Package</b>. <!--
  * end-user-doc -->
- * 
  * @generated
  */
 public class ArchitecturePackageImpl extends EPackageImpl implements
 		ArchitecturePackage {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private EClass ttaEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private EClass busEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	private EClass bridgeEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass segmentEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	private EClass globalControlUnitEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
-	private EClass functionalUnitEClass = null;
+	private EClass functionUnitEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private EClass registerFileEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private EClass portEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private EClass socketEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private EClass operationEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	private EClass operationCtrlEClass = null;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private EClass addressSpaceEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass guardEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass elementEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass readsEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass writesEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass resourceEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass portToIndexMapEntryEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass shortImmediateEClass = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EEnum socketTypeEEnum = null;
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EEnum extensionEEnum = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -145,7 +206,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private static boolean isInited = false;
@@ -166,14 +226,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public static ArchitecturePackage init() {
-		if (isInited)
-			return (ArchitecturePackage) EPackage.Registry.INSTANCE
-					.getEPackage(ArchitecturePackage.eNS_URI);
+		if (isInited) return (ArchitecturePackage)EPackage.Registry.INSTANCE.getEPackage(ArchitecturePackage.eNS_URI);
 
 		// Obtain or create and register package
-		ArchitecturePackageImpl theArchitecturePackage = (ArchitecturePackageImpl) (EPackage.Registry.INSTANCE
-				.get(eNS_URI) instanceof ArchitecturePackageImpl ? EPackage.Registry.INSTANCE
-				.get(eNS_URI) : new ArchitecturePackageImpl());
+		ArchitecturePackageImpl theArchitecturePackage = (ArchitecturePackageImpl)(EPackage.Registry.INSTANCE.get(eNS_URI) instanceof ArchitecturePackageImpl ? EPackage.Registry.INSTANCE.get(eNS_URI) : new ArchitecturePackageImpl());
 
 		isInited = true;
 
@@ -186,15 +242,14 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		// Mark meta-data to indicate it can't be changed
 		theArchitecturePackage.freeze();
 
+  
 		// Update the registry and return the package
-		EPackage.Registry.INSTANCE.put(ArchitecturePackage.eNS_URI,
-				theArchitecturePackage);
+		EPackage.Registry.INSTANCE.put(ArchitecturePackage.eNS_URI, theArchitecturePackage);
 		return theArchitecturePackage;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EClass getTTA() {
@@ -203,70 +258,78 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getTTA_Name() {
-		return (EAttribute) ttaEClass.getEStructuralFeatures().get(0);
+		return (EAttribute)ttaEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EReference getTTA_Gcu() {
+		return (EReference)ttaEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getTTA_Buses() {
-		return (EReference) ttaEClass.getEStructuralFeatures().get(1);
+		return (EReference)ttaEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EReference getTTA_Bridges() {
+		return (EReference)ttaEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getTTA_Sockets() {
-		return (EReference) ttaEClass.getEStructuralFeatures().get(2);
+		return (EReference)ttaEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
-	public EReference getTTA_FunctionalUnits() {
-		return (EReference) ttaEClass.getEStructuralFeatures().get(3);
+	public EReference getTTA_FunctionUnits() {
+		return (EReference)ttaEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EReference getTTA_RegisterFiles() {
-		return (EReference) ttaEClass.getEStructuralFeatures().get(4);
+		return (EReference)ttaEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EReference getTTA_Program() {
-		return (EReference) ttaEClass.getEStructuralFeatures().get(5);
+		return (EReference)ttaEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EReference getTTA_Data() {
-		return (EReference) ttaEClass.getEStructuralFeatures().get(6);
+		return (EReference)ttaEClass.getEStructuralFeatures().get(8);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EClass getBus() {
@@ -275,25 +338,86 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getBus_Name() {
-		return (EAttribute) busEClass.getEStructuralFeatures().get(0);
+		return (EAttribute)busEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getBus_Width() {
-		return (EAttribute) busEClass.getEStructuralFeatures().get(1);
+		return (EAttribute)busEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EReference getBus_Guards() {
+		return (EReference)busEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBus_Segments() {
+		return (EReference)busEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBus_ShortImmediate() {
+		return (EReference)busEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getBridge() {
+		return bridgeEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBridge_InputBus() {
+		return (EReference)bridgeEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getBridge_OutputBus() {
+		return (EReference)bridgeEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getSegment() {
+		return segmentEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getSegment_Name() {
+		return (EAttribute)segmentEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getGlobalControlUnit() {
@@ -302,96 +426,94 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EReference getGlobalControlUnit_Ports() {
-		return (EReference) globalControlUnitEClass.getEStructuralFeatures()
-				.get(0);
+		return (EReference)globalControlUnitEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
-	public EReference getGlobalControlUnit_Program() {
-		return (EReference) globalControlUnitEClass.getEStructuralFeatures()
-				.get(1);
+	public EReference getGlobalControlUnit_ReturnAddress() {
+		return (EReference)globalControlUnitEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EReference getGlobalControlUnit_AddressSpace() {
+		return (EReference)globalControlUnitEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getGlobalControlUnit_Operations() {
-		return (EReference) globalControlUnitEClass.getEStructuralFeatures()
-				.get(2);
+		return (EReference)globalControlUnitEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getGlobalControlUnit_DelaySlots() {
-		return (EAttribute) globalControlUnitEClass.getEStructuralFeatures()
-				.get(3);
+		return (EAttribute)globalControlUnitEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getGlobalControlUnit_GuardLatency() {
-		return (EAttribute) globalControlUnitEClass.getEStructuralFeatures()
-				.get(4);
+		return (EAttribute)globalControlUnitEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
-	public EClass getFunctionalUnit() {
-		return functionalUnitEClass;
+	public EClass getFunctionUnit() {
+		return functionUnitEClass;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
-	public EAttribute getFunctionalUnit_Name() {
-		return (EAttribute) functionalUnitEClass.getEStructuralFeatures()
-				.get(0);
+	public EAttribute getFunctionUnit_Name() {
+		return (EAttribute)functionUnitEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
-	public EReference getFunctionalUnit_Operations() {
-		return (EReference) functionalUnitEClass.getEStructuralFeatures()
-				.get(1);
+	public EReference getFunctionUnit_Operations() {
+		return (EReference)functionUnitEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
-	public EReference getFunctionalUnit_Ports() {
-		return (EReference) functionalUnitEClass.getEStructuralFeatures()
-				.get(2);
+	public EReference getFunctionUnit_Ports() {
+		return (EReference)functionUnitEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EReference getFunctionUnit_AddressSpace() {
+		return (EReference)functionUnitEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getRegisterFile() {
@@ -400,43 +522,54 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getRegisterFile_Name() {
-		return (EAttribute) registerFileEClass.getEStructuralFeatures().get(0);
+		return (EAttribute)registerFileEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getRegisterFile_Size() {
-		return (EAttribute) registerFileEClass.getEStructuralFeatures().get(1);
+		return (EAttribute)registerFileEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getRegisterFile_Width() {
-		return (EAttribute) registerFileEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)registerFileEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EAttribute getRegisterFile_MaxReads() {
+		return (EAttribute)registerFileEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getRegisterFile_MaxWrites() {
+		return (EAttribute)registerFileEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EReference getRegisterFile_Ports() {
-		return (EReference) registerFileEClass.getEStructuralFeatures().get(3);
+		return (EReference)registerFileEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EClass getPort() {
@@ -445,34 +578,46 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getPort_Name() {
-		return (EAttribute) portEClass.getEStructuralFeatures().get(0);
+		return (EAttribute)portEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EReference getPort_ConnectedSocket() {
-		return (EReference) portEClass.getEStructuralFeatures().get(1);
+		return (EReference)portEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getPort_Width() {
-		return (EAttribute) portEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)portEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EAttribute getPort_Trigger() {
+		return (EAttribute)portEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getPort_SetsOpcode() {
+		return (EAttribute)portEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getSocket() {
@@ -481,16 +626,30 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getSocket_Name() {
-		return (EAttribute) socketEClass.getEStructuralFeatures().get(0);
+		return (EAttribute)socketEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EReference getSocket_ConnectedSegments() {
+		return (EReference)socketEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getSocket_Type() {
+		return (EAttribute)socketEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getOperation() {
@@ -499,25 +658,38 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getOperation_Name() {
-		return (EAttribute) operationEClass.getEStructuralFeatures().get(0);
+		return (EAttribute)operationEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
-	public EClass getOperationCtrl() {
-		return operationCtrlEClass;
+	public EReference getOperation_Pipeline() {
+		return (EReference)operationEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EReference getOperation_PortToIndexMap() {
+		return (EReference)operationEClass.getEStructuralFeatures().get(2);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getOperation_Control() {
+		return (EAttribute)operationEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EClass getAddressSpace() {
@@ -526,74 +698,213 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getAddressSpace_Name() {
-		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(0);
+		return (EAttribute)addressSpaceEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getAddressSpace_Width() {
-		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(1);
+		return (EAttribute)addressSpaceEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getAddressSpace_MinAddress() {
-		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)addressSpaceEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public EAttribute getAddressSpace_MaxAddress() {
-		return (EAttribute) addressSpaceEClass.getEStructuralFeatures().get(3);
+		return (EAttribute)addressSpaceEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * @generated
+	 */
+	public EClass getGuard() {
+		return guardEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getElement() {
+		return elementEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getElement_StartCycle() {
+		return (EAttribute)elementEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getElement_Cycles() {
+		return (EAttribute)elementEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getReads() {
+		return readsEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getReads_Name() {
+		return (EAttribute)readsEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getWrites() {
+		return writesEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getWrites_Name() {
+		return (EAttribute)writesEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getResource() {
+		return resourceEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getResource_Name() {
+		return (EAttribute)resourceEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getportToIndexMapEntry() {
+		return portToIndexMapEntryEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getportToIndexMapEntry_Key() {
+		return (EReference)portToIndexMapEntryEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getportToIndexMapEntry_Value() {
+		return (EAttribute)portToIndexMapEntryEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getShortImmediate() {
+		return shortImmediateEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getShortImmediate_Extension() {
+		return (EAttribute)shortImmediateEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getShortImmediate_Width() {
+		return (EAttribute)shortImmediateEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EEnum getSocketType() {
+		return socketTypeEEnum;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EEnum getExtension() {
+		return extensionEEnum;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public ArchitectureFactory getArchitectureFactory() {
-		return (ArchitectureFactory) getEFactoryInstance();
+		return (ArchitectureFactory)getEFactoryInstance();
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private boolean isCreated = false;
 
 	/**
-	 * Creates the meta-model objects for the package. This method is guarded to
-	 * have no affect on any invocation but its first. <!-- begin-user-doc -->
+	 * Creates the meta-model objects for the package.  This method is
+	 * guarded to have no affect on any invocation but its first.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	public void createPackageContents() {
-		if (isCreated)
-			return;
+		if (isCreated) return;
 		isCreated = true;
 
 		// Create classes and their features
 		ttaEClass = createEClass(TTA);
 		createEAttribute(ttaEClass, TTA__NAME);
+		createEReference(ttaEClass, TTA__GCU);
 		createEReference(ttaEClass, TTA__BUSES);
+		createEReference(ttaEClass, TTA__BRIDGES);
 		createEReference(ttaEClass, TTA__SOCKETS);
-		createEReference(ttaEClass, TTA__FUNCTIONAL_UNITS);
+		createEReference(ttaEClass, TTA__FUNCTION_UNITS);
 		createEReference(ttaEClass, TTA__REGISTER_FILES);
 		createEReference(ttaEClass, TTA__PROGRAM);
 		createEReference(ttaEClass, TTA__DATA);
@@ -601,51 +912,93 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		busEClass = createEClass(BUS);
 		createEAttribute(busEClass, BUS__NAME);
 		createEAttribute(busEClass, BUS__WIDTH);
+		createEReference(busEClass, BUS__GUARDS);
+		createEReference(busEClass, BUS__SEGMENTS);
+		createEReference(busEClass, BUS__SHORT_IMMEDIATE);
+
+		bridgeEClass = createEClass(BRIDGE);
+		createEReference(bridgeEClass, BRIDGE__INPUT_BUS);
+		createEReference(bridgeEClass, BRIDGE__OUTPUT_BUS);
+
+		segmentEClass = createEClass(SEGMENT);
+		createEAttribute(segmentEClass, SEGMENT__NAME);
 
 		globalControlUnitEClass = createEClass(GLOBAL_CONTROL_UNIT);
 		createEReference(globalControlUnitEClass, GLOBAL_CONTROL_UNIT__PORTS);
-		createEReference(globalControlUnitEClass, GLOBAL_CONTROL_UNIT__PROGRAM);
-		createEReference(globalControlUnitEClass,
-				GLOBAL_CONTROL_UNIT__OPERATIONS);
-		createEAttribute(globalControlUnitEClass,
-				GLOBAL_CONTROL_UNIT__DELAY_SLOTS);
-		createEAttribute(globalControlUnitEClass,
-				GLOBAL_CONTROL_UNIT__GUARD_LATENCY);
+		createEReference(globalControlUnitEClass, GLOBAL_CONTROL_UNIT__RETURN_ADDRESS);
+		createEReference(globalControlUnitEClass, GLOBAL_CONTROL_UNIT__ADDRESS_SPACE);
+		createEReference(globalControlUnitEClass, GLOBAL_CONTROL_UNIT__OPERATIONS);
+		createEAttribute(globalControlUnitEClass, GLOBAL_CONTROL_UNIT__DELAY_SLOTS);
+		createEAttribute(globalControlUnitEClass, GLOBAL_CONTROL_UNIT__GUARD_LATENCY);
 
-		functionalUnitEClass = createEClass(FUNCTIONAL_UNIT);
-		createEAttribute(functionalUnitEClass, FUNCTIONAL_UNIT__NAME);
-		createEReference(functionalUnitEClass, FUNCTIONAL_UNIT__OPERATIONS);
-		createEReference(functionalUnitEClass, FUNCTIONAL_UNIT__PORTS);
+		functionUnitEClass = createEClass(FUNCTION_UNIT);
+		createEAttribute(functionUnitEClass, FUNCTION_UNIT__NAME);
+		createEReference(functionUnitEClass, FUNCTION_UNIT__OPERATIONS);
+		createEReference(functionUnitEClass, FUNCTION_UNIT__PORTS);
+		createEReference(functionUnitEClass, FUNCTION_UNIT__ADDRESS_SPACE);
 
 		registerFileEClass = createEClass(REGISTER_FILE);
 		createEAttribute(registerFileEClass, REGISTER_FILE__NAME);
 		createEAttribute(registerFileEClass, REGISTER_FILE__SIZE);
 		createEAttribute(registerFileEClass, REGISTER_FILE__WIDTH);
+		createEAttribute(registerFileEClass, REGISTER_FILE__MAX_READS);
+		createEAttribute(registerFileEClass, REGISTER_FILE__MAX_WRITES);
 		createEReference(registerFileEClass, REGISTER_FILE__PORTS);
 
 		portEClass = createEClass(PORT);
 		createEAttribute(portEClass, PORT__NAME);
 		createEReference(portEClass, PORT__CONNECTED_SOCKET);
 		createEAttribute(portEClass, PORT__WIDTH);
+		createEAttribute(portEClass, PORT__TRIGGER);
+		createEAttribute(portEClass, PORT__SETS_OPCODE);
 
 		socketEClass = createEClass(SOCKET);
 		createEAttribute(socketEClass, SOCKET__NAME);
+		createEReference(socketEClass, SOCKET__CONNECTED_SEGMENTS);
+		createEAttribute(socketEClass, SOCKET__TYPE);
 
 		operationEClass = createEClass(OPERATION);
 		createEAttribute(operationEClass, OPERATION__NAME);
-
-		operationCtrlEClass = createEClass(OPERATION_CTRL);
+		createEReference(operationEClass, OPERATION__PIPELINE);
+		createEReference(operationEClass, OPERATION__PORT_TO_INDEX_MAP);
+		createEAttribute(operationEClass, OPERATION__CONTROL);
 
 		addressSpaceEClass = createEClass(ADDRESS_SPACE);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__NAME);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__WIDTH);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MIN_ADDRESS);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MAX_ADDRESS);
+
+		guardEClass = createEClass(GUARD);
+
+		elementEClass = createEClass(ELEMENT);
+		createEAttribute(elementEClass, ELEMENT__START_CYCLE);
+		createEAttribute(elementEClass, ELEMENT__CYCLES);
+
+		readsEClass = createEClass(READS);
+		createEAttribute(readsEClass, READS__NAME);
+
+		writesEClass = createEClass(WRITES);
+		createEAttribute(writesEClass, WRITES__NAME);
+
+		resourceEClass = createEClass(RESOURCE);
+		createEAttribute(resourceEClass, RESOURCE__NAME);
+
+		portToIndexMapEntryEClass = createEClass(PORT_TO_INDEX_MAP_ENTRY);
+		createEReference(portToIndexMapEntryEClass, PORT_TO_INDEX_MAP_ENTRY__KEY);
+		createEAttribute(portToIndexMapEntryEClass, PORT_TO_INDEX_MAP_ENTRY__VALUE);
+
+		shortImmediateEClass = createEClass(SHORT_IMMEDIATE);
+		createEAttribute(shortImmediateEClass, SHORT_IMMEDIATE__EXTENSION);
+		createEAttribute(shortImmediateEClass, SHORT_IMMEDIATE__WIDTH);
+
+		// Create enums
+		socketTypeEEnum = createEEnum(SOCKET_TYPE);
+		extensionEEnum = createEEnum(EXTENSION);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	private boolean isInitialized = false;
@@ -658,8 +1011,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public void initializePackageContents() {
-		if (isInitialized)
-			return;
+		if (isInitialized) return;
 		isInitialized = true;
 
 		// Initialize package
@@ -672,167 +1024,119 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		// Set bounds for type parameters
 
 		// Add supertypes to classes
-		operationCtrlEClass.getESuperTypes().add(this.getOperation());
+		readsEClass.getESuperTypes().add(this.getElement());
+		writesEClass.getESuperTypes().add(this.getElement());
+		resourceEClass.getESuperTypes().add(this.getElement());
 
 		// Initialize classes and features; add operations and parameters
-		initEClass(ttaEClass, net.sf.orcc.backends.tta.architecture.TTA.class,
-				"TTA", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTTA_Name(), ecorePackage.getEString(), "name", null,
-				0, 1, net.sf.orcc.backends.tta.architecture.TTA.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE,
-				!IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTTA_Buses(), this.getBus(), null, "buses", null, 0,
-				-1, net.sf.orcc.backends.tta.architecture.TTA.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
-				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEReference(getTTA_Sockets(), this.getSocket(), null, "sockets",
-				null, 0, -1, net.sf.orcc.backends.tta.architecture.TTA.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
-				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEReference(getTTA_FunctionalUnits(), this.getFunctionalUnit(),
-				null, "functionalUnits", null, 0, -1,
-				net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTTA_RegisterFiles(), this.getRegisterFile(), null,
-				"registerFiles", null, 0, -1,
-				net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTTA_Program(), this.getAddressSpace(), null,
-				"program", null, 0, 1,
-				net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getTTA_Data(), this.getAddressSpace(), null, "data",
-				null, 0, 1, net.sf.orcc.backends.tta.architecture.TTA.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
-				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
+		initEClass(ttaEClass, net.sf.orcc.backends.tta.architecture.TTA.class, "TTA", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getTTA_Name(), ecorePackage.getEString(), "name", null, 0, 1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTTA_Gcu(), this.getGlobalControlUnit(), null, "gcu", null, 0, 1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTTA_Buses(), this.getBus(), null, "buses", null, 0, -1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTTA_Bridges(), this.getBridge(), null, "bridges", null, 0, -1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTTA_Sockets(), this.getSocket(), null, "sockets", null, 0, -1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTTA_FunctionUnits(), this.getFunctionUnit(), null, "functionUnits", null, 0, -1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTTA_RegisterFiles(), this.getRegisterFile(), null, "registerFiles", null, 0, -1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTTA_Program(), this.getAddressSpace(), null, "program", null, 0, 1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTTA_Data(), this.getAddressSpace(), null, "data", null, 0, 1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(busEClass, Bus.class, "Bus", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getBus_Name(), ecorePackage.getEString(), "name", null,
-				0, 1, Bus.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBus_Width(), ecorePackage.getEInt(), "width", null,
-				0, 1, Bus.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(busEClass, Bus.class, "Bus", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getBus_Name(), ecorePackage.getEString(), "name", null, 0, 1, Bus.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBus_Width(), ecorePackage.getEInt(), "width", null, 0, 1, Bus.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getBus_Guards(), this.getGuard(), null, "guards", null, 0, -1, Bus.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getBus_Segments(), this.getSegment(), null, "segments", null, 0, -1, Bus.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getBus_ShortImmediate(), this.getShortImmediate(), null, "shortImmediate", null, 0, 1, Bus.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(globalControlUnitEClass, GlobalControlUnit.class,
-				"GlobalControlUnit", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getGlobalControlUnit_Ports(), this.getPort(), null,
-				"ports", null, 0, -1, GlobalControlUnit.class, IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getGlobalControlUnit_Program(), this.getAddressSpace(),
-				null, "program", null, 0, 1, GlobalControlUnit.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE,
-				IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEReference(getGlobalControlUnit_Operations(),
-				this.getOperationCtrl(), null, "operations", null, 0, 1,
-				GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getGlobalControlUnit_DelaySlots(),
-				ecorePackage.getEInt(), "delaySlots", null, 0, 1,
-				GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEAttribute(getGlobalControlUnit_GuardLatency(),
-				ecorePackage.getEInt(), "guardLatency", null, 0, 1,
-				GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
+		initEClass(bridgeEClass, Bridge.class, "Bridge", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getBridge_InputBus(), this.getBus(), null, "inputBus", null, 0, 1, Bridge.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getBridge_OutputBus(), this.getBus(), null, "outputBus", null, 0, 1, Bridge.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(functionalUnitEClass, FunctionalUnit.class,
-				"FunctionalUnit", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getFunctionalUnit_Name(), ecorePackage.getEString(),
-				"name", null, 0, 1, FunctionalUnit.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEReference(getFunctionalUnit_Operations(), this.getOperation(),
-				null, "operations", null, 0, -1, FunctionalUnit.class,
-				!IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE,
-				!IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEReference(getFunctionalUnit_Ports(), this.getPort(), null,
-				"ports", null, 0, -1, FunctionalUnit.class, IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(segmentEClass, Segment.class, "Segment", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getSegment_Name(), ecorePackage.getEString(), "name", null, 0, 1, Segment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(registerFileEClass, RegisterFile.class, "RegisterFile",
-				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getRegisterFile_Name(), ecorePackage.getEString(),
-				"name", null, 0, 1, RegisterFile.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getRegisterFile_Size(), ecorePackage.getEInt(), "size",
-				null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
-		initEAttribute(getRegisterFile_Width(), ecorePackage.getEInt(),
-				"width", null, 0, 1, RegisterFile.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEReference(getRegisterFile_Ports(), this.getPort(), null, "ports",
-				null, 0, -1, RegisterFile.class, IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(globalControlUnitEClass, GlobalControlUnit.class, "GlobalControlUnit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getGlobalControlUnit_Ports(), this.getPort(), null, "ports", null, 0, -1, GlobalControlUnit.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getGlobalControlUnit_ReturnAddress(), this.getPort(), null, "returnAddress", null, 0, 1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getGlobalControlUnit_AddressSpace(), this.getAddressSpace(), null, "addressSpace", null, 0, 1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getGlobalControlUnit_Operations(), this.getOperation(), null, "operations", null, 0, -1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGlobalControlUnit_DelaySlots(), ecorePackage.getEInt(), "delaySlots", "0", 0, 1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGlobalControlUnit_GuardLatency(), ecorePackage.getEInt(), "guardLatency", "0", 0, 1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE,
-				IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null,
-				0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getPort_ConnectedSocket(), this.getSocket(), null,
-				"connectedSocket", null, 0, 1, Port.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES,
-				!IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPort_Width(), ecorePackage.getEInt(), "width", null,
-				0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE,
-				!IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEClass(functionUnitEClass, FunctionUnit.class, "FunctionUnit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getFunctionUnit_Name(), ecorePackage.getEString(), "name", null, 0, 1, FunctionUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getFunctionUnit_Operations(), this.getOperation(), null, "operations", null, 0, -1, FunctionUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getFunctionUnit_Ports(), this.getPort(), null, "ports", null, 0, -1, FunctionUnit.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getFunctionUnit_AddressSpace(), this.getAddressSpace(), null, "addressSpace", null, 0, 1, FunctionUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(socketEClass, Socket.class, "Socket", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getSocket_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, Socket.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
+		initEClass(registerFileEClass, RegisterFile.class, "RegisterFile", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getRegisterFile_Name(), ecorePackage.getEString(), "name", null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRegisterFile_Size(), ecorePackage.getEInt(), "size", null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRegisterFile_Width(), ecorePackage.getEInt(), "width", null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRegisterFile_MaxReads(), ecorePackage.getEInt(), "maxReads", null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRegisterFile_MaxWrites(), ecorePackage.getEInt(), "maxWrites", null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getRegisterFile_Ports(), this.getPort(), null, "ports", null, 0, -1, RegisterFile.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(operationEClass, Operation.class, "Operation", !IS_ABSTRACT,
-				!IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getOperation_Name(), ecorePackage.getEString(), "name",
-				null, 0, 1, Operation.class, !IS_TRANSIENT, !IS_VOLATILE,
-				IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED,
-				IS_ORDERED);
+		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPort_ConnectedSocket(), this.getSocket(), null, "connectedSocket", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPort_Width(), ecorePackage.getEInt(), "width", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPort_Trigger(), ecorePackage.getEBoolean(), "trigger", "false", 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPort_SetsOpcode(), ecorePackage.getEBoolean(), "setsOpcode", "false", 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(operationCtrlEClass, OperationCtrl.class, "OperationCtrl",
-				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEClass(socketEClass, Socket.class, "Socket", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getSocket_Name(), ecorePackage.getEString(), "name", null, 0, 1, Socket.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getSocket_ConnectedSegments(), this.getSegment(), null, "connectedSegments", null, 0, -1, Socket.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSocket_Type(), this.getSocketType(), "type", null, 0, 1, Socket.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
-		initEClass(addressSpaceEClass, AddressSpace.class, "AddressSpace",
-				!IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getAddressSpace_Name(), ecorePackage.getEString(),
-				"name", null, 0, 1, AddressSpace.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAddressSpace_Width(), ecorePackage.getEInt(),
-				"width", null, 0, 1, AddressSpace.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAddressSpace_MinAddress(), ecorePackage.getEInt(),
-				"minAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAddressSpace_MaxAddress(), ecorePackage.getEInt(),
-				"maxAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT,
-				!IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE,
-				!IS_DERIVED, IS_ORDERED);
+		initEClass(operationEClass, Operation.class, "Operation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getOperation_Name(), ecorePackage.getEString(), "name", null, 0, 1, Operation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getOperation_Pipeline(), this.getElement(), null, "pipeline", null, 0, -1, Operation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getOperation_PortToIndexMap(), this.getportToIndexMapEntry(), null, "portToIndexMap", null, 0, -1, Operation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getOperation_Control(), ecorePackage.getEBoolean(), "control", "false", 0, 1, Operation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(addressSpaceEClass, AddressSpace.class, "AddressSpace", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getAddressSpace_Name(), ecorePackage.getEString(), "name", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getAddressSpace_Width(), ecorePackage.getEInt(), "width", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getAddressSpace_MinAddress(), ecorePackage.getEInt(), "minAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getAddressSpace_MaxAddress(), ecorePackage.getEInt(), "maxAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(guardEClass, Guard.class, "Guard", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		initEClass(elementEClass, Element.class, "Element", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getElement_StartCycle(), ecorePackage.getEInt(), "startCycle", null, 0, 1, Element.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getElement_Cycles(), ecorePackage.getEInt(), "cycles", null, 1, 1, Element.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		addEOperation(elementEClass, ecorePackage.getEBoolean(), "isReads", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		addEOperation(elementEClass, ecorePackage.getEBoolean(), "isWrites", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		addEOperation(elementEClass, ecorePackage.getEBoolean(), "isResource", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		initEClass(readsEClass, Reads.class, "Reads", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getReads_Name(), ecorePackage.getEInt(), "name", null, 0, 1, Reads.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(writesEClass, Writes.class, "Writes", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getWrites_Name(), ecorePackage.getEInt(), "name", null, 0, 1, Writes.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(resourceEClass, Resource.class, "Resource", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getResource_Name(), ecorePackage.getEString(), "name", null, 0, 1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(portToIndexMapEntryEClass, Map.Entry.class, "portToIndexMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getportToIndexMapEntry_Key(), this.getPort(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getportToIndexMapEntry_Value(), ecorePackage.getEIntegerObject(), "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(shortImmediateEClass, ShortImmediate.class, "ShortImmediate", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getShortImmediate_Extension(), this.getExtension(), "extension", null, 0, 1, ShortImmediate.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getShortImmediate_Width(), ecorePackage.getEInt(), "width", null, 0, 1, ShortImmediate.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		// Initialize enums and add enum literals
+		initEEnum(socketTypeEEnum, SocketType.class, "SocketType");
+		addEEnumLiteral(socketTypeEEnum, SocketType.INPUT);
+		addEEnumLiteral(socketTypeEEnum, SocketType.OUTPUT);
+
+		initEEnum(extensionEEnum, Extension.class, "Extension");
+		addEEnumLiteral(extensionEEnum, Extension.SIGN);
+		addEEnumLiteral(extensionEEnum, Extension.ZERO);
 
 		// Create resource
 		createResource(eNS_URI);

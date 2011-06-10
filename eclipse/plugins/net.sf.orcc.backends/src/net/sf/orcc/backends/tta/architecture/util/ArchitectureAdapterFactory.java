@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.tta.architecture.util;
 
+import java.util.Map;
 import net.sf.orcc.backends.tta.architecture.*;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -102,12 +103,20 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 				return createBusAdapter();
 			}
 			@Override
+			public Adapter caseBridge(Bridge object) {
+				return createBridgeAdapter();
+			}
+			@Override
+			public Adapter caseSegment(Segment object) {
+				return createSegmentAdapter();
+			}
+			@Override
 			public Adapter caseGlobalControlUnit(GlobalControlUnit object) {
 				return createGlobalControlUnitAdapter();
 			}
 			@Override
-			public Adapter caseFunctionalUnit(FunctionalUnit object) {
-				return createFunctionalUnitAdapter();
+			public Adapter caseFunctionUnit(FunctionUnit object) {
+				return createFunctionUnitAdapter();
 			}
 			@Override
 			public Adapter caseRegisterFile(RegisterFile object) {
@@ -126,12 +135,36 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 				return createOperationAdapter();
 			}
 			@Override
-			public Adapter caseOperationCtrl(OperationCtrl object) {
-				return createOperationCtrlAdapter();
-			}
-			@Override
 			public Adapter caseAddressSpace(AddressSpace object) {
 				return createAddressSpaceAdapter();
+			}
+			@Override
+			public Adapter caseGuard(Guard object) {
+				return createGuardAdapter();
+			}
+			@Override
+			public Adapter caseElement(Element object) {
+				return createElementAdapter();
+			}
+			@Override
+			public Adapter caseReads(Reads object) {
+				return createReadsAdapter();
+			}
+			@Override
+			public Adapter caseWrites(Writes object) {
+				return createWritesAdapter();
+			}
+			@Override
+			public Adapter caseResource(Resource object) {
+				return createResourceAdapter();
+			}
+			@Override
+			public Adapter caseportToIndexMapEntry(Map.Entry<Port, Integer> object) {
+				return createportToIndexMapEntryAdapter();
+			}
+			@Override
+			public Adapter caseShortImmediate(ShortImmediate object) {
+				return createShortImmediateAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -182,6 +215,34 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Bridge <em>Bridge</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Bridge
+	 * @generated
+	 */
+	public Adapter createBridgeAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Segment <em>Segment</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Segment
+	 * @generated
+	 */
+	public Adapter createSegmentAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit <em>Global Control Unit</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -196,16 +257,16 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.FunctionalUnit <em>Functional Unit</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.FunctionUnit <em>Function Unit</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.tta.architecture.FunctionalUnit
+	 * @see net.sf.orcc.backends.tta.architecture.FunctionUnit
 	 * @generated
 	 */
-	public Adapter createFunctionalUnitAdapter() {
+	public Adapter createFunctionUnitAdapter() {
 		return null;
 	}
 
@@ -266,20 +327,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.OperationCtrl <em>Operation Ctrl</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see net.sf.orcc.backends.tta.architecture.OperationCtrl
-	 * @generated
-	 */
-	public Adapter createOperationCtrlAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.AddressSpace <em>Address Space</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -290,6 +337,104 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createAddressSpaceAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Guard
+	 * @generated
+	 */
+	public Adapter createGuardAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Element
+	 * @generated
+	 */
+	public Adapter createElementAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Reads <em>Reads</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Reads
+	 * @generated
+	 */
+	public Adapter createReadsAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Writes <em>Writes</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Writes
+	 * @generated
+	 */
+	public Adapter createWritesAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Resource <em>Resource</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Resource
+	 * @generated
+	 */
+	public Adapter createResourceAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>port To Index Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see java.util.Map.Entry
+	 * @generated
+	 */
+	public Adapter createportToIndexMapEntryAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.ShortImmediate <em>Short Immediate</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.ShortImmediate
+	 * @generated
+	 */
+	public Adapter createShortImmediateAdapter() {
 		return null;
 	}
 

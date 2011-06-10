@@ -5,12 +5,16 @@
     nsURI="http://orcc.sf.net/backends/tta/architecture/TTA_architecture" nsPrefix="net.sf.orcc.backends.tta.architecture">
   <eClassifiers xsi:type="ecore:EClass" name="TTA">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="gcu" eType="#//GlobalControlUnit"
+        containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="buses" upperBound="-1"
         eType="#//Bus" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="bridges" upperBound="-1"
+        eType="#//Bridge" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="sockets" upperBound="-1"
         eType="#//Socket" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="functionalUnits" upperBound="-1"
-        eType="#//FunctionalUnit" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="functionUnits" upperBound="-1"
+        eType="#//FunctionUnit" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="registerFiles" upperBound="-1"
         eType="#//RegisterFile" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="program" eType="#//AddressSpace"
@@ -21,26 +25,46 @@
   <eClassifiers xsi:type="ecore:EClass" name="Bus">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="guards" upperBound="-1"
+        eType="#//Guard" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="segments" upperBound="-1"
+        eType="#//Segment" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="shortImmediate" eType="#//ShortImmediate"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Bridge">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputBus" eType="#//Bus"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputBus" eType="#//Bus"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Segment">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="GlobalControlUnit">
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port" transient="true" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="program" eType="#//AddressSpace"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="operations" eType="#//OperationCtrl"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="delaySlots" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="guardLatency" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="returnAddress" eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="addressSpace" eType="#//AddressSpace"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="operations" upperBound="-1"
+        eType="#//Operation" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="delaySlots" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="0"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="guardLatency" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
+        defaultValueLiteral="0"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="FunctionalUnit">
+  <eClassifiers xsi:type="ecore:EClass" name="FunctionUnit">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="operations" upperBound="-1"
         eType="#//Operation" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port" transient="true" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="addressSpace" eType="#//AddressSpace"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RegisterFile">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxReads" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxWrites" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port" transient="true" containment="true"/>
   </eClassifiers>
@@ -48,18 +72,64 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="connectedSocket" eType="#//Socket"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="trigger" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="setsOpcode" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Socket">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="connectedSegments" upperBound="-1"
+        eType="#//Segment"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//SocketType"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Operation">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pipeline" upperBound="-1"
+        eType="#//Element"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="portToIndexMap" upperBound="-1"
+        eType="#//portToIndexMapEntry" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="control" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="OperationCtrl" eSuperTypes="#//Operation"/>
   <eClassifiers xsi:type="ecore:EClass" name="AddressSpace">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="minAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Guard"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Element" abstract="true" interface="true">
+    <eOperations name="isReads" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eOperations name="isWrites" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eOperations name="isResource" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="startCycle" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cycles" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Reads" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Writes" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Resource" eSuperTypes="#//Element">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="portToIndexMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ShortImmediate">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="extension" eType="#//Extension"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="width" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="SocketType">
+    <eLiterals name="input"/>
+    <eLiterals name="output" value="1" literal="output"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Extension">
+    <eLiterals name="sign" literal="sign"/>
+    <eLiterals name="zero" value="1" literal="zero"/>
   </eClassifiers>
 </ecore:EPackage>

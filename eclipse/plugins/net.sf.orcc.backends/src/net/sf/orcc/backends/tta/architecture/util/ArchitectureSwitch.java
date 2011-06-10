@@ -30,6 +30,7 @@ package net.sf.orcc.backends.tta.architecture.util;
 
 import java.util.List;
 
+import java.util.Map;
 import net.sf.orcc.backends.tta.architecture.*;
 
 import org.eclipse.emf.ecore.EClass;
@@ -121,15 +122,27 @@ public class ArchitectureSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case ArchitecturePackage.BRIDGE: {
+				Bridge bridge = (Bridge)theEObject;
+				T result = caseBridge(bridge);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.SEGMENT: {
+				Segment segment = (Segment)theEObject;
+				T result = caseSegment(segment);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case ArchitecturePackage.GLOBAL_CONTROL_UNIT: {
 				GlobalControlUnit globalControlUnit = (GlobalControlUnit)theEObject;
 				T result = caseGlobalControlUnit(globalControlUnit);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ArchitecturePackage.FUNCTIONAL_UNIT: {
-				FunctionalUnit functionalUnit = (FunctionalUnit)theEObject;
-				T result = caseFunctionalUnit(functionalUnit);
+			case ArchitecturePackage.FUNCTION_UNIT: {
+				FunctionUnit functionUnit = (FunctionUnit)theEObject;
+				T result = caseFunctionUnit(functionUnit);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -157,16 +170,54 @@ public class ArchitectureSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ArchitecturePackage.OPERATION_CTRL: {
-				OperationCtrl operationCtrl = (OperationCtrl)theEObject;
-				T result = caseOperationCtrl(operationCtrl);
-				if (result == null) result = caseOperation(operationCtrl);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case ArchitecturePackage.ADDRESS_SPACE: {
 				AddressSpace addressSpace = (AddressSpace)theEObject;
 				T result = caseAddressSpace(addressSpace);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.GUARD: {
+				Guard guard = (Guard)theEObject;
+				T result = caseGuard(guard);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.ELEMENT: {
+				Element element = (Element)theEObject;
+				T result = caseElement(element);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.READS: {
+				Reads reads = (Reads)theEObject;
+				T result = caseReads(reads);
+				if (result == null) result = caseElement(reads);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.WRITES: {
+				Writes writes = (Writes)theEObject;
+				T result = caseWrites(writes);
+				if (result == null) result = caseElement(writes);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.RESOURCE: {
+				Resource resource = (Resource)theEObject;
+				T result = caseResource(resource);
+				if (result == null) result = caseElement(resource);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToIndexMapEntry = (Map.Entry<Port, Integer>)theEObject;
+				T result = caseportToIndexMapEntry(portToIndexMapEntry);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.SHORT_IMMEDIATE: {
+				ShortImmediate shortImmediate = (ShortImmediate)theEObject;
+				T result = caseShortImmediate(shortImmediate);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -205,6 +256,36 @@ public class ArchitectureSwitch<T> {
 	}
 
 	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Bridge</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Bridge</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseBridge(Bridge object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Segment</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Segment</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseSegment(Segment object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Global Control Unit</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -220,17 +301,17 @@ public class ArchitectureSwitch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Functional Unit</em>'.
+	 * Returns the result of interpreting the object as an instance of '<em>Function Unit</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
 	 * returning a non-null result will terminate the switch.
 	 * <!-- end-user-doc -->
 	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Functional Unit</em>'.
+	 * @return the result of interpreting the object as an instance of '<em>Function Unit</em>'.
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseFunctionalUnit(FunctionalUnit object) {
+	public T caseFunctionUnit(FunctionUnit object) {
 		return null;
 	}
 
@@ -295,21 +376,6 @@ public class ArchitectureSwitch<T> {
 	}
 
 	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Operation Ctrl</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Operation Ctrl</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseOperationCtrl(OperationCtrl object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpreting the object as an instance of '<em>Address Space</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -321,6 +387,111 @@ public class ArchitectureSwitch<T> {
 	 * @generated
 	 */
 	public T caseAddressSpace(AddressSpace object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Guard</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Guard</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseGuard(Guard object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Element</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Element</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseElement(Element object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Reads</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Reads</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseReads(Reads object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Writes</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Writes</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseWrites(Writes object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Resource</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Resource</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseResource(Resource object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>port To Index Map Entry</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>port To Index Map Entry</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseportToIndexMapEntry(Map.Entry<Port, Integer> object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Short Immediate</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Short Immediate</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseShortImmediate(ShortImmediate object) {
 		return null;
 	}
 

@@ -41,6 +41,8 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getConnectedSocket <em>Connected Socket</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getWidth <em>Width</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#isTrigger <em>Trigger</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#isSetsOpcode <em>Sets Opcode</em>}</li>
  * </ul>
  * </p>
  *
@@ -126,5 +128,59 @@ public interface Port extends EObject {
 	 * @generated
 	 */
 	void setWidth(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Trigger</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Trigger</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Trigger</em>' attribute.
+	 * @see #setTrigger(boolean)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_Trigger()
+	 * @model default="false"
+	 * @generated
+	 */
+	boolean isTrigger();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#isTrigger <em>Trigger</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Trigger</em>' attribute.
+	 * @see #isTrigger()
+	 * @generated
+	 */
+	void setTrigger(boolean value);
+
+	/**
+	 * Returns the value of the '<em><b>Sets Opcode</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Sets Opcode</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Sets Opcode</em>' attribute.
+	 * @see #setSetsOpcode(boolean)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_SetsOpcode()
+	 * @model default="false"
+	 * @generated
+	 */
+	boolean isSetsOpcode();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#isSetsOpcode <em>Sets Opcode</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Sets Opcode</em>' attribute.
+	 * @see #isSetsOpcode()
+	 * @generated
+	 */
+	void setSetsOpcode(boolean value);
 
 } // Port

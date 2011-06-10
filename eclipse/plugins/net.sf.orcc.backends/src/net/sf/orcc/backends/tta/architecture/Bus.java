@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -40,6 +41,9 @@ import org.eclipse.emf.ecore.EObject;
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Bus#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Bus#getWidth <em>Width</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Bus#getGuards <em>Guards</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Bus#getSegments <em>Segments</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Bus#getShortImmediate <em>Short Immediate</em>}</li>
  * </ul>
  * </p>
  *
@@ -99,5 +103,63 @@ public interface Bus extends EObject {
 	 * @generated
 	 */
 	void setWidth(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Guards</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Guard}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Guards</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Guards</em>' containment reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getBus_Guards()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Guard> getGuards();
+
+	/**
+	 * Returns the value of the '<em><b>Segments</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Segment}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Segments</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Segments</em>' containment reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getBus_Segments()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Segment> getSegments();
+
+	/**
+	 * Returns the value of the '<em><b>Short Immediate</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Short Immediate</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Short Immediate</em>' containment reference.
+	 * @see #setShortImmediate(ShortImmediate)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getBus_ShortImmediate()
+	 * @model containment="true"
+	 * @generated
+	 */
+	ShortImmediate getShortImmediate();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Bus#getShortImmediate <em>Short Immediate</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Short Immediate</em>' containment reference.
+	 * @see #getShortImmediate()
+	 * @generated
+	 */
+	void setShortImmediate(ShortImmediate value);
 
 } // Bus

@@ -41,7 +41,8 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getPorts <em>Ports</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getProgram <em>Program</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getReturnAddress <em>Return Address</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getAddressSpace <em>Address Space</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getOperations <em>Operations</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getDelaySlots <em>Delay Slots</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getGuardLatency <em>Guard Latency</em>}</li>
@@ -70,59 +71,76 @@ public interface GlobalControlUnit extends EObject {
 	EList<Port> getPorts();
 
 	/**
-	 * Returns the value of the '<em><b>Program</b></em>' reference.
+	 * Returns the value of the '<em><b>Return Address</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Program</em>' reference isn't clear,
+	 * If the meaning of the '<em>Return Address</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Program</em>' reference.
-	 * @see #setProgram(AddressSpace)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_Program()
+	 * @return the value of the '<em>Return Address</em>' reference.
+	 * @see #setReturnAddress(Port)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_ReturnAddress()
 	 * @model
 	 * @generated
 	 */
-	AddressSpace getProgram();
+	Port getReturnAddress();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getProgram <em>Program</em>}' reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getReturnAddress <em>Return Address</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Program</em>' reference.
-	 * @see #getProgram()
+	 * @param value the new value of the '<em>Return Address</em>' reference.
+	 * @see #getReturnAddress()
 	 * @generated
 	 */
-	void setProgram(AddressSpace value);
+	void setReturnAddress(Port value);
 
 	/**
-	 * Returns the value of the '<em><b>Operations</b></em>' reference.
+	 * Returns the value of the '<em><b>Address Space</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Address Space</em>' reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Address Space</em>' reference.
+	 * @see #setAddressSpace(AddressSpace)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_AddressSpace()
+	 * @model
+	 * @generated
+	 */
+	AddressSpace getAddressSpace();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getAddressSpace <em>Address Space</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Address Space</em>' reference.
+	 * @see #getAddressSpace()
+	 * @generated
+	 */
+	void setAddressSpace(AddressSpace value);
+
+	/**
+	 * Returns the value of the '<em><b>Operations</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Operation}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Operations</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Operations</em>' reference.
-	 * @see #setOperations(OperationCtrl)
+	 * @return the value of the '<em>Operations</em>' containment reference list.
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_Operations()
-	 * @model
+	 * @model containment="true"
 	 * @generated
 	 */
-	OperationCtrl getOperations();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getOperations <em>Operations</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Operations</em>' reference.
-	 * @see #getOperations()
-	 * @generated
-	 */
-	void setOperations(OperationCtrl value);
+	EList<Operation> getOperations();
 
 	/**
 	 * Returns the value of the '<em><b>Delay Slots</b></em>' attribute.
+	 * The default value is <code>"0"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Delay Slots</em>' attribute isn't clear,
@@ -132,7 +150,7 @@ public interface GlobalControlUnit extends EObject {
 	 * @return the value of the '<em>Delay Slots</em>' attribute.
 	 * @see #setDelaySlots(int)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_DelaySlots()
-	 * @model
+	 * @model default="0"
 	 * @generated
 	 */
 	int getDelaySlots();
@@ -149,6 +167,7 @@ public interface GlobalControlUnit extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Guard Latency</b></em>' attribute.
+	 * The default value is <code>"0"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Guard Latency</em>' attribute isn't clear,
@@ -158,7 +177,7 @@ public interface GlobalControlUnit extends EObject {
 	 * @return the value of the '<em>Guard Latency</em>' attribute.
 	 * @see #setGuardLatency(int)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_GuardLatency()
-	 * @model
+	 * @model default="0"
 	 * @generated
 	 */
 	int getGuardLatency();

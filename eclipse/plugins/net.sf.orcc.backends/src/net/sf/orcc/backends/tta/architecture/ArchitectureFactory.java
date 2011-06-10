@@ -56,16 +56,25 @@ public interface ArchitectureFactory extends EFactory {
 	 */
 	Bus createBus();
 
-	Bus createBus(int index, int width);
-
 	/**
-	 * Returns a new object of class '<em>Functional Unit</em>'.
+	 * Returns a new object of class '<em>Bridge</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Functional Unit</em>'.
+	 * @return a new object of class '<em>Bridge</em>'.
 	 * @generated
 	 */
-	FunctionalUnit createFunctionalUnit();
+	Bridge createBridge();
+
+	/**
+	 * Returns a new object of class '<em>Segment</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Segment</em>'.
+	 * @generated
+	 */
+	Segment createSegment();
+
+	Bus createBus(int index, int width);
 
 	/**
 	 * Returns a new object of class '<em>Global Control Unit</em>'.
@@ -77,6 +86,15 @@ public interface ArchitectureFactory extends EFactory {
 	GlobalControlUnit createGlobalControlUnit();
 	
 	/**
+	 * Returns a new object of class '<em>Function Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Function Unit</em>'.
+	 * @generated
+	 */
+	FunctionUnit createFunctionUnit();
+
+	/**
 	 * Returns a new object of class '<em>Operation</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -86,15 +104,6 @@ public interface ArchitectureFactory extends EFactory {
 	Operation createOperation();
 
 	/**
-	 * Returns a new object of class '<em>Operation Ctrl</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Operation Ctrl</em>'.
-	 * @generated
-	 */
-	OperationCtrl createOperationCtrl();
-
-	/**
 	 * Returns a new object of class '<em>Address Space</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -102,6 +111,51 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	AddressSpace createAddressSpace();
+
+	/**
+	 * Returns a new object of class '<em>Guard</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Guard</em>'.
+	 * @generated
+	 */
+	Guard createGuard();
+
+	/**
+	 * Returns a new object of class '<em>Reads</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Reads</em>'.
+	 * @generated
+	 */
+	Reads createReads();
+
+	/**
+	 * Returns a new object of class '<em>Writes</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Writes</em>'.
+	 * @generated
+	 */
+	Writes createWrites();
+
+	/**
+	 * Returns a new object of class '<em>Resource</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Resource</em>'.
+	 * @generated
+	 */
+	Resource createResource();
+
+	/**
+	 * Returns a new object of class '<em>Short Immediate</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Short Immediate</em>'.
+	 * @generated
+	 */
+	ShortImmediate createShortImmediate();
 
 	/**
 	 * Returns a new object of class '<em>Port</em>'.

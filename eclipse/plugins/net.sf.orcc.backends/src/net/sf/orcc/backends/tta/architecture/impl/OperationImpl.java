@@ -28,15 +28,26 @@
  */
 package net.sf.orcc.backends.tta.architecture.impl;
 
+import java.util.Collection;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.Element;
 import net.sf.orcc.backends.tta.architecture.Operation;
 
+import net.sf.orcc.backends.tta.architecture.Port;
 import org.eclipse.emf.common.notify.Notification;
 
+import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
 
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+import org.eclipse.emf.ecore.util.EcoreEMap;
+import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
  * <!-- begin-user-doc -->
@@ -46,6 +57,9 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl#getPipeline <em>Pipeline</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl#getPortToIndexMap <em>Port To Index Map</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl#isControl <em>Control</em>}</li>
  * </ul>
  * </p>
  *
@@ -71,6 +85,46 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	 * @ordered
 	 */
 	protected String name = NAME_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getPipeline() <em>Pipeline</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPipeline()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Element> pipeline;
+
+	/**
+	 * The cached value of the '{@link #getPortToIndexMap() <em>Port To Index Map</em>}' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPortToIndexMap()
+	 * @generated
+	 * @ordered
+	 */
+	protected EMap<Port, Integer> portToIndexMap;
+
+	/**
+	 * The default value of the '{@link #isControl() <em>Control</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isControl()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean CONTROL_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isControl() <em>Control</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isControl()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean control = CONTROL_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -117,11 +171,77 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<Element> getPipeline() {
+		if (pipeline == null) {
+			pipeline = new EObjectResolvingEList<Element>(Element.class, this, ArchitecturePackage.OPERATION__PIPELINE);
+		}
+		return pipeline;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EMap<Port, Integer> getPortToIndexMap() {
+		if (portToIndexMap == null) {
+			portToIndexMap = new EcoreEMap<Port,Integer>(ArchitecturePackage.Literals.PORT_TO_INDEX_MAP_ENTRY, portToIndexMapEntryImpl.class, this, ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP);
+		}
+		return portToIndexMap;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean isControl() {
+		return control;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setControl(boolean newControl) {
+		boolean oldControl = control;
+		control = newControl;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.OPERATION__CONTROL, oldControl, control));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
+				return ((InternalEList<?>)getPortToIndexMap()).basicRemove(otherEnd, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case ArchitecturePackage.OPERATION__NAME:
 				return getName();
+			case ArchitecturePackage.OPERATION__PIPELINE:
+				return getPipeline();
+			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
+				if (coreType) return getPortToIndexMap();
+				else return getPortToIndexMap().map();
+			case ArchitecturePackage.OPERATION__CONTROL:
+				return isControl();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -131,11 +251,22 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case ArchitecturePackage.OPERATION__NAME:
 				setName((String)newValue);
+				return;
+			case ArchitecturePackage.OPERATION__PIPELINE:
+				getPipeline().clear();
+				getPipeline().addAll((Collection<? extends Element>)newValue);
+				return;
+			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
+				((EStructuralFeature.Setting)getPortToIndexMap()).set(newValue);
+				return;
+			case ArchitecturePackage.OPERATION__CONTROL:
+				setControl((Boolean)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -152,6 +283,15 @@ public class OperationImpl extends EObjectImpl implements Operation {
 			case ArchitecturePackage.OPERATION__NAME:
 				setName(NAME_EDEFAULT);
 				return;
+			case ArchitecturePackage.OPERATION__PIPELINE:
+				getPipeline().clear();
+				return;
+			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
+				getPortToIndexMap().clear();
+				return;
+			case ArchitecturePackage.OPERATION__CONTROL:
+				setControl(CONTROL_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -166,6 +306,12 @@ public class OperationImpl extends EObjectImpl implements Operation {
 		switch (featureID) {
 			case ArchitecturePackage.OPERATION__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
+			case ArchitecturePackage.OPERATION__PIPELINE:
+				return pipeline != null && !pipeline.isEmpty();
+			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
+				return portToIndexMap != null && !portToIndexMap.isEmpty();
+			case ArchitecturePackage.OPERATION__CONTROL:
+				return control != CONTROL_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -182,6 +328,8 @@ public class OperationImpl extends EObjectImpl implements Operation {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (name: ");
 		result.append(name);
+		result.append(", control: ");
+		result.append(control);
 		result.append(')');
 		return result.toString();
 	}

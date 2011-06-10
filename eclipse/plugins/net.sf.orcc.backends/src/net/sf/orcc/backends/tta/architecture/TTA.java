@@ -41,9 +41,11 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getGcu <em>Gcu</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getBuses <em>Buses</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getBridges <em>Bridges</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getSockets <em>Sockets</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getFunctionalUnits <em>Functional Units</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getFunctionUnits <em>Function Units</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getRegisterFiles <em>Register Files</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getData <em>Data</em>}</li>
@@ -82,6 +84,32 @@ public interface TTA extends EObject {
 	void setName(String value);
 
 	/**
+	 * Returns the value of the '<em><b>Gcu</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Gcu</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Gcu</em>' containment reference.
+	 * @see #setGcu(GlobalControlUnit)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTTA_Gcu()
+	 * @model containment="true"
+	 * @generated
+	 */
+	GlobalControlUnit getGcu();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.TTA#getGcu <em>Gcu</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Gcu</em>' containment reference.
+	 * @see #getGcu()
+	 * @generated
+	 */
+	void setGcu(GlobalControlUnit value);
+
+	/**
 	 * Returns the value of the '<em><b>Buses</b></em>' containment reference list.
 	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Bus}.
 	 * <!-- begin-user-doc -->
@@ -96,6 +124,22 @@ public interface TTA extends EObject {
 	 * @generated
 	 */
 	EList<Bus> getBuses();
+
+	/**
+	 * Returns the value of the '<em><b>Bridges</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Bridge}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Bridges</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Bridges</em>' containment reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTTA_Bridges()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Bridge> getBridges();
 
 	/**
 	 * Returns the value of the '<em><b>Sockets</b></em>' containment reference list.
@@ -114,20 +158,20 @@ public interface TTA extends EObject {
 	EList<Socket> getSockets();
 
 	/**
-	 * Returns the value of the '<em><b>Functional Units</b></em>' containment reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.FunctionalUnit}.
+	 * Returns the value of the '<em><b>Function Units</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.FunctionUnit}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Functional Units</em>' containment reference list isn't clear,
+	 * If the meaning of the '<em>Function Units</em>' containment reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Functional Units</em>' containment reference list.
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTTA_FunctionalUnits()
+	 * @return the value of the '<em>Function Units</em>' containment reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTTA_FunctionUnits()
 	 * @model containment="true"
 	 * @generated
 	 */
-	EList<FunctionalUnit> getFunctionalUnits();
+	EList<FunctionUnit> getFunctionUnits();
 
 	/**
 	 * Returns the value of the '<em><b>Register Files</b></em>' containment reference list.
