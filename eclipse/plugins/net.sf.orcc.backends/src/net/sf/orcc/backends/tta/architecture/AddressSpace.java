@@ -39,7 +39,6 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth <em>Width</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getMinAddress <em>Min Address</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getMaxAddress <em>Max Address</em>}</li>
  * </ul>
@@ -77,30 +76,16 @@ public interface AddressSpace extends EObject {
 	void setName(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Width</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Width</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Width</em>' attribute.
-	 * @see #setWidth(int)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getAddressSpace_Width()
-	 * @model
+	 * @model kind="operation"
 	 * @generated
 	 */
 	int getWidth();
-
-	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth <em>Width</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Width</em>' attribute.
-	 * @see #getWidth()
-	 * @generated
-	 */
-	void setWidth(int value);
 
 	/**
 	 * Returns the value of the '<em><b>Min Address</b></em>' attribute.

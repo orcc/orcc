@@ -780,7 +780,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getAddressSpace_Width() {
+	public EAttribute getAddressSpace_MinAddress() {
 		return (EAttribute)addressSpaceEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -788,16 +788,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getAddressSpace_MinAddress() {
-		return (EAttribute)addressSpaceEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getAddressSpace_MaxAddress() {
-		return (EAttribute)addressSpaceEClass.getEStructuralFeatures().get(3);
+		return (EAttribute)addressSpaceEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -1199,7 +1191,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		addressSpaceEClass = createEClass(ADDRESS_SPACE);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__NAME);
-		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__WIDTH);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MIN_ADDRESS);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MAX_ADDRESS);
 
@@ -1215,10 +1206,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		resourceEClass = createEClass(RESOURCE);
 		createEAttribute(resourceEClass, RESOURCE__NAME);
-
-		portToIndexMapEntryEClass = createEClass(PORT_TO_INDEX_MAP_ENTRY);
-		createEReference(portToIndexMapEntryEClass, PORT_TO_INDEX_MAP_ENTRY__KEY);
-		createEAttribute(portToIndexMapEntryEClass, PORT_TO_INDEX_MAP_ENTRY__VALUE);
 
 		shortImmediateEClass = createEClass(SHORT_IMMEDIATE);
 		createEAttribute(shortImmediateEClass, SHORT_IMMEDIATE__EXTENSION);
@@ -1248,6 +1235,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		termUnitEClass = createEClass(TERM_UNIT);
 		createEReference(termUnitEClass, TERM_UNIT__FUNCTION_UNIT);
 		createEReference(termUnitEClass, TERM_UNIT__PORT);
+
+		portToIndexMapEntryEClass = createEClass(PORT_TO_INDEX_MAP_ENTRY);
+		createEReference(portToIndexMapEntryEClass, PORT_TO_INDEX_MAP_ENTRY__KEY);
+		createEAttribute(portToIndexMapEntryEClass, PORT_TO_INDEX_MAP_ENTRY__VALUE);
 
 		// Create enums
 		socketTypeEEnum = createEEnum(SOCKET_TYPE);
@@ -1361,9 +1352,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(addressSpaceEClass, AddressSpace.class, "AddressSpace", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getAddressSpace_Name(), ecorePackage.getEString(), "name", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAddressSpace_Width(), ecorePackage.getEInt(), "width", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAddressSpace_MinAddress(), ecorePackage.getEInt(), "minAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAddressSpace_MaxAddress(), ecorePackage.getEInt(), "maxAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		addEOperation(addressSpaceEClass, ecorePackage.getEInt(), "getWidth", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(elementEClass, Element.class, "Element", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getElement_StartCycle(), ecorePackage.getEInt(), "startCycle", null, 0, 1, Element.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1383,10 +1375,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(resourceEClass, Resource.class, "Resource", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getResource_Name(), ecorePackage.getEString(), "name", null, 0, 1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(portToIndexMapEntryEClass, Map.Entry.class, "portToIndexMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getportToIndexMapEntry_Key(), this.getPort(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getportToIndexMapEntry_Value(), ecorePackage.getEIntegerObject(), "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(shortImmediateEClass, ShortImmediate.class, "ShortImmediate", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getShortImmediate_Extension(), this.getExtension(), "extension", null, 0, 1, ShortImmediate.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1416,6 +1404,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(termUnitEClass, TermUnit.class, "TermUnit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getTermUnit_FunctionUnit(), this.getFunctionUnit(), null, "functionUnit", null, 0, 1, TermUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTermUnit_Port(), this.getPort(), null, "port", null, 0, 1, TermUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(portToIndexMapEntryEClass, Map.Entry.class, "portToIndexMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getportToIndexMapEntry_Key(), this.getPort(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getportToIndexMapEntry_Value(), ecorePackage.getEIntegerObject(), "value", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
 		initEEnum(socketTypeEEnum, SocketType.class, "SocketType");

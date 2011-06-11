@@ -122,42 +122,42 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public OpUnary createOpUnaryFromString(EDataType eDataType, String initialValue) {
+	public OpUnary createOpUnaryFromString(EDataType eDataType,
+			String initialValue) {
 		OpUnary result = OpUnary.get(initialValue);
 		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 		return result;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String convertOpUnaryToString(EDataType eDataType, Object instanceValue) {
+	public String convertOpUnaryToString(EDataType eDataType,
+			Object instanceValue) {
 		return instanceValue == null ? null : instanceValue.toString();
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public OpBinary createOpBinaryFromString(EDataType eDataType, String initialValue) {
+	public OpBinary createOpBinaryFromString(EDataType eDataType,
+			String initialValue) {
 		OpBinary result = OpBinary.get(initialValue);
 		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 		return result;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String convertOpBinaryToString(EDataType eDataType, Object instanceValue) {
+	public String convertOpBinaryToString(EDataType eDataType,
+			Object instanceValue) {
 		return instanceValue == null ? null : instanceValue.toString();
 	}
 
@@ -211,7 +211,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			case ArchitecturePackage.READS: return createReads();
 			case ArchitecturePackage.WRITES: return createWrites();
 			case ArchitecturePackage.RESOURCE: return createResource();
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: return (EObject)createportToIndexMapEntry();
 			case ArchitecturePackage.SHORT_IMMEDIATE: return createShortImmediate();
 			case ArchitecturePackage.EXPR_UNARY: return createExprUnary();
 			case ArchitecturePackage.EXPR_BINARY: return createExprBinary();
@@ -219,6 +218,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			case ArchitecturePackage.EXPR_FALSE: return createExprFalse();
 			case ArchitecturePackage.TERM_BOOL: return createTermBool();
 			case ArchitecturePackage.TERM_UNIT: return createTermUnit();
+			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: return (EObject)createportToIndexMapEntry();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -230,6 +230,15 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 */
 	public AddressSpace createAddressSpace() {
 		AddressSpaceImpl addressSpace = new AddressSpaceImpl();
+		return addressSpace;
+	}
+
+	public AddressSpace createAddressSpace(String name, int minAddress,
+			int maxAddress) {
+		AddressSpaceImpl addressSpace = new AddressSpaceImpl();
+		addressSpace.setName(name);
+		addressSpace.setMinAddress(minAddress);
+		addressSpace.setMaxAddress(maxAddress);
 		return addressSpace;
 	}
 
@@ -426,8 +435,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public ExprUnary createExprUnary() {
@@ -436,8 +444,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public ExprBinary createExprBinary() {
@@ -446,8 +453,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public ExprTrue createExprTrue() {
@@ -456,8 +462,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public ExprFalse createExprFalse() {
@@ -466,8 +471,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public TermBool createTermBool() {
@@ -476,8 +480,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public TermUnit createTermUnit() {

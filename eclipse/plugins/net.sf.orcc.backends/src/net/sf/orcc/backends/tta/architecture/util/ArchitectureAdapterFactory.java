@@ -155,10 +155,6 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 				return createResourceAdapter();
 			}
 			@Override
-			public Adapter caseportToIndexMapEntry(Map.Entry<Port, Integer> object) {
-				return createportToIndexMapEntryAdapter();
-			}
-			@Override
 			public Adapter caseShortImmediate(ShortImmediate object) {
 				return createShortImmediateAdapter();
 			}
@@ -193,6 +189,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseTermUnit(TermUnit object) {
 				return createTermUnitAdapter();
+			}
+			@Override
+			public Adapter caseportToIndexMapEntry(Map.Entry<Port, Integer> object) {
+				return createportToIndexMapEntryAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {

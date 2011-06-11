@@ -203,12 +203,6 @@ public class ArchitectureSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: {
-				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToIndexMapEntry = (Map.Entry<Port, Integer>)theEObject;
-				T result = caseportToIndexMapEntry(portToIndexMapEntry);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case ArchitecturePackage.SHORT_IMMEDIATE: {
 				ShortImmediate shortImmediate = (ShortImmediate)theEObject;
 				T result = caseShortImmediate(shortImmediate);
@@ -266,6 +260,12 @@ public class ArchitectureSwitch<T> {
 				TermUnit termUnit = (TermUnit)theEObject;
 				T result = caseTermUnit(termUnit);
 				if (result == null) result = caseTerm(termUnit);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: {
+				@SuppressWarnings("unchecked") Map.Entry<Port, Integer> portToIndexMapEntry = (Map.Entry<Port, Integer>)theEObject;
+				T result = caseportToIndexMapEntry(portToIndexMapEntry);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}

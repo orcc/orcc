@@ -697,22 +697,13 @@ public interface ArchitecturePackage extends EPackage {
 	int ADDRESS_SPACE__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Width</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ADDRESS_SPACE__WIDTH = 1;
-
-	/**
 	 * The feature id for the '<em><b>Min Address</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ADDRESS_SPACE__MIN_ADDRESS = 2;
+	int ADDRESS_SPACE__MIN_ADDRESS = 1;
 
 	/**
 	 * The feature id for the '<em><b>Max Address</b></em>' attribute.
@@ -721,7 +712,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ADDRESS_SPACE__MAX_ADDRESS = 3;
+	int ADDRESS_SPACE__MAX_ADDRESS = 2;
 
 	/**
 	 * The number of structural features of the '<em>Address Space</em>' class.
@@ -730,7 +721,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ADDRESS_SPACE_FEATURE_COUNT = 4;
+	int ADDRESS_SPACE_FEATURE_COUNT = 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}' class.
@@ -740,7 +731,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getGuard()
 	 * @generated
 	 */
-	int GUARD = 17;
+	int GUARD = 16;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprUnaryImpl <em>Expr Unary</em>}' class.
@@ -750,7 +741,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprUnary()
 	 * @generated
 	 */
-	int EXPR_UNARY = 18;
+	int EXPR_UNARY = 17;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprBinaryImpl <em>Expr Binary</em>}' class.
@@ -760,7 +751,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprBinary()
 	 * @generated
 	 */
-	int EXPR_BINARY = 19;
+	int EXPR_BINARY = 18;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprTrueImpl <em>Expr True</em>}' class.
@@ -770,7 +761,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprTrue()
 	 * @generated
 	 */
-	int EXPR_TRUE = 20;
+	int EXPR_TRUE = 19;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ExprFalseImpl <em>Expr False</em>}' class.
@@ -780,7 +771,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExprFalse()
 	 * @generated
 	 */
-	int EXPR_FALSE = 21;
+	int EXPR_FALSE = 20;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Term <em>Term</em>}' class.
@@ -790,7 +781,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTerm()
 	 * @generated
 	 */
-	int TERM = 22;
+	int TERM = 21;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermBoolImpl <em>Term Bool</em>}' class.
@@ -800,7 +791,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermBool()
 	 * @generated
 	 */
-	int TERM_BOOL = 23;
+	int TERM_BOOL = 22;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.TermUnitImpl <em>Term Unit</em>}' class.
@@ -810,7 +801,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getTermUnit()
 	 * @generated
 	 */
-	int TERM_UNIT = 24;
+	int TERM_UNIT = 23;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}' class.
@@ -995,34 +986,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getportToIndexMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_INDEX_MAP_ENTRY = 15;
-
-	/**
-	 * The feature id for the '<em><b>Key</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_TO_INDEX_MAP_ENTRY__KEY = 0;
-
-	/**
-	 * The feature id for the '<em><b>Value</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_TO_INDEX_MAP_ENTRY__VALUE = 1;
-
-	/**
-	 * The number of structural features of the '<em>port To Index Map Entry</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int PORT_TO_INDEX_MAP_ENTRY_FEATURE_COUNT = 2;
+	int PORT_TO_INDEX_MAP_ENTRY = 24;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.
@@ -1032,7 +996,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getShortImmediate()
 	 * @generated
 	 */
-	int SHORT_IMMEDIATE = 16;
+	int SHORT_IMMEDIATE = 15;
 
 	/**
 	 * The feature id for the '<em><b>Extension</b></em>' attribute.
@@ -1213,6 +1177,33 @@ public interface ArchitecturePackage extends EPackage {
 	 * @ordered
 	 */
 	int TERM_UNIT_FEATURE_COUNT = TERM_FEATURE_COUNT + 2;
+
+	/**
+	 * The feature id for the '<em><b>Key</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_INDEX_MAP_ENTRY__KEY = 0;
+
+	/**
+	 * The feature id for the '<em><b>Value</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_INDEX_MAP_ENTRY__VALUE = 1;
+
+	/**
+	 * The number of structural features of the '<em>port To Index Map Entry</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT_TO_INDEX_MAP_ENTRY_FEATURE_COUNT = 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.SocketType <em>Socket Type</em>}' enum.
@@ -1869,17 +1860,6 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getAddressSpace_Name();
-
-	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth <em>Width</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Width</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth()
-	 * @see #getAddressSpace()
-	 * @generated
-	 */
-	EAttribute getAddressSpace_Width();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getMinAddress <em>Min Address</em>}'.
@@ -2782,14 +2762,6 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute ADDRESS_SPACE__NAME = eINSTANCE.getAddressSpace_Name();
-
-		/**
-		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute ADDRESS_SPACE__WIDTH = eINSTANCE.getAddressSpace_Width();
 
 		/**
 		 * The meta object literal for the '<em><b>Min Address</b></em>' attribute feature.
