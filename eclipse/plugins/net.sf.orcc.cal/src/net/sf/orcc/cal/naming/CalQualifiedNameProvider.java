@@ -37,12 +37,15 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.naming.IQualifiedNameConverter;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.naming.QualifiedName;
 import org.eclipse.xtext.util.IResourceScopeCache;
 import org.eclipse.xtext.util.PolymorphicDispatcher;
 import org.eclipse.xtext.util.SimpleAttributeResolver;
 import org.eclipse.xtext.util.Tuples;
 
+import com.google.common.base.Function;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -55,34 +58,38 @@ import com.google.inject.Provider;
 public class CalQualifiedNameProvider extends
 		IQualifiedNameProvider.AbstractImpl {
 
-	@Inject
-	private IResourceScopeCache cache = IResourceScopeCache.NullImpl.INSTANCE;
-
-	private PolymorphicDispatcher<String> qualifiedName = new PolymorphicDispatcher<String>(
+	private PolymorphicDispatcher<QualifiedName> qualifiedName = new PolymorphicDispatcher<QualifiedName>(
 			"qualifiedName", 1, 1, Collections.singletonList(this),
-			PolymorphicDispatcher.NullErrorHandler.<String> get()) {
+			PolymorphicDispatcher.NullErrorHandler.<QualifiedName> get()) {
 		@Override
-		protected String handleNoSuchMethod(Object... params) {
+		protected QualifiedName handleNoSuchMethod(Object... params) {
 			return null;
 		}
 	};
 
-	private SimpleAttributeResolver<EObject, String> resolver = SimpleAttributeResolver
+	@Inject
+	private IQualifiedNameConverter converter = new IQualifiedNameConverter.DefaultImpl();
+
+	@Inject
+	private IResourceScopeCache cache = IResourceScopeCache.NullImpl.INSTANCE;
+
+	private Function<EObject, String> resolver = SimpleAttributeResolver
 			.newResolver(String.class, "name");
 
-	public String getDelimiter() {
-		return ".";
+	protected Function<EObject, String> getResolver() {
+		return resolver;
 	}
 
-	public String getQualifiedName(final EObject obj) {
+	public QualifiedName getFullyQualifiedName(final EObject obj) {
 		return cache.get(Tuples.pair(obj, "fqn"), obj.eResource(),
-				new Provider<String>() {
+				new Provider<QualifiedName>() {
 
-					public String get() {
+					public QualifiedName get() {
 						EObject temp = obj;
-						String name = qualifiedName.invoke(temp);
-						if (name != null) {
-							return name;
+						QualifiedName qualifiedNameFromDispatcher = qualifiedName
+								.invoke(temp);
+						if (qualifiedNameFromDispatcher != null) {
+							return qualifiedNameFromDispatcher;
 						}
 
 						AstEntity entity = null;
@@ -98,14 +105,15 @@ public class CalQualifiedNameProvider extends
 							// object inside an entity
 							EObject cter = temp.eContainer();
 							if (cter instanceof AstUnit) {
-								String parentsName = getQualifiedName(cter);
-								String value = resolver.getValue(temp);
+								QualifiedName parentsName = getFullyQualifiedName(cter);
+								String value = getResolver().apply(temp);
 								if (value != null) {
-									return parentsName + getDelimiter() + value;
+									return parentsName.append(value);
 								}
 							}
 						} else {
-							return Util.getQualifiedName(entity);
+							return getConverter().toQualifiedName(
+									Util.getQualifiedName(entity));
 						}
 
 						return null;
@@ -115,16 +123,13 @@ public class CalQualifiedNameProvider extends
 
 	}
 
-	protected SimpleAttributeResolver<EObject, String> getResolver() {
-		return resolver;
+	protected IQualifiedNameConverter getConverter() {
+		return converter;
 	}
 
-	public String getWildcard() {
-		return "*";
-	}
-
-	public String qualifiedName(AstTag tag) {
-		return OrccUtil.toString(tag.getIdentifiers(), ".");
+	public QualifiedName qualifiedName(AstTag tag) {
+		return getConverter().toQualifiedName(
+				OrccUtil.toString(tag.getIdentifiers(), "."));
 	}
 
 }

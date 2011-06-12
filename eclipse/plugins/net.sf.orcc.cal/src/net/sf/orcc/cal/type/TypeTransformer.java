@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.type;
 
+import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
+
 import java.util.List;
 import java.util.ListIterator;
 
@@ -42,7 +44,6 @@ import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalFactory;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.cal.validation.CalJavaValidator;
@@ -51,6 +52,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -171,9 +173,10 @@ public class TypeTransformer extends VoidSwitch {
 	 * @param feature
 	 *            feature of the object that caused the error
 	 */
-	private void error(String string, EObject source, int feature) {
+	private void error(String string, EObject source,
+			EStructuralFeature feature, int index) {
 		if (validator != null) {
-			validator.error(string, source, feature);
+			validator.error(string, source, feature, index);
 		}
 	}
 
@@ -218,7 +221,8 @@ public class TypeTransformer extends VoidSwitch {
 						error("variable "
 								+ astVariable.getName()
 								+ " does not have a compile-time constant initial value",
-								astVariable, CalPackage.AST_VARIABLE);
+								astVariable, eINSTANCE.getAstVariable_Name(),
+								-1);
 					} else {
 						// register the value
 						astVariable.setInitialValue(initialValue);

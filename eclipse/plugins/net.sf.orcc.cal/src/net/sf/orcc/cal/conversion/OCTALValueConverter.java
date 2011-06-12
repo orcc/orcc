@@ -9,7 +9,7 @@ package net.sf.orcc.cal.conversion;
 
 import org.eclipse.xtext.conversion.ValueConverterException;
 import org.eclipse.xtext.conversion.impl.AbstractLexerBasedConverter;
-import org.eclipse.xtext.parsetree.AbstractNode;
+import org.eclipse.xtext.nodemodel.INode;
 import org.eclipse.xtext.util.Strings;
 
 /**
@@ -37,7 +37,7 @@ public class OCTALValueConverter extends AbstractLexerBasedConverter<Long> {
 		return value.toString();
 	}
 
-	public Long toValue(String string, AbstractNode node) {
+	public Long toValue(String string, INode node) {
 		if (Strings.isEmpty(string))
 			throw new ValueConverterException(
 					"Couldn't convert empty string to int.", node, null);

@@ -46,7 +46,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.linking.impl.DefaultLinkingService;
-import org.eclipse.xtext.parsetree.AbstractNode;
+import org.eclipse.xtext.nodemodel.INode;
 
 /**
  * This class defines a linking service for built-in functions/procedures and
@@ -114,7 +114,7 @@ public class CalLinkingService extends DefaultLinkingService {
 
 	@Override
 	public List<EObject> getLinkedObjects(EObject context, EReference ref,
-			AbstractNode node) {
+			INode node) {
 		List<EObject> result = super.getLinkedObjects(context, ref, node);
 		if (result != null && !result.isEmpty()) {
 			return result;

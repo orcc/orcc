@@ -54,9 +54,8 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 	public OrccPreferencePage() {
 		super(GRID);
 
-		InstanceScope scope = new InstanceScope();
-		IPreferenceStore store = new ScopedPreferenceStore(scope,
-				OrccActivator.PLUGIN_ID);
+		IPreferenceStore store = new ScopedPreferenceStore(
+				InstanceScope.INSTANCE, OrccActivator.PLUGIN_ID);
 		setPreferenceStore(store);
 		setDescription("General settings for Orcc");
 	}

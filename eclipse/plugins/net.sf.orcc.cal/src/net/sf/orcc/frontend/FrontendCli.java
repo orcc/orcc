@@ -51,13 +51,13 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.xtext.diagnostics.Severity;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
 import org.eclipse.xtext.util.CancelIndicator;
 import org.eclipse.xtext.validation.CheckMode;
 import org.eclipse.xtext.validation.IResourceValidator;
 import org.eclipse.xtext.validation.Issue;
-import org.eclipse.xtext.validation.Issue.Severity;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -114,7 +114,7 @@ public class FrontendCli implements IApplication {
 		IResourceValidator v = ((XtextResource) resource)
 				.getResourceServiceProvider().getResourceValidator();
 		List<Issue> issues = v.validate(resource, CheckMode.ALL,
-				new CancelIndicator.NullImpl());
+				CancelIndicator.NullImpl);
 
 		for (Issue issue : issues) {
 			if (issue.getSeverity() == Severity.ERROR) {

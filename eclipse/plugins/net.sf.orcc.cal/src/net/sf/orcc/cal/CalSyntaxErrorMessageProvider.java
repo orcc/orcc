@@ -30,8 +30,8 @@ package net.sf.orcc.cal;
 
 import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.RecognitionException;
+import org.eclipse.xtext.nodemodel.SyntaxErrorMessage;
 import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider;
-import org.eclipse.xtext.parser.antlr.SyntaxErrorMessage;
 
 /**
  * This class defines a syntax error message provider specific to RVC-CAL.

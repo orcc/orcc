@@ -30,13 +30,12 @@ package net.sf.orcc.cal;
 
 import net.sf.orcc.cal.linking.CalLinkingService;
 import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
-import net.sf.orcc.cal.resource.CalResourceDescriptionManager;
 
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingService;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider;
-import org.eclipse.xtext.resource.IResourceDescription;
+import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 
 /**
  * Use this class to register components to be used within the IDE.
@@ -53,20 +52,10 @@ public class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
 		return CalQualifiedNameProvider.class;
 	}
 
-	public Class<? extends IResourceDescription.Manager> bindIResourceDescription$Manager() {
-		// this must be used so that the set of objects exported by an actor is
-		// minimal, namely input ports and output ports only
-
-		// this prevents the builder from building tens of actors each time an
-		// actor changes ever so slightly
-
-		// note that the NamesAreUniqueValidator only works on exported objects,
-		// so we have to do our own unique name validation, see the
-		// CalJavaValidator
-
-		return CalResourceDescriptionManager.class;
+	public Class<? extends IDefaultResourceDescriptionStrategy> bindIDefaultResourceDescriptionStrategy() {
+		return CalResourceDescription.class;
 	}
-	
+
 	public Class<? extends ISyntaxErrorMessageProvider> bindISyntaxErrorMessageProvider() {
 		return CalSyntaxErrorMessageProvider.class;
 	}

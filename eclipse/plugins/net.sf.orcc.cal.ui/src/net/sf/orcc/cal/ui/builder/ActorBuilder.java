@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.ui.builder;
 
+import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -121,7 +123,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				// deletion
 				IResourceDescription desc = delta.getOld();
 				for (IEObjectDescription objDesc : desc
-						.getExportedObjects(CalPackage.eINSTANCE.getAstActor())) {
+						.getExportedObjectsByType(eINSTANCE.getAstActor())) {
 					File file = new File(outputFolder + File.separator
 							+ objDesc.getName() + ".json");
 					file.delete();

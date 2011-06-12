@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.expression;
 
+import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +48,6 @@ import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.validation.CalJavaValidator;
@@ -64,6 +65,7 @@ import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -106,7 +108,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		}
 
 		error("cannot use function \"" + name + "\" in expression", expression,
-				CalPackage.AST_EXPRESSION_CALL__FUNCTION);
+				eINSTANCE.getAstExpressionCall_Function(), -1);
 
 		return null;
 	}
@@ -132,7 +134,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			}
 		} else {
 			error("expected condition of type bool", expression,
-					CalPackage.AST_EXPRESSION_IF__CONDITION);
+					eINSTANCE.getAstExpressionIf_Condition(), -1);
 			return null;
 		}
 	}
@@ -145,12 +147,12 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			error("variable \"" + variable.getName() + "\" ("
 					+ Util.getLocation(variable)
 					+ ") does not have a compile-time constant value",
-					expression, CalPackage.AST_EXPRESSION_INDEX__SOURCE);
+					expression, eINSTANCE.getAstExpressionIndex_Source(), -1);
 			return null;
 		}
 
 		List<AstExpression> indexes = expression.getIndexes();
-
+		int errorIdx = 0;
 		for (AstExpression index : indexes) {
 			Expression indexValue = evaluate(index);
 			if (value != null && value.isListExpr()) {
@@ -160,24 +162,28 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 					if (intExpr.isLong()) {
 						error("index must be a int(size=32) integer",
 								expression,
-								CalPackage.AST_EXPRESSION_INDEX__INDEXES);
+								eINSTANCE.getAstExpressionIndex_Indexes(),
+								errorIdx);
 					} else {
 						try {
 							value = list.get(intExpr.getIntValue());
 						} catch (IndexOutOfBoundsException e) {
 							error("index out of bounds", expression,
-									CalPackage.AST_EXPRESSION_INDEX__INDEXES);
+									eINSTANCE.getAstExpressionIndex_Indexes(),
+									errorIdx);
 						}
 					}
 				} else {
 					error("index must be an integer", expression,
-							CalPackage.AST_EXPRESSION_INDEX__INDEXES);
+							eINSTANCE.getAstExpressionIndex_Indexes(), errorIdx);
 				}
 			} else {
 				error("variable \"" + variable.getName() + "\" ("
 						+ Util.getLocation(variable) + ") must be of type List",
-						expression, CalPackage.AST_EXPRESSION_INDEX__SOURCE);
+						expression, eINSTANCE.getAstExpressionIndex_Source(),
+						-1);
 			}
+			errorIdx++;
 		}
 
 		return EcoreUtil.copy(value);
@@ -228,7 +234,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			}
 
 			error("bitnot expects an integer expression", expression,
-					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
+					eINSTANCE.getAstExpressionUnary_UnaryOperator(), -1);
 			return null;
 		}
 		case LOGIC_NOT: {
@@ -238,7 +244,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			}
 
 			error("not expects a boolean expression", expression,
-					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
+					eINSTANCE.getAstExpressionUnary_UnaryOperator(), -1);
 			return null;
 		}
 		case MINUS: {
@@ -249,7 +255,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			}
 
 			error("minus expects an integer expression", expression,
-					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
+					eINSTANCE.getAstExpressionUnary_UnaryOperator(), -1);
 			return null;
 		}
 		case NUM_ELTS:
@@ -261,7 +267,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 			}
 
 			error("operator # expects a list expression", expression,
-					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
+					eINSTANCE.getAstExpressionUnary_UnaryOperator(), -1);
 			return null;
 		}
 
@@ -281,9 +287,10 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		return value;
 	}
 
-	private void error(String string, EObject source, int feature) {
+	private void error(String string, EObject source,
+			EStructuralFeature feature, int index) {
 		if (validator != null) {
-			validator.error(string, source, feature);
+			validator.error(string, source, feature, index);
 		}
 	}
 
@@ -316,20 +323,21 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 	 *             if the given expression cannot be evaluated.
 	 */
 	public int evaluateAsInteger(AstExpression expression) {
+		EObject cter = expression.eContainer();
+		EStructuralFeature feature = expression.eContainingFeature();
 		Expression value = evaluate(expression);
 		if (value != null && value.isIntExpr()) {
 			ExprInt intExpr = (ExprInt) value;
 			if (intExpr.isLong()) {
-				error("integer expression too large", expression,
-						CalPackage.AST_EXPRESSION);
+				error("integer expression too large", cter, feature, -1);
 			} else {
 				return intExpr.getIntValue();
 			}
 		}
 
 		// evaluated ok, but not as an integer
-		error("expected compile-time constant integer expression", expression,
-				CalPackage.AST_EXPRESSION);
+		error("expected compile-time constant integer expression", cter,
+				feature, -1);
 		return 0;
 	}
 

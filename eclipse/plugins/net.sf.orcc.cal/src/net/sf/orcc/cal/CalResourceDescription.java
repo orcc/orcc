@@ -26,24 +26,17 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal.resource;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+package net.sf.orcc.cal;
 
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 
-import org.apache.log4j.Logger;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.resource.IEObjectDescription;
-import org.eclipse.xtext.resource.impl.DefaultResourceDescription;
-
-import com.google.common.collect.Lists;
+import org.eclipse.xtext.resource.impl.DefaultResourceDescriptionStrategy;
+import org.eclipse.xtext.util.IAcceptor;
 
 /**
  * This class defines a CAL resource description that returns a set of exported
@@ -52,59 +45,31 @@ import com.google.common.collect.Lists;
  * @author Matthieu Wipliez
  * 
  */
-public class CalResourceDescription extends DefaultResourceDescription {
-
-	private final static Logger log = Logger
-			.getLogger(CalResourceDescription.class);
-
-	public CalResourceDescription(Resource resource,
-			IQualifiedNameProvider nameProvider) {
-		super(resource, nameProvider);
-	}
+public class CalResourceDescription extends DefaultResourceDescriptionStrategy {
 
 	@Override
-	protected List<IEObjectDescription> computeExportedObjects() {
-		loadResourceIfNecessary();
-		if (getResource().getContents().isEmpty()) {
-			return Collections.emptyList();
-		}
+	public boolean createEObjectDescriptions(EObject eObject,
+			IAcceptor<IEObjectDescription> acceptor) {
+		if (eObject instanceof AstEntity) {
+			// create the object description for the entity (with qualified
+			// name)
+			super.createEObjectDescriptions(eObject, acceptor);
 
-		List<IEObjectDescription> result = Lists.newArrayList();
-		AstEntity entity = (AstEntity) getResource().getContents().get(0);
-
-		// create the object description for the entity (with qualified name)
-		IEObjectDescription description = createIEObjectDescription(entity);
-		result.add(description);
-
-		// create object descriptions for variables/functions of a unit
-		AstUnit unit = entity.getUnit();
-		if (unit != null) {
-			for (AstVariable variable : unit.getVariables()) {
-				description = createIEObjectDescription(variable);
-				if (description != null) {
-					result.add(description);
+			// create object descriptions for variables/functions of a unit
+			AstEntity entity = (AstEntity) eObject;
+			AstUnit unit = entity.getUnit();
+			if (unit != null) {
+				for (AstVariable variable : unit.getVariables()) {
+					super.createEObjectDescriptions(variable, acceptor);
 				}
-			}
 
-			for (AstFunction function : unit.getFunctions()) {
-				description = createIEObjectDescription(function);
-				if (description != null) {
-					result.add(description);
+				for (AstFunction function : unit.getFunctions()) {
+					super.createEObjectDescriptions(function, acceptor);
 				}
 			}
 		}
 
-		return result;
-	}
-
-	protected void loadResourceIfNecessary() {
-		if (!getResource().isLoaded()) {
-			try {
-				getResource().load(null);
-			} catch (IOException e) {
-				log.error(e.getMessage(), e);
-			}
-		}
+		return false;
 	}
 
 }

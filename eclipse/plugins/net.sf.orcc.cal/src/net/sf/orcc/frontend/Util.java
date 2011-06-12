@@ -29,8 +29,8 @@
 package net.sf.orcc.frontend;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.parsetree.CompositeNode;
-import org.eclipse.xtext.parsetree.NodeUtil;
+import org.eclipse.xtext.nodemodel.ICompositeNode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
 /**
  * This class defines various utility functions.
@@ -48,11 +48,11 @@ public class Util {
 	 * @return the line on which the given object is defined
 	 */
 	public static int getLocation(EObject object) {
-		CompositeNode node = NodeUtil.getNode(object);
+		ICompositeNode node = NodeModelUtils.getNode(object);
 		if (node == null) {
 			return 0;
 		} else {
-			return node.getLine();
+			return node.getStartLine();
 		}
 	}
 

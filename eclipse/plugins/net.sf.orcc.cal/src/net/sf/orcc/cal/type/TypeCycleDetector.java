@@ -28,16 +28,18 @@
  */
 package net.sf.orcc.cal.type;
 
+import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
+
 import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.cal.validation.CalJavaValidator;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -107,7 +109,7 @@ public class TypeCycleDetector extends VoidSwitch {
 			if (!variables.isEmpty()) {
 				for (AstVariable variable : variables) {
 					error(variable.getName() + " has a cyclic type definition",
-							variable, CalPackage.AST_VARIABLE);
+							variable, eINSTANCE.getAstVariable_Name(), -1);
 				}
 			}
 		}
@@ -116,9 +118,10 @@ public class TypeCycleDetector extends VoidSwitch {
 		return hasCycles;
 	}
 
-	private void error(String string, EObject source, int feature) {
+	private void error(String string, EObject source,
+			EStructuralFeature feature, int index) {
 		if (validator != null) {
-			validator.error(string, source, feature);
+			validator.error(string, source, feature, index);
 		}
 	}
 

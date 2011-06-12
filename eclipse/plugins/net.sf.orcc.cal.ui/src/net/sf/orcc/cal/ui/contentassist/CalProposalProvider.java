@@ -81,7 +81,7 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 	 */
 	private void addUnits(EObject model, EReference reference, Set<String> units) {
 		IScope scope = getScopeProvider().getScope(model, reference);
-		Iterable<IEObjectDescription> candidates = scope.getAllContents();
+		Iterable<IEObjectDescription> candidates = scope.getAllElements();
 		for (IEObjectDescription candidate : candidates) {
 			URI uri = candidate.getEObjectURI();
 			uri = uri.trimFragment();

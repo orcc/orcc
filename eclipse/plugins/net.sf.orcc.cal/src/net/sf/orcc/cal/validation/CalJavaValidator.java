@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.validation;
 
+import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -82,6 +84,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -139,7 +142,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			String name = pattern.getPort().getName();
 			if (names.contains(name)) {
 				error("Duplicate port " + name + " in input pattern", pattern,
-						CalPackage.AST_INPUT_PATTERN__PORT);
+						eINSTANCE.getAstInputPattern_Port(), -1);
 			}
 			names.add(name);
 		}
@@ -160,7 +163,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			String name = pattern.getPort().getName();
 			if (names.contains(name)) {
 				error("Duplicate port " + name + " in output pattern", pattern,
-						CalPackage.AST_OUTPUT_PATTERN__PORT);
+						eINSTANCE.getAstOutputPattern_Port(), -1);
 			}
 			names.add(name);
 
@@ -168,12 +171,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat == null) {
 				List<AstExpression> values = pattern.getValues();
+				int index = 0;
 				for (AstExpression value : values) {
 					Type type = checker.getType(value);
 					if (!checker.isConvertibleTo(type, portType)) {
 						error("this expression must be of type " + portType,
-								value, CalPackage.AST_EXPRESSION);
+								value, eINSTANCE.getAstOutputPattern_Repeat(),
+								index);
 					}
+					index++;
 				}
 			} else {
 				int repeat = new AstExpressionEvaluator(this)
@@ -181,6 +187,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				if (repeat != 1) {
 					// each value is supposed to be a list
 					List<AstExpression> values = pattern.getValues();
+					int index = 0;
 					for (AstExpression value : values) {
 						Type type = checker.getType(value);
 						if (type.isList()) {
@@ -195,7 +202,9 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 						error("this expression must be of type List of "
 								+ portType
 								+ " with a size greater than or equal to "
-								+ repeat, value, CalPackage.AST_EXPRESSION);
+								+ repeat, value,
+								eINSTANCE.getAstOutputPattern_Repeat(), index);
+						index++;
 					}
 				}
 			}
@@ -220,7 +229,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			if (name.equals(variable.getName())) {
 				error("Action " + name
 						+ " has the same name as a state variable",
-						CalPackage.AST_ACTION__TAG);
+						eINSTANCE.getAstAction_Tag());
 			}
 		}
 
@@ -229,7 +238,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		for (AstPort input : inputs) {
 			if (name.equals(input.getName())) {
 				error("Action " + name + " has the same name as an input port",
-						CalPackage.AST_ACTION__TAG);
+						eINSTANCE.getAstAction_Tag());
 			}
 		}
 
@@ -238,7 +247,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		for (AstPort output : outputs) {
 			if (name.equals(output.getName())) {
 				error("Action " + name + " has the same name as an output port",
-						CalPackage.AST_ACTION__TAG);
+						eINSTANCE.getAstAction_Tag());
 			}
 		}
 	}
@@ -281,8 +290,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 		AstScheduleRegExp scheduleRegExp = actor.getScheduleRegExp();
 		if (scheduleRegExp != null && !actor.getPriorities().isEmpty()) {
-			error("Regexp scheduler with priorities.", scheduleRegExp,
-					CalPackage.AST_SCHEDULE_REG_EXP);
+			error("Regexp scheduler with priorities.", actor,
+					eINSTANCE.getAstActor_ScheduleRegExp(), -1);
 		}
 
 		checkPriorities(actor, actionList);
@@ -293,7 +302,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		AstVariable variable = assign.getTarget().getVariable();
 		if (variable.isConstant()) {
 			error("The variable " + variable.getName() + " is not assignable",
-					CalPackage.AST_STATEMENT_ASSIGN__TARGET);
+					eINSTANCE.getAstStatementAssign_Target());
 		}
 
 		// create expression
@@ -316,7 +325,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		if (!checker.isConvertibleTo(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
 					+ targetType, assign,
-					CalPackage.AST_STATEMENT_ASSIGN__VALUE);
+					eINSTANCE.getAstStatementAssign_Value(), -1);
 		}
 	}
 
@@ -330,7 +339,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				if (parameters.size() > 1) {
 					error("built-in procedure " + name
 							+ " takes at most one expression", astCall,
-							CalPackage.AST_STATEMENT_CALL);
+							eINSTANCE.getAstStatementCall_Procedure(), -1);
 				}
 			}
 
@@ -340,13 +349,14 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		if (procedure.getParameters().size() != parameters.size()) {
 			error("procedure " + name + " takes "
 					+ procedure.getParameters().size() + " arguments.",
-					astCall, CalPackage.AST_STATEMENT_CALL);
+					astCall, eINSTANCE.getAstStatementCall_Procedure(), -1);
 			return;
 		}
 
 		TypeChecker checker = new TypeChecker(this);
 		Iterator<AstVariable> itFormal = procedure.getParameters().iterator();
 		Iterator<AstExpression> itActual = parameters.iterator();
+		int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
 			Type formalType = itFormal.next().getIrType();
 			AstExpression expression = itActual.next();
@@ -356,8 +366,9 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			if (!checker.isConvertibleTo(actualType, formalType)) {
 				error("Type mismatch: cannot convert from " + actualType
 						+ " to " + formalType, expression,
-						CalPackage.AST_EXPRESSION);
+						eINSTANCE.getAstStatementCall_Parameters(), index);
 			}
+			index++;
 		}
 	}
 
@@ -390,7 +401,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		if (!expectedName.equals(entityName)) {
 			error("The qualified name " + entityName
 					+ " does not match the expected name " + expectedName,
-					entity, CalPackage.AST_ENTITY__NAME,
+					entity, eINSTANCE.getAstEntity_Name(),
 					CalConstants.ERROR_NAME, entityName, expectedName);
 		}
 	}
@@ -463,8 +474,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 					error("The package " + packageName
 							+ " does not match the expected package "
 							+ expectedName, entity,
-							CalPackage.AST_ENTITY__PACKAGE, code, packageName,
-							expectedName);
+							eINSTANCE.getAstEntity_Package(), code,
+							packageName, expectedName);
 				}
 			}
 		} catch (JavaModelException e) {
@@ -491,7 +502,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				if (actions == null || actions.isEmpty()) {
 					error("tag " + getName(tag)
 							+ " does not refer to any action", transition,
-							CalPackage.AST_TRANSITION__TAG);
+							eINSTANCE.getAstTransition_Tag(), -1);
 				}
 			}
 		}
@@ -525,7 +536,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 		if (!used && !function.isNative()) {
 			warning("The function " + function.getName() + " is never called",
-					CalPackage.AST_FUNCTION__NAME);
+					eINSTANCE.getAstFunction_Name());
 		}
 	}
 
@@ -541,7 +552,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 		if (higher < lower) {
 			error("higher bound must be greater than lower bound", generator,
-					CalPackage.AST_GENERATOR);
+					eINSTANCE.getAstGenerator_Higher(), -1);
 		}
 	}
 
@@ -597,23 +608,23 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			if (reference == CalPackage.eINSTANCE.getAstActor_Parameters()) {
 				return;
 			}
-			
+
 			if (variable.eContainer() instanceof AstFunction) {
 				AstFunction function = (AstFunction) variable.eContainer();
 				if (function.isNative()) {
 					return;
 				}
 			}
-			
+
 			if (variable.eContainer() instanceof AstProcedure) {
 				AstProcedure procedure = (AstProcedure) variable.eContainer();
 				if (procedure.isNative()) {
 					return;
 				}
 			}
-			
+
 			warning("The variable " + variable.getName() + " is never read",
-					CalPackage.AST_VARIABLE__NAME);
+					eINSTANCE.getAstVariable_Name());
 		}
 	}
 
@@ -649,14 +660,16 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 				List<AstAction> sources = actionList
 						.getTaggedActions(previousTag.getIdentifiers());
+				int index = 0;
 				if (sources == null || sources.isEmpty()) {
 					error("tag " + getName(previousTag)
 							+ " does not refer to any action", inequality,
-							CalPackage.AST_INEQUALITY);
+							eINSTANCE.getAstInequality_Tags(), index);
 				}
 
 				while (it.hasNext()) {
 					AstTag tag = it.next();
+					index++;
 					sources = actionList.getTaggedActions(previousTag
 							.getIdentifiers());
 					List<AstAction> targets = actionList.getTaggedActions(tag
@@ -665,7 +678,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 					if (targets == null || targets.isEmpty()) {
 						error("tag " + getName(tag)
 								+ " does not refer to any action", inequality,
-								CalPackage.AST_INEQUALITY);
+								eINSTANCE.getAstInequality_Tags(), index);
 					}
 
 					if (sources != null && targets != null) {
@@ -697,7 +710,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			error("priorities of actor "
 					+ ((AstEntity) actor.eContainer()).getName()
 					+ " contain a cycle: " + builder.toString(), actor,
-					CalPackage.AST_ACTOR__PRIORITIES);
+					eINSTANCE.getAstActor_Priorities(), -1);
 		}
 	}
 
@@ -719,9 +732,10 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 		}.doSwitch(Util.getTopLevelContainer(procedure));
 
-		if (!used && procedure.eContainer() instanceof AstActor && !procedure.isNative()) {
+		if (!used && procedure.eContainer() instanceof AstActor
+				&& !procedure.isNative()) {
 			warning("The procedure " + procedure.getName() + " is never called",
-					CalPackage.AST_PROCEDURE__NAME);
+					eINSTANCE.getAstProcedure_Name());
 		}
 	}
 
@@ -731,8 +745,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		Type expressionType = function.getExpression().getIrType();
 		if (!checker.isConvertibleTo(expressionType, returnType)) {
 			error("Type mismatch: cannot convert from " + expressionType
-					+ " to " + returnType, function.getExpression(),
-					CalPackage.AST_EXPRESSION);
+					+ " to " + returnType, function,
+					eINSTANCE.getAstFunction_Expression(), -1);
 		}
 	}
 
@@ -742,7 +756,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			String name = getName(variable);
 			if (names.contains(name)) {
 				error("Duplicate variable " + name, variable,
-						CalPackage.AST_VARIABLE__NAME);
+						eINSTANCE.getAstVariable_Name(), -1);
 			}
 			names.add(name);
 		}
@@ -765,14 +779,16 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			Type type = checker.getType(value);
 			if (!checker.isConvertibleTo(type, targetType)) {
 				error("Type mismatch: cannot convert from " + type + " to "
-						+ targetType, variable, CalPackage.AST_VARIABLE);
+						+ targetType, variable,
+						eINSTANCE.getAstVariable_Value(), -1);
 			}
 		}
 	}
 
 	@Override
-	public void error(String string, EObject source, Integer feature) {
-		super.error(string, source, feature);
+	public void error(String string, EObject source,
+			EStructuralFeature feature, int index) {
+		super.error(string, source, feature, index);
 	}
 
 	private String getExpectedName(IPath rootPath, IPath filePath) {

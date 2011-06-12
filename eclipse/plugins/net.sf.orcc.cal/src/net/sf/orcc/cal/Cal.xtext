@@ -323,17 +323,17 @@ AstExpressionString: value=STRING;
 
 AstType: AstTypeBool | AstTypeFloat | AstTypeInt | AstTypeList | AstTypeString | AstTypeUint;
 
-AstTypeBool: name='bool';
+AstTypeBool: {AstTypeBool} 'bool';
 
-AstTypeFloat: name='float';
+AstTypeFloat: {AstTypeFloat} 'float';
 
-AstTypeInt: name='int' ('(' 'size' '=' size = AstExpression ')')?;
+AstTypeInt: {AstTypeInt} 'int' ('(' 'size' '=' size = AstExpression ')')?;
 
-AstTypeList: name='List' '(' 'type' ':' type = AstType ',' 'size' '=' size = AstExpression ')';
+AstTypeList: 'List' '(' 'type' ':' type = AstType ',' 'size' '=' size = AstExpression ')';
 
-AstTypeString: name='String';
+AstTypeString: {AstTypeString} 'String';
 
-AstTypeUint: name='uint' ('(' 'size' '=' size = AstExpression ')')?;
+AstTypeUint: {AstTypeUint} 'uint' ('(' 'size' '=' size = AstExpression ')')?;
 
 AstVariableDeclaration returns AstVariable: type=AstType name=ID
 	('[' dimensions += AstExpression ']')*;

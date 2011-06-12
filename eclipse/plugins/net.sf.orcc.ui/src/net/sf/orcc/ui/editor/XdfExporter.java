@@ -67,6 +67,7 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -92,11 +93,12 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.IGrammarAccess;
+import org.eclipse.xtext.nodemodel.ICompositeNode;
+import org.eclipse.xtext.nodemodel.ILeafNode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 import org.eclipse.xtext.parser.IParseResult;
-import org.eclipse.xtext.parser.antlr.IAntlrParser;
-import org.eclipse.xtext.parsetree.CompositeNode;
-import org.eclipse.xtext.parsetree.LeafNode;
-import org.eclipse.xtext.parsetree.NodeUtil;
+import org.eclipse.xtext.parser.IParser;
 
 import com.google.inject.Injector;
 
@@ -108,13 +110,15 @@ import com.google.inject.Injector;
  */
 public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 
-	private IAntlrParser parser;
+	private IParser parser;
 
 	private Map<String, Var> varMap;
 
 	private Map<Vertex, net.sf.orcc.network.Vertex> vertexMap;
 
 	private Injector injector;
+
+	private CalGrammarAccess access;
 
 	private void addEdge(Network network, Edge edge) {
 		net.sf.orcc.network.Vertex source = vertexMap.get(edge.getSource());
@@ -327,7 +331,8 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 
 	private Expression parseExpression(Object value) {
 		Reader reader = new StringReader((String) value);
-		IParseResult result = parser.parse("AstExpression", reader);
+		IParseResult result = parser.parse(access.getAstExpressionRule(),
+				reader);
 		AstExpression expression = (AstExpression) result.getRootASTElement();
 
 		linkModel(expression);
@@ -337,7 +342,7 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 
 	private Type parseType(Object value) {
 		Reader reader = new StringReader((String) value);
-		IParseResult result = parser.parse("AstType", reader);
+		IParseResult result = parser.parse(access.getAstTypeRule(), reader);
 		AstType type = (AstType) result.getRootASTElement();
 
 		linkModel(type);
@@ -352,8 +357,8 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 			if (obj instanceof AstVariableReference) {
 				AstVariableReference ref = (AstVariableReference) obj;
 
-				CompositeNode node = NodeUtil.getNode(obj);
-				for (LeafNode leaf : node.getLeafNodes()) {
+				ICompositeNode node = NodeModelUtils.getNode(obj);
+				for (ILeafNode leaf : node.getLeafNodes()) {
 					AstVariable variable = CalFactory.eINSTANCE
 							.createAstVariable();
 					variable.setName(leaf.getText());
@@ -366,7 +371,8 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 	@SuppressWarnings("unchecked")
 	private <T> T parseVariable(Object parameter) {
 		Reader reader = new StringReader((String) parameter);
-		IParseResult result = parser.parse("AstVariableDeclaration", reader);
+		IParseResult result = parser.parse(
+				access.getAstVariableDeclarationRule(), reader);
 		return (T) result.getRootASTElement();
 	}
 
@@ -374,7 +380,9 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 	public void transform(Graph graph, OutputStream out) {
 		injector = CalActivator.getInstance()
 				.getInjector("net.sf.orcc.cal.Cal");
-		parser = injector.getInstance(IAntlrParser.class);
+		parser = injector.getInstance(IParser.class);
+		access = (CalGrammarAccess) injector.getInstance(IGrammarAccess.class);
+
 		varMap = new HashMap<String, Var>();
 		vertexMap = new HashMap<Vertex, net.sf.orcc.network.Vertex>();
 
