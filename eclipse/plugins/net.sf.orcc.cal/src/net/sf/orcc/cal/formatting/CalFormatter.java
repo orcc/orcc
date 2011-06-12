@@ -517,14 +517,14 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureTypeInt(FormattingConfig c) {
 		AstTypeIntElements access = f.getAstTypeIntAccess();
 
-		c.setNoSpace().around(access.getLeftParenthesisKeyword_1_0());
-		c.setNoSpace().after(access.getSizeKeyword_1_1());
-		c.setNoSpace().after(access.getEqualsSignKeyword_1_2());
-		c.setNoSpace().before(access.getRightParenthesisKeyword_1_4());
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_2_0());
+		c.setNoSpace().after(access.getSizeKeyword_2_1());
+		c.setNoSpace().after(access.getEqualsSignKeyword_2_2());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_2_4());
 
-		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_1_0());
-		c.setNoLinewrap().around(access.getEqualsSignKeyword_1_2());
-		c.setNoLinewrap().around(access.getRightParenthesisKeyword_1_4());
+		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_2_0());
+		c.setNoLinewrap().around(access.getEqualsSignKeyword_2_2());
+		c.setNoLinewrap().around(access.getRightParenthesisKeyword_2_4());
 	}
 
 	private void configureTypeList(FormattingConfig c) {
@@ -547,15 +547,15 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureTypeUint(FormattingConfig c) {
 		AstTypeUintElements access = f.getAstTypeUintAccess();
 
-		c.setNoSpace().before(access.getLeftParenthesisKeyword_1_0());
-		c.setNoSpace().after(access.getLeftParenthesisKeyword_1_0());
-		c.setNoSpace().after(access.getSizeKeyword_1_1());
-		c.setNoSpace().after(access.getEqualsSignKeyword_1_2());
-		c.setNoSpace().before(access.getRightParenthesisKeyword_1_4());
+		c.setNoSpace().before(access.getLeftParenthesisKeyword_2_0());
+		c.setNoSpace().after(access.getLeftParenthesisKeyword_2_0());
+		c.setNoSpace().after(access.getSizeKeyword_2_1());
+		c.setNoSpace().after(access.getEqualsSignKeyword_2_2());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_2_4());
 
-		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_1_0());
-		c.setNoLinewrap().around(access.getEqualsSignKeyword_1_2());
-		c.setNoLinewrap().around(access.getRightParenthesisKeyword_1_4());
+		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_2_0());
+		c.setNoLinewrap().around(access.getEqualsSignKeyword_2_2());
+		c.setNoLinewrap().around(access.getRightParenthesisKeyword_2_4());
 	}
 
 	/**

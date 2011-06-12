@@ -90,7 +90,7 @@ public class OrccActivator extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		contexts = new IScopeContext[] { new InstanceScope() };
+		contexts = new IScopeContext[] { InstanceScope.INSTANCE };
 		plugin = this;
 	}
 
