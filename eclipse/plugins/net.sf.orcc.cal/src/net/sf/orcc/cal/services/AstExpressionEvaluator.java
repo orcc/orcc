@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal.expression;
+package net.sf.orcc.cal.services;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
@@ -51,7 +51,6 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;

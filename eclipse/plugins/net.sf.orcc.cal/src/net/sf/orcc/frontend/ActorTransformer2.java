@@ -39,7 +39,7 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;

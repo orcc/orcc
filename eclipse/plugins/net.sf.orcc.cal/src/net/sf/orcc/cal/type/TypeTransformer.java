@@ -46,7 +46,7 @@ import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;

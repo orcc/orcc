@@ -33,7 +33,7 @@ import java.util.WeakHashMap;
 
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.ir.Type;
 

@@ -35,8 +35,8 @@ import java.util.Set;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.services.CalJavaValidator;
 import net.sf.orcc.cal.util.VoidSwitch;
-import net.sf.orcc.cal.validation.CalJavaValidator;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;

@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.cal;
 
-import net.sf.orcc.cal.linking.CalLinkingService;
-import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
+import net.sf.orcc.cal.services.CalLinkingService;
+import net.sf.orcc.cal.services.CalQualifiedNameProvider;
 
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingService;

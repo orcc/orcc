@@ -58,7 +58,7 @@ import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.services.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
