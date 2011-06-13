@@ -29,12 +29,14 @@
 package net.sf.orcc.backends.tta.architecture.impl;
 
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.Reads;
 
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.ecore.EClass;
 
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
@@ -47,7 +49,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ReadsImpl#getStartCycle <em>Start Cycle</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ReadsImpl#getCycles <em>Cycles</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ReadsImpl#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.ReadsImpl#getPort <em>Port</em>}</li>
  * </ul>
  * </p>
  *
@@ -95,24 +97,14 @@ public class ReadsImpl extends EObjectImpl implements Reads {
 	protected int cycles = CYCLES_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
+	 * The cached value of the '{@link #getPort() <em>Port</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getName()
+	 * @see #getPort()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int NAME_EDEFAULT = 0;
-
-	/**
-	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getName()
-	 * @generated
-	 * @ordered
-	 */
-	protected int name = NAME_EDEFAULT;
+	protected Port port;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -180,8 +172,16 @@ public class ReadsImpl extends EObjectImpl implements Reads {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public int getName() {
-		return name;
+	public Port getPort() {
+		if (port != null && port.eIsProxy()) {
+			InternalEObject oldPort = (InternalEObject)port;
+			port = (Port)eResolveProxy(oldPort);
+			if (port != oldPort) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.READS__PORT, oldPort, port));
+			}
+		}
+		return port;
 	}
 
 	/**
@@ -189,11 +189,20 @@ public class ReadsImpl extends EObjectImpl implements Reads {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setName(int newName) {
-		int oldName = name;
-		name = newName;
+	public Port basicGetPort() {
+		return port;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setPort(Port newPort) {
+		Port oldPort = port;
+		port = newPort;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.READS__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.READS__PORT, oldPort, port));
 	}
 
 	/**
@@ -241,8 +250,9 @@ public class ReadsImpl extends EObjectImpl implements Reads {
 				return getStartCycle();
 			case ArchitecturePackage.READS__CYCLES:
 				return getCycles();
-			case ArchitecturePackage.READS__NAME:
-				return getName();
+			case ArchitecturePackage.READS__PORT:
+				if (resolve) return getPort();
+				return basicGetPort();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -261,8 +271,8 @@ public class ReadsImpl extends EObjectImpl implements Reads {
 			case ArchitecturePackage.READS__CYCLES:
 				setCycles((Integer)newValue);
 				return;
-			case ArchitecturePackage.READS__NAME:
-				setName((Integer)newValue);
+			case ArchitecturePackage.READS__PORT:
+				setPort((Port)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -282,8 +292,8 @@ public class ReadsImpl extends EObjectImpl implements Reads {
 			case ArchitecturePackage.READS__CYCLES:
 				setCycles(CYCLES_EDEFAULT);
 				return;
-			case ArchitecturePackage.READS__NAME:
-				setName(NAME_EDEFAULT);
+			case ArchitecturePackage.READS__PORT:
+				setPort((Port)null);
 				return;
 		}
 		super.eUnset(featureID);
@@ -301,8 +311,8 @@ public class ReadsImpl extends EObjectImpl implements Reads {
 				return startCycle != START_CYCLE_EDEFAULT;
 			case ArchitecturePackage.READS__CYCLES:
 				return cycles != CYCLES_EDEFAULT;
-			case ArchitecturePackage.READS__NAME:
-				return name != NAME_EDEFAULT;
+			case ArchitecturePackage.READS__PORT:
+				return port != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -321,8 +331,6 @@ public class ReadsImpl extends EObjectImpl implements Reads {
 		result.append(startCycle);
 		result.append(", cycles: ");
 		result.append(cycles);
-		result.append(", name: ");
-		result.append(name);
 		result.append(')');
 		return result.toString();
 	}

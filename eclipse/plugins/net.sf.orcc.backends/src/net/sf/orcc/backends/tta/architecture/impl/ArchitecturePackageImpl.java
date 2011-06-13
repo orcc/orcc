@@ -977,11 +977,12 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getReads_Name() {
-		return (EAttribute)readsEClass.getEStructuralFeatures().get(0);
+	public EReference getReads_Port() {
+		return (EReference)readsEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -993,11 +994,12 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getWrites_Name() {
-		return (EAttribute)writesEClass.getEStructuralFeatures().get(0);
+	public EReference getWrites_Port() {
+		return (EReference)writesEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1199,10 +1201,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(elementEClass, ELEMENT__CYCLES);
 
 		readsEClass = createEClass(READS);
-		createEAttribute(readsEClass, READS__NAME);
+		createEReference(readsEClass, READS__PORT);
 
 		writesEClass = createEClass(WRITES);
-		createEAttribute(writesEClass, WRITES__NAME);
+		createEReference(writesEClass, WRITES__PORT);
 
 		resourceEClass = createEClass(RESOURCE);
 		createEAttribute(resourceEClass, RESOURCE__NAME);
@@ -1368,10 +1370,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		addEOperation(elementEClass, ecorePackage.getEBoolean(), "isResource", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(readsEClass, Reads.class, "Reads", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getReads_Name(), ecorePackage.getEInt(), "name", null, 0, 1, Reads.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getReads_Port(), this.getPort(), null, "port", null, 0, 1, Reads.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(writesEClass, Writes.class, "Writes", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getWrites_Name(), ecorePackage.getEInt(), "name", null, 0, 1, Writes.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getWrites_Port(), this.getPort(), null, "port", null, 0, 1, Writes.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(resourceEClass, Resource.class, "Resource", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getResource_Name(), ecorePackage.getEString(), "name", null, 0, 1, Resource.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

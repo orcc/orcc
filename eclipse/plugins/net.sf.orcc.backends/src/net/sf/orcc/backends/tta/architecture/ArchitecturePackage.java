@@ -869,13 +869,13 @@ public interface ArchitecturePackage extends EPackage {
 	int READS__CYCLES = ELEMENT__CYCLES;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * The feature id for the '<em><b>Port</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int READS__NAME = ELEMENT_FEATURE_COUNT + 0;
+	int READS__PORT = ELEMENT_FEATURE_COUNT + 0;
 
 	/**
 	 * The number of structural features of the '<em>Reads</em>' class.
@@ -915,13 +915,13 @@ public interface ArchitecturePackage extends EPackage {
 	int WRITES__CYCLES = ELEMENT__CYCLES;
 
 	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * The feature id for the '<em><b>Port</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int WRITES__NAME = ELEMENT_FEATURE_COUNT + 0;
+	int WRITES__PORT = ELEMENT_FEATURE_COUNT + 0;
 
 	/**
 	 * The number of structural features of the '<em>Writes</em>' class.
@@ -2105,15 +2105,15 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getReads();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Reads#getName <em>Name</em>}'.
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Reads#getPort <em>Port</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Reads#getName()
+	 * @return the meta object for the reference '<em>Port</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Reads#getPort()
 	 * @see #getReads()
 	 * @generated
 	 */
-	EAttribute getReads_Name();
+	EReference getReads_Port();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Writes <em>Writes</em>}'.
@@ -2126,15 +2126,15 @@ public interface ArchitecturePackage extends EPackage {
 	EClass getWrites();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Writes#getName <em>Name</em>}'.
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Writes#getPort <em>Port</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Name</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Writes#getName()
+	 * @return the meta object for the reference '<em>Port</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Writes#getPort()
 	 * @see #getWrites()
 	 * @generated
 	 */
-	EAttribute getWrites_Name();
+	EReference getWrites_Port();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Resource <em>Resource</em>}'.
@@ -2968,12 +2968,12 @@ public interface ArchitecturePackage extends EPackage {
 		EClass READS = eINSTANCE.getReads();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Port</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute READS__NAME = eINSTANCE.getReads_Name();
+		EReference READS__PORT = eINSTANCE.getReads_Port();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.WritesImpl <em>Writes</em>}' class.
@@ -2986,12 +2986,12 @@ public interface ArchitecturePackage extends EPackage {
 		EClass WRITES = eINSTANCE.getWrites();
 
 		/**
-		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Port</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute WRITES__NAME = eINSTANCE.getWrites_Name();
+		EReference WRITES__PORT = eINSTANCE.getWrites_Port();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ResourceImpl <em>Resource</em>}' class.

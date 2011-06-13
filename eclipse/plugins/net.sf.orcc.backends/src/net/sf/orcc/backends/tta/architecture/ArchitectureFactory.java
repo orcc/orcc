@@ -55,6 +55,8 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Bus createBus();
+	
+	Bus createBus(int index, int width);
 
 	/**
 	 * Returns a new object of class '<em>Bridge</em>'.
@@ -73,8 +75,6 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Segment createSegment();
-
-	Bus createBus(int index, int width);
 
 	/**
 	 * Returns a new object of class '<em>Global Control Unit</em>'.
@@ -111,6 +111,9 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	AddressSpace createAddressSpace();
+	
+	AddressSpace createAddressSpace(String name, int minAddress,
+			int maxAddress);
 
 	/**
 	 * Returns a new object of class '<em>Reads</em>'.

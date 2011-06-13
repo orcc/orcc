@@ -37,7 +37,7 @@ package net.sf.orcc.backends.tta.architecture;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Reads#getName <em>Name</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Reads#getPort <em>Port</em>}</li>
  * </ul>
  * </p>
  *
@@ -47,29 +47,29 @@ package net.sf.orcc.backends.tta.architecture;
  */
 public interface Reads extends Element {
 	/**
-	 * Returns the value of the '<em><b>Name</b></em>' attribute.
+	 * Returns the value of the '<em><b>Port</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Port</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Name</em>' attribute.
-	 * @see #setName(int)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getReads_Name()
+	 * @return the value of the '<em>Port</em>' reference.
+	 * @see #setPort(Port)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getReads_Port()
 	 * @model
 	 * @generated
 	 */
-	int getName();
+	Port getPort();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Reads#getName <em>Name</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Reads#getPort <em>Port</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Name</em>' attribute.
-	 * @see #getName()
+	 * @param value the new value of the '<em>Port</em>' reference.
+	 * @see #getPort()
 	 * @generated
 	 */
-	void setName(int value);
+	void setPort(Port value);
 
 } // Reads
