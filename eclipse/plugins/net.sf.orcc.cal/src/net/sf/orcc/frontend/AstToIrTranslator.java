@@ -35,6 +35,7 @@ import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatement;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstReturn;
@@ -62,7 +63,7 @@ public class AstToIrTranslator {
 	private void addParameters(Procedure procedure, List<AstVariable> parameters) {
 		for (AstVariable parameter : parameters) {
 			int lineNumber = Util.getLocation(parameter);
-			Type type = parameter.getIrType();
+			Type type = Util.getType(parameter);
 			String name = parameter.getName();
 
 			Var var = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
@@ -80,7 +81,7 @@ public class AstToIrTranslator {
 
 		int lineNumber = Util.getLocation(function);
 		procedure = IrFactory.eINSTANCE.createProcedure(function.getName(),
-				lineNumber, function.getIrType());
+				lineNumber, Util.getType(function));
 		mapAstIr.put(function, procedure);
 		actor.getProcs().add(procedure);
 
@@ -119,7 +120,7 @@ public class AstToIrTranslator {
 
 	public void transformLocal(Procedure procedure, AstVariable variable) {
 		int lineNumber = Util.getLocation(variable);
-		Type type = variable.getIrType();
+		Type type = Util.getType(variable);
 		String name = variable.getName();
 		boolean assignable = !variable.isConstant();
 

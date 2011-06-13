@@ -48,7 +48,7 @@ import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
-import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
@@ -675,8 +675,7 @@ public class ActorTransformer {
 		int repeat = 1;
 		AstExpression astRepeat = pattern.getRepeat();
 		if (astRepeat != null) {
-			repeat = new AstExpressionEvaluator(null)
-					.evaluateAsInteger(astRepeat);
+			repeat = Util.getIntValue(astRepeat);
 			totalConsumption *= repeat;
 		}
 		irInputPattern.setNumTokens(port, totalConsumption);
@@ -750,8 +749,7 @@ public class ActorTransformer {
 			int repeat = 1;
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator(null)
-						.evaluateAsInteger(astRepeat);
+				repeat = Util.getIntValue(astRepeat);
 				totalConsumption *= repeat;
 			}
 			irOutputPattern.setNumTokens(port, totalConsumption);
@@ -777,7 +775,7 @@ public class ActorTransformer {
 	private void transformPorts(EStructuralFeature feature,
 			List<AstPort> portList) {
 		for (AstPort astPort : portList) {
-			Type type = astPort.getIrType();
+			Type type = Util.getType(astPort);
 			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
 					astPort.isNative());
 			mapPorts.put(astPort, port);

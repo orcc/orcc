@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,31 +28,29 @@
  */
 package net.sf.orcc.cal.type;
 
-import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstType;
+import net.sf.orcc.cal.cal.AstTypeBool;
+import net.sf.orcc.cal.cal.AstTypeFloat;
+import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
-import net.sf.orcc.cal.cal.AstUnit;
+import net.sf.orcc.cal.cal.AstTypeString;
+import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalFactory;
+import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
-import net.sf.orcc.cal.util.VoidSwitch;
-import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -61,86 +59,97 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * @author Matthieu Wipliez
  * 
  */
-public class TypeTransformer extends VoidSwitch {
-
-	private CalJavaValidator validator;
+public class TypeTransformer extends CalSwitch<Type> {
 
 	/**
 	 * Creates a new AST type to IR type transformation.
 	 */
-	public TypeTransformer(CalJavaValidator validator) {
-		this.validator = validator;
+	public TypeTransformer() {
 	}
 
 	@Override
-	public Void caseAstExpression(AstExpression expression) {
-		TypeChecker checker = new TypeChecker(validator);
-		checker.getType(expression);
-		return null;
+	public Type caseAstExpression(AstExpression expression) {
+		TypeChecker checker = new TypeChecker(null);
+		return checker.getType(expression);
 	}
 
 	@Override
-	public Void caseAstFunction(AstFunction function) {
-		TypeConverter converter = new TypeConverter(validator);
-		Type type = converter.transformType(function.getType());
-		function.setIrType(type);
-		return super.caseAstFunction(function);
+	public Type caseAstFunction(AstFunction function) {
+		return doSwitch(function.getType());
 	}
 
 	@Override
-	public Void caseAstInputPattern(AstInputPattern input) {
-		AstPort port = input.getPort();
-		doSwitch(port);
+	public Type caseAstPort(AstPort port) {
+		return doSwitch(port.getType());
+	}
 
-		// type of each token
-		Type type = port.getIrType();
+	@Override
+	public Type caseAstTypeBool(AstTypeBool type) {
+		return IrFactory.eINSTANCE.createTypeBool();
+	}
 
-		// repeat equals to 1 when absent
-		AstExpression astRepeat = input.getRepeat();
-		if (astRepeat != null) {
-			int repeat = new AstExpressionEvaluator(validator)
-					.evaluateAsInteger(astRepeat);
-			type = IrFactory.eINSTANCE.createTypeList(repeat, type);
+	@Override
+	public Type caseAstTypeFloat(AstTypeFloat type) {
+		return IrFactory.eINSTANCE.createTypeFloat();
+	}
+
+	@Override
+	public Type caseAstTypeInt(AstTypeInt type) {
+		AstExpression astSize = type.getSize();
+		int size;
+		if (astSize == null) {
+			size = 32;
+		} else {
+			size = new AstExpressionEvaluator(null).evaluateAsInteger(astSize);
+		}
+		return IrFactory.eINSTANCE.createTypeInt(size);
+	}
+
+	@Override
+	public Type caseAstTypeList(AstTypeList listType) {
+		Type type = doSwitch(listType.getType());
+		AstExpression expression = listType.getSize();
+		Expression size = new AstExpressionEvaluator(null).evaluate(expression);
+		return IrFactory.eINSTANCE.createTypeList(size, type);
+	}
+
+	@Override
+	public Type caseAstTypeString(AstTypeString type) {
+		return IrFactory.eINSTANCE.createTypeString();
+	}
+
+	@Override
+	public Type caseAstTypeUint(AstTypeUint type) {
+		AstExpression astSize = type.getSize();
+		int size;
+		if (astSize == null) {
+			size = 32;
+		} else {
+			size = new AstExpressionEvaluator(null).evaluateAsInteger(astSize);
 		}
 
-		for (AstVariable token : input.getTokens()) {
-			token.setIrType(type);
-		}
-
-		return null;
+		return IrFactory.eINSTANCE.createTypeUint(size);
 	}
 
 	@Override
-	public Void caseAstPort(AstPort port) {
-		if (port.getIrType() == null) {
-			TypeConverter converter = new TypeConverter(validator);
-			Type type = converter.transformType(port.getType());
-			port.setIrType(type);
+	public Type caseAstVariable(AstVariable variable) {
+		AstType astType;
+		List<AstExpression> dimensions;
+
+		if (variable.eContainer() instanceof AstInputPattern) {
+			AstInputPattern pattern = (AstInputPattern) variable.eContainer();
+			astType = EcoreUtil.copy(pattern.getPort().getType());
+			dimensions = new ArrayList<AstExpression>();
+			AstExpression repeat = pattern.getRepeat();
+			if (repeat != null) {
+				dimensions.add(repeat);
+			}
+		} else {
+			astType = EcoreUtil.copy(variable.getType());
+			dimensions = variable.getDimensions();
 		}
-
-		return null;
-	}
-
-	@Override
-	public Void caseAstTypeList(AstTypeList typeList) {
-		doSwitch(typeList.getType());
-		doSwitch(typeList.getSize());
-		return null;
-	}
-
-	@Override
-	public Void caseAstVariable(AstVariable variable) {
-		if (variable.getIrType() != null) {
-			// if the variable has already been converted, do not do it again
-			return null;
-		}
-
-		TypeConverter converter = new TypeConverter(validator);
-		doSwitch(variable.getType());
 
 		// convert the type of the variable
-		AstType astType = EcoreUtil.copy(variable.getType());
-		List<AstExpression> dimensions = variable.getDimensions();
 		ListIterator<AstExpression> it = dimensions.listIterator(dimensions
 				.size());
 		while (it.hasPrevious()) {
@@ -153,95 +162,8 @@ public class TypeTransformer extends VoidSwitch {
 
 			astType = newAstType;
 		}
-		variable.setType(astType);
 
-		Type type = converter.transformType(astType);
-		variable.setIrType(type);
-
-		doSwitch(variable.getValue());
-
-		return null;
-	}
-
-	/**
-	 * Wrapper call to {@link CalJavaValidator#error(String, EObject, Integer)}.
-	 * 
-	 * @param string
-	 *            error message
-	 * @param source
-	 *            source object
-	 * @param feature
-	 *            feature of the object that caused the error
-	 */
-	private void error(String string, EObject source,
-			EStructuralFeature feature, int index) {
-		if (validator != null) {
-			validator.error(string, source, feature, index);
-		}
-	}
-
-	/**
-	 * Evaluates the state variables of the given entity.
-	 * 
-	 * @param entity
-	 *            an entity
-	 */
-	private void evaluateStateVariables(AstEntity entity) {
-		List<AstVariable> variables;
-		AstActor actor = entity.getActor();
-		if (actor == null) {
-			AstUnit unit = entity.getUnit();
-			variables = unit.getVariables();
-		} else {
-			variables = actor.getStateVariables();
-		}
-
-		evaluateStateVariables(variables);
-	}
-
-	/**
-	 * Evaluates the given list of state variables, and register them as
-	 * variables.
-	 * 
-	 * @param variables
-	 *            a list of state variables
-	 */
-	private void evaluateStateVariables(List<AstVariable> variables) {
-		for (AstVariable astVariable : variables) {
-			// evaluate initial value (if any)
-			AstExpression astValue = astVariable.getValue();
-			if (astValue != null) {
-				Expression initialValue = (Expression) astVariable
-						.getInitialValue();
-				if (initialValue == null) {
-					// only evaluates the initial value once (when validating)
-					initialValue = new AstExpressionEvaluator(validator)
-							.evaluate(astValue);
-					if (initialValue == null) {
-						error("variable "
-								+ astVariable.getName()
-								+ " does not have a compile-time constant initial value",
-								astVariable, eINSTANCE.getAstVariable_Name(),
-								-1);
-					} else {
-						// register the value
-						astVariable.setInitialValue(initialValue);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Transforms the given AST type to an IR type.
-	 * 
-	 * @param type
-	 *            an AST type
-	 * @return an IR type
-	 */
-	public void transformTypes(AstEntity entity) {
-		evaluateStateVariables(entity);
-		doSwitch(entity);
+		return doSwitch(astType);
 	}
 
 }

@@ -50,8 +50,8 @@ import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.type.TypeChecker;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.validation.CalJavaValidator;
-import net.sf.orcc.frontend.Util;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
@@ -142,7 +142,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 	@Override
 	public Expression caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		Expression value = (Expression) variable.getInitialValue();
+		Expression value = evaluate(variable.getValue());
 		if (value == null) {
 			error("variable \"" + variable.getName() + "\" ("
 					+ Util.getLocation(variable)
@@ -277,14 +277,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 	@Override
 	public Expression caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		Expression value = (Expression) variable.getInitialValue();
-		if (value == null) {
-			// the variable may be in another unit and it may have a value if we
-			// evaluate it
-			value = evaluate(variable.getValue());
-		}
-
-		return value;
+		return evaluate(variable.getValue());
 	}
 
 	private void error(String string, EObject source,

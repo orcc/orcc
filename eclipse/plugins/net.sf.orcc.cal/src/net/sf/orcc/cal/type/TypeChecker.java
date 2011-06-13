@@ -126,14 +126,9 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionCall(AstExpressionCall astCall) {
-		// built-in function
 		AstFunction function = astCall.getFunction();
-
-		// if the function has not been typed, type it
-		Type type = function.getIrType();
-		if (type == null) {
-			new TypeTransformer(validator).doSwitch(function);
-		}
+		TypeTransformer transformer = new TypeTransformer();
+		Type type = transformer.doSwitch(function);
 
 		String name = function.getName();
 		List<AstExpression> parameters = astCall.getParameters();
@@ -148,7 +143,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		Iterator<AstExpression> itActual = parameters.iterator();
 		int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
-			Type formalType = itFormal.next().getIrType();
+			Type formalType = transformer.doSwitch(itFormal.next());
 			AstExpression expression = itActual.next();
 			Type actualType = getType(expression);
 
@@ -161,7 +156,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			index++;
 		}
 
-		return function.getIrType();
+		return type;
 	}
 
 	@Override
@@ -201,13 +196,8 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		Type type = variable.getIrType();
-		if (type == null) {
-			type = getTypeVariable(variable);
-			if (type == null) {
-				return null;
-			}
-		}
+		TypeTransformer transformer = new TypeTransformer();
+		Type type = transformer.doSwitch(variable);
 
 		List<AstExpression> indexes = expression.getIndexes();
 		int errorIdx = 0;
@@ -245,16 +235,13 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		// size of generators
 		for (AstGenerator generator : expression.getGenerators()) {
-			getType(generator.getLower());
-			getType(generator.getHigher());
+			// getType(generator.getLower());
+			// getType(generator.getHigher());
 
-			AstExpression astValue = generator.getLower();
 			int lower = new AstExpressionEvaluator(validator)
-					.evaluateAsInteger(astValue);
-
-			astValue = generator.getHigher();
+					.evaluateAsInteger(generator.getLower());
 			int higher = new AstExpressionEvaluator(validator)
-					.evaluateAsInteger(astValue);
+					.evaluateAsInteger(generator.getHigher());
 			size *= (higher - lower) + 1;
 		}
 
@@ -325,12 +312,8 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		Type type = variable.getIrType();
-		if (type == null) {
-			type = getTypeVariable(variable);
-		}
-
-		return type;
+		TypeTransformer transformer = new TypeTransformer();
+		return transformer.doSwitch(variable);
 	}
 
 	@Override
@@ -379,14 +362,8 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type type = variable.getIrType();
-		if (type == null) {
-			type = getTypeVariable(variable);
-			if (type == null) {
-				return null;
-			}
-		}
-
+		TypeTransformer transformer = new TypeTransformer();
+		Type type = transformer.doSwitch(variable);
 		List<Expression> dimensions = type.getDimensionsExpr();
 
 		Iterator<Expression> itD = dimensions.iterator();
@@ -430,7 +407,8 @@ public class TypeChecker extends CalSwitch<Type> {
 			AstVariable formal = itF.next();
 			AstExpression actual = itA.next();
 			if (actual == expression) {
-				return formal.getIrType();
+				TypeTransformer transformer = new TypeTransformer();
+				return transformer.doSwitch(formal);
 			}
 		}
 
@@ -563,14 +541,8 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type type = expression.getIrType();
-		if (type == null) {
-			setTargetType(expression);
-			type = doSwitch(expression);
-			expression.setIrType(type);
-		}
-
-		return type;
+		setTargetType(expression);
+		return doSwitch(expression);
 	}
 
 	/**
@@ -905,37 +877,6 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Checks if the initial value of the variable is convertible to the type of
-	 * the variable. Transforms the type of the variable if it has not been done
-	 * yet.
-	 * 
-	 * @param variable
-	 *            a variable
-	 * @return the type of the variable
-	 */
-	private Type getTypeVariable(AstVariable variable) {
-		Type targetType = variable.getIrType();
-		if (targetType == null) {
-			new TypeTransformer(validator).doSwitch(variable);
-			targetType = variable.getIrType();
-		}
-
-		AstExpression value = variable.getValue();
-		if (value != null) {
-			TypeChecker checker = new TypeChecker(validator);
-			Type type = checker.getType(variable.getValue());
-
-			if (!checker.isConvertibleTo(type, targetType)) {
-				error("Type mismatch: cannot convert from " + type + " to "
-						+ targetType, variable,
-						eINSTANCE.getAstVariable_Value(), -1);
-			}
-		}
-
-		return targetType;
-	}
-
-	/**
 	 * Returns <code>true</code> if type src can be converted to type dst.
 	 * 
 	 * @param src
@@ -1005,6 +946,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	 *            an expression
 	 */
 	private void setTargetType(AstExpression expression) {
+		TypeTransformer transformer = new TypeTransformer();
 		EObject cter = expression.eContainer();
 		Type targetType = null;
 
@@ -1027,24 +969,25 @@ public class TypeChecker extends CalSwitch<Type> {
 
 			case CalPackage.AST_FUNCTION:
 				AstFunction func = (AstFunction) cter;
-				targetType = func.getIrType();
+				targetType = transformer.doSwitch(func);
 				break;
 
 			case CalPackage.AST_GENERATOR:
 				AstGenerator generator = (AstGenerator) cter;
-				targetType = generator.getVariable().getIrType();
+				targetType = transformer.doSwitch(generator.getVariable());
 				break;
 
 			case CalPackage.AST_OUTPUT_PATTERN:
 				AstOutputPattern pattern = (AstOutputPattern) cter;
-				targetType = pattern.getPort().getIrType();
+				targetType = transformer.doSwitch(pattern.getPort());
 				break;
 
 			case CalPackage.AST_STATEMENT_ASSIGN: {
 				AstStatementAssign assign = (AstStatementAssign) cter;
 				if (expression.eContainer() == assign.getValue()) {
 					// expression is located in the value
-					targetType = assign.getTarget().getVariable().getIrType();
+					targetType = transformer.doSwitch(assign.getTarget()
+							.getVariable());
 				} else {
 					// expression is located in the indexes
 					targetType = findIndexType(assign.getTarget(),
@@ -1063,12 +1006,12 @@ public class TypeChecker extends CalSwitch<Type> {
 
 			case CalPackage.AST_STATEMENT_FOREACH:
 				AstStatementForeach foreach = (AstStatementForeach) cter;
-				targetType = foreach.getVariable().getIrType();
+				targetType = transformer.doSwitch(foreach.getVariable());
 				break;
 
 			case CalPackage.AST_VARIABLE:
 				AstVariable variable = (AstVariable) cter;
-				targetType = variable.getIrType();
+				targetType = transformer.doSwitch(variable);
 				break;
 			}
 		}

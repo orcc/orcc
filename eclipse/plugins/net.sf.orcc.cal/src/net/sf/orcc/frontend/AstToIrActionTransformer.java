@@ -42,7 +42,7 @@ import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
-import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ExprVar;
@@ -486,8 +486,7 @@ public class AstToIrActionTransformer {
 		int repeat = 1;
 		AstExpression astRepeat = pattern.getRepeat();
 		if (astRepeat != null) {
-			repeat = new AstExpressionEvaluator(null)
-					.evaluateAsInteger(astRepeat);
+			repeat = Util.getIntValue(astRepeat);
 			totalConsumption *= repeat;
 		}
 		irInputPattern.setNumTokens(port, totalConsumption);
@@ -559,8 +558,7 @@ public class AstToIrActionTransformer {
 			int repeat = 1;
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator(null)
-						.evaluateAsInteger(astRepeat);
+				repeat = Util.getIntValue(astRepeat);
 				totalConsumption *= repeat;
 			}
 			irOutputPattern.setNumTokens(port, totalConsumption);

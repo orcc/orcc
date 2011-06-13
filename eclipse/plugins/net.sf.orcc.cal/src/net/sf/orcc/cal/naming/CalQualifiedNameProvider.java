@@ -28,26 +28,18 @@
  */
 package net.sf.orcc.cal.naming;
 
-import java.util.Collections;
-
+import net.sf.orcc.cal.cal.AstAction;
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
+import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.util.OrccUtil;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.naming.IQualifiedNameConverter;
-import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.naming.DefaultDeclarativeQualifiedNameProvider;
 import org.eclipse.xtext.naming.QualifiedName;
-import org.eclipse.xtext.util.IResourceScopeCache;
-import org.eclipse.xtext.util.PolymorphicDispatcher;
-import org.eclipse.xtext.util.SimpleAttributeResolver;
-import org.eclipse.xtext.util.Tuples;
-
-import com.google.common.base.Function;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 /**
  * This class defines a qualified name provider for RVC-CAL.
@@ -56,80 +48,42 @@ import com.google.inject.Provider;
  * 
  */
 public class CalQualifiedNameProvider extends
-		IQualifiedNameProvider.AbstractImpl {
+		DefaultDeclarativeQualifiedNameProvider {
 
-	private PolymorphicDispatcher<QualifiedName> qualifiedName = new PolymorphicDispatcher<QualifiedName>(
-			"qualifiedName", 1, 1, Collections.singletonList(this),
-			PolymorphicDispatcher.NullErrorHandler.<QualifiedName> get()) {
-		@Override
-		protected QualifiedName handleNoSuchMethod(Object... params) {
-			return null;
+	public QualifiedName qualifiedName(AstAction action) {
+		AstTag tag = action.getTag();
+		if (tag == null) {
+			return getConverter().toQualifiedName(action.toString());
 		}
-	};
 
-	@Inject
-	private IQualifiedNameConverter converter = new IQualifiedNameConverter.DefaultImpl();
-
-	@Inject
-	private IResourceScopeCache cache = IResourceScopeCache.NullImpl.INSTANCE;
-
-	private Function<EObject, String> resolver = SimpleAttributeResolver
-			.newResolver(String.class, "name");
-
-	protected Function<EObject, String> getResolver() {
-		return resolver;
+		return getConverter().toQualifiedName(
+				OrccUtil.toString(tag.getIdentifiers(), "."));
 	}
 
-	public QualifiedName getFullyQualifiedName(final EObject obj) {
-		return cache.get(Tuples.pair(obj, "fqn"), obj.eResource(),
-				new Provider<QualifiedName>() {
-
-					public QualifiedName get() {
-						EObject temp = obj;
-						QualifiedName qualifiedNameFromDispatcher = qualifiedName
-								.invoke(temp);
-						if (qualifiedNameFromDispatcher != null) {
-							return qualifiedNameFromDispatcher;
-						}
-
-						AstEntity entity = null;
-						if (temp instanceof AstEntity) {
-							// return qualified name of entity
-							entity = (AstEntity) temp;
-						} else if (temp.eContainer() instanceof AstEntity) {
-							// return qualified name of entity
-							entity = (AstEntity) temp.eContainer();
-						}
-
-						if (entity == null) {
-							// object inside an entity
-							EObject cter = temp.eContainer();
-							if (cter instanceof AstUnit) {
-								QualifiedName parentsName = getFullyQualifiedName(cter);
-								String value = getResolver().apply(temp);
-								if (value != null) {
-									return parentsName.append(value);
-								}
-							}
-						} else {
-							return getConverter().toQualifiedName(
-									Util.getQualifiedName(entity));
-						}
-
-						return null;
-					}
-
-				});
-
+	public QualifiedName qualifiedName(AstActor actor) {
+		return getConverter().toQualifiedName(
+				Util.getQualifiedName((AstEntity) actor.eContainer()));
 	}
 
-	protected IQualifiedNameConverter getConverter() {
-		return converter;
+	public QualifiedName qualifiedName(AstStatementForeach foreach) {
+		return getConverter().toQualifiedName(foreach.toString());
+	}
+
+	public QualifiedName qualifiedName(AstEntity entity) {
+		return getConverter().toQualifiedName(Util.getQualifiedName(entity));
+	}
+
+	public QualifiedName qualifiedName(AstExpression expr) {
+		return getConverter().toQualifiedName(expr.toString());
 	}
 
 	public QualifiedName qualifiedName(AstTag tag) {
+		return null;
+	}
+
+	public QualifiedName qualifiedName(AstUnit unit) {
 		return getConverter().toQualifiedName(
-				OrccUtil.toString(tag.getIdentifiers(), "."));
+				Util.getQualifiedName((AstEntity) unit.eContainer()));
 	}
 
 }

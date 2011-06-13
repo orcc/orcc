@@ -39,6 +39,8 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.frontend.schedule.RegExpConverter;
@@ -160,7 +162,7 @@ public class ActorTransformer2 {
 	private void transformParameter(Actor actor,
 			Map<EObject, EObject> mapAstIr, AstVariable astVariable) {
 		int lineNumber = Util.getLocation(astVariable);
-		Type type = astVariable.getIrType();
+		Type type = Util.getType(astVariable);
 		String name = astVariable.getName();
 
 		Var var = IrFactory.eINSTANCE.createVar(lineNumber, type, name, false,
@@ -180,7 +182,7 @@ public class ActorTransformer2 {
 			AstActor astActor) {
 		// transform input ports
 		for (AstPort astPort : astActor.getInputs()) {
-			Type type = astPort.getIrType();
+			Type type = Util.getType(astPort);
 			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
 					astPort.isNative());
 			mapAstIr.put(astPort, port);
@@ -189,7 +191,7 @@ public class ActorTransformer2 {
 
 		// transform output ports
 		for (AstPort astPort : astActor.getOutputs()) {
-			Type type = astPort.getIrType();
+			Type type = Util.getType(astPort);
 			Port port = IrFactory.eINSTANCE.createPort(type, astPort.getName(),
 					astPort.isNative());
 			mapAstIr.put(astPort, port);
@@ -207,11 +209,12 @@ public class ActorTransformer2 {
 	private void transformStateVariable(Actor actor,
 			Map<EObject, EObject> mapAstIr, AstVariable astVariable) {
 		int lineNumber = Util.getLocation(astVariable);
-		Type type = astVariable.getIrType();
+		Type type = Util.getType(astVariable);
 		String name = astVariable.getName();
 		boolean assignable = !astVariable.isConstant();
 
-		Expression initialValue = astVariable.getInitialValue();
+		Expression initialValue = new AstExpressionEvaluator(null)
+				.evaluate(astVariable.getValue());
 
 		Var var = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
 				assignable, initialValue);

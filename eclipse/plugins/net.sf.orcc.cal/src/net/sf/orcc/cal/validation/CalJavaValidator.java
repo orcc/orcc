@@ -64,10 +64,8 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
-import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.type.TypeCycleDetector;
-import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
@@ -167,7 +165,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}
 			names.add(name);
 
-			Type portType = pattern.getPort().getIrType();
+			Type portType = Util.getType(pattern.getPort());
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat == null) {
 				List<AstExpression> values = pattern.getValues();
@@ -176,14 +174,13 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 					Type type = checker.getType(value);
 					if (!checker.isConvertibleTo(type, portType)) {
 						error("this expression must be of type " + portType,
-								value, eINSTANCE.getAstOutputPattern_Repeat(),
-								index);
+								astRepeat,
+								eINSTANCE.getAstOutputPattern_Repeat(), index);
 					}
 					index++;
 				}
 			} else {
-				int repeat = new AstExpressionEvaluator(this)
-						.evaluateAsInteger(astRepeat);
+				int repeat = Util.getIntValue(astRepeat);
 				if (repeat != 1) {
 					// each value is supposed to be a list
 					List<AstExpression> values = pattern.getValues();
@@ -358,7 +355,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		Iterator<AstExpression> itActual = parameters.iterator();
 		int index = 0;
 		while (itFormal.hasNext() && itActual.hasNext()) {
-			Type formalType = itFormal.next().getIrType();
+			Type formalType = Util.getType(itFormal.next());
 			AstExpression expression = itActual.next();
 			Type actualType = checker.getType(expression);
 
@@ -379,9 +376,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 		// check there are no cycles in type definitions
 		if (!new TypeCycleDetector(this).detectCycles(entity)) {
-			// transforms AST types to IR types
-			// this is a prerequisite for type checking
-			new TypeTransformer(this).transformTypes(entity);
 		}
 	}
 
@@ -542,13 +536,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkGenerator(AstGenerator generator) {
-		AstExpression astValue = generator.getLower();
-		int lower = new AstExpressionEvaluator(this)
-				.evaluateAsInteger(astValue);
-
-		astValue = generator.getHigher();
-		int higher = new AstExpressionEvaluator(this)
-				.evaluateAsInteger(astValue);
+		int lower = Util.getIntValue(generator.getLower());
+		int higher = Util.getIntValue(generator.getHigher());
 
 		if (higher < lower) {
 			error("higher bound must be greater than lower bound", generator,
@@ -741,8 +730,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	private void checkReturnType(AstFunction function) {
 		TypeChecker checker = new TypeChecker(this);
-		Type returnType = function.getIrType();
-		Type expressionType = function.getExpression().getIrType();
+		Type returnType = Util.getType(function);
+		Type expressionType = Util.getType(function.getExpression());
 		if (!checker.isConvertibleTo(expressionType, returnType)) {
 			error("Type mismatch: cannot convert from " + expressionType
 					+ " to " + returnType, function,
@@ -775,7 +764,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		TypeChecker checker = new TypeChecker(this);
 		if (value != null) {
 			// check types
-			Type targetType = variable.getIrType();
+			Type targetType = Util.getType(variable);
 			Type type = checker.getType(value);
 			if (!checker.isConvertibleTo(type, targetType)) {
 				error("Type mismatch: cannot convert from " + type + " to "

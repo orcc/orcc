@@ -46,6 +46,7 @@ import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
@@ -77,7 +78,7 @@ public class AstToIrExprTranslator extends CalSwitch<Expression> {
 		Expression e2 = doSwitch(expression.getRight());
 
 		return IrFactory.eINSTANCE.createExprBinary(e1, op, e2,
-				expression.getIrType());
+				Util.getType(expression));
 	}
 
 	@Override
@@ -129,7 +130,7 @@ public class AstToIrExprTranslator extends CalSwitch<Expression> {
 		}
 
 		return IrFactory.eINSTANCE.createExprUnary(op, expr,
-				expression.getIrType());
+				Util.getType(expression));
 	}
 
 	@Override

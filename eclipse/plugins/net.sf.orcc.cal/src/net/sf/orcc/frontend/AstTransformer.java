@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA 
+import com.google.inject.Inject;
+of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -54,13 +56,12 @@ import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
-import net.sf.orcc.cal.cal.AstType;
-import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
@@ -122,7 +123,7 @@ public class AstTransformer {
 			Expression e2 = doSwitch(expression.getRight());
 
 			return IrFactory.eINSTANCE.createExprBinary(e1, op, e2,
-					expression.getIrType());
+					Util.getType(expression));
 		}
 
 		@Override
@@ -168,7 +169,7 @@ public class AstTransformer {
 			Var currentTarget = target;
 			List<Expression> currentIndexes = indexes;
 
-			Type type = expression.getIrType();
+			Type type = Util.getType(expression);
 			// create a temporary variable if the target is null
 			// or it is not null and the expression does not return a list
 			if (target == null || !type.isList()) {
@@ -223,7 +224,7 @@ public class AstTransformer {
 					.getIndexes());
 
 			Var target = context.getProcedure().newTempLocalVariable(
-					expression.getIrType(), "local_" + var.getName());
+					Util.getType(expression), "local_" + var.getName());
 
 			InstLoad load = IrFactory.eINSTANCE.createInstLoad(lineNumber,
 					target, var, indexes);
@@ -283,7 +284,7 @@ public class AstTransformer {
 			}
 
 			return IrFactory.eINSTANCE.createExprUnary(op, expr,
-					expression.getIrType());
+					Util.getType(expression));
 		}
 
 		@Override
@@ -338,13 +339,8 @@ public class AstTransformer {
 
 			// size of generators
 			for (AstGenerator generator : generators) {
-				AstExpression astValue = generator.getLower();
-				int lower = new AstExpressionEvaluator(null)
-						.evaluateAsInteger(astValue);
-
-				astValue = generator.getHigher();
-				int higher = new AstExpressionEvaluator(null)
-						.evaluateAsInteger(astValue);
+				int lower = Util.getIntValue(generator.getLower());
+				int higher = Util.getIntValue(generator.getHigher());
 				size *= (higher - lower) + 1;
 			}
 
@@ -466,9 +462,7 @@ public class AstTransformer {
 				Var loopVar = transformLocalVariable(astVariable);
 				procedure.getLocals().add(loopVar);
 
-				AstExpression astLower = generator.getLower();
-				int lower = new AstExpressionEvaluator(null)
-						.evaluateAsInteger(astLower);
+				int lower = Util.getIntValue(generator.getLower());
 				Expression thisIndex = IrFactory.eINSTANCE
 						.createExprVar(loopVar);
 				if (lower != 0) {
@@ -478,9 +472,7 @@ public class AstTransformer {
 							thisIndex.getType());
 				}
 
-				AstExpression astHigher = generator.getHigher();
-				int higher = new AstExpressionEvaluator(null)
-						.evaluateAsInteger(astHigher);
+				int higher = Util.getIntValue(generator.getHigher());
 
 				if (index == null) {
 					index = thisIndex;
@@ -1103,7 +1095,7 @@ public class AstTransformer {
 	 * 
 	 */
 	private boolean isInitializeNeeded(AstVariable astVariable) {
-		Type type = astVariable.getIrType();
+		Type type = Util.getType(astVariable);
 		AstExpression value = astVariable.getValue();
 		if (type.isList() && value != null) {
 			// the variable is a List with an initial value
@@ -1154,21 +1146,14 @@ public class AstTransformer {
 	 * 
 	 * @param type
 	 *            The IR type of the list.
-	 * @param astType
-	 *            The AST type of the list.
 	 */
-	private void recTransformList(Type type, AstType astType) {
+	private void recTransformList(Type type) {
 		if (type.isList()) {
-			AstTypeList astTypeList = (AstTypeList) astType;
 			TypeList typeList = (TypeList) type;
-			if (typeList.getSizeExpr() == null) {
-				// The size is not an integer constant, transform the size
-				// expression now.
-				Expression newSize = exprTransformer.doSwitch(astTypeList
-						.getSize());
-				typeList.setSizeExpr(newSize);
-			}
-			recTransformList(typeList.getType(), astTypeList.getType());
+			Expression newSize = exprTransformer.doSwitch(typeList
+					.getSizeExpr());
+			typeList.setSizeExpr(newSize);
+			recTransformList(typeList.getType());
 		}
 	}
 
@@ -1261,7 +1246,7 @@ public class AstTransformer {
 	private void transformFunction(AstFunction astFunction) {
 		String name = astFunction.getName();
 		int lineNumber = Util.getLocation(astFunction);
-		Type type = astFunction.getIrType();
+		Type type = Util.getType(astFunction);
 
 		Procedure procedure = IrFactory.eINSTANCE.createProcedure(name,
 				lineNumber, type);
@@ -1319,14 +1304,13 @@ public class AstTransformer {
 	public Var transformGlobalVariable(EStructuralFeature feature,
 			AstVariable astVariable) {
 		int lineNumber = Util.getLocation(astVariable);
-		AstType astType = astVariable.getType();
-		Type type = EcoreUtil.copy(astVariable.getIrType());
+		Type type = EcoreUtil.copy(Util.getType(astVariable));
 		if (type.isList()) {
 			// Create a null context in order to prevent the expression
 			// transformer
 			// from adding a local_ prefix to every variable.
 			Context oldContext = newContext(null);
-			recTransformList(type, astType);
+			recTransformList(type);
 			restoreContext(oldContext);
 		}
 		String name = astVariable.getName();
@@ -1335,13 +1319,12 @@ public class AstTransformer {
 		// check if the variable needs to be initialized in the "initialize"
 		// procedure
 		boolean mustInitialize = isInitializeNeeded(astVariable);
-		Expression initialValue;
+		Expression initialValue = null;
 		if (mustInitialize) {
 			initialValue = null;
 		} else {
 			AstExpression value = astVariable.getValue();
-			initialValue = (Expression) astVariable.getInitialValue();
-			if (initialValue == null && value != null) {
+			if (value != null) {
 				initialValue = (Expression) new AstExpressionEvaluator(null)
 						.evaluate(value);
 			}
@@ -1397,7 +1380,7 @@ public class AstTransformer {
 		String name = getQualifiedName(astVariable);
 
 		boolean assignable = !astVariable.isConstant();
-		Type type = astVariable.getIrType();
+		Type type = Util.getType(astVariable);
 
 		// create local variable with the given name
 		Var local = IrFactory.eINSTANCE.createVar(lineNumber, type, name,
