@@ -1141,23 +1141,6 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Recursively convert a global variable of type List. If the size was not
-	 * set, transform the size expression to IR and set the size.
-	 * 
-	 * @param type
-	 *            The IR type of the list.
-	 */
-	private void recTransformList(Type type) {
-		if (type.isList()) {
-			TypeList typeList = (TypeList) type;
-			Expression newSize = exprTransformer.doSwitch(typeList
-					.getSizeExpr());
-			typeList.setSizeExpr(newSize);
-			recTransformList(typeList.getType());
-		}
-	}
-
-	/**
 	 * Loads globals at the beginning of the current procedure, stores them at
 	 * the end, and restores the context
 	 * 
@@ -1305,14 +1288,6 @@ public class AstTransformer {
 			AstVariable astVariable) {
 		int lineNumber = Util.getLocation(astVariable);
 		Type type = EcoreUtil.copy(Util.getType(astVariable));
-		if (type.isList()) {
-			// Create a null context in order to prevent the expression
-			// transformer
-			// from adding a local_ prefix to every variable.
-			Context oldContext = newContext(null);
-			recTransformList(type);
-			restoreContext(oldContext);
-		}
 		String name = astVariable.getName();
 		boolean assignable = !astVariable.isConstant();
 
