@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,41 +28,24 @@
  */
 package net.sf.orcc.cal;
 
-import net.sf.orcc.cal.linking.CalLinkingService;
-import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
-
-import org.eclipse.xtext.conversion.IValueConverterService;
-import org.eclipse.xtext.linking.ILinkingService;
-import org.eclipse.xtext.naming.IQualifiedNameProvider;
-import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.resource.IResourceDescription;
+import org.eclipse.xtext.resource.impl.DefaultResourceDescriptionManager;
 
 /**
- * Use this class to register components to be used within the IDE.
+ * This class defines a CAL resource description manager.
+ * 
+ * @author Matthieu Wipliez
+ * 
  */
-public class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
+public class CalResourceDescriptionManager extends
+		DefaultResourceDescriptionManager {
 
 	@Override
-	public Class<? extends ILinkingService> bindILinkingService() {
-		return CalLinkingService.class;
-	}
-
-	@Override
-	public Class<? extends IQualifiedNameProvider> bindIQualifiedNameProvider() {
-		return CalQualifiedNameProvider.class;
-	}
-
-	public Class<? extends IResourceDescription.Manager> bindIResourceDescription$Manager() {
-		return CalResourceDescriptionManager.class;
-	}
-
-	public Class<? extends ISyntaxErrorMessageProvider> bindISyntaxErrorMessageProvider() {
-		return CalSyntaxErrorMessageProvider.class;
-	}
-
-	@Override
-	public Class<? extends IValueConverterService> bindIValueConverterService() {
-		return CalValueConverter.class;
+	protected IResourceDescription internalGetResourceDescription(
+			Resource resource, IDefaultResourceDescriptionStrategy strategy) {
+		return new CalResourceDescription(resource, strategy, getCache());
 	}
 
 }

@@ -74,7 +74,7 @@ public class CalQualifiedNameProvider extends
 	}
 
 	public QualifiedName qualifiedName(AstExpression expr) {
-		return getConverter().toQualifiedName(expr.toString());
+		return null;
 	}
 
 	public QualifiedName qualifiedName(AstTag tag) {

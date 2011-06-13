@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,142 +28,40 @@
  */
 package net.sf.orcc.cal;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
+import java.util.List;
 
-import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstGenerator;
-import net.sf.orcc.cal.cal.AstInputPattern;
-import net.sf.orcc.cal.cal.AstOutputPattern;
-import net.sf.orcc.cal.cal.CalPackage;
-import net.sf.orcc.cal.expression.AstExpressionEvaluator;
-import net.sf.orcc.cal.type.TypeTransformer;
-import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.cal.cal.AstUnit;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.xmi.XMIResource;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
-import org.eclipse.xtext.naming.QualifiedName;
-import org.eclipse.xtext.resource.EObjectDescription;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy;
 import org.eclipse.xtext.resource.IEObjectDescription;
-import org.eclipse.xtext.resource.IResourceDescription;
-import org.eclipse.xtext.resource.impl.DefaultResourceDescriptionStrategy;
-import org.eclipse.xtext.util.IAcceptor;
+import org.eclipse.xtext.resource.impl.DefaultResourceDescription;
 import org.eclipse.xtext.util.IResourceScopeCache;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+public class CalResourceDescription extends DefaultResourceDescription {
 
-/**
- * This class defines a CAL resource description that returns a set of exported
- * objects that only contains the actor and its ports.
- * 
- * @author Matthieu Wipliez
- * 
- */
-public class CalResourceDescription extends DefaultResourceDescriptionStrategy {
-
-	public static final String KEY_INT_VALUE = "intValue";
-
-	public static final String KEY_TYPE = "type";
-
-	@Inject
-	private IResourceDescription.Manager manager;
-
-	@Inject
-	public IResourceScopeCache cache;
-
-	public static CalResourceDescription instance;
-
-	public CalResourceDescription() {
-		instance = this;
+	public CalResourceDescription(Resource resource,
+			IDefaultResourceDescriptionStrategy strategy,
+			IResourceScopeCache cache) {
+		super(resource, strategy, cache);
 	}
 
 	@Override
-	public boolean createEObjectDescriptions(EObject eObject,
-			IAcceptor<IEObjectDescription> acceptor) {
-		if (getQualifiedNameProvider() == null) {
-			return false;
-		} else {
-			if (Util.getNameProvider() == null) {
-				Util.setManager(manager);
-				Util.setNameProvider(getQualifiedNameProvider());
+	protected List<IEObjectDescription> computeExportedObjects() {
+		final List<IEObjectDescription> exportedEObjects = super
+				.computeExportedObjects();
+		Iterator<IEObjectDescription> it = exportedEObjects.iterator();
+		while (it.hasNext()) {
+			IEObjectDescription desc = it.next();
+			EObject cter = desc.getEObjectOrProxy().eContainer();
+			if (!(cter instanceof AstUnit)) {
+				it.remove();
 			}
 		}
 
-		try {
-			QualifiedName qualifiedName = getQualifiedNameProvider()
-					.getFullyQualifiedName(eObject);
-			if (qualifiedName != null) {
-				Map<String, String> userData = new HashMap<String, String>(0);
-
-				// for expressions (because class is a subclass of
-				// AST_EXPRESSION)
-				if (eObject instanceof AstExpression) {
-					if (eObject.eContainer() instanceof AstGenerator) {
-						// store value of bounds of generator
-						createInt(userData, (AstExpression) eObject);
-					}
-					createType(userData, eObject);
-				}
-
-				// for functions, ports, variables, and patterns
-				switch (eObject.eClass().getClassifierID()) {
-				case CalPackage.AST_FUNCTION:
-				case CalPackage.AST_PORT:
-				case CalPackage.AST_VARIABLE:
-					createType(userData, eObject);
-					break;
-
-				case CalPackage.AST_INPUT_PATTERN:
-					createInt(userData, ((AstInputPattern) eObject).getRepeat());
-					break;
-
-				case CalPackage.AST_OUTPUT_PATTERN:
-					createInt(userData,
-							((AstOutputPattern) eObject).getRepeat());
-					break;
-				}
-
-				// create IEObjectDescription
-				final IEObjectDescription desc = EObjectDescription.create(
-						qualifiedName, eObject, userData);
-				acceptor.accept(desc);
-
-				// add to cache
-				cache.get(eObject, eObject.eResource(),
-						new Provider<IEObjectDescription>() {
-
-							@Override
-							public IEObjectDescription get() {
-								return desc;
-							}
-						});
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return true;
-	}
-
-	private void createInt(Map<String, String> userData, AstExpression expr) {
-		int repeat = new AstExpressionEvaluator(null).evaluateAsInteger(expr);
-		userData.put(KEY_INT_VALUE, String.valueOf(repeat));
-	}
-
-	private void createType(Map<String, String> userData, EObject eObject)
-			throws IOException {
-		Type type = new TypeTransformer().doSwitch(eObject);
-		XMIResource res = new XMIResourceImpl();
-		res.getContents().add(type);
-		StringWriter writer = new StringWriter();
-		res.save(writer, null);
-
-		userData.put(KEY_TYPE, writer.toString());
+		return exportedEObjects;
 	}
 
 }
