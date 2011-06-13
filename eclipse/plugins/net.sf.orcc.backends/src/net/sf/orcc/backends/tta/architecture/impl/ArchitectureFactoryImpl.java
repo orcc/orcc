@@ -310,6 +310,13 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return bus;
 	}
 
+	public Bus createSimpleBus(int index, int width) {
+		Bus bus = createBus(index, width);
+		bus.getSegments().add(createSegment("segment0"));
+		bus.setShortImmediate(createShortImmediate(width, Extension.ZERO));
+		return bus;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -491,6 +498,12 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return segment;
 	}
 
+	public Segment createSegment(String name) {
+		SegmentImpl segment = new SegmentImpl();
+		segment.setName(name);
+		return segment;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -498,6 +511,13 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 */
 	public ShortImmediate createShortImmediate() {
 		ShortImmediateImpl shortImmediate = new ShortImmediateImpl();
+		return shortImmediate;
+	}
+
+	public ShortImmediate createShortImmediate(int width, Extension extension) {
+		ShortImmediateImpl shortImmediate = new ShortImmediateImpl();
+		shortImmediate.setWidth(width);
+		shortImmediate.setExtension(extension);
 		return shortImmediate;
 	}
 
@@ -596,8 +616,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		// Global Control Unit
 		tta.setGcu(createSimpleGlobalControlUnit(tta.getProgram()));
 		// Buses
-		tta.getBuses().add(createBus(0, 32));
-		tta.getBuses().add(createBus(1, 32));
+		tta.getBuses().add(createSimpleBus(0, 32));
+		tta.getBuses().add(createSimpleBus(1, 32));
 		// Register files
 		tta.getRegisterFiles().add(createSimpleRegisterFile("RF_1", 32, 12));
 		tta.getRegisterFiles().add(createSimpleRegisterFile("RF_2", 32, 12));
@@ -616,9 +636,22 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return socket;
 	}
 
-	public Socket createSocket(String name) {
+	public Socket createSocket(String name, EList<Segment> segments) {
 		SocketImpl socket = new SocketImpl();
 		socket.setName(name);
+		socket.getConnectedSegments().addAll(segments);
+		return socket;
+	}
+
+	public Socket createOutputSocket(String name, EList<Segment> segments) {
+		Socket socket = createSocket(name, segments);
+		socket.setType(SocketType.OUTPUT);
+		return socket;
+	}
+
+	public Socket createInputSocket(String name, EList<Segment> segments) {
+		Socket socket = createSocket(name, segments);
+		socket.setType(SocketType.INPUT);
 		return socket;
 	}
 
@@ -662,7 +695,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		WritesImpl writes = new WritesImpl();
 		return writes;
 	}
-	
+
 	public Writes createWrites(Port port, int startCycle, int cycle) {
 		WritesImpl writes = new WritesImpl();
 		writes.setPort(port);

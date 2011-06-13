@@ -532,13 +532,22 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>Connected Socket</b></em>' reference.
+	 * The feature id for the '<em><b>Input Socket</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__CONNECTED_SOCKET = 1;
+	int PORT__INPUT_SOCKET = 1;
+
+	/**
+	 * The feature id for the '<em><b>Output Socket</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PORT__OUTPUT_SOCKET = 2;
 
 	/**
 	 * The feature id for the '<em><b>Width</b></em>' attribute.
@@ -547,7 +556,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__WIDTH = 2;
+	int PORT__WIDTH = 3;
 
 	/**
 	 * The feature id for the '<em><b>Trigger</b></em>' attribute.
@@ -556,7 +565,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__TRIGGER = 3;
+	int PORT__TRIGGER = 4;
 
 	/**
 	 * The feature id for the '<em><b>Sets Opcode</b></em>' attribute.
@@ -565,7 +574,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__SETS_OPCODE = 4;
+	int PORT__SETS_OPCODE = 5;
 
 	/**
 	 * The number of structural features of the '<em>Port</em>' class.
@@ -574,7 +583,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int PORT_FEATURE_COUNT = 5;
+	int PORT_FEATURE_COUNT = 6;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.SocketImpl <em>Socket</em>}' class.
@@ -1700,15 +1709,26 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getPort_Name();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Port#getConnectedSocket <em>Connected Socket</em>}'.
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Connected Socket</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Port#getConnectedSocket()
+	 * @return the meta object for the reference '<em>Input Socket</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Port#getInputSocket()
 	 * @see #getPort()
 	 * @generated
 	 */
-	EReference getPort_ConnectedSocket();
+	EReference getPort_InputSocket();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Output Socket</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Port#getOutputSocket()
+	 * @see #getPort()
+	 * @generated
+	 */
+	EReference getPort_OutputSocket();
 
 	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Port#getWidth <em>Width</em>}'.
@@ -2638,12 +2658,20 @@ public interface ArchitecturePackage extends EPackage {
 		EAttribute PORT__NAME = eINSTANCE.getPort_Name();
 
 		/**
-		 * The meta object literal for the '<em><b>Connected Socket</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Input Socket</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT__CONNECTED_SOCKET = eINSTANCE.getPort_ConnectedSocket();
+		EReference PORT__INPUT_SOCKET = eINSTANCE.getPort_InputSocket();
+
+		/**
+		 * The meta object literal for the '<em><b>Output Socket</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PORT__OUTPUT_SOCKET = eINSTANCE.getPort_OutputSocket();
 
 		/**
 		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.

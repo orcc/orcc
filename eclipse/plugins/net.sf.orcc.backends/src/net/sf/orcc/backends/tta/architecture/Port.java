@@ -39,7 +39,8 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getName <em>Name</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getConnectedSocket <em>Connected Socket</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getWidth <em>Width</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#isTrigger <em>Trigger</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#isSetsOpcode <em>Sets Opcode</em>}</li>
@@ -78,30 +79,110 @@ public interface Port extends EObject {
 	void setName(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Connected Socket</b></em>' reference.
+	 * Returns the value of the '<em><b>Input Socket</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Connected Socket</em>' reference isn't clear,
+	 * If the meaning of the '<em>Input Socket</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Connected Socket</em>' reference.
-	 * @see #setConnectedSocket(Socket)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_ConnectedSocket()
-	 * @model
+	 * @return the value of the '<em>Input Socket</em>' reference.
+	 * @see #isSetInputSocket()
+	 * @see #unsetInputSocket()
+	 * @see #setInputSocket(Socket)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_InputSocket()
+	 * @model unsettable="true"
 	 * @generated
 	 */
-	Socket getConnectedSocket();
+	Socket getInputSocket();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getConnectedSocket <em>Connected Socket</em>}' reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Connected Socket</em>' reference.
-	 * @see #getConnectedSocket()
+	 * @param value the new value of the '<em>Input Socket</em>' reference.
+	 * @see #isSetInputSocket()
+	 * @see #unsetInputSocket()
+	 * @see #getInputSocket()
 	 * @generated
 	 */
-	void setConnectedSocket(Socket value);
+	void setInputSocket(Socket value);
+
+	/**
+	 * Unsets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isSetInputSocket()
+	 * @see #getInputSocket()
+	 * @see #setInputSocket(Socket)
+	 * @generated
+	 */
+	void unsetInputSocket();
+
+	/**
+	 * Returns whether the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getInputSocket <em>Input Socket</em>}' reference is set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return whether the value of the '<em>Input Socket</em>' reference is set.
+	 * @see #unsetInputSocket()
+	 * @see #getInputSocket()
+	 * @see #setInputSocket(Socket)
+	 * @generated
+	 */
+	boolean isSetInputSocket();
+
+	/**
+	 * Returns the value of the '<em><b>Output Socket</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Output Socket</em>' reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Output Socket</em>' reference.
+	 * @see #isSetOutputSocket()
+	 * @see #unsetOutputSocket()
+	 * @see #setOutputSocket(Socket)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_OutputSocket()
+	 * @model unsettable="true"
+	 * @generated
+	 */
+	Socket getOutputSocket();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Output Socket</em>' reference.
+	 * @see #isSetOutputSocket()
+	 * @see #unsetOutputSocket()
+	 * @see #getOutputSocket()
+	 * @generated
+	 */
+	void setOutputSocket(Socket value);
+
+	/**
+	 * Unsets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isSetOutputSocket()
+	 * @see #getOutputSocket()
+	 * @see #setOutputSocket(Socket)
+	 * @generated
+	 */
+	void unsetOutputSocket();
+
+	/**
+	 * Returns whether the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}' reference is set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return whether the value of the '<em>Output Socket</em>' reference is set.
+	 * @see #unsetOutputSocket()
+	 * @see #getOutputSocket()
+	 * @see #setOutputSocket(Socket)
+	 * @generated
+	 */
+	boolean isSetOutputSocket();
 
 	/**
 	 * Returns the value of the '<em><b>Width</b></em>' attribute.
@@ -180,5 +261,13 @@ public interface Port extends EObject {
 	 * @generated
 	 */
 	void setSetsOpcode(boolean value);
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model
+	 * @generated
+	 */
+	void connect(Socket socket);
 
 } // Port

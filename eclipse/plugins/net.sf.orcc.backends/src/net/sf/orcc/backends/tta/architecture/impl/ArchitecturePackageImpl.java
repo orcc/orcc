@@ -63,6 +63,7 @@ import net.sf.orcc.backends.tta.architecture.Writes;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
@@ -657,11 +658,21 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getPort_ConnectedSocket() {
+	public EReference getPort_InputSocket() {
 		return (EReference)portEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getPort_OutputSocket() {
+		return (EReference)portEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -669,14 +680,6 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	public EAttribute getPort_Width() {
-		return (EAttribute)portEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getPort_Trigger() {
 		return (EAttribute)portEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -684,8 +687,16 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getPort_SetsOpcode() {
+	public EAttribute getPort_Trigger() {
 		return (EAttribute)portEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getPort_SetsOpcode() {
+		return (EAttribute)portEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -1175,7 +1186,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		portEClass = createEClass(PORT);
 		createEAttribute(portEClass, PORT__NAME);
-		createEReference(portEClass, PORT__CONNECTED_SOCKET);
+		createEReference(portEClass, PORT__INPUT_SOCKET);
+		createEReference(portEClass, PORT__OUTPUT_SOCKET);
 		createEAttribute(portEClass, PORT__WIDTH);
 		createEAttribute(portEClass, PORT__TRIGGER);
 		createEAttribute(portEClass, PORT__SETS_OPCODE);
@@ -1336,10 +1348,14 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getPort_ConnectedSocket(), this.getSocket(), null, "connectedSocket", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPort_InputSocket(), this.getSocket(), null, "inputSocket", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getPort_OutputSocket(), this.getSocket(), null, "outputSocket", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_Width(), ecorePackage.getEInt(), "width", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_Trigger(), ecorePackage.getEBoolean(), "trigger", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_SetsOpcode(), ecorePackage.getEBoolean(), "setsOpcode", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		EOperation op = addEOperation(portEClass, null, "connect", 0, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getSocket(), "socket", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(socketEClass, Socket.class, "Socket", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSocket_Name(), ecorePackage.getEString(), "name", null, 0, 1, Socket.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
