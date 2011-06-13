@@ -568,13 +568,13 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT__TRIGGER = 4;
 
 	/**
-	 * The feature id for the '<em><b>Sets Opcode</b></em>' attribute.
+	 * The feature id for the '<em><b>Opcode Selector</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PORT__SETS_OPCODE = 5;
+	int PORT__OPCODE_SELECTOR = 5;
 
 	/**
 	 * The number of structural features of the '<em>Port</em>' class.
@@ -1753,15 +1753,15 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getPort_Trigger();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Port#isSetsOpcode <em>Sets Opcode</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Port#isOpcodeSelector <em>Opcode Selector</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Sets Opcode</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Port#isSetsOpcode()
+	 * @return the meta object for the attribute '<em>Opcode Selector</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Port#isOpcodeSelector()
 	 * @see #getPort()
 	 * @generated
 	 */
-	EAttribute getPort_SetsOpcode();
+	EAttribute getPort_OpcodeSelector();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Socket <em>Socket</em>}'.
@@ -2690,12 +2690,12 @@ public interface ArchitecturePackage extends EPackage {
 		EAttribute PORT__TRIGGER = eINSTANCE.getPort_Trigger();
 
 		/**
-		 * The meta object literal for the '<em><b>Sets Opcode</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Opcode Selector</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT__SETS_OPCODE = eINSTANCE.getPort_SetsOpcode();
+		EAttribute PORT__OPCODE_SELECTOR = eINSTANCE.getPort_OpcodeSelector();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.SocketImpl <em>Socket</em>}' class.

@@ -43,7 +43,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getOutputSocket <em>Output Socket</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#getWidth <em>Width</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#isTrigger <em>Trigger</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#isSetsOpcode <em>Sets Opcode</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.Port#isOpcodeSelector <em>Opcode Selector</em>}</li>
  * </ul>
  * </p>
  *
@@ -237,30 +237,30 @@ public interface Port extends EObject {
 	void setTrigger(boolean value);
 
 	/**
-	 * Returns the value of the '<em><b>Sets Opcode</b></em>' attribute.
+	 * Returns the value of the '<em><b>Opcode Selector</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Sets Opcode</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Opcode Selector</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Sets Opcode</em>' attribute.
-	 * @see #setSetsOpcode(boolean)
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_SetsOpcode()
+	 * @return the value of the '<em>Opcode Selector</em>' attribute.
+	 * @see #setOpcodeSelector(boolean)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getPort_OpcodeSelector()
 	 * @model
 	 * @generated
 	 */
-	boolean isSetsOpcode();
+	boolean isOpcodeSelector();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#isSetsOpcode <em>Sets Opcode</em>}' attribute.
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Port#isOpcodeSelector <em>Opcode Selector</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Sets Opcode</em>' attribute.
-	 * @see #isSetsOpcode()
+	 * @param value the new value of the '<em>Opcode Selector</em>' attribute.
+	 * @see #isOpcodeSelector()
 	 * @generated
 	 */
-	void setSetsOpcode(boolean value);
+	void setOpcodeSelector(boolean value);
 
 	/**
 	 * <!-- begin-user-doc -->

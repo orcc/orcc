@@ -692,10 +692,11 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getPort_SetsOpcode() {
+	public EAttribute getPort_OpcodeSelector() {
 		return (EAttribute)portEClass.getEStructuralFeatures().get(5);
 	}
 
@@ -1190,7 +1191,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(portEClass, PORT__OUTPUT_SOCKET);
 		createEAttribute(portEClass, PORT__WIDTH);
 		createEAttribute(portEClass, PORT__TRIGGER);
-		createEAttribute(portEClass, PORT__SETS_OPCODE);
+		createEAttribute(portEClass, PORT__OPCODE_SELECTOR);
 
 		socketEClass = createEClass(SOCKET);
 		createEAttribute(socketEClass, SOCKET__NAME);
@@ -1352,7 +1353,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEReference(getPort_OutputSocket(), this.getSocket(), null, "outputSocket", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_Width(), ecorePackage.getEInt(), "width", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPort_Trigger(), ecorePackage.getEBoolean(), "trigger", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPort_SetsOpcode(), ecorePackage.getEBoolean(), "setsOpcode", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPort_OpcodeSelector(), ecorePackage.getEBoolean(), "opcodeSelector", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		EOperation op = addEOperation(portEClass, null, "connect", 0, 1, IS_UNIQUE, IS_ORDERED);
 		addEParameter(op, this.getSocket(), "socket", 0, 1, IS_UNIQUE, IS_ORDERED);

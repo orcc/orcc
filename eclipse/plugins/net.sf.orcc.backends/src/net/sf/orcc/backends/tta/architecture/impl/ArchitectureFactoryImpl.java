@@ -58,6 +58,7 @@ import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
 
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
@@ -423,9 +424,12 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return port;
 	}
 
-	public Port createPort(String name, int width) {
+	public Port createPort(String name, int width, boolean opcodeSelector,
+			boolean isTrigger) {
 		Port port = createPort(name);
 		port.setWidth(width);
+		port.setOpcodeSelector(opcodeSelector);
+		port.setTrigger(isTrigger);
 		return port;
 	}
 
@@ -581,14 +585,23 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return termUnit;
 	}
 
-	public GlobalControlUnit createSimpleGlobalControlUnit(
-			AddressSpace addressSpace) {
+	public GlobalControlUnit createSimpleGlobalControlUnit(TTA tta) {
 		GlobalControlUnit gcu = createGlobalControlUnit(3, 1);
-		gcu.setAddressSpace(addressSpace);
+		gcu.setAddressSpace(tta.getProgram());
+
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket gcu_i1 = createInputSocket("gcu_i1", segments);
+		Socket gcu_i2 = createInputSocket("gcu_i2", segments);
+		Socket gcu_o1 = createOutputSocket("gcu_o1", segments);
 
 		// Ports
-		Port ra = createPort("ra", 13);
-		Port pc = createPort("pc", 13);
+		Port pc = createPort("pc", 13, false, false);
+		pc.connect(gcu_i1);
+		Port ra = createPort("ra", 13, true, true);
+		ra.connect(gcu_i2);
+		ra.connect(gcu_o1);
+
 		gcu.setReturnAddress(ra);
 		gcu.getPorts().add(ra);
 		gcu.getPorts().add(pc);
@@ -600,11 +613,31 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return gcu;
 	}
 
-	public RegisterFile createSimpleRegisterFile(String name, int size,
-			int width) {
+	private EList<Segment> getAllSegments(EList<Bus> buses) {
+		EList<Segment> segments = new BasicEList<Segment>();
+		for (Bus bus : buses) {
+			segments.addAll(bus.getSegments());
+		}
+		return segments;
+	}
+
+	public RegisterFile createSimpleRegisterFile(TTA tta, String name,
+			int size, int width) {
 		RegisterFile registerFile = createRegisterFile(name, size, width, 1, 1);
-		registerFile.getPorts().add(createPort("wr"));
-		registerFile.getPorts().add(createPort("rd"));
+
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
+
+		// Ports
+		Port wr = createPort("wr");
+		wr.connect(o1);
+		Port rd = createPort("rd");
+		rd.connect(i1);
+		registerFile.getPorts().add(wr);
+		registerFile.getPorts().add(rd);
+
 		return registerFile;
 	}
 
@@ -613,15 +646,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		// Address spaces
 		tta.setData(createAddressSpace());
 		tta.setProgram(createAddressSpace());
-		// Global Control Unit
-		tta.setGcu(createSimpleGlobalControlUnit(tta.getProgram()));
 		// Buses
 		tta.getBuses().add(createSimpleBus(0, 32));
 		tta.getBuses().add(createSimpleBus(1, 32));
+		// Global Control Unit
+		tta.setGcu(createSimpleGlobalControlUnit(tta));
 		// Register files
-		tta.getRegisterFiles().add(createSimpleRegisterFile("RF_1", 32, 12));
-		tta.getRegisterFiles().add(createSimpleRegisterFile("RF_2", 32, 12));
-		tta.getRegisterFiles().add(createSimpleRegisterFile("BOOL", 1, 2));
+		tta.getRegisterFiles().add(
+				createSimpleRegisterFile(tta, "RF_1", 32, 12));
+		tta.getRegisterFiles().add(
+				createSimpleRegisterFile(tta, "RF_2", 32, 12));
+		tta.getRegisterFiles().add(createSimpleRegisterFile(tta, "BOOL", 1, 2));
 		// Fonctional units
 		return tta;
 	}
