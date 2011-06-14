@@ -56,7 +56,7 @@ import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.services.AstExpressionEvaluator;
-import net.sf.orcc.cal.services.CalJavaValidator;
+import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;

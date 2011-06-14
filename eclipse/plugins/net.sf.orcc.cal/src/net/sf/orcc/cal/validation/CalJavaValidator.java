@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.cal.services;
+package net.sf.orcc.cal.validation;
 
 import static net.sf.orcc.cal.cal.CalPackage.eINSTANCE;
 
