@@ -1,78 +1,111 @@
 
-processor(instance, options) ::= <<
+processor(tta, options) ::= <<
 \<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
 \<adf version="1.7"\>
-
+	<tta.buses: bus(); separator="\n">
+	<tta.sockets: socket(); separator="\n">
+	<tta.functionUnits: functionUnit(); separator="\n">
+	<tta.registerFiles: registerFile()>
+	<addressSpace(tta.program)>
+	<addressSpace(tta.data)>
+	<globalControlUnit(tta.gcu)>
 \</adf\>
 >>
 
-bus(index) ::= <<
-\<bus name="B<index>"\>
-	\<width\>32\</width\>
-	\<guard\>
-		\<always-true/\>
-	\</guard\>
-	\<guard\>
-		\<simple-expr\>
-			\<bool\>
-				\<name\>BOOL\</name\>
-				\<index\>0\</index\>
-			\</bool\>
-		\</simple-expr\>
-	\</guard\>
-	\<guard\>
-		\<inverted-expr\>
-			\<bool\>
-				\<name\>BOOL\</name\>
-				\<index\>0\</index\>
-			\</bool\>
-		\</inverted-expr\>
-	\</guard\>
-	\<guard\>
-		\<simple-expr\>
-			\<bool\>
-				\<name\>BOOL\</name\>
-				\<index\>1\</index\>
-			\</bool\>
-		\</simple-expr\>
-	\</guard\>
-	\<guard\>
-		\<inverted-expr\>
-			\<bool\>
-				\<name\>BOOL\</name\>
-				\<index\>1\</index\>
-			\</bool\>
-		\</inverted-expr\>
-	\</guard\>
-	\<segment name="seg1"\>
-		\<writes-to/\>
-	\</segment\>
-	\<short-immediate\>
-		\<extension\>zero\</extension\>
-		\<width\>32\</width\>
-	\</short-immediate\>
+bus(bus) ::= <<
+\<bus name="<bus.name>"\>
+	\<width\><bus.width>\</width\>
+	<bus.guards: guard(); separator="\n">
+	<bus.segments: segment(); separator="\n">
+	<shortImmediate(bus.shortImmediate)>
 \</bus\>
+>>
+
+guard(guard) ::= <<
+\<guard\>
+	<expression(guard)>
+\</guard\>
+>>
+
+expression(expr) ::= <<
+<if(expr.exprTrue)
+><exprTrue()><
+elseif(expr.exprFalse)
+><exprFalse()><
+elseif(expr.exprUnary)
+><exprUnary(expr)><
+elseif(expr.exprBinary)
+><exprBinary(expr)><
+endif>
+>>
+
+exprTrue() ::= <<
+\<always-true/\>
+>>
+
+exprFalse() ::= <<
+\<always-false/\>
+>>
+
+exprUnary(expr) ::= <<
+<if(expr.simple)>\<simple-expr\><else>\<inverted-expr\><endif>
+	<term(expr.term)>
+<if(expr.simple)>\</simple-expr\><else>\</inverted-expr\><endif>
+>>
+
+exprBinary(expr) ::= <<
+<if(expr.and)>\<and-expr\><else>\<or-expr\><endif>
+	<exprUnary(expr.e1)>
+	<exprUnary(expr.e2)>
+<if(expr.and)>\</and-expr\><else>\</or-expr\><endif>
+>>
+
+term(term) ::= <<
+<if(term.termBool)
+><termBool(term)><
+elseif(term.termUnit)
+><termUnit(term)><
+endif>
+>>
+
+termBool(term) ::= <<
+\<bool\>
+	\<name\><term.register.name>\</name\>
+	\<index\><term.index>\</index\>
+\</bool\>
+>>
+
+termUnit(term) ::= <<
+\<unit\>
+	\<name\><term.functionUnit.name>\</name\>
+	\<port\><term.port.name>\</port\>
+\</unit\>
+>>
+
+segment(segment) ::= <<
+\<segment name="<segment.name>"\>
+	\<writes-to/\>
+\</segment\>
+>>
+
+shortImmediate(shortImmediate) ::= <<
+\<short-immediate\>
+	\<extension\>zero\</extension\>
+	\<width\><shortImmediate.width>\</width\>
+\</short-immediate\>
 >>
 
 socket(socket) ::= <<
 \<socket name="<socket.name>"\>
-	<socket.inputs: socketRead()>
-	<socket.outputs: socketWrite()>
+	<socket.segments: socketSegment()>
 \</socket\>
 >>
 
-socketRead(input) ::= <<
-\<reads-from\>
-	\<bus\><input.bus.name>\</bus\>
-	\<segment\><input.segment.name>\</segment\>
-\</reads-from\>
->>
-
-socketWrite(output) ::= <<
-\<writes-to\>
-	\<bus\><output.bus.name>\</bus\>
-	\<segment\><output.segment.name>\</segment\>
-\</writes-to\>
+socketSegment(segment) ::= <<
+<if(socket.input)>\<reads-from\><else>\<writes-to\><endif>
+	\<bus\><segment.bus.name>\</bus\>
+	\<segment\><segment.name>\</segment\>
+<if(socket.input)>\</reads-from\><else>\</writes-to\><endif>
 >>
 
 functionUnit() ::= <<
@@ -81,72 +114,82 @@ functionUnit() ::= <<
 \</function-unit\>
 >>
 
-registerFile() ::= <<
-\<register-file name="RF_2"\>
-    \<type\>normal\</type\>
-    \<size\>12\</size\>
-    \<width\>32\</width\>
-    \<max-reads\>1\</max-reads\>
-    \<max-writes\>1\</max-writes\>
-    \<port name="wr"\>
-      \<connects-to\>RF_i1\</connects-to\>
-    \</port\>
-    \<port name="rd"\>
-      \<connects-to\>RF_o1\</connects-to\>
-    \</port\>
-  \</register-file\>
+registerFile(register) ::= <<
+\<register-file name="<register.name>"\>
+	\<type\>normal\</type\>
+	\<size\><register.size>\</size\>
+	\<width\><register.width>\</width\>
+	\<max-reads\><register.maxReads>\</max-reads\>
+	\<max-writes\><register.maxWrites>\</max-writes\>
+	<register.ports: { port | port(port, false) }; separator="\n">
+\</register-file\>
 >>
 
-adressSpaces() ::= <<
+port(port, width=true) ::= <<
+\<port name="<port.name>"\>
+	\<connects-to\>RF_o1\</connects-to\>
+	<if(width)>\<width\>32\</width\><endif>
+	<if(port.trigger)>\<triggers/\><endif>
+	<if(port.opcodeSelector)>\<sets-opcode/\><endif>
+\</port\>
+>>
+
+addressSpace(addressSpace) ::= <<
 \<address-space name="data"\>
-	\<width\>8\</width\>
-	\<min-address\>0\</min-address\>
-	\<max-address\>131071\</max-address\>
-\</address-space\>
-
-\<address-space name="instructions"\>
-	\<width\>8\</width\>
-	\<min-address\>0\</min-address\>
-	\<max-address\>8191\</max-address\>
+	\<width\><addressSpace.width>\</width\>
+	\<min-address\><addressSpace.minAddress>\</min-address\>
+	\<max-address\><addressSpace.maxAddress>\</max-address\>
 \</address-space\>
 >>
 
-globalControlUnit() ::= <<
+globalControlUnit(gcu) ::= <<
 \<global-control-unit name="gcu"\>
-	\<port name="pc"\>
-		\<connects-to\>gcu_i1\</connects-to\>
-		\<width\>13\</width\>
-		\<triggers/\>
-		\<sets-opcode/\>
-	\</port\>
-	\<special-port name="ra"\>
-		\<connects-to\>gcu_i2\</connects-to\>
-		\<connects-to\>gcu_o1\</connects-to\>
-		\<width\>13\</width\>
-	\</special-port\>
-	\<return-address\>ra\</return-address\>
-	\<ctrl-operation\>
-		\<name\>jump\</name\>
-		\<bind name="1"\>pc\</bind\>
-		\<pipeline\>
-			\<reads name="1"\>
-				\<start-cycle\>0\</start-cycle\>
-				\<cycles\>1\</cycles\>
-			\</reads\>
-		\</pipeline\>
-	\</ctrl-operation\>
-	\<ctrl-operation\>
-		\<name\>call\</name\>
-		\<bind name="1"\>pc\</bind\>
-		\<pipeline\>
-			\<reads name="1"\>
-				\<start-cycle\>0\</start-cycle\>
-				\<cycles\>1\</cycles\>
-			\</reads\>
-		\</pipeline\>
-	\</ctrl-operation\>
-	\<address-space\>instructions\</address-space\>
-	\<delay-slots\>3\</delay-slots\>
-	\<guard-latency\>1\</guard-latency\>
+	<gcu.port: port(); separator="\n">
+	\<return-address\><gcu.returnAdress.name>\</return-address\>
+	<gcu.operations: { operation | <operation(operation, false)> }; separator="\n">
+	\<address-space\><gcu.addressSpace.name>\</address-space\>
+	\<delay-slots\><gcu.delaySlots>\</delay-slots\>
+	\<guard-latency\><gcu.guardLatency>\</guard-latency\>
 \</global-control-unit\>
+>>
+
+operation(operation, control=false) ::= <<
+\<<if(control)>ctrl-<endif>operation\>
+	\<name\><operation.name>\</name\>
+	\<bind name="1"\>pc\</bind\>
+	\<pipeline\>
+		<operation.pipeline: element(); separator="\n">
+	\</pipeline\>
+\</<if(control)>ctrl-<endif>operation\>
+>>
+
+element(element) ::= <<
+<if(element.reads)
+>reads(element)<
+elseif(element.writes)
+>writes(element)<
+elseif(element.resource)
+>resource(element)<
+endif>
+>>
+
+reads(element) ::= <<
+\<reads name="<operation.portToIndexMap.(element.port)>"\>
+	\<start-cycle\><element.startCycle>\</start-cycle\>
+	\<cycles\><element.cycles>\</cycles\>
+\</reads\>
+>>
+
+writes(element) ::= <<
+\<writes name="<operation.portToIndexMap.(element.port)>"\>
+	\<start-cycle\><element.startCycle>\</start-cycle\>
+	\<cycles\><element.cycles>\</cycles\>
+\</writes\>
+>>
+
+resource(element) ::= <<
+\<resource name="element.name"\>
+	\<start-cycle\><element.startCycle>\</start-cycle\>
+	\<cycles\><element.cycles>\</cycles\>
+\</resource\>
 >>

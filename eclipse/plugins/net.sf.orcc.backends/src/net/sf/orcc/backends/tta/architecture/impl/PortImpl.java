@@ -149,8 +149,8 @@ public class PortImpl extends EObjectImpl implements Port {
 
 	/**
 	 * The default value of the '{@link #isOpcodeSelector() <em>Opcode Selector</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #isOpcodeSelector()
 	 * @generated
 	 * @ordered
@@ -159,8 +159,8 @@ public class PortImpl extends EObjectImpl implements Port {
 
 	/**
 	 * The cached value of the '{@link #isOpcodeSelector() <em>Opcode Selector</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @see #isOpcodeSelector()
 	 * @generated
 	 * @ordered
@@ -358,8 +358,7 @@ public class PortImpl extends EObjectImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public boolean isOpcodeSelector() {
@@ -367,8 +366,7 @@ public class PortImpl extends EObjectImpl implements Port {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setOpcodeSelector(boolean newOpcodeSelector) {
@@ -382,15 +380,10 @@ public class PortImpl extends EObjectImpl implements Port {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	public void connect(Socket socket) {
-		switch (socket.getType()) {
-		case INPUT:
+		if (socket.isInput()) {
 			inputSocket = socket;
-			break;
-		case OUTPUT:
+		} else {
 			outputSocket = socket;
-			break;
-		default:
-			throw new NullPointerException();
 		}
 	}
 

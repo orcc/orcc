@@ -73,4 +73,12 @@ public interface Segment extends EObject {
 	 */
 	void setName(String value);
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model kind="operation"
+	 * @generated
+	 */
+	Bus getBus();
+
 } // Segment

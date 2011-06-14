@@ -34,17 +34,14 @@ import net.sf.orcc.backends.tta.architecture.OpUnary;
 import net.sf.orcc.backends.tta.architecture.Term;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Expr Unary</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Expr Unary</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -58,8 +55,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	/**
 	 * The default value of the '{@link #getOperator() <em>Operator</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOperator()
 	 * @generated
 	 * @ordered
@@ -68,8 +64,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 
 	/**
 	 * The cached value of the '{@link #getOperator() <em>Operator</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getOperator()
 	 * @generated
 	 * @ordered
@@ -78,8 +73,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 
 	/**
 	 * The cached value of the '{@link #getTerm() <em>Term</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getTerm()
 	 * @generated
 	 * @ordered
@@ -87,8 +81,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	protected Term term;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected ExprUnaryImpl() {
@@ -96,8 +89,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -106,8 +98,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public OpUnary getOperator() {
@@ -115,8 +106,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setOperator(OpUnary newOperator) {
@@ -127,8 +117,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Term getTerm() {
@@ -144,8 +133,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Term basicGetTerm() {
@@ -153,8 +141,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setTerm(Term newTerm) {
@@ -165,8 +152,49 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public boolean isInverted() {
+		return getOperator() == OpUnary.INVERTED;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public boolean isSimple() {
+		return getOperator() == OpUnary.SIMPLE;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public boolean isExprUnary() {
+		return true;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public boolean isExprBinary() {
+		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public boolean isExprTrue() {
+		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public boolean isExprFalse() {
+		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -182,8 +210,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -200,8 +227,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -218,8 +244,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -234,8 +259,7 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -249,4 +273,4 @@ public class ExprUnaryImpl extends EObjectImpl implements ExprUnary {
 		return result.toString();
 	}
 
-} //ExprUnaryImpl
+} // ExprUnaryImpl

@@ -1325,6 +1325,8 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(segmentEClass, Segment.class, "Segment", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSegment_Name(), ecorePackage.getEString(), "name", null, 0, 1, Segment.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+		addEOperation(segmentEClass, this.getBus(), "getBus", 0, 1, IS_UNIQUE, IS_ORDERED);
+
 		initEClass(globalControlUnitEClass, GlobalControlUnit.class, "GlobalControlUnit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getGlobalControlUnit_Ports(), this.getPort(), null, "ports", null, 0, -1, GlobalControlUnit.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGlobalControlUnit_ReturnAddress(), this.getPort(), null, "returnAddress", null, 0, 1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1362,6 +1364,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEAttribute(getSocket_Name(), ecorePackage.getEString(), "name", null, 0, 1, Socket.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getSocket_ConnectedSegments(), this.getSegment(), null, "connectedSegments", null, 0, -1, Socket.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSocket_Type(), this.getSocketType(), "type", null, 0, 1, Socket.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		addEOperation(socketEClass, ecorePackage.getEBoolean(), "isInput", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		addEOperation(socketEClass, ecorePackage.getEBoolean(), "isOutput", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(operationEClass, Operation.class, "Operation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getOperation_Name(), ecorePackage.getEString(), "name", null, 0, 1, Operation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1401,20 +1407,40 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(guardEClass, Guard.class, "Guard", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
+		addEOperation(guardEClass, ecorePackage.getEBoolean(), "isExprUnary", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		addEOperation(guardEClass, ecorePackage.getEBoolean(), "isExprBinary", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		addEOperation(guardEClass, ecorePackage.getEBoolean(), "isExprTrue", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		addEOperation(guardEClass, ecorePackage.getEBoolean(), "isExprFalse", 0, 1, IS_UNIQUE, IS_ORDERED);
+
 		initEClass(exprUnaryEClass, ExprUnary.class, "ExprUnary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getExprUnary_Operator(), this.getOpUnary(), "operator", "", 0, 1, ExprUnary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getExprUnary_Term(), this.getTerm(), null, "term", null, 0, 1, ExprUnary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		addEOperation(exprUnaryEClass, ecorePackage.getEBoolean(), "isInverted", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		addEOperation(exprUnaryEClass, ecorePackage.getEBoolean(), "isSimple", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(exprBinaryEClass, ExprBinary.class, "ExprBinary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getExprBinary_Operator(), this.getOpBinary(), "operator", "", 0, 1, ExprBinary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getExprBinary_E1(), this.getExprUnary(), null, "e1", null, 0, 1, ExprBinary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getExprBinary_E2(), this.getExprUnary(), null, "e2", null, 0, 1, ExprBinary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+		addEOperation(exprBinaryEClass, ecorePackage.getEBoolean(), "isOr", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		addEOperation(exprBinaryEClass, ecorePackage.getEBoolean(), "isAnd", 0, 1, IS_UNIQUE, IS_ORDERED);
+
 		initEClass(exprTrueEClass, ExprTrue.class, "ExprTrue", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(exprFalseEClass, ExprFalse.class, "ExprFalse", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(termEClass, Term.class, "Term", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+		addEOperation(termEClass, ecorePackage.getEBoolean(), "isTermBool", 0, 1, IS_UNIQUE, IS_ORDERED);
+
+		addEOperation(termEClass, ecorePackage.getEBoolean(), "isTermUnit", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(termBoolEClass, TermBool.class, "TermBool", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getTermBool_Register(), this.getRegisterFile(), null, "register", null, 0, 1, TermBool.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

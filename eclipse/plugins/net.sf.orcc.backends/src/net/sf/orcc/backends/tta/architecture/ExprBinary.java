@@ -130,4 +130,20 @@ public interface ExprBinary extends Guard {
 	 */
 	void setE2(ExprUnary value);
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model kind="operation"
+	 * @generated
+	 */
+	boolean isOr();
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model kind="operation"
+	 * @generated
+	 */
+	boolean isAnd();
+
 } // ExprBinary

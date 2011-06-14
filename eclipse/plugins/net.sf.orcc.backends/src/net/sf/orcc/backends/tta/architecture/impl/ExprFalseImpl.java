@@ -64,4 +64,36 @@ public class ExprFalseImpl extends EObjectImpl implements ExprFalse {
 		return ArchitecturePackage.Literals.EXPR_FALSE;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public boolean isExprUnary() {
+		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public boolean isExprBinary() {
+		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public boolean isExprTrue() {
+		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public boolean isExprFalse() {
+		return true;
+	}
+
 } //ExprFalseImpl

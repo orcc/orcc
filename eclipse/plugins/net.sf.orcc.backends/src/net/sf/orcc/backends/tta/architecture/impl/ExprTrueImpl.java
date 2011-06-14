@@ -64,4 +64,36 @@ public class ExprTrueImpl extends EObjectImpl implements ExprTrue {
 		return ArchitecturePackage.Literals.EXPR_TRUE;
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public boolean isExprUnary() {
+		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public boolean isExprBinary() {
+		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public boolean isExprTrue() {
+		return true;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public boolean isExprFalse() {
+		return false;
+	}
+
 } //ExprTrueImpl

@@ -185,6 +185,22 @@ public class SocketImpl extends EObjectImpl implements Socket {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 */
+	public boolean isInput() {
+		return this.getType() == SocketType.INPUT;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public boolean isOutput() {
+		return this.getType() == SocketType.OUTPUT;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override

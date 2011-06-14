@@ -33,17 +33,14 @@ import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 
 import org.eclipse.emf.common.notify.Notification;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Term Bool</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Term Bool</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
@@ -57,8 +54,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
 public class TermBoolImpl extends EObjectImpl implements TermBool {
 	/**
 	 * The cached value of the '{@link #getRegister() <em>Register</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getRegister()
 	 * @generated
 	 * @ordered
@@ -67,8 +63,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 
 	/**
 	 * The default value of the '{@link #getIndex() <em>Index</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getIndex()
 	 * @generated
 	 * @ordered
@@ -77,8 +72,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 
 	/**
 	 * The cached value of the '{@link #getIndex() <em>Index</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getIndex()
 	 * @generated
 	 * @ordered
@@ -86,8 +80,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	protected int index = INDEX_EDEFAULT;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected TermBoolImpl() {
@@ -95,8 +88,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -105,8 +97,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public RegisterFile getRegister() {
@@ -122,8 +113,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public RegisterFile basicGetRegister() {
@@ -131,8 +121,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setRegister(RegisterFile newRegister) {
@@ -143,8 +132,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getIndex() {
@@ -152,8 +140,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setIndex(int newIndex) {
@@ -164,8 +151,21 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public boolean isTermBool() {
+		return true;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 */
+	public boolean isTermUnit() {
+		return false;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -181,8 +181,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -199,8 +198,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -217,8 +215,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -233,8 +230,7 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -248,4 +244,4 @@ public class TermBoolImpl extends EObjectImpl implements TermBool {
 		return result.toString();
 	}
 
-} //TermBoolImpl
+} // TermBoolImpl
