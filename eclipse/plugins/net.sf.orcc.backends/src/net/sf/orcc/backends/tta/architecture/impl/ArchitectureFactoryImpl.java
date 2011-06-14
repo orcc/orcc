@@ -394,16 +394,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return functionUnit;
 	}
 
-	@Override
-	public FunctionUnit createFunctionUnit(String name,
-			EList<Operation> operations, EList<Port> ports) {
-		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		functionUnit.setName(name);
-		functionUnit.getOperations().addAll(operations);
-		functionUnit.getPorts().addAll(ports);
-		return functionUnit;
-	}
-
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -533,11 +523,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Port createPort(String name, int width, boolean opcodeSelector,
+	public Port createPort(String name, int width, boolean isOpcodeSelector,
 			boolean isTrigger) {
 		Port port = createPort(name);
 		port.setWidth(width);
-		port.setOpcodeSelector(opcodeSelector);
+		port.setOpcodeSelector(isOpcodeSelector);
 		port.setTrigger(isTrigger);
 		return port;
 	}
