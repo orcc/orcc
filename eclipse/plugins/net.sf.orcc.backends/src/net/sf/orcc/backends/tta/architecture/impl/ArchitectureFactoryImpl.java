@@ -30,7 +30,6 @@ package net.sf.orcc.backends.tta.architecture.impl;
 
 import java.util.Map;
 
-import net.sf.orcc.backends.tta.architecture.*;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
