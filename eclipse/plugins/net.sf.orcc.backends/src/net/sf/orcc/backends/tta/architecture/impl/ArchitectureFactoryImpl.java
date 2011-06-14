@@ -133,22 +133,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * 
 	 * @generated
 	 */
-	public OpUnary createOpUnaryFromString(EDataType eDataType,
-			String initialValue) {
-		OpUnary result = OpUnary.get(initialValue);
-		if (result == null)
-			throw new IllegalArgumentException("The value '" + initialValue
-					+ "' is not a valid enumerator of '" + eDataType.getName()
-					+ "'");
-		return result;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public String convertOpUnaryToString(EDataType eDataType,
+	public String convertOpBinaryToString(EDataType eDataType,
 			Object instanceValue) {
 		return instanceValue == null ? null : instanceValue.toString();
 	}
@@ -158,22 +143,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * 
 	 * @generated
 	 */
-	public OpBinary createOpBinaryFromString(EDataType eDataType,
-			String initialValue) {
-		OpBinary result = OpBinary.get(initialValue);
-		if (result == null)
-			throw new IllegalArgumentException("The value '" + initialValue
-					+ "' is not a valid enumerator of '" + eDataType.getName()
-					+ "'");
-		return result;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public String convertOpBinaryToString(EDataType eDataType,
+	public String convertOpUnaryToString(EDataType eDataType,
 			Object instanceValue) {
 		return instanceValue == null ? null : instanceValue.toString();
 	}
@@ -278,6 +248,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return addressSpace;
 	}
 
+	@Override
 	public AddressSpace createAddressSpace(String name, int minAddress,
 			int maxAddress) {
 		AddressSpaceImpl addressSpace = new AddressSpaceImpl();
@@ -307,6 +278,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return bus;
 	}
 
+	@Override
 	public Bus createBus(int index, int width) {
 		BusImpl bus = new BusImpl();
 		bus.setName("Bus" + index);
@@ -314,11 +286,65 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return bus;
 	}
 
-	public Bus createSimpleBus(int index, int width) {
-		Bus bus = createBus(index, width);
-		bus.getSegments().add(createSegment("segment0"));
-		bus.setShortImmediate(createShortImmediate(width, Extension.ZERO));
-		return bus;
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public ExprBinary createExprBinary() {
+		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
+		return exprBinary;
+	}
+
+	@Override
+	public ExprBinary createExprBinary(OpBinary op, ExprUnary e1, ExprUnary e2) {
+		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
+		exprBinary.setE1(e1);
+		exprBinary.setE2(e2);
+		exprBinary.setOperator(op);
+		return exprBinary;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public ExprFalse createExprFalse() {
+		ExprFalseImpl exprFalse = new ExprFalseImpl();
+		return exprFalse;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public ExprTrue createExprTrue() {
+		ExprTrueImpl exprTrue = new ExprTrueImpl();
+		return exprTrue;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public ExprUnary createExprUnary() {
+		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
+		return exprUnary;
+	}
+
+	@Override
+	public ExprUnary createExprUnary(boolean isInverted, Term term) {
+		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
+		if (isInverted) {
+			exprUnary.setOperator(OpUnary.INVERTED);
+		} else {
+			exprUnary.setOperator(OpUnary.SIMPLE);
+		}
+		exprUnary.setTerm(term);
+		return exprUnary;
 	}
 
 	/**
@@ -368,6 +394,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return functionUnit;
 	}
 
+	@Override
 	public FunctionUnit createFunctionUnit(String name,
 			EList<Operation> operations, EList<Port> ports) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
@@ -387,12 +414,56 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return globalControlUnit;
 	}
 
+	@Override
 	public GlobalControlUnit createGlobalControlUnit(int delaySlots,
 			int guardLatency) {
 		GlobalControlUnitImpl globalControlUnit = new GlobalControlUnitImpl();
 		globalControlUnit.setDelaySlots(delaySlots);
 		globalControlUnit.setGuardLatency(guardLatency);
 		return globalControlUnit;
+	}
+
+	@Override
+	public Socket createInputSocket(String name, EList<Segment> segments) {
+		Socket socket = createSocket(name, segments);
+		socket.setType(SocketType.INPUT);
+		return socket;
+	}
+
+	@Override
+	public FunctionUnit createLSU(TTA tta) {
+		FunctionUnit LSU = createSimpleFonctionUnit(tta, "LSU");
+		// Operations
+		EList<Port> ports = LSU.getPorts();
+		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
+		for (String loadOperation : loadOperations) {
+			LSU.getOperations().add(
+					createOperationLoad(loadOperation, ports.get(0),
+							ports.get(2)));
+		}
+		String[] storeOperations = { "stw", "stq", "sth" };
+		for (String storeOperation : storeOperations) {
+			LSU.getOperations().add(
+					createOperationLoad(storeOperation, ports.get(0),
+							ports.get(1)));
+		}
+		LSU.setAddressSpace(tta.getData());
+		return LSU;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public OpBinary createOpBinaryFromString(EDataType eDataType,
+			String initialValue) {
+		OpBinary result = OpBinary.get(initialValue);
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
+		return result;
 	}
 
 	/**
@@ -405,56 +476,43 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
+	@Override
 	public Operation createOperation(String name) {
 		OperationImpl operation = new OperationImpl();
 		operation.setName(name);
 		return operation;
 	}
 
-	public Operation createSimpleOperation(String name, Port in1, Port out1) {
-		Operation operation = createOperation(name);
-		operation.setControl(false);
-		operation.getPortToIndexMap().put(in1, 1);
-		operation.getPortToIndexMap().put(out1, 2);
-		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createWrites(out1, 0, 1));
-		return operation;
+	@Override
+	public Operation createOperationLoad(String name, Port in, Port out) {
+		return createSimpleOperation(name, in, 0, 1, true, out, 2, 1, false);
 	}
 
-	public Operation createSimpleOperation(String name, Port port1,
-			int startCycle1, int cycle1, boolean isReads1, Port port2,
-			int startCycle2, int cycle2, boolean isReads2) {
-		Operation operation = createOperation(name);
-		operation.setControl(false);
-		operation.getPortToIndexMap().put(port1, 1);
-		operation.getPortToIndexMap().put(port2, 2);
-		Element element1, element2;
-		if (isReads1) {
-			element1 = createReads(port1, startCycle1, cycle1);
-		} else {
-			element1 = createWrites(port1, startCycle1, cycle1);
-		}
-		if (isReads2) {
-			element2 = createReads(port2, startCycle2, cycle2);
-		} else {
-			element2 = createWrites(port2, startCycle2, cycle2);
-		}
-		operation.getPipeline().add(element1);
-		operation.getPipeline().add(element2);
-		return operation;
+	@Override
+	public Operation createOperationStore(String name, Port in1, Port in2) {
+		return createSimpleOperation(name, in1, 0, 1, true, in2, 2, 1, true);
 	}
 
-	public Operation createSimpleOperation(String name, Port in1, Port in2,
-			Port out1) {
-		Operation operation = createOperation(name);
-		operation.setControl(false);
-		operation.getPortToIndexMap().put(in1, 1);
-		operation.getPortToIndexMap().put(in2, 2);
-		operation.getPortToIndexMap().put(out1, 3);
-		operation.getPipeline().add(createReads(in1, 0, 1));
-		operation.getPipeline().add(createReads(in2, 0, 1));
-		operation.getPipeline().add(createWrites(out1, 0, 1));
-		return operation;
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public OpUnary createOpUnaryFromString(EDataType eDataType,
+			String initialValue) {
+		OpUnary result = OpUnary.get(initialValue);
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
+		return result;
+	}
+
+	@Override
+	public Socket createOutputSocket(String name, EList<Segment> segments) {
+		Socket socket = createSocket(name, segments);
+		socket.setType(SocketType.OUTPUT);
+		return socket;
 	}
 
 	/**
@@ -467,12 +525,14 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return port;
 	}
 
+	@Override
 	public Port createPort(String name) {
 		PortImpl port = new PortImpl();
 		port.setName(name);
 		return port;
 	}
 
+	@Override
 	public Port createPort(String name, int width, boolean opcodeSelector,
 			boolean isTrigger) {
 		Port port = createPort(name);
@@ -502,6 +562,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return reads;
 	}
 
+	@Override
 	public Reads createReads(Port port, int startCycle, int cycle) {
 		ReadsImpl reads = new ReadsImpl();
 		reads.setPort(port);
@@ -520,6 +581,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return registerFile;
 	}
 
+	@Override
 	public RegisterFile createRegisterFile(String name, int size, int width,
 			int maxReads, int maxWrites) {
 		RegisterFileImpl registerFile = new RegisterFileImpl();
@@ -551,6 +613,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return segment;
 	}
 
+	@Override
 	public Segment createSegment(String name) {
 		SegmentImpl segment = new SegmentImpl();
 		segment.setName(name);
@@ -567,6 +630,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return shortImmediate;
 	}
 
+	@Override
 	public ShortImmediate createShortImmediate(int width, Extension extension) {
 		ShortImmediateImpl shortImmediate = new ShortImmediateImpl();
 		shortImmediate.setWidth(width);
@@ -574,109 +638,66 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return shortImmediate;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public ExprUnary createExprUnary() {
-		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
-		return exprUnary;
+	@Override
+	public Bus createSimpleBus(int index, int width) {
+		Bus bus = createBus(index, width);
+		bus.getSegments().add(createSegment("segment0"));
+		bus.setShortImmediate(createShortImmediate(width, Extension.ZERO));
+		return bus;
 	}
 
-	public EList<Guard> createSimpleGuards(RegisterFile register) {
-		EList<Guard> guards = new BasicEList<Guard>();
-		guards.add(createExprTrue());
-		guards.add(createExprUnary(false, createTermBool(register, 0)));
-		guards.add(createExprUnary(true, createTermBool(register, 0)));
-		guards.add(createExprUnary(false, createTermBool(register, 1)));
-		guards.add(createExprUnary(true, createTermBool(register, 1)));
-		return guards;
+	@Override
+	public Operation createSimpleCtrlOperation(String name, Port port) {
+		Operation operation = new OperationImpl();
+		operation.setName(name);
+		operation.setControl(true);
+		operation.getPipeline().add(createReads(port, 0, 1));
+		operation.getPortToIndexMap().put(port, 1);
+		return operation;
 	}
 
-	public ExprUnary createExprUnary(boolean isInverted, Term term) {
-		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
-		if (isInverted) {
-			exprUnary.setOperator(OpUnary.INVERTED);
-		} else {
-			exprUnary.setOperator(OpUnary.SIMPLE);
+	@Override
+	public FunctionUnit createSimpleFonctionUnit(TTA tta, String name) {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		functionUnit.setName(name);
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket i2 = createInputSocket(name + "_i2", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
+		// Port
+		Port in1t = createPort("in1t", 32, true, true);
+		Port in2 = createPort("in2", 32, false, false);
+		Port out1 = createPort("out1", 32, false, false);
+		in1t.connect(i1);
+		in2.connect(i2);
+		out1.connect(o1);
+		functionUnit.getPorts().add(in1t);
+		functionUnit.getPorts().add(in2);
+		functionUnit.getPorts().add(out1);
+		return functionUnit;
+	}
+
+	@Override
+	public FunctionUnit createSimpleFonctionUnit(TTA tta, String name,
+			String[] operations1, String[] operations2) {
+		FunctionUnit functionUnit = createSimpleFonctionUnit(tta, name);
+		EList<Port> ports = functionUnit.getPorts();
+		// Operations
+		for (String operation : operations1) {
+			functionUnit.getOperations()
+					.add(createSimpleOperation(operation, ports.get(0),
+							ports.get(2)));
 		}
-		exprUnary.setTerm(term);
-		return exprUnary;
+		for (String operation : operations2) {
+			functionUnit.getOperations().add(
+					createSimpleOperation(operation, ports.get(0),
+							ports.get(1), ports.get(2)));
+		}
+		return functionUnit;
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public ExprBinary createExprBinary() {
-		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
-		return exprBinary;
-	}
-
-	public ExprBinary createExprBinary(OpBinary op, ExprUnary e1, ExprUnary e2) {
-		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
-		exprBinary.setE1(e1);
-		exprBinary.setE2(e2);
-		exprBinary.setOperator(op);
-		return exprBinary;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public ExprTrue createExprTrue() {
-		ExprTrueImpl exprTrue = new ExprTrueImpl();
-		return exprTrue;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public ExprFalse createExprFalse() {
-		ExprFalseImpl exprFalse = new ExprFalseImpl();
-		return exprFalse;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public TermBool createTermBool() {
-		TermBoolImpl termBool = new TermBoolImpl();
-		return termBool;
-	}
-
-	public TermBool createTermBool(RegisterFile register, int index) {
-		TermBoolImpl termBool = new TermBoolImpl();
-		termBool.setRegister(register);
-		termBool.setIndex(index);
-		return termBool;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @generated
-	 */
-	public TermUnit createTermUnit() {
-		TermUnitImpl termUnit = new TermUnitImpl();
-		return termUnit;
-	}
-
-	public TermUnit createTermUnit(FunctionUnit unit, Port port) {
-		TermUnitImpl termUnit = new TermUnitImpl();
-		termUnit.setFunctionUnit(unit);
-		termUnit.setPort(port);
-		return termUnit;
-	}
-
+	@Override
 	public GlobalControlUnit createSimpleGlobalControlUnit(TTA tta) {
 		GlobalControlUnit gcu = createGlobalControlUnit(3, 1);
 		gcu.setAddressSpace(tta.getProgram());
@@ -705,14 +726,67 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return gcu;
 	}
 
-	private EList<Segment> getAllSegments(EList<Bus> buses) {
-		EList<Segment> segments = new BasicEList<Segment>();
-		for (Bus bus : buses) {
-			segments.addAll(bus.getSegments());
-		}
-		return segments;
+	@Override
+	public EList<Guard> createSimpleGuards(RegisterFile register) {
+		EList<Guard> guards = new BasicEList<Guard>();
+		guards.add(createExprTrue());
+		guards.add(createExprUnary(false, createTermBool(register, 0)));
+		guards.add(createExprUnary(true, createTermBool(register, 0)));
+		guards.add(createExprUnary(false, createTermBool(register, 1)));
+		guards.add(createExprUnary(true, createTermBool(register, 1)));
+		return guards;
 	}
 
+	@Override
+	public Operation createSimpleOperation(String name, Port port1,
+			int startCycle1, int cycle1, boolean isReads1, Port port2,
+			int startCycle2, int cycle2, boolean isReads2) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPortToIndexMap().put(port1, 1);
+		operation.getPortToIndexMap().put(port2, 2);
+		Element element1, element2;
+		if (isReads1) {
+			element1 = createReads(port1, startCycle1, cycle1);
+		} else {
+			element1 = createWrites(port1, startCycle1, cycle1);
+		}
+		if (isReads2) {
+			element2 = createReads(port2, startCycle2, cycle2);
+		} else {
+			element2 = createWrites(port2, startCycle2, cycle2);
+		}
+		operation.getPipeline().add(element1);
+		operation.getPipeline().add(element2);
+		return operation;
+	}
+
+	@Override
+	public Operation createSimpleOperation(String name, Port in1, Port out1) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPortToIndexMap().put(in1, 1);
+		operation.getPortToIndexMap().put(out1, 2);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createWrites(out1, 0, 1));
+		return operation;
+	}
+
+	@Override
+	public Operation createSimpleOperation(String name, Port in1, Port in2,
+			Port out1) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPortToIndexMap().put(in1, 1);
+		operation.getPortToIndexMap().put(in2, 2);
+		operation.getPortToIndexMap().put(out1, 3);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createReads(in2, 0, 1));
+		operation.getPipeline().add(createWrites(out1, 0, 1));
+		return operation;
+	}
+
+	@Override
 	public RegisterFile createSimpleRegisterFile(TTA tta, String name,
 			int size, int width) {
 		RegisterFile registerFile = createRegisterFile(name, size, width, 1, 1);
@@ -733,6 +807,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return registerFile;
 	}
 
+	@Override
 	public TTA createSimpleTTA(String name) {
 		TTA tta = createTTA(name);
 		// Address spaces
@@ -770,75 +845,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		units.add(createSimpleFonctionUnit(tta, "Mul", null, mulOperations2));
 		// * And-ior-xor
 		String[] aixOperations2 = { "and", "ior", "xor" };
-		units.add(createSimpleFonctionUnit(tta, "And-ior-xor", null, aixOperations2));
+		units.add(createSimpleFonctionUnit(tta, "And-ior-xor", null,
+				aixOperations2));
 		return tta;
-	}
-
-	public FunctionUnit createLSU(TTA tta) {
-		FunctionUnit LSU = createSimpleFonctionUnit(tta, "LSU");
-		// Operations
-		EList<Port> ports = LSU.getPorts();
-		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
-		for (String loadOperation : loadOperations) {
-			LSU.getOperations().add(
-					createOperationLoad(loadOperation, ports.get(0),
-							ports.get(2)));
-		}
-		String[] storeOperations = { "stw", "stq", "sth" };
-		for (String storeOperation : storeOperations) {
-			LSU.getOperations().add(
-					createOperationLoad(storeOperation, ports.get(0),
-							ports.get(1)));
-		}
-		LSU.setAddressSpace(tta.getData());
-		return LSU;
-	}
-
-	public Operation createOperationLoad(String name, Port in, Port out) {
-		return createSimpleOperation(name, in, 0, 1, true, out, 2, 1, false);
-	}
-
-	public Operation createOperationStore(String name, Port in1, Port in2) {
-		return createSimpleOperation(name, in1, 0, 1, true, in2, 2, 1, true);
-	}
-
-	public FunctionUnit createSimpleFonctionUnit(TTA tta, String name) {
-		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		functionUnit.setName(name);
-		// Sockets
-		EList<Segment> segments = getAllSegments(tta.getBuses());
-		Socket i1 = createInputSocket(name + "_i1", segments);
-		Socket i2 = createInputSocket(name + "_i2", segments);
-		Socket o1 = createOutputSocket(name + "_o1", segments);
-		// Port
-		Port in1t = createPort("in1t", 32, true, true);
-		Port in2 = createPort("in2", 32, false, false);
-		Port out1 = createPort("out1", 32, false, false);
-		in1t.connect(i1);
-		in2.connect(i2);
-		out1.connect(o1);
-		functionUnit.getPorts().add(in1t);
-		functionUnit.getPorts().add(in2);
-		functionUnit.getPorts().add(out1);
-		return functionUnit;
-	}
-
-	public FunctionUnit createSimpleFonctionUnit(TTA tta, String name,
-			String[] operations1, String[] operations2) {
-		FunctionUnit functionUnit = createSimpleFonctionUnit(tta, name);
-		EList<Port> ports = functionUnit.getPorts();
-		// Operations
-		for (String operation : operations1) {
-			functionUnit.getOperations()
-					.add(createSimpleOperation(operation, ports.get(0),
-							ports.get(2)));
-		}
-		for (String operation : operations2) {
-			functionUnit.getOperations().add(
-					createSimpleOperation(operation, ports.get(0),
-							ports.get(1), ports.get(2)));
-		}
-		return functionUnit;
 	}
 
 	/**
@@ -851,22 +860,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return socket;
 	}
 
+	@Override
 	public Socket createSocket(String name, EList<Segment> segments) {
 		SocketImpl socket = new SocketImpl();
 		socket.setName(name);
 		socket.getConnectedSegments().addAll(segments);
-		return socket;
-	}
-
-	public Socket createOutputSocket(String name, EList<Segment> segments) {
-		Socket socket = createSocket(name, segments);
-		socket.setType(SocketType.OUTPUT);
-		return socket;
-	}
-
-	public Socket createInputSocket(String name, EList<Segment> segments) {
-		Socket socket = createSocket(name, segments);
-		socket.setType(SocketType.INPUT);
 		return socket;
 	}
 
@@ -890,11 +888,48 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 * 
 	 * @generated
 	 */
+	public TermBool createTermBool() {
+		TermBoolImpl termBool = new TermBoolImpl();
+		return termBool;
+	}
+
+	@Override
+	public TermBool createTermBool(RegisterFile register, int index) {
+		TermBoolImpl termBool = new TermBoolImpl();
+		termBool.setRegister(register);
+		termBool.setIndex(index);
+		return termBool;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public TermUnit createTermUnit() {
+		TermUnitImpl termUnit = new TermUnitImpl();
+		return termUnit;
+	}
+
+	@Override
+	public TermUnit createTermUnit(FunctionUnit unit, Port port) {
+		TermUnitImpl termUnit = new TermUnitImpl();
+		termUnit.setFunctionUnit(unit);
+		termUnit.setPort(port);
+		return termUnit;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
 	public TTA createTTA() {
 		TTAImpl tta = new TTAImpl();
 		return tta;
 	}
 
+	@Override
 	public TTA createTTA(String name) {
 		TTAImpl tta = new TTAImpl();
 		tta.setName(name);
@@ -911,12 +946,21 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return writes;
 	}
 
+	@Override
 	public Writes createWrites(Port port, int startCycle, int cycle) {
 		WritesImpl writes = new WritesImpl();
 		writes.setPort(port);
 		writes.setStartCycle(startCycle);
 		writes.setCycles(cycle);
 		return writes;
+	}
+
+	private EList<Segment> getAllSegments(EList<Bus> buses) {
+		EList<Segment> segments = new BasicEList<Segment>();
+		for (Bus bus : buses) {
+			segments.addAll(bus.getSegments());
+		}
+		return segments;
 	}
 
 	/**
@@ -926,15 +970,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 */
 	public ArchitecturePackage getArchitecturePackage() {
 		return (ArchitecturePackage) getEPackage();
-	}
-
-	public Operation createSimpleCtrlOperation(String name, Port port) {
-		Operation operation = new OperationImpl();
-		operation.setName(name);
-		operation.setControl(true);
-		operation.getPipeline().add(createReads(port, 0, 1));
-		operation.getPortToIndexMap().put(port, 1);
-		return operation;
 	}
 
 } // ArchitectureFactoryImpl

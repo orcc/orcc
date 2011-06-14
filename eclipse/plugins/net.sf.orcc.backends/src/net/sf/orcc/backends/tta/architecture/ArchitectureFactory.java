@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EFactory;
 
 /**
@@ -48,62 +49,6 @@ public interface ArchitectureFactory extends EFactory {
 	ArchitectureFactory eINSTANCE = net.sf.orcc.backends.tta.architecture.impl.ArchitectureFactoryImpl.init();
 
 	/**
-	 * Returns a new object of class '<em>Bus</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Bus</em>'.
-	 * @generated
-	 */
-	Bus createBus();
-	
-	Bus createBus(int index, int width);
-
-	/**
-	 * Returns a new object of class '<em>Bridge</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Bridge</em>'.
-	 * @generated
-	 */
-	Bridge createBridge();
-
-	/**
-	 * Returns a new object of class '<em>Segment</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Segment</em>'.
-	 * @generated
-	 */
-	Segment createSegment();
-
-	/**
-	 * Returns a new object of class '<em>Global Control Unit</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Global Control Unit</em>'.
-	 * @generated
-	 */
-	GlobalControlUnit createGlobalControlUnit();
-	
-	/**
-	 * Returns a new object of class '<em>Function Unit</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Function Unit</em>'.
-	 * @generated
-	 */
-	FunctionUnit createFunctionUnit();
-
-	/**
-	 * Returns a new object of class '<em>Operation</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Operation</em>'.
-	 * @generated
-	 */
-	Operation createOperation();
-
-	/**
 	 * Returns a new object of class '<em>Address Space</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -114,52 +59,27 @@ public interface ArchitectureFactory extends EFactory {
 	
 	AddressSpace createAddressSpace(String name, int minAddress,
 			int maxAddress);
-
+	
 	/**
-	 * Returns a new object of class '<em>Reads</em>'.
+	 * Returns a new object of class '<em>Bridge</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Reads</em>'.
+	 * @return a new object of class '<em>Bridge</em>'.
 	 * @generated
 	 */
-	Reads createReads();
-
+	Bridge createBridge();
+	
 	/**
-	 * Returns a new object of class '<em>Writes</em>'.
+	 * Returns a new object of class '<em>Bus</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Writes</em>'.
+	 * @return a new object of class '<em>Bus</em>'.
 	 * @generated
 	 */
-	Writes createWrites();
-
-	/**
-	 * Returns a new object of class '<em>Resource</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Resource</em>'.
-	 * @generated
-	 */
-	Resource createResource();
-
-	/**
-	 * Returns a new object of class '<em>Short Immediate</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Short Immediate</em>'.
-	 * @generated
-	 */
-	ShortImmediate createShortImmediate();
-
-	/**
-	 * Returns a new object of class '<em>Expr Unary</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr Unary</em>'.
-	 * @generated
-	 */
-	ExprUnary createExprUnary();
-
+	Bus createBus();
+	
+	Bus createBus(int index, int width);
+	
 	/**
 	 * Returns a new object of class '<em>Expr Binary</em>'.
 	 * <!-- begin-user-doc -->
@@ -168,16 +88,9 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	ExprBinary createExprBinary();
-
-	/**
-	 * Returns a new object of class '<em>Expr True</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Expr True</em>'.
-	 * @generated
-	 */
-	ExprTrue createExprTrue();
-
+	
+	ExprBinary createExprBinary(OpBinary op, ExprUnary e1, ExprUnary e2);
+	
 	/**
 	 * Returns a new object of class '<em>Expr False</em>'.
 	 * <!-- begin-user-doc -->
@@ -186,25 +99,72 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	ExprFalse createExprFalse();
-
+	
 	/**
-	 * Returns a new object of class '<em>Term Bool</em>'.
+	 * Returns a new object of class '<em>Expr True</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Term Bool</em>'.
+	 * @return a new object of class '<em>Expr True</em>'.
 	 * @generated
 	 */
-	TermBool createTermBool();
-
+	ExprTrue createExprTrue();
+	
 	/**
-	 * Returns a new object of class '<em>Term Unit</em>'.
+	 * Returns a new object of class '<em>Expr Unary</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Term Unit</em>'.
+	 * @return a new object of class '<em>Expr Unary</em>'.
 	 * @generated
 	 */
-	TermUnit createTermUnit();
-
+	ExprUnary createExprUnary();
+	
+	ExprUnary createExprUnary(boolean isInverted, Term term);
+	
+	/**
+	 * Returns a new object of class '<em>Function Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Function Unit</em>'.
+	 * @generated
+	 */
+	FunctionUnit createFunctionUnit();
+	
+	FunctionUnit createFunctionUnit(String name,
+			EList<Operation> operations, EList<Port> ports);
+	
+	/**
+	 * Returns a new object of class '<em>Global Control Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Global Control Unit</em>'.
+	 * @generated
+	 */
+	GlobalControlUnit createGlobalControlUnit();
+	
+	GlobalControlUnit createGlobalControlUnit(int delaySlots,
+			int guardLatency);
+	
+	Socket createInputSocket(String name, EList<Segment> segments);
+	
+	FunctionUnit createLSU(TTA tta);
+	
+	/**
+	 * Returns a new object of class '<em>Operation</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Operation</em>'.
+	 * @generated
+	 */
+	Operation createOperation();
+	
+	Operation createOperation(String name);
+	
+	Operation createOperationLoad(String name, Port in, Port out);
+	
+	Operation createOperationStore(String name, Port in1, Port in2);
+	
+	Socket createOutputSocket(String name, EList<Segment> segments);
+	
 	/**
 	 * Returns a new object of class '<em>Port</em>'.
 	 * <!-- begin-user-doc -->
@@ -213,7 +173,23 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Port createPort();
-
+	
+	Port createPort(String name);
+	
+	Port createPort(String name, int width, boolean opcodeSelector,
+			boolean isTrigger);
+	
+	/**
+	 * Returns a new object of class '<em>Reads</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Reads</em>'.
+	 * @generated
+	 */
+	Reads createReads();
+	
+	Reads createReads(Port port, int startCycle, int cycle);
+	
 	/**
 	 * Returns a new object of class '<em>Register File</em>'.
 	 * <!-- begin-user-doc -->
@@ -222,6 +198,67 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	RegisterFile createRegisterFile();
+	
+	RegisterFile createRegisterFile(String name, int size, int width,
+			int maxReads, int maxWrites);
+	
+	/**
+	 * Returns a new object of class '<em>Resource</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Resource</em>'.
+	 * @generated
+	 */
+	Resource createResource();
+	
+	/**
+	 * Returns a new object of class '<em>Segment</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Segment</em>'.
+	 * @generated
+	 */
+	Segment createSegment();
+	
+	Segment createSegment(String name);
+	
+	/**
+	 * Returns a new object of class '<em>Short Immediate</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Short Immediate</em>'.
+	 * @generated
+	 */
+	ShortImmediate createShortImmediate();
+	
+	ShortImmediate createShortImmediate(int width, Extension extension);
+
+	Bus createSimpleBus(int index, int width);
+
+	Operation createSimpleCtrlOperation(String name, Port port);
+
+	FunctionUnit createSimpleFonctionUnit(TTA tta, String name);
+	
+	FunctionUnit createSimpleFonctionUnit(TTA tta, String name,
+			String[] operations1, String[] operations2);
+
+	GlobalControlUnit createSimpleGlobalControlUnit(TTA tta);
+
+	EList<Guard> createSimpleGuards(RegisterFile register);
+	
+	Operation createSimpleOperation(String name, Port port1,
+			int startCycle1, int cycle1, boolean isReads1, Port port2,
+			int startCycle2, int cycle2, boolean isReads2);
+
+	Operation createSimpleOperation(String name, Port in1, Port out1);
+
+	Operation createSimpleOperation(String name, Port in1, Port in2,
+			Port out1);
+
+	RegisterFile createSimpleRegisterFile(TTA tta, String name,
+			int size, int width);
+
+	TTA createSimpleTTA(String name);
 
 	/**
 	 * Returns a new object of class '<em>Socket</em>'.
@@ -232,6 +269,30 @@ public interface ArchitectureFactory extends EFactory {
 	 */
 	Socket createSocket();
 
+	Socket createSocket(String name, EList<Segment> segments);
+
+	/**
+	 * Returns a new object of class '<em>Term Bool</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Term Bool</em>'.
+	 * @generated
+	 */
+	TermBool createTermBool();
+
+	TermBool createTermBool(RegisterFile register, int index);
+
+	/**
+	 * Returns a new object of class '<em>Term Unit</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Term Unit</em>'.
+	 * @generated
+	 */
+	TermUnit createTermUnit();
+
+	TermUnit createTermUnit(FunctionUnit unit, Port port);
+
 	/**
 	 * Returns a new object of class '<em>TTA</em>'.
 	 * <!-- begin-user-doc -->
@@ -240,6 +301,19 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	TTA createTTA();
+
+	TTA createTTA(String name);
+
+	/**
+	 * Returns a new object of class '<em>Writes</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Writes</em>'.
+	 * @generated
+	 */
+	Writes createWrites();
+
+	Writes createWrites(Port port, int startCycle, int cycle);
 
 	/**
 	 * Returns the package supported by this factory.
