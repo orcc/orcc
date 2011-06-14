@@ -29,7 +29,7 @@ declareBroadcasts(instances) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
 
-allocateFifoType(type, size, count) ::= <<
+allocateFifoType(count, type, size) ::= <<
 chan chan_<count> = [SIZE] of {<type>};
 >>
 

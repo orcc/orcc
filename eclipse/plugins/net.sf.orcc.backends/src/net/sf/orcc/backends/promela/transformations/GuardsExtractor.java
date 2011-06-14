@@ -41,7 +41,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
@@ -56,32 +55,31 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 	private Action currAction;
 
 	private Map<Action, List<Expression>> guards;
+	
+	private Map<Action, List<Action>> priority;
 
 	private List<Expression> guardList;
 
 	private List<InstLoad> loadList;
 
-	public GuardsExtractor(Map<Action, List<Expression>> guards) {
+	public GuardsExtractor(Map<Action, List<Expression>> guards, Map<Action, List<Action>> priority) {
 		this.guards = guards;
+		this.priority = priority;
 	}
 
 	// takes the guard from the previous action and negates it and adds it to
 	// the guard of this action which has lower priority
-	private void addPriorityToGuard(Action action, List<Expression> prevGuards) {
-		Expression prty;
+	private void addPriorityToGuard(Action action, List<Action> prevActions) {
+		//Expression prty;
 		// if there is no guard add the guard "true"
 		if (guards.get(action).isEmpty()) {
 			guards.get(action).add(0, IrFactory.eINSTANCE.createExprBool(true));
 		}
-		// add the guards from the previous actions as not guard
-		for (Expression expr : prevGuards) {
-			prty = IrFactory.eINSTANCE.createExprUnary(OpUnary.LOGIC_NOT, expr,
-					expr.getType());
-			guards.get(action).add(prty);
+		// add list actions with higher priority to be used in the guard
+		for (Action a : prevActions) {
+			priority.get(action).add(a);
 		}
-		prevGuards.add(guards.get(action).get(0)); // TODO: if the original
-													// guard is more than 1 expr
-													// this will not work
+		prevActions.add(action);
 	}
 
 	// If the local variable derived from this variable is used in an expression
@@ -125,17 +123,13 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 		// Get the priorities. The list of actions are in decreasing priority
 		// order.
 		// The easy way is to for each action add the "not guard" of the
-		// previous action.
-		// As the guard of the action only needs one list position we can use
-		// the rest of the list for the priorities
-
-		// In each action there is an action scheduler
-		// actions not in a FSM are present in the "actions" list and appear in
-		// decreasing priority order.
+		// previous action, this is now done in the stringtemplate, here
+		// we only list the actions with higher priority.
 		if (!actor.hasFsm()) {
-			List<Expression> prevGuards = new ArrayList<Expression>();
+			List<Action> prevActions = new ArrayList<Action>();
 			for (Action action : actor.getActions()) {
-				addPriorityToGuard(action, prevGuards);
+				priority.put(action, new ArrayList<Action>());
+				addPriorityToGuard(action, prevActions);
 			}
 		}
 		// Actions in the FSM appear in
@@ -143,9 +137,10 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 		// of priority
 		else {
 			for (Transitions transitions : actor.getFsm().getTransitions()) {
-				List<Expression> prevGuards = new ArrayList<Expression>();
+				List<Action> prevActions = new ArrayList<Action>();
 				for (Transition trans : transitions.getList()) {
-					addPriorityToGuard(trans.getAction(), prevGuards);
+					priority.put(trans.getAction(), new ArrayList<Action>());
+					addPriorityToGuard(trans.getAction(), prevActions);
 				}
 			}
 		}

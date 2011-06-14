@@ -62,6 +62,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 
+	private Map<Action, List<Action>> priority = new HashMap<Action, List<Action>>();
+	
 	private InstancePrinter instancePrinter;
 
 	private final Map<String, String> transformations;
@@ -88,7 +90,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorVisitor<?>[] transformations = {
 				new RenameTransformation(this.transformations),
-				new GuardsExtractor(guards), new PhiRemoval(),
+				new GuardsExtractor(guards, priority), new PhiRemoval(),
 				new DeadCodeElimination(), new DeadVariableRemoval() };
 
 		for (ActorVisitor<?> transformation : transformations) {
@@ -109,12 +111,15 @@ public class PromelaBackendImpl extends AbstractBackend {
 		instancePrinter.setExpressionPrinter(new CExpressionPrinter());
 		instancePrinter.setTypePrinter(new PromelaTypePrinter());
 		instancePrinter.getOptions().put("guards", guards);
-
+		instancePrinter.getOptions().put("priority", priority);
+		
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printInstances(network);
 
 		new BroadcastAdder().transform(network);
+		
+		network.computeTemplateMaps();
 		printNetwork(network);
 	}
 

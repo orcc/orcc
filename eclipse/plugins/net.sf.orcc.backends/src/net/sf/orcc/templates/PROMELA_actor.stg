@@ -222,16 +222,16 @@ stateVar(variable) ::= <<
 <if(!variable.type.list)>
 #define <variable.name> <Constant(variable.initialValue)>
 <else>
-static const <varDecl(variable)> = <Constant(variable.initialValue)>;
+const <varDecl(variable)> = <Constant(variable.initialValue)>;
 <endif>
 <else>
 <if(variable.type.list)>
-static <variable.type> <variable.name>_backup<listSize(variable.type.dimensions)> = <Constant(variable.initialValue)>;
+<variable.type> <variable.name>_backup<listSize(variable.type.dimensions)> = <Constant(variable.initialValue)>;
 <endif>
-static <varDecl(variable)>;
+<varDecl(variable)>;
 <endif>
 <else>
-static <varDecl(variable)>;
+<varDecl(variable)>;
 <endif>
 >>
 
@@ -313,20 +313,21 @@ scheduler(action) ::= <<
 
 guard() ::= <<
 <options.guards.(action); separator=" && ">
+<options.priority.(action): priorities(); separator=" && ">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action Templates
 ///////////////////////////////////////////////////////////////////////////////
 
-priorities() ::= << 
-<if (rest(options.guards.(action)))>
- /*priority*/ && !( <rest(options.guards.(action)); separator=" && "> )
-<endif>
+priorities(act) ::= << 
+ /*priority*/ 
+ && (!<options.guards.(act); separator=" && ">)
+
 >> 
 
 inputPatternPort(variable) ::= <<
-chan_<pattern.varToPortMap.(variable).name>?<variable.name>[0];
+chan_<instance.id>_<pattern.varToPortMap.(variable).name>?<variable.name>[0];
 
 >>
 
@@ -335,7 +336,7 @@ inputPattern(pattern) ::= <<
 >>
 
 outputPatternPort(variable) ::= <<
-chan_<pattern.varToPortMap.(variable).name>!<variable.name>[0];
+chan_<instance.id>_<pattern.varToPortMap.(variable).name>!<variable.name>[0];
 
 >>
 
@@ -344,7 +345,7 @@ outputPattern(pattern) ::= <<
 >>
 
 peekPatternPort(variable) ::= <<
-chan_<pattern.varToPortMap.(variable).name>?\<<variable.name>[0]\>;
+chan_<instance.id>_<pattern.varToPortMap.(variable).name>?\<<variable.name>[0]\>;
 
 >>
 
@@ -353,13 +354,22 @@ peekPattern(pattern) ::= <<
 >>
 
 inputChannelCheck(pattern) ::= <<
-<pattern.keys: {key | && nempty(chan_<instance.id>_<key>)} >
+<pattern.ports: {port | && nempty(chan_<instance.id>_<port.name>)} >
 >>
 
 outputChannelCheck(pattern) ::= <<
-<pattern.keys: {key | && nfull(chan_<instance.id>_<key>)} >
+<pattern.ports: {port | && nfull(chan_<instance.id>_<port.name>)} >
 >>
 
+// needed in case of time dependent condition, not used yet
+
+negInputChannelCheck(pattern) ::= <<
+<pattern.ports: {port | || empty(chan_<instance.id>_<port.name>)} >
+>>
+
+negOutputChannelCheck(pattern) ::= <<
+<pattern.ports: {port | || full(chan_<instance.id>_<port.name>)} >
+>>
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -369,6 +379,10 @@ outputChannelCheck(pattern) ::= <<
 proctype(instance, actor) ::= <<
 proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">) {
 
+	<if (actor.fsm)>
+	/* States of the FSM */
+	<actor.fsm.states: {s | int state_<s.name> = <i0>;}; separator="\n">
+
 	/* State variables */
 	<actor.stateVars : stateVar()>
 	<actor.stateVars : initializeStateVar()>
@@ -376,10 +390,7 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 	/* Ports */
     < [instance.actor.inputs, instance.actor.outputs] : portDeclaration(); separator="\n">
 
-	<if (actor.fsm)>
-	/* States of the FSM */
-	<actor.fsm.states: {s | int state_<s.name> = <i0>;}; separator="\n">
-	
+
 	/* Initial State */
 	<instance.id>_state = state_<actor.fsm.initialState.name>;
 	
