@@ -838,14 +838,29 @@ public class XDFParser {
 	 * @throws OrccException
 	 */
 	private void parsePort(Element eltPort) throws OrccException {
-		Type type = typeParser.parseType(eltPort.getFirstChild()).getResult();
+		ParseContinuation<Type> cont = typeParser.parseType(eltPort
+				.getFirstChild());
+		Type type = cont.getResult();
 		String name = eltPort.getAttribute("name");
 		if (name.isEmpty()) {
 			throw new OrccException("Port has an empty name");
 		}
 
+		boolean native_ = false;
+		Node node = cont.getNode();
+		while (node != null) {
+			if (node.getNodeName().equals("Note")) {
+				Element note = (Element) node;
+				if ("native".equals(note.getAttribute("kind"))) {
+					native_ = true;
+					break;
+				}
+			}
+			node = node.getNextSibling();
+		}
+
 		// creates a port
-		Port port = IrFactory.eINSTANCE.createPort(type, name);
+		Port port = IrFactory.eINSTANCE.createPort(type, name, native_);
 
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");

@@ -102,6 +102,9 @@
                         <xsl:apply-templates select="Type"/>
                     </xsl:attribute>
                 </parameter>
+                <xsl:if test="Note[@kind = 'native']">
+                    <parameter name="native" value="true"/>
+                </xsl:if>
             </parameters>
         </vertex>
     </xsl:template>

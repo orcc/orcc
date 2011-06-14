@@ -564,6 +564,12 @@ public class XDFWriter {
 			portElt.setAttribute("kind", kind);
 			portElt.setAttribute("name", port.getName());
 			portElt.appendChild(writeType(port.getType()));
+
+			if (port.isNative()) {
+				Element note = document.createElement("Note");
+				note.setAttribute("kind", "native");
+				portElt.appendChild(note);
+			}
 		}
 	}
 

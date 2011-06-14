@@ -35,6 +35,10 @@
                   name="port type"
                   type="java.lang.String">
             </parameter>
+               <parameter
+                     name="native"
+                     type="java.lang.Boolean">
+               </parameter>
                <color
                      blue="100"
                      green="60"
@@ -59,6 +63,10 @@
                   name="port type"
                   type="java.lang.String">
             </parameter>
+               <parameter
+                     name="native"
+                     type="java.lang.Boolean">
+               </parameter>
                <color
                      blue="100"
                      green="0"

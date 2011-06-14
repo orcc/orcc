@@ -191,13 +191,15 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 		net.sf.orcc.network.Vertex networkVertex;
 		if ("Input port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
-			Port port = IrFactory.eINSTANCE.createPort(type, name);
+			boolean native_ = (Boolean) vertex.getValue("native");
+			Port port = IrFactory.eINSTANCE.createPort(type, name, native_);
 
 			network.getInputs().put(name, port);
 			networkVertex = new net.sf.orcc.network.Vertex("Input", port);
 		} else if ("Output port".equals(vertex.getType().getName())) {
 			Type type = parseType(vertex.getValue("port type"));
-			Port port = IrFactory.eINSTANCE.createPort(type, name);
+			boolean native_ = (Boolean) vertex.getValue("native");
+			Port port = IrFactory.eINSTANCE.createPort(type, name, native_);
 
 			network.getOutputs().put(name, port);
 			networkVertex = new net.sf.orcc.network.Vertex("Output", port);
