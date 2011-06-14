@@ -35,6 +35,7 @@ import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Bridge;
 import net.sf.orcc.backends.tta.architecture.Bus;
+import net.sf.orcc.backends.tta.architecture.Element;
 import net.sf.orcc.backends.tta.architecture.ExprBinary;
 import net.sf.orcc.backends.tta.architecture.ExprFalse;
 import net.sf.orcc.backends.tta.architecture.ExprTrue;
@@ -42,6 +43,7 @@ import net.sf.orcc.backends.tta.architecture.ExprUnary;
 import net.sf.orcc.backends.tta.architecture.Extension;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
+import net.sf.orcc.backends.tta.architecture.Guard;
 import net.sf.orcc.backends.tta.architecture.OpBinary;
 import net.sf.orcc.backends.tta.architecture.OpUnary;
 import net.sf.orcc.backends.tta.architecture.Operation;
@@ -54,6 +56,7 @@ import net.sf.orcc.backends.tta.architecture.ShortImmediate;
 import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.SocketType;
 import net.sf.orcc.backends.tta.architecture.TTA;
+import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
@@ -408,6 +411,52 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return operation;
 	}
 
+	public Operation createSimpleOperation(String name, Port in1, Port out1) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPortToIndexMap().put(in1, 1);
+		operation.getPortToIndexMap().put(out1, 2);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createWrites(out1, 0, 1));
+		return operation;
+	}
+
+	public Operation createSimpleOperation(String name, Port port1,
+			int startCycle1, int cycle1, boolean isReads1, Port port2,
+			int startCycle2, int cycle2, boolean isReads2) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPortToIndexMap().put(port1, 1);
+		operation.getPortToIndexMap().put(port2, 2);
+		Element element1, element2;
+		if (isReads1) {
+			element1 = createReads(port1, startCycle1, cycle1);
+		} else {
+			element1 = createWrites(port1, startCycle1, cycle1);
+		}
+		if (isReads2) {
+			element2 = createReads(port2, startCycle2, cycle2);
+		} else {
+			element2 = createWrites(port2, startCycle2, cycle2);
+		}
+		operation.getPipeline().add(element1);
+		operation.getPipeline().add(element2);
+		return operation;
+	}
+
+	public Operation createSimpleOperation(String name, Port in1, Port in2,
+			Port out1) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPortToIndexMap().put(in1, 1);
+		operation.getPortToIndexMap().put(in2, 2);
+		operation.getPortToIndexMap().put(out1, 3);
+		operation.getPipeline().add(createReads(in1, 0, 1));
+		operation.getPipeline().add(createReads(in2, 0, 1));
+		operation.getPipeline().add(createWrites(out1, 0, 1));
+		return operation;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -535,6 +584,27 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return exprUnary;
 	}
 
+	public EList<Guard> createSimpleGuards(RegisterFile register) {
+		EList<Guard> guards = new BasicEList<Guard>();
+		guards.add(createExprTrue());
+		guards.add(createExprUnary(false, createTermBool(register, 0)));
+		guards.add(createExprUnary(true, createTermBool(register, 0)));
+		guards.add(createExprUnary(false, createTermBool(register, 1)));
+		guards.add(createExprUnary(true, createTermBool(register, 1)));
+		return guards;
+	}
+
+	public ExprUnary createExprUnary(boolean isInverted, Term term) {
+		ExprUnaryImpl exprUnary = new ExprUnaryImpl();
+		if (isInverted) {
+			exprUnary.setOperator(OpUnary.INVERTED);
+		} else {
+			exprUnary.setOperator(OpUnary.SIMPLE);
+		}
+		exprUnary.setTerm(term);
+		return exprUnary;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -542,6 +612,14 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 */
 	public ExprBinary createExprBinary() {
 		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
+		return exprBinary;
+	}
+
+	public ExprBinary createExprBinary(OpBinary op, ExprUnary e1, ExprUnary e2) {
+		ExprBinaryImpl exprBinary = new ExprBinaryImpl();
+		exprBinary.setE1(e1);
+		exprBinary.setE2(e2);
+		exprBinary.setOperator(op);
 		return exprBinary;
 	}
 
@@ -575,6 +653,13 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return termBool;
 	}
 
+	public TermBool createTermBool(RegisterFile register, int index) {
+		TermBoolImpl termBool = new TermBoolImpl();
+		termBool.setRegister(register);
+		termBool.setIndex(index);
+		return termBool;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -582,6 +667,13 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	 */
 	public TermUnit createTermUnit() {
 		TermUnitImpl termUnit = new TermUnitImpl();
+		return termUnit;
+	}
+
+	public TermUnit createTermUnit(FunctionUnit unit, Port port) {
+		TermUnitImpl termUnit = new TermUnitImpl();
+		termUnit.setFunctionUnit(unit);
+		termUnit.setPort(port);
 		return termUnit;
 	}
 
@@ -647,18 +739,106 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		tta.setData(createAddressSpace());
 		tta.setProgram(createAddressSpace());
 		// Buses
-		tta.getBuses().add(createSimpleBus(0, 32));
-		tta.getBuses().add(createSimpleBus(1, 32));
+		Bus bus0 = createSimpleBus(0, 32);
+		Bus bus1 = createSimpleBus(1, 32);
+		tta.getBuses().add(bus0);
+		tta.getBuses().add(bus1);
 		// Global Control Unit
 		tta.setGcu(createSimpleGlobalControlUnit(tta));
 		// Register files
-		tta.getRegisterFiles().add(
-				createSimpleRegisterFile(tta, "RF_1", 32, 12));
-		tta.getRegisterFiles().add(
-				createSimpleRegisterFile(tta, "RF_2", 32, 12));
-		tta.getRegisterFiles().add(createSimpleRegisterFile(tta, "BOOL", 1, 2));
+		RegisterFile rf1 = createSimpleRegisterFile(tta, "RF_1", 32, 12);
+		RegisterFile rf2 = createSimpleRegisterFile(tta, "RF_2", 32, 12);
+		RegisterFile bool = createSimpleRegisterFile(tta, "BOOL", 1, 2);
+		tta.getRegisterFiles().add(rf1);
+		tta.getRegisterFiles().add(rf2);
+		tta.getRegisterFiles().add(bool);
+		// Guards
+		bus0.getGuards().addAll(createSimpleGuards(bool));
+		bus1.getGuards().addAll(createSimpleGuards(bool));
 		// Fonctional units
+		EList<FunctionUnit> units = tta.getFunctionUnits();
+		// * ALU
+		String[] aluOperations1 = { "sxqw", "sxhw" };
+		String[] aluOperations2 = { "add", "and", "eq", "gt", "gtu", "ior",
+				"shl", "shr", "shru", "sub", "xor" };
+		units.add(createSimpleFonctionUnit(tta, "ALU", aluOperations1,
+				aluOperations2));
+		// * LSU
+		units.add(createLSU(tta));
+		// * Mul
+		String[] mulOperations2 = { "mul" };
+		units.add(createSimpleFonctionUnit(tta, "Mul", null, mulOperations2));
+		// * And-ior-xor
+		String[] aixOperations2 = { "and", "ior", "xor" };
+		units.add(createSimpleFonctionUnit(tta, "And-ior-xor", null, aixOperations2));
 		return tta;
+	}
+
+	public FunctionUnit createLSU(TTA tta) {
+		FunctionUnit LSU = createSimpleFonctionUnit(tta, "LSU");
+		// Operations
+		EList<Port> ports = LSU.getPorts();
+		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
+		for (String loadOperation : loadOperations) {
+			LSU.getOperations().add(
+					createOperationLoad(loadOperation, ports.get(0),
+							ports.get(2)));
+		}
+		String[] storeOperations = { "stw", "stq", "sth" };
+		for (String storeOperation : storeOperations) {
+			LSU.getOperations().add(
+					createOperationLoad(storeOperation, ports.get(0),
+							ports.get(1)));
+		}
+		LSU.setAddressSpace(tta.getData());
+		return LSU;
+	}
+
+	public Operation createOperationLoad(String name, Port in, Port out) {
+		return createSimpleOperation(name, in, 0, 1, true, out, 2, 1, false);
+	}
+
+	public Operation createOperationStore(String name, Port in1, Port in2) {
+		return createSimpleOperation(name, in1, 0, 1, true, in2, 2, 1, true);
+	}
+
+	public FunctionUnit createSimpleFonctionUnit(TTA tta, String name) {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		functionUnit.setName(name);
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket i2 = createInputSocket(name + "_i2", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
+		// Port
+		Port in1t = createPort("in1t", 32, true, true);
+		Port in2 = createPort("in2", 32, false, false);
+		Port out1 = createPort("out1", 32, false, false);
+		in1t.connect(i1);
+		in2.connect(i2);
+		out1.connect(o1);
+		functionUnit.getPorts().add(in1t);
+		functionUnit.getPorts().add(in2);
+		functionUnit.getPorts().add(out1);
+		return functionUnit;
+	}
+
+	public FunctionUnit createSimpleFonctionUnit(TTA tta, String name,
+			String[] operations1, String[] operations2) {
+		FunctionUnit functionUnit = createSimpleFonctionUnit(tta, name);
+		EList<Port> ports = functionUnit.getPorts();
+		// Operations
+		for (String operation : operations1) {
+			functionUnit.getOperations()
+					.add(createSimpleOperation(operation, ports.get(0),
+							ports.get(2)));
+		}
+		for (String operation : operations2) {
+			functionUnit.getOperations().add(
+					createSimpleOperation(operation, ports.get(0),
+							ports.get(1), ports.get(2)));
+		}
+		return functionUnit;
 	}
 
 	/**
