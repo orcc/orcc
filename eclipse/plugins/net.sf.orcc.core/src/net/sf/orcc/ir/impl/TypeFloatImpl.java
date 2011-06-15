@@ -75,4 +75,9 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "float";
+	}
+
 }

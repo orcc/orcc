@@ -166,18 +166,9 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_STRING__SIZE, oldSize, size));
 	}
 
-	/**
-	 * @generated
-	 */
 	@Override
 	public String toString() {
-		if (eIsProxy()) return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (size: ");
-		result.append(size);
-		result.append(')');
-		return result.toString();
+		return "String";
 	}
 
 }

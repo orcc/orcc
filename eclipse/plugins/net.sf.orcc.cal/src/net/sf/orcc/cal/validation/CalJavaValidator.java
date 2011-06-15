@@ -57,6 +57,8 @@ import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
+import net.sf.orcc.cal.cal.AstStatementIf;
+import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstUnit;
@@ -324,6 +326,24 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			error("Type mismatch: cannot convert from " + type + " to "
 					+ targetType, assign,
 					eINSTANCE.getAstStatementAssign_Value(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstStatementIf(AstStatementIf astIf) {
+		Type type = new TypeChecker(this).getType(astIf.getCondition());
+		if (type == null || !type.isBool()) {
+			error("Type mismatch: cannot convert from " + type + " to bool",
+					astIf, eINSTANCE.getAstStatementIf_Condition(), -1);
+		}
+	}
+
+	@Check(CheckType.NORMAL)
+	public void checkAstStatementWhile(AstStatementWhile astWhile) {
+		Type type = new TypeChecker(this).getType(astWhile.getCondition());
+		if (type == null || !type.isBool()) {
+			error("Type mismatch: cannot convert from " + type + " to bool",
+					astWhile, eINSTANCE.getAstStatementWhile_Condition(), -1);
 		}
 	}
 

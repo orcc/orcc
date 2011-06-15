@@ -52,4 +52,9 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "bool";
+	}
+
 }

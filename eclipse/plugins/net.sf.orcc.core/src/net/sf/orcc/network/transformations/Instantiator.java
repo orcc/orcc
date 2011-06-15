@@ -40,7 +40,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -273,9 +272,7 @@ public class Instantiator implements INetworkTransformation {
 		Type dstType = dstPortType;
 		if (!EcoreUtil.equals(srcType, dstType)) {
 			throw new OrccException("Type error: port " + sourceString + " is "
-					+ new TypePrinter().doSwitch(srcType) + ", port "
-					+ targetString + " is "
-					+ new TypePrinter().doSwitch(dstType));
+					+ srcType + ", port " + targetString + " is " + dstType);
 		}
 	}
 

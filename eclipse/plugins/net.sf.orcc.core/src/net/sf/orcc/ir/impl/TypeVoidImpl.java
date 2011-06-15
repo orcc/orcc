@@ -76,4 +76,9 @@ public class TypeVoidImpl extends TypeImpl implements TypeVoid {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "void";
+	}
+
 }
