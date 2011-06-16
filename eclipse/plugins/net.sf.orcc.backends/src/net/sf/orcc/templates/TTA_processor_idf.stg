@@ -1,5 +1,5 @@
 
-processor(instance, options) ::= <<
+tta(tta, options) ::= <<
 \<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
 \<adf-implementation\>
 

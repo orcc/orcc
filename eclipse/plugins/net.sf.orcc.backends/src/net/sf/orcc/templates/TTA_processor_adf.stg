@@ -1,5 +1,5 @@
 
-processor(tta, options) ::= <<
+tta(tta, options) ::= <<
 \<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
 \<adf version="1.7"\>
 	<tta.buses: bus(); separator="\n">
