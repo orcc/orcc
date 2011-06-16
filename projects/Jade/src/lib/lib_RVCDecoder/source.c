@@ -39,7 +39,7 @@ static int AVCFile;
 
 static int data_length;
 static unsigned char* data;
-static int nb;
+static int nb = 0;
 
 extern int* stopVar;
 
@@ -78,13 +78,13 @@ void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
 	nb++;
 
 	if (data_length == 0){
+		nb = 0;
 		*stopVar = 1;
 	}
 }
 
 
 void source_sendNal(unsigned char* nal, int nal_length){
-	nb = 0;
 	data = nal;
 	data_length = nal_length;
 }

@@ -44,7 +44,7 @@ typedef struct{
 	unsigned char* pV[1];
 }RVCFRAME;
 
-void displayYUV_setOutBufferAddr(char* outBuffer, int newNalu);
+void displayYUV_setOutBufferAddr(char* outBuffer);
 
 #ifdef __cplusplus
 }

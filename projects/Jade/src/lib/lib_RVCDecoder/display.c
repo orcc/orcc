@@ -33,46 +33,46 @@
 #define DISPLAY_ENABLE 2
 
 static RVCFRAME Frame;
-static int frameEmpty = 1;
+extern int safeguardFrameEmpty;
+
+extern int* stopVar;
 
 char* outBuffer;
 
-static int got_pic = 0;
+extern int bufferBusy;
 
 char display_flag;
 
 
-void displayYUV_setOutBufferAddr(char* Address, int newNalu){
+void displayYUV_setOutBufferAddr(char* Address){
 	outBuffer = Address;
+	display_flag = DISPLAY_READY + DISPLAY_ENABLE;
 
-	if (newNalu){
-		got_pic = 0;
-		display_flag = DISPLAY_READY + DISPLAY_ENABLE;
-	}
-
-	if (!frameEmpty){
+	if (!safeguardFrameEmpty){
 		memcpy(outBuffer, Frame.pY[0], Frame.Width * Frame.Height); 
 		memcpy(outBuffer + Frame.Width * Frame.Height, Frame.pU[0], Frame.Width * Frame.Height/4);
 		memcpy(outBuffer + 5*Frame.Width * Frame.Height/4, Frame.pV[0], Frame.Width * Frame.Height/4);
 
-		frameEmpty = 1;
-		got_pic = 1;
+		safeguardFrameEmpty = 1;
+		bufferBusy = 1;
 	}
 }
 
 void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU,
 							   unsigned char *pictureBufferV, unsigned short pictureWidth,
 							   unsigned short pictureHeight){
-				   
 
-	if(!got_pic){
+	
+
+	if(!bufferBusy){
+		bufferBusy = 1;
+
 		memcpy(outBuffer, pictureBufferY, pictureWidth * pictureHeight); 
 		memcpy(outBuffer + pictureWidth * pictureHeight, pictureBufferU, pictureWidth * pictureHeight/4);
 		memcpy(outBuffer + 5*pictureWidth * pictureHeight/4, pictureBufferV, pictureWidth * pictureHeight/4);
 
-		got_pic = 1;
 	}else{
-		frameEmpty = 0;
+		safeguardFrameEmpty = 0;
 
 		Frame.Width = pictureWidth;
 		Frame.Height = pictureHeight;
@@ -82,8 +82,8 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pic
 		*Frame.pV = pictureBufferV;
 
 		display_flag = DISPLAY_ENABLE;
+		*stopVar = 1;
 	}
-	
 }
 
 char displayYUV_getFlags(){

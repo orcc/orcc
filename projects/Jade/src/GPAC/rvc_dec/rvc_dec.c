@@ -40,7 +40,7 @@ typedef struct{
 
 
 DllImport int rvc_init(char *XDF, int isAVCFile);
-DllImport void rvc_decode(unsigned char* nal, int nal_length, char *outBuffer, int newNalu);
+DllImport int rvc_decode(unsigned char* nal, int nal_length, char *outBuffer, int newBuffer);
 DllImport void rvc_close();
 
 
@@ -198,10 +198,10 @@ static GF_Err RVCD_GetCapabilities(GF_BaseDecoder *ifcg, GF_CodecCapability *cap
 		capability->cap.valueInt = GF_PIXEL_YV12;
 		break;
 	case GF_CODEC_BUFFER_MIN:
-		capability->cap.valueInt = 1;
+		capability->cap.valueInt = 2;
 		break;
 	case GF_CODEC_BUFFER_MAX:
-		capability->cap.valueInt = 4;
+		capability->cap.valueInt = 2;
 		break;
 	case GF_CODEC_PADDING_BYTES:
 		capability->cap.valueInt = 32;
@@ -222,12 +222,16 @@ static GF_Err RVCD_SetCapabilities(GF_BaseDecoder *ifcg, GF_CodecCapability capa
 	return GF_NOT_SUPPORTED;
 }
 
+
+int bookmark = 0;
+
 static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg, 
 		char *inBuffer, u32 inBufferLength,
 		u16 ES_ID,
 		char *outBuffer, u32 *outBufferLength,
 		u8 PaddingBits, u32 mmlevel)
 {
+	s32 got_pic;
 	RVCDec *ctx = (RVCDec*) ifcg->privateStack;
 
 	if (!ES_ID || (ES_ID!=ctx->ES_ID) /*|| !ctx->codec*/) {
@@ -241,11 +245,12 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 
 	//if your decoder outputs directly in the memory passed, setup pointers for your decoder output picture
 
+	got_pic = 0;
 	
 	if (ctx->nalu_size_length) {
 		u32 i, nalu_size = 0;
 		u8 *ptr = inBuffer;
-		int newNalu = 1;
+		int nalNumber = 1;
 		
 		while (inBufferLength) {
 			for (i=0; i<ctx->nalu_size_length; i++) {
@@ -255,22 +260,34 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 
 			//same remark as above regardin start codes
 			
-			rvc_decode(ptr, nalu_size, outBuffer, newNalu);
+			if(nalNumber > bookmark){
+				bookmark ++;
+				got_pic = rvc_decode(ptr, nalu_size, outBuffer, !got_pic);
+				if(got_pic>1){
+					return GF_PACKED_FRAMES;
+				}
+			}else if(nalNumber == bookmark){
+				got_pic = rvc_decode(NULL, 0, outBuffer, !got_pic);
+				if(got_pic>1){
+					return GF_PACKED_FRAMES;
+				}
+			}
+			nalNumber ++;
 
-			newNalu = 0;
-			
 			ptr += nalu_size;
 			if (inBufferLength < nalu_size + ctx->nalu_size_length) 
 				break;
 
 			inBufferLength -= nalu_size + ctx->nalu_size_length;
 		}
+		bookmark = 0;
+
 	} else {
 		u32 i, nalu_size = 0;
 		u8 *ptr = inBuffer;
 		
 
-		rvc_decode(ptr, inBufferLength, outBuffer, 1);
+		got_pic = rvc_decode(ptr, inBufferLength, outBuffer, 1);
 	}
 
 	//if (got_pic!=1) return GF_OK;
@@ -293,7 +310,8 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 	/*memcpy(outBuffer, pic.pY[0], ctx->stride*ctx->height); 
 	memcpy(outBuffer + ctx->stride * ctx->height, pic.pU[0], ctx->stride*ctx->height/4);
 	memcpy(outBuffer + 5*ctx->stride * ctx->height/4, pic.pV[0], ctx->stride*ctx->height/4);*/
-
+	
+	if(got_pic>1) return GF_PACKED_FRAMES;
 	return GF_OK;
 }
 
