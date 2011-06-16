@@ -132,27 +132,45 @@ printPortsStatus(dir, ports) ::= <<
 <ports: { port | <printStatus(dir, port)> }; separator="\n">
 >>
 
-checkPorts(action, dir, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
+checkOutputPorts(action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
 <if(!lastPort)
->%has_valid_<dir>s_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)><
+>%free_room_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = sub i32 256, %status_<port.name>
+%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %free_room_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, <pattern.numTokensMap.(port)><
 else
->%available_<dir>_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
-%has_valid_<dir>s_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_<dir>s_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_<dir>_<if(state)><state.name>_<endif><action.name>_<port.name><
+>%free_room_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = sub i32 256, %status_<port.name>
+%available_output_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %free_room_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)>, <pattern.numTokensMap.(port)>
+%has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_outputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_output_<if(state)><state.name>_<endif><action.name>_<port.name><
 endif><
 if(restPorts)>
-<checkPorts(action, dir, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
+<checkOutputPorts(action, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
 endif>
 >>
 
-checkPattern(action, dir, pattern, state=false) ::= <<
-<checkPorts(action, dir, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
+checkOutputPattern(action, pattern, state=false) ::= <<
+<checkOutputPorts(action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
+>>
+
+checkInputPorts(action, port, restPorts, portToIndexMap, state, lastPort=false) ::= <<
+<if(!lastPort)
+>%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)><
+else
+>%available_input_<if(state)><state.name>_<endif><action.name>_<port.name> = icmp sge i32 %status_<port.name>, <pattern.numTokensMap.(port)>
+%has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(port)> = and i1 %has_valid_inputs_<if(state)><state.name>_<endif><action.name>_<portToIndexMap.(lastPort)>, %available_input_<if(state)><state.name>_<endif><action.name>_<port.name><
+endif><
+if(restPorts)>
+<checkInputPorts(action, first(restPorts), rest(restPorts), portToIndexMap, state, port)><
+endif>
+>>
+
+checkInputPattern(action, pattern, state=false) ::= <<
+<checkInputPorts(action, first(pattern.ports), rest(pattern.ports), instance.actor.templateData.portToIndexByPatternMap.(pattern), state)>
 >>
 
 actionTest(action) ::= <<
 	; ACTION <action.name>
 <if(!action.inputPattern.empty)
 >	;; Input pattern
-	<checkPattern(action, "input", action.inputPattern)>
+	<checkInputPattern(action, action.inputPattern)>
 	%is_schedulable_<action.name> = call i1 @isSchedulable_<action.name> ()
 	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name>, %has_valid_inputs_<action.name>_<length(action.inputPattern.ports)>
 	
@@ -167,7 +185,7 @@ endif>
 bb_<action.name>_check_outputs:
 <if(!action.outputPattern.empty)
 >	;; Output pattern
-	<checkPattern(action, "output", action.outputPattern)>
+	<checkOutputPattern(action, action.outputPattern)>
 	
 	br i1 %has_valid_outputs_<action.name>_<length(action.outputPattern.ports)>, label %bb_<action.name>_fire, label %bb_<action.name>_unschedulable<
 else
@@ -201,7 +219,7 @@ actionTestState(sourceState, transition, restTransitionsList) ::= <<
 	; ACTION <transition.action.name>
 <if(!transition.action.inputPattern.empty)
 >	;; Input pattern
-	<checkPattern(transition.action, "input", transition.action.inputPattern, sourceState)>
+	<checkInputPattern(transition.action, transition.action.inputPattern, sourceState)>
 	%is_schedulable_<sourceState.name>_<transition.action.name> = call i1 @isSchedulable_<transition.action.name> ()
 	%is_fireable_<sourceState.name>_<transition.action.name> = and i1 %is_schedulable_<sourceState.name>_<transition.action.name>, %has_valid_inputs_<sourceState.name>_<transition.action.name>_<length(transition.action.inputPattern.ports)>
 	
@@ -216,7 +234,7 @@ endif>
 bb_<sourceState.name>_<transition.action.name>_check_outputs:
 <if(!transition.action.outputPattern.empty)
 >	;; Output pattern
-	<checkPattern(transition.action, "output", transition.action.outputPattern, sourceState)>
+	<checkOutputPattern(transition.action, transition.action.outputPattern, sourceState)>
 	
 	br i1 %has_valid_outputs_<sourceState.name>_<transition.action.name>_<length(transition.action.outputPattern.ports)>, label %bb_<sourceState.name>_<transition.action.name>_fire, label %bb_<sourceState.name>_<transition.action.name>_unschedulable<
 else
