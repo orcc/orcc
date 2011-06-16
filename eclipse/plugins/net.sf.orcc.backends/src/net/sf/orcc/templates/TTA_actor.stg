@@ -19,7 +19,7 @@ printStatus(dir, port) ::= <<
 >>
 
 printReadFunction(port) ::= <<
-define void @_read_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
+define internal void @_read_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
 	%cond = icmp sgt i32 %numTokens, 0
   
@@ -45,7 +45,7 @@ bb2:
 >>
 
 printWriteFunction(port) ::= <<
-define void @_write_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
+define internal void @_write_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
   %cond = icmp sgt i32 %numTokens, 0
   
@@ -71,7 +71,7 @@ bb2:
 >>
 
 printPeekFunction(port) ::= <<
-define void @_peek_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
+define internal void @_peek_<port.name>(<port.type>* %data, i32 %numTokens) nounwind {
 entry:
 	%cond = icmp sgt i32 %numTokens, 0
   
@@ -286,7 +286,7 @@ default:
 ///////////////////////////////////////////////////////////////////////////////
 
 printAction(action) ::= <<
-define <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+define internal <action.scheduler.returnType> @<action.scheduler.name>(<action.scheduler.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.scheduler.locals: variableDeclaration()>
 <if(action.inputPattern)>
@@ -296,7 +296,7 @@ entry:
 <printNodes(action.scheduler.nodes)>
 }
 
-define void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
+define internal void @<action.body.name>(<action.body.parameters: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
 	<action.body.locals: variableDeclaration()>
 <if(action.inputPattern)>
