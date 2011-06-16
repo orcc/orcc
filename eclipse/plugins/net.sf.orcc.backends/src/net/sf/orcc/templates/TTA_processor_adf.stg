@@ -108,8 +108,8 @@ socketSegment(segment) ::= <<
 <if(socket.input)>\</reads-from\><else>\</writes-to\><endif>
 >>
 
-functionUnit() ::= <<
-\<function-unit name="LSU"\>
+functionUnit(functionUnit) ::= <<
+\<function-unit name="<functionUnit.name>"\>
 
 \</function-unit\>
 >>
@@ -121,7 +121,7 @@ registerFile(register) ::= <<
 	\<width\><register.width>\</width\>
 	\<max-reads\><register.maxReads>\</max-reads\>
 	\<max-writes\><register.maxWrites>\</max-writes\>
-	<register.ports: { port | port(port, false) }; separator="\n">
+	<register.ports: { port | <port(port, false)> }; separator="\n">
 \</register-file\>
 >>
 
@@ -165,11 +165,11 @@ operation(operation, control=false) ::= <<
 
 element(element) ::= <<
 <if(element.reads)
->reads(element)<
+><reads(element)><
 elseif(element.writes)
->writes(element)<
+><writes(element)><
 elseif(element.resource)
->resource(element)<
+><resource(element)><
 endif>
 >>
 
