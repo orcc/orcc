@@ -298,7 +298,7 @@ BasicBlock* DPNScheduler::createActionTestState(FSM::NextStateInfo* nextStateInf
 	checkPeekPattern(action->getPeekPattern(), function, stateBB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  stateBB);
-	BranchInst* branchInst	= BranchInst::Create(fireStateBB, skipStateBB, callInst, stateBB);
+	BranchInst::Create(fireStateBB, skipStateBB, callInst, stateBB);
 
 
 	//Create a basic block skip_hasRoom that store state and return from function
@@ -306,7 +306,7 @@ BasicBlock* DPNScheduler::createActionTestState(FSM::NextStateInfo* nextStateInf
 	skipHasRoomBrName.append(action->getName());
 	BasicBlock* skipRoomBB = BasicBlock::Create(Context, skipHasRoomBrName, function);
 	ConstantInt* index = ConstantInt::get(Type::getInt32Ty(Context), sourceState->getIndex());
-	StoreInst* storeInst = new StoreInst(index, stateVar, skipRoomBB);
+	new StoreInst(index, stateVar, skipRoomBB);
 	BranchInst::Create(returnBB, skipRoomBB);
 
 	//Create output pattern

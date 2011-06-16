@@ -89,7 +89,7 @@ BasicBlock*  QSDFScheduler::createConfigurationTest(Action* action, CSDFMoC* csd
 	checkPeekPattern(action->getPeekPattern(), function, BB);
 	Procedure* scheduler = action->getScheduler();
 	CallInst* schedInst = CallInst::Create(scheduler->getFunction(), "",  BB);
-	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, schedInst, BB);
+	BranchInst::Create(fireBB, skipBB, schedInst, BB);
 
 	//Create output pattern
 	fireBB = checkOutputPattern(action->getOutputPattern(), function, returnBB, fireBB);

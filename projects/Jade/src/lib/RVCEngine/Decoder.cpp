@@ -55,7 +55,6 @@ using namespace llvm;
 using namespace std;
 
 Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose, bool noMultiCore): Context(C){
-	clock_t timer = clock ();
 	
 	//Set property of the decoder
 	this->configuration = configuration;

@@ -67,7 +67,6 @@ public:
 	 *
      */
 	AbstractFifo(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size) : Context(C){
-		this->connection;
 		this->module = module;
 		this->fifoType = type;
 		this->fifoSize = size;

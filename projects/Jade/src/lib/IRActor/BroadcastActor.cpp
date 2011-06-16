@@ -161,7 +161,7 @@ Procedure* BroadcastActor::createScheduler(){
 
 	//Return resut
 	ConstantInt* one = ConstantInt::get(Type::getInt1Ty(Context), 1);
-	ReturnInst* returnInst = ReturnInst::Create(Context, one, BBEntry);
+	ReturnInst::Create(Context, one, BBEntry);
 
 	return new Procedure(isSchedulableName, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);
 }
@@ -274,5 +274,5 @@ void BroadcastActor::createSetReadEnd(Port* port, BasicBlock* current){
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
 	Function* readEndFn = FifoMng::getReadEndFunction(port->getType(), decoder);
-	CallInst* retVal = CallInst::Create(readEndFn, vector.begin(), vector.end(), "", current);
+	CallInst::Create(readEndFn, vector.begin(), vector.end(), "", current);
 }

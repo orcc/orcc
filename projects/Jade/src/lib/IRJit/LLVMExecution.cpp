@@ -212,7 +212,7 @@ void LLVMExecution::linkExternalProc(list<Procedure*> externs){
 void LLVMExecution::run() {
 	// Get scheduler functions
 	Scheduler* scheduler = decoder->getScheduler();
-	Function* func = scheduler->getMainFunction();
+	Function* func = dyn_cast<Function>(scheduler->getMainFunction());
 
 	// Run scheduler
 	stopVal = 0;
@@ -240,6 +240,7 @@ int* LLVMExecution::initialize(){
    if (NoLazyCompilation) {
 		for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
 			Function *Fn = &*I;
+        cout << Fn->getNameStr()<< "function name";
 			if (!Fn->isDeclaration())
 				EE->getPointerToFunction(Fn);
 		}
@@ -247,7 +248,7 @@ int* LLVMExecution::initialize(){
 	}
 
    	// Initialize the network
-	Function* init = scheduler->getInitFunction();
+	Function* init = dyn_cast<Function>(scheduler->getInitFunction());
 	std::vector<GenericValue> noargs;
 	EE->runFunction(init, noargs);
 
@@ -279,14 +280,9 @@ void* LLVMExecution::getGVPtr(llvm::GlobalVariable* gv){
 }
 
 void LLVMExecution::clear() {
-	Module* module = decoder->getModule();
+	decoder->getModule();
 	EE->runStaticConstructorsDestructors(true);
 	EE->clearAllGlobalMappings();
-	
-/*
-	for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
-		EE->freeMachineCodeForFunction(I);
-	}*/
 }
 
 

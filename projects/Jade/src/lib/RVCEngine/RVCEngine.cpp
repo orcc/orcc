@@ -134,7 +134,6 @@ int RVCEngine::unload(Network* network) {
 		return 1;
 	}
 	
-	Decoder* decoder = it->second;
 	decoders.erase(it);
 	
 	return 0;	
@@ -217,6 +216,7 @@ int RVCEngine::optimize(Network* network, int optLevel){
 	opt.optimize(optLevel);
 	
 	cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+    return 0;
 }
 
 int RVCEngine::reconfigure(Network* oldNetwork, Network* newNetwork){

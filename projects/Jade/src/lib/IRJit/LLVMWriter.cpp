@@ -75,7 +75,6 @@ GlobalVariable* LLVMWriter::createPortVariable(Port* port){
 GlobalVariable* LLVMWriter::addVariable(llvm::GlobalVariable* variable){
 	string Err;
 	const GlobalVariable *SGV = variable;
-    GlobalValue *DGV = 0;
 	Module *Dest = module;
 	
       // No linking to be performed, simply create an identical version of the
@@ -97,8 +96,6 @@ GlobalVariable* LLVMWriter::addVariable(llvm::GlobalVariable* variable){
 
 bool LLVMWriter::LinkGlobalInits(llvm::GlobalVariable* variable){
 	string Error;
-	const GlobalVariable *SGV = variable;
-	Module* Dest = module;
     
 	GlobalVariable *GV = cast<GlobalVariable>(ValueMap[variable]);
     
@@ -134,8 +131,6 @@ Function* LLVMWriter::addFunctionProtosInternal(const Function* function){
 	Module* Dest = module;
 	std::string Err;
 
-	GlobalValue *DGV = 0;
-
 	Function *NF =
       Function::Create(cast<FunctionType>(SF->getType()->getElementType()),
                        GlobalValue::InternalLinkage,  prefix + SF->getName(), Dest);
@@ -149,8 +144,6 @@ Function* LLVMWriter::addFunctionProtosExternal(const Function* function){
     const Function *SF = function;   // SrcFunction
 	Module* Dest = module;
 	std::string Err;
-	
-	GlobalValue *DGV = 0;
 	
 	Function *NF =
 	Function::Create(cast<FunctionType>(SF->getType()->getElementType()),
