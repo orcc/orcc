@@ -65,7 +65,7 @@ cl::opt<FifoTy> Fifo(values(clEnumVal(trace,   "trace"),
 					 init(circular));
 
 // Jade options
-cl::opt<std::string> VTLDir(init("D:\\Users\\olabois\\orcc\\trunk\\projects\\Jade\\VTL\\"));
+cl::opt<std::string> VTLDir(init(""));
 
 cl::opt<std::string> SystemDir(init(""));
 
@@ -106,7 +106,7 @@ char *write_file;
 void print_usage(){
 }
 
-void rvc_init(char *XDF, int isAVCFile){
+void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 
 	//Initialize context
 	LLVMContext &Context = getGlobalContext();
@@ -120,7 +120,7 @@ void rvc_init(char *XDF, int isAVCFile){
 	Configuration* configuration = new Configuration(network);
 
 	// Parsing actor and bound it to the configuration
-	RVCEngine engine(Context, VTLDir, Fifo, FifoSize);
+	RVCEngine engine(Context, VTLFolder, Fifo, FifoSize);
 	map<string, Actor*>* requieredActors = engine.parseActors(configuration);
 	configuration->setActors(requieredActors);
 

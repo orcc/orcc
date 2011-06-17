@@ -50,7 +50,7 @@ extern "C" {
 #define Exported
 #endif
 
-Exported void rvc_init(char *XDF, int isAVCFile);
+Exported void rvc_init(char *XDF, char* VTLFolder, int isAVCFile);
 
 Exported int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffer, int newNal);
 
