@@ -92,7 +92,7 @@ Decoder* decoder;
 extern "C" {
 #endif
 
-#include "Jade/lib_RVCDecoder/RVCDecoder.h"
+#include "Jade/RVCDecoder/RVCDecoder.h"
 
 int bufferBusy;
 int safeguardFrameEmpty = 1;

@@ -58,7 +58,7 @@ class Configuration;
 #include <pthread.h>
 
 #include "Jade/Fifo/FifoSelection.h"
-#include "Jade/lib_RVCDecoder/RVCDecoder.h"
+#include "Jade/RVCDecoder/RVCDecoder.h"
 //------------------------------
 
 /**

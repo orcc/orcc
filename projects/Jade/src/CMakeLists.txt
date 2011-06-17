@@ -107,7 +107,7 @@ add_subdirectory(lib/Scenario)
 add_subdirectory(lib/TinyXml)
 add_subdirectory(lib/XDFSerialize)
 add_subdirectory(lib/ZLib)
-add_subdirectory(lib/lib_RVCDecoder)
+add_subdirectory(lib/RVCDecoder)
 
 # Include directories
 include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS} ${SDL_INCLUDE_DIR})
