@@ -76,6 +76,7 @@ void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
 
 	if (nbTokenSend == data_length + startCodeSize){
 		nbTokenSend = 0;
+		data_length = 0;
 		*stopVar = 1;
 	}
 }
