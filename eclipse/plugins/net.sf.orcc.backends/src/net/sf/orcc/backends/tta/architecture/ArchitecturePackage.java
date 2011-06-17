@@ -724,13 +724,22 @@ public interface ArchitecturePackage extends EPackage {
 	int ADDRESS_SPACE__MAX_ADDRESS = 2;
 
 	/**
+	 * The feature id for the '<em><b>Width</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ADDRESS_SPACE__WIDTH = 3;
+
+	/**
 	 * The number of structural features of the '<em>Address Space</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ADDRESS_SPACE_FEATURE_COUNT = 3;
+	int ADDRESS_SPACE_FEATURE_COUNT = 4;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}' class.
@@ -1904,6 +1913,17 @@ public interface ArchitecturePackage extends EPackage {
 	EAttribute getAddressSpace_MaxAddress();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth <em>Width</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Width</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.AddressSpace#getWidth()
+	 * @see #getAddressSpace()
+	 * @generated
+	 */
+	EAttribute getAddressSpace_Width();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2806,6 +2826,14 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute ADDRESS_SPACE__MAX_ADDRESS = eINSTANCE.getAddressSpace_MaxAddress();
+
+		/**
+		 * The meta object literal for the '<em><b>Width</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ADDRESS_SPACE__WIDTH = eINSTANCE.getAddressSpace_Width();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Guard <em>Guard</em>}' class.

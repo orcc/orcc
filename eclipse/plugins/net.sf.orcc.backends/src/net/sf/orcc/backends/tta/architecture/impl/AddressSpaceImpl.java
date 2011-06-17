@@ -45,6 +45,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl#getMinAddress <em>Min Address</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl#getMaxAddress <em>Max Address</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl#getWidth <em>Width</em>}</li>
  * </ul>
  * </p>
  *
@@ -106,6 +107,26 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 	protected int maxAddress = MAX_ADDRESS_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getWidth() <em>Width</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getWidth()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int WIDTH_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getWidth() <em>Width</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getWidth()
+	 * @generated
+	 * @ordered
+	 */
+	protected int width = WIDTH_EDEFAULT;
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -146,6 +167,18 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 	 */
 	public int getWidth() {
 		return getMaxAddress() - getMinAddress();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setWidth(int newWidth) {
+		int oldWidth = width;
+		width = newWidth;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.ADDRESS_SPACE__WIDTH, oldWidth, width));
 	}
 
 	/**
@@ -199,6 +232,8 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 				return getMinAddress();
 			case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
 				return getMaxAddress();
+			case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
+				return getWidth();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -218,6 +253,9 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 				return;
 			case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
 				setMaxAddress((Integer)newValue);
+				return;
+			case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
+				setWidth((Integer)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -239,6 +277,9 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 			case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
 				setMaxAddress(MAX_ADDRESS_EDEFAULT);
 				return;
+			case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
+				setWidth(WIDTH_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -256,6 +297,8 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 				return minAddress != MIN_ADDRESS_EDEFAULT;
 			case ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS:
 				return maxAddress != MAX_ADDRESS_EDEFAULT;
+			case ArchitecturePackage.ADDRESS_SPACE__WIDTH:
+				return width != WIDTH_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -275,6 +318,8 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 		result.append(minAddress);
 		result.append(", maxAddress: ");
 		result.append(maxAddress);
+		result.append(", width: ");
+		result.append(width);
 		result.append(')');
 		return result.toString();
 	}

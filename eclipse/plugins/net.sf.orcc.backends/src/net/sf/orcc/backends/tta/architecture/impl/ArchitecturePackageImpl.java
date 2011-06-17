@@ -805,6 +805,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getAddressSpace_Width() {
+		return (EAttribute)addressSpaceEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -1208,6 +1217,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__NAME);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MIN_ADDRESS);
 		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__MAX_ADDRESS);
+		createEAttribute(addressSpaceEClass, ADDRESS_SPACE__WIDTH);
 
 		elementEClass = createEClass(ELEMENT);
 		createEAttribute(elementEClass, ELEMENT__START_CYCLE);
@@ -1379,8 +1389,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEAttribute(getAddressSpace_Name(), ecorePackage.getEString(), "name", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAddressSpace_MinAddress(), ecorePackage.getEInt(), "minAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAddressSpace_MaxAddress(), ecorePackage.getEInt(), "maxAddress", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		addEOperation(addressSpaceEClass, ecorePackage.getEInt(), "getWidth", 0, 1, IS_UNIQUE, IS_ORDERED);
+		initEAttribute(getAddressSpace_Width(), ecorePackage.getEInt(), "width", null, 0, 1, AddressSpace.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(elementEClass, Element.class, "Element", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getElement_StartCycle(), ecorePackage.getEInt(), "startCycle", null, 0, 1, Element.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
