@@ -43,7 +43,7 @@ typedef struct{
 } RVCFRAME;
 
 
-DllImport int rvc_init(char *XDF, int isAVCFile);
+DllImport int rvc_init(char* XDF, char* VTLFolder, int isAVCFile);
 DllImport int rvc_decode(unsigned char* nal, int nal_length, char *outBuffer, int newBuffer, int newNal);
 DllImport void rvc_close();
 
@@ -66,6 +66,7 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 	s32 res;
 	char Picture;
 	RVCDec *ctx = (RVCDec*) ifcg->privateStack;
+	char* VTLFolder = "D:\\Users\\olabois\\orcc\\trunk\\projects\\Jade\\VTL\\";
 	int isAVCFile;
 
 	/*not supported in this version*/
@@ -80,7 +81,7 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 	if(esd->decoderConfig->objectTypeIndication==GPAC_OTI_VIDEO_AVC) isAVCFile = 1;
 	else isAVCFile = 0;
 
-	rvc_init(esd->decoderConfig->rvc_config->data, isAVCFile); //->data contains the uncompressed XDF
+	rvc_init(esd->decoderConfig->rvc_config->data, VTLFolder, isAVCFile); //->data contains the uncompressed XDF
 
 		
 	/*decoder config not known, output buffers will be reconfigured at run-time*/
@@ -313,8 +314,8 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 	
 	/*memcpy(outBuffer, pic.pY[0], ctx->stride*ctx->height); 
 	memcpy(outBuffer + ctx->stride * ctx->height, pic.pU[0], ctx->stride*ctx->height/4);
-	memcpy(outBuffer + 5*ctx->stride * ctx->height/4, pic.pV[0], ctx->stride*ctx->height/4);*/
-	
+	memcpy(outBuffer + 5*ctx->stride * ctx->height/4, pic.pV[0], ctx->stride*ctx->height/4);*/	
+
 	if(got_pic>1) return GF_PACKED_FRAMES;
 	return GF_OK;
 }
