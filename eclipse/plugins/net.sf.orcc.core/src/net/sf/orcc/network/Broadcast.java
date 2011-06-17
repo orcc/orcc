@@ -95,7 +95,7 @@ public class Broadcast {
 		portMap = new HashMap<Port, Integer>();
 		portMap.put(getInput(), 0);
 		for (int i = 0; i < numOutputs; i++) {
-			portMap.put(getOutputs().getList().get(i), i);
+			portMap.put(getOutputs().getList().get(i), i + 1);
 		}
 	}
 
