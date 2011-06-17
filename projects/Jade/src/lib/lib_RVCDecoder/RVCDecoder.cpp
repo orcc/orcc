@@ -136,13 +136,13 @@ void rvc_init(char *XDF, int isAVCFile){
 	}
 }
 
-int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffer){
+int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffer, int newNal){
 
 	if(newBuffer){
 		bufferBusy = 0;
 	}
 	
-	source_sendNal(nal, nal_length);
+	source_sendNal(nal, nal_length, !newNal);
 
 	displayYUV_setOutBufferAddr(outBuffer);
 

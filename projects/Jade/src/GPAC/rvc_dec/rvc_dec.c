@@ -40,7 +40,7 @@ typedef struct{
 
 
 DllImport int rvc_init(char *XDF, int isAVCFile);
-DllImport int rvc_decode(unsigned char* nal, int nal_length, char *outBuffer, int newBuffer);
+DllImport int rvc_decode(unsigned char* nal, int nal_length, char *outBuffer, int newBuffer, int newNal);
 DllImport void rvc_close();
 
 
@@ -107,7 +107,7 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 			}
 			/* call decode - warning for AVC: the data blocks do not contain startcode prefixes (00000001), you may need to add them) */
 			
-			rvc_decode(slc->data, slc->size, &Picture, 1);
+			rvc_decode(slc->data, slc->size, &Picture, 1, 1);
 			/*if (res<0) {
 				GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, ("[SVC Decoder] Error decoding SPS %d\n", res));
 			}*/
@@ -120,7 +120,7 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 			/*same remark as above*/
 
 			
-			rvc_decode(slc->data, slc->size, &Picture, 1);
+			rvc_decode(slc->data, slc->size, &Picture, 1, 1);
 			/*if (res<0) {
 				GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, ("[SVC Decoder] Error decoding PPS %d\n", res));
 			}*/
@@ -140,7 +140,7 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 		ctx->pixel_ar = (dsi.par_num<<16) | dsi.par_den;
 		
 		
-		rvc_decode(esd->decoderConfig->decoderSpecificInfo->data, esd->decoderConfig->decoderSpecificInfo->dataLength, &Picture, 1);
+		rvc_decode(esd->decoderConfig->decoderSpecificInfo->data, esd->decoderConfig->decoderSpecificInfo->dataLength, &Picture, 1, 1);
 		/*if (res<0) {
 			GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, ("[SVC Decoder] Error decoding PPS %d\n", res));
 		}*/
@@ -149,7 +149,7 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 	} else {
 		/*unknown type, do what you want*/
 		
-		rvc_decode(esd->decoderConfig->decoderSpecificInfo->data, esd->decoderConfig->decoderSpecificInfo->dataLength, &Picture, 1);
+		rvc_decode(esd->decoderConfig->decoderSpecificInfo->data, esd->decoderConfig->decoderSpecificInfo->dataLength, &Picture, 1, 1);
 		/*if (res<0) {
 			GF_LOG(GF_LOG_ERROR, GF_LOG_CODEC, ("[SVC Decoder] Error decoding PPS %d\n", res));
 		}*/
@@ -198,7 +198,7 @@ static GF_Err RVCD_GetCapabilities(GF_BaseDecoder *ifcg, GF_CodecCapability *cap
 		capability->cap.valueInt = GF_PIXEL_YV12;
 		break;
 	case GF_CODEC_BUFFER_MIN:
-		capability->cap.valueInt = 2;
+		capability->cap.valueInt = 1;
 		break;
 	case GF_CODEC_BUFFER_MAX:
 		capability->cap.valueInt = 2;
@@ -262,12 +262,12 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 			
 			if(nalNumber > bookmark){
 				bookmark ++;
-				got_pic = rvc_decode(ptr, nalu_size, outBuffer, !got_pic);
+				got_pic = rvc_decode(ptr, nalu_size, outBuffer, !got_pic, !bookmark);
 				if(got_pic>1){
 					return GF_PACKED_FRAMES;
 				}
 			}else if(nalNumber == bookmark){
-				got_pic = rvc_decode(NULL, 0, outBuffer, !got_pic);
+				got_pic = rvc_decode(NULL, 0, outBuffer, !got_pic, 0);
 				if(got_pic>1){
 					return GF_PACKED_FRAMES;
 				}
@@ -287,7 +287,7 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 		u8 *ptr = inBuffer;
 		
 
-		got_pic = rvc_decode(ptr, inBufferLength, outBuffer, 1);
+		got_pic = rvc_decode(ptr, inBufferLength, outBuffer, 1, 1);
 	}
 
 	//if (got_pic!=1) return GF_OK;

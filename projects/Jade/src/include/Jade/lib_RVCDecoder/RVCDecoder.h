@@ -52,7 +52,7 @@ extern "C" {
 
 Exported void rvc_init(char *XDF, int isAVCFile);
 
-Exported int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffer);
+Exported int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffer, int newNal);
 
 Exported void rvc_close();
 
