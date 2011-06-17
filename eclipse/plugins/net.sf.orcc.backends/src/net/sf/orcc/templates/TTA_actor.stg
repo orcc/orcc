@@ -339,19 +339,22 @@ entry:
 
 printBcastOutputConditions(lastPort, currentPort, restPorts) ::= <<
 <if(restPorts)
->%available_output_<indexPort(currentPort)> = icmp sge i32 %status_output_<indexPort(currentPort)>, 1
+>%free_room_output_<indexPort(currentPort)> = sub i32 256, %status_<currentPort.name>
+%available_output_<indexPort(currentPort)> = icmp sge i32 %free_room_output_<indexPort(currentPort)>, 1
 %has_valid_output_<indexPort(currentPort)> = and i1 %has_valid_output_<indexPort(lastPort)>, %available_output_<indexPort(currentPort)>
 <printBcastOutputConditions(currentPort, first(restPorts), rest(restPorts))><
 else
->%available_output_<indexPort(currentPort)> = icmp sge i32 %status_output_<indexPort(currentPort)>, 1
+>%free_room_output_<indexPort(currentPort)> = sub i32 256, %status_<currentPort.name>
+%available_output_<indexPort(currentPort)> = icmp sge i32 %free_room_output_<indexPort(currentPort)>, 1
 %can_copy_next_token = and i1 %has_valid_output_<indexPort(lastPort)>, %available_output_<indexPort(currentPort)><
 endif>
 >>
 
 printBcastCondition(broadcast) ::= <<
 %has_valid_input = icmp sge i32 %status_input, 1
-%available_output_0 = icmp sge i32 %status_output_0, 1
-%has_valid_output_0 = and i1 %has_valid_input, %available_output_0
+%free_room_output_1 = sub i32 256, %status_<first(broadcast.outputs.list).name>
+%available_output_1 = icmp sge i32 %free_room_output_1, 1
+%has_valid_output_1 = and i1 %has_valid_input, %available_output_1
 <printBcastOutputConditions(first(broadcast.outputs.list), first(rest(broadcast.outputs.list)), rest(rest(broadcast.outputs.list)))>
 >>
 
