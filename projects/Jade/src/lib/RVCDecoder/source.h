@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-void source_sendNal(unsigned char* nal, int nal_length, int resume);
+void source_sendNal(unsigned char* nal, int nal_length);
 
 void source_isAVCFile();
 

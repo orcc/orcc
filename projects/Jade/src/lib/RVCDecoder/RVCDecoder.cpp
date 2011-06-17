@@ -99,6 +99,9 @@ int safeguardFrameEmpty = 1;
 	
 int* stopVar;
 
+//Configure verbose mode
+bool verbose = true;
+
 
 //Native elts
 char *yuv_file;
@@ -120,12 +123,12 @@ void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 	Configuration* configuration = new Configuration(network);
 
 	// Parsing actor and bound it to the configuration
-	RVCEngine engine(Context, VTLFolder, Fifo, FifoSize);
+	RVCEngine engine(Context, VTLFolder, Fifo, FifoSize, "", "", false, false, verbose);
 	map<string, Actor*>* requieredActors = engine.parseActors(configuration);
 	configuration->setActors(requieredActors);
 
 	//Create decoder
-	decoder = new Decoder(Context, configuration);
+	decoder = new Decoder(Context, configuration, verbose);
 	
 	//Initialize the execution engine
 	LLVMExecution* llvmEE = decoder->getEE();
@@ -136,13 +139,13 @@ void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 	}
 }
 
-int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffer, int newNal){
+int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffer){
 
 	if(newBuffer){
 		bufferBusy = 0;
 	}
 	
-	source_sendNal(nal, nal_length, !newNal);
+	source_sendNal(nal, nal_length);
 
 	displayYUV_setOutBufferAddr(outBuffer);
 

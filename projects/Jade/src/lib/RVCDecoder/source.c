@@ -75,18 +75,14 @@ void source_readNBytes(unsigned char *outTable, unsigned short nbTokenToRead){
 	nbTokenSend += nbTokenToRead;
 
 	if (nbTokenSend == data_length + startCodeSize){
-		nbTokenSend = 0;
 		data_length = 0;
+		nbTokenSend = 0;
 		*stopVar = 1;
 	}
 }
 
 
-void source_sendNal(unsigned char* nal, int nal_length, int resume){
-	if(!resume){
-		nbTokenSend = 0;
-	}
-
+void source_sendNal(unsigned char* nal, int nal_length){
 	data = nal;
 	data_length = nal_length;
 }
