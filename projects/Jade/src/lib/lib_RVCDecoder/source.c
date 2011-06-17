@@ -92,6 +92,6 @@ void source_sendNal(unsigned char* nal, int nal_length, int resume){
 
 void source_isAVCFile(){
 	unsigned char AVCStartCode[4] = {0x00, 0x00, 0x00, 0x01};
-	memcpy(StartCode, AVCStartCode, startCodeSize);
 	startCodeSize = 4;
+	memcpy(StartCode, AVCStartCode, startCodeSize);
 }
