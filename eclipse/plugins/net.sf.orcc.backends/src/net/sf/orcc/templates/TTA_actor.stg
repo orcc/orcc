@@ -359,7 +359,16 @@ broadcast(broadcast) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Broadcast file
 
-define void @_start() noreturn nounwind noinline {
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Input FIFO
+<printReadFunction(broadcast.input)>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Output FIFOs
+<broadcast.outputs.list: printWriteFunction(); separator="\n\n">
+
+
+define void @main() noreturn nounwind noinline {
 entry:
 	%token = alloca [1 x <broadcast.input.type>]
 	%token_ptr = bitcast [1 x <broadcast.input.type>]* %token to <broadcast.input.type>*
@@ -379,14 +388,6 @@ bb_broadcast_copy:
 	
 	br label %bb_broadcast_start
 }
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Input FIFO
-<printReadFunction(broadcast.input)>
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Output FIFOs
-<broadcast.outputs.list: printWriteFunction(); separator="\n\n">
 
 >>
 
@@ -410,26 +411,6 @@ actor(actor) ::= <<
 ; State variables of the actor
 <actor.stateVars: stateVar(); separator="\n">
 <endif>
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Action-scheduler
-<if(actor.fsm)>
-@_FSM_state = global i32 <actor.templateData.stateToLabelMap.(actor.fsm.initialState)>
-<endif>
-
-define void @_start() noreturn nounwind noinline {
-entry:
-
-	br label %bb_scheduler_start
-bb_scheduler_start:
-	<printPortsStatus("IN", actor.inputs)>
-	<printPortsStatus("OUT", actor.outputs)>
-<if(actor.fsm)
-><schedulerWithFSM(actor.actionsOutsideFsm, actor.fsm)><
-else
-><schedulerWithoutFSM(actor.actionsOutsideFsm)><
-endif>
-}
 
 <if(actor.inputs)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -460,6 +441,26 @@ endif>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
 <actor.actions: printAction(); separator="\n\n">
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Action-scheduler
+<if(actor.fsm)>
+@_FSM_state = global i32 <actor.templateData.stateToLabelMap.(actor.fsm.initialState)>
+<endif>
+
+define void @main() noreturn nounwind noinline {
+entry:
+
+	br label %bb_scheduler_start
+bb_scheduler_start:
+	<printPortsStatus("IN", actor.inputs)>
+	<printPortsStatus("OUT", actor.outputs)>
+<if(actor.fsm)
+><schedulerWithFSM(actor.actionsOutsideFsm, actor.fsm)><
+else
+><schedulerWithoutFSM(actor.actionsOutsideFsm)><
+endif>
+}
 
 >>
 
