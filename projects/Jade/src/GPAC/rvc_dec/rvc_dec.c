@@ -28,7 +28,11 @@
 #include <gpac/avparse.h>
 #include <gpac/constants.h>
 
-#define DllImport   __declspec( dllimport )
+#ifdef WIN32
+#define DllImport __declspec( dllimport )
+#else
+#define DllImport
+#endif
 
 typedef struct{
 	int Width;
