@@ -78,9 +78,6 @@ public class TTABackendImpl extends AbstractBackend {
 
 	private final Map<String, String> transformations;
 
-	private String hardwarePath;
-	private String softwarePath;
-
 	/**
 	 * Creates a new instance of the TTA back-end. Initializes the
 	 * transformation hash map.
@@ -130,9 +127,6 @@ public class TTABackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		hardwarePath = createFolder(path, "hardware");
-		softwarePath = createFolder(path, "software");
-
 		doTransformNetwork(network);
 
 		transformActors(network.getActors());
@@ -149,21 +143,18 @@ public class TTABackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 
-		createFolder(hardwarePath, instance.getId());
-		printProcessor(instance);
-		return printer.print(instance.getId() + ".ll", softwarePath, instance,
+		String instancePath = createFolder(path, instance.getId());
+		printProcessor(instance, instancePath);
+		return printer.print(instance.getId() + ".ll", instancePath, instance,
 				"instance");
 	}
 
 	private void printNetwork(Network network) {
 		NetworkPrinter printer = new NetworkPrinter("TTA_network");
-		printer.print(network.getName() + ".vhd", hardwarePath, network,
-				"network");
+		printer.print(network.getName() + ".vhd", path, network, "network");
 	}
 
-	private void printProcessor(Instance instance) {
-		String processorPath = createFolder(hardwarePath, instance.getId());
-
+	private void printProcessor(Instance instance, String instancePath) {
 		TTA simpleTTA = ArchitectureFactory.eINSTANCE.createSimpleTTA(instance
 				.getId());
 
@@ -179,14 +170,14 @@ public class TTABackendImpl extends AbstractBackend {
 				!debugMode, true);
 
 		vhdlPrinter.print("processor_" + instance.getId() + ".vhd",
-				processorPath, instance, "processor");
+				instancePath, instance, "processor");
 		adfPrinter.print("processor_" + instance.getId() + ".adf",
-				processorPath, simpleTTA, "tta");
+				instancePath, simpleTTA, "tta");
 		idfPrinter.print("processor_" + instance.getId() + ".idf",
-				processorPath, simpleTTA, "tta");
-		dramPrinter.print("dram_" + instance.getId() + ".vhd", processorPath,
+				instancePath, simpleTTA, "tta");
+		dramPrinter.print("dram_" + instance.getId() + ".vhd", instancePath,
 				instance, "dram");
-		iromPrinter.print("irom_" + instance.getId() + ".vhd", processorPath,
+		iromPrinter.print("irom_" + instance.getId() + ".vhd", instancePath,
 				instance, "irom");
 
 	}
