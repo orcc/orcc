@@ -32,8 +32,6 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Expression;
@@ -45,11 +43,11 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a visitor that transforms a division into an equivalent
@@ -59,371 +57,10 @@ import net.sf.orcc.ir.util.EcoreHelper;
  * 
  */
 public class DivisionSubstitution extends AbstractActorVisitor<Object> {
-	/**
-	 * This class searches the div operators and transforms them into call
-	 * instructions
-	 * 
-	 * @author Khaled Jerbi
-	 * 
-	 */
-	private class DivisionSearcher extends AbstractActorVisitor<Object> {
-		private Procedure divProc;
-
-		private boolean flagAdd;
-		private Type typeInt = IrFactory.eINSTANCE.createTypeInt();
-		private Type typeBool = IrFactory.eINSTANCE.createTypeBool();
-		private List<Expression> parameters;
-
-		public DivisionSearcher(Procedure divProc, boolean flagAdd) {
-			super(true);
-			this.divProc = divProc;
-			this.flagAdd = flagAdd;
-		}
-
-		@Override
-		public Object caseExprBinary(ExprBinary expr) {
-			parameters = new ArrayList<Expression>();
-			if (expr.getOp() == OpBinary.DIV) {
-				// what ever the epression type of division operands they are
-				// put in local variables VarNum and varDenum the result of
-				// callInst is put in tmp
-				Var varNum = IrFactory.eINSTANCE.createVar(typeInt, "num",
-						true, counter);
-				Var varDenum = IrFactory.eINSTANCE.createVar(typeInt, "den",
-						true, counter);
-				Var tmp = IrFactory.eINSTANCE.createVar(typeInt, "tmpDiv",
-						true, counter);
-				counter++;
-				
-				procedure.getLocals().add(varNum);
-				procedure.getLocals().add(varDenum);
-				procedure.getLocals().add(tmp);
-
-				InstAssign assign0 = IrFactory.eINSTANCE.createInstAssign(
-						varNum, expr.getE1());
-				InstAssign assign1 = IrFactory.eINSTANCE.createInstAssign(
-						varDenum, expr.getE2());
-				if (flagAdd) {
-					divProc = createDivProc();
-					flagAdd = false;
-				}
-
-				parameters.add(IrFactory.eINSTANCE.createExprVar(varNum));
-				parameters.add(IrFactory.eINSTANCE.createExprVar(varDenum));
-
-				InstCall call = IrFactory.eINSTANCE.createInstCall(tmp,
-						divProc, parameters);
-				EcoreHelper.addInstBeforeExpr(expr, assign0, true);
-				EcoreHelper.addInstBeforeExpr(expr, assign1, true);
-				EcoreHelper.addInstBeforeExpr(expr, call, true);
-				
-				EcoreUtil.replace(expr, IrFactory.eINSTANCE.createExprVar(tmp));
-			}
-			return null;
-		}
-
-		/**
-		 * This method creates the alternative division function using the num
-		 * and the denom
-		 * 
-		 * @param varNum
-		 *            numerator
-		 * @param varDenum
-		 *            denomerator
-		 * @return division function
-		 */
-		private Procedure createDivProc() {
-
-			Var varNum = IrFactory.eINSTANCE.createVar(typeInt, "num", true, 0);
-			Var varDenum = IrFactory.eINSTANCE.createVar(typeInt, "den", true,
-					0);
-			// counter++;
-			divProc.getParameters().add(varNum);
-			divProc.getParameters().add(varDenum);
-
-			Var result = IrFactory.eINSTANCE.createVar(IrFactory.eINSTANCE.createTypeInt(), "result", true, 0);
-			divProc.getLocals().add(result);
-			
-			Var i = IrFactory.eINSTANCE.createVar(IrFactory.eINSTANCE.createTypeInt(), "i", true, 0);
-			divProc.getLocals().add(i);
-				
-			Var flipResult = IrFactory.eINSTANCE.createVar(IrFactory.eINSTANCE.createTypeInt(), "flipResult", true, 0);
-			divProc.getLocals().add(flipResult);
-			
-			Var denom = IrFactory.eINSTANCE.createVar(IrFactory.eINSTANCE.createTypeInt(64), "denom", true, 0);
-			divProc.getLocals().add(denom);
-			
-			Var numer = IrFactory.eINSTANCE.createVar(IrFactory.eINSTANCE.createTypeInt(64), "numer", true, 0);
-			divProc.getLocals().add(numer);
-			
-			Var mask = IrFactory.eINSTANCE.createVar(IrFactory.eINSTANCE.createTypeInt(), "mask", true, 0);
-			divProc.getLocals().add(mask);
-			
-			Var remainder = IrFactory.eINSTANCE.createVar(IrFactory.eINSTANCE.createTypeInt(), "remainder", true, 0);
-			divProc.getLocals().add(remainder);
-
-			NodeBlock initBlock = createInitBlock(result, flipResult);
-			divProc.getNodes().add(initBlock);
-
-			NodeIf nodeIf_1 = createNodeIf(varNum, flipResult);
-			divProc.getNodes().add(nodeIf_1);
-
-			NodeIf nodeIf_2 = createNodeIf(varDenum, flipResult);
-			divProc.getNodes().add(nodeIf_2);
-
-			NodeBlock block_1 = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			InstAssign assign_blk10 = IrFactory.eINSTANCE.createInstAssign(
-					remainder, IrFactory.eINSTANCE.createExprVar(varNum));
-			Expression blk11And = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(varDenum),
-					OpBinary.BITAND,
-					IrFactory.eINSTANCE.createExprInt(0xFFFFFFFFL),
-					IrFactory.eINSTANCE.createTypeInt());
-			InstAssign assign_blk11 = IrFactory.eINSTANCE.createInstAssign(
-					denom, blk11And);
-			InstAssign assign_blk12 = IrFactory.eINSTANCE.createInstAssign(
-					mask, IrFactory.eINSTANCE.createExprInt(0x80000000L));
-			InstAssign assign_blk13 = IrFactory.eINSTANCE.createInstAssign(i,
-					IrFactory.eINSTANCE.createExprInt(0));
-			block_1.add(assign_blk10);
-			block_1.add(assign_blk11);
-			block_1.add(assign_blk12);
-			block_1.add(assign_blk13);
-			divProc.getNodes().add(block_1);
-			
-			NodeWhile nodeWhile = createNodeWhile(i, numer, remainder, denom,
-					result, mask, varDenum);
-			divProc.getNodes().add(nodeWhile);
-			
-			NodeIf nodeIf_3 = createResultNodeIf(flipResult, result);
-			divProc.getNodes().add(nodeIf_3);
-
-			NodeBlock blockReturn = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			blockReturn
-					.add(IrFactory.eINSTANCE
-							.createInstReturn(IrFactory.eINSTANCE
-									.createExprVar(result)));
-			divProc.getNodes().add(blockReturn);
-
-			return divProc;
-		}
-
-		/**
-		 * this method creates an initializing instructions for result and
-		 * flipResult variables to zero
-		 * 
-		 * @param result
-		 *            to be initialized to zero
-		 * @param flipResult
-		 *            to be initialized to zero
-		 * @return node block with initialization assigns
-		 */
-		private NodeBlock createInitBlock(Var result, Var flipResult) {
-			NodeBlock initBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			InstAssign initResult = IrFactory.eINSTANCE.createInstAssign(
-					result, IrFactory.eINSTANCE.createExprInt(0));
-			InstAssign initFlip = IrFactory.eINSTANCE.createInstAssign(
-					flipResult, IrFactory.eINSTANCE.createExprInt(0));
-			initBlock.add(initResult);
-			initBlock.add(initFlip);
-			return initBlock;
-		}
-
-		/**
-		 * creates the following if node: if (var < 0) { var = -var; flip ^= 1;
-		 * }
-		 * 
-		 * @param var
-		 *            (see definition)
-		 * @param flip
-		 *            (see definition)
-		 * @return if node
-		 */
-		private NodeIf createNodeIf(Var var, Var flip) {
-			NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
-			NodeBlock blockIf_1 = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			Expression conditionIf_1 = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(var), OpBinary.LT,
-					IrFactory.eINSTANCE.createExprInt(0), typeBool);
-			nodeIf.setCondition(conditionIf_1);
-			NodeBlock join = IrFactory.eINSTANCE.createNodeBlock();
-			nodeIf.setJoinNode(join);
-			Expression oppNomerator = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
-					IrFactory.eINSTANCE.createExprVar(var), typeInt);
-			InstAssign assign10 = IrFactory.eINSTANCE.createInstAssign(var,
-					oppNomerator);
-			blockIf_1.add(assign10);
-			Expression xorFlip = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(flip), OpBinary.BITXOR,
-					IrFactory.eINSTANCE.createExprInt(1), typeInt);
-			InstAssign assign11 = IrFactory.eINSTANCE.createInstAssign(flip,
-					xorFlip);
-			blockIf_1.add(assign11);
-			nodeIf.getThenNodes().add(blockIf_1);
-			return nodeIf;
-		}
-
-		/**
-		 * creates the required if node specified in the xilinx division model
-		 * 
-		 * @param numer
-		 * @param denom
-		 * @param result
-		 * @param mask
-		 * @param remainder
-		 * @param varDenum
-		 * @param i
-		 * @return if Node
-		 */
-		private NodeIf createNodeIfWhile(Var numer, Var denom, Var result,
-				Var mask, Var remainder, Var varDenum, Var i) {
-			NodeIf nodeIf = IrFactory.eINSTANCE.createNodeIf();
-			Expression condition = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(numer), OpBinary.GE,
-					IrFactory.eINSTANCE.createExprVar(denom),
-					IrFactory.eINSTANCE.createTypeInt());
-			nodeIf.setCondition(condition);
-			
-			NodeBlock join = IrFactory.eINSTANCE.createNodeBlock();
-			nodeIf.setJoinNode(join);
-			
-			NodeBlock nodeBlk = IrFactory.eINSTANCE.createNodeBlock();
-			Expression orExpr = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(result), OpBinary.BITOR,
-					IrFactory.eINSTANCE.createExprVar(mask),
-					IrFactory.eINSTANCE.createTypeInt());
-			InstAssign assignBlk_0 = IrFactory.eINSTANCE.createInstAssign(
-					result, orExpr);
-			nodeBlk.add(assignBlk_0);
-
-			Expression minusExpr = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprInt(31), OpBinary.MINUS,
-					IrFactory.eINSTANCE.createExprVar(i),
-					IrFactory.eINSTANCE.createTypeInt());
-			Expression lShiftExpr = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(varDenum),
-					OpBinary.SHIFT_LEFT, minusExpr,
-					IrFactory.eINSTANCE.createTypeInt());
-			Expression RemainderMinus = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(remainder),
-					OpBinary.MINUS, lShiftExpr,
-					IrFactory.eINSTANCE.createTypeInt());
-			InstAssign assignBlk_1 = IrFactory.eINSTANCE.createInstAssign(
-					remainder, RemainderMinus);
-			nodeBlk.add(assignBlk_1);
-
-			nodeIf.getThenNodes().add(nodeBlk);
-
-			return nodeIf;
-		}
-
-		/**
-		 * returns the required while node Specified in the xilinx division
-		 * model
-		 * 
-		 * @param i
-		 * @param numer
-		 * @param remainder
-		 * @param denom
-		 * @param result
-		 * @param mask
-		 * @param varDenum
-		 * @return
-		 */
-		private NodeWhile createNodeWhile(Var i, Var numer, Var remainder,
-				Var denom, Var result, Var mask, Var varDenum) {
-			NodeWhile nodeWhile = IrFactoryImpl.eINSTANCE.createNodeWhile();
-			
-			Expression condition = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(i), OpBinary.LT,
-					IrFactory.eINSTANCE.createExprInt(32),
-					IrFactory.eINSTANCE.createTypeBool());
-			nodeWhile.setCondition(condition);
-			NodeBlock joinWhile = IrFactory.eINSTANCE.createNodeBlock();
-			nodeWhile.setJoinNode(joinWhile);
-			
-			NodeBlock nodeBlk_0 = IrFactory.eINSTANCE.createNodeBlock();
-			
-			Expression andExpr = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(remainder),
-					OpBinary.BITAND,
-					IrFactory.eINSTANCE.createExprInt(0xFFFFFFFFL),
-					IrFactory.eINSTANCE.createTypeInt());
-			Expression minusExpr = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprInt(31), OpBinary.MINUS,
-					IrFactory.eINSTANCE.createExprVar(i),
-					IrFactory.eINSTANCE.createTypeInt());
-			Expression shiftExpr = IrFactory.eINSTANCE.createExprBinary(   
-					andExpr, OpBinary.SHIFT_RIGHT, minusExpr,
-					IrFactory.eINSTANCE.createTypeInt());
-			
-			InstAssign assignBlk_0 = IrFactory.eINSTANCE.createInstAssign(
-					numer, shiftExpr);
-					
-			nodeBlk_0.add(assignBlk_0);
-			nodeWhile.getNodes().add(nodeBlk_0);
-			
-			NodeIf nodeIf = createNodeIfWhile(numer, denom, result, mask,
-					remainder, varDenum, i);
-			//nodeWhile.getNodes().add(nodeIf);
-
-			NodeBlock nodeBlk_1 = IrFactory.eINSTANCE.createNodeBlock();
-			Expression maskShift = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(mask),
-					OpBinary.SHIFT_RIGHT, IrFactory.eINSTANCE.createExprInt(1),
-					IrFactory.eINSTANCE.createTypeInt());
-			Expression assignBlk_1Value = IrFactory.eINSTANCE.createExprBinary(
-					maskShift, OpBinary.BITAND,
-					IrFactory.eINSTANCE.createExprInt(0x7FFFFFFFL),
-					IrFactory.eINSTANCE.createTypeInt());
-			InstAssign assignBlk_10 = IrFactory.eINSTANCE.createInstAssign(
-					mask, assignBlk_1Value);
-			//nodeBlk_1.add(assignBlk_10);
-			Expression iIncrement = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(i), OpBinary.PLUS,
-					IrFactory.eINSTANCE.createExprInt(1),
-					IrFactory.eINSTANCE.createTypeInt());
-			InstAssign assignBlk_11 = IrFactory.eINSTANCE.createInstAssign(i,
-					iIncrement);
-			//nodeBlk_1.add(assignBlk_11);
-			nodeWhile.getNodes().add(nodeBlk_1);
-			
-			return nodeWhile;
-		}
-
-		/**
-		 * returns an if node if (flipResult != 0) { result = -result; }
-		 * 
-		 * @param flipResult
-		 *            (see definition)
-		 * @param result
-		 *            (see definition)
-		 * @return If node (see definition)
-		 */
-		private NodeIf createResultNodeIf(Var flipResult, Var result) {
-			NodeIf nodeIf = IrFactoryImpl.eINSTANCE.createNodeIf();
-			NodeBlock blockIf_1 = IrFactoryImpl.eINSTANCE.createNodeBlock();
-			Expression conditionIf = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprVar(flipResult), OpBinary.NE,
-					IrFactory.eINSTANCE.createExprInt(0), typeBool);
-			nodeIf.setCondition(conditionIf);
-			NodeBlock join = IrFactory.eINSTANCE.createNodeBlock();
-			nodeIf.setJoinNode(join);
-			Expression oppflip = IrFactory.eINSTANCE.createExprBinary(
-					IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
-					IrFactory.eINSTANCE.createExprVar(result), typeInt);
-			InstAssign assign10 = IrFactory.eINSTANCE.createInstAssign(result,
-					oppflip);
-			blockIf_1.add(assign10);
-			nodeIf.getThenNodes().add(blockIf_1);
-			return nodeIf;
-		}
-	}
-
+	private IrFactory factory = IrFactory.eINSTANCE;
 	private int counter;
-	private Procedure divProc = IrFactory.eINSTANCE.createProcedure("DIV_II",
-			0, IrFactory.eINSTANCE.createTypeInt());
+	private Procedure divProc;
+	private List<Expression> parameters;
 
 	public DivisionSubstitution() {
 		super(true);
@@ -431,15 +68,328 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseActor(Actor actor) {
-		boolean flagAdd = true;
-		DivisionSearcher divisionSearcher = new DivisionSearcher(divProc,
-				flagAdd);
-		divisionSearcher.doSwitch(actor);
-		// addition of the new div function once per actor
-		if (!actor.getProcs().contains(divProc)
-				&& (!divProc.getNodes().isEmpty())) {
+		super.doSwitch(actor);
+		if (divProc != null) {
 			actor.getProcs().add(divProc);
 		}
 		return null;
+	}
+
+	@Override
+	public Object caseExprBinary(ExprBinary expr) {
+		parameters = new ArrayList<Expression>();
+		if (expr.getOp() == OpBinary.DIV) {
+			// what ever the epression type of division operands they are
+			// put in local variables VarNum and varDenum the result of
+			// callInst is put in tmp
+			Var varNum = factory.createVar(factory.createTypeInt(), "num",
+					true, counter);
+			Var varDenum = factory.createVar(factory.createTypeInt(), "den",
+					true, counter);
+			Var tmp = factory.createVar(factory.createTypeInt(), "tmpDiv",
+					true, counter);
+			counter++;
+
+			procedure.getLocals().add(varNum);
+			procedure.getLocals().add(varDenum);
+			procedure.getLocals().add(tmp);
+
+			InstAssign assign0 = factory.createInstAssign(varNum, expr.getE1());
+			InstAssign assign1 = factory.createInstAssign(varDenum,
+					expr.getE2());
+			if (divProc == null) {
+				divProc = createDivProc();
+			}
+
+			parameters.add(factory.createExprVar(varNum));
+			parameters.add(factory.createExprVar(varDenum));
+
+			InstCall call = factory.createInstCall(tmp, divProc, parameters);
+			EcoreHelper.addInstBeforeExpr(expr, assign0, true);
+			EcoreHelper.addInstBeforeExpr(expr, assign1, true);
+			EcoreHelper.addInstBeforeExpr(expr, call, true);
+
+			EcoreUtil.replace(expr, factory.createExprVar(tmp));
+		}
+		return null;
+	}
+
+	/**
+	 * This method creates the alternative division function using the num and
+	 * the denom
+	 * 
+	 * @param varNum
+	 *            numerator
+	 * @param varDenum
+	 *            denomerator
+	 * @return division function
+	 */
+	private Procedure createDivProc() {
+		Procedure divProc = factory.createProcedure("DIV_II", 0,
+				factory.createTypeInt());
+
+		Var varNum = factory.createVar(factory.createTypeInt(), "num", true, 0);
+		Var varDenum = factory.createVar(factory.createTypeInt(), "den", true,
+				0);
+		// counter++;
+		divProc.getParameters().add(varNum);
+		divProc.getParameters().add(varDenum);
+
+		Var result = factory.createVar(factory.createTypeInt(), "result", true,
+				0);
+		divProc.getLocals().add(result);
+
+		Var i = factory.createVar(factory.createTypeInt(), "i", true, 0);
+		divProc.getLocals().add(i);
+
+		Var flipResult = factory.createVar(factory.createTypeInt(),
+				"flipResult", true, 0);
+		divProc.getLocals().add(flipResult);
+
+		Var denom = factory.createVar(factory.createTypeInt(64), "denom", true,
+				0);
+		divProc.getLocals().add(denom);
+
+		Var numer = factory.createVar(factory.createTypeInt(64), "numer", true,
+				0);
+		divProc.getLocals().add(numer);
+
+		Var mask = factory.createVar(factory.createTypeInt(), "mask", true, 0);
+		divProc.getLocals().add(mask);
+
+		Var remainder = factory.createVar(factory.createTypeInt(), "remainder",
+				true, 0);
+		divProc.getLocals().add(remainder);
+
+		NodeBlock initBlock = createInitBlock(result, flipResult);
+		divProc.getNodes().add(initBlock);
+
+		NodeIf nodeIf_1 = createNodeIf(varNum, flipResult);
+		divProc.getNodes().add(nodeIf_1);
+
+		NodeIf nodeIf_2 = createNodeIf(varDenum, flipResult);
+		divProc.getNodes().add(nodeIf_2);
+
+		NodeBlock block_1 = factory.createNodeBlock();
+		InstAssign assign_blk10 = factory.createInstAssign(remainder,
+				factory.createExprVar(varNum));
+		Expression blk11And = factory.createExprBinary(
+				factory.createExprVar(varDenum), OpBinary.BITAND,
+				factory.createExprInt(0xFFFFFFFFL), factory.createTypeInt());
+		InstAssign assign_blk11 = factory.createInstAssign(denom, blk11And);
+		InstAssign assign_blk12 = factory.createInstAssign(mask,
+				factory.createExprInt(0x80000000L));
+		InstAssign assign_blk13 = factory.createInstAssign(i,
+				factory.createExprInt(0));
+		block_1.add(assign_blk10);
+		block_1.add(assign_blk11);
+		block_1.add(assign_blk12);
+		block_1.add(assign_blk13);
+		divProc.getNodes().add(block_1);
+
+		NodeWhile nodeWhile = createNodeWhile(i, numer, remainder, denom,
+				result, mask, varDenum);
+		divProc.getNodes().add(nodeWhile);
+
+		NodeIf nodeIf_3 = createResultNodeIf(flipResult, result);
+		divProc.getNodes().add(nodeIf_3);
+
+		NodeBlock blockReturn = factory.createNodeBlock();
+		blockReturn
+				.add(factory.createInstReturn(factory.createExprVar(result)));
+		divProc.getNodes().add(blockReturn);
+
+		return divProc;
+	}
+
+	/**
+	 * this method creates an initializing instructions for result and
+	 * flipResult variables to zero
+	 * 
+	 * @param result
+	 *            to be initialized to zero
+	 * @param flipResult
+	 *            to be initialized to zero
+	 * @return node block with initialization assigns
+	 */
+	private NodeBlock createInitBlock(Var result, Var flipResult) {
+		NodeBlock initBlock = factory.createNodeBlock();
+		InstAssign initResult = factory.createInstAssign(result,
+				factory.createExprInt(0));
+		InstAssign initFlip = factory.createInstAssign(flipResult,
+				factory.createExprInt(0));
+		initBlock.add(initResult);
+		initBlock.add(initFlip);
+		return initBlock;
+	}
+
+	/**
+	 * creates the following if node: if (var < 0) { var = -var; flip ^= 1; }
+	 * 
+	 * @param var
+	 *            (see definition)
+	 * @param flip
+	 *            (see definition)
+	 * @return if node
+	 */
+	private NodeIf createNodeIf(Var var, Var flip) {
+		NodeIf nodeIf = factory.createNodeIf();
+		NodeBlock blockIf_1 = factory.createNodeBlock();
+		Expression conditionIf_1 = factory.createExprBinary(
+				factory.createExprVar(var), OpBinary.LT,
+				factory.createExprInt(0), factory.createTypeBool());
+		nodeIf.setCondition(conditionIf_1);
+		NodeBlock join = factory.createNodeBlock();
+		nodeIf.setJoinNode(join);
+		Expression oppNomerator = factory.createExprBinary(
+				factory.createExprInt(0), OpBinary.MINUS,
+				factory.createExprVar(var), factory.createTypeInt());
+		InstAssign assign10 = factory.createInstAssign(var, oppNomerator);
+		blockIf_1.add(assign10);
+		Expression xorFlip = factory.createExprBinary(
+				factory.createExprVar(flip), OpBinary.BITXOR,
+				factory.createExprInt(1), factory.createTypeInt());
+		InstAssign assign11 = factory.createInstAssign(flip, xorFlip);
+		blockIf_1.add(assign11);
+		nodeIf.getThenNodes().add(blockIf_1);
+		return nodeIf;
+	}
+
+	/**
+	 * creates the required if node specified in the xilinx division model
+	 * 
+	 * @param numer
+	 * @param denom
+	 * @param result
+	 * @param mask
+	 * @param remainder
+	 * @param varDenum
+	 * @param i
+	 * @return if Node
+	 */
+	private NodeIf createNodeIfWhile(Var numer, Var denom, Var result,
+			Var mask, Var remainder, Var varDenum, Var i) {
+		NodeIf nodeIf = factory.createNodeIf();
+		Expression condition = factory.createExprBinary(
+				factory.createExprVar(numer), OpBinary.GE,
+				factory.createExprVar(denom), factory.createTypeInt());
+		nodeIf.setCondition(condition);
+
+		NodeBlock join = factory.createNodeBlock();
+		nodeIf.setJoinNode(join);
+
+		NodeBlock nodeBlk = factory.createNodeBlock();
+		Expression orExpr = factory.createExprBinary(
+				factory.createExprVar(result), OpBinary.BITOR,
+				factory.createExprVar(mask), factory.createTypeInt());
+		InstAssign assignBlk_0 = factory.createInstAssign(result, orExpr);
+		nodeBlk.add(assignBlk_0);
+
+		Expression minusExpr = factory.createExprBinary(
+				factory.createExprInt(31), OpBinary.MINUS,
+				factory.createExprVar(i), factory.createTypeInt());
+		Expression lShiftExpr = factory.createExprBinary(
+				factory.createExprVar(varDenum), OpBinary.SHIFT_LEFT,
+				minusExpr, factory.createTypeInt());
+		Expression RemainderMinus = factory.createExprBinary(
+				factory.createExprVar(remainder), OpBinary.MINUS, lShiftExpr,
+				factory.createTypeInt());
+		InstAssign assignBlk_1 = factory.createInstAssign(remainder,
+				RemainderMinus);
+		nodeBlk.add(assignBlk_1);
+
+		nodeIf.getThenNodes().add(nodeBlk);
+
+		return nodeIf;
+	}
+
+	/**
+	 * returns the required while node Specified in the xilinx division model
+	 * 
+	 * @param i
+	 * @param numer
+	 * @param remainder
+	 * @param denom
+	 * @param result
+	 * @param mask
+	 * @param varDenum
+	 * @return
+	 */
+	private NodeWhile createNodeWhile(Var i, Var numer, Var remainder,
+			Var denom, Var result, Var mask, Var varDenum) {
+		NodeWhile nodeWhile = factory.createNodeWhile();
+
+		Expression condition = factory.createExprBinary(
+				factory.createExprVar(i), OpBinary.LT,
+				factory.createExprInt(32), factory.createTypeBool());
+		nodeWhile.setCondition(condition);
+		NodeBlock joinWhile = factory.createNodeBlock();
+		nodeWhile.setJoinNode(joinWhile);
+
+		NodeBlock nodeBlk_0 = factory.createNodeBlock();
+
+		Expression andExpr = factory.createExprBinary(
+				factory.createExprVar(remainder), OpBinary.BITAND,
+				factory.createExprInt(0xFFFFFFFFL), factory.createTypeInt());
+		Expression minusExpr = factory.createExprBinary(
+				factory.createExprInt(31), OpBinary.MINUS,
+				factory.createExprVar(i), factory.createTypeInt());
+		Expression shiftExpr = factory.createExprBinary(andExpr,
+				OpBinary.SHIFT_RIGHT, minusExpr, factory.createTypeInt());
+
+		InstAssign assignBlk_0 = factory.createInstAssign(numer, shiftExpr);
+
+		nodeBlk_0.add(assignBlk_0);
+		nodeWhile.getNodes().add(nodeBlk_0);
+
+		NodeIf nodeIf = createNodeIfWhile(numer, denom, result, mask,
+				remainder, varDenum, i);
+		nodeWhile.getNodes().add(nodeIf);
+
+		NodeBlock nodeBlk_1 = factory.createNodeBlock();
+		Expression maskShift = factory.createExprBinary(
+				factory.createExprVar(mask), OpBinary.SHIFT_RIGHT,
+				factory.createExprInt(1), factory.createTypeInt());
+		Expression assignBlk_1Value = factory.createExprBinary(maskShift,
+				OpBinary.BITAND, factory.createExprInt(0x7FFFFFFFL),
+				factory.createTypeInt());
+		InstAssign assignBlk_10 = factory.createInstAssign(mask,
+				assignBlk_1Value);
+		nodeBlk_1.add(assignBlk_10);
+		Expression iIncrement = factory.createExprBinary(
+				factory.createExprVar(i), OpBinary.PLUS,
+				factory.createExprInt(1), factory.createTypeInt());
+		InstAssign assignBlk_11 = factory.createInstAssign(i, iIncrement);
+		nodeBlk_1.add(assignBlk_11);
+		nodeWhile.getNodes().add(nodeBlk_1);
+
+		return nodeWhile;
+	}
+
+	/**
+	 * returns an if node if (flipResult != 0) { result = -result; }
+	 * 
+	 * @param flipResult
+	 *            (see definition)
+	 * @param result
+	 *            (see definition)
+	 * @return If node (see definition)
+	 */
+	private NodeIf createResultNodeIf(Var flipResult, Var result) {
+		NodeIf nodeIf = factory.createNodeIf();
+		NodeBlock blockIf_1 = factory.createNodeBlock();
+		Expression conditionIf = factory.createExprBinary(
+				factory.createExprVar(flipResult), OpBinary.NE,
+				factory.createExprInt(0), factory.createTypeBool());
+		nodeIf.setCondition(conditionIf);
+		NodeBlock join = factory.createNodeBlock();
+		nodeIf.setJoinNode(join);
+		Expression oppflip = factory.createExprBinary(factory.createExprInt(0),
+				OpBinary.MINUS, factory.createExprVar(result),
+				factory.createTypeInt());
+		InstAssign assign10 = factory.createInstAssign(result, oppflip);
+		blockIf_1.add(assign10);
+		nodeIf.getThenNodes().add(blockIf_1);
+		return nodeIf;
 	}
 }
