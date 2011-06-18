@@ -66,13 +66,16 @@ public interface ArchitectureFactory extends EFactory {
 	 * 
 	 * @param name
 	 *            the name of the AddressSpace
+	 * @param the
+	 *            width of the AdressSpace
 	 * @param minAddress
 	 *            the minimum address
 	 * @param maxAddress
 	 *            the maximum address
 	 * @return an AddressSpace with the given parameters
 	 */
-	AddressSpace createAddressSpace(String name, int minAddress, int maxAddress);
+	AddressSpace createAddressSpace(String name, int width, int minAddress,
+			int maxAddress);
 
 	/**
 	 * Returns a new object of class '<em>Bridge</em>'.

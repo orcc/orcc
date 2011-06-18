@@ -162,12 +162,6 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.ADDRESS_SPACE__NAME, oldName, name));
 	}
 
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 */
-	public int getWidth() {
-		return getMaxAddress() - getMinAddress();
-	}
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -217,6 +211,15 @@ public class AddressSpaceImpl extends EObjectImpl implements AddressSpace {
 		maxAddress = newMaxAddress;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.ADDRESS_SPACE__MAX_ADDRESS, oldMaxAddress, maxAddress));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getWidth() {
+		return width;
 	}
 
 	/**

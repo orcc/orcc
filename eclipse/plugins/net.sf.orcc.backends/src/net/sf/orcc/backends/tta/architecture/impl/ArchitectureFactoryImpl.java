@@ -30,7 +30,6 @@ package net.sf.orcc.backends.tta.architecture.impl;
 
 import java.util.Map;
 
-import net.sf.orcc.backends.tta.architecture.*;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitectureFactory;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
@@ -218,10 +217,11 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public AddressSpace createAddressSpace(String name, int minAddress,
+	public AddressSpace createAddressSpace(String name, int width, int minAddress,
 			int maxAddress) {
 		AddressSpaceImpl addressSpace = new AddressSpaceImpl();
 		addressSpace.setName(name);
+		addressSpace.setWidth(width);
 		addressSpace.setMinAddress(minAddress);
 		addressSpace.setMaxAddress(maxAddress);
 		return addressSpace;
@@ -744,8 +744,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	public TTA createSimpleTTA(String name) {
 		TTA tta = createTTA(name);
 		// Address spaces
-		tta.setData(createAddressSpace("data", 0, 1024));
-		tta.setProgram(createAddressSpace("instructions", 0, 1024));
+		tta.setData(createAddressSpace("data", 8, 0, 131071));
+		tta.setProgram(createAddressSpace("instructions", 8, 0, 8191));
 		// Buses
 		Bus bus0 = createSimpleBus(0, 32);
 		Bus bus1 = createSimpleBus(1, 32);

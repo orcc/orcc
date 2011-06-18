@@ -112,7 +112,7 @@ socketSegment(segment) ::= <<
 
 functionUnit(functionUnit) ::= <<
 \<function-unit name="<functionUnit.name>"\>
-	<functionUnit.port: port(); separator="\n">
+	<functionUnit.ports: port(); separator="\n">
 	<functionUnit.operations: { operation | <operation(operation, false)> }; separator="\n">
 	<if(functionUnit.addressSpace)>\<address-space\><functionUnit.addressSpace.name>\</address-space\><else>\<address-space/\><endif>
 \</function-unit\>
