@@ -22,8 +22,12 @@ public class UniqueInstantiator implements INetworkTransformation {
 
 	@Override
 	public void transform(Network network) throws OrccException {
-		graph = network.getGraph();
+		this.transform(network.getGraph());
+	}
 
+	public void transform(DirectedGraph<Vertex, Connection> graph)
+			throws OrccException {
+		this.graph = graph;
 		for (Vertex vertex : graph.vertexSet()) {
 			Instance instance = vertex.getInstance();
 			Actor actor = instance.getActor();

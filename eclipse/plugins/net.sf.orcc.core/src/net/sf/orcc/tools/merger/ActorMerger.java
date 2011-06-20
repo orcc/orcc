@@ -577,9 +577,6 @@ public class ActorMerger implements INetworkTransformation {
 	public void transform(Network network) throws OrccException {
 		graph = network.getGraph();
 
-		// make unique instance
-		new UniqueInstantiator().transform(network);
-
 		// static region detections
 		StaticRegionDetector detector = new StaticRegionDetector(network);
 		for (Set<Vertex> vertices : detector.staticRegionSets()) {
@@ -587,6 +584,9 @@ public class ActorMerger implements INetworkTransformation {
 
 			DirectedGraph<Vertex, Connection> subgraph = new DirectedSubgraph<Vertex, Connection>(
 					graph, vertices, null);
+
+			// make instance unique in the sub-graph
+			new UniqueInstantiator().transform(subgraph);
 
 			// create the static schedule of vertices
 			scheduler = new SASLoopScheduler(subgraph);
