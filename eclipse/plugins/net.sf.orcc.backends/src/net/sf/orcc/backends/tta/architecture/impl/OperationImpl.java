@@ -37,6 +37,7 @@ import net.sf.orcc.backends.tta.architecture.Port;
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
@@ -209,6 +210,14 @@ public class OperationImpl extends EObjectImpl implements Operation {
 		control = newControl;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.OPERATION__CONTROL, oldControl, control));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 */
+	public EList<Port> getPorts() {
+		return new BasicEList<Port>(getPortToIndexMap().keySet());
 	}
 
 	/**

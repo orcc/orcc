@@ -89,6 +89,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//SocketType"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Operation">
+    <eOperations name="getPorts" upperBound="-1" eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="pipeline" upperBound="-1"
         eType="#//Element"/>

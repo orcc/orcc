@@ -160,7 +160,7 @@ globalControlUnit(gcu) ::= <<
 operation(operation, control=false) ::= <<
 \<<if(control)>ctrl-<endif>operation\>
 	\<name\><operation.name>\</name\>
-	\<bind name="1"\>pc\</bind\>
+	<operation.ports: { port | \<bind name="<operation.portToIndexMap.(port)>"\><port.name>\</bind\> }; separator="\n" >
 	\<pipeline\>
 		<operation.pipeline: element(); separator="\n">
 	\</pipeline\>

@@ -137,4 +137,12 @@ public interface Operation extends EObject {
 	 */
 	void setControl(boolean value);
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model kind="operation"
+	 * @generated
+	 */
+	EList<Port> getPorts();
+
 } // Operation
