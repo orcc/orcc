@@ -42,11 +42,16 @@ import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
+import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
+
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * 
@@ -62,7 +67,7 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 	private NodeBlock newBlockNode;
 
 	@Override
-	public Object caseActor(Actor actor){
+	public Object caseActor(Actor actor) {
 		for (Procedure procedure : actor.getProcs()) {
 			doSwitch(procedure);
 		}
@@ -137,15 +142,34 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 
 		return null;
 	}
-	
+
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		if (!procedure.getReturnType().isVoid()) {
+		if (!procedure.getReturnType().isVoid() && isTernarisable(procedure)) {
 			newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			super.caseProcedure(procedure);
 			EcoreHelper.delete(procedure.getNodes());
 			procedure.getNodes().add(newBlockNode);
 		}
 		return null;
+	}
+
+	/**
+	 * Returns true if this procedure can be transformed to ternary instructions
+	 * 
+	 * @param the
+	 *            tested procedure
+	 * @return true if this procedure can be transformed to ternary instructions
+	 */
+	private boolean isTernarisable(Procedure procedure) {
+		TreeIterator<EObject> it = EcoreUtil.getAllContents(procedure
+				.getNodes());
+		while (it.hasNext()) {
+			EObject object = it.next();
+			if (object instanceof NodeWhile) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
