@@ -319,10 +319,12 @@ entry:
 	<action.body.locals: variableDeclaration()>
 <if(action.inputPattern)>
 	<action.inputPattern.variables: variableDeclaration()>
-	<printReadCalls(action.inputPattern)>
 <endif>
 <if(action.outputPattern)>
 	<action.outputPattern.variables: variableDeclaration()>
+<endif>
+<if(action.inputPattern)>
+	<printReadCalls(action.inputPattern)>
 <endif>
 <printNodes(action.body.nodes, false)>
 <if(action.outputPattern)>
