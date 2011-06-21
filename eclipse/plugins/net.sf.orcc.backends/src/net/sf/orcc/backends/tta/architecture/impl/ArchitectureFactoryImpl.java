@@ -642,14 +642,13 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		Socket gcu_o1 = createOutputSocket("gcu_o1", segments);
 
 		// Ports
-		Port pc = createPort("pc", 13, false, false);
+		Port pc = createPort("pc", 13, true, true);
 		pc.connect(gcu_i1);
-		Port ra = createPort("ra", 13, true, true);
+		Port ra = createPort("ra", 13, false, false);
 		ra.connect(gcu_i2);
 		ra.connect(gcu_o1);
 
 		gcu.setReturnAddress(ra);
-		gcu.getPorts().add(ra);
 		gcu.getPorts().add(pc);
 
 		// Control operations
@@ -754,12 +753,12 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		// Global Control Unit
 		tta.setGcu(createSimpleGlobalControlUnit(tta));
 		// Register files
+		RegisterFile bool = createSimpleRegisterFile(tta, "BOOL", 1, 2);
 		RegisterFile rf1 = createSimpleRegisterFile(tta, "RF_1", 32, 12);
 		RegisterFile rf2 = createSimpleRegisterFile(tta, "RF_2", 32, 12);
-		RegisterFile bool = createSimpleRegisterFile(tta, "BOOL", 1, 2);
+		tta.getRegisterFiles().add(bool);
 		tta.getRegisterFiles().add(rf1);
 		tta.getRegisterFiles().add(rf2);
-		tta.getRegisterFiles().add(bool);
 		// Guards
 		bus0.getGuards().addAll(createSimpleGuards(bool));
 		bus1.getGuards().addAll(createSimpleGuards(bool));

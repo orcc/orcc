@@ -43,7 +43,8 @@
   <eClassifiers xsi:type="ecore:EClass" name="GlobalControlUnit">
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port" transient="true" containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="returnAddress" eType="#//Port"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="returnAddress" eType="#//Port"
+        containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="addressSpace" eType="#//AddressSpace"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="operations" upperBound="-1"
         eType="#//Operation" containment="true"/>

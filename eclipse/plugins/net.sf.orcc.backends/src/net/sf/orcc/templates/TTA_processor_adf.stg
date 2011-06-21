@@ -3,12 +3,16 @@ tta(tta, options) ::= <<
 \<?xml version="1.0" encoding="UTF-8" standalone="no" ?\>
 \<adf version="1.7"\>
 	<tta.buses: bus(); separator="\n\n">
+	
 	<tta.sockets: socket(); separator="\n\n">
+	
 	<tta.functionUnits: functionUnit(); separator="\n\n">
+	
 	<tta.registerFiles: registerFile(); separator="\n\n">
-	<if(tta.program)><addressSpace(tta.program)><endif>
 	
 	<if(tta.data)><addressSpace(tta.data)><endif>
+	
+	<if(tta.program)><addressSpace(tta.program)><endif>
 	
 	<if(tta.gcu)><globalControlUnit(tta.gcu)><endif>
 \</adf\>
@@ -129,13 +133,18 @@ registerFile(register) ::= <<
 \</register-file\>
 >>
 
-port(port, width=true) ::= <<
-\<port name="<port.name>"\>
-	\<connects-to\>RF_o1\</connects-to\>
-	<if(width)>\<width\>32\</width\><endif>
+port(port, width=true, special=false) ::= <<
+\<<if(special)>special-<endif>port name="<port.name>"\>
+	<connectSocket(port.inputSocket)>
+	<connectSocket(port.outputSocket)>
+	<if(width)>\<width\><port.width>\</width\><endif>
 	<if(port.trigger)>\<triggers/\><endif>
 	<if(port.opcodeSelector)>\<sets-opcode/\><endif>
-\</port\>
+\</<if(special)>special-<endif>port\>
+>>
+
+connectSocket(socket) ::= <<
+<if(socket)>\<connects-to\><socket.name>\</connects-to\><endif>
 >>
 
 addressSpace(addressSpace) ::= <<
@@ -149,6 +158,7 @@ addressSpace(addressSpace) ::= <<
 globalControlUnit(gcu) ::= <<
 \<global-control-unit name="gcu"\>
 	<gcu.ports: port(); separator="\n">
+	<port(gcu.returnAddress, true, true)>
 	\<return-address\><gcu.returnAddress.name>\</return-address\>
 	<gcu.operations: { operation | <operation(operation, true)> }; separator="\n">
 	\<address-space\><gcu.addressSpace.name>\</address-space\>
