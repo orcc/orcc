@@ -57,14 +57,21 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 	private Map<Action, List<Expression>> guards;
 	
 	private Map<Action, List<Action>> priority;
+	
+	private Map<Action, List<InstLoad>> loadPeeks;
 
 	private List<Expression> guardList;
 
 	private List<InstLoad> loadList;
+	
+	private List<InstLoad> usedLoadsList;
+	
+	private int peekCnt = 0;
 
-	public GuardsExtractor(Map<Action, List<Expression>> guards, Map<Action, List<Action>> priority) {
+	public GuardsExtractor(Map<Action, List<Expression>> guards, Map<Action, List<Action>> priority, Map<Action, List<InstLoad>> loadPeeks) {
 		this.guards = guards;
 		this.priority = priority;
+		this.loadPeeks = loadPeeks;
 	}
 
 	// takes the guard from the previous action and negates it and adds it to
@@ -88,6 +95,13 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 		ListIterator<InstLoad> loadIter = loadList.listIterator();
 		while (loadIter.hasNext()) {
 			InstLoad ld = loadIter.next();
+			// do not remove the Loads related to Peeks
+			if (isFromPeek(ld)) {
+				usedLoadsList.add(ld);
+				ld.getTarget().getVariable().setName(
+						ld.getTarget().getVariable().getName() + "_peek_" + peekCnt++);
+				continue;
+			}
 			ListIterator<Expression> itr = guardList.listIterator();
 			while (itr.hasNext()) {
 				Expression element = itr.next();
@@ -95,6 +109,12 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 			}
 		}
 	}
+
+
+	private boolean isFromPeek(InstLoad ld) {
+		return currAction.getPeekPattern().contains(ld.getSource().getVariable());
+	}
+
 
 	// recursively searches through the expression and finds if the local
 	// variable derived from the Load is present
@@ -116,7 +136,9 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 			currAction = action;
 			guardList = new ArrayList<Expression>();
 			loadList = new ArrayList<InstLoad>();
+			usedLoadsList = new ArrayList<InstLoad>();
 			guards.put(currAction, guardList);
+			loadPeeks.put(currAction, usedLoadsList);
 			doSwitch(action.getScheduler());
 			removeLoads();
 		}

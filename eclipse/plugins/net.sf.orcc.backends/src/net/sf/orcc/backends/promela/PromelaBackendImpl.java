@@ -41,6 +41,7 @@ import net.sf.orcc.backends.promela.transformations.GuardsExtractor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
@@ -63,6 +64,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 
 	private Map<Action, List<Action>> priority = new HashMap<Action, List<Action>>();
+	
+	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
 	
 	private InstancePrinter instancePrinter;
 
@@ -90,7 +93,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorVisitor<?>[] transformations = {
 				new RenameTransformation(this.transformations),
-				new GuardsExtractor(guards, priority), new PhiRemoval(),
+				new GuardsExtractor(guards, priority, loadPeeks), new PhiRemoval(),
 				new DeadCodeElimination(), new DeadVariableRemoval() };
 
 		for (ActorVisitor<?> transformation : transformations) {
@@ -112,6 +115,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		instancePrinter.setTypePrinter(new PromelaTypePrinter());
 		instancePrinter.getOptions().put("guards", guards);
 		instancePrinter.getOptions().put("priority", priority);
+		instancePrinter.getOptions().put("loadPeeks", loadPeeks);
 		
 		List<Actor> actors = network.getActors();
 		transformActors(actors);

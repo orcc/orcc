@@ -79,7 +79,7 @@ printInt(number) ::= <<
 
 // the values of a list: {val1, val2, ..., valn}
 printList(constant) ::= <<
-{<constant.value: Constant(); wrap, separator=", ">}
+1 /*{<constant.value: Constant(); wrap, separator=", ">}*/
 >>
 
 printString(constant) ::= <<
@@ -220,9 +220,9 @@ stateVar(variable) ::= <<
 <if(variable.initialized)>
 <if(!variable.assignable)>
 <if(!variable.type.list)>
-#define <variable.name> <Constant(variable.initialValue)>
+<variable.type> <variable.name> = <Constant(variable.initialValue)>;
 <else>
-const <varDecl(variable)> = <Constant(variable.initialValue)>;
+<varDecl(variable)> = <Constant(variable.initialValue)>;
 <endif>
 <else>
 <if(variable.type.list)>
@@ -251,7 +251,7 @@ memcpy(<variable.name>, <variable.name>_backup, sizeof(<variable.name>_backup));
 
 newState() ::= << 
 :: <instance.id>_state == state_<fsm_trans.SourceState.name> -\> {
-	<fsm_trans.list: { tr | <peekPattern(tr.action.peekPattern)>}>
+	<fsm_trans.list: { tr | <peekPattern(pattern=tr.action.peekPattern, action=tr.action)>}>
 	if
 	<fsm_trans.list: {
 			tr|
@@ -285,6 +285,7 @@ schedulerFSM(action) ::= <<
 guardFSM() ::= <<
 <if (options.guards.(action))>
  <options.guards.(action); separator=" && ">
+ <options.priority.(action): priorities()>
 <else>
 skip
 <endif>
@@ -313,7 +314,7 @@ scheduler(action) ::= <<
 
 guard() ::= <<
 <options.guards.(action); separator=" && ">
-<options.priority.(action): priorities(); separator=" && ">
+<options.priority.(action): priorities()>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -322,7 +323,7 @@ guard() ::= <<
 
 priorities(act) ::= << 
  /*priority*/ 
- && (!<options.guards.(act); separator=" && ">)
+ && !(<options.guards.(act); separator=" && ">)
 
 >> 
 
@@ -344,13 +345,25 @@ outputPattern(pattern) ::= <<
 <pattern.variables: outputPatternPort()>
 >>
 
+peekPatternVar() ::= <<
+<options.loadPeeks.(action): {ld | <ld.target.variable.type> <ld.target.variable.name>; }>
+
+>>
+
 peekPatternPort(variable) ::= <<
 chan_<instance.id>_<pattern.varToPortMap.(variable).name>?\<<variable.name>[0]\>;
 
 >>
 
-peekPattern(pattern) ::= <<
+peekPatternLoad(variable) ::= <<
+<options.loadPeeks.(action): printLoad()>
+
+>>
+
+peekPattern(pattern, action) ::= <<
+<peekPatternVar()>
 <pattern.variables: peekPatternPort()>
+<pattern.variables: peekPatternLoad()>
 >>
 
 inputChannelCheck(pattern) ::= <<
@@ -382,6 +395,7 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 	<if (actor.fsm)>
 	/* States of the FSM */
 	<actor.fsm.states: {s | int state_<s.name> = <i0>;}; separator="\n">
+	<endif>
 
 	/* State variables */
 	<actor.stateVars : stateVar()>
@@ -390,7 +404,7 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 	/* Ports */
     < [instance.actor.inputs, instance.actor.outputs] : portDeclaration(); separator="\n">
 
-
+	<if (actor.fsm)>
 	/* Initial State */
 	<instance.id>_state = state_<actor.fsm.initialState.name>;
 	
@@ -400,7 +414,7 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 	<else>
 	do
 	:: skip -\> 
-	  <actor.actionsOutsideFsm: { a | <peekPattern(a.peekPattern)>}>
+	  <actor.actionsOutsideFsm: { a | <peekPattern(pattern=a.peekPattern,action=a)>}>
 	  if
 	  <actor.actionsOutsideFsm: scheduler(); separator="\n">
 	  fi;
