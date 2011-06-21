@@ -68,7 +68,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseActor(Actor actor) {
-		super.doSwitch(actor);
+		super.caseActor(actor);
 		if (divProc != null) {
 			actor.getProcs().add(divProc);
 		}
