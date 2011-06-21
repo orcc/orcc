@@ -171,7 +171,7 @@ actionTest(action) ::= <<
 <if(!action.inputPattern.empty)
 >	;; Input pattern
 	<checkInputPattern(action, action.inputPattern)>
-	%is_schedulable_<action.name> = call i1 @isSchedulable_<action.name> ()
+	%is_schedulable_<action.name> = call i1 @<action.scheduler.name> ()
 	%is_fireable_<action.name> = and i1 %is_schedulable_<action.name>, %has_valid_inputs_<action.name>_<length(action.inputPattern.ports)>
 	
 	br i1 %is_fireable_<action.name>, label %bb_<action.name>_check_outputs, label %bb_<action.name>_unschedulable<
@@ -196,7 +196,7 @@ endif>
 
 
 bb_<action.name>_fire:
-	call void @<action.name> ()
+	call void @<action.body.name> ()
 
 	br label %bb_scheduler_start
 
@@ -220,7 +220,7 @@ actionTestState(sourceState, transition, restTransitionsList) ::= <<
 <if(!transition.action.inputPattern.empty)
 >	;; Input pattern
 	<checkInputPattern(transition.action, transition.action.inputPattern, sourceState)>
-	%is_schedulable_<sourceState.name>_<transition.action.name> = call i1 @isSchedulable_<transition.action.name> ()
+	%is_schedulable_<sourceState.name>_<transition.action.name> = call i1 @<transition.action.scheduler.name> ()
 	%is_fireable_<sourceState.name>_<transition.action.name> = and i1 %is_schedulable_<sourceState.name>_<transition.action.name>, %has_valid_inputs_<sourceState.name>_<transition.action.name>_<length(transition.action.inputPattern.ports)>
 	
 	br i1 %is_fireable_<sourceState.name>_<transition.action.name>, label %bb_<sourceState.name>_<transition.action.name>_check_outputs, label %bb_<sourceState.name>_<transition.action.name>_unschedulable<
@@ -245,7 +245,7 @@ endif>
 
 
 bb_<sourceState.name>_<transition.action.name>_fire:
-	call void @<transition.action.name> ()
+	call void @<transition.action.body.name> ()
 	store i32 <instance.actor.templateData.stateToLabelMap.(transition.state)>, i32* @_FSM_state
 	
 	br label %bb_scheduler_start
