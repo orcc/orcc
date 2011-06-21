@@ -99,7 +99,7 @@ shortImmediate(shortImmediate) ::= <<
 
 socket(socket) ::= <<
 \<socket name="<socket.name>"\>
-	<socket.segments: socketSegment()>
+	<socket.connectedSegments: socketSegment()>
 \</socket\>
 >>
 
@@ -139,7 +139,7 @@ port(port, width=true) ::= <<
 >>
 
 addressSpace(addressSpace) ::= <<
-\<address-space name="data"\>
+\<address-space name="<addressSpace.name>"\>
 	\<width\><addressSpace.width>\</width\>
 	\<min-address\><addressSpace.minAddress>\</min-address\>
 	\<max-address\><addressSpace.maxAddress>\</max-address\>
@@ -148,8 +148,8 @@ addressSpace(addressSpace) ::= <<
 
 globalControlUnit(gcu) ::= <<
 \<global-control-unit name="gcu"\>
-	<gcu.port: port(); separator="\n">
-	\<return-address\><gcu.returnAdress.name>\</return-address\>
+	<gcu.ports: port(); separator="\n">
+	\<return-address\><gcu.returnAddress.name>\</return-address\>
 	<gcu.operations: { operation | <operation(operation, true)> }; separator="\n">
 	\<address-space\><gcu.addressSpace.name>\</address-space\>
 	\<delay-slots\><gcu.delaySlots>\</delay-slots\>
