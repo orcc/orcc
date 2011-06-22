@@ -37,6 +37,7 @@ import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
+import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
@@ -70,7 +71,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	public Object caseActor(Actor actor) {
 		super.caseActor(actor);
 		if (divProc != null) {
-			actor.getProcs().add(divProc);
+			actor.getProcs().add(0,divProc);
 		}
 		return null;
 	}
@@ -97,16 +98,19 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 			InstAssign assign0 = factory.createInstAssign(varNum, expr.getE1());
 			InstAssign assign1 = factory.createInstAssign(varDenum,
 					expr.getE2());
+			InstAssign assign2 = factory.createInstAssign(tmp, factory.createExprInt(0));
 			if (divProc == null) {
 				divProc = createDivProc();
 			}
 
 			parameters.add(factory.createExprVar(varNum));
 			parameters.add(factory.createExprVar(varDenum));
+			parameters.add(factory.createExprVar(tmp));
 
-			InstCall call = factory.createInstCall(tmp, divProc, parameters);
+			InstCall call = factory.createInstCall(null, divProc, parameters);
 			EcoreHelper.addInstBeforeExpr(expr, assign0, true);
 			EcoreHelper.addInstBeforeExpr(expr, assign1, true);
+			EcoreHelper.addInstBeforeExpr(expr, assign2, true);
 			EcoreHelper.addInstBeforeExpr(expr, call, true);
 
 			EcoreUtil.replace(expr, factory.createExprVar(tmp));
@@ -131,14 +135,16 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		Var varNum = factory.createVar(factory.createTypeInt(), "num", true, 0);
 		Var varDenum = factory.createVar(factory.createTypeInt(), "den", true,
 				0);
+		Var tmp = factory.createVar(factory.createTypeInt(), "tmp", true, 0);
 		// counter++;
 		divProc.getParameters().add(varNum);
 		divProc.getParameters().add(varDenum);
-
+		divProc.getParameters().add(tmp);
+/*
 		Var result = factory.createVar(factory.createTypeInt(), "result", true,
 				0);
 		divProc.getLocals().add(result);
-
+*/
 		Var i = factory.createVar(factory.createTypeInt(), "i", true, 0);
 		divProc.getLocals().add(i);
 
@@ -161,7 +167,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				true, 0);
 		divProc.getLocals().add(remainder);
 
-		NodeBlock initBlock = createInitBlock(result, flipResult);
+		NodeBlock initBlock = createInitBlock(tmp, flipResult);
 		divProc.getNodes().add(initBlock);
 
 		NodeIf nodeIf_1 = createNodeIf(varNum, flipResult);
@@ -175,10 +181,10 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				factory.createExprVar(varNum));
 		Expression blk11And = factory.createExprBinary(
 				factory.createExprVar(varDenum), OpBinary.BITAND,
-				factory.createExprInt(0xFFFFFFFFL), factory.createTypeInt());
+				factory.createExprInt(0), factory.createTypeInt());
 		InstAssign assign_blk11 = factory.createInstAssign(denom, blk11And);
 		InstAssign assign_blk12 = factory.createInstAssign(mask,
-				factory.createExprInt(0x80000000L));
+				factory.createExprInt(0));
 		InstAssign assign_blk13 = factory.createInstAssign(i,
 				factory.createExprInt(0));
 		block_1.add(assign_blk10);
@@ -188,17 +194,18 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		divProc.getNodes().add(block_1);
 
 		NodeWhile nodeWhile = createNodeWhile(i, numer, remainder, denom,
-				result, mask, varDenum);
+				tmp, mask, varDenum);
 		divProc.getNodes().add(nodeWhile);
 
-		NodeIf nodeIf_3 = createResultNodeIf(flipResult, result);
+		NodeIf nodeIf_3 = createResultNodeIf(flipResult, tmp);
 		divProc.getNodes().add(nodeIf_3);
 
 		NodeBlock blockReturn = factory.createNodeBlock();
-		blockReturn
-				.add(factory.createInstReturn(factory.createExprVar(result)));
+		InstReturn instReturn = factory.createInstReturn();
+		blockReturn.add(instReturn);
+		divProc.setReturnType(factory.createTypeVoid());
 		divProc.getNodes().add(blockReturn);
-
+		
 		return divProc;
 	}
 
@@ -233,28 +240,33 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 * @return if node
 	 */
 	private NodeIf createNodeIf(Var var, Var flip) {
-		NodeIf nodeIf = factory.createNodeIf();
-		NodeBlock blockIf_1 = factory.createNodeBlock();
-		Expression conditionIf_1 = factory.createExprBinary(
-				factory.createExprVar(var), OpBinary.LT,
-				factory.createExprInt(0), factory.createTypeBool());
-		nodeIf.setCondition(conditionIf_1);
-		NodeBlock join = factory.createNodeBlock();
-		nodeIf.setJoinNode(join);
-		Expression oppNomerator = factory.createExprBinary(
-				factory.createExprInt(0), OpBinary.MINUS,
-				factory.createExprVar(var), factory.createTypeInt());
-		InstAssign assign10 = factory.createInstAssign(var, oppNomerator);
-		blockIf_1.add(assign10);
-		Expression xorFlip = factory.createExprBinary(
-				factory.createExprVar(flip), OpBinary.BITXOR,
-				factory.createExprInt(1), factory.createTypeInt());
-		InstAssign assign11 = factory.createInstAssign(flip, xorFlip);
-		blockIf_1.add(assign11);
-		nodeIf.getThenNodes().add(blockIf_1);
-		return nodeIf;
-	}
-
+		  NodeIf nodeIf = factory.createNodeIf();
+		  NodeBlock blockIf_1 = factory.createNodeBlock();
+		  Expression conditionIf_1 = factory.createExprBinary(
+		    factory.createExprVar(var), OpBinary.LT,
+		    factory.createExprInt(0), factory.createTypeBool());
+		  nodeIf.setCondition(conditionIf_1);
+		  NodeBlock join = factory.createNodeBlock();
+		  nodeIf.setJoinNode(join);
+		  Expression oppNomerator = factory.createExprBinary(
+		    factory.createExprInt(0), OpBinary.MINUS,
+		    factory.createExprVar(var), factory.createTypeInt());
+		  InstAssign assign10 = factory.createInstAssign(var, oppNomerator);
+		  blockIf_1.add(assign10);
+		  Expression xorFlip = factory.createExprBinary(
+		    factory.createExprVar(flip), OpBinary.BITXOR,
+		    factory.createExprInt(1), factory.createTypeInt());
+		  InstAssign assign11 = factory.createInstAssign(flip, xorFlip);
+		  blockIf_1.add(assign11);
+		  nodeIf.getThenNodes().add(blockIf_1);
+		  NodeBlock blockIf_2 = factory.createNodeBlock();
+		  InstAssign assign20 = factory.createInstAssign(var, factory.createExprVar(var));
+		  blockIf_2.add(assign20);
+		  InstAssign assign21 = factory.createInstAssign(flip, factory.createExprVar(flip));
+		  blockIf_2.add(assign21);
+		  nodeIf.getElseNodes().add(blockIf_2);  
+		  return nodeIf;
+		 }
 	/**
 	 * creates the required if node specified in the xilinx division model
 	 * 
@@ -267,12 +279,12 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 * @param i
 	 * @return if Node
 	 */
-	private NodeIf createNodeIfWhile(Var numer, Var denom, Var result,
-			Var mask, Var remainder, Var varDenum, Var i) {
-		NodeIf nodeIf = factory.createNodeIf();
-		Expression condition = factory.createExprBinary(
-				factory.createExprVar(numer), OpBinary.GE,
-				factory.createExprVar(denom), factory.createTypeInt());
+	 private NodeIf createNodeIfWhile(Var numer, Var denom, Var result,
+			   Var mask, Var remainder, Var varDenum, Var i) {
+			  NodeIf nodeIf = factory.createNodeIf();
+			  Expression condition = factory.createExprBinary(
+			    factory.createExprVar(numer), OpBinary.GE,
+			    factory.createExprVar(denom), factory.createTypeBool());
 		nodeIf.setCondition(condition);
 
 		NodeBlock join = factory.createNodeBlock();
@@ -330,7 +342,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 		Expression andExpr = factory.createExprBinary(
 				factory.createExprVar(remainder), OpBinary.BITAND,
-				factory.createExprInt(0xFFFFFFFFL), factory.createTypeInt());
+				factory.createExprInt(0), factory.createTypeInt());
 		Expression minusExpr = factory.createExprBinary(
 				factory.createExprInt(31), OpBinary.MINUS,
 				factory.createExprVar(i), factory.createTypeInt());
@@ -351,7 +363,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				factory.createExprVar(mask), OpBinary.SHIFT_RIGHT,
 				factory.createExprInt(1), factory.createTypeInt());
 		Expression assignBlk_1Value = factory.createExprBinary(maskShift,
-				OpBinary.BITAND, factory.createExprInt(0x7FFFFFFFL),
+				OpBinary.BITAND, factory.createExprInt(0),
 				factory.createTypeInt());
 		InstAssign assignBlk_10 = factory.createInstAssign(mask,
 				assignBlk_1Value);
