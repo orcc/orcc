@@ -47,6 +47,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -61,6 +62,9 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.runtime.Fifo_String;
+import net.sf.orcc.runtime.Fifo_boolean;
+import net.sf.orcc.runtime.Fifo_int;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -96,8 +100,21 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private IProject project;
 
-	protected void connectActors(Actor source, Port srcPort, Actor target,
-			Port tgtPort, int fifoSize) {
+	private Map<String, Fifo> fifos;
+
+	protected void connectActors(Instance source, Port srcPort,
+			Instance target, Port tgtPort, int fifoSize) {
+		Fifo fifo = null;
+		Type type = srcPort.getType();
+		if (type.isInt()) {
+			fifo = new Fifo_int(fifoSize);
+		} else if (type.isBool()) {
+			fifo = new Fifo_boolean(fifoSize);	
+		} else {
+			fifo = new Fifo_String(fifoSize);
+		}
+		fifos.put(source.getId() + "_" + srcPort.getName(), fifo);
+		fifos.put(target.getId() + "_" + tgtPort.getName(), fifo);
 	}
 
 	/**
@@ -109,6 +126,7 @@ public class SlowSimulator extends AbstractSimulator {
 	 * @param graph
 	 */
 	public void connectNetwork(DirectedGraph<Vertex, Connection> graph) {
+		fifos = new HashMap<String, Fifo>();
 		// Get edges from the graph has actors point-to-point connections.
 		Set<Connection> connections = graph.edgeSet();
 		// Loop over the connections and ask for the source and target actors
@@ -139,12 +157,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 				// connect source and target actors
 				if ((srcPort != null) && (tgtPort != null)) {
-					// Connect actors through specific simulator method
-					connectActors(srcInst.getActor(), srcPort,
-							tgtInst.getActor(), tgtPort, size);
-					// process.write("Connecting " + srcInst.getId() + "."
-					// + srcPort.getName() + " to " + tgtInst.getId()
-					// + "." + tgtPort.getName() + "\n");
+					connectActors(srcInst, srcPort, tgtInst, tgtPort, size);
 				}
 			}
 		}
@@ -199,16 +212,30 @@ public class SlowSimulator extends AbstractSimulator {
 					}
 
 					ActorInterpreter interpreter = new ConnectedActorInterpreter(
-							clonedActor, instance.getParameters());
+							instance.getId(), clonedActor,
+							instance.getParameters());
 					interpreters.put(instance, interpreter);
 				} else if (instance.isBroadcast()) {
 					Actor actor = IrFactory.eINSTANCE.createActor();
 					ActorInterpreter interpreter = new ConnectedActorInterpreter(
-							actor, instance.getParameters());
+							instance.getId(), actor, instance.getParameters());
 					interpreters.put(instance, interpreter);
 				}
 			}
 		}
+	}
+
+	protected void runNetwork(Network network) {
+		boolean isAlive = true;
+		do {
+			boolean status = false;
+			for (Instance instance : network.getInstances()) {
+				ActorInterpreter interpreter = interpreters.get(instance);
+				((ConnectedActorInterpreter) interpreter).setFifos(fifos);
+				status |= interpreter.schedule();
+			}
+			isAlive = status;
+		} while (isAlive);
 	}
 
 	@Override
@@ -236,6 +263,7 @@ public class SlowSimulator extends AbstractSimulator {
 			instantiateNetwork(graph);
 			connectNetwork(graph);
 			initializeNetwork(network);
+			runNetwork(network);
 		} catch (OrccException e) {
 			throw new OrccRuntimeException(e.getMessage());
 		} catch (FileNotFoundException e) {

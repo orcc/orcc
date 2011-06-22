@@ -67,8 +67,11 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 */
 	private Map<String, Fifo> fifos;
 	
-	public ConnectedActorInterpreter(Actor actor, Map<String, Expression> parameters) {
+	private String id;
+	
+	public ConnectedActorInterpreter(String id, Actor actor, Map<String, Expression> parameters) {
 		super(actor, parameters);
+		this.id = id;
 	}
 
 	/**
@@ -123,7 +126,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		if (outputPattern != null) {
 			for (Port port : outputPattern.getPorts()) {
 				Integer nbOfTokens = outputPattern.getNumTokens(port);
-				if (!fifos.get(port.getName()).hasRoom(nbOfTokens)) {
+				if (!fifos.get(id+"_"+port.getName()).hasRoom(nbOfTokens)) {
 					return false;
 				}
 			}
@@ -145,7 +148,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port.getName());
+			Fifo fifo = fifos.get(id+"_"+port.getName());
 			peekFifo(inputPattern.getVariable(port).getValue(), fifo, numTokens);
 		}
 
@@ -154,13 +157,13 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port.getName());
+			Fifo fifo = fifos.get(id+"_"+port.getName());
 			fifo.readEnd(numTokens);
 		}
 
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port.getName());
+			Fifo fifo = fifos.get(id+"_"+port.getName());
 			writeFifo(outputPattern.getVariable(port).getValue(), fifo,
 					numTokens);
 		}
@@ -177,7 +180,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		Pattern pattern = action.getInputPattern();
 		// check tokens
 		for (Port port : pattern.getPorts()) {
-			Fifo fifo = fifos.get(port.getName());
+			Fifo fifo = fifos.get(id+"_"+port.getName());
 			boolean hasTok = fifo.hasTokens(pattern.getNumTokens(port));
 			if (!hasTok) {
 				return false;
@@ -191,7 +194,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			if (peeked != null) {
 				peeked.setValue(tokenAllocator.doSwitch(peeked.getType()));
 				int numTokens = pattern.getNumTokens(port);
-				Fifo fifo = fifos.get(port.getName());
+				Fifo fifo = fifos.get(id+"_"+port.getName());
 				peekFifo(peeked.getValue(), fifo, numTokens);
 			}
 		}
