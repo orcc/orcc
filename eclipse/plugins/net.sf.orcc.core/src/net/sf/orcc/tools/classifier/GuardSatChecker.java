@@ -31,15 +31,12 @@ package net.sf.orcc.tools.classifier;
 import static net.sf.orcc.ir.util.EcoreHelper.getContainerOfType;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Def;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
@@ -51,7 +48,6 @@ import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.InstStore;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -62,7 +58,6 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
 import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.tools.classifier.smt.SmtScript;
@@ -109,11 +104,22 @@ public class GuardSatChecker {
 		 *            an expression
 		 */
 		private void addAssertion(Var variable, Expression value) {
+			addAssertion(variable, (String) doSwitch(value));
+		}
+
+		/**
+		 * Adds an assertion that the given variable equals the given term.
+		 * 
+		 * @param variable
+		 *            a variable
+		 * @param term
+		 *            a term
+		 */
+		private void addAssertion(Var variable, String term) {
 			if (!script.getVariables().contains(variable)) {
 				declareVar(variable);
 			}
 
-			String term = (String) doSwitch(value);
 			String name = getUniqueName(variable);
 			script.addCommand("(assert (= " + name + " " + term + "))");
 		}
@@ -222,14 +228,19 @@ public class GuardSatChecker {
 
 		@Override
 		public Object caseInstLoad(InstLoad load) {
-			if (load.getIndexes().isEmpty()) {
-				Use source = load.getSource();
-				ExprVar expr = IrFactory.eINSTANCE.createExprVar(source);
-				addAssertion(load.getTarget().getVariable(), expr);
-
-				// set container back
-				load.setSource(source);
+			Use source = load.getSource();
+			Var variable = source.getVariable();
+			if (!script.getVariables().contains(variable)) {
+				declareVar(variable);
 			}
+
+			String term = getUniqueName(variable);
+			for (Expression index : load.getIndexes()) {
+				term = "(select " + term + " " + doSwitch(index) + ")";
+			}
+
+			addAssertion(load.getTarget().getVariable(), term);
+
 			return null;
 		}
 
@@ -257,6 +268,7 @@ public class GuardSatChecker {
 
 		@Override
 		public Object caseProcedure(Procedure procedure) {
+			script.addCommand("");
 			script.addCommand("; procedure " + procedure.getName());
 			return super.caseProcedure(procedure);
 		}
@@ -298,13 +310,7 @@ public class GuardSatChecker {
 		 * @return the 32-bit BitVec representation
 		 */
 		private String getStringOfInt(BigInteger integer) {
-			StringBuilder builder = new StringBuilder("#b");
-			String str = integer.toString(2);
-			for (int i = 0; i < 32 - str.length(); i++) {
-				builder.append('0');
-			}
-			builder.append(str);
-			return builder.toString();
+			return "(_ bv" + integer + " 32)";
 		}
 
 		/**
@@ -399,45 +405,6 @@ public class GuardSatChecker {
 	}
 
 	/**
-	 * Computes a map from ports to token values so that the given action will
-	 * be fireable, based on the given assertions.
-	 * 
-	 * @param action
-	 *            an action
-	 * @param assertions
-	 *            a list of assertions as a map between variable names and
-	 *            values
-	 * @return a map from ports to token values
-	 */
-	private Map<Port, Expression> computePortTokenMap(Action action,
-			Map<String, Expression> assertions) {
-		String schedulerName = action.getScheduler().getName() + "_";
-		Pattern pattern = action.getPeekPattern();
-		Map<Port, Expression> portMap = new HashMap<Port, Expression>();
-		for (Entry<String, Expression> entry : assertions.entrySet()) {
-			String name = entry.getKey();
-			int index = name.indexOf(schedulerName);
-			if (index != -1) {
-				name = name.substring(index + schedulerName.length());
-			}
-			Var var = action.getScheduler().getLocal(name);
-			if (var != null) {
-				for (Def def : var.getDefs()) {
-					for (Use use : EcoreHelper.getUses(def.eContainer())) {
-						Port port = pattern.getPort(use.getVariable());
-						if (port != null) {
-							Expression value = entry.getValue();
-							portMap.put(port, value);
-						}
-					}
-				}
-			}
-		}
-
-		return portMap;
-	}
-
-	/**
 	 * Computes the values of tokens that when present on the given ports
 	 * satisfy the following two conditions:
 	 * <ol>
@@ -459,7 +426,7 @@ public class GuardSatChecker {
 			List<Action> others, Action action) {
 		SmtTranslator translator = new SmtTranslator();
 		translator.doSwitch(action.getScheduler());
-		
+
 		SExp assertion;
 
 		if (others.isEmpty()) {
@@ -467,11 +434,11 @@ public class GuardSatChecker {
 		} else {
 			SExpList list = new SExpList(new SExpSymbol("and"));
 			assertion = list;
-			
+
 			for (Action previous : others) {
 				translator.doSwitch(previous.getScheduler());
-				list.add(new SExpList(new SExpSymbol("not"),
-						new SExpSymbol(previous.getScheduler().getName())));
+				list.add(new SExpList(new SExpSymbol("not"), new SExpSymbol(
+						previous.getScheduler().getName())));
 			}
 			list.add(new SExpSymbol(action.getScheduler().getName()));
 		}
@@ -484,10 +451,10 @@ public class GuardSatChecker {
 		script.addCommand("(check-sat)");
 
 		SmtSolver solver = new SmtSolver(actor);
-		solver.checkSat(script);
+		solver.checkSat(script, action, ports);
 
 		// fills the map
-		return computePortTokenMap(action, solver.getAssertions());
+		return solver.getAssertions();
 	}
 
 }

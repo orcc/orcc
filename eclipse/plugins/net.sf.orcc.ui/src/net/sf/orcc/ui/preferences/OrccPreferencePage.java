@@ -164,7 +164,9 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 
 				updateMode = false;
 				if ("CVC3".equals(text)) {
-					textControl.setText("+lang smt2 +model");
+					// no model option because CVC3 does not know how to deal
+					// with arrays, and does not support (get-value)
+					textControl.setText("+lang smt2");
 				} else if ("Z3".equals(text)) {
 					textControl.setText("/smt2 /m");
 				}

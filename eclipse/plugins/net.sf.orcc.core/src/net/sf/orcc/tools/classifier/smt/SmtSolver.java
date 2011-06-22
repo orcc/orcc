@@ -29,6 +29,7 @@
 package net.sf.orcc.tools.classifier.smt;
 
 import static net.sf.orcc.OrccActivator.getDefault;
+import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 
@@ -40,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,9 +49,18 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.sexp.SExp;
+import net.sf.orcc.util.sexp.SExpList;
+import net.sf.orcc.util.sexp.SExpParser;
+import net.sf.orcc.util.sexp.SExpSymbol;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -62,17 +73,117 @@ import org.eclipse.core.resources.IFolder;
  */
 public class SmtSolver {
 
+	private class SmtSolverOutputProcessor implements Runnable {
+
+		private Reader reader;
+
+		public SmtSolverOutputProcessor(InputStream in) {
+			reader = new InputStreamReader(in);
+		}
+
+		/**
+		 * Parse the assertion encoded as the given list s-expression.
+		 * 
+		 * @param list
+		 *            a list s-expression
+		 */
+		private Expression getExpression(SExp exp) {
+			return eINSTANCE.createExprBool(true);
+		}
+
+//		private int parseValue(SExp sexp) {
+//			if (sexp.isSymbol()) {
+//				String contents = ((SExpSymbol) sexp).getContents();
+//				return Integer.parseInt(contents);
+//			} else if (sexp.isList()) {
+//				SExpList list = (SExpList) sexp;
+//				if (list.startsWith(new SExpSymbol("_"))) {
+//					SExpSymbol bv = list.getSymbol(1);
+//					String contents = bv.getContents().substring(2);
+//					BigInteger value = new BigInteger(contents);
+//					if (value.compareTo(BigInteger.valueOf(2147483647)) > 0) {
+//						value = value.subtract(BigInteger.valueOf(4294967296L));
+//					}
+//
+//					return value.intValue();
+//				}
+//			}
+//
+//			return 0;
+//		}
+
+		@Override
+		public void run() {
+			StringBuilder builder = new StringBuilder();
+			try {
+				char[] cbuf = new char[8192];
+				int n = reader.read(cbuf);
+				while (n > 0) {
+					builder.append(cbuf, 0, n);
+					n = reader.read(cbuf);
+				}
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			} finally {
+				try {
+					reader.close();
+				} catch (IOException e) {
+				}
+			}
+
+			SExpParser parser = new SExpParser(builder.toString());
+			SExp exp = parser.read();
+			if (exp != null && exp.isSymbol()) {
+				SExpSymbol symbol = (SExpSymbol) exp;
+				satisfied = "sat".equals(symbol.getContents());
+
+				// parse assertions (if there are any)
+				if (satisfied && action != null && ports != null) {
+					exp = parser.read();
+					if (exp != null && exp.isList()) {
+						SExpList list = (SExpList) exp;
+
+						Pattern pattern = action.getPeekPattern();
+						int index = 0;
+						for (Port port : ports) {
+							SExpList portList = (SExpList) list.get(index);
+							index++;
+
+							Expression value;
+							int numTokens = pattern.getNumTokens(port);
+							if (numTokens > 1) {
+								value = IrFactory.eINSTANCE.createExprList();
+								for (int i = 0; i < numTokens; i++) {
+									exp = portList.get(i);
+									Expression tok = getExpression(exp);
+									((ExprList) value).getValue().add(tok);
+								}
+							} else {
+								value = getExpression(portList);
+							}
+							assertions.put(port, value);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private Action action;
+
 	private Actor actor;
 
-	private Map<String, Expression> assertions;
+	private Map<Port, Expression> assertions;
+
+	private List<String> options;
 
 	private IFolder output;
+
+	private List<Port> ports;
 
 	private boolean satisfied;
 
 	private String solver;
-
-	private List<String> options;
 
 	/**
 	 * Creates a new solver. The solver writes SMT-LIB files that are given the
@@ -82,7 +193,7 @@ public class SmtSolver {
 	 *            the actor
 	 */
 	public SmtSolver(Actor actor) {
-		assertions = new HashMap<String, Expression>();
+		assertions = new HashMap<Port, Expression>();
 
 		this.actor = actor;
 		IFile file = actor.getFile();
@@ -105,13 +216,30 @@ public class SmtSolver {
 	}
 
 	/**
-	 * Checks if the given scripts are satisfiable.
+	 * Checks if the given script is satisfiable.
 	 * 
-	 * @param scripts
-	 * @return
+	 * @param script
+	 *            an SMT script
+	 * @return <code>true</code> if the given script is satisfiable
 	 */
 	public boolean checkSat(SmtScript script) {
+		return checkSat(script, null, null);
+	}
+
+	/**
+	 * Checks if the given script is satisfiable, and
+	 * 
+	 * @param script
+	 *            an SMT script
+	 * @param action
+	 *            if present, will get the tokens read on these ports
+	 * @return <code>true</code> if the given script is satisfiable
+	 */
+	public boolean checkSat(SmtScript script, Action action, List<Port> ports) {
 		try {
+			this.action = action;
+			this.ports = ports;
+
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			PrintStream ps = new PrintStream(bos);
 			ps.println("(set-logic QF_AUFBV)");
@@ -119,6 +247,24 @@ public class SmtSolver {
 				ps.println(command);
 			}
 
+			if (action != null && ports != null) {
+				ps.print("(get-value (");
+				Pattern pattern = action.getPeekPattern();
+				for (Port port : ports) {
+					int numTokens = pattern.getNumTokens(port);
+					if (numTokens > 1) {
+						ps.print("(");
+						for (int i = 0; i < numTokens; i++) {
+							ps.print("(select " + port.getName() + " (_ bv" + i
+									+ " 32)) ");
+						}
+						ps.print(")");
+					} else {
+						ps.print("(select " + port.getName() + " (_ bv0 32)) ");
+					}
+				}
+				ps.println("))");
+			}
 			ps.close();
 
 			IFile file = output.getFile(actor.getSimpleName() + ".smt2");
@@ -134,13 +280,11 @@ public class SmtSolver {
 	}
 
 	/**
-	 * Returns the assertions as a map between variable names and associated
-	 * values.
+	 * Returns the assertions as a map between ports and associated values.
 	 * 
-	 * @return the assertions as a map between variable names and associated
-	 *         values
+	 * @return the assertions as a map between ports and associated values
 	 */
-	public Map<String, Expression> getAssertions() {
+	public Map<Port, Expression> getAssertions() {
 		return assertions;
 	}
 
@@ -193,11 +337,6 @@ public class SmtSolver {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
-		// update satisfied and assertions fields
-		satisfied = processor.isSatisfied();
-		if (satisfied) {
-			assertions.putAll(processor.getAssertions());
-		}
 	}
+
 }
