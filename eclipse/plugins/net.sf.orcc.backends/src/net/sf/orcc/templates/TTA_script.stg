@@ -1,0 +1,34 @@
+
+script(network, options) ::= <<
+#!/usr/bin/env python
+#
+# Generated from <network.name> using Open-RVC CAL Compiler
+#
+
+import commands, sys, os
+
+print '*********************************************************************'
+print '** Launching compilation of <network.name>' 
+print '** for Transport Trigger Architecture (using TCE tools)'
+print '*********************************************************************'
+             
+pathname = os.path.dirname(sys.argv[0])        
+scriptPath = os.path.abspath(pathname)
+
+adfFile = scriptPath + os.sep + 'processor_default.adf'
+
+instances = [<network.instances: { instance |'<instance.id>'}; wrap, separator=", ">]
+
+for instance in instances:
+	instancePath = os.path.join(scriptPath, instance)
+	llFile = instancePath + os.sep + instance + '.ll'
+	tpefFile = instancePath + os.sep + instance + '.tpef'
+	
+	status,output = commands.getstatusoutput('tcecc -o ' + tpefFile + ' -a ' + adfFile + ' ' + llFile)
+	if status != 0 :
+		print '******** Error during the compilation of ' + instance + '.ll'
+		print output
+		
+print '** Compilation done'
+		
+>>

@@ -150,8 +150,12 @@ public class TTABackendImpl extends AbstractBackend {
 	}
 
 	private void printNetwork(Network network) {
-		NetworkPrinter printer = new NetworkPrinter("TTA_network");
-		printer.print(network.getName() + ".vhd", path, network, "network");
+		NetworkPrinter networkPrinter = new NetworkPrinter("TTA_network");
+		NetworkPrinter scriptPrinter = new NetworkPrinter("TTA_script");
+		networkPrinter.print(network.getName() + ".vhd", path, network,
+				"network");
+		scriptPrinter.print("tcecc_" + network.getName(), path, network,
+				"script");
 	}
 
 	private void printProcessor(Instance instance, String instancePath) {
