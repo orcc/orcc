@@ -41,4 +41,8 @@ public class PreferenceConstants {
 
 	public static final String P_SOLVER = "solver";
 
+	public static final String P_SOLVER_OPTIONS = "solverOptions";
+
+	public static final String P_SOLVER_TYPE = "solverType";
+
 }

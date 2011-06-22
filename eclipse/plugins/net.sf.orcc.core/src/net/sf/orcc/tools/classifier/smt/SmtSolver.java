@@ -30,6 +30,7 @@ package net.sf.orcc.tools.classifier.smt;
 
 import static net.sf.orcc.OrccActivator.getDefault;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
+import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -39,7 +40,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -68,6 +72,8 @@ public class SmtSolver {
 
 	private String solver;
 
+	private List<String> options;
+
 	/**
 	 * Creates a new solver. The solver writes SMT-LIB files that are given the
 	 * name of the actor.
@@ -87,10 +93,15 @@ public class SmtSolver {
 			File solverFile = new File(solverPath);
 			if (solverFile.exists()) {
 				solver = solverPath;
-				return;
+			} else {
+				throw new OrccRuntimeException("solver executable not found!");
 			}
+		} else {
+			throw new OrccRuntimeException("path of solver is empty!");
 		}
-		throw new OrccRuntimeException("incorrect path of solver executable!");
+
+		String strOptions = getDefault().getPreference(P_SOLVER_OPTIONS, "");
+		options = Arrays.asList(strOptions.split(" "));
 	}
 
 	/**
@@ -141,8 +152,12 @@ public class SmtSolver {
 	 * @throws IOException
 	 */
 	private void launchSolver(IFile file) throws IOException {
-		ProcessBuilder pb = new ProcessBuilder(solver, "+model", "+lang",
-				"smt2", file.getLocation().toOSString());
+		List<String> allOptions = new ArrayList<String>(options.size() + 2);
+		allOptions.add(solver);
+		allOptions.addAll(options);
+		allOptions.add(file.getLocation().toOSString());
+
+		ProcessBuilder pb = new ProcessBuilder(allOptions);
 		final Process process = pb.start();
 
 		// Output error message

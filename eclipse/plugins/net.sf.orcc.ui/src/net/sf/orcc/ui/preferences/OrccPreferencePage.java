@@ -31,13 +31,29 @@ package net.sf.orcc.ui.preferences;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLBOX;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
+import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
+import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_TYPE;
 import net.sf.orcc.OrccActivator;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -51,6 +67,12 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 public class OrccPreferencePage extends FieldEditorPreferencePage implements
 		IWorkbenchPreferencePage {
 
+	private Composite radioComposite;
+
+	private Text textControl;
+
+	private boolean updateMode;
+
 	public OrccPreferencePage() {
 		super(GRID);
 
@@ -58,6 +80,11 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 				InstanceScope.INSTANCE, OrccActivator.PLUGIN_ID);
 		setPreferenceStore(store);
 		setDescription("General settings for Orcc");
+	}
+
+	@Override
+	public void adjustGridLayout() {
+
 	}
 
 	/**
@@ -68,11 +95,107 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 	@Override
 	public void createFieldEditors() {
 		Composite parent = getFieldEditorParent();
-		addField(new FileFieldEditor(P_JADE, "Path of &Jade executable:",
-				parent));
-		addField(new FileFieldEditor(P_JADE_TOOLBOX, "Path of Jade &toolbox:",
-				parent));
-		addField(new FileFieldEditor(P_SOLVER, "Path of SMT &solver:", parent));
+		parent.setLayout(new GridLayout(1, false));
+
+		// Jade group
+		Group group = new Group(parent, SWT.NONE);
+		group.setFont(getFont());
+		group.setLayout(new GridLayout(3, false));
+		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		group.setText("Jade");
+
+		addField(new FileFieldEditor(P_JADE, "Path of Jade executable:", group));
+		addField(new FileFieldEditor(P_JADE_TOOLBOX, "Path of Jade toolbox:",
+				group));
+
+		// solver group
+		group = new Group(parent, SWT.NONE);
+		group.setFont(getFont());
+		group.setLayout(new GridLayout(3, false));
+		group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+		group.setText("SMT solver");
+
+		addField(new FileFieldEditor(P_SOLVER, "Path of solver executable:",
+				group));
+
+		// composite for field radio
+		Composite composite = new Composite(group, SWT.NONE);
+		composite.setLayout(new GridLayout(2, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, false, false);
+		data.horizontalSpan = 2;
+		composite.setLayoutData(data);
+
+		// field options
+		StringFieldEditor fieldOptions = new StringFieldEditor(
+				P_SOLVER_OPTIONS, "Options of SMT solver:", composite);
+		textControl = fieldOptions.getTextControl(composite);
+		addField(fieldOptions);
+
+		// composite for field solver type
+		composite = new Composite(group, SWT.NONE);
+		composite.setLayout(new GridLayout(2, false));
+		data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		data.horizontalSpan = 3;
+		composite.setLayoutData(data);
+
+		// radio buttons
+		RadioGroupFieldEditor fieldRadio = new RadioGroupFieldEditor(
+				P_SOLVER_TYPE, "Set default options for solver:", 2,
+				new String[][] { { "CVC3", "CVC3" }, { "Z3", "Z3" },
+						{ "Custom", "Custom" }, }, composite);
+		radioComposite = fieldRadio.getRadioBoxControl(composite);
+		addField(fieldRadio);
+
+		createListeners();
+	}
+
+	private void createListeners() {
+		SelectionListener sel = new SelectionListener() {
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Widget widget = e.widget;
+				Button button = (Button) widget;
+				String text = button.getText();
+
+				updateMode = false;
+				if ("CVC3".equals(text)) {
+					textControl.setText("+lang smt2 +model");
+				} else if ("Z3".equals(text)) {
+					textControl.setText("/smt2 /m");
+				}
+				updateMode = true;
+			}
+
+		};
+
+		final Control[] children = radioComposite.getChildren();
+		for (int i = 0; i < children.length; i++) {
+			Control child = children[i];
+			if (child instanceof Button) {
+				Button button = (Button) child;
+				button.addSelectionListener(sel);
+			}
+		}
+
+		updateMode = true;
+		textControl.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (updateMode) {
+					for (int i = 0; i < children.length - 1; i++) {
+						((Button) children[i]).setSelection(false);
+					}
+					((Button) children[children.length - 1]).setSelection(true);
+				}
+			}
+
+		});
 	}
 
 	@Override
