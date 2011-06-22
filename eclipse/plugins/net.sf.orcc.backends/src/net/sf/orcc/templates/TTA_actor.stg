@@ -396,6 +396,10 @@ bb_broadcast_copy:
 
 >>
 
+actorParameter(var, expr) ::= <<
+@<var.name> = global <var.type> <Constant(expr)>
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
@@ -408,7 +412,7 @@ actor(actor) ::= <<
 <if(actor.parameters)>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<actor.parameters: actorParameter(); separator="\n">
+<actor.parameters: { var | <actorParameter(var, instance.parameters.(var.name))> }; separator="\n">
 <endif>
 
 <if(actor.stateVars)>
