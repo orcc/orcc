@@ -181,10 +181,10 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				factory.createExprVar(varNum));
 		Expression blk11And = factory.createExprBinary(
 				factory.createExprVar(varDenum), OpBinary.BITAND,
-				factory.createExprInt(0), factory.createTypeInt());
+				factory.createExprInt(0xFFFFFFFFL), factory.createTypeInt());
 		InstAssign assign_blk11 = factory.createInstAssign(denom, blk11And);
 		InstAssign assign_blk12 = factory.createInstAssign(mask,
-				factory.createExprInt(0));
+				factory.createExprInt(0x80000000L));
 		InstAssign assign_blk13 = factory.createInstAssign(i,
 				factory.createExprInt(0));
 		block_1.add(assign_blk10);
@@ -342,7 +342,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 		Expression andExpr = factory.createExprBinary(
 				factory.createExprVar(remainder), OpBinary.BITAND,
-				factory.createExprInt(0), factory.createTypeInt());
+				factory.createExprInt(0xFFFFFFFFL), factory.createTypeInt());
 		Expression minusExpr = factory.createExprBinary(
 				factory.createExprInt(31), OpBinary.MINUS,
 				factory.createExprVar(i), factory.createTypeInt());
@@ -363,7 +363,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 				factory.createExprVar(mask), OpBinary.SHIFT_RIGHT,
 				factory.createExprInt(1), factory.createTypeInt());
 		Expression assignBlk_1Value = factory.createExprBinary(maskShift,
-				OpBinary.BITAND, factory.createExprInt(0),
+				OpBinary.BITAND, factory.createExprInt(0x7FFFFFFFL),
 				factory.createTypeInt());
 		InstAssign assignBlk_10 = factory.createInstAssign(mask,
 				assignBlk_1Value);
