@@ -100,21 +100,20 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private IProject project;
 
-	private Map<String, Fifo> fifos;
+	private Map<Port, Fifo> fifos;
 
-	protected void connectActors(Instance source, Port srcPort,
-			Instance target, Port tgtPort, int fifoSize) {
+	protected void connectActors(Port srcPort, Port tgtPort, int fifoSize) {
 		Fifo fifo = null;
 		Type type = srcPort.getType();
 		if (type.isInt()) {
 			fifo = new Fifo_int(fifoSize);
 		} else if (type.isBool()) {
-			fifo = new Fifo_boolean(fifoSize);	
+			fifo = new Fifo_boolean(fifoSize);
 		} else {
 			fifo = new Fifo_String(fifoSize);
 		}
-		fifos.put(source.getId() + "_" + srcPort.getName(), fifo);
-		fifos.put(target.getId() + "_" + tgtPort.getName(), fifo);
+		fifos.put(srcPort, fifo);
+		fifos.put(tgtPort, fifo);
 	}
 
 	/**
@@ -126,7 +125,6 @@ public class SlowSimulator extends AbstractSimulator {
 	 * @param graph
 	 */
 	public void connectNetwork(DirectedGraph<Vertex, Connection> graph) {
-		fifos = new HashMap<String, Fifo>();
 		// Get edges from the graph has actors point-to-point connections.
 		Set<Connection> connections = graph.edgeSet();
 		// Loop over the connections and ask for the source and target actors
@@ -136,8 +134,8 @@ public class SlowSimulator extends AbstractSimulator {
 			Vertex tgtVertex = graph.getEdgeTarget(connection);
 
 			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
-				Instance srcInst = srcVertex.getInstance();
-				Instance tgtInst = tgtVertex.getInstance();
+				Actor src = srcVertex.getInstance().getActor();
+				Actor tgt = tgtVertex.getInstance().getActor();
 
 				// get FIFO size (user-defined nor default)
 				int size;
@@ -152,12 +150,12 @@ public class SlowSimulator extends AbstractSimulator {
 
 				// create the communication FIFO between source and target
 				// actors
-				Port srcPort = connection.getSource();
-				Port tgtPort = connection.getTarget();
+				Port srcPort = src.getOutput(connection.getSource().getName());
+				Port tgtPort = tgt.getInput(connection.getTarget().getName());
 
 				// connect source and target actors
 				if ((srcPort != null) && (tgtPort != null)) {
-					connectActors(srcInst, srcPort, tgtInst, tgtPort, size);
+					connectActors(srcPort, tgtPort, size);
 				}
 			}
 		}
@@ -202,6 +200,7 @@ public class SlowSimulator extends AbstractSimulator {
 				Instance instance = vertex.getInstance();
 				if (instance.isActor()) {
 					Actor clonedActor = EcoreUtil.copy(instance.getActor());
+					instance.setContents(clonedActor);
 
 					ActorVisitor<?>[] transformations = {
 							new DeadGlobalElimination(),
@@ -211,15 +210,18 @@ public class SlowSimulator extends AbstractSimulator {
 						transformation.doSwitch(clonedActor);
 					}
 
-					ActorInterpreter interpreter = new ConnectedActorInterpreter(
-							instance.getId(), clonedActor,
-							instance.getParameters());
+					ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
+							clonedActor, instance.getParameters());
+
 					interpreters.put(instance, interpreter);
+					interpreter.setFifos(fifos);
+
 				} else if (instance.isBroadcast()) {
 					Actor actor = IrFactory.eINSTANCE.createActor();
-					ActorInterpreter interpreter = new ConnectedActorInterpreter(
-							instance.getId(), actor, instance.getParameters());
+					ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
+							actor, instance.getParameters());
 					interpreters.put(instance, interpreter);
+					interpreter.setFifos(fifos);
 				}
 			}
 		}
@@ -231,7 +233,6 @@ public class SlowSimulator extends AbstractSimulator {
 			boolean status = false;
 			for (Instance instance : network.getInstances()) {
 				ActorInterpreter interpreter = interpreters.get(instance);
-				((ConnectedActorInterpreter) interpreter).setFifos(fifos);
 				status |= interpreter.schedule();
 			}
 			isAlive = status;
@@ -242,6 +243,8 @@ public class SlowSimulator extends AbstractSimulator {
 	public void start(String mode) {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
+
+			fifos = new HashMap<Port, Fifo>();
 
 			IFile file = OrccUtil.getFile(project, xdfFile, "xdf");
 

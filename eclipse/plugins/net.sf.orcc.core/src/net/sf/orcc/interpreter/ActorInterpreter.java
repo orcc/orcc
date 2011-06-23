@@ -461,13 +461,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 		if (actor.hasFsm()) {
 			// Then check for next FSM transition
-			Transitions transitions = null;
-			for(Transitions thatTransitions : actor.getFsm().getTransitions()) {
-				if(thatTransitions.getSourceState().equals(fsmState)) {
-					transitions = thatTransitions;
-				}
-			}
-			
+			Transitions transitions = actor.getFsm().getTransitions(fsmState);
 			for (Transition transition : transitions.getList()) {
 				Action action = transition.getAction();
 				if (isSchedulable(action)) {
