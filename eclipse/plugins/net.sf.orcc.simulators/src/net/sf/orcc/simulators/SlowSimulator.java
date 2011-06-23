@@ -105,7 +105,7 @@ public class SlowSimulator extends AbstractSimulator {
 	protected void connectActors(Port srcPort, Port tgtPort, int fifoSize) {
 		Fifo fifo = null;
 		Type type = srcPort.getType();
-		if (type.isInt()) {
+		if (type.isInt() || type.isUint()) {
 			fifo = new Fifo_int(fifoSize);
 		} else if (type.isBool()) {
 			fifo = new Fifo_boolean(fifoSize);
@@ -214,6 +214,7 @@ public class SlowSimulator extends AbstractSimulator {
 
 				} else if (instance.isBroadcast()) {
 					Actor actor = IrFactory.eINSTANCE.createActor();
+					actor.setNative(true);
 					ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
 							actor, instance.getParameters());
 					interpreters.put(instance, interpreter);

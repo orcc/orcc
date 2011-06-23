@@ -248,7 +248,10 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				}
 			}
 		} else if (proc.isNative()) {
-			callNativeProcedure(proc, callParams);
+			Expression result = (Expression) callNativeProcedure(proc, callParams);
+			if(call.hasResult()) {
+				call.getTarget().getVariable().setValue(result);
+			}
 		} else {
 			List<Var> procParams = proc.getParameters();
 			for (int i = 0; i < callParams.size(); i++) {

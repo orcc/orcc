@@ -63,7 +63,7 @@ public class Source {
 		}
 	}
 
-	public static void source_readNBytes(Object outTable[], int nbTokenToRead) {
+	public static void source_readNBytes(Object outTable[], Integer nbTokenToRead) {
 		try {
 			for (int i = 0; i < nbTokenToRead; i++) {
 				outTable[i] = new Integer(in.read());
