@@ -12,6 +12,7 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
+import net.sf.orcc.ir.util.MapAdapter;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -58,10 +59,12 @@ public class TransitionsImpl extends EObjectImpl implements Transitions {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
+	 * 
 	 */
 	protected TransitionsImpl() {
 		super();
+
+		eAdapters().add(new MapAdapter());
 	}
 
 	/**

@@ -28,13 +28,15 @@
  */
 package net.sf.orcc.ir.util;
 
+import static net.sf.orcc.ir.IrPackage.eINSTANCE;
+
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.ActorImpl;
@@ -44,6 +46,7 @@ import net.sf.orcc.ir.impl.ProcedureImpl;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an adapter that maintains a map of variables from a list
@@ -61,46 +64,41 @@ public class MapAdapter implements Adapter {
 		Map<? extends Object, ? extends Object> map;
 		Object key;
 
-		if (notification.getFeature() == IrPackage.eINSTANCE
-				.getProcedure_Locals()) {
+		Object feature = notification.getFeature();
+		if (feature == eINSTANCE.getProcedure_Locals()) {
 			map = ((ProcedureImpl) target).getLocalsMap();
 			key = ((Var) object).getIndexedName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getProcedure_Parameters()) {
+		} else if (feature == eINSTANCE.getProcedure_Parameters()) {
 			map = ((ProcedureImpl) target).getParametersMap();
 			key = ((Var) object).getIndexedName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_Inputs()) {
+		} else if (feature == eINSTANCE.getActor_Inputs()) {
 			map = ((ActorImpl) target).getInputsMap();
 			key = ((Port) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_Outputs()) {
+		} else if (feature == eINSTANCE.getActor_Outputs()) {
 			map = ((ActorImpl) target).getOutputsMap();
 			key = ((Port) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_Parameters()) {
+		} else if (feature == eINSTANCE.getActor_Parameters()) {
 			map = ((ActorImpl) target).getParametersMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_Procs()) {
+		} else if (feature == eINSTANCE.getActor_Procs()) {
 			map = ((ActorImpl) target).getProceduresMap();
 			key = ((Procedure) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_StateVars()) {
+		} else if (feature == eINSTANCE.getActor_StateVars()) {
 			map = ((ActorImpl) target).getStateVariablesMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).put(key, object);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getFSM_Transitions()) {
+		} else if (feature == eINSTANCE.getFSM_Transitions()) {
 			map = ((FSMImpl) target).getTransitionsMap();
 			key = ((Transitions) object).getSourceState();
-			((Map<Object, Object>) map).put(key, object);
+			if (key != null) {
+				((Map<Object, Object>) map).put(key, object);
+			}
 		}
 	}
 
@@ -146,6 +144,10 @@ public class MapAdapter implements Adapter {
 			}
 			break;
 		}
+
+		case Notification.SET:
+			set(notification, notification.getNewValue());
+			break;
 		}
 	}
 
@@ -154,46 +156,54 @@ public class MapAdapter implements Adapter {
 		Map<? extends Object, ? extends Object> map;
 		Object key;
 
-		if (notification.getFeature() == IrPackage.eINSTANCE
-				.getProcedure_Locals()) {
+		Object feature = notification.getFeature();
+		if (feature == eINSTANCE.getProcedure_Locals()) {
 			map = ((ProcedureImpl) target).getLocalsMap();
 			key = ((Var) object).getIndexedName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getProcedure_Parameters()) {
+		} else if (feature == eINSTANCE.getProcedure_Parameters()) {
 			map = ((ProcedureImpl) target).getParametersMap();
 			key = ((Var) object).getIndexedName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_Inputs()) {
+		} else if (feature == eINSTANCE.getActor_Inputs()) {
 			map = ((ActorImpl) target).getInputsMap();
 			key = ((Port) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_Outputs()) {
+		} else if (feature == eINSTANCE.getActor_Outputs()) {
 			map = ((ActorImpl) target).getOutputsMap();
 			key = ((Port) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_Parameters()) {
+		} else if (feature == eINSTANCE.getActor_Parameters()) {
 			map = ((ActorImpl) target).getParametersMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_Procs()) {
+		} else if (feature == eINSTANCE.getActor_Procs()) {
 			map = ((ActorImpl) target).getProceduresMap();
 			key = ((Procedure) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getActor_StateVars()) {
+		} else if (feature == eINSTANCE.getActor_StateVars()) {
 			map = ((ActorImpl) target).getStateVariablesMap();
 			key = ((Var) object).getName();
 			((Map<Object, Object>) map).remove(key);
-		} else if (notification.getFeature() == IrPackage.eINSTANCE
-				.getFSM_Transitions()) {
+		} else if (feature == eINSTANCE.getFSM_Transitions()) {
 			map = ((FSMImpl) target).getTransitionsMap();
 			key = ((Transitions) object).getSourceState();
-			((Map<Object, Object>) map).remove(key);
+			if (key != null) {
+				((Map<Object, Object>) map).remove(key);
+			}
+		}
+	}
+
+	private void set(Notification notification, Object object) {
+		Object feature = notification.getFeature();
+		if (feature == eINSTANCE.getTransitions_SourceState()) {
+			Transitions transitions = (Transitions) target;
+			EObject cter = transitions.eContainer();
+			if (cter instanceof FSMImpl) {
+				Map<State, Transitions> map = ((FSMImpl) cter)
+						.getTransitionsMap();
+				map.put((State) object, transitions);
+			}
 		}
 	}
 
