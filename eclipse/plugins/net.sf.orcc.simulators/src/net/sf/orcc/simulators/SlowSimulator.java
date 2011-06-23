@@ -230,12 +230,17 @@ public class SlowSimulator extends AbstractSimulator {
 	protected void runNetwork(Network network) {
 		boolean isAlive = true;
 		do {
-			boolean status = false;
+			boolean hasExecuted = false;
 			for (Instance instance : network.getInstances()) {
 				ActorInterpreter interpreter = interpreters.get(instance);
-				status |= interpreter.schedule();
+
+				int nbFiring = 0;
+				while (interpreter.schedule()) {
+					nbFiring++;
+				}
+				hasExecuted |= (nbFiring > 0);
 			}
-			isAlive = status;
+			isAlive = hasExecuted;
 		} while (isAlive);
 	}
 
