@@ -134,9 +134,6 @@ public class SlowSimulator extends AbstractSimulator {
 			Vertex tgtVertex = graph.getEdgeTarget(connection);
 
 			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
-				Actor src = srcVertex.getInstance().getActor();
-				Actor tgt = tgtVertex.getInstance().getActor();
-
 				// get FIFO size (user-defined nor default)
 				int size;
 				IAttribute attr = connection
@@ -150,9 +147,8 @@ public class SlowSimulator extends AbstractSimulator {
 
 				// create the communication FIFO between source and target
 				// actors
-				Port srcPort = src.getOutput(connection.getSource().getName());
-				Port tgtPort = tgt.getInput(connection.getTarget().getName());
-
+				Port srcPort = connection.getSource();
+				Port tgtPort = connection.getTarget();
 				// connect source and target actors
 				if ((srcPort != null) && (tgtPort != null)) {
 					connectActors(srcPort, tgtPort, size);
@@ -269,6 +265,7 @@ public class SlowSimulator extends AbstractSimulator {
 			// graph corresponding to the flat network instantiation.
 			DirectedGraph<Vertex, Connection> graph = network.getGraph();
 			instantiateNetwork(graph);
+			updateConnections(graph);
 			connectNetwork(graph);
 			initializeNetwork(network);
 			runNetwork(network);
@@ -276,6 +273,41 @@ public class SlowSimulator extends AbstractSimulator {
 			throw new OrccRuntimeException(e.getMessage());
 		} catch (FileNotFoundException e) {
 			throw new OrccRuntimeException(e.getMessage());
+		}
+	}
+
+	private void updateConnections(DirectedGraph<Vertex, Connection> graph)
+			throws OrccException {
+		for (Connection connection : graph.edgeSet()) {
+			Vertex srcVertex = graph.getEdgeSource(connection);
+			Vertex tgtVertex = graph.getEdgeTarget(connection);
+
+			if (srcVertex.isInstance()) {
+				Instance source = srcVertex.getInstance();
+				String srcPortName = connection.getSource().getName();
+
+				Port srcPort;
+				if (source.isActor()) {
+					srcPort = source.getActor().getOutput(srcPortName);
+				} else {
+					srcPort = source.getBroadcast().getOutput(srcPortName);
+				}
+				connection.setSource(srcPort);
+			}
+
+			if (tgtVertex.isInstance()) {
+				Instance target = tgtVertex.getInstance();
+				String dstPortName = connection.getTarget().getName();
+
+				Port dstPort;
+				if (target.isActor()) {
+					dstPort = target.getActor().getInput(dstPortName);
+				} else {
+					dstPort = target.getBroadcast().getInput();
+				}
+
+				connection.setTarget(dstPort);
+			}
 		}
 	}
 
