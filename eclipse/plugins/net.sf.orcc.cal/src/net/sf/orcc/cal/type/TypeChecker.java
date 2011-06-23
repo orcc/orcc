@@ -541,8 +541,9 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		setTargetType(expression);
-		return doSwitch(expression);
+		TypeChecker checker = new TypeChecker(validator);
+		checker.setTargetType(expression);
+		return checker.doSwitch(expression);
 	}
 
 	/**
