@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: net.sf.orcc.cal.tests
+Bundle-SymbolicName: net.sf.orcc.cal.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: net.sf.orcc.cal,
+ net.sf.orcc.cal.ui;bundle-version="0.9.5",
+ org.eclipse.core.runtime,
+ org.eclipse.ui.workbench;resolution:=optional,
+ org.eclipse.xtext,
+ org.eclipse.xtext.junit4,
+ org.eclipse.xtext.ui.junit,
+ org.junit4
