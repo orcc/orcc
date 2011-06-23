@@ -92,13 +92,13 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 			Var varDenum = factory.createVar(factory.createTypeInt(), "den",
 					true, counter);
 			Var tmp = factory.createVar(factory.createTypeInt(), "divVar",
-					true, counter);
+					true, 0);
 			tmp.setGlobal(true);
 			counter++;
 
 			procedure.getLocals().add(varNum);
 			procedure.getLocals().add(varDenum);
-			if(counter == 0){
+			if(counter == 1){
 			myActor.getStateVars().add(tmp);
 			}
 			InstAssign assign0 = factory.createInstAssign(varNum, expr.getE1());
