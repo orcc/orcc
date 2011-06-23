@@ -44,6 +44,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.stringtemplate.v4.Interpreter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
@@ -75,12 +76,12 @@ public class NlTransformation implements ITransformation {
 				new ObjectModelAdaptor() {
 
 					@Override
-					public Object getProperty(ST self, Object o,
-							Object property, String propertyName)
+					public Object getProperty(Interpreter interp, ST st,
+							Object o, Object property, String propertyName)
 							throws STNoSuchPropertyException {
 						try {
 							// first try standard object adaptor
-							return super.getProperty(self, o, property,
+							return super.getProperty(interp, st, o, property,
 									propertyName);
 						} catch (STNoSuchPropertyException e) {
 							// if not found, try in the properties
