@@ -30,6 +30,10 @@ package net.sf.orcc.tools.classifier;
 
 import static net.sf.orcc.moc.MocFactory.eINSTANCE;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,8 +43,12 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.State;
+import net.sf.orcc.ir.Transition;
+import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.Invocation;
@@ -75,6 +83,35 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	}
 
 	/**
+	 * Tries to evaluate the guards to check if they are compatible.
+	 * 
+	 * @param previous
+	 *            the action that occurs before <code>action</code>
+	 * @param action
+	 *            an action
+	 * @return <code>true</code> if the guards of the given actions are
+	 *         compatible
+	 */
+	private boolean areGuardsCompatible(Action previous, Action action) {
+		GuardSatChecker checker = new GuardSatChecker(actor);
+		try {
+			if (checker.checkSat(previous, action)) {
+				System.out.println(actor.getName() + ": guards of actions "
+						+ previous.getName() + " and " + action.getName()
+						+ " are compatible");
+				return true;
+			}
+
+			return false;
+		} catch (OrccRuntimeException e) {
+			System.err.println(actor.getName()
+					+ ": could not check time-dependency");
+			e.printStackTrace();
+			return true;
+		}
+	}
+
+	/**
 	 * Classifies the actor as dynamic, quasi-static, or static.
 	 * 
 	 * @return the class of the actor
@@ -103,8 +140,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 
 		// checks for actors with time-dependent behavior
 		MoC moc;
-		TimeDependencyAnalyzer tdAnalyzer = new TimeDependencyAnalyzer();
-		if (tdAnalyzer.isTimeDependent(actor)) {
+		if (isTimeDependent()) {
 			moc = MocFactory.eINSTANCE.createDPNMoC();
 			showMarker();
 		} else {
@@ -239,15 +275,19 @@ public class ActorClassifier implements ActorVisitor<Object> {
 			State initialState = fsm.getInitialState();
 
 			// analyze the configuration of this actor
-			ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer();
-			analyzer.analyze(actor);
+			List<Port> ports = new ArrayList<Port>();
+			Map<Action, Map<Port, Expression>> configurations = new HashMap<Action, Map<Port, Expression>>();
+			findConfigurationPorts(ports);
+			if (!ports.isEmpty()) {
+				findConfigurationValues(configurations, ports);
+			}
 
 			// will unroll for each branch departing from the initial state
 			QSDFMoC quasiStatic = MocFactory.eINSTANCE.createQSDFMoC();
 
 			for (Action action : fsm.getTargetActions(initialState)) {
-				Map<Port, Expression> configuration = analyzer
-						.getConfiguration(action);
+				Map<Port, Expression> configuration = configurations
+						.get(action);
 				if (configuration == null) {
 					return MocFactory.eINSTANCE.createKPNMoC();
 				}
@@ -319,6 +359,65 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	}
 
 	/**
+	 * Finds the configuration ports of this actor, if any.
+	 */
+	private void findConfigurationPorts(List<Port> ports) {
+		List<Set<Port>> actionPorts = new ArrayList<Set<Port>>();
+
+		FSM fsm = actor.getFsm();
+		State initialState = fsm.getInitialState();
+
+		// visits the scheduler of each action departing from the initial state
+		for (Action action : fsm.getTargetActions(initialState)) {
+			Set<Port> candidates = new HashSet<Port>();
+			candidates.addAll(action.getPeekPattern().getPorts());
+			actionPorts.add(candidates);
+		}
+
+		// add all ports peeked
+		Set<Port> candidates = new HashSet<Port>();
+		for (Set<Port> set : actionPorts) {
+			candidates.addAll(set);
+		}
+
+		// and then only retains the ones that are common to every action
+		for (Set<Port> set : actionPorts) {
+			if (!set.isEmpty()) {
+				candidates.retainAll(set);
+			}
+		}
+
+		// copies the candidates to the ports list
+		ports.addAll(candidates);
+	}
+
+	/**
+	 * For each action departing from the initial state, visits its guards and
+	 * stores a constrained variable that will contain the value to read from
+	 * the configuration port when solved.
+	 */
+	private void findConfigurationValues(
+			Map<Action, Map<Port, Expression>> configurations, List<Port> ports) {
+		List<Action> previous = new ArrayList<Action>();
+
+		// visits the scheduler of each action departing from the initial state
+		FSM fsm = actor.getFsm();
+		State initialState = fsm.getInitialState();
+		for (Action targetAction : fsm.getTargetActions(initialState)) {
+			// create the configuration for this action
+			GuardSatChecker checker = new GuardSatChecker(actor);
+			Map<Port, Expression> configuration = checker.computeTokenValues(
+					ports, previous, targetAction);
+
+			// add the configuration
+			configurations.put(targetAction, configuration);
+
+			// add current action to "previous" list
+			previous.add(targetAction);
+		}
+	}
+
+	/**
 	 * Returns <code>true</code> if the given FSM looks like the FSM of a
 	 * cyclo-static actor, <code>false</code> otherwise. A potentially
 	 * cyclo-static actor is an actor with an FSM that cycles back to its
@@ -371,6 +470,80 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns <code>true</code> if this actor has a time-dependent behavior.
+	 * 
+	 * @return <code>true</code> if this actor has a time-dependent behavior
+	 */
+	private boolean isTimeDependent() {
+		if (actor.hasFsm()) {
+			FSM fsm = actor.getFsm();
+			for (Transitions transitions : fsm.getTransitions()) {
+				List<Action> actions = new ArrayList<Action>();
+				for (Transition transition : transitions.getList()) {
+					actions.add(transition.getAction());
+				}
+
+				if (isTimeDependent(actions)) {
+					return true;
+				}
+			}
+
+			return false;
+		} else {
+			return isTimeDependent(actor.getActionsOutsideFsm());
+		}
+	}
+
+	/**
+	 * Returns <code>true</code> if the given list of actions has a
+	 * time-dependent behavior.
+	 * 
+	 * @param actions
+	 *            a list of actions
+	 * @return <code>true</code> if the given list of actions has a
+	 *         time-dependent behavior
+	 */
+	private boolean isTimeDependent(List<Action> actions) {
+		Iterator<Action> it = actions.iterator();
+
+		Pattern higherPriorityPattern = IrFactory.eINSTANCE.createPattern();
+		List<Action> higherPriorityActions = new ArrayList<Action>();
+
+		if (it.hasNext()) {
+			// initialization with the first, higher priority action
+			Action higherPriorityAction = it.next();
+			higherPriorityPattern.updatePattern(higherPriorityAction
+					.getInputPattern());
+			higherPriorityActions.add(higherPriorityAction);
+
+			// other actions are compared to the higher priority action and
+			// pattern
+			while (it.hasNext()) {
+				Action lowerPriorityAction = it.next();
+				Pattern lowerPriorityPattern = lowerPriorityAction
+						.getInputPattern();
+
+				if (!lowerPriorityPattern.isSupersetOf(higherPriorityPattern)) {
+					for (Action action : higherPriorityActions) {
+						// it may still be ok if guards are mutually
+						// exclusive
+						if (areGuardsCompatible(action, lowerPriorityAction)) {
+							return true;
+						}
+					}
+				}
+
+				// Add the current action to higherPriorityActions
+				higherPriorityActions.add(lowerPriorityAction);
+				higherPriorityPattern.updatePattern(lowerPriorityAction
+						.getInputPattern());
+			}
+		}
+
+		return false;
 	}
 
 	/**
