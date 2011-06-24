@@ -397,7 +397,7 @@ bb_broadcast_copy:
 >>
 
 actorParameter(var, expr) ::= <<
-@<var.name> = global <var.type> <Constant(expr)>
+@<var.name> = global <var.type> <Constant(expr, var.type)>
 >>
 
 
