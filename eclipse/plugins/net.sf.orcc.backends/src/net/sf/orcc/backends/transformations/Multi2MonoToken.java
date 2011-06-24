@@ -63,6 +63,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.util.EList;
@@ -101,7 +102,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		@Override
 		public Object caseInstLoad(InstLoad load) {
 			Var varSource = load.getSource().getVariable();
-			Pattern pattern = IrUtil.getContainerOfType(varSource,
+			Pattern pattern = EcoreHelper.getContainerOfType(varSource,
 					Pattern.class);
 			if (pattern != null) {
 				Port testPort = pattern.getPort(varSource);
@@ -153,7 +154,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		@Override
 		public Object caseInstLoad(InstLoad load) {
 			Var varSource = load.getSource().getVariable();
-			Pattern pattern = IrUtil.getContainerOfType(varSource,
+			Pattern pattern = EcoreHelper.getContainerOfType(varSource,
 					Pattern.class);
 			if (pattern != null) {
 				Port testPort = pattern.getPort(varSource);
@@ -184,7 +185,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		@Override
 		public Object caseInstStore(InstStore store) {
 			Var varTarget = store.getTarget().getVariable();
-			Pattern pattern = IrUtil.getContainerOfType(varTarget,
+			Pattern pattern = EcoreHelper.getContainerOfType(varTarget,
 					Pattern.class);
 			if (pattern != null) {
 				Port testPort = pattern.getPort(varTarget);

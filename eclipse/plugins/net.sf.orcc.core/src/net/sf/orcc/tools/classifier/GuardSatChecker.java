@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.tools.classifier;
 
-import static net.sf.orcc.ir.util.IrUtil.getContainerOfType;
-
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +60,7 @@ import net.sf.orcc.ir.util.IrSwitch;
 import net.sf.orcc.ir.util.TypePrinter;
 import net.sf.orcc.tools.classifier.smt.SmtScript;
 import net.sf.orcc.tools.classifier.smt.SmtSolver;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.sexp.SExp;
 import net.sf.orcc.util.sexp.SExpList;
 import net.sf.orcc.util.sexp.SExpSymbol;
@@ -250,7 +249,8 @@ public class GuardSatChecker {
 			// as the procedure equals the returned value
 
 			Expression value = instReturn.getValue();
-			Procedure procedure = getContainerOfType(value, Procedure.class);
+			Procedure procedure = EcoreHelper.getContainerOfType(value,
+					Procedure.class);
 			Var variable = IrFactory.eINSTANCE.createVar(
 					IrFactory.eINSTANCE.createTypeBool(), procedure.getName(),
 					true, 0);

@@ -48,6 +48,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -188,7 +189,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 
 		// Cut the block containing call instruction in two parts to put
 		// inlined nodes between them
-		NodeBlock currentBlock = IrUtil.getContainerOfType(call,
+		NodeBlock currentBlock = EcoreHelper.getContainerOfType(call,
 				NodeBlock.class);
 		NodeBlock followingBlock = IrFactory.eINSTANCE.createNodeBlock();
 		while (indexInst < currentBlock.getInstructions().size()) {
@@ -201,7 +202,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		inlinedNodes.addAll(clonedNodes);
 		inlinedNodes.add(followingBlock);
 
-		List<Node> currentNodes = IrUtil.getContainingList(currentBlock);
+		List<Node> currentNodes = EcoreHelper.getContainingList(currentBlock);
 		currentNodes.addAll(indexNode + 1, inlinedNodes);
 
 		// Remove useless call instruction

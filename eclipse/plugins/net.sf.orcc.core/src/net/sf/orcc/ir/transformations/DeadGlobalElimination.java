@@ -38,6 +38,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 /**
  * This class defines a very simple Dead Global Elimination.
@@ -57,7 +58,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor<Object> {
 		List<Def> definitions = variable.getDefs();
 		while (!definitions.isEmpty()) {
 			Def def = definitions.get(0);
-			Instruction instruction = IrUtil.getContainerOfType(def,
+			Instruction instruction = EcoreHelper.getContainerOfType(def,
 					Instruction.class);
 			IrUtil.delete(instruction);
 		}
@@ -65,7 +66,7 @@ public class DeadGlobalElimination extends AbstractActorVisitor<Object> {
 		List<Use> uses = variable.getUses();
 		while (!uses.isEmpty()) {
 			Use use = uses.get(0);
-			Instruction instruction = IrUtil.getContainerOfType(use,
+			Instruction instruction = EcoreHelper.getContainerOfType(use,
 					Instruction.class);
 			IrUtil.delete(instruction);
 		}

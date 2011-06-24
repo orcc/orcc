@@ -45,6 +45,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 /**
  * This class removes phi assignments and transforms them to copies.
@@ -118,7 +119,7 @@ public class PhiRemoval extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseNodeWhile(NodeWhile node) {
-		List<Node> nodes = IrUtil.getContainingList(node);
+		List<Node> nodes = EcoreHelper.getContainingList(node);
 		// the node before the while.
 		if (indexNode > 0) {
 			Node previousNode = nodes.get(indexNode - 1);

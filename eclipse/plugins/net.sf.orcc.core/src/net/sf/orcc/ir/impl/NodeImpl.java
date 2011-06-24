@@ -15,7 +15,7 @@ import net.sf.orcc.ir.CFGEdge;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
@@ -69,7 +69,7 @@ public abstract class NodeImpl extends EObjectImpl implements Node {
 
 	@Override
 	public Procedure getProcedure() {
-		return IrUtil.getContainerOfType(this, Procedure.class);
+		return EcoreHelper.getContainerOfType(this, Procedure.class);
 	}
 
 	@Override

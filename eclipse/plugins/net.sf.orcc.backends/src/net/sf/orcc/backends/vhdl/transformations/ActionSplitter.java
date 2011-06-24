@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.vhdl.transformations;
 
 import static net.sf.orcc.ir.util.IrUtil.copy;
-import static net.sf.orcc.ir.util.IrUtil.getContainerOfType;
 import static org.eclipse.emf.ecore.util.EcoreUtil.isAncestor;
 
 import java.util.ArrayList;
@@ -57,6 +56,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.util.TreeIterator;
@@ -179,7 +179,8 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 		}
 
 		// the procedure that contains this instruction
-		Procedure procedure = getContainerOfType(instruction, Procedure.class);
+		Procedure procedure = EcoreHelper.getContainerOfType(instruction,
+				Procedure.class);
 
 		// moves the variables defined elsewhere
 		TreeIterator<EObject> it = instruction.eAllContents();
@@ -294,8 +295,8 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 					fac.createExprVar(local));
 			store.setPredicate(fac.createPredicate());
 
-			Instruction inst = getContainerOfType(local.getDefs().get(0),
-					Instruction.class);
+			Instruction inst = EcoreHelper.getContainerOfType(local.getDefs()
+					.get(0), Instruction.class);
 			NodeBlock block = inst.getBlock();
 			int index = block.indexOf(inst);
 			block.add(index + 1, store);

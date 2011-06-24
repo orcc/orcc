@@ -45,6 +45,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.impl.IrResourceFactoryImpl;
+import net.sf.orcc.util.EcoreHelper;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -52,7 +53,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -87,19 +87,19 @@ public class IrUtil {
 	 */
 	public static boolean addInstBeforeExpr(Expression expression,
 			Instruction instruction, boolean usePreviousJoinNode) {
-		Instruction instContainer = IrUtil.getContainerOfType(expression,
+		Instruction instContainer = EcoreHelper.getContainerOfType(expression,
 				Instruction.class);
-		Node nodeContainer = IrUtil.getContainerOfType(expression,
+		Node nodeContainer = EcoreHelper.getContainerOfType(expression,
 				Node.class);
 		if (instContainer != null) {
 			if (usePreviousJoinNode && instContainer.isPhi()
 					&& isWhileJoinNode(nodeContainer)) {
-				NodeWhile nodeWhile = IrUtil.getContainerOfType(
+				NodeWhile nodeWhile = EcoreHelper.getContainerOfType(
 						nodeContainer, NodeWhile.class);
 				addToPreviousNodeBlock(nodeWhile, instruction);
 				return false;
 			} else {
-				List<Instruction> instructions = IrUtil
+				List<Instruction> instructions = EcoreHelper
 						.getContainingList(instContainer);
 				instructions.add(instructions.indexOf(instContainer),
 						instruction);
@@ -119,7 +119,7 @@ public class IrUtil {
 
 	private static void addToPreviousNodeBlock(Node node,
 			Instruction instruction) {
-		List<Node> nodes = IrUtil.getContainingList(node);
+		List<Node> nodes = EcoreHelper.getContainingList(node);
 		NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
 		nodeBlock.add(instruction);
 		nodes.add(nodes.indexOf(node), nodeBlock);
@@ -228,58 +228,6 @@ public class IrUtil {
 		return actor;
 	}
 
-	/**
-	 * Returns the container of <code>ele</code> with the given type, or
-	 * <code>null</code> if no such container exists. This method has been
-	 * copied from the EcoreUtil2 class of Xtext.
-	 * 
-	 * @param <T>
-	 *            type parameter
-	 * @param ele
-	 *            an object
-	 * @param type
-	 *            the type of the container
-	 * @return the container of <code>ele</code> with the given type
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends EObject> T getContainerOfType(EObject ele,
-			Class<T> type) {
-		if (type.isAssignableFrom(ele.getClass())) {
-			return (T) ele;
-		}
-
-		if (ele.eContainer() != null) {
-			return getContainerOfType(ele.eContainer(), type);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the list that contains this object, or <code>null</code>.
-	 * 
-	 * @param <T>
-	 *            type of the objects contained in the list
-	 * @param <T1>
-	 *            type of the object as a specialization of <code>T</code>
-	 * @param eObject
-	 *            the object
-	 * @return the list that contains this object, or <code>null</code>
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends EObject, T1 extends T> List<T> getContainingList(
-			T1 eObject) {
-		EStructuralFeature feature = eObject.eContainingFeature();
-		if (feature.getUpperBound() == EStructuralFeature.UNBOUNDED_MULTIPLICITY) {
-			Object obj = eObject.eContainer().eGet(feature);
-			if (obj != null && List.class.isAssignableFrom(obj.getClass())) {
-				return (List<T>) obj;
-			}
-		}
-
-		return null;
-	}
-
 	public static List<Use> getUses(EObject eObject) {
 		List<Use> uses = new ArrayList<Use>();
 		TreeIterator<EObject> it = eObject.eAllContents();
@@ -295,7 +243,7 @@ public class IrUtil {
 
 	private static boolean isWhileJoinNode(Node node) {
 		if (node.isBlockNode()) {
-			NodeWhile nodeWhile = IrUtil.getContainerOfType(node,
+			NodeWhile nodeWhile = EcoreHelper.getContainerOfType(node,
 					NodeWhile.class);
 			return (nodeWhile != null && nodeWhile.getJoinNode() == node);
 		}

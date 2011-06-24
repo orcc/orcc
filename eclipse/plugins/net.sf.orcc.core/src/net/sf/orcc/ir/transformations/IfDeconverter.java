@@ -45,6 +45,7 @@ import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -62,7 +63,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseNodeBlock(NodeBlock block) {
-		Procedure procedure = IrUtil.getContainerOfType(block,
+		Procedure procedure = EcoreHelper.getContainerOfType(block,
 				Procedure.class);
 		NodeBlock targetBlock = null;
 
@@ -132,7 +133,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 	 */
 	private List<Node> findNodes(List<Node> parentNodes, Expression condition) {
 		for (NodeIf nodeIf : nodeIfList) {
-			List<Node> nodes = IrUtil.getContainingList(nodeIf);
+			List<Node> nodes = EcoreHelper.getContainingList(nodeIf);
 			if (EcoreUtil.equals(condition, nodeIf.getCondition())
 					&& parentNodes == nodes) {
 				return nodeIf.getThenNodes();

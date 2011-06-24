@@ -59,6 +59,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -247,7 +248,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			NodeWhile nodeWhile = (NodeWhile) containingNode;
 			if (value0.isVarExpr()) {
 				NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
-				IrUtil.getContainingList(containingNode).add(indexNode,
+				EcoreHelper.getContainingList(containingNode).add(indexNode,
 						block);
 				indexNode++;
 				values.set(0, castExpression(value0, block, 0));

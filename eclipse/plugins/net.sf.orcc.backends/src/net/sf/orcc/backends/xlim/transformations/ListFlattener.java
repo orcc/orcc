@@ -43,6 +43,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 /**
  * This class defines an actor transformation that transforms declarations and
@@ -97,7 +98,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 
 		if (!indexes.isEmpty()) {
 			printAssignment(
-					IrUtil.getContainerOfType(load, NodeBlock.class),
+					EcoreHelper.getContainerOfType(load, NodeBlock.class),
 					indexes,
 					IrUtil.copy(load.getSource().getVariable().getType()));
 		}
@@ -111,7 +112,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 
 		if (!indexes.isEmpty()) {
 			printAssignment(
-					IrUtil.getContainerOfType(store, NodeBlock.class),
+					EcoreHelper.getContainerOfType(store, NodeBlock.class),
 					indexes,
 					IrUtil.copy(store.getTarget().getVariable().getType()));
 		}

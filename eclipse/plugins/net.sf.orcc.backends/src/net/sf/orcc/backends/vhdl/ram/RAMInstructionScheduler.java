@@ -57,6 +57,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 /**
  * This class defines a visitor that transforms loads and stores to RAM
@@ -223,7 +224,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				Var var = use.getVariable();
 				if (var.isLocal() && !var.getType().isList()) {
 					Def def = var.getDefs().get(0);
-					Instruction defInst = IrUtil.getContainerOfType(def,
+					Instruction defInst = EcoreHelper.getContainerOfType(def,
 							Instruction.class);
 					if (pendingInstructions.contains(defInst)) {
 						// removes this instruction from the instruction list
@@ -282,7 +283,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            a Load
 	 */
 	private void convertLoad(InstLoad load) {
-		instructions = IrUtil.getContainingList(load);
+		instructions = EcoreHelper.getContainingList(load);
 		List<Expression> indexes = load.getIndexes();
 		Var var = load.getSource().getVariable();
 		Predicate predicate = load.getPredicate();
@@ -322,7 +323,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            a Store
 	 */
 	private void convertStore(InstStore store) {
-		instructions = IrUtil.getContainingList(store);
+		instructions = EcoreHelper.getContainingList(store);
 		List<Expression> indexes = store.getIndexes();
 		Var var = store.getTarget().getVariable();
 		Predicate predicate = store.getPredicate();

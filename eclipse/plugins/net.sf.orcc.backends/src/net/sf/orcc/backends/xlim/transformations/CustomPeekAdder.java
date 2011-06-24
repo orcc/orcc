@@ -46,6 +46,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -65,7 +66,7 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 	public Object caseAction(Action action) {
 		customPeekedMap = new HashMap<Port, Map<Integer, Var>>();
 		doSwitch(action.getPeekPattern());
-		((XlimActorTemplateData) IrUtil.getContainerOfType(action,
+		((XlimActorTemplateData) EcoreHelper.getContainerOfType(action,
 				Actor.class).getTemplateData()).getCustomPeekedMapPerAction()
 				.put(action, customPeekedMap);
 		return null;
@@ -80,7 +81,7 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 			List<Use> uses = new ArrayList<Use>(oldTarget.getUses());
 			for (Use use : uses) {
 				// Create a custom peek for each load of this variable
-				InstLoad load = IrUtil.getContainerOfType(use,
+				InstLoad load = EcoreHelper.getContainerOfType(use,
 						InstLoad.class);
 
 				Var newVar = load.getTarget().getVariable();
@@ -90,9 +91,9 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 					indexToVariableMap.put(((ExprInt) indexExpr).getIntValue(),
 							newVar);
 				} else {
-					Actor actor = IrUtil.getContainerOfType(pattern,
+					Actor actor = EcoreHelper.getContainerOfType(pattern,
 							Actor.class);
-					Action action = IrUtil.getContainerOfType(pattern,
+					Action action = EcoreHelper.getContainerOfType(pattern,
 							Action.class);
 					throw new OrccRuntimeException(
 							"One repeat and one guard on the same input port are forbidden with XLIM backend. \nActor: "

@@ -57,6 +57,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
+import net.sf.orcc.util.EcoreHelper;
 
 /**
  * This class defines an actor transformation that transforms assignments whose
@@ -252,7 +253,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Expression> {
 		block.add(assign);
 
 		// increments index and adds the if after the current block
-		List<Node> nodes = IrUtil.getContainingList(IrUtil
+		List<Node> nodes = EcoreHelper.getContainingList(EcoreHelper
 				.getContainerOfType(instruction, Node.class));
 		nodes.add(indexNode + 1, nodeIf);
 	}
@@ -268,7 +269,7 @@ public class BoolExprTransformation extends AbstractActorVisitor<Expression> {
 		// adds a new block after the if node created
 		// the index is not incremented so the created block will be visited too
 		NodeBlock targetBlock = IrFactoryImpl.eINSTANCE.createNodeBlock();
-		List<Node> nodes = IrUtil.getContainingList(block);
+		List<Node> nodes = EcoreHelper.getContainingList(block);
 		nodes.add(indexNode + 2, targetBlock);
 
 		// moves instructions
