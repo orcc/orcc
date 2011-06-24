@@ -241,7 +241,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		interpretedActor.setConfiguration(configuration);
 
 		// schedule the actor
-		String initialState = actor.getFsm().getInitialState().getName();
+		State initialState = actor.getFsm().getInitialState();
 		int nbPhases = 0;
 		final int MAX_PHASES = 16384;
 		do {
@@ -271,37 +271,43 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 */
 	private MoC classifyQSDF() {
 		FSM fsm = actor.getFsm();
-		if (isQuasiStaticFsm(fsm)) {
-			State initialState = fsm.getInitialState();
-
-			// analyze the configuration of this actor
-			List<Port> ports = new ArrayList<Port>();
-			Map<Action, Map<Port, Expression>> configurations = new HashMap<Action, Map<Port, Expression>>();
-			findConfigurationPorts(ports);
-			if (!ports.isEmpty()) {
-				findConfigurationValues(configurations, ports);
-			}
-
-			// will unroll for each branch departing from the initial state
-			QSDFMoC quasiStatic = MocFactory.eINSTANCE.createQSDFMoC();
-
-			for (Action action : fsm.getTargetActions(initialState)) {
-				Map<Port, Expression> configuration = configurations
-						.get(action);
-				if (configuration == null) {
-					return MocFactory.eINSTANCE.createKPNMoC();
-				}
-				SDFMoC staticClass = classifyFsmConfiguration(configuration);
-
-				quasiStatic.getConfigurations().put(action, staticClass);
-			}
-
-			return quasiStatic;
-		} else {
+		if (!isQuasiStaticFsm(fsm)) {
 			System.out.println(actor.getName()
 					+ " has an FSM that is NOT compatible with quasi-static");
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
+
+		State initialState = fsm.getInitialState();
+
+		// analyze the configuration of this actor
+		List<Port> ports = findConfigurationPorts();
+		if (ports.isEmpty()) {
+			System.out.println("no configuration ports found for "
+					+ actor.getName());
+			return MocFactory.eINSTANCE.createKPNMoC();
+		}
+
+		Map<Action, Map<Port, Expression>> configurations = findConfigurationValues(ports);
+		if (configurations.isEmpty()) {
+			System.out.println("no configurations for " + actor.getName());
+			return MocFactory.eINSTANCE.createKPNMoC();
+		}
+
+		// will unroll for each branch departing from the initial state
+		QSDFMoC quasiStatic = MocFactory.eINSTANCE.createQSDFMoC();
+
+		for (Action action : fsm.getTargetActions(initialState)) {
+			Map<Port, Expression> configuration = configurations.get(action);
+			if (configuration == null) {
+				System.out.println("no configuration for " + action.getName());
+				return MocFactory.eINSTANCE.createKPNMoC();
+			}
+			SDFMoC staticClass = classifyFsmConfiguration(configuration);
+
+			quasiStatic.setSDFMoC(action, staticClass);
+		}
+
+		return quasiStatic;
 	}
 
 	/**
@@ -361,7 +367,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	/**
 	 * Finds the configuration ports of this actor, if any.
 	 */
-	private void findConfigurationPorts(List<Port> ports) {
+	private List<Port> findConfigurationPorts() {
 		List<Set<Port>> actionPorts = new ArrayList<Set<Port>>();
 
 		FSM fsm = actor.getFsm();
@@ -388,7 +394,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		}
 
 		// copies the candidates to the ports list
-		ports.addAll(candidates);
+		return new ArrayList<Port>(candidates);
 	}
 
 	/**
@@ -396,8 +402,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 * stores a constrained variable that will contain the value to read from
 	 * the configuration port when solved.
 	 */
-	private void findConfigurationValues(
-			Map<Action, Map<Port, Expression>> configurations, List<Port> ports) {
+	private Map<Action, Map<Port, Expression>> findConfigurationValues(
+			List<Port> ports) {
+		Map<Action, Map<Port, Expression>> configurations = new HashMap<Action, Map<Port, Expression>>();
 		List<Action> previous = new ArrayList<Action>();
 
 		// visits the scheduler of each action departing from the initial state
@@ -415,6 +422,8 @@ public class ActorClassifier implements ActorVisitor<Object> {
 			// add current action to "previous" list
 			previous.add(targetAction);
 		}
+
+		return configurations;
 	}
 
 	/**

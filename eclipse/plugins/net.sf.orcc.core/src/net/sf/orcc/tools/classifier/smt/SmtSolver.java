@@ -29,7 +29,6 @@
 package net.sf.orcc.tools.classifier.smt;
 
 import static net.sf.orcc.OrccActivator.getDefault;
-import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER;
 import static net.sf.orcc.preferences.PreferenceConstants.P_SOLVER_OPTIONS;
 
@@ -42,6 +41,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -88,29 +88,26 @@ public class SmtSolver {
 		 *            a list s-expression
 		 */
 		private Expression getExpression(SExp exp) {
-			return eINSTANCE.createExprBool(true);
-		}
+			if (exp.isSymbol()) {
+				SExpSymbol symbol = (SExpSymbol) exp;
+				if ("true".equals(symbol.getContents())) {
+					return IrFactory.eINSTANCE.createExprBool(true);
+				} else if ("false".equals(symbol.getContents())) {
+					return IrFactory.eINSTANCE.createExprBool(false);
+				}
+			} else if (exp.isList()) {
+				SExpList list = (SExpList) exp;
+				if (list.startsWith(new SExpSymbol("_"))) {
+					SExpSymbol bv = list.getSymbol(1);
+					// remove "bv" from the symbol
+					String contents = bv.getContents().substring(2);
+					BigInteger value = new BigInteger(contents);
+					return IrFactory.eINSTANCE.createExprInt(value);
+				}
+			}
 
-//		private int parseValue(SExp sexp) {
-//			if (sexp.isSymbol()) {
-//				String contents = ((SExpSymbol) sexp).getContents();
-//				return Integer.parseInt(contents);
-//			} else if (sexp.isList()) {
-//				SExpList list = (SExpList) sexp;
-//				if (list.startsWith(new SExpSymbol("_"))) {
-//					SExpSymbol bv = list.getSymbol(1);
-//					String contents = bv.getContents().substring(2);
-//					BigInteger value = new BigInteger(contents);
-//					if (value.compareTo(BigInteger.valueOf(2147483647)) > 0) {
-//						value = value.subtract(BigInteger.valueOf(4294967296L));
-//					}
-//
-//					return value.intValue();
-//				}
-//			}
-//
-//			return 0;
-//		}
+			return null;
+		}
 
 		@Override
 		public void run() {
@@ -146,20 +143,21 @@ public class SmtSolver {
 						Pattern pattern = action.getPeekPattern();
 						int index = 0;
 						for (Port port : ports) {
-							SExpList portList = (SExpList) list.get(index);
+							exp = list.get(index);
 							index++;
 
 							Expression value;
 							int numTokens = pattern.getNumTokens(port);
 							if (numTokens > 1) {
 								value = IrFactory.eINSTANCE.createExprList();
+								SExpList portList = (SExpList) exp;
 								for (int i = 0; i < numTokens; i++) {
 									exp = portList.get(i);
 									Expression tok = getExpression(exp);
 									((ExprList) value).getValue().add(tok);
 								}
 							} else {
-								value = getExpression(portList);
+								value = getExpression(exp);
 							}
 							assertions.put(port, value);
 						}
