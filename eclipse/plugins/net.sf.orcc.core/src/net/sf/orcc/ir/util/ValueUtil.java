@@ -28,12 +28,13 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 
 /**
  * This class defines many static utility methods to deal with values.
@@ -86,6 +87,58 @@ public class ValueUtil {
 	}
 
 	/**
+	 * Creates a new array that matches the given type.
+	 * 
+	 * @param type
+	 *            a type of list
+	 * @return an array
+	 */
+	public static Object createArray(TypeList type) {
+		List<Integer> dimensions = type.getDimensions();
+		int[] array = new int[dimensions.size()];
+		for (int i = 0; i < array.length; i++) {
+			array[i] = dimensions.get(i);
+		}
+
+		Type eltType = type.getElementType();
+		if (eltType.isBool()) {
+			return Array.newInstance(Boolean.TYPE, array);
+		} else if (eltType.isFloat()) {
+			return Array.newInstance(Float.TYPE, array);
+		} else if (eltType.isInt()) {
+			int size = eltType.getSizeInBits();
+			if (size <= 8) {
+				return Array.newInstance(Byte.TYPE, array);
+			} else if (size <= 16) {
+				return Array.newInstance(Short.TYPE, array);
+			} else if (size <= 32) {
+				return Array.newInstance(Integer.TYPE, array);
+			} else if (size <= 64) {
+				return Array.newInstance(Long.TYPE, array);
+			} else {
+				return Array.newInstance(BigInteger.class, array);
+			}
+		} else if (eltType.isUint()) {
+			int size = eltType.getSizeInBits();
+			if (size < 8) {
+				return Array.newInstance(Byte.TYPE, array);
+			} else if (size < 16) {
+				return Array.newInstance(Short.TYPE, array);
+			} else if (size < 32) {
+				return Array.newInstance(Integer.TYPE, array);
+			} else if (size < 64) {
+				return Array.newInstance(Long.TYPE, array);
+			} else {
+				return Array.newInstance(BigInteger.class, array);
+			}
+		} else if (eltType.isString()) {
+			return Array.newInstance(String.class, array);
+		} else {
+			throw new IllegalArgumentException("wtf?");
+		}
+	}
+
+	/**
 	 * Returns a new integer equal to the division of the two operands, or
 	 * <code>null</code> if the two operands are not both integers.
 	 * 
@@ -124,9 +177,57 @@ public class ValueUtil {
 		return getBigInteger(val1).compareTo(getBigInteger(val2)) >= 0;
 	}
 
-	public static Object get(Type type, Object array, List<Expression> indexes) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Returns the value in the given array, at the given indexes, knowing the
+	 * type of the array.
+	 * 
+	 * @param type
+	 * @param array
+	 * @param indexes
+	 * @return
+	 */
+	public static Object get(TypeList type, Object array, List<Object> indexes) {
+		int numIndexes = indexes.size();
+		for (int i = 0; i < numIndexes - 1; i++) {
+			int index = getIntValue(indexes.get(i));
+			array = Array.get(array, index);
+		}
+
+		int index = getIntValue(indexes.get(numIndexes - 1));
+		Type eltType = type.getElementType();
+		if (eltType.isBool()) {
+			return Array.getBoolean(array, index);
+		} else if (eltType.isFloat()) {
+			return Array.getFloat(array, index);
+		} else if (eltType.isInt()) {
+			int size = eltType.getSizeInBits();
+			if (size <= 8) {
+				// extend to int
+				return (int) Array.getByte(array, index);
+			} else if (size <= 16) {
+				// extend to int
+				return (int) Array.getShort(array, index);
+			} else if (size <= 32) {
+				return Array.getInt(array, index);
+			} else if (size <= 64) {
+				return Array.getLong(array, index);
+			}
+		} else if (eltType.isUint()) {
+			int size = eltType.getSizeInBits();
+			if (size < 8) {
+				// extend to int
+				return (int) Array.getByte(array, index);
+			} else if (size < 16) {
+				// extend to int
+				return (int) Array.getShort(array, index);
+			} else if (size < 32) {
+				return Array.getInt(array, index);
+			} else if (size < 64) {
+				return Array.getLong(array, index);
+			}
+		}
+
+		return Array.get(array, index);
 	}
 
 	public static BigInteger getBigInteger(Object value) {
@@ -138,6 +239,18 @@ public class ValueUtil {
 			return (BigInteger) value;
 		} else {
 			return null;
+		}
+	}
+
+	private static byte getByteValue(Object value) {
+		if (value instanceof Integer) {
+			return ((Integer) value).byteValue();
+		} else if (value instanceof Long) {
+			return ((Long) value).byteValue();
+		} else if (value instanceof BigInteger) {
+			return ((BigInteger) value).byteValue();
+		} else {
+			return 0;
 		}
 	}
 
@@ -167,13 +280,37 @@ public class ValueUtil {
 		return integer;
 	}
 
-	public static int getIntValue(Object value) {
+	private static int getIntValue(Object value) {
 		if (value instanceof Integer) {
 			return ((Integer) value).intValue();
 		} else if (value instanceof Long) {
 			return ((Long) value).intValue();
 		} else if (value instanceof BigInteger) {
 			return ((BigInteger) value).intValue();
+		} else {
+			return 0;
+		}
+	}
+
+	private static long getLongValue(Object value) {
+		if (value instanceof Integer) {
+			return ((Integer) value).longValue();
+		} else if (value instanceof Long) {
+			return ((Long) value).longValue();
+		} else if (value instanceof BigInteger) {
+			return ((BigInteger) value).longValue();
+		} else {
+			return 0;
+		}
+	}
+
+	private static short getShortValue(Object value) {
+		if (value instanceof Integer) {
+			return ((Integer) value).shortValue();
+		} else if (value instanceof Long) {
+			return ((Long) value).shortValue();
+		} else if (value instanceof BigInteger) {
+			return ((BigInteger) value).shortValue();
 		} else {
 			return 0;
 		}
@@ -351,10 +488,49 @@ public class ValueUtil {
 		return getIntValue(bi1.or(bi2));
 	}
 
-	public static void set(Type type, Object array, List<Expression> indexes,
+	public static void set(TypeList type, Object array, List<Object> indexes,
 			Object value) {
-		// TODO Auto-generated method stub
+		int numIndexes = indexes.size();
+		for (int i = 0; i < numIndexes - 1; i++) {
+			int index = getIntValue(indexes.get(i));
+			array = Array.get(array, index);
+		}
 
+		int index = getIntValue(indexes.get(numIndexes - 1));
+		Type eltType = type.getElementType();
+		if (eltType.isBool()) {
+			Array.setBoolean(array, index, (Boolean) value);
+		} else if (eltType.isFloat()) {
+			Array.setFloat(array, index, (Float) value);
+		} else if (eltType.isInt()) {
+			int size = eltType.getSizeInBits();
+			if (size <= 8) {
+				Array.setByte(array, index, getByteValue(value));
+			} else if (size <= 16) {
+				Array.setShort(array, index, getShortValue(value));
+			} else if (size <= 32) {
+				Array.setInt(array, index, getIntValue(value));
+			} else if (size <= 64) {
+				Array.setLong(array, index, getLongValue(value));
+			} else {
+				Array.set(array, index, value);
+			}
+		} else if (eltType.isUint()) {
+			int size = eltType.getSizeInBits();
+			if (size < 8) {
+				Array.setByte(array, index, getByteValue(value));
+			} else if (size < 16) {
+				Array.setShort(array, index, getShortValue(value));
+			} else if (size < 32) {
+				Array.setInt(array, index, getIntValue(value));
+			} else if (size < 64) {
+				Array.setLong(array, index, getLongValue(value));
+			} else {
+				Array.set(array, index, value);
+			}
+		} else {
+			Array.set(array, index, value);
+		}
 	}
 
 	/**
