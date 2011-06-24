@@ -74,6 +74,7 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.validation.AbstractCalJavaValidator;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.util.TypeUtil;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -192,7 +193,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 						Type type = checker.getType(value);
 						if (type.isList()) {
 							TypeList typeList = (TypeList) type;
-							Type lub = checker.getLub(portType,
+							Type lub = TypeUtil.getLub(portType,
 									typeList.getType());
 							if (lub != null && typeList.getSize() >= repeat) {
 								continue;

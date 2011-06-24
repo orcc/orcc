@@ -66,8 +66,8 @@ import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.impl.ExprIntImpl;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -91,23 +91,6 @@ public class TypeChecker extends CalSwitch<Type> {
 	 */
 	public TypeChecker(CalJavaValidator validator) {
 		this.validator = validator;
-	}
-
-	/**
-	 * Returns <code>true</code> if the two given types are compatible.
-	 * 
-	 * @param t1
-	 *            a type
-	 * @param t2
-	 *            another type
-	 * @return <code>true</code> if the two given types are compatible
-	 */
-	public boolean areTypeCompatible(Type t1, Type t2) {
-		if (t1 == null || t2 == null) {
-			return false;
-		}
-
-		return getLub(t1, t2) != null;
 	}
 
 	@Override
@@ -183,7 +166,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		type = getLub(t1, t2);
+		type = TypeUtil.getLub(t1, t2);
 		if (type == null) {
 			error("Incompatible operand types " + t1 + " and " + t2,
 					expression, eINSTANCE.getAstExpressionIf_Condition(), -1);
@@ -223,7 +206,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionInteger(AstExpressionInteger expression) {
-		return IrFactory.eINSTANCE.createTypeInt(ExprIntImpl.getSize(expression
+		return IrFactory.eINSTANCE.createTypeInt(TypeUtil.getSize(expression
 				.getValue()));
 	}
 
@@ -300,8 +283,8 @@ public class TypeChecker extends CalSwitch<Type> {
 				return null;
 			}
 			TypeList listType = (TypeList) type;
-			return IrFactory.eINSTANCE.createTypeInt(ExprIntImpl
-					.getSize(listType.getSize()));
+			return IrFactory.eINSTANCE.createTypeInt(TypeUtil.getSize(listType
+					.getSize()));
 		default:
 			error("Unknown unary operator", expression,
 					eINSTANCE.getAstExpressionUnary_Expression(), -1);
@@ -378,7 +361,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			AstExpression index = itI.next();
 			if (EcoreUtil.isAncestor(index, expression)) {
 				// index goes from 0 to dim - 1
-				int indexSize = ExprIntImpl.getSize(new ExpressionEvaluator()
+				int indexSize = TypeUtil.getSize(new ExpressionEvaluator()
 						.evaluateAsInteger(dim) - 1);
 				return IrFactory.eINSTANCE.createTypeInt(indexSize);
 			}
@@ -454,82 +437,6 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Returns the Least Upper Bound of the given types.
-	 * 
-	 * @param t1
-	 *            a type
-	 * @param t2
-	 *            another type
-	 * @return the Least Upper Bound of the given types
-	 */
-	public Type getLub(Type t1, Type t2) {
-		if (t1 == null || t2 == null) {
-			return null;
-		}
-
-		if (t1.isBool() && t2.isBool()) {
-			return t1;
-		} else if (t1.isFloat() && t2.isFloat()) {
-			return t1;
-		} else if (t1.isString() && t2.isString()) {
-			return t1;
-		} else if (t1.isInt() && t2.isInt()) {
-			return IrFactory.eINSTANCE.createTypeInt(Math.max(
-					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
-		} else if (t1.isList() && t2.isList()) {
-			TypeList listType1 = (TypeList) t1;
-			TypeList listType2 = (TypeList) t2;
-			Type type = getLub(listType1.getType(), listType2.getType());
-			if (type != null) {
-				// only return a list when the underlying type is valid
-				int size = Math.max(listType1.getSize(), listType2.getSize());
-				return IrFactory.eINSTANCE.createTypeList(size, type);
-			}
-		} else if (t1.isUint() && t2.isUint()) {
-			return IrFactory.eINSTANCE.createTypeUint(Math.max(
-					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
-		} else if (t1.isInt() && t2.isUint()) {
-			int si = ((TypeInt) t1).getSize();
-			int su = ((TypeUint) t2).getSize();
-			if (si > su) {
-				return IrFactory.eINSTANCE.createTypeInt(si);
-			} else {
-				return IrFactory.eINSTANCE.createTypeInt(su + 1);
-			}
-		} else if (t1.isUint() && t2.isInt()) {
-			int su = ((TypeUint) t1).getSize();
-			int si = ((TypeInt) t2).getSize();
-			if (si > su) {
-				return IrFactory.eINSTANCE.createTypeInt(si);
-			} else {
-				return IrFactory.eINSTANCE.createTypeInt(su + 1);
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the size of the given type if this type is a int or an uint, and
-	 * zero otherwise.
-	 * 
-	 * @param type
-	 *            a type
-	 * @return the size of the given type
-	 */
-	private int getSize(Type type) {
-		if (type.isInt()) {
-			TypeInt typeInt = (TypeInt) type;
-			return typeInt.getSize();
-		} else if (type.isUint()) {
-			TypeUint typeUint = (TypeUint) type;
-			return typeUint.getSize();
-		} else {
-			return 0;
-		}
-	}
-
-	/**
 	 * Computes and returns the type of the given expression.
 	 * 
 	 * @param expression
@@ -562,7 +469,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			while (it.hasNext()) {
 				expression = it.next();
 				Type t2 = getType(expression);
-				t1 = getLub(t1, t2);
+				t1 = TypeUtil.getLub(t1, t2);
 			}
 			return t1;
 		}
@@ -614,12 +521,12 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type type = getLub(t1, t2);
+		Type type = TypeUtil.getLub(t1, t2);
 		if (type == null) {
 			return null;
 		}
 
-		setSize(type, getSize(type) + 1);
+		setSize(type, type.getSizeInBits() + 1);
 
 		return type;
 	}
@@ -672,7 +579,7 @@ public class TypeChecker extends CalSwitch<Type> {
 						index);
 				return null;
 			}
-			return getLub(t1, t2);
+			return TypeUtil.getLub(t1, t2);
 
 		case TIMES:
 			return getTypeTimes(t1, t2, source, feature, index);
@@ -720,7 +627,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		case LE:
 		case LT:
 		case NE:
-			Type type = getLub(t1, t2);
+			Type type = TypeUtil.getLub(t1, t2);
 			if (type == null) {
 				error("Incompatible operand types " + t1 + " and " + t2,
 						source, feature, index);
@@ -777,12 +684,12 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type type = getLub(t1, t2);
+		Type type = TypeUtil.getLub(t1, t2);
 		if (type == null) {
 			return null;
 		}
 
-		setSize(type, getSize(type) + 1);
+		setSize(type, type.getSizeInBits() + 1);
 
 		return type;
 	}
@@ -867,12 +774,12 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		Type type = getLub(t1, t2);
+		Type type = TypeUtil.getLub(t1, t2);
 		if (type == null) {
 			return null;
 		}
 
-		setSize(type, getSize(t1) + getSize(t2));
+		setSize(type, t1.getSizeInBits() + t2.getSizeInBits());
 
 		return type;
 	}

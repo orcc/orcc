@@ -34,18 +34,14 @@ import java.util.List;
 
 import net.sf.orcc.backends.instructions.InstRamSetAddress;
 import net.sf.orcc.backends.instructions.InstructionsPackage;
-
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.impl.ExprIntImpl;
 import net.sf.orcc.ir.util.ExpressionPrinter;
+import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.common.notify.NotificationChain;
-
 import org.eclipse.emf.common.util.EList;
-
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
-
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -180,7 +176,7 @@ public class InstRamSetAddressImpl extends InstRamImpl implements
 		List<Integer> indexSizes = new ArrayList<Integer>(dimensions.size());
 		for (int size : dimensions) {
 			// index goes from 0 to size - 1, and we remove the sign bit
-			int indexSize = ExprIntImpl.getSize(size - 1) - 1;
+			int indexSize = TypeUtil.getSize(size - 1) - 1;
 			indexSizes.add(indexSize);
 		}
 

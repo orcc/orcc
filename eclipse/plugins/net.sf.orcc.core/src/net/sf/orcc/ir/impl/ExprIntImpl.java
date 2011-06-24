@@ -13,6 +13,7 @@ import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
@@ -39,32 +40,6 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 	 * @ordered
 	 */
 	protected static final BigInteger VALUE_EDEFAULT = null;
-
-	/**
-	 * Returns the number of bits in the two's-complement representation of the
-	 * given number, <i>including</i> a sign bit.
-	 * 
-	 * @param number
-	 *            a number
-	 * @return the number of bits in the two's-complement representation of the
-	 *         given number, <i>including</i> a sign bit
-	 */
-	public static int getSize(BigInteger number) {
-		return number.bitLength() + 1;
-	}
-
-	/**
-	 * Returns the number of bits in the two's-complement representation of the
-	 * given number, <i>including</i> a sign bit.
-	 * 
-	 * @param number
-	 *            a number
-	 * @return the number of bits in the two's-complement representation of the
-	 *         given number, <i>including</i> a sign bit
-	 */
-	public static int getSize(long number) {
-		return getSize(BigInteger.valueOf(number));
-	}
 
 	/**
 	 * The cached value of the '{@link #getValue() <em>Value</em>}' attribute.
@@ -183,7 +158,7 @@ public class ExprIntImpl extends ExpressionImpl implements ExprInt {
 
 	@Override
 	public Type getType() {
-		return IrFactory.eINSTANCE.createTypeInt(getSize(value));
+		return IrFactory.eINSTANCE.createTypeInt(TypeUtil.getSize(value));
 	}
 
 	/**

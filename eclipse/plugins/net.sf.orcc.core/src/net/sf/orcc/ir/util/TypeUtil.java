@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.util;
 
+import java.math.BigInteger;
+
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
@@ -41,6 +43,23 @@ import net.sf.orcc.ir.TypeUint;
  * 
  */
 public class TypeUtil {
+
+	/**
+	 * Returns <code>true</code> if the two given types are compatible.
+	 * 
+	 * @param t1
+	 *            a type
+	 * @param t2
+	 *            another type
+	 * @return <code>true</code> if the two given types are compatible
+	 */
+	public static boolean areTypeCompatible(Type t1, Type t2) {
+		if (t1 == null || t2 == null) {
+			return false;
+		}
+
+		return getLub(t1, t2) != null;
+	}
 
 	/**
 	 * Returns the Least Upper Bound of the given types.
@@ -57,11 +76,11 @@ public class TypeUtil {
 		}
 
 		if (t1.isBool() && t2.isBool()) {
-			return t1;
+			return IrFactory.eINSTANCE.createTypeBool();
 		} else if (t1.isFloat() && t2.isFloat()) {
-			return t1;
+			return IrFactory.eINSTANCE.createTypeFloat();
 		} else if (t1.isString() && t2.isString()) {
-			return t1;
+			return IrFactory.eINSTANCE.createTypeString();
 		} else if (t1.isInt() && t2.isInt()) {
 			return IrFactory.eINSTANCE.createTypeInt(Math.max(
 					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
@@ -96,6 +115,32 @@ public class TypeUtil {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the number of bits in the two's-complement representation of the
+	 * given number, <i>including</i> a sign bit.
+	 * 
+	 * @param number
+	 *            a number
+	 * @return the number of bits in the two's-complement representation of the
+	 *         given number, <i>including</i> a sign bit
+	 */
+	public static int getSize(BigInteger number) {
+		return number.bitLength() + 1;
+	}
+
+	/**
+	 * Returns the number of bits in the two's-complement representation of the
+	 * given number, <i>including</i> a sign bit.
+	 * 
+	 * @param number
+	 *            a number
+	 * @return the number of bits in the two's-complement representation of the
+	 *         given number, <i>including</i> a sign bit
+	 */
+	public static int getSize(long number) {
+		return getSize(BigInteger.valueOf(number));
 	}
 
 }
