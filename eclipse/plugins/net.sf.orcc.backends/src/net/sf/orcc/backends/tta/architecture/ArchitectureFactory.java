@@ -182,6 +182,15 @@ public interface ArchitectureFactory extends EFactory {
 	ExprUnary createExprUnary(boolean isInverted, Term term);
 
 	/**
+	 * Returns a new object of class '<em>Function Unit</em>'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return a new object of class '<em>Function Unit</em>'.
+	 * @generated
+	 */
+	FunctionUnit createFunctionUnit();
+
+	/**
 	 * Returns a new simple function unit with 2 input ports and 1 output ports
 	 * without operation
 	 * 
@@ -191,7 +200,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the name of the function unit
 	 * @return a simple FunctionUnit
 	 */
-	FunctionUnit createFonctionUnit(TTA tta, String name);
+	FunctionUnit createFunctionUnit(TTA tta, String name);
 
 	/**
 	 * Returns a new simple function unit with 2 input ports and 1 output ports
@@ -207,17 +216,8 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the names of 2-input/1-output operations
 	 * @return a simple FunctionUnit
 	 */
-	FunctionUnit createFonctionUnit(TTA tta, String name, String[] operations1,
+	FunctionUnit createFunctionUnit(TTA tta, String name, String[] operations1,
 			String[] operations2);
-
-	/**
-	 * Returns a new object of class '<em>Function Unit</em>'. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
-	 * 
-	 * @return a new object of class '<em>Function Unit</em>'.
-	 * @generated
-	 */
-	FunctionUnit createFunctionUnit();
 
 	/**
 	 * Returns a new object of class '<em>Global Control Unit</em>'. <!--

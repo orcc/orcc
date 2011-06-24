@@ -331,7 +331,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createFonctionUnit(TTA tta, String name) {
+	public FunctionUnit createFunctionUnit(TTA tta, String name) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
 		functionUnit.setName(name);
 		// Sockets
@@ -353,9 +353,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createFonctionUnit(TTA tta, String name,
+	public FunctionUnit createFunctionUnit(TTA tta, String name,
 			String[] operations1, String[] operations2) {
-		FunctionUnit functionUnit = createFonctionUnit(tta, name);
+		FunctionUnit functionUnit = createFunctionUnit(tta, name);
 		EList<Port> ports = functionUnit.getPorts();
 		// Operations
 		if (operations1 != null) {
@@ -470,7 +470,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	@Override
 	public FunctionUnit createLSU(TTA tta) {
-		FunctionUnit LSU = createFonctionUnit(tta, "LSU");
+		FunctionUnit LSU = createFunctionUnit(tta, "LSU");
 		// Operations
 		EList<Port> ports = LSU.getPorts();
 		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
@@ -935,21 +935,21 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		// Guards
 		bus0.getGuards().addAll(createGuardsDefault(bool));
 		bus1.getGuards().addAll(createGuardsDefault(bool));
-		// Fonctional units
+		// Functional units
 		EList<FunctionUnit> units = tta.getFunctionUnits();
 		// * ALU
 		String[] aluOperations1 = { "sxqw", "sxhw" };
 		String[] aluOperations2 = { "add", "and", "eq", "gt", "gtu", "ior",
 				"shl", "shr", "shru", "sub", "xor" };
-		units.add(createFonctionUnit(tta, "ALU", aluOperations1, aluOperations2));
+		units.add(createFunctionUnit(tta, "ALU", aluOperations1, aluOperations2));
 		// * LSU
 		units.add(createLSU(tta));
 		// * Mul
 		String[] mulOperations2 = { "mul" };
-		units.add(createFonctionUnit(tta, "Mul", null, mulOperations2));
+		units.add(createFunctionUnit(tta, "Mul", null, mulOperations2));
 		// * And-ior-xor
 		String[] aixOperations2 = { "and", "ior", "xor" };
-		units.add(createFonctionUnit(tta, "And_ior_xor", null, aixOperations2));
+		units.add(createFunctionUnit(tta, "And_ior_xor", null, aixOperations2));
 		return tta;
 	}
 
