@@ -32,8 +32,6 @@ import java.util.Set;
 
 import net.sf.orcc.ir.Action;
 
-import org.eclipse.emf.common.util.EMap;
-
 /**
  * This class defines a quasi-static dataflow (QSDF) MoC. QSDF is a model that
  * exhibits static behavior for a given configuration. An actor that has the
@@ -57,14 +55,6 @@ public interface QSDFMoC extends MoC {
 	Set<Action> getActions();
 
 	/**
-	 * Return the configurations of this quasi-static MoC.
-	 * 
-	 * @return a map of configurations
-	 * @model keyType="net.sf.orcc.ir.Action" valueType="net.sf.orcc.moc.SDFMoC"
-	 */
-	EMap<Action, SDFMoC> getConfigurations();
-
-	/**
 	 * Returns the SDF MoC that is associated with the configuration given by
 	 * the action.
 	 * 
@@ -72,6 +62,17 @@ public interface QSDFMoC extends MoC {
 	 *            a configuration action
 	 * @return a SDF MoC
 	 */
-	SDFMoC getStaticClass(Action action);
+	SDFMoC getSDFMoC(Action action);
+
+	/**
+	 * Sets the SDF MoC that is associated with the configuration given by the
+	 * action.
+	 * 
+	 * @param action
+	 *            a configuration action
+	 * @param moc
+	 *            a SDF MoC
+	 */
+	void setSDFMoC(Action action, SDFMoC moc);
 
 }

@@ -233,10 +233,6 @@
   </genPackages>
   <genPackages prefix="Moc" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="MoC.ecore#/">
-    <genDataTypes ecoreDataType="MoC.ecore#//EMap">
-      <genTypeParameters ecoreTypeParameter="MoC.ecore#//EMap/T"/>
-      <genTypeParameters ecoreTypeParameter="MoC.ecore#//EMap/T1"/>
-    </genDataTypes>
     <genClasses image="false" ecoreClass="MoC.ecore#//MoC"/>
     <genClasses ecoreClass="MoC.ecore#//CSDFMoC">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//CSDFMoC/inputPattern"/>
@@ -246,14 +242,8 @@
     </genClasses>
     <genClasses ecoreClass="MoC.ecore#//DPNMoC"/>
     <genClasses ecoreClass="MoC.ecore#//KPNMoC"/>
-    <genClasses ecoreClass="MoC.ecore#//QSDFMoC">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MoC.ecore#//QSDFMoC/configurations"/>
-    </genClasses>
+    <genClasses ecoreClass="MoC.ecore#//QSDFMoC"/>
     <genClasses ecoreClass="MoC.ecore#//SDFMoC"/>
-    <genClasses ecoreClass="MoC.ecore#//ActionToSDFMoCMapEntry">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//ActionToSDFMoCMapEntry/key"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//ActionToSDFMoCMapEntry/value"/>
-    </genClasses>
     <genClasses ecoreClass="MoC.ecore#//Invocation">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MoC.ecore#//Invocation/action"/>
     </genClasses>

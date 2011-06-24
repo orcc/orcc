@@ -6,15 +6,18 @@
  */
 package net.sf.orcc.moc.util;
 
-import java.util.Map;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.moc.*;
+import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.DPNMoC;
+import net.sf.orcc.moc.Invocation;
+import net.sf.orcc.moc.KPNMoC;
+import net.sf.orcc.moc.MoC;
+import net.sf.orcc.moc.MocPackage;
+import net.sf.orcc.moc.QSDFMoC;
+import net.sf.orcc.moc.SDFMoC;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
-
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -96,10 +99,6 @@ public class MocAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public Adapter caseSDFMoC(SDFMoC object) {
 				return createSDFMoCAdapter();
-			}
-			@Override
-			public Adapter caseActionToSDFMoCMapEntry(Map.Entry<Action, SDFMoC> object) {
-				return createActionToSDFMoCMapEntryAdapter();
 			}
 			@Override
 			public Adapter caseInvocation(Invocation object) {
@@ -206,20 +205,6 @@ public class MocAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createSDFMoCAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link java.util.Map.Entry <em>Action To SDF Mo CMap Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see java.util.Map.Entry
-	 * @generated
-	 */
-	public Adapter createActionToSDFMoCMapEntryAdapter() {
 		return null;
 	}
 

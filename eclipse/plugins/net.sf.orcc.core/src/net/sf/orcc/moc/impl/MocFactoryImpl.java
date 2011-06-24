@@ -6,8 +6,6 @@
  */
 package net.sf.orcc.moc.impl;
 
-import java.util.Map;
-
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.moc.CSDFMoC;
@@ -19,9 +17,7 @@ import net.sf.orcc.moc.MocPackage;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
 
-import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
@@ -77,28 +73,6 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String convertEMapToString(EDataType eDataType, Object instanceValue) {
-		return super.convertToString(instanceValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String convertToString(EDataType eDataType, Object instanceValue) {
-		switch (eDataType.getClassifierID()) {
-			case MocPackage.EMAP:
-				return convertEMapToString(eDataType, instanceValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
-		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
@@ -107,20 +81,10 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 			case MocPackage.KPN_MO_C: return createKPNMoC();
 			case MocPackage.QSDF_MO_C: return createQSDFMoC();
 			case MocPackage.SDF_MO_C: return createSDFMoC();
-			case MocPackage.ACTION_TO_SDF_MO_CMAP_ENTRY: return (EObject)createActionToSDFMoCMapEntry();
 			case MocPackage.INVOCATION: return createInvocation();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Action, SDFMoC> createActionToSDFMoCMapEntry() {
-		ActionToSDFMoCMapEntryImpl actionToSDFMoCMapEntry = new ActionToSDFMoCMapEntryImpl();
-		return actionToSDFMoCMapEntry;
 	}
 
 	/**
@@ -140,29 +104,6 @@ public class MocFactoryImpl extends EFactoryImpl implements MocFactory {
 	public DPNMoC createDPNMoC() {
 		DPNMoCImpl dpnMoC = new DPNMoCImpl();
 		return dpnMoC;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EMap<?, ?> createEMapFromString(EDataType eDataType,
-			String initialValue) {
-		return (EMap<?, ?>)super.createFromString(initialValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object createFromString(EDataType eDataType, String initialValue) {
-		switch (eDataType.getClassifierID()) {
-			case MocPackage.EMAP:
-				return createEMapFromString(eDataType, initialValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
-		}
 	}
 
 	/**

@@ -331,7 +331,7 @@ public class LLVMTemplateData {
 
 	private void computeQSDFMoC(QSDFMoC qsdfMoc) {
 		for (Action action : qsdfMoc.getActions()) {
-			computeConfiguration(action, qsdfMoc.getStaticClass(action));
+			computeConfiguration(action, qsdfMoc.getSDFMoC(action));
 		}
 	}
 
