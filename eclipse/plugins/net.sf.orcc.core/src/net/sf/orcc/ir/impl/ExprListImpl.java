@@ -11,9 +11,9 @@ import java.util.Collection;
 import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.util.TypeUtil;
 
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.AbstractEList;
@@ -141,31 +141,19 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 		return getValue().get(index.getIntValue());
 	}
 
+	@Override
 	public Expression get(int index) {
 		return getValue().get(index);
 	}
 
+	@Override
 	public int getSize() {
 		return getValue().size();
 	}
 
 	@Override
 	public Type getType() {
-		if (getValue().size() == 0) {
-			return null;
-		}
-
-		// Verify if every expressions on the list are getting the same type
-		Expression firstExpr = getValue().get(0);
-		Type refType = firstExpr.getType();
-		for (Expression expr : getValue()) {
-			Type type = expr.getType();
-			if (!refType.equals(type)) {
-				return null;
-			}
-		}
-
-		return IrFactory.eINSTANCE.createTypeList(getSize(), refType);
+		return TypeUtil.getType(this);
 	}
 
 	/**
@@ -184,10 +172,12 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 		return true;
 	}
 
+	@Override
 	public void set(ExprInt index, Expression value) {
 		((AbstractEList<Expression>) getValue()).setUnique(index.getIntValue(), value);
 	}
 
+	@Override
 	public void set(int index, Expression value) {
 		((AbstractEList<Expression>) getValue()).set(index, value);
 	}

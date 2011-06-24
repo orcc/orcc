@@ -28,8 +28,15 @@
  */
 package net.sf.orcc.ir.util;
 
-import java.math.BigInteger;
+import static net.sf.orcc.ir.IrFactory.eINSTANCE;
 
+import java.math.BigInteger;
+import java.util.Iterator;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
+import net.sf.orcc.ir.ExprList;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
@@ -141,6 +148,30 @@ public class TypeUtil {
 	 */
 	public static int getSize(long number) {
 		return getSize(BigInteger.valueOf(number));
+	}
+
+	/**
+	 * Computes the type of the given list expression.
+	 * 
+	 * @param expr
+	 *            a list expression
+	 * @return the type of the given list expression
+	 */
+	public static Type getType(ExprList expr) {
+		Iterator<Expression> it = expr.getValue().iterator();
+		if (it.hasNext()) {
+			Expression subExpr = it.next();
+			Type eltLubType = EcoreUtil.copy(subExpr.getType());
+			while (it.hasNext()) {
+				subExpr = it.next();
+				Type t2 = subExpr.getType();
+				eltLubType = TypeUtil.getLub(eltLubType, t2);
+			}
+
+			return eINSTANCE.createTypeList(expr.getSize(), eltLubType);
+		}
+
+		return null;
 	}
 
 }
