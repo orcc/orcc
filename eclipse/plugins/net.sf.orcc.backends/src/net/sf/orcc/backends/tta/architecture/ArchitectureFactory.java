@@ -109,6 +109,19 @@ public interface ArchitectureFactory extends EFactory {
 	Bus createBus(int index, int width);
 
 	/**
+	 * Returns a new simple bus containing only one segment, using zero
+	 * extension mode and initialized with the given arguments
+	 * 
+	 * @param index
+	 *            the index of the bus
+	 * @param width
+	 *            the width of the bus
+	 * @return a Bus containing only one segment, using zero extension mode and
+	 *         initialized with the given arguments
+	 */
+	Bus createBusDefault(int index, int width);
+
+	/**
 	 * Returns a new object of class '<em>Expr Binary</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -169,6 +182,35 @@ public interface ArchitectureFactory extends EFactory {
 	ExprUnary createExprUnary(boolean isInverted, Term term);
 
 	/**
+	 * Returns a new simple function unit with 2 input ports and 1 output ports
+	 * without operation
+	 * 
+	 * @param tta
+	 *            the containing TTA processor
+	 * @param name
+	 *            the name of the function unit
+	 * @return a simple FunctionUnit
+	 */
+	FunctionUnit createFonctionUnit(TTA tta, String name);
+
+	/**
+	 * Returns a new simple function unit with 2 input ports and 1 output ports
+	 * with operations
+	 * 
+	 * @param tta
+	 *            the containing TTA processor
+	 * @param name
+	 *            the name of the function unit
+	 * @param operations1
+	 *            the names of 1-input/1-output operations
+	 * @param operations2
+	 *            the names of 2-input/1-output operations
+	 * @return a simple FunctionUnit
+	 */
+	FunctionUnit createFonctionUnit(TTA tta, String name, String[] operations1,
+			String[] operations2);
+
+	/**
 	 * Returns a new object of class '<em>Function Unit</em>'. <!--
 	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
@@ -196,6 +238,26 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a GlobalControlUnit with the given parameters
 	 */
 	GlobalControlUnit createGlobalControlUnit(int delaySlots, int guardLatency);
+
+	/**
+	 * Returns a new global control unit corresponding to default TTA processor
+	 * include in the TCE tools
+	 * 
+	 * @param tta
+	 *            the containing TTA processor
+	 * @return a simple GlobalControlUnit
+	 */
+	GlobalControlUnit createGlobalControlUnitDefault(TTA tta);
+
+	/**
+	 * Returns a new list of guards corresponding to default TTA processor
+	 * include in the TCE tools
+	 * 
+	 * @param register
+	 *            the referenced BOOL register
+	 * @return a simple list of guards
+	 */
+	EList<Guard> createGuardsDefault(RegisterFile register);
 
 	/**
 	 * Return a new input socket with the given parameters
@@ -236,30 +298,15 @@ public interface ArchitectureFactory extends EFactory {
 	Operation createOperation(String name);
 
 	/**
-	 * Returns a new load operation
+	 * Returns a new simple control operation containing only one read operation
 	 * 
 	 * @param name
-	 *            the name of the load operation
-	 * @param in
-	 *            the input port
-	 * @param out
-	 *            the output port
-	 * @return a load Operation with the given parameters
+	 *            the name of the operation
+	 * @param port
+	 *            the port read by this operation
+	 * @return a control Operation
 	 */
-	Operation createOperationLoad(String name, Port in, Port out);
-
-	/**
-	 * Returns a new store operation
-	 * 
-	 * @param name
-	 *            the name of the load operation
-	 * @param in1
-	 *            the first input port
-	 * @param in2
-	 *            the second input port
-	 * @return a store Operation with the given parameters
-	 */
-	Operation createOperationStore(String name, Port in1, Port in2);
+	Operation createOperationCtrl(String name, Port port);
 
 	/**
 	 * Return a new output socket with the given parameters
@@ -356,6 +403,23 @@ public interface ArchitectureFactory extends EFactory {
 			int maxReads, int maxWrites);
 
 	/**
+	 * Returns a new register file corresponding to default TTA processor
+	 * include in the TCE tools
+	 * 
+	 * @param tta
+	 *            the containing TTA processor
+	 * @param name
+	 *            the name of the register file
+	 * @param size
+	 *            the size of the register file
+	 * @param width
+	 *            the width of the register file
+	 * @return a new simple RegisterFile
+	 */
+	RegisterFile createRegisterFileDefault(TTA tta, String name, int size,
+			int width);
+
+	/**
 	 * Returns a new object of class '<em>Resource</em>'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
@@ -363,6 +427,19 @@ public interface ArchitectureFactory extends EFactory {
 	 * @generated
 	 */
 	Resource createResource();
+
+	/**
+	 * Return a new resource initialized with the given parameters
+	 * 
+	 * @param name
+	 *            the name of the resource
+	 * @param startCycle
+	 *            the start of the resource use
+	 * @param cycle
+	 *            the duration of the resource use
+	 * @return a Resource initialized with the given parameters
+	 */
+	Resource createResource(String name, int startCycle, int cycles);
 
 	/**
 	 * Returns a new object of class '<em>Segment</em>'.
@@ -406,166 +483,6 @@ public interface ArchitectureFactory extends EFactory {
 	ShortImmediate createShortImmediate(int width, Extension extension);
 
 	/**
-	 * Returns a new simple bus containing only one segment, using zero
-	 * extension mode and initialized with the given arguments
-	 * 
-	 * @param index
-	 *            the index of the bus
-	 * @param width
-	 *            the width of the bus
-	 * @return a Bus containing only one segment, using zero extension mode and
-	 *         initialized with the given arguments
-	 */
-	Bus createBusDefault(int index, int width);
-
-	/**
-	 * Returns a new simple control operation containing only one read operation
-	 * 
-	 * @param name
-	 *            the name of the operation
-	 * @param port
-	 *            the port read by this operation
-	 * @return a control Operation
-	 */
-	Operation createOperationCtrl(String name, Port port);
-
-	/**
-	 * Returns a new simple function unit with 2 input ports and 1 output ports
-	 * without operation
-	 * 
-	 * @param tta
-	 *            the containing TTA processor
-	 * @param name
-	 *            the name of the function unit
-	 * @return a simple FunctionUnit
-	 */
-	FunctionUnit createFonctionUnit(TTA tta, String name);
-
-	/**
-	 * Returns a new simple function unit with 2 input ports and 1 output ports
-	 * with operations
-	 * 
-	 * @param tta
-	 *            the containing TTA processor
-	 * @param name
-	 *            the name of the function unit
-	 * @param operations1
-	 *            the names of 1-input/1-output operations
-	 * @param operations2
-	 *            the names of 2-input/1-output operations
-	 * @return a simple FunctionUnit
-	 */
-	FunctionUnit createFonctionUnit(TTA tta, String name,
-			String[] operations1, String[] operations2);
-
-	/**
-	 * Returns a new global control unit corresponding to default TTA processor
-	 * include in the TCE tools
-	 * 
-	 * @param tta
-	 *            the containing TTA processor
-	 * @return a simple GlobalControlUnit
-	 */
-	GlobalControlUnit createGlobalControlUnitDefault(TTA tta);
-
-	/**
-	 * Returns a new list of guards corresponding to default TTA processor
-	 * include in the TCE tools
-	 * 
-	 * @param register
-	 *            the referenced BOOL register
-	 * @return a simple list of guards
-	 */
-	EList<Guard> createGuardsDefault(RegisterFile register);
-
-	/**
-	 * Return a new simple operation (2-input or 1-input/1-output or 2-output)
-	 * with the given parameter
-	 * 
-	 * @param name
-	 *            the name of the operation
-	 * @param port1
-	 *            the first port
-	 * @param startCycle1
-	 *            the starting cycle of the first step of the operation
-	 * @param cycle1
-	 *            the duration of the first step of the operation
-	 * @param isReads1
-	 *            whether the first step of the operation is a reading
-	 * @param port2
-	 *            the second port
-	 * @param startCycle2
-	 *            the starting cycle of the second step of the operation
-	 * @param cycle2
-	 *            the duration of the second step of the operation
-	 * @param isReads2
-	 *            whether the second step of the operation is a reading
-	 * @return a new simple Operation initialized with the given parameters
-	 */
-	Operation createOperationDefault(String name, Port port1, int startCycle1,
-			int cycle1, boolean isReads1, Port port2, int startCycle2,
-			int cycle2, boolean isReads2);
-
-	/**
-	 * Return a new simple operation (1-input/1-output with a duration of 1
-	 * cycle) with the given parameters
-	 * 
-	 * @param name
-	 *            the name of the operation
-	 * @param in1
-	 *            the input port
-	 * @param out1
-	 *            the output port
-	 * @return a new simple Operation initialized with the given parameters
-	 */
-	Operation createOperationDefault(String name, Port in1, Port out1);
-
-	/**
-	 * Return a new simple operation (2-input/1-output with a duration of 1
-	 * cycle) with the given parameters
-	 * 
-	 * @param name
-	 *            the name of the operation
-	 * @param in1
-	 *            the first input port
-	 * @param in2
-	 *            the second input port
-	 * @param out1
-	 *            the output port
-	 * @return a new simple Operation initialized with the given parameters
-	 */
-	Operation createOperationDefault(String name, Port in1, Port in2, Port out1);
-
-	/**
-	 * Returns a new register file corresponding to default TTA processor
-	 * include in the TCE tools
-	 * 
-	 * @param tta
-	 *            the containing TTA processor
-	 * @param name
-	 *            the name of the register file
-	 * @param size
-	 *            the size of the register file
-	 * @param width
-	 *            the width of the register file
-	 * @return a new simple RegisterFile
-	 */
-	RegisterFile createRegisterFileDefault(TTA tta, String name, int size,
-			int width);
-
-	/**
-	 * Returns a simple TTA processor corresponding to default TTA processor
-	 * include in the TCE tools
-	 * 
-	 * @param name
-	 *            the name of the TTA
-	 * @return a simple TTA
-	 */
-	TTA createTTADefault(String name);
-	
-	TTA createTTASpecialized(String name, Instance instance);
-
-	/**
 	 * Returns a new object of class '<em>Socket</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -584,6 +501,28 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a Socket initialized with the given parameters
 	 */
 	Socket createSocket(String name, EList<Segment> segments);
+
+	/**
+	 * Return a new input Stream unit
+	 * 
+	 * @param tta
+	 *            the containing tta processor
+	 * @param index
+	 *            the index of the stream unit
+	 * @return a new input Stream unit
+	 */
+	FunctionUnit createStreamInput(TTA tta, int index);
+
+	/**
+	 * Return a new output Stream unit
+	 * 
+	 * @param tta
+	 *            the containing TTA processor
+	 * @param index
+	 *            the index of the stream unit
+	 * @return a new output Stream unit
+	 */
+	FunctionUnit createStreamOutput(TTA tta, int index);
 
 	/**
 	 * Returns a new object of class '<em>Term Bool</em>'.
@@ -644,6 +583,18 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a name TTA
 	 */
 	TTA createTTA(String name);
+
+	/**
+	 * Returns a simple TTA processor corresponding to default TTA processor
+	 * include in the TCE tools
+	 * 
+	 * @param name
+	 *            the name of the TTA
+	 * @return a simple TTA
+	 */
+	TTA createTTADefault(String name);
+
+	TTA createTTASpecialized(String name, Instance instance);
 
 	/**
 	 * Returns a new object of class '<em>Writes</em>'.
