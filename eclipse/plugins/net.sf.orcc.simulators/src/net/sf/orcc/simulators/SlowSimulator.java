@@ -45,7 +45,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -91,6 +90,8 @@ public class SlowSimulator extends AbstractSimulator {
 	private int fifoSize;
 
 	private Map<Instance, ActorInterpreter> interpreters;
+
+	private Map<Instance, BroadcastInterpreter> bcastInterpreters;
 
 	private String stimulusFile;
 
@@ -161,8 +162,15 @@ public class SlowSimulator extends AbstractSimulator {
 		Source.setFileName(stimulusFile);
 
 		for (Instance instance : network.getInstances()) {
-			ActorInterpreter interpreter = interpreters.get(instance);
-			interpreter.initialize();
+			if (instance.isActor()) {
+				ActorInterpreter interpreter = interpreters.get(instance);
+				interpreter.initialize();
+			} else {
+				BroadcastInterpreter interpreter = bcastInterpreters
+						.get(instance);
+				interpreter.initialize();
+
+			}
 		}
 	}
 
@@ -213,12 +221,10 @@ public class SlowSimulator extends AbstractSimulator {
 					interpreter.setFifos(fifos);
 
 				} else if (instance.isBroadcast()) {
-					Actor actor = IrFactory.eINSTANCE.createActor();
-					actor.setNative(true);
-					ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-							actor, instance.getParameters());
-					interpreters.put(instance, interpreter);
-					interpreter.setFifos(fifos);
+					BroadcastInterpreter bcastInterpreter = new BroadcastInterpreter(
+							instance.getBroadcast());
+					bcastInterpreters.put(instance, bcastInterpreter);
+					bcastInterpreter.setFifos(fifos);
 				}
 			}
 		}
@@ -229,11 +235,18 @@ public class SlowSimulator extends AbstractSimulator {
 		do {
 			boolean hasExecuted = false;
 			for (Instance instance : network.getInstances()) {
-				ActorInterpreter interpreter = interpreters.get(instance);
-
 				int nbFiring = 0;
-				while (interpreter.schedule()) {
-					nbFiring++;
+				if (instance.isActor()) {
+					ActorInterpreter interpreter = interpreters.get(instance);
+					while (interpreter.schedule()) {
+						nbFiring++;
+					}
+				} else {
+					BroadcastInterpreter interpreter = bcastInterpreters
+							.get(instance);
+					while (interpreter.schedule()) {
+						nbFiring++;
+					}
 				}
 				hasExecuted |= (nbFiring > 0);
 			}
@@ -245,6 +258,8 @@ public class SlowSimulator extends AbstractSimulator {
 	public void start(String mode) {
 		try {
 			interpreters = new HashMap<Instance, ActorInterpreter>();
+
+			bcastInterpreters = new HashMap<Instance, BroadcastInterpreter>();
 
 			fifos = new HashMap<Port, Fifo>();
 
