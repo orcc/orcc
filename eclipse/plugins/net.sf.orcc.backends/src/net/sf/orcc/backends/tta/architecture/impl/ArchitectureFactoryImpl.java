@@ -61,6 +61,7 @@ import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
 import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.network.Instance;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -74,12 +75,14 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
  * end-user-doc -->
+ * 
  * @generated
  */
 public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		ArchitectureFactory {
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @deprecated
 	 * @generated
 	 */
@@ -89,28 +92,28 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	/**
-	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates the default factory implementation. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public static ArchitectureFactory init() {
 		try {
-			ArchitectureFactory theArchitectureFactory = (ArchitectureFactory)EPackage.Registry.INSTANCE.getEFactory("http://orcc.sf.net/backends/tta/architecture/TTA_architecture"); 
+			ArchitectureFactory theArchitectureFactory = (ArchitectureFactory) EPackage.Registry.INSTANCE
+					.getEFactory("http://orcc.sf.net/backends/tta/architecture/TTA_architecture");
 			if (theArchitectureFactory != null) {
 				return theArchitectureFactory;
 			}
-		}
-		catch (Exception exception) {
+		} catch (Exception exception) {
 			EcorePlugin.INSTANCE.log(exception);
 		}
 		return new ArchitectureFactoryImpl();
 	}
 
 	/**
-	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc --> <!--
+	 * Creates an instance of the factory. <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArchitectureFactoryImpl() {
@@ -119,6 +122,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertExtensionToString(EDataType eDataType,
@@ -128,6 +132,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpBinaryToString(EDataType eDataType,
@@ -137,6 +142,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertOpUnaryToString(EDataType eDataType,
@@ -146,6 +152,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public String convertSocketTypeToString(EDataType eDataType,
@@ -155,60 +162,87 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
-			case ArchitecturePackage.SOCKET_TYPE:
-				return convertSocketTypeToString(eDataType, instanceValue);
-			case ArchitecturePackage.EXTENSION:
-				return convertExtensionToString(eDataType, instanceValue);
-			case ArchitecturePackage.OP_UNARY:
-				return convertOpUnaryToString(eDataType, instanceValue);
-			case ArchitecturePackage.OP_BINARY:
-				return convertOpBinaryToString(eDataType, instanceValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		case ArchitecturePackage.SOCKET_TYPE:
+			return convertSocketTypeToString(eDataType, instanceValue);
+		case ArchitecturePackage.EXTENSION:
+			return convertExtensionToString(eDataType, instanceValue);
+		case ArchitecturePackage.OP_UNARY:
+			return convertOpUnaryToString(eDataType, instanceValue);
+		case ArchitecturePackage.OP_BINARY:
+			return convertOpBinaryToString(eDataType, instanceValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case ArchitecturePackage.TTA: return createTTA();
-			case ArchitecturePackage.BUS: return createBus();
-			case ArchitecturePackage.BRIDGE: return createBridge();
-			case ArchitecturePackage.SEGMENT: return createSegment();
-			case ArchitecturePackage.GLOBAL_CONTROL_UNIT: return createGlobalControlUnit();
-			case ArchitecturePackage.FUNCTION_UNIT: return createFunctionUnit();
-			case ArchitecturePackage.REGISTER_FILE: return createRegisterFile();
-			case ArchitecturePackage.PORT: return createPort();
-			case ArchitecturePackage.SOCKET: return createSocket();
-			case ArchitecturePackage.OPERATION: return createOperation();
-			case ArchitecturePackage.ADDRESS_SPACE: return createAddressSpace();
-			case ArchitecturePackage.READS: return createReads();
-			case ArchitecturePackage.WRITES: return createWrites();
-			case ArchitecturePackage.RESOURCE: return createResource();
-			case ArchitecturePackage.SHORT_IMMEDIATE: return createShortImmediate();
-			case ArchitecturePackage.EXPR_UNARY: return createExprUnary();
-			case ArchitecturePackage.EXPR_BINARY: return createExprBinary();
-			case ArchitecturePackage.EXPR_TRUE: return createExprTrue();
-			case ArchitecturePackage.EXPR_FALSE: return createExprFalse();
-			case ArchitecturePackage.TERM_BOOL: return createTermBool();
-			case ArchitecturePackage.TERM_UNIT: return createTermUnit();
-			case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY: return (EObject)createportToIndexMapEntry();
-			default:
-				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		case ArchitecturePackage.TTA:
+			return createTTA();
+		case ArchitecturePackage.BUS:
+			return createBus();
+		case ArchitecturePackage.BRIDGE:
+			return createBridge();
+		case ArchitecturePackage.SEGMENT:
+			return createSegment();
+		case ArchitecturePackage.GLOBAL_CONTROL_UNIT:
+			return createGlobalControlUnit();
+		case ArchitecturePackage.FUNCTION_UNIT:
+			return createFunctionUnit();
+		case ArchitecturePackage.REGISTER_FILE:
+			return createRegisterFile();
+		case ArchitecturePackage.PORT:
+			return createPort();
+		case ArchitecturePackage.SOCKET:
+			return createSocket();
+		case ArchitecturePackage.OPERATION:
+			return createOperation();
+		case ArchitecturePackage.ADDRESS_SPACE:
+			return createAddressSpace();
+		case ArchitecturePackage.READS:
+			return createReads();
+		case ArchitecturePackage.WRITES:
+			return createWrites();
+		case ArchitecturePackage.RESOURCE:
+			return createResource();
+		case ArchitecturePackage.SHORT_IMMEDIATE:
+			return createShortImmediate();
+		case ArchitecturePackage.EXPR_UNARY:
+			return createExprUnary();
+		case ArchitecturePackage.EXPR_BINARY:
+			return createExprBinary();
+		case ArchitecturePackage.EXPR_TRUE:
+			return createExprTrue();
+		case ArchitecturePackage.EXPR_FALSE:
+			return createExprFalse();
+		case ArchitecturePackage.TERM_BOOL:
+			return createTermBool();
+		case ArchitecturePackage.TERM_UNIT:
+			return createTermUnit();
+		case ArchitecturePackage.PORT_TO_INDEX_MAP_ENTRY:
+			return (EObject) createPortToIndexMapEntry();
+		default:
+			throw new IllegalArgumentException("The class '" + eClass.getName()
+					+ "' is not a valid classifier");
 		}
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public AddressSpace createAddressSpace() {
@@ -217,8 +251,8 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public AddressSpace createAddressSpace(String name, int width, int minAddress,
-			int maxAddress) {
+	public AddressSpace createAddressSpace(String name, int width,
+			int minAddress, int maxAddress) {
 		AddressSpaceImpl addressSpace = new AddressSpaceImpl();
 		addressSpace.setName(name);
 		addressSpace.setWidth(width);
@@ -229,6 +263,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Bridge createBridge() {
@@ -238,6 +273,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Bus createBus() {
@@ -253,8 +289,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return bus;
 	}
 
+	@Override
+	public Bus createBusDefault(int index, int width) {
+		Bus bus = createBus(index, width);
+		bus.getSegments().add(createSegment("segment0"));
+		bus.setShortImmediate(createShortImmediate(width, Extension.ZERO));
+		return bus;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprBinary createExprBinary() {
@@ -273,6 +318,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprFalse createExprFalse() {
@@ -282,6 +328,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprTrue createExprTrue() {
@@ -291,6 +338,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ExprUnary createExprUnary() {
@@ -312,277 +360,17 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Extension createExtensionFromString(EDataType eDataType,
 			String initialValue) {
 		Extension result = Extension.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
 		return result;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object createFromString(EDataType eDataType, String initialValue) {
-		switch (eDataType.getClassifierID()) {
-			case ArchitecturePackage.SOCKET_TYPE:
-				return createSocketTypeFromString(eDataType, initialValue);
-			case ArchitecturePackage.EXTENSION:
-				return createExtensionFromString(eDataType, initialValue);
-			case ArchitecturePackage.OP_UNARY:
-				return createOpUnaryFromString(eDataType, initialValue);
-			case ArchitecturePackage.OP_BINARY:
-				return createOpBinaryFromString(eDataType, initialValue);
-			default:
-				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
-		}
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public FunctionUnit createFunctionUnit() {
-		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
-		return functionUnit;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public GlobalControlUnit createGlobalControlUnit() {
-		GlobalControlUnitImpl globalControlUnit = new GlobalControlUnitImpl();
-		return globalControlUnit;
-	}
-
-	@Override
-	public GlobalControlUnit createGlobalControlUnit(int delaySlots,
-			int guardLatency) {
-		GlobalControlUnitImpl globalControlUnit = new GlobalControlUnitImpl();
-		globalControlUnit.setDelaySlots(delaySlots);
-		globalControlUnit.setGuardLatency(guardLatency);
-		return globalControlUnit;
-	}
-
-	@Override
-	public Socket createInputSocket(String name, EList<Segment> segments) {
-		Socket socket = createSocket(name, segments);
-		socket.setType(SocketType.INPUT);
-		return socket;
-	}
-
-	@Override
-	public FunctionUnit createLSU(TTA tta) {
-		FunctionUnit LSU = createFonctionUnit(tta, "LSU");
-		// Operations
-		EList<Port> ports = LSU.getPorts();
-		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
-		for (String loadOperation : loadOperations) {
-			LSU.getOperations().add(
-					createOperationLoad(loadOperation, ports.get(0),
-							ports.get(2)));
-		}
-		String[] storeOperations = { "stw", "stq", "sth" };
-		for (String storeOperation : storeOperations) {
-			LSU.getOperations().add(
-					createOperationLoad(storeOperation, ports.get(0),
-							ports.get(1)));
-		}
-		LSU.setAddressSpace(tta.getData());
-		return LSU;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public OpBinary createOpBinaryFromString(EDataType eDataType,
-			String initialValue) {
-		OpBinary result = OpBinary.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
-		return result;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Operation createOperation() {
-		OperationImpl operation = new OperationImpl();
-		return operation;
-	}
-
-	@Override
-	public Operation createOperation(String name) {
-		OperationImpl operation = new OperationImpl();
-		operation.setName(name);
-		return operation;
-	}
-
-	@Override
-	public Operation createOperationLoad(String name, Port in, Port out) {
-		return createOperationDefault(name, in, 0, 1, true, out, 2, 1, false);
-	}
-
-	@Override
-	public Operation createOperationStore(String name, Port in1, Port in2) {
-		return createOperationDefault(name, in1, 0, 1, true, in2, 2, 1, true);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public OpUnary createOpUnaryFromString(EDataType eDataType,
-			String initialValue) {
-		OpUnary result = OpUnary.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
-		return result;
-	}
-
-	@Override
-	public Socket createOutputSocket(String name, EList<Segment> segments) {
-		Socket socket = createSocket(name, segments);
-		socket.setType(SocketType.OUTPUT);
-		return socket;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Port createPort() {
-		PortImpl port = new PortImpl();
-		return port;
-	}
-
-	@Override
-	public Port createPort(String name) {
-		PortImpl port = new PortImpl();
-		port.setName(name);
-		return port;
-	}
-
-	@Override
-	public Port createPort(String name, int width, boolean isOpcodeSelector,
-			boolean isTrigger) {
-		Port port = createPort(name);
-		port.setWidth(width);
-		port.setOpcodeSelector(isOpcodeSelector);
-		port.setTrigger(isTrigger);
-		return port;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Map.Entry<Port, Integer> createportToIndexMapEntry() {
-		portToIndexMapEntryImpl portToIndexMapEntry = new portToIndexMapEntryImpl();
-		return portToIndexMapEntry;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Reads createReads() {
-		ReadsImpl reads = new ReadsImpl();
-		return reads;
-	}
-
-	@Override
-	public Reads createReads(Port port, int startCycle, int cycle) {
-		ReadsImpl reads = new ReadsImpl();
-		reads.setPort(port);
-		reads.setStartCycle(startCycle);
-		reads.setCycles(cycle);
-		return reads;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public RegisterFile createRegisterFile() {
-		RegisterFileImpl registerFile = new RegisterFileImpl();
-		return registerFile;
-	}
-
-	@Override
-	public RegisterFile createRegisterFile(String name, int size, int width,
-			int maxReads, int maxWrites) {
-		RegisterFileImpl registerFile = new RegisterFileImpl();
-		registerFile.setName(name);
-		registerFile.setSize(size);
-		registerFile.setWidth(width);
-		registerFile.setMaxReads(maxReads);
-		registerFile.setMaxWrites(maxWrites);
-		return registerFile;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Resource createResource() {
-		ResourceImpl resource = new ResourceImpl();
-		return resource;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Segment createSegment() {
-		SegmentImpl segment = new SegmentImpl();
-		return segment;
-	}
-
-	@Override
-	public Segment createSegment(String name) {
-		SegmentImpl segment = new SegmentImpl();
-		segment.setName(name);
-		return segment;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ShortImmediate createShortImmediate() {
-		ShortImmediateImpl shortImmediate = new ShortImmediateImpl();
-		return shortImmediate;
-	}
-
-	@Override
-	public ShortImmediate createShortImmediate(int width, Extension extension) {
-		ShortImmediateImpl shortImmediate = new ShortImmediateImpl();
-		shortImmediate.setWidth(width);
-		shortImmediate.setExtension(extension);
-		return shortImmediate;
-	}
-
-	@Override
-	public Bus createBusDefault(int index, int width) {
-		Bus bus = createBus(index, width);
-		bus.getSegments().add(createSegment("segment0"));
-		bus.setShortImmediate(createShortImmediate(width, Extension.ZERO));
-		return bus;
-	}
-
-	@Override
-	public Operation createOperationCtrl(String name, Port port) {
-		Operation operation = new OperationImpl();
-		operation.setName(name);
-		operation.setControl(true);
-		operation.getPipeline().add(createReads(port, 0, 1));
-		operation.getPortToIndexMap().put(port, 1);
-		return operation;
 	}
 
 	@Override
@@ -630,6 +418,57 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return functionUnit;
 	}
 
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	@Override
+	public Object createFromString(EDataType eDataType, String initialValue) {
+		switch (eDataType.getClassifierID()) {
+		case ArchitecturePackage.SOCKET_TYPE:
+			return createSocketTypeFromString(eDataType, initialValue);
+		case ArchitecturePackage.EXTENSION:
+			return createExtensionFromString(eDataType, initialValue);
+		case ArchitecturePackage.OP_UNARY:
+			return createOpUnaryFromString(eDataType, initialValue);
+		case ArchitecturePackage.OP_BINARY:
+			return createOpBinaryFromString(eDataType, initialValue);
+		default:
+			throw new IllegalArgumentException("The datatype '"
+					+ eDataType.getName() + "' is not a valid classifier");
+		}
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public FunctionUnit createFunctionUnit() {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		return functionUnit;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public GlobalControlUnit createGlobalControlUnit() {
+		GlobalControlUnitImpl globalControlUnit = new GlobalControlUnitImpl();
+		return globalControlUnit;
+	}
+
+	@Override
+	public GlobalControlUnit createGlobalControlUnit(int delaySlots,
+			int guardLatency) {
+		GlobalControlUnitImpl globalControlUnit = new GlobalControlUnitImpl();
+		globalControlUnit.setDelaySlots(delaySlots);
+		globalControlUnit.setGuardLatency(guardLatency);
+		return globalControlUnit;
+	}
+
 	@Override
 	public GlobalControlUnit createGlobalControlUnitDefault(TTA tta) {
 		GlobalControlUnit gcu = createGlobalControlUnit(3, 1);
@@ -670,13 +509,81 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
+	public Socket createInputSocket(String name, EList<Segment> segments) {
+		Socket socket = createSocket(name, segments);
+		socket.setType(SocketType.INPUT);
+		return socket;
+	}
+
+	@Override
+	public FunctionUnit createLSU(TTA tta) {
+		FunctionUnit LSU = createFonctionUnit(tta, "LSU");
+		// Operations
+		EList<Port> ports = LSU.getPorts();
+		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
+		for (String loadOperation : loadOperations) {
+			LSU.getOperations().add(
+					createOperationLoad(loadOperation, ports.get(0),
+							ports.get(2)));
+		}
+		String[] storeOperations = { "stw", "stq", "sth" };
+		for (String storeOperation : storeOperations) {
+			LSU.getOperations().add(
+					createOperationStore(storeOperation, ports.get(0),
+							ports.get(1)));
+		}
+		LSU.setAddressSpace(tta.getData());
+		return LSU;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public OpBinary createOpBinaryFromString(EDataType eDataType,
+			String initialValue) {
+		OpBinary result = OpBinary.get(initialValue);
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
+		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Operation createOperation() {
+		OperationImpl operation = new OperationImpl();
+		return operation;
+	}
+
+	@Override
+	public Operation createOperation(String name) {
+		OperationImpl operation = new OperationImpl();
+		operation.setName(name);
+		return operation;
+	}
+
+	@Override
+	public Operation createOperationCtrl(String name, Port port) {
+		Operation operation = new OperationImpl();
+		operation.setName(name);
+		operation.setControl(true);
+		operation.getPipeline().add(createReads(port, 0, 1));
+		operation.getPortToIndexMap().put(port, 1);
+		return operation;
+	}
+
+	@Override
 	public Operation createOperationDefault(String name, Port port1,
 			int startCycle1, int cycle1, boolean isReads1, Port port2,
 			int startCycle2, int cycle2, boolean isReads2) {
 		Operation operation = createOperation(name);
 		operation.setControl(false);
-		operation.getPortToIndexMap().put(port1, 1);
-		operation.getPortToIndexMap().put(port2, 2);
 		Element element1, element2;
 		if (isReads1) {
 			element1 = createReads(port1, startCycle1, cycle1);
@@ -697,8 +604,6 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	public Operation createOperationDefault(String name, Port in1, Port out1) {
 		Operation operation = createOperation(name);
 		operation.setControl(false);
-		operation.getPortToIndexMap().put(in1, 1);
-		operation.getPortToIndexMap().put(out1, 2);
 		operation.getPipeline().add(createReads(in1, 0, 1));
 		operation.getPipeline().add(createWrites(out1, 0, 1));
 		return operation;
@@ -709,13 +614,163 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 			Port out1) {
 		Operation operation = createOperation(name);
 		operation.setControl(false);
-		operation.getPortToIndexMap().put(in1, 1);
-		operation.getPortToIndexMap().put(in2, 2);
-		operation.getPortToIndexMap().put(out1, 3);
 		operation.getPipeline().add(createReads(in1, 0, 1));
 		operation.getPipeline().add(createReads(in2, 0, 1));
 		operation.getPipeline().add(createWrites(out1, 0, 1));
 		return operation;
+	}
+
+	public Operation createOperationIn(String name, Port in, Port out) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createReads(in, 0, 1));
+		operation.getPipeline().add(createWrites(out, 1, 1));
+		return operation;
+	}
+
+	@Override
+	public Operation createOperationLoad(String name, Port in, Port out) {
+		return createOperationDefault(name, in, 0, 1, true, out, 2, 1, false);
+	}
+
+	public Operation createOperationOut(String name, Port in, Port out) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createReads(in, 0, 1));
+		return operation;
+	}
+
+	public Operation createOperationInPeek(String name, Port in, Port out) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createReads(in, 0, 1));
+		operation.getPipeline().add(createWrites(out, 1, 1));
+		return operation;
+	}
+	
+	public Operation createOperationInStatus(String name, Port in, Port out) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createResource("res0", 0, 3));
+		operation.getPipeline().add(createReads(in, 0, 1));
+		operation.getPipeline().add(createWrites(out, 1, 1));
+		return operation;
+	}
+
+	public Operation createOperationOutStatus(String name, Port in, Port out) {
+		Operation operation = createOperation(name);
+		operation.setControl(false);
+		operation.getPipeline().add(createReads(in, 0, 1));
+		operation.getPipeline().add(createWrites(out, 0, 1));
+		return operation;
+	}
+
+	@Override
+	public Operation createOperationStore(String name, Port in1, Port in2) {
+		return createOperationDefault(name, in1, 0, 1, true, in2, 2, 1, true);
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public OpUnary createOpUnaryFromString(EDataType eDataType,
+			String initialValue) {
+		OpUnary result = OpUnary.get(initialValue);
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
+		return result;
+	}
+
+	@Override
+	public Socket createOutputSocket(String name, EList<Segment> segments) {
+		Socket socket = createSocket(name, segments);
+		socket.setType(SocketType.OUTPUT);
+		return socket;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Port createPort() {
+		PortImpl port = new PortImpl();
+		return port;
+	}
+
+	@Override
+	public Port createPort(String name) {
+		PortImpl port = new PortImpl();
+		port.setName(name);
+		return port;
+	}
+
+	@Override
+	public Port createPort(String name, int width, boolean isOpcodeSelector,
+			boolean isTrigger) {
+		Port port = createPort(name);
+		port.setWidth(width);
+		port.setOpcodeSelector(isOpcodeSelector);
+		port.setTrigger(isTrigger);
+		return port;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Map.Entry<Port, Integer> createPortToIndexMapEntry() {
+		PortToIndexMapEntryImpl portToIndexMapEntry = new PortToIndexMapEntryImpl();
+		return portToIndexMapEntry;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Reads createReads() {
+		ReadsImpl reads = new ReadsImpl();
+		return reads;
+	}
+
+	@Override
+	public Reads createReads(Port port, int startCycle, int cycle) {
+		ReadsImpl reads = new ReadsImpl();
+		reads.setPort(port);
+		reads.setStartCycle(startCycle);
+		reads.setCycles(cycle);
+		return reads;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public RegisterFile createRegisterFile() {
+		RegisterFileImpl registerFile = new RegisterFileImpl();
+		return registerFile;
+	}
+
+	@Override
+	public RegisterFile createRegisterFile(String name, int size, int width,
+			int maxReads, int maxWrites) {
+		RegisterFileImpl registerFile = new RegisterFileImpl();
+		registerFile.setName(name);
+		registerFile.setSize(size);
+		registerFile.setWidth(width);
+		registerFile.setMaxReads(maxReads);
+		registerFile.setMaxWrites(maxWrites);
+		return registerFile;
 	}
 
 	@Override
@@ -737,6 +792,195 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		registerFile.getPorts().add(rd);
 
 		return registerFile;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Resource createResource() {
+		ResourceImpl resource = new ResourceImpl();
+		return resource;
+	}
+
+	public Resource createResource(String name, int startCycle, int cycles) {
+		ResourceImpl resource = new ResourceImpl();
+		resource.setName(name);
+		resource.setStartCycle(startCycle);
+		resource.setCycles(cycles);
+		return resource;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Segment createSegment() {
+		SegmentImpl segment = new SegmentImpl();
+		return segment;
+	}
+
+	@Override
+	public Segment createSegment(String name) {
+		SegmentImpl segment = new SegmentImpl();
+		segment.setName(name);
+		return segment;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public ShortImmediate createShortImmediate() {
+		ShortImmediateImpl shortImmediate = new ShortImmediateImpl();
+		return shortImmediate;
+	}
+
+	@Override
+	public ShortImmediate createShortImmediate(int width, Extension extension) {
+		ShortImmediateImpl shortImmediate = new ShortImmediateImpl();
+		shortImmediate.setWidth(width);
+		shortImmediate.setExtension(extension);
+		return shortImmediate;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public Socket createSocket() {
+		SocketImpl socket = new SocketImpl();
+		return socket;
+	}
+
+	@Override
+	public Socket createSocket(String name, EList<Segment> segments) {
+		SocketImpl socket = new SocketImpl();
+		socket.setName(name);
+		socket.getConnectedSegments().addAll(segments);
+		EcoreHelper.getContainerOfType(segments.get(0), TTA.class).getSockets()
+				.add(socket);
+		return socket;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public SocketType createSocketTypeFromString(EDataType eDataType,
+			String initialValue) {
+		SocketType result = SocketType.get(initialValue);
+		if (result == null)
+			throw new IllegalArgumentException("The value '" + initialValue
+					+ "' is not a valid enumerator of '" + eDataType.getName()
+					+ "'");
+		return result;
+	}
+
+	public FunctionUnit createStreamInput(TTA tta, int index) {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		String name = "STREAM_IN_" + index;
+		functionUnit.setName(name);
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
+		// Port
+		Port in1t = createPort("in1t", 32, true, true);
+		Port out1 = createPort("out1", 32, false, false);
+		in1t.connect(i1);
+		out1.connect(o1);
+		functionUnit.getPorts().add(in1t);
+		functionUnit.getPorts().add(out1);
+		// Operations
+		functionUnit.getOperations().add(
+				createOperationIn("stream_in_v" + index, in1t, out1));
+		functionUnit.getOperations().add(
+				createOperationInPeek("stream_in_peek_v" + index, in1t, out1));
+		functionUnit.getOperations().add(
+				createOperationInStatus("stream_in_status_v" + index, in1t, out1));
+		return functionUnit;
+	}
+
+	public FunctionUnit createStreamOutput(TTA tta, int index) {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		String name = "STREAM_OUT_" + index;
+		functionUnit.setName(name);
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket(name + "_i1", segments);
+		Socket o1 = createOutputSocket(name + "_o1", segments);
+		// Port
+		Port in1t = createPort("in1t", 32, true, true);
+		Port out1 = createPort("out1", 32, false, false);
+		in1t.connect(i1);
+		out1.connect(o1);
+		functionUnit.getPorts().add(in1t);
+		functionUnit.getPorts().add(out1);
+		// Operations
+		functionUnit.getOperations().add(
+				createOperationOut("stream_out_v" + index, in1t, out1));
+		functionUnit.getOperations().add(
+				createOperationOutStatus("stream_out_status_v" + index, in1t, out1));
+		return functionUnit;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public TermBool createTermBool() {
+		TermBoolImpl termBool = new TermBoolImpl();
+		return termBool;
+	}
+
+	@Override
+	public TermBool createTermBool(RegisterFile register, int index) {
+		TermBoolImpl termBool = new TermBoolImpl();
+		termBool.setRegister(register);
+		termBool.setIndex(index);
+		return termBool;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public TermUnit createTermUnit() {
+		TermUnitImpl termUnit = new TermUnitImpl();
+		return termUnit;
+	}
+
+	@Override
+	public TermUnit createTermUnit(FunctionUnit unit, Port port) {
+		TermUnitImpl termUnit = new TermUnitImpl();
+		termUnit.setFunctionUnit(unit);
+		termUnit.setPort(port);
+		return termUnit;
+	}
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	public TTA createTTA() {
+		TTAImpl tta = new TTAImpl();
+		return tta;
+	}
+
+	@Override
+	public TTA createTTA(String name) {
+		TTAImpl tta = new TTAImpl();
+		tta.setName(name);
+		return tta;
 	}
 
 	@Override
@@ -768,8 +1012,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		String[] aluOperations1 = { "sxqw", "sxhw" };
 		String[] aluOperations2 = { "add", "and", "eq", "gt", "gtu", "ior",
 				"shl", "shr", "shru", "sub", "xor" };
-		units.add(createFonctionUnit(tta, "ALU", aluOperations1,
-				aluOperations2));
+		units.add(createFonctionUnit(tta, "ALU", aluOperations1, aluOperations2));
 		// * LSU
 		units.add(createLSU(tta));
 		// * Mul
@@ -777,93 +1020,13 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		units.add(createFonctionUnit(tta, "Mul", null, mulOperations2));
 		// * And-ior-xor
 		String[] aixOperations2 = { "and", "ior", "xor" };
-		units.add(createFonctionUnit(tta, "And_ior_xor", null,
-				aixOperations2));
+		units.add(createFonctionUnit(tta, "And_ior_xor", null, aixOperations2));
 		return tta;
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Socket createSocket() {
-		SocketImpl socket = new SocketImpl();
-		return socket;
-	}
-
-	@Override
-	public Socket createSocket(String name, EList<Segment> segments) {
-		SocketImpl socket = new SocketImpl();
-		socket.setName(name);
-		socket.getConnectedSegments().addAll(segments);
-		EcoreHelper.getContainerOfType(segments.get(0), TTA.class).getSockets()
-				.add(socket);
-		return socket;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public SocketType createSocketTypeFromString(EDataType eDataType,
-			String initialValue) {
-		SocketType result = SocketType.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
-		return result;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public TermBool createTermBool() {
-		TermBoolImpl termBool = new TermBoolImpl();
-		return termBool;
-	}
-
-	@Override
-	public TermBool createTermBool(RegisterFile register, int index) {
-		TermBoolImpl termBool = new TermBoolImpl();
-		termBool.setRegister(register);
-		termBool.setIndex(index);
-		return termBool;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public TermUnit createTermUnit() {
-		TermUnitImpl termUnit = new TermUnitImpl();
-		return termUnit;
-	}
-
-	@Override
-	public TermUnit createTermUnit(FunctionUnit unit, Port port) {
-		TermUnitImpl termUnit = new TermUnitImpl();
-		termUnit.setFunctionUnit(unit);
-		termUnit.setPort(port);
-		return termUnit;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public TTA createTTA() {
-		TTAImpl tta = new TTAImpl();
-		return tta;
-	}
-
-	@Override
-	public TTA createTTA(String name) {
-		TTAImpl tta = new TTAImpl();
-		tta.setName(name);
-		return tta;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Writes createWrites() {
@@ -888,12 +1051,31 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return segments;
 	}
 
+	public TTA createTTASpecialized(String name, Instance instance) {
+		TTA tta = createTTADefault(name);
+		if (instance.isActor()) {
+			for (int i = 0; i < instance.getActor().getInputs().size(); i++) {
+				tta.getFunctionUnits().add(createStreamInput(tta, i + 1));
+			}
+			for (int i = 0; i < instance.getActor().getOutputs().size(); i++) {
+				tta.getFunctionUnits().add(createStreamOutput(tta, i + 1));
+			}
+		} else if (instance.isBroadcast()) {
+			tta.getFunctionUnits().add(createStreamInput(tta, 1));
+			for (int i = 0; i < instance.getBroadcast().getNumOutputs(); i++) {
+				tta.getFunctionUnits().add(createStreamOutput(tta, i + 1));
+			}
+		}
+		return tta;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public ArchitecturePackage getArchitecturePackage() {
-		return (ArchitecturePackage)getEPackage();
+		return (ArchitecturePackage) getEPackage();
 	}
 
 } // ArchitectureFactoryImpl

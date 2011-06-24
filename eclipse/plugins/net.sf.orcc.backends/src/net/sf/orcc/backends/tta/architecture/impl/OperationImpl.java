@@ -29,37 +29,32 @@
 package net.sf.orcc.backends.tta.architecture.impl;
 
 import java.util.Collection;
+
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.Element;
 import net.sf.orcc.backends.tta.architecture.Operation;
-
 import net.sf.orcc.backends.tta.architecture.Port;
-import org.eclipse.emf.common.notify.Notification;
+import net.sf.orcc.backends.tta.architecture.Reads;
+import net.sf.orcc.backends.tta.architecture.Writes;
 
-import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EClass;
-
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
-import org.eclipse.emf.ecore.util.EcoreEMap;
-import org.eclipse.emf.ecore.util.InternalEList;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Operation</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '
+ * <em><b>Operation</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl#getPipeline <em>Pipeline</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl#getPortToIndexMap <em>Port To Index Map</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.OperationImpl#isControl <em>Control</em>}</li>
  * </ul>
  * </p>
@@ -69,8 +64,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 public class OperationImpl extends EObjectImpl implements Operation {
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -79,8 +73,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 
 	/**
 	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getName()
 	 * @generated
 	 * @ordered
@@ -89,8 +82,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 
 	/**
 	 * The cached value of the '{@link #getPipeline() <em>Pipeline</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getPipeline()
 	 * @generated
 	 * @ordered
@@ -98,19 +90,8 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	protected EList<Element> pipeline;
 
 	/**
-	 * The cached value of the '{@link #getPortToIndexMap() <em>Port To Index Map</em>}' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getPortToIndexMap()
-	 * @generated
-	 * @ordered
-	 */
-	protected EMap<Port, Integer> portToIndexMap;
-
-	/**
 	 * The default value of the '{@link #isControl() <em>Control</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #isControl()
 	 * @generated
 	 * @ordered
@@ -119,8 +100,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 
 	/**
 	 * The cached value of the '{@link #isControl() <em>Control</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #isControl()
 	 * @generated
 	 * @ordered
@@ -128,8 +108,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	protected boolean control = CONTROL_EDEFAULT;
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected OperationImpl() {
@@ -137,8 +116,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -147,8 +125,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public String getName() {
@@ -156,8 +133,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setName(String newName) {
@@ -168,8 +144,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public EList<Element> getPipeline() {
@@ -180,20 +155,19 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	public EMap<Port, Integer> getPortToIndexMap() {
-		if (portToIndexMap == null) {
-			portToIndexMap = new EcoreEMap<Port,Integer>(ArchitecturePackage.Literals.PORT_TO_INDEX_MAP_ENTRY, portToIndexMapEntryImpl.class, this, ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP);
+		EMap<Port, Integer> portToIndexMap = new BasicEMap<Port, Integer>(1);
+		int i = 1;
+		for(Port port: getPorts()){
+			portToIndexMap.put(port, i++);
 		}
 		return portToIndexMap;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public boolean isControl() {
@@ -201,8 +175,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setControl(boolean newControl) {
@@ -213,30 +186,22 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 */
 	public EList<Port> getPorts() {
-		return new BasicEList<Port>(getPortToIndexMap().keySet());
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
-				return ((InternalEList<?>)getPortToIndexMap()).basicRemove(otherEnd, msgs);
+		EList<Port> ports = new BasicEList<Port>();
+		for (Element element : getPipeline()) {
+			if (element.isReads()) {
+				ports.add(((Reads) element).getPort());
+			} else if (element.isWrites()) {
+				ports.add(((Writes) element).getPort());
+			}
 		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
+		return ports;
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -246,9 +211,6 @@ public class OperationImpl extends EObjectImpl implements Operation {
 				return getName();
 			case ArchitecturePackage.OPERATION__PIPELINE:
 				return getPipeline();
-			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
-				if (coreType) return getPortToIndexMap();
-				else return getPortToIndexMap().map();
 			case ArchitecturePackage.OPERATION__CONTROL:
 				return isControl();
 		}
@@ -256,8 +218,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
@@ -271,9 +232,6 @@ public class OperationImpl extends EObjectImpl implements Operation {
 				getPipeline().clear();
 				getPipeline().addAll((Collection<? extends Element>)newValue);
 				return;
-			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
-				((EStructuralFeature.Setting)getPortToIndexMap()).set(newValue);
-				return;
 			case ArchitecturePackage.OPERATION__CONTROL:
 				setControl((Boolean)newValue);
 				return;
@@ -282,8 +240,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -295,9 +252,6 @@ public class OperationImpl extends EObjectImpl implements Operation {
 			case ArchitecturePackage.OPERATION__PIPELINE:
 				getPipeline().clear();
 				return;
-			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
-				getPortToIndexMap().clear();
-				return;
 			case ArchitecturePackage.OPERATION__CONTROL:
 				setControl(CONTROL_EDEFAULT);
 				return;
@@ -306,8 +260,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -317,8 +270,6 @@ public class OperationImpl extends EObjectImpl implements Operation {
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case ArchitecturePackage.OPERATION__PIPELINE:
 				return pipeline != null && !pipeline.isEmpty();
-			case ArchitecturePackage.OPERATION__PORT_TO_INDEX_MAP:
-				return portToIndexMap != null && !portToIndexMap.isEmpty();
 			case ArchitecturePackage.OPERATION__CONTROL:
 				return control != CONTROL_EDEFAULT;
 		}
@@ -326,8 +277,7 @@ public class OperationImpl extends EObjectImpl implements Operation {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -343,4 +293,4 @@ public class OperationImpl extends EObjectImpl implements Operation {
 		return result.toString();
 	}
 
-} //OperationImpl
+} // OperationImpl

@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.tta.architecture;
 
+import net.sf.orcc.network.Instance;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EFactory;
 
@@ -560,6 +562,8 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a simple TTA
 	 */
 	TTA createTTADefault(String name);
+	
+	TTA createTTASpecialized(String name, Instance instance);
 
 	/**
 	 * Returns a new object of class '<em>Socket</em>'.

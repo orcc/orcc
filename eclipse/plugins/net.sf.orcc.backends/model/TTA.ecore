@@ -91,11 +91,10 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Operation">
     <eOperations name="getPorts" upperBound="-1" eType="#//Port"/>
+    <eOperations name="getPortToIndexMap" upperBound="-1" eType="#//PortToIndexMapEntry"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="pipeline" upperBound="-1"
         eType="#//Element"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="portToIndexMap" upperBound="-1"
-        eType="#//portToIndexMapEntry" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="control" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AddressSpace">
@@ -176,7 +175,7 @@
     <eLiterals name="and"/>
     <eLiterals name="or" value="1"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="portToIndexMapEntry" instanceClassName="java.util.Map$Entry">
+  <eClassifiers xsi:type="ecore:EClass" name="PortToIndexMapEntry" instanceClassName="java.util.Map$Entry">
     <eStructuralFeatures xsi:type="ecore:EReference" name="key" eType="#//Port"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"/>
   </eClassifiers>

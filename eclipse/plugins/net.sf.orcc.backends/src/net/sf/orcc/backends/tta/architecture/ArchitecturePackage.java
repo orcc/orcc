@@ -660,22 +660,13 @@ public interface ArchitecturePackage extends EPackage {
 	int OPERATION__PIPELINE = 1;
 
 	/**
-	 * The feature id for the '<em><b>Port To Index Map</b></em>' map.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int OPERATION__PORT_TO_INDEX_MAP = 2;
-
-	/**
 	 * The feature id for the '<em><b>Control</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int OPERATION__CONTROL = 3;
+	int OPERATION__CONTROL = 2;
 
 	/**
 	 * The number of structural features of the '<em>Operation</em>' class.
@@ -684,7 +675,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int OPERATION_FEATURE_COUNT = 4;
+	int OPERATION_FEATURE_COUNT = 3;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.AddressSpaceImpl <em>Address Space</em>}' class.
@@ -997,11 +988,11 @@ public interface ArchitecturePackage extends EPackage {
 	int RESOURCE_FEATURE_COUNT = ELEMENT_FEATURE_COUNT + 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.portToIndexMapEntryImpl <em>port To Index Map Entry</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortToIndexMapEntryImpl <em>Port To Index Map Entry</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.backends.tta.architecture.impl.portToIndexMapEntryImpl
-	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getportToIndexMapEntry()
+	 * @see net.sf.orcc.backends.tta.architecture.impl.PortToIndexMapEntryImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPortToIndexMapEntry()
 	 * @generated
 	 */
 	int PORT_TO_INDEX_MAP_ENTRY = 24;
@@ -1215,7 +1206,7 @@ public interface ArchitecturePackage extends EPackage {
 	int PORT_TO_INDEX_MAP_ENTRY__VALUE = 1;
 
 	/**
-	 * The number of structural features of the '<em>port To Index Map Entry</em>' class.
+	 * The number of structural features of the '<em>Port To Index Map Entry</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1848,17 +1839,6 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getOperation_Pipeline();
 
 	/**
-	 * Returns the meta object for the map '{@link net.sf.orcc.backends.tta.architecture.Operation#getPortToIndexMap <em>Port To Index Map</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the map '<em>Port To Index Map</em>'.
-	 * @see net.sf.orcc.backends.tta.architecture.Operation#getPortToIndexMap()
-	 * @see #getOperation()
-	 * @generated
-	 */
-	EReference getOperation_PortToIndexMap();
-
-	/**
 	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Operation#isControl <em>Control</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2103,6 +2083,40 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getTermUnit_Port();
 
 	/**
+	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To Index Map Entry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Port To Index Map Entry</em>'.
+	 * @see java.util.Map.Entry
+	 * @model keyType="net.sf.orcc.backends.tta.architecture.Port"
+	 *        valueDataType="org.eclipse.emf.ecore.EIntegerObject"
+	 * @generated
+	 */
+	EClass getPortToIndexMapEntry();
+
+	/**
+	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Key</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getPortToIndexMapEntry()
+	 * @generated
+	 */
+	EReference getPortToIndexMapEntry_Key();
+
+	/**
+	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Value</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Value</em>'.
+	 * @see java.util.Map.Entry
+	 * @see #getPortToIndexMapEntry()
+	 * @generated
+	 */
+	EAttribute getPortToIndexMapEntry_Value();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2196,40 +2210,6 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getResource_Name();
-
-	/**
-	 * Returns the meta object for class '{@link java.util.Map.Entry <em>port To Index Map Entry</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>port To Index Map Entry</em>'.
-	 * @see java.util.Map.Entry
-	 * @model keyType="net.sf.orcc.backends.tta.architecture.Port"
-	 *        valueDataType="org.eclipse.emf.ecore.EIntegerObject"
-	 * @generated
-	 */
-	EClass getportToIndexMapEntry();
-
-	/**
-	 * Returns the meta object for the reference '{@link java.util.Map.Entry <em>Key</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Key</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getportToIndexMapEntry()
-	 * @generated
-	 */
-	EReference getportToIndexMapEntry_Key();
-
-	/**
-	 * Returns the meta object for the attribute '{@link java.util.Map.Entry <em>Value</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Value</em>'.
-	 * @see java.util.Map.Entry
-	 * @see #getportToIndexMapEntry()
-	 * @generated
-	 */
-	EAttribute getportToIndexMapEntry_Value();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.ShortImmediate <em>Short Immediate</em>}'.
@@ -2778,14 +2758,6 @@ public interface ArchitecturePackage extends EPackage {
 		EReference OPERATION__PIPELINE = eINSTANCE.getOperation_Pipeline();
 
 		/**
-		 * The meta object literal for the '<em><b>Port To Index Map</b></em>' map feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference OPERATION__PORT_TO_INDEX_MAP = eINSTANCE.getOperation_PortToIndexMap();
-
-		/**
 		 * The meta object literal for the '<em><b>Control</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -3068,14 +3040,14 @@ public interface ArchitecturePackage extends EPackage {
 		EAttribute RESOURCE__NAME = eINSTANCE.getResource_Name();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.portToIndexMapEntryImpl <em>port To Index Map Entry</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortToIndexMapEntryImpl <em>Port To Index Map Entry</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.backends.tta.architecture.impl.portToIndexMapEntryImpl
-		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getportToIndexMapEntry()
+		 * @see net.sf.orcc.backends.tta.architecture.impl.PortToIndexMapEntryImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPortToIndexMapEntry()
 		 * @generated
 		 */
-		EClass PORT_TO_INDEX_MAP_ENTRY = eINSTANCE.getportToIndexMapEntry();
+		EClass PORT_TO_INDEX_MAP_ENTRY = eINSTANCE.getPortToIndexMapEntry();
 
 		/**
 		 * The meta object literal for the '<em><b>Key</b></em>' reference feature.
@@ -3083,7 +3055,7 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference PORT_TO_INDEX_MAP_ENTRY__KEY = eINSTANCE.getportToIndexMapEntry_Key();
+		EReference PORT_TO_INDEX_MAP_ENTRY__KEY = eINSTANCE.getPortToIndexMapEntry_Key();
 
 		/**
 		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
@@ -3091,7 +3063,7 @@ public interface ArchitecturePackage extends EPackage {
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute PORT_TO_INDEX_MAP_ENTRY__VALUE = eINSTANCE.getportToIndexMapEntry_Value();
+		EAttribute PORT_TO_INDEX_MAP_ENTRY__VALUE = eINSTANCE.getPortToIndexMapEntry_Value();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.

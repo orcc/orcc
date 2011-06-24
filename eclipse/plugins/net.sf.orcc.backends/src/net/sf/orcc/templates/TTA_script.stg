@@ -15,12 +15,11 @@ print '*********************************************************************'
 pathname = os.path.dirname(sys.argv[0])        
 scriptPath = os.path.abspath(pathname)
 
-adfFile = scriptPath + os.sep + 'processor_default.adf'
-
 instances = [<network.instances: { instance |'<instance.id>'}; wrap, separator=", ">]
 
 for instance in instances:
 	instancePath = os.path.join(scriptPath, instance)
+	adfFile = instancePath + os.sep + 'processor_' + instance + '.adf'
 	llFile = instancePath + os.sep + instance + '.ll'
 	tpefFile = instancePath + os.sep + instance + '.tpef'
 	

@@ -202,7 +202,7 @@ writes(element) ::= <<
 >>
 
 resource(element) ::= <<
-\<resource name="element.name"\>
+\<resource name="<element.name>"\>
 	\<start-cycle\><element.startCycle>\</start-cycle\>
 	\<cycles\><element.cycles>\</cycles\>
 \</resource\>

@@ -33,16 +33,14 @@ import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
 
 /**
- * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Operation</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> A representation of the model object '
+ * <em><b>Operation</b></em>'. <!-- end-user-doc -->
  *
  * <p>
  * The following features are supported:
  * <ul>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Operation#getName <em>Name</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Operation#getPipeline <em>Pipeline</em>}</li>
- *   <li>{@link net.sf.orcc.backends.tta.architecture.Operation#getPortToIndexMap <em>Port To Index Map</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.Operation#isControl <em>Control</em>}</li>
  * </ul>
  * </p>
@@ -53,13 +51,14 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface Operation extends EObject {
 	/**
-	 * Returns the value of the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Name</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear, there really
+	 * should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getOperation_Name()
@@ -70,8 +69,7 @@ public interface Operation extends EObject {
 
 	/**
 	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Operation#getName <em>Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Name</em>' attribute.
 	 * @see #getName()
 	 * @generated
@@ -79,14 +77,16 @@ public interface Operation extends EObject {
 	void setName(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Pipeline</b></em>' reference list.
-	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Element}.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Pipeline</b></em>' reference list. The
+	 * list contents are of type
+	 * {@link net.sf.orcc.backends.tta.architecture.Element}. <!--
+	 * begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Pipeline</em>' reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Pipeline</em>' reference list.
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getOperation_Pipeline()
 	 * @model
@@ -95,30 +95,26 @@ public interface Operation extends EObject {
 	EList<Element> getPipeline();
 
 	/**
-	 * Returns the value of the '<em><b>Port To Index Map</b></em>' map.
-	 * The key is of type {@link net.sf.orcc.backends.tta.architecture.Port},
-	 * and the value is of type {@link java.lang.Integer},
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Port To Index Map</em>' map isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Port To Index Map</em>' map isn't clear, there
+	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Port To Index Map</em>' map.
-	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getOperation_PortToIndexMap()
-	 * @model mapType="net.sf.orcc.backends.tta.architecture.portToIndexMapEntry<net.sf.orcc.backends.tta.architecture.Port, org.eclipse.emf.ecore.EIntegerObject>"
+	 * @model kind="operation" mapType="net.sf.orcc.backends.tta.architecture.PortToIndexMapEntry<net.sf.orcc.backends.tta.architecture.Port, org.eclipse.emf.ecore.EIntegerObject>"
 	 * @generated
 	 */
 	EMap<Port, Integer> getPortToIndexMap();
 
 	/**
-	 * Returns the value of the '<em><b>Control</b></em>' attribute.
-	 * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Control</b></em>' attribute. <!--
+	 * begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Control</em>' attribute isn't clear,
-	 * there really should be more of a description here...
+	 * If the meaning of the '<em>Control</em>' attribute isn't clear, there
+	 * really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
+	 * 
 	 * @return the value of the '<em>Control</em>' attribute.
 	 * @see #setControl(boolean)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getOperation_Control()
@@ -128,18 +124,20 @@ public interface Operation extends EObject {
 	boolean isControl();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.Operation#isControl <em>Control</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Control</em>' attribute.
+	 * Sets the value of the '
+	 * {@link net.sf.orcc.backends.tta.architecture.Operation#isControl
+	 * <em>Control</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
+	 * -->
+	 * 
+	 * @param value
+	 *            the new value of the '<em>Control</em>' attribute.
 	 * @see #isControl()
 	 * @generated
 	 */
 	void setControl(boolean value);
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @model kind="operation"
 	 * @generated
 	 */
