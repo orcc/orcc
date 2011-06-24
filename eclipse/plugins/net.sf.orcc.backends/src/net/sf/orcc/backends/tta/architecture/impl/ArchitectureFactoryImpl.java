@@ -777,7 +777,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		units.add(createFonctionUnit(tta, "Mul", null, mulOperations2));
 		// * And-ior-xor
 		String[] aixOperations2 = { "and", "ior", "xor" };
-		units.add(createFonctionUnit(tta, "And-ior-xor", null,
+		units.add(createFonctionUnit(tta, "And_ior_xor", null,
 				aixOperations2));
 		return tta;
 	}
