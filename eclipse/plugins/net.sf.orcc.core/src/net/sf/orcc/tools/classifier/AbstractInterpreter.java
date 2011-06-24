@@ -198,15 +198,12 @@ public class AbstractInterpreter extends ActorInterpreter {
 		} else {
 			Expression value = source.getValue();
 			for (Expression index : instr.getIndexes()) {
-				if (value != null && value.isListExpr()) {
-					index = exprInterpreter.doSwitch(index);
-					if (index == null) {
-						value = null;
-						break;
-					} else {
-						value = ((ExprList) value).get((ExprInt) index);
-					}
+				if (value == null || !value.isListExpr()) {
+					break;
 				}
+
+				index = exprInterpreter.doSwitch(index);
+				value = ((ExprList) value).get((ExprInt) index);
 			}
 			target.setValue(EcoreUtil.copy(value));
 		}

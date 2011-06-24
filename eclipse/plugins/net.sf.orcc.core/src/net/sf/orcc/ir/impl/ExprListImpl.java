@@ -133,7 +133,11 @@ public class ExprListImpl extends ExpressionImpl implements ExprList {
 		super.eUnset(featureID);
 	}
 
+	@Override
 	public Expression get(ExprInt index) {
+		if (index == null || index.getValue() == null) {
+			return null;
+		}
 		return getValue().get(index.getIntValue());
 	}
 
