@@ -39,6 +39,7 @@ import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
 import net.sf.orcc.ir.InstReturn;
 import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
@@ -48,6 +49,7 @@ import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.EcoreHelper;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -59,10 +61,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	private IrFactory factory = IrFactory.eINSTANCE;
-	private int counter;
 	private Procedure divProc;
-	private List<Expression> parameters;
-	private Actor myActor;
 
 	public DivisionSubstitution() {
 		super(true);
@@ -70,7 +69,6 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseActor(Actor actor) {
-		myActor = actor;
 		super.caseActor(actor);
 
 		if (divProc != null) {
@@ -81,41 +79,36 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseExprBinary(ExprBinary expr) {
-		parameters = new ArrayList<Expression>();
 		if (expr.getOp() == OpBinary.DIV) {
-			// what ever the epression type of division operands they are
-			// put in local variables VarNum and varDenum the result of
-			// callInst is put in tmp
-			Var varNum = factory.createVarInt("num", true, counter);
-			Var varDenum = factory.createVarInt("den", true, counter);
-			Var tmp = factory.createVarInt("divVar", true, 0);
-			tmp.setGlobal(true);
-			counter++;
-
-			procedure.getLocals().add(varNum);
-			procedure.getLocals().add(varDenum);
-			if (counter == 1) {
-				myActor.getStateVars().add(tmp);
+			if (divProc == null) {
+				divProc = createDivProc();
 			}
+
+			// what ever the expression type of division operands they are
+			// put in local variables VarNum and varDenum the result of
+			// callInst is put in result
+			Var varNum = procedure.newTempLocalVariable(
+					factory.createTypeInt(), "num");
+			Var varDenum = procedure.newTempLocalVariable(
+					factory.createTypeInt(), "den");
+			Var varResult = procedure.newTempLocalVariable(
+					factory.createTypeInt(), "result");
+
 			InstAssign assign0 = factory.createInstAssign(varNum, expr.getE1());
 			InstAssign assign1 = factory.createInstAssign(varDenum,
 					expr.getE2());
-			InstAssign assign2 = factory.createInstAssign(tmp,
-					factory.createExprInt(0));
-			if (divProc == null) {
-				divProc = createDivProc(tmp);
-			}
 
+			List<Expression> parameters = new ArrayList<Expression>();
 			parameters.add(factory.createExprVar(varNum));
 			parameters.add(factory.createExprVar(varDenum));
 
-			InstCall call = factory.createInstCall(null, divProc, parameters);
+			InstCall call = factory.createInstCall(varResult, divProc,
+					parameters);
 			EcoreHelper.addInstBeforeExpr(expr, assign0, true);
 			EcoreHelper.addInstBeforeExpr(expr, assign1, true);
-			EcoreHelper.addInstBeforeExpr(expr, assign2, true);
 			EcoreHelper.addInstBeforeExpr(expr, call, true);
 
-			EcoreUtil.replace(expr, factory.createExprVar(tmp));
+			EcoreUtil.replace(expr, factory.createExprVar(varResult));
 		}
 		return null;
 	}
@@ -127,86 +120,69 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 * @param varNum
 	 *            numerator
 	 * @param varDenum
-	 *            denomerator
+	 *            denumerator
 	 * @return division function
 	 */
-	private Procedure createDivProc(Var tmp) {
+	private Procedure createDivProc() {
 		Procedure divProc = factory.createProcedure("DIV_II", 0,
 				factory.createTypeInt());
 
+		// Create parameters
 		Var varNum = factory.createVarInt("num", true, 0);
 		Var varDenum = factory.createVarInt("den", true, 0);
-		// counter++;
 		divProc.getParameters().add(varNum);
 		divProc.getParameters().add(varDenum);
 
-		Var result = factory.createVarInt("result", true, 0);
-		divProc.getLocals().add(result);
+		// Create needed local variables
+		Var result = divProc.newTempLocalVariable(factory.createTypeInt(),
+				"result");
+		Var i = divProc.newTempLocalVariable(factory.createTypeInt(), "i");
+		Var flipResult = divProc.newTempLocalVariable(factory.createTypeInt(),
+				"flipResult");
+		Var denom = divProc.newTempLocalVariable(factory.createTypeInt(64),
+				"denom");
+		Var numer = divProc.newTempLocalVariable(factory.createTypeInt(64),
+				"numer");
+		Var mask = divProc
+				.newTempLocalVariable(factory.createTypeInt(), "mask");
+		Var remainder = divProc.newTempLocalVariable(factory.createTypeInt(),
+				"remainder");
 
-		Var i = factory.createVarInt("i", true, 0);
-		divProc.getLocals().add(i);
+		// Create procedural code
+		EList<Node> nodes = divProc.getNodes();
+		nodes.add(createInitBlock(result, flipResult));
+		nodes.add(createNodeIf(varNum, flipResult));
+		nodes.add(createNodeIf(varDenum, flipResult));
+		nodes.add(createAssignmentBlock(varDenum, remainder, varNum, denom,
+				mask, remainder));
+		nodes.add(createNodeWhile(i, numer, remainder, denom, result, mask,
+				varDenum));
+		nodes.add(createResultNodeIf(flipResult, result));
 
-		Var flipResult = factory.createVarInt("flipResult", true, 0);
-		divProc.getLocals().add(flipResult);
-
-		Var denom = factory.createVarInt("denom", 64, true, 0);
-		divProc.getLocals().add(denom);
-
-		Var numer = factory.createVarInt("numer", 64, true, 0);
-		divProc.getLocals().add(numer);
-
-		Var mask = factory.createVarInt("mask", true, 0);
-		divProc.getLocals().add(mask);
-
-		Var remainder = factory.createVarInt("remainder", true, 0);
-		divProc.getLocals().add(remainder);
-
-		NodeBlock initBlock = createInitBlock(result, flipResult);
-		divProc.getNodes().add(initBlock);
-
-		NodeIf nodeIf_1 = createNodeIf(varNum, flipResult);
-		divProc.getNodes().add(nodeIf_1);
-
-		NodeIf nodeIf_2 = createNodeIf(varDenum, flipResult);
-		divProc.getNodes().add(nodeIf_2);
-
-		NodeBlock block_1 = factory.createNodeBlock();
-		InstAssign assign_blk10 = factory.createInstAssign(remainder,
-				factory.createExprVar(varNum));
-		Expression blk11And = factory.createExprBinary(
-				factory.createExprVar(varDenum), OpBinary.BITAND,
-				factory.createExprInt(0xFFFFFFFFL), factory.createTypeInt());
-		InstAssign assign_blk11 = factory.createInstAssign(denom, blk11And);
-		InstAssign assign_blk12 = factory.createInstAssign(mask,
-				factory.createExprInt(0x80000000L));
-		InstAssign assign_blk13 = factory.createInstAssign(i,
-				factory.createExprInt(0));
-		block_1.add(assign_blk10);
-		block_1.add(assign_blk11);
-		block_1.add(assign_blk12);
-		block_1.add(assign_blk13);
-		divProc.getNodes().add(block_1);
-
-		NodeWhile nodeWhile = createNodeWhile(i, numer, remainder, denom,
-				result, mask, varDenum);
-		divProc.getNodes().add(nodeWhile);
-
-		NodeIf nodeIf_3 = createResultNodeIf(flipResult, result);
-		divProc.getNodes().add(nodeIf_3);
-
-		NodeBlock stateVarUpDate = factory.createNodeBlock();
-		InstAssign sateVarAssign = factory.createInstAssign(tmp,
-				factory.createExprVar(result));
-		stateVarUpDate.add(sateVarAssign);
-		divProc.getNodes().add(stateVarUpDate);
-
+		// Create return instruction
 		NodeBlock blockReturn = factory.createNodeBlock();
-		InstReturn instReturn = factory.createInstReturn();
+		InstReturn instReturn = factory.createInstReturn(factory
+				.createExprVar(result));
 		blockReturn.add(instReturn);
-		divProc.setReturnType(factory.createTypeVoid());
+		divProc.setReturnType(factory.createTypeInt());
 		divProc.getNodes().add(blockReturn);
 
 		return divProc;
+	}
+
+	private NodeBlock createAssignmentBlock(Var varDenum, Var remainder,
+			Var varNum, Var denom, Var mask, Var i) {
+		NodeBlock block = factory.createNodeBlock();
+		Expression blk11And = factory.createExprBinary(
+				factory.createExprVar(varDenum), OpBinary.BITAND,
+				factory.createExprInt(0xFFFFFFFFL), factory.createTypeInt());
+		block.add(factory.createInstAssign(remainder,
+				factory.createExprVar(varNum)));
+		block.add(factory.createInstAssign(denom, blk11And));
+		block.add(factory.createInstAssign(mask,
+				factory.createExprInt(0x80000000L)));
+		block.add(factory.createInstAssign(i, factory.createExprInt(0)));
+		return block;
 	}
 
 	/**
@@ -221,12 +197,10 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 */
 	private NodeBlock createInitBlock(Var result, Var flipResult) {
 		NodeBlock initBlock = factory.createNodeBlock();
-		InstAssign initResult = factory.createInstAssign(result,
-				factory.createExprInt(0));
-		InstAssign initFlip = factory.createInstAssign(flipResult,
-				factory.createExprInt(0));
-		initBlock.add(initResult);
-		initBlock.add(initFlip);
+		initBlock
+				.add(factory.createInstAssign(result, factory.createExprInt(0)));
+		initBlock.add(factory.createInstAssign(flipResult,
+				factory.createExprInt(0)));
 		return initBlock;
 	}
 
