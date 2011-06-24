@@ -69,7 +69,7 @@ Module* LLVMParser::loadModule(Package* package, string file) {
 		//Archive case
 		Mod = ParseArchive(package, Filename);
 	}else{
-		//Bitecode et Assembly case
+		//Bitecode and Assembly case
 		Mod = ParseIRFile(Filename.c_str(), Err, Context);
 	}
 
@@ -124,7 +124,7 @@ void LLVMParser::openArchive(Package* package){
 	std::string Error;
 	LLVMContext &Context = getGlobalContext();
 
-	//Get archive file
+	//Get archive file name
 	string archiveName = PackageMng::getFirstFolder(package->getDirectory()) + ".a";
 	sys::Path archiveFile(directory + archiveName);
 
@@ -132,6 +132,12 @@ void LLVMParser::openArchive(Package* package){
 	if(CompressionMng::IsGZipFile(archiveFile.c_str())){
 		string GZipFile = archiveFile.str() + ".gz";
 		CompressionMng::uncompressGZip(GZipFile);
+	}
+
+	//Check if archive exists
+	if(!archiveFile.exists()){
+		cerr <<"Package system not found";
+		exit(1);
 	}
 
 	//Load archive
