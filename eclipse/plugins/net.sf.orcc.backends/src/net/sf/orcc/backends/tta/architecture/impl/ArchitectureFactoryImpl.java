@@ -753,9 +753,9 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		// Global Control Unit
 		tta.setGcu(createGlobalControlUnitDefault(tta));
 		// Register files
-		RegisterFile bool = createRegisterFileDefault(tta, "BOOL", 1, 2);
-		RegisterFile rf1 = createRegisterFileDefault(tta, "RF_1", 32, 12);
-		RegisterFile rf2 = createRegisterFileDefault(tta, "RF_2", 32, 12);
+		RegisterFile bool = createRegisterFileDefault(tta, "BOOL", 2, 1);
+		RegisterFile rf1 = createRegisterFileDefault(tta, "RF_1", 12, 32);
+		RegisterFile rf2 = createRegisterFileDefault(tta, "RF_2", 12, 32);
 		tta.getRegisterFiles().add(bool);
 		tta.getRegisterFiles().add(rf1);
 		tta.getRegisterFiles().add(rf2);
