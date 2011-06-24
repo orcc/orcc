@@ -990,6 +990,16 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public Var createVar(Type type, String name, boolean assignable, int index) {
 		return createVar(0, type, name, assignable, index);
 	}
+	
+	@Override
+	public Var createVarInt(String name, boolean assignable, int index){
+		return createVar(createTypeInt(), name, assignable, index);
+	}
+	
+	@Override
+	public Var createVarInt(String name, int size, boolean assignable, int index){
+		return createVar(createTypeInt(size), name, assignable, index);
+	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->

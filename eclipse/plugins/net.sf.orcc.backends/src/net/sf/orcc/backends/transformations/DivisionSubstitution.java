@@ -72,7 +72,7 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	public Object caseActor(Actor actor) {
 		myActor = actor;
 		super.caseActor(actor);
-		
+
 		if (divProc != null) {
 			actor.getProcs().add(0, divProc);
 		}
@@ -86,19 +86,16 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 			// what ever the epression type of division operands they are
 			// put in local variables VarNum and varDenum the result of
 			// callInst is put in tmp
-			Var varNum = factory.createVar(factory.createTypeInt(), "num",
-					true, counter);
-			Var varDenum = factory.createVar(factory.createTypeInt(), "den",
-					true, counter);
-			Var tmp = factory.createVar(factory.createTypeInt(), "divVar",
-					true, 0);
+			Var varNum = factory.createVarInt("num", true, counter);
+			Var varDenum = factory.createVarInt("den", true, counter);
+			Var tmp = factory.createVarInt("divVar", true, 0);
 			tmp.setGlobal(true);
 			counter++;
 
 			procedure.getLocals().add(varNum);
 			procedure.getLocals().add(varDenum);
-			if(counter == 1){
-			myActor.getStateVars().add(tmp);
+			if (counter == 1) {
+				myActor.getStateVars().add(tmp);
 			}
 			InstAssign assign0 = factory.createInstAssign(varNum, expr.getE1());
 			InstAssign assign1 = factory.createInstAssign(varDenum,
@@ -137,37 +134,31 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		Procedure divProc = factory.createProcedure("DIV_II", 0,
 				factory.createTypeInt());
 
-		Var varNum = factory.createVar(factory.createTypeInt(), "num", true, 0);
-		Var varDenum = factory.createVar(factory.createTypeInt(), "den", true,
-				0);
+		Var varNum = factory.createVarInt("num", true, 0);
+		Var varDenum = factory.createVarInt("den", true, 0);
 		// counter++;
 		divProc.getParameters().add(varNum);
 		divProc.getParameters().add(varDenum);
 
-		Var result = factory.createVar(factory.createTypeInt(), "result", true,
-				0);
+		Var result = factory.createVarInt("result", true, 0);
 		divProc.getLocals().add(result);
 
-		Var i = factory.createVar(factory.createTypeInt(), "i", true, 0);
+		Var i = factory.createVarInt("i", true, 0);
 		divProc.getLocals().add(i);
 
-		Var flipResult = factory.createVar(factory.createTypeInt(),
-				"flipResult", true, 0);
+		Var flipResult = factory.createVarInt("flipResult", true, 0);
 		divProc.getLocals().add(flipResult);
 
-		Var denom = factory.createVar(factory.createTypeInt(64), "denom", true,
-				0);
+		Var denom = factory.createVarInt("denom", 64, true, 0);
 		divProc.getLocals().add(denom);
 
-		Var numer = factory.createVar(factory.createTypeInt(64), "numer", true,
-				0);
+		Var numer = factory.createVarInt("numer", 64, true, 0);
 		divProc.getLocals().add(numer);
 
-		Var mask = factory.createVar(factory.createTypeInt(), "mask", true, 0);
+		Var mask = factory.createVarInt("mask", true, 0);
 		divProc.getLocals().add(mask);
 
-		Var remainder = factory.createVar(factory.createTypeInt(), "remainder",
-				true, 0);
+		Var remainder = factory.createVarInt("remainder", true, 0);
 		divProc.getLocals().add(remainder);
 
 		NodeBlock initBlock = createInitBlock(result, flipResult);

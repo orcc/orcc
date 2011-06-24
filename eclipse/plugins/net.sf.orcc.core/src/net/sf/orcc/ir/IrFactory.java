@@ -760,6 +760,34 @@ public interface IrFactory extends EFactory {
 	 *            index of this variable
 	 */
 	Var createVar(Type type, String name, boolean assignable, int index);
+	
+	/**
+	 * Creates a new local integer variable with the given name, index. The
+	 * variable may be assignable or not.
+	 * 
+	 * @param name
+	 *            the variable name
+	 * @param assignable
+	 *            whether this variable is assignable
+	 * @param index
+	 *            index of this variable
+	 */
+	Var createVarInt(String name, boolean assignable, int index);
+	
+	/**
+	 * Creates a new local integer variable with the given name, size, index. The
+	 * variable may be assignable or not.
+	 * 
+	 * @param name
+	 *            the variable name
+	 * @param size
+	 *            the size of the integer variable
+	 * @param assignable
+	 *            whether this variable is assignable
+	 * @param index
+	 *            index of this variable
+	 */
+	Var createVarInt(String name, int size, boolean assignable, int index);
 
 	/**
 	 * Returns the package supported by this factory.
