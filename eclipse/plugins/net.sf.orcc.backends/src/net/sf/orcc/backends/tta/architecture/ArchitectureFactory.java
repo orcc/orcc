@@ -414,7 +414,7 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a Bus containing only one segment, using zero extension mode and
 	 *         initialized with the given arguments
 	 */
-	Bus createSimpleBus(int index, int width);
+	Bus createBusDefault(int index, int width);
 
 	/**
 	 * Returns a new simple control operation containing only one read operation
@@ -425,7 +425,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the port read by this operation
 	 * @return a control Operation
 	 */
-	Operation createSimpleCtrlOperation(String name, Port port);
+	Operation createOperationCtrl(String name, Port port);
 
 	/**
 	 * Returns a new simple function unit with 2 input ports and 1 output ports
@@ -437,7 +437,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the name of the function unit
 	 * @return a simple FunctionUnit
 	 */
-	FunctionUnit createSimpleFonctionUnit(TTA tta, String name);
+	FunctionUnit createFonctionUnit(TTA tta, String name);
 
 	/**
 	 * Returns a new simple function unit with 2 input ports and 1 output ports
@@ -453,7 +453,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the names of 2-input/1-output operations
 	 * @return a simple FunctionUnit
 	 */
-	FunctionUnit createSimpleFonctionUnit(TTA tta, String name,
+	FunctionUnit createFonctionUnit(TTA tta, String name,
 			String[] operations1, String[] operations2);
 
 	/**
@@ -464,7 +464,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the containing TTA processor
 	 * @return a simple GlobalControlUnit
 	 */
-	GlobalControlUnit createSimpleGlobalControlUnit(TTA tta);
+	GlobalControlUnit createGlobalControlUnitDefault(TTA tta);
 
 	/**
 	 * Returns a new list of guards corresponding to default TTA processor
@@ -474,7 +474,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the referenced BOOL register
 	 * @return a simple list of guards
 	 */
-	EList<Guard> createSimpleGuards(RegisterFile register);
+	EList<Guard> createGuardsDefault(RegisterFile register);
 
 	/**
 	 * Return a new simple operation (2-input or 1-input/1-output or 2-output)
@@ -500,7 +500,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            whether the second step of the operation is a reading
 	 * @return a new simple Operation initialized with the given parameters
 	 */
-	Operation createSimpleOperation(String name, Port port1, int startCycle1,
+	Operation createOperationDefault(String name, Port port1, int startCycle1,
 			int cycle1, boolean isReads1, Port port2, int startCycle2,
 			int cycle2, boolean isReads2);
 
@@ -516,7 +516,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the output port
 	 * @return a new simple Operation initialized with the given parameters
 	 */
-	Operation createSimpleOperation(String name, Port in1, Port out1);
+	Operation createOperationDefault(String name, Port in1, Port out1);
 
 	/**
 	 * Return a new simple operation (2-input/1-output with a duration of 1
@@ -532,7 +532,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the output port
 	 * @return a new simple Operation initialized with the given parameters
 	 */
-	Operation createSimpleOperation(String name, Port in1, Port in2, Port out1);
+	Operation createOperationDefault(String name, Port in1, Port in2, Port out1);
 
 	/**
 	 * Returns a new register file corresponding to default TTA processor
@@ -548,7 +548,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the width of the register file
 	 * @return a new simple RegisterFile
 	 */
-	RegisterFile createSimpleRegisterFile(TTA tta, String name, int size,
+	RegisterFile createRegisterFileDefault(TTA tta, String name, int size,
 			int width);
 
 	/**
@@ -559,7 +559,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the name of the TTA
 	 * @return a simple TTA
 	 */
-	TTA createSimpleTTA(String name);
+	TTA createTTADefault(String name);
 
 	/**
 	 * Returns a new object of class '<em>Socket</em>'.

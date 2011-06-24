@@ -1339,7 +1339,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 
 		initEClass(globalControlUnitEClass, GlobalControlUnit.class, "GlobalControlUnit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getGlobalControlUnit_Ports(), this.getPort(), null, "ports", null, 0, -1, GlobalControlUnit.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getGlobalControlUnit_ReturnAddress(), this.getPort(), null, "returnAddress", null, 0, 1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getGlobalControlUnit_ReturnAddress(), this.getPort(), null, "returnAddress", null, 0, 1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGlobalControlUnit_AddressSpace(), this.getAddressSpace(), null, "addressSpace", null, 0, 1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGlobalControlUnit_Operations(), this.getOperation(), null, "operations", null, 0, -1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getGlobalControlUnit_DelaySlots(), ecorePackage.getEInt(), "delaySlots", null, 0, 1, GlobalControlUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

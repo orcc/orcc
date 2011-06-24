@@ -75,7 +75,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	protected EList<Port> ports;
 
 	/**
-	 * The cached value of the '{@link #getReturnAddress() <em>Return Address</em>}' reference.
+	 * The cached value of the '{@link #getReturnAddress() <em>Return Address</em>}' containment reference.
 	 * <!-- begin-user-doc --> <!--
 	 * end-user-doc -->
 	 * @see #getReturnAddress()
@@ -174,23 +174,22 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * @generated
 	 */
 	public Port getReturnAddress() {
-		if (returnAddress != null && returnAddress.eIsProxy()) {
-			InternalEObject oldReturnAddress = (InternalEObject)returnAddress;
-			returnAddress = (Port)eResolveProxy(oldReturnAddress);
-			if (returnAddress != oldReturnAddress) {
-				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, oldReturnAddress, returnAddress));
-			}
-		}
 		return returnAddress;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Port basicGetReturnAddress() {
-		return returnAddress;
+	public NotificationChain basicSetReturnAddress(Port newReturnAddress, NotificationChain msgs) {
+		Port oldReturnAddress = returnAddress;
+		returnAddress = newReturnAddress;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, oldReturnAddress, newReturnAddress);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -198,10 +197,17 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 	 * @generated
 	 */
 	public void setReturnAddress(Port newReturnAddress) {
-		Port oldReturnAddress = returnAddress;
-		returnAddress = newReturnAddress;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, oldReturnAddress, returnAddress));
+		if (newReturnAddress != returnAddress) {
+			NotificationChain msgs = null;
+			if (returnAddress != null)
+				msgs = ((InternalEObject)returnAddress).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, null, msgs);
+			if (newReturnAddress != null)
+				msgs = ((InternalEObject)newReturnAddress).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, null, msgs);
+			msgs = basicSetReturnAddress(newReturnAddress, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS, newReturnAddress, newReturnAddress));
 	}
 
 	/**
@@ -298,6 +304,8 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 		switch (featureID) {
 			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
 				return ((InternalEList<?>)getPorts()).basicRemove(otherEnd, msgs);
+			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
+				return basicSetReturnAddress(null, msgs);
 			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__OPERATIONS:
 				return ((InternalEList<?>)getOperations()).basicRemove(otherEnd, msgs);
 		}
@@ -314,8 +322,7 @@ public class GlobalControlUnitImpl extends EObjectImpl implements
 			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__PORTS:
 				return getPorts();
 			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__RETURN_ADDRESS:
-				if (resolve) return getReturnAddress();
-				return basicGetReturnAddress();
+				return getReturnAddress();
 			case ArchitecturePackage.GLOBAL_CONTROL_UNIT__ADDRESS_SPACE:
 				if (resolve) return getAddressSpace();
 				return basicGetAddressSpace();

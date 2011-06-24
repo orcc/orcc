@@ -331,7 +331,7 @@ public interface ArchitecturePackage extends EPackage {
 	int GLOBAL_CONTROL_UNIT__PORTS = 0;
 
 	/**
-	 * The feature id for the '<em><b>Return Address</b></em>' reference.
+	 * The feature id for the '<em><b>Return Address</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -1512,10 +1512,10 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getGlobalControlUnit_Ports();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getReturnAddress <em>Return Address</em>}'.
+	 * Returns the meta object for the containment reference '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getReturnAddress <em>Return Address</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Return Address</em>'.
+	 * @return the meta object for the containment reference '<em>Return Address</em>'.
 	 * @see net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getReturnAddress()
 	 * @see #getGlobalControlUnit()
 	 * @generated
@@ -2520,7 +2520,7 @@ public interface ArchitecturePackage extends EPackage {
 		EReference GLOBAL_CONTROL_UNIT__PORTS = eINSTANCE.getGlobalControlUnit_Ports();
 
 		/**
-		 * The meta object literal for the '<em><b>Return Address</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Return Address</b></em>' containment reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated

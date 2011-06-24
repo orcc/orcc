@@ -377,7 +377,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	@Override
 	public FunctionUnit createLSU(TTA tta) {
-		FunctionUnit LSU = createSimpleFonctionUnit(tta, "LSU");
+		FunctionUnit LSU = createFonctionUnit(tta, "LSU");
 		// Operations
 		EList<Port> ports = LSU.getPorts();
 		String[] loadOperations = { "ldw", "ldq", "ldh", "ldqu", "ldhu" };
@@ -425,12 +425,12 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 
 	@Override
 	public Operation createOperationLoad(String name, Port in, Port out) {
-		return createSimpleOperation(name, in, 0, 1, true, out, 2, 1, false);
+		return createOperationDefault(name, in, 0, 1, true, out, 2, 1, false);
 	}
 
 	@Override
 	public Operation createOperationStore(String name, Port in1, Port in2) {
-		return createSimpleOperation(name, in1, 0, 1, true, in2, 2, 1, true);
+		return createOperationDefault(name, in1, 0, 1, true, in2, 2, 1, true);
 	}
 
 	/**
@@ -568,7 +568,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Bus createSimpleBus(int index, int width) {
+	public Bus createBusDefault(int index, int width) {
 		Bus bus = createBus(index, width);
 		bus.getSegments().add(createSegment("segment0"));
 		bus.setShortImmediate(createShortImmediate(width, Extension.ZERO));
@@ -576,7 +576,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Operation createSimpleCtrlOperation(String name, Port port) {
+	public Operation createOperationCtrl(String name, Port port) {
 		Operation operation = new OperationImpl();
 		operation.setName(name);
 		operation.setControl(true);
@@ -586,7 +586,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createSimpleFonctionUnit(TTA tta, String name) {
+	public FunctionUnit createFonctionUnit(TTA tta, String name) {
 		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
 		functionUnit.setName(name);
 		// Sockets
@@ -608,22 +608,22 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public FunctionUnit createSimpleFonctionUnit(TTA tta, String name,
+	public FunctionUnit createFonctionUnit(TTA tta, String name,
 			String[] operations1, String[] operations2) {
-		FunctionUnit functionUnit = createSimpleFonctionUnit(tta, name);
+		FunctionUnit functionUnit = createFonctionUnit(tta, name);
 		EList<Port> ports = functionUnit.getPorts();
 		// Operations
 		if (operations1 != null) {
 			for (String operation : operations1) {
 				functionUnit.getOperations().add(
-						createSimpleOperation(operation, ports.get(0),
+						createOperationDefault(operation, ports.get(0),
 								ports.get(2)));
 			}
 		}
 		if (operations2 != null) {
 			for (String operation : operations2) {
 				functionUnit.getOperations().add(
-						createSimpleOperation(operation, ports.get(0),
+						createOperationDefault(operation, ports.get(0),
 								ports.get(1), ports.get(2)));
 			}
 		}
@@ -631,7 +631,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public GlobalControlUnit createSimpleGlobalControlUnit(TTA tta) {
+	public GlobalControlUnit createGlobalControlUnitDefault(TTA tta) {
 		GlobalControlUnit gcu = createGlobalControlUnit(3, 1);
 		gcu.setAddressSpace(tta.getProgram());
 
@@ -652,14 +652,14 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		gcu.getPorts().add(pc);
 
 		// Control operations
-		gcu.getOperations().add(createSimpleCtrlOperation("jump", pc));
-		gcu.getOperations().add(createSimpleCtrlOperation("call", pc));
+		gcu.getOperations().add(createOperationCtrl("jump", pc));
+		gcu.getOperations().add(createOperationCtrl("call", pc));
 
 		return gcu;
 	}
 
 	@Override
-	public EList<Guard> createSimpleGuards(RegisterFile register) {
+	public EList<Guard> createGuardsDefault(RegisterFile register) {
 		EList<Guard> guards = new BasicEList<Guard>();
 		guards.add(createExprTrue());
 		guards.add(createExprUnary(false, createTermBool(register, 0)));
@@ -670,7 +670,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Operation createSimpleOperation(String name, Port port1,
+	public Operation createOperationDefault(String name, Port port1,
 			int startCycle1, int cycle1, boolean isReads1, Port port2,
 			int startCycle2, int cycle2, boolean isReads2) {
 		Operation operation = createOperation(name);
@@ -694,7 +694,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Operation createSimpleOperation(String name, Port in1, Port out1) {
+	public Operation createOperationDefault(String name, Port in1, Port out1) {
 		Operation operation = createOperation(name);
 		operation.setControl(false);
 		operation.getPortToIndexMap().put(in1, 1);
@@ -705,7 +705,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public Operation createSimpleOperation(String name, Port in1, Port in2,
+	public Operation createOperationDefault(String name, Port in1, Port in2,
 			Port out1) {
 		Operation operation = createOperation(name);
 		operation.setControl(false);
@@ -719,7 +719,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public RegisterFile createSimpleRegisterFile(TTA tta, String name,
+	public RegisterFile createRegisterFileDefault(TTA tta, String name,
 			int size, int width) {
 		RegisterFile registerFile = createRegisterFile(name, size, width, 1, 1);
 
@@ -740,44 +740,44 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 	}
 
 	@Override
-	public TTA createSimpleTTA(String name) {
+	public TTA createTTADefault(String name) {
 		TTA tta = createTTA(name);
 		// Address spaces
 		tta.setData(createAddressSpace("data", 8, 0, 131071));
 		tta.setProgram(createAddressSpace("instructions", 8, 0, 8191));
 		// Buses
-		Bus bus0 = createSimpleBus(0, 32);
-		Bus bus1 = createSimpleBus(1, 32);
+		Bus bus0 = createBusDefault(0, 32);
+		Bus bus1 = createBusDefault(1, 32);
 		tta.getBuses().add(bus0);
 		tta.getBuses().add(bus1);
 		// Global Control Unit
-		tta.setGcu(createSimpleGlobalControlUnit(tta));
+		tta.setGcu(createGlobalControlUnitDefault(tta));
 		// Register files
-		RegisterFile bool = createSimpleRegisterFile(tta, "BOOL", 1, 2);
-		RegisterFile rf1 = createSimpleRegisterFile(tta, "RF_1", 32, 12);
-		RegisterFile rf2 = createSimpleRegisterFile(tta, "RF_2", 32, 12);
+		RegisterFile bool = createRegisterFileDefault(tta, "BOOL", 1, 2);
+		RegisterFile rf1 = createRegisterFileDefault(tta, "RF_1", 32, 12);
+		RegisterFile rf2 = createRegisterFileDefault(tta, "RF_2", 32, 12);
 		tta.getRegisterFiles().add(bool);
 		tta.getRegisterFiles().add(rf1);
 		tta.getRegisterFiles().add(rf2);
 		// Guards
-		bus0.getGuards().addAll(createSimpleGuards(bool));
-		bus1.getGuards().addAll(createSimpleGuards(bool));
+		bus0.getGuards().addAll(createGuardsDefault(bool));
+		bus1.getGuards().addAll(createGuardsDefault(bool));
 		// Fonctional units
 		EList<FunctionUnit> units = tta.getFunctionUnits();
 		// * ALU
 		String[] aluOperations1 = { "sxqw", "sxhw" };
 		String[] aluOperations2 = { "add", "and", "eq", "gt", "gtu", "ior",
 				"shl", "shr", "shru", "sub", "xor" };
-		units.add(createSimpleFonctionUnit(tta, "ALU", aluOperations1,
+		units.add(createFonctionUnit(tta, "ALU", aluOperations1,
 				aluOperations2));
 		// * LSU
 		units.add(createLSU(tta));
 		// * Mul
 		String[] mulOperations2 = { "mul" };
-		units.add(createSimpleFonctionUnit(tta, "Mul", null, mulOperations2));
+		units.add(createFonctionUnit(tta, "Mul", null, mulOperations2));
 		// * And-ior-xor
 		String[] aixOperations2 = { "and", "ior", "xor" };
-		units.add(createSimpleFonctionUnit(tta, "And-ior-xor", null,
+		units.add(createFonctionUnit(tta, "And-ior-xor", null,
 				aixOperations2));
 		return tta;
 	}

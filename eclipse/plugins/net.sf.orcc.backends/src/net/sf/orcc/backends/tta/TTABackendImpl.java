@@ -159,7 +159,7 @@ public class TTABackendImpl extends AbstractBackend {
 	}
 
 	private void printProcessor(Instance instance, String instancePath) {
-		TTA simpleTTA = ArchitectureFactory.eINSTANCE.createSimpleTTA(instance
+		TTA simpleTTA = ArchitectureFactory.eINSTANCE.createTTADefault(instance
 				.getId());
 
 		InstancePrinter vhdlPrinter = new InstancePrinter("TTA_processor_vhdl",

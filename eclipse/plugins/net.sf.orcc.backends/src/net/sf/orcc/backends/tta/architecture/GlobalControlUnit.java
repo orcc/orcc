@@ -71,26 +71,26 @@ public interface GlobalControlUnit extends EObject {
 	EList<Port> getPorts();
 
 	/**
-	 * Returns the value of the '<em><b>Return Address</b></em>' reference.
+	 * Returns the value of the '<em><b>Return Address</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Return Address</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Return Address</em>' reference.
+	 * @return the value of the '<em>Return Address</em>' containment reference.
 	 * @see #setReturnAddress(Port)
 	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getGlobalControlUnit_ReturnAddress()
-	 * @model
+	 * @model containment="true"
 	 * @generated
 	 */
 	Port getReturnAddress();
 
 	/**
-	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getReturnAddress <em>Return Address</em>}' reference.
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.GlobalControlUnit#getReturnAddress <em>Return Address</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Return Address</em>' reference.
+	 * @param value the new value of the '<em>Return Address</em>' containment reference.
 	 * @see #getReturnAddress()
 	 * @generated
 	 */
