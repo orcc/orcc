@@ -349,6 +349,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		// Interpret first expression ("if" condition)
 		Expression condition = exprInterpreter.doSwitch(node.getCondition());
 
+		Object ret;
 		// if (condition is true)
 		if (condition != null && condition.isBooleanExpr()) {
 			int oldBranch = branch;
@@ -360,13 +361,13 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				branch = 1;
 			}
 
-			doSwitch(node.getJoinNode());
+			ret = doSwitch(node.getJoinNode());
 			branch = oldBranch;
 		} else {
 			throw new OrccRuntimeException("Condition not boolean at line "
 					+ node.getLineNumber() + "\n");
 		}
-		return null;
+		return ret;
 	}
 
 	@Override
