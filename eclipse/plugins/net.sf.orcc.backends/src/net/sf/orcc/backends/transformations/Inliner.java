@@ -47,7 +47,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -177,7 +177,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 				Expression expr = call.getParameters().get(i);
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
 						variableToLocalVariableMap.get(parameter),
-						EcoreHelper.copy(expr));
+						IrUtil.copy(expr));
 				parametersBlock.add(assign);
 			}
 		}
@@ -188,7 +188,7 @@ public class Inliner extends AbstractActorVisitor<Object> {
 
 		// Cut the block containing call instruction in two parts to put
 		// inlined nodes between them
-		NodeBlock currentBlock = EcoreHelper.getContainerOfType(call,
+		NodeBlock currentBlock = IrUtil.getContainerOfType(call,
 				NodeBlock.class);
 		NodeBlock followingBlock = IrFactory.eINSTANCE.createNodeBlock();
 		while (indexInst < currentBlock.getInstructions().size()) {
@@ -201,11 +201,11 @@ public class Inliner extends AbstractActorVisitor<Object> {
 		inlinedNodes.addAll(clonedNodes);
 		inlinedNodes.add(followingBlock);
 
-		List<Node> currentNodes = EcoreHelper.getContainingList(currentBlock);
+		List<Node> currentNodes = IrUtil.getContainingList(currentBlock);
 		currentNodes.addAll(indexNode + 1, inlinedNodes);
 
 		// Remove useless call instruction
-		EcoreHelper.delete(call);
+		IrUtil.delete(call);
 	}
 
 	/**
@@ -226,10 +226,10 @@ public class Inliner extends AbstractActorVisitor<Object> {
 				if (callTarget != null) {
 					InstAssign instAssign = IrFactory.eINSTANCE
 							.createInstAssign(callTarget.getVariable(),
-									EcoreHelper.copy(instReturn.getValue()));
+									IrUtil.copy(instReturn.getValue()));
 					EcoreUtil.replace(instReturn, instAssign);
 				}
-				EcoreHelper.delete(instReturn);
+				IrUtil.delete(instReturn);
 			}
 		}
 	}

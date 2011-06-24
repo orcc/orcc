@@ -56,7 +56,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 /**
  * This class defines a visitor that transforms loads and stores to RAM
@@ -95,7 +95,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		int port = ram.getLastPortUsed() % 2 + 1;
 		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
 				.createInstRamSetAddress(port, var, indexes);
-		rsa.setPredicate(EcoreHelper.copy(ram.getPredicate()));
+		rsa.setPredicate(IrUtil.copy(ram.getPredicate()));
 
 		// insert the RSA before the previous split instruction
 		for (int i = indexInst - 1; i > 0; i--) {
@@ -122,7 +122,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		InstRamRead read = InstructionsFactory.eINSTANCE.createInstRamRead(
 				port, load.getSource().getVariable(), load.getTarget()
 						.getVariable());
-		read.setPredicate(EcoreHelper.copy(ram.getPredicate()));
+		read.setPredicate(IrUtil.copy(ram.getPredicate()));
 
 		// add pending read to the list
 		pendingReads.get(ram).add(read);
@@ -143,7 +143,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		int port = ram.getLastPortUsed() % 2 + 1;
 		InstRamSetAddress rsa = InstructionsFactory.eINSTANCE
 				.createInstRamSetAddress(port, var, indexes);
-		rsa.setPredicate(EcoreHelper.copy(ram.getPredicate()));
+		rsa.setPredicate(IrUtil.copy(ram.getPredicate()));
 		instructions.add(indexInst++, rsa);
 	}
 
@@ -155,7 +155,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 */
 	private void addSplitInstruction(RAM ram) {
 		InstSplit instSplit = InstructionsFactory.eINSTANCE.createInstSplit();
-		instSplit.setPredicate(EcoreHelper.copy(ram.getPredicate()));
+		instSplit.setPredicate(IrUtil.copy(ram.getPredicate()));
 		instructions.add(indexInst++, instSplit);
 	}
 
@@ -173,7 +173,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 		int port = ram.getLastPortUsed() % 2 + 1;
 		InstRamWrite write = InstructionsFactory.eINSTANCE.createInstRamWrite(
 				port, store.getTarget().getVariable(), store.getValue());
-		write.setPredicate(EcoreHelper.copy(ram.getPredicate()));
+		write.setPredicate(IrUtil.copy(ram.getPredicate()));
 		instructions.add(indexInst++, write);
 	}
 
@@ -202,7 +202,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	public Object caseInstLoad(InstLoad load) {
 		if (isVarTransformableToRam(load.getSource().getVariable())) {
 			convertLoad(load);
-			EcoreHelper.delete(load);
+			IrUtil.delete(load);
 			indexInst--;
 		}
 		return null;
@@ -223,7 +223,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 				Var var = use.getVariable();
 				if (var.isLocal() && !var.getType().isList()) {
 					Def def = var.getDefs().get(0);
-					Instruction defInst = EcoreHelper.getContainerOfType(def,
+					Instruction defInst = IrUtil.getContainerOfType(def,
 							Instruction.class);
 					if (pendingInstructions.contains(defInst)) {
 						// removes this instruction from the instruction list
@@ -248,7 +248,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	public Object caseInstStore(InstStore store) {
 		if (isVarTransformableToRam(store.getTarget().getVariable())) {
 			convertStore(store);
-			EcoreHelper.delete(store);
+			IrUtil.delete(store);
 			indexInst--;
 		}
 		return null;
@@ -282,7 +282,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            a Load
 	 */
 	private void convertLoad(InstLoad load) {
-		instructions = EcoreHelper.getContainingList(load);
+		instructions = IrUtil.getContainingList(load);
 		List<Expression> indexes = load.getIndexes();
 		Var var = load.getSource().getVariable();
 		Predicate predicate = load.getPredicate();
@@ -322,7 +322,7 @@ public class RAMInstructionScheduler extends AbstractActorVisitor<Object> {
 	 *            a Store
 	 */
 	private void convertStore(InstStore store) {
-		instructions = EcoreHelper.getContainingList(store);
+		instructions = IrUtil.getContainingList(store);
 		List<Expression> indexes = store.getIndexes();
 		Var var = store.getTarget().getVariable();
 		Predicate predicate = store.getPredicate();

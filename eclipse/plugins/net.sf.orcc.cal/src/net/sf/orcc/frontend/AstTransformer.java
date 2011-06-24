@@ -85,7 +85,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.Scope;
 
@@ -566,7 +566,7 @@ public class AstTransformer {
 				int lineNumber = Util.getLocation(expression);
 
 				indexes = new ArrayList<Expression>(
-						EcoreHelper.copy(currentIndexes));
+						IrUtil.copy(currentIndexes));
 				indexes.add(IrFactory.eINSTANCE.createExprInt(i));
 				i++;
 

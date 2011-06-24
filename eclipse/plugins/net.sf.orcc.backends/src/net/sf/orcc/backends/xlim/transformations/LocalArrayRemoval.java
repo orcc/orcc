@@ -37,7 +37,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -51,7 +51,7 @@ public class LocalArrayRemoval extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseProcedure(Procedure procedure) {
-		Actor actor = EcoreHelper.getContainerOfType(procedure, Actor.class);
+		Actor actor = IrUtil.getContainerOfType(procedure, Actor.class);
 		EList<Var> stateVars = actor.getStateVars();
 		for (Var var : new ArrayList<Var>(procedure.getLocals())) {
 			if (var.getType().isList()) {
@@ -69,7 +69,7 @@ public class LocalArrayRemoval extends AbstractActorVisitor<Object> {
 					defs.get(0).setVariable(newVar);
 				}
 				
-				EcoreHelper.delete(var);
+				IrUtil.delete(var);
 				stateVars.add(newVar);
 			}
 		}

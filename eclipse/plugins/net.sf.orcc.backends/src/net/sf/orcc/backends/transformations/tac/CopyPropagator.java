@@ -34,7 +34,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -72,7 +72,7 @@ public class CopyPropagator extends AbstractActorVisitor<Object> {
 				targetUses.get(0).setVariable(source);
 			}
 			EcoreUtil.remove(target);
-			EcoreHelper.delete(assign);
+			IrUtil.delete(assign);
 			indexInst--;
 		}
 		return null;

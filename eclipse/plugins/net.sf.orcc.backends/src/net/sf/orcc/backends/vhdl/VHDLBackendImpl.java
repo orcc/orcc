@@ -61,7 +61,7 @@ import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
@@ -158,7 +158,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		// applies transformations
 		for (ActorVisitor<?> transformation : transformationsCodegen) {
 			transformation.doSwitch(actor);
-			if (debugMode && !EcoreHelper.serializeActor(path, actor)) {
+			if (debugMode && !IrUtil.serializeActor(path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}
@@ -219,12 +219,12 @@ public class VHDLBackendImpl extends AbstractBackend {
 		}
 
 		// remove initialize actions
-		EcoreHelper.delete(actor.getInitializes());
+		IrUtil.delete(actor.getInitializes());
 
 		// remove initialization procedure (we could do better)
 		Procedure initProc = actor.getProcedure("_initialize");
 		if (initProc != null) {
-			EcoreHelper.delete(initProc);
+			IrUtil.delete(initProc);
 		}
 	}
 

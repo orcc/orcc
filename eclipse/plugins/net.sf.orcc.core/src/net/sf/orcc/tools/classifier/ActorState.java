@@ -42,7 +42,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 /**
  * This class defines the state of an actor as a set of scalar state variables
@@ -71,7 +71,7 @@ public class ActorState {
 				// we might consider this constant if it is used by guards
 				boolean usedByGuard = false;
 				for (Use use : variable.getUses()) {
-					Procedure proc = EcoreHelper.getContainerOfType(use,
+					Procedure proc = IrUtil.getContainerOfType(use,
 							Procedure.class);
 					if (proc.eContainingFeature() == IrPackage.eINSTANCE
 							.getAction_Scheduler()) {

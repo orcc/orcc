@@ -47,7 +47,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -103,7 +103,7 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 		for (Var stateVar : actor.getStateVars()) {
 			Expression initConst = stateVar.getInitialValue();
 			if (initConst != null) {
-				stateVar.setValue(EcoreHelper.copy(initConst));
+				stateVar.setValue(IrUtil.copy(initConst));
 			}
 		}
 
@@ -120,7 +120,7 @@ public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 			Type type = stateVar.getType();
 			if (type.isList() && stateVar.getInitialValue() == null
 					&& stateVar.getValue() != null) {
-				stateVar.setInitialValue(EcoreHelper.copy(stateVar.getValue()));
+				stateVar.setInitialValue(IrUtil.copy(stateVar.getValue()));
 			} else if (stateVar.getInitialValue() == null && initToZero) {
 				if (type.isList()) {
 					stateVar.setInitialValue(listAllocator.doSwitch(stateVar

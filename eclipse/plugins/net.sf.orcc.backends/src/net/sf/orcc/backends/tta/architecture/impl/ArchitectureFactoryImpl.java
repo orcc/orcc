@@ -60,7 +60,7 @@ import net.sf.orcc.backends.tta.architecture.Term;
 import net.sf.orcc.backends.tta.architecture.TermBool;
 import net.sf.orcc.backends.tta.architecture.TermUnit;
 import net.sf.orcc.backends.tta.architecture.Writes;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.network.Instance;
 
 import org.eclipse.emf.common.util.BasicEList;
@@ -794,7 +794,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		SocketImpl socket = new SocketImpl();
 		socket.setName(name);
 		socket.getConnectedSegments().addAll(segments);
-		EcoreHelper.getContainerOfType(segments.get(0), TTA.class).getSockets()
+		IrUtil.getContainerOfType(segments.get(0), TTA.class).getSockets()
 				.add(socket);
 		return socket;
 	}

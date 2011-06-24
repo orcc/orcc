@@ -38,7 +38,7 @@ import net.sf.orcc.ir.InstSpecific;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -72,7 +72,7 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 						expr = IrFactory.eINSTANCE.createExprInt(0);
 					}
 					values.set(values.indexOf(value), expr);
-					EcoreHelper.delete(value);
+					IrUtil.delete(value);
 				}
 			}
 		}
@@ -106,7 +106,7 @@ public class InstPhiTransformation extends AbstractActorVisitor<Object> {
 				} else {
 					expr = IrFactory.eINSTANCE.createExprInt(0);
 				}
-				EcoreHelper.delete(oldExpr);
+				IrUtil.delete(oldExpr);
 				return expr;
 			}
 		}

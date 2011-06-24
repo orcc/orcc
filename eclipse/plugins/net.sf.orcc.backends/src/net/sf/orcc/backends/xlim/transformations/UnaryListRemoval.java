@@ -45,7 +45,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -75,19 +75,19 @@ public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 				Var oldTarget = pattern.getVariable(port);
 				Var newTarget;
 
-				Procedure procedure = EcoreHelper.getContainerOfType(pattern,
+				Procedure procedure = IrUtil.getContainerOfType(pattern,
 						Action.class).getBody();
 
 				if (!oldTarget.getUses().isEmpty()) {
 					// First case: an input variable
-					InstLoad load = EcoreHelper.getContainerOfType(oldTarget
+					InstLoad load = IrUtil.getContainerOfType(oldTarget
 							.getUses().get(0), InstLoad.class);
 					newTarget = load.getTarget().getVariable();
 
-					EcoreHelper.delete(load);
+					IrUtil.delete(load);
 				} else if (!oldTarget.getDefs().isEmpty()) {
 					// Second case: an output variable
-					InstStore store = EcoreHelper.getContainerOfType(oldTarget
+					InstStore store = IrUtil.getContainerOfType(oldTarget
 							.getDefs().get(0), InstStore.class);
 
 					Expression expr = store.getValue();
@@ -103,7 +103,7 @@ public class UnaryListRemoval extends AbstractActorVisitor<Object> {
 						instructions.add(instructions.indexOf(store), assign);
 					}
 
-					EcoreHelper.delete(store);
+					IrUtil.delete(store);
 				} else {
 					// Third case: an input swallower
 					// i.e. an input variable which just consumes tokens

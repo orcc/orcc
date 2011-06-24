@@ -33,7 +33,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -53,13 +53,13 @@ public class ConstantPropagator extends AbstractActorVisitor<Object> {
 				|| value.isStringExpr()) {
 			EList<Use> targetUses = assign.getTarget().getVariable().getUses();
 			while (!targetUses.isEmpty()) {
-				ExprVar expr = EcoreHelper.getContainerOfType(
+				ExprVar expr = IrUtil.getContainerOfType(
 						targetUses.get(0), ExprVar.class);
-				EcoreUtil.replace(expr, EcoreHelper.copy(value));
-				EcoreHelper.delete(expr);
+				EcoreUtil.replace(expr, IrUtil.copy(value));
+				IrUtil.delete(expr);
 			}
 			EcoreUtil.remove(assign.getTarget());
-			EcoreHelper.delete(assign);
+			IrUtil.delete(assign);
 			indexInst--;
 		}
 		return null;

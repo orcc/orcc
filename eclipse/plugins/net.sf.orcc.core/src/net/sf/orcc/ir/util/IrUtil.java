@@ -66,7 +66,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
  * @author Herve Yviquel
  * 
  */
-public class EcoreHelper {
+public class IrUtil {
 
 	/**
 	 * Add the given instruction before the given expression. If the expression
@@ -87,19 +87,19 @@ public class EcoreHelper {
 	 */
 	public static boolean addInstBeforeExpr(Expression expression,
 			Instruction instruction, boolean usePreviousJoinNode) {
-		Instruction instContainer = EcoreHelper.getContainerOfType(expression,
+		Instruction instContainer = IrUtil.getContainerOfType(expression,
 				Instruction.class);
-		Node nodeContainer = EcoreHelper.getContainerOfType(expression,
+		Node nodeContainer = IrUtil.getContainerOfType(expression,
 				Node.class);
 		if (instContainer != null) {
 			if (usePreviousJoinNode && instContainer.isPhi()
 					&& isWhileJoinNode(nodeContainer)) {
-				NodeWhile nodeWhile = EcoreHelper.getContainerOfType(
+				NodeWhile nodeWhile = IrUtil.getContainerOfType(
 						nodeContainer, NodeWhile.class);
 				addToPreviousNodeBlock(nodeWhile, instruction);
 				return false;
 			} else {
-				List<Instruction> instructions = EcoreHelper
+				List<Instruction> instructions = IrUtil
 						.getContainingList(instContainer);
 				instructions.add(instructions.indexOf(instContainer),
 						instruction);
@@ -119,7 +119,7 @@ public class EcoreHelper {
 
 	private static void addToPreviousNodeBlock(Node node,
 			Instruction instruction) {
-		List<Node> nodes = EcoreHelper.getContainingList(node);
+		List<Node> nodes = IrUtil.getContainingList(node);
 		NodeBlock nodeBlock = IrFactory.eINSTANCE.createNodeBlock();
 		nodeBlock.add(instruction);
 		nodes.add(nodes.indexOf(node), nodeBlock);
@@ -295,7 +295,7 @@ public class EcoreHelper {
 
 	private static boolean isWhileJoinNode(Node node) {
 		if (node.isBlockNode()) {
-			NodeWhile nodeWhile = EcoreHelper.getContainerOfType(node,
+			NodeWhile nodeWhile = IrUtil.getContainerOfType(node,
 					NodeWhile.class);
 			return (nodeWhile != null && nodeWhile.getJoinNode() == node);
 		}

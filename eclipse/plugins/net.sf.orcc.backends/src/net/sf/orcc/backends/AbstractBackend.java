@@ -48,7 +48,7 @@ import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
@@ -365,7 +365,7 @@ public abstract class AbstractBackend implements Backend, IApplication {
 		write("Parsing " + files.size() + " actors...\n");
 		List<Actor> actors = new ArrayList<Actor>();
 		for (IFile file : files) {
-			Actor actor = EcoreHelper.deserializeActor(file);
+			Actor actor = IrUtil.deserializeActor(file);
 			actors.add(actor);
 
 			if (isCanceled()) {

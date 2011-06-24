@@ -30,7 +30,7 @@ package net.sf.orcc.tools;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.WriteListener;
 
 import org.eclipse.core.resources.IFile;
@@ -93,7 +93,7 @@ public abstract class AbstractActorAnalyzer implements ActorAnalyzer {
 		Actor actor;
 
 		IFile file = null;
-		actor = EcoreHelper.deserializeActor(file);
+		actor = IrUtil.deserializeActor(file);
 
 		if (isCanceled()) {
 			return;

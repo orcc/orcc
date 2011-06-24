@@ -47,7 +47,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -76,19 +76,19 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstAssign(InstAssign assign) {
-		newBlockNode.add(EcoreHelper.copy(assign));
+		newBlockNode.add(IrUtil.copy(assign));
 		return null;
 	}
 
 	@Override
 	public Object caseInstCall(InstCall call) {
-		newBlockNode.add(EcoreHelper.copy(call));
+		newBlockNode.add(IrUtil.copy(call));
 		return null;
 	}
 
 	@Override
 	public Object caseInstLoad(InstLoad load) {
-		newBlockNode.add(EcoreHelper.copy(load));
+		newBlockNode.add(IrUtil.copy(load));
 		return null;
 	}
 
@@ -97,8 +97,8 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 		InstTernary ternaryOp = InstructionsFactory.eINSTANCE
 				.createInstTernary(phi.getTarget().getVariable(),
 						IrFactory.eINSTANCE.createExprVar(condVar),
-						EcoreHelper.copy(phi.getValues().get(0)),
-						EcoreHelper.copy(phi.getValues().get(1)));
+						IrUtil.copy(phi.getValues().get(0)),
+						IrUtil.copy(phi.getValues().get(1)));
 
 		newBlockNode.add(ternaryOp);
 		return null;
@@ -106,19 +106,19 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstReturn(InstReturn returnInstr) {
-		newBlockNode.add(EcoreHelper.copy(returnInstr));
+		newBlockNode.add(IrUtil.copy(returnInstr));
 		return null;
 	}
 
 	@Override
 	public Object caseInstSpecific(InstSpecific inst) {
-		newBlockNode.add(EcoreHelper.copy(inst));
+		newBlockNode.add(IrUtil.copy(inst));
 		return null;
 	}
 
 	@Override
 	public Object caseInstStore(InstStore store) {
-		newBlockNode.add(EcoreHelper.copy(store));
+		newBlockNode.add(IrUtil.copy(store));
 		return null;
 	}
 
@@ -148,7 +148,7 @@ public class InstTernaryAdder extends AbstractActorVisitor<Object> {
 		if (!procedure.getReturnType().isVoid() && isTernarisable(procedure)) {
 			newBlockNode = IrFactoryImpl.eINSTANCE.createNodeBlock();
 			super.caseProcedure(procedure);
-			EcoreHelper.delete(procedure.getNodes());
+			IrUtil.delete(procedure.getNodes());
 			procedure.getNodes().add(newBlockNode);
 		}
 		return null;

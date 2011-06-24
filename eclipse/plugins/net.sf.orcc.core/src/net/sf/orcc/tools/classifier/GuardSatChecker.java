@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.tools.classifier;
 
-import static net.sf.orcc.ir.util.EcoreHelper.getContainerOfType;
+import static net.sf.orcc.ir.util.IrUtil.getContainerOfType;
 
 import java.math.BigInteger;
 import java.util.List;

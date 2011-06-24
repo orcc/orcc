@@ -58,7 +58,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -98,7 +98,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 		Expression e2 = expr.getE2();
 		if (isTypeReducer(expr.getOp())) {
 			// TOFIX: Probably a better solution
-			expr.setType(EcoreHelper.copy(getBigger(e1.getType(), e2.getType())));
+			expr.setType(IrUtil.copy(getBigger(e1.getType(), e2.getType())));
 		}
 		if (expr.getOp().isComparison()) {
 			parentType = getBigger(e1.getType(), e2.getType());
@@ -166,7 +166,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			cast.setTarget(IrFactory.eINSTANCE.createDef(assign.getTarget()
 					.getVariable()));
 
-			EcoreHelper.delete(assign);
+			IrUtil.delete(assign);
 		}
 		return null;
 	}
@@ -201,10 +201,10 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 
 		if (load.getIndexes().isEmpty()) {
 			// Load from a scalar variable
-			uncastedType = EcoreHelper.copy(source.getType());
+			uncastedType = IrUtil.copy(source.getType());
 		} else {
 			// Load from an array variable
-			uncastedType = EcoreHelper.copy(((TypeList) source.getType())
+			uncastedType = IrUtil.copy(((TypeList) source.getType())
 					.getElementType());
 		}
 
@@ -247,7 +247,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 			NodeWhile nodeWhile = (NodeWhile) containingNode;
 			if (value0.isVarExpr()) {
 				NodeBlock block = IrFactory.eINSTANCE.createNodeBlock();
-				EcoreHelper.getContainingList(containingNode).add(indexNode,
+				IrUtil.getContainingList(containingNode).add(indexNode,
 						block);
 				indexNode++;
 				values.set(0, castExpression(value0, block, 0));
@@ -324,8 +324,8 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 						EcoreUtil.copy(expr.getType()),
 						"expr_" + procedure.getName());
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						oldVar, EcoreHelper.copy(expr));
-				EcoreHelper
+						oldVar, IrUtil.copy(expr));
+				IrUtil
 						.addInstBeforeExpr(expr, assign, usePreviousJoinNode);
 			}
 
@@ -334,10 +334,10 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 					"castedExpr_" + procedure.getName());
 			InstCast cast = InstructionsFactory.eINSTANCE.createInstCast(
 					oldVar, newVar);
-			if (EcoreHelper.addInstBeforeExpr(expr, cast, usePreviousJoinNode)) {
+			if (IrUtil.addInstBeforeExpr(expr, cast, usePreviousJoinNode)) {
 				indexInst++;
 			}
-			EcoreHelper.delete(expr);
+			IrUtil.delete(expr);
 			return IrFactory.eINSTANCE.createExprVar(newVar);
 		}
 
@@ -354,7 +354,7 @@ public class CastAdder extends AbstractActorVisitor<Expression> {
 						EcoreUtil.copy(expr.getType()),
 						"expr_" + procedure.getName());
 				InstAssign assign = IrFactory.eINSTANCE.createInstAssign(
-						oldVar, EcoreHelper.copy(expr));
+						oldVar, IrUtil.copy(expr));
 				node.add(index, assign);
 				index++;
 			}

@@ -48,7 +48,7 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -189,8 +189,8 @@ public class LiteralIntegersAdder extends AbstractActorVisitor<Expression> {
 				EcoreUtil.copy(expr.getType()), "literal");
 
 		InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
-				EcoreHelper.copy(expr));
-		EcoreHelper.addInstBeforeExpr(expr, assign, usePreviousJoinNode);
+				IrUtil.copy(expr));
+		IrUtil.addInstBeforeExpr(expr, assign, usePreviousJoinNode);
 
 		return IrFactory.eINSTANCE.createExprVar(target);
 	}

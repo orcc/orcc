@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
-import static net.sf.orcc.ir.util.EcoreHelper.copy;
-import static net.sf.orcc.ir.util.EcoreHelper.getContainerOfType;
+import static net.sf.orcc.ir.util.IrUtil.copy;
+import static net.sf.orcc.ir.util.IrUtil.getContainerOfType;
 import static org.eclipse.emf.ecore.util.EcoreUtil.isAncestor;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.util.TreeIterator;
@@ -372,7 +372,7 @@ public class ActionSplitter extends AbstractActorVisitor<Object> {
 
 		// remove the SplitInstruction
 		NodeBlock block = instSplit.getBlock();
-		EcoreHelper.delete(instSplit);
+		IrUtil.delete(instSplit);
 
 		// move instructions
 		NodeBlock targetBlock = nextAction.getBody().getFirst();

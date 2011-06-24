@@ -50,7 +50,7 @@ import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -91,17 +91,17 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		if (complexityLevel > 0) {
 			// Make a new assignment to the binary expression
 			Var target = procedure.newTempLocalVariable(
-					EcoreHelper.copy(expr.getType()), "splitted_expr");
+					IrUtil.copy(expr.getType()), "splitted_expr");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
-					EcoreHelper.copy(expr));
+					IrUtil.copy(expr));
 
 			// Add assignment to instruction's list
-			if (EcoreHelper
+			if (IrUtil
 					.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
 				indexInst++;
 			}
 
-			EcoreHelper.delete(expr);
+			IrUtil.delete(expr);
 			return IrFactory.eINSTANCE.createExprVar(target);
 		} else {
 			return expr;
@@ -146,20 +146,20 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		case MINUS:
 			newExpr = IrFactory.eINSTANCE.createExprBinary(
 					IrFactory.eINSTANCE.createExprInt(0), OpBinary.MINUS,
-					EcoreHelper.copy(expr.getExpr()),
-					EcoreHelper.copy(expr.getType()));
+					IrUtil.copy(expr.getExpr()),
+					IrUtil.copy(expr.getType()));
 			break;
 		case LOGIC_NOT:
 			newExpr = IrFactory.eINSTANCE.createExprBinary(
-					EcoreHelper.copy(expr.getExpr()), OpBinary.EQ,
+					IrUtil.copy(expr.getExpr()), OpBinary.EQ,
 					IrFactory.eINSTANCE.createExprBool(false),
-					EcoreHelper.copy(expr.getType()));
+					IrUtil.copy(expr.getType()));
 			break;
 		case BITNOT:
 			newExpr = IrFactory.eINSTANCE.createExprBinary(
-					EcoreHelper.copy(expr.getExpr()), OpBinary.BITXOR,
-					EcoreHelper.copy(expr.getExpr()),
-					EcoreHelper.copy(expr.getType()));
+					IrUtil.copy(expr.getExpr()), OpBinary.BITXOR,
+					IrUtil.copy(expr.getExpr()),
+					IrUtil.copy(expr.getType()));
 			break;
 		default:
 			throw new OrccRuntimeException("unsupported operator");
@@ -168,20 +168,20 @@ public class ExpressionSplitter extends AbstractActorVisitor<Expression> {
 		if (complexityLevel > 0) {
 			// Make a new assignment to the binary expression
 			Var target = procedure.newTempLocalVariable(
-					EcoreHelper.copy(expr.getType()), "splittedExpr");
+					IrUtil.copy(expr.getType()), "splittedExpr");
 			InstAssign assign = IrFactory.eINSTANCE.createInstAssign(target,
 					newExpr);
 
 			// Add assignment to instruction's list
-			if (EcoreHelper
+			if (IrUtil
 					.addInstBeforeExpr(expr, assign, usePreviousJoinNode)) {
 				indexInst++;
 			}
 
-			EcoreHelper.delete(expr);
+			IrUtil.delete(expr);
 			return IrFactory.eINSTANCE.createExprVar(target);
 		} else {
-			EcoreHelper.delete(expr);
+			IrUtil.delete(expr);
 			return newExpr;
 		}
 	}

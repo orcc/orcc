@@ -47,7 +47,7 @@ import net.sf.orcc.backends.transformations.TypeResizer;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.transformations.RenameTransformation;
 import net.sf.orcc.ir.util.ActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -232,7 +232,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
-			if (debugMode && !EcoreHelper.serializeActor(path, actor)) {
+			if (debugMode && !IrUtil.serializeActor(path, actor)) {
 				System.out.println("oops " + transformation + " "
 						+ actor.getName());
 			}

@@ -30,7 +30,7 @@ package net.sf.orcc.backends.vhdl.ram;
 
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Predicate;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 /**
  * This class defines a RAM.
@@ -134,9 +134,9 @@ public class RAM {
 	 */
 	public void setPredicate(Predicate newPredicate) {
 		if (predicate != null) {
-			EcoreHelper.delete(predicate);
+			IrUtil.delete(predicate);
 		}
-		predicate = EcoreHelper.copy(newPredicate);
+		predicate = IrUtil.copy(newPredicate);
 	}
 
 }

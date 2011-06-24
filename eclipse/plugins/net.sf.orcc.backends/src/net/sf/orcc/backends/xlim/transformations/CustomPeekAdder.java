@@ -45,7 +45,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -65,7 +65,7 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 	public Object caseAction(Action action) {
 		customPeekedMap = new HashMap<Port, Map<Integer, Var>>();
 		doSwitch(action.getPeekPattern());
-		((XlimActorTemplateData) EcoreHelper.getContainerOfType(action,
+		((XlimActorTemplateData) IrUtil.getContainerOfType(action,
 				Actor.class).getTemplateData()).getCustomPeekedMapPerAction()
 				.put(action, customPeekedMap);
 		return null;
@@ -80,7 +80,7 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 			List<Use> uses = new ArrayList<Use>(oldTarget.getUses());
 			for (Use use : uses) {
 				// Create a custom peek for each load of this variable
-				InstLoad load = EcoreHelper.getContainerOfType(use,
+				InstLoad load = IrUtil.getContainerOfType(use,
 						InstLoad.class);
 
 				Var newVar = load.getTarget().getVariable();
@@ -90,9 +90,9 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 					indexToVariableMap.put(((ExprInt) indexExpr).getIntValue(),
 							newVar);
 				} else {
-					Actor actor = EcoreHelper.getContainerOfType(pattern,
+					Actor actor = IrUtil.getContainerOfType(pattern,
 							Actor.class);
-					Action action = EcoreHelper.getContainerOfType(pattern,
+					Action action = IrUtil.getContainerOfType(pattern,
 							Action.class);
 					throw new OrccRuntimeException(
 							"One repeat and one guard on the same input port are forbidden with XLIM backend. \nActor: "
@@ -100,7 +100,7 @@ public class CustomPeekAdder extends AbstractActorVisitor<Object> {
 									+ " - Action: "
 									+ action.getName());
 				}
-				EcoreHelper.delete(load);
+				IrUtil.delete(load);
 			}
 			EcoreUtil.remove(oldTarget);
 			customPeekedMap.put(port, indexToVariableMap);

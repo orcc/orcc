@@ -41,7 +41,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -57,7 +57,7 @@ public class GetElementPtrAdder extends AbstractActorVisitor<Object> {
 	private Var addGEP(Var array, Type type, List<Expression> indexes,
 			NodeBlock currentNode) {
 		// Make a new localVariable that will contains the elt to access
-		Var eltVar = procedure.newTempLocalVariable(EcoreHelper.copy(type),
+		Var eltVar = procedure.newTempLocalVariable(IrUtil.copy(type),
 				array.getName() + "_" + "elt");
 
 		InstGetElementPtr gep = InstructionsFactory.eINSTANCE

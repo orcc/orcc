@@ -51,7 +51,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -157,7 +157,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 			if (loop != null) {
 				List<Use> uses = new ArrayList<Use>(oldVar.getUses());
 				for (Use use : uses) {
-					Node node = EcoreHelper.getContainerOfType(use, Node.class);
+					Node node = IrUtil.getContainerOfType(use, Node.class);
 
 					// only changes uses that are in the loop
 					if (node != join && EcoreUtil.isAncestor(loop, node)) {
@@ -168,7 +168,7 @@ public class SSATransformation extends AbstractActorVisitor<Object> {
 		}
 
 		// replace use
-		EcoreHelper.removeUses(phi.getValues().get(branch - 1));
+		IrUtil.removeUses(phi.getValues().get(branch - 1));
 		phi.getValues().set(branch - 1,
 				IrFactory.eINSTANCE.createExprVar(newVar));
 	}

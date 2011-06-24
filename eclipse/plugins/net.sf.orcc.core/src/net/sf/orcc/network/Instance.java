@@ -37,7 +37,7 @@ import java.util.TreeMap;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
@@ -321,7 +321,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		}
 		actor = Network.getActorFromPool(className);
 		if (actor == null) {
-			actor = EcoreHelper.deserializeActor(file);
+			actor = IrUtil.deserializeActor(file);
 			if (actor == null) {
 				throw new OrccException("Actor \"" + className
 						+ "\" not found!\nIf this actor has errors, please "

@@ -47,7 +47,7 @@ import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -104,9 +104,9 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 
 			InstCall call = factory.createInstCall(varResult, divProc,
 					parameters);
-			EcoreHelper.addInstBeforeExpr(expr, assign0, true);
-			EcoreHelper.addInstBeforeExpr(expr, assign1, true);
-			EcoreHelper.addInstBeforeExpr(expr, call, true);
+			IrUtil.addInstBeforeExpr(expr, assign0, true);
+			IrUtil.addInstBeforeExpr(expr, assign1, true);
+			IrUtil.addInstBeforeExpr(expr, call, true);
 
 			EcoreUtil.replace(expr, factory.createExprVar(varResult));
 		}

@@ -62,7 +62,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.impl.IrFactoryImpl;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.eclipse.emf.common.util.EList;
@@ -101,7 +101,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		@Override
 		public Object caseInstLoad(InstLoad load) {
 			Var varSource = load.getSource().getVariable();
-			Pattern pattern = EcoreHelper.getContainerOfType(varSource,
+			Pattern pattern = IrUtil.getContainerOfType(varSource,
 					Pattern.class);
 			if (pattern != null) {
 				Port testPort = pattern.getPort(varSource);
@@ -153,7 +153,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		@Override
 		public Object caseInstLoad(InstLoad load) {
 			Var varSource = load.getSource().getVariable();
-			Pattern pattern = EcoreHelper.getContainerOfType(varSource,
+			Pattern pattern = IrUtil.getContainerOfType(varSource,
 					Pattern.class);
 			if (pattern != null) {
 				Port testPort = pattern.getPort(varSource);
@@ -184,7 +184,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		@Override
 		public Object caseInstStore(InstStore store) {
 			Var varTarget = store.getTarget().getVariable();
-			Pattern pattern = EcoreHelper.getContainerOfType(varTarget,
+			Pattern pattern = IrUtil.getContainerOfType(varTarget,
 					Pattern.class);
 			if (pattern != null) {
 				Port testPort = pattern.getPort(varTarget);
@@ -1685,7 +1685,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		if (visitedActionsNames.isEmpty()) {
 			// fill lists the first time
 			visitedActionsNames.add(actionName);
-			visitedActions.add(EcoreHelper.copy(action));
+			visitedActions.add(IrUtil.copy(action));
 		} else {
 			if (visitedActionsNames.contains(actionName)) {
 				// if action is visited then it is replaced by not transformed
@@ -1697,7 +1697,7 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				updateFSM(updateAction, action, source, target);
 			} else {
 				visitedActionsNames.add(actionName);
-				visitedActions.add(EcoreHelper.copy(action));
+				visitedActions.add(IrUtil.copy(action));
 			}
 		}
 	}

@@ -34,7 +34,7 @@ import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -81,7 +81,7 @@ public class Frontend {
 		try {
 			Actor actor = actorTransformer.transform(file, astActor);
 			removeDanglingUses(actor);
-			EcoreHelper.serializeActor(outputFolder, actor);
+			IrUtil.serializeActor(outputFolder, actor);
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();
 		}

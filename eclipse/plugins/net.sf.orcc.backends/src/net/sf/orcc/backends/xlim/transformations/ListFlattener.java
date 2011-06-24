@@ -42,7 +42,7 @@ import net.sf.orcc.ir.NodeBlock;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 /**
  * This class defines an actor transformation that transforms declarations and
@@ -80,7 +80,7 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 				IrFactory.eINSTANCE.createTypeInt(), "concat_index");
 
 		// sets indexVar as memory index
-		EcoreHelper.delete(indexes);
+		IrUtil.delete(indexes);
 		indexes.add(IrFactory.eINSTANCE.createExprVar(indexVar));
 
 		// add a special assign instruction that assigns the index variable the
@@ -97,9 +97,9 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 
 		if (!indexes.isEmpty()) {
 			printAssignment(
-					EcoreHelper.getContainerOfType(load, NodeBlock.class),
+					IrUtil.getContainerOfType(load, NodeBlock.class),
 					indexes,
-					EcoreHelper.copy(load.getSource().getVariable().getType()));
+					IrUtil.copy(load.getSource().getVariable().getType()));
 		}
 
 		return null;
@@ -111,9 +111,9 @@ public class ListFlattener extends AbstractActorVisitor<Object> {
 
 		if (!indexes.isEmpty()) {
 			printAssignment(
-					EcoreHelper.getContainerOfType(store, NodeBlock.class),
+					IrUtil.getContainerOfType(store, NodeBlock.class),
 					indexes,
-					EcoreHelper.copy(store.getTarget().getVariable().getType()));
+					IrUtil.copy(store.getTarget().getVariable().getType()));
 		}
 
 		return null;

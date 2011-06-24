@@ -40,7 +40,7 @@ import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -61,7 +61,7 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		List<Instruction> instructions = block.getInstructions();
 		// annotate with predicate
 		for (Instruction instruction : instructions) {
-			instruction.setPredicate(EcoreHelper.copy(currentPredicate));
+			instruction.setPredicate(IrUtil.copy(currentPredicate));
 		}
 
 		// move to target block
@@ -79,27 +79,27 @@ public class IfConverter extends AbstractActorVisitor<Object> {
 		Predicate previousPredicate = currentPredicate;
 
 		// predicate for "then" branch
-		currentPredicate = EcoreHelper.copy(previousPredicate);
+		currentPredicate = IrUtil.copy(previousPredicate);
 		currentPredicate.getExpressions().add(
-				EcoreHelper.copy(nodeIf.getCondition()));
+				IrUtil.copy(nodeIf.getCondition()));
 		doSwitch(nodeIf.getThenNodes());
-		EcoreHelper.delete(currentPredicate);
+		IrUtil.delete(currentPredicate);
 
 		// predicate for "else" branch
-		currentPredicate = EcoreHelper.copy(previousPredicate);
+		currentPredicate = IrUtil.copy(previousPredicate);
 		currentPredicate.getExpressions().add(
 				IrFactory.eINSTANCE.createExprUnary(OpUnary.LOGIC_NOT,
-						EcoreHelper.copy(nodeIf.getCondition()),
+						IrUtil.copy(nodeIf.getCondition()),
 						IrFactory.eINSTANCE.createTypeBool()));
 		doSwitch(nodeIf.getElseNodes());
-		EcoreHelper.delete(currentPredicate);
+		IrUtil.delete(currentPredicate);
 
 		// restore predicate for "join" node
 		currentPredicate = previousPredicate;
 		doSwitch(nodeIf.getJoinNode());
 
 		// deletes condition and node
-		EcoreHelper.delete(nodeIf.getCondition());
+		IrUtil.delete(nodeIf.getCondition());
 		EcoreUtil.remove(nodeIf);
 
 		return null;

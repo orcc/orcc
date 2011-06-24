@@ -44,7 +44,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 /**
  * This class defines a very simple Dead Var Elimination.
@@ -67,10 +67,10 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 			return;
 		}
 
-		List<Use> uses = EcoreHelper.getUses(instruction);
+		List<Use> uses = IrUtil.getUses(instruction);
 		for (Use use : uses) {
 			for (Def def : use.getVariable().getDefs()) {
-				Instruction instDef = EcoreHelper.getContainerOfType(def,
+				Instruction instDef = IrUtil.getContainerOfType(def,
 						Instruction.class);
 				if (instDef != null) {
 					instructionsToVisit.add(instDef);
@@ -79,7 +79,7 @@ public class DeadVariableRemoval extends AbstractActorVisitor<Object> {
 		}
 
 		// remove instruction
-		EcoreHelper.delete(instruction);
+		IrUtil.delete(instruction);
 
 		// adds target to list of to-be-removed variables
 		unusedLocals.add(target);

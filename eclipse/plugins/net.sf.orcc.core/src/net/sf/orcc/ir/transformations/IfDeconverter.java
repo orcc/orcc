@@ -44,7 +44,7 @@ import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Predicate;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.EcoreHelper;
+import net.sf.orcc.ir.util.IrUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -62,7 +62,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseNodeBlock(NodeBlock block) {
-		Procedure procedure = EcoreHelper.getContainerOfType(block,
+		Procedure procedure = IrUtil.getContainerOfType(block,
 				Procedure.class);
 		NodeBlock targetBlock = null;
 
@@ -74,7 +74,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 			if (!predicate.isSameAs(currentPredicate)) {
 				// deletes the current predicate
 				if (currentPredicate != null) {
-					EcoreHelper.delete(currentPredicate);
+					IrUtil.delete(currentPredicate);
 				}
 
 				// updates the target block
@@ -82,7 +82,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 			}
 
 			// deletes the predicate of the instruction
-			EcoreHelper.delete(predicate);
+			IrUtil.delete(predicate);
 
 			// moves the instruction
 			targetBlock.getInstructions().add(inst);
@@ -90,7 +90,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 
 		// deletes the current predicate
 		if (currentPredicate != null) {
-			EcoreHelper.delete(currentPredicate);
+			IrUtil.delete(currentPredicate);
 		}
 
 		// remove this block
@@ -132,7 +132,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 	 */
 	private List<Node> findNodes(List<Node> parentNodes, Expression condition) {
 		for (NodeIf nodeIf : nodeIfList) {
-			List<Node> nodes = EcoreHelper.getContainingList(nodeIf);
+			List<Node> nodes = IrUtil.getContainingList(nodeIf);
 			if (EcoreUtil.equals(condition, nodeIf.getCondition())
 					&& parentNodes == nodes) {
 				return nodeIf.getThenNodes();
@@ -179,7 +179,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 				if (nodes == null) {
 					// create a new if
 					NodeIf nodeIf = IrFactory.eINSTANCE.createNodeIf();
-					nodeIf.setCondition(EcoreHelper.copy(condition));
+					nodeIf.setCondition(IrUtil.copy(condition));
 					nodeIf.setJoinNode(IrFactory.eINSTANCE.createNodeBlock());
 					nodeIfList.add(nodeIf);
 					parentNodes.add(nodeIf);
@@ -190,7 +190,7 @@ public class IfDeconverter extends AbstractActorVisitor<Object> {
 					parentNodes = nodes;
 				}
 
-				currentPredicate.add(EcoreHelper.copy(condition));
+				currentPredicate.add(IrUtil.copy(condition));
 			}
 
 			return procedure.getLast(parentNodes);
