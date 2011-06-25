@@ -452,7 +452,62 @@ public interface IrFactory extends EFactory {
 	 */
 	InstStore createInstStore(int lineNumber, Var target,
 			List<Expression> indexes, Expression value);
+	
+	/**
+	 * Creates an InstStore with the given target, indexes, value.
+	 * 
+	 * @param target
+	 * @param source
+	 * @param indexes
+	 * @return a store
+	 */
+	InstStore createInstStore(Var target, List<Expression> indexes,
+			Expression value);
 
+	/**
+	 * Creates an InstStore with the given target, indexes, value.
+	 * 
+	 * @param target
+	 * @param source
+	 * @param indexes
+	 * @return a store
+	 */
+	InstStore createInstStore(Var target, List<Expression> indexes,
+			Var source);
+	
+	/**
+	 * Creates an InstStore with the given target, index and source.
+	 * 
+	 * @param target
+	 * @param source
+	 * @param index
+	 * @return a store
+	 */
+	InstStore createInstStore(Var target, int index,
+			Var source);
+	
+	/**
+	 * Creates an InstStore with the given target, index and source.
+	 * 
+	 * @param target
+	 * @param source
+	 * @param index
+	 * @return a store
+	 */
+	InstStore createInstStore(Var target, Var index,
+			Var source);
+	
+	/**
+	 * Creates an InstStore with the given target, indexes, value.
+	 * 
+	 * @param target
+	 * @param value
+	 * @param indexes
+	 * @return a store
+	 */
+	InstStore createInstStore(Var target, List<Expression> indexes,
+			int value);
+	
 	/**
 	 * Creates an InstStore with the given target and source.
 	 * 
@@ -461,6 +516,24 @@ public interface IrFactory extends EFactory {
 	 * @return a store
 	 */
 	InstStore createInstStore(Var target, Expression value);
+	
+	/**
+	 * Creates an InstStore with the given target and source.
+	 * 
+	 * @param target
+	 * @param source
+	 * @return a store
+	 */
+	InstStore createInstStore(Var target, Var source);
+	
+	/**
+	 * Creates an InstStore with the given target and value.
+	 * 
+	 * @param target
+	 * @param value
+	 * @return a store
+	 */
+	InstStore createInstStore(Var target, int value);
 
 	/**
 	 * Returns a new object of class '<em>Node Block</em>'.
