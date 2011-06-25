@@ -298,21 +298,12 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				"index" + port.getName());
 		index.setIndex(1);
 		Var writeIndex = writeIndexes.get(position);
-		Instruction loadInd = factory.createInstLoad(index, writeIndex);
-		bodyNode.add(loadInd);
-
-		Var indexInc = body.newTempLocalVariable(factory.createTypeInt(32),
-				"index" + port.getName());
-		indexInc.setIndex(2);
+		bodyNode.add(factory.createInstLoad(index, writeIndex));
 
 		Expression value = factory.createExprBinary(
 				factory.createExprVar(index), OpBinary.PLUS,
 				factory.createExprInt(1), factory.createTypeInt(32));
-		Instruction assign = factory.createInstAssign(indexInc, value);
-		bodyNode.add(assign);
-
-		Instruction store = factory.createInstStore(writeIndex, indexInc);
-		bodyNode.add(store);
+		bodyNode.add(factory.createInstStore(writeIndex, value));
 	}
 
 	/**
@@ -341,35 +332,31 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @return a new action created with the given name
 	 */
 	private Action createAction(Expression condition, String name) {
-		// scheduler
+		Tag tag = factory.createTag(name);
+
+		// Scheduler building
 		Procedure scheduler = factory.createProcedure("isSchedulable_" + name,
 				0, factory.createTypeBool());
+		NodeBlock blockScheduler = factory.createNodeBlock();
 		Var result = scheduler.newTempLocalVariable(factory.createTypeBool(),
 				"actionResult");
 		result.setIndex(1);
+		blockScheduler.add(factory.createInstAssign(result, condition));
+		blockScheduler.add(factory.createInstReturn(factory
+				.createExprVar(result)));
+		scheduler.getNodes().add(blockScheduler);
 
-		NodeBlock block = factory.createNodeBlock();
-		block.add(factory.createInstAssign(result, condition));
-		block.add(factory.createInstReturn(factory.createExprVar(result)));
-		scheduler.getNodes().add(block);
-
-		// body
+		// Body building ;-)
 		Procedure body = factory.createProcedure(name, 0,
 				factory.createTypeVoid());
-		block = factory.createNodeBlock();
-		block.add(factory.createInstReturn());
-		body.getNodes().add(block);
-
-		// tag
-		Tag tag = factory.createTag(name);
+		NodeBlock blockBody = factory.createNodeBlock();
+		blockBody.add(factory.createInstReturn());
+		body.getNodes().add(blockBody);
 
 		Action action = factory.createAction(tag, factory.createPattern(),
 				factory.createPattern(), factory.createPattern(), scheduler,
 				body);
-
-		// add action to actor's actions
-		this.actor.getActions().add(action);
-
+		actor.getActions().add(action);
 		return action;
 	}
 
@@ -419,15 +406,17 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 	 * @return new done action
 	 */
 	private Action createDoneAction(String name, Var counter, int numTokens) {
-		// body
+		Tag tag = factory.createTag(name);
+
+		// Body building ;-)
 		Procedure body = factory.createProcedure(name, 0,
 				factory.createTypeVoid());
-		NodeBlock block = factory.createNodeBlock();
-		block.add(factory.createInstStore(counter, 0));
-		block.add(factory.createInstReturn());
-		body.getNodes().add(block);
+		NodeBlock blockBody = factory.createNodeBlock();
+		blockBody.add(factory.createInstStore(counter, 0));
+		blockBody.add(factory.createInstReturn());
+		body.getNodes().add(blockBody);
 
-		// scheduler
+		// Scheduler building
 		Procedure scheduler = factory.createProcedure("isSchedulable_" + name,
 				0, factory.createTypeBool());
 		Var temp = scheduler.newTempLocalVariable(factory.createTypeBool(),
@@ -441,26 +430,24 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		Var localCounter = factory.createVar(0, counter.getType(),
 				"localCounter", true, 1);
 		scheduler.getLocals().add(localCounter);
-		block = factory.createNodeBlock();
-		block.add(0, factory.createInstLoad(localCounter, counter));
+		NodeBlock blockScheduler = factory.createNodeBlock();
+		blockScheduler.add(0, factory.createInstLoad(localCounter, counter));
 
 		Expression guardValue = factory.createExprInt(numTokens);
 		Expression counterExpression = factory.createExprVar(localCounter);
 		Expression expression = factory.createExprBinary(counterExpression,
 				OpBinary.EQ, guardValue, factory.createTypeBool());
-		block.add(factory.createInstAssign(temp, expression));
-		block.add(factory.createInstAssign(result, factory.createExprVar(temp)));
-		block.add(factory.createInstReturn(factory.createExprVar(result)));
-		scheduler.getNodes().add(block);
+		blockScheduler.add(factory.createInstAssign(temp, expression));
+		blockScheduler.add(factory.createInstAssign(result,
+				factory.createExprVar(temp)));
+		blockScheduler.add(factory.createInstReturn(factory
+				.createExprVar(result)));
+		scheduler.getNodes().add(blockScheduler);
 
-		// tag
-		Tag tag = factory.createTag(name);
-
+		
 		Action action = factory.createAction(tag, factory.createPattern(),
 				factory.createPattern(), factory.createPattern(), scheduler,
 				body);
-
-		// add action to actor's actions
 		this.actor.getActions().add(action);
 
 		return action;
