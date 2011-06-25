@@ -498,6 +498,28 @@ public interface IrFactory extends EFactory {
 			Var source);
 	
 	/**
+	 * Creates an InstStore with the given target, index and source.
+	 * 
+	 * @param target
+	 * @param source
+	 * @param index
+	 * @return a store
+	 */
+	InstStore createInstStore(Var target, Var index,
+			Expression source);
+	
+	/**
+	 * Creates an InstStore with the given target, index and source.
+	 * 
+	 * @param target
+	 * @param source
+	 * @param index
+	 * @return a store
+	 */
+	InstStore createInstStore(Var target, int index,
+			Expression source);
+	
+	/**
 	 * Creates an InstStore with the given target, indexes, value.
 	 * 
 	 * @param target

@@ -56,7 +56,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.IrUtil;
@@ -444,7 +443,6 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 				.createExprVar(result)));
 		scheduler.getNodes().add(blockScheduler);
 
-		
 		Action action = factory.createAction(tag, factory.createPattern(),
 				factory.createPattern(), factory.createPattern(), scheduler,
 				body);
@@ -635,28 +633,20 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		input.setIndex(1);
 
 		List<Expression> load2Index = new ArrayList<Expression>(1);
-		Expression expression1 = factory.createExprVar(mask);
-		load2Index.add(expression1);
+		load2Index.add(factory.createExprVar(mask));
 		bodyNode.add(factory.createInstLoad(input, buffer, load2Index));
 		bodyNode.add(factory.createInstStore(storeList, counter, input));
 		// globalCounter= globalCounter + 1
 
-		Expression storeIndexElement = factory.createExprVar(counter);
-		Expression inc1 = factory.createExprInt(1);
-		Expression assignValue = factory.createExprBinary(storeIndexElement,
-				OpBinary.PLUS, inc1, factory.createTypeInt(32));
-
+		Expression assignValue = factory.createExprBinary(
+				factory.createExprVar(counter), OpBinary.PLUS,
+				factory.createExprInt(1), factory.createTypeInt(32));
 		bodyNode.add(factory.createInstStore(readCounter, assignValue));
-
-		Var tmp = body.newTempLocalVariable(factory.createTypeInt(32), "tmp");
-		tmp.setIndex(1);
 
 		Expression incValue = factory.createExprBinary(
 				factory.createExprVar(index), OpBinary.PLUS,
 				factory.createExprInt(1), factory.createTypeInt(32));
-
-		bodyNode.add(factory.createInstAssign(tmp, incValue));
-		bodyNode.add(factory.createInstStore(writeIndex, tmp));
+		bodyNode.add(factory.createInstStore(writeIndex, incValue));
 	}
 
 	/**
@@ -685,9 +675,9 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		Var mask = factory.createVar(0, factory.createTypeInt(32), "mask",
 				true, 1);
 		locals.add(mask);
-		Expression exprmask = factory.createExprInt(bufferSize - 1);
 		Expression maskValue = factory.createExprBinary(
-				factory.createExprVar(counter), OpBinary.BITAND, exprmask,
+				factory.createExprVar(counter), OpBinary.BITAND,
+				factory.createExprInt(bufferSize - 1),
 				factory.createTypeInt(32));
 		bodyNode.add(factory.createInstAssign(mask, maskValue));
 
@@ -723,39 +713,22 @@ public class Multi2MonoToken extends AbstractActorVisitor<Object> {
 		Var counter1 = factory.createVar(0, writeCounter.getType(),
 				port.getName() + "_Local_writeCounter", true, outputIndex);
 		locals.add(counter1);
-		Instruction load1 = factory.createInstLoad(counter1, writeCounter);
-		bodyNode.add(load1);
+		bodyNode.add(factory.createInstLoad(counter1, writeCounter));
 
 		Var output = factory.createVar(0, port.getType(), port.getName()
 				+ "_LocalOutput", true, outputIndex);
 		locals.add(output);
 		List<Expression> load2Index = new ArrayList<Expression>(1);
 		load2Index.add(factory.createExprVar(writeCounter));
-		Instruction load2 = factory.createInstLoad(output, writeList,
-				load2Index);
-		bodyNode.add(load2);
+		bodyNode.add(factory.createInstLoad(output, writeList, load2Index));
 
-		Var out = factory.createVar(0, port.getType(), "_LocalTemp", true,
-				outputIndex);
-		locals.add(out);
-		Use assign1Expr = factory.createUse(output);
-		Expression assign1Value = factory.createExprVar(assign1Expr);
-		Instruction assign1 = factory.createInstAssign(out, assign1Value);
-		bodyNode.add(assign1);
-
-		Var counter2 = factory.createVar(0, writeCounter.getType(),
-				port.getName() + "_Local_writeCounter_2", true, outputIndex);
-		locals.add(counter2);
-		Expression assign2IndexElement = factory.createExprVar(counter1);
-		Expression e2Assign2 = factory.createExprInt(1);
-		Expression assign2Value = factory.createExprBinary(assign2IndexElement,
-				OpBinary.PLUS, e2Assign2, factory.createTypeInt(32));
-		Instruction assign2 = factory.createInstAssign(counter2, assign2Value);
-		bodyNode.add(assign2);
-
+		Expression assign2Value = factory.createExprBinary(
+				factory.createExprVar(counter1), OpBinary.PLUS,
+				factory.createExprInt(1), factory.createTypeInt(32));
+		
 		// locals.put(OUTPUT.getName(), OUTPUT);
-		bodyNode.add(factory.createInstStore(OUTPUT, 0, out));
-		bodyNode.add(factory.createInstStore(writeCounter, counter2));
+		bodyNode.add(factory.createInstStore(OUTPUT, 0, output));
+		bodyNode.add(factory.createInstStore(writeCounter, assign2Value));
 	}
 
 	/**

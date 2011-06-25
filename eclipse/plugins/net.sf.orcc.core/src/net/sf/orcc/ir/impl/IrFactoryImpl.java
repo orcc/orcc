@@ -719,11 +719,27 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 	
 	@Override
+	public InstStore createInstStore(Var target, int index,
+			Expression source) {
+		List<Expression> indexes = new ArrayList<Expression>(1);
+		indexes.add(createExprInt(index));
+		return createInstStore(target, indexes, source);
+	}
+	
+	@Override
 	public InstStore createInstStore(Var target, Var index,
 			Var source) {
 		List<Expression> indexes = new ArrayList<Expression>(1);
 		indexes.add(createExprVar(index));
 		return createInstStore(target, indexes, createExprVar(source));
+	}
+	
+	@Override
+	public InstStore createInstStore(Var target, Var index,
+			Expression source) {
+		List<Expression> indexes = new ArrayList<Expression>(1);
+		indexes.add(createExprVar(index));
+		return createInstStore(target, indexes, source);
 	}
 	
 	@Override
