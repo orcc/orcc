@@ -236,6 +236,39 @@ public interface IrFactory extends EFactory {
 	 * @return an InstAssign with the given location, target and value.
 	 */
 	InstAssign createInstAssign(Var target, Expression value);
+	
+	/**
+	 * Creates an InstAssign with the given target and integer value.
+	 * 
+	 * @param target
+	 *            target variable
+	 * @param value
+	 *            integer value
+	 * @return an InstAssign with the given target and value.
+	 */
+	InstAssign createInstAssign(Var target, int value);
+
+	/**
+	 * Creates an InstAssign with the given target and integer value.
+	 * 
+	 * @param target
+	 *            target variable
+	 * @param value
+	 *            integer value
+	 * @return an InstAssign with the given target and value.
+	 */
+	InstAssign createInstAssign(Var target, long value);
+	
+	/**
+	 * Creates an InstAssign with the given target and source.
+	 * 
+	 * @param target
+	 *            target variable
+	 * @param value
+	 *            source variable
+	 * @return an InstAssign with the given target and value.
+	 */
+	InstAssign createInstAssign(Var target, Var value);
 
 	/**
 	 * Returns a new object of class '<em>Inst Call</em>'.

@@ -57,6 +57,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * hardware compilable function specified in xilinx division model
  * 
  * @author Khaled Jerbi
+ * @author Herve Yviquel
  * 
  */
 public class DivisionSubstitution extends AbstractActorVisitor<Object> {
@@ -176,12 +177,10 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		Expression blk11And = factory.createExprBinary(
 				factory.createExprVar(varDenum), OpBinary.BITAND,
 				factory.createExprInt(0xFFFFFFFFL), factory.createTypeInt());
-		block.add(factory.createInstAssign(remainder,
-				factory.createExprVar(varNum)));
+		block.add(factory.createInstAssign(remainder, varNum));
 		block.add(factory.createInstAssign(denom, blk11And));
-		block.add(factory.createInstAssign(mask,
-				factory.createExprInt(0x80000000L)));
-		block.add(factory.createInstAssign(i, factory.createExprInt(0)));
+		block.add(factory.createInstAssign(mask, 0x80000000L));
+		block.add(factory.createInstAssign(i, 0));
 		return block;
 	}
 
@@ -197,10 +196,8 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 	 */
 	private NodeBlock createInitBlock(Var result, Var flipResult) {
 		NodeBlock initBlock = factory.createNodeBlock();
-		initBlock
-				.add(factory.createInstAssign(result, factory.createExprInt(0)));
-		initBlock.add(factory.createInstAssign(flipResult,
-				factory.createExprInt(0)));
+		initBlock.add(factory.createInstAssign(result, 0));
+		initBlock.add(factory.createInstAssign(flipResult, 0));
 		return initBlock;
 	}
 
@@ -234,11 +231,9 @@ public class DivisionSubstitution extends AbstractActorVisitor<Object> {
 		blockIf_1.add(assign11);
 		nodeIf.getThenNodes().add(blockIf_1);
 		NodeBlock blockIf_2 = factory.createNodeBlock();
-		InstAssign assign20 = factory.createInstAssign(var,
-				factory.createExprVar(var));
+		InstAssign assign20 = factory.createInstAssign(var, var);
 		blockIf_2.add(assign20);
-		InstAssign assign21 = factory.createInstAssign(flip,
-				factory.createExprVar(flip));
+		InstAssign assign21 = factory.createInstAssign(flip, flip);
 		blockIf_2.add(assign21);
 		nodeIf.getElseNodes().add(blockIf_2);
 		return nodeIf;

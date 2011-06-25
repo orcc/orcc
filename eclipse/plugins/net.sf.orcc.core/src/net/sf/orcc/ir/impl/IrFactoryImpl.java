@@ -457,7 +457,22 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	public InstAssign createInstAssign(Var target, Expression value) {
 		return createInstAssign(0, target, value);
 	}
+	
+	@Override
+	public InstAssign createInstAssign(Var target, int value) {
+		return createInstAssign(target, createExprInt(value));
+	}
+	
+	@Override
+	public InstAssign createInstAssign(Var target, long value) {
+		return createInstAssign(target, createExprInt(value));
+	}
 
+	@Override
+	public InstAssign createInstAssign(Var target, Var value) {
+		return createInstAssign(target, createExprVar(value));
+	}
+	
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
