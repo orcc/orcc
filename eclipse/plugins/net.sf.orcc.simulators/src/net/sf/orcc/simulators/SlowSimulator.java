@@ -236,7 +236,13 @@ public class SlowSimulator extends AbstractSimulator {
 						nbFiring++;
 					}
 				}
+				
 				hasExecuted |= (nbFiring > 0);
+				
+				// check for cancelation
+				if (isCanceled()) {
+					return;
+				}
 			}
 			isAlive = hasExecuted;
 		} while (isAlive);

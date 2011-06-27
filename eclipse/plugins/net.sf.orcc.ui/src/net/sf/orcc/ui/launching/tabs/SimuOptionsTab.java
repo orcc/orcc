@@ -30,22 +30,24 @@ package net.sf.orcc.ui.launching.tabs;
 
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import net.sf.orcc.ui.OrccUiActivator;
+
+import java.math.BigInteger;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
 /**
+ * This class defines the options tab for simulation.
  * 
- * @author plagalay
+ * @author Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
  * 
  */
 public class SimuOptionsTab extends OptionsTab {
@@ -63,11 +65,6 @@ public class SimuOptionsTab extends OptionsTab {
 	}
 
 	@Override
-	public Image getImage() {
-		return OrccUiActivator.getImage("icons/orcc.png");
-	}
-
-	@Override
 	public String getName() {
 		return "Simulation options";
 	}
@@ -76,7 +73,7 @@ public class SimuOptionsTab extends OptionsTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
 			int size = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-			int exponent = Integer.bitCount(size);
+			int exponent = BigInteger.valueOf(size).bitLength() - 1;
 			spinner.setSelection(exponent);
 		} catch (CoreException e) {
 			e.printStackTrace();
