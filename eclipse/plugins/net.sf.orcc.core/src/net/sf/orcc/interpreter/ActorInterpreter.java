@@ -150,6 +150,29 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		return null;
 	}
 
+	/**
+	 * Calls the print procedure. Prints to stdout by default. This method may
+	 * be overridden.
+	 * 
+	 * @param procedure
+	 *            a native procedure
+	 */
+	protected void callPrintProcedure(Procedure procedure,
+			List<Expression> parameters) {
+		for (int i = 0; i < parameters.size(); i++) {
+			if (parameters.get(i).isStringExpr()) {
+				// String characters rework for escaped control
+				// management
+				String str = ((ExprString) parameters.get(i)).getValue();
+				String unescaped = OrccUtil.getUnescapedString(str);
+				System.out.print(unescaped);
+			} else {
+				Object value = exprInterpreter.doSwitch(parameters.get(i));
+				System.out.print(String.valueOf(value));
+			}
+		}
+	}
+
 	@Override
 	public Object caseExprBinary(ExprBinary expr) {
 		return null;
@@ -226,18 +249,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 		// Special "print" case
 		if (call.isPrint()) {
-			for (int i = 0; i < callParams.size(); i++) {
-				if (callParams.get(i).isStringExpr()) {
-					// String characters rework for escaped control
-					// management
-					String str = ((ExprString) callParams.get(i)).getValue();
-					String unescaped = OrccUtil.getUnescapedString(str);
-					System.out.print(unescaped);
-				} else {
-					Object value = exprInterpreter.doSwitch(callParams.get(i));
-					System.out.print(String.valueOf(value));
-				}
-			}
+			callPrintProcedure(proc, callParams);
 		} else if (proc.isNative()) {
 			Object result = callNativeProcedure(proc, callParams);
 			if (call.hasResult()) {

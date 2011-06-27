@@ -202,7 +202,8 @@ public class SlowSimulator extends AbstractSimulator {
 					}
 
 					ConnectedActorInterpreter interpreter = new ConnectedActorInterpreter(
-							clonedActor, instance.getParameters());
+							clonedActor, instance.getParameters(),
+							getWriteListener());
 
 					interpreters.put(instance, interpreter);
 					interpreter.setFifos(fifos);
@@ -235,9 +236,9 @@ public class SlowSimulator extends AbstractSimulator {
 						nbFiring++;
 					}
 				}
-				
+
 				hasExecuted |= (nbFiring > 0);
-				
+
 				// check for cancelation
 				if (isCanceled()) {
 					return;

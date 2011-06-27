@@ -139,6 +139,15 @@ public abstract class AbstractSimulator implements Simulator {
 	}
 
 	/**
+	 * Returns the write listener.
+	 * 
+	 * @return the write listener
+	 */
+	protected WriteListener getWriteListener() {
+		return listener;
+	}
+
+	/**
 	 * Called when options are initialized.
 	 */
 	abstract protected void initializeOptions();

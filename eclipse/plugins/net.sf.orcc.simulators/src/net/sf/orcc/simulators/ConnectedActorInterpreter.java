@@ -36,6 +36,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
@@ -45,6 +46,8 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.util.OrccUtil;
+import net.sf.orcc.util.WriteListener;
 
 /**
  * This class defines an actor that can be interpreted by calling
@@ -62,9 +65,12 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 */
 	private Map<Port, Fifo> fifos;
 
+	private WriteListener listener;
+
 	public ConnectedActorInterpreter(Actor actor,
-			Map<String, Expression> parameters) {
+			Map<String, Expression> parameters, WriteListener listener) {
 		super(actor, parameters);
+		this.listener = listener;
 	}
 
 	/**
@@ -101,6 +107,23 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			throw new OrccRuntimeException(
 					"exception during native procedure call to " + methodName,
 					e);
+		}
+	}
+
+	@Override
+	protected void callPrintProcedure(Procedure procedure,
+			List<Expression> parameters) {
+		for (int i = 0; i < parameters.size(); i++) {
+			if (parameters.get(i).isStringExpr()) {
+				// String characters rework for escaped control
+				// management
+				String str = ((ExprString) parameters.get(i)).getValue();
+				String unescaped = OrccUtil.getUnescapedString(str);
+				listener.writeText(unescaped);
+			} else {
+				Object value = exprInterpreter.doSwitch(parameters.get(i));
+				listener.writeText(String.valueOf(value));
+			}
 		}
 	}
 
