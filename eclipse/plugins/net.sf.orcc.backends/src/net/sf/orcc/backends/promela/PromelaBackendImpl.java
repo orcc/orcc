@@ -116,6 +116,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		instancePrinter.getOptions().put("guards", guards);
 		instancePrinter.getOptions().put("priority", priority);
 		instancePrinter.getOptions().put("loadPeeks", loadPeeks);
+		instancePrinter.getOptions().put("network", network);
 		
 		List<Actor> actors = network.getActors();
 		transformActors(actors);

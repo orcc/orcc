@@ -32,9 +32,15 @@ printf("state = state_<tr.state.name>;\n");
 
 // TODO: the [1] is not OK, it did not work with the "port.type.dimensions"
 
-portDeclaration(port) ::= <<
-	<port.type> <port.name>[1];
+
+printFifoSize(size) ::= <<
+<if(size)><size><else>SIZE<endif>
 >>
+
+portDeclaration(port) ::= <<
+	<port.type> <port.name>[<printFifoSize(options.network.incomingMap.(instance).(port).size)>];
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // parameters
@@ -46,14 +52,8 @@ listSize(values) ::= <<
 <values : { value | [<value>]} >
 >>
 
-varDecl(variable) ::= <<
-<
-if(variable.port)
-><
-else
-><variable.type> <variable.indexedName><listSize(variable.type.dimensions)><
-endif
->
+varDecl(variable, sep="") ::= <<
+<variable.type> <variable.indexedName><listSize(variable.type.dimensions)><sep>
 >>
 
 
@@ -207,8 +207,8 @@ do
 :: <whileNode.condition> -\>
 	<printNodes(whileNode.nodes)>
 :: else -\> break;
-od
-}
+od;
+
 <printBlockNode(whileNode.joinNode)>
 >>
 
@@ -264,8 +264,9 @@ schedulerFSM(action) ::= <<
 	<guardFSM()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
 	-\> 
 	/* Temp variables*/
+	int promela_io_index; // used for reading/writing multiple tokens
 	<if(action.body.locals)>
-	<action.body.locals: { var | <if(!var.port)> <varDecl(var)>;<\n><endif>}>
+	<action.body.locals: { var | <varDecl(var)>;<\n>}>
 	<endif>
 	 
 	<inputPattern(action.inputPattern)>
@@ -301,8 +302,9 @@ scheduler(action) ::= <<
 	<guard()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
 	-\>
 	/* Temp variables*/
+	int promela_io_index; // used for reading/writing multiple tokens
 	<if(action.body.locals)>
-	<action.body.locals: {var | <if(!var.port)><varDecl(var)>;<\n><endif>}>
+	<action.body.locals: {var | <varDecl(var)>;<\n>}>
 	<endif> 
 	<inputPattern(action.inputPattern)>
 	<printNodes(action.body.nodes)>
@@ -328,7 +330,13 @@ priorities(act) ::= <<
 >> 
 
 inputPatternPort(variable) ::= <<
-chan_<instance.id>_<pattern.varToPortMap.(variable).name>?<variable.name>[0];
+promela_io_index=0;
+do
+:: promela_io_index \< <variable.type.dimensions> -> 
+	chan_<instance.id>_<pattern.varToPortMap.(variable).name>?<variable.name>[promela_io_index];
+	promela_io_index = promela_io_index + 1;
+:: else -> break
+od;
 
 >>
 
@@ -337,7 +345,13 @@ inputPattern(pattern) ::= <<
 >>
 
 outputPatternPort(variable) ::= <<
-chan_<instance.id>_<pattern.varToPortMap.(variable).name>!<variable.name>[0];
+promela_io_index=0;
+do
+:: promela_io_index \< <variable.type.dimensions> -> 
+	chan_<instance.id>_<pattern.varToPortMap.(variable).name>!<variable.name>[promela_io_index];
+	promela_io_index = promela_io_index + 1;
+:: else -> break
+od;
 
 >>
 

@@ -29,8 +29,8 @@ declareBroadcasts(instances) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
 
-allocateFifoType(count, type, size) ::= <<
-chan chan_<count> = [SIZE] of {<type>};
+allocateFifoType(count, type, edge) ::= <<
+chan chan_<count> = [<if(edge.size)><edge.size><else>SIZE<endif>] of {<type>};
 >>
 
 tryAllocateFifo(edge, src, tgt) ::= <<
@@ -38,11 +38,11 @@ tryAllocateFifo(edge, src, tgt) ::= <<
 <allocateFifoType(
   count=network.connectionMap.(edge),
   type=edge.source.type,
-  size=edge.size)><else>
+  edge=edge)><else>
 <allocateFifoType(
   count=network.connectionMap.(edge),
   type=edge.target.type,
-  size=edge.size)><endif>
+  edge=edge)><endif>
 >>
 
 
@@ -90,6 +90,7 @@ assignFifos(edges) ::= <<
 network(network, options) ::= <<
 // Generated from "<network.name>"
 
+#define uint int
 #define SIZE 1
 
 // FIFO allocation
