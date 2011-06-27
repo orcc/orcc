@@ -177,8 +177,9 @@ actionTest(action) ::= <<
 	br i1 %is_fireable_<action.name>, label %bb_<action.name>_check_outputs, label %bb_<action.name>_unschedulable<
 else
 >	;; Empty input pattern
+	%is_fireable_<action.name> = call i1 @<action.scheduler.name> ()
 	
-	br label %bb_<action.name>_check_outputs<
+	br i1 %is_fireable_<action.name>, label %bb_<action.name>_check_outputs, label %bb_<action.name>_unschedulable<
 endif>
 
 
