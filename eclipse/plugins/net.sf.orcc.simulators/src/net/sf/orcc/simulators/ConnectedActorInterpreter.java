@@ -36,7 +36,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
@@ -205,11 +204,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		}
 
 		Object result = doSwitch(action.getScheduler());
-		if (result instanceof ExprBool) {
-			return ((ExprBool) result).isValue();
-		} else {
-			return false;
-		}
+		return ValueUtil.isTrue(result);
 	}
 
 	/**
