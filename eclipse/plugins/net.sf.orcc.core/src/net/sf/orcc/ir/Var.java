@@ -116,9 +116,9 @@ public interface Var extends EObject {
 	 * Returns the current value of this variable. Used by the interpreter.
 	 * 
 	 * @return the current value of this variable
-	 * @model containment="true" transient="true"
+	 * @model transient="true"
 	 */
-	Expression getValue();
+	Object getValue();
 
 	/**
 	 * Returns <code>true</code> if this variable can be assigned to.
@@ -235,6 +235,6 @@ public interface Var extends EObject {
 	 * @param value
 	 *            the value of this variable
 	 */
-	void setValue(Expression value);
+	void setValue(Object value);
 
 }

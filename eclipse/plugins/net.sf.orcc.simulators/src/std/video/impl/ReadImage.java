@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2011, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes and EPFL
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes and EPFL nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,77 +26,93 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package std.io.impl;
+package std.video.impl;
 
-import java.io.FileNotFoundException;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
-/**
- * This class defines native functions for the Source actor.
- * 
- * @author Matthieu Wipliez
- * 
- */
-public class Source {
+import javax.imageio.ImageIO;
+
+public class ReadImage {
 
 	private static String fileName;
 
-	private static RandomAccessFile in;
+	private static int height;
+
+	private static BufferedImage image;
+
+	private static int width;
+
+	private static int x;
+
+	private static int y;
+
+	public static void advance() {
+		x++;
+		if (x == width) {
+			x = 0;
+			y++;
+		}
+
+		if (y == height) {
+			x = 0;
+			y = 0;
+		}
+	}
+
+	public static int getBlue() {
+		return getBlue(image.getRGB(x, y));
+	}
+
+	private static int getBlue(int pixel) {
+		return ((pixel) & 0xff);
+	}
+
+	public static int getGreen() {
+		return getGreen(image.getRGB(x, y));
+	}
+
+	private static int getGreen(int pixel) {
+		return ((pixel >> 8) & 0xff);
+	}
+
+	public static int getHeight() {
+		return image.getHeight();
+	}
+
+	public static int getRed() {
+		return getRed(image.getRGB(x, y));
+	}
+
+	private static int getRed(int pixel) {
+		return ((pixel >> 16) & 0xff);
+	}
+
+	public static int getWidth() {
+		return image.getWidth();
+	}
+
+	public static void readImage_initialize() {
+		try {
+			image = ImageIO.read(new File(fileName));
+		} catch (IOException e) {
+			String msg = "image error";
+			throw new RuntimeException(msg, e);
+		}
+
+		width = image.getWidth();
+		height = image.getHeight();
+	}
 
 	/**
-	 * Sets the file name used by this Source class.
+	 * Sets the file name used by this ReadImage class.
 	 * 
 	 * @param fileName
 	 *            name of a file to read
 	 */
 	public static void setFileName(String fileName) {
-		Source.fileName = fileName;
-	}
-
-	public static void source_init() {
-		try {
-			in = new RandomAccessFile(fileName, "r");
-		} catch (FileNotFoundException e) {
-			String msg = "file not found: \"" + fileName + "\"";
-			throw new RuntimeException(msg, e);
-		}
-	}
-
-	public static void source_readNBytes(short outTable[], Integer nbTokenToRead) {
-		try {
-			byte[] b = new byte[outTable.length];
-			in.read(b);
-			for (int i = 0; i < nbTokenToRead; i++) {
-				outTable[i] = b[i];
-			}
-		} catch (IOException e) {
-			String msg = "I/O error when reading file \"" + fileName + "\"";
-			throw new RuntimeException(msg, e);
-		}
-	}
-
-	public static void source_rewind() {
-		try {
-			// and for Damien, no there are no rewind on RandomAccessFile :)
-			in.seek(0L);
-		} catch (IOException e) {
-			String msg = "I/O error when rewinding file \"" + fileName + "\"";
-			throw new RuntimeException(msg, e);
-		}
-	}
-
-	public static int source_sizeOfFile() {
-		try {
-			if (in == null) {
-				return 0;
-			}
-			return (int) in.length();
-		} catch (IOException e) {
-			String msg = "I/O error when getting size of file \"" + fileName
-					+ "\"";
-			throw new RuntimeException(msg, e);
-		}
+		ReadImage.fileName = fileName;
 	}
 
 }

@@ -104,13 +104,23 @@ public class VarImpl extends EObjectImpl implements Var {
 	protected Type type;
 
 	/**
-	 * The cached value of the '{@link #getValue() <em>Value</em>}' containment reference.
+	 * The default value of the '{@link #getValue() <em>Value</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getValue()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Object VALUE_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getValue() <em>Value</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @see #getValue()
 	 * @generated
 	 * @ordered
 	 */
-	protected Expression value;
+	protected Object value = VALUE_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #isAssignable() <em>Assignable</em>}' attribute.
@@ -228,21 +238,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetValue(Expression newValue,
-			NotificationChain msgs) {
-		Expression oldValue = value;
-		value = newValue;
-		if (eNotificationRequired()) {
-			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, IrPackage.VAR__VALUE, oldValue, newValue);
-			if (msgs == null) msgs = notification; else msgs.add(notification);
-		}
-		return msgs;
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
@@ -299,8 +294,6 @@ public class VarImpl extends EObjectImpl implements Var {
 				return basicSetInitialValue(null, msgs);
 			case IrPackage.VAR__TYPE:
 				return basicSetType(null, msgs);
-			case IrPackage.VAR__VALUE:
-				return basicSetValue(null, msgs);
 			case IrPackage.VAR__USES:
 				return ((InternalEList<?>)getUses()).basicRemove(otherEnd, msgs);
 			case IrPackage.VAR__DEFS:
@@ -325,7 +318,7 @@ public class VarImpl extends EObjectImpl implements Var {
 			case IrPackage.VAR__TYPE:
 				return type != null;
 			case IrPackage.VAR__VALUE:
-				return value != null;
+				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 			case IrPackage.VAR__ASSIGNABLE:
 				return assignable != ASSIGNABLE_EDEFAULT;
 			case IrPackage.VAR__GLOBAL:
@@ -361,7 +354,7 @@ public class VarImpl extends EObjectImpl implements Var {
 				setType((Type)newValue);
 				return;
 			case IrPackage.VAR__VALUE:
-				setValue((Expression)newValue);
+				setValue(newValue);
 				return;
 			case IrPackage.VAR__ASSIGNABLE:
 				setAssignable((Boolean)newValue);
@@ -413,7 +406,7 @@ public class VarImpl extends EObjectImpl implements Var {
 				setType((Type)null);
 				return;
 			case IrPackage.VAR__VALUE:
-				setValue((Expression)null);
+				setValue(VALUE_EDEFAULT);
 				return;
 			case IrPackage.VAR__ASSIGNABLE:
 				setAssignable(ASSIGNABLE_EDEFAULT);
@@ -447,27 +440,6 @@ public class VarImpl extends EObjectImpl implements Var {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getLineNumber() {
-		return lineNumber;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setLineNumber(int newLineNumber) {
-		int oldLineNumber = lineNumber;
-		lineNumber = newLineNumber;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__LINE_NUMBER, oldLineNumber, lineNumber));
-	}
-
-	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -490,6 +462,15 @@ public class VarImpl extends EObjectImpl implements Var {
 	 */
 	public Expression getInitialValue() {
 		return initialValue;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getLineNumber() {
+		return lineNumber;
 	}
 
 	/**
@@ -523,7 +504,7 @@ public class VarImpl extends EObjectImpl implements Var {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Expression getValue() {
+	public Object getValue() {
 		return value;
 	}
 
@@ -620,6 +601,18 @@ public class VarImpl extends EObjectImpl implements Var {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setLineNumber(int newLineNumber) {
+		int oldLineNumber = lineNumber;
+		lineNumber = newLineNumber;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__LINE_NUMBER, oldLineNumber, lineNumber));
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -649,21 +642,15 @@ public class VarImpl extends EObjectImpl implements Var {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setValue(Expression newValue) {
-		if (newValue != value) {
-			NotificationChain msgs = null;
-			if (value != null)
-				msgs = ((InternalEObject)value).eInverseRemove(this, EOPPOSITE_FEATURE_BASE - IrPackage.VAR__VALUE, null, msgs);
-			if (newValue != null)
-				msgs = ((InternalEObject)newValue).eInverseAdd(this, EOPPOSITE_FEATURE_BASE - IrPackage.VAR__VALUE, null, msgs);
-			msgs = basicSetValue(newValue, msgs);
-			if (msgs != null) msgs.dispatch();
-		}
-		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__VALUE, newValue, newValue));
+	public void setValue(Object newValue) {
+		Object oldValue = value;
+		value = newValue;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.VAR__VALUE, oldValue, value));
 	}
 
 	/**
@@ -679,6 +666,8 @@ public class VarImpl extends EObjectImpl implements Var {
 		result.append(index);
 		result.append(", name: ");
 		result.append(name);
+		result.append(", value: ");
+		result.append(value);
 		result.append(", assignable: ");
 		result.append(assignable);
 		result.append(", global: ");

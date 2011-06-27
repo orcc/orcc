@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.interpreter;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,9 +60,11 @@ import net.sf.orcc.ir.State;
 import net.sf.orcc.ir.Transition;
 import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -94,10 +96,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	 */
 	private State fsmState;
 
-	final private ListAllocator listAllocator;
-
-	final protected ListAllocator tokenAllocator;
-
 	/**
 	 * Actor's constant parameters to be set at initialization time
 	 */
@@ -117,8 +115,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		// Set instance name and actor class definition at parent level
 		this.actor = actor;
 
-		listAllocator = new ListAllocator(true);
-		tokenAllocator = new ListAllocator(false);
 		exprInterpreter = new ExpressionEvaluator();
 
 		// Get actor FSM properties
@@ -141,7 +137,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	final protected void allocatePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Var var = pattern.getVariable(port);
-			var.setValue(tokenAllocator.doSwitch(var.getType()));
+			Object value = ValueUtil.createArray(var.getType());
+			var.setValue(value);
 		}
 	}
 
@@ -203,7 +200,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseExprVar(ExprVar expr) {
-		return doSwitch(expr.getUse().getVariable().getValue());
+		return expr.getUse().getVariable().getValue();
 	}
 
 	@Override
@@ -242,14 +239,13 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 					String unescaped = OrccUtil.getUnescapedString(str);
 					System.out.print(unescaped);
 				} else {
-					Expression value = exprInterpreter.doSwitch(callParams
-							.get(i));
+					Object value = exprInterpreter.doSwitch(callParams.get(i));
 					System.out.print(String.valueOf(value));
 				}
 			}
 		} else if (proc.isNative()) {
-			Expression result = (Expression) callNativeProcedure(proc, callParams);
-			if(call.hasResult()) {
+			Object result = callNativeProcedure(proc, callParams);
+			if (call.hasResult()) {
 				call.getTarget().getVariable().setValue(result);
 			}
 		} else {
@@ -260,7 +256,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			}
 
 			// Interpret procedure body
-			Expression result = (Expression) doSwitch(proc);
+			Object result = doSwitch(proc);
 			if (call.hasResult()) {
 				call.getTarget().getVariable().setValue(result);
 			}
@@ -273,17 +269,19 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		Var target = instr.getTarget().getVariable();
 		Var source = instr.getSource().getVariable();
 		if (instr.getIndexes().isEmpty()) {
-			target.setValue(EcoreUtil.copy(source.getValue()));
+			target.setValue(source.getValue());
 		} else {
 			try {
-				Expression value = source.getValue();
+				Object array = source.getValue();
+				List<Object> indexes = new ArrayList<Object>(instr.getIndexes()
+						.size());
 				for (Expression index : instr.getIndexes()) {
-					if (value.isListExpr()) {
-						value = ((ExprList) value)
-								.get((ExprInt) exprInterpreter.doSwitch(index));
-					}
+					indexes.add(exprInterpreter.doSwitch(index));
 				}
-				target.setValue(EcoreUtil.copy(value));
+
+				TypeList type = (TypeList) source.getType();
+				Object value = ValueUtil.get(type, array, indexes);
+				target.setValue(value);
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
 						"Array index out of bounds at line "
@@ -316,25 +314,21 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 	@Override
 	public Object caseInstStore(InstStore instr) {
-		Var var = instr.getTarget().getVariable();
-		Expression value = exprInterpreter.doSwitch(instr.getValue());
+		Var target = instr.getTarget().getVariable();
+		Object value = exprInterpreter.doSwitch(instr.getValue());
 		if (instr.getIndexes().isEmpty()) {
-			var.setValue(value);
+			target.setValue(value);
 		} else {
 			try {
-				Expression target = var.getValue();
-				Iterator<Expression> it = instr.getIndexes().iterator();
-				ExprInt index = (ExprInt) exprInterpreter.doSwitch(it.next());
-				while (it.hasNext()) {
-					if (target.isListExpr()) {
-						target = ((ExprList) target).get(index);
-					}
-					index = (ExprInt) exprInterpreter.doSwitch(it.next());
+				Object array = target.getValue();
+				List<Object> indexes = new ArrayList<Object>(instr.getIndexes()
+						.size());
+				for (Expression index : instr.getIndexes()) {
+					indexes.add(exprInterpreter.doSwitch(index));
 				}
 
-				if (target.isListExpr()) {
-					((ExprList) target).set(index, value);
-				}
+				Type type = ((TypeList) target.getType()).getElementType();
+				ValueUtil.set(type, array, value, indexes.toArray());
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
 						"Array index out of bounds at line "
@@ -347,13 +341,13 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	@Override
 	public Object caseNodeIf(NodeIf node) {
 		// Interpret first expression ("if" condition)
-		Expression condition = exprInterpreter.doSwitch(node.getCondition());
+		Object condition = exprInterpreter.doSwitch(node.getCondition());
 
 		Object ret;
 		// if (condition is true)
-		if (condition != null && condition.isBooleanExpr()) {
+		if (ValueUtil.isBool(condition)) {
 			int oldBranch = branch;
-			if (((ExprBool) condition).isValue()) {
+			if (ValueUtil.isTrue(condition)) {
 				doSwitch(node.getThenNodes());
 				branch = 0;
 			} else {
@@ -377,26 +371,16 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		doSwitch(node.getJoinNode());
 
 		// Interpret first expression ("while" condition)
-		Expression condition = exprInterpreter.doSwitch(node.getCondition());
+		Object condition = exprInterpreter.doSwitch(node.getCondition());
 
 		// while (condition is true) do
-		if (condition != null && condition.isBooleanExpr()) {
-			branch = 1;
-			while (((ExprBool) condition).isValue()) {
-				doSwitch(node.getNodes());
-				doSwitch(node.getJoinNode());
+		branch = 1;
+		while (ValueUtil.isTrue(condition)) {
+			doSwitch(node.getNodes());
+			doSwitch(node.getJoinNode());
 
-				// Interpret next value of "while" condition
-				condition = exprInterpreter.doSwitch(node.getCondition());
-				if (condition == null || !condition.isBooleanExpr()) {
-					throw new OrccRuntimeException(
-							"Condition not boolean at line "
-									+ node.getLineNumber() + "\n");
-				}
-			}
-		} else {
-			throw new OrccRuntimeException("Condition not boolean at line "
-					+ node.getLineNumber() + "\n");
+			// Interpret next value of "while" condition
+			condition = exprInterpreter.doSwitch(node.getCondition());
 		}
 
 		branch = oldBranch;
@@ -409,7 +393,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		for (Var local : procedure.getLocals()) {
 			Type type = local.getType();
 			if (type.isList()) {
-				local.setValue(listAllocator.doSwitch(type));
+				Object value = ValueUtil.createArray(local.getType());
+				local.setValue(value);
 			}
 		}
 
@@ -504,11 +489,11 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				if (initConst == null) {
 					if (type.isList()) {
 						// Allocate empty array variable
-						stateVar.setValue(listAllocator.doSwitch(type));
+						stateVar.setValue(ValueUtil.createArray(type));
 					}
 				} else {
 					// initialize
-					stateVar.setValue(EcoreUtil.copy(initConst));
+					stateVar.setValue(exprInterpreter.doSwitch(initConst));
 				}
 			}
 

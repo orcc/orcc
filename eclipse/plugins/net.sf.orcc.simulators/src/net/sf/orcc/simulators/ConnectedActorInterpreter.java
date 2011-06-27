@@ -37,19 +37,15 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBool;
-import net.sf.orcc.ir.ExprInt;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.runtime.Fifo;
-import net.sf.orcc.runtime.Fifo_String;
-import net.sf.orcc.runtime.Fifo_boolean;
-import net.sf.orcc.runtime.Fifo_int;
 
 /**
  * This class defines an actor that can be interpreted by calling
@@ -88,7 +84,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		Object[] args = new Object[numParams];
 		int i = 0;
 		for (Expression parameter : parameters) {
-			args[i] = doSwitch(parameter);
+			args[i] = exprInterpreter.doSwitch(parameter);
 			parameterTypes[i] = args[i].getClass();
 
 			i++;
@@ -101,14 +97,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 					+ actor.getSimpleName());
 			Method method = clasz
 					.getMethod(procedure.getName(), parameterTypes);
-			Object res = method.invoke(null, args);
-			if (res instanceof Boolean) {
-				return IrFactory.eINSTANCE.createExprBool((Boolean) res);
-			} else if (res instanceof Integer) {
-				return IrFactory.eINSTANCE.createExprInt((Integer) res);
-			} else {
-				return null;
-			}
+			return method.invoke(null, args);
 		} catch (Exception e) {
 			throw new OrccRuntimeException(
 					"exception during native procedure call to " + methodName,
@@ -151,23 +140,30 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
 			Fifo fifo = fifos.get(port);
-			peekFifo(inputPattern.getVariable(port).getValue(), fifo, numTokens);
+
+			Var variable = inputPattern.getVariable(port);
+			Type type = ((TypeList) variable.getType()).getElementType();
+			Object array = variable.getValue();
+			for (int i = 0; i < numTokens; i++) {
+				Object value = fifo.read();
+				ValueUtil.set(type, array, value, i);
+			}
 		}
 
 		// Interpret the whole action
 		doSwitch(action.getBody());
 
-		for (Port port : inputPattern.getPorts()) {
-			int numTokens = inputPattern.getNumTokens(port);
-			Fifo fifo = fifos.get(port);
-			fifo.readEnd(numTokens);
-		}
-
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
 			Fifo fifo = fifos.get(port);
-			writeFifo(outputPattern.getVariable(port).getValue(), fifo,
-					numTokens);
+
+			Var variable = outputPattern.getVariable(port);
+			Type type = ((TypeList) variable.getType()).getElementType();
+			Object array = variable.getValue();
+			for (int i = 0; i < numTokens; i++) {
+				Object value = ValueUtil.get(type, array, (Integer) i);
+				fifo.write(value);
+			}
 		}
 	}
 
@@ -192,12 +188,19 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		// allocates peeked variables
 		pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
+			int numTokens = pattern.getNumTokens(port);
+			Fifo fifo = fifos.get(port);
+
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				peeked.setValue(tokenAllocator.doSwitch(peeked.getType()));
-				int numTokens = pattern.getNumTokens(port);
-				Fifo fifo = fifos.get(port);
-				peekFifo(peeked.getValue(), fifo, numTokens);
+				peeked.setValue(ValueUtil.createArray(peeked.getType()));
+			}
+
+			Type type = ((TypeList) peeked.getType()).getElementType();
+			Object array = peeked.getValue();
+			for (int i = 0; i < numTokens; i++) {
+				Object value = fifo.peek();
+				ValueUtil.set(type, array, value, i);
 			}
 		}
 
@@ -209,35 +212,6 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		}
 	}
 
-	private void peekFifo(Expression value, Fifo fifo, int numTokens) {
-		if (fifo instanceof Fifo_int) {
-			ExprList target = (ExprList) value;
-			int[] intTarget = new int[target.getSize()];
-			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
-					fifo.getReadIndex(numTokens), intTarget, 0, numTokens);
-			for (int i = 0; i < intTarget.length; i++) {
-				target.set(i, IrFactory.eINSTANCE.createExprInt(intTarget[i]));
-			}
-		} else if (fifo instanceof Fifo_boolean) {
-			ExprList target = (ExprList) value;
-			boolean[] boolTarget = new boolean[target.getSize()];
-			System.arraycopy(((Fifo_boolean) fifo).getReadArray(numTokens),
-					fifo.getReadIndex(numTokens), boolTarget, 0, numTokens);
-			for (int i = 0; i < boolTarget.length; i++) {
-				target.set(i, IrFactory.eINSTANCE.createExprBool(boolTarget[i]));
-			}
-		} else if (fifo instanceof Fifo_String) {
-			ExprList target = (ExprList) value;
-			String[] stringTarget = new String[target.getSize()];
-			System.arraycopy(((Fifo_String) fifo).getReadArray(numTokens),
-					fifo.getReadIndex(numTokens), stringTarget, 0, numTokens);
-			for (int i = 0; i < stringTarget.length; i++) {
-				target.set(i,
-						IrFactory.eINSTANCE.createExprString(stringTarget[i]));
-			}
-		}
-	}
-
 	/**
 	 * Set the communication FIFOs map for interpreter to be able to execute
 	 * read/write accesses.
@@ -246,33 +220,6 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 	 */
 	public void setFifos(Map<Port, Fifo> fifos) {
 		this.fifos = fifos;
-	}
-
-	private void writeFifo(Expression value, Fifo fifo, int numTokens) {
-		ExprList target = (ExprList) value;
-		if (fifo instanceof Fifo_int) {
-			int[] fifoArray = ((Fifo_int) fifo).getWriteArray(numTokens);
-			int index = fifo.getWriteIndex(numTokens);
-			for (Expression obj_elem : target.getValue()) {
-				fifoArray[index++] = ((ExprInt) obj_elem).getIntValue();
-			}
-			((Fifo_int) fifo).writeEnd(numTokens, fifoArray);
-		} else if (fifo instanceof Fifo_boolean) {
-			boolean[] fifoArray = ((Fifo_boolean) fifo)
-					.getWriteArray(numTokens);
-			int index = fifo.getWriteIndex(numTokens);
-			for (Expression obj_elem : target.getValue()) {
-				fifoArray[index++] = ((ExprBool) obj_elem).isValue();
-			}
-			((Fifo_boolean) fifo).writeEnd(numTokens, fifoArray);
-		} else if (fifo instanceof Fifo_String) {
-			String[] fifoArray = ((Fifo_String) fifo).getWriteArray(numTokens);
-			int index = fifo.getWriteIndex(numTokens);
-			for (Expression obj_elem : target.getValue()) {
-				fifoArray[index++] = ((ExprString) obj_elem).getValue();
-			}
-			((Fifo_String) fifo).writeEnd(numTokens, fifoArray);
-		}
 	}
 
 }

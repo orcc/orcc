@@ -62,6 +62,7 @@ import net.sf.orcc.ir.OpUnary;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -88,9 +89,15 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 	@Override
 	public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
 		OpBinary op = OpBinary.getOperator(expression.getOperator());
-		Expression val1 = evaluate(expression.getLeft());
-		Expression val2 = evaluate(expression.getRight());
-		return new ExpressionEvaluator().interpretBinaryExpr(val1, op, val2);
+		Expression e1 = evaluate(expression.getLeft());
+		Expression e2 = evaluate(expression.getRight());
+
+		Object val1 = ValueUtil.getValue(e1);
+		Object val2 = ValueUtil.getValue(e2);
+
+		Object result = new ExpressionEvaluator().interpretBinaryExpr(val1, op,
+				val2);
+		return ValueUtil.getExpression(result);
 	}
 
 	@Override

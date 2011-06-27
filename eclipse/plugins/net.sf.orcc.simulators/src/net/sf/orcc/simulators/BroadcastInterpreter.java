@@ -35,9 +35,6 @@ import java.util.Map;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.runtime.Fifo;
-import net.sf.orcc.runtime.Fifo_String;
-import net.sf.orcc.runtime.Fifo_boolean;
-import net.sf.orcc.runtime.Fifo_int;
 
 /**
  * This class defines a broadcast that can be interpreted by calling
@@ -74,43 +71,10 @@ public class BroadcastInterpreter {
 
 	public boolean schedule() {
 		if (input.hasTokens(1) && outputsHaveRoom()) {
-			if (input instanceof Fifo_int) {
-				int[] tokens = ((Fifo_int) input).getReadArray(1);
-				int tokens_Index = input.getReadIndex(1);
-				int token = tokens[tokens_Index];
-
-				for (Fifo output : outputs) {
-					int[] outputTokens = ((Fifo_int) output).getWriteArray(1);
-					int output_Index = output.getWriteIndex(1);
-					outputTokens[output_Index] = token;
-					((Fifo_int) output).writeEnd(1, outputTokens);
-				}
-			} else if (input instanceof Fifo_boolean) {
-				boolean[] tokens = ((Fifo_boolean) input).getReadArray(1);
-				int tokens_Index = input.getReadIndex(1);
-				boolean token = tokens[tokens_Index];
-
-				for (Fifo output : outputs) {
-					boolean[] outputTokens = ((Fifo_boolean) output)
-							.getWriteArray(1);
-					int output_Index = output.getWriteIndex(1);
-					outputTokens[output_Index] = token;
-					((Fifo_boolean) output).writeEnd(1, outputTokens);
-				}
-			} else if (input instanceof Fifo_String) {
-				String[] tokens = ((Fifo_String) input).getReadArray(1);
-				int tokens_Index = input.getReadIndex(1);
-				String token = tokens[tokens_Index];
-
-				for (Fifo output : outputs) {
-					String[] outputTokens = ((Fifo_String) output)
-							.getWriteArray(1);
-					int output_Index = output.getWriteIndex(1);
-					outputTokens[output_Index] = token;
-					((Fifo_String) output).writeEnd(1, outputTokens);
-				}
+			Object value = input.read();
+			for (Fifo output : outputs) {
+				output.write(value);
 			}
-			((Fifo_int) input).readEnd(1);
 			return true;
 		} else {
 			return false;

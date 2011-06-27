@@ -33,6 +33,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
+import net.sf.orcc.ir.ExprBool;
+import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 
@@ -93,46 +98,64 @@ public class ValueUtil {
 	 *            a type of list
 	 * @return an array
 	 */
-	public static Object createArray(TypeList type) {
-		List<Integer> dimensions = type.getDimensions();
-		int[] array = new int[dimensions.size()];
-		for (int i = 0; i < array.length; i++) {
-			array[i] = dimensions.get(i);
+	public static Object createArray(Type type) {
+		if (!(type instanceof TypeList)) {
+			throw new IllegalArgumentException("expected TypeList");
 		}
 
-		Type eltType = type.getElementType();
-		if (eltType.isBool()) {
-			return Array.newInstance(Boolean.TYPE, array);
-		} else if (eltType.isFloat()) {
-			return Array.newInstance(Float.TYPE, array);
-		} else if (eltType.isInt()) {
-			int size = eltType.getSizeInBits();
+		List<Integer> listDimensions = type.getDimensions();
+		int[] dimensions = new int[listDimensions.size()];
+		for (int i = 0; i < dimensions.length; i++) {
+			dimensions[i] = listDimensions.get(i);
+		}
+
+		Type eltType = ((TypeList) type).getElementType();
+		return createArray(eltType, dimensions);
+	}
+
+	/**
+	 * Creates a new array whose elements have the given type, and with the
+	 * given number of dimensions.
+	 * 
+	 * @param type
+	 *            type of elements
+	 * @param dimensions
+	 *            number of elements for each dimension
+	 * @return an array
+	 */
+	public static Object createArray(Type type, int... dimensions) {
+		if (type.isBool()) {
+			return Array.newInstance(Boolean.TYPE, dimensions);
+		} else if (type.isFloat()) {
+			return Array.newInstance(Float.TYPE, dimensions);
+		} else if (type.isInt()) {
+			int size = type.getSizeInBits();
 			if (size <= 8) {
-				return Array.newInstance(Byte.TYPE, array);
+				return Array.newInstance(Byte.TYPE, dimensions);
 			} else if (size <= 16) {
-				return Array.newInstance(Short.TYPE, array);
+				return Array.newInstance(Short.TYPE, dimensions);
 			} else if (size <= 32) {
-				return Array.newInstance(Integer.TYPE, array);
+				return Array.newInstance(Integer.TYPE, dimensions);
 			} else if (size <= 64) {
-				return Array.newInstance(Long.TYPE, array);
+				return Array.newInstance(Long.TYPE, dimensions);
 			} else {
-				return Array.newInstance(BigInteger.class, array);
+				return Array.newInstance(BigInteger.class, dimensions);
 			}
-		} else if (eltType.isUint()) {
-			int size = eltType.getSizeInBits();
+		} else if (type.isUint()) {
+			int size = type.getSizeInBits();
 			if (size < 8) {
-				return Array.newInstance(Byte.TYPE, array);
+				return Array.newInstance(Byte.TYPE, dimensions);
 			} else if (size < 16) {
-				return Array.newInstance(Short.TYPE, array);
+				return Array.newInstance(Short.TYPE, dimensions);
 			} else if (size < 32) {
-				return Array.newInstance(Integer.TYPE, array);
+				return Array.newInstance(Integer.TYPE, dimensions);
 			} else if (size < 64) {
-				return Array.newInstance(Long.TYPE, array);
+				return Array.newInstance(Long.TYPE, dimensions);
 			} else {
-				return Array.newInstance(BigInteger.class, array);
+				return Array.newInstance(BigInteger.class, dimensions);
 			}
-		} else if (eltType.isString()) {
-			return Array.newInstance(String.class, array);
+		} else if (type.isString()) {
+			return Array.newInstance(String.class, dimensions);
 		} else {
 			throw new IllegalArgumentException("wtf?");
 		}
@@ -155,6 +178,16 @@ public class ValueUtil {
 			return null;
 		}
 		return getIntValue(bi1.divide(bi2));
+	}
+
+	public static boolean equals(Object val1, Object val2) {
+		if (isBool(val1) && isBool(val2)) {
+			return ((Boolean) val1).equals(val2);
+		} else if (isInt(val1) && isInt(val2)) {
+			return getBigInteger(val1).equals(getBigInteger(val2));
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -186,15 +219,19 @@ public class ValueUtil {
 	 * @param indexes
 	 * @return
 	 */
-	public static Object get(TypeList type, Object array, List<Object> indexes) {
-		int numIndexes = indexes.size();
+	public static Object get(Type type, Object array, Object... indexes) {
+		if (!(type instanceof TypeList)) {
+			throw new IllegalArgumentException("expected TypeList");
+		}
+
+		int numIndexes = indexes.length;
 		for (int i = 0; i < numIndexes - 1; i++) {
-			int index = getIntValue(indexes.get(i));
+			int index = getIntValue(indexes[i]);
 			array = Array.get(array, index);
 		}
 
-		int index = getIntValue(indexes.get(numIndexes - 1));
-		Type eltType = type.getElementType();
+		int index = getIntValue(indexes[numIndexes - 1]);
+		Type eltType = ((TypeList) type).getElementType();
 		if (eltType.isBool()) {
 			return Array.getBoolean(array, index);
 		} else if (eltType.isFloat()) {
@@ -254,6 +291,16 @@ public class ValueUtil {
 		}
 	}
 
+	public static Expression getExpression(Object value) {
+		if (isBool(value)) {
+			return IrFactory.eINSTANCE.createExprBool((Boolean) value);
+		} else if (isInt(value)) {
+			return IrFactory.eINSTANCE.createExprInt(getBigInteger(value));
+		} else {
+			return null;
+		}
+	}
+
 	public static Object getFloatValue(BigDecimal decimal) {
 		float f = decimal.floatValue();
 		if (!Float.isInfinite(f)) {
@@ -280,7 +327,7 @@ public class ValueUtil {
 		return integer;
 	}
 
-	private static int getIntValue(Object value) {
+	public static int getIntValue(Object value) {
 		if (value instanceof Integer) {
 			return ((Integer) value).intValue();
 		} else if (value instanceof Long) {
@@ -314,6 +361,16 @@ public class ValueUtil {
 		} else {
 			return 0;
 		}
+	}
+
+	public static Object getValue(Expression expr) {
+		switch (expr.eClass().getClassifierID()) {
+		case IrPackage.EXPR_BOOL:
+			return ((ExprBool) expr).isValue();
+		case IrPackage.EXPR_INT:
+			return getIntValue(((ExprInt) expr).getValue());
+		}
+		return null;
 	}
 
 	/**
@@ -377,7 +434,7 @@ public class ValueUtil {
 	 * @return <code>true</code> if value is a list
 	 */
 	public static boolean isList(Object value) {
-		return value.getClass().isArray();
+		return (value != null && value.getClass().isArray());
 	}
 
 	/**
@@ -409,6 +466,40 @@ public class ValueUtil {
 			return null;
 		}
 		return getBigInteger(val1).compareTo(getBigInteger(val2)) <= 0;
+	}
+
+	/**
+	 * If value is an array, returns its number of elements.
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public static int length(Object value) {
+		if (isList(value)) {
+			return Array.getLength(value);
+		}
+		return 0;
+	}
+
+	public static boolean logicAnd(Object val1, Object val2) {
+		if (isBool(val1) && isBool(val2)) {
+			return ((Boolean) val1) && ((Boolean) val2);
+		}
+		return false;
+	}
+
+	public static boolean logicNot(Object value) {
+		if (isBool(value)) {
+			return !((Boolean) value);
+		}
+		return false;
+	}
+
+	public static boolean logicOr(Object val1, Object val2) {
+		if (isBool(val1) && isBool(val2)) {
+			return ((Boolean) val1) || ((Boolean) val2);
+		}
+		return false;
 	}
 
 	/**
@@ -470,6 +561,38 @@ public class ValueUtil {
 	}
 
 	/**
+	 * Returns <code>-value</code>.
+	 * 
+	 * @param value
+	 * @return <code>-value</code>.
+	 */
+	public static Object negate(Object value) {
+		BigInteger bi = getBigInteger(value);
+		if (bi == null) {
+			return null;
+		}
+		return bi.negate();
+	}
+
+	/**
+	 * Returns <code>~value</code>.
+	 * 
+	 * @param value
+	 * @return <code>~value</code>.
+	 */
+	public static Object not(Object value) {
+		BigInteger bi = getBigInteger(value);
+		if (bi == null) {
+			return null;
+		}
+		return bi.not();
+	}
+
+	public static boolean notEquals(Object val1, Object val2) {
+		return !equals(val1, val2);
+	}
+
+	/**
 	 * Returns a new integer equal to the bitwise or of the two operands, or
 	 * <code>null</code> if the two operands are not both integers.
 	 * 
@@ -488,22 +611,39 @@ public class ValueUtil {
 		return getIntValue(bi1.or(bi2));
 	}
 
-	public static void set(TypeList type, Object array, List<Object> indexes,
-			Object value) {
-		int numIndexes = indexes.size();
+	public static Object pow(Object val1, Object val2) {
+		BigInteger bi1 = getBigInteger(val1);
+		int i2 = getIntValue(val2);
+		if (bi1 == null) {
+			return null;
+		}
+		return bi1.pow(i2);
+	}
+
+	/**
+	 * Writes the given value in the given array at the given indexes. Type is
+	 * the type of the innermost elements of the array.
+	 * 
+	 * @param type
+	 * @param array
+	 * @param value
+	 * @param indexes
+	 */
+	public static void set(Type type, Object array, Object value,
+			Object... indexes) {
+		int numIndexes = indexes.length;
 		for (int i = 0; i < numIndexes - 1; i++) {
-			int index = getIntValue(indexes.get(i));
+			int index = getIntValue(indexes[i]);
 			array = Array.get(array, index);
 		}
 
-		int index = getIntValue(indexes.get(numIndexes - 1));
-		Type eltType = type.getElementType();
-		if (eltType.isBool()) {
+		int index = getIntValue(indexes[numIndexes - 1]);
+		if (type.isBool()) {
 			Array.setBoolean(array, index, (Boolean) value);
-		} else if (eltType.isFloat()) {
+		} else if (type.isFloat()) {
 			Array.setFloat(array, index, (Float) value);
-		} else if (eltType.isInt()) {
-			int size = eltType.getSizeInBits();
+		} else if (type.isInt()) {
+			int size = type.getSizeInBits();
 			if (size <= 8) {
 				Array.setByte(array, index, getByteValue(value));
 			} else if (size <= 16) {
@@ -515,8 +655,8 @@ public class ValueUtil {
 			} else {
 				Array.set(array, index, value);
 			}
-		} else if (eltType.isUint()) {
-			int size = eltType.getSizeInBits();
+		} else if (type.isUint()) {
+			int size = type.getSizeInBits();
 			if (size < 8) {
 				Array.setByte(array, index, getByteValue(value));
 			} else if (size < 16) {

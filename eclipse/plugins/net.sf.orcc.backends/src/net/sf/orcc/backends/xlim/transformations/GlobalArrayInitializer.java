@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.interpreter.ActorInterpreter;
-import net.sf.orcc.interpreter.ListAllocator;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBool;

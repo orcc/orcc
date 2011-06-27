@@ -46,7 +46,6 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
@@ -61,9 +60,6 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.runtime.Fifo;
-import net.sf.orcc.runtime.Fifo_String;
-import net.sf.orcc.runtime.Fifo_boolean;
-import net.sf.orcc.runtime.Fifo_int;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -85,13 +81,17 @@ import std.io.impl.Source;
  */
 public class SlowSimulator extends AbstractSimulator {
 
+	private Map<Instance, BroadcastInterpreter> bcastInterpreters;
+
 	protected List<Fifo> fifoList;
+
+	private Map<Port, Fifo> fifos;
 
 	private int fifoSize;
 
 	private Map<Instance, ActorInterpreter> interpreters;
 
-	private Map<Instance, BroadcastInterpreter> bcastInterpreters;
+	private IProject project;
 
 	private String stimulusFile;
 
@@ -99,20 +99,8 @@ public class SlowSimulator extends AbstractSimulator {
 
 	private String xdfFile;
 
-	private IProject project;
-
-	private Map<Port, Fifo> fifos;
-
 	protected void connectActors(Port srcPort, Port tgtPort, int fifoSize) {
-		Fifo fifo = null;
-		Type type = srcPort.getType();
-		if (type.isInt() || type.isUint()) {
-			fifo = new Fifo_int(fifoSize);
-		} else if (type.isBool()) {
-			fifo = new Fifo_boolean(fifoSize);
-		} else {
-			fifo = new Fifo_String(fifoSize);
-		}
+		Fifo fifo = new Fifo(srcPort.getType(), fifoSize);
 		fifos.put(srcPort, fifo);
 		fifos.put(tgtPort, fifo);
 	}

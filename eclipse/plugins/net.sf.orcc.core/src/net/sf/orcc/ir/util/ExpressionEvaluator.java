@@ -28,11 +28,8 @@
  */
 package net.sf.orcc.ir.util;
 
-import static net.sf.orcc.ir.IrFactory.eINSTANCE;
-
+import java.util.ArrayList;
 import java.util.List;
-
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
@@ -44,10 +41,13 @@ import net.sf.orcc.ir.ExprString;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.OpBinary;
 import net.sf.orcc.ir.OpUnary;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
+
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines an expression evaluator.
@@ -55,7 +55,7 @@ import net.sf.orcc.ir.Var;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ExpressionEvaluator extends IrSwitch<Expression> {
+public class ExpressionEvaluator extends IrSwitch<Object> {
 
 	private boolean throwException;
 
@@ -69,9 +69,9 @@ public class ExpressionEvaluator extends IrSwitch<Expression> {
 	 *             if the expression cannot be evaluated as an integer
 	 */
 	public int evaluateAsInteger(Expression expr) {
-		Expression value = doSwitch(expr);
-		if (value != null && value.isIntExpr()) {
-			return ((ExprInt) value).getIntValue();
+		Object value = doSwitch(expr);
+		if (ValueUtil.isInt(value)) {
+			return ValueUtil.getIntValue(value);
 		}
 
 		// evaluated ok, but not as an integer
@@ -79,10 +79,10 @@ public class ExpressionEvaluator extends IrSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseExprBinary(ExprBinary expr) {
-		Expression val1 = doSwitch(expr.getE1());
-		Expression val2 = doSwitch(expr.getE2());
-		Expression result = interpretBinaryExpr(val1, expr.getOp(), val2);
+	public Object caseExprBinary(ExprBinary expr) {
+		Object val1 = doSwitch(expr.getE1());
+		Object val2 = doSwitch(expr.getE2());
+		Object result = interpretBinaryExpr(val1, expr.getOp(), val2);
 
 		if (result == null) {
 			// will throw exception if uninitialized variable used
@@ -103,41 +103,44 @@ public class ExpressionEvaluator extends IrSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseExprBool(ExprBool expr) {
-		return EcoreUtil.copy(expr);
+	public Object caseExprBool(ExprBool expr) {
+		return expr.isValue();
 	}
 
 	@Override
-	public Expression caseExprFloat(ExprFloat expr) {
-		return EcoreUtil.copy(expr);
+	public Object caseExprFloat(ExprFloat expr) {
+		return ValueUtil.getFloatValue(expr.getValue());
 	}
 
 	@Override
-	public Expression caseExprInt(ExprInt expr) {
-		return EcoreUtil.copy(expr);
+	public Object caseExprInt(ExprInt expr) {
+		return ValueUtil.getIntValue(expr.getValue());
 	}
 
 	@Override
-	public Expression caseExprList(ExprList expr) {
-		ExprList list = IrFactory.eINSTANCE.createExprList();
+	public Object caseExprList(ExprList expr) {
+		Type type = ((TypeList) expr.getType()).getElementType();
+		Object array = ValueUtil.createArray(type, expr.getValue().size());
 		List<Expression> expressions = expr.getValue();
-		List<Expression> values = list.getValue();
+		int index = 0;
 		for (Expression expression : expressions) {
-			values.add(doSwitch(expression));
+			Object value = doSwitch(expression);
+			ValueUtil.set(type, array, value, index);
+			index++;
 		}
 
-		return list;
+		return array;
 	}
 
 	@Override
-	public Expression caseExprString(ExprString expr) {
+	public Object caseExprString(ExprString expr) {
 		return EcoreUtil.copy(expr);
 	}
 
 	@Override
-	public Expression caseExprUnary(ExprUnary expr) {
-		Expression value = doSwitch(expr.getExpr());
-		Expression result = interpretUnaryExpr(expr.getOp(), value);
+	public Object caseExprUnary(ExprUnary expr) {
+		Object value = doSwitch(expr.getExpr());
+		Object result = interpretUnaryExpr(expr.getOp(), value);
 
 		if (result == null) {
 			// will throw exception if uninitialized variable used
@@ -155,18 +158,18 @@ public class ExpressionEvaluator extends IrSwitch<Expression> {
 	}
 
 	@Override
-	public Expression caseExprVar(ExprVar expr) {
+	public Object caseExprVar(ExprVar expr) {
 		Var var = expr.getUse().getVariable();
-		Expression value = var.getValue();
+		Object value = var.getValue();
 		if (value == null) {
-			value = var.getInitialValue();
+			value = doSwitch(var.getInitialValue());
 		}
 		if (value == null && throwException) {
 			throwException = false;
 			throw new OrccRuntimeException("Uninitialized variable: "
 					+ var.getName());
 		}
-		return EcoreUtil.copy(value);
+		return value;
 	}
 
 	/**
@@ -182,147 +185,48 @@ public class ExpressionEvaluator extends IrSwitch<Expression> {
 	 *            another expression
 	 * @return the value of <code>val1</code> <code>op</code> <code>val2</code>
 	 */
-	public Expression interpretBinaryExpr(Expression val1, OpBinary op,
-			Expression val2) {
-		if (val1 == null || val2 == null) {
-			return null;
-		}
-
-		// update b1 or i1, and checks the value of i1
-		ExprBool b1 = null;
-		ExprInt i1 = null;
-		if (val1.isBooleanExpr()) {
-			b1 = (ExprBool) val1;
-		} else if (val1.isIntExpr()) {
-			i1 = (ExprInt) val1;
-			if (i1.getValue() == null) {
-				return null;
-			}
-		}
-
-		// update b2 or i2, and checks the value of i2
-		ExprBool b2 = null;
-		ExprInt i2 = null;
-		if (val2.isBooleanExpr()) {
-			b2 = (ExprBool) val2;
-		} else if (val2.isIntExpr()) {
-			i2 = (ExprInt) val2;
-			if (i2.getValue() == null) {
-				return null;
-			}
-		}
-
+	public Object interpretBinaryExpr(Object val1, OpBinary op, Object val2) {
 		switch (op) {
 		case BITAND:
-			if (i1 != null && i2 != null) {
-				return i1.and(i2);
-			}
-			break;
+			return ValueUtil.and(val1, val2);
 		case BITOR:
-			if (i1 != null && i2 != null) {
-				return i1.or(i2);
-			}
-			break;
+			return ValueUtil.or(val1, val2);
 		case BITXOR:
-			if (i1 != null && i2 != null) {
-				return i1.xor(i2);
-			}
-			break;
+			return ValueUtil.xor(val1, val2);
 		case DIV:
-			if (i1 != null && i2 != null) {
-				return i1.divide(i2);
-			}
-			break;
+			return ValueUtil.divide(val1, val2);
 		case DIV_INT:
-			if (i1 != null && i2 != null) {
-				return i1.divide(i2);
-			}
-			break;
+			return ValueUtil.divide(val1, val2);
 		case EQ:
-			if (i1 != null && i2 != null) {
-				return eINSTANCE.createExprBool(EcoreUtil.equals(i1, i2));
-			} else if (b1 != null && b2 != null) {
-				return eINSTANCE.createExprBool(EcoreUtil.equals(b1, b2));
-			}
-			break;
+			return ValueUtil.equals(val1, val2);
 		case EXP:
-			break;
+			return ValueUtil.pow(val1, val2);
 		case GE:
-			if (i1 != null && i2 != null) {
-				return i1.ge(i2);
-			}
-			break;
+			return ValueUtil.ge(val1, val2);
 		case GT:
-			if (i1 != null && i2 != null) {
-				return i1.gt(i2);
-			}
-			break;
+			return ValueUtil.gt(val1, val2);
 		case LOGIC_AND:
-			if (b1 != null && b2 != null) {
-				return IrFactory.eINSTANCE.createExprBool(b1.isValue()
-						&& b2.isValue());
-			}
-			break;
+			return ValueUtil.logicAnd(val1, val2);
 		case LE:
-			if (i1 != null && i2 != null) {
-				return i1.le(i2);
-			}
-			break;
+			return ValueUtil.le(val1, val2);
 		case LOGIC_OR:
-			if (b1 != null && b2 != null) {
-				return IrFactory.eINSTANCE.createExprBool(b1.isValue()
-						|| b2.isValue());
-			}
-			break;
+			return ValueUtil.logicOr(val1, val2);
 		case LT:
-			if (i1 != null && i2 != null) {
-				return i1.lt(i2);
-			}
-			break;
+			return ValueUtil.lt(val1, val2);
 		case MINUS:
-			if (i1 != null && i2 != null) {
-				return i1.subtract(i2);
-			}
-			break;
+			return ValueUtil.subtract(val1, val2);
 		case MOD:
-			if (i1 != null && i2 != null) {
-				return i1.mod(i2);
-			}
-			break;
+			return ValueUtil.mod(val1, val2);
 		case NE:
-			if (i1 != null && i2 != null) {
-				return eINSTANCE.createExprBool(!EcoreUtil.equals(i1, i2));
-			} else if (b1 != null && b2 != null) {
-				return eINSTANCE.createExprBool(!EcoreUtil.equals(b1, b2));
-			}
-			break;
+			return ValueUtil.notEquals(val1, val2);
 		case PLUS:
-			if (i1 != null && i2 != null) {
-				return i1.add(i2);
-			}
-
-			if (val1 != null && val1.isListExpr() && val2 != null
-					&& val2.isListExpr()) {
-				ExprList l1 = (ExprList) val1;
-				ExprList l2 = (ExprList) val2;
-				return IrFactory.eINSTANCE.createExprList(l1, l2);
-			}
-			break;
+			return ValueUtil.add(val1, val2);
 		case SHIFT_LEFT:
-			if (i1 != null && i2 != null) {
-				return i1.shiftLeft(i2);
-			}
-			break;
+			return ValueUtil.shiftLeft(val1, val2);
 		case SHIFT_RIGHT:
-			if (i1 != null && i2 != null) {
-				return i1.shiftRight(i2);
-			}
-			break;
+			return ValueUtil.shiftRight(val1, val2);
 		case TIMES:
-			if (i1 != null && i2 != null) {
-				return i1.multiply(i2);
-			}
-			break;
+			return ValueUtil.multiply(val1, val2);
 		}
 
 		return null;
@@ -338,25 +242,16 @@ public class ExpressionEvaluator extends IrSwitch<Expression> {
 	 *            an expression
 	 * @return the value of <code>op</code> <code>value</code>
 	 */
-	public Expression interpretUnaryExpr(OpUnary op, Expression value) {
+	public Object interpretUnaryExpr(OpUnary op, Object value) {
 		switch (op) {
 		case BITNOT:
-			if (value != null && value.isIntExpr()) {
-				return ((ExprInt) value).not();
-			}
-			break;
+			return ValueUtil.not(value);
 		case LOGIC_NOT:
-			if (value != null && value.isBooleanExpr()) {
-				return ((ExprBool) value).not();
-			}
-			break;
+			return ValueUtil.logicNot(value);
 		case MINUS:
-			if (value != null && value.isIntExpr()) {
-				return ((ExprInt) value).negate();
-			}
-			break;
+			return ValueUtil.negate(value);
 		case NUM_ELTS:
-			break;
+			return ValueUtil.length(value);
 		}
 
 		return null;

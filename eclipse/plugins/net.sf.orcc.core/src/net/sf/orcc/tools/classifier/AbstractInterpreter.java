@@ -29,7 +29,6 @@
 package net.sf.orcc.tools.classifier;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -37,22 +36,15 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBool;
-import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstLoad;
 import net.sf.orcc.ir.InstPhi;
-import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
-
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import net.sf.orcc.ir.util.ValueUtil;
 
 /**
  * This class defines an abstract interpreter of an actor. It refines the
@@ -137,7 +129,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				peeked.setValue(tokenAllocator.doSwitch(peeked.getType()));
+				peeked.setValue(ValueUtil.createArray(peeked.getType()));
 
 				if (configuration != null && configuration.containsKey(port)
 						&& !portRead.get(port)) {
@@ -190,27 +182,6 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	public Object caseInstLoad(InstLoad instr) {
-		Var target = instr.getTarget().getVariable();
-		Var source = instr.getSource().getVariable();
-		if (instr.getIndexes().isEmpty()) {
-			target.setValue(EcoreUtil.copy(source.getValue()));
-		} else {
-			Expression value = source.getValue();
-			for (Expression index : instr.getIndexes()) {
-				if (value == null || !value.isListExpr()) {
-					break;
-				}
-
-				index = exprInterpreter.doSwitch(index);
-				value = ((ExprList) value).get((ExprInt) index);
-			}
-			target.setValue(EcoreUtil.copy(value));
-		}
-		return null;
-	}
-
-	@Override
 	public Object caseInstPhi(InstPhi phi) {
 		if (branch != -1) {
 			return super.caseInstPhi(phi);
@@ -219,55 +190,13 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	@Override
-	public Object caseInstStore(InstStore instr) {
-		Var var = instr.getTarget().getVariable();
-		if (instr.getIndexes().isEmpty()) {
-			var.setValue(exprInterpreter.doSwitch(instr.getValue()));
-		} else {
-			Expression target = var.getValue();
-			Iterator<Expression> it = instr.getIndexes().iterator();
-			ExprInt index = (ExprInt) exprInterpreter.doSwitch(it.next());
-
-			while (it.hasNext()) {
-				if (target != null && target.isListExpr() && index != null) {
-					target = ((ExprList) target).get(index);
-				}
-				index = (ExprInt) exprInterpreter.doSwitch(it.next());
-			}
-
-			Expression value = (Expression) exprInterpreter.doSwitch(instr
-					.getValue());
-			if (target != null && target.isListExpr() && index != null) {
-				if (value == null) {
-					// create new expression with null value
-					Type type = ((TypeList) var.getType()).getElementType();
-					if (type.isBool()) {
-						value = IrFactory.eINSTANCE.createExprBool();
-					} else if (type.isFloat()) {
-						value = IrFactory.eINSTANCE.createExprFloat();
-					} else if (type.isInt() || type.isUint()) {
-						value = IrFactory.eINSTANCE.createExprInt();
-					} else if (type.isString()) {
-						value = IrFactory.eINSTANCE.createExprString();
-					} else {
-						// else do not set value
-						return null;
-					}
-				}
-				((ExprList) target).set(index, value);
-			}
-		}
-		return null;
-	}
-
-	@Override
 	public Object caseNodeIf(NodeIf node) {
 		// Interpret first expression ("if" condition)
-		Expression condition = exprInterpreter.doSwitch(node.getCondition());
+		Object condition = exprInterpreter.doSwitch(node.getCondition());
 
 		int oldBranch = branch;
-		if (condition != null && condition.isBooleanExpr()) {
-			if (((ExprBool) condition).isValue()) {
+		if (ValueUtil.isBool(condition)) {
+			if (ValueUtil.isTrue(condition)) {
 				doSwitch(node.getThenNodes());
 				branch = 0;
 			} else {
@@ -296,18 +225,17 @@ public class AbstractInterpreter extends ActorInterpreter {
 		doSwitch(node.getJoinNode());
 
 		// Interpret first expression ("while" condition)
-		Expression condition = exprInterpreter.doSwitch(node.getCondition());
+		Object condition = exprInterpreter.doSwitch(node.getCondition());
 
-		if (condition != null && condition.isBooleanExpr()) {
+		if (ValueUtil.isBool(condition)) {
 			branch = 1;
-			while (((ExprBool) condition).isValue()) {
+			while (ValueUtil.isTrue(condition)) {
 				doSwitch(node.getNodes());
 				doSwitch(node.getJoinNode());
 
 				// Interpret next value of "while" condition
 				condition = exprInterpreter.doSwitch(node.getCondition());
-				if (schedulableMode
-						&& (condition == null || !condition.isBooleanExpr())) {
+				if (schedulableMode && !ValueUtil.isBool(condition)) {
 					throw new OrccRuntimeException(
 							"Condition not boolean at line "
 									+ node.getLineNumber() + "\n");

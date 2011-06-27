@@ -1169,8 +1169,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getVar_Value() {
-		return (EReference)varEClass.getEStructuralFeatures().get(4);
+	public EAttribute getVar_Value() {
+		return (EAttribute)varEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -2099,7 +2099,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		createEReference(varEClass, VAR__INITIAL_VALUE);
 		createEAttribute(varEClass, VAR__NAME);
 		createEReference(varEClass, VAR__TYPE);
-		createEReference(varEClass, VAR__VALUE);
+		createEAttribute(varEClass, VAR__VALUE);
 		createEAttribute(varEClass, VAR__ASSIGNABLE);
 		createEAttribute(varEClass, VAR__GLOBAL);
 		createEReference(varEClass, VAR__USES);
@@ -2365,7 +2365,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 		initEReference(getVar_InitialValue(), this.getExpression(), null, "initialValue", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Name(), theEcorePackage.getEString(), "name", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Type(), this.getType(), null, "type", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getVar_Value(), this.getExpression(), null, "value", null, 0, 1, Var.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVar_Value(), ecorePackage.getEJavaObject(), "value", null, 0, 1, Var.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Assignable(), ecorePackage.getEBoolean(), "assignable", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getVar_Global(), ecorePackage.getEBoolean(), "global", null, 0, 1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getVar_Uses(), this.getUse(), this.getUse_Variable(), "uses", null, 0, -1, Var.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

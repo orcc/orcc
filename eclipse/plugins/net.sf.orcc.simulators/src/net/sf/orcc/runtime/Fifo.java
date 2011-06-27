@@ -35,37 +35,34 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.util.ValueUtil;
+
 /**
- * This class defines an abstract FIFO.
+ * This class defines a generic FIFO.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class Fifo {
+public class Fifo {
 
-	protected int fillCount;
-
-	protected int read;
-
-	final protected int size;
-
-	protected int write;
-
-	protected FileOutputStream fos = null;
-
-	protected OutputStreamWriter out = null;
+	private Object contents;
 
 	private String fifoName;
 
-	/**
-	 * Creates a new FIFO with the given size.
-	 * 
-	 * @param size
-	 *            the size of the FIFO
-	 */
-	public Fifo(int size) {
-		this.size = size;
-	}
+	private int fillCount;
+
+	private FileOutputStream fos;
+
+	private OutputStreamWriter out;
+
+	private int readIdx;
+
+	private int size;
+
+	private Type type;
+
+	private int writeIdx;
 
 	/**
 	 * Creates a new FIFO with the given size and a file for tracing exchanged
@@ -98,6 +95,19 @@ public abstract class Fifo {
 				throw new RuntimeException(msg, e);
 			}
 		}
+	}
+
+	/**
+	 * Creates a new FIFO with the given type and size.
+	 * 
+	 * @param size
+	 *            the size of the FIFO
+	 */
+	public Fifo(Type type, int size) {
+		this.type = type;
+		this.size = size;
+
+		contents = ValueUtil.createArray(type, size);
 	}
 
 	public void close() {
@@ -146,40 +156,6 @@ public abstract class Fifo {
 	}
 
 	/**
-	 * Returns the index at which tokens can be read in the array returned by
-	 * {@link #getReadArray(int)}.
-	 * 
-	 * @param numTokens
-	 *            a number of tokens to read
-	 * @return the index at which tokens can be read in the array returned by
-	 *         {@link #getReadArray(int)}
-	 */
-	final public int getReadIndex(int numTokens) {
-		if (read + numTokens <= size) {
-			return read;
-		} else {
-			return 0;
-		}
-	}
-
-	/**
-	 * Returns the index at which tokens can be written in the array returned by
-	 * {@link #getWriteArray(int)}.
-	 * 
-	 * @param numTokens
-	 *            a number of tokens to write
-	 * @return the index at which tokens can be written in the array returned by
-	 *         {@link #getWriteArray(int)}
-	 */
-	final public int getWriteIndex(int numTokens) {
-		if (write + numTokens <= size) {
-			return write;
-		} else {
-			return 0;
-		}
-	}
-
-	/**
 	 * Returns <code>true</code> if there is enough room for the given number of
 	 * tokens in this FIFO.
 	 * 
@@ -206,22 +182,46 @@ public abstract class Fifo {
 	}
 
 	/**
-	 * Signals that reading is finished.
+	 * Peeks one token from the FIFO.
 	 * 
-	 * @param numTokens
-	 *            the number of tokens that were read
+	 * @return the token read
 	 */
-	final public void readEnd(int numTokens) {
-		fillCount -= numTokens;
-		read += numTokens;
-		if (read > size) {
-			read -= size;
+	public Object peek() {
+		return ValueUtil.get(type, contents, (Integer) readIdx);
+	}
+
+	/**
+	 * Reads one token from the FIFO.
+	 * 
+	 * @return the token read
+	 */
+	public Object read() {
+		Object value = ValueUtil.get(type, contents, (Integer) readIdx);
+		fillCount--;
+		readIdx++;
+		if (readIdx > size) {
+			readIdx -= size;
 		}
+		return value;
 	}
 
 	@Override
 	public String toString() {
-		return write + "/" + read;
+		return writeIdx + "/" + readIdx;
+	}
+
+	/**
+	 * Writes one token from the FIFO.
+	 * 
+	 * @return the token read
+	 */
+	public void write(Object value) {
+		ValueUtil.set(type, contents, value, readIdx);
+		fillCount++;
+		writeIdx++;
+		if (writeIdx > size) {
+			writeIdx -= size;
+		}
 	}
 
 }

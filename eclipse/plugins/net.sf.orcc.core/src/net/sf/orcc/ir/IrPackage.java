@@ -1300,11 +1300,11 @@ public interface IrPackage extends EPackage {
 		EReference VAR__USES = eINSTANCE.getVar_Uses();
 
 		/**
-		 * The meta object literal for the '<em><b>Value</b></em>' containment reference feature.
+		 * The meta object literal for the '<em><b>Value</b></em>' attribute feature.
 		 * <!-- begin-user-doc --> <!-- end-user-doc -->
 		 * @generated
 		 */
-		EReference VAR__VALUE = eINSTANCE.getVar_Value();
+		EAttribute VAR__VALUE = eINSTANCE.getVar_Value();
 
 	}
 
@@ -3073,7 +3073,7 @@ public interface IrPackage extends EPackage {
 	int VAR__TYPE = 3;
 
 	/**
-	 * The feature id for the '<em><b>Value</b></em>' containment reference.
+	 * The feature id for the '<em><b>Value</b></em>' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
@@ -5018,14 +5018,14 @@ public interface IrPackage extends EPackage {
 	EReference getVar_Uses();
 
 	/**
-	 * Returns the meta object for the containment reference '{@link net.sf.orcc.ir.Var#getValue <em>Value</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.Var#getValue <em>Value</em>}'.
 	 * <!-- begin-user-doc
 	 * --> <!-- end-user-doc -->
-	 * @return the meta object for the containment reference '<em>Value</em>'.
+	 * @return the meta object for the attribute '<em>Value</em>'.
 	 * @see net.sf.orcc.ir.Var#getValue()
 	 * @see #getVar()
 	 * @generated
 	 */
-	EReference getVar_Value();
+	EAttribute getVar_Value();
 
 } // IrPackage

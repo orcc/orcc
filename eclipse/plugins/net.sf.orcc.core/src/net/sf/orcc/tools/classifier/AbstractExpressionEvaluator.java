@@ -31,7 +31,6 @@ package net.sf.orcc.tools.classifier;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 
 /**
@@ -45,10 +44,10 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	private boolean schedulableMode;
 
 	@Override
-	public Expression caseExprBinary(ExprBinary expr) {
-		Expression val1 = doSwitch(expr.getE1());
-		Expression val2 = doSwitch(expr.getE2());
-		Expression result = interpretBinaryExpr(val1, expr.getOp(), val2);
+	public Object caseExprBinary(ExprBinary expr) {
+		Object val1 = doSwitch(expr.getE1());
+		Object val2 = doSwitch(expr.getE2());
+		Object result = interpretBinaryExpr(val1, expr.getOp(), val2);
 
 		// only throws an exception if we are in schedulable mode and the result
 		// is null
@@ -59,9 +58,9 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	}
 
 	@Override
-	public Expression caseExprUnary(ExprUnary expr) {
-		Expression value = doSwitch(expr.getExpr());
-		Expression result = interpretUnaryExpr(expr.getOp(), value);
+	public Object caseExprUnary(ExprUnary expr) {
+		Object value = doSwitch(expr.getExpr());
+		Object result = interpretUnaryExpr(expr.getOp(), value);
 
 		if (schedulableMode && value == null) {
 			throw new OrccRuntimeException("Runtime unary expression");

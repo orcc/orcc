@@ -43,6 +43,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.IrSwitch;
+import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.util.OrderedMap;
@@ -120,9 +121,10 @@ public class SolveParametersTransform extends IrSwitch<Expression> implements
 			}
 
 			Expression resolvedValue = doSwitch(value);
-			Expression constantValue = new ExpressionEvaluator()
+			Object constantValue = new ExpressionEvaluator()
 					.doSwitch(resolvedValue);
-			entry.setValue(constantValue);
+			value = ValueUtil.getExpression(constantValue);
+			entry.setValue(value);
 		}
 	}
 
