@@ -332,10 +332,10 @@ priorities(act) ::= <<
 inputPatternPort(variable) ::= <<
 promela_io_index=0;
 do
-:: promela_io_index \< <variable.type.dimensions> -> 
+:: promela_io_index \< <variable.type.dimensions> -\> 
 	chan_<instance.id>_<pattern.varToPortMap.(variable).name>?<variable.name>[promela_io_index];
 	promela_io_index = promela_io_index + 1;
-:: else -> break
+:: else -\> break
 od;
 
 >>
@@ -347,10 +347,10 @@ inputPattern(pattern) ::= <<
 outputPatternPort(variable) ::= <<
 promela_io_index=0;
 do
-:: promela_io_index \< <variable.type.dimensions> -> 
+:: promela_io_index \< <variable.type.dimensions> -\> 
 	chan_<instance.id>_<pattern.varToPortMap.(variable).name>!<variable.name>[promela_io_index];
 	promela_io_index = promela_io_index + 1;
-:: else -> break
+:: else -\> break
 od;
 
 >>
