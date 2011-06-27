@@ -157,7 +157,6 @@ public class SlowSimulator extends AbstractSimulator {
 				BroadcastInterpreter interpreter = bcastInterpreters
 						.get(instance);
 				interpreter.initialize();
-
 			}
 		}
 	}

@@ -80,11 +80,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 public class ActorInterpreter extends AbstractActorVisitor<Object> {
 
 	/**
-	 * actor being interpreted
-	 */
-	protected Actor actor;
-
-	/**
 	 * branch being visited
 	 */
 	protected int branch;

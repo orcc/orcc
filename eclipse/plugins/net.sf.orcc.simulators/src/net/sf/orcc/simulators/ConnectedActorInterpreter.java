@@ -217,4 +217,9 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 		this.fifos = fifos;
 	}
 
+	@Override
+	public String toString() {
+		return "interpreter for actor " + actor.getName();
+	}
+
 }

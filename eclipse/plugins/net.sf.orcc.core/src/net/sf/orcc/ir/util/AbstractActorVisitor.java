@@ -256,7 +256,8 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 		List<Instruction> instructions = block.getInstructions();
 		T result = null;
 		for (indexInst = 0; indexInst < instructions.size() && result == null; indexInst++) {
-			result = doSwitch(instructions.get(indexInst));
+			Instruction inst = instructions.get(indexInst);
+			result = doSwitch(inst);
 		}
 
 		// restore old index
@@ -321,7 +322,8 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 		int oldIndexNode = indexNode;
 		T result = null;
 		for (indexNode = 0; indexNode < nodes.size() && result == null; indexNode++) {
-			result = doSwitch(nodes.get(indexNode));
+			Node node = nodes.get(indexNode);
+			result = doSwitch(node);
 		}
 
 		indexNode = oldIndexNode;
