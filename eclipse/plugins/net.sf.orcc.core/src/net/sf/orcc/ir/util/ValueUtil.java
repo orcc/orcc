@@ -212,7 +212,7 @@ public class ValueUtil {
 
 	/**
 	 * Returns the value in the given array, at the given indexes, knowing the
-	 * type of the array.
+	 * type of the elements of the array.
 	 * 
 	 * @param type
 	 * @param array
@@ -220,10 +220,6 @@ public class ValueUtil {
 	 * @return
 	 */
 	public static Object get(Type type, Object array, Object... indexes) {
-		if (!(type instanceof TypeList)) {
-			throw new IllegalArgumentException("expected TypeList");
-		}
-
 		int numIndexes = indexes.length;
 		for (int i = 0; i < numIndexes - 1; i++) {
 			int index = getIntValue(indexes[i]);
@@ -231,13 +227,12 @@ public class ValueUtil {
 		}
 
 		int index = getIntValue(indexes[numIndexes - 1]);
-		Type eltType = ((TypeList) type).getElementType();
-		if (eltType.isBool()) {
+		if (type.isBool()) {
 			return Array.getBoolean(array, index);
-		} else if (eltType.isFloat()) {
+		} else if (type.isFloat()) {
 			return Array.getFloat(array, index);
-		} else if (eltType.isInt()) {
-			int size = eltType.getSizeInBits();
+		} else if (type.isInt()) {
+			int size = type.getSizeInBits();
 			if (size <= 8) {
 				// extend to int
 				return (int) Array.getByte(array, index);
@@ -249,8 +244,8 @@ public class ValueUtil {
 			} else if (size <= 64) {
 				return Array.getLong(array, index);
 			}
-		} else if (eltType.isUint()) {
-			int size = eltType.getSizeInBits();
+		} else if (type.isUint()) {
+			int size = type.getSizeInBits();
 			if (size < 8) {
 				// extend to int
 				return (int) Array.getByte(array, index);

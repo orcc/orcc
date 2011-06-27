@@ -279,7 +279,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 					indexes.add(exprInterpreter.doSwitch(index));
 				}
 
-				TypeList type = (TypeList) source.getType();
+				Type type = target.getType();
 				Object value = ValueUtil.get(type, array, indexes);
 				target.setValue(value);
 			} catch (IndexOutOfBoundsException e) {

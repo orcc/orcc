@@ -187,7 +187,7 @@ public class Fifo {
 	 * @return the token read
 	 */
 	public Object peek() {
-		return ValueUtil.get(type, contents, (Integer) readIdx);
+		return ValueUtil.get(type, contents, readIdx);
 	}
 
 	/**
@@ -196,10 +196,10 @@ public class Fifo {
 	 * @return the token read
 	 */
 	public Object read() {
-		Object value = ValueUtil.get(type, contents, (Integer) readIdx);
+		Object value = ValueUtil.get(type, contents, readIdx);
 		fillCount--;
 		readIdx++;
-		if (readIdx > size) {
+		if (readIdx >= size) {
 			readIdx -= size;
 		}
 		return value;
@@ -216,10 +216,10 @@ public class Fifo {
 	 * @return the token read
 	 */
 	public void write(Object value) {
-		ValueUtil.set(type, contents, value, readIdx);
+		ValueUtil.set(type, contents, value, writeIdx);
 		fillCount++;
 		writeIdx++;
-		if (writeIdx > size) {
+		if (writeIdx >= size) {
 			writeIdx -= size;
 		}
 	}

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
