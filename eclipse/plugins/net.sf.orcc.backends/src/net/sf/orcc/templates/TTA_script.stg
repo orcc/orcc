@@ -27,6 +27,10 @@ for instance in instances:
 	if status != 0 :
 		print '******** Error during the compilation of ' + instance + '.ll'
 		print output
+	else :
+		asmFile = instancePath + os.sep + instance + '.tceasm'
+		commands.getstatusoutput('tcedisasm -n -o ' + asmFile + ' ' + adfFile + ' ' + tpefFile)
+		
 		
 print '** Compilation done'
 		
