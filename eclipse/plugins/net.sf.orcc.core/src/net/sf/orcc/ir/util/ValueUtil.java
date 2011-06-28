@@ -98,11 +98,7 @@ public class ValueUtil {
 	 *            a type of list
 	 * @return an array
 	 */
-	public static Object createArray(Type type) {
-		if (!(type instanceof TypeList)) {
-			throw new IllegalArgumentException("expected TypeList");
-		}
-
+	public static Object createArray(TypeList type) {
 		List<Integer> listDimensions = type.getDimensions();
 		int[] dimensions = new int[listDimensions.size()];
 		for (int i = 0; i < dimensions.length; i++) {
@@ -157,7 +153,7 @@ public class ValueUtil {
 		} else if (type.isString()) {
 			return Array.newInstance(String.class, dimensions);
 		} else {
-			throw new IllegalArgumentException("wtf?");
+			throw new IllegalArgumentException("expected scalar type");
 		}
 	}
 
@@ -616,13 +612,16 @@ public class ValueUtil {
 	}
 
 	/**
-	 * Writes the given value in the given array at the given indexes. Type is
-	 * the type of the innermost elements of the array.
+	 * Writes the given value in the given array at the given indexes.
 	 * 
 	 * @param type
+	 *            type of the innermost elements of the array.
 	 * @param array
+	 *            an array object
 	 * @param value
+	 *            a value
 	 * @param indexes
+	 *            indexes
 	 */
 	public static void set(Type type, Object array, Object value,
 			Object... indexes) {

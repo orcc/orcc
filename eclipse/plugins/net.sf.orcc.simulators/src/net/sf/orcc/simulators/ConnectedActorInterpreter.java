@@ -215,7 +215,8 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				peeked.setValue(ValueUtil.createArray(peeked.getType()));
+				peeked.setValue(ValueUtil.createArray((TypeList) peeked
+						.getType()));
 			}
 
 			Type type = ((TypeList) peeked.getType()).getElementType();

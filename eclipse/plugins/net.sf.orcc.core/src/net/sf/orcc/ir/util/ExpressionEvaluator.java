@@ -56,26 +56,11 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  */
 public class ExpressionEvaluator extends IrSwitch<Object> {
 
+	private Type eltType;
+
+	private Expression rootExpr;
+
 	private boolean throwException;
-
-	/**
-	 * Evaluates this expression and return its value as an integer.
-	 * 
-	 * @param expr
-	 *            an expression to evaluate
-	 * @return the expression evaluated as an integer
-	 * @throws OrccRuntimeException
-	 *             if the expression cannot be evaluated as an integer
-	 */
-	public int evaluateAsInteger(Expression expr) {
-		Object value = doSwitch(expr);
-		if (ValueUtil.isInt(value)) {
-			return ValueUtil.getIntValue(value);
-		}
-
-		// evaluated ok, but not as an integer
-		throw new OrccRuntimeException("expected integer expression");
-	}
 
 	@Override
 	public Object caseExprBinary(ExprBinary expr) {
@@ -118,14 +103,32 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 
 	@Override
 	public Object caseExprList(ExprList expr) {
-		Type type = ((TypeList) expr.getType()).getElementType();
-		Object array = ValueUtil.createArray(type, expr.getValue().size());
+		Type type = (TypeList) expr.getType();
+		if (eltType == null) {
+			rootExpr = expr;
+			eltType = ((TypeList) type).getElementType();
+		}
+
+		List<Integer> listDimensions = type.getDimensions();
+		int[] dimensions = new int[listDimensions.size()];
+		for (int i = 0; i < dimensions.length; i++) {
+			dimensions[i] = listDimensions.get(i);
+		}
+		Object array = ValueUtil.createArray(eltType, dimensions);
+
+		type = ((TypeList) type).getType();
 		List<Expression> expressions = expr.getValue();
 		int index = 0;
 		for (Expression expression : expressions) {
 			Object value = doSwitch(expression);
 			ValueUtil.set(type, array, value, index);
 			index++;
+		}
+
+		// reset element type
+		if (expr == rootExpr) {
+			rootExpr = null;
+			eltType = null;
 		}
 
 		return array;
@@ -166,6 +169,25 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 					+ var.getName());
 		}
 		return value;
+	}
+
+	/**
+	 * Evaluates this expression and return its value as an integer.
+	 * 
+	 * @param expr
+	 *            an expression to evaluate
+	 * @return the expression evaluated as an integer
+	 * @throws OrccRuntimeException
+	 *             if the expression cannot be evaluated as an integer
+	 */
+	public int evaluateAsInteger(Expression expr) {
+		Object value = doSwitch(expr);
+		if (ValueUtil.isInt(value)) {
+			return ValueUtil.getIntValue(value);
+		}
+
+		// evaluated ok, but not as an integer
+		throw new OrccRuntimeException("expected integer expression");
 	}
 
 	/**

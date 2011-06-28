@@ -122,7 +122,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	final protected void allocatePattern(Pattern pattern) {
 		for (Port port : pattern.getPorts()) {
 			Var var = pattern.getVariable(port);
-			Object value = ValueUtil.createArray(var.getType());
+			Object value = ValueUtil.createArray((TypeList) var.getType());
 			var.setValue(value);
 		}
 	}
@@ -228,7 +228,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 					indexes[i++] = exprInterpreter.doSwitch(index);
 				}
 
-				Type type = target.getType();
+				Type type = ((TypeList) source.getType()).getElementType();
 				Object value = ValueUtil.get(type, array, indexes);
 				target.setValue(value);
 			} catch (IndexOutOfBoundsException e) {
@@ -342,7 +342,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		for (Var local : procedure.getLocals()) {
 			Type type = local.getType();
 			if (type.isList()) {
-				Object value = ValueUtil.createArray(local.getType());
+				Object value = ValueUtil
+						.createArray((TypeList) local.getType());
 				local.setValue(value);
 			}
 		}
@@ -438,7 +439,8 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				if (initConst == null) {
 					if (type.isList()) {
 						// Allocate empty array variable
-						stateVar.setValue(ValueUtil.createArray(type));
+						stateVar.setValue(ValueUtil
+								.createArray((TypeList) type));
 					}
 				} else {
 					// initialize

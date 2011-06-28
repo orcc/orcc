@@ -43,6 +43,7 @@ import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ValueUtil;
 
@@ -129,7 +130,8 @@ public class AbstractInterpreter extends ActorInterpreter {
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				peeked.setValue(ValueUtil.createArray(peeked.getType()));
+				peeked.setValue(ValueUtil.createArray((TypeList) peeked
+						.getType()));
 
 				if (configuration != null && configuration.containsKey(port)
 						&& !portRead.get(port)) {
