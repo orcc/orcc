@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2011, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,21 +28,13 @@
  */
 package net.sf.orcc.interpreter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ExprBinary;
-import net.sf.orcc.ir.ExprBool;
-import net.sf.orcc.ir.ExprFloat;
-import net.sf.orcc.ir.ExprInt;
-import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.ExprString;
-import net.sf.orcc.ir.ExprUnary;
-import net.sf.orcc.ir.ExprVar;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstAssign;
 import net.sf.orcc.ir.InstCall;
@@ -67,14 +59,12 @@ import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 /**
- * This class defines an actor that can be interpreted by calling
- * {@link #initialize()} and {@link #schedule()}. It consists in an action
- * scheduler, an FSM state, and a node interpreter.
+ * This class defines an interpreter for an actor. The interpreter can
+ * {@link #initialize()} and {@link #schedule()} the actor.
  * 
  * @author Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
  * 
  */
 public class ActorInterpreter extends AbstractActorVisitor<Object> {
@@ -174,54 +164,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 	}
 
 	@Override
-	public Object caseExprBinary(ExprBinary expr) {
-		return null;
-	}
-
-	@Override
-	public Object caseExprBool(ExprBool expr) {
-		return expr.isValue();
-	}
-
-	@Override
-	public Object caseExprFloat(ExprFloat expr) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object caseExprInt(ExprInt expr) {
-		return expr.getIntValue();
-	}
-
-	@Override
-	public Object caseExprList(ExprList expr) {
-		Object[] values = new Object[expr.getValue().size()];
-		int i = 0;
-		for (Expression subExpr : expr.getValue()) {
-			if (subExpr != null) {
-				values[i] = doSwitch(subExpr);
-			}
-			i++;
-		}
-		return values;
-	}
-
-	@Override
-	public Object caseExprString(ExprString expr) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object caseExprUnary(ExprUnary expr) {
-		return null;
-	}
-
-	@Override
-	public Object caseExprVar(ExprVar expr) {
-		return expr.getUse().getVariable().getValue();
-	}
-
-	@Override
 	public Object caseInstAssign(InstAssign instr) {
 		try {
 			Var target = instr.getTarget().getVariable();
@@ -280,10 +222,10 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		} else {
 			try {
 				Object array = source.getValue();
-				List<Object> indexes = new ArrayList<Object>(instr.getIndexes()
-						.size());
+				Object[] indexes = new Object[instr.getIndexes().size()];
+				int i = 0;
 				for (Expression index : instr.getIndexes()) {
-					indexes.add(exprInterpreter.doSwitch(index));
+					indexes[i++] = exprInterpreter.doSwitch(index);
 				}
 
 				Type type = target.getType();
@@ -328,14 +270,14 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 		} else {
 			try {
 				Object array = target.getValue();
-				List<Object> indexes = new ArrayList<Object>(instr.getIndexes()
-						.size());
+				Object[] indexes = new Object[instr.getIndexes().size()];
+				int i = 0;
 				for (Expression index : instr.getIndexes()) {
-					indexes.add(exprInterpreter.doSwitch(index));
+					indexes[i++] = exprInterpreter.doSwitch(index);
 				}
 
 				Type type = ((TypeList) target.getType()).getElementType();
-				ValueUtil.set(type, array, value, indexes.toArray());
+				ValueUtil.set(type, array, value, indexes);
 			} catch (IndexOutOfBoundsException e) {
 				throw new OrccRuntimeException(
 						"Array index out of bounds at line "
@@ -484,7 +426,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			// Initialize actors parameters with instance map
 			for (Var param : actor.getParameters()) {
 				Expression value = parameters.get(param.getName());
-				param.setValue(EcoreUtil.copy(value));
+				param.setValue(exprInterpreter.doSwitch(value));
 			}
 
 			// Check for List state variables which need to be allocated or
@@ -551,16 +493,6 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 			throw new OrccRuntimeException("Runtime exception thrown by actor "
 					+ actor.getName(), ex);
 		}
-	}
-
-	/**
-	 * Sets the actor attribute.
-	 * 
-	 * @param actor
-	 *            an actor
-	 */
-	public void setActor(Actor actor) {
-		this.actor = actor;
 	}
 
 }

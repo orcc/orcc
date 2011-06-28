@@ -49,6 +49,21 @@ public class DisplayYUV {
 
 	private static Canvas canvas;
 
+	/**
+	 * display is disabled.
+	 */
+	public static final int DISPLAY_DISABLE = 0;
+
+	/**
+	 * display is enabled.
+	 */
+	public static final int DISPLAY_ENABLE = 2;
+
+	/**
+	 * display is ready.
+	 */
+	public static final int DISPLAY_READY = 1;
+
 	private static JFrame frame;
 
 	private static BufferedImage image;
@@ -81,8 +96,8 @@ public class DisplayYUV {
 	 * @param pictureHeight
 	 *            height
 	 */
-	public static void compareYUV_displayPicture(Object[] pictureBufferY,
-			Object[] pictureBufferU, Object[] pictureBufferV,
+	public static void compareYUV_comparePicture(short[] pictureBufferY,
+			short[] pictureBufferU, short[] pictureBufferV,
 			Integer pictureWidth, Integer pictureHeight) {
 
 	}
@@ -106,8 +121,8 @@ public class DisplayYUV {
 		return (r << 16) | (g << 8) | b;
 	}
 
-	public static void displayYUV_displayPicture(Object[] pictureBufferY,
-			Object[] pictureBufferU, Object[] pictureBufferV,
+	public static void displayYUV_displayPicture(short[] pictureBufferY,
+			short[] pictureBufferU, short[] pictureBufferV,
 			Integer pictureWidth, Integer pictureHeight) {
 		if (pictureWidth != lastWidth || pictureHeight != lastHeight) {
 			setVideoSize(pictureWidth, pictureHeight);
@@ -115,14 +130,12 @@ public class DisplayYUV {
 
 		for (int i = 0; i < pictureWidth / 2; i++) {
 			for (int j = 0; j < pictureHeight / 2; j++) {
-				int u = getInt(pictureBufferU[i + j * pictureWidth / 2]);
-				int v = getInt(pictureBufferV[i + j * pictureWidth / 2]);
-				int y0 = getInt(pictureBufferY[i * 2 + j * 2 * pictureWidth]);
-				int y1 = getInt(pictureBufferY[i * 2 + 1 + j * 2 * pictureWidth]);
-				int y2 = getInt(pictureBufferY[i * 2 + (j * 2 + 1)
-						* pictureWidth]);
-				int y3 = getInt(pictureBufferY[i * 2 + 1 + (j * 2 + 1)
-						* pictureWidth]);
+				int u = pictureBufferU[i + j * pictureWidth / 2];
+				int v = pictureBufferV[i + j * pictureWidth / 2];
+				int y0 = pictureBufferY[i * 2 + j * 2 * pictureWidth];
+				int y1 = pictureBufferY[i * 2 + 1 + j * 2 * pictureWidth];
+				int y2 = pictureBufferY[i * 2 + (j * 2 + 1) * pictureWidth];
+				int y3 = pictureBufferY[i * 2 + 1 + (j * 2 + 1) * pictureWidth];
 
 				int rgb0 = convertYCbCrtoRGB(y0, u, v);
 				int rgb1 = convertYCbCrtoRGB(y1, u, v);
@@ -142,9 +155,21 @@ public class DisplayYUV {
 			buffer.show();
 			graphics.dispose();
 		}
-
 	}
 
+	/**
+	 * Returns the flags of the display. This implementation returns a display
+	 * always enabled and ready.
+	 * 
+	 * @return the flags of the display
+	 */
+	public static int displayYUV_getFlags() {
+		return DISPLAY_ENABLE | DISPLAY_READY;
+	}
+
+	/**
+	 * Initializes the display.
+	 */
 	public static void displayYUV_init() {
 		frame = new JFrame("display");
 		frame.addWindowListener(new WindowAdapter() {
@@ -166,21 +191,6 @@ public class DisplayYUV {
 		canvas = new Canvas();
 		frame.add(canvas);
 		frame.setVisible(true);
-	}
-
-	/**
-	 * Return the given object casted as an Integer, or 0.
-	 * 
-	 * @param obj
-	 *            an object
-	 * @return the given object casted as an Integer, or 0
-	 */
-	private static int getInt(Object obj) {
-		if (obj instanceof Integer) {
-			return (Integer) obj;
-		} else {
-			return 0;
-		}
 	}
 
 	private static void setVideoSize(int newWidth, int newHeight) {

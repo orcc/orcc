@@ -183,7 +183,7 @@ public class ConnectedActorInterpreter extends ActorInterpreter {
 			Type type = ((TypeList) variable.getType()).getElementType();
 			Object array = variable.getValue();
 			for (int i = 0; i < numTokens; i++) {
-				Object value = ValueUtil.get(type, array, (Integer) i);
+				Object value = ValueUtil.get(type, array, i);
 				fifo.write(value);
 			}
 		}

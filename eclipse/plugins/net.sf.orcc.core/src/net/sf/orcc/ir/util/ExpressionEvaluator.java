@@ -160,9 +160,6 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 	public Object caseExprVar(ExprVar expr) {
 		Var var = expr.getUse().getVariable();
 		Object value = var.getValue();
-		if (value == null) {
-			value = doSwitch(var.getInitialValue());
-		}
 		if (value == null && throwException) {
 			throwException = false;
 			throw new OrccRuntimeException("Uninitialized variable: "
