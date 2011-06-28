@@ -1,40 +1,157 @@
 
+indexPort(port) ::= <<
+<if(instance.actor)
+><instance.actor.templateData.portToIndexMap.(port)><
+elseif(instance.broadcast)
+><instance.broadcast.portMap.(port)><
+endif>
+>>
+
+port(port) ::= <<
+Port('<port.name>', <indexPort(port)>)
+>>
+
+initPorts(instance) ::= <<
+<if(instance.actor)
+><instance.id>_inputs = [<instance.actor.inputs: port(); separator=", ">]
+<instance.id>_outputs = [<instance.actor.outputs: port(); separator=", ">]<
+elseif(instance.broadcast)
+><instance.id>_inputs = [<port(instance.broadcast.input)>]
+<instance.id>_outputs = [<instance.broadcast.outputs.list: port(); separator=", ">]<
+endif>
+>>
+
+initInstance(instance) ::= <<
+Instance('<instance.id>', <instance.id>_inputs, <instance.id>_outputs)
+>>
+
 script(network, options) ::= <<
 #!/usr/bin/env python
 #
 # Generated from <network.name> using Open-RVC CAL Compiler
 #
 
-import commands, sys, os, time
+import commands, sys, os, time, getopt
 
-start = time.time()
+class Port:
+	name = ''
+	index = 0
+	
+	def __init__(self, name, index):
+		self.name = name
+		self.index = index
 
-print '*********************************************************************'
-print '** Launching compilation of <network.name>' 
-print '** for Transport Trigger Architecture (using TCE tools)'
-print '*********************************************************************'
-             
+class Instance:
+	name = ''
+	inputs = []
+	outputs = []
+	
+	def __init__(self, name, inputs, outputs):
+		self.name = name
+		self.inputs = inputs
+		self.outputs = outputs
+	
+	def compile(self, scriptPath):
+		instancePath = os.path.join(scriptPath, self.name)
+		os.chdir(instancePath)
+		
+		adfFile = 'processor_' + self.name + '.adf'
+		llFile = self.name + '.ll'
+		tpefFile = self.name + '.tpef'
+
+		status,output = commands.getstatusoutput('tcecc -o ' + tpefFile + ' -a ' + adfFile + ' ' + llFile)
+		if status != 0:
+			print '** ERROR **'
+			print output
+		else:
+			asmFile = instancePath + os.sep + self.name + '.tceasm'
+			commands.getstatusoutput('tcedisasm -n -o ' + asmFile + ' ' + adfFile + ' ' + tpefFile)	
+			
+	def simulate(self, scriptPath): 
+		instancePath = os.path.join(scriptPath, self.name)
+		os.chdir(instancePath)
+		
+		# Copy trace to the instance folder
+		for input in self.inputs:
+			srcTrace = scriptPath + os.sep + 'trace' + os.sep + 'decoder_' + self.name + '_' + input.name + '.txt'
+			tgtTrace = instancePath + os.sep + 'tta_stream_v%d.in' % (input.index)
+			status,output = commands.getstatusoutput('cp ' + srcTrace + ' ' + tgtTrace)
+			if status != 0:
+				print output
+		
+		adfFile = 'processor_' + self.name + '.adf'
+		tpefFile = self.name + '.tpef'
+		status,output = commands.getstatusoutput('ttasim --no-debugmode -q -a ' + adfFile + ' -p ' + tpefFile)
+
+
+def main():
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "hcsx:v", ["help", "verbose", "compile", "simulate"])
+	except getopt.GetoptError, err:
+		print str(err)
+		usage()
+		sys.exit(2)
+		
+	for o, a in opts:
+		if o in ("-v", "--verbose"):
+			verbose = True
+		elif o in ("-h", "--help"):
+			usage()
+			sys.exit()
+			
+	for o, a in opts:
+		if o in ("-c", "--compile"):
+			compile()
+			
+	for o, a in opts:
+		if o in ("-s", "--simulate"):
+			simulate()
+	
+	
+def usage():
+	print 'tcecc_<network.name>: [-h] [-v]'
+
+
+def compile():
+	start = time.time()
+	
+	print '*********************************************************************'
+	print '** Compile <network.name> for TTA'
+	print '*********************************************************************'
+
+	for instance in instances:
+		print '\>\> Instance ' + instance.name + '.'
+		instance.compile(scriptPath)
+
+	print '** Compilation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
+	print '*********************************************************************'
+
+
+def simulate():
+	start = time.time()
+
+	print '*********************************************************************'
+	print '** Simulate the execution of <network.name> on TTA'
+	print '*********************************************************************'
+
+	for instance in instances:
+		print '\>\> Instance ' + instance.name + '.'
+		instance.simulate(scriptPath)
+
+	print '** Simulation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
+	print '*********************************************************************'
+
+
 pathname = os.path.dirname(sys.argv[0])        
 scriptPath = os.path.abspath(pathname)
+verbose = False
 
-instances = [<network.instances: { instance |'<instance.id>'}; wrap, separator=", ">]
+## Ports initialization
+<network.instances: initPorts(); separator="\n">
 
-for instance in instances:
-	print '\>\> Instance: ' + instance
+## Instances initialization
+instances = [<network.instances: initInstance(); wrap, separator=", ">]
 
-	instancePath = os.path.join(scriptPath, instance)
-	adfFile = instancePath + os.sep + 'processor_' + instance + '.adf'
-	llFile = instancePath + os.sep + instance + '.ll'
-	tpefFile = instancePath + os.sep + instance + '.tpef'
-	
-	status,output = commands.getstatusoutput('tcecc -o ' + tpefFile + ' -a ' + adfFile + ' ' + llFile)
-	if status != 0 :
-		print '** ERROR **'
-		print output
-	else :
-		asmFile = instancePath + os.sep + instance + '.tceasm'
-		commands.getstatusoutput('tcedisasm -n -o ' + asmFile + ' ' + adfFile + ' ' + tpefFile)		
-		
-print 'Compilation done in %f seconds' % (time.time() - start)
+main()
 		
 >>
