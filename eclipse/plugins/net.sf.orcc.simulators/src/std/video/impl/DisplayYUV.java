@@ -72,6 +72,10 @@ public class DisplayYUV {
 
 	private static int lastWidth;
 
+	private static long t1;
+
+	private static long t2;
+
 	private static int clip(int n) {
 		if (n < 0) {
 			return 0;
@@ -155,6 +159,10 @@ public class DisplayYUV {
 			buffer.show();
 			graphics.dispose();
 		}
+
+		t2 = System.currentTimeMillis();
+		System.out.println("image displayed in " + (t2 - t1) + " ms");
+		t1 = t2;
 	}
 
 	/**
@@ -191,6 +199,8 @@ public class DisplayYUV {
 		canvas = new Canvas();
 		frame.add(canvas);
 		frame.setVisible(true);
+
+		t1 = System.currentTimeMillis();
 	}
 
 	private static void setVideoSize(int newWidth, int newHeight) {
