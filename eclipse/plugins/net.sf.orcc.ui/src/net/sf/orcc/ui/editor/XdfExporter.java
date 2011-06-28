@@ -82,7 +82,6 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
-import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.attributes.ValueAttribute;
 import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.util.OrccUtil;
@@ -144,9 +143,13 @@ public class XdfExporter extends CalSwitch<Object> implements ITransformation {
 
 		// buffer size
 		Map<String, IAttribute> attributes = new HashMap<String, IAttribute>();
-		String bufferSize = (String) edge.getValue("bufferSize");
-		if (bufferSize != null) {
-			attributes.put("size", new StringAttribute(bufferSize));
+		String bufferSize = (String) edge.getValue("buffer size");
+		
+		if (bufferSize != null && bufferSize.length() != 0) {
+			Expression expr = IrFactory.eINSTANCE.createExprInt(Integer
+					.parseInt(bufferSize));
+			IValueAttribute attr = new ValueAttribute(expr);
+			attributes.put("bufferSize", attr);
 		}
 
 		// connection
