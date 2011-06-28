@@ -41,7 +41,6 @@ import java.util.Set;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
@@ -234,7 +233,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 *            a configuration
 	 * @return a static class
 	 */
-	private SDFMoC classifyFsmConfiguration(Map<Port, Expression> configuration) {
+	private SDFMoC classifyFsmConfiguration(Map<Port, Object> configuration) {
 		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
 
 		AbstractInterpreter interpretedActor = newInterpreter();
@@ -287,7 +286,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
-		Map<Action, Map<Port, Expression>> configurations = findConfigurationValues(ports);
+		Map<Action, Map<Port, Object>> configurations = findConfigurationValues(ports);
 		if (configurations.isEmpty()) {
 			System.out.println("no configurations for " + actor.getName());
 			return MocFactory.eINSTANCE.createKPNMoC();
@@ -297,7 +296,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		QSDFMoC quasiStatic = MocFactory.eINSTANCE.createQSDFMoC();
 
 		for (Action action : fsm.getTargetActions(initialState)) {
-			Map<Port, Expression> configuration = configurations.get(action);
+			Map<Port, Object> configuration = configurations.get(action);
 			if (configuration == null) {
 				System.out.println("no configuration for " + action.getName());
 				return MocFactory.eINSTANCE.createKPNMoC();
@@ -402,9 +401,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 * stores a constrained variable that will contain the value to read from
 	 * the configuration port when solved.
 	 */
-	private Map<Action, Map<Port, Expression>> findConfigurationValues(
+	private Map<Action, Map<Port, Object>> findConfigurationValues(
 			List<Port> ports) {
-		Map<Action, Map<Port, Expression>> configurations = new HashMap<Action, Map<Port, Expression>>();
+		Map<Action, Map<Port, Object>> configurations = new HashMap<Action, Map<Port, Object>>();
 		List<Action> previous = new ArrayList<Action>();
 
 		// visits the scheduler of each action departing from the initial state
@@ -413,7 +412,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		for (Action targetAction : fsm.getTargetActions(initialState)) {
 			// create the configuration for this action
 			GuardSatChecker checker = new GuardSatChecker(actor);
-			Map<Port, Expression> configuration = checker.computeTokenValues(
+			Map<Port, Object> configuration = checker.computeTokenValues(
 					ports, previous, targetAction);
 
 			// add the configuration

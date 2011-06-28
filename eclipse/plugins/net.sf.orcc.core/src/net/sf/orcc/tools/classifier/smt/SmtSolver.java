@@ -51,11 +51,9 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.sexp.SExp;
 import net.sf.orcc.util.sexp.SExpList;
@@ -87,13 +85,13 @@ public class SmtSolver {
 		 * @param list
 		 *            a list s-expression
 		 */
-		private Expression getExpression(SExp exp) {
+		private Object getExpression(SExp exp) {
 			if (exp.isSymbol()) {
 				SExpSymbol symbol = (SExpSymbol) exp;
 				if ("true".equals(symbol.getContents())) {
-					return IrFactory.eINSTANCE.createExprBool(true);
+					return true;
 				} else if ("false".equals(symbol.getContents())) {
-					return IrFactory.eINSTANCE.createExprBool(false);
+					return false;
 				}
 			} else if (exp.isList()) {
 				SExpList list = (SExpList) exp;
@@ -102,7 +100,7 @@ public class SmtSolver {
 					// remove "bv" from the symbol
 					String contents = bv.getContents().substring(2);
 					BigInteger value = new BigInteger(contents);
-					return IrFactory.eINSTANCE.createExprInt(value);
+					return ValueUtil.getIntValue(value);
 				}
 			}
 
@@ -146,16 +144,16 @@ public class SmtSolver {
 							exp = list.get(index);
 							index++;
 
-							Expression value;
+							Object value;
 							int numTokens = pattern.getNumTokens(port);
 							if (numTokens > 1) {
-								value = IrFactory.eINSTANCE.createExprList();
+								List<Object> values = new ArrayList<Object>();
 								SExpList portList = (SExpList) exp;
 								for (int i = 0; i < numTokens; i++) {
-									exp = portList.get(i);
-									Expression tok = getExpression(exp);
-									((ExprList) value).getValue().add(tok);
+									SExp subExpr = portList.get(i);
+									values.add(getExpression(subExpr));
 								}
+								value = values.toArray();
 							} else {
 								value = getExpression(exp);
 							}
@@ -171,7 +169,7 @@ public class SmtSolver {
 
 	private Actor actor;
 
-	private Map<Port, Expression> assertions;
+	private Map<Port, Object> assertions;
 
 	private List<String> options;
 
@@ -191,7 +189,7 @@ public class SmtSolver {
 	 *            the actor
 	 */
 	public SmtSolver(Actor actor) {
-		assertions = new HashMap<Port, Expression>();
+		assertions = new HashMap<Port, Object>();
 
 		this.actor = actor;
 		IFile file = actor.getFile();
@@ -282,7 +280,7 @@ public class SmtSolver {
 	 * 
 	 * @return the assertions as a map between ports and associated values
 	 */
-	public Map<Port, Expression> getAssertions() {
+	public Map<Port, Object> getAssertions() {
 		return assertions;
 	}
 

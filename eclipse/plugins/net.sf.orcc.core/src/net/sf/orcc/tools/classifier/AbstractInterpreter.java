@@ -34,14 +34,13 @@ import java.util.Map;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ExprBool;
-import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstPhi;
 import net.sf.orcc.ir.NodeIf;
 import net.sf.orcc.ir.NodeWhile;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.ActorInterpreter;
@@ -56,7 +55,7 @@ import net.sf.orcc.ir.util.ValueUtil;
  */
 public class AbstractInterpreter extends ActorInterpreter {
 
-	private Map<Port, Expression> configuration;
+	private Map<Port, Object> configuration;
 
 	private Map<Port, Boolean> portRead;
 
@@ -80,13 +79,8 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	@Override
 	public void execute(Action action) {
-		// allocate patterns
-		Pattern inputPattern = action.getInputPattern();
-		Pattern outputPattern = action.getOutputPattern();
-		allocatePattern(inputPattern);
-		allocatePattern(outputPattern);
-
 		scheduledAction = action;
+		Pattern inputPattern = action.getInputPattern();
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
 			if (configuration != null && configuration.containsKey(port)
@@ -103,8 +97,14 @@ public class AbstractInterpreter extends ActorInterpreter {
 			port.increaseTokenConsumption(numTokens);
 		}
 
+		// allocate output pattern (but not input pattern)
+		Pattern outputPattern = action.getOutputPattern();
+		allocatePattern(outputPattern);
+
+		// execute action
 		doSwitch(action.getBody());
 
+		// update token production
 		for (Port port : outputPattern.getPorts()) {
 			int numTokens = outputPattern.getNumTokens(port);
 			port.increaseTokenProduction(numTokens);
@@ -125,18 +125,20 @@ public class AbstractInterpreter extends ActorInterpreter {
 	protected boolean isSchedulable(Action action) {
 		// do not check the number of tokens present on FIFOs
 
-		// allocates peeked variables
 		Pattern pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
 			if (peeked != null) {
-				peeked.setValue(ValueUtil.createArray((TypeList) peeked
-						.getType()));
-
 				if (configuration != null && configuration.containsKey(port)
 						&& !portRead.get(port)) {
-					ExprList target = (ExprList) peeked.getValue();
-					target.set(0, configuration.get(port));
+					// allocates peeked variables
+					TypeList typeList = (TypeList) peeked.getType();
+					Object array = ValueUtil.createArray(typeList);
+					peeked.setValue(array);
+
+					Type type = typeList.getType();
+					Object value = configuration.get(port);
+					ValueUtil.set(type, array, value, 0);
 				}
 			}
 		}
@@ -149,8 +151,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 				throw new OrccRuntimeException("could not determine if action "
 						+ action.toString() + " is schedulable");
 			}
-			return (result instanceof ExprBool)
-					&& ((ExprBool) result).isValue();
+			return ValueUtil.isTrue(result);
 		} finally {
 			// disable schedulable mode
 			setSchedulableMode(false);
@@ -163,7 +164,7 @@ public class AbstractInterpreter extends ActorInterpreter {
 	 * @param configuration
 	 *            a configuration as a map of ports and values
 	 */
-	public void setConfiguration(Map<Port, Expression> configuration) {
+	public void setConfiguration(Map<Port, Object> configuration) {
 		this.configuration = configuration;
 		portRead = new HashMap<Port, Boolean>(configuration.size());
 		for (Port port : configuration.keySet()) {

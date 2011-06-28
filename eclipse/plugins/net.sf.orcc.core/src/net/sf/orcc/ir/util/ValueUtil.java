@@ -217,6 +217,10 @@ public class ValueUtil {
 	 * @return
 	 */
 	public static Object get(Type type, Object array, Object... indexes) {
+		if (array == null) {
+			return null;
+		}
+		
 		int numIndexes = indexes.length;
 		for (int i = 0; i < numIndexes - 1; i++) {
 			int index = getIntValue(indexes[i]);
@@ -638,6 +642,10 @@ public class ValueUtil {
 	 */
 	public static void set(Type type, Object array, Object value,
 			Object... indexes) {
+		if (array == null || value == null) {
+			return;
+		}
+		
 		int numIndexes = indexes.length;
 		for (int i = 0; i < numIndexes - 1; i++) {
 			int index = getIntValue(indexes[i]);
