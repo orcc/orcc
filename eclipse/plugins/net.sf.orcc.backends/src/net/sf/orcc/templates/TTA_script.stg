@@ -5,7 +5,9 @@ script(network, options) ::= <<
 # Generated from <network.name> using Open-RVC CAL Compiler
 #
 
-import commands, sys, os
+import commands, sys, os, time
+
+start = time.time()
 
 print '*********************************************************************'
 print '** Launching compilation of <network.name>' 
@@ -18,6 +20,8 @@ scriptPath = os.path.abspath(pathname)
 instances = [<network.instances: { instance |'<instance.id>'}; wrap, separator=", ">]
 
 for instance in instances:
+	print '\>\> Instance: ' + instance
+
 	instancePath = os.path.join(scriptPath, instance)
 	adfFile = instancePath + os.sep + 'processor_' + instance + '.adf'
 	llFile = instancePath + os.sep + instance + '.ll'
@@ -25,13 +29,12 @@ for instance in instances:
 	
 	status,output = commands.getstatusoutput('tcecc -o ' + tpefFile + ' -a ' + adfFile + ' ' + llFile)
 	if status != 0 :
-		print '******** Error during the compilation of ' + instance + '.ll'
+		print '** ERROR **'
 		print output
 	else :
 		asmFile = instancePath + os.sep + instance + '.tceasm'
-		commands.getstatusoutput('tcedisasm -n -o ' + asmFile + ' ' + adfFile + ' ' + tpefFile)
+		commands.getstatusoutput('tcedisasm -n -o ' + asmFile + ' ' + adfFile + ' ' + tpefFile)		
 		
-		
-print '** Compilation done'
+print 'Compilation done in %f seconds' % (time.time() - start)
 		
 >>
