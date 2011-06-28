@@ -32,11 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
-
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -53,7 +50,7 @@ import net.sf.orcc.util.EcoreHelper;
  */
 public class ActorState {
 
-	private Map<Var, Expression> state;
+	private Map<Var, Object> state;
 
 	/**
 	 * Creates a new actor state initialized to all the state variables of the
@@ -63,11 +60,10 @@ public class ActorState {
 	 *            an actor
 	 */
 	public ActorState(Actor actor) {
-		state = new HashMap<Var, Expression>();
+		state = new HashMap<Var, Object>();
 		for (Var variable : actor.getStateVars()) {
 			Type type = variable.getType();
-			Expression constant = variable.getInitialValue();
-			if (constant != null && !type.isList()) {
+			if (variable.isInitialized() && !type.isList()) {
 				// we might consider this constant if it is used by guards
 				boolean usedByGuard = false;
 				for (Use use : variable.getUses()) {
@@ -106,14 +102,14 @@ public class ActorState {
 	 * @return <code>true</code> if the condition stated above holds
 	 */
 	public boolean isInitialState() {
-		for (Entry<Var, Expression> entry : state.entrySet()) {
+		for (Entry<Var, Object> entry : state.entrySet()) {
 			Var stateVariable = entry.getKey();
-			Expression value = stateVariable.getValue();
+			Object value = stateVariable.getValue();
 			if (value == null) {
 				// oops not static!
 				throw new OrccRuntimeException("null state variable");
 			} else {
-				if (!EcoreUtil.equals(value, entry.getValue())) {
+				if (!value.equals(entry.getValue())) {
 					return false;
 				}
 			}
