@@ -28,29 +28,14 @@
  */
 package net.sf.orcc.backends.xlim.transformations;
 
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 
 import net.sf.orcc.interpreter.ActorInterpreter;
-import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ExprBool;
-import net.sf.orcc.ir.ExprInt;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.InstCall;
-import net.sf.orcc.ir.InstStore;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Node;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.IrUtil;
-
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * 
@@ -58,103 +43,39 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
  * by a procedure
  * 
  * @author Herve Yviquel
+ * @author Matthieu Wipliez
  * 
  */
 public class GlobalArrayInitializer extends AbstractActorVisitor<Object> {
 
-	private class SpecialActorInterpreter extends ActorInterpreter {
-
-		public SpecialActorInterpreter(Actor actor,
-				Map<String, Expression> parameters) {
-			super(actor, parameters);
-		}
-
-		@Override
-		public Object caseInstStore(InstStore instr) {
-			Var target = instr.getTarget().getVariable();
-			Type type = target.getType();
-			// Allocate value field of list if it is initialized
-			if (type.isList() && target.getValue() == null) {
-				target.setValue((Expression) listAllocator.doSwitch(type));
-			}
-			return super.caseInstStore(instr);
-		}
-
-	}
-
-	private ActorInterpreter actorInterpreter;
-
 	private boolean initToZero;
-
-	private ListAllocator listAllocator;
 
 	public GlobalArrayInitializer(boolean initToZero) {
 		this.initToZero = initToZero;
-		listAllocator = new ListAllocator(initToZero);
 	}
 
 	@Override
 	public Object caseActor(Actor actor) {
-		actorInterpreter = new SpecialActorInterpreter(actor,
-				new HashMap<String, Expression>(0));
+		ActorInterpreter actorInterpreter = new ActorInterpreter(actor,
+				Collections.<String, Expression> emptyMap());
 
-		// Initialize value field if there is an initial value
-		for (Var stateVar : actor.getStateVars()) {
-			Expression initConst = stateVar.getInitialValue();
-			if (initConst != null) {
-				stateVar.setValue(IrUtil.copy(initConst));
-			}
-		}
+		// initialize variables
+		actorInterpreter.initialize();
 
-		for (Action action : actor.getInitializes()) {
-			for (Node node : action.getBody().getNodes()) {
-				actorInterpreter.doSwitch(node);
-				this.doSwitch(node);
-
-			}
-		}
-
-		// Copy computed value to initialValue field and clean value field
-		for (Var stateVar : actor.getStateVars()) {
-			Type type = stateVar.getType();
-			if (type.isList() && stateVar.getInitialValue() == null
-					&& stateVar.getValue() != null) {
-				stateVar.setInitialValue(IrUtil.copy(stateVar.getValue()));
-			} else if (stateVar.getInitialValue() == null && initToZero) {
-				if (type.isList()) {
-					stateVar.setInitialValue(listAllocator.doSwitch(stateVar
-							.getType()));
-				} else {
-					stateVar.setInitialValue(IrFactory.eINSTANCE
-							.createExprInt(0));
+		if (initToZero) {
+			for (Var stateVar : actor.getStateVars()) {
+				Type type = stateVar.getType();
+				if (stateVar.getInitialValue() == null) {
+					if (type.isBool()) {
+						stateVar.setValue(false);
+					} else if (type.isInt()) {
+						stateVar.setValue(0);
+					}
 				}
-				initializeExpression(stateVar.getInitialValue());
 			}
 		}
 
 		return null;
-	}
-
-	@Override
-	public Object caseInstCall(InstCall call) {
-		// Set initialize to native so it will not be printed
-		call.getProcedure().setNative(true);
-		return null;
-	}
-
-	private void initializeExpression(Expression expr) {
-		TreeIterator<EObject> it = EcoreUtil.getAllContents(expr, true);
-		while (it.hasNext()) {
-			EObject object = it.next();
-
-			if (object instanceof ExprInt) {
-				ExprInt exprInt = (ExprInt) object;
-				exprInt.setValue(BigInteger.ZERO);
-			} else if (object instanceof Use) {
-				ExprBool exprBool = (ExprBool) object;
-				exprBool.setValue(false);
-			}
-		}
 	}
 
 }
