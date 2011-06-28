@@ -35,6 +35,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.ExprBool;
 import net.sf.orcc.ir.ExprInt;
+import net.sf.orcc.ir.ExprList;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.IrPackage;
@@ -92,24 +93,6 @@ public class ValueUtil {
 	}
 
 	/**
-	 * Creates a new array that matches the given type.
-	 * 
-	 * @param type
-	 *            a type of list
-	 * @return an array
-	 */
-	public static Object createArray(TypeList type) {
-		List<Integer> listDimensions = type.getDimensions();
-		int[] dimensions = new int[listDimensions.size()];
-		for (int i = 0; i < dimensions.length; i++) {
-			dimensions[i] = listDimensions.get(i);
-		}
-
-		Type eltType = ((TypeList) type).getElementType();
-		return createArray(eltType, dimensions);
-	}
-
-	/**
 	 * Creates a new array whose elements have the given type, and with the
 	 * given number of dimensions.
 	 * 
@@ -155,6 +138,24 @@ public class ValueUtil {
 		} else {
 			throw new IllegalArgumentException("expected scalar type");
 		}
+	}
+
+	/**
+	 * Creates a new array that matches the given type.
+	 * 
+	 * @param type
+	 *            a type of list
+	 * @return an array
+	 */
+	public static Object createArray(TypeList type) {
+		List<Integer> listDimensions = type.getDimensions();
+		int[] dimensions = new int[listDimensions.size()];
+		for (int i = 0; i < dimensions.length; i++) {
+			dimensions[i] = listDimensions.get(i);
+		}
+
+		Type eltType = ((TypeList) type).getElementType();
+		return createArray(eltType, dimensions);
 	}
 
 	/**
@@ -287,6 +288,13 @@ public class ValueUtil {
 			return IrFactory.eINSTANCE.createExprBool((Boolean) value);
 		} else if (isInt(value)) {
 			return IrFactory.eINSTANCE.createExprInt(getBigInteger(value));
+		} else if (isList(value)) {
+			ExprList list = IrFactory.eINSTANCE.createExprList();
+			int length = Array.getLength(value);
+			for (int i = 0; i < length; i++) {
+				list.getValue().add(getExpression(Array.get(value, i)));
+			}
+			return list;
 		} else {
 			return null;
 		}
@@ -325,6 +333,10 @@ public class ValueUtil {
 			return ((Long) value).intValue();
 		} else if (value instanceof BigInteger) {
 			return ((BigInteger) value).intValue();
+		} else if (value instanceof Byte) {
+			return ((Byte) value).intValue();
+		} else if (value instanceof Short) {
+			return ((Short) value).intValue();
 		} else {
 			return 0;
 		}
@@ -414,7 +426,8 @@ public class ValueUtil {
 	 * @return <code>true</code> if value is an integer
 	 */
 	public static boolean isInt(Object value) {
-		return (value instanceof Integer || value instanceof Long || value instanceof BigInteger);
+		return (value instanceof Byte || value instanceof Short
+				|| value instanceof Integer || value instanceof Long || value instanceof BigInteger);
 	}
 
 	/**
