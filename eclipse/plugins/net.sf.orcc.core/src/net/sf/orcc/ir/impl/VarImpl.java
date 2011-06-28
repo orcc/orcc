@@ -536,7 +536,7 @@ public class VarImpl extends EObjectImpl implements Var {
 
 	@Override
 	public boolean isInitialized() {
-		return (initialValue != null);
+		return (initialValue != null || value != null);
 	}
 
 	@Override
