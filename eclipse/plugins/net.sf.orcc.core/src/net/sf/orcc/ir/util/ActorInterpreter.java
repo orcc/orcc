@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.interpreter;
+package net.sf.orcc.ir.util;
 
 import java.util.List;
 import java.util.Map;
@@ -54,9 +54,6 @@ import net.sf.orcc.ir.Transitions;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
-import net.sf.orcc.ir.util.AbstractActorVisitor;
-import net.sf.orcc.ir.util.ExpressionEvaluator;
-import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.util.OrccUtil;
 
 /**
@@ -394,7 +391,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 				if (checkOutputPattern(action.getOutputPattern())) {
 					return action;
 				}
-				break;
+				return null;
 			}
 		}
 
@@ -409,7 +406,7 @@ public class ActorInterpreter extends AbstractActorVisitor<Object> {
 						fsmState = transition.getState();
 						return action;
 					}
-					break;
+					return null;
 				}
 			}
 		}

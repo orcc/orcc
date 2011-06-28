@@ -128,15 +128,6 @@ public class Fifo {
 	}
 
 	/**
-	 * Returns the level of the fifo.
-	 * 
-	 * @return fifo level
-	 */
-	public int getLevel() {
-		return fillCount;
-	}
-
-	/**
 	 * Returns the name of the fifo (name of writing actor and its corresponding
 	 * output port.
 	 * 

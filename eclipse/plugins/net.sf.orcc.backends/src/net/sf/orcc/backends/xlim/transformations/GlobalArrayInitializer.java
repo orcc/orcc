@@ -30,12 +30,12 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.Collections;
 
-import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.ActorInterpreter;
 
 /**
  * 

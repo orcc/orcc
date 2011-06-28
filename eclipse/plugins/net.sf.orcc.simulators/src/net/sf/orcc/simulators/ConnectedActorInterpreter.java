@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprString;
@@ -44,6 +43,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
+import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.ValueUtil;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.util.OrccUtil;

@@ -42,13 +42,13 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
+import net.sf.orcc.ir.util.ActorInterpreter;
 import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
 import net.sf.orcc.network.Connection;
