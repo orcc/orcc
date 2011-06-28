@@ -46,6 +46,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
@@ -77,11 +78,8 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 
 			// if no exception has been thrown, throw it now
 			throw new OrccRuntimeException(
-					"Could not evaluate binary expression " + " expr " + expr
-							+ " " + expr.getOp().toString() + "(" + " exp1: "
-							+ expr.getE1() + " = " + val1
-							+ expr.getOp().getText() + " exp2: " + expr.getE2()
-							+ " = " + val2 + ")\n");
+					"Could not evaluate binary expression:\n"
+							+ new ExpressionPrinter().doSwitch(expr) + "\n");
 		}
 		return result;
 	}
@@ -169,6 +167,14 @@ public class ExpressionEvaluator extends IrSwitch<Object> {
 					+ var.getName());
 		}
 		return value;
+	}
+
+	@Override
+	public Object doSwitch(EObject eObject) {
+		if (eObject == null) {
+			return null;
+		}
+		return super.doSwitch(eObject);
 	}
 
 	/**
