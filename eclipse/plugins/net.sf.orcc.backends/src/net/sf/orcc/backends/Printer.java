@@ -59,6 +59,16 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
  */
 public class Printer {
 
+	protected static class EMapModelAdaptor implements ModelAdaptor {
+
+		@Override
+		public Object getProperty(Interpreter interp, ST st, Object o,
+				Object property, String propertyName)
+				throws STNoSuchPropertyException {
+			return ((EMap<?, ?>) o).get(property);
+		}
+	}
+
 	protected class ExpressionRenderer implements AttributeRenderer {
 
 		@Override
@@ -99,15 +109,7 @@ public class Printer {
 		group.registerRenderer(Expression.class, new ExpressionRenderer());
 		group.registerRenderer(Type.class, new TypeRenderer());
 
-		group.registerModelAdaptor(EMap.class, new ModelAdaptor() {
-
-			@Override
-			public Object getProperty(Interpreter interp, ST st, Object o,
-					Object property, String propertyName)
-					throws STNoSuchPropertyException {
-				return ((EMap<?, ?>) o).get(property);
-			}
-		});
+		group.registerModelAdaptor(EMap.class, new EMapModelAdaptor());
 
 		options = new HashMap<String, Object>();
 		customAttributes = new HashMap<String, Object>();

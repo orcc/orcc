@@ -85,7 +85,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	private boolean hardwareGen;
 
 	private Map<String, String> mapping;
-	
+
 	private boolean multi2mono;
 
 	private Map<Integer, List<Instance>> computeMapping(Network network,
@@ -121,7 +121,6 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		
 		XlimActorTemplateData data = new XlimActorTemplateData();
 		actor.setTemplateData(data);
 
@@ -148,7 +147,7 @@ public class XlimBackendImpl extends AbstractBackend {
 						+ actor.getName());
 			}
 		}
-		
+
 		data.computeTemplateMaps(actor);
 	}
 
