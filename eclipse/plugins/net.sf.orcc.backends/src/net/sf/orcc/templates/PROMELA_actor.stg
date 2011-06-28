@@ -250,19 +250,28 @@ memcpy(<variable.name>, <variable.name>_backup, sizeof(<variable.name>_backup));
 ///////////////////////////////////////////////////////////////////////////////
 
 newState() ::= << 
-:: <instance.id>_state == state_<fsm_trans.SourceState.name> -\> {
+::	<instance.id>_state == state_<fsm_trans.SourceState.name> -\> {
 	<fsm_trans.list: { tr | <peekPattern(pattern=tr.action.peekPattern, action=tr.action)>}>
-	if
-	<fsm_trans.list: {
-			tr|
-:: <tr.action: schedulerFSM(); separator="\n"> }>
-	fi;}
+	<actionsInState(fsm_trans.list)>
+	}
+>>
+
+actionsInState(trans) ::= <<
+if
+:: <first(trans): {tr | <schedulerFSM(tr.action)> }>
+:: else -\>
+	<if (rest(trans))><actionsInState(rest(trans))><else>skip;<endif>
+fi;
+
 >>
 
 schedulerFSM(action) ::= <<
 	/* <action.name> */ atomic { 
-	<guardFSM()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
-	-\> 
+	<guardFSM()>
+	-\>
+	// Block on channels if needed
+	<inputChannelCheck(action.inputPattern)>
+	<outputChannelCheck(action.outputPattern)>
 	/* Temp variables*/
 	int promela_io_index; // used for reading/writing multiple tokens
 	<if(action.body.locals)>
@@ -286,7 +295,6 @@ schedulerFSM(action) ::= <<
 guardFSM() ::= <<
 <if (options.guards.(action))>
  <options.guards.(action); separator=" && ">
- <options.priority.(action): priorities()>
 <else>
 skip
 <endif>
@@ -299,8 +307,12 @@ skip
 
 scheduler(action) ::= <<
 :: /* <action.name> */ atomic { 
-	<guard()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
+	<guard()>
 	-\>
+	// Block on channels if needed
+	<inputChannelCheck(action.inputPattern)> 
+	<outputChannelCheck(action.outputPattern)>
+	
 	/* Temp variables*/
 	int promela_io_index; // used for reading/writing multiple tokens
 	<if(action.body.locals)>
@@ -381,22 +393,13 @@ peekPattern(pattern, action) ::= <<
 >>
 
 inputChannelCheck(pattern) ::= <<
-<pattern.ports: {port | && nempty(chan_<instance.id>_<port.name>)} >
+<pattern.ports: {port | nempty(chan_<instance.id>_<port.name>)};separator=" && " ><if (pattern.ports)>;<endif>
 >>
 
 outputChannelCheck(pattern) ::= <<
-<pattern.ports: {port | && nfull(chan_<instance.id>_<port.name>)} >
+<pattern.ports: {port | nfull(chan_<instance.id>_<port.name>)};separator=" && " ><if (pattern.ports)>;<endif>
 >>
 
-// needed in case of time dependent condition, not used yet
-
-negInputChannelCheck(pattern) ::= <<
-<pattern.ports: {port | || empty(chan_<instance.id>_<port.name>)} >
->>
-
-negOutputChannelCheck(pattern) ::= <<
-<pattern.ports: {port | || full(chan_<instance.id>_<port.name>)} >
->>
 
 
 ///////////////////////////////////////////////////////////////////////////////
