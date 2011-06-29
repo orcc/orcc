@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.eclipse.emf.ecore.EObject;
+
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ExprBinary;
@@ -56,7 +58,7 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 
 	private Map<Action, List<Expression>> guards;
 	
-	private Map<Action, List<Action>> priority;
+	private Map<EObject, List<Action>> priority;
 	
 	private Map<Action, List<InstLoad>> loadPeeks;
 
@@ -68,26 +70,12 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 	
 	private int peekCnt = 0;
 
-	public GuardsExtractor(Map<Action, List<Expression>> guards, Map<Action, List<Action>> priority, Map<Action, List<InstLoad>> loadPeeks) {
+	public GuardsExtractor(Map<Action, List<Expression>> guards, Map<EObject, List<Action>> priority, Map<Action, List<InstLoad>> loadPeeks) {
 		this.guards = guards;
 		this.priority = priority;
 		this.loadPeeks = loadPeeks;
 	}
 
-	// takes the guard from the previous action and negates it and adds it to
-	// the guard of this action which has lower priority
-	private void addPriorityToGuard(Action action, List<Action> prevActions) {
-		//Expression prty;
-		// if there is no guard add the guard "true"
-		if (guards.get(action).isEmpty()) {
-			guards.get(action).add(0, IrFactory.eINSTANCE.createExprBool(true));
-		}
-		// add list actions with higher priority to be used in the guard
-		for (Action a : prevActions) {
-			priority.get(action).add(a);
-		}
-		prevActions.add(action);
-	}
 
 	// If the local variable derived from this variable is used in an expression
 	// then the variable is put directly in the expression instead
@@ -147,22 +135,28 @@ public class GuardsExtractor extends AbstractActorVisitor<Object> {
 		// The easy way is to for each action add the "not guard" of the
 		// previous action, this is now done in the stringtemplate, here
 		// we only list the actions with higher priority.
-		if (!actor.hasFsm()) {
+		if (!actor.getActionsOutsideFsm().isEmpty()) {
 			List<Action> prevActions = new ArrayList<Action>();
-			for (Action action : actor.getActions()) {
+			for (Action action : actor.getActionsOutsideFsm()) {
 				priority.put(action, new ArrayList<Action>());
-				addPriorityToGuard(action, prevActions);
+				for (Action a : prevActions) {
+					priority.get(action).add(a);
+				}
+				prevActions.add(action);
 			}
 		}
 		// Actions in the FSM appear in
-		// actionScheduler->transition<List>->nextStateinfo<List> also in oder
+		// actionScheduler->transition<List> also in order
 		// of priority
-		else {
+		if (actor.hasFsm()) {
 			for (Transitions transitions : actor.getFsm().getTransitions()) {
 				List<Action> prevActions = new ArrayList<Action>();
 				for (Transition trans : transitions.getList()) {
-					priority.put(trans.getAction(), new ArrayList<Action>());
-					addPriorityToGuard(trans.getAction(), prevActions);
+					priority.put(trans, new ArrayList<Action>());
+					for (Action a : prevActions) {
+						priority.get(trans).add(a);
+					}
+					prevActions.add(trans.getAction());
 				}
 			}
 		}

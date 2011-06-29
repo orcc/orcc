@@ -245,6 +245,11 @@ memcpy(<variable.name>, <variable.name>_backup, sizeof(<variable.name>_backup));
 <endif>
 >>
 
+parameters(parameters) ::= <<
+<parameters.keys: { k | int <k> = <Constant(parameters.(k))>;
+}>
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with fsm
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,26 +257,20 @@ memcpy(<variable.name>, <variable.name>_backup, sizeof(<variable.name>_backup));
 newState() ::= << 
 ::	<instance.id>_state == state_<fsm_trans.SourceState.name> -\> {
 	<fsm_trans.list: { tr | <peekPattern(pattern=tr.action.peekPattern, action=tr.action)>}>
-	<actionsInState(fsm_trans.list)>
+	<actor.actionsOutsideFsm: { a | <peekPattern(pattern=a.peekPattern,action=a)>}>
+	if
+	<fsm_trans.list: {
+			tr|
+::	<tr.action: schedulerFSM(); separator="\n"> }>
+	<actor.actionsOutsideFsm: scheduler(); separator="\n">
+	fi;
 	}
->>
-
-actionsInState(trans) ::= <<
-if
-:: <first(trans): {tr | <schedulerFSM(tr.action)> }>
-:: else -\>
-	<if (rest(trans))><actionsInState(rest(trans))><else>skip;<endif>
-fi;
-
 >>
 
 schedulerFSM(action) ::= <<
 	/* <action.name> */ atomic { 
-	<guardFSM()>
-	-\>
-	// Block on channels if needed
-	<inputChannelCheck(action.inputPattern)>
-	<outputChannelCheck(action.outputPattern)>
+	<guardFSM()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
+	-\> 
 	/* Temp variables*/
 	int promela_io_index; // used for reading/writing multiple tokens
 	<if(action.body.locals)>
@@ -294,9 +293,9 @@ schedulerFSM(action) ::= <<
 
 guardFSM() ::= <<
 <if (options.guards.(action))>
- <options.guards.(action); separator=" && ">
+ <options.guards.(action); separator=" && "><options.priority.(tr): priorities()>
 <else>
-skip
+skip <options.priority.(tr): priorities()>
 <endif>
 >>
 
@@ -307,11 +306,8 @@ skip
 
 scheduler(action) ::= <<
 :: /* <action.name> */ atomic { 
-	<guard()>
+	<guard()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
 	-\>
-	// Block on channels if needed
-	<inputChannelCheck(action.inputPattern)> 
-	<outputChannelCheck(action.outputPattern)>
 	
 	/* Temp variables*/
 	int promela_io_index; // used for reading/writing multiple tokens
@@ -327,18 +323,20 @@ scheduler(action) ::= <<
 >>
 
 guard() ::= <<
-<options.guards.(action); separator=" && ">
-<options.priority.(action): priorities()>
+<if (options.guards.(action))>
+ <options.guards.(action); separator=" && "><options.priority.(action): priorities()>
+<else>
+skip <options.priority.(action): priorities()>
+<endif>
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action Templates
 ///////////////////////////////////////////////////////////////////////////////
 
-priorities(act) ::= << 
- /*priority*/ 
- && !(<options.guards.(act); separator=" && ">)
-
+priorities(act) ::= <<  
+<if (options.guards.(act))> && !(<options.guards.(act); separator=" && ">)<endif>
 >> 
 
 inputPatternPort(variable) ::= <<
@@ -347,7 +345,7 @@ do
 :: promela_io_index \< <variable.type.dimensions> -\> 
 	chan_<instance.id>_<pattern.varToPortMap.(variable).name>?<variable.name>[promela_io_index];
 	promela_io_index = promela_io_index + 1;
-:: else -\> break
+:: else -\> break;
 od;
 
 >>
@@ -362,7 +360,7 @@ do
 :: promela_io_index \< <variable.type.dimensions> -\> 
 	chan_<instance.id>_<pattern.varToPortMap.(variable).name>!<variable.name>[promela_io_index];
 	promela_io_index = promela_io_index + 1;
-:: else -\> break
+:: else -\> break;
 od;
 
 >>
@@ -393,11 +391,11 @@ peekPattern(pattern, action) ::= <<
 >>
 
 inputChannelCheck(pattern) ::= <<
-<pattern.ports: {port | nempty(chan_<instance.id>_<port.name>)};separator=" && " ><if (pattern.ports)>;<endif>
+<if (pattern.ports)> && <pattern.ports: {port | nempty(chan_<instance.id>_<port.name>)};separator=" && " ><endif>
 >>
 
 outputChannelCheck(pattern) ::= <<
-<pattern.ports: {port | nfull(chan_<instance.id>_<port.name>)};separator=" && " ><if (pattern.ports)>;<endif>
+<if (pattern.ports)> && <pattern.ports: {port | nfull(chan_<instance.id>_<port.name>)};separator=" && " ><endif>
 >>
 
 
@@ -417,6 +415,9 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 	/* State variables */
 	<actor.stateVars : stateVar()>
 	<actor.stateVars : initializeStateVar()>
+	
+	/* Parameters*/
+	<parameters(instance.parameters)>
 	
 	/* Ports */
     < [instance.actor.inputs, instance.actor.outputs] : portDeclaration(); separator="\n">

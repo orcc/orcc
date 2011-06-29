@@ -52,6 +52,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines a template-based PROMELA back-end.
@@ -63,7 +64,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 
-	private Map<Action, List<Action>> priority = new HashMap<Action, List<Action>>();
+	private Map<EObject, List<Action>> priority = new HashMap<EObject, List<Action>>();
 	
 	private Map<Action, List<InstLoad>> loadPeeks = new HashMap<Action, List<InstLoad>>();
 	
