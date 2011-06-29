@@ -104,9 +104,9 @@ public class TTABackendImpl extends AbstractBackend {
 				new TtaTypeResizer(), new BoolToIntTransformation(),
 				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
-				new TacTransformation(true), new CastAdder(true, false),
+				new TacTransformation(true), 
 				new InstPhiTransformation(), new GetElementPtrAdder(),
-				new BlockCombine(), new BuildCFG() };
+				new CastAdder(true, false), new BlockCombine(), new BuildCFG() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
