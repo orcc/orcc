@@ -28,14 +28,12 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
-import java.util.List;
-
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
+import net.sf.orcc.ir.util.ValueUtil;
 
 /**
  * This class defines an actor transformation that transforms declarations of
@@ -48,38 +46,54 @@ import net.sf.orcc.ir.util.AbstractActorVisitor;
  */
 public class ListDeclarationTransformation extends AbstractActorVisitor<Object> {
 
-	/**
-	 * Flattens a multi-dimensional list expression to a list with a single
-	 * dimension.
-	 * 
-	 * @param expression
-	 *            an expression
-	 * @param list
-	 *            a list expression
-	 */
-	private void flattenList(Expression expression, ExprList list) {
-		if (expression.isListExpr()) {
-			List<Expression> expressions = ((ExprList) expression).getValue();
-			while (!expressions.isEmpty()) {
-				Expression subExpr = expressions.get(0);
-				flattenList(subExpr, list);
-			}
-		} else {
-			list.getValue().add(expression);
-		}
-	}
+	private int index;
+
+	private Object targetValue;
 
 	@Override
 	public Object caseActor(Actor actor) {
 		// VHDL synthesizers don't support multi-dimensional memory yet
 		for (Var variable : actor.getStateVars()) {
 			if (variable.getType().isList() && variable.isInitialized()) {
-				ExprList list = IrFactory.eINSTANCE.createExprList();
-				flattenList(variable.getValue(), list);
-				variable.setValue(list);
+				TypeList typeList = (TypeList) variable.getType();
+				Type eltType = typeList.getElementType();
+
+				// compute total size
+				int size = 1;
+				for (int dim : typeList.getDimensions()) {
+					size *= dim;
+				}
+
+				// create array and fill it
+				targetValue = ValueUtil.createArray(eltType, size);
+				index = 0;
+				flattenList(typeList, variable.getValue());
+				variable.setValue(targetValue);
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Flattens a multi-dimensional array into a single-dimensional one.
+	 * 
+	 * @param type
+	 *            type of the given value
+	 * @param value
+	 *            a value (array or scalar)
+	 */
+	private void flattenList(Type type, Object value) {
+		if (type.isList()) {
+			TypeList typeList = (TypeList) type;
+			Type eltType = typeList.getType();
+			for (int i = 0; i < typeList.getSize(); i++) {
+				Object eltValue = ValueUtil.get(eltType, value, i);
+				flattenList(eltType, eltValue);
+			}
+		} else {
+			ValueUtil.set(type, targetValue, value, index);
+			index++;
+		}
 	}
 
 }

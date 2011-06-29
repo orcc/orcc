@@ -37,16 +37,14 @@ import java.util.Set;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ExprList;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.InstLoad;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Var;
 import net.sf.orcc.ir.util.AbstractActorVisitor;
-
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import net.sf.orcc.ir.util.ValueUtil;
 
 /**
  * This class defines template data for the VHDL back-end.
@@ -118,42 +116,11 @@ public class VHDLTemplateData {
 
 	private Map<Var, Boolean> customInitMap;
 
-	private Expression initValue;
+	private Object initValue;
 
-	private Map<Var, Expression> initValueMap;
+	private Map<Var, Object> initValueMap;
 
-	/**
-	 * Returns <code>true</code> if the given variable has an initial value that
-	 * is not a list of a unique value.
-	 * 
-	 * @param variable
-	 *            a variable
-	 * @param value
-	 *            a value
-	 * @return <code>true</code> if the given variable has an initial value that
-	 *         is not a list of a unique value
-	 */
-	private boolean getCustomInitFlag(Var variable, Expression value) {
-		if (value.isListExpr()) {
-			ExprList exprList = (ExprList) value;
-			for (Expression subExpr : exprList.getValue()) {
-				boolean customInit = getCustomInitFlag(variable, subExpr);
-				if (customInit) {
-					return true;
-				}
-			}
-		} else {
-			if (initValue == null) {
-				initValue = value;
-			} else {
-				if (!EcoreUtil.equals(initValue, value)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
+	private List<String> signals;
 
 	/**
 	 * Returns the map of global variables to custom init flag.
@@ -169,11 +136,9 @@ public class VHDLTemplateData {
 	 * 
 	 * @return the initValue map
 	 */
-	public Map<Var, Expression> getInitValueMap() {
+	public Map<Var, Object> getInitValueMap() {
 		return initValueMap;
 	}
-
-	private List<String> signals;
 
 	/**
 	 * Returns the list of variables.
@@ -195,20 +160,35 @@ public class VHDLTemplateData {
 				new SensitivityComputer().doSwitch(actor));
 
 		customInitMap = new HashMap<Var, Boolean>();
-		initValueMap = new HashMap<Var, Expression>();
+		initValueMap = new HashMap<Var, Object>();
 		for (Var variable : actor.getStateVars()) {
 			if (variable.getType().isList() && variable.isAssignable()) {
-				boolean customInit;
-				if (variable.getInitialValue() == null) {
-					// arrays not initialized => initialize to zero
-					customInit = false;
-					initValue = IrFactory.eINSTANCE.createExprInt(0);
-				} else {
-					initValue = null;
+				TypeList typeList = (TypeList) variable.getType();
+				Type eltType = typeList.getElementType();
 
+				boolean customInit = false;
+				if (variable.getValue() == null) {
+					if (eltType.isBool()) {
+						initValue = false;
+					} else {
+						initValue = 0;
+					}
+				} else {
 					// compute custom init
-					Expression initialValue = variable.getValue();
-					customInit = getCustomInitFlag(variable, initialValue);
+					Object array = variable.getValue();
+					int length = ValueUtil.length(array);
+					if (length > 0) {
+						Object firstValue = ValueUtil.get(eltType, array, 0);
+						initValue = firstValue;
+						for (int i = 1; i < length; i++) {
+							Object value = ValueUtil.get(eltType, array, i);
+							if (!firstValue.equals(value)) {
+								customInit = true;
+								initValue = null;
+								break;
+							}
+						}
+					}
 				}
 
 				// if not custom init, save initValue
