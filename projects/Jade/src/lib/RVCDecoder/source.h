@@ -27,15 +27,41 @@
  * SUCH DAMAGE.
  */
 
+
+/**
+@brief Description of the source
+@author Olivier Labois
+@file source.h
+@version 1.0
+@date 29/06/2011
+*/
+
+
 #ifndef SOURCE_H
 #define SOURCE_H
+
+#define NAL_IS_READ			0
+#define NAL_NOT_READ		1
+#define	NAL_TODO_READ		2
+#define NAL_ALREADY_READ	3
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void source_sendNal(unsigned char* nal, int nal_length);
 
+/*!
+ *  @brief Prepare the source of llvm execution engine decoder
+ *  
+ *  @param nal : input nal
+ *
+ *  @param nal_length : length of the input nal
+ */
+void source_prepare(unsigned char* nal, int nal_length);
+
+/*!
+ *  @brief Set AVC start code
+ */
 void source_isAVCFile();
 
 #ifdef __cplusplus

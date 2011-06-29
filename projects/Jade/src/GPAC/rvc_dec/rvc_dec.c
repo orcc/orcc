@@ -24,6 +24,15 @@
  */
 
 
+/**
+@brief Implementation of RVC Decoder
+@author Olivier Labois
+@file rvc_dec.c
+@version 1.0
+@date 29/06/2011
+*/
+
+
 #include <gpac/modules/codec.h>
 #include <gpac/avparse.h>
 #include <gpac/constants.h>
@@ -33,14 +42,6 @@
 #else
 #define DllImport
 #endif
-
-typedef struct{
-	int Width;
-	int Height;
-	unsigned char* pY[1];
-	unsigned char* pU[1]; 
-	unsigned char* pV[1];
-} RVCFRAME;
 
 
 DllImport int rvc_init(char* XDF, char* VTLFolder, int isAVCFile);
@@ -66,7 +67,7 @@ static GF_Err RVCD_AttachStream(GF_BaseDecoder *ifcg, GF_ESD *esd)
 	s32 res;
 	char Picture;
 	RVCDec *ctx = (RVCDec*) ifcg->privateStack;
-	char* VTLFolder = "D:\\Users\\olabois\\orcc\\trunk\\projects\\Jade\\VTL\\";
+	char* VTLFolder = "D:\\...\\VTL\\"; //-> take the VTL Folder here
 	int isAVCFile;
 
 	/*not supported in this version*/
@@ -251,7 +252,7 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 	//if your decoder outputs directly in the memory passed, setup pointers for your decoder output picture
 
 	got_pic = 0;
-	
+
 	if (ctx->nalu_size_length) {
 		u32 i, nalu_size = 0;
 		u8 *ptr = inBuffer;
@@ -263,19 +264,12 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 			}
 			ptr += ctx->nalu_size_length;
 
-			//same remark as above regardin start codes
+			//same remark as above regarding start codes
 			
-			if(nalNumber > bookmark){
+			if(nalNumber >= bookmark){
 				got_pic = rvc_decode(ptr, nalu_size, outBuffer, !got_pic);
-				bookmark ++;
-				if(got_pic>1){
-					return GF_PACKED_FRAMES;
-				}
-			}else if(nalNumber == bookmark){
-				got_pic = rvc_decode(NULL, 0, outBuffer, !got_pic);
-				if(got_pic>1){
-					return GF_PACKED_FRAMES;
-				}
+				if(nalNumber != bookmark) bookmark ++;
+				if(got_pic>1) return GF_PACKED_FRAMES;
 			}
 			nalNumber ++;
 
@@ -291,7 +285,6 @@ static GF_Err RVCD_ProcessData(GF_MediaDecoder *ifcg,
 		u32 i, nalu_size = 0;
 		u8 *ptr = inBuffer;
 		
-
 		got_pic = rvc_decode(ptr, inBufferLength, outBuffer, 1);
 	}
 

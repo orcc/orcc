@@ -27,8 +27,9 @@
  * SUCH DAMAGE.
  */
 
+
 /**
-@brief Implementation of RVCDecoder
+@brief Implementation of RVCDecoder library
 @author Olivier Labois
 @file RVCDecoder.cpp
 @version 1.0
@@ -93,6 +94,9 @@ extern "C" {
 #endif
 
 #include "Jade/RVCDecoder/RVCDecoder.h"
+#include "source.h"
+
+int nalState;
 
 int bufferBusy;
 int safeguardFrameEmpty = 1;
@@ -141,19 +145,30 @@ void rvc_init(char *XDF, char* VTLFolder, int isAVCFile){
 
 int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffer){
 
+	//Initialize buffer state
 	if(newBuffer){
 		bufferBusy = 0;
 	}
-	
-	source_sendNal(nal, nal_length);
 
-	displayYUV_setOutBufferAddr(outBuffer);
+	//Initialize the reading nal state
+	if(nalState == NAL_IS_READ){
+		if(safeguardFrameEmpty){
+			nalState = NAL_NOT_READ;
+		}else{
+			nalState = NAL_ALREADY_READ;
+		}
+	}
+	
+	//Prepare source and display
+	source_prepare(nal, nal_length);
+	displayYUV_prepare(outBuffer);
 
 	//Start decoder
 	if(nal_length){
 		decoder->getEE()->run();
 	}
 
+	//Return the number of generated frames
 	if(!safeguardFrameEmpty) return 2;
 	if(bufferBusy) return 1;
 	return 0;

@@ -27,6 +27,16 @@
  * SUCH DAMAGE.
  */
 
+
+/**
+@brief Description of the display
+@author Olivier Labois
+@file display.h
+@version 1.0
+@date 29/06/2011
+*/
+
+
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
@@ -44,7 +54,15 @@ typedef struct{
 	unsigned char* pV[1];
 }RVCFRAME;
 
-void displayYUV_setOutBufferAddr(char* outBuffer);
+/*!
+ *  @brief Prepare the display of llvm execution engine decoder
+ *
+ *	When we have two output frames, the second is saved and transmit
+ *	when the output buffer is free
+ *  
+ *  @param outBuffer : output buffer
+ */
+void displayYUV_prepare(char* outBuffer);
 
 #ifdef __cplusplus
 }

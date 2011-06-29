@@ -27,6 +27,16 @@
  * SUCH DAMAGE.
  */
 
+
+/**
+@brief Implementation of the display
+@author Olivier Labois
+@file display.c
+@version 1.0
+@date 29/06/2011
+*/
+
+
 #include <stdio.h>
 #include <string.h>
 
@@ -35,22 +45,22 @@
 #define DISPLAY_READY 1
 #define DISPLAY_ENABLE 2
 
+char display_flag;
+
+char* outBuffer;
+extern int bufferBusy;
+
 static RVCFRAME Frame;
 extern int safeguardFrameEmpty;
 
 extern int* stopVar;
 
-char* outBuffer;
 
-extern int bufferBusy;
-
-char display_flag;
-
-
-void displayYUV_setOutBufferAddr(char* Address){
+void displayYUV_prepare(char* Address){
 	outBuffer = Address;
 	display_flag = DISPLAY_READY + DISPLAY_ENABLE;
 
+	//Set safeguard frame in output buffer
 	if (!safeguardFrameEmpty){
 		memcpy(outBuffer, Frame.pY[0], Frame.Width * Frame.Height); 
 		memcpy(outBuffer + Frame.Width * Frame.Height, Frame.pU[0], Frame.Width * Frame.Height/4);
@@ -64,9 +74,8 @@ void displayYUV_setOutBufferAddr(char* Address){
 void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pictureBufferU,
 							   unsigned char *pictureBufferV, unsigned short pictureWidth,
 							   unsigned short pictureHeight){
-
 	
-
+	//Set generated frame in output buffer
 	if(!bufferBusy){
 		bufferBusy = 1;
 
@@ -74,6 +83,7 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pic
 		memcpy(outBuffer + pictureWidth * pictureHeight, pictureBufferU, pictureWidth * pictureHeight/4);
 		memcpy(outBuffer + 5*pictureWidth * pictureHeight/4, pictureBufferV, pictureWidth * pictureHeight/4);
 
+	//Save frame in safeguard buffer and stop scheduler
 	}else{
 		safeguardFrameEmpty = 0;
 
@@ -85,6 +95,7 @@ void displayYUV_displayPicture(unsigned char *pictureBufferY, unsigned char *pic
 		*Frame.pV = pictureBufferV;
 
 		display_flag = DISPLAY_ENABLE;
+
 		*stopVar = 1;
 	}
 }
