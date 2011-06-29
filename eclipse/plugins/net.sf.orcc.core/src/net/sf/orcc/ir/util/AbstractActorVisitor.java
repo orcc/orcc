@@ -330,4 +330,14 @@ public abstract class AbstractActorVisitor<T> extends IrSwitch<T> implements
 		return result;
 	}
 
+	/**
+	 * Returns the value of the <code>actor</code> attribute. This may be
+	 * <code>null</code> if the visitor did not set it.
+	 * 
+	 * @return the value of the <code>actor</code> attribute
+	 */
+	final public Actor getActor() {
+		return actor;
+	}
+
 }
