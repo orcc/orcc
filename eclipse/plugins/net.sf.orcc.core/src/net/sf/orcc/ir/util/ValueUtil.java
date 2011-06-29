@@ -177,13 +177,13 @@ public class ValueUtil {
 		return getIntValue(bi1.divide(bi2));
 	}
 
-	public static boolean equals(Object val1, Object val2) {
+	public static Object equals(Object val1, Object val2) {
 		if (isBool(val1) && isBool(val2)) {
 			return ((Boolean) val1).equals(val2);
 		} else if (isInt(val1) && isInt(val2)) {
 			return getBigInteger(val1).equals(getBigInteger(val2));
 		} else {
-			return false;
+			return null;
 		}
 	}
 
@@ -596,8 +596,12 @@ public class ValueUtil {
 		return bi.not();
 	}
 
-	public static boolean notEquals(Object val1, Object val2) {
-		return !equals(val1, val2);
+	public static Object notEquals(Object val1, Object val2) {
+		Object result = equals(val1, val2);
+		if (isBool(result)) {
+			return !((Boolean) result);
+		}
+		return null;
 	}
 
 	/**
