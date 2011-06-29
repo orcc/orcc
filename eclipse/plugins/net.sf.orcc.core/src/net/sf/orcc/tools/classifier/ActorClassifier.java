@@ -60,6 +60,7 @@ import net.sf.orcc.util.UniqueEdge;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -185,7 +186,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		// new interpreter must be called before creation of ActorState
 		AbstractInterpreter interpreter = newInterpreter();
 
-		ActorState state = new ActorState(actor);
+		ActorState state = new ActorState(interpreter.getActor());
 		if (state.isEmpty()) {
 			FSM fsm = actor.getFsm();
 			if (fsm == null || !isCycloStaticFsm(fsm)) {
@@ -216,8 +217,8 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		}
 
 		// set token rates
-		csdfMoc.setNumTokensConsumed(actor);
-		csdfMoc.setNumTokensProduced(actor);
+		csdfMoc.setNumTokensConsumed(interpreter.getActor());
+		csdfMoc.setNumTokensProduced(interpreter.getActor());
 		csdfMoc.setNumberOfPhases(nbPhases);
 
 		return csdfMoc;
@@ -227,29 +228,27 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 * Classify the FSM of the actor this unroller was created with, starting
 	 * from the given initial state, and using the given configuration.
 	 * 
-	 * @param initialState
-	 *            the initial state of the FSM
 	 * @param configuration
 	 *            a configuration
 	 * @return a static class
 	 */
-	private SDFMoC classifyFsmConfiguration(Map<Port, Object> configuration) {
+	private SDFMoC classifyFsmConfiguration(Map<String, Object> configuration) {
 		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
 
-		AbstractInterpreter interpretedActor = newInterpreter();
-		interpretedActor.setConfiguration(configuration);
+		AbstractInterpreter interpreter = newInterpreter();
+		State initialState = interpreter.getFsmState();
+		interpreter.setConfiguration(configuration);
 
 		// schedule the actor
-		State initialState = actor.getFsm().getInitialState();
 		int nbPhases = 0;
 		final int MAX_PHASES = 16384;
 		do {
-			interpretedActor.schedule();
-			Action latest = interpretedActor.getScheduledAction();
+			interpreter.schedule();
+			Action latest = interpreter.getScheduledAction();
 			Invocation invocation = eINSTANCE.createInvocation(latest);
 			sdfMoc.getInvocations().add(invocation);
 			nbPhases++;
-		} while (!interpretedActor.getFsmState().equals(initialState)
+		} while (!interpreter.getFsmState().equals(initialState)
 				&& nbPhases < MAX_PHASES);
 
 		if (nbPhases == MAX_PHASES) {
@@ -257,8 +256,8 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		}
 
 		// set token rates
-		sdfMoc.setNumTokensConsumed(actor);
-		sdfMoc.setNumTokensProduced(actor);
+		sdfMoc.setNumTokensConsumed(interpreter.getActor());
+		sdfMoc.setNumTokensProduced(interpreter.getActor());
 
 		return sdfMoc;
 	}
@@ -270,8 +269,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 */
 	private MoC classifyQSDF() {
 		FSM fsm = actor.getFsm();
+		String name = actor.getName();
 		if (!isQuasiStaticFsm(fsm)) {
-			System.out.println(actor.getName()
+			System.out.println(name
 					+ " has an FSM that is NOT compatible with quasi-static");
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
@@ -279,16 +279,16 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		State initialState = fsm.getInitialState();
 
 		// analyze the configuration of this actor
-		List<Port> ports = findConfigurationPorts();
+		List<Port> ports = findConfigurationPorts(fsm);
 		if (ports.isEmpty()) {
-			System.out.println("no configuration ports found for "
-					+ actor.getName());
+			System.out.println("no configuration ports found for " + name);
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
-		Map<Action, Map<Port, Object>> configurations = findConfigurationValues(ports);
+		Map<Action, Map<String, Object>> configurations = findConfigurationValues(
+				fsm, ports);
 		if (configurations.isEmpty()) {
-			System.out.println("no configurations for " + actor.getName());
+			System.out.println("no configurations for " + name);
 			return MocFactory.eINSTANCE.createKPNMoC();
 		}
 
@@ -296,7 +296,7 @@ public class ActorClassifier implements ActorVisitor<Object> {
 		QSDFMoC quasiStatic = MocFactory.eINSTANCE.createQSDFMoC();
 
 		for (Action action : fsm.getTargetActions(initialState)) {
-			Map<Port, Object> configuration = configurations.get(action);
+			Map<String, Object> configuration = configurations.get(action);
 			if (configuration == null) {
 				System.out.println("no configuration for " + action.getName());
 				return MocFactory.eINSTANCE.createKPNMoC();
@@ -333,15 +333,15 @@ public class ActorClassifier implements ActorVisitor<Object> {
 
 		// schedule
 		SDFMoC sdfMoc = MocFactory.eINSTANCE.createSDFMoC();
-		AbstractInterpreter interpretedActor = newInterpreter();
-		interpretedActor.schedule();
-		Action action = interpretedActor.getScheduledAction();
+		AbstractInterpreter interpreter = newInterpreter();
+		interpreter.schedule();
+		Action action = interpreter.getScheduledAction();
 		Invocation invocation = eINSTANCE.createInvocation(action);
 		sdfMoc.getInvocations().add(invocation);
 
 		// set token rates
-		sdfMoc.setNumTokensConsumed(actor);
-		sdfMoc.setNumTokensProduced(actor);
+		sdfMoc.setNumTokensConsumed(interpreter.getActor());
+		sdfMoc.setNumTokensProduced(interpreter.getActor());
 
 		return sdfMoc;
 	}
@@ -350,14 +350,19 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	public Object doSwitch(Actor actor) {
 		try {
 			this.actor = actor;
+
+			actor.resetTokenConsumption();
+			actor.resetTokenProduction();
+
 			classify();
-			actor = null;
 		} catch (Exception e) {
 			System.out.println("An exception occurred when classifying actor "
 					+ actor.getName() + ": " + e);
 			System.out.println("MoC set to DPN");
 			System.out.println();
 			actor.setMoC(MocFactory.eINSTANCE.createDPNMoC());
+		} finally {
+			this.actor = null;
 		}
 
 		return null;
@@ -366,10 +371,9 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	/**
 	 * Finds the configuration ports of this actor, if any.
 	 */
-	private List<Port> findConfigurationPorts() {
+	private List<Port> findConfigurationPorts(FSM fsm) {
 		List<Set<Port>> actionPorts = new ArrayList<Set<Port>>();
 
-		FSM fsm = actor.getFsm();
 		State initialState = fsm.getInitialState();
 
 		// visits the scheduler of each action departing from the initial state
@@ -401,18 +405,17 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 * stores a constrained variable that will contain the value to read from
 	 * the configuration port when solved.
 	 */
-	private Map<Action, Map<Port, Object>> findConfigurationValues(
+	private Map<Action, Map<String, Object>> findConfigurationValues(FSM fsm,
 			List<Port> ports) {
-		Map<Action, Map<Port, Object>> configurations = new HashMap<Action, Map<Port, Object>>();
+		Map<Action, Map<String, Object>> configurations = new HashMap<Action, Map<String, Object>>();
 		List<Action> previous = new ArrayList<Action>();
 
 		// visits the scheduler of each action departing from the initial state
-		FSM fsm = actor.getFsm();
 		State initialState = fsm.getInitialState();
 		for (Action targetAction : fsm.getTargetActions(initialState)) {
 			// create the configuration for this action
 			GuardSatChecker checker = new GuardSatChecker(actor);
-			Map<Port, Object> configuration = checker.computeTokenValues(
+			Map<String, Object> configuration = checker.computeTokenValues(
 					ports, previous, targetAction);
 
 			// add the configuration
@@ -561,14 +564,10 @@ public class ActorClassifier implements ActorVisitor<Object> {
 	 * @return the interpreter created
 	 */
 	private AbstractInterpreter newInterpreter() {
-		AbstractInterpreter interpretedActor = new AbstractInterpreter(actor);
-
-		actor.resetTokenConsumption();
-		actor.resetTokenProduction();
-
-		interpretedActor.initialize();
-
-		return interpretedActor;
+		AbstractInterpreter interpreter = new AbstractInterpreter(
+				EcoreUtil.copy(actor));
+		interpreter.initialize();
+		return interpreter;
 	}
 
 	private void showMarker() {

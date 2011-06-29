@@ -422,7 +422,7 @@ public class GuardSatChecker {
 	 *         peeked on ports in the map, values associated with them are given
 	 *         to the interpreter, which allows <code>action</code> to fire
 	 */
-	public Map<Port, Object> computeTokenValues(List<Port> ports,
+	public Map<String, Object> computeTokenValues(List<Port> ports,
 			List<Action> others, Action action) {
 		SmtTranslator translator = new SmtTranslator();
 		translator.doSwitch(action.getScheduler());

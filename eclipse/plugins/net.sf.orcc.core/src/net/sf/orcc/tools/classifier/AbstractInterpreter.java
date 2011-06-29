@@ -55,9 +55,9 @@ import net.sf.orcc.ir.util.ValueUtil;
  */
 public class AbstractInterpreter extends ActorInterpreter {
 
-	private Map<Port, Object> configuration;
+	private Map<String, Object> configuration;
 
-	private Map<Port, Boolean> portRead;
+	private Map<String, Boolean> portRead;
 
 	private boolean schedulableMode;
 
@@ -83,15 +83,16 @@ public class AbstractInterpreter extends ActorInterpreter {
 		Pattern inputPattern = action.getInputPattern();
 		for (Port port : inputPattern.getPorts()) {
 			int numTokens = inputPattern.getNumTokens(port);
-			if (configuration != null && configuration.containsKey(port)
-					&& !portRead.get(port)) {
+			String portName = port.getName();
+			if (configuration != null && configuration.containsKey(portName)
+					&& !portRead.get(portName)) {
 				// Should we use a range of values in the spirit of
 				// "Accurate Static Branch Prediction by Value Range Propagation"?
 
 				// in the meantime, we only use the configuration value in the
 				// Peek
 
-				portRead.put(port, true);
+				portRead.put(portName, true);
 			}
 
 			port.increaseTokenConsumption(numTokens);
@@ -128,18 +129,17 @@ public class AbstractInterpreter extends ActorInterpreter {
 		Pattern pattern = action.getPeekPattern();
 		for (Port port : pattern.getPorts()) {
 			Var peeked = pattern.getVariable(port);
-			if (peeked != null) {
-				if (configuration != null && configuration.containsKey(port)
-						&& !portRead.get(port)) {
-					// allocates peeked variables
-					TypeList typeList = (TypeList) peeked.getType();
-					Object array = ValueUtil.createArray(typeList);
-					peeked.setValue(array);
+			String portName = port.getName();
+			if (configuration != null && configuration.containsKey(portName)
+					&& !portRead.get(portName)) {
+				// allocates peeked variables
+				TypeList typeList = (TypeList) peeked.getType();
+				Object array = ValueUtil.createArray(typeList);
+				peeked.setValue(array);
 
-					Type type = typeList.getType();
-					Object value = configuration.get(port);
-					ValueUtil.set(type, array, value, 0);
-				}
+				Type type = typeList.getType();
+				Object value = configuration.get(portName);
+				ValueUtil.set(type, array, value, 0);
 			}
 		}
 
@@ -164,10 +164,10 @@ public class AbstractInterpreter extends ActorInterpreter {
 	 * @param configuration
 	 *            a configuration as a map of ports and values
 	 */
-	public void setConfiguration(Map<Port, Object> configuration) {
+	public void setConfiguration(Map<String, Object> configuration) {
 		this.configuration = configuration;
-		portRead = new HashMap<Port, Boolean>(configuration.size());
-		for (Port port : configuration.keySet()) {
+		portRead = new HashMap<String, Boolean>(configuration.size());
+		for (String port : configuration.keySet()) {
 			portRead.put(port, false);
 		}
 	}

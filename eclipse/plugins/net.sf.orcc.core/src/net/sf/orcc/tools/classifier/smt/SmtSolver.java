@@ -157,7 +157,7 @@ public class SmtSolver {
 							} else {
 								value = getExpression(exp);
 							}
-							assertions.put(port, value);
+							assertions.put(port.getName(), value);
 						}
 					}
 				}
@@ -169,7 +169,7 @@ public class SmtSolver {
 
 	private Actor actor;
 
-	private Map<Port, Object> assertions;
+	private Map<String, Object> assertions;
 
 	private List<String> options;
 
@@ -189,7 +189,7 @@ public class SmtSolver {
 	 *            the actor
 	 */
 	public SmtSolver(Actor actor) {
-		assertions = new HashMap<Port, Object>();
+		assertions = new HashMap<String, Object>();
 
 		this.actor = actor;
 		IFile file = actor.getFile();
@@ -280,7 +280,7 @@ public class SmtSolver {
 	 * 
 	 * @return the assertions as a map between ports and associated values
 	 */
-	public Map<Port, Object> getAssertions() {
+	public Map<String, Object> getAssertions() {
 		return assertions;
 	}
 
