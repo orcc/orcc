@@ -200,7 +200,8 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the name of the function unit
 	 * @return a simple FunctionUnit
 	 */
-	FunctionUnit createFunctionUnit(TTA tta, String name);
+	FunctionUnit createFunctionUnit(TTA tta, String name,
+			Implementation implementation);
 
 	/**
 	 * Returns a new simple function unit with 2 input ports and 1 output ports
@@ -217,7 +218,7 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a simple FunctionUnit
 	 */
 	FunctionUnit createFunctionUnit(TTA tta, String name, String[] operations1,
-			String[] operations2);
+			String[] operations2, Implementation implementation);
 
 	/**
 	 * Returns a new object of class '<em>Global Control Unit</em>'. <!--
@@ -260,6 +261,15 @@ public interface ArchitectureFactory extends EFactory {
 	EList<Guard> createGuardsDefault(RegisterFile register);
 
 	/**
+	 * Returns a new object of class '<em>Implementation</em>'. <!--
+	 * begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @return a new object of class '<em>Implementation</em>'.
+	 * @generated
+	 */
+	Implementation createImplementation();
+
+	/**
 	 * Return a new input socket with the given parameters
 	 * 
 	 * @param name
@@ -277,7 +287,7 @@ public interface ArchitectureFactory extends EFactory {
 	 *            the containing TTA processor
 	 * @return an LSU with the given parameters
 	 */
-	FunctionUnit createLSU(TTA tta);
+	FunctionUnit createLSU(TTA tta, Implementation implementation);
 
 	/**
 	 * Returns a new object of class '<em>Operation</em>'.
@@ -400,7 +410,7 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a RegisterFile initialized with the given parameters
 	 */
 	RegisterFile createRegisterFile(String name, int size, int width,
-			int maxReads, int maxWrites);
+			int maxReads, int maxWrites, Implementation implementation);
 
 	/**
 	 * Returns a new register file corresponding to default TTA processor
@@ -417,7 +427,7 @@ public interface ArchitectureFactory extends EFactory {
 	 * @return a new simple RegisterFile
 	 */
 	RegisterFile createRegisterFileDefault(TTA tta, String name, int size,
-			int width);
+			int width, Implementation implementation);
 
 	/**
 	 * Returns a new object of class '<em>Resource</em>'.

@@ -31,6 +31,7 @@ package net.sf.orcc.backends.tta.architecture.impl;
 import java.util.Collection;
 
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
+import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Port;
 import net.sf.orcc.backends.tta.architecture.RegisterFile;
 
@@ -61,6 +62,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getMaxReads <em>Max Reads</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getMaxWrites <em>Max Writes</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getPorts <em>Ports</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl#getImplementation <em>Implementation</em>}</li>
  * </ul>
  * </p>
  *
@@ -176,6 +178,16 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 * @ordered
 	 */
 	protected EList<Port> ports;
+
+	/**
+	 * The cached value of the '{@link #getImplementation() <em>Implementation</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getImplementation()
+	 * @generated
+	 * @ordered
+	 */
+	protected Implementation implementation;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -318,6 +330,44 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Implementation getImplementation() {
+		if (implementation != null && implementation.eIsProxy()) {
+			InternalEObject oldImplementation = (InternalEObject)implementation;
+			implementation = (Implementation)eResolveProxy(oldImplementation);
+			if (implementation != oldImplementation) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION, oldImplementation, implementation));
+			}
+		}
+		return implementation;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Implementation basicGetImplementation() {
+		return implementation;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setImplementation(Implementation newImplementation) {
+		Implementation oldImplementation = implementation;
+		implementation = newImplementation;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION, oldImplementation, implementation));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -347,6 +397,9 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 				return getMaxWrites();
 			case ArchitecturePackage.REGISTER_FILE__PORTS:
 				return getPorts();
+			case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
+				if (resolve) return getImplementation();
+				return basicGetImplementation();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -379,6 +432,9 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 				getPorts().clear();
 				getPorts().addAll((Collection<? extends Port>)newValue);
 				return;
+			case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
+				setImplementation((Implementation)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -409,6 +465,9 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 			case ArchitecturePackage.REGISTER_FILE__PORTS:
 				getPorts().clear();
 				return;
+			case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
+				setImplementation((Implementation)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -433,6 +492,8 @@ public class RegisterFileImpl extends EObjectImpl implements RegisterFile {
 				return maxWrites != MAX_WRITES_EDEFAULT;
 			case ArchitecturePackage.REGISTER_FILE__PORTS:
 				return ports != null && !ports.isEmpty();
+			case ArchitecturePackage.REGISTER_FILE__IMPLEMENTATION:
+				return implementation != null;
 		}
 		return super.eIsSet(featureID);
 	}

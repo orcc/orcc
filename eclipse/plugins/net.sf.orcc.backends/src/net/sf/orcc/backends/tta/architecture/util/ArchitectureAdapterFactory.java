@@ -191,6 +191,10 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 				return createTermUnitAdapter();
 			}
 			@Override
+			public Adapter caseImplementation(Implementation object) {
+				return createImplementationAdapter();
+			}
+			@Override
 			public Adapter casePortToIndexMapEntry(Map.Entry<Port, Integer> object) {
 				return createPortToIndexMapEntryAdapter();
 			}
@@ -477,6 +481,20 @@ public class ArchitectureAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createTermUnitAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.backends.tta.architecture.Implementation <em>Implementation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.backends.tta.architecture.Implementation
+	 * @generated
+	 */
+	public Adapter createImplementationAdapter() {
 		return null;
 	}
 

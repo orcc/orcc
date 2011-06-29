@@ -44,6 +44,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getOperations <em>Operations</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getPorts <em>Ports</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getAddressSpace <em>Address Space</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getImplementation <em>Implementation</em>}</li>
  * </ul>
  * </p>
  *
@@ -135,5 +136,31 @@ public interface FunctionUnit extends EObject {
 	 * @generated
 	 */
 	void setAddressSpace(AddressSpace value);
+
+	/**
+	 * Returns the value of the '<em><b>Implementation</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Implementation</em>' reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Implementation</em>' reference.
+	 * @see #setImplementation(Implementation)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getFunctionUnit_Implementation()
+	 * @model
+	 * @generated
+	 */
+	Implementation getImplementation();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getImplementation <em>Implementation</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Implementation</em>' reference.
+	 * @see #getImplementation()
+	 * @generated
+	 */
+	void setImplementation(Implementation value);
 
 } // FunctionUnit

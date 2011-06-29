@@ -33,6 +33,7 @@ import java.util.Collection;
 import net.sf.orcc.backends.tta.architecture.AddressSpace;
 import net.sf.orcc.backends.tta.architecture.ArchitecturePackage;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
+import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.Operation;
 import net.sf.orcc.backends.tta.architecture.Port;
 
@@ -61,6 +62,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl#getOperations <em>Operations</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl#getPorts <em>Ports</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl#getAddressSpace <em>Address Space</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.FunctionUnitImpl#getImplementation <em>Implementation</em>}</li>
  * </ul>
  * </p>
  *
@@ -116,6 +118,16 @@ public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 	 * @ordered
 	 */
 	protected AddressSpace addressSpace;
+
+	/**
+	 * The cached value of the '{@link #getImplementation() <em>Implementation</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getImplementation()
+	 * @generated
+	 * @ordered
+	 */
+	protected Implementation implementation;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -224,6 +236,44 @@ public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Implementation getImplementation() {
+		if (implementation != null && implementation.eIsProxy()) {
+			InternalEObject oldImplementation = (InternalEObject)implementation;
+			implementation = (Implementation)eResolveProxy(oldImplementation);
+			if (implementation != oldImplementation) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION, oldImplementation, implementation));
+			}
+		}
+		return implementation;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Implementation basicGetImplementation() {
+		return implementation;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setImplementation(Implementation newImplementation) {
+		Implementation oldImplementation = implementation;
+		implementation = newImplementation;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION, oldImplementation, implementation));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -252,6 +302,9 @@ public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 			case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
 				if (resolve) return getAddressSpace();
 				return basicGetAddressSpace();
+			case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
+				if (resolve) return getImplementation();
+				return basicGetImplementation();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -279,6 +332,9 @@ public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 			case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
 				setAddressSpace((AddressSpace)newValue);
 				return;
+			case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
+				setImplementation((Implementation)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -303,6 +359,9 @@ public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 			case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
 				setAddressSpace((AddressSpace)null);
 				return;
+			case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
+				setImplementation((Implementation)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -323,6 +382,8 @@ public class FunctionUnitImpl extends EObjectImpl implements FunctionUnit {
 				return ports != null && !ports.isEmpty();
 			case ArchitecturePackage.FUNCTION_UNIT__ADDRESS_SPACE:
 				return addressSpace != null;
+			case ArchitecturePackage.FUNCTION_UNIT__IMPLEMENTATION:
+				return implementation != null;
 		}
 		return super.eIsSet(featureID);
 	}

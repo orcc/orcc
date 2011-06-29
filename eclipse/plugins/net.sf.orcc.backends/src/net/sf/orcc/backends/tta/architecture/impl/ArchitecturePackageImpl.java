@@ -44,6 +44,7 @@ import net.sf.orcc.backends.tta.architecture.Extension;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
 import net.sf.orcc.backends.tta.architecture.Guard;
+import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.OpBinary;
 import net.sf.orcc.backends.tta.architecture.OpUnary;
 import net.sf.orcc.backends.tta.architecture.Operation;
@@ -195,6 +196,13 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * @generated
 	 */
 	private EClass termUnitEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass implementationEClass = null;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -402,6 +410,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getTTA_HardwareDatabase() {
+		return (EReference)ttaEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -586,6 +603,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getFunctionUnit_Implementation() {
+		return (EReference)functionUnitEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -639,6 +665,15 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 */
 	public EReference getRegisterFile_Ports() {
 		return (EReference)registerFileEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getRegisterFile_Implementation() {
+		return (EReference)registerFileEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -962,6 +997,33 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EClass getImplementation() {
+		return implementationEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getImplementation_HdbFile() {
+		return (EAttribute)implementationEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getImplementation_Id() {
+		return (EAttribute)implementationEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getPortToIndexMapEntry() {
 		return portToIndexMapEntryEClass;
 	}
@@ -1152,6 +1214,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(ttaEClass, TTA__REGISTER_FILES);
 		createEReference(ttaEClass, TTA__PROGRAM);
 		createEReference(ttaEClass, TTA__DATA);
+		createEReference(ttaEClass, TTA__HARDWARE_DATABASE);
 
 		busEClass = createEClass(BUS);
 		createEAttribute(busEClass, BUS__NAME);
@@ -1180,6 +1243,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(functionUnitEClass, FUNCTION_UNIT__OPERATIONS);
 		createEReference(functionUnitEClass, FUNCTION_UNIT__PORTS);
 		createEReference(functionUnitEClass, FUNCTION_UNIT__ADDRESS_SPACE);
+		createEReference(functionUnitEClass, FUNCTION_UNIT__IMPLEMENTATION);
 
 		registerFileEClass = createEClass(REGISTER_FILE);
 		createEAttribute(registerFileEClass, REGISTER_FILE__NAME);
@@ -1188,6 +1252,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEAttribute(registerFileEClass, REGISTER_FILE__MAX_READS);
 		createEAttribute(registerFileEClass, REGISTER_FILE__MAX_WRITES);
 		createEReference(registerFileEClass, REGISTER_FILE__PORTS);
+		createEReference(registerFileEClass, REGISTER_FILE__IMPLEMENTATION);
 
 		portEClass = createEClass(PORT);
 		createEAttribute(portEClass, PORT__NAME);
@@ -1255,6 +1320,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		createEReference(termUnitEClass, TERM_UNIT__FUNCTION_UNIT);
 		createEReference(termUnitEClass, TERM_UNIT__PORT);
 
+		implementationEClass = createEClass(IMPLEMENTATION);
+		createEAttribute(implementationEClass, IMPLEMENTATION__HDB_FILE);
+		createEAttribute(implementationEClass, IMPLEMENTATION__ID);
+
 		portToIndexMapEntryEClass = createEClass(PORT_TO_INDEX_MAP_ENTRY);
 		createEReference(portToIndexMapEntryEClass, PORT_TO_INDEX_MAP_ENTRY__KEY);
 		createEAttribute(portToIndexMapEntryEClass, PORT_TO_INDEX_MAP_ENTRY__VALUE);
@@ -1314,6 +1383,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEReference(getTTA_RegisterFiles(), this.getRegisterFile(), null, "registerFiles", null, 0, -1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTTA_Program(), this.getAddressSpace(), null, "program", null, 0, 1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTTA_Data(), this.getAddressSpace(), null, "data", null, 0, 1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getTTA_HardwareDatabase(), this.getImplementation(), null, "hardwareDatabase", null, 0, -1, net.sf.orcc.backends.tta.architecture.TTA.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(busEClass, Bus.class, "Bus", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getBus_Name(), ecorePackage.getEString(), "name", null, 0, 1, Bus.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1344,6 +1414,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEReference(getFunctionUnit_Operations(), this.getOperation(), null, "operations", null, 0, -1, FunctionUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getFunctionUnit_Ports(), this.getPort(), null, "ports", null, 0, -1, FunctionUnit.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getFunctionUnit_AddressSpace(), this.getAddressSpace(), null, "addressSpace", null, 0, 1, FunctionUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getFunctionUnit_Implementation(), this.getImplementation(), null, "implementation", null, 0, 1, FunctionUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(registerFileEClass, RegisterFile.class, "RegisterFile", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getRegisterFile_Name(), ecorePackage.getEString(), "name", null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1352,6 +1423,7 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEAttribute(getRegisterFile_MaxReads(), ecorePackage.getEInt(), "maxReads", null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getRegisterFile_MaxWrites(), ecorePackage.getEInt(), "maxWrites", null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getRegisterFile_Ports(), this.getPort(), null, "ports", null, 0, -1, RegisterFile.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getRegisterFile_Implementation(), this.getImplementation(), null, "implementation", null, 0, 1, RegisterFile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portEClass, Port.class, "Port", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPort_Name(), ecorePackage.getEString(), "name", null, 0, 1, Port.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1455,6 +1527,10 @@ public class ArchitecturePackageImpl extends EPackageImpl implements
 		initEClass(termUnitEClass, TermUnit.class, "TermUnit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getTermUnit_FunctionUnit(), this.getFunctionUnit(), null, "functionUnit", null, 0, 1, TermUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTermUnit_Port(), this.getPort(), null, "port", null, 0, 1, TermUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(implementationEClass, Implementation.class, "Implementation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getImplementation_HdbFile(), ecorePackage.getEString(), "hdbFile", null, 0, 1, Implementation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getImplementation_Id(), ecorePackage.getEInt(), "id", null, 0, 1, Implementation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(portToIndexMapEntryEClass, Map.Entry.class, "PortToIndexMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getPortToIndexMapEntry_Key(), this.getPort(), null, "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

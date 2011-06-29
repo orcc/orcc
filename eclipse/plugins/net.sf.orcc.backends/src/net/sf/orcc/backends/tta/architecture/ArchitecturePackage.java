@@ -174,13 +174,22 @@ public interface ArchitecturePackage extends EPackage {
 	int TTA__DATA = 8;
 
 	/**
+	 * The feature id for the '<em><b>Hardware Database</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TTA__HARDWARE_DATABASE = 9;
+
+	/**
 	 * The number of structural features of the '<em>TTA</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TTA_FEATURE_COUNT = 9;
+	int TTA_FEATURE_COUNT = 10;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.BusImpl <em>Bus</em>}' class.
@@ -431,13 +440,22 @@ public interface ArchitecturePackage extends EPackage {
 	int FUNCTION_UNIT__ADDRESS_SPACE = 3;
 
 	/**
+	 * The feature id for the '<em><b>Implementation</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_UNIT__IMPLEMENTATION = 4;
+
+	/**
 	 * The number of structural features of the '<em>Function Unit</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int FUNCTION_UNIT_FEATURE_COUNT = 4;
+	int FUNCTION_UNIT_FEATURE_COUNT = 5;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl <em>Register File</em>}' class.
@@ -504,13 +522,22 @@ public interface ArchitecturePackage extends EPackage {
 	int REGISTER_FILE__PORTS = 5;
 
 	/**
+	 * The feature id for the '<em><b>Implementation</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int REGISTER_FILE__IMPLEMENTATION = 6;
+
+	/**
 	 * The number of structural features of the '<em>Register File</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int REGISTER_FILE_FEATURE_COUNT = 6;
+	int REGISTER_FILE_FEATURE_COUNT = 7;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl <em>Port</em>}' class.
@@ -995,7 +1022,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getPortToIndexMapEntry()
 	 * @generated
 	 */
-	int PORT_TO_INDEX_MAP_ENTRY = 24;
+	int PORT_TO_INDEX_MAP_ENTRY = 25;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ShortImmediateImpl <em>Short Immediate</em>}' class.
@@ -1188,6 +1215,43 @@ public interface ArchitecturePackage extends EPackage {
 	int TERM_UNIT_FEATURE_COUNT = TERM_FEATURE_COUNT + 2;
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.impl.ImplementationImpl <em>Implementation</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ImplementationImpl
+	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getImplementation()
+	 * @generated
+	 */
+	int IMPLEMENTATION = 24;
+
+	/**
+	 * The feature id for the '<em><b>Hdb File</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int IMPLEMENTATION__HDB_FILE = 0;
+
+	/**
+	 * The feature id for the '<em><b>Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int IMPLEMENTATION__ID = 1;
+
+	/**
+	 * The number of structural features of the '<em>Implementation</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int IMPLEMENTATION_FEATURE_COUNT = 2;
+
+	/**
 	 * The feature id for the '<em><b>Key</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1222,7 +1286,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getSocketType()
 	 * @generated
 	 */
-	int SOCKET_TYPE = 25;
+	int SOCKET_TYPE = 26;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.Extension <em>Extension</em>}' enum.
@@ -1232,7 +1296,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getExtension()
 	 * @generated
 	 */
-	int EXTENSION = 26;
+	int EXTENSION = 27;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpUnary <em>Op Unary</em>}' enum.
@@ -1242,7 +1306,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpUnary()
 	 * @generated
 	 */
-	int OP_UNARY = 27;
+	int OP_UNARY = 28;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.backends.tta.architecture.OpBinary <em>Op Binary</em>}' enum.
@@ -1252,7 +1316,7 @@ public interface ArchitecturePackage extends EPackage {
 	 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getOpBinary()
 	 * @generated
 	 */
-	int OP_BINARY = 28;
+	int OP_BINARY = 29;
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.TTA <em>TTA</em>}'.
@@ -1362,6 +1426,17 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EReference getTTA_Data();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link net.sf.orcc.backends.tta.architecture.TTA#getHardwareDatabase <em>Hardware Database</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Hardware Database</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.TTA#getHardwareDatabase()
+	 * @see #getTTA()
+	 * @generated
+	 */
+	EReference getTTA_HardwareDatabase();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Bus <em>Bus</em>}'.
@@ -1612,6 +1687,17 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getFunctionUnit_AddressSpace();
 
 	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.FunctionUnit#getImplementation <em>Implementation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Implementation</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.FunctionUnit#getImplementation()
+	 * @see #getFunctionUnit()
+	 * @generated
+	 */
+	EReference getFunctionUnit_Implementation();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.RegisterFile <em>Register File</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1686,6 +1772,17 @@ public interface ArchitecturePackage extends EPackage {
 	 * @generated
 	 */
 	EReference getRegisterFile_Ports();
+
+	/**
+	 * Returns the meta object for the reference '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getImplementation <em>Implementation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Implementation</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.RegisterFile#getImplementation()
+	 * @see #getRegisterFile()
+	 * @generated
+	 */
+	EReference getRegisterFile_Implementation();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Port <em>Port</em>}'.
@@ -2083,6 +2180,38 @@ public interface ArchitecturePackage extends EPackage {
 	EReference getTermUnit_Port();
 
 	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.backends.tta.architecture.Implementation <em>Implementation</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Implementation</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Implementation
+	 * @generated
+	 */
+	EClass getImplementation();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Implementation#getHdbFile <em>Hdb File</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Hdb File</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Implementation#getHdbFile()
+	 * @see #getImplementation()
+	 * @generated
+	 */
+	EAttribute getImplementation_HdbFile();
+
+	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.backends.tta.architecture.Implementation#getId <em>Id</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Id</em>'.
+	 * @see net.sf.orcc.backends.tta.architecture.Implementation#getId()
+	 * @see #getImplementation()
+	 * @generated
+	 */
+	EAttribute getImplementation_Id();
+
+	/**
 	 * Returns the meta object for class '{@link java.util.Map.Entry <em>Port To Index Map Entry</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2388,6 +2517,14 @@ public interface ArchitecturePackage extends EPackage {
 		EReference TTA__DATA = eINSTANCE.getTTA_Data();
 
 		/**
+		 * The meta object literal for the '<em><b>Hardware Database</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TTA__HARDWARE_DATABASE = eINSTANCE.getTTA_HardwareDatabase();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.BusImpl <em>Bus</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2582,6 +2719,14 @@ public interface ArchitecturePackage extends EPackage {
 		EReference FUNCTION_UNIT__ADDRESS_SPACE = eINSTANCE.getFunctionUnit_AddressSpace();
 
 		/**
+		 * The meta object literal for the '<em><b>Implementation</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference FUNCTION_UNIT__IMPLEMENTATION = eINSTANCE.getFunctionUnit_Implementation();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.RegisterFileImpl <em>Register File</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -2638,6 +2783,14 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EReference REGISTER_FILE__PORTS = eINSTANCE.getRegisterFile_Ports();
+
+		/**
+		 * The meta object literal for the '<em><b>Implementation</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference REGISTER_FILE__IMPLEMENTATION = eINSTANCE.getRegisterFile_Implementation();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.PortImpl <em>Port</em>}' class.
@@ -2958,6 +3111,32 @@ public interface ArchitecturePackage extends EPackage {
 		 * @generated
 		 */
 		EReference TERM_UNIT__PORT = eINSTANCE.getTermUnit_Port();
+
+		/**
+		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.impl.ImplementationImpl <em>Implementation</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ImplementationImpl
+		 * @see net.sf.orcc.backends.tta.architecture.impl.ArchitecturePackageImpl#getImplementation()
+		 * @generated
+		 */
+		EClass IMPLEMENTATION = eINSTANCE.getImplementation();
+
+		/**
+		 * The meta object literal for the '<em><b>Hdb File</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute IMPLEMENTATION__HDB_FILE = eINSTANCE.getImplementation_HdbFile();
+
+		/**
+		 * The meta object literal for the '<em><b>Id</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute IMPLEMENTATION__ID = eINSTANCE.getImplementation_Id();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.backends.tta.architecture.Element <em>Element</em>}' class.

@@ -21,6 +21,8 @@
         containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="data" eType="#//AddressSpace"
         containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="hardwareDatabase" upperBound="-1"
+        eType="#//Implementation" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Bus">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -58,6 +60,7 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port" transient="true" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="addressSpace" eType="#//AddressSpace"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="implementation" eType="#//Implementation"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RegisterFile">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -67,6 +70,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="maxWrites" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="ports" upperBound="-1"
         eType="#//Port" transient="true" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="implementation" eType="#//Implementation"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Port">
     <eOperations name="connect">
@@ -158,6 +162,10 @@
   <eClassifiers xsi:type="ecore:EClass" name="TermUnit" eSuperTypes="#//Term">
     <eStructuralFeatures xsi:type="ecore:EReference" name="functionUnit" eType="#//FunctionUnit"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="port" eType="#//Port"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Implementation">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="hdbFile" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="SocketType">
     <eLiterals name="input"/>

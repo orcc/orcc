@@ -36,6 +36,7 @@ import net.sf.orcc.backends.tta.architecture.Bridge;
 import net.sf.orcc.backends.tta.architecture.Bus;
 import net.sf.orcc.backends.tta.architecture.FunctionUnit;
 import net.sf.orcc.backends.tta.architecture.GlobalControlUnit;
+import net.sf.orcc.backends.tta.architecture.Implementation;
 import net.sf.orcc.backends.tta.architecture.RegisterFile;
 import net.sf.orcc.backends.tta.architecture.Socket;
 import net.sf.orcc.backends.tta.architecture.TTA;
@@ -65,6 +66,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.TTAImpl#getRegisterFiles <em>Register Files</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.TTAImpl#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.TTAImpl#getData <em>Data</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.impl.TTAImpl#getHardwareDatabase <em>Hardware Database</em>}</li>
  * </ul>
  * </p>
  *
@@ -162,6 +164,16 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	 * @ordered
 	 */
 	protected AddressSpace data;
+
+	/**
+	 * The cached value of the '{@link #getHardwareDatabase() <em>Hardware Database</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getHardwareDatabase()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Implementation> hardwareDatabase;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
@@ -378,6 +390,18 @@ public class TTAImpl extends EObjectImpl implements TTA {
 	}
 
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Implementation> getHardwareDatabase() {
+		if (hardwareDatabase == null) {
+			hardwareDatabase = new EObjectContainmentEList<Implementation>(Implementation.class, this, ArchitecturePackage.TTA__HARDWARE_DATABASE);
+		}
+		return hardwareDatabase;
+	}
+
+	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
@@ -401,6 +425,8 @@ public class TTAImpl extends EObjectImpl implements TTA {
 				return basicSetProgram(null, msgs);
 			case ArchitecturePackage.TTA__DATA:
 				return basicSetData(null, msgs);
+			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+				return ((InternalEList<?>)getHardwareDatabase()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -430,6 +456,8 @@ public class TTAImpl extends EObjectImpl implements TTA {
 				return getProgram();
 			case ArchitecturePackage.TTA__DATA:
 				return getData();
+			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+				return getHardwareDatabase();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -474,6 +502,10 @@ public class TTAImpl extends EObjectImpl implements TTA {
 			case ArchitecturePackage.TTA__DATA:
 				setData((AddressSpace)newValue);
 				return;
+			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+				getHardwareDatabase().clear();
+				getHardwareDatabase().addAll((Collection<? extends Implementation>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -512,6 +544,9 @@ public class TTAImpl extends EObjectImpl implements TTA {
 			case ArchitecturePackage.TTA__DATA:
 				setData((AddressSpace)null);
 				return;
+			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+				getHardwareDatabase().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -541,6 +576,8 @@ public class TTAImpl extends EObjectImpl implements TTA {
 				return program != null;
 			case ArchitecturePackage.TTA__DATA:
 				return data != null;
+			case ArchitecturePackage.TTA__HARDWARE_DATABASE:
+				return hardwareDatabase != null && !hardwareDatabase.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

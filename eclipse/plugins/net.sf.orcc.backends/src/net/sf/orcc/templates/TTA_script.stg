@@ -116,30 +116,28 @@ def compile():
 	start = time.time()
 	
 	print '*********************************************************************'
-	print '** Compile <network.name> for TTA'
+	print '* Compile <network.name> for TTA'
 	print '*********************************************************************'
 
 	for instance in instances:
 		print '\>\> Instance ' + instance.name + '.'
 		instance.compile(scriptPath)
 
-	print '** Compilation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
-	print '*********************************************************************'
+	print '* Compilation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
 
 
 def simulate():
 	start = time.time()
 
 	print '*********************************************************************'
-	print '** Simulate the execution of <network.name> on TTA'
+	print '* Simulate the execution of <network.name> on TTA'
 	print '*********************************************************************'
 
 	for instance in instances:
 		print '\>\> Instance ' + instance.name + '.'
 		instance.simulate(scriptPath)
 
-	print '** Simulation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
-	print '*********************************************************************'
+	print '* Simulation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
 
 
 pathname = os.path.dirname(sys.argv[0])        

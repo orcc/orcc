@@ -49,6 +49,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getRegisterFiles <em>Register Files</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getProgram <em>Program</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getData <em>Data</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.TTA#getHardwareDatabase <em>Hardware Database</em>}</li>
  * </ul>
  * </p>
  *
@@ -240,5 +241,21 @@ public interface TTA extends EObject {
 	 * @generated
 	 */
 	void setData(AddressSpace value);
+
+	/**
+	 * Returns the value of the '<em><b>Hardware Database</b></em>' containment reference list.
+	 * The list contents are of type {@link net.sf.orcc.backends.tta.architecture.Implementation}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Hardware Database</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Hardware Database</em>' containment reference list.
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getTTA_HardwareDatabase()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Implementation> getHardwareDatabase();
 
 } // TTA

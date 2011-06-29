@@ -46,6 +46,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxReads <em>Max Reads</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getMaxWrites <em>Max Writes</em>}</li>
  *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getPorts <em>Ports</em>}</li>
+ *   <li>{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getImplementation <em>Implementation</em>}</li>
  * </ul>
  * </p>
  *
@@ -199,5 +200,31 @@ public interface RegisterFile extends EObject {
 	 * @generated
 	 */
 	EList<Port> getPorts();
+
+	/**
+	 * Returns the value of the '<em><b>Implementation</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Implementation</em>' reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Implementation</em>' reference.
+	 * @see #setImplementation(Implementation)
+	 * @see net.sf.orcc.backends.tta.architecture.ArchitecturePackage#getRegisterFile_Implementation()
+	 * @model
+	 * @generated
+	 */
+	Implementation getImplementation();
+
+	/**
+	 * Sets the value of the '{@link net.sf.orcc.backends.tta.architecture.RegisterFile#getImplementation <em>Implementation</em>}' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Implementation</em>' reference.
+	 * @see #getImplementation()
+	 * @generated
+	 */
+	void setImplementation(Implementation value);
 
 } // RegisterFile
