@@ -32,6 +32,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.ExprBinary;
 import net.sf.orcc.ir.ExprUnary;
 import net.sf.orcc.ir.util.ExpressionEvaluator;
+import net.sf.orcc.ir.util.ExpressionPrinter;
 
 /**
  * This class defines a partial expression evaluator.
@@ -52,7 +53,8 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 		// only throws an exception if we are in schedulable mode and the result
 		// is null
 		if (schedulableMode && result == null) {
-			throw new OrccRuntimeException("Runtime binary expression");
+			throw new OrccRuntimeException("Expression \""
+					+ new ExpressionPrinter().doSwitch(expr) + "\" is null");
 		}
 		return result;
 	}
@@ -63,7 +65,8 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 		Object result = interpretUnaryExpr(expr.getOp(), value);
 
 		if (schedulableMode && value == null) {
-			throw new OrccRuntimeException("Runtime unary expression");
+			throw new OrccRuntimeException("Expression \""
+					+ new ExpressionPrinter().doSwitch(expr) + "\" is null");
 		}
 		return result;
 	}
