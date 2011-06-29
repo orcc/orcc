@@ -65,7 +65,7 @@ initVariable(type, value) ::= <<
 >\<initValue typeName="List"\>
 	<value: {elt | <initVariable(type=type.type, value=elt)>}; separator="">\</initValue\>
 <else
->\<initValue size="<if (type.bool)>1<else><type.size><endif>" typeName="<type>" value="<value>"/\>
+>\<initValue size="<if (type.bool)>1<else><type.size><endif>" typeName="<type>" value="<if (type.bool)><if (value)>1<else>0<endif><else><value><endif>"/\>
 <endif>
 >>
 
