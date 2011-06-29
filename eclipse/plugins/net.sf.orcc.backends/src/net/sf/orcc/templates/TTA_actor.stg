@@ -336,6 +336,10 @@ entry:
 }
 >>
 
+callInitialize(initialize) ::= <<
+call <initialize.body.returnType> @<initialize.body.name> ()
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Broadcast
@@ -461,6 +465,7 @@ actor(actor) ::= <<
 
 define void @main() noreturn nounwind noinline {
 entry:
+	<actor.initializes: callInitialize(); separator="\n">
 
 	br label %bb_scheduler_start
 bb_scheduler_start:
