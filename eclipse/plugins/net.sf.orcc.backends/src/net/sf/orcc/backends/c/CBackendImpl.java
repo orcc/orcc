@@ -251,7 +251,9 @@ public class CBackendImpl extends AbstractBackend {
 		network.flatten();
 
 		if (classify) {
+			write("Starting classification of actors... ");
 			new NetworkClassifier().transform(network);
+			write("done\n");
 		}
 
 		if (codesign) {
