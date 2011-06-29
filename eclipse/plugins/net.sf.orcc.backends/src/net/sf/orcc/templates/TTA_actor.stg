@@ -227,8 +227,9 @@ actionTestState(sourceState, transition, restTransitionsList) ::= <<
 	br i1 %is_fireable_<sourceState.name>_<transition.action.name>, label %bb_<sourceState.name>_<transition.action.name>_check_outputs, label %bb_<sourceState.name>_<transition.action.name>_unschedulable<
 else
 >	;; Empty input pattern
+	%is_fireable_<sourceState.name>_<transition.action.name> = call i1 @<transition.action.scheduler.name> ()
 	
-	br label %bb_<sourceState.name>_<transition.action.name>_check_outputs<
+	br i1 %is_fireable_<sourceState.name>_<transition.action.name>, label %bb_<sourceState.name>_<transition.action.name>_check_outputs, label %bb_<sourceState.name>_<transition.action.name>_unschedulable<
 endif>
 
 
@@ -480,9 +481,6 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 
 instance(instance, options) ::= <<
-target datalayout = "E-p:32:32:32-i1:8:8-i8:8:32-i16:16:32-i32:32:32-i64:32:32-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-n32"
-target triple = "tce-tut-llvm"
-
 <if(instance.actor)
 ><actor(instance.actor)><
 elseif(instance.broadcast)
