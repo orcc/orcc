@@ -13,9 +13,9 @@ printf("<instance.Id>.<action.name>();\n");
 >>
 
 printActionState() ::= <<
-<if (actor.stateVars.list)>
+<if (actor.stateVars)>
 #ifdef PSTATE
-printf("<actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>=%d}; separator=";">\n\n", <actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>}; separator=",">);
+printf("<actor.stateVars : {var | <var.name><arrayDim(var.type.dimensions)>=%d}; separator=";">\n\n", <actor.stateVars : {var | <var.name><arrayDim(var.type.dimensions)>}; separator=",">);
 #endif
 <endif>
 >>
@@ -256,12 +256,12 @@ parameters(parameters) ::= <<
 
 newState() ::= << 
 ::	<instance.id>_state == state_<fsm_trans.SourceState.name> -\> {
-	<fsm_trans.list: { tr | <peekPattern(pattern=tr.action.peekPattern, action=tr.action)>}>
-	<actor.actionsOutsideFsm: { a | <peekPattern(pattern=a.peekPattern,action=a)>}>
 	if
 	<fsm_trans.list: {
 			tr|
+<peekPattern(pattern=tr.action.peekPattern, action=tr.action)>
 ::	<tr.action: schedulerFSM(); separator="\n"> }>
+	<actor.actionsOutsideFsm: { a | <peekPattern(pattern=a.peekPattern,action=a)>}>
 	<actor.actionsOutsideFsm: scheduler(); separator="\n">
 	fi;
 	}
@@ -285,6 +285,8 @@ schedulerFSM(action) ::= <<
 	
 	<instance.id>_state = state_<tr.state.name>;
 	
+	<options.loadPeeks.(action): {ld | <ld.target.variable.name>_done = 0; }>
+	
 	<printActionName()>
 	<printFSMState()>
 	<printActionState()>
@@ -293,9 +295,9 @@ schedulerFSM(action) ::= <<
 
 guardFSM() ::= <<
 <if (options.guards.(action))>
- <options.guards.(action); separator=" && "><options.priority.(tr): priorities()>
+ <options.guards.(action); separator=" && "><options.priority.(tr): priorities()><peekDone(action)>
 <else>
-skip <options.priority.(tr): priorities()>
+skip <options.priority.(tr): priorities()><peekDone(action)>
 <endif>
 >>
 
@@ -324,9 +326,9 @@ scheduler(action) ::= <<
 
 guard() ::= <<
 <if (options.guards.(action))>
- <options.guards.(action); separator=" && "><options.priority.(action): priorities()>
+ <options.guards.(action); separator=" && "><options.priority.(action): priorities()><peekDone(action)>
 <else>
-skip <options.priority.(action): priorities()>
+skip <options.priority.(action): priorities()><peekDone(action)>
 <endif>
 
 >>
@@ -336,7 +338,7 @@ skip <options.priority.(action): priorities()>
 ///////////////////////////////////////////////////////////////////////////////
 
 priorities(act) ::= <<  
-<if (options.guards.(act))> && !(<options.guards.(act); separator=" && ">)<endif>
+<if (options.guards.(act))> && !(<options.guards.(act); separator=" && ">) <peekDone(act)><endif>
 >> 
 
 inputPatternPort(variable) ::= <<
@@ -369,25 +371,39 @@ outputPattern(pattern) ::= <<
 <pattern.variables: outputPatternPort()>
 >>
 
-peekPatternVar() ::= <<
-<options.loadPeeks.(action): {ld | <ld.target.variable.type> <ld.target.variable.name>; }>
+peekDone(action) ::= <<
+<options.loadPeeks.(action): {ld |  && <ld.target.variable.name>_done == 1 }>
+>>
+
+peekPatternVar(action) ::= <<
+<options.loadPeeks.(action): {ld | <ld.target.variable.type> <ld.target.variable.name> = 0; }>
+<options.loadPeeks.(action): {ld | bool <ld.target.variable.name>_done = 0; }>
 
 >>
 
+peekPatternCheck(variable) ::= <<
+chan_<instance.id>_<pattern.varToPortMap.(variable).name>
+>>
+
+
 peekPatternPort(variable) ::= <<
 chan_<instance.id>_<pattern.varToPortMap.(variable).name>?\<<variable.name>[0]\>;
-
 >>
 
 peekPatternLoad(variable) ::= <<
 <options.loadPeeks.(action): printLoad()>
-
 >>
 
 peekPattern(pattern, action) ::= <<
-<peekPatternVar()>
-<pattern.variables: peekPatternPort()>
-<pattern.variables: peekPatternLoad()>
+<if (pattern.variables)>
+:: /*<action.name>_peek()*/ atomic { 
+	nempty(<pattern.variables: peekPatternCheck(); separator="&&">) <options.loadPeeks.(action): {ld |  && <ld.target.variable.name>_done == 0 }> -\>
+	<pattern.variables: peekPatternPort()>
+	<pattern.variables: peekPatternLoad()>
+	<options.loadPeeks.(action): {ld | <ld.target.variable.name>_done = 1; }>
+	
+}
+<endif>
 >>
 
 inputChannelCheck(pattern) ::= <<
@@ -412,6 +428,9 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 	<actor.fsm.states: {s | int state_<s.name> = <i0>;}; separator="\n">
 	<endif>
 
+	/*peek variables*/
+	<actor.actions: peekPatternVar()>
+
 	/* State variables */
 	<actor.stateVars : stateVar()>
 	<actor.stateVars : initializeStateVar()>
@@ -432,8 +451,8 @@ proctype <instance.id>(<actor.parameters.list: varDecl(); wrap, separator=", ">)
 	<else>
 	do
 	:: skip -\> 
-	  <actor.actionsOutsideFsm: { a | <peekPattern(pattern=a.peekPattern,action=a)>}>
 	  if
+	  <actor.actionsOutsideFsm: { a | <peekPattern(pattern=a.peekPattern,action=a)>}>
 	  <actor.actionsOutsideFsm: scheduler(); separator="\n">
 	  fi;
 	od;
