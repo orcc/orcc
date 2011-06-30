@@ -149,23 +149,22 @@ int rvc_decode(unsigned char* nal, int nal_length, char* outBuffer, int newBuffe
 	if(newBuffer){
 		bufferBusy = 0;
 	}
-
-	//Initialize the reading nal state
-	if(nalState == NAL_IS_READ){
-		if(safeguardFrameEmpty){
-			nalState = NAL_NOT_READ;
-		}else{
-			nalState = NAL_ALREADY_READ;
-		}
-	}
 	
 	//Prepare source and display
 	source_prepare(nal, nal_length);
 	displayYUV_prepare(outBuffer);
 
 	//Start decoder
-	if(nal_length){
-		decoder->getEE()->run();
+	decoder->getEE()->run();
+
+
+	//Reset reading nal state for the next use
+	if(nalState == NAL_IS_READ){
+		if(safeguardFrameEmpty){
+			nalState = NAL_NOT_READ;
+		}else{
+			nalState = NAL_ALREADY_READ;
+		}
 	}
 
 	//Return the number of generated frames

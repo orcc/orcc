@@ -57,11 +57,12 @@ extern int* stopVar;
 void source_init() {
 	startCodeSize = 0;
 	nbTokenSend = 0;
-	nalState = NAL_TODO_READ;
+	nalState = NAL_NOT_READ;
 }
 
 int source_sizeOfFile() { 
 	if(!data_length){
+		//Stop scheduler
 		*stopVar = 1;
 		return 0;
 	}else{
