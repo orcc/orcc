@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2011, IRISA
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+#   * Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#     this list of conditions and the following disclaimer in the documentation
+#     and/or other materials provided with the distribution.
+#   * Neither the name of IRISA nor the names of its
+#     contributors may be used to endorse or promote products derived from this
+#     software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+# WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+#
+# @author Herve Yviquel
+
+import sys
+import os
+import time
+import getopt
+
+def main():
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "hcsx:v", ["help", "verbose", "compile", "simulate"])
+	except getopt.GetoptError, err:
+		print str(err)
+		usage()
+		sys.exit(2)
+		
+	for o, a in opts:
+		if o in ("-v", "--verbose"):
+			verbose = True
+		elif o in ("-h", "--help"):
+			usage()
+			sys.exit()
+			
+	for o, a in opts:
+		if o in ("-c", "--compile"):
+			compile()
+			
+	for o, a in opts:
+		if o in ("-s", "--simulate"):
+			simulate()
+	
+	
+def usage():
+	print 'tcecc_<network.name>: [-h] [-v]'
+
+
+def compile():
+	start = time.time()
+	
+	print '*********************************************************************'
+	print '* Compile <network.name> for TTA'
+	print '*********************************************************************'
+
+	for instance in instances:
+		print '\>\> Instance ' + instance.name + '.'
+		instance.compile(scriptPath)
+
+	print '* Compilation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
+
+
+def simulate():
+	start = time.time()
+
+	print '*********************************************************************'
+	print '* Simulate the execution of <network.name> on TTA'
+	print '*********************************************************************'
+
+	for instance in instances:
+		print '\>\> Instance ' + instance.name + '.'
+		instance.simulate(scriptPath)
+
+	print '* Simulation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
+
+
+pathname = os.path.dirname(sys.argv[0])        
+scriptPath = os.path.abspath(pathname)
+verbose = False
+
+
+main()
