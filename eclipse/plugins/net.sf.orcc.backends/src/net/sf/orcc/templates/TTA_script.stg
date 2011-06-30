@@ -31,6 +31,8 @@ script(network, options) ::= <<
 # Generated from <network.name> using Open-RVC CAL Compiler
 #
 
+from orcc_ import *
+
 ## Ports initialization
 <network.instances: initPorts(); separator="\n">
 
