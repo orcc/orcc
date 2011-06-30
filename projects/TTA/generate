@@ -34,6 +34,7 @@ import sys
 import os
 import time
 import getopt
+from orcc_ import *
 
 def main():
 	try:
@@ -67,12 +68,12 @@ def compile():
 	start = time.time()
 	
 	print '*********************************************************************'
-	print '* Compile <network.name> for TTA'
+	print '* Compile the application for TTA'
 	print '*********************************************************************'
 
 	for instance in instances:
-		print '\>\> Instance ' + instance.name + '.'
-		instance.compile(scriptPath)
+		print '>> Instance ' + instance.name + '.'
+		instance.compile(srcPath)
 
 	print '* Compilation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
 
@@ -81,19 +82,29 @@ def simulate():
 	start = time.time()
 
 	print '*********************************************************************'
-	print '* Simulate the execution of <network.name> on TTA'
+	print '* Simulate the execution of the application on TTA'
 	print '*********************************************************************'
 
-	for instance in instances:
-		print '\>\> Instance ' + instance.name + '.'
-		instance.simulate(scriptPath)
+	for instance in app.instances:
+		print '>> Instance ' + instance.name + '.'
+		instance.simulate(srcPath)
 
 	print '* Simulation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
 
 
+# Get useful path
 pathname = os.path.dirname(sys.argv[0])        
 scriptPath = os.path.abspath(pathname)
-verbose = False
+srcPath = os.path.join(scriptPath, 'generated')
+buildPath = os.path.join(scriptPath, 'build-generated')
+libPath = os.path.join(scriptPath, 'orcc_')
+
+# Add orcc_ to python path
+sys.path.append(libPath)
+
+# Import list of instances
+import_string = "from generated.informations import instances"
+exec(import_string)
 
 
 main()

@@ -30,7 +30,6 @@ package net.sf.orcc.backends.tta;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +59,7 @@ import net.sf.orcc.ir.util.ActorVisitor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 
@@ -104,9 +104,9 @@ public class TTABackendImpl extends AbstractBackend {
 				new TtaTypeResizer(), new BoolToIntTransformation(),
 				new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
-				new TacTransformation(true), 
-				new InstPhiTransformation(), new GetElementPtrAdder(),
-				new CastAdder(true, false), new BlockCombine(), new BuildCFG() };
+				new TacTransformation(true), new InstPhiTransformation(),
+				new GetElementPtrAdder(), new CastAdder(true, false),
+				new BlockCombine(), new BuildCFG() };
 
 		for (ActorVisitor<?> transformation : transformations) {
 			transformation.doSwitch(actor);
@@ -143,7 +143,7 @@ public class TTABackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(new LLVMExpressionPrinter());
 		printer.setTypePrinter(new LLVMTypePrinter());
 
-		String instancePath = createFolder(path, instance.getId());
+		String instancePath = OrccUtil.createFolder(path, instance.getId());
 		printProcessor(instance, instancePath);
 		return printer.print(instance.getId() + ".ll", instancePath, instance,
 				"instance");
@@ -154,8 +154,8 @@ public class TTABackendImpl extends AbstractBackend {
 		NetworkPrinter scriptPrinter = new NetworkPrinter("TTA_script");
 		networkPrinter.print(network.getName() + ".vhd", path, network,
 				"network");
-		scriptPrinter.print("tcecc_" + network.getName(), path, network,
-				"script");
+		scriptPrinter.print("informations.py", path, network, "script");
+		OrccUtil.createFile(path, "__init__.py");
 	}
 
 	private void printProcessor(Instance instance, String instancePath) {
@@ -184,16 +184,6 @@ public class TTABackendImpl extends AbstractBackend {
 		iromPrinter.print("irom_" + instance.getId() + ".vhd", instancePath,
 				instance, "irom");
 
-	}
-
-	private String createFolder(String path, String folderName) {
-		// checks output folder exists, and if not creates it
-		String newPath = path + File.separator + folderName;
-		File folder = new File(newPath);
-		if (!folder.exists()) {
-			folder.mkdir();
-		}
-		return newPath;
 	}
 
 }

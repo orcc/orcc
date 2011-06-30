@@ -31,7 +31,7 @@
 
 
 import os
-import command
+import commands
 
 class Instance:
     name = ''

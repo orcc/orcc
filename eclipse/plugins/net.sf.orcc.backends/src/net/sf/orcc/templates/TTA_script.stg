@@ -26,7 +26,7 @@ Instance('<instance.id>', <instance.id>_inputs, <instance.id>_outputs)
 >>
 
 script(network, options) ::= <<
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Generated from <network.name> using Open-RVC CAL Compiler
 #

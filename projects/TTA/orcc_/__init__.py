@@ -37,6 +37,6 @@
 import instance
 import port
 
-Instance = instance.Port
+Instance = instance.Instance
 Port = port.Port
 
