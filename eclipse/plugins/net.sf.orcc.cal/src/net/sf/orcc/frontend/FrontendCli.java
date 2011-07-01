@@ -59,9 +59,6 @@ import org.eclipse.xtext.validation.CheckMode;
 import org.eclipse.xtext.validation.IResourceValidator;
 import org.eclipse.xtext.validation.Issue;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-
 /**
  * This class defines an RVC-CAL front-end.
  * 
@@ -72,15 +69,11 @@ public class FrontendCli implements IApplication {
 
 	private List<IFile> actors;
 
-	@Inject
-	private Frontend frontend;
-
 	private IFolder outputFolder;
 
 	private XtextResourceSet resourceSet;
 
 	public FrontendCli() {
-
 	}
 
 	private void getActors(IContainer container) throws CoreException {
@@ -132,6 +125,7 @@ public class FrontendCli implements IApplication {
 			if (!hasErrors) {
 				AstActor actor = entity.getActor();
 				if (actor != null) {
+					Frontend frontend = new Frontend();
 					frontend.compile(outputFolder, actorPath, actor);
 				}
 			}
@@ -160,9 +154,7 @@ public class FrontendCli implements IApplication {
 				.get(IApplicationContext.APPLICATION_ARGS);
 		if (args.length == 2) {
 			System.out.println("setup of CAL Xtext parser");
-			Injector injector = new CalStandaloneSetup()
-					.createInjectorAndDoEMFRegistration();
-			frontend = injector.getInstance(Frontend.class);
+			new CalStandaloneSetup().createInjectorAndDoEMFRegistration();
 			System.out.println("done");
 
 			setProject(args[0]);

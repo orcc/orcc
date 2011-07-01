@@ -39,7 +39,6 @@ import net.sf.orcc.OrccProjectNature;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
-import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.util.OrccUtil;
 
@@ -66,8 +65,6 @@ import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescription.Delta;
 
-import com.google.inject.Injector;
-
 /**
  * This class defines an actor builder invoked by Xtext. The class is referenced
  * by an extension point in the plugin.xml as an Xtext builder participant.
@@ -77,18 +74,10 @@ import com.google.inject.Injector;
  */
 public class ActorBuilder implements IXtextBuilderParticipant {
 
-	private Frontend frontend;
-
 	/**
 	 * Creates a new actor builder.
 	 */
 	public ActorBuilder() {
-		// since the actor builder is not created by Guice we have to manually
-		// retrieve the injector so we can inject the front-end (and its
-		// dependencies)
-		Injector injector = CalActivator.getInstance().getInjector(
-				"net.sf.orcc.cal.Cal");
-		frontend = injector.getInstance(Frontend.class);
 	}
 
 	@Override
@@ -183,6 +172,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			// and then we compile
 			AstActor actor = entity.getActor();
 			if (actor != null) {
+				Frontend frontend = new Frontend();
 				frontend.compile(outputFolder, file, actor);
 			}
 		} catch (IOException e) {

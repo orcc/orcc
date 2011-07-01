@@ -42,8 +42,6 @@ import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
-import com.google.inject.Inject;
-
 /**
  * This class defines an RVC-CAL front-end.
  * 
@@ -52,10 +50,10 @@ import com.google.inject.Inject;
  */
 public class Frontend {
 
-	@Inject
 	private ActorTransformer actorTransformer;
 
 	public Frontend() {
+		actorTransformer = new ActorTransformer();
 	}
 
 	/**

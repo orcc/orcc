@@ -84,8 +84,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
-import com.google.inject.Inject;
-
 /**
  * This class transforms an AST actor to its IR equivalent.
  * 
@@ -94,7 +92,6 @@ import com.google.inject.Inject;
  */
 public class ActorTransformer {
 
-	@Inject
 	private AstTransformer astTransformer;
 
 	/**
@@ -112,6 +109,7 @@ public class ActorTransformer {
 	 */
 	public ActorTransformer() {
 		mapPorts = new HashMap<AstPort, Port>();
+		astTransformer = new AstTransformer();
 	}
 
 	/**
