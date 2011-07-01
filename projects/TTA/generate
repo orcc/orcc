@@ -38,7 +38,7 @@ from orcc_ import *
 
 def main():
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hcsx:v", ["help", "verbose", "compile", "simulate"])
+		opts, args = getopt.getopt(sys.argv[1:], "hcsgx:v", ["help", "verbose", "compile", "simulate", "generate"])
 	except getopt.GetoptError, err:
 		print str(err)
 		usage()
@@ -57,11 +57,19 @@ def main():
 			
 	for o, a in opts:
 		if o in ("-s", "--simulate"):
-			simulate()
+			# simulate()
+			print "Simulation is currently break."
+	
+	for o, a in opts:
+		if o in ("-g", "--generate"):
+			generate()
 	
 	
 def usage():
-	print 'tcecc_<network.name>: [-h] [-v]'
+	print 'Usage: generate [options]'
+	print ''
+	print 'Options:'
+	
 
 
 def compile():
@@ -82,14 +90,28 @@ def simulate():
 	start = time.time()
 
 	print '*********************************************************************'
-	print '* Simulate the execution of the application on TTA'
+	print '* Simulate the execution of the application on  each TTA'
 	print '*********************************************************************'
 
-	for instance in app.instances:
+	for instance in instances:
 		print '>> Instance ' + instance.name + '.'
 		instance.simulate(srcPath)
 
 	print '* Simulation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
+	
+
+def generate():
+	start = time.time()
+	
+	print '*********************************************************************'
+	print '* Generate the TTA processors'
+	print '*********************************************************************'
+
+	for instance in instances:
+		print '>> Instance ' + instance.name + '.'
+		instance.generate(srcPath, buildPath, libPath)
+
+	print '* Generation of %d instances done in %f seconds.' % (len(instances), time.time() - start)
 
 
 # Get useful path
@@ -97,14 +119,14 @@ pathname = os.path.dirname(sys.argv[0])
 scriptPath = os.path.abspath(pathname)
 srcPath = os.path.join(scriptPath, 'generated')
 buildPath = os.path.join(scriptPath, 'build-generated')
-libPath = os.path.join(scriptPath, 'orcc_')
+pylibPath = os.path.join(scriptPath, 'orcc_')
+libPath = os.path.join(os.path.dirname(os.path.dirname(scriptPath)), "libraries", "TTA")
 
 # Add orcc_ to python path
-sys.path.append(libPath)
+sys.path.append(pylibPath)
 
 # Import list of instances
 import_string = "from generated.informations import instances"
 exec(import_string)
-
 
 main()

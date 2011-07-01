@@ -2,10 +2,10 @@
 #
 # Copyright (c) 2011, IRISA
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #   * Redistributions of source code must retain the above copyright notice,
 #     this list of conditions and the following disclaimer.
 #   * Redistributions in binary form must reproduce the above copyright notice,
@@ -14,7 +14,7 @@
 #   * Neither the name of IRISA nor the names of its
 #     contributors may be used to endorse or promote products derived from this
 #     software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,46 +32,73 @@
 
 import os
 import commands
+import subprocess
 
 class Instance:
     name = ''
+    # Ports
     inputs = []
     outputs = []
-    
+    # Useful filenames
+    _adfFile = ''
+    _idfFile = ''
+    _llFile = ''
+    _tpefFile = ''
+    _asmFile = ''
+    _bemFile = ''
+    # Useful names
+    _entity = ''
+
     def __init__(self, name, inputs, outputs):
         self.name = name
         self.inputs = inputs
         self.outputs = outputs
-    
-    def compile(self, scriptPath):
-        instancePath = os.path.join(scriptPath, self.name)
-        os.chdir(instancePath)
-        
-        adfFile = 'processor_' + self.name + '.adf'
-        llFile = self.name + '.ll'
-        tpefFile = self.name + '.tpef'
+        self._adfFile = 'processor_' + self.name + '.adf'
+        self._idfFile = 'processor_' + self.name + '.idf'
+        self._llFile = self.name + '.ll'
+        self._tpefFile = self.name + '.tpef'
+        self._asmFile = self.name + '.tceasm'
+        self._bemFile = self.name + '.bem'
+        self._entity = 'processor_' + self.name + '_tl'
 
-        status,output = commands.getstatusoutput('tcecc -o ' + tpefFile + ' -a ' + adfFile + ' ' + llFile)
+
+    def compile(self, srcPath):
+        instancePath = os.path.join(srcPath, self.name)
+        os.chdir(instancePath)
+
+        status,output = commands.getstatusoutput('tcecc -o ' + self._tpefFile + ' -a ' + self._adfFile + ' ' + self._llFile)
         if status != 0:
             print '** ERROR **'
             print output
         else:
-            asmFile = instancePath + os.sep + self.name + '.tceasm'
-            commands.getstatusoutput('tcedisasm -n -o ' + asmFile + ' ' + adfFile + ' ' + tpefFile) 
-            
-    def simulate(self, scriptPath): 
-        instancePath = os.path.join(scriptPath, self.name)
+            commands.getstatusoutput('tcedisasm -n -o ' + self._asmFile + ' ' + self._adfFile + ' ' + self._tpefFile)
+
+    def generate(self, srcPath, buildPath, libPath):
+		srcPath = os.path.join(srcPath, self.name)
+		sharePath = os.path.join(buildPath, "share")
+		buildPath = os.path.join(buildPath, self.name)
+		os.chdir(srcPath)
+		retcode = subprocess.call(["createbem", "-o", self._bemFile, self._adfFile])
+		retcode = subprocess.call(["cp", "-f", os.path.join(libPath, "fifo", "many_streams.hdb"), srcPath])
+		retcode = subprocess.call(["cp", "-Rf", os.path.join(libPath, "fifo", "vhdl"), srcPath])
+		retcode = subprocess.call(["rm", "-rf", buildPath])
+		retcode = subprocess.call(["generateprocessor", "-o", buildPath, "-b", self._bemFile, "--shared-files-dir", sharePath, 
+		"-l", "vhdl", "-e", self._entity, "-i", self._idfFile, self._adfFile])
+		retcode = subprocess.call(["rm", "-f", "many_streams.hdb"])
+		retcode = subprocess.call(["rm", "-rf", os.path.join(srcPath, "vhdl")])
+
+    def simulate(self, srcPath):
+        instancePath = os.path.join(srcPath, self.name)
         os.chdir(instancePath)
-        
+
         # Copy trace to the instance folder
         for input in self.inputs:
-            srcTrace = scriptPath + os.sep + 'trace' + os.sep + 'decoder_' + self.name + '_' + input.name + '.txt'
+            srcTrace = srcPath + os.sep + 'trace' + os.sep + 'decoder_' + self.name + '_' + input.name + '.txt'
             tgtTrace = instancePath + os.sep + 'tta_stream_v%d.in' % (input.index)
             status,output = commands.getstatusoutput('cp ' + srcTrace + ' ' + tgtTrace)
             if status != 0:
                 print output
+
+        status,output = commands.getstatusoutput('ttasim --no-debugmode -q -a ' + self._adfFile + ' -p ' + self._tpefFile)
         
-        adfFile = 'processor_' + self.name + '.adf'
-        tpefFile = self.name + '.tpef'
-        status,output = commands.getstatusoutput('ttasim --no-debugmode -q -a ' + adfFile + ' -p ' + tpefFile)
 
