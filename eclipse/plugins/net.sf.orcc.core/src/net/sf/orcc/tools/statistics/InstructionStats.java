@@ -153,7 +153,7 @@ public class InstructionStats {
 	}
 
 	private InstructionStatsBuilder instrStatsBuilder;
-	private Map<Actor, InstructionStatsElement> instructionStatsMap;
+	private Map<Actor, InstructionStatsElement> instructionStatsMap = new HashMap<Actor, InstructionStatsElement>();
 
 	public InstructionStats() {
 		instrStatsBuilder = new InstructionStatsBuilder();
