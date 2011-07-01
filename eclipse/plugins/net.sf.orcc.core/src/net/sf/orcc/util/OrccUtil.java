@@ -318,24 +318,24 @@ public class OrccUtil {
 			return vtlFolders;
 		}
 
+		// add output folders of this project
+		IFolder outputFolder = getOutputFolder(project);
+		if (outputFolder != null) {
+			vtlFolders.add(outputFolder);
+		}
+
 		// add output folders of required projects
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		try {
 			for (String name : javaProject.getRequiredProjectNames()) {
 				IProject refProject = root.getProject(name);
-				IFolder outputFolder = getOutputFolder(refProject);
+				outputFolder = getOutputFolder(refProject);
 				if (outputFolder != null) {
 					vtlFolders.add(outputFolder);
 				}
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
-		}
-
-		// add output folders of this project
-		IFolder outputFolder = getOutputFolder(project);
-		if (outputFolder != null) {
-			vtlFolders.add(outputFolder);
 		}
 
 		return vtlFolders;
