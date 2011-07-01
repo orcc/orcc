@@ -230,6 +230,51 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		return addressSpace;
 	}
 
+	@Override
+	public FunctionUnit createAluUnit(TTA tta) {
+		FunctionUnitImpl functionUnit = new FunctionUnitImpl();
+		functionUnit.setName("ALU");
+		// Sockets
+		EList<Segment> segments = getAllSegments(tta.getBuses());
+		Socket i1 = createInputSocket("ALU_i1", segments);
+		Socket i2 = createInputSocket("ALU_i2", segments);
+		Socket o1 = createOutputSocket("ALU_o1", segments);
+		// Port
+		Port in1t = createPort("in1t", 32, true, true);
+		Port in2 = createPort("in2", 32, false, false);
+		Port out1 = createPort("out1", 32, false, false);
+		in1t.connect(i1);
+		in2.connect(i2);
+		out1.connect(o1);
+		functionUnit.getPorts().add(in1t);
+		functionUnit.getPorts().add(in2);
+		functionUnit.getPorts().add(out1);
+		// Implementation
+		Implementation aluImpl = createImplementation("asic_130nm_1.5V.hdb",
+				375);
+		functionUnit.setImplementation(aluImpl);
+		tta.getHardwareDatabase().add(aluImpl);
+
+		// Operations (Shift operations use inverse binding)
+		String[] oneInputOps = { "sxqw", "sxhw" };
+		String[] twoInputOps = { "add", "and", "eq", "gt", "gtu", "ior", "sub",
+				"xor" };
+		String[] shiftOps = { "shl", "shr", "shru" };
+		for (String operation : oneInputOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in1t, out1));
+		}
+		for (String operation : twoInputOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in1t, in2, out1));
+		}
+		for (String operation : shiftOps) {
+			functionUnit.getOperations().add(
+					createOperationDefault(operation, in2, in1t, out1));
+		}
+		return functionUnit;
+	}
+
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
@@ -860,8 +905,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				createOperationInStatus("stream_in_status_v" + index, in1t,
 						out1));
 		// Implementation
-		Implementation streamImpl = createImplementation(
-				"../fifo_fu/many_streams.hdb", 21 + index);
+		Implementation streamImpl = createImplementation("many_streams.hdb", 22);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;
@@ -890,8 +934,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 				createOperationOutStatus("stream_out_status_v" + index, in1t,
 						out1));
 		// Implementation
-		Implementation streamImpl = createImplementation(
-				"../fifo_fu/many_streams.hdb", 4 + index);
+		Implementation streamImpl = createImplementation("many_streams.hdb", 5);
 		functionUnit.setImplementation(streamImpl);
 		tta.getHardwareDatabase().add(streamImpl);
 		return functionUnit;
@@ -979,14 +1022,7 @@ public class ArchitectureFactoryImpl extends EFactoryImpl implements
 		// Functional units
 		EList<FunctionUnit> units = tta.getFunctionUnits();
 		// * ALU
-		String[] aluOperations1 = { "sxqw", "sxhw" };
-		String[] aluOperations2 = { "add", "and", "eq", "gt", "gtu", "ior",
-				"shl", "shr", "shru", "sub", "xor" };
-		Implementation aluImpl = createImplementation("asic_130nm_1.5V.hdb",
-				375);
-		units.add(createFunctionUnit(tta, "ALU", aluOperations1,
-				aluOperations2, aluImpl));
-		tta.getHardwareDatabase().add(aluImpl);
+		units.add(createAluUnit(tta));
 		// * LSU
 		Implementation lsuImpl = createImplementation("stratixII.hdb", 2);
 		units.add(createLSU(tta, lsuImpl));

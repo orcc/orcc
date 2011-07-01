@@ -80,6 +80,15 @@ public interface ArchitectureFactory extends EFactory {
 			int maxAddress);
 
 	/**
+	 * Returns a new ALU unit
+	 * 
+	 * @param tta
+	 *            the containing TTA
+	 * @return a new ALU unit
+	 */
+	FunctionUnit createAluUnit(TTA tta);
+
+	/**
 	 * Returns a new object of class '<em>Bridge</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
