@@ -55,11 +55,6 @@ public class Frontend {
 	@Inject
 	private ActorTransformer actorTransformer;
 
-	/**
-	 * output folder
-	 */
-	private IFolder outputFolder;
-
 	public Frontend() {
 	}
 
@@ -77,7 +72,8 @@ public class Frontend {
 	 *            AST of the actor
 	 * @throws OrccException
 	 */
-	public void compile(IFile file, AstActor astActor) throws OrccException {
+	public void compile(IFolder outputFolder, IFile file, AstActor astActor)
+			throws OrccException {
 		try {
 			Actor actor = actorTransformer.transform(file, astActor);
 			removeDanglingUses(actor);
@@ -120,17 +116,6 @@ public class Frontend {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Sets the output folder to the given absolute path. The method will create
-	 * the folder if it does not exist.
-	 * 
-	 * @param outputFolder
-	 *            absolute path of an output folder
-	 */
-	public void setOutputFolder(IFolder outputFolder) {
-		this.outputFolder = outputFolder;
 	}
 
 }

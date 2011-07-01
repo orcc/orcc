@@ -75,6 +75,8 @@ public class FrontendCli implements IApplication {
 	@Inject
 	private Frontend frontend;
 
+	private IFolder outputFolder;
+
 	private XtextResourceSet resourceSet;
 
 	public FrontendCli() {
@@ -130,7 +132,7 @@ public class FrontendCli implements IApplication {
 			if (!hasErrors) {
 				AstActor actor = entity.getActor();
 				if (actor != null) {
-					frontend.compile(actorPath, actor);
+					frontend.compile(outputFolder, actorPath, actor);
 				}
 			}
 		} catch (OrccException e) {
@@ -148,15 +150,7 @@ public class FrontendCli implements IApplication {
 			e.printStackTrace();
 		}
 
-		IFolder folder = OrccUtil.getOutputFolder(project);
-		frontend.setOutputFolder(folder);
-		if (!folder.exists()) {
-			try {
-				folder.create(false, false, null);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
+		outputFolder = OrccUtil.getOutputFolder(project);
 	}
 
 	@Override

@@ -113,9 +113,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			outputFolder.delete(true, null);
 		}
 
-		// set output folder
-		frontend.setOutputFolder(outputFolder);
-
 		ResourceSet set = context.getResourceSet();
 		monitor.beginTask("Building actors", context.getDeltas().size());
 		for (Delta delta : context.getDeltas()) {
@@ -136,7 +133,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 					if (obj.eClass()
 							.equals(CalPackage.eINSTANCE.getAstEntity())) {
 						AstEntity entity = (AstEntity) obj;
-						build(resource, entity);
+						build(outputFolder, resource, entity);
 					}
 				}
 			}
@@ -160,7 +157,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 * @throws CoreException
 	 *             if something goes wrong
 	 */
-	private void build(Resource resource, AstEntity entity)
+	private void build(IFolder outputFolder, Resource resource, AstEntity entity)
 			throws CoreException {
 		try {
 			URL resourceUrl = new URL(resource.getURI().toString());
@@ -186,7 +183,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			// and then we compile
 			AstActor actor = entity.getActor();
 			if (actor != null) {
-				frontend.compile(file, actor);
+				frontend.compile(outputFolder, file, actor);
 			}
 		} catch (IOException e) {
 			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",
