@@ -49,6 +49,8 @@ class Instance:
     _bemFile = ""
     _mifFile = ""
     _mifDataFile = ""
+    _romFile = ""
+    _ramFile = ""
     # Useful names
     _entity = ""
 
@@ -65,6 +67,8 @@ class Instance:
         self._mifFile = self.name + ".mif"
         self._mifDataFile = self.name + "_data" + ".mif"
         self._entity = "processor_" + self.name + "_tl"
+        self._romFile = "irom_" + self.name + ".vhd"
+        self._ramFile = "dram_" + self.name + ".vhd"
 
     def compile(self, srcPath):
         instancePath = os.path.join(srcPath, self.name)
@@ -91,6 +95,10 @@ class Instance:
         # Copy memories to build directory
         shutil.copy(self._mifFile, buildPath)
         shutil.copy(self._mifDataFile, buildPath)
+        shutil.copy("imem_mau_pkg.vhdl", buildPath)
+        shutil.copy(self._romFile, buildPath)
+        shutil.copy(self._ramFile, buildPath)
+        
         # Clean working directory
         os.remove("many_streams.hdb")
         shutil.rmtree("vhdl", ignore_errors=True)
